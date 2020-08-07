@@ -72,12 +72,66 @@
           :label="
             $str('activity_general_anonymous_responses_label', 'mod_perform')
           "
+          :helpmsg="
+            $str(
+              'activity_general_anonymous_responses_label_help',
+              'mod_perform'
+            )
+          "
         >
-          <span v-if="isActive">{{
-            activeToggleText(value.anonymous_responses)
-          }}</span>
-          <ToggleSwitch v-else v-model="form.anonymousResponse" toggle-first />
+          <div>
+            <span v-if="isActive">{{
+              activeToggleText(value.anonymous_responses)
+            }}</span>
+            <ToggleSwitch
+              v-else
+              v-model="form.anonymousResponse"
+              toggle-first
+              @input="anonymityValueChanged"
+            />
+          </div>
         </FormRow>
+
+        <FormRow
+          v-slot="{ labelId }"
+          :label="$str('visibility_condition_label', 'mod_perform')"
+          :helpmsg="$str('visibility_condition_label_help', 'mod_perform')"
+        >
+          <div>
+            <RadioGroup
+              v-if="!isAnonymousResponse"
+              v-model="form.visibilityConditionValue"
+              :aria-labelledby="labelId"
+            >
+              <Radio
+                v-for="item in visibilityConditionOptions"
+                :key="item.value"
+                :value="item.value"
+              >
+                {{ item.name }}
+              </Radio>
+            </RadioGroup>
+            <span v-else>{{
+              $str(
+                'visibility_condition_all_participants_closed',
+                'mod_perform'
+              )
+            }}</span>
+          </div>
+        </FormRow>
+
+        <FormRow v-if="showWarning">
+          <div class="tui-performManageActivityGeneralInfo__warning">
+            <NotificationBanner
+              type="warning"
+              :message="
+                $str(
+                  'visibility_condition_status_mismatch_warning',
+                  'mod_perform'
+                )
+              "
+            /></div
+        ></FormRow>
       </template>
 
       <div class="tui-performManageActivityManualRelationships">
@@ -143,14 +197,18 @@ import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
 import InputText from 'tui/components/form/InputText';
+import NotificationBanner from 'tui/components/notifications/NotificationBanner';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
 import Select from 'tui/components/form/Select';
 import Textarea from 'tui/components/form/Textarea';
 import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 import {
-  ACTIVITY_STATUS_ACTIVE,
   ACTIVITY_NAME_MAX_LENGTH,
+  ACTIVITY_STATUS_ACTIVE,
+  VISIBILITY_CONDITION_NONE,
+  VISIBILITY_CONDITION_ALL_PARTICIPANT_CLOSED,
 } from 'mod_perform/constants';
-
 //GraphQL
 import activityTypesQuery from 'mod_perform/graphql/activity_types';
 import manualRelationshipOptionsQuery from 'mod_perform/graphql/manual_relationship_selector_options';
@@ -163,6 +221,9 @@ export default {
     Form,
     FormRow,
     InputText,
+    NotificationBanner,
+    Radio,
+    RadioGroup,
     Select,
     Textarea,
     ToggleSwitch,
@@ -193,6 +254,8 @@ export default {
         type_id: this.value.type.id,
         manualRelationshipSelections: this.getManualRelationshipSelections(),
         anonymousResponse: this.value && this.value.anonymous_responses,
+        visibilityConditionValue: this.value.settings.visibility_condition
+          .value,
       },
       activityTypes: [
         {
@@ -246,6 +309,35 @@ export default {
             };
           })
         : [];
+    },
+
+    /**
+     * Is anonymous response setting enabled
+     */
+    isAnonymousResponse() {
+      if (this.isActive) {
+        return this.value.anonymous_responses;
+      } else {
+        return this.form.anonymousResponse;
+      }
+    },
+
+    /**
+     * Check if should show warning message for visibility condition
+     */
+    showWarning() {
+      return (
+        this.value.settings.visibility_condition.value !== null &&
+        this.value.settings.visibility_condition.value !==
+          VISIBILITY_CONDITION_NONE &&
+        !this.value.settings.close_on_completion
+      );
+    },
+
+    visibilityConditionOptions() {
+      return this.value.visibility_condition_options
+        .slice()
+        .sort((a, b) => a.value - b.value);
     },
   },
 
@@ -361,10 +453,17 @@ export default {
         }
       }
 
+      if (
+        this.value.settings.visibility_condition.value !=
+        this.form.visibilityConditionValue
+      ) {
+        variables.visibility_condition = this.form.visibilityConditionValue;
+      }
+
       const { data: resultData } = await this.$apollo.mutate({
         mutation,
         variables,
-        refetchAll: false,
+        refetchAll: true,
       });
 
       return resultData.mod_perform_update_activity.activity;
@@ -462,6 +561,15 @@ export default {
         ] = relationship.selector_relationship.id;
       });
     },
+
+    /**
+     * Set visibility condition edit/read-only mode base on the setting of anonymise responses
+     */
+    anonymityValueChanged() {
+      if (this.form.anonymousResponse) {
+        this.form.visibilityConditionValue = VISIBILITY_CONDITION_ALL_PARTICIPANT_CLOSED;
+      }
+    },
   },
 };
 </script>
@@ -472,6 +580,7 @@ export default {
       "activity_general_tab_heading",
       "activity_general_response_attribution_heading",
       "activity_general_anonymous_responses_label",
+      "activity_general_anonymous_responses_label_help",
       "boolean_setting_text_enabled",
       "boolean_setting_text_disabled",
       "general_info_label_activity_description",
@@ -480,7 +589,11 @@ export default {
       "general_info_participant_selection_description",
       "general_info_participant_selection_heading",
       "save_changes",
-      "unsaved_changes_warning"
+      "unsaved_changes_warning",
+      "visibility_condition_all_participants_closed",
+      "visibility_condition_label",
+      "visibility_condition_label_help",
+      "visibility_condition_status_mismatch_warning"
     ],
     "moodle": [
       "cancel"

@@ -13,6 +13,15 @@ Represents the activity settings.
 type mod_perform_activity_settings {
   close_on_completion: Boolean!
   multisection: Boolean!
+  visibility_condition: Int!
+}
+
+"""
+Represents the response visibility condition option
+"""
+type mod_perform_visibility_condition_option {
+  name: String!
+  value: Int!
 }
 
 """
@@ -32,6 +41,7 @@ type mod_perform_activity {
   sections: [mod_perform_section!]!
   state_details: mod_perform_activity_state!
   settings: mod_perform_activity_settings!
+  visibility_condition_options: [mod_perform_visibility_condition_option!]
   anonymous_responses: Boolean! # If true all responses will be anonymized
   manual_relationships: [mod_perform_manual_relationship!]!
 }
@@ -348,6 +358,7 @@ extend type Mutation {
     description: param_text
     type_id: core_id
     anonymous_responses: param_boolean
+    visibility_condition: param_integer
     relationships: [mod_perform_activity_manual_relationship_selection_input!]
   ): mod_perform_activity_result!
 

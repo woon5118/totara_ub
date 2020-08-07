@@ -124,10 +124,20 @@ export default {
           refetchAll: false,
         });
 
-        this.$emit(
-          'change',
-          result.mod_perform_toggle_activity_multisection_setting
+        const newMultiSection = Object.assign({}, this.activity.settings, {
+          multisection:
+            result.mod_perform_toggle_activity_multisection_setting.settings
+              .multisection,
+        });
+        const newSetting = Object.assign(
+          {},
+          result.mod_perform_toggle_activity_multisection_setting,
+          {
+            settings: newMultiSection,
+          }
         );
+
+        this.$emit('change', newSetting);
 
         notify({
           duration: NOTIFICATION_DURATION,

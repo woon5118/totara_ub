@@ -22,9 +22,12 @@
  * @category test
  */
 
+use mod_perform\entities\activity\activity_setting as activity_setting_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
-use mod_perform\entities\activity\activity_setting as activity_setting_entity;
+use mod_perform\models\activity\settings\visibility_conditions\all_responses;
+use mod_perform\models\activity\settings\visibility_conditions\own_response;
+use mod_perform\state\activity\draft;
 
 /**
  * @coversDefaultClass activity_setting.
@@ -64,6 +67,81 @@ class mod_perform_activity_setting_model_testcase extends advanced_testcase {
             ->where('activity_id', $activity->id)
             ->count();
         $this->assertEquals(0, $db_count, 'wrong db settings count');
+    }
+
+    /**
+     * @covers ::load_by_name
+     */
+    public function test_load_by_name() {
+        $activity = $this->create_test_data();
+        $name = activity_setting::VISIBILITY_CONDITION;
+        $value = 1;
+        activity_setting::create($activity, $name, $value);
+
+        $setting = activity_setting::load_by_name($activity->get_id(), activity_setting::VISIBILITY_CONDITION);
+        $this->assertGreaterThan(0, $setting->id, 'wrong id');
+        $this->assertEquals($name, $setting->name, 'wrong name');
+        $this->assertEquals($value, $setting->value, 'wrong value');
+    }
+
+    /**
+     * @covers ::load_by_name_or_create
+     */
+    public function test_load_by_name_or_create() {
+        $activity = $this->create_test_data();
+        $this->assertEquals(0, $activity->settings->get()->count());
+
+        $setting = activity_setting::load_by_name_or_create($activity->get_id(), activity_setting::VISIBILITY_CONDITION);
+        $this->assertEquals(1, $activity->settings->get()->count());
+
+        $this->assertGreaterThan(0, $setting->id, 'wrong id');
+        $this->assertEquals(activity_setting::VISIBILITY_CONDITION, $setting->name, 'wrong name');
+        $this->assertEquals('', $setting->value);
+    }
+
+    /**
+     * @covers ::validate
+     */
+    public function test_visibility_condition_update_invalid_activity_status() {
+        $this->setAdminUser();
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container(["anonymous_responses" => true]);
+        $activity->refresh();
+
+        $this->expectExceptionMessage(
+            "Can not update visibility condition for activated activity when anonymity is enabled."
+        );
+        activity_setting::validate($activity, activity_setting::VISIBILITY_CONDITION, all_responses::VALUE);
+    }
+
+    /**
+     * Test visibility condition value must be all responses closed when anonymity is enabled
+     * @covers ::validate
+     */
+    public function test_incorrect_visibility_condition_should_throw_exception() {
+        $this->setAdminUser();
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container(["anonymous_responses" => true, 'activity_status'=> draft::get_code()]);
+        $activity->refresh();
+
+        $this->expectExceptionMessage(
+            "Anonymous activities have to be set to show responses after all participants completed their instances."
+        );
+        activity_setting::validate($activity, activity_setting::VISIBILITY_CONDITION, own_response::VALUE);
+    }
+
+    /**
+     * @covers ::validate
+     */
+    public function test_visibility_condition_update_invalid_value() {
+        $this->setAdminUser();
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container();
+
+        $this->expectExceptionMessage(
+            "invalid visibility condition value: 5"
+        );
+        activity_setting::validate($activity, activity_setting::VISIBILITY_CONDITION, 5);
     }
 
     /**

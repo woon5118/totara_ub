@@ -25,6 +25,9 @@
       margin-top: var(--tui-gap-12);
     }
   }
+  &__warning {
+    max-width: 712px;
+  }
 }
 
 .tui-performManageActivityManualRelationships {

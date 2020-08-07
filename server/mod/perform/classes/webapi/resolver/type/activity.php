@@ -29,6 +29,7 @@ use core\webapi\type_resolver;
 use mod_perform\formatter\activity\activity as activity_formatter;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\activity_setting;
+use mod_perform\models\activity\settings\visibility_conditions\none;
 
 /**
  * Note: It is the responsibility of the query to ensure the user is permitted to see an activity.
@@ -59,7 +60,8 @@ class activity implements type_resolver {
 
             return [
                 'close_on_completion' => (bool)$settings->lookup(activity_setting::CLOSE_ON_COMPLETION),
-                'multisection' => $activity->multisection_setting
+                'multisection' => $activity->multisection_setting,
+                'visibility_condition' => (int)$settings->lookup(activity_setting::VISIBILITY_CONDITION, none::VALUE)
             ];
         }
 

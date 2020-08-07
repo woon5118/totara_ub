@@ -47,6 +47,18 @@
           </FormRowDetails>
         </div>
       </FormRow>
+
+      <FormRow>
+        <div class="tui-performActivityWorkflowSettings__warning">
+          <NotificationBanner
+            v-if="showWarning"
+            type="warning"
+            :message="
+              $str('automatic_closure_status_mismatch_warning', 'mod_perform')
+            "
+          />
+        </div>
+      </FormRow>
     </Form>
 
     <ConfirmationModal
@@ -75,13 +87,14 @@ import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
+import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
-
 // Util
 import { notify } from 'tui/notifications';
 import {
   ACTIVITY_STATUS_DRAFT,
   NOTIFICATION_DURATION,
+  VISIBILITY_CONDITION_NONE,
 } from 'mod_perform/constants';
 // Queries
 import toggleActivityCloseOnCompletion from 'mod_perform/graphql/toggle_activity_close_on_completion_setting';
@@ -92,6 +105,7 @@ export default {
     Form,
     FormRow,
     FormRowDetails,
+    NotificationBanner,
     ToggleSwitch,
   },
 
@@ -113,6 +127,14 @@ export default {
   computed: {
     isDraft() {
       return this.activity.state_details.name === ACTIVITY_STATUS_DRAFT;
+    },
+    showWarning() {
+      return (
+        this.activity.settings.visibility_condition != null &&
+        this.activity.settings.visibility_condition.value !==
+          VISIBILITY_CONDITION_NONE &&
+        !this.value
+      );
     },
   },
 
@@ -165,6 +187,14 @@ export default {
             type: 'success',
           });
           this.isSaving = false;
+
+          const newSettings = Object.assign({}, this.activity.settings, {
+            close_on_completion: this.value,
+          });
+          const newActivity = Object.assign({}, this.activity, {
+            settings: newSettings,
+          });
+          this.$emit('change', newActivity);
         })
         .catch(() => {
           this.value = this.activity.settings.close_on_completion;
@@ -183,6 +213,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "automatic_closure_status_mismatch_warning",
       "modal_confirm",
       "workflow_automatic_closure_confirmation_title",
       "workflow_automatic_closure_disabled_confirmation_text",

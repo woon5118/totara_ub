@@ -23,11 +23,13 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
+use core\orm\query\builder;
 use core\webapi\execution_context;
-use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
+use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\settings\visibility_conditions\all_responses;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 
@@ -41,16 +43,33 @@ class update_activity implements mutation_resolver, has_middleware {
         /** @var activity $activity */
         $activity = $args['activity'];
 
-        $activity->set_general_info($args['name'], $args['description'] ?? null, $args['type_id'] ?? null);
+        builder::get_db()->transaction(
+            function () use ($args, $activity) {
+                if (isset($args['relationships'])) {
+                    $activity->update_manual_relationship_selections($args['relationships']);
+                }
 
-        if (isset($args['anonymous_responses'])) {
-            $activity->set_attribution_settings($args['anonymous_responses']);
-        }
+                $activity->set_general_info($args['name'], $args['description'] ?? null, $args['type_id'] ?? null);
 
-        if (isset($args['relationships'])) {
-            $activity->update_manual_relationship_selections($args['relationships']);
-        }
-        $activity->update();
+                $visibility_condition_value = null;
+                if (isset($args['anonymous_responses'])) {
+                    $activity->set_anonymous_setting($args['anonymous_responses']);
+                    // Turn on anonymous responses will automatically set the visibility to 'all responses closed'
+                    if ($args['anonymous_responses']) {
+                        $visibility_condition_value = all_responses::VALUE;
+                    }
+                }
+
+                $activity->update();
+
+                // Visibility condition should be updated after anonymous setting
+                // because visibility condition validation need the updated anonymous setting value
+                if (isset($args['visibility_condition'])) {
+                    $visibility_condition_value = $visibility_condition_value ?? $args['visibility_condition'];
+                    $activity->update_visibility_condition($visibility_condition_value);
+                }
+            }
+        );
 
         return ['activity' => $activity];
     }

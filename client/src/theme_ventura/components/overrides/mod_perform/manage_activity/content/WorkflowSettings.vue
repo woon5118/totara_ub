@@ -21,6 +21,9 @@
   &__heading {
     @include tui-font-heading-small();
   }
+  &__warning {
+    max-width: 712px;
+  }
 }
 
 @media (min-width: $tui-screen-sm) {

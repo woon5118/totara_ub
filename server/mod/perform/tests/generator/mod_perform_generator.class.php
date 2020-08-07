@@ -232,6 +232,13 @@ class mod_perform_generator extends component_generator_base {
                 $data[activity_setting::MULTISECTION] === 'yes'
             );
         }
+        if (isset($data[activity_setting::VISIBILITY_CONDITION])) {
+            activity_setting::create(
+                $activity,
+                activity_setting::VISIBILITY_CONDITION,
+                $data[activity_setting::VISIBILITY_CONDITION]
+            );
+        }
     }
 
     /**
@@ -1088,7 +1095,7 @@ class mod_perform_generator extends component_generator_base {
                         'activity_status' => 'DRAFT',
                     ]
                 );
-                $activity->set_attribution_settings(true)->update();
+                $activity->set_anonymous_setting(true)->update();
 
                 if ($status !== draft::get_code()) {
                     $activity->activate();

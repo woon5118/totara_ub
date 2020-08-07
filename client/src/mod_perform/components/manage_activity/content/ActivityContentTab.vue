@@ -18,7 +18,7 @@
 
 <template>
   <div class="tui-performManageActivityContent">
-    <WorkflowSettings :activity="value" />
+    <WorkflowSettings :activity="value" @change="updateActivity($event)" />
 
     <h3 class="tui-performManageActivityContent__heading">
       {{ $str('activity_content_tab_heading', 'mod_perform') }}

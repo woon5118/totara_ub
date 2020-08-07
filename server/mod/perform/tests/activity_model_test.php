@@ -124,7 +124,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
 
         $this->assertFalse($activity->anonymous_responses);
 
-        $activity->set_attribution_settings(true)->update();
+        $activity->set_anonymous_setting(true)->update();
 
         // Assert in memory state is correct
         $this->assertTrue($activity->anonymous_responses);
@@ -151,7 +151,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Attribution settings can not be updated when an activity is active');
 
-        $activity->set_attribution_settings(true);
+        $activity->set_anonymous_setting(true);
     }
 
     /**

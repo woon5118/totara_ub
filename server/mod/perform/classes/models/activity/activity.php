@@ -47,6 +47,7 @@ use mod_perform\models\activity\details\notification_real;
 use mod_perform\models\activity\helpers\activity_clone;
 use mod_perform\models\activity\helpers\activity_deletion;
 use mod_perform\models\activity\helpers\activity_multisection_toggler;
+use mod_perform\models\activity\settings\visibility_conditions\visibility_manager;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\activity_state as activity_status;
 use mod_perform\state\activity\draft;
@@ -111,6 +112,7 @@ class activity extends model {
         'state_details',
         'multisection_setting',
         'can_clone',
+        'visibility_condition_options',
     ];
 
     public const NAME_MAX_LENGTH = 1024;
@@ -343,7 +345,7 @@ class activity extends model {
      * @param bool $anonymous_responses
      * @return $this
      */
-    public function set_attribution_settings(bool $anonymous_responses): self {
+    public function set_anonymous_setting(bool $anonymous_responses): self {
         if ($this->is_active()) {
             throw new coding_exception('Attribution settings can not be updated when an activity is active');
         }
@@ -727,6 +729,30 @@ class activity extends model {
      */
     public function get_notifications(): collection {
         return $this->entity->notifications->map_to(notification_real::class);
+    }
+
+    /**
+     * Update activity visibility condition setting
+     *
+     * @param int $visibility_condition
+     * @return activity_setting
+     * @throws coding_exception
+     * @throws moodle_exception
+     */
+    public function update_visibility_condition(int $visibility_condition) {
+        $activity_setting = activity_setting::load_by_name_or_create(
+            $this->get_id(), activity_setting::VISIBILITY_CONDITION
+        );
+        return $activity_setting->update($visibility_condition);
+    }
+
+    /**
+     * Get all visibility condition options for activity
+     *
+     * @return collection
+     */
+    public function get_visibility_condition_options() {
+        return (new visibility_manager())->get_options();
     }
 
 }

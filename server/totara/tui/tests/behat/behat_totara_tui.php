@@ -895,7 +895,7 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
-     * @Then /^I should see "([^"]*)" in the tui (success|warning|error) notification (banner|toast)(| and close it)$/
+     * @Then /^I should see "((?:[^"]|\\")*)" in the tui (success|warning|error) notification (banner|toast)(| and close it)$/
      * @param string $expected_text
      * @param string $message_type
      * @param string $notification_type
@@ -1101,12 +1101,6 @@ class behat_totara_tui extends behat_base {
         $form_row = $this->find_form_row_by_label($form_row_label);
 
         $actual_content = $form_row->find('css', self::TUI_FORM_ROW_ACTION_LOCATOR . ' > *');
-
-        $tag = $actual_content->getTagName();
-
-        if ($tag !== 'span') {
-            $this->fail('Expected display only form row to contain a span');
-        }
 
         if (trim($actual_content->getText()) !== $expected_value) {
             $this->fail('Form row did not contain the expected text');

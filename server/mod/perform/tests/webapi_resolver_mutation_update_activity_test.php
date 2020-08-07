@@ -23,7 +23,10 @@
  */
 
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\activity_type as activity_type_model;
+use mod_perform\models\activity\settings\visibility_conditions\all_responses;
+use mod_perform\models\activity\settings\visibility_conditions\own_response;
 use mod_perform\state\activity\draft;
 use totara_core\advanced_feature;
 use totara_core\relationship\relationship;
@@ -104,6 +107,44 @@ class mod_perform_webapi_resolver_mutation_update_activity_testcase extends adva
         foreach ($updated_activity->manual_relationships as $manual_relationship) {
             $this->assertEquals($manual_relationship->selector_relationship_id, $manager_relationship->id);
         }
+    }
+
+    /**
+     * Test update visibility condition for an activity
+     */
+    public function test_update_visibility_control(): void {
+        [$activity, $args] = $this->create_activity();
+        $args['visibility_condition'] = all_responses::VALUE;
+        $this->assertEquals(0, $activity->get_settings()->get()->count());
+
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
+
+        $activity_setting = activity_setting::load_by_name($activity->get_id(), activity_setting::VISIBILITY_CONDITION);
+        $this->assertEquals($args['visibility_condition'], $activity_setting->value);
+    }
+
+    /**
+     * Test update invalid visibility condition will throw exception
+     */
+    public function test_update_invalid_visibility_control_value_should_throw_exception() {
+        [$activity, $args] = $this->create_activity();
+        $args['visibility_condition'] = 5;
+
+        $this->expectExceptionMessage("invalid visibility condition value: 5");
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
+    }
+
+    /**
+     * Test turn on anonymous responses will set visibility control to all responses closed
+     */
+    public function test_turn_on_anonymous_responses_should_set_visibility_control_to_all_responses_closed() {
+        [$activity, $args] = $this->create_activity();
+        $args['visibility_condition'] = own_response::VALUE;
+
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
+        $activity_setting = activity_setting::load_by_name($activity->get_id(), activity_setting::VISIBILITY_CONDITION);
+
+        $this->assertEquals(all_responses::VALUE, $activity_setting->value);
     }
 
     public function test_successful_ajax_call(): void {
