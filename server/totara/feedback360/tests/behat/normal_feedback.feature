@@ -59,7 +59,7 @@ Feature: Normal feedback
     And I log out
 
     And I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Request Feedback" "button" in the "Normal feedback" "table_row"
     And I press "Add user(s)"
     And I click on "User Two" "link" in the "Add user(s)" "totaradialogue"
@@ -80,7 +80,7 @@ Feature: Normal feedback
     And I log out
 
     And I log in as "user2"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Respond now" "button" in the "User One" "table_row"
     # If the next line fails check the hack in totara_feedback360_renderer::display_feedback_header
     And "#feedbackhead .feedback360-save input[value='Save progress']" "css_element" should be visible
@@ -89,7 +89,7 @@ Feature: Normal feedback
     And I log out
 
     And I log in as "user5"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Respond now" "button" in the "User One" "table_row"
     And I set the field "How much do you like me?" to "Quite a bit"
     And I press "Submit feedback"
@@ -97,7 +97,7 @@ Feature: Normal feedback
 
   Scenario: Check responses are shown
     Given I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     Then I should see "2 out of 5" in the "Normal feedback" "table_row"
     When I follow "Normal feedback"
     Then I should see "View Response" in the "User Two" "table_row"
@@ -117,7 +117,7 @@ Feature: Normal feedback
 
   Scenario: Check you can delete unresponded users
     Given I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     When I click on "Edit" "link" in the "Normal feedback" "table_row"
     Then I should see "User Two"
     And I should see "User Three"
@@ -142,7 +142,7 @@ Feature: Normal feedback
 
   Scenario: Add new request via search tab when finding users
     Given I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Edit" "link" in the "Normal feedback" "table_row"
     And I press "Add user(s)"
     And I click on "Search" "link" in the "Add user(s)" "totaradialogue"
@@ -159,7 +159,7 @@ Feature: Normal feedback
 
   Scenario: Cancel requests to feedback360 responders
     Given I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "stop" "link" in the "Normal feedback" "table_row"
     Then I should see "Are you sure you want to cancel this feedback request?"
     When I press "Continue"
@@ -168,7 +168,7 @@ Feature: Normal feedback
 
   Scenario: Remind feedback360 responders
     Given I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     When I click on "remind" "link" in the "Normal feedback" "table_row"
     Then I should see "This will send a reminder message to everyone you have requested feedback from that has yet to respond:"
     And I should see "User Three"
@@ -181,7 +181,7 @@ Feature: Normal feedback
 
   Scenario: Set and update time due for feedback360 requests
     Given I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Edit" "link" in the "Normal feedback" "table_row"
     And I set the following fields to these values:
      | duedate[enabled] | 1     |

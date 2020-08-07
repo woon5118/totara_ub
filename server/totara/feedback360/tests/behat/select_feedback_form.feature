@@ -61,7 +61,7 @@ Feature: Select feedback360 for requests
 
   Scenario: Select which feedback360 form to request feedback for
     Given I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Request Feedback" "button" in the "Feedback Two" "table_row"
     And I press "Add user(s)"
     And I click on "User Two" "link" in the "Add user(s)" "totaradialogue"
@@ -82,12 +82,12 @@ Feature: Select feedback360 for requests
 
     When I log out
     And I log in as "user3"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Respond now" "button" in the "User One" "table_row"
     Then I should see "Feedback One Question"
 
     When I log out
     And I log in as "user2"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Respond now" "button" in the "User One" "table_row"
     Then I should see "Feedback Two Question"

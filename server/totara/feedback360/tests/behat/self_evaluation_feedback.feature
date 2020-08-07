@@ -61,7 +61,7 @@ Feature: Self evaluation feedback
 
     # The feedback should be available to to the user.
     When I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     Then I should see "Feedback 1"
 
     # The user can make feedback requests including self evaluation.
@@ -172,7 +172,7 @@ Feature: Self evaluation feedback
 
     # The feedback should be available to to the user.
     When I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     Then I should see "Feedback 1"
 
     # The user can make feedback requests with self evaluation required.
@@ -256,7 +256,7 @@ Feature: Self evaluation feedback
 
     # The feedback should be available to to the user.
     When I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     Then I should see "Feedback 1"
 
     # The user can make feedback requests without seeing self evaluation options.

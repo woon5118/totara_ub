@@ -6,7 +6,7 @@ Feature: Main menu behat step testing
   @javascript
   Scenario: Test I should see in the totara menu with javascript
     When I log in as "admin"
-    Then I should see "Performance" in the totara menu
+    Then I should see "Develop" in the totara menu
     And I should see "Goals" in the totara menu
     And I should not see "Perf" in the totara menu
     And I should not see "Goal" in the totara menu
@@ -36,7 +36,7 @@ Feature: Main menu behat step testing
 
   Scenario: Test I should see in the totara menu without javascript
     When I log in as "admin"
-    Then I should see "Performance" in the totara menu
+    Then I should see "Develop" in the totara menu
     And I should see "Goals" in the totara menu
     And I should not see "Perf" in the totara menu
     And I should not see "Goal" in the totara menu

@@ -52,7 +52,7 @@ Feature: anonymous feedback
     And I log out
 
     And I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Request Feedback" "button" in the "Anonymous feedback" "table_row"
     And I press "Add user(s)"
     And I click on "User Two" "link" in the "Add user(s)" "totaradialogue"
@@ -73,7 +73,7 @@ Feature: anonymous feedback
     And I log out
 
     And I log in as "user2"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Respond now" "button" in the "User One" "table_row"
     And I should see "This feedback request has been sent to 5 users (including you)."
     And I set the field "How much do you like me?" to "Not at all"
@@ -81,7 +81,7 @@ Feature: anonymous feedback
     And I log out
 
     And I log in as "user5"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     And I click on "Respond now" "button" in the "User One" "table_row"
     And I should see "This feedback request has been sent to 5 users (including you)."
     And I set the field "How much do you like me?" to "Quite a bit"
@@ -90,7 +90,7 @@ Feature: anonymous feedback
 
   Scenario: Check responses are anonymous
     Given I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     Then I should see "2 out of 5" in the "Anonymous feedback" "table_row"
     When I follow "Anonymous feedback"
     Then I should not see "Two"
@@ -105,7 +105,7 @@ Feature: anonymous feedback
 
   Scenario: Check you can't see who has not responded
     Given I log in as "user1"
-    And I click on "360° Feedback" in the totara menu
+    And I am on "360° Feedback" page
     When I click on "Edit" "link" in the "Anonymous feedback" "table_row"
     Then I should see "User Two"
     And I should see "User Three"

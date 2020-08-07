@@ -37,7 +37,7 @@ Feature: A basic test of the Totara Main menu
     Given I navigate to "Main menu" node in "Site administration > Navigation"
     When I click on "Edit" "link" in the "Test item" "table_row"
     And I set the following Totara form fields to these values:
-      | Parent item | Performance |
+      | Parent item | Develop |
     And I click on "Save changes" "button"
     Then I should see "Main menu has been updated successfully"
 
