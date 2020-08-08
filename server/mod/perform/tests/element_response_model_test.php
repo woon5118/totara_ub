@@ -26,11 +26,12 @@ use core\collection;
 
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
-use mod_perform\models\activity\element;
-use mod_perform\models\activity\respondable_element_plugin;
+use mod_perform\models\activity\element_plugin;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\element_validation_error;
+use performelement_short_text\answer_length_exceeded_error;
 
 /**
  * @group perform
@@ -90,14 +91,44 @@ class mod_perform_response_model_testcase extends advanced_testcase {
      * @throws coding_exception
      */
     public function test_saving_supports_elements_that_have_not_been_responded_to(): void {
-        $participant_instance = new participant_instance_entity(['id' => 100]);
-        $section_element = new section_element_entity(['id' => 200]);
+        self::setAdminUser();
+
+        $subject = self::getDataGenerator()->create_user();
+        $participant = self::getDataGenerator()->create_user();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $subject_instance = $generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject->id,
+            'other_participant_id' => $participant->id,
+            'include_questions' => true,
+        ]);
+
+        $participant_instance = $subject_instance->participant_instances->first();
+
+        $track = $subject_instance->track;
+        $activity = $track->activity;
+        $sections = $activity->sections;
+        /** @var section_entity $section */
+        foreach ($sections as $section) {
+            /** @var section_element_entity $section_element */
+            $section_elements = $section->section_elements;
+            foreach ($section_elements as $section_element) {
+                $element_type = $section_element->element;
+                if ($element_type) {
+                    break 2;
+                }
+            }
+        }
+        $element = element_plugin::load_by_plugin($element_type->plugin_name);
 
         $element_response = new section_element_response($participant_instance,
             $section_element,
             null,
             new collection(),
-            $this->create_question_element_plugin_stub()
+            $element
         );
 
         $element_response->save();
@@ -106,22 +137,52 @@ class mod_perform_response_model_testcase extends advanced_testcase {
 
         // Saving when a response record has not yet been created will create the record with the foreign keys
         // pulled from the participant_instance and section_element.
-        self::assertEquals(100, $element_response_entity->participant_instance_id);
-        self::assertEquals(200, $element_response_entity->section_element_id);
+        self::assertEquals($participant_instance->id, $element_response_entity->participant_instance_id);
+        self::assertEquals($section_element->id, $element_response_entity->section_element_id);
     }
 
     /**
      * @throws coding_exception
      */
     public function test_validation_success(): void {
-        $participant_instance = new participant_instance_entity(['id' => 100]);
-        $section_element = new section_element_entity(['id' => 200]);
+        self::setAdminUser();
+
+        $subject = self::getDataGenerator()->create_user();
+        $participant = self::getDataGenerator()->create_user();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $subject_instance = $generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject->id,
+            'other_participant_id' => $participant->id,
+            'include_questions' => true,
+        ]);
+
+        $participant_instance = $subject_instance->participant_instances->first();
+
+        $track = $subject_instance->track;
+        $activity = $track->activity;
+        $sections = $activity->sections;
+        /** @var section_entity $section */
+        foreach ($sections as $section) {
+            /** @var section_element_entity $section_element */
+            $section_elements = $section->section_elements;
+            foreach ($section_elements as $section_element) {
+                $element_type = $section_element->element;
+                if ($element_type) {
+                    break 2;
+                }
+            }
+        }
+        $element = element_plugin::load_by_plugin($section_element->element->plugin_name);
 
         $element_response = new section_element_response($participant_instance,
             $section_element,
             null,
             new collection(),
-            $this->create_question_element_plugin_stub()
+            $element
         );
 
         $response_data = ['answer_text' => 'Hello there.'];
@@ -135,17 +196,48 @@ class mod_perform_response_model_testcase extends advanced_testcase {
      * @throws coding_exception
      */
     public function test_validation_with_errors(): void {
-        $participant_instance = new participant_instance_entity(['id' => 100]);
-        $section_element = new section_element_entity(['id' => 200]);
+        self::setAdminUser();
+
+        $subject = self::getDataGenerator()->create_user();
+        $participant = self::getDataGenerator()->create_user();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $subject_instance = $generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject->id,
+            'other_participant_id' => $participant->id,
+            'include_questions' => true,
+        ]);
+
+        $participant_instance = $subject_instance->participant_instances->first();
+
+        $track = $subject_instance->track;
+        $activity = $track->activity;
+        $sections = $activity->sections;
+        /** @var section_entity $section */
+        foreach ($sections as $section) {
+            /** @var section_element_entity $section_element */
+            $section_elements = $section->section_elements;
+            foreach ($section_elements as $section_element) {
+                $element_type = $section_element->element;
+                if ($element_type) {
+                    break 2;
+                }
+            }
+        }
+        $element = element_plugin::load_by_plugin($section_element->element->plugin_name);
 
         $element_response = new section_element_response($participant_instance,
             $section_element,
             null,
             new collection(),
-            $this->create_question_element_plugin_with_validation_errors()
+            $element
         );
 
-        $response_data = ['answer_text' => 'Hello there.'];
+        // Structurally valid response, but will fail validation for being too long.
+        $response_data = ['answer_text' => str_repeat('x', 1025)];
 
         $element_response->set_response_data(json_encode($response_data));
 
@@ -154,34 +246,9 @@ class mod_perform_response_model_testcase extends advanced_testcase {
         /** @var element_validation_error[] $validation_errors */
         $validation_errors = $element_response->get_validation_errors()->all();
 
-        self::assertNotEmpty($validation_errors, 'Expected validation errors, none were generated');
+        self::assertCount(1, $validation_errors);
 
-        self::assertEquals('There was a problem.', $validation_errors[0]->error_message);
-        self::assertEquals(1, $validation_errors[0]->error_code);
-
-        self::assertEquals('There was another problem.', $validation_errors[1]->error_message);
-        self::assertEquals(2, $validation_errors[1]->error_code);
+        self::assertEquals('Question text exceeds the maximum length', $validation_errors[0]->error_message);
+        self::assertEquals(answer_length_exceeded_error::LENGTH_EXCEEDED, $validation_errors[0]->error_code);
     }
-
-    private function create_question_element_plugin_stub(): respondable_element_plugin {
-        return new class extends respondable_element_plugin {
-            public function __construct() {
-            }
-        };
-    }
-
-    private function create_question_element_plugin_with_validation_errors(): respondable_element_plugin {
-        return new class extends respondable_element_plugin {
-            public function __construct() {
-            }
-
-            public function validate_response(?string $encoded_response_data, ?element $element): collection {
-                $error = new element_validation_error(1, 'There was a problem.');
-                $error2 = new element_validation_error(2, 'There was another problem.');
-
-                return new collection([$error, $error2]);
-            }
-        };
-    }
-    
 }

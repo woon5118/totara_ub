@@ -64,31 +64,25 @@ class mod_perform_element_multi_choice_multi_testcase extends advanced_testcase 
         /** @var multi_choice_multi $element_type */
         $element_type = element_plugin::load_by_plugin('multi_choice_multi');
 
-        $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true]);
+        $json = '{"options":[{"name":"option_0","value":"11"},{"name":"option_1","value":"12"},{"name":"option_2","value":"13"}]}';
+        $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true, 'data' => $json]);
         $errors = $element_type->validate_response(json_encode(['answer_option' => $answer_option]), $element);
 
         self::assertEquals($expected_errors, $errors);
     }
 
     public function validation_provider(): array {
-        $json = '{"options":[{"name":"option_0","value":"11"},{"name":"option_1","value":"12"},{"name":"option_2","value":"13"}]}';
         return [
             'no errors' => [
                 new collection(),
                 [
-                    'options' =>
-                    [
-                        'name' => 'option_0',
-                        'value' => '1'
-                    ],
-                    [
-                        'name' => 'option_2',
-                        'value' => '1'
-                    ]
-                ]
+                    'option_0',
+                    'option_2',
+                ],
             ],
             'missing answer' => [
-                new collection([new answer_required_error()]), [],
+                new collection([new answer_required_error()]),
+                [],
             ],
         ];
     }

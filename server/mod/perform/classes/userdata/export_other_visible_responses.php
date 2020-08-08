@@ -65,7 +65,8 @@ class export_other_visible_responses extends item {
             ->get(true)
             ->map(function ($response) use ($user) {
                 return self::process_response_record($response, $user->id);
-            });
+            })
+            ->to_array();
 
         $export = new export();
         $export->data = $responses;

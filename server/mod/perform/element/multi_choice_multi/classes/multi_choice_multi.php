@@ -71,11 +71,11 @@ class multi_choice_multi extends respondable_element_plugin {
             throw new coding_exception('Invalid response data format, expected "answer_option" to be an array');
         }
 
-        if ($element_data === null || $element_data['options'] === null) {
+        if ($element_data === null || !isset($element_data['options'])) {
             throw new coding_exception('Invalid element data format, expected "options" field');
         }
 
-        if (!is_array($response_data['answer_option'])) {
+        if (!is_array($element_data['options'])) {
             throw new coding_exception('Invalid element data format, expected "options" to be an array');
         }
 
@@ -92,9 +92,4 @@ class multi_choice_multi extends respondable_element_plugin {
         }
         return $responses;
     }
-<<<<<<< HEAD
-
 }
-=======
-}
->>>>>>> 3aae2173a0c... fixup code

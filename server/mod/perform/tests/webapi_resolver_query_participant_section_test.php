@@ -184,7 +184,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                                 'performelement_static_content/components/StaticContentElementParticipant',
                         ],
                     'title' => 'test element title',
-                    'data' => null,
+                    'data' => '{"textValue":null}',
                     'is_required' => false,
                     'is_respondable' => false,
                 ],
