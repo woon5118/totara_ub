@@ -75,4 +75,10 @@ class short_text extends respondable_element_plugin {
         return $response_data['answer_text'];
     }
 
+    /**
+     * @return string
+     */
+    public function get_example_response_data(): string {
+        return '{"answer_text": ""}';
+    }
 }

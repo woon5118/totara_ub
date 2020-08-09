@@ -1394,12 +1394,18 @@ class mod_perform_generator extends component_generator_base {
             $section_elements = $section->section_elements;
             /** @var section_element_entity $section_element */
             foreach ($section_elements as $section_element) {
+                $element_type = $section_element->element->plugin_name;
+                $element_plugin = mod_perform\models\activity\element_plugin::load_by_plugin($element_type);
+                if (!($element_plugin instanceof \mod_perform\models\activity\respondable_element_plugin)) {
+                    // Don't create responses for non-respondable elements.
+                    continue;
+                }
                 /** @var participant_instance_entity $participant_instance */
                 foreach ($subject_instance->participant_instances as $participant_instance) {
                     $element_response_entity = new element_response();
                     $element_response_entity->participant_instance_id = $participant_instance->id;
                     $element_response_entity->section_element_id = $section_element->id;
-                    $element_response_entity->response_data = '{}';
+                    $element_response_entity->response_data = $element_plugin->get_example_response_data();
                     $element_response_entity->save();
 
                     if (!is_null($max_responses) && $count >= $max_responses) {
