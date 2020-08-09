@@ -48,6 +48,7 @@ class activity_activated extends base {
     public static function create_from_activity(activity $activity): self {
         $data = [
             'objectid' => $activity->get_id(),
+            'userid' => \core\session\manager::get_realuser()->id,
             'relateduserid' => null,
             'other' => [],
             'context' => $activity->get_context(),

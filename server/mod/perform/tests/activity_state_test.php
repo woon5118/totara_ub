@@ -81,6 +81,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         $this->assertInstanceOf(activity_activated::class, $event);
         $this->assertEquals($activity->get_id(), $event->objectid);
         $this->assertEquals($activity->get_context()->id, $event->contextid);
+        $this->assertEquals($user->id, $event->userid);
 
         $sink->clear();
 
