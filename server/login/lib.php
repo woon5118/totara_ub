@@ -312,7 +312,8 @@ function core_login_get_return_url() {
     }
 
     // If the url to go to is the same as the site page, check for default homepage.
-    if ($urltogo === $CFG->wwwroot or $urltogo === $CFG->wwwroot.'/' or $urltogo === $CFG->wwwroot.'/index.php') {
+    // Totara: ... unless this is the site admin, who needs to hit the site page first to check for upgrades.
+    if (($urltogo === $CFG->wwwroot or $urltogo === $CFG->wwwroot.'/' or $urltogo === $CFG->wwwroot.'/index.php') && !is_siteadmin()) {
         if (get_home_page() == HOMEPAGE_TOTARA_DASHBOARD) {
             $urltogo = $CFG->wwwroot.'/totara/dashboard/';
         } else if (get_home_page() == HOMEPAGE_TOTARA_GRID_CATALOG) {

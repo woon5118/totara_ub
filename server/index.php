@@ -74,7 +74,8 @@ if (!empty($CFG->maintenance_enabled) and !$hasmaintenanceaccess) {
 
 $hassiteconfig = has_capability('moodle/site:config', context_system::instance());
 
-if ($hassiteconfig && moodle_needs_upgrading()) {
+// Totara: Check if this is an initial install without a site fullname.
+if ($hassiteconfig && (moodle_needs_upgrading() || (empty($SITE->fullname) || empty($SITE->shortname)))) {
     redirect($CFG->wwwroot .'/'. $CFG->admin .'/index.php');
 }
 

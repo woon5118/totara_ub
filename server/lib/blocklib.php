@@ -1157,6 +1157,12 @@ class block_manager {
                     foreach($this->birecordsbyregion[$region] as $instance) {
                         if ($instance->blockname == $forced) {
                             $found = true;
+                            // Totara: the instance may be present but not marked as required by theme.
+                            if(!$instance->requiredbytheme && $instance->parentcontextid == context_system::instance()->id) {
+                                global $DB;
+                                $params = array('id' => $instance->id);
+                                $DB->set_field('block_instances', 'requiredbytheme', 1, $params);
+                            }
                         }
                     }
                 }
