@@ -70,7 +70,14 @@ trait webapi_phpunit_helper {
         $raw = $this->execute_graphql_operation($operation_name, $variables, $type)
             ->toArray(true);
 
-        $result = $raw['data'][$operation_name] ?? null;
+        // Usually the operation name matches the query name
+        $query_name = $operation_name;
+        // Operation name suffixed with _nosession usually do not use it in the query name itself
+        if (substr($operation_name, -10) === '_nosession') {
+            $query_name = substr($operation_name, 0, strrpos($operation_name, '_nosession'));
+        }
+
+        $result = $raw['data'][$query_name] ?? null;
 
         $errors = $raw['errors'][0] ?? [];
         $error = $errors['debugMessage'] ?? $errors['message'] ?? null;

@@ -39,6 +39,12 @@ class subject_instance_for_external_participant implements query_resolver, has_m
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
+        // This query is supposed to work only for non-logged in external users
+        global $USER;
+        if ($USER && $USER->id > 0) {
+            return null;
+        }
+
         $subject_instance_id = $args['subject_instance_id'] ?? 0;
         if (!$subject_instance_id) {
             return null;
@@ -66,10 +72,7 @@ class subject_instance_for_external_participant implements query_resolver, has_m
 
         /** @var subject_instance_model $subject_instance */
         return (new subject_instance_data_provider($participant_id, participant_source::EXTERNAL))
-            ->set_subject_instance_id_filter($subject_instance_id)
-            ->fetch()
-            ->get()
-            ->first();
+            ->get_subject_instance($subject_instance_id);
     }
 
     /**
