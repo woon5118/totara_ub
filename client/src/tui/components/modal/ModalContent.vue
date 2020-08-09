@@ -61,7 +61,8 @@ export default {
   props: {
     title: {
       type: String,
-      required: true,
+      required: false,
+      validator: x => !x || x.slice(0).trim().length > 0,
     },
     titleId: String,
     titleVisible: {
@@ -69,6 +70,14 @@ export default {
       default: true,
     },
     closeButton: Boolean,
+  },
+
+  mounted() {
+    if (!this.title && !(this.$slots.title && this.$slots.title.length > 0)) {
+      console.error(
+        '[ModalContent] You must pass either a non-empty title prop or define a non-empty title slot.'
+      );
+    }
   },
 
   methods: {
