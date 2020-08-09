@@ -143,7 +143,7 @@ final class framework implements \core\output\framework {
      * @param moodle_page|null $page If null $PAGE is used.
      * @return component
      */
-    public static function vue($name, moodle_page $page = null) {
+    public static function vue($name, moodle_page $page = null): component {
         global $PAGE;
         if ($page === null) {
             $page = $PAGE;

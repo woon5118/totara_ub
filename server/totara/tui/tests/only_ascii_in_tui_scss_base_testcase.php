@@ -29,7 +29,7 @@
  * @package totara_tui
  */
 
-abstract class core_only_ascii_in_tui_scss_base_testcase extends basic_testcase {
+abstract class totara_tui_only_ascii_in_tui_scss_base_testcase extends basic_testcase {
     /**
      * Check TUI SCSS does not contain any non-ascii characters
      *

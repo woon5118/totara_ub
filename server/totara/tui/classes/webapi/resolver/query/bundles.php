@@ -43,6 +43,16 @@ final class bundles implements query_resolver {
     public static function resolve(array $args, execution_context $ec) {
         global $PAGE;
 
+        if (!isset($args['components'])) {
+            // GraphQL asserts this for us, but the resolve method may be called directly as well.
+            throw new \coding_exception('Missing required arg: components.');
+        }
+
+        if (!isset($args['theme'])) {
+            // GraphQL asserts this for us, but the resolve method may be called directly as well.
+            throw new \coding_exception('Missing required arg: theme.');
+        }
+
         $components = [];
         foreach ($args['components'] as $component) {
             if ($component === framework::clean_component_name($component)) {

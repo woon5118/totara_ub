@@ -522,7 +522,6 @@ final class bundle {
      * @param string $path_absolute
      */
     private function add_bundle_scss_file_to_map(string $bundle, string $suffix, string $path_relative, string $path_absolute) {
-
         if (strpos($path_relative, 'styles' . DIRECTORY_SEPARATOR) === 0) {
             $path_relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($path_relative, strlen('styles' . DIRECTORY_SEPARATOR)));
             $this->map_scss_imports[$bundle][$suffix][$path_relative] = $path_absolute;

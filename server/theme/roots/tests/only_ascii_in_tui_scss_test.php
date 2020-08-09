@@ -24,7 +24,7 @@
 global $CFG;
 require_once($CFG->dirroot . '/totara/tui/tests/only_ascii_in_tui_scss_base_testcase.php');
 
-class theme_roots_only_ascii_in_tui_scss_testcase extends core_only_ascii_in_tui_scss_base_testcase {
+class theme_roots_only_ascii_in_tui_scss_testcase extends totara_tui_only_ascii_in_tui_scss_base_testcase {
     public function test_no_unicode_in_scss() {
         $this->check_tui_scss_for_non_ascii('theme_roots');
     }

@@ -24,14 +24,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @author Simon Chester <simon.chester@totaralearning.com>
  * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
  * @package totara_tui
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-class core_tui_scss_compiler_implementation_testcase extends basic_testcase {
+class totara_tui_local_scss_compiler_implementation_testcase extends advanced_testcase {
     /**
      * Try to normalize some of the formatting of the generated CSS.
      *

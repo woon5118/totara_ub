@@ -56,9 +56,6 @@ final class scss extends requirement {
      * {@inheritdoc}
      */
     public function get_url(array $options = null): moodle_url {
-        if ($this->name !== 'tui_bundle.scss') {
-            throw new coding_exception('Unknown SCSS bundle');
-        }
         if (empty($options['theme'])) {
             throw new coding_exception('Theme not specified');
         }
@@ -76,7 +73,7 @@ final class scss extends requirement {
         global $CFG;
 
         $rev = bundle::get_css_rev();
-        $suffix = bundle::get_css_suffix_for_url(true);
+        $suffix = bundle::get_css_suffix_for_url();
         $direction = right_to_left() ? 'rtl' : 'ltr';
 
         $arguments = [
