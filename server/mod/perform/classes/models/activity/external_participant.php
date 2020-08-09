@@ -24,9 +24,11 @@
 
 namespace mod_perform\models\activity;
 
+use coding_exception;
 use core\orm\entity\model;
+use core\orm\query\builder;
 use mod_perform\entities\activity\external_participant as external_participant_entity;
-use moodle_page;
+use mod_perform\entities\activity\participant_instance;
 use user_picture;
 
 /**
@@ -74,25 +76,39 @@ class external_participant extends model {
      * and email combination. The only way to distinguish between them is by the
      * id and/or token.
      *
+     * @param int $participant_instance_id
      * @param string $fullname external participant name.
      * @param string $email external participant email.
      *
      * @return external_participant the newly created model.
      */
-    public static function create(string $fullname, string $email): external_participant {
-        $entity = new external_participant_entity();
-        $entity->name = $fullname;
-        $entity->email = $email;
-        $entity->token = self::generate_token($fullname, $email);
-
-        try {
-            $entity->save();
-        } catch (\dml_exception $exception) {
-            // If the token does already exist (rare), we just wait for 1 microsecond
-            // and try again as microtime() will return a new time value.
-            usleep(1);
-            return self::create($fullname, $email);
+    public static function create(int $participant_instance_id, string $fullname, string $email): external_participant {
+        if (empty(trim($fullname)) || empty(trim($email))) {
+            throw new coding_exception('Fullname or email for external participant cannot be empty.');
         }
+
+        $entity = builder::get_db()->transaction(function () use ($participant_instance_id, $fullname, $email) {
+            $entity = new external_participant_entity();
+            $entity->name = $fullname;
+            $entity->email = $email;
+            $entity->token = self::generate_token($participant_instance_id);
+            $entity->save();
+
+            // Now update the participant id in the instance table
+            /** @var participant_instance $participant_instance */
+            $participant_instance = participant_instance::repository()
+                ->find_or_fail($participant_instance_id);
+
+            if ($participant_instance->participant_source != participant_source::EXTERNAL) {
+                throw new coding_exception('Something went wrong, invalid participant source detected.');
+            }
+
+            $participant_instance->participant_id = $entity->id;
+            $participant_instance->save();
+
+            return $entity;
+        });
+
 
         return new external_participant($entity);
     }
@@ -100,27 +116,12 @@ class external_participant extends model {
     /**
      * Generates a unique token hash.
      *
-     * @param string $fullname external participant name.
-     * @param string $email external participant email.
+     * @param int $participant_instance_id
      *
      * @return string the generated token.
      */
-    private static function generate_token(string $fullname, string $email): string {
-        $prev_id = external_participant_entity::repository()
-            ->select('max(id) as max_id')
-            ->get()
-            ->first()
-            ->max_id;
-
-        // It is possible for 2 independent users to nominate the same external
-        // user on the same site within the same microsecond. However it is unlikely
-        // the random number generator returns the same value in both cases -
-        // especially since the random number is between 0 and at least 32767 on
-        // Windows. So collisions are theoretically possible but very improbable.
-        return hash(
-            'sha256',
-            get_site_identifier() . microtime() . $fullname . $email . $prev_id . rand()
-        );
+    private static function generate_token(int $participant_instance_id): string {
+        return hash('sha256', password_hash(uniqid($participant_instance_id), PASSWORD_DEFAULT));
     }
 
     /**

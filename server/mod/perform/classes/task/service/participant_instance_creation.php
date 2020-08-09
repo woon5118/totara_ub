@@ -80,12 +80,8 @@ class participant_instance_creation {
      * @return void
      */
     public function generate_instances(collection $subject_instance_dtos): void {
-        builder::get_db()->transaction(
-            function () use ($subject_instance_dtos) {
-                $this->aggregate_participant_instances($subject_instance_dtos);
-                $this->save_data();
-            }
-        );
+        $this->aggregate_participant_instances($subject_instance_dtos);
+        $this->save_data();
     }
 
     /**
@@ -502,14 +498,13 @@ class participant_instance_creation {
                 $source = participant_source::EXTERNAL;
 
                 $metadata = $participant_dto->get_meta();
-                $name = $metadata['name'];
-                $email = $metadata['email'];
-                $user_id = external_participant::create($name, $email)->id;
+
+                $data['external']['name'] = $metadata['name'];
+                $data['external']['email'] = $metadata['email'];
             }
 
             $data['participant_data']['participant_source'] = $source;
             $data['participant_data']['participant_id'] = $user_id;
-
 
             $this->participation_creation_list[] = $data;
 
@@ -529,23 +524,33 @@ class participant_instance_creation {
         if (count($this->participation_creation_list) === 0) {
             return;
         }
-        $db = builder::get_db();
 
-        $created_participants_dtos = new collection();
-        foreach ($this->participation_creation_list as $participant_instance) {
-            $section_data = [];
-            $section_data['activity_id'] = $participant_instance['activity_id'];
-            $section_data['core_relationship_id'] = $participant_instance['participant_data']['core_relationship_id'];
-            $section_data['id'] = $db->insert_record(
-                participant_instance_entity::TABLE,
-                (object) $participant_instance['participant_data']
-            );
-            $created_participants_dtos->append(
-                participant_instance_dto::create_from_data($section_data)
-            );
-        }
-        (new participant_instances_created($created_participants_dtos))->execute();
-        $this->participation_creation_list = [];
+        builder::get_db()->transaction(function () {
+            $created_participants_dtos = new collection();
+            foreach ($this->participation_creation_list as $participant_instance) {
+                $participant_instance_id = builder::table(participant_instance_entity::TABLE)
+                    ->insert($participant_instance['participant_data']);
+
+                $section_data = [];
+                $section_data['activity_id'] = $participant_instance['activity_id'];
+                $section_data['core_relationship_id'] = $participant_instance['participant_data']['core_relationship_id'];
+                $section_data['id'] = $participant_instance_id;
+
+                if ($participant_instance['participant_data']['participant_source'] == participant_source::EXTERNAL) {
+                    external_participant::create(
+                        $participant_instance_id,
+                        $participant_instance['external']['name'],
+                        $participant_instance['external']['email']
+                    );
+                }
+
+                $created_participants_dtos->append(
+                    participant_instance_dto::create_from_data($section_data)
+                );
+            }
+            (new participant_instances_created($created_participants_dtos))->execute();
+            $this->participation_creation_list = [];
+        });
     }
 
     /**

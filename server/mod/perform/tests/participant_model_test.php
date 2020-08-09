@@ -54,7 +54,17 @@ class mod_perform_participant_model_test extends advanced_testcase {
     public function test_load_with_external_participant() {
         $name = 'Aug man';
         $email = 'august@year.com';
-        $external_participant = external_participant::create($name, $email);
+        $external_participant = $this->getMockBuilder(external_participant::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $external_participant->expects($this->any())
+            ->method('__get')
+            ->willReturnMap([
+                ['fullname', $name],
+                ['email', $email],
+            ]);
+
         $participant = new participant($external_participant, participant_source::EXTERNAL);
 
         $this->assertEquals($name, $participant->fullname);

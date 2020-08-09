@@ -1046,18 +1046,6 @@ class mod_perform_generator extends component_generator_base {
         $this->create_section_with_combined_manager_appraiser($subject_user, $manager_appraiser_user, $data['activity_name']);
     }
 
-
-    /**
-     * Creates an external participant.
-     *
-     * @param array $data
-     * @return void
-     */
-    public function create_external_participant(array $data): void {
-        external_participant::create($data['fullname'], $data['email']);
-    }
-
-
     private function find_or_make_perform_activity($name, $type, $status = null, $anonymous_responses = false): activity {
         $data = [
             'activity_type' => $type,

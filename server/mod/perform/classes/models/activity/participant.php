@@ -55,13 +55,6 @@ class participant {
     private $source;
 
     /**
-     * Expected user classes.
-     *
-     * @var string[]
-     */
-    private $expected_types = [user::class, external_participant::class];
-
-    /**
      * Fields available on a participant.
      *
      * @var array
@@ -83,7 +76,7 @@ class participant {
      * @param int $participant_source
      */
     public function __construct($participant, int $participant_source = participant_source::INTERNAL) {
-        if (!in_array(get_class($participant), $this->expected_types, true)) {
+        if (!$participant instanceof user && !$participant instanceof external_participant) {
             throw new coding_exception(sprintf("Invalid class %s loaded into participant.", get_class($participant)));
         }
 
