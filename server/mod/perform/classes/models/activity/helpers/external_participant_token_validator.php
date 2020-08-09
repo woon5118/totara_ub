@@ -55,7 +55,7 @@ class external_participant_token_validator {
      *
      * @return participant_instance|null
      */
-    public function load_instance_by_token(): ?participant_instance {
+    protected function load_instance_by_token(): ?participant_instance {
         /** @var participant_instance_entity $participant_instance */
         $participant_instance = participant_instance_entity::repository()
             ->join([external_participant::TABLE, 'ep'], 'participant_id', 'id')

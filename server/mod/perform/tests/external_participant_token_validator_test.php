@@ -23,6 +23,11 @@
  */
 
 use mod_perform\constants;
+use mod_perform\entities\activity\external_participant;
+use mod_perform\entities\activity\participant_instance;
+use mod_perform\models\activity\activity;
+use mod_perform\models\activity\helpers\external_participant_token_validator;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,8 +37,46 @@ defined('MOODLE_INTERNAL') || die();
 class mod_perform_external_participant_token_validator_testcase extends advanced_testcase {
 
     public function test_valid_token() {
-        $this->markTestIncomplete();
-        $data = $this->setup_data();
+        $this->setup_data();
+
+        /** @var external_participant $external_participant */
+        $external_participant = external_participant::repository()->get()->first();
+
+        $expected_participant_instance = $external_participant->participant_instance;
+
+        $validator = new external_participant_token_validator($external_participant->token);
+        $this->assertTrue($validator->is_valid());
+        $this->assertEquals($expected_participant_instance->id, $validator->get_participant_instance()->id);
+        $this->assertFalse($validator->is_subject_instance_closed());
+
+        $actual_participant_instance = $validator->get_participant_instance();
+        $actual_section = $actual_participant_instance->participant_sections->first();
+
+        /** @var participant_instance $other_participant_instance */
+        $other_participant_instance = participant_instance::repository()
+            ->where('participant_id', '<>', $external_participant->id)
+            ->order_by('id')
+            ->first();
+
+        $other_section = $other_participant_instance->participant_sections->first();
+
+        $this->assertTrue($validator->is_valid_for_section($actual_section->id));
+        $this->assertFalse($validator->is_valid_for_section($other_section->id));
+
+        // Use some invalid token
+        $invalid_validator = new external_participant_token_validator('idontexist');
+        $this->assertFalse($invalid_validator->is_valid());
+        $this->assertNull($invalid_validator->get_participant_instance());
+        $this->assertTrue($invalid_validator->is_subject_instance_closed());
+
+        // Close the subject instance
+        $subject_instance = subject_instance_model::load_by_entity($expected_participant_instance->subject_instance);
+        $subject_instance->manually_close();
+
+        $validator = new external_participant_token_validator($external_participant->token);
+        $this->assertTrue($validator->is_valid());
+        $this->assertEquals($expected_participant_instance->id, $validator->get_participant_instance()->id);
+        $this->assertTrue($validator->is_subject_instance_closed());
     }
 
     private function setup_data() {
