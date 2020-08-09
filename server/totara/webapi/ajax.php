@@ -73,6 +73,7 @@ try {
     error_log('API error: exception during set up stage - ' . $e->getMessage());
     util::send_error('Unknown internal error', 500);
 }
+global $PAGE;
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/totara/webapi/ajax.php');

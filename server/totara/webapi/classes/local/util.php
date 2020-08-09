@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
@@ -23,7 +23,9 @@
 
 namespace totara_webapi\local;
 
+use GraphQL\Error\FormattedError;
 use Throwable;
+use totara_webapi\client_aware_exception_helper;
 
 /**
  * Class util
@@ -114,10 +116,8 @@ final class util {
 
         self::log_exception($ex);
 
-        // TODO: decide how to mark exceptions as "client aware"
-
         $response = [
-            'errors' => \GraphQL\Error\FormattedError::createFromException($ex, (bool)$CFG->debugdeveloper),
+            'errors' => FormattedError::createFromException($ex, (bool)$CFG->debugdeveloper),
         ];
 
         self::send_response($response, 500);
@@ -143,6 +143,21 @@ final class util {
                 )
             );
         }
+    }
+
+    /**
+     * GraphQL error formatter, converts registered exceptions to client-aware exceptions.
+     *
+     * @param Throwable $error
+     * @return array
+     */
+    public static function graphql_error_formatter(Throwable $error): array {
+        $previous_exception = $error->getPrevious();
+        if ($previous_exception && client_aware_exception_helper::exception_registered($previous_exception)) {
+            $error = client_aware_exception_helper::create($previous_exception);
+        }
+
+        return FormattedError::createFromException($error);
     }
 
     /**

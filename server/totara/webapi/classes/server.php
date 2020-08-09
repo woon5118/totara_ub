@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -26,14 +26,12 @@ namespace totara_webapi;
 use coding_exception;
 use core\performance_statistics\collector;
 use core\webapi\execution_context;
-use Exception;
 use GraphQL\Error\Debug;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\StandardServer;
 use GraphQL\Type\Schema;
-use stdClass;
 use Throwable;
 use totara_webapi\local\util;
 
@@ -123,14 +121,22 @@ class server {
                 && !NO_MOODLE_COOKIES
                 && !confirm_sesskey($_SERVER['HTTP_X_TOTARA_SESSKEY'] ?? null)
             ) {
-                throw new webapi_request_exception('Invalid sesskey, page reload required');
+                $exception = new webapi_request_exception('Invalid sesskey, page reload required');
+
+                throw new client_aware_exception(
+                    $exception,
+                    [
+                        'category' => 'require_login',
+                        'http_status_code' => 400,
+                    ]
+                );
             }
 
             $request->validate();
 
             $operations = $this->prepare_operations($request);
 
-            $schema = $this->prepare_schema($request);
+            $schema = $this->prepare_schema();
 
             $server = new StandardServer([
                 'persistentQueryLoader' => new persistent_operations_loader(),
@@ -141,11 +147,13 @@ class server {
                 'rootValue' => graphql::get_server_root($schema),
                 'context' => $this->execution_context,
                 'errorsHandler' => [util::class, 'graphql_error_handler'],
+                'errorFormatter' => [util::class, 'graphql_error_formatter'],
             ]);
             $result = $server->executeRequest($operations);
         } catch (Throwable $e) {
             $result = new ExecutionResult(null, [$e]);
             $result->setErrorsHandler([util::class, 'graphql_error_handler']);
+            $result->setErrorFormatter([util::class, 'graphql_error_formatter']);
         }
 
         if ((defined('MDL_PERF') && MDL_PERF === true)
@@ -160,10 +168,9 @@ class server {
     /**
      * Build and validate the schema (on developer mode)
      *
-     * @param request $request
      * @return Schema
      */
-    protected function prepare_schema(request $request): Schema {
+    protected function prepare_schema(): Schema {
         $schema_file_loader = new schema_file_loader();
         $schema_builder = new schema_builder($schema_file_loader);
         $schema = $schema_builder->build();
@@ -257,14 +264,18 @@ class server {
                         util::send_error('Invalid result', 500);
                     }
                     if (!empty($execution_result->errors)) {
-                        $status_code = $this->has_internal_errors($execution_result) ? 500 : 400;
+                        $status_code = $this->has_internal_errors($execution_result)
+                            ? 500
+                            : $this->get_http_status_code($execution_result->errors);
                     }
                     return $execution_result->toArray($this->debug);
                 }, $result
             );
         } else {
             if (!empty($result->errors)) {
-                $status_code = $this->has_internal_errors($result) ? 500 : 400;
+                $status_code = $this->has_internal_errors($result)
+                    ? 500
+                    : $this->get_http_status_code($result->errors);
             }
             $result = $result->toArray($this->debug);
         }
@@ -283,14 +294,52 @@ class server {
         if (empty($result->errors)) {
             return false;
         }
+        $has_client_aware = false;
         foreach ($result->errors as $error) {
-            // If it's an error not happening in the GraphQL server or as part of the request,
+            $error_is_client_aware = $this->error_is_client_aware($error);
+            if ($error_is_client_aware) {
+                $has_client_aware = true;
+            }
+            // If it's an error not happening in the GraphQL server or as part of the request.
             // i.e. in the resolver we can give it a 500
-            if ((!$error instanceof Error || $error->getPrevious()) && !$error instanceof webapi_request_exception) {
+            if (!$error_is_client_aware && (!$error instanceof Error || $error->getPrevious()) && !$error instanceof webapi_request_exception) {
                 return true;
             }
         }
-        return false;
+
+        return !$has_client_aware;
     }
 
+    /**
+     * Gets http status code from the first client aware error.
+     */
+    private function get_http_status_code(array $errors): int {
+        if (empty($errors)) {
+            return 200;
+        }
+        $previous_exception = $errors[0]->getPrevious();
+
+        return $previous_exception
+            ? client_aware_exception_helper::get_exception_data($previous_exception)['http_status_code']
+            : 400;
+    }
+
+    /**
+     * Checks if error is client_aware.
+     *
+     * @param $error
+     * @return bool
+     */
+    private function error_is_client_aware($error): bool {
+        if ($error instanceof client_aware_exception) {
+            return true;
+        }
+        $previous = $error->getPrevious();
+
+        if (!$previous) {
+            return false;
+        }
+
+        return ($error instanceof Error && client_aware_exception_helper::exception_registered($previous));
+    }
 }
