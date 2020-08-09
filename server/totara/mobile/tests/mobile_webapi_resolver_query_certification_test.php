@@ -99,7 +99,7 @@ class totara_mobile_webapi_resolver_query_certification_testcase extends advance
         // Set the first user to in progress on the first certification.
         list($ccomp, $pcomp) = certif_load_completion($certifications[0]->id, $users[0]->id);
         $pcomp->timestarted = time() - 1;
-        $pcomp->timedue = time() + (DAYSECS*14);
+        $pcomp->timedue = -1; // Make sure this isn't set for now.
         certif_write_completion($ccomp, $pcomp);
 
         return [$users, $certifications];
@@ -263,7 +263,7 @@ class totara_mobile_webapi_resolver_query_certification_testcase extends advance
                     "fullname" => "cert1",
                     "shortname" => "c1",
                     "duedate" => null,
-                    "duedateState" => '',
+                    "duedateState" => null,
                     "summary" => "The first certification",
                     "summaryformat" => 'HTML',
                     "endnote" => "Congratulations on completing the first certification",

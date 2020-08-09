@@ -235,7 +235,7 @@ class totara_mobile_webapi_resolver_type_program_testcase extends advanced_testc
     }
 
     /**
-     * Test the program type resolver for the duedate field
+     * Test the program type resolver for the availablefrom field
      */
     public function test_resolve_availablefrom() {
         list($user, $program) = $this->create_faux_programs();
@@ -251,6 +251,9 @@ class totara_mobile_webapi_resolver_type_program_testcase extends advanced_testc
         $this->assertTrue(is_string($value));
     }
 
+    /**
+     * Test the program type resolver for the availableuntil field
+     */
     public function test_resolve_availableuntil() {
         list($user, $program) = $this->create_faux_programs();
         $this->setUser($user);
@@ -487,6 +490,75 @@ class totara_mobile_webapi_resolver_type_program_testcase extends advanced_testc
         $cs1 = array_shift($csets);
         $this->assertEquals('Courseset One', $cs1->name);
         $this->assertEmpty($value);
+    }
+
+    public function test_resolve_duedate() {
+        list($user, $program) = $this->create_faux_programs();
+        $this->setUser($user);
+
+        // Do a quick test for null when timedue is not set.
+        $value = $this->resolve('duedate', $program);
+        $this->assertNull($value);
+
+        $timedue = time() + (DAYSECS * 12); // Due in 12 days.
+
+        // Set the timedue for the user so we can test it.
+        $pcomp = prog_load_completion($program->id, $user->id);
+        $pcomp->timestarted = time() - 1;
+        $pcomp->timedue = $timedue;
+        prog_write_completion($pcomp);
+
+        $date = new DateTime('@' . $timedue);
+        $date->setTimezone(core_date::get_user_timezone_object());
+
+        $formats = [
+            \core\date_format::FORMAT_TIMESTAMP => $timedue,
+            \core\date_format::FORMAT_ISO8601 => $date->format(DateTime::ISO8601),
+        ];
+
+        foreach ($formats as $format => $expected) {
+            $value = $this->resolve('duedate', $program, ['format' => $format]);
+            $this->assertEquals($expected, $value);
+        }
+    }
+
+    public function test_resolve_duedate_state() {
+        list($user, $program) = $this->create_faux_programs();
+        $this->setUser($user);
+
+        $timedue_long = time() + (DAYSECS * 31); // Due in 31 days.
+        $timedue_short = time() + (DAYSECS * 12); // Due in 12 days.
+        $timedue_overdue = time() - DAYSECS; // Was due yesterday.
+
+        $value = $this->resolve('duedate_state', $program);
+        $this->assertNull($value);
+
+        // Set the timedue for the user to quite a while away.
+        $pcomp = prog_load_completion($program->id, $user->id);
+        $pcomp->timestarted = time() - 1;
+        $pcomp->timedue = $timedue_long;
+        prog_write_completion($pcomp);
+
+        $value = $this->resolve('duedate_state', $program, ['format' => format::FORMAT_PLAIN]);;
+        $this->assertEquals('info', $value);
+
+        // Set the timedue for the user to quite a while away.
+        $pcomp = prog_load_completion($program->id, $user->id);
+        $pcomp->timestarted = time() - 1;
+        $pcomp->timedue = $timedue_short;
+        prog_write_completion($pcomp);
+
+        $value = $this->resolve('duedate_state', $program, ['format' => format::FORMAT_PLAIN]);
+        $this->assertEquals('warning', $value);
+
+        // Set the timedue for the user to quite a while away.
+        $pcomp = prog_load_completion($program->id, $user->id);
+        $pcomp->timestarted = time() - 1;
+        $pcomp->timedue = $timedue_overdue;
+        prog_write_completion($pcomp);
+
+        $value = $this->resolve('duedate_state', $program, ['format' => format::FORMAT_PLAIN]);
+        $this->assertEquals('danger', $value);
     }
 
     public function test_resolve_count_unavailablesets() {

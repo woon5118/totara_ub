@@ -606,20 +606,58 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
         $this->setUser($user);
         $items = $this->get_learning_items($user->id);
 
-        // Check that each core instance of learning item gets resolved correctly.
-        $item = array_pop($items);
-        $value = $this->resolve('duedate', $item, ['format' => \core\date_format::FORMAT_TIMESTAMP]);
-        $this->assertEquals(null, $value);
-        $this->assertTrue(is_null($value));
+        $timedue = time() + (DAYSECS * 12); // Due in 12 days.
+        $date = new DateTime('@' . $timedue);
+        $date->setTimezone(core_date::get_user_timezone_object());
+        $formats = [
+            \core\date_format::FORMAT_TIMESTAMP => $timedue,
+            \core\date_format::FORMAT_ISO8601 => $date->format(DateTime::ISO8601),
+        ];
 
-        $item = array_pop($items);
-        $value = $this->resolve('duedate', $item, ['format' => \core\date_format::FORMAT_TIMESTAMP]);
-        $this->assertEquals(null, $value);
+        foreach ($items as $item) {
+            $value = $this->resolve('duedate', $item);
+            $this->assertEquals(null, $value);
 
-        $item = array_pop($items);
-        $value = $this->resolve('duedate', $item, ['format' => \core\date_format::FORMAT_TIMESTAMP]);
-        $this->assertEquals(null, $value);
-        $this->assertTrue(is_null($value));
+            // This course item is not assigned via a learning plan so can not have a duedate set.
+            if ($item->itemtype != 'course') {
+                // Fake setting the timedue for the user.
+                $item->duedate = $timedue;
+
+                foreach ($formats as $format => $expected) {
+                    $value = $this->resolve('duedate', $item, ['format' => $format]);
+                    $this->assertEquals($expected, $value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Test the learning item type resolver for the duedate field
+     */
+    public function test_resolve_duedate_state() {
+        list($user, $course, $program, $certification) = $this->create_faux_learning_items();
+        $this->setUser($user);
+        $items = $this->get_learning_items($user->id);
+
+        $teststates = [
+            'info' => (time() + (DAYSECS * 31)), // Due in 31 days.
+            'warning' => (time() + (DAYSECS * 12)), // Due in 12 days.
+            'danger' => (time() - DAYSECS), // Was due yesterday.
+        ];
+
+        foreach ($items as $item) {
+            $value = $this->resolve('duedate_state', $item);
+            $this->assertEquals(null, $value);
+
+            // This course item is not assigned via a learning plan so can not have a duedate set.
+            if ($item->itemtype != 'course') {
+                foreach ($teststates as $expected => $timedue) {
+                    $item->duedate = $timedue;
+                    $value = $this->resolve('duedate_state', $item, ['format' => format::FORMAT_PLAIN]);
+                    $this->assertEquals($expected, $value);
+                }
+            }
+        }
     }
 
     /**

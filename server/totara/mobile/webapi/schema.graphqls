@@ -102,7 +102,7 @@ type totara_mobile_learning_item {
   Learning item duedate status, as computed by server. One of
   "info", "warning", "danger", or "overdue".
   """
-  duedate_state: String
+  duedate_state(format: core_format = PLAIN): String
   """
   Flag indicating whether item is suitable for native mobile display
   """

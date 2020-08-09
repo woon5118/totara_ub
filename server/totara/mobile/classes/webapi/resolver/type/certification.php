@@ -23,6 +23,7 @@
 
 namespace totara_mobile\webapi\resolver\type;
 
+use totara_mobile\local\duedate_state as mobile_duedate_state;
 use totara_mobile\formatter\mobile_certification_formatter;
 use core\format;
 use context_program;
@@ -106,26 +107,12 @@ class certification implements type_resolver {
                     }
                 }
 
-                // Note: These fields define the state of a notification and shouldn't be translated.
+                // Mobile - override duedate state to make them consistent.
                 if ($field == 'duedate_state') {
-                    $now =  time();
-
-                    if (empty($progcompletion->timedue) || $progcompletion->timedue == -1) {
-                        return '';
-                    } else if ($progcompletion->timedue < $now) {
-                        // Program overdue.
-                        return 'danger';
+                    if (!empty($progcompletion->timedue) && $progcompletion->timedue != -1) {
+                        $certification->duedate_state = mobile_duedate_state::calculate($progcompletion->timedue);
                     } else {
-                        $days = floor(($progcompletion->timedue - $now) / DAYSECS);
-                        if ($days == 0) {
-                            // Program due immediately.
-                            return 'danger';
-                        } else if ($days > 0 && $days < 10) {
-                            // Program due in the next 1-10 days.
-                            return 'warning';
-                        } else {
-                            return '';
-                        }
+                        return null;
                     }
                 }
 

@@ -24,6 +24,7 @@
 namespace totara_mobile\webapi\resolver\type;
 
 use totara_mobile\formatter\mobile_program_formatter;
+use totara_mobile\local\duedate_state as mobile_duedate_state;
 use core\format;
 use context_program;
 use core\webapi\execution_context;
@@ -149,6 +150,10 @@ class program implements type_resolver {
             // however completion is it's own object and duedate is part of the program.
             if ($completion = prog_load_completion($program->id, $USER->id, false)) {
 
+                if ($field == 'completion') {
+                    return $completion;
+                }
+
                 if ($field == 'duedate') {
                     if (!empty($completion->timedue) && $completion->timedue != -1) {
                         $program->duedate = $completion->timedue;
@@ -157,32 +162,14 @@ class program implements type_resolver {
                     }
                 }
 
-                // Note: These fields define the state of a notification and shouldn't be translated.
+                // Mobile - override duedate states to make them consistent.
                 if ($field == 'duedate_state') {
-                    $now =  time();
-                    if (empty($completion->timedue) || $completion->timedue == -1) {
-                        return '';
-                    } else if ($completion->timedue < $now) {
-                        // Program overdue.
-                        return 'danger';
+                    if (!empty($completion->timedue) && $completion->timedue != -1) {
+                        $program->duedate_state = mobile_duedate_state::calculate($completion->timedue);
                     } else {
-                        $days = floor(($completion->timedue - $now) / DAYSECS);
-                        if ($days == 0) {
-                            // Program due immediately.
-                            return 'danger';
-                        } else if ($days > 0 && $days < 10) {
-                            // Program due in the next 1-10 days.
-                            return 'warning';
-                        } else {
-                            return '';
-                        }
+                        return null;
                     }
                 }
-
-                if ($field == 'completion') {
-                    return $completion;
-                }
-
             } else {
                 return null;
             }
@@ -229,6 +216,7 @@ class program implements type_resolver {
                 }
             }
         }
+
         $formatter = new mobile_program_formatter($program, $program_context);
         $formatted = $formatter->format($field, $format);
 

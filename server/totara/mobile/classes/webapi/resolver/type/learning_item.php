@@ -27,6 +27,7 @@ namespace totara_mobile\webapi\resolver\type;
 use core\orm\query\builder;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
+use totara_mobile\local\duedate_state as mobile_duedate_state;
 use totara_mobile\formatter\mobile_learning_item_formatter;
 use totara_core\user_learning\item;
 use totara_core\user_learning\item_base;
@@ -87,15 +88,27 @@ class learning_item implements type_resolver {
             }
         }
 
-        if ($field == 'duedate') {
+        if ($field == 'duedate' || $field == 'duedate_state') {
             // Make sure we have the due date, this is for programs and certifications, also courses inside learning plans.
             if ($item instanceof item_has_dueinfo) {
                 $item->ensure_duedate_loaded();
+            } else {
+                return null;
+            }
+
+            if ($field == 'duedate') {
                 if (empty($item->duedate) || $item->duedate == -1) {
                     return null;
                 }
-            } else {
-                return null;
+            }
+
+            // Mobile - override duedate state to make them consistent.
+            if ($field == 'duedate_state') {
+                if (!empty($item->duedate) && $item->duedate != -1) {
+                    $item->duedate_state = mobile_duedate_state::calculate($item->duedate);
+                } else {
+                    return null;
+                }
             }
         }
 
@@ -106,12 +119,6 @@ class learning_item implements type_resolver {
                 return $item->get_progress_percentage();
             } else {
                 return null;
-            }
-        }
-
-        if ($field == 'duedate_state') {
-            if (empty($item->duedate) || $item->duedate == -1) {
-                $item->duedate_state = null; // For consistency.
             }
         }
 

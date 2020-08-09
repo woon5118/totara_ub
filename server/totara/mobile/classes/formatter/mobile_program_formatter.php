@@ -37,7 +37,7 @@ class mobile_program_formatter extends program_formatter {
             'shortname' => string_field_formatter::class,
             'idnumber' => null,
             'duedate' => date_field_formatter::class,
-            'duedate_state' => null,
+            'duedate_state' => string_field_formatter::class,
             'summary' => function ($value, text_field_formatter $formatter) {
                 $component = 'totara_program';
                 $filearea = 'summary';

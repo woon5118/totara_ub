@@ -247,7 +247,7 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
     }
 
     /**
-     * Test the certification type resolver for the duedate field
+     * Test the certification type resolver for the availablefrom field
      */
     public function test_resolve_availablefrom() {
         list($user, $certification) = $this->create_faux_certifications();
@@ -521,6 +521,76 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
         $cs1 = array_shift($csets);
         $this->assertEquals('Courseset One', $cs1->name);
         $this->assertEmpty($value);
+    }
+
+    public function test_resolve_duedate() {
+        list($user, $certification) = $this->create_faux_certifications();
+        $this->setUser($user);
+
+        // Do a quick test for null when timedue is not set.
+        $value = $this->resolve('duedate', $certification);
+        $this->assertNull($value);
+
+        $timedue = time() + (DAYSECS * 12); // Due in 12 days.
+
+        // Set the timedue for the user so we can test it.
+        list($ccomp, $pcomp) = certif_load_completion($certification->id, $user->id);
+        $pcomp->timestarted = time() - 1;
+        $pcomp->timedue = $timedue;
+        certif_write_completion($ccomp, $pcomp);
+
+        $date = new DateTime('@' . $timedue);
+        $date->setTimezone(core_date::get_user_timezone_object());
+
+        $formats = [
+             \core\date_format::FORMAT_TIMESTAMP => $timedue,
+             \core\date_format::FORMAT_ISO8601 => $date->format(DateTime::ISO8601),
+        ];
+
+        foreach ($formats as $format => $expected) {
+            $value = $this->resolve('duedate', $certification, ['format' => $format]);
+            $this->assertEquals($expected, $value);
+        }
+    }
+
+    public function test_resolve_duedate_state() {
+        list($user, $certification) = $this->create_faux_certifications();
+        $this->setUser($user);
+
+        $value = $this->resolve('duedate', $certification);
+        $this->assertNull($value);
+
+        $timedue_long = time() + (DAYSECS * 31); // Due in 31 days.
+        $timedue_short = time() + (DAYSECS * 12); // Due in 12 days.
+        $timedue_overdue = time() - DAYSECS; // Was due yesterday.
+
+        // Set the timedue for the user so we can test it.
+        list($ccomp, $pcomp) = certif_load_completion($certification->id, $user->id);
+        $pcomp->timestarted = time() - 1;
+        $pcomp->timedue = $timedue_long;
+        certif_write_completion($ccomp, $pcomp);
+
+        $value = $this->resolve('duedate_state', $certification, ['format' => format::FORMAT_PLAIN]);;
+        $this->assertEquals('info', $value);
+
+        // Set the timedue for the user to quite a while away.
+        list($ccomp, $pcomp) = certif_load_completion($certification->id, $user->id);
+        $pcomp->timestarted = time() - 1;
+        $pcomp->timedue = $timedue_short;
+        certif_write_completion($ccomp, $pcomp);
+
+        $value = $this->resolve('duedate_state', $certification, ['format' => format::FORMAT_PLAIN]);;
+        $this->assertEquals('warning', $value);
+
+        // Set the timedue for the user to quite a while away.
+        list($ccomp, $pcomp) = certif_load_completion($certification->id, $user->id);
+        $pcomp->timestarted = time() - 1;
+        $pcomp->timedue = $timedue_overdue;
+        certif_write_completion($ccomp, $pcomp);
+
+        $value = $this->resolve('duedate_state', $certification, ['format' => format::FORMAT_PLAIN]);;
+        $this->assertEquals('danger', $value);
+
     }
 
     public function test_resolve_count_unavailablesets() {

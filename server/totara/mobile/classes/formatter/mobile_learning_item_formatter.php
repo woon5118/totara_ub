@@ -25,6 +25,7 @@ namespace totara_mobile\formatter;
 
 use totara_core\formatter\learning_item_formatter;
 use core\webapi\formatter\field\date_field_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 
 /**
  * Formatter for learning items
@@ -43,7 +44,7 @@ class mobile_learning_item_formatter extends learning_item_formatter {
             'progress' => null,
             'idnumber' => null,
             'duedate' => date_field_formatter::class,
-            'duedate_state' => null,
+            'duedate_state' => string_field_formatter::class,
             'description' => 'item_description_formatter',
             'description_format' => null,
             'url_view' => null,

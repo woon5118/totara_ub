@@ -237,7 +237,7 @@ class totara_mobile_webapi_resolver_query_program_testcase extends advanced_test
                     "fullname" => "prog1",
                     "shortname" => "p1",
                     "duedate" => null,
-                    "duedateState" => '',
+                    "duedateState" => null,
                     "summary" => "The first program",
                     "summaryformat" => 'HTML',
                     "endnote" => "You've finished the first program",

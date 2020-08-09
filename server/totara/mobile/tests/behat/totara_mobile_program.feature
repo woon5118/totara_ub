@@ -1,0 +1,93 @@
+@totara @totara_mobile @totara_program @_file_upload @javascript
+Feature: Test the totara_mobile_program query
+
+  Background:
+    Given I am on a totara site
+    And the following "users" exist:
+      | username | firstname | lastname | email                |
+      | student1 | Student   | 1        | student1@example.com |
+    And the following "programs" exist in "totara_program" plugin:
+      | fullname  | shortname | category |
+      | Program 1 | prog1     |          |
+    And the following "program assignments" exist in "totara_program" plugin:
+      | program | user     |
+      | prog1   | student1 |
+    When I log in as "admin"
+    And I navigate to "Plugins > Mobile > Mobile settings" in site administration
+    And I set the following fields to these values:
+      | Enable mobile app | 1 |
+    And I click on "Save changes" "button"
+
+  Scenario: Test the query with a basic program
+    And I log out
+    When I am using the mobile emulator
+    Then I should see "Device emulator loading..."
+    And I should see "Making login_setup request"
+    And I set the field "username" to "student1"
+    And I set the field "password" to "student1"
+    When I click on "Submit Credentials 1" "button"
+    Then I should see "Native login OK"
+    And I should see "Setting up new GraphQL browser"
+    When I set the field "jsondata2" to "{\"operationName\": \"totara_mobile_program\",\"variables\": {\"programid\": 1}}"
+    And I click on "Submit Request 2" "button"
+    Then I should not see "Coding error detected" in the "#response2" "css_element"
+    And I should see "\"fullname\": \"Program 1\"" in the "#response2" "css_element"
+    And I should see "\"shortname\": \"prog1\"" in the "#response2" "css_element"
+    And I should see "\"duedate\": null" in the "#response2" "css_element"
+    And I should see "\"duedateState\": null" in the "#response2" "css_element"
+    And I should see "\"summary\": \"\"" in the "#response2" "css_element"
+    And I should see "\"endnote\": \"\"" in the "#response2" "css_element"
+    And I should see "\"completion\": {" in the "#response2" "css_element"
+    And I should see "\"currentCourseSets\": []" in the "#response2" "css_element"
+    And I should see "\"countUnavailableSets\": 0" in the "#response2" "css_element"
+    And I should see "\"imageSrc\": \"\"" in the "#response2" "css_element"
+
+  Scenario: Test the query with a program that has an image
+    When I navigate to "Manage programs" node in "Site administration > Programs"
+    And I click on "Miscellaneous" "link"
+    And I click on "Program 1" "link"
+    And I click on "Edit program details" "button"
+    And I switch to "Details" tab
+    And I expand all fieldsets
+    And I upload "totara/program/tests/fixtures/leaves-blue.png" file to "Image" filemanager
+    And I press "Save changes"
+    And I log out
+
+    When I am using the mobile emulator
+    Then I should see "Device emulator loading..."
+    And I should see "Making login_setup request"
+    And I set the field "username" to "student1"
+    And I set the field "password" to "student1"
+    When I click on "Submit Credentials 1" "button"
+    Then I should see "Native login OK"
+    And I should see "Setting up new GraphQL browser"
+    When I set the field "jsondata2" to "{\"operationName\": \"totara_mobile_program\",\"variables\": {\"programid\": 1}}"
+    And I click on "Submit Request 2" "button"
+    And I should not see "Coding error detected" in the "#response2" "css_element"
+    Then I should see "\"fullname\": \"Program 1\"" in the "#response2" "css_element"
+    And I should see "\"imageSrc\"" in the "#response2" "css_element"
+    And I click on "link0" "link" in the "#response2" "css_element"
+    Then I should see "26) File request HTTP ok."
+    And I should see "27) File received image/png"
+    And I should see "28) File response 3312 bytes"
+
+  Scenario: Test the query with a program that has a custom default image
+    When I navigate to "Manage programs" node in "Site administration > Programs"
+    And I follow "Set default image for all programs"
+    And I upload "totara/program/tests/fixtures/leaves-blue.png" file to "" filemanager
+    And I press "Save changes"
+    And I log out
+
+    When I am using the mobile emulator
+    Then I should see "Device emulator loading..."
+    And I should see "Making login_setup request"
+    And I set the field "username" to "student1"
+    And I set the field "password" to "student1"
+    When I click on "Submit Credentials 1" "button"
+    Then I should see "Native login OK"
+    And I should see "Setting up new GraphQL browser"
+    When I set the field "jsondata2" to "{\"operationName\": \"totara_mobile_program\",\"variables\": {\"programid\": 1}}"
+    And I click on "Submit Request 2" "button"
+    Then I should not see "Coding error detected" in the "#response2" "css_element"
+    And I should see "\"fullname\": \"Program 1\"" in the "#response2" "css_element"
+    And I should see "\"imageSrc\": \"\"" in the "#response2" "css_element"
