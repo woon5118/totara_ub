@@ -60,7 +60,9 @@ class rb_filter_enrol extends rb_filter_type {
         $choices = array('' => get_string('anyvalue', 'filters')) + $options;
         $mform->addElement('select', $this->name, $label, $choices);
         $mform->setType($this->name, PARAM_TEXT);
-        $this->add_help_button($mform, $this->name, 'filterenrol', 'filters');
+        // Custom help language string to be displayed in the help button of this filter (Expected an array as follow: ['sitewide', 'rb_source_facetoface_asset']).
+        $customhelptext = isset($this->options['customhelptext']) && is_array($this->options['customhelptext']) ? $this->options['customhelptext'] : null;
+        $this->add_help_button($mform, $this->name, 'filterenrol', 'filters', $customhelptext);
         if ($advanced) {
             $mform->setAdvanced($this->name);
         }

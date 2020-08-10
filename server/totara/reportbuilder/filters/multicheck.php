@@ -128,7 +128,9 @@ class rb_filter_multicheck extends rb_filter_type {
             $mform->disabledIf($this->name . '[' . $id . ']', $this->name . '_op', 'eq', 0);
         }
         $mform->addGroup($objs, $this->name . '_grp', $grplabel, '', false);
-        $this->add_help_button($mform, $this->name . '_grp', 'filtermultiselect', 'totara_reportbuilder');
+        // Custom help language string to be displayed in the help button of this filter (Expected an array as follow: ['sitewide', 'rb_source_facetoface_asset']).
+        $customhelptext = isset($this->options['customhelptext']) && is_array($this->options['customhelptext']) ? $this->options['customhelptext'] : null;
+        $this->add_help_button($mform, $this->name . '_grp', 'filtermultiselect', 'totara_reportbuilder', $customhelptext);
 
         if ($advanced) {
             $mform->setAdvanced($this->name . '_op');

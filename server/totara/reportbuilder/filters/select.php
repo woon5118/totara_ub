@@ -83,7 +83,8 @@ class rb_filter_select extends rb_filter_type {
         $defaultvalue = $this->defaultvalue;
         $simplemode = $this->options['simplemode'];
         $attr = $this->options['attributes'];
-        $customhelptext = isset($this->options['customhelptext']) ? $this->options['customhelptext'] : null;
+        // Custom help language string to be displayed in the help button of this filter (Expected an array as follow: ['sitewide', 'rb_source_facetoface_asset']).
+        $customhelptext = isset($this->options['customhelptext']) && is_array($this->options['customhelptext']) ? $this->options['customhelptext'] : null;
 
         $options = array();
         foreach ($this->options['selectchoices'] as $key => $option) {

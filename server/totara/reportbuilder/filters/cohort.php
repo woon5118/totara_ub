@@ -49,7 +49,9 @@ class rb_filter_cohort extends rb_filter_type {
 
         $mform->addElement('hidden', $this->name, '');
         $mform->setType($this->name, PARAM_SEQUENCE);
-        $this->add_help_button($mform, $this->name . '_list', 'reportbuildercohortfilter', 'totara_reportbuilder');
+        // Custom help language string to be displayed in the help button of this filter (Expected an array as follow: ['sitewide', 'rb_source_facetoface_asset']).
+        $customhelptext = isset($this->options['customhelptext']) && is_array($this->options['customhelptext']) ? $this->options['customhelptext'] : null;
+        $this->add_help_button($mform, $this->name . '_list', 'reportbuildercohortfilter', 'totara_reportbuilder', $customhelptext);
 
         // set default values
         if (isset($SESSION->reportbuilder[$this->report->get_uniqueid()][$this->name])) {

@@ -194,7 +194,9 @@ class rb_filter_grpconcat_jobassignment extends rb_filter_hierarchy_multi {
         }
 
         $grp =& $mform->addElement('group', $this->name . '_grp', $label, $objs, '', false);
-        $this->add_help_button($mform, $grp->_name, 'reportbuilderjobassignmentfilter', 'totara_reportbuilder');
+        // Custom help language string to be displayed in the help button of this filter (Expected an array as follow: ['sitewide', 'rb_source_facetoface_asset']).
+        $customhelptext = isset($this->options['customhelptext']) && is_array($this->options['customhelptext']) ? $this->options['customhelptext'] : null;
+        $this->add_help_button($mform, $grp->_name, 'reportbuilderjobassignmentfilter', 'totara_reportbuilder', $customhelptext);
         $mform->disabledIf($this->name . '_child', $this->name . '_op', 'eq', 0);
 
         if ($advanced) {

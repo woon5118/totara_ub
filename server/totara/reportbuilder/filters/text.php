@@ -60,7 +60,9 @@ class rb_filter_text extends rb_filter_type {
         $mform->setType($this->name . '_op', PARAM_INT);
         $mform->setType($this->name, PARAM_TEXT);
         $grp =& $mform->addElement('group', $this->name . '_grp', $label, $objs, '', false);
-        $this->add_help_button($mform, $grp->_name, 'filtertext', 'filters');
+        // Custom help language string to be displayed in the help button of this filter (Expected an array as follow: ['sitewide', 'rb_source_facetoface_asset']).
+        $customhelptext = isset($this->options['customhelptext']) && is_array($this->options['customhelptext']) ? $this->options['customhelptext'] : null;
+        $this->add_help_button($mform, $grp->_name, 'filtertext', 'filters', $customhelptext);
         $mform->disabledIf($this->name, $this->name . '_op', 'eq', self::RB_FILTER_ISEMPTY);
         $mform->disabledIf($this->name, $this->name . '_op', 'eq', self::RB_FILTER_ISNOTEMPTY);
         if ($advanced) {
