@@ -36,6 +36,12 @@ class participant_section_external_participant extends participant_section {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
+        // This query is supposed to work only for non-logged in external users
+        global $USER;
+        if ($USER && $USER->id > 0) {
+            return null;
+        }
+
         $participant_instance_id = $args['participant_instance_id'] ?? 0;
         $participant_section_id = $args['participant_section_id'] ?? 0;
 
@@ -52,7 +58,7 @@ class participant_section_external_participant extends participant_section {
         }
 
         $participant_instance = $validator->get_participant_instance();
-        if ($participant_instance_id != $participant_instance->id) {
+        if ($participant_instance_id && $participant_instance_id != $participant_instance->id) {
             return null;
         }
 
@@ -63,7 +69,8 @@ class participant_section_external_participant extends participant_section {
             ? $section_provider->find_by_section_id($participant_section_id)
             : $section_provider->find_by_instance_id($participant_instance_id);
 
-        if (!$participant_section) {
+        // Just making sure we have found a section and it matches the instance
+        if (!$participant_section || $participant_section->participant_instance_id != $participant_instance->id) {
             return null;
         }
 
