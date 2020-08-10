@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript @totara_customfield
+@mod @mod_facetoface @mod_facetoface_attendees_add @totara @javascript @totara_customfield @_file_upload
 Feature: Add seminar attendees from csv file with custom fields
   In order to test the bulk add attendees from file
   As a site manager
@@ -33,7 +33,6 @@ Feature: Add seminar attendees from csv file with custom fields
       | Short name (must be unique) | datetime         |
     And I press "Save changes"
 
-  @_file_upload
   Scenario: Login as manager, upload csv file with custom fields using bulk add attendees from file and check the result.
 
     And I set the field "Create a new custom field" to "Menu of choices"
@@ -112,7 +111,6 @@ Feature: Add seminar attendees from csv file with custom fields
     And I should see "Sed do eiusmod tempor incididunt" in the "John3 Smith3" "table_row"
     And I should see "/mod/facetoface/view.php?id=1" in the "John3 Smith3" "table_row"
 
-  @_file_upload
   Scenario: Valid CSV format, but where header and columns are missed
 
     And I am on "Course 1" course homepage
@@ -129,7 +127,6 @@ Feature: Add seminar attendees from csv file with custom fields
     And I should see "Booked" in the "John2 Smith2" "table_row"
     And I should see "Booked" in the "John3 Smith3" "table_row"
 
-  @_file_upload
   Scenario: Invalid CSV format, one of the custom field values is missed
 
     And I am on "Course 1" course homepage
@@ -143,7 +140,6 @@ Feature: Add seminar attendees from csv file with custom fields
     When I press "Continue"
     Then I should see "Invalid CSV file format - number of columns is not constant!"
 
-  @_file_upload
   Scenario: Login as manager, upload csv file with required multi-select custom field using bulk add attendees from file and check the result.
 
     And I set the field "Create a new custom field" to "Multi-select"
@@ -170,7 +166,6 @@ Feature: Add seminar attendees from csv file with custom fields
     And I should see "Moa, Tuatara" in the "John2 Smith2" "table_row"
     And I should see "Tuatara" in the "John3 Smith3" "table_row"
 
-  @_file_upload
   Scenario: Add users via file upload with customfield hidden
 
     And I click on "Hide" "link" in the "Requests for session organiser" "table_row"

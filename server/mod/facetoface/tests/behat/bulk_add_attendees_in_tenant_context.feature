@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript @_file_upload @tenant @totara_tenant
+@mod @mod_facetoface @mod_facetoface_attendees_add @totara @javascript @_file_upload @tenant @totara_tenant
 Feature: Add seminar attendees in tenant context via bulk options
   In order to test tenant context in the bulk add attendees
   As admin

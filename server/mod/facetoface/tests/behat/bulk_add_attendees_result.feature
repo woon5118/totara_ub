@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript
+@mod @mod_facetoface @mod_facetoface_attendees_add @totara @javascript
 Feature: Add seminar attendees in bulk and see results
   In order to test the bulk add attendees information result
   As admin

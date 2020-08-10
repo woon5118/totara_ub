@@ -344,7 +344,11 @@ final class attendees_list_helper {
                 }
 
                 // Check that user exists.
-                $user = $DB->get_record('user', array($idfield => $data[$idfield]));
+                if ($idfield === 'idnumber') {
+                    $user = $DB->get_record('user', array($idfield => $data[$idfield]));
+                } else {
+                    $user = $DB->get_record_select('user', "LOWER({$idfield}) = LOWER(:value)", ['value' => $data[$idfield]]);
+                }
                 if (!$user) {
                     $usersnotexist[] = $data[$idfield];
                     continue;
@@ -358,7 +362,7 @@ final class attendees_list_helper {
                         try {
                             $jobassignment = job_assignment::get_with_idnumber($user->id, $data['jobassignmentidnumber'], true);
                             $data['jobassignmentid'] = $jobassignment->id;
-                        } catch(\dml_missing_record_exception $e) {
+                        } catch (\dml_missing_record_exception $e) {
                             $a = new \stdClass();
                             $a->user = fullname($user);
                             $a->idnumber = $data['jobassignmentidnumber'];
@@ -454,8 +458,18 @@ final class attendees_list_helper {
         $userstoadd = array();
 
         if (!empty($addusers)) {
-            list($insql, $params) = $DB->get_in_or_equal($addusers, SQL_PARAMS_NAMED);
-            $availableusers = $DB->get_records_sql("SELECT * FROM {user} WHERE {$field} " . $insql, $params);
+            list($insql, $params) = $DB->get_in_or_equal($addusers, SQL_PARAMS_NAMED, 'f2fuser');
+            if ($field === 'idnumber') {
+                $availableusers = $DB->get_records_sql("SELECT * FROM {user} WHERE {$field} " . $insql, $params);
+            } else {
+                // Sort names in descending order to prevent ":uq_f2fuser_12" from ending up with "LOWER(:uq_f2fuser_1)2".
+                $param_names = array_keys($params);
+                rsort($param_names);
+                $insql = preg_replace('/:(' . implode('|', array_map(function ($x) {
+                    return preg_quote($x);
+                }, $param_names)) . ')/', 'LOWER(:$1)', $insql);
+                $availableusers = $DB->get_records_sql("SELECT * FROM {user} WHERE LOWER({$field}) " . $insql, $params);
+            }
             foreach ($availableusers as $id => $user) {
                 $added[] = $user->{$field};
                 $userstoadd[] = $user->id;

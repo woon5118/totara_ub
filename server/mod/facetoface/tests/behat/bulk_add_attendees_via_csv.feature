@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript @_file_upload
+@mod @mod_facetoface @mod_facetoface_attendees_add @totara @javascript @_file_upload
 Feature: Add seminar attendees in bulk via csv file
   In order to test the bulk add attendees information result
   As admin
@@ -112,3 +112,14 @@ Feature: Add seminar attendees in bulk via csv file
     Then I should see "Booked" in the "John1 Smith1" "table_row"
     And I should see "Booked" in the "John2 Smith2" "table_row"
     And I should see "Booked" in the "John3 Smith3" "table_row"
+
+  Scenario: Upload csv file using 'Comma' delimiter option with case insensitive idnumber and no required custom fields
+    Given I click on the seminar event action "Attendees" in row "#1"
+    And I set the field "Attendee actions" to "Add users via file upload"
+    And I upload "mod/facetoface/tests/fixtures/f2f_attendees_invalid_idnumber.csv" file to "CSV text file" filemanager
+    And I set the field "delimiter" to "Comma (,)"
+    And I press "Continue"
+    And I press "Confirm"
+    Then I should see "Bulk add attendees error"
+    And I follow "View results"
+    Then I should see "No user was found with the following user ID number: i2"

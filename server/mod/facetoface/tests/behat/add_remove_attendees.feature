@@ -1,4 +1,4 @@
-@javascript @mod @mod_facetoface @totara
+@javascript @mod @mod_facetoface @mod_facetoface_attendees_add @totara
 Feature: Add - Remove seminar attendees
   In order to test the add/remove seminar attendees
   As admin
@@ -118,6 +118,52 @@ Feature: Add - Remove seminar attendees
     Then I should see "This seminar requires manager approval. Users without a manager cannot join the seminar." in the "Sam2 Student2" "table_row"
     And I press "Cancel"
 
+  Scenario: Add users by idnumber via textarea
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 1        |
+    Given I log in as "admin"
+    And I am on "Test seminar name" seminar homepage
+    When I click on the seminar event action "Attendees" in row "#1"
+    And I set the field "Attendee actions" to "Add users via list of IDs"
+    # By default user is expected to separate ID's by newline, but comma is also supported.
+    And I set the following fields to these values:
+      | User identifier | ID number   |
+      | csvinput        | sid#1,sid#2 |
+    And I press "Continue"
+    And I click on "Change selected users" "link"
+    Then the following fields match these values:
+      | User identifier | ID number   |
+      | csvinput        | sid#1,sid#2 |
+    And I press "Continue"
+    And I press "Confirm"
+    And I click on "Wait-list" "link"
+    And I should see "Sam1 Student1"
+    And I should see "Sam2 Student2"
+
+  Scenario: Add users by case insensitive idnumber via textarea
+    And the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface        | details | capacity |
+      | Test seminar name | event 1 | 1        |
+    Given I log in as "admin"
+    And I am on "Test seminar name" seminar homepage
+    When I click on the seminar event action "Attendees" in row "#1"
+    And I set the field "Attendee actions" to "Add users via list of IDs"
+    # By default user is expected to separate ID's by newline, but comma is also supported.
+    And I set the following fields to these values:
+      | User identifier | ID number   |
+      | csvinput        | Sid#1,sid#2 |
+    And I press "Continue"
+    And I click on "Change selected users" "link"
+    Then the following fields match these values:
+      | User identifier | ID number   |
+      | csvinput        | Sid#1,sid#2 |
+    And I press "Continue"
+    And I press "Confirm"
+    Then I should see "Bulk add attendees error"
+    And I follow "View results"
+    Then I should see "No user was found with the following user ID number: Sid#1"
+
   Scenario: Add users by username via textarea
     And the following "seminar events" exist in "mod_facetoface" plugin:
       | facetoface        | details | capacity |
@@ -129,12 +175,12 @@ Feature: Add - Remove seminar attendees
     # By default user is expected to separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
       | User identifier | Username          |
-      | csvinput        | student1,student2 |
+      | csvinput        | Student1,student2 |
     And I press "Continue"
     And I click on "Change selected users" "link"
     Then the following fields match these values:
       | User identifier | Username          |
-      | csvinput        | student1,student2 |
+      | csvinput        | Student1,student2 |
     And I press "Continue"
     And I press "Confirm"
     And I click on "Wait-list" "link"
@@ -152,12 +198,12 @@ Feature: Add - Remove seminar attendees
     # By default user separate ID's by newline, but comma is also supported.
     And I set the following fields to these values:
       | User identifier | Email address |
-      | csvinput        | student1@example.com,student2@example.com |
+      | csvinput        | Student1@example.com,student2@example.com |
     And I press "Continue"
     And I click on "Change selected users" "link"
     Then the following fields match these values:
       | User identifier | Email address |
-      | csvinput        | student1@example.com,student2@example.com |
+      | csvinput        | Student1@example.com,student2@example.com |
     And I press "Continue"
     And I press "Confirm"
     And I click on "Wait-list" "link"
