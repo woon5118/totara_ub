@@ -15,9 +15,8 @@
  *
  * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
  * @package core
+ * @var core_config $CFG
  */
-
-/** @var core_config $CFG */
 
 /***********************************************************************************************************************
 Getting started
@@ -28,8 +27,19 @@ Getting started
 //
 
 /***********************************************************************************************************************
+Totara Registration
+***********************************************************************************************************************/
+//
+// When installing or upgrading Totara you will be asked to resgiter your site if you have not already.
+// To save having to provide the information through the web interface you can set the following configuration variables.
+// Site type can be one of: production, trial, qa, demo, or development.
+// $CFG->sitetype = 'production';
+// $CFG->registrationcode = 'xxxxxxxxxxxxxxxx'; // Your unique code provided by the registration system
+//
+
+/***********************************************************************************************************************
 Web Address
- ***********************************************************************************************************************/
+***********************************************************************************************************************/
 //
 // Set the full web address that your Totara installation will be access on.
 // Important information
@@ -41,7 +51,7 @@ $CFG->wwwroot   = 'https://example.com/totara';
 
 /***********************************************************************************************************************
 Data directory
- ***********************************************************************************************************************/
+***********************************************************************************************************************/
 //
 // The following is the path to the directory that Totara will use to store files.
 // This includes user uploaded files, temporary and cache files, and other miscellaneous files created by Totara.
@@ -66,6 +76,14 @@ $CFG->directorypermissions = 02777;
 // Set a locally available cache directory. This is intended for server clusters and does NOT need to be shared between
 // nodes. Only data that is safe to cache like this will be stored in this directory.
 // $CFG->localcachedir = '/var/totara/localcache/';
+//
+// Set the lifetime a served file will remain in caches (in seconds)
+// This setting only has an effect in areas where stale files are not expected to be a problem. Areas where it is vital
+// the correct file is served will not make use of caching.
+// If you are concerned about users receiving stale files you can lower this lifetime.
+// $CFG->filelifetime = 60*60*6;
+//
+
 
 /***********************************************************************************************************************
  Database configuration
@@ -89,6 +107,47 @@ $CFG->dboptions = array(
     // Port to use to connect to the database. When empty the default port for your chosen DB will be used.
     'dbport'    => '',
 );
+//
+// Totara used to periodically ask the database management system to analyse the context and context_map tables,
+// ensuring that statistics for the tables are up to date.
+// Having accurate statistics can have a significant performance impact on a site, particularly if courses, activities
+// and users are being created, moved or deleted often. Unfortunately, there are known issues with some database systems
+// when analysing tables for a heavily loaded database.
+// Totara tries to ensure that table statistics are up to date in a safe way for your database.
+//
+// PostgreSQL:
+// Analyze table is called after every change to context as well as updates to the context_map table.
+// There are no known issues with this approach in this database system, and it will result in
+// the best possible outcome as statistics for the tables are always up to date.
+//
+// MySQL, MariaDB and MSSQL:
+// There is a known performance problem within these database systems which can have significant impact
+// when the system is heavily loaded.
+// As such a scheduled task that runs only once per day has been introduced.
+// Sites using these database systems may want to tweak when table analysis happens to best suit
+// how those sites are used.
+// It is possible to control when to analyse tables through the analyze_context_table_after_build setting.
+//
+// Setting it to true will execute analyze table command after changes to the context table as well as
+// updates to the context_map table.
+// Setting it to false will prevent this and it will be done late at night by totara_core\task\analyze_table_task
+// to mitigate performance degradation.
+// It is better to revisit the scheduled tasks setting to let the task run at off-peak times on your site.
+//
+// The default for this setting is true for PostgreSQL, and false for MySQL, MariaDB and MSSQL.
+//
+// $CFG->analyze_context_table_after_build = true;
+//
+// The context_map table is exceptionally large, and changes to a single context record can lead to
+// a significant number of updates for the context_map table.
+// The following setting controls how often table statistics are updated when updating the context_map table.
+// By default it will update context_map table statistics when more than 1000 updates have occured.
+// If set to a positive integer, it will update statistics after the number of updates is more than the value.
+// Setting it to 0 will cause it to update statistics after every update.
+// Note: table statistics will not be updated if $CFG->analyze_context_table_after_build has been set to false.
+//
+// $CFG->analyze_context_table_inserted_count_threshold = 1000;     // this is "analyze", not "analyse"
+//
 
 /***********************************************************************************************************************
 Database configuration: PostgreSQL
@@ -297,18 +356,6 @@ Web server configuration
 //
 
 /***********************************************************************************************************************
-General settings
-***********************************************************************************************************************/
-//
-// Set the default language for the site. This can be set through the admin user interface.
-// $CFG->lang = 'en';
-//
-// When undertaking an operation that is expected to be resource intensive Totara will raise the memory limit available
-// to PHP. This setting allows you to control how much memory is made available.
-// The value must be a valid PHP memory value.
-// $CFG->extramemorylimit = '1024M';
-
-/***********************************************************************************************************************
 Session handling
 ***********************************************************************************************************************/
 //
@@ -442,11 +489,56 @@ Mail
 // $CFG->noreplyuserid = -10;
 //
 // Force Totara to use a real user account as the support user when sending mail. By default Totara will create a dummy
-//// user for this purpose and use the configured support email address.
+// user for this purpose and use the configured support email address.
 // $CFG->supportuserid = -20;
+
+
+/***********************************************************************************************************************
+JavaScript and CSS
+***********************************************************************************************************************/
+//
+// Enable slash arguments when serving YUI JavaScript.
+// This may improve caching and performance in some environments, although may require special rewrite rules in order to
+// work around path length limitations in some systems. RewriteRule (^.*/theme/yui_combo\.php)(/.*) $1?file=$2
+// $CFG->yuislasharguments = 1;
 //
 
+/***********************************************************************************************************************
+Locking
+***********************************************************************************************************************/
+//
+// Critical tasks often acquire locks to ensure that processed do not collide.
+// Out of the box Totara will use the database to manager locking if you are using PostgreSQL, and the file system to
+// manage locking for all other sites. The file system is often a poor choice to manage locking for large scale sites
+// and we recommend an alternative lock manager is chosen.
+// Locking should be tested using lib/tests/other/lockingtestpage.php page.
+// The following are lock managers are available:
+//
+// $CFG->lock_factory = "auto";
+// $CFG->lock_factory = "\\core\\lock\\file_lock_factory";
+// $CFG->lock_factory = "\\core\\lock\\postgres_lock_factory"; // DB locking based on postgres advisory locks.
+// $CFG->lock_factory = "\\core\\lock\\mysql_lock_factory"; // DB locking based on MySQL/MariaDB locks.
+// $CFG->lock_factory = "\\core\\lock\\mssql_lock_factory"; // DB locking based on MS SQL Server application locks.
+//
+// The following factory has been deprecated in Totara 13. We strongly recommend you use the correct locking factory for
+// your database from the options above.
+// $CFG->lock_factory = "\\core\\lock\\db_record_lock_factory";
+//
+// File system locking
+// Configure the directory in which locks are created. This must exist and be shared across all web servers if your site
+// is scaled horizontally.
+// $CFG->lock_file_root = $CFG->dataroot . '/lock';
+//
 
+/***********************************************************************************************************************
+Caching
+***********************************************************************************************************************/
+//
+// Custom cache configuration file path
+// Totara stores cache configuration information within a file in the site data directory by default.
+// The location of this file can be changed using the following setting.
+// $CFG->altcacheconfigpath = '/var/common/shared.cache.config.php
+//
 
 /***********************************************************************************************************************
 Themes
@@ -461,6 +553,10 @@ Themes
 // Individual selection points such as user, and course still need to be enabled in the product.
 // $CFG->themeorder = ['course', 'category', 'session', 'user', 'site'];
 //
+// Enable theme designer mode
+// Styles will no longer be cached. This will greatly slow down your site performance, but will make theme development
+// much easier when working with older technologies.
+// $CFG->themedesignermode = true;
 //
 //
 
@@ -503,18 +599,100 @@ Block and page settings
 //
 
 /***********************************************************************************************************************
-JavaScript and CSS
+Report Builder
 ***********************************************************************************************************************/
 //
-// Enable slash arguments when serving YUI JavaScript.
-// This may improve caching and performance in some environments, although may require special rewrite rules in order to
-// work around path length limitations in some systems. RewriteRule (^.*/theme/yui_combo\.php)(/.*) $1?file=$2
-// $CFG->yuislasharguments = 1;
+// Configure a read only database for Report Builder to use
+// These settings enable you to configure a second database connection that will be used by Report Builder when generating
+// report. This can improve performance of report builder and lower the load on the main database server.
+// $CFG->clone_dbname = 'totara_clone';
+// $CFG->clone_dbhost = $CFG->dbhost;
+// $CFG->clone_dbuser = $CFG->dbuser;
+// $CFG->clone_dbpass = $CFG->dbpass;
+// $CFG->clone_dboptions = $CFG->dboptions;
 //
 
 /***********************************************************************************************************************
-Miscelaneous settings
- ***********************************************************************************************************************/
+Grid catalog settings
+***********************************************************************************************************************/
+//
+// Override the full text search relevance weighting applied to relevance columns when searching.
+// $CFG->catalogrelevanceweight = ['high' => 16, 'medium' => 4 , 'low' => 1];
+//
+// Enable cascading content when storing data about learning items that will be indexed and searched up.
+// When enabled the high value content column will contain high value, the medium will contain high and medium, and the
+// low value content will include high, medium and low value content.
+// In databases that apply implicit "AND" behaviour across columns during a full text search this will ensure that if
+// the user searches for two words, which only appear across two buckets, that results will still be returned.
+// At the time of writing this, this settin is applicable to PgSQL and MSSQL only.
+// After changing this setting you will need to run:
+// php server/totara/catalog/cli/populate_catalog_data.php --purge_catalog_first
+// $CFG->catalog_use_and_compatible_buckets = true;
+//
+// Enable multi-linguage alphabetical sorting.
+// When viewing the grid catalog on a site with only a single language installed the user will be able to order the
+// results alphabetically. If multiple languages are installed however this option is removed as sorting multi-language
+// content is unreliable and will not provide the desired results in most cases.
+// The following setting will force the alphabetical option to appear regardless of the number of languages installed.
+// $CFG->catalog_enable_alpha_sorting_with_multiple_languages = true;
+//
+
+/***********************************************************************************************************************
+General settings
+***********************************************************************************************************************/
+//
+// Set the default language for the site. This can be set through the admin user interface.
+// $CFG->lang = 'en';
+//
+// When undertaking an operation that is expected to be resource intensive Totara will raise the memory limit available
+// to PHP. This setting allows you to control how much memory is made available.
+// The value must be a valid PHP memory value.
+// $CFG->extramemorylimit = '1024M';
+//
+// Configure a key which must be provided in order to upgrade a site via the web interfaces after the code has been
+// upgraded. This ensures only users who know the key can trigger a site upgrade through the web interfaces.
+// We strongly recommend that you put your site into maintenance mode, and then upgrade via the command line interfaces.
+// $CFG->upgradekey = 'ASecretOnlyYourSysAdminKnows';
+//
+// Configure the default quick access menu
+// The quick access menu in Totara allows administrators to quickly access important links. They can customise their
+// menu by adding and removing the items there.
+// The following setting overrides the default menu that administrators will see before they begin customising it.
+// Item keys are required and can currently only be found by inspecting the menu items in the browser.
+// Group can be one of: platform, learn, engage, perform, configuration.
+// $CFG->defaultquickaccessmenu = [
+//    [
+//        'key'    => 'item_key_1',
+//        'group'  => 'platform', // Optional, defaults to 'learn'
+//        'label'  => 'sometext', // Optional
+//        'weight' => 1000        // Optional
+//    ],
+//    ['key' => 'item_key_2', 'group' => 'platform', 'label' => 'sometext', 'weight' => 2000],
+//    ['key' => 'item_key_3', 'group' => 'learn', 'label' => 'sometext', 'weight' => 3000],
+// ];
+//
+// Force a particular flavour of Totara
+// $CFG->forceflavour = 'flavourname';
+//
+// Configure which flavours get shown on the feature overview screen
+// $CFG->showflavours = 'flavourname,enterprise';
+//
+
+/***********************************************************************************************************************
+Advanced settings
+***********************************************************************************************************************/
+//
+// Force plugin settings
+// Individual plugin settings can be forced to a specific value within your config.php by using the following setting.
+// $CFG->forced_plugin_settings = [
+//     'plugin_name' => [
+//         'setting_name_1' => 'value',
+//         'setting_name_2' => 'value',
+//     ],
+//     'mod_facetoface' => [
+//         'facetoface_approvaloptions' => 'approval_manager,approval_admin'
+//     ];
+// ];
 //
 // Prevent modifications to scheduled tasks through the user interfaces.
 // $CFG->preventscheduledtaskchanges = true;
@@ -535,6 +713,60 @@ Miscelaneous settings
 // This will anonymise all user names for all users who do not hold the capability to view user details.
 // $CFG->forcefirstname = 'John';
 // $CFG->forcelastname  = 'Smith';
+//
+// Limit the number of courses shown in the calendar when the Calendar Admin sees all setting has been turned on and
+// the admin sets the filter for the calendar to "All courses". The default is 50.
+// $CFG->calendar_adminallcourseslimit = 50;
+//
+// Fast hashing can be enabled to more quickly hash users' passwords when being
+// imported via HR Import at the cost of security. Due to the nature of this setting
+// we strongly recommend against enabling it.
+// $CFG->tool_totara_sync_enable_fasthash = true;
+//
+// Path to Ghostsrcipt
+// Used to generated images of pages for use in PDF's. Is required by the Annotate PDF functionality.
+// $CFG->pathtogs = '/usr/bin/gs';
+//
+// Path to du (Disk Usage)
+// Providing the path to du will enable its use. Performance of operations that look at the file system will likely
+// improve if du is configured and used.
+// $CFG->pathtodu = '/usr/bin/du';
+//
+// Path to dot
+// Enables the generation of images from DOT files. Currently only required by the profiling tool.
+// $CFG->pathtodot = '/usr/bin/dot';
+//
+// Prevent stats processing and remove all admin options from the user interfaces.
+// $CFG->disablestatsprocessing = true;
+//
+// Disable fixing of numeric day values printed by the userdate() function.
+// PHP will print a single digit day string prefixed with a 0, e.g. 7 => 07
+// Totara removes the leading 0 when this happens in order to make the userdate more readable.
+// If you want to disable this automatic fixing, the following setting can be used.
+// $CFG->nofixday = true;
+//
+// Force the log report to use line graphs instead of bar graphs
+// $CFG->preferlinegraphs = true;
+//
+// Path to the PHP binary to be used when executing commands using the PCNTL extension
+// The PCNTL extension is available in unix based systems only and enables a more secure means of executing external
+// programs from within Totara.
+// The \core\copmmand\executable API, used consistently throughout Totara will make use of PCNTL when both the extension
+// is enabled, and the following setting is provided.
+// $CFG->pcntl_phpclipath = '/usr/bin/php';
+//
+// Whitelist third party executables
+// Third party plugins that execute external programs from within Totara using the \core\copmmand\executable API require
+// the executables they use be whitelisted, and Totara informed as to whether the program is executed via the client
+// requests or via cli scripts. Third party plugins will inform of this in their instructions when required.
+// True informs Totara the program will be executed from client requests, false indicates from cli scripts.
+// $CFG->thirdpartyexeclist = array('/path/to/bin' => true, '/path/to/script.sh' => false);
+//
+// Set the path in which completion upload files exist on the server
+// When users will be selecting completion import files to upload from the server itself this setting will need to be
+// set to the directory that the completion files exist within. Sub directories can be used to further organise.
+// $CFG->completionimportdir = '';
+//
 
 /***********************************************************************************************************************
 Experimental settings
@@ -545,7 +777,6 @@ Experimental settings
 // The setting should be considered experimental as it may require other hacks in order to function as expected and may
 // not be compatible with some features.
 // $CFG->urlrewriteclass = '\local_cleanurls\url_rewriter';
-//
 //
 
 /***********************************************************************************************************************
@@ -568,6 +799,29 @@ Deprecated settings
 // This setting must be set BEFORE upgrading to Totara 2.9.0 or above. Deprecated in Totara 13.
 // $CFG->completionexcludefailures = 1;
 //
+// Path to aspell
+// Required in order to use spell check with old editors. This setting is no longer used by any core editors and
+// was deprecated in Totara 13.
+// $CFG->aspellpath = '';
+//
+// Set the lifetime of the Totara networking key pair in days.
+// It should not be necessary to change this.
+// This functionality has been deprecated and will be removed in ta future version of Totara.
+// $CFG->mnetkeylifetime = 28;
+//
+// Export hierarchies in legacy format
+// The export format of hierarchies changed in Totara 12. If you require the original format enabling this setting will
+// ensure your export stays as it was.
+// This setting has been deprecated and will be removed in a future verison.
+// $CFG->hierarchylegacyexport = 1;
+//
+// Disable static maps when calculating visibility
+// These maps are used to improve the performance of queries resolving visibility checks solely against the database.
+// While tested extensively we theorised that there may be database configurations in which the databases query
+// optimiser may not resolve to an optimal strategy when using these maps. Whenthe following setting is turned on the
+// static maps will not be used, and instead the original resolvers will be used.
+// This setting was deprecated in Totara 13 and will be removed in a future version.
+//  $CFG->disable_visibility_maps = 0;
 //
 
 /***********************************************************************************************************************
@@ -633,5 +887,145 @@ Dangerous advanced settings
 // This is strongly discouraged due to its security implications. It may be useful when trying to get third party SSO
 // authentication plugins working or if the deprecated alternative login URL setting is being used.
 // $CFG->allowlogincsrf = 1;
+//
+// Enable fast hashing of users passwords when importing users through HR Import.
+// When turned on password hashing for users is significantly faster. However this comes at the cost of security. We
+// strongly recommend not changing this setting.
+// $CFG->tool_totara_sync_enable_fasthash = true;
+//
+// Enable custom script replacement of existing Totara scripts.
+// If set, must be set to a directory that can be read by the web server. When set and a request is made to a script in
+// Totara that requires config.php, the code will check if a script exists within the configured directory, in the same
+// path as the script being served. If found the custom script will be used instead of the Totara script.
+// This only works for files that include config.php, and for which the script filename is used in the request.
+// For example https://examples.com/course/index.php will be resolved by /var/customscripts/course/index.php if it
+// exists.
+// The use of custom scripts like this is highly discouraged. It may introduce security vulnerabilities and may not be
+// compatible with upgrades. Additionally you will not encounter conflicts if changes are made to the original script.
+// $CFG->customscripts = '/home/example/customscripts';
+//
+
+/***********************************************************************************************************************
+Developer settings
+***********************************************************************************************************************/
+//
+// The following settings should not be used on production sites on a permanent basis. They are intended for debugging
+// and diagnostics only. Enabling them lessens the security profile of a site.
+//
+// Enable debugging for the whole site:
+// $CFG->debug = (E_ALL | E_STRICT);
+// $CFG->debugdisplay = 1;
+//
+// Enable debugging just for a series of users.
+// Comma separated user ids from the database. Does not require debugging be enabled for the whole site.
+// $CFG->debugusers = '2,15';
+//
+// Force PHP To report and display errors.
+// This should not be needed in normal circumstances; these values can also be set in your php.ini file.
+// @error_reporting(E_ALL | E_STRICT);
+// @ini_set('display_errors', '1');
+//
+// Enable debugging just for cron.
+// There is no need to set this if you have set any of the above.
+// $CFG->showcrondebugging = true;
+//
+// Disable JS caching
+// Totara by default sets headers to ensure that JS is cached. During development or when debugging problems you may
+// want to disable JS caching in order to ensure up-to-date JS files are used.
+// $CFG->cachejs = false;
+//
+// Disable GraphQL schema caching
+// Totara builds a complete schema file given the individual schema files for all components and plugins. During
+// development you may want to disable this caching in order to ensure your schema changes are reflected in real time.
+// $CFG->cache_graphql_schema = false;
+//
+// Disable lang string caching
+// Totara caches compiled language string resolutions. During development you may want to disable this caching in order
+// to see live changes to language strings.
+// $CFG->langstringcache = false;
+//
+// Enable scheduled tasks to be changed to next run via the user interface
+// When enabled a new action appears on the scheduled task interface to override the schedule of a scheduled task
+// causing it to run when cron next runs.
+// $CFG->debugallowscheduledtaskoverride = true;
+//
+// Capture performance information and display it in the page footer of every page (theme must support this)
+// $CFG->perfdebug = 15;
+//    OR
+// define('MDL_PERF'  , true);
+//
+// Write performance information into the web server error log
+// define('MDL_PERFTOLOG'  , true);
+//
+// DEPRECATED: Used to signal additional DB performance logging. This is no longer required setting perfdebug = 15 OR
+// defining MDL_PERF will cause DB performance logging to occur.
+// define('MDL_PERFDB'  , true);
+//
+// DEPRECATED: Causes performance information to be written to the footer of the page. This is no longer required
+// setting perfdebug = 15 OR defining MDL_PERF will cause performance information to be printed in the footer.
+// define('MDL_PERFTOFOOT', true);
+//
+// Totara also ships with a profiling tool. This tool requires the XHProf extension to be installed and available.
+// Once enabled a new "profiling" node will be shown under development, in the site administration menu.
+// $CFG->profilingenabled = true;
+//
+// Additionally early profiling can be enabled. This will cause further code to be profiling, including the setup
+// of essential constructs such as the database connection, and loading configuration data.
+// $CFG->earlyprofilingenabled = true;
+//
+// Early profiling requires the following configuration:
+// Allow the current page to be profiled by added "PROFILEME" to the GET params.
+// $CFG->profilingallowme = 1;
+// When enabled you can start and stop profiling of all pages requested by the current user by adding one of the
+// following keys to the GET params for a page: PROFILEALL or PROFILEALLSTOP
+// $CFG->profilingallowall = 1;
+// Used to enable random profiling at a set frequency, 100 (one in 100 pages will be profiled).
+// $CFG->profilingautofrec = 100;
+// Set to a pattern, if the current file path matches the pattern the request will be profiled.
+// $CFG->profilingincluded = 'forum';
+// Set to a pattern, if the current file path matches the pattern the request will NOT be profiled.
+// $CFG->profilingexcluded = 'forum/view.php';
+// When set profiling run information in the database will only be kept for X minutes
+// $CFG->profilinglifetime = 10;
+//
+// Disable the sending of email.
+// This is particularly useful when testing production data in a test environment.
+// $CFG->noemailever = true;
+//
+// Force Totara to divert all email to a specified address.
+// It is recommended to use a mail catcher as that will enable you to confirm the intended receiptient however in lieu
+// of that this setting can be useful when debugging email.
+// $CFG->divertallemailsto = 'developer@example.com';
+//
+// Divert all email as per $CFG->divertallemailsto unless it matches the set addresses
+// Should be set to a comma separated list of addresses, or regular expressions to match the desired email addresses.
+// $CFG->divertallemailsexcept = 'tester@example.com, developer(\+.*)?@example.com';
+//
+// Enable imap fetch debugging
+// Causes verbose debug information to be printed when fetching email messages from an IMAP server.
+// $CFG->debugimap = true;
+//
+// During upgrade print SQL statements when executing them
+// $CFG->upgradeshowsql = true;
+//
+// During cron print SQL statements when executing them
+// $CFG->showcronsql = true;
+//
+// Enable YUI JavaScript logging
+// $CFG->yuiloglevel = 'debug';
+//
+// Configure which YUI modules log and which do not.
+// $CFG->yuiloginclude = array(
+//     'moodle-core-dock-loader' => true,
+//     'moodle-course-categoryexpander' => true,
+// );
+// $CFG->yuilogexclude = array(
+//     'moodle-core-dock' => true,
+//     'moodle-core-notification' => true,
+// );
+//
+// Set the password used when generating users through the generator tool
+// $CFG->tool_generator_users_password = 'passw0rd!';
+//
 
 // All done!
