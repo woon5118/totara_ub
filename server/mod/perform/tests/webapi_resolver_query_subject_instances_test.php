@@ -29,12 +29,14 @@ use core\entities\user;
 use core\webapi\formatter\field\date_field_formatter;
 use mod_perform\constants;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\external_participant;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\expand_task;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
+use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\models\response\participant_section as participant_section_model;
 use mod_perform\state\activity\active;
@@ -66,7 +68,6 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $activity = $perform_generator->create_full_activities()->first();
         /** @var participant_instance $participant_instance */
         $participant_instance = participant_instance::repository()->get()->first();
-        $participant_instance_model = participant_instance_model::load_by_entity($participant_instance);
         /** @var subject_instance $subject_instance */
         $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
 
@@ -151,6 +152,162 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             'name' => $subject_relationship->get_name(),
                         ],
                         'is_for_current_user' => true,
+                    ],
+                    'progress_status' => section_not_started::get_name(),
+                    'availability_status' => open::get_name(),
+                    'is_overdue' => false,
+                ],
+            ],
+            'can_participate' => true,
+        ];
+
+        $this->assertCount(1, $subject["sections"], 'wrong sections count');
+        $this->assertEquals($expected_section, $subject['sections'][0]);
+    }
+
+    public function test_query_successful_with_single_section_and_external_participant(): void {
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->enable_creation_of_manual_participants()
+            ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_EXTERNAL]);
+
+        $activity = $perform_generator->create_full_activities($configuration)->first();
+        /** @var participant_instance $participant_instance */
+        // Get the internal user
+        $participant_instance = participant_instance::repository()
+            ->where('participant_source', participant_source::INTERNAL)
+            ->get()
+            ->first();
+
+        /** @var subject_instance $subject_instance */
+        $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
+
+        $subject_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
+        $external_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_EXTERNAL);
+
+        /** @var external_participant $external_participant */
+        $external_participant = external_participant::repository()
+            ->order_by('id')
+            ->first();
+
+        $external_participant_instance = $external_participant->participant_instance;
+
+        $participant_id = $participant_instance->participant_id;
+        self::setUser($participant_id);
+
+        $args = [
+            'filters' => [
+                'about' => [subject_instances_about::VALUE_ABOUT_SELF]
+            ]
+        ];
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $actual = $this->get_webapi_operation_data($result);
+        $this->assertCount(1, $actual, 'wrong subject count');
+
+        $subject = $actual[0];
+        $expected_subject = [
+            'id' => (string) $subject_instance->id,
+            'progress_status' => $subject_instance->get_progress_status(),
+            'availability_status' => $subject_instance->get_availability_status(),
+            'created_at' => (new date_field_formatter(date_format::FORMAT_DATE, $subject_instance->get_context()))
+                ->format($subject_instance->created_at),
+            'due_date' => null,
+            'is_overdue' => false,
+            'activity' => [
+                'name' => $activity->name,
+                'settings' => [
+                    activity_setting::MULTISECTION => false
+                ],
+                'type' => [
+                    'display_name' => $activity->type->display_name
+                ],
+                'anonymous_responses' => false,
+            ],
+            'subject_user' => [
+                'fullname' => $subject_instance->subject_user->fullname
+            ],
+            'participant_instances' => [
+                [
+                    'progress_status' => participant_instance_not_started::get_name(),
+                    'core_relationship' => [
+                        'id' => $subject_relationship->id,
+                        'name' => $subject_relationship->get_name(),
+                    ],
+                    'participant_id' => $participant_id,
+                    'id' => (string) $participant_instance->id,
+                    'availability_status' => participant_instance_open::get_name(),
+                    'is_overdue' => false,
+                    'is_for_current_user' => true
+                ],
+                [
+                    'progress_status' => participant_instance_not_started::get_name(),
+                    'core_relationship' => [
+                        'id' => $external_relationship->id,
+                        'name' => $external_relationship->get_name(),
+                    ],
+                    'participant_id' => $external_participant->id,
+                    'id' => (string) $external_participant_instance->id,
+                    'availability_status' => participant_instance_open::get_name(),
+                    'is_overdue' => false,
+                    'is_for_current_user' => false
+                ]
+            ]
+        ];
+        $this->assertEquals($expected_subject, $subject['subject']);
+
+        $participant = new user($participant_id);
+        $profile_image_url = (new user_picture($participant->get_record(), 0))->get_url($GLOBALS['PAGE'])->out(false);
+
+        global $PAGE;
+        $renderer = $PAGE->get_renderer('core');
+        $default_image_url = $renderer->image_url('u/f2');
+
+        $section = $activity->sections->first();
+        $expected_section = [
+            'section' => [
+                'id' => $section->id,
+                'display_title' => $section->display_title,
+                'sort_order' => 1,
+            ],
+            'participant_sections' => [
+                [
+                    'id' => $participant_instance->participant_sections->first()->id,
+                    'participant_instance' => [
+                        'progress_status' => participant_instance_not_started::get_name(),
+                        'participant_id' => $participant_id,
+                        'participant' => [
+                            'fullname' => $participant->fullname,
+                            'profileimageurlsmall' => $profile_image_url
+                        ],
+                        'core_relationship' => [
+                            'id' => $subject_relationship->id,
+                            'name' => $subject_relationship->get_name(),
+                        ],
+                        'is_for_current_user' => true,
+                    ],
+                    'progress_status' => section_not_started::get_name(),
+                    'availability_status' => open::get_name(),
+                    'is_overdue' => false,
+                ],
+                [
+                    'id' => $external_participant_instance->participant_sections->first()->id,
+                    'participant_instance' => [
+                        'progress_status' => participant_instance_not_started::get_name(),
+                        'participant_id' => $external_participant->id,
+                        'participant' => [
+                            'fullname' => $external_participant->name,
+                            'profileimageurlsmall' => $default_image_url
+                        ],
+                        'core_relationship' => [
+                            'id' => $external_relationship->id,
+                            'name' => $external_relationship->get_name(),
+                        ],
+                        'is_for_current_user' => false,
                     ],
                     'progress_status' => section_not_started::get_name(),
                     'availability_status' => open::get_name(),
