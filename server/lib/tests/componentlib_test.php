@@ -124,6 +124,17 @@ class core_componentlib_testcase extends advanced_testcase {
 class testable_lang_installer extends lang_installer {
 
     /**
+     * Prepare the installer
+     *
+     * @param string|array $langcode a code of the language to install
+     */
+    public function __construct($langcode = '') {
+        global $CFG;
+        unset($CFG->langotherroot);
+        parent::__construct($langcode);
+    }
+
+    /**
      * @see parent::is_queued()
      */
     public function protected_is_queued($langcode = '') {
