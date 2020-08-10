@@ -45,7 +45,7 @@
                 :is="componentFor(sectionElement)"
                 v-for="(sectionElement, index) in sectionElements"
                 ref="sectionElements"
-                :key="sectionElement.clientId"
+                :key="sectionElement.id"
                 :data="sectionElement.element.data"
                 :raw-data="sectionElement.element.raw_data"
                 :title="sectionElement.element.title"
@@ -53,19 +53,16 @@
                 :identifier="sectionElement.element.identifier"
                 :is-required="sectionElement.element.is_required"
                 :type="sectionElement.element.type"
-                :error="errors[sectionElement.clientId]"
+                :error="errors[sectionElement.id]"
                 :activity-state="activityState"
                 @update="update(sectionElement, $event, index)"
                 @edit="edit(sectionElement)"
                 @display="display(sectionElement)"
                 @display-read="displayReadOnly(sectionElement)"
-                @remove="tryDelete(sectionElement)"
+                @remove="tryDelete(sectionElement, index)"
               />
 
-              <ContentAddElementButton
-                v-if="!isActive"
-                @add-element-item="add"
-              />
+              <ContentAddElementButton v-if="isDraft" @add-element-item="add" />
             </div>
           </Loader>
 
@@ -118,7 +115,10 @@ import sectionDetailQuery from 'mod_perform/graphql/section_admin';
 import updateSectionElementMutation from 'mod_perform/graphql/update_section_elements';
 import { notify } from 'tui/notifications';
 import { pull, uniqueId } from 'tui/util';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
+import {
+  ACTIVITY_STATUS_DRAFT,
+  NOTIFICATION_DURATION,
+} from 'mod_perform/constants';
 
 export default {
   components: {
@@ -209,12 +209,12 @@ export default {
     },
 
     /**
-     * check active status
+     * Is the activity a draft, and thus can be modified?
      *
      * @return {Boolean}
      */
-    isActive() {
-      return this.activityState.name === 'ACTIVE';
+    isDraft() {
+      return this.activityState.name === ACTIVITY_STATUS_DRAFT;
     },
   },
 
@@ -258,6 +258,7 @@ export default {
       // Prevent query from running when modal is closed.
       this.skipQuery = true;
       this.editingIds = [];
+      this.sectionElements = [];
       this.unsavedChangesModalOpen = false;
       this.isOpen = false;
     },
@@ -267,8 +268,7 @@ export default {
      */
     add(plugin) {
       const sectionElement = {
-        id: this.sectionId,
-        clientId: uniqueId(),
+        id: 'unsaved-' + uniqueId(),
         element: {
           id: null,
           type: plugin,
@@ -318,9 +318,20 @@ export default {
         toSave.create_new = [
           Object.assign(elementToSave, {
             plugin_name: sectionElement.element.type.plugin_name,
-            sort_order: index + 1,
+            sort_order: this.getSortOrder(index),
           }),
         ];
+
+        // Increment the sort order of every saved element after this element by 1.
+        toSave.move = this.sectionElements
+          .slice(index + 1)
+          .filter(this.elementExists)
+          .map(element => {
+            return {
+              section_element_id: element.id,
+              sort_order: element.sort_order + 1,
+            };
+          });
       } else {
         toSave.update = [
           Object.assign(elementToSave, {
@@ -334,17 +345,51 @@ export default {
     },
 
     /**
+     * Has the specified element not been saved into the DB?
+     */
+    elementDoesNotExist(element) {
+      return 'creating' in element;
+    },
+
+    /**
+     * Has the specified element been saved into the DB?
+     */
+    elementExists(element) {
+      return !this.elementDoesNotExist(element);
+    },
+
+    /**
+     * Calculate the sort order value for a section element.
+     *
+     * @param {Number} index
+     */
+    getSortOrder(index) {
+      const savedSectionElementsBefore = this.sectionElements
+        .slice(0, index)
+        .filter(this.elementExists);
+
+      return savedSectionElementsBefore.length + 1;
+    },
+
+    /**
      * Add element into edit list
      */
     edit(sectionElement) {
-      this.editingIds.push(sectionElement.clientId);
+      this.editingIds.push(sectionElement.id);
     },
 
     /**
      * Remove element from the edit list.
      */
     stopEditing(sectionElement) {
-      pull(this.editingIds, sectionElement.clientId);
+      pull(this.editingIds, sectionElement.id);
+    },
+
+    /**
+     * Is the element currently being edited?
+     */
+    isEditing(element) {
+      return this.editingIds.includes(element.id);
     },
 
     /**
@@ -352,13 +397,13 @@ export default {
      * Remove creating view if section element move to display mode
      */
     display(sectionElement) {
-      if (this.isElementEditable()) {
+      if (this.isDraft) {
         this.stopEditing(sectionElement);
         if (sectionElement.creating) {
           this.remove(sectionElement);
         }
       } else {
-        pull(this.readOnlyIds, sectionElement.clientId);
+        pull(this.readOnlyIds, sectionElement.id);
       }
     },
 
@@ -368,7 +413,14 @@ export default {
      *
      */
     displayReadOnly(sectionElement) {
-      this.readOnlyIds.push(sectionElement.clientId);
+      this.readOnlyIds.push(sectionElement.id);
+    },
+
+    /**
+     * Is the element in a read-only state?
+     */
+    isReadOnly(element) {
+      return this.readOnlyIds.includes(element.id);
     },
 
     /**
@@ -384,11 +436,13 @@ export default {
      * Try delete the section element.
      * If it exists in the DB, show a confirmation before deleting.
      * @param {Object} sectionElement
+     * @param {Number} index
      */
-    tryDelete(sectionElement) {
+    tryDelete(sectionElement, index) {
       if (sectionElement.element.id) {
         this.deleteModalOpen = true;
         this.elementToDelete = sectionElement;
+        this.elementToDelete.index = index;
       } else {
         this.remove(sectionElement);
       }
@@ -402,11 +456,12 @@ export default {
 
       // Need to recalculate the sort orders if deleting
       const move = this.sectionElements
-        .filter(element => element.id !== this.elementToDelete.id)
+        .slice(this.elementToDelete.index + 1)
+        .filter(this.elementExists)
         .map((element, index) => {
           return {
             section_element_id: element.id,
-            sort_order: index + 1,
+            sort_order: this.elementToDelete.sort_order + index,
           };
         });
 
@@ -421,8 +476,10 @@ export default {
         },
         this.$str('toast_success_delete_element', 'mod_perform')
       );
+
       this.remove(this.elementToDelete);
       this.closeDeleteModal();
+      this.isSaving = false;
     },
 
     /**
@@ -438,15 +495,13 @@ export default {
      */
     componentFor(sectionElement) {
       const { type } = sectionElement.element;
-      const isEditing = this.editingIds.includes(sectionElement.clientId);
-      const isReadOnly = this.readOnlyIds.includes(sectionElement.clientId);
-      let componentName = isEditing
-        ? type.admin_form_component
-        : type.admin_display_component;
-      if (isReadOnly) {
-        componentName = type.admin_read_only_display_component;
+      if (this.isReadOnly(sectionElement)) {
+        return tui.asyncComponent(type.admin_read_only_display_component);
       }
-      return tui.asyncComponent(componentName);
+      if (this.isEditing(sectionElement)) {
+        return tui.asyncComponent(type.admin_form_component);
+      }
+      return tui.asyncComponent(type.admin_display_component);
     },
 
     /**
@@ -503,17 +558,42 @@ export default {
 
     /**
      * Process and apply the section element data from gql for use within vue.
+     *
+     * @param {Array} data GraphQL data
      */
     updateSectionElementData(data) {
-      this.sectionElements = data.map(item => {
+      const elements = data.map(item => {
+        // Don't reset the element data if it is being edited.
+        const existingElement = this.sectionElements.find(
+          element => element.id === item.id
+        );
+        if (existingElement && this.isEditing(existingElement)) {
+          return existingElement;
+        }
+
         return Object.assign({}, item, {
-          clientId: uniqueId(),
           element: Object.assign({}, item.element, {
             type: item.element.element_plugin,
             data: JSON.parse(item.element.data),
             raw_data: JSON.parse(item.element.raw_data),
           }),
         });
+      });
+
+      const unsavedElements = this.sectionElements.filter(
+        this.elementDoesNotExist
+      );
+
+      this.sectionElements = elements.concat(unsavedElements).sort((a, b) => {
+        const sortDiff = a.sort_order - b.sort_order;
+        if (sortDiff !== 0) {
+          return sortDiff;
+        } else {
+          // There can be duplicate sort orders because the back end must always have sequential orders,
+          // but in the front end there could be an unsaved element that we want to place between two
+          // saved elements. We should show the unsaved element before the saved one in this case.
+          return this.elementDoesNotExist(a) ? -1 : 1;
+        }
       });
     },
 
@@ -541,13 +621,6 @@ export default {
         message: this.$str('toast_error_generic_update', 'mod_perform'),
         type: 'error',
       });
-    },
-
-    /**
-     * Check element editable
-     */
-    isElementEditable() {
-      return this.activityState.name !== 'ACTIVE';
     },
   },
 };
