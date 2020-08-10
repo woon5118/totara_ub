@@ -54,6 +54,7 @@ class participant_section_availability_closed extends base {
         $data = [
             'objectid' => $participant_section->get_id(),
             'relateduserid' => $participant_section->get_participant_instance()->participant_id,
+            'userid' => \core\session\manager::get_realuser()->id,
             'other' => [
                 'participant_instance_id' => $participant_section->get_participant_instance()->get_id(),
             ],
@@ -74,13 +75,8 @@ class participant_section_availability_closed extends base {
      * @inheritDoc
      */
     public function get_description() {
-        return get_string(
-            'event_participant_section_availability_closed_description',
-            'mod_perform',
-            [
-                'id' => $this->objectid,
-                'user_id' => $this->relateduserid,
-            ]
-        );
+        return "The availability of the participant section with id '$this->objectid'"
+             . " for the user with id '$this->relateduserid' has been closed"
+             . " by the user with id '$this->userid'";
     }
 }

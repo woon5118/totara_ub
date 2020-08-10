@@ -114,7 +114,7 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
          * @var participant_instance $participant2
          * @var participant_instance_entity $participant1_entity
          */
-        [$participant1, $participant2, $participant1_entity] = $this->create_data();
+        [$participant1, $participant2, $participant1_entity, $activity] = $this->create_data();
 
         $participant1_entity->progress = complete::get_code();
         $participant1_entity->save();
@@ -127,7 +127,12 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
         $participant1_entity->refresh();
 
         $this->assertCount(1, $events);
-        $this->assertInstanceOf(participant_instance_availability_closed::class, reset($events));
+
+        $event = reset($events);
+        $this->assertInstanceOf(participant_instance_availability_closed::class, $event);
+        $this->assertEquals($participant1_entity->id, $event->objectid);
+        $this->assertEquals($activity->get_context()->id, $event->contextid);
+        $this->assertEquals(get_admin()->id, $event->userid);
 
         $this->assertEquals(closed::get_code(), $participant1->availability_state::get_code());
         $this->assertEquals(open::get_code(), $participant2->availability_state::get_code());

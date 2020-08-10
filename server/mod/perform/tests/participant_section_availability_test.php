@@ -101,7 +101,7 @@ class mod_perform_participant_section_availability_testcase extends state_testca
 
         // Check that event has been triggered.
         if ($target_state_class === closed::class) {
-            $this->assert_section_availability_closed_event($sink, $participant_section);
+            $this->assert_section_availability_closed_event($sink, $participant_section, $subject_user->id);
         }
     }
 
@@ -112,7 +112,8 @@ class mod_perform_participant_section_availability_testcase extends state_testca
      */
     private function assert_section_availability_closed_event(
         phpunit_event_sink $sink,
-        participant_section $participant_section
+        participant_section $participant_section,
+        int $user_id
     ): void {
         $events = $sink->get_events();
         $this->assertCount(1, $events);
@@ -121,6 +122,7 @@ class mod_perform_participant_section_availability_testcase extends state_testca
         $this->assertEquals($participant_section->get_id(), $event->objectid);
 
         $this->assertEquals($participant_section->get_context(), $event->get_context());
+        $this->assertEquals($user_id, $event->userid);
 
         $only_activity = activity::load_by_entity(activity_entity::repository()->one());
 

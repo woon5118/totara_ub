@@ -53,6 +53,7 @@ class subject_instance_availability_closed extends base {
         $data = [
             'objectid' => $subject_instance->id,
             'relateduserid' => $subject_instance->subject_user_id,
+            'userid' => \core\session\manager::get_realuser()->id,
             'other' => [],
             'context' => $subject_instance->get_context(),
         ];
@@ -71,8 +72,9 @@ class subject_instance_availability_closed extends base {
      * @inheritDoc
      */
     public function get_description() {
-        return 'The availability of the subject instance with id ' . $this->objectid
-            . ' for the user with id ' . $this->relateduserid . ' has been closed';
+        return "The availability of the subject instance with id '$this->objectid'"
+             . " for the user with id '$this->relateduserid' has been closed"
+             . " by the user with id '$this->userid'";
     }
 
 }

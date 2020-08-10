@@ -23,6 +23,10 @@
 
 namespace mod_perform\state\subject_instance;
 
+use core\event\base;
+use mod_perform\event\subject_instance_availability_opened;
+use mod_perform\models\activity\subject_instance;
+use mod_perform\state\state_event;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package mod_perform
  */
-class open extends subject_instance_availability {
+class open extends subject_instance_availability implements state_event {
 
     /**
      * @inheritDoc
@@ -79,4 +83,12 @@ class open extends subject_instance_availability {
         // Already in the correct state.
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function get_event(): base {
+        /** @var subject_instance $subject_instance */
+        $subject_instance = $this->get_object();
+        return subject_instance_availability_opened::create_from_subject_instance($subject_instance);
+    }
 }

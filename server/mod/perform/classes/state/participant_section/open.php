@@ -23,16 +23,20 @@
 
 namespace mod_perform\state\participant_section;
 
+use core\event\base;
+use mod_perform\event\participant_section_availability_opened;
+use mod_perform\models\response\participant_section;
 use mod_perform\state\transition;
+use mod_perform\state\state_event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class represents the "closed" availability status of a participant section.
+ * This class represents the "open" availability status of a participant section.
  *
  * @package mod_perform
  */
-class open extends participant_section_availability {
+class open extends participant_section_availability implements state_event {
 
     /**
      * @inheritDoc
@@ -79,4 +83,12 @@ class open extends participant_section_availability {
         // Already in the correct state.
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function get_event(): base {
+        /** @var participant_section $participant_section */
+        $participant_section = $this->get_object();
+        return participant_section_availability_opened::create_from_participant_section($participant_section);
+    }
 }

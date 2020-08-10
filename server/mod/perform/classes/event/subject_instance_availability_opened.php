@@ -17,22 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @author Murali Nair <murali.nair@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\event;
 
 use core\event\base;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\models\activity\participant_instance;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\models\activity\subject_instance;
 
-/**
- * Class participant_instance_availability_closed event is triggered when a participant instance is closed.
+/**_
+ * Class subject_instance_availability_opened event is triggered when a
+ * participant instance is closed.
  *
  * @package mod_perform\event
  */
-class participant_instance_availability_closed extends base {
+class subject_instance_availability_opened extends base {
 
     /**
      * Initialise required event data properties.
@@ -40,24 +41,21 @@ class participant_instance_availability_closed extends base {
     protected function init() {
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = participant_instance_entity::TABLE;
+        $this->data['objecttable'] = subject_instance_entity::TABLE;
     }
 
     /**
      * Create instance of event.
      *
-     * @param participant_instance $participant_instance
+     * @param subject_instance $subject_instance
      * @return self|base
      */
-    public static function create_from_participant_instance(participant_instance $participant_instance): self {
-        $subject_instance = $participant_instance->subject_instance;
+    public static function create_from_subject_instance(subject_instance $subject_instance): self {
         $data = [
-            'objectid' => $participant_instance->id,
-            'relateduserid' => $participant_instance->participant_id,
+            'objectid' => $subject_instance->id,
+            'relateduserid' => $subject_instance->subject_user_id,
             'userid' => \core\session\manager::get_realuser()->id,
-            'other' => [
-                'subject_instance_id' => $subject_instance->id,
-            ],
+            'other' => [],
             'context' => $subject_instance->get_context(),
         ];
 
@@ -68,15 +66,16 @@ class participant_instance_availability_closed extends base {
      * @inheritDoc
      */
     public static function get_name() {
-        return get_string('event_participant_instance_availability_closed', 'mod_perform');
+        return get_string('event_subject_instance_availability_opened', 'mod_perform');
     }
 
     /**
      * @inheritDoc
      */
     public function get_description() {
-        return "The availability of the participant instance with id '$this->objectid'"
-             . " for the user with id '$this->relateduserid' has been closed"
+        return "The availability of the subject instance with id '$this->objectid'"
+             . " for the user with id '$this->relateduserid' has been opened"
              . " by the user with id '$this->userid'";
     }
+
 }

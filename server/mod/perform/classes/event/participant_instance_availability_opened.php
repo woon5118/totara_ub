@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @author Murali Nair <murali.nair@totaralearning.com>
  * @package mod_perform
  */
 
@@ -28,14 +28,15 @@ use mod_perform\entities\activity\participant_instance as participant_instance_e
 use mod_perform\models\activity\participant_instance;
 
 /**
- * Class participant_instance_availability_closed event is triggered when a participant instance is closed.
+ * Class participant_instance_availability_opened event is triggered when a
+ * participant instance is created/re-opened.
  *
  * @package mod_perform\event
  */
-class participant_instance_availability_closed extends base {
+class participant_instance_availability_opened extends base {
 
     /**
-     * Initialise required event data properties.
+     * @inheritDoc
      */
     protected function init() {
         $this->data['crud'] = 'u';
@@ -44,12 +45,15 @@ class participant_instance_availability_closed extends base {
     }
 
     /**
-     * Create instance of event.
+     * Create instance of the event.
      *
      * @param participant_instance $participant_instance
-     * @return self|base
+     *
+     * @return participant_instance_availability_opened the instance.
      */
-    public static function create_from_participant_instance(participant_instance $participant_instance): self {
+    public static function create_from_participant_instance(
+        participant_instance $participant_instance
+    ): participant_instance_availability_opened {
         $subject_instance = $participant_instance->subject_instance;
         $data = [
             'objectid' => $participant_instance->id,
@@ -68,7 +72,7 @@ class participant_instance_availability_closed extends base {
      * @inheritDoc
      */
     public static function get_name() {
-        return get_string('event_participant_instance_availability_closed', 'mod_perform');
+        return get_string('event_participant_instance_availability_opened', 'mod_perform');
     }
 
     /**
@@ -76,7 +80,8 @@ class participant_instance_availability_closed extends base {
      */
     public function get_description() {
         return "The availability of the participant instance with id '$this->objectid'"
-             . " for the user with id '$this->relateduserid' has been closed"
+             . " for the user with id '$this->relateduserid' has been opened"
              . " by the user with id '$this->userid'";
     }
+
 }

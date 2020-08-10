@@ -23,7 +23,11 @@
 
 namespace mod_perform\state\participant_instance;
 
+use core\event\base;
+use mod_perform\event\participant_instance_availability_opened;
+use mod_perform\models\activity\participant_instance;
 use mod_perform\state\transition;
+use mod_perform\state\state_event;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package mod_perform
  */
-class open extends participant_instance_availability {
+class open extends participant_instance_availability implements state_event {
 
     /**
      * @inheritDoc
@@ -79,4 +83,12 @@ class open extends participant_instance_availability {
         // Already in the correct state.
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function get_event(): base {
+        /** @var participant_instance $participant_instance */
+        $participant_instance = $this->get_object();
+        return participant_instance_availability_opened::create_from_participant_instance($participant_instance);
+    }
 }
