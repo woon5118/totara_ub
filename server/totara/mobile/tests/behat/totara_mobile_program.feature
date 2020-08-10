@@ -40,6 +40,7 @@ Feature: Test the totara_mobile_program query
     And I should see "\"completion\": {" in the "#response2" "css_element"
     And I should see "\"currentCourseSets\": []" in the "#response2" "css_element"
     And I should see "\"countUnavailableSets\": 0" in the "#response2" "css_element"
+    And I should see "\"courseSetHeader\": \"\"" in the "#response2" "css_element"
     And I should see "\"imageSrc\": \"\"" in the "#response2" "css_element"
 
   Scenario: Test the query with a program that has an image

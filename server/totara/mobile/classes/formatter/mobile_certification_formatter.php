@@ -65,6 +65,9 @@ class mobile_certification_formatter extends certification_formatter {
             'coursesets' => null, // Default - mobile\program_courseset::class
             'current_coursesets' => null, // Default - mobile\program_courseset::class
             'count_unavailablesets' => null, // Basic int
+            'count_completedsets' => null, // Basic int
+            'count_optionalsets' => null, // Basic int
+            'courseset_header' => string_field_formatter::class,
             'completion' => null, // Default - program\completion_formatter::class
             'mobile_image' => null,
         ];

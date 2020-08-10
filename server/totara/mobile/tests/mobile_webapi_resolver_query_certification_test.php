@@ -279,6 +279,7 @@ class totara_mobile_webapi_resolver_query_certification_testcase extends advance
                     ],
                     "currentCourseSets" => [$expectedsetdata],
                     "countUnavailableSets" => 1,
+                    "courseSetHeader" => "",
                     "__typename" => 'totara_mobile_certification'
                 ]
             ];

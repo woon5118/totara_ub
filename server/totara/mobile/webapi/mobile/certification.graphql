@@ -45,6 +45,7 @@ query totara_mobile_certification($certificationid: core_id!) {
       __typename
     }
     countUnavailableSets: count_unavailablesets
+    courseSetHeader: courseset_header
     __typename
   }
 }

@@ -178,6 +178,18 @@ type totara_mobile_program {
   """
   count_unavailablesets: Int
   """
+  A count of the coursesets in all the certifications completed courseset groups that a user did not have to complete.
+  """
+  count_optionalsets: Int
+  """
+  A count of the coursesets in all the certifications completed courseset groups that a user completed.
+  """
+  count_completedsets: Int
+  """
+  The header of the current courseset, combining count_optionalsets and count_completed steps into a string.
+  """
+  courseset_header: String
+  """
   Current users completion information within the program
   """
   completion: totara_program_completion
@@ -287,6 +299,18 @@ type totara_mobile_certification {
   A count of the coursesets after the current courseset group (split by a THEN condition)
   """
   count_unavailablesets: Int
+  """
+  A count of the coursesets in all the certifications completed courseset groups that a user did not have to complete.
+  """
+  count_optionalsets: Int
+  """
+  A count of the coursesets in all the certifications completed courseset groups that a user completed.
+  """
+  count_completedsets: Int
+  """
+  The header of the current courseset, combining count_optionalsets and count_completed steps into a string.
+  """
+  courseset_header: String
   """
   Current users completion information within the Certification
   """

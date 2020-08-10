@@ -123,7 +123,13 @@ class certification implements type_resolver {
             }
         }
 
-        $currentdata = ['current_coursesets', 'count_unavailablesets'];
+        $currentdata = [
+            'current_coursesets',
+            'count_unavailablesets',
+            'count_optionalsets',
+            'count_completedsets',
+            'courseset_header'
+        ];
         if ($field == 'coursesets' || in_array($field, $currentdata)) {
             /* @var $content \prog_content */
             $content = $certification->get_content();
@@ -181,6 +187,18 @@ class certification implements type_resolver {
 
                 if ($field == 'count_unavailablesets') {
                     return $data->unavailablecount;
+                }
+
+                if ($field == 'count_optionalsets') {
+                    return $data->optionalcount;
+                }
+
+                if ($field == 'count_completedsets') {
+                    return $data->completecount;
+                }
+
+                if ($field == 'courseset_header') {
+                    return $item->get_coursesets_header_text($data->completecount, $data->optionalcount);
                 }
             }
         }
@@ -250,6 +268,4 @@ class certification implements type_resolver {
         }
         return true;
     }
-
-
 }

@@ -333,7 +333,7 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
             'certifpath' => CERTIFPATH_CERT
         ];
         $cs1 = $DB->insert_record('prog_courseset', (object)$cs1data);
-        $c1 = $this->getDataGenerator()->create_course();
+        $c1 = $this->getDataGenerator()->create_course(['fullname' => 'cs1course']);
         $DB->insert_record('prog_courseset_course', (object)['coursesetid' => $cs1, 'courseid' => $c1->id, 'sortorder' => 1]);
 
         $cs2data = [
@@ -352,7 +352,7 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
             'certifpath' => CERTIFPATH_CERT
         ];
         $cs2 = $DB->insert_record('prog_courseset', (object)$cs2data);
-        $c2 = $this->getDataGenerator()->create_course();
+        $c2 = $this->getDataGenerator()->create_course(['fullname' => 'cs2course']);
         $DB->insert_record('prog_courseset_course', (object)['coursesetid' => $cs2, 'courseid' => $c2->id, 'sortorder' => 1]);
 
         $cs3data = [
@@ -371,7 +371,7 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
             'certifpath' => CERTIFPATH_CERT
         ];
         $cs3 = $DB->insert_record('prog_courseset', (object)$cs3data);
-        $c3 = $this->getDataGenerator()->create_course();
+        $c3 = $this->getDataGenerator()->create_course(['fullname' => 'cs3course']);
         $DB->insert_record('prog_courseset_course', (object)['coursesetid' => $cs3, 'courseid' => $c3->id, 'sortorder' => 1]);
 
         $cs4data = [
@@ -390,27 +390,8 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
             'certifpath' => CERTIFPATH_CERT
         ];
         $cs4 = $DB->insert_record('prog_courseset', (object)$cs4data);
-        $c4 = $this->getDataGenerator()->create_course();
+        $c4 = $this->getDataGenerator()->create_course(['fullname' => 'cs4course']);
         $DB->insert_record('prog_courseset_course', (object)['coursesetid' => $cs4, 'courseid' => $c4->id, 'sortorder' => 1]);
-
-        $cs5data = [
-            'programid' => $certification->id,
-            'sortorder' => 1,
-            'label' => 'Courseset FIVE',
-            'nextsetoperator' => 0, // The last courseset sets nextsetoperator to 0, for reasons unknown.
-            'completiontype' => 1,
-            'mincourses' => 0,
-            'coursesumfield' => 0,
-            'coursesumfieldtotal' => 0,
-            'timeallowed' => 86400,
-            'recurrancetime' => 0,
-            'recurrancecreatetime' => 0,
-            'contenttype' => 1,
-            'certifpath' => CERTIFPATH_RECERT
-        ];
-        $cs5= $DB->insert_record('prog_courseset', (object)$cs4data);
-        $c5 = $this->getDataGenerator()->create_course();
-        $DB->insert_record('prog_courseset_course', (object)['coursesetid' => $cs5, 'courseid' => $c1->id, 'sortorder' => 1]);
 
         $prog_gen->assign_program($certification->id, $users);
 
@@ -594,13 +575,93 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
     }
 
     public function test_resolve_count_unavailablesets() {
-        list($user, $certification) = $this->create_faux_certifications();
+        global $DB;
+
+        $user = $this->getDataGenerator()->create_user();
+        $certification = $this->setup_complex_coursesets([$user->id]);
         $this->setUser($user);
 
         $value = $this->resolve('count_unavailablesets', $certification);
         $this->assertIsInt($value);
         $this->assertEquals(1, $value);
+
+        // Complete the course in courseset 3.
+        $course = $DB->get_record('course', ['fullname' => 'cs3course']);
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $course->id));
+        $completion->mark_complete();
+
+        $value = $this->resolve('count_unavailablesets', $certification);
+        $this->assertIsInt($value);
+        $this->assertEquals(0, $value);
     }
+
+    public function test_resolve_count_optionalsets() {
+        global $DB;
+
+        $user = $this->getDataGenerator()->create_user();
+        $certification = $this->setup_complex_coursesets([$user->id]);
+        $this->setUser($user);
+
+        $value = $this->resolve('count_optionalsets', $certification);
+        $this->assertIsInt($value);
+        $this->assertEquals(0, $value);
+
+        // Complete the course in courseset 3.
+        $course = $DB->get_record('course', ['fullname' => 'cs3course']);
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $course->id));
+        $completion->mark_complete();
+
+        $value = $this->resolve('count_optionalsets', $certification);
+        $this->assertIsInt($value);
+        $this->assertEquals(2, $value);
+    }
+
+    public function test_resolve_count_completedsets() {
+        global $DB;
+
+        $user = $this->getDataGenerator()->create_user();
+        $certification = $this->setup_complex_coursesets([$user->id]);
+        $this->setUser($user);
+
+        $value = $this->resolve('count_completedsets', $certification);
+        $this->assertIsInt($value);
+        $this->assertEquals(0, $value);
+
+        // Complete the course in courseset 3.
+        $course = $DB->get_record('course', ['fullname' => 'cs3course']);
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $course->id));
+        $completion->mark_complete();
+
+        $value = $this->resolve('count_completedsets', $certification);
+        $this->assertIsInt($value);
+        $this->assertEquals(1, $value);
+    }
+
+    public function test_resolve_courseset_header() {
+        global $DB;
+
+        $user = $this->getDataGenerator()->create_user();
+        $certification = $this->setup_complex_coursesets([$user->id]);
+        $this->setUser($user);
+
+        $value = $this->resolve('courseset_header', $certification);
+        $this->assertIsString($value);
+        $this->assertEquals('', $value);
+
+        // Complete the course in courseset 3.
+        $course = $DB->get_record('course', ['fullname' => 'cs3course']);
+        $this->getDataGenerator()->enrol_user($user->id, $course->id);
+        $completion = new completion_completion(array('userid' => $user->id, 'course' => $course->id));
+        $completion->mark_complete();
+
+        $value = $this->resolve('courseset_header', $certification);
+        $this->assertIsString($value);
+        $this->assertEquals('1 completed set and 2 optional sets', $value);
+    }
+
 
     public function test_resolve_mobileimage() {
         list($user, $certification) = $this->create_faux_certifications();

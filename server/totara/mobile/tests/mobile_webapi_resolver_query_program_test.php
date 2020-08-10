@@ -252,6 +252,7 @@ class totara_mobile_webapi_resolver_query_program_testcase extends advanced_test
                     ],
                     "currentCourseSets" => [$expectedsetdata],
                     "countUnavailableSets" => 1,
+                    "courseSetHeader" => "",
                     "__typename" => 'totara_mobile_program'
                 ]
             ];
