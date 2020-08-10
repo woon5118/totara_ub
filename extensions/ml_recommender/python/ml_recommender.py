@@ -48,7 +48,7 @@ from lightfm.data import Dataset
 from lightfm.evaluation import auc_score
 
 
-def _get_items(data_home, data_file=None):
+def _get_items(data_home, data_file=None, nlp_active=None, top_x_word_count=None):
     """
     Load items data, then apply (naive) NLP to reduce text content to relatively meaningful bag-of-words.
     Bag-of-Words is appended to the item features matrix.
@@ -61,11 +61,13 @@ def _get_items(data_home, data_file=None):
     file_path = os.path.join(os.path.abspath(data_home), data_file)
     items = pd.read_csv(file_path, sep=',', encoding='utf-8')
 
-    # No NLP for now.
-    nlp_active = False
+    # Optionally do NLP, else just drop content if it is present.
     if nlp_active == True:
         # Apply NLP processing to text documents.
         bows = _nlp_naive(items['document'])
+
+        # Keep only the top 5 words per document.
+        bows = _bows_top_x(bows=bows, top_x=top_x_word_count)
 
         # Drop the text content column and replace with BOW matrix.
         items.drop(['document'], axis=1, inplace=True)
@@ -200,6 +202,35 @@ def _inverse_document_frequencies(term_frequencies):
 
     return tf_idfs_df
 
+def _bows_top_x(bows=None, top_x=None):
+    """
+    Only keep pertinent words per article according to TF-IDF.  It does not require many words to determine theme.
+
+    :param bows:
+    :param top_x:
+    :return:
+    """
+    column_names = bows.columns.values.tolist()
+    columns_to_delete = {}
+    columns_to_keep = {}
+    for index, row in bows.iterrows():
+        row.sort_values(ascending=False, inplace=True)
+        top_x_words = row.to_frame()[:top_x]
+
+        for word in column_names:
+            if word in top_x_words.index:
+                bows.at[index, word] = 1
+                columns_to_keep[word] = 0
+                if word in columns_to_delete:
+                    del columns_to_delete[word]
+            else:
+                bows.at[index, word] = 0
+                if word not in columns_to_keep:
+                    columns_to_delete[word] = 0
+
+    bows.drop(list(columns_to_delete.keys()), axis=1, inplace=True)
+
+    return bows
 
 # ------------------------------------------------------------------------------
 
@@ -319,6 +350,9 @@ def _feature_list(feature_labels, feature_values):
     """
     features = []
     for label, value in zip(feature_labels, feature_values):
+        # Ensure 1 || 0 as opposed to 1.0 || 0.0, or anything similar.
+        value = int(round(value))
+
         feature = str(label) + ":" + str(value)
         features.append(feature)
     return features
@@ -345,6 +379,7 @@ parser.add_argument("--result_count_item", help="Number of items-to-item recomme
 parser.add_argument("--threads", help="Number of parallel threads to use (should be <= physical cores)", required=True,
                     type=int)
 parser.add_argument('--data_path', help='Path to data directory', required=True, type=Path)
+parser.add_argument('--content_filtering', help='Enable NLP of text content', required=False, type=bool)
 args = parser.parse_args()
 
 # Set runtime variables from arguments.
@@ -353,9 +388,13 @@ data_home = args.data_path
 num_threads = args.threads
 user_result_count = args.result_count_user
 item_result_count = args.result_count_item
+nlp_active = False
+if args.content_filtering is not None:
+    nlp_active = args.content_filtering
 
 # There is no immediate reason why the standard 80%/20% split for training and test data needs to be changed.
 training_size = 0.8
+top_x_word_count = 4
 
 # Initialise working variables.
 users = None
@@ -381,7 +420,7 @@ if query == 'hybrid':
     users_raw = None
 
     # Load and pre-process item data.
-    items_raw = _get_items(data_home, 'item_data.csv')
+    items_raw = _get_items(data_home, 'item_data.csv', nlp_active=True, top_x_word_count=top_x_word_count)
     num_items = items_raw.shape[0]
     unique_items = items_raw['item_id']
     item_feature_names = list(items_raw.columns.values)
@@ -420,7 +459,7 @@ if query == 'hybrid':
     for feature_row in features_list:
         feature_list.append(_feature_list(item_feature_names, feature_row))
 
-    # Form user tuples and build user features.
+    # Form tuples and build features.
     item_tuples = list(zip(items_raw.item_id, feature_list))
     item_features = dataset.build_item_features(item_tuples, normalize=False)
 
