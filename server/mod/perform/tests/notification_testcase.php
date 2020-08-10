@@ -217,7 +217,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      * This will not trigger any notifications.
      *
      * @param track $track
-     * @return integer[] array of participant instance ids
+     * @return participant_instance[] array of participant instance entities
      */
     public function create_participant_instances_on_track(track $track): array {
         $collection = track_user_assignment::repository()
@@ -237,14 +237,11 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
         (new participant_instance_creation())->generate_instances($collection);
         $sink->close();
 
-        return builder::table(participant_instance::TABLE)
+        return participant_instance::repository()
             ->where_in('subject_instance_id', $collection->map(function (subject_instance_dto $sid) {
                 return $sid->id;
             })->all())
             ->get()
-            ->map(function (stdClass $rec) {
-                return $rec->id;
-            })
             ->all();
     }
 

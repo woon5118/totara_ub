@@ -103,26 +103,26 @@ abstract class factory {
      * @return cartel
      */
     public static function create_cartel_on_participant_instances(array $participant_instances): cartel {
-        $ids = array_map(function ($e, $i) {
+        $instances = array_map(function ($e, $i) {
             if ($e instanceof participant_instance_dto) {
-                return $e->get_id();
+                return participant_instance::load_by_id($e->get_id());
             }
             if ($e instanceof participant_instance) {
-                return $e->get_id();
+                return $e;
             }
             if ($e instanceof participant_instance_entity) {
-                return $e->id;
+                return participant_instance::load_by_entity($e);
             }
             if ($e instanceof stdClass) {
-                return $e->id;
+                return participant_instance::load_by_id($e->id);
             }
             if (is_int($e)) {
-                return $e;
+                return participant_instance::load_by_id($e);
             }
             throw new coding_exception('unknown element at ' . $i);
         }, $participant_instances, array_keys($participant_instances));
-        /** @var integer[] $ids */
-        return new cartel($ids);
+        /** @var participant_instance[] $instances */
+        return new cartel($instances);
     }
 
     /**

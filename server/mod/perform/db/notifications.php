@@ -31,7 +31,6 @@ $notifications = [
         'name' => ['notification_broker_instance_created', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\instance_created::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
-        'is_reminder' => false,
     ],
     'instance_created_reminder' => [
         'name' => ['notification_broker_instance_created_reminder', 'mod_perform'],
@@ -54,7 +53,7 @@ $notifications = [
         'class' => \mod_perform\notification\brokers\due_date::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
         'condition' => \mod_perform\notification\conditions\after_midnight::class,
-        'is_reminder' => false,
+        'is_reminder' => true,
     ],
     'overdue_reminder' => [
         'name' => ['notification_broker_overdue_reminder', 'mod_perform'],
@@ -68,6 +67,10 @@ $notifications = [
         'name' => ['notification_broker_completion', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\completion::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
-        'is_reminder' => false,
+    ],
+    'reopened' => [
+        'name' => ['notification_broker_reopened', 'mod_perform'],
+        'class' => \mod_perform\notification\brokers\reopened::class,
+        'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
     ],
 ];

@@ -297,6 +297,7 @@ $string['notification_broker_due_date_reminder'] = 'Due date approaching reminde
 $string['notification_broker_instance_created'] = 'Participant instance creation';
 $string['notification_broker_instance_created_reminder'] = 'Participant instance creation reminder';
 $string['notification_broker_overdue_reminder'] = 'Overdue reminder';
+$string['notification_broker_reopened'] = 'Reopened activity';
 $string['notification_trigger_instance_creation'] = 'instance creation';
 $string['notification_trigger_duedate'] = 'due date';
 $string['overdue'] = 'Overdue?';
@@ -702,6 +703,29 @@ Please ensure you complete it as soon as possible.
 
 You can access the activity through this link: $Activity link$';
 $string['template_overdue_reminder_subject_subject'] = 'Overdue - $Activity name$/$Activity type$';
+
+$string['template_reopened_appraiser_body'] = 'The following activity has been reopened:
+
+$Activity name$/$Activity type$: $subject full name$
+
+As $subject full name$’s $relationship name$, it requires further action from you to complete it.
+
+You can access the activity through this link: $Activity link$';
+$string['template_reopened_appraiser_subject'] = 'Reopened activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_reopened_manager_body'] = 'The following activity has been reopened:
+
+$Activity name$/$Activity type$: $subject full name$
+
+As $subject full name$’s $relationship name$, it requires further action from you to complete it.
+
+You can access the activity through this link: $Activity link$';
+$string['template_reopened_manager_subject'] = 'Reopened activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_reopened_subject_body'] = 'Your $$Activity name$/$Activity type$ has been reopened and requires further action from you to complete it.
+
+You can access the activity through this link: $Activity link$';
+$string['template_reopened_subject_subject'] = 'Reopened activity - $Activity name$/$Activity type';
 
 $string['toast_error_create_activity'] = 'An error occurred while saving, and the activity could not be created.';
 $string['toast_error_generic_update'] = 'An error occurred, and your latest changes have not been saved.';

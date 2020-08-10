@@ -31,6 +31,7 @@ use mod_perform\entities\activity\subject_instance;
 use mod_perform\expand_task;
 use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\notification\cartel;
+use mod_perform\notification\factory;
 use totara_job\job_assignment;
 
 require_once(__DIR__ . '/notification_testcase.php');
@@ -71,10 +72,10 @@ class mod_perform_notification_cartel_testcase extends mod_perform_notification_
         $activity->activate();
         $this->assertTrue($activity->is_active());
 
-        $ids = $this->create_participant_instances_on_track($track);
-        $this->assertCount(3, $ids);
+        $entities = $this->create_participant_instances_on_track($track);
+        $this->assertCount(3, $entities);
         $this->assertEquals(2, subject_instance::repository()->count());
-        $cartel = new cartel($ids);
+        $cartel = factory::create_cartel_on_participant_instances($entities);
 
         $repo = function (string $class_key = null) {
             return builder::table(notification_message::TABLE, 'm')

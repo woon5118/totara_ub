@@ -32,16 +32,21 @@ use mod_perform\models\activity\participant_instance as participant_instance_mod
  * The cartel class.
  */
 class cartel {
-    /** @var integer[] */
-    private $participant_instance_ids;
+    /** @var participant_instance_model[] */
+    private $participant_instances;
 
     /**
      * Constructor. *Do not instantiate this class directly. Use the factory class.*
      *
-     * @param integer[] $participant_instance_ids
+     * @param participant_instance_model[] $participant_instances
      */
-    public function __construct(array $participant_instance_ids) {
-        $this->participant_instance_ids = $participant_instance_ids;
+    public function __construct(array $participant_instances) {
+        if (!empty(array_filter($participant_instances, function ($x) {
+            return !($x instanceof participant_instance_model);
+        }))) {
+            throw new coding_exception('participant_instances must be an array of participant_instance models');
+        }
+        $this->participant_instances = $participant_instances;
     }
 
     /**
@@ -52,10 +57,7 @@ class cartel {
         $subject_instance_id = false;
         $dealer = null;
 
-        $entities = participant_instance_entity::repository()->where_in('id', $this->participant_instance_ids)->get()->all();
-        /** @var participant_instance_entity[] $entities */
-        foreach ($entities as $entity) {
-            $instance = participant_instance_model::load_by_entity($entity);
+        foreach ($this->participant_instances as $instance) {
             if ($instance->subject_instance_id !== $subject_instance_id) {
                 $notification = notification_model::load_by_activity_and_class_key($instance->get_subject_instance()->get_activity(), $class_key);
                 $dealer = factory::create_dealer_on_notification($notification);
