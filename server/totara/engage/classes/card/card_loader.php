@@ -112,7 +112,7 @@ class card_loader {
                         ['user', 'u'],
                         function (builder $join) use ($in_sql, $parameters): void {
                             $join->where_field('master.userid', 'u.id');
-                            $join->where_raw("(u.id {$in_sql} OR u.tenantid IS NULL)", $parameters);
+                            $join->where_raw("(u.tenantid {$in_sql} OR u.tenantid IS NULL)", $parameters);
                         }
                     );
                 } else {
