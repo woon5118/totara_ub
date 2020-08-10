@@ -307,8 +307,8 @@ select.menuf2f-select {
   &__filter {
     @include flex-wrap-vertical-center;
 
-    border: 1px $facetoface-border-color solid;
-    border-radius: $facetoface-border-radius;
+    border-top: 1px $facetoface-border-color solid;
+    border-bottom: 1px $facetoface-border-color solid;
     margin: var(--legacy-gap-4) 0;
     padding: var(--legacy-gap-2) var(--legacy-gap-2) 0;
 
@@ -318,9 +318,8 @@ select.menuf2f-select {
     }
 
     @mixin child() {
+      align-items: center;
       display: flex;
-      flex-wrap: wrap;
-      flex-direction: column;
       margin: 0 var(--legacy-gap-2) var(--legacy-gap-2);
       max-width: 100%;
     }
@@ -340,12 +339,7 @@ select.menuf2f-select {
       @include child;
 
       &__label {
-        margin: 0;
-        // Override Moodle form
-        font: inherit;
-        font-size: var(--legacy-font-size-11);
-        line-height: var(--legacy-font-size-16);
-        padding: 0 var(--legacy-gap-1) 1px 0;
+        margin: auto var(--legacy-gap-3) auto 0;
       }
 
       &__select {
@@ -728,10 +722,6 @@ select.menuf2f-select {
     }
   }
 
-  @mixin divider() {
-    border-bottom: 1px solid $facetoface-border-color;
-  }
-
   &__action-reservation {
     border-top: 1px solid $facetoface-border-color;
     padding-top: var(--legacy-gap-2);
@@ -739,14 +729,10 @@ select.menuf2f-select {
 
   // +++ Navigation bar +++ //
   &__navigation {
-    color: var(--legacy-color-neutral-1);
     margin: var(--legacy-gap-4) (0px - floor(($grid-gutter-width / 2))) var(--legacy-gap-4) 0px - ceil(($grid-gutter-width / 2));
     padding-left:  ceil(($grid-gutter-width / 2));
     padding-right: floor(($grid-gutter-width / 2));
-    position: relative; // IE11 does not support sticky position
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: relative;
 
     &__items {
       display: flex;
@@ -799,6 +785,11 @@ select.menuf2f-select {
     &__content {
       flex: 1;
       order: 0;
+
+
+      @mixin divider() {
+        border-bottom: 1px solid $facetoface-border-color;
+      }
 
       &__management {
         @include divider;
