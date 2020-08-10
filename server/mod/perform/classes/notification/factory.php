@@ -87,13 +87,26 @@ abstract class factory {
      * @return cartel
      */
     public static function create_cartel_on_subject_instance($subject_instance): cartel {
-        if ($subject_instance instanceof subject_instance_dto) {
-            $subject_instance = $subject_instance->id;
-        } else if ($subject_instance instanceof subject_instance_entity) {
-            $subject_instance = $subject_instance->id;
+        if ($subject_instance instanceof subject_instance_entity) {
+            $participant_instances = $subject_instance->participant_instances->all();
+        } else {
+            if ($subject_instance instanceof subject_instance_dto) {
+                $subject_instance = $subject_instance->id;
+            }
+            $participant_instances = participant_instance_entity::repository()->where('subject_instance_id', $subject_instance)->get()->all();
         }
-        $participant_instances = participant_instance_entity::repository()->where('subject_instance_id', $subject_instance)->get()->all();
         return self::create_cartel_on_participant_instances($participant_instances);
+    }
+
+    /**
+     * Create a cartel instance.
+     *
+     * @param subject_instance_entity[] $subject_instances
+     * @return cartel
+     */
+    public static function create_cartel_on_subject_instances_for_manual_participants(array $subject_instances): cartel {
+        // Need a different class because participant instances are not available.
+        return new cartel_secret($subject_instances);
     }
 
     /**

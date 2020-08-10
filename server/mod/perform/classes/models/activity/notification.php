@@ -25,7 +25,9 @@ namespace mod_perform\models\activity;
 
 use coding_exception;
 use core\orm\collection;
+use core\orm\query\builder;
 use core\orm\query\exceptions\record_not_found_exception;
+use mod_perform\models\activity\details\notification_secret;
 use mod_perform\notification\factory;
 use mod_perform\models\activity\details\notification_interface as notification_interface;
 use mod_perform\models\activity\details\notification_real;
@@ -34,7 +36,7 @@ use mod_perform\models\activity\details\notification_sparse;
 /**
  * A proxy class that represents a single performance notification setting.
  *
- * @property-read integer $id ID
+ * @property-read integer|null $id ID
  * @property string $name
  * @property string $class_key
  * @property boolean $active is active?
@@ -56,7 +58,7 @@ final class notification implements notification_interface {
      * @param notification_interface $input
      */
     private function __construct(notification_interface $input) {
-        if (!($input instanceof notification_real) && !($input instanceof notification_sparse)) {
+        if (!($input instanceof notification_real || $input instanceof notification_sparse || $input instanceof notification_secret)) {
             throw new coding_exception('invalid instance passed');
         }
         $this->current = $input;
@@ -86,6 +88,9 @@ final class notification implements notification_interface {
         $models = notification_real::load_by_activity($activity);
         $results = new collection();
         foreach ($classes as $class_key => $unused) {
+            if ($loader->is_secret($class_key)) {
+                continue;
+            }
             $model = $models->find('class_key', $class_key)
                    ?? new notification_sparse($activity, $class_key);
             $results->append(new self($model));
@@ -101,9 +106,13 @@ final class notification implements notification_interface {
      * @return self
      */
     public static function load_by_activity_and_class_key(activity $activity, string $class_key): self {
-        factory::create_loader()->ensure_class_key_exists($class_key);
-        $model = notification_real::load_by_activity_and_class_key($activity, $class_key, false)
-            ?? new notification_sparse($activity, $class_key);
+        $loader = factory::create_loader();
+        if ($loader->is_secret($class_key)) {
+            $model = new notification_secret($activity, $class_key);
+        } else {
+            $model = notification_real::load_by_activity_and_class_key($activity, $class_key, false)
+                ?? new notification_sparse($activity, $class_key);
+        }
         return new self($model);
     }
 
@@ -143,10 +152,17 @@ final class notification implements notification_interface {
      * Get all recipients.
      *
      * @param boolean $active_only get only active recipients
-     * @return collection|notification_recipient[]
+     * @return collection<integer, notification_recipient>
      */
     public function get_recipients(bool $active_only = false): collection {
         return notification_recipient::load_by_notification($this, $active_only);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function recipients_builder(builder $builder, bool $active_only = false): void {
+        $this->current->recipients_builder($builder, $active_only);
     }
 
     /**
@@ -160,7 +176,9 @@ final class notification implements notification_interface {
      * @inheritDoc
      */
     public function get_id(): ?int {
-        return $this->current->get_id();
+        $current = $this->current; // suppress warning.
+        /** @var notification_sparse|notification_real $current */
+        return $current->get_id();
     }
 
     /**

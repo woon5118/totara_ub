@@ -82,6 +82,8 @@ class mod_perform_notification_message_model_testcase extends mod_perform_notifi
         $this->assertCount(2, $recipients);
         $this->recipient_subject = $recipients->find('relationship_id', $this->relationships1[constants::RELATIONSHIP_SUBJECT]->id);
         $this->recipient_appraiser = $recipients->find('relationship_id', $this->relationships1[constants::RELATIONSHIP_APPRAISER]->id);
+        $this->assertNotEquals(0, $this->recipient_subject->notification_id);
+        $this->assertNotEquals(0, $this->recipient_appraiser->notification_id);
     }
 
     public function tearDown(): void {

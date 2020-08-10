@@ -1,5 +1,5 @@
 @totara @perform @mod_perform @mod_perform_notification @javascript @vuejs
-Feature: Perform activity notifications
+Feature: Perform activity notifications - core relationships
   As an activity administrator
   I should to be able to set that participants within an activity are notified when certain conditions are met
 
@@ -44,21 +44,21 @@ Feature: Perform activity notifications
       | track_description | assignment_type | assignment_name |
       | track 1           | cohort          | aud1            |
     And the following "language customisation" exist in "tool_customlang" plugin:
-      | component   | id                                                   | string                               |
-      | mod_perform | template_instance_created_subject_subject            | New activity notice                  |
-      | mod_perform | template_instance_created_reminder_subject_subject   | Te manatu mō te whakarite            |
-      | mod_perform | template_due_date_reminder_subject_subject           | Si avvicina la scadenza              |
-      | mod_perform | template_due_date_subject_subject                    | Notificación de fecha de vencimiento |
-      | mod_perform | template_overdue_reminder_subject_subject            | Försenad påminnelse                  |
-      | mod_perform | template_completion_subject_subject                  | Ukončení činnosti                    |
-      | mod_perform | template_reopened_subject_subject                    | Ua toe tatalaina se gaoioiga         |
-      | mod_perform | template_instance_created_appraiser_subject          | Nuwe aktiwiteitskennisgewing         |
-      | mod_perform | template_instance_created_reminder_appraiser_subject | Herinnering aan activiteit           |
-      | mod_perform | template_due_date_reminder_appraiser_subject         | A határidő közeledik                 |
-      | mod_perform | template_due_date_appraiser_subject                  | Iraungitze data jakinaraztea         |
-      | mod_perform | template_overdue_reminder_appraiser_subject          | Spomenuté oneskorenie                |
-      | mod_perform | template_completion_appraiser_subject                | Finalizarea activității              |
-      | mod_perform | template_reopened_appraiser_subject                  | Dejavnost je bila znova odprta       |
+      | component   | id                                                   | string                               | comment    |
+      | mod_perform | template_instance_created_subject_subject            | New activity notice                  | English    |
+      | mod_perform | template_instance_created_reminder_subject_subject   | Te manatu mō te whakarite            | Maori      |
+      | mod_perform | template_due_date_reminder_subject_subject           | Si avvicina la scadenza              | Italian    |
+      | mod_perform | template_due_date_subject_subject                    | Notificación de fecha de vencimiento | Spanish    |
+      | mod_perform | template_overdue_reminder_subject_subject            | Försenad påminnelse                  | Swedish    |
+      | mod_perform | template_completion_subject_subject                  | Ukončení činnosti                    | Czech      |
+      | mod_perform | template_reopened_subject_subject                    | Ua toe tatalaina se gaoioiga         | Samoan     |
+      | mod_perform | template_instance_created_appraiser_subject          | Nuwe aktiwiteitskennisgewing         | Afrikaans  |
+      | mod_perform | template_instance_created_reminder_appraiser_subject | Herinnering aan activiteit           | Dutch      |
+      | mod_perform | template_due_date_reminder_appraiser_subject         | A határidő közeledik                 | Hungarian  |
+      | mod_perform | template_due_date_appraiser_subject                  | Iraungitze data jakinaraztea         | Basque     |
+      | mod_perform | template_overdue_reminder_appraiser_subject          | Spomenuté oneskorenie                | Slovak     |
+      | mod_perform | template_completion_appraiser_subject                | Finalizarea activității              | Romanian   |
+      | mod_perform | template_reopened_appraiser_subject                  | Dejavnost je bila znova odprta       | Slovenian  |
     And I log in as "admin"
     And I navigate to the manage perform activities page
     And I follow "Activity test"
@@ -71,16 +71,18 @@ Feature: Perform activity notifications
     And I click on "Appraiser" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
     And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
     And I confirm the tui confirmation modal
-    And I wait until the next second
+    And I wait for the next second
     And I trigger cron
     And I press the "back" button in the browser
     And I log out
+
+    # user1 should receive a notification
     When I log in as "user1"
     And I open the notification popover
     Then I should see "New activity notice" exactly "1" times
     And I log out
 
-    # appraiser should receive as many notifications as user1 does
+    # appraiser should receive a notification
     When I log in as "appraiser"
     And I open the notification popover
     Then I should see "Nuwe aktiwiteitskennisgewing" exactly "1" times
@@ -116,7 +118,7 @@ Feature: Perform activity notifications
     And I close the tui notification toast
     And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
     And I confirm the tui confirmation modal
-    And I wait until the next second
+    And I wait for the next second
     And I trigger cron
     And I press the "back" button in the browser
 
@@ -223,7 +225,7 @@ Feature: Perform activity notifications
       | dueDateOffset[from_unit]  | weeks |
     And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
     And I confirm the tui confirmation modal
-    And I wait until the next second
+    And I wait for the next second
     And I trigger cron
     And I press the "back" button in the browser
 
@@ -433,7 +435,7 @@ Feature: Perform activity notifications
       | dueDateOffset[from_unit]  | weeks |
     And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
     And I confirm the tui confirmation modal
-    And I wait until the next second
+    And I wait for the next second
     And I trigger cron
     And I press the "back" button in the browser
 
@@ -529,7 +531,7 @@ Feature: Perform activity notifications
     And I click on "Appraiser" tui "toggle_button" in the "Completion of subject instance" tui "collapsible"
     And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
     And I confirm the tui confirmation modal
-    And I wait until the next second
+    And I wait for the next second
     And I trigger cron
     And I press the "back" button in the browser
     And I log out
@@ -576,22 +578,24 @@ Feature: Perform activity notifications
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
-    And I wait until the next second
+    And I wait for the next second
     And I trigger cron
     And I press the "back" button in the browser
     And I reload the page
+
+    # user1 should receive a notification
     And I open the notification popover
     Then I should see "Ukončení činnosti" exactly "1" times
     And I am on homepage
     And I log out
 
-    # user3 should receive the notification
+    # user3 should receive a notification
     When I log in as "user3"
     And I open the notification popover
     Then I should see "Ukončení činnosti" exactly "1" times
     And I log out
 
-    # appraiser should receive the notification
+    # appraiser should receive a notification
     When I log in as "appraiser"
     And I open the notification popover
     Then I should see "Finalizarea activității" exactly "1" times
@@ -616,7 +620,7 @@ Feature: Perform activity notifications
     And I click on "Appraiser" tui "toggle_button" in the "Reopened activity" tui "collapsible"
     And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
     And I confirm the tui confirmation modal
-    And I wait until the next second
+    And I wait for the next second
     And I trigger cron
     And I press the "back" button in the browser
     And I log out
@@ -657,7 +661,7 @@ Feature: Perform activity notifications
     And I confirm the tui confirmation modal
     And I click on "Close" "link_or_button" in the "User Three" "table_row"
     And I confirm the tui confirmation modal
-    And I wait until the next second
+    And I wait for the next second
     And I trigger cron
     And I am on homepage
     And I log out
@@ -683,25 +687,25 @@ Feature: Perform activity notifications
     And I confirm the tui confirmation modal
     And I click on "Reopen" "link_or_button" in the "User Three" "table_row"
     And I confirm the tui confirmation modal
-    And I wait until the next second
+    And I wait for the next second
     And I trigger cron
     And I am on homepage
     And I log out
 
-    # user1 should receive the notification
+    # user1 should receive a notification
     When I log in as "user1"
     And I open the notification popover
     Then I should see "Ua toe tatalaina se gaoioiga" exactly "1" times
     And I am on homepage
     And I log out
 
-    # user3 should receive the notification
+    # user3 should receive a notification
     When I log in as "user3"
     And I open the notification popover
     Then I should see "Ua toe tatalaina se gaoioiga" exactly "1" times
     And I log out
 
-    # appraiser should receive the notification
+    # appraiser should receive a notification
     When I log in as "appraiser"
     And I open the notification popover
     Then I should see "Dejavnost je bila znova odprta" exactly "1" times

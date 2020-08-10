@@ -26,6 +26,9 @@ namespace mod_perform\notification;
 use invalid_parameter_exception;
 use mod_perform\models\activity\details\notification_interface;
 
+/**
+ * The trigger types and helper functions.
+ */
 final class trigger {
     const TYPE_ONCE = 0;
     const TYPE_BEFORE = 1;

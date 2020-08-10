@@ -27,50 +27,63 @@ defined('MOODLE_INTERNAL') || die();
 // Instead, use the loader instance returned by mod_perform\notification\factory::create_loader().
 
 $notifications = [
-    'instance_created' => [
+    'participant_selection' => [ // 23
+        'name' => ['notification_broker_participant_selection', 'mod_perform'],
+        'class' => \mod_perform\notification\brokers\participant_selection::class,
+        'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
+        'recipients' => \mod_perform\notification\recipient::STANDARD,
+    ],
+    'instance_created' => [ // 18
         'name' => ['notification_broker_instance_created', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\instance_created::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
+        'recipients' => \mod_perform\notification\recipient::STANDARD | \mod_perform\notification\recipient::MANUAL,
     ],
-    'instance_created_reminder' => [
+    'instance_created_reminder' => [ // 19
         'name' => ['notification_broker_instance_created_reminder', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\instance_created_reminder::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_AFTER,
         'trigger_label' => ['notification_trigger_instance_creation', 'mod_perform'],
         'condition' => \mod_perform\notification\conditions\days_after::class,
+        'recipients' => \mod_perform\notification\recipient::ALL,
         'is_reminder' => true,
     ],
-    'due_date_reminder' => [
+    'due_date_reminder' => [ // 20
         'name' => ['notification_broker_due_date_reminder', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\due_date_reminder::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_BEFORE,
         'trigger_label' => ['notification_trigger_duedate', 'mod_perform'],
         'condition' => \mod_perform\notification\conditions\days_before::class,
+        'recipients' => \mod_perform\notification\recipient::ALL,
         'is_reminder' => true,
     ],
-    'due_date' => [
+    'due_date' => [ // 21
         'name' => ['notification_broker_due_date', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\due_date::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
         'condition' => \mod_perform\notification\conditions\after_midnight::class,
+        'recipients' => \mod_perform\notification\recipient::ALL,
         'is_reminder' => true,
     ],
-    'overdue_reminder' => [
+    'overdue_reminder' => [ // 22
         'name' => ['notification_broker_overdue_reminder', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\overdue_reminder::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_AFTER,
         'trigger_label' => ['notification_trigger_duedate', 'mod_perform'],
         'condition' => \mod_perform\notification\conditions\days_after::class,
+        'recipients' => \mod_perform\notification\recipient::ALL,
         'is_reminder' => true,
     ],
-    'completion' => [
+    'completion' => [ // 25
         'name' => ['notification_broker_completion', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\completion::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
+        'recipients' => \mod_perform\notification\recipient::STANDARD,
     ],
-    'reopened' => [
+    'reopened' => [ // 26
         'name' => ['notification_broker_reopened', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\reopened::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
+        'recipients' => \mod_perform\notification\recipient::ALL,
     ],
 ];

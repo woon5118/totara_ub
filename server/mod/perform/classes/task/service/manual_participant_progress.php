@@ -31,6 +31,8 @@ use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\manual_relationship_selector;
 use mod_perform\entities\activity\subject_instance;
+use mod_perform\models\activity\helpers\manual_participant_helper;
+use mod_perform\notification\factory;
 use mod_perform\state\subject_instance\pending;
 use stdClass;
 use totara_core\entities\relationship;
@@ -69,14 +71,16 @@ class manual_participant_progress {
         // At the end add all the selectors determined before with the least amount of queries
         if (!empty($this->selectors_to_insert)) {
             builder::get_db()->insert_records_via_batch(manual_relationship_selector::TABLE, $this->selectors_to_insert);
-            // TODO: Trigger event(s) for notification TL-25366
+            // Send notifications.
+            $cartel = factory::create_cartel_on_subject_instances_for_manual_participants($pending_subject_instances->all());
+            $cartel->dispatch('participant_selection');
         }
     }
 
     /**
      * Load all subject instance which are pending
      *
-     * @return collection|subject_instance[]
+     * @return collection<subject_instance>
      */
     private function load_pending_subject_instances(): collection {
         // Use eager loading to reduce number of queries in case we have a lot of subject instances to process
@@ -178,7 +182,7 @@ class manual_participant_progress {
      * Get manual relationships if this activity has them
      *
      * @param subject_instance $subject_instance
-     * @return collection
+     * @return collection<relationship>
      */
     private function get_manual_relationships(subject_instance $subject_instance): collection {
         $sections = $subject_instance->track->activity->sections;

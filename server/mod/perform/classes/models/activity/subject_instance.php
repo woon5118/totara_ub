@@ -62,6 +62,7 @@ use totara_job\job_assignment;
  * @property-read int $availability The availability status code
  * @property-read activity $activity The top level perform activity this is an instance of
  * @property-read collection|participant_instance[] $participant_instances models created from participant_instance entities
+ * @property-read int|null $job_assignment_id
  * @property-read job_assignment|null $job_assignment The job assignment this instance is in relation to (per job activities),
  *                                               null for per user activities
  * @property-read string $progress_status internal name of current progress state
@@ -80,6 +81,7 @@ class subject_instance extends model {
     protected $entity_attribute_whitelist = [
         'id',
         'subject_user_id',
+        'job_assignment_id',
         'created_at',
         'progress',
         'availability',

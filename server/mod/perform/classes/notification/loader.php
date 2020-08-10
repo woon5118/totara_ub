@@ -24,6 +24,7 @@
 namespace mod_perform\notification;
 
 use coding_exception;
+use core\orm\query\builder;
 use mod_perform\notification\exceptions\class_key_not_available;
 
 /**
@@ -42,6 +43,7 @@ class loader {
         'class',
         'name',
         'trigger_type',
+        'recipients',
     ];
 
     /** @var string[] */
@@ -80,6 +82,9 @@ class loader {
                 if ($value != $mandatory_dependency[1] && !isset($notif[$mandatory_field])) {
                     throw new coding_exception("{$mandatory_field} is missing for {$class_key}");
                 }
+            }
+            if (!$notif['recipients']) {
+                throw new coding_exception("no recipients are set for {$class_key}");
             }
         }
     }
@@ -206,9 +211,22 @@ class loader {
      *
      * @param string $class_key
      * @return boolean
+     * @throws coding_exception
      */
     public function support_triggers(string $class_key): bool {
         return $this->get_trigger_type_of($class_key) !== trigger::TYPE_ONCE;
+    }
+
+    /**
+     * Return the possible recipient relationships.
+     *
+     * @param string $class_key
+     * @return integer OR combined recipient constants
+     * @throws coding_exception
+     */
+    public function get_possible_recipients_of(string $class_key): int {
+        $info = $this->get_information($class_key);
+        return $info['recipients'];
     }
 
     /**
@@ -243,5 +261,17 @@ class loader {
     public function is_reminder(string $class_key): bool {
         $info = $this->get_information($class_key);
         return !empty($info['is_reminder']);
+    }
+
+    /**
+     * Return whether a broker is hidden from a user.
+     *
+     * @param string $class_key
+     * @return boolean
+     * @throws class_key_not_available
+     */
+    public function is_secret(string $class_key): bool {
+        $info = $this->get_information($class_key);
+        return !empty($info['secret']);
     }
 }

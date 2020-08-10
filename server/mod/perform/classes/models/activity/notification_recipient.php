@@ -26,8 +26,14 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use core\orm\collection;
 use core\orm\query\builder;
+use invalid_parameter_exception;
+use mod_perform\entities\activity\section as section_entity;
+use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
+use mod_perform\notification\factory;
+use mod_perform\notification\recipient;
 use stdClass;
+use totara_core\entities\relationship as relationship_entity;
 use totara_core\relationship\relationship;
 
 /**
@@ -45,7 +51,7 @@ class notification_recipient {
     /** @var integer */
     private $relationship_id;
 
-    /** @var integer */
+    /** @var integer|null */
     private $notification_id;
 
     /** @var integer|null */
@@ -57,7 +63,7 @@ class notification_recipient {
     /**
      * @param notification_recipient_entity|stdClass $object
      */
-    private function __construct($object) {
+    public function __construct($object) {
         if ($object instanceof notification_recipient_entity) {
             $this->relationship_id = $object->core_relationship_id;
             $this->notification_id = $object->notification_id;
@@ -155,6 +161,10 @@ class notification_recipient {
         if (!$parent->exists()) {
             throw new coding_exception('parent record does not exist');
         }
+        $loader = factory::create_loader();
+        if (!recipient::is_available($loader->get_possible_recipients_of($parent->class_key), $relationship)) {
+            throw new invalid_parameter_exception("{$relationship->idnumber} is unavailable");
+        }
         $entity = new notification_recipient_entity();
         $entity->notification_id = $parent->get_id();
         $entity->core_relationship_id = $relationship->get_id();
@@ -183,45 +193,26 @@ class notification_recipient {
      *
      * @param notification $parent
      * @param boolean $active_only get only active recipients
-     * @return collection
+     * @return collection<integer, notification_recipient>
      */
     public static function load_by_notification(notification $parent, bool $active_only = false): collection {
-        $notify_id = $parent->id;
-        $params = ['activity_id' => $parent->activity->id];
-        $notification_id_part = ' AND 1 != 1';
-        if ($notify_id !== null) {
-            $notification_id_part = ' AND nr.notification_id = :notification_id';
-            $params['notification_id'] = $notify_id;
-        }
-        $active_only_part = $active_only ? 'AND nr.active <> 0' : '';
-
-        $sql = "
-            SELECT 
-                r.id as relationship_id,
-                nr.id as recipient_id,
-                nr.active as active,
-                r.sort_order
-            FROM {perform_section} s 
-            JOIN {perform_section_relationship} sr ON s.id = sr.section_id
-            JOIN {totara_core_relationship} r ON sr.core_relationship_id = r.id 
-            LEFT JOIN {perform_notification_recipient} nr ON sr.core_relationship_id = nr.core_relationship_id
-                {$notification_id_part}
-            WHERE s.activity_id = :activity_id
-                {$active_only_part}
-            GROUP BY
-                r.id,
-                nr.id,
-                nr.active,
-                r.sort_order
-            ORDER BY r.sort_order
-        ";
-
-        $records = builder::get_db()->get_records_sql($sql, $params);
-
-        return collection::new($records)
-            ->map_to(function ($source) use ($notify_id) {
-                $source->notification_id = $notify_id;
+        $loader = factory::create_loader();
+        $builder = builder::table(section_entity::TABLE, 's')
+            ->join([section_relationship_entity::TABLE, 'sr'], 's.id', 'sr.section_id')
+            ->join([relationship_entity::TABLE, 'r'], 'r.id', 'sr.core_relationship_id')
+            ->where('s.activity_id', $parent->activity->id)
+            ->select(['r.id as relationship_id', 'r.sort_order'])
+            ->group_by(['r.id', 'r.sort_order'])
+            ->order_by('r.sort_order')
+            ->map_to(function ($source) use ($parent) {
+                $source->notification_id = $parent->id;
+                if (empty($source->recipient_id)) {
+                    $source->recipient_id = null;
+                }
                 return new self($source);
             });
+        recipient::where_available($loader->get_possible_recipients_of($parent->class_key), $builder, 'r');
+        $parent->recipients_builder($builder, $active_only);
+        return $builder->get();
     }
 }

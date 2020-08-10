@@ -23,6 +23,7 @@
 
 namespace mod_perform\models\activity\details;
 
+use core\orm\query\builder;
 use mod_perform\models\activity\activity;
 
 /**
@@ -49,6 +50,18 @@ interface notification_interface {
      * @return boolean
      */
     public function get_active(): bool;
+
+    /**
+     * Modify the builder to obtain associated recipients.
+     * *Do not call this function directly!!*
+     *
+     * @param builder $builder a partially set up builder: see notification_recipient::load_by_notification()
+     *                         * {perform_section} s
+     *                         * {perform_section_relationship} sr
+     *                         * {totara_core_relationship} r
+     * @param boolean $active_only get only active recipients
+     */
+    public function recipients_builder(builder $builder, bool $active_only = false): void;
 
     /**
      * Return the array of trigger values.

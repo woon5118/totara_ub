@@ -72,13 +72,14 @@ class mod_perform_webapi_resolver_query_notifications_testcase extends advanced_
         $this->assertSame($notifications[1]->name, $result['instance_created_reminder']['name']);
         $this->assertSame($notifications[1]->active, $result['instance_created_reminder']['active']);
         $this->assertSame($notifications[1]->trigger_label, $result['instance_created_reminder']['trigger_label']);
-        next($result);
-        next($result);
-        for ($one = current($result); $one !== false; $one = next($result)) {
-            $this->assertNull($one['id']);
-            $this->assertSame($one['name'], mod_perform\notification\factory::create_loader()->get_name_of($one['class_key']));
-            $this->assertFalse($one['active']);
-            $this->assertSame($one['trigger_label'], mod_perform\notification\factory::create_loader()->get_trigger_label_of($one['class_key']));
+        unset($result['instance_created']);
+        unset($result['instance_created_reminder']);
+        foreach ($result as $class_key => $one) {
+            $this->assertNull($one['id'], $class_key);
+            $this->assertEquals($class_key, $one['class_key']);
+            $this->assertSame($one['name'], mod_perform\notification\factory::create_loader()->get_name_of($one['class_key']), $class_key);
+            $this->assertFalse($one['active'], $class_key);
+            $this->assertSame($one['trigger_label'], mod_perform\notification\factory::create_loader()->get_trigger_label_of($one['class_key']), $class_key);
         }
     }
 

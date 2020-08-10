@@ -31,7 +31,9 @@ use mod_perform\notification\conditions\days_after;
 use mod_perform\notification\conditions\days_before;
 use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\notification\loader;
+use mod_perform\notification\recipient;
 use mod_perform\notification\trigger;
+use totara_core\entities\relationship;
 
 /**
  * Class mod_perform_notification_loader_testcase
@@ -65,26 +67,32 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         return [
             'empty' => [[], 'notification data is empty'],
             'missing class' => [[
-                'kia_ora' => ['name' => 'kia ora', 'trigger_type' => trigger::TYPE_ONCE]
+                'kia_ora' => ['name' => 'kia ora', 'trigger_type' => trigger::TYPE_ONCE, 'recipients' => recipient::ALL]
             ], 'class is missing for kia_ora'],
             'missing name' => [[
-                'kia_ora' => ['class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_ONCE]
+                'kia_ora' => ['class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_ONCE, 'recipients' => recipient::ALL]
             ], 'name is missing for kia_ora'],
             'missing trigger type' => [[
-                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora']
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'recipients' => recipient::ALL]
             ], 'trigger_type is missing for kia_ora'],
             'missing trigger label 1' => [[
-                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_BEFORE, 'condition' => days_after::class]
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_BEFORE, 'condition' => days_after::class, 'recipients' => recipient::ALL]
             ], 'trigger_label is missing for kia_ora'],
             'missing trigger label 2' => [[
-                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_AFTER, 'condition' => days_before::class]
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_AFTER, 'condition' => days_before::class, 'recipients' => recipient::ALL]
             ], 'trigger_label is missing for kia_ora'],
             'missing condition 1' => [[
-                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_BEFORE, 'trigger_label' => ['ok']]
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_BEFORE, 'trigger_label' => ['ok'], 'recipients' => recipient::ALL]
             ], 'condition is missing for kia_ora'],
             'missing condition 2' => [[
-                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_AFTER, 'trigger_label' => ['ok']]
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_AFTER, 'trigger_label' => ['ok'], 'recipients' => recipient::ALL]
             ], 'condition is missing for kia_ora'],
+            'no recipients' => [[
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_ONCE, 'trigger_label' => ['ok']]
+            ], 'recipients is missing for kia_ora'],
+            'no recipients' => [[
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_ONCE, 'trigger_label' => ['ok'], 'recipients' => 0]
+            ], 'no recipients are set for kia_ora'],
         ];
     }
 
@@ -117,6 +125,8 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'name' => ['notification_broker_instance_created', 'mod_perform'],
                 'trigger_type' => trigger::TYPE_ONCE,
                 'is_reminder' => false,
+                'secret' => false,
+                'recipients' => recipient::ALL,
             ],
             'test_overdue_reminder' => [
                 'class' => overdue_reminder::class,
@@ -125,6 +135,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'trigger_label' => ['readme'],
                 'condition' => days_after::class,
                 'is_reminder' => true,
+                'recipients' => recipient::STANDARD | recipient::MANUAL,
             ],
             'test_due_date_reminder' => [
                 'class' => due_date_reminder::class,
@@ -133,6 +144,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'trigger_label' => ['tags', 'moodle'],
                 'condition' => days_before::class,
                 'is_reminder' => true,
+                'recipients' => recipient::STANDARD,
             ],
             'kia_ora_koutou_katoa' => [
                 'class' => mod_perform_notification_loader_testcase::class,
@@ -141,6 +153,8 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'trigger_label' => ['ok'],
                 'condition' => after_midnight::class,
                 'is_reminder' => false,
+                'secret' => true,
+                'recipients' => recipient::EXTERNAL,
             ],
         ];
         return loader::create($notifications);
@@ -235,6 +249,20 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         }
     }
 
+    public function test_get_possible_recipients_of() {
+        $loader = $this->create_loader();
+        $this->assertSame(recipient::STANDARD | recipient::MANUAL | recipient::EXTERNAL, $loader->get_possible_recipients_of('test_instance_created'));
+        $this->assertSame(recipient::STANDARD | recipient::MANUAL, $loader->get_possible_recipients_of('test_overdue_reminder'));
+        $this->assertSame(recipient::STANDARD, $loader->get_possible_recipients_of('test_due_date_reminder'));
+        $this->assertSame(recipient::EXTERNAL, $loader->get_possible_recipients_of('kia_ora_koutou_katoa'));
+        try {
+            $loader->get_possible_recipients_of('he_who_must_not_be_named');
+            $this->fail('class_key_not_available expected');
+        } catch (class_key_not_available $ex) {
+            $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
+        }
+    }
+
     public function test_is_reminder() {
         $loader = $this->create_loader();
         $this->assertFalse($loader->is_reminder('test_instance_created'));
@@ -245,6 +273,20 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
             $loader->is_reminder('he_who_must_not_be_named');
             $this->fail('invalid_parameter_exception expected');
         } catch (invalid_parameter_exception $ex) {
+            $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
+        }
+    }
+
+    public function test_is_secret() {
+        $loader = $this->create_loader();
+        $this->assertFalse($loader->is_secret('test_instance_created'));
+        $this->assertFalse($loader->is_secret('test_overdue_reminder'));
+        $this->assertFalse($loader->is_secret('test_due_date_reminder'));
+        $this->assertTrue($loader->is_secret('kia_ora_koutou_katoa'));
+        try {
+            $loader->is_secret('he_who_must_not_be_named');
+            $this->fail('class_key_not_available expected');
+        } catch (class_key_not_available $ex) {
             $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
         }
     }

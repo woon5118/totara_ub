@@ -603,7 +603,14 @@ class mod_perform_generator extends component_generator_base {
             // Add notification recipient for each relationship.
             foreach ($relationships as $relationship_idnumber) {
                 foreach ($notifications as $notification) {
-                    $this->create_notification_recipient($notification, ['idnumber' => $relationship_idnumber], true);
+                    // Not all notifications support all recipient roles.
+                    // Ideally, we should filter out which relationships to be added based on each notification
+                    // rather than the dreadful try-catch-swallow pattern.
+                    try {
+                        $this->create_notification_recipient($notification, ['idnumber' => $relationship_idnumber], true);
+                    } catch (invalid_parameter_exception $ex) {
+                        // Good bye, exception.
+                    }
                 }
             }
 

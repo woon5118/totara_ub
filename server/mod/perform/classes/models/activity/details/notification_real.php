@@ -26,15 +26,17 @@ namespace mod_perform\models\activity\details;
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
+use core\orm\query\builder;
 use core\orm\query\exceptions\record_not_found_exception;
 use mod_perform\entities\activity\notification as notification_entity;
+use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\notification\factory;
 
 /**
  * The internal implementation that represents an existing performance notification setting.
  */
-final class notification_real extends model implements notification_interface {
+class notification_real extends model implements notification_interface {
 
     /**
      * @inheritDoc
@@ -55,6 +57,22 @@ final class notification_real extends model implements notification_interface {
      */
     public function get_active(): bool {
         return $this->entity->active;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function recipients_builder(builder $builder, bool $active_only = false): void {
+        $builder
+            ->left_join([notification_recipient_entity::TABLE, 'nr'], function (builder $joining) {
+                $joining->where_field('r.id', 'nr.core_relationship_id')
+                    ->where('nr.notification_id', '=', $this->entity->id);
+            })
+            ->add_select(['nr.id as recipient_id', 'nr.active as active'])
+            ->group_by(['nr.id', 'nr.active', 'nr.notification_id']);
+        if ($active_only) {
+            $builder->where('nr.active', '<>', 0);
+        }
     }
 
     /**

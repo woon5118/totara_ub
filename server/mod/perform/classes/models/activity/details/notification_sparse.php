@@ -24,6 +24,7 @@
 namespace mod_perform\models\activity\details;
 
 use coding_exception;
+use core\orm\query\builder;
 use mod_perform\notification\broker;
 use mod_perform\notification\factory;
 use mod_perform\models\activity\activity;
@@ -31,15 +32,15 @@ use mod_perform\models\activity\activity;
 /**
  * The internal implementation that represents a non-existent performance notification setting.
  */
-final class notification_sparse implements notification_interface {
+class notification_sparse implements notification_interface {
     /** @var string */
-    private $class_key;
+    protected $class_key;
 
     /** @var activity */
-    private $activity;
+    protected $activity;
 
     /** @var broker */
-    private $broker;
+    protected $broker;
 
     /**
      * @param activity $activity
@@ -81,6 +82,16 @@ final class notification_sparse implements notification_interface {
      */
     public function get_active(): bool {
         return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function recipients_builder(builder $builder, bool $active_only = false): void {
+        if ($active_only) {
+            $builder->where_raw('1 != 1');
+        }
+        $builder->add_select_raw('0 AS active');
     }
 
     /**

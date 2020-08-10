@@ -255,15 +255,6 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * For example, if the current time stamp is 123456.789, the function will wait for 211 milliseconds.
-     * @Given /^I wait until the next second$/
-     */
-    public function i_wait_until_the_next_second(): void {
-        $time = microtime(true) - 0.001;
-        usleep((ceil($time) - $time) / 0.000001);
-    }
-
-    /**
      * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<container_element_string>(?:[^"]|\\")*)" "(?P<container_selector_string>(?:[^"]|\\")*)" of the activity section$/
      * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<container_element_string>(?:[^"]|\\")*)" "(?P<container_selector_string>(?:[^"]|\\")*)" of the "(?P<section_number>\d+)" activity section$/
      *

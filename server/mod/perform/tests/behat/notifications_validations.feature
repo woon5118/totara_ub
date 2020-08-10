@@ -53,27 +53,33 @@ Feature: Perform activity validation in the notifications tab
     Then I should see "No recipients. Go to Content tab: Responding participants, to add recipients" in the "Participant instance creation reminder" tui "collapsible"
 
   Scenario: mod_perform_notification_902: Trigger events are displayed only on the reminders
+    And I click on "Participant selection notification" tui "toggle_switch"
     And I click on "Participant instance creation notification" tui "toggle_switch"
     And I click on "Participant instance creation reminder notification" tui "toggle_switch"
     And I click on "Due date approaching reminder notification" tui "toggle_switch"
     And I click on "On due date reminder notification" tui "toggle_switch"
     And I click on "Overdue reminder notification" tui "toggle_switch"
     And I click on "Completion of subject instance notification" tui "toggle_switch"
+    And I click on "Reopened activity notification" tui "toggle_switch"
+    And I toggle the "Participant selection" tui collapsible
     And I toggle the "Participant instance creation" tui collapsible
     And I toggle the "Participant instance creation reminder" tui collapsible
     And I toggle the "Due date approaching reminder" tui collapsible
     And I toggle the "On due date reminder" tui collapsible
     And I toggle the "Overdue reminder" tui collapsible
     And I toggle the "Completion of subject instance" tui collapsible
+    And I toggle the "Reopened activity" tui collapsible
     And the field "trigger-instance_created_reminder[0]" matches value "1"
     And the field "trigger-due_date_reminder[0]" matches value "1"
     And the field "trigger-overdue_reminder[0]" matches value "1"
+    But I should not see "Trigger events" in the "Participant selection" tui "collapsible"
     But I should not see "Trigger events" in the "Participant instance creation" tui "collapsible"
     And I should see "day(s) after instance creation" in the "Participant instance creation reminder" tui "collapsible"
     And I should see "day(s) before due date" in the "Due date approaching reminder" tui "collapsible"
     But I should not see "Trigger events" in the "On due date reminder" tui "collapsible"
     And I should see "day(s) after due date" in the "Overdue reminder" tui "collapsible"
     But I should not see "Trigger events" in the "Completion of subject instance" tui "collapsible"
+    But I should not see "Trigger events" in the "Reopened activity" tui "collapsible"
 
   Scenario: mod_perform_notification_903: Trigger events must be unique and between 1 and 365
     When I toggle the "Participant instance creation reminder" tui collapsible

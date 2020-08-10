@@ -61,7 +61,7 @@ class relationship_resolver_dto {
     /**
      * Get user id
      *
-     * @return int
+     * @return int|null
      */
     public function get_user_id(): ?int {
         return $this->user_id;
@@ -89,7 +89,7 @@ class relationship_resolver_dto {
      * Get user ids from an array of dtos
      *
      * @param relationship_resolver_dto[] $relationship_resolver_dtos
-     * @return array
+     * @return (integer|null)[]
      */
     public static function get_user_ids($relationship_resolver_dtos): array {
         $user_ids = [];

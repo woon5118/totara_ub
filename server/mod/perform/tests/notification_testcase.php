@@ -40,6 +40,7 @@ use mod_perform\notification\clock;
 use mod_perform\notification\condition;
 use mod_perform\notification\factory;
 use mod_perform\notification\loader;
+use mod_perform\notification\recipient;
 use mod_perform\notification\trigger;
 use mod_perform\notification\triggerable;
 use totara_core\relationship\relationship;
@@ -80,6 +81,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
                     'class' => mod_perform_mock_broker_one::class,
                     'name' => 'mock #1',
                     'trigger_type' => trigger::TYPE_ONCE,
+                    'recipients' => recipient::ALL,
                 ],
                 'mock_two' => [
                     'class' => mod_perform_mock_broker_two::class,
@@ -87,6 +89,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
                     'trigger_type' => trigger::TYPE_BEFORE,
                     'trigger_label' => ['clear'],
                     'condition' => mod_perform_mock_condition_fail::class,
+                    'recipients' => recipient::STANDARD | recipient::MANUAL,
                 ],
                 'mock_three' => [
                     'class' => mod_perform_mock_broker_three::class,
@@ -94,6 +97,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
                     'trigger_type' => trigger::TYPE_AFTER,
                     'trigger_label' => ['learner'],
                     'condition' => mod_perform_mock_condition_fail::class,
+                    'recipients' => recipient::STANDARD,
                 ],
             ];
         }
