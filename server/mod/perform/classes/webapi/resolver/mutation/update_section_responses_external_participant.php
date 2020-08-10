@@ -75,13 +75,6 @@ class update_section_responses_external_participant implements mutation_resolver
         $participant_section->set_responses_data_from_request($input['update']);
         $participant_section->complete();
 
-        // Reload this section to make sure we get the most recent data back
-        $participant_section = (new participant_section_with_responses(
-            $participant_id,
-            participant_source::EXTERNAL,
-            $participant_section_id
-        ))->get();
-
         return [
             'participant_section' => $participant_section
         ];

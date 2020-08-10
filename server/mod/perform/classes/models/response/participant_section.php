@@ -270,6 +270,8 @@ class participant_section extends model {
             $state->complete();
         });
 
+        $this->refresh();
+
         return true;
     }
 
@@ -400,6 +402,17 @@ class participant_section extends model {
                 $participant_instance->manually_open(true, false);
             }
         }
+    }
+
+    /**
+     * Reload the data for this model
+     *
+     * @return $this
+     */
+    public function refresh(): self {
+        $this->entity->refresh();
+
+        return $this;
     }
 
 }

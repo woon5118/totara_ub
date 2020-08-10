@@ -298,12 +298,6 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
         ];
 
         // re-save
-        // TODO the code generates an error in every test situation because a
-        // bug where an admin user cannot see user details. However a test that
-        // runs by itself always passes due to a hook method that overrides the
-        // error. For some reason, that hook does not fire when the whole Totara
-        // suite runs and this test then fails. The fix for that is in TL-25073.
-        // For now just ignore the error.
         [$result, ] = $this->parsed_graphql_operation(self::MUTATION, $args);
         $result = $result['participant_section'];
 
