@@ -163,8 +163,10 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     if (!empty($CFG->tenantsenabled) and !isguestuser($user) && !is_mnet_remote_user($user)) {
         $editaction = '';
         if (has_capability('totara/tenant:manageparticipants', $systemcontext)) {
-            $editurl = new \moodle_url('/totara/tenant/participant_manage.php', array('id' => $user->id));
-            $editaction = $OUTPUT->action_icon($editurl, new \core\output\flex_icon('settings', array('alt' => get_string('participantmanage', 'totara_tenant'))));
+            if ($DB->record_exists('tenant', [])) {
+                $editurl = new \moodle_url('/totara/tenant/participant_manage.php', array('id' => $user->id));
+                $editaction = $OUTPUT->action_icon($editurl, new \core\output\flex_icon('settings', array('alt' => get_string('participantmanage', 'totara_tenant'))));
+            }
         }
         if ($user->tenantid) {
             $tenant = \core\record\tenant::fetch($user->tenantid);
