@@ -323,21 +323,22 @@ Feature: Certification editing tool
     Then I should see "<status>" in the "fn_001 ln_001" "table_row"
     And I should see "Not certified" in the "fn_002 ln_002" "table_row"
 
+    # NOTE: the status column may seem a bit weird, but unfortunately this test does not set expiration dates properly.
     Examples:
       | oldstate                       | newstate                       | see        | status        |
       | Newly assigned                 | Newly assigned                 | should not | Not certified |
-      | Newly assigned                 | Certified, before window opens | should     | Certified     |
-      | Newly assigned                 | Certified, window is open      | should     | Certified     |
+      | Newly assigned                 | Certified, before window opens | should     | Expired       |
+      | Newly assigned                 | Certified, window is open      | should     | Expired       |
       | Newly assigned                 | Expired                        | should     | Expired       |
       | Certified, before window opens | Newly assigned                 | should     | Not certified |
-      | Certified, before window opens | Certified, before window opens | should not | Certified     |
-      | Certified, before window opens | Certified, window is open      | should     | Certified     |
+      | Certified, before window opens | Certified, before window opens | should not | Expired       |
+      | Certified, before window opens | Certified, window is open      | should     | Expired       |
       | Certified, before window opens | Expired                        | should     | Expired       |
       | Certified, window is open      | Newly assigned                 | should     | Not certified |
-      | Certified, window is open      | Certified, before window opens | should     | Certified     |
-      | Certified, window is open      | Certified, window is open      | should not | Certified     |
+      | Certified, window is open      | Certified, before window opens | should     | Expired       |
+      | Certified, window is open      | Certified, window is open      | should not | Expired       |
       | Certified, window is open      | Expired                        | should     | Expired       |
       | Expired                        | Newly assigned                 | should     | Not certified |
-      | Expired                        | Certified, before window opens | should     | Certified     |
-      | Expired                        | Certified, window is open      | should     | Certified     |
+      | Expired                        | Certified, before window opens | should     | Expired       |
+      | Expired                        | Certified, window is open      | should     | Expired       |
       | Expired                        | Expired                        | should not | Expired       |
