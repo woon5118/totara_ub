@@ -60,17 +60,27 @@ class rb_element_performance_reporting_embedded extends rb_base_embedded {
             [
                 'type' => 'element',
                 'value' => 'title',
-                'heading' => get_string('element_title', 'mod_perform'),
+                'heading' => get_string('question_title', 'mod_perform'),
             ],
             [
                 'type' => 'section',
                 'value' => 'title',
-                'heading' => get_string('section_title', 'mod_perform'),
+                'heading' => get_string('element_reporting_title_section_title', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'type',
+                'heading' => get_string('element_reporting_title_element_type', 'mod_perform'),
+            ],
+            [
+                'type' => 'section',
+                'value' => 'responding_relationship_count',
+                'heading' => get_string('element_reporting_title_responding_relationships', 'mod_perform'),
             ],
             [
                 'type' => 'element',
                 'value' => 'is_required',
-                'heading' => get_string('element_is_required', 'mod_perform'),
+                'heading' => get_string('element_reporting_title_required', 'mod_perform'),
             ],
             [
                 'type' => 'element',
@@ -95,6 +105,14 @@ class rb_element_performance_reporting_embedded extends rb_base_embedded {
             [
                 'type' => 'section',
                 'value' => 'title',
+            ],
+            [
+                'type' => 'element',
+                'value' => 'type',
+            ],
+            [
+                'type' => 'section',
+                'value' => 'involved_relationships',
             ],
             [
                 'type' => 'element',

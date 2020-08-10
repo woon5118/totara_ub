@@ -76,35 +76,75 @@ Feature: Test viewing Performance activity response data
     When I click on "view or export" "link"
     Then I should see "Performance activity response data"
 
-  Scenario: I can preview elements
+  Scenario: I can see question data and view question previews
     Given I log in as "manager"
 
     # First check the optional questions activity.
     When I navigate to the mod perform response data report for "Simple optional questions activity" activity
-    And I click on "Preview" "button" in the "Question one" "table_row"
-    Then I should see "Question one" in the ".tui-modalContent__content" "css_element"
-    Then I should see "(optional)" in the ".tui-modalContent__content" "css_element"
+    Then I should see "2 records selected"
+    And the following should exist in the "element_performance_reporting" table:
+      | Question text | Section title | Element type | Responding relationships | Required | Reporting ID |
+      | Question one  | Part one      | Short text   | 1                        | No       |              |
+      | Question two  | Part one      | Short text   | 1                        | No       |              |
+
+    When I click on "Export all" "button"
+    Then I should see "Export performance response records" in the tui modal
+    And I should see "The selected records will be exported to CSV" in the tui modal
+
+    When I click on "Cancel" "button" in the ".tui-modal" "css_element"
+    Then I should not see "Export performance response records"
+
+    When I set the following fields to these values:
+      | totara_core_relationship-totara_core_relationship_id | Appraiser |
+    And I click on "submitgroupstandard[addfilter]" "button"
+
+    # Action card should not be visible
+    Then I should not see "records selected"
+    Then I should not see "Export all"
+
+    # And there should be no rows
+    Then I should not see "Question one"
+    Then I should not see "Question two"
+
+    When I set the following fields to these values:
+      | totara_core_relationship-totara_core_relationship_id | Subject |
+    And I click on "submitgroupstandard[addfilter]" "button"
+    Then I should see "2 records selected"
+    And the following should exist in the "element_performance_reporting" table:
+      | Question text | Section title | Element type | Responding relationships | Required | Reporting ID |
+      | Question one  | Part one      | Short text   | 1                        | No       |              |
+      | Question two  | Part one      | Short text   | 1                        | No       |              |
+
+    When I click on "Preview" "button" in the "Question one" "table_row"
+    Then I should see "Question one" in the tui modal
+    And I should see "(optional)" in the tui modal
     And the following fields match these values:
       | [answer_text] |  |
 
     When I click on "Close" "button"
     And I click on "Preview" "button" in the "Question two" "table_row"
-    Then I should see "Question two" in the ".tui-modalContent__content" "css_element"
-    Then I should see "(optional)" in the ".tui-modalContent__content" "css_element"
+    Then I should see "Question two" in the tui modal
+    And I should see "(optional)" in the tui modal
     And the following fields match these values:
       | [answer_text] |  |
 
     # Now check the required questions activity.
     When I navigate to the mod perform response data report for "Simple required questions activity" activity
-    And I click on "Preview" "button" in the "Question one" "table_row"
-    Then I should see "Question one" in the ".tui-modalContent__content" "css_element"
-    Then I should see "*" in the ".tui-modalContent__content" "css_element"
+    Then I should see "2 records selected"
+    And the following should exist in the "element_performance_reporting" table:
+      | Question text | Section title | Element type | Responding relationships | Required | Reporting ID |
+      | Question one  | Part one      | Short text   | 1                        | Yes      |              |
+      | Question two  | Part one      | Short text   | 1                        | Yes      |              |
+
+    When I click on "Preview" "button" in the "Question one" "table_row"
+    Then I should see "Question one" in the tui modal
+    And I should see "*" in the tui modal
     And the following fields match these values:
       | [answer_text] |  |
 
     When I click on "Close" "button"
     And I click on "Preview" "button" in the "Question two" "table_row"
-    Then I should see "Question two" in the ".tui-modalContent__content" "css_element"
-    Then I should see "*" in the ".tui-modalContent__content" "css_element"
+    Then I should see "Question two" in the tui modal
+    And I should see "*" in the tui modal
     And the following fields match these values:
       | [answer_text] |  |

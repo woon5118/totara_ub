@@ -47,7 +47,7 @@ abstract class perform_controller extends controller {
      * of an export. This is used to prevent an excessively large query when using an
      * embedded report result as the basis of an export.
      */
-    const BULK_EXPORT_MAX_ROWS = 10000;
+    public const BULK_EXPORT_MAX_ROWS = 10000;
 
     /**
      * Checks and call require_login if parameter is set, can be overridden if special set up is needed

@@ -34,6 +34,7 @@ use mod_perform\rb\display\subject_instance_manage_participation_actions;
 use mod_perform\views\embedded_report_view;
 use mod_perform\views\override_nav_breadcrumbs;
 use moodle_url;
+use totara_mvc\renders_components;
 use totara_mvc\view;
 use totara_mvc\has_report;
 use totara_tui\output\component;
@@ -41,11 +42,12 @@ use totara_tui\output\component;
 class manage_participation extends perform_controller {
     use manage_participation_tabs;
     use has_report;
+    use renders_components;
 
     /**
      * @var activity $activity
      */
-    private $activity = null;
+    private $activity;
     /**
      * @var string
      */
@@ -165,7 +167,6 @@ class manage_participation extends perform_controller {
      * @return string The rendered info card component
      */
     private function get_info_card_component(): string {
-        global $PAGE;
         $card_component = null;
 
         if ($this->should_show_subject_instance_card()) {
@@ -175,14 +176,13 @@ class manage_participation extends perform_controller {
         }
 
         if ($card_component !== null) {
-            return $PAGE->get_renderer('core')->render($card_component);
+            return $this->render_component($card_component);
         }
 
         return '';
     }
 
     private function get_toasts_component(): string {
-        global $PAGE;
         $message = null;
 
         $participants_created_count = $this->get_optional_param('participant_instance_created_count', false, PARAM_INT);
@@ -215,11 +215,9 @@ class manage_participation extends perform_controller {
             $message = get_string('participant_instances_manually_added_toast', 'mod_perform', $participants_created_count);
         }
 
-        return $PAGE->get_renderer('core')->render(
-            new component(
-                'mod_perform/components/manage_activity/participation/Toasts',
-                ['message' => $message]
-            )
+        return $this->get_rendered_component(
+            'mod_perform/components/manage_activity/participation/Toasts',
+            ['message' => $message]
         );
     }
 

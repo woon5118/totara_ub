@@ -850,7 +850,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         // Loop through installed sources.
         $sourcelist = reportbuilder::get_source_list(true);
         foreach ($sourcelist as $sourcename => $title) {
-            $sources[] = array($sourcename, $title);
+            $sources[$sourcename] = [$sourcename, $title];
         }
 
         return $sources;

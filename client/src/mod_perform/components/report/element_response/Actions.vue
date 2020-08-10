@@ -72,6 +72,8 @@ export default {
     exportUrl() {
       return this.$url('/mod/perform/reporting/performance/export.php', {
         element_id: this.elementId,
+        action: 'item',
+        format: 'csv',
       });
     },
   },

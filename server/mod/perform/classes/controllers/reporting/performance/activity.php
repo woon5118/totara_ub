@@ -25,7 +25,6 @@ namespace mod_perform\controllers\reporting\performance;
 
 use context;
 use context_coursecat;
-use context_system;
 use core\output\notification;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity as activity_model;
@@ -35,17 +34,19 @@ use mod_perform\views\override_nav_breadcrumbs;
 use moodle_exception;
 use moodle_url;
 use totara_mvc\has_report;
+use totara_mvc\renders_components;
 use totara_mvc\view;
 
 class activity extends perform_controller {
 
     use has_report;
+    use renders_components;
 
     /**
      * mod_perform\models\activity\activity instance
      * @var activity_model $activity
      */
-    private $activity = null;
+    private $activity;
 
     public function setup_context(): context {
         if ($this->get_optional_param('activity_id', null, PARAM_INT)) {
@@ -91,33 +92,22 @@ class activity extends perform_controller {
         // Current filtered count
         $filtered_count = $report->get_filtered_count();
 
-        // Hash of current filtered state
-        // This is used to ensure we're not using stale data.
-        $filter_hash = $report->get_search_hash();
+        $action_card_component = '';
+        // Only show the action card if there are results.
+        if ($filtered_count > 0) {
+            $action_card_props = [
+                'activity-id' => $activity_id,
+                'row-count' => $filtered_count,
+                'embedded-shortname' => 'element_performance_reporting',
+                'filter-hash' => $report->get_search_hash(), // Hash of current filtered state, ensures we're not using stale data.
+                'export-row-limit' => self::BULK_EXPORT_MAX_ROWS,
+            ];
 
-        // Shortname of embedded report being used to generate list of items.
-        $filtered_report_shortname = 'element_performance_reporting';
+            $action_card_component = $this->get_rendered_component(
+                'mod_perform/components/report/element_response/ExportActionCard', $action_card_props
+            );
+        }
 
-        // Whether or not 'Export selected' button should be disabled or not.
-        $export_disabled = $filtered_count > self::BULK_EXPORT_MAX_ROWS;
-
-        // String showning number of results
-        $count_string_identifier = $filtered_count == 1 ? 'x_record_selected' : 'x_records_selected';
-        $count_string = get_string($count_string_identifier, 'mod_perform', $filtered_count);
-
-        // Data for template.
-        $additional_data = [
-            'filtered_report_count_string' => $count_string,
-            'filtered_report_embedded_shortname' => $filtered_report_shortname,
-            'filtered_report_filter_hash' => $filter_hash,
-            'export_disabled' => $export_disabled,
-            'extra_params' => [
-                [
-                    'name' => 'activity_id',
-                    'value' => $activity_id,
-                ],
-            ],
-        ];
 
         $a = (object)[
             'target' => $activity_name,
@@ -129,7 +119,7 @@ class activity extends perform_controller {
         $report_view = embedded_report_view::create_from_report($report, $debug, 'mod_perform/bulk_exportable_report')
             ->add_override(new override_nav_breadcrumbs())
             ->set_title(get_string('performance_data_for', 'mod_perform', $activity_name))
-            ->set_additional_data($additional_data);
+            ->set_additional_data(['action_card_component' => $action_card_component]);
 
         $report_renderer = $report_view->get_page()->get_renderer('totara_reportbuilder');
 
@@ -163,4 +153,5 @@ class activity extends perform_controller {
         }
         return $this->activity;
     }
+
 }

@@ -66,7 +66,7 @@ class element_actions extends base {
 
         return $OUTPUT->render(
             new component(
-                'mod_perform/components/report/element_response/actions',
+                'mod_perform/components/report/element_response/Actions',
                 $props
             )
         );

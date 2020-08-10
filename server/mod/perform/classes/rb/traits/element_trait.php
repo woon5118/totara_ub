@@ -121,7 +121,7 @@ trait element_trait {
         $this->columnoptions[] = new rb_column_option(
             'element',
             'title',
-            get_string('element_title', 'mod_perform'),
+            get_string('question_title', 'mod_perform'),
             "{$join}.title",
             [
                 'joins' => [$join],
@@ -189,14 +189,7 @@ trait element_trait {
         $this->filteroptions[] = new rb_filter_option(
             'element',
             'title',
-            get_string('element_title', 'mod_perform'),
-            'text'
-        );
-
-        $this->filteroptions[] = new rb_filter_option(
-            'element',
-            'identifier',
-            get_string('element_identifier', 'mod_perform'),
+            get_string('question_title', 'mod_perform'),
             'text'
         );
 
@@ -205,7 +198,18 @@ trait element_trait {
             'type',
             get_string('element_type', 'mod_perform'),
             'select',
-            ['selectchoices' => $this->get_element_type_options()]
+            [
+                'selectchoices' => $this->get_element_type_options(),
+                'simplemode' => true,
+                'attributes' => rb_filter_option::select_width_limiter(),
+            ]
+        );
+
+        $this->filteroptions[] = new rb_filter_option(
+            'element',
+            'identifier',
+            get_string('element_identifier', 'mod_perform'),
+            'text'
         );
     }
 
@@ -217,7 +221,7 @@ trait element_trait {
     protected function get_element_type_options(): array {
         $respondable_elements = element_plugin::get_element_plugins(true, false);
 
-        return array_map(function($element) {
+        return array_map(function ($element) {
             return $element->get_name();
         }, $respondable_elements);
     }

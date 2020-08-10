@@ -26,9 +26,12 @@
 use mod_perform\models\activity\element_plugin;
 use mod_perform\rb\traits\activity_trait;
 use mod_perform\rb\traits\element_trait;
+use mod_perform\rb\traits\participant_instance_trait;
 use mod_perform\rb\traits\section_element_trait;
 use mod_perform\rb\traits\section_trait;
 use totara_core\advanced_feature;
+use totara_core\entities\relationship;
+use totara_core\relationship\relationship as relationship_model;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -38,7 +41,6 @@ defined('MOODLE_INTERNAL') || die();
  * Class rb_source_perform_element
  */
 class rb_source_perform_element extends rb_base_source {
-
     use section_element_trait;
     use element_trait;
     use section_trait;
@@ -60,6 +62,7 @@ class rb_source_perform_element extends rb_base_source {
 
         $this->usedcomponents[] = 'mod_perform';
         $this->base = '{perform_element}';
+        $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
 
@@ -157,7 +160,7 @@ class rb_source_perform_element extends rb_base_source {
                     'noexport' => true,
                     'nosort' => true,
                 ]
-            )
+            ),
         ];
 
         return $columnoptions;
@@ -170,6 +173,26 @@ class rb_source_perform_element extends rb_base_source {
      */
     protected function define_filteroptions() {
         $filteroptions = [];
+
+        $filteroptions[] = new rb_filter_option(
+            'section',
+            'involved_relationships',
+            get_string('element_reporting_title_responding_relationship', 'mod_perform'),
+            'correlated_subquery_select',
+            [
+                'simplemode' => true,
+                'selectchoices' => $this->get_responding_relationship_options(),
+                'searchfield' => 'cr.id',
+                'subquery' => "EXISTS(SELECT 'x'
+                                        FROM {perform_section_relationship} sr
+                                        JOIN {totara_core_relationship} cr ON cr.id = sr.core_relationship_id
+                                        WHERE (%1\$s) = sr.section_id
+                                          AND (%2\$s)
+                                          AND sr.can_answer = 1)",
+            ],
+            'perform_section.id',
+            'perform_section'
+        );
 
         return $filteroptions;
     }
@@ -343,5 +366,20 @@ class rb_source_perform_element extends rb_base_source {
     public function phpunit_column_test_expected_count($columnoption) {
         // create_subject_instances() creates an activity with two elements, so should expect two results from this report.
         return 2;
+    }
+
+    /**
+     * Get an array relationship names keyed by id.
+     *
+     * @return string[] [id => Display Name]
+     */
+    private function get_responding_relationship_options(): array {
+        return relationship::repository()
+            ->order_by('idnumber')
+            ->get()
+            ->key_by('id')
+            ->map(function (relationship $relationship) {
+                return (new relationship_model($relationship))->get_name();
+            })->all(true);
     }
 }

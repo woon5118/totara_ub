@@ -21,25 +21,41 @@
  * @package totara_reportbuilder
  */
 
+use totara_reportbuilder\report_helper;
+
 defined('MOODLE_INTERNAL') || die();
 
 class totara_reportbuilder_report_helper_testcase extends advanced_testcase {
 
-    public function test_get_sources_and_create() {
+    /**
+     * @param string $source_name
+     * @dataProvider sources_provider
+     */
+    public function test_get_sources_and_create(string $source_name): void {
         global $DB;
 
-        $this->setAdminUser();
+        self::setAdminUser();
 
-        $sources = \totara_reportbuilder\report_helper::get_sources();
+        $report_id = report_helper::create($source_name);
 
-        self::assertIsArray($sources);
-        self::assertNotEmpty($sources);
+        self::assertNotEmpty($report_id);
+        self::assertEquals($source_name, $DB->get_field('report_builder', 'source', ['id' => $report_id]));
+    }
+
+    public function sources_provider(): array {
+        $sources = report_helper::get_sources();
+
+        if (!is_array($sources) || count($sources) === 0) {
+            $this->fail('Sources must be a non empty array');
+        }
+
+        $cases = [];
 
         foreach ($sources as $source) {
-            $reportid = \totara_reportbuilder\report_helper::create($source);
-
-            self::assertNotEmpty($reportid);
-            self::assertEquals($source, $DB->get_field('report_builder', 'source', ['id' => $reportid]));
+            $cases[$source] = [$source];
         }
+
+        return $cases;
     }
+
 }

@@ -97,8 +97,6 @@ trait section_trait {
     protected function add_section_joins() {
         /** @var section_trait|rb_base_source $this */
         $join = $this->section_join;
-
-        // None at present.
     }
 
     /**
@@ -111,7 +109,7 @@ trait section_trait {
         $this->columnoptions[] = new rb_column_option(
             'section',
             'title',
-            get_string('section_title', 'mod_perform'),
+            get_string('element_reporting_title_section_title', 'mod_perform'),
             "{$join}.title",
             [
                 'joins' => [$join],
@@ -156,6 +154,22 @@ trait section_trait {
                 'displayfunc' => 'nice_date'
             ]
         );
+
+        $this->columnoptions[] = new rb_column_option(
+            'section',
+            'responding_relationship_count',
+            get_string('element_reporting_title_responding_relationships', 'mod_perform'),
+            "(SELECT COUNT('x')
+            FROM {perform_section_relationship} sr
+            WHERE sr.section_id = {$join}.id
+            AND sr.can_answer = 1)",
+            [
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
+            ]
+        );
     }
 
     /**
@@ -165,7 +179,7 @@ trait section_trait {
         $this->filteroptions[] = new rb_filter_option(
             'section',
             'title',
-            get_string('section_title', 'mod_perform'),
+            get_string('element_reporting_title_section_title', 'mod_perform'),
             'text'
         );
 
