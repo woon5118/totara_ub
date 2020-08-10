@@ -236,7 +236,7 @@ $THEME->layouts = array(
 );
 
 $THEME->hidefromselector = true;
-
+$THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->javascripts_footer = array(
     'moodlebootstrap', 'dock'
 );

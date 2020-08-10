@@ -597,13 +597,13 @@ class totara_program_renderer extends plugin_renderer_base {
             $out .= html_writer::empty_tag('br');
 
             if ($duedate < $now) {
-                    $out .= $this->notification(get_string('overdue', 'totara_plan'), 'notifyproblem');
+                $out .= html_writer::span($this->flex_icon('warning-sign') . ' ' . get_string('overdue', 'totara_plan'), 'totara_program__overdue');
             } else {
                 $days = floor(($duedate - $now) / DAYSECS);
                 if ($days == 0) {
-                    $out .= $this->notification(get_string('duetoday', 'totara_plan'), 'notifyproblem');
+                    $out .= html_writer::span($this->flex_icon('warning-sign') . ' ' .  get_string('duetoday', 'totara_plan'), 'totara_program__due-today');
                 } else if ($days > 0 && $days < 10) {
-                    $out .= $this->notification(get_string('dueinxdays', 'totara_plan', $days), 'notifynotice');
+                    $out .= html_writer::span($this->flex_icon('warning-sign') . ' ' .  get_string('dueinxdays', 'totara_plan', $days), 'totara_program__due-soon');
                 }
             }
         }

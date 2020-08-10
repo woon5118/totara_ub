@@ -750,3 +750,26 @@ div.nextsetoperator-group-and {
     margin-top: $padding-large-vertical;
   }
 }
+
+.totara_program {
+  &__overdue,
+  &__due-today,
+  &__due-soon {
+    border-radius: $border-radius-small;
+    font-size: var(--legacy-font-size-13);
+    font-weight: bold;
+    color: var(--legacy-color-neutral-1);
+    padding: var(--legacy-gap-1);
+    margin: var(--legacy-gap-2) var(--legacy-gap-2) var(--legacy-gap-2) 0;
+    display: inline-block;
+  }
+
+  &__overdue,
+  &__due-today {
+    background-color: var(--legacy-color-prompt-alert);
+  }
+
+  &__due-soon {
+    background-color: var(--legacy-color-prompt-warning);
+  }
+}
