@@ -373,7 +373,14 @@ class behat_config_util {
             $this->contexts = $contexts;
         }
 
-        $autoload = TOOL_BEHAT_DIR_VENDOR . '/autoload.php';
+        if (defined('TOOL_BEHAT_DIR_VENDOR')) {
+            $autoload = TOOL_BEHAT_DIR_VENDOR . '/autoload.php';
+        } else if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+            // PHPUnit, just guess
+            $autoload = $CFG->srcroot . '/test/behat/vendor/autoload.php';
+        } else {
+            throw new \coding_exception('This method must only be called from a behat script.');
+        }
         if (!file_exists($autoload)) {
             throw new \coding_exception('Behat composer requirements are not available.');
         }
