@@ -139,6 +139,10 @@ class participant_section_with_responses {
      * @return participant_section|null
      */
     public function get(): ?participant_section {
+        if (!$this->participant_section) {
+            $this->fetch();
+        }
+
         return $this->participant_section;
     }
 

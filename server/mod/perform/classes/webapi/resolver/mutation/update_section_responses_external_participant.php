@@ -37,6 +37,12 @@ class update_section_responses_external_participant implements mutation_resolver
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
+        // This mutation is supposed to work only for non-logged in external users
+        global $USER;
+        if ($USER && $USER->id > 0) {
+            return null;
+        }
+
         $input = $args['input'];
 
         $participant_section_id = $input['participant_section_id'];
@@ -57,7 +63,7 @@ class update_section_responses_external_participant implements mutation_resolver
             $participant_id,
             participant_source::EXTERNAL,
             $participant_section_id
-        ))->fetch()->get();
+        ))->get();
 
         // Something is not valid, we do only return null to not reveal anything through error messages
         if ($participant_section === null) {
@@ -68,6 +74,13 @@ class update_section_responses_external_participant implements mutation_resolver
 
         $participant_section->set_responses_data_from_request($input['update']);
         $participant_section->complete();
+
+        // Reload this section to make sure we get the most recent data back
+        $participant_section = (new participant_section_with_responses(
+            $participant_id,
+            participant_source::EXTERNAL,
+            $participant_section_id
+        ))->get();
 
         return [
             'participant_section' => $participant_section
