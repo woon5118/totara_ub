@@ -26,9 +26,7 @@ namespace mod_perform\webapi\resolver\type;
 use coding_exception;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use mod_perform\models\activity\settings\visibility_conditions\visibility_manager;
 use mod_perform\models\activity\settings\visibility_conditions\visibility_option;
-use totara_reportbuilder\webapi\resolver\type\source;
 
 /**
  * Class visibility_condition_option
@@ -48,7 +46,9 @@ class visibility_condition_option implements type_resolver {
             case 'name':
                 return $source->get_name();
             case 'value':
-                return $source->get_code();
+                return $source->get_value();
+            case 'participant_description':
+                return $source->get_participant_description();
             default:
                 $err = "Unknown field '$field' requested in visibility option type resolver";
                 throw new coding_exception($err);

@@ -13,6 +13,9 @@ query mod_perform_subject_instance_for_participant(
       settings {
         close_on_completion
         multisection
+        visibility_condition {
+          participant_description
+        }
       }
       anonymous_responses
     }

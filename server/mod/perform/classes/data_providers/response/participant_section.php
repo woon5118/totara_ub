@@ -24,7 +24,7 @@
 namespace mod_perform\data_providers\response;
 
 use Exception;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\entities\activity\participant_section_repository;
 use mod_perform\models\response\participant_section as participant_section_model;
 
 class participant_section {
@@ -52,12 +52,22 @@ class participant_section {
      */
     public function find_by_section_id(int $participant_section_id): ?participant_section_model {
         try {
-            $participant_section = participant_section_model::load_by_id($participant_section_id);
+            $participant_section_entity = participant_section_repository::get_participant_section_for_user(
+                $participant_section_id,
+                $this->participant_id,
+                $this->participant_source
+            );
+            if (!$participant_section_entity) {
+                return null;
+            }
+            $participant_section = participant_section_model::load_by_entity($participant_section_entity);
         } catch (Exception $e) {
-            $participant_section = null;
+            return null;
         }
 
-        return $this->is_valid($participant_section) ? $participant_section : null;
+        return $this->is_valid($participant_section)
+            ? $participant_section
+            : null;
     }
 
     /**
@@ -67,35 +77,33 @@ class participant_section {
      * @return participant_section_model|null
      */
     public function find_by_instance_id(int $participant_instance_id): ?participant_section_model {
-        $participant_section_entity = participant_section_entity::repository()
-            ->fetch_default($participant_instance_id, $this->participant_id);
+        $participant_section_entity = participant_section_repository::fetch_default(
+            $participant_instance_id,
+            $this->participant_id,
+            $this->participant_source
+        );
 
-        $participant_section = $participant_section_entity
-            ? participant_section_model::load_by_entity($participant_section_entity)
+        if (!$participant_section_entity) {
+            return null;
+        }
+        $participant_section = participant_section_model::load_by_entity($participant_section_entity);
+
+        return $this->is_valid($participant_section)
+            ? $participant_section
             : null;
-
-        return $this->is_valid($participant_section) ? $participant_section : null;
     }
 
     /**
-     * Check whether this section (if given) is valid
+     * Check whether this section is valid
      *
-     * @param participant_section_model|null $participant_section
+     * @param participant_section_model $participant_section
      * @return bool
      */
-    private function is_valid(?participant_section_model $participant_section): bool {
-        if ($participant_section) {
-            $participant_instance = $participant_section->participant_instance;
+    private function is_valid(participant_section_model $participant_section): bool {
+        $participant_instance = $participant_section->participant_instance;
 
-            // If the section does belong to the current user return it;
-            if ($participant_instance->participant_id == $this->participant_id
-                && $this->participant_source == $participant_instance->participant_source
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+        return $participant_instance->participant_id == $this->participant_id
+            && $this->participant_source == $participant_instance->participant_source;
     }
 
 }

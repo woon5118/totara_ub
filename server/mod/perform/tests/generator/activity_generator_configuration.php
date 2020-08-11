@@ -268,7 +268,7 @@ class mod_perform_activity_generator_configuration {
     /**
      * @return bool
      */
-    public function should_use_anonymous_responses(): bool {
+    public function get_anonymous_responses_setting(): bool {
         return $this->use_anonymous_responses;
     }
 

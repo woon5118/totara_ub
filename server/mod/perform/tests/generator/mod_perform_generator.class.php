@@ -49,7 +49,6 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\element;
-use mod_perform\models\activity\external_participant;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\participant_source;
@@ -562,7 +561,7 @@ class mod_perform_generator extends component_generator_base {
                 'activity_type' => $type,
                 'create_section' => false,
                 'activity_status' => $configuration->get_activity_status(),
-                'anonymous_responses' => $configuration->should_use_anonymous_responses(),
+                'anonymous_responses' => $configuration->get_anonymous_responses_setting(),
             ];
 
             $activity = $this->create_activity_in_container($data);

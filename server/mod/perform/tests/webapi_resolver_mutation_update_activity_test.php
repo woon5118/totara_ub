@@ -127,7 +127,8 @@ class mod_perform_webapi_resolver_mutation_update_activity_testcase extends adva
      * Test update invalid visibility condition will throw exception
      */
     public function test_update_invalid_visibility_control_value_should_throw_exception() {
-        [$activity, $args] = $this->create_activity();
+        [, $args] = $this->create_activity();
+        $args['anonymous_responses'] = false;
         $args['visibility_condition'] = 5;
 
         $this->expectExceptionMessage("invalid visibility condition value: 5");

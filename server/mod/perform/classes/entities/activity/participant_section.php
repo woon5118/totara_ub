@@ -81,7 +81,7 @@ class participant_section extends entity {
             section_element::class,
             'section_id',
             'section_id'
-        );
+        )->order_by('sort_order');
     }
 
     /**

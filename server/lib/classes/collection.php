@@ -221,6 +221,18 @@ class collection implements Iterator, JsonSerializable, Countable {
     }
 
     /**
+     * Checks if all items in collection has a column value or pass a callback condition.
+     *
+     * @param string|callable $column Column name to compare value with or a custom callback to find the desired item
+     * @param mixed|null $value Value to compare to
+     * @param bool $strict_comparison Strict comparison in find method
+     * @return bool
+     */
+    public function has($column, $value = null, $strict_comparison = false): bool {
+        return $this->find($column, $value, $strict_comparison) !== null;
+    }
+
+    /**
      * Return first item in the collection matching a giving column value or a callback
      *
      * @param string|callable $column Column name to compare value with or a custom callback to find the desired item

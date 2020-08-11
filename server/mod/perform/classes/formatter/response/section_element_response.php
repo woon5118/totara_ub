@@ -24,13 +24,13 @@
 namespace mod_perform\formatter\response;
 
 use core\orm\formatter\entity_model_formatter;
-use mod_perform\models\response\section_element_response as response_section_element_model;
+use mod_perform\models\response\section_element_response as section_element_response_model;
 
 /**
  * Class section_element_response
  *
  * @package mod_perform\formatter\response
- * @property response_section_element_model object
+ * @property section_element_response_model object
  */
 class section_element_response extends entity_model_formatter {
 

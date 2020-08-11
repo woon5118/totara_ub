@@ -28,7 +28,8 @@ use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
-use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\participant_instance;
+use mod_perform\models\activity\section_element;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\element_validation_error;
 use performelement_short_text\answer_length_exceeded_error;
@@ -59,8 +60,8 @@ class mod_perform_response_model_testcase extends advanced_testcase {
         $this->expectExceptionMessage($expected_message);
 
         new section_element_response(
-            $participant_instance_entity,
-            $section_element_entity,
+            participant_instance::load_by_entity($participant_instance_entity),
+            section_element::load_by_entity($section_element_entity),
             $element_response_entity,
             new collection()
         );
@@ -122,13 +123,12 @@ class mod_perform_response_model_testcase extends advanced_testcase {
                 }
             }
         }
-        $element = element_plugin::load_by_plugin($element_type->plugin_name);
 
-        $element_response = new section_element_response($participant_instance,
-            $section_element,
+        $element_response = new section_element_response(
+            participant_instance::load_by_entity($participant_instance),
+            section_element::load_by_entity($section_element),
             null,
-            new collection(),
-            $element
+            new collection()
         );
 
         $element_response->save();
@@ -176,13 +176,12 @@ class mod_perform_response_model_testcase extends advanced_testcase {
                 }
             }
         }
-        $element = element_plugin::load_by_plugin($section_element->element->plugin_name);
 
-        $element_response = new section_element_response($participant_instance,
-            $section_element,
+        $element_response = new section_element_response(
+            participant_instance::load_by_entity($participant_instance),
+            section_element::load_by_entity($section_element),
             null,
-            new collection(),
-            $element
+            new collection()
         );
 
         $response_data = ['answer_text' => 'Hello there.'];
@@ -227,13 +226,12 @@ class mod_perform_response_model_testcase extends advanced_testcase {
                 }
             }
         }
-        $element = element_plugin::load_by_plugin($section_element->element->plugin_name);
 
-        $element_response = new section_element_response($participant_instance,
-            $section_element,
+        $element_response = new section_element_response(
+            participant_instance::load_by_entity($participant_instance),
+            section_element::load_by_entity($section_element),
             null,
-            new collection(),
-            $element
+            new collection()
         );
 
         // Structurally valid response, but will fail validation for being too long.

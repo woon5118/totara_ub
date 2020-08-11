@@ -17,25 +17,34 @@
 -->
 
 <template>
-  <p>
-    <template v-if="notVisibleToAnyone">
-      {{ $str('response_visibility_not_visible_to_anyone', 'mod_perform') }}
-    </template>
-    <template v-else>
-      <span
-        v-if="anonymousResponses"
-        v-html="$str('response_visibility_label_anonymous', 'mod_perform')"
-      />
-      <span v-else v-html="$str('response_visibility_label', 'mod_perform')" />
+  <div>
+    <p>
+      <template v-if="notVisibleToAnyone">
+        {{ $str('response_visibility_not_visible_to_anyone', 'mod_perform') }}
+      </template>
+      <template v-else>
+        <span
+          v-if="anonymousResponses"
+          v-html="$str('response_visibility_label_anonymous', 'mod_perform')"
+        />
+        <span
+          v-else
+          v-html="$str('response_visibility_label', 'mod_perform')"
+        />
 
-      <template v-for="(description, i) in relationshipDescriptions">
-        <span :key="i" v-html="description" /><template
-          v-if="i + 1 !== relationshipDescriptions.length"
-          >,
+        <template v-for="(description, i) in relationshipDescriptions">
+          <span :key="i" v-html="description" /><template
+            v-if="i + 1 !== relationshipDescriptions.length"
+            >,
+          </template>
         </template>
       </template>
-    </template>
-  </p>
+    </p>
+
+    <p v-if="activity.settings.visibility_condition.participant_description">
+      {{ activity.settings.visibility_condition.participant_description }}
+    </p>
+  </div>
 </template>
 
 <script>
@@ -51,8 +60,8 @@ export default {
       type: Array,
       required: true,
     },
-    anonymousResponses: {
-      type: Boolean,
+    activity: {
+      type: Object,
       required: true,
     },
   },
@@ -112,6 +121,9 @@ export default {
       return this.visibleToRelationships.filter(
         relationship => relationship.idnumber !== RELATIONSHIP_SUBJECT
       );
+    },
+    anonymousResponses() {
+      return this.activity.anonymous_responses;
     },
   },
 };

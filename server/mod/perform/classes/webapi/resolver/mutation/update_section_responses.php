@@ -30,6 +30,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
+use mod_perform\data_providers\response\participant_section;
 use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\models\activity\participant_source;
 
@@ -42,24 +43,20 @@ class update_section_responses implements mutation_resolver, has_middleware {
 
         $participant_id = user::logged_in()->id;
         $participant_section_id = $input['participant_section_id'];
+        $participant_section = (new participant_section($participant_id, participant_source::INTERNAL))->find_by_section_id($participant_section_id);
 
-        $participant_section = (new participant_section_with_responses(
-            $participant_id,
-            participant_source::INTERNAL,
-            $participant_section_id
-        ))->get();
-
-        if ($participant_section === null) {
+        if (!$participant_section) {
             throw new coding_exception(sprintf('Participant section not found for id %d', $participant_section_id));
         }
 
-        $ec->set_relevant_context($participant_section->get_context());
+        $participant_section_with_responses = (new participant_section_with_responses($participant_section))->build();
+        $ec->set_relevant_context($participant_section_with_responses->get_context());
 
-        $participant_section->set_responses_data_from_request($input['update']);
-        $participant_section->complete();
+        $participant_section_with_responses->set_responses_data_from_request($input['update']);
+        $participant_section_with_responses->complete();
 
         return [
-            'participant_section' => $participant_section
+            'participant_section' => $participant_section_with_responses
         ];
     }
 

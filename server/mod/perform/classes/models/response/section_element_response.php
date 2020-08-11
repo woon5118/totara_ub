@@ -28,13 +28,10 @@ use core\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\entities\activity\element_response as element_response_entity;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\participant_instance;
-use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\respondable_element_plugin;
 use mod_perform\models\activity\section_element;
-use totara_core\relationship\relationship as core_relationship_model;
 
 /**
  * Represents the response or lack of to a question or other element which
@@ -55,11 +52,11 @@ class section_element_response extends model {
 
     protected $entity_attribute_whitelist = [
         'response_data', // as a JSON encoded string
-        'section_element_id',
     ];
 
     protected $model_accessor_whitelist = [
         'section_element',
+        'section_element_id',
         'element',
         'validation_errors',
         'participant_instance',
@@ -73,9 +70,9 @@ class section_element_response extends model {
     protected $other_responder_groups;
 
     /**
-     * @var participant_instance_entity
+     * @var participant_instance
      */
-    private $participant_instance_entity;
+    private $participant_instance;
 
     /**
      * @var element_response_entity
@@ -85,17 +82,12 @@ class section_element_response extends model {
     /**
      * @var section_element_entity
      */
-    protected $section_element_entity;
+    protected $section_element;
 
     /**
      * @var collection
      */
     protected $validation_errors;
-
-    /**
-     * @var element_plugin
-     */
-    private $element_plugin;
 
     /**
      * @inheritDoc
@@ -107,47 +99,72 @@ class section_element_response extends model {
     /**
      * element_response constructor.
      *
-     * @param participant_instance_entity $participant_instance_entity
-     * @param section_element_entity $section_element_entity
+     * @param participant_instance $participant_instance
+     * @param section_element $section_element
      * @param element_response_entity|null $element_response_entity
      * @param collection|responder_group[] $other_responder_groups
-     * @param element_plugin|null $element_plugin
+     *
      * @throws coding_exception
      */
     public function __construct(
-        participant_instance_entity $participant_instance_entity,
-        section_element_entity $section_element_entity,
+        participant_instance $participant_instance,
+        section_element $section_element,
         ?element_response_entity $element_response_entity,
-        collection $other_responder_groups,
-        element_plugin $element_plugin = null
+        collection $other_responder_groups
     ) {
         if ($element_response_entity === null) {
             $element_response_entity = new element_response_entity();
-            $element_response_entity->participant_instance_id = $participant_instance_entity->id;
-            $element_response_entity->section_element_id = $section_element_entity->id;
-        } else if ((int) $element_response_entity->participant_instance_id !== (int) $participant_instance_entity->id) {
+            $element_response_entity->participant_instance_id = $participant_instance->id;
+            $element_response_entity->section_element_id = $section_element->id;
+        } else {
+            $this->verify_participant_instance($element_response_entity, $participant_instance);
+            $this->verify_section_element($element_response_entity, $section_element);
+        }
+
+        $this->entity = $element_response_entity;
+        $this->participant_instance = $participant_instance;
+        $this->section_element = $section_element;
+        $this->other_responder_groups = $other_responder_groups;
+    }
+
+    /**
+     * Verifies element response is for the participant instance.
+     *
+     * @param $element_response_entity
+     * @param $participant_instance
+     *
+     * @throws coding_exception
+     */
+    private function verify_participant_instance($element_response_entity, $participant_instance) {
+        if ((int) $element_response_entity->participant_instance_id !== (int) $participant_instance->id) {
             throw new coding_exception(
                 'participant_instance_id of the element response does not match the supplied participant instance'
             );
-        } else if ((int) $element_response_entity->section_element_id !== (int) $section_element_entity->id) {
+        }
+    }
+
+    /**
+     * Verifies section_element is for element_response.
+     *
+     * @param $element_response_entity
+     * @param $section_element_entity
+     *
+     * @throws coding_exception
+     */
+    private function verify_section_element($element_response_entity, $section_element_entity) {
+        if ((int) $element_response_entity->section_element_id !== (int) $section_element_entity->id) {
             throw new coding_exception(
                 'section_element_id of the element response does not match the supplied section element'
             );
         }
-
-        if ($element_plugin === null) {
-            $element_plugin = (new element($section_element_entity->element))->get_element_plugin();
-        }
-
-        $this->entity = $element_response_entity;
-        $this->participant_instance_entity = $participant_instance_entity;
-        $this->section_element_entity = $section_element_entity;
-        $this->element_plugin = $element_plugin;
-        $this->other_responder_groups = $other_responder_groups;
     }
 
     public function get_section_element(): section_element {
-        return new section_element($this->section_element_entity);
+        return $this->section_element;
+    }
+
+    public function get_section_element_id() {
+        return $this->section_element->id;
     }
 
     /**
@@ -163,7 +180,7 @@ class section_element_response extends model {
      * @return int
      */
     public function get_sort_order(): int {
-        return $this->section_element_entity->sort_order;
+        return $this->section_element->sort_order;
     }
 
     /**
@@ -171,7 +188,7 @@ class section_element_response extends model {
      * @return participant_instance
      */
     public function get_participant_instance(): participant_instance {
-        return new participant_instance($this->participant_instance_entity);
+        return $this->participant_instance;
     }
 
     /**
@@ -190,11 +207,14 @@ class section_element_response extends model {
      * @return bool
      */
     public function validate_response(): bool {
-        if (!$this->element_plugin instanceof respondable_element_plugin) {
+        if (!$this->get_element()->get_element_plugin() instanceof respondable_element_plugin) {
             return true;
         }
 
-        $this->validation_errors = $this->element_plugin->validate_response($this->entity->response_data, $this->get_element());
+        $this->validation_errors = $this->get_element()->get_element_plugin()->validate_response(
+            $this->entity->response_data,
+            $this->get_element()
+        );
 
         return $this->validation_errors->count() === 0;
     }
@@ -222,14 +242,13 @@ class section_element_response extends model {
      * @return string
      */
     public function get_relationship_name(): string {
-        $core_relationship_entity = $this->participant_instance_entity->core_relationship;
-        return (new core_relationship_model($core_relationship_entity))->get_name();
+        return $this->participant_instance->core_relationship->get_name();
     }
 
     public function get_element(): element {
         $element = null;
-        if ($this->section_element_entity->element) {
-            $element = new element($this->section_element_entity->element);
+        if ($this->section_element->element) {
+            $element = $this->section_element->element;
         }
 
         return $element;
@@ -242,5 +261,4 @@ class section_element_response extends model {
     public function get_other_responder_groups(): ?collection {
         return $this->other_responder_groups;
     }
-
 }

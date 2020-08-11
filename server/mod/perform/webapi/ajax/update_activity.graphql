@@ -29,7 +29,10 @@ mutation mod_perform_update_activity(
       }
       anonymous_responses
       settings {
-        visibility_condition
+        visibility_condition {
+          name
+          value
+        }
         close_on_completion
         multisection
       }

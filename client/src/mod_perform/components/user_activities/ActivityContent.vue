@@ -117,7 +117,7 @@
                     class="tui-participantContent__sectionHeadingOtherResponsesDescription"
                     :current-user-is-subject="currentUserIsSubject"
                     :visible-to-relationships="responsesAreVisibleTo"
-                    :anonymous-responses="activity.anonymous_responses"
+                    :activity="activity"
                   />
                   <div
                     class="tui-participantContent__sectionHeading-other-response-switch"
@@ -445,11 +445,7 @@ export default {
             this.initialValues.sectionElements[
               item.section_element_id
             ] = JSON.parse(item.response_data);
-            if (item.other_responder_groups.length > 0) {
-              this.hasOtherResponse = true;
-            } else {
-              this.hasOtherResponse = false;
-            }
+            this.hasOtherResponse = item.other_responder_groups.length > 0;
             item.other_responder_groups.forEach(group => {
               if (group.responses.length > 0 && item.response_data) {
                 this.showOtherResponse = true;

@@ -27,6 +27,7 @@ use coding_exception;
 use core\orm\entity\repository;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\models\activity\participant_source;
 
 class participant_section_repository extends repository {
 
@@ -35,14 +36,23 @@ class participant_section_repository extends repository {
      *
      * @param int $participant_instance_id
      * @param int $participant_id
+     * @param int $participant_source
      * @return participant_section
      * @throws coding_exception
      */
-    public function fetch_default(int $participant_instance_id, int $participant_id): participant_section_entity {
+    public static function fetch_default(
+        int $participant_instance_id,
+        int $participant_id,
+        int $participant_source = participant_source::INTERNAL
+    ): participant_section_entity {
         /** @var participant_section_entity $first_participant_section */
-        $first_participant_section = $this->build_participant_sections_by_instance_id($participant_instance_id)
+        $first_participant_section = participant_section_entity::repository()->as('ps')
+            ->join([section::TABLE, 's'], 'ps.section_id', 's.id')
+            ->where('participant_instance_id', $participant_instance_id)
+            ->order_by('s.sort_order', 'asc')
             ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
             ->where('pi.participant_id', $participant_id)
+            ->where('pi.participant_source', $participant_source)
             ->first();
 
         if ($first_participant_section === null) {
@@ -53,16 +63,29 @@ class participant_section_repository extends repository {
     }
 
     /**
-     * Create query builder to get sorted participant sections by participant instance id.
+     * Gets the participant section for a user.
      *
-     * @param int $participant_instance_id
-     * @return repository
+     * @param int $participant_section_id
+     * @param int $user_id
+     * @param int $participant_source
+     * @return participant_section|null
      */
-    private function build_participant_sections_by_instance_id(int $participant_instance_id): repository {
-        return participant_section_entity::repository()
-            ->as('ps')
-            ->join([section::TABLE, 's'], 'ps.section_id', 's.id')
-            ->where('participant_instance_id', $participant_instance_id)
-            ->order_by('s.sort_order', 'asc');
+    public static function get_participant_section_for_user(
+        int $participant_section_id,
+        int $user_id,
+        int $participant_source = participant_source::INTERNAL
+    ): ?participant_section_entity {
+        return participant_section_entity::repository()->as('ps')
+            // Bulk fetch all related entities that are required to build the domain models.
+            ->with('section_elements.element') // Used in section element_response class (element is for validation).
+            ->with('participant_instance') // For section element response class.
+            ->with('section.core_relationships.resolvers') // To create other responder groups.
+            ->with('participant_instance.core_relationship.resolvers') // For excluding main participant in other responder groups.
+            // Ensure the user we are fetching responses for is a participant for the section they belong to.
+            ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
+            ->where('ps.id', $participant_section_id)
+            ->where('pi.participant_id', $user_id)
+            ->where('pi.participant_source', $participant_source)
+            ->one(false);
     }
 }

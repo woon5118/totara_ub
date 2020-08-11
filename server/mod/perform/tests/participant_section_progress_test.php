@@ -31,7 +31,8 @@ use mod_perform\entities\activity\participant_section as participant_section_ent
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section_element;
 use mod_perform\models\activity\activity;
-use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\participant_instance;
+use mod_perform\models\activity\section_element as section_element_model;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\element_validation_error;
 use mod_perform\models\response\participant_section;
@@ -341,7 +342,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 
-        $participant_instance_entity = $participant_section_entity->participant_instance;
+        $participant_instance = participant_instance::load_by_entity($participant_section_entity->participant_instance);
 
         $element1 = $perform_generator->create_element(['plugin_name' => $element_plugin]);
         $section_element1 = new section_element(['id' => 1, 'element_id' => $element1->id]);
@@ -350,19 +351,17 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
         $section_element2 = new section_element(['id' => 2, 'element_id' => $element2->id]);
 
         $response1 = new section_element_response(
-            $participant_instance_entity,
-            $section_element1,
+            $participant_instance,
+            section_element_model::load_by_entity($section_element1),
             null,
-            new collection(),
-            element_plugin::load_by_plugin($element_plugin)
+            new collection()
         );
 
         $response2 = new section_element_response(
-            $participant_instance_entity,
-            $section_element2,
+            $participant_instance,
+            section_element_model::load_by_entity($section_element2),
             null,
-            new collection(),
-            element_plugin::load_by_plugin($element_plugin)
+            new collection()
         );
 
         $responses = new collection([$response1, $response2]);

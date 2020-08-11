@@ -13,7 +13,7 @@ Represents the activity settings.
 type mod_perform_activity_settings {
   close_on_completion: Boolean!
   multisection: Boolean!
-  visibility_condition: Int!
+  visibility_condition: mod_perform_visibility_condition_option!
 }
 
 """
@@ -22,6 +22,7 @@ Represents the response visibility condition option
 type mod_perform_visibility_condition_option {
   name: String!
   value: Int!
+  participant_description: String
 }
 
 """

@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
+use mod_perform\data_providers\response\participant_section;
 use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\models\activity\helpers\external_participant_token_validator;
 use mod_perform\models\activity\participant_source;
@@ -59,21 +60,17 @@ class update_section_responses_external_participant implements mutation_resolver
         $participant_instance = $validator->get_participant_instance();
         $participant_id = $participant_instance->participant_id;
 
-        $participant_section = (new participant_section_with_responses(
-            $participant_id,
-            participant_source::EXTERNAL,
-            $participant_section_id
-        ))->get();
+        $participant_section = (new participant_section($participant_id, participant_source::EXTERNAL))->find_by_section_id($participant_section_id);
 
         // Something is not valid, we do only return null to not reveal anything through error messages
         if ($participant_section === null) {
             return null;
         }
+        $participant_section_with_responses = (new participant_section_with_responses($participant_section))->build();
+        $ec->set_relevant_context($participant_section_with_responses->get_context());
 
-        $ec->set_relevant_context($participant_instance->get_context());
-
-        $participant_section->set_responses_data_from_request($input['update']);
-        $participant_section->complete();
+        $participant_section_with_responses->set_responses_data_from_request($input['update']);
+        $participant_section_with_responses->complete();
 
         return [
             'participant_section' => $participant_section

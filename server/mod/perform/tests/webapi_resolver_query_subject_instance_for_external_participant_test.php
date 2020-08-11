@@ -212,6 +212,9 @@ class mod_perform_webapi_resolver_query_subject_instance_for_external_participan
                 'settings' => [
                     'close_on_completion' => false,
                     'multisection' => false,
+                    'visibility_condition' => [
+                        'participant_description' => ''
+                    ],
                 ],
                 'anonymous_responses' => false,
             ],
@@ -292,7 +295,7 @@ class mod_perform_webapi_resolver_query_subject_instance_for_external_participan
 
         $activities = $generator->create_full_activities($configuration);
         /** @var activity $activity */
-        $activity = $activities->first();
+        $activities->first();
     }
 
     /**

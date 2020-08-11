@@ -19,7 +19,7 @@ Feature: As an activity administrator, I need to be able to update visibility co
       | user1 | aud1   |
       | user2 | aud1   |
     And the following "activity sections" exist in "mod_perform" plugin:
-      | activity_name           | section_name |
+      | activity_name    | section_name |
       | My Test Activity | section 1    |
     And the following "section relationships" exist in "mod_perform" plugin:
       | section_name | relationship |

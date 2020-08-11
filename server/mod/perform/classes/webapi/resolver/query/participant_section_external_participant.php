@@ -76,18 +76,14 @@ class participant_section_external_participant extends participant_section {
 
         $ec->set_relevant_context($participant_instance->get_context());
 
-        $data_provider = new participant_section_with_responses(
-            $participant_id,
-            participant_source::EXTERNAL,
-            $participant_section->id
-        );
+        $data_provider = new participant_section_with_responses($participant_section);
 
         // When this participant section is fetched, for now we can safely assume that the participant is accessing
         // the section. In the future, this may have to move to a set_accessed mutation, e.g. if sections become
         // expandable in the front end and are fetched before actually being accessed.
         $participant_section->on_participant_access();
 
-        return $data_provider->fetch()->get();
+        return $data_provider->build();
     }
 
     /**

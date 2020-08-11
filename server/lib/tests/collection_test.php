@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class core_orm_collection_testcase
  *
+ * @covers collection
  * @package core
  * @group orm
  */
@@ -413,6 +414,21 @@ class core_collection_testcase extends advanced_testcase {
         $this->assertEquals('Jane', $collection->find(function ($item) {
             return $item['id'] === 64 || $item['name'] === 'Ashley';
         })['name']);
+    }
+
+    public function test_can_check_if_collection_has_item() {
+        $collection = new collection($this->get_dummy_keyed_non_sequential_unordered_items());
+
+        $this->assertTrue($collection->has('id', 64));
+        $this->assertFalse($collection->has('id', '007'));
+        $this->assertFalse($collection->has('id', '64', true));
+
+        // Test using a callback.
+        $this->assertTrue(
+            $collection->has(function ($item) {
+                return $item['id'] === 64 && $item['name'] === 'Jane';
+            })
+        );
     }
 
     public function test_it_can_sort_simple_collection() {

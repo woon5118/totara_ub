@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -25,146 +25,105 @@ namespace mod_perform\data_providers\response;
 
 use coding_exception;
 use core\collection;
-use core\orm\entity\entity;
-use mod_perform\entities\activity\activity;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity\section_element as section_element_entity;
-use mod_perform\models\activity\element;
+use mod_perform\models\activity\activity_setting;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
+use mod_perform\models\activity\section_element;
+use mod_perform\models\activity\section_relationship;
+use mod_perform\models\activity\settings\visibility_conditions\visibility_manager;
+use mod_perform\models\activity\settings\visibility_conditions\visibility_option;
 use mod_perform\models\response\participant_section;
 use mod_perform\models\response\responder_group;
 use mod_perform\models\response\section_element_response;
-use totara_core\entities\relationship as core_relationship_entity;
-use totara_core\relationship\relationship as core_relationship_model;
 
 class participant_section_with_responses {
 
-    /** @var int */
-    protected $participant_section_id;
-
-    /** @var int */
-    protected $participant_id;
-
-    /** @var collection|section_element_response[] */
-    protected $main_section_element_responses;
-
-    /** @var participant_section_entity|null */
-    protected $participant_section_entity;
-
     /** @var participant_section|null */
-    protected $participant_section;
+    private $participant_section;
 
     /** @var collection|section_element_response[] */
-    protected $others_section_element_responses;
-
-    /** @var int */
-    protected $participant_source;
-
-    /**@var string[] */
-    private $other_participant_relationship_type_names;
+    private $others_section_element_responses;
 
     /**
      * responses_for_participant_section constructor.
      *
-     * @param int $participant_id The id of the user who wants to view or answer the section.
-     * @param int $participant_source the source of the participant, external or internal
-     * @param int $participant_section_id The id of the participant section you want to fetch responses for.
+     * @param participant_section $participant_section
      */
-    public function __construct(int $participant_id, int $participant_source, int $participant_section_id) {
-        $this->participant_id = $participant_id;
-        $this->participant_section_id = $participant_section_id;
-        $this->participant_source = $participant_source;
+    public function __construct(participant_section $participant_section) {
+        $this->participant_section = $participant_section;
+        $this->others_section_element_responses = new collection();
     }
 
     /**
-     * Load the participant section and all child data into memory.
+     * Builds the participant section and all child data into memory.
      *
-     * @return $this
+     * @return participant_section
      */
-    public function fetch(): self {
-        $this->participant_section_entity = $this->fetch_participant_section();
-
-        // The participant section either doesn't exist or does not belong to the supplied participant id.
-        // The front end or calling code will handle these cases the same way,
-        // the participant section does not exist as far as the user is concerned.
-        if ($this->participant_section_entity === null) {
-            return $this;
-        }
-
-        $other_participant_instances = $this->fetch_other_participant_instances();
-
-        $participant_instance_ids = array_merge(
-            [$this->participant_section_entity->participant_instance_id],
-            $other_participant_instances->pluck('id')
-        );
-
-        $section_element_ids = $this->participant_section_entity->section_elements->pluck('id');
-
-        $existing_responses = $this->fetch_existing_responses($participant_instance_ids, $section_element_ids);
+    public function build(): participant_section {
+        $action_data = $this->analyze_response_visibility_and_other_participants();
 
         // Build the the responses from other participants.
         // We do this before building the main participants ($participant_id) responses because
         // these will be injected as child data to the main section_element_response models.
-        $this->others_section_element_responses = $this->create_others_element_responses(
-            $other_participant_instances,
-            $this->participant_section_entity->section_elements,
-            $existing_responses
-        );
+        if ($action_data['include_responder_groups']) {
+            $this->others_section_element_responses = $this->create_others_element_responses(
+                $action_data['other_participant_instances'],
+                $this->participant_section->section->section_elements,
+                $action_data['existing_responses']
+            );
+        }
 
         // We get the main responses after the "others responses" because
         // the "others responses" are children of the main responses through
         // relationship groups.
-        $this->main_section_element_responses = $this->create_section_element_responses(
-            $this->participant_section_entity->participant_instance,
-            $this->participant_section_entity->section_elements,
-            $existing_responses,
-            true,
-            $this->is_anonymous_responses($this->participant_section_entity)
+        $main_section_element_responses = $this->create_section_element_responses(
+            $this->participant_section->participant_instance,
+            $this->participant_section->section->section_elements,
+            $action_data['existing_responses'],
+            $action_data['include_responder_groups']
         );
 
-        // Finally create the top level model and inject all the child models.
-        $this->participant_section = new participant_section(
-            $this->participant_section_entity,
-            $this->main_section_element_responses
-        );
-
-        return $this;
+        // Finally add section_element_responses collection to participant_section.
+        return $this->participant_section->set_element_responses($main_section_element_responses);
     }
 
     /**
-     * Get the fetched participant_section.
+     * Analyzes the response visibility and the other participants responses to include.
      *
-     * @return participant_section|null
+     * @return array
      */
-    public function get(): ?participant_section {
-        if (!$this->participant_section) {
-            $this->fetch();
+    private function analyze_response_visibility_and_other_participants(): array {
+        $participant_instance_ids = [];
+
+        if ($this->participant_section_relationship_can_answer()) {
+            $participant_instance_ids[] = $this->participant_section->participant_instance_id;
         }
 
-        return $this->participant_section;
-    }
+        $other_participant_instances = new collection();
+        $process_other_responses = false;
+        $participant_can_view = $this->participant_section_relationship_can_view();
 
-    /**
-     * Fetch the top level participant section entity with required relationships eagerly loaded.
-     *
-     * @return entity|participant_section_entity|null
-     */
-    protected function fetch_participant_section(): ?participant_section_entity {
-        return participant_section_entity::repository()
-            ->as('ps')
-            // Bulk fetch all related entities that are required to build the domain models.
-            ->with('section_elements.element') // Used in section element_response class (element is for validation).
-            ->with('participant_instance') // For section element response class.
-            ->with('section.core_relationships.resolvers') // To create other responder groups.
-            ->with('participant_instance.core_relationship.resolvers') // For excluding main participant in other responder groups.
-            // Ensure the user we are fetching responses for is a participant for the section they belong to.
-            ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
-            ->where('ps.id', $this->participant_section_id)
-            ->where('pi.participant_id', $this->participant_id)
-            ->where('pi.participant_source', $this->participant_source)
-            ->one(false);
+        if ($participant_can_view) {
+            $other_participant_instances = $this->fetch_other_participant_instances();
+            $process_other_responses = $this->visibility_conditions_pass($other_participant_instances);
+            if ($other_participant_instances->count() > 0) {
+                array_push($participant_instance_ids, ...$other_participant_instances->pluck('id'));
+            }
+        }
+        $existing_responses = $this->fetch_existing_responses(
+            $participant_instance_ids,
+            $this->participant_section->section->section_elements->pluck('id')
+        );
+
+        return [
+            'existing_responses' => $existing_responses,
+            'other_participant_instances' => $other_participant_instances->map_to(participant_instance_model::class),
+            'participant_relationship_has_can_view_permissions' => $participant_can_view,
+            'include_responder_groups' => $process_other_responses && $participant_can_view,
+        ];
     }
 
     /**
@@ -175,7 +134,7 @@ class participant_section_with_responses {
      * @param int[] $section_element_ids
      * @return collection
      */
-    protected function fetch_existing_responses(array $participant_instance_ids, array $section_element_ids): collection {
+    private function fetch_existing_responses(array $participant_instance_ids, array $section_element_ids): collection {
         return element_response_entity::repository()
             ->where_in('section_element_id', $section_element_ids)
             ->where_in('participant_instance_id', $participant_instance_ids)
@@ -187,75 +146,68 @@ class participant_section_with_responses {
      *
      * @return collection|participant_instance_entity[]
      */
-    protected function fetch_other_participant_instances(): collection {
-        $participant_instance = $this->participant_section_entity->participant_instance;
+    private function fetch_other_participant_instances(): collection {
+        $participant_instance = $this->participant_section->participant_instance;
 
         return participant_instance_entity::repository()
             ->as('pi')
             // Bulk fetch all required related entities.
             ->with('core_relationship.resolvers') // Required for grouping section_element_responses by relationship_name.
             ->with('participant_user') // Required for the eventual output of other responders section_element_response models.
+            ->with('participant_sections')
             ->join([participant_section_entity::TABLE, 'ps'], 'id', 'participant_instance_id')
             ->where('subject_instance_id', $participant_instance->subject_instance_id)
             // Guard on the actual participant_instance_id (rather than participant_user_id)
             // because we need to handle the case where the same user is both a manager and appraiser to the subject.
-            ->where('pi.id', '!=', $this->participant_section_entity->participant_instance_id)
-            ->where('ps.section_id', $this->participant_section_entity->section_id)
+            ->where('pi.id', '!=', $this->participant_section->participant_instance_id)
+            ->where('ps.section_id', $this->participant_section->section_id)
             ->get();
     }
 
     /**
-     * @param participant_instance_entity $participant_instance_entity
+     * @param participant_instance_model $participant_instance
      * @param collection $section_elements
      * @param collection $existing_responses
      * @param bool $include_other_responder_groups
-     * @param bool $anonymous_responses
+     *
      * @return collection|section_element_response[]
      */
-    protected function create_section_element_responses(
-        participant_instance_entity $participant_instance_entity,
+    private function create_section_element_responses(
+        participant_instance_model $participant_instance,
         collection $section_elements,
         collection $existing_responses,
-        bool $include_other_responder_groups = false,
-        bool $anonymous_responses = false
+        bool $include_other_responder_groups = false
     ): collection {
         return $section_elements
-            ->filter(function (section_element_entity $section_element_entity) {
+            ->filter(function (section_element $section_element_entity) {
                 // We are only interested in respondable elements
-                return element::load_by_entity($section_element_entity->element)->is_respondable;
+                return $section_element_entity->element->is_respondable;
             })
             ->map(
-                function (section_element_entity $section_element_entity) use (
-                    $participant_instance_entity,
+                function (section_element $section_element) use (
+                    $participant_instance,
                     $existing_responses,
-                    $include_other_responder_groups,
-                    $anonymous_responses
+                    $include_other_responder_groups
                 ) {
                     // The element response model will accept missing entities
                     // in the case where a question has not yet been answered.
                     $element_response_entity = $this->find_existing_response_entity(
                         $existing_responses,
-                        $section_element_entity->id,
-                        $participant_instance_entity->id
+                        $section_element->id,
+                        $participant_instance->id
                     );
 
                     $other_responder_groups = new collection();
 
-                    if ($include_other_responder_groups &&
-                        $this->user_can_view_others_responses()
-                    ) {
-                        $other_responder_groups = $this->create_other_responder_groups(
-                            $section_element_entity->id,
-                            $anonymous_responses
-                        );
+                    if ($include_other_responder_groups) {
+                        $other_responder_groups = $this->create_other_responder_groups($section_element->id);
                     }
 
                     return new section_element_response(
-                        $participant_instance_entity,
-                        $section_element_entity,
+                        $participant_instance,
+                        $section_element,
                         $element_response_entity,
-                        $other_responder_groups,
-                        null
+                        $other_responder_groups
                     );
                 }
             );
@@ -287,7 +239,7 @@ class participant_section_with_responses {
     /**
      * Create the responses by other participants (not $participant_id) for a particular section element.
      *
-     * @param collection|participant_instance_entity[] $other_participant_instances
+     * @param collection|participant_instance_model[] $other_participant_instances
      * @param collection $section_elements
      * @param collection $existing_responses
      * @return collection
@@ -324,12 +276,12 @@ class participant_section_with_responses {
      * Note: this is not yet filtering based on "perform_section_relationship.can_answer".
      *
      * @param int $section_element_id
-     * @param bool $anonymous_responses
      * @return collection|responder_group[]
      */
-    protected function create_other_responder_groups(int $section_element_id, bool $anonymous_responses): collection {
+    private function create_other_responder_groups(int $section_element_id): collection {
         // Always create a group for the other participants relationship types.
         $grouped_by_relationship = [];
+        $anonymous_responses = $this->participant_section->section->activity->anonymous_responses;
         if (!$anonymous_responses) {
             foreach ($this->get_other_participants_relationship_type_names() as $relationship_type_name) {
                 $grouped_by_relationship[$relationship_type_name] = [];
@@ -351,17 +303,14 @@ class participant_section_with_responses {
             // If we are fetching for one of the many manager/appraisers their relationship type name
             // will not have a group, as the relationship type name of the $participant_id
             // is excluded from the $this->other_participant_relationship_type_names array.
-
             if (!$anonymous_responses) {
                 if (!array_key_exists($relationship_name, $grouped_by_relationship)) {
                     $grouped_by_relationship[$relationship_name] = [];
                 }
                 $grouped_by_relationship[$relationship_name][] = $other_response;
-            }
-            else {
+            } else {
                 $grouped_by_relationship['anonymous'][] = $other_response;
             }
-
         }
 
         $other_responder_groups = new collection();
@@ -378,28 +327,23 @@ class participant_section_with_responses {
      *
      * @return string[]
      */
-    protected function get_other_participants_relationship_type_names(): array {
-        if ($this->other_participant_relationship_type_names === null) {
-            $core_relationship_entities = $this->participant_section_entity->section->core_relationships;
+    private function get_other_participants_relationship_type_names(): array {
+        $section_relationships = $this->participant_section->section->section_relationships;
 
-            $names = $core_relationship_entities->map(
-                function (core_relationship_entity $core_relationship_entity) {
-                    return (new core_relationship_model($core_relationship_entity))->get_name();
-                }
-            );
+        $names = $section_relationships->map(
+            function (section_relationship $section_relationship) {
+                return $section_relationship->core_relationship->get_name();
+            }
+        );
 
-            $main_participant_relationship_name = $this->fetch_main_participant_relationship_name();
+        $main_participant_relationship_name = $this->fetch_main_participant_relationship_name();
+        $without_main_participant_relationship = $names->filter(
+            function (string $relationship_type_name) use ($main_participant_relationship_name) {
+                return $relationship_type_name !== $main_participant_relationship_name;
+            }
+        );
 
-            $without_main_participant_relationship = $names->filter(
-                function (string $relationship_type_name) use ($main_participant_relationship_name) {
-                    return $relationship_type_name !== $main_participant_relationship_name;
-                }
-            );
-
-            $this->other_participant_relationship_type_names = array_unique($without_main_participant_relationship->to_array());
-        }
-
-        return $this->other_participant_relationship_type_names;
+        return array_unique($without_main_participant_relationship->to_array());
     }
 
     /**
@@ -408,40 +352,52 @@ class participant_section_with_responses {
      * @return string
      * @throws coding_exception
      */
-    protected function fetch_main_participant_relationship_name(): string {
-        $main_participant_relationship_entity = $this->participant_section_entity
+    private function fetch_main_participant_relationship_name(): string {
+        return $this->participant_section
             ->participant_instance
-            ->core_relationship;
-
-        return (new core_relationship_model($main_participant_relationship_entity))->get_name();
+            ->core_relationship->get_name();
     }
 
     /**
-     * Can the user we are fetching the section view others' responses for this section.
-     *
+     * Checks if section relationship for the participant has can_view permissions.
      * @return bool
+     * @throws coding_exception
      */
-    protected function user_can_view_others_responses(): bool {
-        return (new participant_section($this->participant_section_entity))->can_view_others_responses();
+    private function participant_section_relationship_can_view(): bool {
+        return $this->participant_section->can_view_others_responses();
     }
 
     /**
-     * Check is anonymous responses
-     * @param participant_section_entity|null $participant_section_entity
+     * Checks if section relationship for the participant has can_answer permissions.
      *
      * @return bool
+     * @throws coding_exception
      */
-    protected function is_anonymous_responses(?participant_section_entity $participant_section_entity): bool {
-        if ($participant_section_entity) {
-            /**
-             * @var activity
-             */
-            $activity = $participant_section_entity->section->activity;
-
-            return $activity->anonymous_responses ?? false;
-        }
-
-        return false;
+    private function participant_section_relationship_can_answer(): bool {
+        return $this->participant_section->can_answer();
     }
 
+    /**
+     * Checks if visibility conditions on activity allow viewing other responses.
+     *
+     * @param collection|participant_instance[] $participant_instances
+     * @return bool
+     */
+    private function visibility_conditions_pass(collection $participant_instances): bool {
+        $visibility_option = $this->get_activity_visibility_option();
+
+        return $visibility_option->show_responses($this->participant_section->participant_instance, $participant_instances);
+    }
+
+    /**
+     * Get the activity visibility setting.
+     *
+     * @return visibility_option
+     */
+    private function get_activity_visibility_option(): visibility_option {
+        $activity_settings = $this->participant_section->section->activity->get_settings();
+        $visibility_value = $activity_settings->lookup(activity_setting::VISIBILITY_CONDITION) ?? 0;
+
+        return (new visibility_manager())->get_option_with_value($visibility_value);
+    }
 }

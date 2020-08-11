@@ -165,13 +165,23 @@ class participant_section extends model {
     public function can_view_others_responses(): bool {
         $core_relationship_id = (int) $this->entity->participant_instance->core_relationship_id;
 
-        $section_is_visible_to = $this->get_responses_are_visible_to()->map(
-            function (relationship $relationship) {
-                return (int) $relationship->id;
-            }
-        )->to_array();
+        return $this->get_responses_are_visible_to()->has('id', $core_relationship_id);
+    }
 
-        return in_array($core_relationship_id, $section_is_visible_to, true);
+    /**
+     * Checks if participant relationship has can_answer permissions on the section.
+     *
+     * @return bool
+     */
+    public function can_answer(): bool {
+        $core_relationship_id = (int) $this->entity->participant_instance->core_relationship_id;
+
+        return $this->entity->section->section_relationships->has(
+            function (section_relationship $relationship) use ($core_relationship_id) {
+                return (int) $relationship->core_relationship_id === $core_relationship_id
+                    && (bool) $relationship->can_answer;
+            }
+        );
     }
 
     public function get_context(): context_module {

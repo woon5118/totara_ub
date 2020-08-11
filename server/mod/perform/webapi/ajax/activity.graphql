@@ -40,7 +40,10 @@ query mod_perform_activity($activity_id: core_id!) {
     settings {
       close_on_completion
       multisection
-      visibility_condition
+      visibility_condition {
+        name
+        value
+      }
     }
     manual_relationships {
       manual_relationship {

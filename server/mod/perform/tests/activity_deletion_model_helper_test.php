@@ -38,6 +38,8 @@ use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use mod_perform\entities\activity\element as element_entity;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
+use mod_perform\models\activity\section_element;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\activity\helpers\activity_deletion;
 use PHPUnit\Framework\Constraint\Constraint;
@@ -80,8 +82,8 @@ class mod_perform_activity_deletion_model_helper_testcase extends advanced_testc
             $section_element_entity = section_element_entity::repository()->order_by('id')->first(true);
 
             $section_element_response = new section_element_response(
-                $participant_instance_entity,
-                $section_element_entity,
+                participant_instance_model::load_by_entity($participant_instance_entity),
+                section_element::load_by_entity($section_element_entity),
                 null,
                 new collection()
             );
