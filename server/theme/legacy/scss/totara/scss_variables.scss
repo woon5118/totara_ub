@@ -79,7 +79,7 @@ $brand-danger: $boot-color-prompt-alert;
 // Fonts colours
 $link-color: $boot-color-state !default;
 $link-hover-color: $boot-color-state-hover !default;
-$text-color: $boot-color-neutral-7 !default;
+$text-color: var(--legacy-color-text) !default;
 // Gray scale colours
 $gray: $boot-color-neutral-6 !default;
 $gray-base: #000 !default;
