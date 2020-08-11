@@ -35,6 +35,7 @@ use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\subject_instance_manual_participant;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\event\participant_instance_manually_added;
 use mod_perform\hook\participant_instances_created;
 use mod_perform\models\activity\external_participant;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
@@ -112,7 +113,15 @@ class participant_instance_creation {
                 return array_merge([], ...$added_instance_groups);
             }
         );
-        return $this->build_models_from_participant_instance_data($added_instances_data);
+
+        $participant_instances = $this->build_models_from_participant_instance_data($added_instances_data);
+
+        foreach ($participant_instances as $participant_instance) {
+            participant_instance_manually_added::create_from_participant_instance($participant_instance)
+                ->trigger();
+        }
+
+        return $participant_instances;
     }
 
     /**

@@ -32,6 +32,7 @@ use mod_perform\entities\activity\section_relationship;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\event\participant_instance_manually_added;
 use mod_perform\expand_task;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\activity\participant_source;
@@ -665,6 +666,53 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $participant_instance->refresh();
         $this->assertEquals(participant_instance_closed::get_code(), $participant_instance->availability);
         $this->assertEquals(participant_instance_complete::get_code(), $participant_instance->progress);
+    }
+
+    public function test_manually_add_participants_event_is_triggered() {
+        $relationships = collection::new([
+            constants::RELATIONSHIP_APPRAISER,
+            constants::RELATIONSHIP_MANAGER
+        ]);
+        $data = $this->generate_test_data_for_adding_participants($relationships->all());
+        $subject_instance_id = $data->subject_instance1_id;
+
+        $generator = $this->getDataGenerator();
+        $perform_generator = $generator->get_plugin_generator('mod_perform');
+        $relationship_participants = $relationships->reduce(
+            function (array $accumulated, string $relationship) use ($generator, $perform_generator): array {
+                $accumulated[] = [
+                    'participant_id' => $generator->create_user()->id,
+                    'core_relationship_id' => $perform_generator->get_core_relationship($relationship)->id
+                ];
+
+                return $accumulated;
+            },
+            []
+        );
+
+        $sink = $this->redirectEvents();
+
+        $activity_admin = $generator->create_user();
+        $this->setUser($activity_admin);
+
+        $manual_participant_instances = (new participant_instance_creation())
+            ->add_instances([$subject_instance_id], $relationship_participants)
+            ->key_by('id');
+
+        $events = $sink->get_events();
+        $this->assertCount(count($relationships), $events);
+
+        foreach ($events as $event) {
+            $this->assertInstanceOf(participant_instance_manually_added::class, $event);
+
+            $expected = $manual_participant_instances->item($event->objectid);
+            $this->assertNotNull($expected, "Unknown participant id: '$event->objectid'");
+            $this->assertEquals($expected->participant_id, $event->relateduserid, 'wrong participant id');
+            $this->assertEquals($activity_admin->id, $event->userid, 'wrong user id');
+            $this->assertEquals($subject_instance_id, $event->other['subject_instance_id'], 'wrong subject instance id');
+        }
+
+        $sink->close();
     }
 
     /**

@@ -131,6 +131,7 @@ $string['event_activity_activated'] = 'Performance activity activated';
 $string['event_activity_deleted'] = 'Performance activity deleted';
 $string['event_participant_instance_availability_closed'] = 'Performance activity participant instance closed';
 $string['event_participant_instance_availability_opened'] = 'Performance activity participant instance opened';
+$string['event_participant_instance_manually_added'] = 'Performance activity participant instance manually added';
 $string['event_participant_section_availability_closed_name'] = 'Performance participant section availability closed';
 $string['event_participant_section_availability_opened_name'] = 'Performance participant section availability opened';
 $string['event_subject_instance_activated'] = 'Performance activity subject instance activated';
