@@ -70,6 +70,37 @@ class totara_tui_output_framework_test extends advanced_testcase {
         }
     }
 
+    public function test_get_head_code_unknown_theme() {
+        global $CFG;
+
+        $theme = $this->createMock('theme_config');
+        $theme->name = 'bananas';
+        $theme->parents = ['ventura', 'legacy', 'base'];
+
+        $page = new moodle_page();
+        $property = new ReflectionProperty($page, '_theme');
+        $property->setAccessible(true);
+        $property->setValue($page, $theme);
+
+        self::assertSame('bananas', $page->theme->name);
+
+        /** @var core_renderer $renderer */
+        $framework = framework::new_instance();
+        $framework->get_head_code($page, new core_renderer($page, RENDERER_TARGET_GENERAL));
+
+        $property = new ReflectionProperty($framework, 'css_urls');
+        $property->setAccessible(true);
+        $urls = $property->getValue($framework);
+
+        if (file_exists($CFG->srcroot . '/client/build/tui')) {
+            self::assertIsArray($urls);
+            self::assertCount(2, $urls);
+            /** @var moodle_url[] $urls */
+            self::assertSame('/totara/tui/styles.php/bananas/1/p/ltr/tui', $urls[0]->out_as_local_url());
+            self::assertSame('/totara/tui/styles.php/bananas/1/p/ltr/theme_bananas', $urls[1]->out_as_local_url());
+        }
+    }
+
     public function test_inject_css_urls() {
         global $CFG;
         $a = ['a', 'b/tui_scss', 'c'];
