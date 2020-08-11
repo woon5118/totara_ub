@@ -28,6 +28,8 @@ use context_module;
 use core\collection;
 use core\entities\user;
 use core\orm\entity\model;
+use mod_perform\controllers\activity\view_external_participant_activity;
+use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\response\participant_section;
 use mod_perform\state\participant_instance\closed;
@@ -38,6 +40,7 @@ use mod_perform\state\participant_instance\participant_instance_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 use mod_perform\state\subject_instance\closed as subject_instance_closed;
+use moodle_url;
 use totara_core\relationship\relationship as relationship_model;
 
 /**
@@ -54,6 +57,7 @@ use totara_core\relationship\relationship as relationship_model;
  * @property-read user $participant
  * @property-read collection|participant_section[] $participant_sections
  * @property-read string $progress_status internal name of current progress state
+ * @property-read moodle_url $participation_url
  * @property-read participant_instance_progress|state $progress_state Current progress state
  * @property-read participant_instance_availability|state $availability_state Current availability state
  * @property-read relationship_model $core_relationship The core relationship
@@ -90,7 +94,8 @@ class participant_instance extends model {
         'participant_sections',
         'is_for_current_user',
         'is_overdue',
-        'subject_instance'
+        'subject_instance',
+        'participation_url'
     ];
 
     protected static function get_entity_class(): string {
@@ -235,6 +240,19 @@ class participant_instance extends model {
 
         return (int) $this->entity->participant_source === participant_source::INTERNAL
             && $this->participant_id == $USER->id;
+    }
+
+    /**
+     * Get url for a user to participate in this instance
+     *
+     * @return moodle_url
+     */
+    public function get_participation_url(): moodle_url {
+        if ($this->participant_source == participant_source::EXTERNAL) {
+            return view_external_participant_activity::get_url(['token' => $this->entity->external_participant->token]);
+        } else {
+            return view_user_activity::get_url(['participant_instance_id' => $this->id]);
+        }
     }
 
     /**

@@ -28,9 +28,12 @@ use context_module;
 use core\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
+use mod_perform\controllers\activity\view_external_participant_activity;
+use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section_relationship;
 use mod_perform\models\activity\participant_instance;
+use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\section;
 use mod_perform\state\participant_instance\closed as participant_instance_closed;
 use mod_perform\state\participant_section\closed;
@@ -41,6 +44,7 @@ use mod_perform\state\participant_section\participant_section_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 use moodle_exception;
+use moodle_url;
 use totara_core\relationship\relationship;
 
 /**
@@ -55,8 +59,9 @@ use totara_core\relationship\relationship;
  * @property-read string $progress_status
  * @property-read participant_instance $participant_instance
  * @property-read section $section
- * @property-read section_element_response[] $section_element_responses
- * @property-read participant_instance[] answerable_participant_instances
+ * @property-read moodle_url $participation_url
+ * @property-read collection|section_element_response[] $section_element_responses
+ * @property-read collection|participant_instance[] answerable_participant_instances
  *
  * @package mod_perform\models\activity
  */
@@ -94,6 +99,7 @@ class participant_section extends model {
         'answerable_participant_instances',
         'is_overdue',
         'responses_are_visible_to',
+        'participation_url',
     ];
 
     /**
@@ -337,6 +343,22 @@ class participant_section extends model {
     public function get_is_overdue(): bool {
         return !$this->is_completed()
             && $this->participant_instance->is_overdue;
+    }
+
+    /**
+     * Get url for a user to participate in this section
+     *
+     * @return moodle_url
+     */
+    public function get_participation_url(): moodle_url {
+        if ($this->participant_instance->participant_source == participant_source::EXTERNAL) {
+            return view_external_participant_activity::get_url([
+                'participant_section_id' => $this->id,
+                'token' => $this->entity->participant_instance->external_participant->token
+            ]);
+        } else {
+            return view_user_activity::get_url(['participant_section_id' => $this->id]);
+        }
     }
 
     /**
