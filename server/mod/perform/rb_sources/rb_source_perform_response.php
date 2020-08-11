@@ -23,6 +23,7 @@
  *
  */
 
+use container_perform\perform as perform_container;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\participant_source;
 use mod_perform\rb\traits\activity_trait;
@@ -49,6 +50,8 @@ class rb_source_perform_response extends rb_base_source {
     use section_trait;
     use activity_trait;
 
+    private $default_context;
+
     /**
      * Constructor.
      *
@@ -62,8 +65,11 @@ class rb_source_perform_response extends rb_base_source {
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
         }
+
         // Remember the active global restriction set.
         $this->globalrestrictionset = $globalrestrictionset;
+
+        $this->default_category_context = context_coursecat::instance(perform_container::get_default_category_id());
 
         // Apply global user restrictions.
         $this->add_global_report_restriction_join('subject_instance', 'subject_user_id', 'subject_instance');
@@ -200,7 +206,15 @@ class rb_source_perform_response extends rb_base_source {
                 get_string('response_data', 'rb_source_perform_response'),
                 'base.response_data',
                 [
-                    'displayfunc' => 'format_string',
+                    'joins' => ['perform_element'],
+                    'displayfunc' => 'element_response',
+                    'extrafields' => [
+                        'element_type' => "perform_element.plugin_name",
+                        'element_data' => "perform_element.data",
+                    ],
+                    'extracontext' => [
+                        'default_category_context' => $this->default_category_context,
+                    ]
                 ]
             ),
             // Column for sorting that combines activity name, section and element sorts, relationship and participant

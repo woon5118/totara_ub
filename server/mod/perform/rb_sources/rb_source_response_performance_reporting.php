@@ -68,4 +68,65 @@ class rb_source_response_performance_reporting extends rb_source_perform_respons
         $restrictions = util::get_report_on_subjects_sql($report->reportfor, "subject_instance.subject_user_id");
         $report->set_post_config_restrictions($restrictions);
     }
+
+    /**
+     * The default columns for this and embedded reports.
+     *
+     * @return array
+     */
+    public static function get_default_columns() {
+        return [
+            [
+                'type' => 'element',
+                'value' => 'identifier',
+                'heading' => get_string('element_identifier', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'type',
+                'heading' => get_string('element_type', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'title',
+                'heading' => get_string('element_title', 'rb_source_response_performance_reporting'),
+            ],
+            [
+                'type' => 'activity',
+                'value' => 'name',
+                'heading' => get_string('activity_name', 'rb_source_response_performance_reporting'),
+            ],
+            [
+                'type' => 'subject_user',
+                'value' => 'namelink',
+                'heading' => get_string('subject_name', 'rb_source_response_performance_reporting'),
+            ],
+            [
+                'type' => 'participant_instance',
+                'value' => 'participant_name',
+                'heading' => get_string('participant_name', 'rb_source_response_performance_reporting'),
+            ],
+            [
+                'type' => 'participant_instance',
+                'value' => 'relationship_name',
+                'heading' => get_string('participant_relationship_name', 'rb_source_response_performance_reporting'),
+            ],
+            [
+                'type' => 'participant_instance',
+                'value' => 'participant_email',
+                'heading' => get_string('participant_email', 'rb_source_response_performance_reporting'),
+            ],
+            [
+                'type' => 'response',
+                'value' => 'response_data',
+                'heading' => get_string('element_response', 'rb_source_response_performance_reporting'),
+            ],
+            [
+                'type' => 'participant_instance',
+                'value' => 'updated_at',
+                'heading' => get_string('section_submission_date', 'rb_source_response_performance_reporting'),
+            ],
+        ];
+    }
+
 }

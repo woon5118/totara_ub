@@ -151,19 +151,25 @@ class export extends perform_controller {
                 if (!empty($ids)) {
                     $extra_data['element_id'] = $ids;
                 }
-                $extra_data['activity_id'] = $this->get_required_param('activity_id', PARAM_INT);
+                $extra_data['activity_id'] = $this->get_required_param('activity_id_export_filter', PARAM_INT);
                 break;
             case self::SHORT_NAME_SUBJECT_INSTANCE:
                 if (!empty($ids)) {
                     $extra_data['subject_instance_id'] = $ids;
                 }
-                $extra_data['subject_user_id'] = $this->get_required_param('subject_user_id', PARAM_INT);
+                $extra_data['subject_user_id'] = $this->get_required_param('subject_user_id_export_filter', PARAM_INT);
                 break;
             case self::SHORT_NAME_ELEMENT_IDENTIFIER:
-                $extra_data[self::SHORT_NAME_ELEMENT_IDENTIFIER] = required_param_array(
-                    self::SHORT_NAME_ELEMENT_IDENTIFIER,
-                    PARAM_INT
-                );
+                $identifiers = $this->get_required_param('element_identifier_export_filter', PARAM_TEXT);
+                $identifiers = explode(',', $identifiers);
+                foreach ($identifiers as $reporting_id) {
+                    if (!is_number($reporting_id)) {
+                        throw new coding_exception('Integer Reporting identifier IDs expected');
+                    }
+                }
+
+                $extra_data['element_identifier'] = $identifiers;
+
                 if (!empty($ids)) {
                     $extra_data['element_id'] = $ids;
                 }
@@ -190,7 +196,7 @@ class export extends perform_controller {
      *
      * @param reportbuilder $report
      * @param string $format
-     * @return view|null
+     * @return view
      */
     protected function handle_export(reportbuilder $report, string $format) {
         // Only support CSV for now as there is no interface for selecting export format. Could potentially
@@ -220,8 +226,7 @@ class export extends perform_controller {
         }
 
         // All okay, export the data.
-        $report->export_data($format);
-        return null;
+        return $report->export_data($format);
     }
 
     public static function get_base_url(): string {

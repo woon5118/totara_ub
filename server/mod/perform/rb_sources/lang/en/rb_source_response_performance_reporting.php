@@ -23,9 +23,17 @@
  *
  */
 
+$string['activity_name'] = 'Activity name';
+$string['element_response'] = 'Element response';
+$string['element_title'] = 'Element text';
+$string['participant_email'] = 'Participant email address';
+$string['participant_name'] = 'Participant name';
+$string['participant_relationship_name'] = 'Participant relationship to subject';
+$string['section_submission_date'] = 'Date of section submission';
 $string['sourcelabel'] = 'Performance Reporting Reponses (Perform)';
 $string['sourcesummary'] = 'Version of responses report source restricted to records where the viewing user can report on the subject\'s performance data.';
 $string['sourcetitle'] = 'Performance Reporting Responses (Perform)';
+$string['subject_name'] = 'Subject name';
 $string['type_activity'] = 'Performance activity';
 $string['type_element'] = 'Element';
 $string['type_participant_instance'] = 'Participant instance';

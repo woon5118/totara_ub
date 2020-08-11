@@ -90,7 +90,7 @@ class user extends perform_controller {
             $filtered_count,
             $report->get_search_hash(),
             export::SHORT_NAME_SUBJECT_INSTANCE,
-            ['subject_user_id' => $subject_user_id]
+            ['subject_user_id_export_filter' => $subject_user_id]
         );
 
         $subject_user = \core_user::get_user($subject_user_id);

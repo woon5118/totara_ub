@@ -711,7 +711,9 @@ class mod_perform_generator extends component_generator_base {
         // Create subject instances for all user assignments
         (new subject_instance_creation())->generate_instances();
 
-        $message_sink->close();
+        if ($message_sink !== null) {
+            $message_sink->close();
+        }
 
         return $message_sink;
     }

@@ -94,7 +94,7 @@ class activity extends perform_controller {
             $filtered_count,
             $report->get_search_hash(),
             export::SHORT_NAME_ELEMENT,
-            ['activity_id' => $activity_id]
+            ['activity_id_export_filter' => $activity_id]
         );
 
         $heading = $this->get_heading($filtered_count, $activity_name);

@@ -26,7 +26,7 @@ use mod_perform\util;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_response.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_response_performance_reporting.php');
 
 class rb_response_export_performance_reporting_embedded extends rb_base_embedded {
 
@@ -70,7 +70,7 @@ class rb_response_export_performance_reporting_embedded extends rb_base_embedded
      * @return array
      */
     protected function define_columns() {
-        return \rb_source_perform_response::get_default_columns();
+        return \rb_source_response_performance_reporting::get_default_columns();
     }
 
     /**
@@ -79,7 +79,7 @@ class rb_response_export_performance_reporting_embedded extends rb_base_embedded
      * @return array
      */
     protected function define_filters() {
-        return \rb_source_perform_response::get_default_filters();
+        return \rb_source_response_performance_reporting::get_default_filters();
     }
 
     /**

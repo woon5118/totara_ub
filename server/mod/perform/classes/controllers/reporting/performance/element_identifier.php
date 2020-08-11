@@ -87,7 +87,7 @@ class element_identifier extends perform_controller {
             $filtered_count,
             $report->get_search_hash(),
             export::SHORT_NAME_ELEMENT_IDENTIFIER,
-            ['element_identifier' => $filtered_report_element_identifier_names]
+            ['element_identifier_export_filter' => $element_identifier]
         );
 
         $heading = $this->get_heading($filtered_count, get_string('selected_reporting_ids', 'mod_perform'));
