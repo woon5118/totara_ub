@@ -114,8 +114,7 @@
 }
 
 .mform span.error {
-  background-color: $state-danger-bg;
-  color: $state-danger-text;
+  @include form-error();
 }
 
 .mform fieldset.error {
@@ -548,13 +547,6 @@ input[type='checkbox'] {
 // For grouped elements with no label.
 .mform .femptylabel .fgroup .felement {
   float: right;
-}
-
-.mform span.error {
-  color: $state-danger-text;
-  background-color: inherit;
-  display: block;
-  clear: both;
 }
 
 .mform .fitem_fpassword .felement.fpassword {

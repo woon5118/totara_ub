@@ -199,3 +199,15 @@
 }
 
 // End of original bootstrap theme code.
+
+@mixin form-error() {
+  font-weight: 400;
+  font-size: var(--legacy-font-size-13);
+  line-height: 1.15;
+  padding: var(--legacy-gap-1) var(--legacy-gap-2);
+  color: var(--legacy-form-error-text-color);
+  background: var(--legacy-form-error-bg-color);
+  display: block;
+  width: max-content;
+  max-width: 100%;
+}
