@@ -25,7 +25,6 @@ namespace mod_perform\models\activity;
 
 use coding_exception;
 use core\entities\user;
-use moodle_page;
 use user_picture;
 
 /**

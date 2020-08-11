@@ -29,6 +29,7 @@ use core\orm\entity\model;
 use core\orm\query\builder;
 use mod_perform\entities\activity\external_participant as external_participant_entity;
 use mod_perform\entities\activity\participant_instance;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
 use user_picture;
 
 /**
@@ -55,13 +56,6 @@ class external_participant extends model {
         'profileimageurlsmall',
         'participant_instance'
     ];
-
-    /**
-     * Default image filename.
-     *
-     * @var string
-     */
-    private $image_filename = 'u/f2';
 
     /**
      * {@inheritdoc}
@@ -121,6 +115,8 @@ class external_participant extends model {
      * @return string the generated token.
      */
     private static function generate_token(int $participant_instance_id): string {
+        // Even though technically not necessary hashing it with md5
+        // obfuscates the quite obvious PHP password hash result
         return hash('sha256', password_hash(uniqid($participant_instance_id), PASSWORD_DEFAULT));
     }
 
@@ -161,12 +157,12 @@ class external_participant extends model {
     /**
      * Get associated participant instance if any.
      *
-     * @return participant_instance the participant instance. This can be null
+     * @return participant_instance_model the participant instance model. This can be null
      *         if it has not been created yet.
      */
-    public function get_participant_instance(): ?participant_instance {
+    public function get_participant_instance(): ?participant_instance_model {
         return $this->entity->participant_instance ?
-            participant_instance::load_by_entity($this->entity->participant_instance)
+            participant_instance_model::load_by_entity($this->entity->participant_instance)
             : null;
     }
 

@@ -161,7 +161,13 @@ final class relationship extends model {
      * @param string $component Plugin that the relationship is exclusive to. Defaults to being available for all.
      * @return relationship
      */
-    public static function create(array $resolver_class_names, string $idnumber, int $sort_order = 1, int $type = null, string $component = null): self {
+    public static function create(
+        array $resolver_class_names,
+        string $idnumber,
+        int $sort_order = 1,
+        int $type = null,
+        string $component = null
+    ): self {
         self::validate_resolvers($resolver_class_names);
 
         if (trim($idnumber) === '' || strlen($idnumber) > 255) {
@@ -177,23 +183,25 @@ final class relationship extends model {
             throw new coding_exception('Specified component/plugin ' . $component . ' does not exist!');
         }
 
-        $relationship = builder::get_db()->transaction(function () use ($resolver_class_names, $idnumber, $sort_order, $type, $component) {
-            $relationship = new relationship_entity();
-            $relationship->idnumber = $idnumber;
-            $relationship->type = $type ?? relationship_entity::TYPE_STANDARD;
-            $relationship->component = $component;
-            $relationship->sort_order = $sort_order;
-            $relationship->save();
+        $relationship = builder::get_db()->transaction(
+            function () use ($resolver_class_names, $idnumber, $sort_order, $type, $component) {
+                $relationship = new relationship_entity();
+                $relationship->idnumber = $idnumber;
+                $relationship->type = $type ?? relationship_entity::TYPE_STANDARD;
+                $relationship->component = $component;
+                $relationship->sort_order = $sort_order;
+                $relationship->save();
 
-            foreach ($resolver_class_names as $resolver_class_name) {
-                $relationship_resolver = new relationship_resolver_entity();
-                $relationship_resolver->relationship_id = $relationship->id;
-                $relationship_resolver->class_name = $resolver_class_name;
-                $relationship_resolver->save();
+                foreach ($resolver_class_names as $resolver_class_name) {
+                    $relationship_resolver = new relationship_resolver_entity();
+                    $relationship_resolver->relationship_id = $relationship->id;
+                    $relationship_resolver->class_name = $resolver_class_name;
+                    $relationship_resolver->save();
+                }
+
+                return $relationship;
             }
-
-            return $relationship;
-        });
+        );
 
         return self::load_by_entity($relationship);
     }
