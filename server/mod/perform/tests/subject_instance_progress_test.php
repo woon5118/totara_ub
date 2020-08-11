@@ -379,7 +379,7 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
             'In progress to complete' => [in_progress::class, complete::class, true, 'ALL_COMPLETE'],
             'In progress to not submitted' => [in_progress::class, not_submitted::class, true, 'SOME_COMPLETE'],
 
-            'Complete to compete' => [complete::class, complete::class, false, 'ALL_COMPLETE'],
+            'Complete to complete' => [complete::class, complete::class, true, 'ALL_COMPLETE'],
             'Complete to not started' => [complete::class, not_started::class, true, 'NONE_COMPLETE'],
             'Complete to in progress' => [complete::class, in_progress::class, true, 'SOME_COMPLETE'],
             'Complete to not submitted' => [complete::class, not_submitted::class, false, 'ALL_COMPLETE'],

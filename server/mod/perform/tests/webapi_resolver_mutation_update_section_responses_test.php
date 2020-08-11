@@ -187,10 +187,10 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
 
         $events = $sink->get_events();
 
-        self::assertCount(
-            0,
-            $events,
-            'Expected no events to be fired'
+        self::assertInstanceOf(
+            participant_section_progress_updated::class,
+            reset($events),
+            'Expected progress updated event to be fired'
         );
     }
 

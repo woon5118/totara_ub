@@ -24,6 +24,7 @@
 namespace mod_perform\state\subject_instance;
 
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\state\subject_instance\condition\all_participant_instances_complete;
 use mod_perform\state\subject_instance\condition\at_least_one_participant_instance_started;
 use mod_perform\state\subject_instance\condition\no_participant_instances_complete;
 use mod_perform\state\subject_instance\condition\not_all_participant_instances_complete;
@@ -56,21 +57,31 @@ class complete extends subject_instance_progress{
             transition::to(new not_started($this->object))->with_conditions([
                 no_participant_instances_complete::class,
             ]),
+
+            // All participants have completed their instances.
+            transition::to(new complete($this->object))->with_conditions([
+                all_participant_instances_complete::class
+            ]),
         ];
     }
 
     public function update_progress(): void {
-        if ($this->can_switch(in_progress::class)) {
-            $this->object->switch_state(in_progress::class);
+        foreach ([in_progress::class, complete::class] as $to_state) {
+            if ($this->can_switch($to_state)) {
+                $this->object->switch_state($to_state);
+                break;
+            }
         }
     }
 
     public function on_enter(): void {
-        // Set the completed_at date.
         /** @var subject_instance_entity $subject_instance_entity */
         $subject_instance_entity = subject_instance_entity::repository()->find($this->get_object()->get_id());
-        $subject_instance_entity->completed_at = time();
-        $subject_instance_entity->update();
+        // Only if not yet completed update the completed at timestamp
+        if (empty($subject_instance_entity->completed_at)) {
+            $subject_instance_entity->completed_at = time();
+            $subject_instance_entity->update();
+        }
     }
 
     public function manually_complete(): void {

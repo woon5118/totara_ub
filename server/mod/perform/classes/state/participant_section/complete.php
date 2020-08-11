@@ -34,33 +34,59 @@ defined('MOODLE_INTERNAL') || die();
  */
 class complete extends participant_section_progress {
 
+    /**
+     * @inheritDoc
+     */
     public static function get_name(): string {
         return 'COMPLETE';
     }
 
+    /**
+     * @inheritDoc
+     */
     public static function get_code(): int {
         return 20;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function get_transitions(): array {
         return [
             // The participant has saved a draft OR an admin has manually moved progress backwards.
             transition::to(new in_progress($this->object)),
+            transition::to(new self($this->object)),
         ];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function complete(): void {
-        // Already in complete state. Do nothing.
+        // It could be that the section was already completed but the close on completion setting got changed.
+        // In this case we still want to react.
+        if ($this->can_switch(complete::class)) {
+            $this->object->switch_state(complete::class);
+        }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function on_participant_access(): void {
         // Not relevant when already complete. Do nothing.
     }
 
+    /**
+     * @inheritDoc
+     */
     public function manually_complete(): void {
         // Not relevant when already complete. Do nothing.
     }
 
+    /**
+     * @inheritDoc
+     */
     public function manually_uncomplete(): void {
         // The user must have done something for it to get into the "complete" state. We move back
         // to "in_progress" to force the user to submit the section again.

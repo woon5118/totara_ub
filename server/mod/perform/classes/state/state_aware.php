@@ -87,28 +87,15 @@ trait state_aware {
         $old_state = $this->get_state(call_user_func([$target_state, 'get_type']));
         $new_state = $old_state->transition_to($target_state);
 
-        if ($this->can_switch_between_states($old_state, $new_state)) {
-            builder::get_db()->transaction(function () use ($new_state) {
-                $this->update_state_code($new_state);
-                if ($new_state instanceof state_event) {
-                    $new_state->get_event()->trigger();
-                }
-                $new_state->on_enter();
-            });
-        }
+        builder::get_db()->transaction(function () use ($new_state) {
+            $this->update_state_code($new_state);
+            if ($new_state instanceof state_event) {
+                $new_state->get_event()->trigger();
+            }
+            $new_state->on_enter();
+        });
 
         return $this;
     }
 
-    /**
-     * Checks state codes & types to ensure switch between states is valid.
-     *
-     * @param state $old_state
-     * @param state $new_state
-     * @return bool
-     */
-    private function can_switch_between_states(state $old_state, state $new_state): bool {
-        return $new_state::get_code() !== $old_state::get_code()
-            && $new_state::get_type() === $old_state::get_type();
-    }
 }

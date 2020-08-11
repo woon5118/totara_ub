@@ -23,6 +23,7 @@
 
 namespace mod_perform\state\participant_instance;
 
+use mod_perform\state\participant_instance\condition\all_sections_complete;
 use mod_perform\state\participant_instance\condition\at_least_one_section_started;
 use mod_perform\state\participant_instance\condition\no_sections_complete;
 use mod_perform\state\participant_instance\condition\not_all_sections_complete;
@@ -55,13 +56,22 @@ class complete extends participant_instance_progress {
             transition::to(new not_started($this->object))->with_conditions([
                 no_sections_complete::class,
             ]),
+
+            // The participant can complete an instance again
+            transition::to(new complete($this->object))->with_conditions([
+                all_sections_complete::class
+            ]),
         ];
     }
 
     public function update_progress(): void {
-        // May transition back to in_progress if another section was added.
-        if ($this->can_switch(in_progress::class)) {
-            $this->object->switch_state(in_progress::class);
+        // A completion progress can happen again if you complete the form a second time
+        // and close on completion
+        foreach ([in_progress::class, complete::class] as $to_state) {
+            if ($this->can_switch($to_state)) {
+                $this->object->switch_state($to_state);
+                break;
+            }
         }
     }
 
