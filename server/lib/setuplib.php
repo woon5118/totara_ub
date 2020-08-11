@@ -1817,7 +1817,7 @@ function make_localcache_directory($directory, $exceptiononerror = true) {
 
     make_writable_directory($CFG->localcachedir, $exceptiononerror);
 
-    if ($CFG->localcachedir !== "$CFG->dataroot/localcache") {
+    if (str_replace(DIRECTORY_SEPARATOR, '/', $CFG->localcachedir) !== str_replace(DIRECTORY_SEPARATOR, '/', "$CFG->dataroot/localcache")) {
         protect_directory($CFG->localcachedir);
     } else {
         protect_directory($CFG->dataroot);

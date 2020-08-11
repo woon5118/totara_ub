@@ -21,6 +21,8 @@
  * @package totara_mobile
  */
 
+use totara_core\path;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -31,24 +33,23 @@ class totara_mobile_webapi_graphql_typename_testcase extends advanced_testcase {
     /**
      * Scan *.graphql files and ensure __typename properties are included for every type
      *
-     * @param string $directory Path to directory to scan
+     * @param path $directory Path to directory to scan
      * @param array  $errors Referenced array of errors
      * @return void
      */
-    private function scan_for_typename(string $directory, array &$errors): void {
-        global $CFG;
-        $directory = str_replace(DIRECTORY_SEPARATOR, '/', $directory);
-        $handle = opendir($directory);
-        while (false !== ($file = readdir($handle))) {
+    private function scan_for_typename(path $directory, array &$errors): void {
+        $directory_iterator = $directory->create_directory_iterator();
+        foreach ($directory_iterator as $file) {
+            /** @var \SplFileInfo $file */
             // Ignore all dotfiles, including ..
-            if (substr($file,0,1) == '.') {
+            if ($file->isDot()) {
                 continue;
             }
             // Ignore everything except .graphql files
-            if (substr($file,-8) != '.graphql') {
+            if (substr($file->getFilename(), -8) != '.graphql') {
                 continue;
             }
-            $file_name = $directory.DIRECTORY_SEPARATOR.$file;
+            $file_name = $directory->join($file->getFilename());
             $contents = file_get_contents($file_name);
             $contents = trim($contents);
             // Skip mutations
@@ -69,7 +70,6 @@ class totara_mobile_webapi_graphql_typename_testcase extends advanced_testcase {
                 }
             }
         }
-        closedir($handle);
     }
 
     /**
@@ -80,7 +80,7 @@ class totara_mobile_webapi_graphql_typename_testcase extends advanced_testcase {
     public function test_typename_in_mobile_graphql(): void {
         global $CFG;
 
-        $source_directory = $CFG->dirroot . '/totara/mobile/webapi/mobile';
+        $source_directory = new path($CFG->dirroot, '/totara/mobile/webapi/mobile');
         $errors = array();
 
         $this->scan_for_typename($source_directory, $errors);

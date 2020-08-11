@@ -28,6 +28,7 @@
  * @package totara_tui
  */
 
+use totara_core\path;
 use totara_tui\local\locator\bundle;
 
 defined('MOODLE_INTERNAL') || die();
@@ -102,7 +103,7 @@ class totara_tui_local_locator_bundle_test extends advanced_testcase {
         $method = new ReflectionMethod(bundle::class, 'anticipated_bundle_location');
         $method->setAccessible(true);
         $actual = $method->invoke(null, 'test');
-        self::assertSame($CFG->srcroot . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR . 'build' . DIRECTORY_SEPARATOR . 'test', $actual);
+        self::assertTrue((new path($CFG->srcroot, 'client/build/test'))->equals($actual));
     }
 
     public function test_get_js_suffix_for_url() {

@@ -37,6 +37,7 @@ use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use coding_exception;
 use core_useragent;
+use totara_core\path;
 use totara_tui\output\framework;
 
 /**
@@ -60,7 +61,7 @@ final class bundle {
     /**
      * The directory containing loadable bundles, relative to $CFG->srcroot
      */
-    private const SOURCE_DIRECTORY = DIRECTORY_SEPARATOR.'client'.DIRECTORY_SEPARATOR.'build';
+    private const SOURCE_DIRECTORY = '/client/build';
 
     /**
      * A singleton.
@@ -187,15 +188,15 @@ final class bundle {
     /**
      * Returns the directory that a bundle should exist in.
      * @param string $bundle
-     * @return string
+     * @return path
      * @throws coding_exception If the bundle name given is not valid.
      */
-    private static function anticipated_bundle_location(string $bundle): string {
+    private static function anticipated_bundle_location(string $bundle): path {
         global $CFG;
         if ($bundle !== framework::clean_bundle_name($bundle)) {
             throw new coding_exception('Invalid bundle name provided.');
         }
-        return $CFG->srcroot . self::SOURCE_DIRECTORY . DIRECTORY_SEPARATOR . $bundle;
+        return new path($CFG->srcroot, self::SOURCE_DIRECTORY, $bundle);
     }
 
     /**
@@ -423,11 +424,11 @@ final class bundle {
             $suffixes_imports[$suffix] = [];
         }
 
-        $directory = $CFG->srcroot . self::SOURCE_DIRECTORY;
-        if (!is_readable($directory) || !is_dir($directory)) {
+        $directory = new path($CFG->srcroot, self::SOURCE_DIRECTORY);
+        if (!$directory->is_readable() || !$directory->is_directory()) {
             throw new coding_exception('Unable to read bundle directory');
         }
-        $directory_iterator = new \DirectoryIterator($directory);
+        $directory_iterator = $directory->create_directory_iterator();
         foreach ($directory_iterator as $file) {
             /** @var \SplFileInfo $file */
             if ($file->isDot() || !$file->isDir()) {
@@ -456,11 +457,11 @@ final class bundle {
         }
 
         $directory_build = self::anticipated_bundle_location($bundle);
-        if (!file_exists($directory_build) || !is_readable($directory_build)) {
+        if (!$directory_build->exists() || !$directory_build->is_readable()) {
             return;
         }
         $iterator = $this->get_tui_build_directory_iterator($directory_build);
-        $length_directory_styles = strlen($directory_build) + 1;
+        $length_directory_styles = strlen($directory_build->out(true) . DIRECTORY_SEPARATOR);
 
         foreach ($iterator as $fileinfo) {
             $file_absolute = $fileinfo[0];
@@ -484,13 +485,13 @@ final class bundle {
 
     /**
      * Returns an Iterator that is designed to iterate all Tui related files within a given directory.
-     * @param string $directory
+     * @param path $directory
      * @return RegexIterator
      */
-    private function get_tui_build_directory_iterator(string $directory): RegexIterator {
+    private function get_tui_build_directory_iterator(path $directory): RegexIterator {
         $iterator = new RegexIterator(
             new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($directory),
+                $directory->create_recursive_directory_iterator(),
                 RecursiveIteratorIterator::SELF_FIRST
             ),
             '/^.+?(?<suffix>(\.legacy)?(\.development)?)?(?<extension>\.(scss|js|json))$/',
@@ -522,8 +523,9 @@ final class bundle {
      * @param string $path_absolute
      */
     private function add_bundle_scss_file_to_map(string $bundle, string $suffix, string $path_relative, string $path_absolute) {
-        if (strpos($path_relative, 'styles' . DIRECTORY_SEPARATOR) === 0) {
-            $path_relative = str_replace(DIRECTORY_SEPARATOR, '/', substr($path_relative, strlen('styles' . DIRECTORY_SEPARATOR)));
+        $relative = (new path($path_relative))->get_relative('styles', true);
+        if ($relative !== null) {
+            $path_relative = $relative->out();
             $this->map_scss_imports[$bundle][$suffix][$path_relative] = $path_absolute;
         } else if ($path_relative === 'tui_bundle.scss') {
             $this->map_bundle_scss[$bundle][$suffix] = $path_absolute;
