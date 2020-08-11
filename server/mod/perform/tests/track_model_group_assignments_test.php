@@ -25,6 +25,8 @@
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment;
 use mod_perform\models\activity\track_assignment_type;
+use mod_perform\event\track_user_group_assigned;
+use mod_perform\event\track_user_group_unassigned;
 
 use mod_perform\user_groups\grouping;
 
@@ -217,5 +219,71 @@ class mod_perform_track_model_group_assignments_testcase extends advanced_testca
             ->assignments
             ->count();
         $this->assertEquals(0, $assignment_count, 'wrong count');
+    }
+
+    /**
+     * @covers ::create
+     * @covers ::remove_assignment
+     */
+    public function test_assignment_events(): void {
+        $this->setAdminUser();
+        $activity_admin = get_admin();
+
+        $generator = $this->getDataGenerator();
+        $hierarchies = $generator->get_plugin_generator('totara_hierarchy');
+        $pos_fw_id = ['frameworkid' => $hierarchies->create_pos_frame([])->id];
+        $org_fw_id = ['frameworkid' => $hierarchies->create_org_frame([])->id];
+        $pos_id = $hierarchies->create_pos($pos_fw_id)->id;
+        $org_id = $hierarchies->create_org($org_fw_id)->id;
+
+        $cohort_id = $generator->create_cohort()->id;
+        $user_id = $generator->create_user()->id;
+
+        $groups = [
+            $cohort_id => grouping::by_type(grouping::COHORT, $cohort_id),
+            $user_id => grouping::by_type(grouping::USER, $user_id),
+            $pos_id => grouping::by_type(grouping::POS, $pos_id),
+            $org_id => grouping::by_type(grouping::ORG, $org_id)
+        ];
+
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container(['create_track' => true]);
+        $track = $activity->get_tracks()->first();
+
+        $sink = $this->redirectEvents();
+        foreach ($groups as $group) {
+            $track->add_assignment(track_assignment_type::ADMIN, $group);
+        }
+
+        $events = $sink->get_events();
+        $this->assertCount(count($groups), $events);
+
+        foreach ($events as $event) {
+            $this->assertInstanceOf(track_user_group_assigned::class, $event);
+
+            $expected = $groups[$event->objectid] ?? null;
+            $this->assertNotNull($expected, "Unknown user group id: '$event->objectid'");
+            $this->assertEquals($activity_admin->id, $event->userid, 'wrong user id');
+            $this->assertEquals($track->id, $event->other['track_id'], 'wrong track id');
+        }
+
+        $sink->clear();
+        foreach ($groups as $group) {
+            $track->remove_assignment(track_assignment_type::ADMIN, $group);
+        }
+
+        $events = $sink->get_events();
+        $this->assertCount(count($groups), $events);
+
+        foreach ($events as $event) {
+            $this->assertInstanceOf(track_user_group_unassigned::class, $event);
+
+            $expected = $groups[$event->objectid] ?? null;
+            $this->assertNotNull($expected, "Unknown user group id: '$event->objectid'");
+            $this->assertEquals($activity_admin->id, $event->userid, 'wrong user id');
+            $this->assertEquals($track->id, $event->other['track_id'], 'wrong track id');
+        }
+
+        $sink->close();
     }
 }

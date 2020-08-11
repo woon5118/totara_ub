@@ -108,6 +108,31 @@ final class grouping {
     }
 
     /**
+     * Returns the stringified type name for the given type.
+     *
+     * @param int $type the group type.
+     *
+     * @return string the type name.
+     */
+    public static function get_type_name(int $type): string {
+        switch ($type) {
+            case self::COHORT:
+                return 'cohort';
+
+            case self::ORG:
+                return 'organisation';
+
+            case self::POS:
+                return 'position';
+
+            case self::USER:
+                return 'individual user';
+        }
+
+        throw new \coding_exception("Unknown grouping type: '$type'");
+    }
+
+    /**
      * Returns the grouping for a cohort.
      *
      * @param int $id the cohort id.

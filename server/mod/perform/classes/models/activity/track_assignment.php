@@ -27,10 +27,14 @@ use core\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\track_assignment as track_assignment_entity;
 use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\event\track_user_group_assigned;
+use mod_perform\event\track_user_group_unassigned;
 use mod_perform\user_groups\grouping;
 
 /**
  * Represents a single performance activity track assignment.
+ *
+ * @property-read track $track
  * @property-read \core\orm\collection|track_user_assignment[] $user_assignments
  */
 class track_assignment extends model {
@@ -55,6 +59,7 @@ class track_assignment extends model {
     ];
 
     protected $model_accessor_whitelist = [
+        'track',
         'user_assignments',
     ];
 
@@ -98,6 +103,9 @@ class track_assignment extends model {
 
         $assignment = new track_assignment($entity);
         $parent->refresh();
+
+        track_user_group_assigned::create_from_track_assignment($assignment)
+            ->trigger();
 
         return $assignment;
     }
@@ -174,7 +182,9 @@ class track_assignment extends model {
         track::load_by_entity($this->entity->track)
             ->require_manage('remove track assignment');
 
+        $event = track_user_group_unassigned::create_from_track_assignment($this);
         $this->entity->delete();
+        $event->trigger();
     }
 
     /**
@@ -201,4 +211,12 @@ class track_assignment extends model {
             ->map_to(track_assignment::class);
     }
 
+    /**
+     * Get the track model that this track assignment belongs to
+     *
+     * @return track the parent track.
+     */
+    public function get_track(): track {
+        return track::load_by_entity($this->entity->track);
+    }
 }
