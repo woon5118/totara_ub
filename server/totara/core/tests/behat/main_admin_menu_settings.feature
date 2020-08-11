@@ -126,7 +126,7 @@ Feature: Totara settings for admin main menu
     Then I should see "Your administration navigation preferences have been reset to default configuration."
     And I should see "Core platform"
     And I should see "Learning"
-    And I should see "Performance"
+    And I should see "Performance (legacy)"
     And I should see "Configuration"
     And I should not see "Untitled"
     And I should not see "Audience global settings"

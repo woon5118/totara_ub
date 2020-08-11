@@ -211,7 +211,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
   Scenario: Change immediate manager after completing dynamic appraisal
     # New manager should not see any appraisals yet.
     When I log in as "newmgr"
-    Then I should not see "All Appraisals" in the totara menu
+    Then I should not see "All Appraisals (legacy)" in the totara menu
 
     # Confirm that old manager has viewing rights to the goal question for all 4
     # learners.
@@ -441,7 +441,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
   Scenario: Change appraiser after completing dynamic appraisal
     # New appraiser should not see any appraisals yet.
     When I log in as "newappraiser"
-    Then I should not see "All Appraisals" in the totara menu
+    Then I should not see "All Appraisals (legacy)" in the totara menu
 
     # Confirm that old appraiser has viewing rights to the goal question for all
     # 4 learners.

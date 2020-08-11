@@ -8,8 +8,8 @@ Feature: Test All Appraisals menu item
     Given I am on a totara site
     And I log in as "admin"
     When I navigate to "Main menu" node in "Site administration > Navigation"
-    Then I should see "All Appraisals" in the "#totaramenutable" "css_element"
-    And I should not see "All Appraisals" in the totara menu
+    Then I should see "All Appraisals (legacy)" in the "#totaramenutable" "css_element"
+    And I should not see "All Appraisals (legacy)" in the totara menu
 
   Scenario: Make sure All Appraisals is available in totara menu even if other things disabled
     Given I am on a totara site
@@ -18,8 +18,8 @@ Feature: Test All Appraisals menu item
     And I set the field "Enable Goals" to "Disable"
     And I press "Save changes"
     When I navigate to "Main menu" node in "Site administration > Navigation"
-    Then I should see "All Appraisals" in the "#totaramenutable" "css_element"
-    And I should not see "All Appraisals" in the totara menu
+    Then I should see "All Appraisals (legacy)" in the "#totaramenutable" "css_element"
+    And I should not see "All Appraisals (legacy)" in the totara menu
 
   Scenario: Make sure All Appraisals is not in totara menu if feature disabled
     Given I am on a totara site
@@ -27,5 +27,5 @@ Feature: Test All Appraisals menu item
     When I navigate to "Advanced features" node in "Site administration > System information"
     And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Navigation"
-    Then I should see "All Appraisals" in the "#totaramenutable" "css_element"
-    And I should see "Unused" in the "All Appraisals" "table_row"
+    Then I should see "All Appraisals (legacy)" in the "#totaramenutable" "css_element"
+    And I should see "Unused" in the "All Appraisals (legacy)" "table_row"

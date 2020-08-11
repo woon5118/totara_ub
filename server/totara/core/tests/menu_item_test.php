@@ -281,7 +281,7 @@ class totara_core_menu_item_testcase extends advanced_testcase {
 
         $performance = $DB->get_record('totara_navigation', array('classname' => '\totara_appraisal\totara\menu\appraisal'), '*', MUST_EXIST);
         $instance = item::create_instance($performance);
-        $this->assertSame('Performance', $instance->get_title());
+        $this->assertSame('Performance (legacy)', $instance->get_title());
 
         $performance->customtitle = '1';
         $performance->title = 'Pokus';
@@ -290,7 +290,7 @@ class totara_core_menu_item_testcase extends advanced_testcase {
 
         $performance->customtitle = '0';
         $instance = item::create_instance($performance);
-        $this->assertSame('Performance', $instance->get_title());
+        $this->assertSame('Performance (legacy)', $instance->get_title());
 
         $myteam = $DB->get_record('totara_navigation', array('classname' => '\totara_core\totara\menu\myteam'), '*', MUST_EXIST);
         $instance = item::create_instance($myteam);

@@ -57,7 +57,7 @@ Feature: Main menu advanced reset tests
       | Visibility        | Show              |
       | Menu url address  | /index.php        |
     And I press "Add"
-    And I click on "Edit" "link" in the "Performance" "table_row"
+    And I click on "Edit" "link" in the "Performance (legacy)" "table_row"
     And I set the following Totara form fields to these values:
       | Override menu title | 1         |
       | Menu title          | Vykonnost |
@@ -92,7 +92,7 @@ Feature: Main menu advanced reset tests
     And I should not see "Test hidden item"
     And I should not see "Test unused item"
     And I should not see "Vykonnost"
-    And "Performance" row "Visibility" column of "totaramenutable" table should contain "Show"
+    And "Performance (legacy)" row "Visibility" column of "totaramenutable" table should contain "Show"
     And "Reports" row "Visibility" column of "totaramenutable" table should contain "Show"
 
   Scenario: Reset advanced Main menu to default with custom backup
@@ -109,5 +109,5 @@ Feature: Main menu advanced reset tests
     And "Test hidden item" row "Visibility" column of "totaramenutable" table should contain "Unused"
     And "Test unused item" row "Visibility" column of "totaramenutable" table should contain "Unused"
     And I should not see "Vykonnost"
-    And "Performance" row "Visibility" column of "totaramenutable" table should contain "Show"
+    And "Performance (legacy)" row "Visibility" column of "totaramenutable" table should contain "Show"
     And "Reports" row "Visibility" column of "totaramenutable" table should contain "Show"

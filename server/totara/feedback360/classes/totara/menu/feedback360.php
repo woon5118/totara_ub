@@ -29,7 +29,7 @@ use totara_core\advanced_feature;
 class feedback360 extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
-        return get_string('feedback360', 'totara_feedback360');
+        return get_string('feedback360_legacy', 'totara_feedback360');
     }
 
     protected function get_default_url() {

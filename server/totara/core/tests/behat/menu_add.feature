@@ -20,7 +20,7 @@ Feature: Main menu advanced add items tests
     And the "Parent item" select box should contain "Learn / Find Learning (Legacy catalogues)"
     And the "Parent item" select box should contain "Develop"
     And the "Parent item" select box should contain "Unused"
-    And the "Parent item" select box should not contain "Performance"
+    And the "Parent item" select box should not contain "Performance (legacy)"
 
     When I press "Add"
     Then I should see "There are required fields in this form marked"
@@ -101,7 +101,7 @@ Feature: Main menu advanced add items tests
     And the "Parent item" select box should contain "Top container / Sub container"
     And the "Parent item" select box should contain "Hidden container"
     And the "Parent item" select box should contain "Unused"
-    And the "Parent item" select box should not contain "Performance"
+    And the "Parent item" select box should not contain "Performance (legacy)"
     And the "Parent item" select box should not contain "Top container / Sub container / Sub sub container"
     And the "Parent item" select box should not contain "Unused / Unused container"
 

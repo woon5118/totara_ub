@@ -135,6 +135,7 @@ $string['eventdeletedfeedback'] = 'Deleted Feedback360';
 $string['eventdeletedrequest'] = 'Deleted Feedback360 Request';
 $string['eventupdatedfeedback'] = 'Updated Feedback360';
 $string['feedback360'] = '360&deg; Feedback';
+$string['feedback360_legacy'] = '360&deg; Feedback (legacy)';
 $string['feedback360:utf8'] = '360° Feedback (legacy)';
 $string['feedback360:managefeedback360'] = 'Manage Feedback forms';
 $string['feedback360:managestafffeedback'] = 'Manage staff members Feedback requests';

@@ -55,7 +55,7 @@ Feature: Main menu advanced edit default items tests
     And I press "Save changes"
     Then I should see "Main menu has been updated successfully"
 
-    When I click on "Edit" "link" in the "Performance" "table_row"
+    When I click on "Edit" "link" in the "Performance (legacy)" "table_row"
     And I should see the following Totara form fields having these values:
       | Parent item         | Unused                        |
       | Override menu title | 0                           |

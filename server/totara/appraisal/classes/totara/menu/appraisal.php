@@ -29,7 +29,7 @@ namespace totara_appraisal\totara\menu;
 class appraisal extends \totara_core\totara\menu\container {
 
     protected function get_default_title() {
-        return get_string('performance', 'totara_appraisal');
+        return get_string('performance_legacy', 'totara_appraisal');
     }
 
     public function get_default_sortorder() {

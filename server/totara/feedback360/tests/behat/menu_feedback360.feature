@@ -7,8 +7,8 @@ Feature: Test 360 Feedback Main menu item
   Scenario: Make sure 360 Feedback is available in totara menu
     And I log in as "admin"
     When I navigate to "Main menu" node in "Site administration > Navigation"
-    Then I should see "360° Feedback" in the "#totaramenutable" "css_element"
-    And I should not see "360° Feedback" in the totara menu
+    Then I should see "360° Feedback (legacy)" in the "#totaramenutable" "css_element"
+    And I should not see "360° Feedback (legacy)" in the totara menu
 
   Scenario: Make sure 360 Feedback is available in totara menu even if other things disabled
     And I log in as "admin"
@@ -16,13 +16,13 @@ Feature: Test 360 Feedback Main menu item
     And I set the field "Enable Goals" to "Disable"
     And I press "Save changes"
     When I navigate to "Main menu" node in "Site administration > Navigation"
-    Then I should see "360° Feedback" in the "#totaramenutable" "css_element"
-    And I should not see "360° Feedback" in the totara menu
+    Then I should see "360° Feedback (legacy)" in the "#totaramenutable" "css_element"
+    And I should not see "360° Feedback (legacy)" in the totara menu
 
   Scenario: Make sure 360 Feedback is not in totara menu if feature disabled
     And I log in as "admin"
     When I navigate to "Advanced features" node in "Site administration > System information"
     And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Navigation"
-    Then I should see "360° Feedback" in the "#totaramenutable" "css_element"
-    And I should see "Unused" in the "360° Feedback" "table_row"
+    Then I should see "360° Feedback (legacy)" in the "#totaramenutable" "css_element"
+    And I should see "Unused" in the "360° Feedback (legacy)" "table_row"

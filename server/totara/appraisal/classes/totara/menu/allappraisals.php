@@ -31,7 +31,7 @@ use totara_core\advanced_feature;
 class allappraisals extends \totara_core\totara\menu\item {
 
     protected function get_default_title() {
-        return get_string('allappraisals', 'totara_appraisal');
+        return get_string('allappraisals_legacy', 'totara_appraisal');
     }
 
     protected function get_default_url() {
