@@ -158,17 +158,6 @@ trait element_trait {
                 'joins' => [$join],
             ]
         );
-        // TODO remove or label as raw data
-        $this->columnoptions[] = new rb_column_option(
-            'element',
-            'data',
-            get_string('element_data', 'mod_perform'),
-            "{$join}.data",
-            [
-                'joins' => [$join],
-                'displayfunc' => 'format_string',
-            ]
-        );
 
         $this->columnoptions[] = new rb_column_option(
             'element',

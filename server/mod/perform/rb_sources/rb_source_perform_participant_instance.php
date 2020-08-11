@@ -23,6 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use core\entities\user;
 use mod_perform\rb\traits\activity_trait;
 use mod_perform\rb\traits\participant_instance_trait;
 use mod_perform\rb\traits\subject_instance_trait;
@@ -327,10 +328,10 @@ class rb_source_perform_participant_instance extends rb_base_source {
         require_once($CFG->dirroot.'/lib/testing/generator/data_generator.php');
         require_once(__DIR__ . '/../tests/generator/mod_perform_generator.class.php');
 
-        $si = (new \mod_perform_generator(new testing_data_generator()))->create_subject_instance([
+        $si = (new mod_perform_generator(new testing_data_generator()))->create_subject_instance([
             'activity_name' => 'Weekly catchup',
             'subject_is_participating' => true,
-            'subject_user_id' => \core\entities\user::repository()->get()->last()->id,
+            'subject_user_id' => user::repository()->get()->last()->id,
         ]);
     }
 }

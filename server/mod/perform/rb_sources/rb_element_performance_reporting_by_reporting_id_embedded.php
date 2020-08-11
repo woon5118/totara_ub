@@ -81,6 +81,12 @@ class rb_element_performance_reporting_by_reporting_id_embedded extends rb_eleme
                 'value' => 'actions',
                 'heading' => get_string('actions', 'mod_perform'),
             ],
+            [
+                'type' => 'element',
+                'value' => 'default_sort',
+                'heading' => get_string('default_sort', 'mod_perform'),
+                'hidden' => true,
+            ],
         ];
     }
 

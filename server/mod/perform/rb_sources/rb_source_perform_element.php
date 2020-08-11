@@ -23,10 +23,10 @@
  *
  */
 
+use core\entities\user;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\rb\traits\activity_trait;
 use mod_perform\rb\traits\element_trait;
-use mod_perform\rb\traits\participant_instance_trait;
 use mod_perform\rb\traits\section_element_trait;
 use mod_perform\rb\traits\section_trait;
 use totara_core\advanced_feature;
@@ -132,35 +132,7 @@ class rb_source_perform_element extends rb_base_source {
      * @return array
      */
     protected function define_columnoptions() {
-        global $DB;
         $columnoptions = [
-            // Column for sorting that combines activity name, section and element sorts to get sensible overall order for elements
-            new rb_column_option(
-                'element',
-                'default_sort',
-                get_string('default_sort', 'mod_perform'),
-                // This will ensure elements are grouped by activity and order within but isn't perfect, particularly for
-                // multiple identically named activities (which we don't prevent). Having an activity.sort_order would be better.
-                $DB->sql_concat_join("' '", ['perform.name', 'perform_section.sort_order', 'section_element.sort_order']),
-                [
-                    'joins' => ['perform', 'perform_section', 'section_element'],
-                    'hidden' => true,
-                    'noexport' => true,
-                    'selectable' => false,
-                ]
-            ),
-            new rb_column_option(
-                'element',
-                'actions',
-                get_string('actions', 'mod_perform'),
-                'base.id',
-                [
-                    'dbdatatype' => 'integer',
-                    'displayfunc' => 'element_actions',
-                    'noexport' => true,
-                    'nosort' => true,
-                ]
-            ),
         ];
 
         return $columnoptions;
@@ -356,7 +328,7 @@ class rb_source_perform_element extends rb_base_source {
         $si = (new mod_perform_generator(new testing_data_generator()))->create_subject_instance([
             'activity_name' => 'Weekly catchup',
             'subject_is_participating' => true,
-            'subject_user_id' => \core\entities\user::repository()->get()->last()->id,
+            'subject_user_id' => user::repository()->get()->last()->id,
             'include_questions' => true,
         ]);
     }

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of Totara Learn
+ * This file is part of Totara Perform
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -15,15 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2020081900;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020070602];
+$string['sourcelabel'] = 'Performance Activity Questions with columns for reporting embedded reports (Perform)';
+$string['sourcesummary'] = 'Questions from performance activities, with additional columns for reporting embedded reports.';
+$string['sourcetitle'] = 'Performance Questions Reporting (Perform)';
+$string['type_activity'] = 'Performance activity';
+$string['type_element'] = 'Element';
+$string['type_section'] = 'Section';

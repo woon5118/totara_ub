@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../../../totara/reportbuilder/rb_sources/rb_source_user.php');
 
+use mod_perform\util;
+
 /**
  * Performance reporting user report.
  *
@@ -91,7 +93,7 @@ class rb_source_user_performance_reporting extends rb_source_user {
                 'nosort' => true,
             ]
         );
-        $columnoptions[] = new \rb_column_option(
+        $columnoptions[] = new rb_column_option(
             'user',
             'user_performance_emailunobscured',
             get_string('user_email_unobscured_no_cap_checks', 'mod_perform'),
@@ -109,7 +111,7 @@ class rb_source_user_performance_reporting extends rb_source_user {
     protected function define_filteroptions() {
         $filteroptions = parent::define_filteroptions();
 
-        $filteroptions[] = new \rb_filter_option(
+        $filteroptions[] = new rb_filter_option(
             'user',
             'user_performance_emailunobscured',
             get_string('user_email_unobscured_no_cap_checks', 'mod_perform'),
@@ -120,7 +122,7 @@ class rb_source_user_performance_reporting extends rb_source_user {
     }
 
     public function post_config(reportbuilder $report) {
-        $restrictions = \mod_perform\util::get_report_on_subjects_sql($report->reportfor, "base.id");
+        $restrictions = util::get_report_on_subjects_sql($report->reportfor, "base.id");
         $report->set_post_config_restrictions($restrictions);
     }
 }

@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/rb_source_perform_response.php');
 
+use mod_perform\util;
+
 /**
  * Performance reporting response report.
  *
@@ -63,7 +65,7 @@ class rb_source_response_performance_reporting extends rb_source_perform_respons
     public function post_config(reportbuilder $report) {
         // NOTE: For this to work, subject_instance must be included in the $this->>sourcejoins array defined in the constructor.
         // Not ideal but there isn't a way to force joins to be added in post_config
-        $restrictions = \mod_perform\util::get_report_on_subjects_sql($report->reportfor, "subject_instance.subject_user_id");
+        $restrictions = util::get_report_on_subjects_sql($report->reportfor, "subject_instance.subject_user_id");
         $report->set_post_config_restrictions($restrictions);
     }
 }

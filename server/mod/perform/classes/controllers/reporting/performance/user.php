@@ -27,16 +27,12 @@ use context;
 use context_coursecat;
 use core\output\notification;
 use mod_perform\controllers\perform_controller;
-use mod_perform\models\activity\activity as activity_model;
 use mod_perform\util;
 use mod_perform\views\embedded_report_view;
 use mod_perform\views\override_nav_breadcrumbs;
-use moodle_exception;
 use moodle_url;
 use totara_mvc\has_report;
-use totara_mvc\renders_components;
 use totara_mvc\view;
-use totara_tui\output\component;
 
 class user extends perform_controller {
 
@@ -56,7 +52,11 @@ class user extends perform_controller {
             $link_url = new moodle_url('/mod/perform/reporting/performance/');
             return self::create_view('mod_perform/no_report', [
                 'content' => view::core_renderer()->notification(
-                    get_string('activity_report_no_params_warning_message', 'mod_perform', (object) ['url' => $link_url->out(true)]),
+                    get_string(
+                        'activity_report_no_params_warning_message',
+                        'mod_perform',
+                        (object) ['url' => $link_url->out(true)]
+                    ),
                     notification::NOTIFY_WARNING
                 )
             ]);
@@ -97,12 +97,12 @@ class user extends perform_controller {
         $subject_user_name = fullname($subject_user);
         $heading = $this->get_heading($filtered_count, $subject_user_name);
 
+        /** @var embedded_report_view $report_view */
         $report_view = embedded_report_view::create_from_report($report, $debug, 'mod_perform/bulk_exportable_report')
             ->add_override(new override_nav_breadcrumbs())
             ->set_title($heading)
-            ->set_back_to(...$this->get_back_to_user_tab())
-            ->set_additional_data(['action_card_component' => $action_card_component]);
-
+            ->set_back_to(...$this->get_back_to_user_tab());
+        $report_view->set_additional_data(['action_card_component' => $action_card_component]);
 
         $report_view->set_report_heading($this->get_report_heading($report, $report_view, $heading));
 

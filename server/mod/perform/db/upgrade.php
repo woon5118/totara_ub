@@ -471,5 +471,17 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020081500, 'perform');
     }
 
+    if ($oldversion < 2020081900) {
+
+        $DB->execute("
+            UPDATE {report_builder}
+               SET source = 'element_performance_reporting'
+             WHERE source = 'perform_element'
+        ");
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020081900, 'perform');
+    }
+
     return true;
 }

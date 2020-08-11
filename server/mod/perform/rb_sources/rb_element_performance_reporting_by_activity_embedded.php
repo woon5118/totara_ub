@@ -39,6 +39,57 @@ class rb_element_performance_reporting_by_activity_embedded extends rb_element_p
     }
 
     /**
+     * Define the default columns for this report.
+     *
+     * @return array
+     */
+    protected function define_columns(): array {
+        return [
+            [
+                'type' => 'element',
+                'value' => 'title',
+                'heading' => get_string('question_title', 'mod_perform'),
+            ],
+            [
+                'type' => 'section',
+                'value' => 'title',
+                'heading' => get_string('element_reporting_title_section_title', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'type',
+                'heading' => get_string('element_reporting_title_element_type', 'mod_perform'),
+            ],
+            [
+                'type' => 'section',
+                'value' => 'responding_relationship_count',
+                'heading' => get_string('element_reporting_title_responding_relationships', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'is_required',
+                'heading' => get_string('element_reporting_title_required', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'identifier',
+                'heading' => get_string('element_identifier', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'actions',
+                'heading' => get_string('actions', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'default_sort',
+                'heading' => get_string('default_sort', 'mod_perform'),
+                'hidden' => true,
+            ],
+        ];
+    }
+
+    /**
      * Define the default filters for this report.
      *
      * @return array

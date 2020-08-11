@@ -34,7 +34,6 @@ use mod_perform\views\override_nav_breadcrumbs;
 use moodle_exception;
 use moodle_url;
 use totara_mvc\has_report;
-use totara_mvc\renders_components;
 use totara_mvc\view;
 use mod_perform\data_providers\activity\reportable_activities;
 
@@ -100,11 +99,12 @@ class activity extends perform_controller {
 
         $heading = $this->get_heading($filtered_count, $activity_name);
 
+        /** @var embedded_report_view $report_view */
         $report_view = embedded_report_view::create_from_report($report, $debug, 'mod_perform/bulk_exportable_report')
             ->add_override(new override_nav_breadcrumbs())
             ->set_title($heading)
-            ->set_back_to(...$this->get_back_to_by_content_tab())
-            ->set_additional_data(['action_card_component' => $action_card_component]);
+            ->set_back_to(...$this->get_back_to_by_content_tab());
+        $report_view->set_additional_data(['action_card_component' => $action_card_component]);
 
         $report_view->set_report_heading($this->get_report_heading($report, $report_view, $heading));
         return $report_view;

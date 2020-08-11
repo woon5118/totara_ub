@@ -18,11 +18,11 @@
 
 <style lang="scss">
 .tui-performReportPerformanceReportingIdBanner {
+  margin-bottom: var(--tui-gap-8);
   padding: var(--tui-gap-2) var(--tui-gap-3);
   background: var(--tui-color-neutral-3);
   border: none;
   border-radius: var(--tui-border-radius-normal);
-  margin-bottom: var(--tui-gap-8);
 
   &__tag {
     margin-left: var(--tui-gap-2);

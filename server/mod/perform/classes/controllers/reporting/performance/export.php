@@ -25,13 +25,13 @@ namespace mod_perform\controllers\reporting\performance;
 
 use context;
 use context_coursecat;
-use context_system;
 use core\output\notification;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity;
 use mod_perform\util;
 use moodle_exception;
 use moodle_url;
+use reportbuilder;
 use totara_mvc\has_report;
 use totara_mvc\view;
 
@@ -188,12 +188,11 @@ class export extends perform_controller {
      * Method to deal with exporting a report. This includes checking the format is supported and
      * rendering an error if not.
      *
-     * @param $report
-     * @param $format
-     * @return view
-     * @throws \coding_exception
+     * @param reportbuilder $report
+     * @param string $format
+     * @return view|null
      */
-    protected function handle_export($report, $format) {
+    protected function handle_export(reportbuilder $report, string $format) {
         // Only support CSV for now as there is no interface for selecting export format. Could potentially
         // add as a setting later if required.
         if ($format != 'csv') {
@@ -207,7 +206,7 @@ class export extends perform_controller {
         }
 
         $current_export_options = $report->get_report_export_options();
-        $all_export_options = \reportbuilder::get_all_general_export_options(true);
+        $all_export_options = reportbuilder::get_all_general_export_options(true);
         $format_name = $all_export_options[$format] ?? $format;
         if (!in_array($format, array_keys($current_export_options))) {
             // Invalid format for this report - tell them to get admin to add to export options or override in source.
@@ -221,7 +220,8 @@ class export extends perform_controller {
         }
 
         // All okay, export the data.
-        return $report->export_data($format);
+        $report->export_data($format);
+        return null;
     }
 
     public static function get_base_url(): string {

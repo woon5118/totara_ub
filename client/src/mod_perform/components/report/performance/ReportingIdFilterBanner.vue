@@ -18,7 +18,12 @@
 <template>
   <div class="tui-performReportPerformanceReportingIdBanner">
     <strong>{{ $str('element_identifier', 'mod_perform') }}</strong>
-    <Tag v-for="reportingId in reportingIds" :key="reportingId" :text="reportingId" class="tui-performReportPerformanceReportingIdBanner__tag"/>
+    <Tag
+      v-for="reportingId in reportingIds"
+      :key="reportingId"
+      :text="reportingId"
+      class="tui-performReportPerformanceReportingIdBanner__tag"
+    />
   </div>
 </template>
 <script>

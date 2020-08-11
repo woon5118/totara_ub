@@ -30,7 +30,7 @@ abstract class rb_element_performance_reporting_base extends rb_base_embedded {
 
     public function __construct() {
         $this->url = $this->get_url();
-        $this->source = 'perform_element';
+        $this->source = 'element_performance_reporting';
         $this->shortname = $this->get_short_name();
         $this->fullname = $this->get_full_name();
         $this->columns = $this->define_columns();
@@ -43,51 +43,7 @@ abstract class rb_element_performance_reporting_base extends rb_base_embedded {
     abstract protected function get_url(): string;
     abstract protected function get_short_name(): string;
     abstract protected function get_full_name(): string;
-
-    /**
-     * Define the default columns for this report.
-     *
-     * @return array
-     */
-    protected function define_columns(): array {
-        return [
-            [
-                'type' => 'element',
-                'value' => 'title',
-                'heading' => get_string('question_title', 'mod_perform'),
-            ],
-            [
-                'type' => 'section',
-                'value' => 'title',
-                'heading' => get_string('element_reporting_title_section_title', 'mod_perform'),
-            ],
-            [
-                'type' => 'element',
-                'value' => 'type',
-                'heading' => get_string('element_reporting_title_element_type', 'mod_perform'),
-            ],
-            [
-                'type' => 'section',
-                'value' => 'responding_relationship_count',
-                'heading' => get_string('element_reporting_title_responding_relationships', 'mod_perform'),
-            ],
-            [
-                'type' => 'element',
-                'value' => 'is_required',
-                'heading' => get_string('element_reporting_title_required', 'mod_perform'),
-            ],
-            [
-                'type' => 'element',
-                'value' => 'identifier',
-                'heading' => get_string('element_identifier', 'mod_perform'),
-            ],
-            [
-                'type' => 'element',
-                'value' => 'actions',
-                'heading' => get_string('actions', 'mod_perform'),
-            ],
-        ];
-    }
+    abstract protected function define_columns(): array;
 
     /**
      * Define the default filters for this report.

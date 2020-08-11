@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_subject_instance.php');
 
+use mod_perform\models\activity\activity;
+
 class rb_perform_subject_instance_embedded extends rb_base_embedded {
 
     /**
@@ -97,8 +99,8 @@ class rb_perform_subject_instance_embedded extends rb_base_embedded {
     public function is_capable($reportfor, $report): bool {
         $activity_id = $report->get_param_value('activity_id') ?? 0;
         try {
-            $activity = \mod_perform\models\activity\activity::load_by_id($activity_id);
-        } catch (\Exception $e) {
+            $activity = activity::load_by_id($activity_id);
+        } catch (Exception $e) {
             throw new moodle_exception('error_activity_id_wrong', 'mod_perform', '', null, $e);
         }
         $context = $activity->get_context();
