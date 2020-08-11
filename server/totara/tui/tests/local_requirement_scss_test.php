@@ -93,16 +93,16 @@ class totara_tui_requirement_local_scss_testcase extends advanced_testcase {
 
         $requirement = new scss('tui');
         if (file_exists($CFG->srcroot . '/client/build/tui/tui_bundle.scss')) {
-            self::assertTrue($requirement->required());
+            self::assertTrue($requirement->has_resources_to_load());
         } else {
-            self::assertFalse($requirement->required());
+            self::assertFalse($requirement->has_resources_to_load());
         }
 
         $requirement = new scss('totara_tui');
-        self::assertFalse($requirement->required());
+        self::assertFalse($requirement->has_resources_to_load());
 
         $requirement = new scss('space_monkey');
-        self::assertFalse($requirement->required());
+        self::assertFalse($requirement->has_resources_to_load());
     }
 
 }

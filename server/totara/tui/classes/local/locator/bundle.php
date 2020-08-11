@@ -552,4 +552,26 @@ final class bundle {
             }
         }
     }
+
+    /**
+     * Returns true if any of the given bundles have any resources.
+     * @param string[] $bundles
+     * @return bool
+     */
+    public static function any_have_resources(array $bundles): bool {
+        $instance = bundle::instance();
+        $instance->ensure_map_generated();
+        foreach ($bundles as $bundle) {
+            if (!is_string($bundle)) {
+                continue;
+            }
+            if (!empty($instance->map_bundle_scss[$bundle])) {
+                return true;
+            }
+            if (!empty($instance->map_bundle_js[$bundle])) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

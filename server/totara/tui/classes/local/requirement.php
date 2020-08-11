@@ -50,6 +50,11 @@ abstract class requirement {
     protected $name;
 
     /**
+     * @var bool Set to true if this requirement should be requested, even if there is no immediate resource to serve.
+     */
+    private $required = false;
+
+    /**
      * Create a new instance of requirement
      *
      * @param string $component Totara component this requirement is part of, e.g. 'mod_example'
@@ -77,17 +82,34 @@ abstract class requirement {
     abstract public function get_url(array $options = null): \moodle_url;
 
     /**
-     * Returns true if this requirement is required.
-     * @return bool
+     * Returns true if this requirement has resources to load.
      */
-    abstract public function required(): bool;
+    public final function has_resources_to_load(): bool {
+        if ($this->required) {
+            return true;
+        }
+        return !is_null($this->get_required_resource());
+    }
+
+    /**
+     * Returns true if this requirement is required.
+     * @return string|null The path to the resource, or null if it does not have one.
+     */
+    abstract public function get_required_resource(): ?string;
+
+    /**
+     * Forces the requirement to load even if it does not have a resource file.
+     */
+    public final function force_resource_to_load() {
+        $this->required = true;
+    }
 
     /**
      * Get the Totara component this requirement is part of, e.g. 'mod_example'
      *
      * @return string
      */
-    public function get_component(): string {
+    public final function get_component(): string {
         return $this->component;
     }
 
@@ -96,7 +118,7 @@ abstract class requirement {
      *
      * @return string
      */
-    public function get_name(): string {
+    public final function get_name(): string {
         return $this->name;
     }
 
@@ -106,7 +128,7 @@ abstract class requirement {
      * @param array $options Options to pass to {@see requirement::get_url()}
      * @return object
      */
-    public function get_api_data(array $options = null): \stdClass {
+    public final function get_api_data(array $options = null): \stdClass {
         $data = new \stdClass;
         $data->id = $this->get_component() . ':' . $this->get_name();
         $data->type = $this->get_type();

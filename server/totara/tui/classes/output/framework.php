@@ -47,6 +47,9 @@ final class framework implements \core\output\framework {
     /** @var string[] List of Totara components to load TUI bundles for. */
     private $components = [];
 
+    /** @var string[] List of components that must be loaded, even if they do not directly have resources to load. */
+    private $forceload = [];
+
     /** @var array Map of Totara components to their state in the sort. */
     private $final_component_state;
 
@@ -93,16 +96,41 @@ final class framework implements \core\output\framework {
      * @param core_renderer $renderer
      */
     public function get_head_code(moodle_page $page, core_renderer $renderer): void {
-        // Always require the theme bundle
-        $this->require_vue('theme_' . $page->theme->name);
+        // Always require the theme bundle first.
+        $this->require_theme_bundle($page->theme);
 
         // Include the CSS for loaded TUI components.
-        $css_urls = array();
-        $requirement_url_options = ['theme' => $page->theme->name];
-        foreach ($this->get_bundles(requirement::TYPE_CSS) as $bundle) {
-            $css_urls[] = $bundle->get_url($requirement_url_options);
+        $this->resolve_css_urls($page->theme->name);
+    }
+
+    /**
+     * Requires the page theme bundle.
+     * @param \theme_config $theme
+     */
+    private function require_theme_bundle(\theme_config $theme) {
+        $themes = array_map(
+            function($value) {
+                return 'theme_' . $value;
+            },
+            array_merge([$theme->name],  $theme->parents)
+        );
+        if (bundle::any_have_resources($themes)) {
+            $component = 'theme_' . $theme->name;
+            $this->require_component($component);
+            $this->forceload[] = $component;
         }
-        $this->css_urls = $css_urls;
+    }
+
+    /**
+     * Resolve the required CSS urls, given the target theme the page is using.
+     * @param string $themename
+     */
+    private function resolve_css_urls(string $themename) {
+        $this->css_urls = [];
+        $requirement_url_options = ['theme' => $themename];
+        foreach ($this->get_bundles(requirement::TYPE_CSS) as $bundle) {
+            $this->css_urls[] = $bundle->get_url($requirement_url_options);
+        }
     }
 
     /**
@@ -301,12 +329,20 @@ final class framework implements \core\output\framework {
                 $requires_tui = true;
                 continue;
             }
-            $requirements[] = new requirement\js($component);
-            $requirements[] = new requirement\scss($component);
+            $js = new requirement\js($component);
+            $scss = new requirement\scss($component);
+
+            if (in_array($component, $this->forceload)) {
+                $js->force_resource_to_load();
+                $scss->force_resource_to_load();
+            }
+
+            $requirements[] = $js;
+            $requirements[] = $scss;
         }
 
         $this->bundles = array_filter($requirements, function(requirement $requirement) {
-            return $requirement->required();
+            return $requirement->has_resources_to_load();
         });
 
         if (!empty($this->bundles) || $requires_tui) {

@@ -77,7 +77,7 @@ final class js extends requirement {
     /**
      * {@inheritdoc}
      */
-    public function required(): bool {
-        return !is_null(bundle::get_bundle_js_file($this->component));
+    public function get_required_resource(): ?string {
+        return bundle::get_bundle_js_file($this->component);
     }
 }

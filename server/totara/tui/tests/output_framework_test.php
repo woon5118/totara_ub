@@ -70,6 +70,11 @@ class totara_tui_output_framework_test extends advanced_testcase {
         }
     }
 
+    /**
+     * Tests that a theme with no immediate Tui resources will still have its CSS/JS requirement added if the parent
+     * themes do have tui resources.
+     * Tui styles/javascript loads resources for the current theme, and in the same request for the theme parents.
+     */
     public function test_get_head_code_unknown_theme() {
         global $CFG;
 

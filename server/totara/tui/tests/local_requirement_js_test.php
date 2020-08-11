@@ -80,16 +80,16 @@ class totara_tui_local_requirement_js_testcase extends advanced_testcase {
 
         $requirement = new js('tui');
         if (file_exists($CFG->srcroot . '/client/build/tui/tui_bundle.js')) {
-            self::assertTrue($requirement->required());
+            self::assertTrue($requirement->has_resources_to_load());
         } else {
-            self::assertFalse($requirement->required());
+            self::assertFalse($requirement->has_resources_to_load());
         }
 
         $requirement = new js('totara_tui');
-        self::assertFalse($requirement->required());
+        self::assertFalse($requirement->has_resources_to_load());
 
         $requirement = new js('space_monkey');
-        self::assertFalse($requirement->required());
+        self::assertFalse($requirement->has_resources_to_load());
     }
 
 }

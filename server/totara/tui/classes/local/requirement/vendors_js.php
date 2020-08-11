@@ -72,7 +72,7 @@ final class vendors_js extends requirement {
     /**
      * {@inheritdoc}
      */
-    public function required(): bool {
-        return !is_null(bundle::get_vendors_file());
+    public function get_required_resource(): ?string {
+        return bundle::get_vendors_file();
     }
 }
