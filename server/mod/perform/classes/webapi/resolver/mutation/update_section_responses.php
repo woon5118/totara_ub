@@ -47,7 +47,7 @@ class update_section_responses implements mutation_resolver, has_middleware {
             $participant_id,
             participant_source::INTERNAL,
             $participant_section_id
-        ))->fetch()->get();
+        ))->get();
 
         if ($participant_section === null) {
             throw new coding_exception(sprintf('Participant section not found for id %d', $participant_section_id));

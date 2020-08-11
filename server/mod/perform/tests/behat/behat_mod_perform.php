@@ -30,8 +30,10 @@ use mod_perform\controllers\activity\edit_activity;
 use mod_perform\controllers\activity\manage_activities;
 use mod_perform\controllers\activity\manage_participation;
 use mod_perform\controllers\activity\user_activities;
+use mod_perform\controllers\activity\view_external_participant_activity;
 use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\entities\activity\activity;
+use mod_perform\entities\activity\external_participant;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\entities\activity\subject_instance;
@@ -111,6 +113,30 @@ class behat_mod_perform extends behat_base {
     public function i_navigate_to_the_edit_perform_activities_page_for(string $activity_name): void {
         $activity = $this->get_activity_by_name($activity_name);
         $this->navigate_to_page(edit_activity::get_url(['activity_id' => $activity->id]));
+    }
+
+    /**
+     * @When /^I navigate to the external participants form for user "([^"]*)"$/
+     * @param string|null $user_fullname
+     */
+    public function i_navigate_to_the_external_participant_form_for_user(string $user_fullname = null): void {
+        /** @var external_participant $external_participant */
+        $external_participant = external_participant::repository()
+            ->where('name', $user_fullname)
+            ->one();
+
+        if (!$external_participant) {
+            $this->fail("External participant with name '{$user_fullname}' not found.");
+        }
+
+        $this->navigate_to_page(view_external_participant_activity::get_url(['token' => $external_participant->token]));
+    }
+
+    /**
+     * @When /^I navigate to the external participants form with the wrong token$/
+     */
+    public function i_navigate_to_the_external_participant_form_wrong_token(): void {
+        $this->navigate_to_page(view_external_participant_activity::get_url(['token' => 'idontexist']));
     }
 
     /**

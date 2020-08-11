@@ -1,5 +1,5 @@
 @totara @perform @mod_perform @javascript @vuejs
-Feature: Allow users to select who will participant in what roles in an activity.
+Feature: Allow users to select manual (internal and external) participants for an activity and for those users to participate.
 
   Background:
     Given the following "users" exist:
@@ -21,7 +21,7 @@ Feature: Allow users to select who will participant in what roles in an activity
     When I log in as "admin"
     And I navigate to the manage perform activities page
 
-  Scenario: Create an activity and make users select participants
+  Scenario: Create an activity and make users select internal and external manual participants making sure those participants can participate in the activity
     # Setup the activity so it can be activated
     When I click on "Add activity" "button"
     And I set the following fields to these values:
@@ -37,6 +37,10 @@ Feature: Allow users to select who will participant in what roles in an activity
     And I click on the "Reviewer" tui checkbox
     And I click on the "External respondent" tui checkbox
     And I click on "Done" "button"
+    And I close the tui notification toast
+    # Toggle "View other responses"
+    And I click on ".tui-performActivitySectionRelationship:nth-of-type(2) .tui-checkbox__label" "css_element"
+    Then I should see "Activity saved" in the tui "success" notification toast
     And I close the tui notification toast
     And I click on "Edit content elements" "button"
     And I click on "Add element" "button"
@@ -224,3 +228,171 @@ Feature: Allow users to select who will participant in what roles in an activity
     And I click on the "Reviewer (Not yet started)" tui radio
     And I click on "Continue" "button"
     Then I should see perform activity relationship to user "Reviewer"
+    When I log out
+
+    # External participant views activity
+    When I navigate to the external participants form for user "Mark Metcalfe"
+    # The menu should not be there
+    Then I should not see "Home" in the ".totaraNav" "css_element"
+    And I should not see "You are logged in as"
+    And "Login" "button" should not exist
+    And I should see perform activity relationship to user "External respondent"
+    And I should see perform "short text" question "Question 1" is unanswered
+    When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
+    And I answer "short text" question "Question 1" with "External participant was here"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    Then I should see "Thank you"
+    And I should see "Your responses have been submitted"
+    And "Review your responses." "link" should exist
+
+    # Try to access the page again, it should still be accessible
+    When I follow "Review your responses."
+    Then I should see perform activity relationship to user "External respondent"
+
+    # Try to access invalid page
+    When I navigate to the external participants form with the wrong token
+    Then I should see "This performance activity is no longer available."
+
+    When I log in as "manager"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Activities about others" "link"
+    And I click on "Act1" "button"
+    Then the "Manager (In progress)" radio button is selected
+    When I click on "Continue" "button"
+    And I wait until ".tui-otherParticipantResponses" "css_element" exists
+    Then I should see that show others responses is toggled "off"
+    When I click show others responses
+    Then I should see "Mark Metcalfe"
+    And I should see perform "short text" question "Question 1" is answered by "External respondent" with "External participant was here"
+    When I log out
+
+    # Change setting of activity to close on completion
+    Given I log in as "admin"
+    When I navigate to the manage perform activities page
+    And I click on "Act1" "link"
+    And I click on the "On completion" tui toggle button
+    And I confirm the tui confirmation modal
+    Then I should see "Activity saved" in the tui "success" notification toast
+    When I close the tui notification toast
+    And I log out
+
+    # Complete as appraiser and peer
+    When I log in as "appraiser"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Activities about others" "link"
+    And I click on "Act1" "button"
+    Then I should see "Select relationship to continue"
+    And I should see "Appraiser (In progress)"
+    And I should see "Peer (In progress)"
+    And the "Appraiser (In progress)" radio button is selected
+    When I click on "Continue" "button"
+    Then I should see perform activity relationship to user "Appraiser"
+    When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
+    And I answer "short text" question "Question 1" with "Appraiser was here"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    And I click on "Act1" "button"
+    Then I should see "Select relationship to continue"
+    And I should see "Appraiser (Complete)"
+    And I should see "Peer (In progress)"
+    When I click on the "Peer (In progress)" tui radio
+    And I click on "Continue" "button"
+    Then I should see perform activity relationship to user "Peer"
+    When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
+    And I answer "short text" question "Question 1" with "Peer was here"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    And I log out
+
+    # Complete as subject
+    When I log in as "subject"
+    And I navigate to the outstanding perform activities list page
+    And I should not see "No items to display"
+    When I click on "Act1" "link"
+    Then I should see perform activity relationship to user "Self"
+    When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
+    And I answer "short text" question "Question 1" with "Manager was here"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    And I log out
+
+    # Complete as colleague
+    When I log in as "colleague"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Activities about others" "link"
+    And I should not see "No items to display"
+    When I click on "Act1" "link"
+    Then I should see perform activity relationship to user "Mentor"
+    When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
+    And I answer "short text" question "Question 1" with "Mentor was here"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    And I log out
+
+    # Complete as the maanager and the reviewer
+    When I log in as "manager"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Activities about others" "link"
+    And I should not see "No items to display"
+    When I click on "Act1" "button"
+    Then I should see "Select relationship to continue"
+    And I should see "Manager (In progress)"
+    And I should see "Reviewer (In progress)"
+    And the "Manager (In progress)" radio button is selected
+    When I click on "Continue" "button"
+    Then I should see perform activity relationship to user "Manager"
+    When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
+    And I answer "short text" question "Question 1" with "Manager was here"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    When I click on "Activities about others" "link"
+    And I click on "Act1" "button"
+    And I click on the "Reviewer (In progress)" tui radio
+    And I click on "Continue" "button"
+    Then I should see perform activity relationship to user "Reviewer"
+    When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
+    And I answer "short text" question "Question 1" with "Reviewer was here"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    And I log out
+
+    # Complete as external respondent again
+    When I navigate to the external participants form for user "Mark Metcalfe"
+    Then I should see perform activity relationship to user "External respondent"
+    And I should see perform "short text" question "Question 1" is unanswered
+    When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
+    And I answer "short text" question "Question 1" with "External participant 1 was here"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    Then I should see "Thank you"
+    And I should see "Your responses have been submitted"
+    And "Review your responses." "link" should exist
+
+    # Alright that's the last participant, subject instance should be closed after that
+    When I navigate to the external participants form for user "Steve Example"
+    Then I should see perform activity relationship to user "External respondent"
+    And I should see perform "short text" question "Question 1" is unanswered
+    When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
+    And I answer "short text" question "Question 1" with "External participant 2 was here"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    Then I should see "Thank you"
+    And I should see "Your responses have been submitted"
+    And "Review your responses." "link" should not exist
+    And I should see "This activity is now closed."
+
+    When I navigate to the external participants form for user "Steve Example"
+    Then I should see "This performance activity is no longer available."
+
+    When I navigate to the external participants form for user "Mark Metcalfe"
+    Then I should see "This performance activity is no longer available."
