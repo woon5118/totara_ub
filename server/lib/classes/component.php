@@ -85,7 +85,6 @@ class core_component {
         'MatthiasMullie\\Minify' => 'lib/minify/matthiasmullie-minify/src/',
         'MatthiasMullie\\PathConverter' => 'lib/minify/matthiasmullie-pathconverter/src/',
         'IMSGlobal\LTI' => 'lib/ltiprovider/src',
-        'PHPMailer\\PHPMailer' => 'lib/phpmailer/src',
         // Totara: extra libraries
         'GraphQL' => 'totara/webapi/lib/graphql-php/src',
         'RedeyeVentures\\GeoPattern' => 'lib/geopattern-php/GeoPattern',

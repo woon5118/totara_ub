@@ -5,7 +5,8 @@
   "homepage": "https://www.totaralearning.com",
   "require": {
     "php": ">=7.2.10 <7.5",
-    "ezyang/htmlpurifier": "4.13.0"
+    "ezyang/htmlpurifier": "4.13.0",
+    "phpmailer/phpmailer": "6.1.6"
   },
   "config": {
     "vendor-dir": "./"

@@ -10,6 +10,20 @@ class ComposerStaticInit21d18eca89973f20fc861332496d6ad5
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
     );
 
+    public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
+            'PHPMailer\\PHPMailer\\' => 20,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
+    );
+
     public static $prefixesPsr0 = array (
         'H' => 
         array (
@@ -23,6 +37,8 @@ class ComposerStaticInit21d18eca89973f20fc861332496d6ad5
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInit21d18eca89973f20fc861332496d6ad5::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit21d18eca89973f20fc861332496d6ad5::$prefixDirsPsr4;
             $loader->prefixesPsr0 = ComposerStaticInit21d18eca89973f20fc861332496d6ad5::$prefixesPsr0;
 
         }, null, ClassLoader::class);
