@@ -14,4 +14,11 @@
     <version>4.13.0</version>
     <licenseversion>2.1+</licenseversion>
   </library>
+  <library>
+    <location>required/webonyx/graphql-php</location>
+    <name>graphql-php</name>
+    <license>MIT</license>
+    <version>0.13.2</version>
+    <licenseversion></licenseversion>
+  </library>
 </libraries>
