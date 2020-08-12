@@ -22,7 +22,7 @@
 
 define('CLI_SCRIPT', true);
 
-require(__DIR__ . '/../../../config.php');
+require(__DIR__ . '/../../server/config.php');
 require_once($CFG->libdir.'/clilib.php');
 
 define('MOODLE_DEFAULT_TAG', dev_get_moodle_tag()); // The upstream release that Totara is based on.
@@ -124,7 +124,7 @@ if ($options['diffupstream']) {
 
 cli_heading('List of ' . count($totaraplugins) . ' Totara plugins');
 $today = date('Ymd') . '00';
-$today = '2019102300';
+$today = '2020081300';
 $requirement = dev_get_requires_version();
 $error = false;
 $todo = array();
