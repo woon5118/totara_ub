@@ -1,0 +1,13 @@
+{
+  "name": "totara/totara_require",
+  "description": "Required libraries used in production",
+  "type": "metapackage",
+  "homepage": "https://www.totaralearning.com",
+  "require": {
+    "php": ">=7.2.10 <7.5",
+    "ezyang/htmlpurifier": "4.12.0"
+  },
+  "config": {
+    "vendor-dir": "./"
+  }
+}

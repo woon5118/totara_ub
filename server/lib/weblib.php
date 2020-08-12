@@ -1981,7 +1981,7 @@ function purify_html($text, $options = array()) {
     }
 
     if (empty($purifiers[$type])) {
-        require_once $CFG->libraries . '/htmlpurifier/locallib.php';
+        require_once $CFG->libdir . '/htmlpurifier/locallib.php';
         $config = HTMLPurifier_Config::createDefault();
 
         $config->set('HTML.DefinitionID', 'moodlehtml');
@@ -2147,7 +2147,7 @@ function purify_uri($uri, $httponly = false, $requirescheme = false) {
     $type .= $requirescheme ? '_s' : '_ns';
 
     if (!isset($configs[$type])) {
-        require_once $CFG->libraries . '/htmlpurifier/locallib.php';
+        require_once $CFG->libdir . '/htmlpurifier/locallib.php';
         $config = HTMLPurifier_Config::createDefault();
 
         // See http://htmlpurifier.org/phorum/read.php?3,6874,6874

@@ -225,6 +225,8 @@ if (!empty($_SERVER['HTTP_X_moz']) && $_SERVER['HTTP_X_moz'] === 'prefetch'){
 //the problem is that we need specific version of quickforms and hacked excel files :-(
 ini_set('include_path', $CFG->libdir.'/pear' . PATH_SEPARATOR . ini_get('include_path'));
 
+// First add composer classloader.
+require_once(__DIR__ . '/../../libraries/required/autoload.php');
 // Register our classloader, in theory somebody might want to replace it to load other hacked core classes.
 if (defined('COMPONENT_CLASSLOADER')) {
     spl_autoload_register(COMPONENT_CLASSLOADER);

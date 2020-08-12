@@ -1,0 +1,27 @@
+From 4df2e3ecc908c4324422a292177a79dac176bec0 Mon Sep 17 00:00:00 2001
+From: Petr Skoda <petr.skoda@totaralearning.com>
+Date: Thu, 13 Aug 2020 08:38:00 +1200
+Subject: [PATCH] TL-23369 lib: fix HTMLPurifier PHP 7.4 compatibility
+
+---
+ .../library/HTMLPurifier/Printer/HTMLDefinition.php           | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libraries/required/ezyang/htmlpurifier/library/HTMLPurifier/Printer/HTMLDefinition.php b/libraries/required/ezyang/htmlpurifier/library/HTMLPurifier/Printer/HTMLDefinition.php
+index 5f2f2f8a7c2..ae8639176e0 100644
+--- a/libraries/required/ezyang/htmlpurifier/library/HTMLPurifier/Printer/HTMLDefinition.php
++++ b/libraries/required/ezyang/htmlpurifier/library/HTMLPurifier/Printer/HTMLDefinition.php
+@@ -43,8 +43,8 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
+         $ret .= $this->element('caption', 'Doctype');
+         $ret .= $this->row('Name', $doctype->name);
+         $ret .= $this->row('XML', $doctype->xml ? 'Yes' : 'No');
+-        $ret .= $this->row('Default Modules', implode($doctype->modules, ', '));
+-        $ret .= $this->row('Default Tidy Modules', implode($doctype->tidyModules, ', '));
++        $ret .= $this->row('Default Modules', implode(', ', $doctype->modules));
++        $ret .= $this->row('Default Tidy Modules', implode(', ', $doctype->tidyModules));
+         $ret .= $this->end('table');
+         return $ret;
+     }
+-- 
+2.26.2
+
