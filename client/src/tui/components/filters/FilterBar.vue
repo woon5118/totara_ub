@@ -46,35 +46,33 @@
       </div>
     </div>
 
-    <div class="tui-filterBar__toggle">
-      <ButtonIcon
-        v-show="vertical"
-        :aria-label="false"
-        class="tui-filterBar__toggle-btn"
-        :styleclass="{
-          transparent: true,
-        }"
-        :text="
-          $str(showFilters ? 'hide_filters' : 'show_filters', 'totara_core')
-        "
-        @click="toggleFilters"
-      >
-        <SliderIcon />
-      </ButtonIcon>
-    </div>
-
-    <OverflowDetector
-      v-if="showFilters || !vertical"
-      v-slot="{ measuring }"
-      @change="overflowChanged"
-    >
+    <OverflowDetector v-slot="{ measuring }" @change="overflowChanged">
       <div
         class="tui-filterBar__filters"
         :class="{
           'tui-filterBar__filters--stacked': vertical && !measuring,
         }"
       >
-        <div class="tui-filterBar__filters-left">
+        <div class="tui-filterBar__toggle">
+          <ButtonIcon
+            v-show="vertical && !measuring"
+            :aria-label="false"
+            class="tui-filterBar__toggle-btn"
+            :styleclass="{
+              transparent: true,
+            }"
+            :text="
+              $str(showFilters ? 'hide_filters' : 'show_filters', 'totara_core')
+            "
+            @click="toggleFilters"
+          >
+            <SliderIcon />
+          </ButtonIcon>
+        </div>
+        <div
+          v-if="showFilters || !vertical || measuring"
+          class="tui-filterBar__filters-left"
+        >
           <div
             v-show="!vertical && !measuring"
             class="tui-filterBar__filters-icon"
@@ -93,7 +91,10 @@
             :stacked="vertical && !measuring"
           />
         </div>
-        <div class="tui-filterBar__filters-right">
+        <div
+          v-if="showFilters || !vertical || measuring"
+          class="tui-filterBar__filters-right"
+        >
           <!-- Right aligned content -->
           <slot
             name="filters-right"
