@@ -53,7 +53,7 @@ class tag_added extends object_update_observer {
             INNER JOIN "ttr_course" c ON c.id = ti.itemid
                 AND ti.itemtype = :item_type
             WHERE ti.id = :object_id 
-              AND (c.containertype IS NULL OR c.containertype = :container_type)
+              AND c.containertype = :container_type
         ';
 
         // Only fetch the tags that is related to courses.

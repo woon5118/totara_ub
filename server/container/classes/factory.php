@@ -234,10 +234,6 @@ final class factory {
 
             if (SITEID != $id) {
                 $containertype = $DB->get_field('course', 'containertype', ['id' => $id], MUST_EXIST);
-
-                if (null == $containertype) {
-                    $containertype = course::get_type();
-                }
             }
 
             $classname = static::get_container_class($containertype);

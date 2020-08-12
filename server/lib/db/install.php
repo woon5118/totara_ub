@@ -85,6 +85,9 @@ function xmldb_main_install() {
     $newsite->timecreated  = time();
     $newsite->timemodified = $newsite->timecreated;
 
+    // Totara: add default container type to 'container_site' - so that it does not fallback to container_course.
+    $newsite->containertype = 'container_site';
+
     if (defined('SITEID')) {
         $newsite->id = SITEID;
         $DB->import_record('course', $newsite);

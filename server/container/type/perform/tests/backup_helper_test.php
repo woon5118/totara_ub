@@ -40,16 +40,6 @@ class container_perform_backup_helper_testcase extends advanced_testcase {
             \container_perform\backup\restore_helper::class,
             \core_container\factory::get_restore_helper($course1->id)
         );
-
-        $course2 = self::getDataGenerator()->create_course(['containertype' => null]);
-        $this->assertNotInstanceOf(
-            \container_perform\backup\backup_helper::class,
-            \core_container\factory::get_backup_helper($course2->id)
-        );
-        $this->assertNotInstanceOf(
-            \container_perform\backup\restore_helper::class,
-            \core_container\factory::get_restore_helper($course2->id)
-        );
     }
 
     public function test_load_perform_helper_from_factory(): void {

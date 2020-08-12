@@ -1034,7 +1034,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
 
         // Totara: Added where clause to only look for course.
-        $whereclause .= " AND (c.containertype IS NULL OR c.containertype = :containertype)";
+        $whereclause .= " AND c.containertype = :containertype";
         $params['containertype'] = \container_course\course::get_type();
 
         $sql = "SELECT ". join(',', $fields). ", $ctxselect

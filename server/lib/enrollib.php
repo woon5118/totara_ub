@@ -348,7 +348,7 @@ function enrol_get_shared_courses($user1, $user2, $preloadcontexts = false, $che
                   JOIN {enrol} e2 ON (c.id = e2.courseid AND e2.status = :enabled2 AND e2.enrol $plugins2)
                   JOIN {user_enrolments} ue2 ON (ue2.enrolid = e2.id AND ue2.status = :active2 AND ue2.userid = :user2)
                   $tenantjoin
-                 WHERE c.visible = 1 AND (c.containertype IS NULL OR c.containertype = :containertype)";
+                 WHERE c.visible = 1 AND c.containertype = :containertype";
         // Totara: Added support for container to only fetch for course container
         $params['containertype'] = \container_course\course::get_type();
         return $DB->record_exists_sql($sql, $params);
@@ -372,7 +372,7 @@ function enrol_get_shared_courses($user1, $user2, $preloadcontexts = false, $che
                   JOIN {enrol} e2 ON (c.id = e2.courseid AND e2.status = :enabled2 AND e2.enrol $plugins2)
                   JOIN {user_enrolments} ue2 ON (ue2.enrolid = e2.id AND ue2.status = :active2 AND ue2.userid = :user2)
                   $tenantjoin
-                 WHERE c.visible = 1 AND (c.containertype IS NULL OR c.containertype = :containertype)
+                 WHERE c.visible = 1 AND c.containertype = :containertype
               ) ec ON ec.id = c.id
               $ctxjoin
           ORDER BY c.id";
@@ -662,7 +662,7 @@ function enrol_get_my_courses($fields = NULL, $sort = 'visible DESC,sortorder AS
     }
 
     // Totara: Added support for container to fetch only courses related.
-    $wheres = array("c.id <> :siteid", "(c.containertype IS NULL OR c.containertype = :containertype)");
+    $wheres = array("c.id <> :siteid", "c.containertype = :containertype");
     $params = array('siteid'=>SITEID, 'containertype' => \container_course\course::get_type());
 
     if (isset($USER->loginascontext) and $USER->loginascontext->contextlevel == CONTEXT_COURSE) {
@@ -981,7 +981,7 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = NUL
                  $subwhere
                    ) en ON (en.courseid = c.id)
            $ccjoin
-             WHERE c.id <> :siteid AND (c.containertype IS NULL OR c.containertype = :containertype)
+             WHERE c.id <> :siteid AND c.containertype = :containertype
           $orderby";
     $params['userid']  = $userid;
     $params['containertype'] = \container_course\course::get_type();

@@ -1144,13 +1144,21 @@ function xmldb_totara_core_upgrade($oldversion) {
     if ($oldversion < 2020062601) {
         // Define field containertype to be added to course.
         $table = new xmldb_table('course');
-        $field = new xmldb_field('containertype', XMLDB_TYPE_CHAR, '255', null, false, null, null, 'icon');
+        $field = new xmldb_field('containertype', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, 'container_course', 'icon');
 
         // Conditionally launch add field containertype.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
+        $index = new xmldb_index('containertype', XMLDB_INDEX_NOTUNIQUE, ['containertype']);
+        // Conditionally launch add index status.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Update site record with container_site value.
+        totara_core_update_site_container_type();
         upgrade_plugin_savepoint(true, 2020062601, 'totara', 'core');
     }
 
@@ -1335,6 +1343,44 @@ function xmldb_totara_core_upgrade($oldversion) {
 
         // Core savepoint reached.
         upgrade_plugin_savepoint(true, 2020072901, 'totara', 'core');
+    }
+
+    if ($oldversion < 2020072902) {
+        // Totara 13 pre-release DML fix. This is to support other developers. It can be removed before release if desired.
+        // Prefer to upgrade step to version 2020062601 for course table.
+        $table = new xmldb_table('course');
+        $field = new xmldb_field('containertype', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, 'container_course', 'icon');
+        $index = new xmldb_index('containertype', XMLDB_INDEX_NOTUNIQUE, ['containertype']);
+
+        if ($dbman->field_exists($table, $field)) {
+            // Site the site course to containertype=container_site.
+            // The function itself will does the check for us.
+            totara_core_update_site_container_type();
+
+            // Set all other nullable courses to containertype=container_course
+            $DB->execute(
+                'UPDATE "ttr_course" SET containertype = :container_course WHERE containertype IS NULL',
+                ['container_course' => 'container_course']
+            );
+
+            if (!$dbman->index_exists($table, $index)) {
+                // Only change the field default and field not null when index is not existing.
+                // This is happening because of the step above that might had already added the field and indexes to
+                // database. However that step previously in older version did not add any indexes, or had any default
+                // value. Which when it comes to here we are adding indexes for the fields and also default values.
+                $dbman->change_field_default($table, $field);
+                $dbman->change_field_notnull($table, $field);
+            }
+        } else {
+            $dbman->add_field($table, $field);
+        }
+
+        // Conditionally launch add index status
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2020072902, 'totara', 'core');
     }
 
     return true;

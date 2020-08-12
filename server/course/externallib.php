@@ -130,7 +130,7 @@ class core_course_external extends external_api {
         $course_sql = '
             SELECT * FROM "ttr_course" c 
             WHERE c.id = :course_id 
-                AND (c.containertype IS NULL OR c.containertype = :container_type)
+                AND c.containertype = :container_type
         ';
 
         $db_parameters = [
@@ -431,18 +431,22 @@ class core_course_external extends external_api {
         //retrieve courses
         if (!array_key_exists('ids', $params['options'])
                 or empty($params['options']['ids'])) {
-            // Totara: Added the ability to fetch only courses and excluding non-courses.
+            // Totara: Added the ability to fetch only courses and excluding non-courses. Note that this part here will return a list of courses including site course records - according to the understanding of PHPUNIT tests related.
             $courses = $DB->get_records_sql(
-                'SELECT * FROM "ttr_course" c WHERE (c.containertype IS NULL OR c.containertype = :type)',
-                ['type' => \container_course\course::get_type()]
+                'SELECT * FROM "ttr_course" c WHERE (c.containertype = :type OR c.containertype = :site_type)',
+                [
+                    'type' => \container_course\course::get_type(),
+                    'site_type' => \container_site\site::get_type()
+                ]
             );
         } else {
-            // Totara: Added the ability to fetch only courses and excluding non-courses.
+            // Totara: Added the ability to fetch only courses and excluding non-courses. Note that this part here will return a list of courses including site course record - according to the understanding of PHPUNIT tests related.
             [$courses_in_sql, $courses_parameters] = $DB->get_in_or_equal($params['options']['ids'], SQL_PARAMS_NAMED);
             $courses_parameters['type'] = \container_course\course::get_type();
+            $courses_parameters['site_type'] = \container_site\site::get_type();
 
             $courses_sql = 'SELECT * FROM "ttr_course" c 
-                    WHERE (c.containertype IS NULL OR c.containertype = :type) 
+                    WHERE (c.containertype = :type OR c.containertype = :site_type)
                       AND c.id ' . $courses_in_sql;
 
             $courses = $DB->get_records_sql($courses_sql, $courses_parameters);

@@ -53,7 +53,7 @@ class tag_updated extends object_update_observer {
             INNER JOIN "ttr_course" c ON c.id = ti.itemid
                 AND ti.itemtype = :item_type
             WHERE ti.tagid = :object_id
-                AND (c.containertype IS NULL OR c.containertype = :container_type)
+                AND c.containertype = :container_type
         ';
 
         $eventdata = $DB->get_records_sql($sql, [

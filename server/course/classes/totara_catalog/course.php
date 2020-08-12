@@ -121,7 +121,7 @@ class course extends provider {
                   JOIN {context} con
                     ON con.instanceid = c.id
                  WHERE c.id <> :sitecourseid
-                   AND (c.containertype IS NULL OR c.containertype = :containertype)
+                   AND c.containertype = :containertype
                    AND con.contextlevel = :coursecontextlevel";
 
         return [

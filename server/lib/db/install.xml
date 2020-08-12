@@ -105,7 +105,7 @@
         <FIELD NAME="cacherev" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Incrementing revision for validating the course content cache"/>
         <FIELD NAME="coursetype" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Totara course type from totara_core"/>
         <FIELD NAME="icon" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Totara course icon from totara_core"/>
-        <FIELD NAME="containertype" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The type of the course, what its purpose is for."/>
+        <FIELD NAME="containertype" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="container_course" SEQUENCE="false" COMMENT="The type of the course, what its purpose is for. Defaults to course."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -116,6 +116,7 @@
         <INDEX NAME="sortorder" UNIQUE="false" FIELDS="sortorder"/>
         <INDEX NAME="audiencevisible" UNIQUE="false" FIELDS="audiencevisible" COMMENT="Used by audience based visibility SQL"/>
         <INDEX NAME="category-sortorder" UNIQUE="false" FIELDS="category, sortorder"/>
+        <INDEX NAME="containertype" UNIQUE="false" FIELDS="containertype"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="course_categories" COMMENT="Course categories">

@@ -862,7 +862,7 @@ function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$total
             FROM {course} c
             $ccjoin
             WHERE $searchcond AND c.id <> ".SITEID." $visibilitysql
-            AND (c.containertype IS NULL OR c.containertype = :containertype)
+            AND c.containertype = :containertype
             ORDER BY $sort";
 
     $params['containertype'] = \container_course\course::get_type();

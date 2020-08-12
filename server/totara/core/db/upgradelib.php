@@ -455,7 +455,7 @@ function totara_core_upgrade_delete_moodle_plugins() {
     );
 
     foreach ($deleteplugins as $deleteplugin) {
-        list($plugintype, $pluginname) = explode('_', $deleteplugin, 2);
+        [$plugintype, $pluginname] = explode('_', $deleteplugin, 2);
         $dir = core_component::get_plugin_directory($plugintype, $pluginname);
         if ($dir and file_exists("$dir/version.php")) {
             // This should not happen, this is not a standard distribution!
@@ -1348,4 +1348,25 @@ function totara_core_update_relationship ($relationship, array $resolvers) {
             );
         }
     }
+}
+
+/**
+ * Set the site course to containertype=container_site.
+ * Copy the logic from {@see get_site()} use execute, we won't check the outcome as if you don't meet this check
+ * then you have bigger problems!
+ *
+ * This is moved into a function so that we can make sure that we have a phpunit test to cover it.
+ *
+ * @return void
+ */
+function totara_core_update_site_container_type(): void {
+    global $DB;
+
+    $site_id = $DB->get_field('course', 'id', ['category' => 0], MUST_EXIST);
+
+    $update_site_record = new stdClass();
+    $update_site_record->id = $site_id;
+    $update_site_record->containertype = 'container_site';
+
+    $DB->update_record('course', $update_site_record);
 }

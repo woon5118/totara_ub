@@ -49,8 +49,17 @@ function xmldb_totara_core_install() {
 
     $field = new xmldb_field('containertype');
     if (!$dbman->field_exists($table, $field)) {
-        $field->set_attributes(XMLDB_TYPE_CHAR, '255', null, false, null, null);
+        $field->set_attributes(XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, 'container_course');
         $dbman->add_field($table, $field);
+
+        // Coditionally update the site course record to use `container_site` for its container type.
+        totara_core_update_site_container_type();
+    }
+
+    $index = new xmldb_index('containertype', XMLDB_INDEX_NOTUNIQUE, ['containertype']);
+    // Conditionally launch add index status.
+    if (!$dbman->index_exists($table, $index)) {
+        $dbman->add_index($table, $index);
     }
 
     // Create totara roles.
