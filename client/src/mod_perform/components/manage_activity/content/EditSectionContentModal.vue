@@ -39,7 +39,85 @@
           </p>
 
           <Loader :loading="isLoading">
-            <div class="tui-performEditSectionContentModal__form">
+            <div
+              v-if="isDraft"
+              class="tui-performEditSectionContentModal__form"
+            >
+              <Droppable
+                v-slot="{
+                  attrs,
+                  events,
+                  isActive,
+                  isDropValid,
+                  dropTarget,
+                  placeholder,
+                }"
+                :source-id="$id('element-list')"
+                source-name="Element List"
+                :accept-drop="validateDropElement"
+                :reorder-only="true"
+                @drop="handleDropElement"
+              >
+                <div
+                  class="tui-performEditSectionContentModal__dragList"
+                  v-bind="attrs"
+                  v-on="events"
+                >
+                  <render :vnode="dropTarget" />
+                  <Draggable
+                    v-for="(sectionElement, index) in sectionElements"
+                    :key="sectionElement.id"
+                    v-slot="{ dragging, attrs, events, moveMenu, anyDragging }"
+                    :index="index"
+                    :value="sectionElement.id"
+                    type="element"
+                    :disabled="!validDragElement(sectionElement)"
+                  >
+                    <div
+                      class="tui-performEditSectionContentModal__draggableItem"
+                      :class="{
+                        'tui-performEditSectionContentModal__draggableItem--dragging': dragging,
+                      }"
+                      v-bind="attrs"
+                      v-on="events"
+                    >
+                      <div
+                        v-if="
+                          (!anyDragging || dragging) &&
+                            validDragElement(sectionElement)
+                        "
+                        class="tui-performEditSectionContentModal__draggableItem-moveIcon"
+                      >
+                        <DragHandleIcon />
+                      </div>
+                      <render :vnode="moveMenu" />
+                      <component
+                        :is="componentFor(sectionElement)"
+                        ref="sectionElements"
+                        :key="sectionElement.id"
+                        :data="sectionElement.element.data"
+                        :raw-data="sectionElement.element.raw_data"
+                        :title="sectionElement.element.title"
+                        :raw-title="sectionElement.element.raw_title"
+                        :identifier="sectionElement.element.identifier"
+                        :is-required="sectionElement.element.is_required"
+                        :type="sectionElement.element.type"
+                        :error="errors[sectionElement.id]"
+                        :activity-state="activityState"
+                        @update="update(sectionElement, $event, index)"
+                        @edit="edit(sectionElement)"
+                        @display="display(sectionElement)"
+                        @display-read="displayReadOnly(sectionElement)"
+                        @remove="tryDelete(sectionElement, index)"
+                      />
+                    </div>
+                  </Draggable>
+                  <render :vnode="placeholder" />
+                </div>
+              </Droppable>
+              <ContentAddElementButton @add-element-item="add" />
+            </div>
+            <div v-else class="tui-performEditSectionContentModal__form">
               <component
                 :is="componentFor(sectionElement)"
                 v-for="(sectionElement, index) in sectionElements"
@@ -60,8 +138,6 @@
                 @display-read="displayReadOnly(sectionElement)"
                 @remove="tryDelete(sectionElement, index)"
               />
-
-              <ContentAddElementButton v-if="isDraft" @add-element-item="add" />
             </div>
           </Loader>
 
@@ -106,6 +182,9 @@ import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import ButtonSubmit from 'tui/components/buttons/Submit';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ContentAddElementButton from 'mod_perform/components/manage_activity/content/ContentAddElementButton';
+import Draggable from 'tui/components/drag_drop/Draggable';
+import Droppable from 'tui/components/drag_drop/Droppable';
+import DragHandleIcon from 'tui/components/icons/common/DragHandle';
 import Loader from 'tui/components/loader/Loader';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
@@ -127,6 +206,9 @@ export default {
     ButtonSubmit,
     ConfirmationModal,
     ContentAddElementButton,
+    Draggable,
+    Droppable,
+    DragHandleIcon,
     Loader,
     Modal,
     ModalContent,
@@ -338,7 +420,7 @@ export default {
           }),
         ];
       }
-      this.save(toSave);
+      this.save(toSave, this.$str('toast_success_save_element', 'mod_perform'));
 
       this.display(sectionElement);
     },
@@ -482,6 +564,26 @@ export default {
     },
 
     /**
+     * Reorder elements
+     */
+    async reorderElements(sectionElements) {
+      this.isSaving = true;
+      const toSave = {};
+      toSave.move = sectionElements
+        .filter(this.elementExists)
+        .map((element, index) => {
+          return {
+            section_element_id: element.id,
+            sort_order: index + 1,
+          };
+        });
+
+      await this.save(toSave, null);
+
+      this.isSaving = false;
+    },
+
+    /**
      * Close element deletion confirmation modal.
      */
     closeDeleteModal() {
@@ -526,7 +628,9 @@ export default {
         const section = result.mod_perform_update_section_elements.section;
         this.updateSectionElementData(section.section_elements);
         this.$emit('update-summary', section);
-        this.showSuccessNotification(saveNotificationMessage);
+        if (saveNotificationMessage) {
+          this.showSuccessNotification(saveNotificationMessage);
+        }
         this.isSaving = false;
       } catch (e) {
         this.showErrorNotification();
@@ -620,6 +724,39 @@ export default {
         message: this.$str('toast_error_generic_update', 'mod_perform'),
         type: 'error',
       });
+    },
+
+    /**
+     * check whether a drag is allowed.
+     *
+     * @param {Array} sectionElements
+     */
+    validDragElement(sectionElement) {
+      return !this.isEditing(sectionElement) && this.sectionElements.length > 1;
+    },
+
+    /**
+     * check whether a drop is allowed.
+     *
+     * @param {DropInfo} info
+     */
+    validateDropElement(info) {
+      return info.destination.sourceId == info.source.sourceId;
+    },
+
+    /**
+     * Called when element is dropped on a list.
+     *
+     * @param {DropInfo} info
+     */
+    handleDropElement(info) {
+      if (info.destination.sourceId == info.source.sourceId) {
+        //reorder elements
+        const item = this.sectionElements.splice(info.source.index, 1)[0];
+        this.sectionElements.splice(info.destination.index, 0, item);
+
+        this.reorderElements(this.sectionElements);
+      }
     },
   },
 };

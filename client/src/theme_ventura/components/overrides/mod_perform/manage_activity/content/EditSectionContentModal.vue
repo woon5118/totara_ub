@@ -32,5 +32,29 @@
       margin-top: var(--tui-gap-4);
     }
   }
+
+  &__dragList {
+    > [data-tui-draggable-placeholder] {
+      margin-top: var(--tui-gap-3);
+    }
+  }
+
+  &__draggableItem {
+    position: relative;
+    margin-top: var(--tui-gap-3);
+    user-select: none;
+
+    &-moveIcon {
+      position: absolute;
+      top: var(--tui-gap-1);
+      left: var(--tui-gap-2);
+      display: none;
+    }
+
+    &:hover &-moveIcon,
+    &--dragging &-moveIcon {
+      display: block;
+    }
+  }
 }
 </style>

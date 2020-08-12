@@ -70,6 +70,8 @@ class behat_mod_perform extends behat_base {
     public const TUI_TRASH_ICON_BUTTON = "button[aria-label='Delete %s']";
 
     public const EDIT_QUESTION_DISPLAY_TITLE_LOCATOR = '.tui-performElementEditDisplay__title';
+    public const QUESTION_DRAG_ITEM_LOCATOR = '.tui-performEditSectionContentModal__draggableItem';
+    public const QUESTION_DRAG_MOVE_ICON_LOCATOR = '.tui-performEditSectionContentModal__draggableItem-moveIcon';
     public const RESPONSE_VISIBILITY_DESCRIPTION_LOCATOR = '.tui-participantContent__sectionHeadingOtherResponsesDescription';
 
     /**
@@ -641,6 +643,57 @@ class behat_mod_perform extends behat_base {
                 $this->getSession()
             );
         }
+    }
+
+    /**
+     * @Then /^I should see drag icon visible in the question "([^"]*)"$/
+     * @param string $question_text
+     */
+    public function i_should_see_drag_icon_visible(string $question_text) {
+        $element = $this->find_element_drag_wrapper_from_text($question_text);
+
+        $element->click();
+        $move_icon = $element->find('css', self::QUESTION_DRAG_MOVE_ICON_LOCATOR);
+
+        if (!$move_icon->isVisible()) {
+            throw new ExpectationException("move icon should be visible", $this->getSession());
+        }
+    }
+
+    /**
+     * @Then /^I should not see drag icon visible in the question "([^"]*)"$/
+     * @param string $question_text
+     */
+    public function i_should_not_see_drag_icon_visible(string $question_text) {
+        $element = $this->find_element_drag_wrapper_from_text($question_text);
+
+        $element->click();
+        $move_icon = $element->find('css', self::QUESTION_DRAG_MOVE_ICON_LOCATOR);
+
+        if ($move_icon) {
+            throw new ExpectationException("move icon should not be visible", $this->getSession());
+        }
+    }
+
+    /**
+     * @param string $question_text
+     *
+     * @return NodeElement
+     * @throws ExpectationException
+     */
+    private function find_element_drag_wrapper_from_text(string $question_text): NodeElement {
+        $drag_items = $this->find_all('css', self::QUESTION_DRAG_ITEM_LOCATOR);
+
+        foreach ($drag_items as $question) {
+            $question_title = $question->find('css', self::EDIT_QUESTION_DISPLAY_TITLE_LOCATOR);
+
+            $actual_title = trim(str_replace('*', '', $question_title->getText()));
+
+            if ($actual_title === $question_text) {
+                return $question;
+            }
+        }
+        throw new ExpectationException("Question not found with text {$question_text}", $this->getSession());
     }
 
     /**
