@@ -623,7 +623,7 @@ In program messages, certain variables can be inserted into the subject and/or b
 :   This will be replaced by the completion criteria set in the assignment tab.
 
 %duedate%
-:   This will be replaced by the date assigned to the user to complete the program.
+:   This will be replaced by the date assigned to the user to complete the program, when used in certifications, the duedate is for the current certification path.
 
 %managername%
 :   This will be replaced by the manager\'s name.
@@ -661,7 +661,7 @@ In program messages, certain variables can be inserted into the subject and/or b
 :   This will be replaced by the completion criteria set in the assignment tab.
 
 %duedate%
-:   This will be replaced by the date assigned to the user to complete the program.
+:   This will be replaced by the date assigned to the user to complete the program, when used in certifications, the duedate is for the current certification path.
 
 %managername%
 :   This will be replaced by the manager\'s name.
@@ -703,7 +703,7 @@ In program messages, certain variables can be inserted into the subject and/or b
 :   This will be replaced by the completion criteria set in the assignment tab.
 
 %duedate%
-:   This will be replaced by the date assigned to the user to complete the program.
+:   This will be replaced by the date assigned to the user to complete the program, when used in certifications, the duedate is for the current certification path.
 
 %managername%
 :   This will be replaced by the manager\'s name.
@@ -1070,7 +1070,7 @@ In program messages, certain variables can be inserted into the subject and/or b
 :   This will be replaced by the completion criteria set in the assignment tab.
 
 %duedate%
-:   This will be replaced by the date assigned to the user to complete the program.
+:   This will be replaced by the date assigned to the user to complete the program, when used in certifications, the duedate is for the current certification path.
 
 %managername%
 :   This will be replaced by the manager\'s name.
