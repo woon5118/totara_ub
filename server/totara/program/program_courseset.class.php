@@ -387,7 +387,7 @@ abstract class course_set {
      *
      * @return string
      */
-    abstract public function display($userid=null,$previous_sets=array(),$next_sets=array(),$accessible=true, $viewinganothersprogram=false);
+    abstract public function display($userid=null,$previous_sets=array(),$next_sets=array(),$accessible=true, $viewinganothersprogram=false, bool $hide_progress = false);
 
     /**
      * Returns the HTML suitable for display the nextsetoperator in a friendly/informative manner
@@ -1026,7 +1026,7 @@ class multi_course_set extends course_set {
      * @param bool $viewinganothersprogram
      * @return string
      */
-    public function display($userid=null, $previous_sets=array(), $next_sets=array(), $accessible=true, $viewinganothersprogram=false) {
+    public function display($userid=null, $previous_sets=array(), $next_sets=array(), $accessible=true, $viewinganothersprogram=false, bool $hide_progress = false) {
         global $USER, $OUTPUT, $DB, $CFG;
 
         if ($userid) {
@@ -1093,7 +1093,7 @@ class multi_course_set extends course_set {
             $table->head[] = get_string('actions');
             $table->colclasses = array('coursename', 'launchcourse');
             $table->attributes['class'] = 'fullwidth generaltable';
-            if ($userid) {
+            if ($userid && !$hide_progress) {
                 $table->head[] = get_string('status', 'totara_program');
                 $table->colclasses[] = 'status';
                 $completeheading = false;
@@ -1160,7 +1160,7 @@ class multi_course_set extends course_set {
                 }
                 $cells[] = new html_table_cell($launch);
 
-                if ($userid) {
+                if ($userid && !$hide_progress) {
                     if (!$status = $DB->get_field('course_completions', 'status', array('userid' => $userid, 'course' => $course->id))) {
                         $status = null;
                     }
@@ -2003,7 +2003,7 @@ class competency_course_set extends course_set {
      * @param bool $viewinganothersprogram
      * @return string
      */
-    public function display($userid=null,$previous_sets=array(),$next_sets=array(),$accessible=true, $viewinganothersprogram=false) {
+    public function display($userid=null,$previous_sets=array(),$next_sets=array(),$accessible=true, $viewinganothersprogram=false, bool $hide_progress = false) {
         global $OUTPUT, $DB, $CFG, $USER;
 
         $out = '';
@@ -2629,7 +2629,7 @@ class recurring_course_set extends course_set {
      * @param bool $viewinganothersprogram
      * @return string
      */
-    public function display($userid=null,$previous_sets=array(),$next_sets=array(),$accessible=true, $viewinganothersprogram=false) {
+    public function display($userid=null,$previous_sets=array(),$next_sets=array(),$accessible=true, $viewinganothersprogram=false, bool $hide_progress = false) {
         global $CFG, $OUTPUT, $DB, $USER;
 
         $out = '';

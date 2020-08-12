@@ -1789,26 +1789,53 @@ class program {
 
         // course sets - for certify or recertify paths
         if ($iscertif) {
+            $hidecertpathprogress = false;
+            $hiderecertpathprogress = false;
+
+            if ($certifcompletion) {
+                if ($certifstate == CERTIFCOMPLETIONSTATE_ASSIGNED || $certifstate == CERTIFCOMPLETIONSTATE_EXPIRED) {
+                   $hiderecertpathprogress = true;
+                } else if ($certifstate == CERTIFCOMPLETIONSTATE_CERTIFIED) {
+                    // Certified window not open
+                    // Do some hacky stuff to figure out which path the user just completed
+                    $conditions = ['userid' => $userid, 'certifid' => $this->certifid];
+                    $history_record = $DB->get_records('certif_completion_history', $conditions, 'timecompleted DESC', 'id, certifid, userid, certifpath', 0, 1);
+                    $history_record = reset($history_record);
+
+                    // Assume cert path if we don't have a history record
+                    $previouspath = $history_record ? $history_record->certifpath : CERTIFPATH_CERT;
+
+                    if ($previouspath == CERTIFPATH_CERT) {
+                        $hiderecertpathprogress = true;
+                    } else {
+                        $hidecertpathprogress = true;
+                    }
+                } else if ($certifstate == CERTIFCOMPLETIONSTATE_WINDOWOPEN) {
+                    // This is always recert state
+                    $hidecertpathprogress = true;
+                }
+            }
+
             // Before window opens, ideally we'd show the last path that they completed, but assuming the recert path because
             // of an existing history record is inaccurate, due to expiry and import. So instead we'll show both paths.
             if (is_siteadmin() || !$certifcompletion || $certifstate == CERTIFCOMPLETIONSTATE_CERTIFIED) {
                 $out .= $OUTPUT->heading(get_string('oricertpath', 'totara_certification'), 2);
-                $out .= $this->display_courseset(CERTIFPATH_CERT, $userid, $viewinganothersprogram);
+                $out .= $this->display_courseset(CERTIFPATH_CERT, $userid, $viewinganothersprogram, $hidecertpathprogress);
 
                 $out .= html_writer::start_tag('div', array('class' => 'programrecert'));
                 $out .= $OUTPUT->heading(get_string('recertpath', 'totara_certification'), 2);
                 $out .= html_writer::end_tag('div');
 
-                $out .= $this->display_courseset(CERTIFPATH_RECERT, $userid, $viewinganothersprogram);
+                $out .= $this->display_courseset(CERTIFPATH_RECERT, $userid, $viewinganothersprogram, $hiderecertpathprogress);
             } else { // Has a certification completion record.
                 if ($certifcompletion->certifpath == CERTIFPATH_CERT) {
                     $out .= $OUTPUT->heading(get_string('oricertpath', 'totara_certification'), 2);
-                    $out .= $this->display_courseset(CERTIFPATH_CERT, $userid, $viewinganothersprogram);
+                    $out .= $this->display_courseset(CERTIFPATH_CERT, $userid, $viewinganothersprogram, $hidecertpathprogress);
                 } else {
                     $out .= html_writer::start_tag('div', array('class' => 'programrecert'));
                     $out .= $OUTPUT->heading(get_string('recertpath', 'totara_certification'), 2);
                     $out .= html_writer::end_tag('div');
-                    $out .= $this->display_courseset(CERTIFPATH_RECERT, $userid, $viewinganothersprogram);
+                    $out .= $this->display_courseset(CERTIFPATH_RECERT, $userid, $viewinganothersprogram, $hiderecertpathprogress);
                 }
             }
         } else {
@@ -1831,12 +1858,13 @@ class program {
     /**
      * Display the course set groups of a given program or certification path.
      *
-     * @param $certifpath
-     * @param $userid If specified then it indicates the user is assigned to the program.
-     * @param $viewinganothersprogram
+     * @param int $certifpath
+     * @param int $userid If specified then it indicates the user is assigned to the program.
+     * @param bool $viewinganothersprogram
+     * @param bool $hide_progress
      * @return string
      */
-    function display_courseset($certifpath, $userid, $viewinganothersprogram) {
+    function display_courseset($certifpath, $userid, $viewinganothersprogram, bool $hide_progress = false) {
         $out = '';
         $courseset_groups = $this->content->get_courseset_groups($certifpath);
 
@@ -1878,7 +1906,7 @@ class program {
                         $out .= html_writer::start_tag('div', array('class' => 'nextsetoperator-group-and'));
                     }
 
-                    $out .= $courseset->display($userid, $previous, $next, $courseset_group_accessible, $viewinganothersprogram);
+                    $out .= $courseset->display($userid, $previous, $next, $courseset_group_accessible, $viewinganothersprogram, $hide_progress);
 
                     if ($prevnextsetoperator == NEXTSETOPERATOR_AND && $courseset->nextsetoperator != NEXTSETOPERATOR_AND) {
                         $out .= html_writer::end_tag('div');
