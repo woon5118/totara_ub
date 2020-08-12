@@ -53,6 +53,12 @@
           flex-direction: row;
           padding-top: var(--tui-gap-2);
           padding-left: var(--tui-gap-4);
+
+          img:first-child {
+            width: 40px;
+            height: 40px;
+            margin-top: var(--tui-gap-1);
+          }
         }
 
         &__title {

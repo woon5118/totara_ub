@@ -127,11 +127,6 @@ export default {
   },
 
   methods: {
-    getImage(card) {
-      let extra = JSON.parse(card.extra);
-      return extra.image || null;
-    },
-
     /**
      *
      * @param {Array} selected

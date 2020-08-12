@@ -131,6 +131,7 @@ final class survey_card extends card {
             'isexpired' => $expired,
             'editable' => $editable,
             'image' => $OUTPUT->image_url("default", 'engage_survey')->out(),
+            'image_rectangle' => $OUTPUT->image_url("default_rectangle", 'engage_survey')->out(),
         ];
     }
 

@@ -24,10 +24,6 @@
     border-top: none;
   }
 
-  .tui-grid {
-    height: 100%;
-  }
-
   /* Vertical grid styles */
   .tui-grid--vertical {
     .tui-layoutOneColumnWithMultiSidePanel__leftSidePanel {

@@ -117,8 +117,8 @@ export default {
 
   methods: {
     getImage(card) {
-      let extra = JSON.parse(card.extra);
-      return extra.image || null;
+      const extra = JSON.parse(card.extra);
+      return extra.image_rectangle || extra.image || null;
     },
 
     getId(row) {
