@@ -298,10 +298,6 @@ class participant_instance extends model {
      * @param bool $open_children
      */
     public function manually_open(bool $open_parent = true, bool $open_children = true): void {
-        if (!$this->get_availability_state() instanceof closed) {
-            throw new coding_exception('This function can only be called if the participant instance is closed');
-        }
-
         if ($open_children) {
             foreach ($this->participant_sections as $participant_section) {
                 // This will trigger an event which will end up calling $this->update_progress_status!

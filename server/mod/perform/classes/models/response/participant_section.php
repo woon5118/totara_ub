@@ -410,10 +410,6 @@ class participant_section extends model {
      * @param bool $open_parent
      */
     public function manually_open(bool $open_parent = true): void {
-        if (!$this->get_availability_state() instanceof closed) {
-            throw new coding_exception('This function can only be called if the participant section is closed');
-        }
-
         $this->get_availability_state()->open();
         // This will trigger an event which will end up calling $this->participant_instance->update_progress_status!
         $this->get_progress_state()->manually_uncomplete();
