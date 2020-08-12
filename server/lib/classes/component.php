@@ -81,7 +81,6 @@ class core_component {
         'Sabberworm\\CSS' => 'lib/php-css-parser',
         'MoodleHQ\\RTLCSS' => 'lib/rtlcss',
         'ScssPhp\\ScssPhp' => 'lib/scssphp',
-        'Box\\Spout' => 'lib/spout/src/Spout',
         'MatthiasMullie\\Minify' => 'lib/minify/matthiasmullie-minify/src/',
         'MatthiasMullie\\PathConverter' => 'lib/minify/matthiasmullie-pathconverter/src/',
         'IMSGlobal\LTI' => 'lib/ltiprovider/src',

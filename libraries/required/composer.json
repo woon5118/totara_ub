@@ -7,7 +7,8 @@
     "php": ">=7.2.10 <7.5",
     "ezyang/htmlpurifier": "4.13.0",
     "phpmailer/phpmailer": "6.1.6",
-    "webonyx/graphql-php" : "0.13.2"
+    "webonyx/graphql-php" : "0.13.2",
+    "box/spout" : "2.7.3"
   },
   "config": {
     "vendor-dir": "./"

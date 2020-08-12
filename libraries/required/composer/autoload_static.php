@@ -19,6 +19,10 @@ class ComposerStaticInit21d18eca89973f20fc861332496d6ad5
         array (
             'GraphQL\\' => 8,
         ),
+        'B' => 
+        array (
+            'Box\\Spout\\' => 10,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -29,6 +33,10 @@ class ComposerStaticInit21d18eca89973f20fc861332496d6ad5
         'GraphQL\\' => 
         array (
             0 => __DIR__ . '/..' . '/webonyx/graphql-php/src',
+        ),
+        'Box\\Spout\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/box/spout/src/Spout',
         ),
     );
 
