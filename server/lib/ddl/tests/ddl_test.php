@@ -1449,9 +1449,10 @@ class core_ddl_testcase extends database_driver_testcase {
         $key = new xmldb_key('id-course-grade');
         $key->set_attributes(XMLDB_KEY_UNIQUE, array('id', 'course', 'grade'));
         $dbman->add_key($table, $key);
+        $this->assertTrue($dbman->key_exists($table, $key));
 
-        // No easy way to test it, this just makes sure no errors are encountered.
-        $this->assertTrue(true);
+        // Make sure there are no errors if key already exists.
+        $dbman->add_key($table, $key);
     }
 
     public function testAddForeignUniqueKey() {
@@ -1463,9 +1464,10 @@ class core_ddl_testcase extends database_driver_testcase {
         $key = new xmldb_key('course');
         $key->set_attributes(XMLDB_KEY_FOREIGN_UNIQUE, array('course'), 'test_table0', array('id'));
         $dbman->add_key($table, $key);
+        $this->assertTrue($dbman->key_exists($table, $key));
 
-        // No easy way to test it, this just makes sure no errors are encountered.
-        $this->assertTrue(true);
+        // Make sure there are no errors if key already exists.
+        $dbman->add_key($table, $key);
     }
 
     public function testDropKey() {
@@ -1477,11 +1479,12 @@ class core_ddl_testcase extends database_driver_testcase {
         $key = new xmldb_key('course');
         $key->set_attributes(XMLDB_KEY_FOREIGN_UNIQUE, array('course'), 'test_table0', array('id'));
         $dbman->add_key($table, $key);
-
+        $this->assertTrue($dbman->key_exists($table, $key));
         $dbman->drop_key($table, $key);
+        $this->assertFalse($dbman->key_exists($table, $key));
 
-        // No easy way to test it, this just makes sure no errors are encountered.
-        $this->assertTrue(true);
+        // Make sure there are no errors if key does not exist.
+        $dbman->drop_key($table, $key);
     }
 
     public function testAddForeignKey() {
@@ -1493,9 +1496,10 @@ class core_ddl_testcase extends database_driver_testcase {
         $key = new xmldb_key('course');
         $key->set_attributes(XMLDB_KEY_FOREIGN, array('course'), 'test_table0', array('id'));
         $dbman->add_key($table, $key);
+        $this->assertTrue($dbman->key_exists($table, $key));
 
-        // No easy way to test it, this just makes sure no errors are encountered.
-        $this->assertTrue(true);
+        // Make sure there are no errors if key already exists.
+        $dbman->add_key($table, $key);
     }
 
     public function testDropForeignKey() {
@@ -1507,11 +1511,12 @@ class core_ddl_testcase extends database_driver_testcase {
         $key = new xmldb_key('course');
         $key->set_attributes(XMLDB_KEY_FOREIGN, array('course'), 'test_table0', array('id'));
         $dbman->add_key($table, $key);
-
+        $this->assertTrue($dbman->key_exists($table, $key));
         $dbman->drop_key($table, $key);
+        $this->assertFalse($dbman->key_exists($table, $key));
 
-        // No easy way to test it, this just makes sure no errors are encountered.
-        $this->assertTrue(true);
+        // Make sure there are no errors if key does not exist.
+        $dbman->drop_key($table, $key);
     }
 
     public function testRenameField() {

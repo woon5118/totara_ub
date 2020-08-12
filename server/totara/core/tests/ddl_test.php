@@ -389,7 +389,9 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $this->assertSame(4, $DB->count_records('test_other'));
 
         $key = new xmldb_key('courseid', XMLDB_KEY_UNIQUE, ['courseid']);
+        $this->assertTrue($dbman->key_exists($table, $key));
         $dbman->drop_key($table, $key);
+        $this->assertFalse($dbman->key_exists($table, $key));
         $record = ['courseid' => 10, 'name' => 'YY'];
         $DB->insert_record('test_other', $record);
         $this->assertSame(5, $DB->count_records('test_other'));
@@ -417,6 +419,9 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table2->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->create_table($table2);
+
+        $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
+        $this->assertTrue($dbman->key_exists($table2, $key));
 
         $course1 = (object)['name' => 'XX'];
         $course1->id = $DB->insert_record('test_course', $course1);
@@ -475,6 +480,7 @@ class totara_core_ddl_testcase extends database_driver_testcase {
 
         $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->drop_key($table2, $key);
+        $this->assertFalse($dbman->key_exists($table2, $key));
 
         $other2 = (object)['name' => 'AA', 'courseid' => $course1->id - 10];
         $other2->id = $DB->insert_record('test_other', $other2);
@@ -506,6 +512,9 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table2->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
         $dbman->create_table($table2);
+
+        $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'restrict');
+        $this->assertTrue($dbman->key_exists($table2, $key));
 
         $course1 = (object)['name' => 'XX'];
         $course1->id = $DB->insert_record('test_course', $course1);
@@ -556,6 +565,9 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'setnull');
         $dbman->create_table($table2);
 
+        $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'setnull');
+        $this->assertTrue($dbman->key_exists($table2, $key));
+
         $course1 = (object)['name' => 'XX'];
         $course1->id = $DB->insert_record('test_course', $course1);
         $this->assertSame(1, $DB->count_records('test_course'));
@@ -604,6 +616,9 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table2->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'cascade');
         $dbman->create_table($table2);
+
+        $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'cascade');
+        $this->assertTrue($dbman->key_exists($table2, $key));
 
         $course1 = (object)['name' => 'XX'];
         $course1->id = $DB->insert_record('test_course', $course1);
@@ -660,6 +675,12 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table3->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table3->add_key('otherid', XMLDB_KEY_FOREIGN, ['otherid'], 'test_other', ['id'], 'cascade');
         $dbman->create_table($table3);
+
+        $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'test_course', ['id'], 'cascade');
+        $this->assertTrue($dbman->key_exists($table2, $key));
+
+        $key = new xmldb_key('otherid', XMLDB_KEY_FOREIGN, ['otherid'], 'test_other', ['id'], 'cascade');
+        $this->assertTrue($dbman->key_exists($table3, $key));
 
         $course1 = (object)['name' => 'XX'];
         $course1->id = $DB->insert_record('test_course', $course1);
@@ -915,6 +936,9 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], 'cascade');
         $dbman->create_table($table2);
 
+        $key = new xmldb_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], 'cascade');
+        $this->assertTrue($dbman->key_exists($table2, $key));
+
         $session1 = (object)['sid' => 'abc123'];
         $session1->id = $DB->insert_record('test_sessions', $session1);
         $this->assertSame(1, $DB->count_records('test_sessions'));
@@ -962,6 +986,9 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table2->add_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], null, 'restrict');
         $dbman->create_table($table2);
+
+        $key = new xmldb_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], null, 'restrict');
+        $this->assertTrue($dbman->key_exists($table2, $key));
 
         $session1 = (object)['sid' => 'abc123'];
         $session1->id = $DB->insert_record('test_sessions', $session1);
@@ -1025,6 +1052,9 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], null, 'cascade');
         $dbman->create_table($table2);
 
+        $key = new xmldb_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], null, 'cascade');
+        $this->assertTrue($dbman->key_exists($table2, $key));
+
         $session1 = (object)['sid' => 'abc123'];
         $session1->id = $DB->insert_record('test_sessions', $session1);
         $this->assertSame(1, $DB->count_records('test_sessions'));
@@ -1084,6 +1114,9 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], 'cascade', 'cascade');
         $dbman->create_table($table2);
 
+        $key = new xmldb_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], 'cascade', 'cascade');
+        $this->assertTrue($dbman->key_exists($table2, $key));
+
         $session1 = (object)['sid' => 'abc123'];
         $session1->id = $DB->insert_record('test_sessions', $session1);
         $this->assertSame(1, $DB->count_records('test_sessions'));
@@ -1137,6 +1170,9 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         $table2->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table2->add_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], null, 'setnull');
         $dbman->create_table($table2);
+
+        $key = new xmldb_key('sid', XMLDB_KEY_FOREIGN_UNIQUE, ['sid'], 'test_sessions', ['sid'], null, 'setnull');
+        $this->assertTrue($dbman->key_exists($table2, $key));
 
         $session1 = (object)['sid' => 'abc123'];
         $session1->id = $DB->insert_record('test_sessions', $session1);

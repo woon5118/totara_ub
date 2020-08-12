@@ -712,9 +712,12 @@ class view_table_php extends XMLDBAction {
         $result .= '        $key = new xmldb_key(' . "'" . $key->getName() . "', " . $key->getPHP(true) . ');' . XMLDB_LINEFEED;
 
         // Launch the proper DDL
+        // NOTE: add_key() works even if key already exists, the IF is there to prevent developer confusion
         $result .= XMLDB_LINEFEED;
         $result .= '        // Launch add key ' . $key->getName() . '.' . XMLDB_LINEFEED;
-        $result .= '        $dbman->add_key($table, $key);' . XMLDB_LINEFEED;
+        $result .= '        if (!$dbman->key_exists($table, $key)) {' . XMLDB_LINEFEED;
+        $result .= '            $dbman->add_key($table, $key);' . XMLDB_LINEFEED;
+        $result .= '        }' . XMLDB_LINEFEED;
 
         // Add the proper upgrade_xxxx_savepoint call
         $result .= $this->upgrade_savepoint_php ($structure);
@@ -758,9 +761,12 @@ class view_table_php extends XMLDBAction {
         $result .= '        $key = new xmldb_key(' . "'" . $key->getName() . "', " . $key->getPHP(true) . ');' . XMLDB_LINEFEED;
 
         // Launch the proper DDL
+        // NOTE: drop_key() works even if key is missing or is incomplete, in special cases the "if exists" might have to be removed.
         $result .= XMLDB_LINEFEED;
         $result .= '        // Launch drop key ' . $key->getName() . '.' . XMLDB_LINEFEED;
-        $result .= '        $dbman->drop_key($table, $key);' . XMLDB_LINEFEED;
+        $result .= '        if ($dbman->key_exists($table, $key)) {' . XMLDB_LINEFEED;
+        $result .= '            $dbman->drop_key($table, $key);' . XMLDB_LINEFEED;
+        $result .= '        }' . XMLDB_LINEFEED;
 
         // Add the proper upgrade_xxxx_savepoint call
         $result .= $this->upgrade_savepoint_php ($structure);
