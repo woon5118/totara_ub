@@ -28,6 +28,8 @@ use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use mod_perform\formatter\activity\participant_instance as participant_instance_formatter;
 use mod_perform\models\activity\anonymous_participant_instance;
+use mod_perform\models\activity\helpers\external_participant_token_validator;
+use mod_perform\models\activity\helpers\external_participation;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 
 class participant_instance implements type_resolver {
@@ -45,8 +47,18 @@ class participant_instance implements type_resolver {
             throw new \coding_exception('Expected participant_instance model');
         }
 
+        $should_anonymise = $participant_instance->should_anonymise();
+
+        // If this is an external participation then we cannot determine the user
+        // by checking logged in user. In this case we need to use the token to
+        // identify the user and whether this instance belongs to him
+        $helper = new external_participation($ec);
+        if ($helper->belongs_to($participant_instance)) {
+            $should_anonymise = false;
+        }
+
         // Last chance guarding when participants should be anonymous.
-        if (!$participant_instance instanceof anonymous_participant_instance && $participant_instance->should_anonymise()) {
+        if (!$participant_instance instanceof anonymous_participant_instance && $should_anonymise) {
             $participant_instance = new anonymous_participant_instance($participant_instance);
         }
 

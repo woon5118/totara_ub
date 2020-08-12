@@ -209,7 +209,7 @@ class participant_instance extends model {
      */
     public function get_core_relationship(): ?relationship_model {
         $relationship_entity = $this->entity->core_relationship;
-        return (new relationship_model($relationship_entity));
+        return $relationship_entity ? (new relationship_model($relationship_entity)) : null;
     }
 
     /**

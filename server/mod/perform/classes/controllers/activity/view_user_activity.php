@@ -75,10 +75,10 @@ class view_user_activity extends perform_controller {
         $url_args = [];
 
         $props['subject-instance-id'] = (int) $this->participant_instance->subject_instance_id;
-        $props['participant-instance-id'] = $this->participant_instance->id;
+        $props['participant-instance-id'] = (int) $this->participant_instance->id;
 
         if ($participant_section_id > 0) {
-            $props['participant-section-id'] = $participant_section_id;
+            $props['participant-section-id'] = (int) $participant_section_id;
             $url_args['participant_section_id'] = $participant_section_id;
         } else if ($participant_instance_id > 0) {
             $url_args['participant_instance_id'] = $participant_instance_id;

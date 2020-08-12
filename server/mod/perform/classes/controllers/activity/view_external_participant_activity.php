@@ -92,9 +92,9 @@ class view_external_participant_activity extends perform_controller {
 
         $props = [
             'token' => $token,
-            'subject-instance-id' => $participant_instance->subject_instance_id,
-            'participant-instance-id' => $participant_instance->id,
-            'participant-section-id' => $participant_section_id,
+            'subject-instance-id' => (int) $participant_instance->subject_instance_id,
+            'participant-instance-id' => (int) $participant_instance->id,
+            'participant-section-id' => (int) $participant_section_id,
         ];
         $url_args = ['token' => $token];
         if ($participant_section_id) {
