@@ -33,6 +33,7 @@ enum core_format {
   HTML
   PLAIN
   MARKDOWN
+  JSON_EDITOR
 }
 
 """

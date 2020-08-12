@@ -276,11 +276,25 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
     public function test_resolve_summaryformat() {
         list($users, $courses) = $this->create_faux_courses();
         $this->setUser($users[0]);
+        $formats = [ // Note: HTML is default so not included here, and RAW is not a saved format.
+            FORMAT_PLAIN => format::FORMAT_PLAIN,
+            FORMAT_MARKDOWN => format::FORMAT_MARKDOWN,
+            FORMAT_JSON_EDITOR => format::FORMAT_JSON_EDITOR,
+        ];
 
         // Check that each core instance of course gets resolved correctly.
-        $value = $this->resolve('summaryformat', $courses[0]);
+        $course = $courses[0];
+        $value = $this->resolve('summaryformat', $course);
         $this->assertEquals('HTML', $value);
         $this->assertTrue(is_string($value));
+
+        // Also check all non default values.
+        foreach ($formats as $format => $expected) {
+            $course->summaryformat = $format;
+            $value = $this->resolve('summaryformat', $course);
+            $this->assertTrue(is_string($value));
+            $this->assertEquals($expected, $value);
+        }
     }
 
     /**

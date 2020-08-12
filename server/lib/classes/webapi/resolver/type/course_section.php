@@ -113,11 +113,11 @@ class course_section implements type_resolver {
                 case FORMAT_PLAIN:
                     return 'PLAIN';
                     break;
-                case FORMAT_RAW:
-                    return 'RAW';
-                    break;
                 case FORMAT_MARKDOWN:
                     return 'MARKDOWN';
+                    break;
+                case FORMAT_JSON_EDITOR:
+                    return 'JSON_EDITOR';
                     break;
                 default:
                     // Note: There is also FORMAT_WIKI but it has been deprecated since 2005.

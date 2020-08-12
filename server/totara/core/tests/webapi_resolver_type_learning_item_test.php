@@ -529,6 +529,11 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         list($user, $course, $program, $certification) = $this->create_faux_learning_items();
         $this->setUser($user);
         $items = $this->get_learning_items($user->id);
+        $formats = [ // Note: HTML is default so not included here, and RAW is not a saved format.
+            FORMAT_PLAIN => format::FORMAT_PLAIN,
+            FORMAT_MARKDOWN => format::FORMAT_MARKDOWN,
+            FORMAT_JSON_EDITOR => format::FORMAT_JSON_EDITOR,
+        ];
 
         // Check that each core instance of learning item gets resolved correctly.
         $item = array_pop($items);
@@ -536,15 +541,37 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         $this->assertEquals('HTML', $value);
         $this->assertTrue(is_string($value));
 
-        $item = array_pop($items);
-        $value = $this->resolve('description_format', $item);
-        $this->assertEquals('HTML', $value);
-        $this->assertTrue(is_string($value));
+        // Also check all non default values.
+        foreach ($formats as $format => $expected) {
+            $item->description_format = $format;
+            $value = $this->resolve('description_format', $item);
+            $this->assertTrue(is_string($value));
+            $this->assertEquals($expected, $value);
+        }
 
         $item = array_pop($items);
         $value = $this->resolve('description_format', $item);
         $this->assertEquals('HTML', $value);
         $this->assertTrue(is_string($value));
+
+        foreach ($formats as $format => $expected) {
+            $item->description_format = $format;
+            $value = $this->resolve('description_format', $item);
+            $this->assertTrue(is_string($value));
+            $this->assertEquals($expected, $value);
+        }
+
+        $item = array_pop($items);
+        $value = $this->resolve('description_format', $item);
+        $this->assertEquals('HTML', $value);
+        $this->assertTrue(is_string($value));
+
+        foreach ($formats as $format => $expected) {
+            $item->description_format = $format;
+            $value = $this->resolve('description_format', $item);
+            $this->assertTrue(is_string($value));
+            $this->assertEquals($expected, $value);
+        }
     }
 
     /**
