@@ -87,7 +87,7 @@ final class profile_watcher {
             }
 
             // We have to respect the mail display settings from user record.
-            $mail_display = $DB->get_field('user', 'maildisplay', ['id' => $hook]);
+            $mail_display = $DB->get_field('user', 'maildisplay', ['id' => $hook->target_user_id]);
             $valid_settings = [
                 \core_user::MAILDISPLAY_EVERYONE,
                 \core_user::MAILDISPLAY_COURSE_MEMBERS_ONLY
