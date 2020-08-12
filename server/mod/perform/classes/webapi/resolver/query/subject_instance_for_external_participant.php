@@ -56,7 +56,7 @@ class subject_instance_for_external_participant implements query_resolver, has_m
         }
 
         $validator = new external_participant_token_validator($token);
-        if (!$validator->is_valid()) {
+        if (!$validator->is_valid() || $validator->is_subject_instance_closed()) {
             return null;
         }
 

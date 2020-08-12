@@ -29,7 +29,9 @@ use mod_perform\entities\activity\participant_section as participant_section_ent
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\participant_source;
+use mod_perform\models\activity\subject_instance;
 use mod_perform\models\response\participant_section;
+use mod_perform\state\subject_instance\closed;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -152,6 +154,52 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_external_par
         $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $this->assertNull($result);
     }
+
+    /**
+     * Tests exception is thrown when updating a closed participant section.
+     *
+     * @return void
+     */
+    public function test_can_not_update_closed_subject_instance() {
+        $external_section = $this->create_test_data(true);
+
+        // Just close the subject instance directly as using the manual close
+        // would close the sections as well, which is already covered
+        $subject_instance = $external_section->participant_instance->subject_instance;
+        $subject_instance->availability = closed::get_code();
+        $subject_instance->save();
+
+        $this->setUser(null);
+
+        $section_elements = $external_section->section_elements;
+
+        $token = $external_section->participant_instance->external_participant->token;
+
+        $expected_responses = [];
+        $answers = [];
+        $i = 1;
+        foreach ($section_elements as $section_element) {
+            $encoded_response = json_encode(['answer_text' => 'response '.$i]);
+            $expected_responses[] = $encoded_response;
+            $answers[] = [
+                'section_element_id' => $section_element->id,
+                'response_data' => $encoded_response,
+            ];
+            $i++;
+        }
+
+        $args = [
+            'input' => [
+                'participant_section_id' => $external_section->id,
+                'token' => $token,
+                'update' => $answers,
+            ],
+        ];
+
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
+        $this->assertNull($result);
+    }
+
 
     /**
      * Tests exception is thrown when updating a closed participant section.

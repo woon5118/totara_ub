@@ -53,6 +53,20 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
             ->order_by('id')
             ->first();
 
+        /** @var participant_section_entity $closed_section */
+        $closed_section = participant_section_entity::repository()
+            ->join([participant_instance_entity::TABLE, 'pi'], 'participant_instance_id', 'id')
+            ->where('pi.participant_source', participant_source::EXTERNAL)
+            ->where('pi.subject_instance_id', '<>', $external_section->participant_instance->subject_instance_id)
+            ->where('pi.subject_instance_id', '<>', $external_section2->participant_instance->subject_instance_id)
+            ->order_by('id')
+            ->first();
+
+        $closed_section_model = participant_section_model::load_by_entity($closed_section);
+        $closed_section_model->participant_instance->subject_instance->manually_close();
+
+        $external_token_closed = $closed_section->participant_instance->external_participant->token;
+
         /** @var $internal_section participant_section_entity */
         $internal_section = participant_section_entity::repository()
             ->join([participant_instance_entity::TABLE, 'pi'], 'participant_instance_id', 'id')
@@ -65,23 +79,26 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
         $user = $this->getDataGenerator()->create_user();
 
         return [
-            'instance - successful' => [(int)$external_section->participant_instance_id, null, $external_token, null, (int)$external_section->id],
+            'instance - successful' => [(int) $external_section->participant_instance_id, null, $external_token, null, (int) $external_section->id],
+            'instance - closed' => [(int) $closed_section->participant_instance_id, null, $external_token_closed, null, null],
             'instance - token and instance dont match' => [(int)$external_section2->participant_instance_id, null, $external_token, null, null],
-            'instance - empty token' => [(int)$external_section->participant_instance_id, null, '', null, null],
-            'instance - invalid token' => [(int)$external_section->participant_instance_id, null, 'idontexist', null, null],
-            'instance - logged in user' => [(int)$external_section->participant_instance_id, null, $external_token, $user, null],
-            'instance - token does not match instance id' => [(int)$internal_section->participant_instance_id, null, $external_token, null, null],
-            'section - successful' => [null, (int)$external_section->id, $external_token, null, (int)$external_section->id],
-            'section - empty token' => [null, (int)$external_section->id, '', null, null],
-            'section - invalid token' => [null, (int)$external_section->id, 'idontexist', null, null],
-            'section - logged in user' => [null, (int)$external_section->id, $external_token, $user, null],
-            'section - token does not match instance id' => [null, (int)$internal_section->id, $external_token, null, null],
-            'both - successful' => [(int)$external_section->participant_instance_id, (int)$external_section->id, $external_token, null, (int)$external_section->id],
-            'instance - token and instance dont match' => [(int)$external_section2->participant_instance_id, (int)$external_section2->id, $external_token, null, null],
-            'both - empty token' => [(int)$external_section->participant_instance_id, (int)$external_section->id, '', null, null],
-            'both - invalid token' => [(int)$external_section->participant_instance_id, (int)$external_section->id, 'idontexist', null, null],
-            'both - logged in user' => [(int)$external_section->participant_instance_id, (int)$external_section->id, $external_token, $user, null],
-            'both - token does not match instance id' => [(int)$external_section->participant_instance_id, (int)$internal_section->id, $external_token, null, null],
+            'instance - empty token' => [(int) $external_section->participant_instance_id, null, '', null, null],
+            'instance - invalid token' => [(int) $external_section->participant_instance_id, null, 'idontexist', null, null],
+            'instance - logged in user' => [(int) $external_section->participant_instance_id, null, $external_token, $user, null],
+            'instance - token does not match instance id' => [(int) $internal_section->participant_instance_id, null, $external_token, null, null],
+            'section - successful' => [null, (int) $external_section->id, $external_token, null, (int) $external_section->id],
+            'section - closed' => [null, (int) $closed_section->id, $external_token_closed, null, null],
+            'section - empty token' => [null, (int) $external_section->id, '', null, null],
+            'section - invalid token' => [null, (int) $external_section->id, 'idontexist', null, null],
+            'section - logged in user' => [null, (int) $external_section->id, $external_token, $user, null],
+            'section - token does not match instance id' => [null, (int) $internal_section->id, $external_token, null, null],
+            'both - successful' => [(int) $external_section->participant_instance_id, (int)$external_section->id, $external_token, null, (int) $external_section->id],
+            'both - closed' => [(int) $closed_section->participant_instance_id, (int) $closed_section->id, $external_token_closed, null, null],
+            'both - token and instance dont match' => [(int) $external_section2->participant_instance_id, (int) $external_section2->id, $external_token, null, null],
+            'both - empty token' => [(int) $external_section->participant_instance_id, (int) $external_section->id, '', null, null],
+            'both - invalid token' => [(int) $external_section->participant_instance_id, (int) $external_section->id, 'idontexist', null, null],
+            'both - logged in user' => [(int) $external_section->participant_instance_id, (int) $external_section->id, $external_token, $user, null],
+            'both - token does not match instance id' => [(int) $external_section->participant_instance_id, (int) $internal_section->id, $external_token, null, null],
         ];
     }
 
@@ -126,7 +143,9 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
 
         $result = $this->resolve_graphql_query(self::QUERY, $args);
         if ($expected_result === null) {
-            $this->assertNull($result, 'Error in dataset \'' . $dataset_name . '\': Expected no return value.');
+            if ($result !== null) {
+                $this->fail('Error in dataset \'' . $dataset_name . '\': Expected no return value.');
+            }
         } else {
             $this->assertInstanceOf(
                 participant_section_model::class,

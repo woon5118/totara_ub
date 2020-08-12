@@ -53,7 +53,7 @@ class participant_section_external_participant extends participant_section {
         }
 
         $validator = new external_participant_token_validator($token);
-        if (!$validator->is_valid()) {
+        if (!$validator->is_valid() || $validator->is_subject_instance_closed()) {
             return null;
         }
 

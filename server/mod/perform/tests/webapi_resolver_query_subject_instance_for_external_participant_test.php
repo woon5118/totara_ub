@@ -149,6 +149,34 @@ class mod_perform_webapi_resolver_query_subject_instance_for_external_participan
         $this->assertNull($result);
     }
 
+    public function test_resolve_closed_subject_instance() {
+        $this->setup_data();
+
+        // Even if someone is logged in the resolving with token should still work
+        // Get the first external participant instance
+        /** @var participant_instance_entity $external_participant_instance */
+        $external_participant_instance = participant_instance_entity::repository()
+            ->where('participant_source', participant_source::EXTERNAL)
+            ->order_by('id')
+            ->first();
+
+        $subject_instance = subject_instance::load_by_entity($external_participant_instance->subject_instance);
+        $subject_instance->manually_close();
+
+        // Make sure you are not logged in
+        $this->setUser(null);
+
+        // This should resolve now as it has a valid token
+        $result = $this->resolve_graphql_query(
+            self::QUERY,
+            [
+                'subject_instance_id' => $external_participant_instance->subject_instance_id,
+                'token' => $external_participant_instance->external_participant->token
+            ]
+        );
+        $this->assertNull($result);
+    }
+
     public function test_query_successful(): void {
         $this->setup_data();
 

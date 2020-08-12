@@ -52,7 +52,7 @@ class update_section_responses_external_participant implements mutation_resolver
         }
 
         $validator = new external_participant_token_validator($token);
-        if (!$validator->is_valid()) {
+        if (!$validator->is_valid() || $validator->is_subject_instance_closed()) {
             return null;
         }
 
