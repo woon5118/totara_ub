@@ -30,15 +30,6 @@
     width: 100%;
   }
 
-  &__btn {
-    &--absoluteButton {
-      position: absolute;
-      top: 0;
-      right: 0;
-      padding-top: var(--tui-gap-1);
-    }
-  }
-
   &--updateAble {
     &:hover,
     &:focus-within,
@@ -53,7 +44,7 @@
 
   &:not(:hover) {
     .tui-inlineEditing__btn:not(:focus) {
-      @include sr-only();
+      visibility: hidden;
     }
   }
 }

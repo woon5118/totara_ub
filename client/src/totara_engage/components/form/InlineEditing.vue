@@ -26,17 +26,16 @@
     }"
     @click="handleClick"
   >
+    <slot name="content" />
+
     <ButtonIcon
       v-show="updateAble"
       :aria-label="buttonAriaLabel"
       :styleclass="{ transparent: true, small: true }"
       class="tui-inlineEditing__btn"
-      :class="{ 'tui-inlineEditing__btn--absoluteButton': absoluteButton }"
     >
       <EditIcon size="200" />
     </ButtonIcon>
-
-    <slot name="content" />
   </div>
 </template>
 
@@ -51,7 +50,6 @@ export default {
   },
 
   props: {
-    absoluteButton: Boolean,
     buttonAriaLabel: {
       type: String,
       default() {
