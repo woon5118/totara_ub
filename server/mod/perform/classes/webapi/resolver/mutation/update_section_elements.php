@@ -97,7 +97,7 @@ class update_section_elements implements mutation_resolver, has_middleware {
                     $update_form_data['title'],
                     $update_form_data['data'],
                     $update_form_data['is_required'] ?? null,
-                    $update_form_data['identifier']
+                    $update_form_data['identifier'] ?? ''
                 );
             }
         });

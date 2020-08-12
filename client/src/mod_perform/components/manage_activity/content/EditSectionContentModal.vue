@@ -127,7 +127,11 @@
                 :raw-data="sectionElement.element.raw_data"
                 :title="sectionElement.element.title"
                 :raw-title="sectionElement.element.raw_title"
-                :identifier="sectionElement.element.identifier"
+                :identifier="
+                  normaliseIdentifierForElements(
+                    sectionElement.element.identifier
+                  )
+                "
                 :is-required="sectionElement.element.is_required"
                 :type="sectionElement.element.type"
                 :error="errors[sectionElement.id]"
@@ -757,6 +761,23 @@ export default {
 
         this.reorderElements(this.sectionElements);
       }
+    },
+
+    /**
+     * Check element editable
+     */
+    isElementEditable() {
+      return this.activityState.name !== 'ACTIVE';
+    },
+
+    /**
+     * Replace null with empty string before passing it on to the element components because they shouldn't
+     * bother about handling null value.
+     *
+     * @param {String} identifier
+     */
+    normaliseIdentifierForElements(identifier) {
+      return identifier === null ? '' : identifier;
     },
   },
 };
