@@ -81,6 +81,7 @@ export default {
       type: Number,
       required: true,
     },
+    disabled: Boolean,
   },
 
   // ensure manager strings are loaded
@@ -557,6 +558,14 @@ export default {
   },
 
   render(h) {
+    if (this.disabled) {
+      const draggableAttrs = { 'data-tui-draggable': true };
+      return this.$scopedSlots.default({
+        draggableAttrs,
+        attrs: draggableAttrs,
+      });
+    }
+
     const nativeDraggableEvents = {
       keydown: this.handleKeyDown,
       focusin: this.handleFocusIn,
