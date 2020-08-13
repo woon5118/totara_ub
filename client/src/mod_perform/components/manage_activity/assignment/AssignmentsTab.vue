@@ -34,6 +34,14 @@
           <DropdownItem @click="openAdder">
             {{ $str('user_group_assignment_group_cohort', 'mod_perform') }}
           </DropdownItem>
+          <DropdownItem @click="openOrgAdder">
+            {{
+              $str('user_group_assignment_group_organisation', 'mod_perform')
+            }}
+          </DropdownItem>
+          <DropdownItem @click="openPosAdder">
+            {{ $str('user_group_assignment_group_position', 'mod_perform') }}
+          </DropdownItem>
         </Dropdown>
       </GridItem>
     </Grid>
@@ -112,10 +120,31 @@
       />
     </div>
     <AudienceAdder
-      :open="isAdderOpen"
-      :existing-items="addedIds"
-      @added="updateSelectionFromAdder"
+      :open="isAudienceAdderOpen"
+      :existing-items="audienceAddedIds"
+      @added="
+        selection =>
+          updateSelectionFromAdder(selection, audienceAddedIds, cohortEnum)
+      "
       @cancel="closeAdder"
+    />
+
+    <OrganisationAdder
+      :open="isOrgAdderOpen"
+      :existing-items="orgAddedIds"
+      @added="
+        selection => updateSelectionFromAdder(selection, orgAddedIds, orgEnum)
+      "
+      @cancel="closeOrgAdder"
+    />
+
+    <PositionAdder
+      :open="isPosAdderOpen"
+      :existing-items="posAddedIds"
+      @added="
+        selection => updateSelectionFromAdder(selection, posAddedIds, posEnum)
+      "
+      @cancel="closePosAdder"
     />
 
     <ConfirmationModal
@@ -139,6 +168,8 @@
 
 <script>
 import AudienceAdder from 'tui/components/adder/AudienceAdder';
+import OrganisationAdder from 'tui/components/adder/OrganisationAdder';
+import PositionAdder from 'tui/components/adder/PositionAdder';
 import Button from 'tui/components/buttons/Button';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Cell from 'tui/components/datatable/Cell';
@@ -173,6 +204,8 @@ export default {
     HeaderCell,
     Table,
     Schedule,
+    OrganisationAdder,
+    PositionAdder,
   },
 
   props: {
@@ -200,12 +233,18 @@ export default {
           },
         },
       ],
-      addedIds: [],
-      isAdderOpen: false,
+      audienceAddedIds: [],
+      orgAddedIds: [],
+      posAddedIds: [],
+      isAudienceAdderOpen: false,
+      isOrgAdderOpen: false,
+      isPosAdderOpen: false,
       confirmationModalOpen: false,
       assignmentToRemove: null,
       adminEnum: 1,
       cohortEnum: 1,
+      orgEnum: 2,
+      posEnum: 3,
     };
   },
 
@@ -228,8 +267,17 @@ export default {
     track() {
       if (this.track) {
         this.assignments = this.track.assignments;
-        this.addedIds = this.assignments
+
+        this.audienceAddedIds = this.assignments
           .filter(assignment => assignment.group.type === this.cohortEnum)
+          .map(assignment => assignment.group.id);
+
+        this.orgAddedIds = this.assignments
+          .filter(assignment => assignment.group.type === this.orgEnum)
+          .map(assignment => assignment.group.id);
+
+        this.posAddedIds = this.assignments
+          .filter(assignment => assignment.group.type === this.posEnum)
           .map(assignment => assignment.group.id);
       }
       this.assignments;
@@ -260,25 +308,41 @@ export default {
      * Shows the cohort selection dialog.
      */
     openAdder() {
-      this.isAdderOpen = true;
+      this.isAudienceAdderOpen = true;
     },
 
     /**
      * Hides the cohort selection dialog without any selections.
      */
     closeAdder() {
-      this.isAdderOpen = false;
+      this.isAudienceAdderOpen = false;
+    },
+
+    openOrgAdder() {
+      this.isOrgAdderOpen = true;
+    },
+
+    closeOrgAdder() {
+      this.isOrgAdderOpen = false;
+    },
+
+    openPosAdder() {
+      this.isPosAdderOpen = true;
+    },
+
+    closePosAdder() {
+      this.isPosAdderOpen = false;
     },
 
     /**
      * Saves the assigned cohorts in the repository.
      */
-    updateSelectionFromAdder(selection) {
+    updateSelectionFromAdder(selection, addedIds, adderType) {
       // Filter out previously added.
       const groups = selection.data
-        .filter(item => this.addedIds.indexOf(item.id) == -1)
+        .filter(item => addedIds.indexOf(item.id) == -1)
         .map(item => {
-          return { id: item.id, type: this.cohortEnum };
+          return { id: item.id, type: adderType };
         });
 
       const selected = {
@@ -293,8 +357,23 @@ export default {
         selected
       );
 
-      this.addedIds = selection.ids;
-      this.isAdderOpen = false;
+      this.$_postProcess(adderType, selection);
+    },
+
+    $_postProcess(adderType, selection) {
+      if (adderType === this.cohortEnum) {
+        this.audienceAddedIds = selection.ids;
+        this.isAudienceAdderOpen = false;
+      }
+      if (adderType === this.orgEnum) {
+        this.orgAddedIds = selection.ids;
+        this.isOrgAdderOpen = false;
+      }
+
+      if (adderType === this.posEnum) {
+        this.posAddedIds = selection.ids;
+        this.isPosAdderOpen = false;
+      }
     },
 
     /**
@@ -429,6 +508,8 @@ export default {
       "user_group_assignment_confirm_remove_draft",
       "user_group_assignment_confirm_remove_title",
       "user_group_assignment_group_cohort",
+      "user_group_assignment_group_organisation",
+      "user_group_assignment_group_position",
       "user_group_assignment_name",
       "user_group_assignment_no_users",
       "user_group_assignment_title",

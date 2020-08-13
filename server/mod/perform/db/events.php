@@ -75,4 +75,24 @@ $observers = [
         'eventname' => subject_instance_activated::class,
         'callback' => subject_instance_manual_status::class.'::subject_instance_activated',
     ],
+    [
+        'eventname' => hierarchy_organisation\event\organisation_deleted::class,
+        'callback' => track_assignment_user_groups::class.'::organisation_deleted',
+    ],
+    [
+        'eventname' => hierarchy_position\event\position_deleted::class,
+        'callback' => track_assignment_user_groups::class.'::position_deleted',
+    ],
+    [
+        'eventname' => totara_job\event\job_assignment_created::class,
+        'callback' => track_assignment_user_groups::class.'::job_assignment_updated',
+    ],
+    [
+        'eventname' => totara_job\event\job_assignment_updated::class,
+        'callback' => track_assignment_user_groups::class.'::job_assignment_updated',
+    ],
+    [
+        'eventname' => totara_job\event\job_assignment_deleted::class,
+        'callback' => track_assignment_user_groups::class.'::job_assignment_updated',
+    ],
 ];

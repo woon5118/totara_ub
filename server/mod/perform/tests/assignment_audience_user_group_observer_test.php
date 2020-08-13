@@ -32,7 +32,7 @@ use totara_cohort\event\members_updated;
  *
  * @group perform
  */
-class mod_perform_assignment_user_group_observer_testcase extends advanced_testcase {
+class mod_perform_assignment_audience_user_group_observer_testcase extends advanced_testcase {
 
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
@@ -110,9 +110,6 @@ class mod_perform_assignment_user_group_observer_testcase extends advanced_testc
     }
 
     private function prepare_assignments() {
-        /** @var totara_hierarchy_generator $hierarchy_generator */
-        $hierarchy_generator = $this->generator()->get_plugin_generator('totara_hierarchy');
-
         $test_data = new class() {
             public $user1;
             public $user2;

@@ -187,4 +187,18 @@ class track_assignment extends model {
         return $this;
     }
 
+    /**
+     * Get all assignments that has a specific grouping.
+     *
+     * @param grouping $grouping
+     * @return collection
+     */
+    public static function get_all_for_grouping(grouping $grouping): collection {
+        return track_assignment_entity::repository()
+            ->where('user_group_type', $grouping->get_type())
+            ->where('user_group_id', $grouping->get_id())
+            ->get()
+            ->map_to(track_assignment::class);
+    }
+
 }

@@ -1338,14 +1338,22 @@ class mod_perform_generator extends component_generator_base {
             ->one(true);
 
         $cohort_ids = [];
+        $org_ids = [];
+        $pos_ids = [];
         switch ($type) {
             case 'cohort':
                 $cohort_ids[] = $DB->get_field('cohort', 'id', ['name' => $data['assignment_name']], MUST_EXIST);
                 break;
+            case 'organisation':
+                $org_ids[] = $DB->get_field('org', 'id', ['fullname' => $data['assignment_name']], MUST_EXIST);
+                break;
+            case 'position':
+                $pos_ids[] = $DB->get_field('pos', 'id', ['fullname' => $data['assignment_name']], MUST_EXIST);
+                break;
             default:
                 throw new coding_exception("creating track assignment not yet implemented for {$type}");
         }
-        $this->create_track_assignments_with_existing_groups(track::load_by_entity($track), $cohort_ids);
+        $this->create_track_assignments_with_existing_groups(track::load_by_entity($track), $cohort_ids, $org_ids, $pos_ids);
     }
 
 }
