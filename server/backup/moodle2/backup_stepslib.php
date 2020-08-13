@@ -382,7 +382,10 @@ class backup_course_structure_step extends backup_structure_step {
             'timecreated', 'timemodified',
             'requested', 'restrictmodules',
             'enablecompletion', 'completionstartonenrol', 'completionprogressonview', 'completionnotify',
-            'audiencevisible', 'icon', 'coursetype'));
+            'audiencevisible', 'icon', 'coursetype',
+            // Totara:
+            'containertype',
+        ));
 
         $category = new backup_nested_element('category', array('id'), array(
             'name', 'description'));

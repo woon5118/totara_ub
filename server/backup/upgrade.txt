@@ -10,6 +10,7 @@ information provided here is intended especially for developers.
 * Allow backup permissions check to be overridden by the course container API
   in backup_controller::__construct and restore_controller::__construct
 * Allow restorer course role to be overridden by the course container API
+* Added 'containertype' course field to backup_course_structure_step::define_structure
 
 === 11 ===
 

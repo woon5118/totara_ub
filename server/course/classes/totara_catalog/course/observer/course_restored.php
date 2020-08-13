@@ -26,6 +26,8 @@ namespace core_course\totara_catalog\course\observer;
 
 defined('MOODLE_INTERNAL') || die();
 
+use container_course\course;
+use core\orm\query\builder;
 use totara_catalog\observer\object_update_observer;
 
 class course_restored extends object_update_observer {
@@ -40,6 +42,15 @@ class course_restored extends object_update_observer {
      * init course update object for restored course
      */
     protected function init_change_objects(): void {
+        // Only update catalog records for actual courses.
+        $restore_catalog_entry = builder::table('course')
+            ->where('id', $this->event->objectid)
+            ->where('containertype', course::get_type())
+            ->exists();
+        if (!$restore_catalog_entry) {
+            return;
+        }
+
         $data = new \stdClass();
         $data->objectid = $this->event->objectid;
         $data->contextid = $this->event->contextid;

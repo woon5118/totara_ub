@@ -12,6 +12,7 @@ information provided here is intended especially for developers.
  * core_course_management_renderer::category_listitem() has been updated to delay-render action menu items
  * core_course\management\helper::get_category_listitem_actions() added a second argument $onlyfastactions
  * core_course_renderer::course_section_cm_completion has been updated changing the self completion icon to a checkbox
+ * core_course\totara_catalog\course\observer\course_restored::init_change_objects now only updates courses with the course container type
  * Function get_module_types_names has been deprecated and will be removed in the future, please use container_course\course::get_module_types_supported instead
  * Function add_course_module has been deprecated and will be removed in the future, please use container_course\module\course_module::create instead
  * Function course_create_section has been deprecated and will be removed in the future, please use container_course\section\course_section::create instead
