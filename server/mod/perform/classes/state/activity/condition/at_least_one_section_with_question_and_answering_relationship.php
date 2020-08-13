@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * The activity has at least one section with at least one valid question and one relationship
  */
-class at_least_one_section_with_question_and_relationship extends condition {
+class at_least_one_section_with_question_and_answering_relationship extends condition {
 
     public function pass(): bool {
         /** @var activity $activity */
@@ -40,9 +40,9 @@ class at_least_one_section_with_question_and_relationship extends condition {
         $sections = $activity->get_sections();
 
         // Check whether the activity has at least one respondable section element
-        // and one relationship for a section
+        // and one answering relationship for a section
         foreach ($sections as $section) {
-            $relationships = $section->get_section_relationships();
+            $relationships = $section->get_answering_section_relationships();
             $respondable_section_elements = $section->get_respondable_section_elements();
 
             if ($relationships->count() >= 1 && $respondable_section_elements->count() >= 1) {

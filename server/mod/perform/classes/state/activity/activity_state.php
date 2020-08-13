@@ -23,6 +23,7 @@
 
 namespace mod_perform\state\activity;
 
+use mod_perform\state\activity\condition\at_least_one_track_with_one_assignment;
 use mod_perform\state\state;
 
 abstract class activity_state extends state {
@@ -48,6 +49,9 @@ abstract class activity_state extends state {
      * Can this activity be activated. This checks the status and the conditions
      * to activate an activity. This does not check the users capability to activate
      * this activity.
+     *
+     * @see at_least_one_track_with_one_assignment
+     * @see at_least_one_section_with_question_and_answering_relationship
      *
      * @return bool
      */

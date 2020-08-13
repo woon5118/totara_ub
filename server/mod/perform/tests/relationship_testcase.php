@@ -148,18 +148,24 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
      * @param array $relationships
      * @return void
      */
-    protected function assert_can_view_status(section $section, array $relationships): void {
+    protected function assert_can_view_and_answer_status(section $section, array $relationships): void {
         $section1_relationships = $section->get_section_relationships();
 
         foreach ($relationships as $relationship) {
+            /** @var section_relationship $created_relationship */
             $created_relationship = $section1_relationships->find(
                 function ($section_relationship) use ($relationship) {
                     return $relationship['core_relationship_id'] == $section_relationship->core_relationship_id;
                 }
             );
+
             $this->assertInstanceOf(section_relationship_model::class, $created_relationship);
+
             $expected_can_view = $relationship['can_view'] ?? false;
             $this->assertEquals($expected_can_view, (bool) $created_relationship->can_view);
+
+            $expected_can_answer = $relationship['can_answer'] ?? false;
+            $this->assertEquals($expected_can_answer, (bool) $created_relationship->can_answer);
         }
     }
 }

@@ -155,14 +155,17 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
                 [
                     'core_relationship_id' => $appraiser_relationship->id,
                     'can_view' => true,
+                    'can_answer' => true,
                 ],
                 [
                     'core_relationship_id' => $manager_relationship->id,
                     'can_view' => true,
+                    'can_answer' => true,
                 ],
                 [
                     'core_relationship_id' => $subject_relationship->id,
                     'can_view' => true,
+                    'can_answer' => true,
                 ],
             ]
         );
@@ -176,10 +179,12 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
                 [
                     'core_relationship_id' => $appraiser_relationship->id,
                     'can_view' => true,
+                    'can_answer' => true,
                 ],
                 [
                     'core_relationship_id' => $manager_relationship->id,
                     'can_view' => true,
+                    'can_answer' => true,
                 ]
             ]
         );
@@ -192,10 +197,12 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
                 [
                     'core_relationship_id' => $manager_relationship->id,
                     'can_view' => true,
+                    'can_answer' => true,
                 ],
                 [
                     'core_relationship_id' => $subject_relationship->id,
                     'can_view' => true,
+                    'can_answer' => true,
                 ]
             ]
         );

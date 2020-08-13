@@ -32,7 +32,10 @@
           @click="removeDisplayedParticipant(participant)"
         />
       </div>
-      <div class="tui-performActivitySectionRelationship__item-options">
+      <div
+        v-if="!isViewOnlyParticipant"
+        class="tui-performActivitySectionRelationship__item-options"
+      >
         <Checkbox
           v-model="participant_can_view"
           @change="toggleCanViewOnParticipant"
@@ -41,12 +44,10 @@
         </Checkbox>
       </div>
     </div>
-    <div v-else class="tui-performActivitySectionRelationship__item">
-      <p>
-        {{ participant.core_relationship.name
-        }}{{ participant.can_view ? '*' : '' }}
-      </p>
-    </div>
+    <p v-else class="tui-performActivitySectionRelationship__item">
+      {{ participant.core_relationship.name
+      }}{{ participant.can_view && !isViewOnlyParticipant ? '*' : '' }}
+    </p>
   </div>
 </template>
 
@@ -67,6 +68,10 @@ export default {
     editable: {
       type: Boolean,
       required: true,
+    },
+    isViewOnlyParticipant: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

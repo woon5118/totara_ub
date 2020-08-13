@@ -17,40 +17,40 @@
 -->
 <style lang="scss">
 .tui-performActivitySectionRelationship {
-  > * {
-    margin-top: var(--tui-gap-4);
-  }
   &__item {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    &-name {
-      display: flex;
-      flex-grow: 1;
-      justify-content: space-between;
-      padding: var(--tui-gap-2);
-      border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
-      border-radius: var(--tui-border-radius-normal);
-    }
-    &-options {
-      margin-top: var(--tui-gap-4);
-    }
+    margin: 0;
+  }
+
+  &__item-name {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+    padding: var(--tui-gap-2);
+    border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+    border-radius: var(--tui-border-radius-normal);
+  }
+
+  &__item-options {
+    margin-top: var(--tui-gap-2);
   }
 }
+
 @media (min-width: $tui-screen-xs) {
   .tui-performActivitySectionRelationship {
-    > * {
-      margin-top: var(--tui-gap-2);
-    }
     &__item {
       flex-direction: row;
-      &-name {
-        max-width: 500px;
-      }
-      &-options {
-        margin: auto 0;
-        padding: var(--tui-gap-2);
-      }
+    }
+
+    &__item-name {
+      max-width: 20rem;
+    }
+
+    &__item-options {
+      margin: auto 0;
+      padding: var(--tui-gap-2);
     }
   }
 }

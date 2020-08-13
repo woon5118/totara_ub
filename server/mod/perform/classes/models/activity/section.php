@@ -207,6 +207,15 @@ class section extends model {
     }
 
     /**
+     * Get a list of all section relationships that this section has
+     *
+     * @return collection|section_relationship[]
+     */
+    public function get_answering_section_relationships(): collection {
+        return $this->get_section_relationships()->filter('can_answer', true);
+    }
+
+    /**
      * Get section elements summary
      *
      * @return stdClass
@@ -271,13 +280,20 @@ class section extends model {
                 if ($section_relationship) {
                     unset($relationship_update['core_relationship_id']);
                 }
-                $section_relationship
-                    ? $section_relationship->update_can_view($relationship_update['can_view'])
-                    : section_relationship::create(
+
+                if ($section_relationship) {
+                    $section_relationship->update_attribution_settings(
+                        $relationship_update['can_view'],
+                        $relationship_update['can_answer']
+                    );
+                } else {
+                    section_relationship::create(
                         $this->get_id(),
                         $relationship_update['core_relationship_id'],
-                        $relationship_update['can_view']
+                        $relationship_update['can_view'],
+                        $relationship_update['can_answer']
                     );
+                }
             }
 
             $relationship_ids = array_column($relationship_updates, 'core_relationship_id');

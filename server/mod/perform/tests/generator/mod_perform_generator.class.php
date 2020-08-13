@@ -359,14 +359,21 @@ class mod_perform_generator extends component_generator_base {
      * @param section $section
      * @param array $data containing the relationship key as the relationship idnumber.
      * @param bool $can_view
+     * @param bool $can_answer
      * @return section_relationship_model
      */
-    public function create_section_relationship(section $section, array $data, $can_view = true): section_relationship_model {
+    public function create_section_relationship(
+        section $section,
+        array $data,
+        $can_view = true,
+        $can_answer = true
+    ): section_relationship_model {
         $core_relationship = $this->get_core_relationship($data['relationship']);
         return section_relationship_model::create(
             $section->get_id(),
             $core_relationship->id,
-            $can_view
+            $can_view,
+            $can_answer
         );
     }
 

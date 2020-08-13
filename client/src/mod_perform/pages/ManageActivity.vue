@@ -75,6 +75,7 @@ import Tabs from 'tui/components/tabs/Tabs';
 import activityQuery from 'mod_perform/graphql/activity';
 import { notify } from 'tui/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
+import { debounce } from 'tui/util';
 
 export default {
   components: {
@@ -136,6 +137,17 @@ export default {
       ],
     };
   },
+  computed: {
+    activityState() {
+      return this.activity ? this.activity.state_details.name : null;
+    },
+  },
+  created() {
+    this.showMutationSuccessNotification = debounce(
+      this.showMutationSuccessNotification,
+      500
+    );
+  },
   apollo: {
     activity: {
       query: activityQuery,
@@ -147,11 +159,6 @@ export default {
       update: data => {
         return data.mod_perform_activity;
       },
-    },
-  },
-  computed: {
-    activityState() {
-      return this.activity ? this.activity.state_details.name : null;
     },
   },
   methods: {

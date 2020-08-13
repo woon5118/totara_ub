@@ -19,7 +19,7 @@
 <style lang="scss">
 .tui-performManageActivityContent {
   & > * + * {
-    margin: var(--tui-gap-4) 0 0;
+    margin: var(--tui-gap-8) 0 0;
   }
 
   &__items {

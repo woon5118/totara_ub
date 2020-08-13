@@ -29,7 +29,7 @@
       :key="relationship.id"
       :value="relationship.id"
       :name="relationship.name"
-      :checked="isActiveParticipant(relationship)"
+      :checked="isCheckedParticipant(relationship)"
       :disabled="isActiveParticipant(relationship)"
       @change="isChecked => handleChange(isChecked, relationship)"
     >
@@ -52,9 +52,9 @@
     <template v-slot:trigger>
       <ButtonIcon
         :styleclass="{ small: true }"
-        :aria-label="$str('activity_participants_add', 'mod_perform')"
+        :aria-label="addButtonAriaLabel"
         :disabled="hasAddedAllParticipants"
-        class="tui-performActivitySectionParticipants__add"
+        @click="resetCheckedParticipants"
       >
         <AddIcon size="100" />
       </ButtonIcon>
@@ -76,7 +76,6 @@ export default {
     Checkbox,
     Popover,
   },
-
   props: {
     activeParticipants: {
       required: true,
@@ -89,15 +88,27 @@ export default {
       type: Array,
       required: true,
     },
+    isViewOnlyParticipants: Boolean,
   },
-
   data() {
     return {
       checkedParticipants: [],
     };
   },
-
   computed: {
+    /**
+     * Get the add button aria-label.
+     *
+     * @return {string}
+     */
+    addButtonAriaLabel() {
+      if (this.isViewOnlyParticipants) {
+        return this.$str('activity_participants_view_only_add', 'mod_perform');
+      }
+
+      return this.$str('activity_participants_add', 'mod_perform');
+    },
+
     /**
      * Checks if all participants have been added.
      *
@@ -117,6 +128,27 @@ export default {
       close();
       this.$emit('update-participants', this.checkedParticipants);
       this.checkedParticipants = [];
+    },
+
+    /**
+     * Checks if participant is active.
+     * @param {Object} participant
+     */
+    isCheckedParticipant(participant) {
+      return this.checkedParticipants.some(
+        checkedParticipant => checkedParticipant.id == participant.id
+      );
+    },
+
+    /**
+     * Uncheck all participants. This should be happening on every display.
+     * The check participants state should only be representative of the current
+     * "selection session", not the overarching state of selections.
+     *
+     * Already selected participants should instead be shown as disabled.
+     */
+    resetCheckedParticipants() {
+      return (this.checkedParticipants = []);
     },
 
     /**
@@ -152,7 +184,8 @@ export default {
     "mod_perform": [
       "activity_participants_select_done",
       "activity_participants_select_heading",
-      "activity_participants_add"
+      "activity_participants_add",
+      "activity_participants_view_only_add"
     ],
     "moodle": [
       "cancel"

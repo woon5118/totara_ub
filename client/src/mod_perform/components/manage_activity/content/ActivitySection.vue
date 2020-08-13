@@ -17,13 +17,14 @@
 -->
 
 <template>
-  <Card
+  <Component
+    :is="autoSave ? 'div' : 'Card'"
     class="tui-performActivitySection"
     :no-border="autoSave"
     :class="[!autoSave && 'tui-performActivitySection__multiple']"
   >
     <div
-      :class="[editMode && !autoSave && 'tui-performActivitySection__editing']"
+      :class="{ 'tui-performActivitySection--editing': editMode && !autoSave }"
     >
       <Grid v-if="!autoSave && !editMode">
         <GridItem :units="isDraft ? 10 : 12">
@@ -71,40 +72,96 @@
         :maxlength="TITLE_INPUT_MAX_LENGTH"
         @input="title = $event"
       />
-      <div class="tui-performActivitySection__participant">
-        <h4 class="tui-performActivitySection__participant-heading">
-          {{ $str('activity_participants_heading', 'mod_perform') }}
-        </h4>
-        <span v-if="(!autoSave && !editMode) || !isDraft">
-          {{ $str('activity_participant_view_other_responses', 'mod_perform') }}
-        </span>
-        <div class="tui-performActivitySection__participant-items">
-          <ActivitySectionRelationship
-            v-for="participant in displayedParticipantsSorted"
-            :key="participant.core_relationship.id"
-            :participant="participant"
-            :editable="(autoSave || editMode) && isDraft"
-            @participant-removed="removeDisplayedParticipant"
-            @can-view-changed="updateParticipantData"
-          />
-        </div>
+      <div
+        class="tui-performActivitySection__participant-groups"
+        :class="{
+          'tui-performActivitySection__participant-groups--editing': isEditing,
+        }"
+      >
+        <Grid :stack-at="764">
+          <GridItem
+            :units="6"
+            class="tui-performActivitySection__participant-group"
+          >
+            <h4 class="tui-performActivitySection__participant-heading">
+              {{ $str('activity_participants_heading', 'mod_perform') }}
+            </h4>
+            <span
+              v-if="(!autoSave && !editMode) || !isDraft"
+              class="tui-performActivitySection__can-view-others-legend"
+            >
+              {{
+                $str('activity_participant_view_other_responses', 'mod_perform')
+              }}
+            </span>
+            <div class="tui-performActivitySection__participant-items">
+              <ActivitySectionRelationship
+                v-for="participant in displayedAnsweringParticipantsSorted"
+                :key="participant.core_relationship.id"
+                :participant="participant"
+                :editable="(autoSave || editMode) && isDraft"
+                @participant-removed="removeDisplayedParticipant"
+                @can-view-changed="updateParticipantData"
+              />
+            </div>
 
-        <div
-          v-if="
-            displayedParticipantsSorted.length === 0 &&
-              ((!autoSave && !editMode) || !isDraft)
-          "
-        >
-          <span class="tui-performActivitySection__participant-info">
-            {{ $str('no_participants_added', 'mod_perform') }}
-          </span>
-        </div>
-        <ParticipantsPopover
-          v-if="(autoSave || editMode) && isDraft"
-          :relationships="relationships"
-          :active-participants="displayedParticipants"
-          @update-participants="updateDisplayedParticipants"
-        />
+            <div
+              v-if="
+                displayedAnsweringParticipantsSorted.length === 0 &&
+                  ((!autoSave && !editMode) || !isDraft)
+              "
+            >
+              <span class="tui-performActivitySection__participant-info">
+                {{ $str('no_participants_added', 'mod_perform') }}
+              </span>
+            </div>
+            <ParticipantsPopover
+              v-if="(autoSave || editMode) && isDraft"
+              :relationships="relationships"
+              :active-participants="displayedParticipants"
+              @update-participants="updateDisplayedParticipants(false, $event)"
+            />
+          </GridItem>
+
+          <GridItem
+            :units="6"
+            class="tui-performActivitySection__participant-group"
+          >
+            <h4 class="tui-performActivitySection__participant-heading">
+              {{
+                $str('activity_participants_view_only_heading', 'mod_perform')
+              }}
+            </h4>
+            <div class="tui-performActivitySection__participant-items">
+              <ActivitySectionRelationship
+                v-for="participant in displayedViewOnlyParticipantsSorted"
+                :key="participant.core_relationship.id"
+                :participant="participant"
+                is-view-only-participant
+                :editable="(autoSave || editMode) && isDraft"
+                @participant-removed="removeDisplayedParticipant"
+              />
+            </div>
+
+            <div
+              v-if="
+                displayedViewOnlyParticipantsSorted.length === 0 &&
+                  ((!autoSave && !editMode) || !isDraft)
+              "
+            >
+              <span class="tui-performActivitySection__participant-info">
+                {{ $str('no_participants_added', 'mod_perform') }}
+              </span>
+            </div>
+            <ParticipantsPopover
+              v-if="(autoSave || editMode) && isDraft"
+              :relationships="relationships"
+              is-view-only-participants
+              :active-participants="displayedParticipants"
+              @update-participants="updateDisplayedParticipants(true, $event)"
+            />
+          </GridItem>
+        </Grid>
       </div>
     </div>
     <ButtonGroup
@@ -124,9 +181,10 @@
         @click="resetSectionChanges"
       />
     </ButtonGroup>
+    <hr class="tui-performActivitySection__divider" />
     <div
       class="tui-performActivitySection__content"
-      :class="[autoSave && 'tui-performActivitySection__content-autoSave']"
+      :class="{ 'tui-performActivitySection__content--autoSave': autoSave }"
     >
       <Grid :stack-at="700">
         <GridItem grows :units="9">
@@ -177,7 +235,7 @@
         <p>{{ $str('modal_section_delete_message', 'mod_perform') }}</p>
       </template>
     </ConfirmationModal>
-  </Card>
+  </Component>
 </template>
 
 <script>
@@ -285,6 +343,12 @@ export default {
 
   computed: {
     /**
+     * Are we editing details.
+     */
+    isEditing() {
+      return !this.autoSave && this.editMode;
+    },
+    /**
      * Get saved participants.
      *
      * @return {Array}
@@ -316,7 +380,8 @@ export default {
         return this.savedParticipants.find(participant => {
           return (
             participant.core_relationship.id === value.core_relationship.id &&
-            participant.can_view === value.can_view
+            participant.can_view === value.can_view &&
+            participant.can_answer === value.can_answer
           );
         });
       });
@@ -324,6 +389,28 @@ export default {
 
     /**
      * Gets Sorted list of the displayed participants.
+     *
+     * @return {Array}
+     */
+    displayedAnsweringParticipantsSorted() {
+      return this.displayedParticipantsSorted.filter(
+        participant => participant.can_answer
+      );
+    },
+
+    /**
+     * Gets Sorted list of the displayed view-only participants.
+     *
+     * @return {Array}
+     */
+    displayedViewOnlyParticipantsSorted() {
+      return this.displayedParticipantsSorted.filter(
+        participant => !participant.can_answer
+      );
+    },
+
+    /**
+     * Gets Sorted list of the displayed answering participants.
      *
      * @return {Array}
      */
@@ -395,6 +482,7 @@ export default {
         return {
           core_relationship_id: participant.core_relationship.id,
           can_view: participant.can_view,
+          can_answer: participant.can_answer,
         };
       });
     },
@@ -430,13 +518,15 @@ export default {
 
     /**
      * Update the displayed participants.
+     * @param {boolean} isViewOnly Are the checked participants "view-only"
      * @param {Array} checkedParticipants List of new participants
      */
-    updateDisplayedParticipants(checkedParticipants) {
+    updateDisplayedParticipants(isViewOnly, checkedParticipants) {
       this.displayedParticipants = this.displayedParticipants.concat(
         checkedParticipants.map(participant => {
           return {
-            can_view: false,
+            can_answer: !isViewOnly,
+            can_view: isViewOnly,
             core_relationship: participant,
           };
         })
@@ -571,6 +661,7 @@ export default {
     "mod_perform": [
       "activity_participant_view_other_responses",
       "activity_participants_heading",
+      "activity_participants_view_only_heading",
       "activity_section_done",
       "edit_content_elements",
       "edit_section",

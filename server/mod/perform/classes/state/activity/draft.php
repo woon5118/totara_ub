@@ -23,7 +23,7 @@
 
 namespace mod_perform\state\activity;
 
-use mod_perform\state\activity\condition\at_least_one_section_with_question_and_relationship;
+use mod_perform\state\activity\condition\at_least_one_section_with_question_and_answering_relationship;
 use mod_perform\state\activity\condition\at_least_one_track_with_one_assignment;
 use mod_perform\state\transition;
 
@@ -64,7 +64,7 @@ class draft extends activity_state {
         return [
             // A draft activity can be activated.
             transition::to(new active($this->object))->with_conditions([
-                at_least_one_section_with_question_and_relationship::class,
+                at_least_one_section_with_question_and_answering_relationship::class,
                 at_least_one_track_with_one_assignment::class
             ]),
         ];

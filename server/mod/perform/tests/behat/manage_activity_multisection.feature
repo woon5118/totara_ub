@@ -14,10 +14,10 @@ Feature: Managing an activity with multiple sections
     And I navigate to the manage perform activities page
 
   Scenario: Manage participants for an activity with multiple sections.
-    # Note already in multisection mode because the generator created multiple sections.
+    # Note already in multi-section mode because the generator created multiple sections.
     When I navigate to the edit perform activities page for activity "Multiple section Activity"
     And I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
-    And I click the add participant button in "1" activity section
+    And I click the add responding participant button in "1" activity section
     Then the following fields match these values:
       | Subject   | 0 |
       | Manager   | 0 |
@@ -32,7 +32,7 @@ Feature: Managing an activity with multiple sections
 
     # Edit relationships for second section.
     When I click on ".tui-performActivitySection__action-edit" "css_element" in the "2" activity section
-    And I click the add participant button in "2" activity section
+    And I click the add responding participant button in "2" activity section
     And I click on the "Manager" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(2) .tui-popoverFrame__content" "css_element"
     And I click on the "Appraiser" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(2) .tui-popoverFrame__content" "css_element"
     And I click on "Done" "button" in the ".tui-popoverPositioner" "css_element" of the "2" activity section
@@ -51,7 +51,7 @@ Feature: Managing an activity with multiple sections
     And I should see "Appraiser*" in the "1" activity section
     And I should see "Appraiser*" in the "2" activity section
 
-  Scenario: Manage activity - toggle multisection states
+  Scenario: Manage activity - toggle multi-section states
     When I navigate to the edit perform activities page for activity "Participant set up test"
     And I click on the "Multiple sections" tui toggle button
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
@@ -67,7 +67,7 @@ Feature: Managing an activity with multiple sections
 
     When I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
     And I set the title of activity section "1" to "Section #1"
-    And I click the add participant button in "1" activity section
+    And I click the add responding participant button in "1" activity section
     And I click on the "Subject" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" "css_element"
     And I click on the "Appraiser" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" "css_element"
     And I click on "Done" "button" in the ".tui-popoverPositioner" "css_element" of the "1" activity section
@@ -104,7 +104,7 @@ Feature: Managing an activity with multiple sections
     And I should see "1" in the "optional" element summary of "1" activity section
     And I should see "Section #2"
 
-    # Multisection off => all sections merged into 1
+    # multi-section off => all sections merged into 1
     When I click on the "Multiple sections" tui toggle button
     Then I should see "All sections' content will be merged and section headings removed. Participant settings will be removed. This cannot be undone." in the tui modal
 
@@ -125,7 +125,7 @@ Feature: Managing an activity with multiple sections
     Then I should see "S2Q1"
     And I should see "S1Q1"
 
-    # Renable multisection; test can save a section title without changing the title
+    # Renable multi-section; test can save a section title without changing the title
     # for the first section to be created.
     When I close the tui modal
     And I close the tui notification toast

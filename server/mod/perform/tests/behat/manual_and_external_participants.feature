@@ -28,7 +28,7 @@ Feature: Allow users to select manual (internal and external) participants for a
       | Activity title | Act1      |
       | Activity type  | Appraisal |
     And I click on "Get started" "button"
-    And I click the add participant button
+    And I click the add responding participant button
     And I click on the "Subject" tui checkbox
     And I click on the "Manager" tui checkbox
     And I click on the "Appraiser" tui checkbox

@@ -33,6 +33,8 @@ use WebDriver\Exception\NoSuchElement;
  *
  */
 class behat_totara_tui extends behat_base {
+    public const PRIMARY_BTN = '.tui-formBtn--prim';
+    public const SECONDARY_BTN = '.tui-formBtn:not(.tui-formBtn--prim)';
 
     private const DATA_TABLE_DEFAULT_LOCATOR = '.tui-dataTable';
     private const DATA_TABLE_DEFAULT_SELECTOR_TYPE = 'css_element';
@@ -879,18 +881,30 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
-     * @Then /^I should see "([^"]*)" in the tui "([^"]*)" notification toast$/
+     * @Then /^I should see "([^"]*)" in the tui "([^"]*)" notification toast(| and close it)$/
      * @param string $expected_text
      * @param string $toast_type
+     * @param string $and_close_it
      * @throws Exception
      */
-    public function i_should_see_in_the_tui_notification_toast(string $expected_text, string $toast_type): void {
+    public function i_should_see_in_the_tui_notification_toast(
+        string $expected_text,
+        string $toast_type,
+        string $and_close_it
+    ): void {
         $locator = self::NOTIFICATION_BANNER_LOCATOR . '--' . $toast_type;
         $locator .= self::NOTIFICATION_TOAST_LOCATOR;
 
         $this->execute('behat_general::assert_element_contains_text',
             [$expected_text, $locator, 'css_element']
         );
+
+        if ($and_close_it) {
+            try {
+                $this->i_close_the_tui_notification_toast();
+            } catch (Throwable $t) {
+            }
+        }
     }
 
     /**
@@ -1584,4 +1598,5 @@ class behat_totara_tui extends behat_base {
 
         $this->fail("Could not find the '{$label}' {$tui_selector}");
     }
+
 }

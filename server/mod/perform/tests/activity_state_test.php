@@ -22,8 +22,10 @@
  */
 
 use mod_perform\constants;
+use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use mod_perform\event\activity_activated;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\section_relationship;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\state\activity\activity_state;
@@ -34,7 +36,7 @@ use mod_perform\state\state_helper;
  */
 class mod_perform_activity_state_testcase extends advanced_testcase {
 
-    public function test_activate() {
+    public function test_activate(): void {
         $user = $this->getDataGenerator()->create_user();
 
         $this->setUser($user);
@@ -63,7 +65,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         $this->assertFalse($activity->is_draft());
     }
 
-    public function test_activate_event_is_triggered() {
+    public function test_activate_event_is_triggered(): void {
         $user = $this->getDataGenerator()->create_user();
 
         $this->setUser($user);
@@ -120,7 +122,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         $this->assertFalse($active_activity->can_activate());
     }
 
-    public function test_get_all_translated() {
+    public function test_get_all_translated(): void {
         $this->assertEqualsCanonicalizing(
             [
                 1 => 'Active',
@@ -133,8 +135,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         );
     }
 
-
-    public function test_cant_activate_with_unsatisfied_conditions() {
+    public function test_cant_activate_with_unsatisfied_conditions(): void {
         $user = $this->getDataGenerator()->create_user();
 
         $this->setUser($user);
@@ -186,8 +187,39 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         $this->assertTrue($invalid_draft_activity->can_activate());
     }
 
+    public function test_cant_activate_with_view_only_relationships(): void {
+        $user = $this->getDataGenerator()->create_user();
 
-    public function test_cant_activate_without_any_relationships() {
+        $this->setUser($user);
+
+        $activity = $this->create_activity_with_view_only_relationship();
+
+        $this->assertEquals(draft::get_code(), $activity->status);
+        $this->assertTrue($activity->is_draft());
+        $this->assertFalse($activity->is_active());
+
+        $activity->activate();
+
+        $activity->refresh();
+
+        $this->assertEquals(draft::get_code(), $activity->status);
+        $this->assertFalse($activity->is_active());
+        $this->assertTrue($activity->is_draft());
+
+        /** @var section_relationship_entity $section_relationship_entity */
+        $section_relationship_entity = section_relationship_entity::repository()->order_by('id')->first();
+        $section_relationship = section_relationship::load_by_entity($section_relationship_entity);
+        $section_relationship->update_attribution_settings(false, true);
+
+        $activity->refresh(true);
+        $activity->activate();
+
+        $this->assertEquals(active::get_code(), $activity->status);
+        $this->assertTrue($activity->is_active());
+        $this->assertFalse($activity->is_draft());
+    }
+
+    public function test_cant_activate_without_any_relationships(): void {
         $user = $this->getDataGenerator()->create_user();
 
         $this->setUser($user);
@@ -233,8 +265,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         $this->assertFalse($invalid_draft_activity->can_activate());
     }
 
-
-    public function test_cant_activate_with_only_static_elements() {
+    public function test_cant_activate_with_only_static_elements(): void {
         $user1 = $this->getDataGenerator()->create_user();
 
         $this->setUser($user1);
@@ -278,6 +309,38 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         $perform_generator->create_section_relationship(
             $section,
             ['relationship' => constants::RELATIONSHIP_MANAGER]
+        );
+
+        $element = $perform_generator->create_element(['title' => 'Question one', 'plugin_name' => $element_plugin_name]);
+        $perform_generator->create_section_element($section, $element);
+
+        $perform_generator->create_single_activity_track_and_assignment($activity);
+
+        return $activity;
+    }
+
+    /**
+     * Creates an activity with one section, one question and one relationship
+     *
+     * @param int|null $status defaults to draft
+     * @param string $element_plugin_name
+     * @return activity
+     */
+    protected function create_activity_with_view_only_relationship(
+        int $status = null,
+        $element_plugin_name = 'short_text'
+    ): activity {
+        $perform_generator = $this->generator();
+
+        $activity = $this->create_activity($status);
+
+        $section = $perform_generator->create_section($activity, ['title' => 'Test section 1']);
+
+        $perform_generator->create_section_relationship(
+            $section,
+            ['relationship' => constants::RELATIONSHIP_MANAGER],
+            true,
+            false
         );
 
         $element = $perform_generator->create_element(['title' => 'Question one', 'plugin_name' => $element_plugin_name]);

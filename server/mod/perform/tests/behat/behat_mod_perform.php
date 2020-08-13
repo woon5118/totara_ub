@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\ElementNotFoundException;
@@ -54,7 +55,8 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
     public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR = '.tui-participantContent__sectionHeading-other-response-switch button';
     public const MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR = '.tui-performActivitySectionRelationship__item-name';
-    public const MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL = '.tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d) [aria-label=\'Add participants\']';
+    public const MANAGE_CONTENT_ADD_RESPONDING_PARTICIPANTS_BUTTON_LABEL = '.tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d) [aria-label=\'Add participants\']';
+    public const MANAGE_CONTENT_ADD_VIEW_ONLY_PARTICIPANTS_BUTTON_LABEL = '.tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d) [aria-label=\'Add view-only participants\']';
     public const MANAGE_CONTENT_ACTIVITY_SECTION = '.tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d)';
     public const MANAGE_CONTENT_ACTIVITY_SECTION_CONTENT_SUMMARY = '.tui-grid-item:nth-of-type(%d) .tui-performActivitySectionElementSummary__count';
     public const INSTANCE_INFO_CARD_LABEL_LOCATOR = '.tui-instanceInfoCard__info-label';
@@ -287,7 +289,7 @@ class behat_mod_perform extends behat_base {
 
         $section_node = $this->get_section_node($section_number, true);
 
-        $editing_node = $section_node->find('css', '.tui-performActivitySection__editing');
+        $editing_node = $section_node->find('css', '.tui-performActivitySection--editing');
         if ($editing_node === null) {
             throw new ExpectationException("Section {$section_number} is not in edit mode", $this->getSession());
         }
@@ -799,13 +801,21 @@ class behat_mod_perform extends behat_base {
 
     /**
      * @Then /^I should see "([^"]*)" as the perform activity participants$/
+     * @Then /^I should see "([^"]*)" as the perform activity (view-only|responding) participants$/
      * @param $expected_participant_list
+     * @param string $group
+     * @throws ExpectationException
      */
-    public function i_should_see_as_the_participants($expected_participant_list): void {
-        $expected_participants = explode(',', $expected_participant_list);
+    public function i_should_see_as_the_participants(
+        $expected_participant_list,
+        string $group = 'responding'
+    ): void {
+        $group_container = $this->find_participant_group_container($group);
 
         /** @var NodeElement[] $rows */
-        $rows = $this->find_all('css', self::MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR);
+        $rows = $group_container->findAll('css', self::MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR);
+
+        $expected_participants = explode(',', $expected_participant_list);
 
         foreach ($expected_participants as $index => $expected_participant) {
             if (trim($rows[$index]->getText()) !== trim($expected_participant)) {
@@ -815,15 +825,79 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @When /^I click the add participant button$/
-     * @When /^I click the add participant button in "([^"]*)" activity section$/
+     * @Then /^the mod perform (responding|view-only) participants popover should match:$/
+     * @param TableNode $table
+     * @param string $group
+     */
+    public function the_mod_perform_participants_popover_should_match(TableNode $table, string $group): void {
+        $group_container = $this->find_participant_group_container($group);
+
+        foreach ($table->getHash() as $hash) {
+            $input = $group_container->find('css', "input[name='{$hash['name']}']");
+
+            if ($hash['checked'] && !$input->isChecked()) {
+                $this->fail("{$hash['name']} did not have the correct checked value");
+            }
+
+            if (!$hash['enabled'] && $input->getAttribute('disabled') !== 'disabled') {
+                $this->fail("{$hash['name']} did not have the correct enabled value");
+            }
+        }
+    }
+
+    /**
+     * @When /^I select "([^"]*)" in the (responding|view-only) participants popover(| then click cancel)$/
+     * @param string $participant_list
+     * @param string $group
+     * @param string $then_click_cancel
+     */
+    public function i_select_in_the_participants_popover(
+        string $participant_list,
+        string $group,
+        string $then_click_cancel
+    ): void {
+        $relationships = explode(',', $participant_list);
+
+        $group_container = $this->find_participant_group_container($group);
+
+        foreach ($relationships as $relationship) {
+            $relationship = trim($relationship);
+
+            $input = $group_container->find('css', "input[name='{$relationship}']");
+            $input->getParent()->find('css', 'label')->click();
+        }
+
+        if ($then_click_cancel) {
+            // "Cancel".
+            $group_container->find('css', behat_totara_tui::SECONDARY_BTN)->click();
+        } else {
+            // "Done".
+            $group_container->find('css', behat_totara_tui::PRIMARY_BTN)->click();
+        }
+    }
+
+    /**
+     * @When /^I click the add (responding|view-only) participant button$/
+     * @When /^I click the add (responding|view-only) participant button in "([^"]*)" activity section$/
      *
+     * @param string $responding
      * @param int $section_number
      * @return void
+     * @throws ExpectationException
      */
-    public function i_click_the_add_participant_button(int $section_number = 1): void {
+    public function i_click_the_add_participant_button(
+        string $responding,
+        int $section_number = 1
+    ): void {
         behat_hooks::set_step_readonly(false);
-        $css_selector = sprintf(self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL, $section_number);
+
+        if ($responding === 'responding') {
+            $selector = self::MANAGE_CONTENT_ADD_RESPONDING_PARTICIPANTS_BUTTON_LABEL;
+        } else {
+            $selector = self::MANAGE_CONTENT_ADD_VIEW_ONLY_PARTICIPANTS_BUTTON_LABEL;
+        }
+
+        $css_selector = sprintf($selector, $section_number);
 
         $this->find(
             'css',
@@ -839,7 +913,7 @@ class behat_mod_perform extends behat_base {
      * @return void
      */
     public function i_should_see_the_add_participant_button_is_disabled(int $section_number = 1): void {
-        $css_selector = sprintf(self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL, $section_number);
+        $css_selector = sprintf(self::MANAGE_CONTENT_ADD_RESPONDING_PARTICIPANTS_BUTTON_LABEL, $section_number);
         $this->execute('behat_general::the_element_should_be_disabled',
             [$css_selector, 'css_element']
         );
@@ -910,7 +984,7 @@ class behat_mod_perform extends behat_base {
      * @return void
      */
     public function i_should_see_the_add_participant_button(int $section_number = 1): void {
-        $css_selector = sprintf(self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL, $section_number);
+        $css_selector = sprintf(self::MANAGE_CONTENT_ADD_RESPONDING_PARTICIPANTS_BUTTON_LABEL, $section_number);
         $this->ensure_element_exists(
             $css_selector,
             'css_element'
@@ -1056,6 +1130,25 @@ class behat_mod_perform extends behat_base {
         }
 
         return $activity;
+    }
+
+    private function find_participant_group_container(string $group): NodeElement {
+        if ($group === 'responding') {
+            $participant_group = 'Responding participants';
+        } else {
+            $participant_group = 'View-only participants';
+        }
+
+        $headings = $this->find_all('css', '.tui-performActivitySection__participant-heading');
+
+        $headings_for_group = array_filter($headings, function (NodeElement $heading) use ($participant_group) {
+            return trim($heading->getText()) === $participant_group;
+        });
+
+        /** @var NodeElement $heading */
+        $heading = reset($headings_for_group);
+
+        return $heading->getParent();
     }
 
 }

@@ -43,7 +43,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
 
     use webapi_phpunit_helper;
 
-    public function test_update_section_title() {
+    public function test_update_section_title(): void {
         $this->setAdminUser();
         $perform_generator = $this->perform_generator();
         $activity = $perform_generator->create_activity_in_container([
@@ -107,7 +107,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         );
     }
 
-    public function test_update_active_activity_not_possible() {
+    public function test_update_active_activity_not_possible(): void {
         $this->setAdminUser();
         $perform_generator = $this->perform_generator();
         $activity = $perform_generator->create_activity_in_container([
@@ -132,7 +132,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         ]);
     }
 
-    public function test_update_invalid_section_id() {
+    public function test_update_invalid_section_id(): void {
         $this->setAdminUser();
         $relationship_id = $this->perform_generator()->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
         $non_existent_section_id = 1234;
@@ -154,7 +154,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
-    public function test_update_missing_capability() {
+    public function test_update_missing_capability(): void {
         $this->setAdminUser();
         $perform_generator = $this->perform_generator();
         $relationship_id = $this->perform_generator()->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
@@ -180,7 +180,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
-    public function test_update_successful() {
+    public function test_update_successful(): void {
         self::setAdminUser();
         $perform_generator = $this->perform_generator();
         $activity1 = $perform_generator->create_activity_in_container([
@@ -208,15 +208,18 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
             [
                 [
                     'core_relationship_id' => $subject_relationship->id,
-                    'can_view' => false,
+                    'can_view' => true,
+                    'can_answer' => false,
                 ],
                 [
                     'core_relationship_id' => $manager_relationship->id,
                     'can_view' => true,
+                    'can_answer' => true,
                 ],
                 [
                     'core_relationship_id' => $appraiser_relationship->id,
                     'can_view' => false,
+                    'can_answer' => true,
                 ],
             ]
         );
@@ -225,8 +228,11 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         /** @var section $returned_section */
         $returned_section = $result['section'];
         $this->assertEquals($section1->id, $returned_section->id);
-        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER]);
-        $this->assert_can_view_status($section1, $args['input']['relationships']);
+        $this->assert_section_relationships(
+            $section1,
+            [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER]
+        );
+        $this->assert_can_view_and_answer_status($section1, $args['input']['relationships']);
         $this->assert_section_relationships($section2, []);
 
         // Remove all relationships.
@@ -239,7 +245,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
     /**
      * Test the mutation through the GraphQL stack.
      */
-    public function test_ajax_query_successful() {
+    public function test_ajax_query_successful(): void {
         $data = $this->create_test_data(null, draft::get_code());
         // Section without relationships.
         $section_id = $data->activity2_section2->id;

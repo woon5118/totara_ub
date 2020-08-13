@@ -18,6 +18,11 @@
 
 <style lang="scss">
 .tui-performActivitySection {
+  &--editing {
+    padding: var(--tui-gap-4);
+    border: solid var(--tui-color-secondary) var(--tui-border-width-normal);
+  }
+
   &__title {
     margin: 0;
   }
@@ -25,13 +30,8 @@
   &__multiple {
     padding: var(--tui-gap-4);
     & > * + * {
-      margin-top: var(--tui-gap-4);
+      margin-top: var(--tui-gap-6);
     }
-  }
-
-  &__editing {
-    padding: var(--tui-gap-4);
-    border: solid var(--tui-color-secondary) var(--tui-border-width-normal);
   }
 
   &.tui-card {
@@ -54,37 +54,66 @@
     min-width: auto;
   }
 
-  &__content {
-    padding: var(--tui-gap-4) 0;
-    border-top: var(--tui-border-width-thin) solid var(--tui-card-border-color);
+  &__divider {
+    margin-top: var(--tui-gap-8);
+    margin-bottom: 0;
+  }
 
-    &-autoSave {
+  &__content {
+    margin-top: var(--tui-gap-4);
+
+    &--autoSave {
       margin-top: var(--tui-gap-4);
       border-bottom: var(--tui-border-width-thin) solid
         var(--tui-card-border-color);
     }
   }
 
-  &__participant {
-    & > * {
-      margin: var(--tui-gap-4) 0 0;
-    }
+  &__can-view-others-legend {
+    display: block;
+  }
 
-    &-info {
-      font-style: italic;
-    }
+  &__participant-heading {
+    margin-top: var(--tui-gap-2);
+  }
 
-    &-heading {
-      @include tui-font-heading-label();
-      display: inline-block;
+  &__participant-items {
+    & > * + * {
+      margin-top: var(--tui-gap-2);
     }
+  }
+
+  &__participant-groups {
+    margin-top: var(--tui-gap-2);
+  }
+
+  &__participant-group {
+    & > * + * {
+      margin-top: var(--tui-gap-4);
+    }
+  }
+
+  &__participant-info {
+    font-style: italic;
+  }
+
+  &__participant-heading {
+    display: inline-block;
+    margin-top: var(--tui-gap-4);
+    margin-bottom: 0;
+    @include tui-font-heading-label();
   }
 }
 
-@media (min-width: $tui-screen-lg) {
+@media (min-width: $tui-screen-sm) {
   .tui-performActivitySection {
+    &__can-view-others-legend {
+      display: inline;
+    }
+
     &__content-buttons {
-      text-align: right;
+      display: flex;
+      justify-content: flex-end;
     }
   }
 }

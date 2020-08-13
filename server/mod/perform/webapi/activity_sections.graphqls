@@ -60,6 +60,7 @@ used to update section relationships.
 input update_section_relationship_input {
   core_relationship_id: core_id!
   can_view: Boolean = false
+  can_answer: Boolean = true
 }
 
 extend type Query {

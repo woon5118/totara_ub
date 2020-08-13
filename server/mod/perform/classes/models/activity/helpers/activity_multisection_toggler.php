@@ -181,7 +181,8 @@ class activity_multisection_toggler {
             foreach ($relationships as $section_relationship) {
                 $relationships_to_transfer[] = [
                     'core_relationship_id' => $section_relationship->core_relationship->id,
-                    'can_view' => $section_relationship->can_view
+                    'can_view' => $section_relationship->can_view,
+                    'can_answer' => $section_relationship->can_answer
                 ];
             }
 
