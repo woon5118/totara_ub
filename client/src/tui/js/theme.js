@@ -92,4 +92,44 @@ export default {
     arrayVarCache.set(name, values);
     return values;
   },
+
+  /**
+   * Takes a Hex colour value, # symbol optional, and an adjustment value
+   * between 0 and 255 and returns a lighter or darker Hex colour value.
+   *
+   * @param {string} hexColorValue
+   * @param {number} adjustmentValue
+   * @return {string}
+   **/
+  adjustHexValueBrightness(hexColorValue, adjustmentValue) {
+    let usePound = false;
+
+    if (hexColorValue[0] == '#') {
+      hexColorValue = hexColorValue.slice(1);
+      usePound = true;
+    }
+
+    let R = parseInt(hexColorValue.substring(0, 2), 16);
+    let G = parseInt(hexColorValue.substring(2, 4), 16);
+    let B = parseInt(hexColorValue.substring(4, 6), 16);
+
+    R = R + adjustmentValue;
+    G = G + adjustmentValue;
+    B = B + adjustmentValue;
+
+    if (R > 255) R = 255;
+    else if (R < 0) R = 0;
+
+    if (G > 255) G = 255;
+    else if (G < 0) G = 0;
+
+    if (B > 255) B = 255;
+    else if (B < 0) B = 0;
+
+    let RR = R.toString(16).length == 1 ? '0' + R.toString(16) : R.toString(16);
+    let GG = G.toString(16).length == 1 ? '0' + G.toString(16) : G.toString(16);
+    let BB = B.toString(16).length == 1 ? '0' + B.toString(16) : B.toString(16);
+
+    return (usePound ? '#' : '') + RR + GG + BB;
+  },
 };
