@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_competency
  */
 
 use totara_competency\entities\competency_achievement;
+use totara_competency\migration_helper;
 use totara_core\advanced_feature;
 
-class totara_competency_install_testcase extends advanced_testcase {
+class totara_competency_migrate_achievements_testcase extends advanced_testcase {
 
     public function setUp(): void {
         parent::setUp();
-        global $CFG;
-        require_once($CFG->dirroot . '/totara/competency/db/upgradelib.php');
     }
 
     private function add_comp_record($competency_id, $user_id, $proficiency, $timecreated, $timemodified) {
@@ -67,7 +66,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $this->assertEquals(0, $DB->count_records('comp_record'));
         $this->assertEquals(0, $DB->count_records('comp_record_history'));
 
-        totara_competency_install_migrate_achievements();
+        migration_helper::migrate_achievements();
 
         // For the most part, we just need to make sure we've made it here without an exception.
 
@@ -81,7 +80,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         $comp_record = $this->add_comp_record(100, 200, null, 300, 400);
 
         // First off, try this without a comp_record_history.
-        totara_competency_install_migrate_achievements();
+        migration_helper::migrate_achievements();
 
         // The comp_record did not get migrated. This is because it is already supposed to have an
         // equivalent in comp_record_history.
@@ -103,7 +102,18 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         $this->setCurrentTimeStart();
 
-        totara_competency_install_migrate_achievements();
+        // We currently only allow running migration once.
+        // Running migration again should not have any affect
+        migration_helper::migrate_achievements();
+        $achievements = $DB->get_records('totara_competency_achievement');
+        $this->assertCount(0, $achievements);
+
+        $assignments = $DB->get_records('totara_competency_assignments');
+        $this->assertCount(0, $assignments);
+
+        // Now remove the configuration setting allowing us to run migration again
+        unset_config('achievements_migrated', 'totara_competency');
+        migration_helper::migrate_achievements();
 
         $achievements = $DB->get_records('totara_competency_achievement');
         $this->assertCount(1, $achievements);
@@ -142,7 +152,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         $this->setCurrentTimeStart();
 
-        totara_competency_install_migrate_achievements();
+        migration_helper::migrate_achievements();
 
         $achievements = $DB->get_records('totara_competency_achievement');
         $this->assertCount(1, $achievements);
@@ -207,7 +217,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         $this->setCurrentTimeStart();
 
-        totara_competency_install_migrate_achievements();
+        migration_helper::migrate_achievements();
 
         $achievements = $DB->get_records('totara_competency_achievement', null, 'time_created ASC');
         $this->assertCount(2, $achievements);
@@ -257,8 +267,6 @@ class totara_competency_install_testcase extends advanced_testcase {
 
     public function test_multiple_users_and_competencies() {
         global $DB;
-        // TODO TL-something fix this test
-        $this->markTestSkipped('TODO');
 
         /** @var totara_competency_generator $competency_generator */
         $competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
@@ -315,7 +323,7 @@ class totara_competency_install_testcase extends advanced_testcase {
         // Eve only has a history record, but no comp_record. This could be invalid data, but let's be aware of what happens with it.
         $listening_eve = $this->add_comp_record_history($listening, $eve, $listening_proficient->id, 500);
 
-        totara_competency_install_migrate_achievements();
+        migration_helper::migrate_achievements();
 
         // There should be 1 record for each of the history records added above.
         $this->assertEquals(10, $DB->count_records('totara_competency_achievement'));
@@ -526,7 +534,7 @@ class totara_competency_install_testcase extends advanced_testcase {
 
         $this->setCurrentTimeStart();
 
-        totara_competency_install_migrate_achievements();
+        migration_helper::migrate_achievements();
 
         $achievements = $DB->get_records('totara_competency_achievement', null, 'time_created ASC');
         $this->assertCount(2, $achievements);

@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_competency
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace totara_competency\task;
 
-function xmldb_totara_competency_install() {
-    global $CFG;
-    require_once($CFG->dirroot . '/totara/competency/db/upgradelib.php');
+use core\task\adhoc_task;
+use totara_competency\migration_helper;
+use totara_core\advanced_feature;
 
-    $task = new \totara_competency\task\default_criteria_on_install();
-    \core\task\manager::queue_adhoc_task($task);
+class migrate_competency_achievements_task extends adhoc_task {
 
-    $task = new \totara_competency\task\migrate_competency_achievements_task();
-    \core\task\manager::queue_adhoc_task($task);
+    /**
+     * Migrate competency achievement records from Learn to Perform.
+     */
+    public function execute() {
+        migration_helper::migrate_achievements();
+    }
 
-    // This is to facilitate the creation of extra-web services we added to core if they don't exists
-    totara_competency_install_core_services();
 }
