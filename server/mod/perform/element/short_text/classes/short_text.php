@@ -81,4 +81,18 @@ class short_text extends respondable_element_plugin {
     public function get_example_response_data(): string {
         return '{"answer_text": ""}';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_group(): int {
+        return self::GROUP_QUESTION;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_sortorder(): int {
+        return 70;
+    }
 }

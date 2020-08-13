@@ -92,4 +92,18 @@ class multi_choice_multi extends respondable_element_plugin {
         }
         return $responses;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_group(): int {
+        return self::GROUP_QUESTION;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_sortorder(): int {
+        return 20;
+    }
 }

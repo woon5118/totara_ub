@@ -68,4 +68,17 @@ class long_text extends respondable_element_plugin {
         return $response_data['answer_text'];
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function get_group(): int {
+        return self::GROUP_QUESTION;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_sortorder(): int {
+        return 60;
+    }
 }

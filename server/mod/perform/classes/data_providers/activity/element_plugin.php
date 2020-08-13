@@ -59,10 +59,11 @@ class element_plugin {
 
         $plugins = [];
         foreach ($plugin_names as $plugin_name => $plugin_path) {
-            $plugins[] = element_plugin_model::load_by_plugin($plugin_name);
+            $plugin = element_plugin_model::load_by_plugin($plugin_name);
+            $plugins[$plugin->get_sortorder()] = $plugin;
         }
-
-        $this->items = $plugins;
+        ksort($plugins);
+        $this->items = array_values($plugins);
 
         return $this;
     }

@@ -6,5 +6,6 @@ query mod_perform_element_plugins {
     admin_display_component
     admin_read_only_display_component
     participant_form_component
+    group
   }
 }

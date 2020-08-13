@@ -41,7 +41,8 @@ class element_plugin extends formatter {
             'admin_display_component' => null, // not formatted, because this admin vue component name
             'admin_read_only_display_component' => null, // not formatted, because this admin vue component name
             'participant_form_component' => null, //not formatted, because this participant form vue component name
-            'participant_response_component' => null //not formatted, because this participant response display vue component name
+            'participant_response_component' => null, //not formatted, because this participant response display vue component name
+            'group' => null, // Not formatted, because this is an internal key
         ];
     }
 
@@ -61,6 +62,8 @@ class element_plugin extends formatter {
                 return $this->object->get_participant_form_component();
             case 'participant_response_component':
                 return $this->object->get_participant_response_component();
+            case 'group':
+                return $this->object->get_group();
             default:
                 throw new \coding_exception('Unexpected field passed to formatter');
         }
@@ -74,7 +77,8 @@ class element_plugin extends formatter {
             'admin_display_component',
             'admin_read_only_display_component',
             'participant_form_component',
-            'participant_response_component'
+            'participant_response_component',
+            'group'
         ];
         return in_array($field, $fields);
     }

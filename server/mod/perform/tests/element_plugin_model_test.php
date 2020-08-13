@@ -48,6 +48,12 @@ class mod_perform_element_plugin_model_testcase extends advanced_testcase {
             }
             public function decode_response(?string $encoded_response_data, ?string $encoded_element_data) {
             }
+            public function get_group(): int {
+                return 0;
+            }
+            public function get_sortorder(): int {
+                return 0;
+            }
         };
 
         $entity = new element_entity();

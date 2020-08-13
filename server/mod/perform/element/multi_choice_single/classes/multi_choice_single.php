@@ -64,4 +64,18 @@ class multi_choice_single extends respondable_element_plugin {
 
         return null;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_group(): int {
+        return self::GROUP_QUESTION;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_sortorder(): int {
+        return 30;
+    }
 }

@@ -30,9 +30,32 @@
           <AddIcon size="200" />
         </ButtonIcon>
       </template>
+      <span
+        tabindex="-1"
+        role="menugroup"
+        class="tui-dropdownItem tui-performEditSectionContentAddElement__dropDownGroupItem"
+      >
+        {{ $str('section_dropdown_question_elements', 'mod_perform') }}
+      </span>
       <DropdownItem
-        v-for="plugin in elementPlugins"
+        v-for="plugin in questionElement"
         :key="plugin.plugin_name"
+        class="tui-performEditSectionContentAddElement__dropDownItem"
+        @click="addElementPlugin(plugin)"
+      >
+        {{ plugin.name }}
+      </DropdownItem>
+      <span
+        tabindex="-1"
+        role="menugroup"
+        class="tui-dropdownItem tui-performEditSectionContentAddElement__dropDownGroupItem"
+      >
+        {{ $str('section_dropdown_other_elements', 'mod_perform') }}
+      </span>
+      <DropdownItem
+        v-for="plugin in otherElement"
+        :key="plugin.plugin_name"
+        class="tui-performEditSectionContentAddElement__dropDownItem"
         @click="addElementPlugin(plugin)"
       >
         {{ plugin.name }}
@@ -68,6 +91,22 @@ export default {
       update: data => data.mod_perform_element_plugins,
     },
   },
+  computed: {
+    questionElement: function() {
+      return this.elementPlugins.filter(function(plugin) {
+        if (plugin.group === '1') {
+          return plugin;
+        }
+      });
+    },
+    otherElement: function() {
+      return this.elementPlugins.filter(function(plugin) {
+        if (plugin.group === '2') {
+          return plugin;
+        }
+      });
+    },
+  },
   methods: {
     addElementPlugin(plugin) {
       this.$emit('add-element-item', plugin);
@@ -80,7 +119,9 @@ export default {
   {
     "mod_perform": [
       "section_element_questions",
-      "section_add_element"
+      "section_add_element",
+      "section_dropdown_other_elements",
+      "section_dropdown_question_elements"
     ]
   }
 </lang-strings>

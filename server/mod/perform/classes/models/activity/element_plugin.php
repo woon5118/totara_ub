@@ -34,6 +34,9 @@ use mod_perform\entities\activity\element as element_entity;
  */
 abstract class element_plugin {
 
+    const GROUP_QUESTION = 1;
+    const GROUP_OTHER = 2;
+
     /**
      * Element plugin constructor
      */
@@ -192,4 +195,18 @@ abstract class element_plugin {
     public function get_is_respondable(): bool {
         return $this instanceof respondable_element_plugin;
     }
+
+    /**
+     * Return if element plugin is a Question element group or Other element group
+     *
+     * @return int
+     */
+    abstract public function get_group(): int;
+
+    /**
+     * Return position key to sort element plugin in the list
+     *
+     * @return int
+     */
+    abstract public function get_sortorder(): int;
 }

@@ -41,4 +41,18 @@ class static_content extends element_plugin {
     public function get_participant_response_component(): string {
         return $this->get_component_path('Participant');
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_group(): int {
+        return self::GROUP_OTHER;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_sortorder(): int {
+        return 80;
+    }
 }

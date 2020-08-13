@@ -14,5 +14,25 @@
   @media screen and (min-width: $tui-screen-lg) {
     width: 30%;
   }
+
+  & &__dropDownGroupItem {
+    font-weight: bold;
+    font-size: var(--tui-font-size-14);
+    cursor: text;
+    pointer-events: none;
+
+    &:hover {
+      background-color: var(--tui-dropdown-item-bg-color);
+    }
+
+    &:focus {
+      background-color: var(--tui-dropdown-item-bg-color);
+    }
+  }
+
+  & &__dropDownItem {
+    padding-left: var(--tui-gap-8);
+    font-size: var(--tui-font-size-14);
+  }
 }
 </style>

@@ -29,6 +29,20 @@ use mod_perform\models\activity\respondable_element_plugin;
 class date_picker extends respondable_element_plugin {
 
     /**
+     * @inheritDoc
+     */
+    public function get_group(): int {
+        return self::GROUP_QUESTION;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_sortorder(): int {
+        return 10;
+    }
+
+    /**
      * Pull the answer text string out of the encoded json data.
      *
      * @param string|null $encoded_response_data

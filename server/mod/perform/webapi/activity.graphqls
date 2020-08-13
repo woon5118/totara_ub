@@ -58,6 +58,7 @@ type mod_perform_element_plugin {
   admin_read_only_display_component: String!
   participant_form_component: String!
   participant_response_component: String!
+  group: String!
 }
 
 """
