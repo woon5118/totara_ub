@@ -24,9 +24,12 @@ import { BatchHttpLink } from 'apollo-link-batch-http';
 import { createTuiContextLink } from './internal/apollo/tui_context_link';
 import { createDevLink } from './internal/apollo/dev_link';
 import { config } from './config';
+import { totaraUrl } from './util';
+
+const lang = config.locale.language;
 
 const httpLinkOptions = {
-  uri: config.wwwroot + '/totara/webapi/ajax.php',
+  uri: totaraUrl('/totara/webapi/ajax.php', { lang }),
   credentials: 'same-origin',
   headers: {
     'X-Totara-Sesskey': config.sesskey,
