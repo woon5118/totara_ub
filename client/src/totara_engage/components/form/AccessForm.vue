@@ -17,7 +17,12 @@
 -->
 
 <template>
-  <Form class="tui-accessForm" :vertical="true" input-width="full">
+  <Form
+    class="tui-accessForm"
+    :vertical="true"
+    input-width="full"
+    @submit.prevent="disabled ? true : done()"
+  >
     <div :class="['tui-accessForm__options', optionsWrapperCss]">
       <FormRow
         v-slot="{ id, labelId }"
