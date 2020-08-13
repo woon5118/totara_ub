@@ -250,6 +250,7 @@ import {
 } from 'mod_perform/constants';
 import { redirectWithPost } from 'mod_perform/redirect';
 import { notify } from 'tui/notifications';
+import { config } from 'tui/config';
 // Components
 import Button from 'tui/components/buttons/Button';
 import ButtonCancel from 'tui/components/buttons/Cancel';
@@ -815,11 +816,15 @@ export default {
      * Redirects back to the list of user activities with a success message.
      */
     goBackToListCompletionSuccess() {
+      const lang = config.locale.language;
       if (this.isExternalParticipant) {
-        window.location.href = this.$url('/mod/perform/activity/external.php', {
-          success: 1,
-          token: this.token,
-        });
+        window.location.href = this.$url(
+          '/mod/perform/activity/external.php?lang=' + lang,
+          {
+            success: 1,
+            token: this.token,
+          }
+        );
         return;
       }
 
