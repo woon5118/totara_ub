@@ -22,6 +22,7 @@
  */
 namespace container_workspace\webapi\resolver\type;
 
+use container_workspace\entity\workspace_discussion;
 use container_workspace\formatter\workspace\formatter;
 use container_workspace\interactor\workspace\interactor;
 use container_workspace\loader\member\loader;
@@ -98,6 +99,12 @@ final class workspace implements type_resolver {
                 $paginator = member_request_loader::get_member_requests($query);
 
                 return $paginator->get_total();
+
+            case 'total_discussions':
+                $workspace_id = $workspace->get_id();
+                $repository = workspace_discussion::repository();
+
+                return $repository->count_for_workspace($workspace_id);
 
             default:
                 $format = null;

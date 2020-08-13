@@ -11,6 +11,7 @@
         <FIELD NAME="area" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="content" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="format" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="contenttext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="This field is for storing the normal text of content, which is help to do like search"/>
         <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>

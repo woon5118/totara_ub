@@ -31,7 +31,7 @@
     </template>
 
     <DiscussionFilter
-      v-if="page.discussions.length"
+      v-if="workspaceTotalDiscussions"
       :sort="sort"
       :search-term="searchTerm"
       :workspace-id="workspaceId"
@@ -142,6 +142,15 @@ export default {
 
     selectedSort: {
       type: String,
+      required: true,
+    },
+
+    /**
+     * A total (aggregate) number of discussions within a workspace. This number will be
+     * completely different from the number total from `page.cursor`
+     */
+    workspaceTotalDiscussions: {
+      type: [Number, String],
       required: true,
     },
   },
@@ -314,6 +323,8 @@ export default {
             });
           },
         });
+
+        this.$emit('add-discussion');
       } catch (e) {
         await notify({
           message: this.$str(

@@ -26,20 +26,21 @@ use core\orm\entity\entity;
 use totara_comment\repository\comment_repository;
 
 /**
- * @property int        $id
- * @property string     $component
- * @property string     $area
- * @property int|null   $format
- * @property string     $content
- * @property int        $userid
- * @property int        $instanceid
- * @property int        $timecreated
- * @property int|null   $timemodified
- * @property int|null   $parentid       The parent's id which if it is not null then this comment is considered as a
- *                                      to another comment.
+ * @property int            $id
+ * @property string         $component
+ * @property string         $area
+ * @property int|null       $format
+ * @property string|null    $content
+ * @property int            $userid
+ * @property int            $instanceid
+ * @property int            $timecreated
+ * @property int|null       $timemodified
+ * @property int|null       $parentid       The parent's id which if it is not null then this comment is considered as a
+ *                                          to another comment.
  *
- * @property int|null   $timedeleted
- * @property int|null   $reasondeleted
+ * @property int|null       $timedeleted
+ * @property int|null       $reasondeleted
+ * @property string|null    $contenttext
  */
 final class comment extends entity {
     /**

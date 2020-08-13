@@ -29,6 +29,8 @@ use container_workspace\query\discussion\sort;
 use core\orm\pagination\offset_cursor_paginator;
 use core\orm\query\builder;
 use core\orm\query\order;
+use totara_comment\comment;
+use container_workspace\workspace;
 
 /**
  * Loader class for discussions within a workspace
@@ -46,6 +48,8 @@ final class loader {
      * @return offset_cursor_paginator
      */
     public static function get_discussions(query $query): offset_cursor_paginator {
+        global $DB;
+
         $builder = builder::table(workspace_discussion::TABLE, 'wd');
         $builder->join(['user', 'u'], 'wd.user_id', 'u.id');
 
@@ -79,7 +83,26 @@ final class loader {
         // Check for search term.
         $search_term = $query->get_search_term();
         if (null !== $search_term && '' !== $search_term) {
-            $builder->where_like('wd.content_text', $search_term);
+            $builder->left_join(
+                [comment::get_entity_table(), 'tc'],
+                function (builder $join): void {
+                    $join->where_field('tc.instanceid', 'wd.id');
+                    $join->where('tc.component', workspace::get_type());
+                    $join->where('tc.area', discussion::AREA);
+                }
+            );
+
+            // Where like for workspace discussion and the comment that related to the workspace.
+            $discussion_like = $DB->sql_like('wd.content_text', ':discussion_search_term', false);
+            $comment_like = $DB->sql_like('tc.contenttext', ':comment_search_term', false);
+
+            $builder->where_raw(
+                "({$discussion_like} OR {$comment_like})",
+                [
+                    'discussion_search_term' => "%{$DB->sql_like_escape($search_term)}%",
+                    'comment_search_term' => "%{$DB->sql_like_escape($search_term)}%"
+                ]
+            );
         }
 
         // Check for pinned discussion

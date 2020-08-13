@@ -242,7 +242,18 @@ final class discussion {
             $content_format = FORMAT_PLAIN;
         }
 
-        // handling files content.
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+
+        // Convert the editor content to plain text.
+        // Note that this should be happening before processing the files, as processing files
+        // can cause the draft files to be removed.
+        $content_text = content_to_text($content, $content_format);
+
+        if (null !== $draft_id) {
+            // After converted to text, we will have to rewrite the
+            // file urls in order to get rid of those hardcoded URL in the content.
+            $content_text = file_rewrite_urls_to_pluginfile($content_text, $draft_id);
+        }
 
         $entity = new workspace_discussion();
         $entity->content_format = $content_format;
@@ -265,26 +276,8 @@ final class discussion {
             $draft_id
         );
 
-        $user_context = \context_user::instance($USER->id);
-        require_once("{$CFG->dirroot}/lib/filelib.php");
-
         // Updating the time to produce and the content_text it self.
-        // Before converting to text - we might have to rewrite the file url within the content first.
-        // Then we will convert it to text and rewritten the plugins again.
-        // This is happening because the node itself - mostly file nodes will only expecting the actual URL
-        // instead of any placeholders. We will have to use the draft url as a temporary solution, since there is no
-        // such API to rewrite actual plugin file.
-        $rewritten_content = file_rewrite_pluginfile_urls(
-            $entity->content,
-            'pluginfile.php',
-            $user_context->id,
-            'user',
-            'draft',
-            $draft_id
-        );
-
-        $text_content = content_to_text($rewritten_content, $content_format);
-        $entity->content_text = file_rewrite_urls_to_pluginfile($text_content, $draft_id);
+        $entity->content_text = $content_text;
 
         // Updating the content after saving file should not updating the time stamp.
         $entity->update_timestamps(false);
@@ -451,6 +444,13 @@ final class discussion {
      */
     public function get_content(): string {
         return $this->entity->content;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_content_text(): string {
+        return $this->entity->content_text;
     }
 
     /**

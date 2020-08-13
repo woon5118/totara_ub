@@ -99,6 +99,11 @@ class container_workspace_discussion_testcase extends advanced_testcase {
                 $file_record->filename
             )
         );
+
+        $content_text = content_to_text($document, FORMAT_JSON_EDITOR);
+        $content_text = file_rewrite_urls_to_pluginfile($content_text, $draft_id);
+
+        $this->assertEquals($content_text, $discussion->get_content_text());
     }
 
     /**

@@ -25,7 +25,6 @@ namespace container_workspace\userdata;
 use container_workspace\discussion\discussion_helper;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
-use container_workspace\repository\discussion_repository;
 use container_workspace\entity\workspace_discussion;
 use totara_userdata\userdata\export;
 use container_workspace\discussion\discussion as model_discussion;
@@ -61,22 +60,38 @@ final class discussion extends item {
     }
 
     /**
+     * @param int $user_id
+     * @param \context $context
+     * @return workspace_discussion[]
+     */
+    private static function get_discussion_entities(int $user_id, \context $context): array {
+        $repository = workspace_discussion::repository();
+
+        if (CONTEXT_COURSE == $context->contextlevel) {
+            $workspace_id = $context->instanceid;
+            return $repository->fetch_by_user_within_workspace($user_id, $workspace_id);
+        } else if (CONTEXT_COURSECAT == $context->contextlevel) {
+            $category_id = $context->instanceid;
+            return $repository->fetch_by_user_within_workspace_category($user_id, $category_id);
+        }
+
+        return $repository->fetch_by_user($user_id);
+    }
+
+    /**
      * @param target_user $user
      * @param \context $context
      *
      * @return int
      */
     protected static function count(target_user $user, \context $context) {
-        /** @var discussion_repository $repository */
         $repository = workspace_discussion::repository();
 
         if (CONTEXT_SYSTEM == $context->contextlevel) {
             return $repository->count_for_user($user->id);
-
         } else if (CONTEXT_COURSE == $context->contextlevel) {
             $workspace_id = $context->instanceid;
             return $repository->count_for_user_within_workspace($user->id, $workspace_id);
-
         } else if (CONTEXT_COURSECAT == $context->contextlevel) {
             $category_id = $context->instanceid;
             return $repository->count_for_user_within_workspace_category($user->id, $category_id);
@@ -96,30 +111,10 @@ final class discussion extends item {
         global $CFG;
         require_once("{$CFG->dirroot}/lib/filelib.php");
 
-        /** @var discussion_repository $repository */
-        $repository = workspace_discussion::repository();
-        $discussions = [];
-
-        // Finding out if we are fetching all discussions created by the specific user
-        // or we are fetching the discussions within specific workspaces.
-        if (CONTEXT_COURSE == $context->contextlevel) {
-            $workspace_id = $context->instanceid;
-            $discussions = $repository->fetch_by_user_within_workspace($user->id, $workspace_id);
-
-        } else if (CONTEXT_SYSTEM == $context->contextlevel) {
-            $discussions = $repository->fetch_by_user($user->id);
-
-        } else if (CONTEXT_COURSECAT == $context->contextlevel) {
-            $category_id = $context->instanceid;
-            $discussions = $repository->fetch_by_user_within_workspace_category(
-                $user->id,
-                $category_id
-            );
-        }
-
-        $export = new export();
+        $discussions = static::get_discussion_entities($user->id, $context);
         $workspace_type = workspace::get_type();
 
+        $export = new export();
         foreach ($discussions as $discussion) {
             $context = \context_course::instance($discussion->course_id);
 
@@ -151,22 +146,7 @@ final class discussion extends item {
      * @return int
      */
     protected static function purge(target_user $user, \context $context): int {
-        /** @var discussion_repository $repository */
-        $repository = workspace_discussion::repository();
-        $entities = [];
-
-        if (CONTEXT_SYSTEM == $context->contextlevel) {
-            $entities = $repository->fetch_by_user($user->id);
-        } else if (CONTEXT_COURSE == $context->contextlevel) {
-            $workspace_id = $context->instanceid;
-            $entities = $repository->fetch_by_user_within_workspace($user->id, $workspace_id);
-        } else if (CONTEXT_COURSECAT == $context->contextlevel) {
-            $category_id = $context->instanceid;
-            $entities = $repository->fetch_by_user_within_workspace_category(
-                $user->id,
-                $category_id
-            );
-        }
+        $entities = static::get_discussion_entities($user->id, $context);
 
         foreach ($entities as $entity) {
             $discussion = model_discussion::from_entity($entity);

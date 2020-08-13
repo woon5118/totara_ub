@@ -35,6 +35,8 @@ use core\orm\entity\entity;
  * @property int|null   $time_modified
  * @property int        $timestamp
  * @property int|null   $time_pinned;
+ *
+ * @method static discussion_repository repository
  */
 final class workspace_discussion extends entity {
     /**

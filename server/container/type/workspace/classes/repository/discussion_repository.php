@@ -139,4 +139,15 @@ final class discussion_repository extends repository {
 
         return $builder->fetch();
     }
+
+    /**
+     * @param int $workspace_id
+     * @return int
+     */
+    public function count_for_workspace(int $workspace_id): int {
+        $builder = builder::table(static::get_table());
+        $builder->where('course_id', $workspace_id);
+
+        return $builder->count();
+    }
 }

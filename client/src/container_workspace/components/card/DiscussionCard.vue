@@ -322,7 +322,6 @@ export default {
     async handleCopyLink() {
       let textArea = document.createElement('textarea');
       textArea.value = this.discussionUrl;
-      textArea.style.display = 'none';
 
       this.$el.appendChild(textArea);
       textArea.focus();

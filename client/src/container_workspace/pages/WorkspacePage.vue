@@ -74,8 +74,10 @@
               <template v-slot:content>
                 <WorkspaceDiscussionTab
                   v-if="workspace.interactor.can_view_discussions"
+                  :workspace-total-discussions="workspace.total_discussions"
                   :selected-sort="discussionSortOption"
                   :workspace-id="workspaceId"
+                  @add-discussion="addDiscussion"
                 />
 
                 <p v-else class="tui-workspacePage__mainContent__tabs__text">
@@ -271,6 +273,27 @@ export default {
         '/container/type/workspace/index.php',
         { hold_notification: 1 }
       );
+    },
+
+    addDiscussion() {
+      let { workspace } = apolloClient.readQuery({
+        query: getWorkspace,
+        variables: {
+          id: this.workspaceId,
+        },
+      });
+
+      workspace = Object.assign({}, workspace, {
+        total_discussions: workspace.total_discussions + 1,
+      });
+
+      apolloClient.writeQuery({
+        query: getWorkspace,
+        variables: {
+          id: this.workspaceId,
+        },
+        data: { workspace },
+      });
     },
 
     /**

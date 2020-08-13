@@ -401,6 +401,21 @@ final class comment {
 
         $this->entity->update_timestamps($flagupdate);
         $this->entity->update();
+
+        $this->entity->refresh();
+    }
+
+    /**
+     * @param string $content_text
+     *
+     * @return void
+     */
+    public function update_content_text(string $content_text): void {
+        $this->entity->contenttext = $content_text;
+        $this->entity->do_not_update_timestamps();
+
+        $this->entity->save();
+        $this->entity->refresh();
     }
 
     /**
@@ -460,5 +475,12 @@ final class comment {
     public function to_record(): \stdClass {
         $record = $this->entity->to_array();
         return (object) $record;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_content_text(): string {
+        return $this->entity->contenttext;
     }
 }

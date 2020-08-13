@@ -14,6 +14,7 @@ query container_workspace_get_workspace($id: param_integer!) {
     image
     total_members
     total_member_requests
+    total_discussions
     interactor {
       __typename
       can_delete

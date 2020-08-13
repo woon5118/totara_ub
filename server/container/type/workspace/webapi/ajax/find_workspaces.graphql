@@ -30,6 +30,8 @@ query container_workspace_find_workspaces(
     url
     description(format: PLAIN)
     total_members
+    total_member_requests
+    total_discussions
     interactor {
       __typename
       can_delete

@@ -37,6 +37,10 @@ type container_workspace_workspace {
   Number of requests to join workspace.
   """
   total_member_requests: Int!
+  """
+  Number of discussions within a workspace.
+  """
+  total_discussions: Int!
 }
 
 """

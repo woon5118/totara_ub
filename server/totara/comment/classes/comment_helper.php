@@ -339,6 +339,27 @@ final class comment_helper {
     }
 
     /**
+     * @param string    $raw_content
+     * @param int       $content_format
+     * @param int|null  $draft_id
+     *
+     * @return string
+     */
+    private static function convert_to_content_text(string $raw_content, int $content_format, ?int $draft_id): string {
+        global $CFG;
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+
+        $content_text = content_to_text($raw_content, $content_format);
+
+        if (null === $draft_id) {
+            return $content_text;
+        }
+
+        // Note that we can only return the content text that had been removed the draft file url only.
+        return file_rewrite_urls_to_pluginfile($content_text, $draft_id);
+    }
+
+    /**
      * An API to create the comment.
      *
      * @param string    $component
@@ -353,7 +374,7 @@ final class comment_helper {
      */
     public static function create_comment(string $component, string $area, int $instance_id, string $content,
                                           ?int $content_format = null, ?int $draft_id = null, ?int $actor_id = null): comment {
-        global $USER;
+        global $USER, $CFG;
 
         if (empty($content)) {
             throw new \coding_exception("Cannot create a comment with empty content");
@@ -378,8 +399,11 @@ final class comment_helper {
             $actor_id
         );
 
-        $context_id = $resolver->get_context_id($instance_id, $area);
+        // Convert the raw content to content text. Note that this process has to be done before saving the
+        // files to the actual area. This is happening because when the files are saved - draft files will be removed.
+        $content_text = static::convert_to_content_text($content, $content_format, $draft_id);
 
+        $context_id = $resolver->get_context_id($instance_id, $area);
         $processed_content = static::process_content_with_files(
             $content,
             $content_format,
@@ -390,6 +414,7 @@ final class comment_helper {
         );
 
         $comment->update_content($processed_content, $content_format, false);
+        $comment->update_content_text($content_text);
 
         if ($actor_id == $USER->id) {
             $comment->set_user($USER);
@@ -448,6 +473,11 @@ final class comment_helper {
         }
 
         $content_format = static::get_format($content_format);
+
+        // Convert the raw content to content text. Note that this process has to be done before saving the
+        // files to the actual area. This is happening because when the files are saved - draft files will be removed.
+        $content_text = static::convert_to_content_text($content, $content_format, $draft_id);
+
         $reply = comment::create(
             $instance_id,
             $content,
@@ -469,6 +499,7 @@ final class comment_helper {
         );
 
         $reply->update_content($processed_content, $content_format, false);
+        $reply->update_content_text($content_text);
 
         if ($actor_id == $USER->id) {
             $reply->set_user($USER);
@@ -488,6 +519,7 @@ final class comment_helper {
 
     /**
      * Update the content of a comment.
+     * Note that this function will try to bump the timestamp for of updating content.
      *
      * @param int $comment_id
      * @param string $content
@@ -530,6 +562,10 @@ final class comment_helper {
             $comment->get_area()
         );
 
+        // Convert the raw content to content text. Note that this process has to be done before saving the
+        // files to the actual area. This is happening because when the files are saved - draft files will be removed.
+        $content_text = static::convert_to_content_text($content, $content_format, $draft_id);
+
         $processed_content = static::process_content_with_files(
             $content,
             $content_format,
@@ -540,6 +576,7 @@ final class comment_helper {
         );
 
         $comment->update_content($processed_content, $content_format);
+        $comment->update_content_text($content_text);
 
         $context = \context::instance_by_id($context_id);
         $event = comment_updated::from_comment($comment, $context);

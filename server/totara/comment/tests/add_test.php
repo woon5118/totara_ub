@@ -23,6 +23,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 use totara_comment\comment_helper;
+use core\json_editor\node\image;
+use core\json_editor\node\paragraph;
 
 class totara_comment_add_testcase extends advanced_testcase {
     /**
@@ -66,5 +68,118 @@ class totara_comment_add_testcase extends advanced_testcase {
         $this->assertEquals(42, $reply->get_instanceid());
         $this->assertTrue($reply->is_reply());
         $this->assertEquals(FORMAT_MOODLE, $reply->get_format());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_comment_with_files(): void {
+        global $CFG;
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+
+        $context_user = \context_user::instance($user_one->id);
+
+        // Create files before adding comments.
+        $draft_id = file_get_unused_draft_itemid();
+        $fs = get_file_storage();
+
+        $document = [
+            'type' => 'doc',
+            'content' => []
+        ];
+
+        for ($i = 0; $i < 5; $i++) {
+            $file_record = new stdClass();
+            $file_record->filename = uniqid() . ".png";
+            $file_record->component = 'user';
+            $file_record->filearea = 'draft';
+            $file_record->contextid = $context_user->id;
+            $file_record->filepath = '/';
+            $file_record->itemid = $draft_id;
+
+            $file = $fs->create_file_from_string($file_record, "This is file '{$i}'");
+            $document['content'][] = paragraph::create_json_node_from_text('This the file you are looking for');
+            $document['content'][] = image::create_raw_node_from_image($file);
+        }
+
+        $document_json = json_encode($document);
+        $comment = comment_helper::create_comment(
+            'totara_comment',
+            'comment',
+            42,
+            $document_json,
+            FORMAT_JSON_EDITOR,
+            $draft_id
+        );
+
+        $this->assertNotEmpty($comment->get_id());
+        $this->assertEquals($user_one->id, $comment->get_userid());
+
+        // Rewritten content.
+        $content_text = content_to_text($document_json, FORMAT_JSON_EDITOR);
+        $content_text = file_rewrite_urls_to_pluginfile($content_text, $draft_id);
+
+        $this->assertEquals($content_text, $comment->get_content_text());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_reply_with_file(): void {
+        global $CFG;
+
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+
+        /** @var totara_comment_generator $comment_generator */
+        $comment_generator = $generator->get_plugin_generator('totara_comment');
+        $comment = $comment_generator->create_comment(42, 'totara_comment', 'comment');
+
+        // Create a reply for the comment. However, we will need to create files first.
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+        $draft_id = file_get_unused_draft_itemid();
+        $fs = get_file_storage();
+
+        $document = [
+            'type' => 'doc',
+            'content' => []
+        ];
+
+        $context_user = \context_user::instance($user_one->id);
+        for ($i = 0; $i < 5; $i++) {
+            $file_record = new stdClass();
+            $file_record->component = 'user';
+            $file_record->filearea = 'draft';
+            $file_record->itemid = $draft_id;
+            $file_record->filename = uniqid() . '.png';
+            $file_record->filepath = '/';
+            $file_record->contextid = $context_user->id;
+
+            $stored_file = $fs->create_file_from_string($file_record, "This is the file");
+            $document['content'][] = paragraph::create_json_node_from_text("This is the file you are looking for");
+            $document['content'][] = image::create_raw_node_from_image($stored_file);
+        }
+
+        $document_json = json_encode($document);
+        $reply = comment_helper::create_reply(
+            $comment->get_id(),
+            $document_json,
+            $draft_id,
+            FORMAT_JSON_EDITOR,
+            $user_one->id
+        );
+
+        $this->assertNotEmpty($reply->get_id());
+
+        // Check if the content text is format correctly.
+        $content_text = content_to_text($document_json, FORMAT_JSON_EDITOR);
+        $content_text = file_rewrite_urls_to_pluginfile($content_text, $draft_id);
+
+        $this->assertEquals($content_text, $reply->get_content_text());
     }
 }
