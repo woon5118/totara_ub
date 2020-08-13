@@ -116,7 +116,7 @@ class participant_section_with_responses {
         // We get the main responses after the "others responses" because
         // the "others responses" are children of the main responses through
         // relationship groups.
-        $this->main_section_element_responses = $this->create_section_elements(
+        $this->main_section_element_responses = $this->create_section_element_responses(
             $this->participant_section_entity->participant_instance,
             $this->participant_section_entity->section_elements,
             $existing_responses,
@@ -210,9 +210,9 @@ class participant_section_with_responses {
      * @param collection $existing_responses
      * @param bool $include_other_responder_groups
      * @param bool $anonymous_responses
-     * @return collection
+     * @return collection|section_element_response[]
      */
-    protected function create_section_elements(
+    protected function create_section_element_responses(
         participant_instance_entity $participant_instance_entity,
         collection $section_elements,
         collection $existing_responses,
@@ -220,6 +220,10 @@ class participant_section_with_responses {
         bool $anonymous_responses = false
     ): collection {
         return $section_elements
+            ->filter(function (section_element_entity $section_element_entity) {
+                // We are only interested in respondable elements
+                return element::load_by_entity($section_element_entity->element)->is_respondable;
+            })
             ->map(
                 function (section_element_entity $section_element_entity) use (
                     $participant_instance_entity,
@@ -235,14 +239,15 @@ class participant_section_with_responses {
                         $participant_instance_entity->id
                     );
 
-                    $is_respondable =  (new element($section_element_entity->element))->get_is_respondable();
                     $other_responder_groups = new collection();
 
-                    if ($is_respondable &&
-                        $include_other_responder_groups &&
+                    if ($include_other_responder_groups &&
                         $this->user_can_view_others_responses()
                     ) {
-                        $other_responder_groups = $this->create_other_responder_groups($section_element_entity->id, $anonymous_responses);
+                        $other_responder_groups = $this->create_other_responder_groups(
+                            $section_element_entity->id,
+                            $anonymous_responses
+                        );
                     }
 
                     return new section_element_response(
@@ -298,7 +303,7 @@ class participant_section_with_responses {
 
         $others_responses = [];
         foreach ($other_participant_instances as $other_participant_instance) {
-            $element_responses = $this->create_section_elements(
+            $element_responses = $this->create_section_element_responses(
                 $other_participant_instance,
                 $section_elements,
                 $existing_responses,

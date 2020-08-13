@@ -220,7 +220,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $section_element_responses = $result['section_element_responses'];
 
         $this->assertCount(
-            2,
+            1,
             $section_element_responses,
             'Expected one section element'
         );
@@ -230,7 +230,8 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
             $section_element_responses
         );
 
-        $this->assertContains(
+        // Non-respondable elements won't have a section element response model
+        $this->assertNotContains(
             $this->create_static_section_element_response($static_section_element->id),
             $section_element_responses
         );

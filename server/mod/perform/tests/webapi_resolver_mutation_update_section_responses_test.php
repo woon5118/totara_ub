@@ -30,7 +30,9 @@ use mod_perform\entities\activity\section_element;
 use mod_perform\event\participant_section_progress_updated;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\section;
 use mod_perform\models\response\participant_section;
+use mod_perform\state\participant_section\closed;
 use mod_perform\state\participant_section\complete;
 use mod_perform\state\participant_section\not_started;
 use performelement_short_text\answer_length_exceeded_error;
@@ -248,6 +250,70 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Can not update response to a closed participant section');
         $this->resolve_graphql_mutation(self::MUTATION, $args);
+    }
+
+    /**
+     * Tests exception is thrown when updating a closed participant section.
+     *
+     * @return void
+     */
+    public function test_mix_of_respondable_and_non_respondable_elements_closes_sections() {
+
+        self::setAdminUser();
+        $subject = self::getDataGenerator()->create_user();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $generator->create_activity_in_container();
+        $activity->settings->update([activity_setting::CLOSE_ON_COMPLETION => true]);
+
+        $subject_instance = $generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject->id,
+            'other_participant_id' => user::logged_in()->id,
+            'activity_id' => $activity->id,
+        ]);
+
+        /** @var participant_instance $other_participant_instance */
+        $other_participant_instance = $subject_instance->participant_instances()
+            ->where('participant_id', user::logged_in()->id)
+            ->one();
+
+        /** @var participant_section_entity $participant_section */
+        $participant_section = $other_participant_instance->participant_sections()->one();
+
+        // Create a static element which is not respondable
+        $section = section::load_by_entity($participant_section->section);
+        $element3 = $generator->create_element(['title' => 'Static element', 'plugin_name' => 'static_content']);
+        $generator->create_section_element($section, $element3, 3);
+
+        /** @var collection|section_element[] $section_elements */
+        $section_elements = $participant_section->section_elements()->get();
+
+        $args = [
+            'input' => [
+                'participant_section_id' => $participant_section->id,
+                'update' => [
+                    [
+                        'section_element_id' => $section_elements->shift()->id,
+                        'response_data' => json_encode(['answer_text' => 'A quick brown fox']),
+                    ],
+                    [
+                        'section_element_id' => $section_elements->shift()->id,
+                        'response_data' => json_encode(['answer_text' => 'Answer 2']),
+                    ],
+                ],
+            ],
+        ];
+
+        /** @var participant_section $initial_save_result */
+        $this->resolve_graphql_mutation(self::MUTATION, $args)['participant_section'];
+
+        $participant_section->refresh();
+
+        // Now the section should be closed
+        $this->assertEquals(complete::get_code(), $participant_section->progress);
+        $this->assertEquals(closed::get_code(), $participant_section->availability);
     }
 
     public function test_with_validation_errors(): void {

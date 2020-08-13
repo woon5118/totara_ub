@@ -188,10 +188,13 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
         $section_element_responses = $result['section_element_responses'];
 
         $this->assertCount(
-            2,
+            1,
             $section_element_responses,
             'Expected one section element'
         );
+
+        $section_element_ids = array_column($section_element_responses, 'section_element_id');
+        $this->assertContains($section_element->id, $section_element_ids);
 
         $expected = [
             'section_element_id' => $section_element->id,
@@ -230,33 +233,10 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
             ],
             'visible_to' => [],
         ];
-
         $this->assertContains($expected, $section_element_responses);
 
-        $expected = [
-            'section_element_id' => $static_section_element->id,
-            'element' =>
-                [
-                    'element_plugin' =>
-                        [
-                            'participant_form_component' =>
-                                'performelement_static_content/components/StaticContentElementParticipant',
-                            'participant_response_component' =>
-                                'performelement_static_content/components/StaticContentElementParticipant',
-                        ],
-                    'title' => 'test element title',
-                    'data' => null,
-                    'is_required' => false,
-                    'is_respondable' => false,
-                ],
-            'sort_order' => 2,
-            'response_data' => null,
-            'validation_errors' => [],
-            'other_responder_groups' => [],
-            'visible_to' => [],
-        ];
-
-        $this->assertContains($expected, $section_element_responses);
+        // Static element should not be in the responses as it's not respondable
+        $this->assertNotContains($static_section_element->id, $section_element_ids);
     }
 
     public function test_failed_ajax_query(): void {
