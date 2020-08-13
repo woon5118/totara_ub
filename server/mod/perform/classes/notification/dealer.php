@@ -28,11 +28,14 @@ use core\entities\user as user_entity;
 use core\message\message;
 use core_user;
 use dml_exception;
+use mod_perform\models\activity\external_participant as external_participant_model;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_message as notification_message_model;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
+use mod_perform\models\activity\participant as participant_model;
 use stdClass;
 use totara_core\relationship\relationship as relationship_model;
+use totara_core\totara_user;
 
 /**
  * The dealer class.
@@ -70,27 +73,28 @@ class dealer {
     /**
      * Post a notification.
      *
-     * @param user_entity|stdClass $user
+     * @param user_entity|stdClass|participant_model|external_participant_model $user
      * @param relationship_model $relationship
      * @return boolean
      */
-
     public function post($user, relationship_model $relationship): bool {
-        // FIXME: Notifications for manual relationships do not work at the moment
-        //        in TL-26488 the way this works will be refactored
-        if ($relationship->type == \totara_core\entities\relationship::TYPE_MANUAL) {
-            debugging('manual relationships do not work at the moment', DEBUG_DEVELOPER);
-            return false;
-        }
-        if ($user instanceof user_entity) {
-            $user = $user->get_record();
-        }
         $recipient = $this->resolve_recipient($relationship);
         if (!$recipient) {
             return false;
         }
         if (!$this->composer->set_relationship($relationship)) {
             return false;
+        }
+        if ($user instanceof participant_model) {
+            // Set $user to either user_entity or external_participant_model.
+            $user = $user->get_user();
+        }
+        if ($user instanceof external_participant_model) {
+            // Convert $user from external_participant_model to the good-old stdClass.
+            $user = totara_user::get_external_user($user->email);
+        } else if ($user instanceof user_entity) {
+            // Convert $user from user_entity to the good-old stdClass.
+            $user = $user->get_record();
         }
         $is_reminder = $this->composer->is_reminder();
         $message = $this->composer->compose($relationship);
@@ -105,7 +109,9 @@ class dealer {
      * @param notification_recipient_model $recipient
      */
     private function save_history(notification_recipient_model $recipient): void {
-        notification_message_model::create($recipient, time());
+        if ($recipient->notification_id) {
+            notification_message_model::create($recipient, time());
+        }
     }
 
     /**
@@ -114,8 +120,7 @@ class dealer {
      * @param stdClass|integer|string $from user object or user id or NOREPLY_USER or SUPPORT_USER
      * @param stdClass|integer|string $to user object or user id or NOREPLY_USER or SUPPORT_USER
      * @param message $message
-     * @param bool $is_reminder
-     * @return void
+     * @param bool $is_reminder set true to send through the reminder channel instead of the notification channel
      */
     private function send_notification($from, $to, message $message, bool $is_reminder): void {
         $from = self::resolve_user($from);

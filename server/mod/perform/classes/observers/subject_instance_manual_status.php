@@ -50,7 +50,7 @@ class subject_instance_manual_status {
         self::generate_instances($subject_instance_dto);
         // FIXME: Someone added this code please remove this function as it could send the instance creation notification twice.
         // FIXME: Also please add some phpunit/behat test(s) to confirm the notification on this scenario.
-        self::trigger_notifications($subject_instance_dto);
+        // self::trigger_notifications($subject_instance_dto);
     }
 
     /**

@@ -556,6 +556,42 @@ Thank you for your participation.
 You can review the completed activity through this link: $Activity link$';
 $string['template_completion_manager_subject'] = 'Completed activity - $Activity name$/$Activity type$: $subject full name$';
 
+$string['template_completion_mentor_body'] = 'The following activity has been completed by all participants:
+
+$Activity name$/$Activity type$: $subject full name$
+
+Thank you for your participation.
+
+You can review the completed activity through this link: $Activity link$';
+$string['template_completion_mentor_subject'] = 'Completed activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_completion_peer_body'] = 'The following activity has been completed by all participants:
+
+$Activity name$/$Activity type$: $subject full name$
+
+Thank you for your participation.
+
+You can review the completed activity through this link: $Activity link$';
+$string['template_completion_peer_subject'] = 'Completed activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_completion_perform_external_body'] = 'The following activity has been completed by all participants:
+
+$Activity name$/$Activity type$: $subject full name$
+
+Thank you for your participation.
+
+You can review the completed activity through this link: $Activity link$';
+$string['template_completion_perform_external_subject'] = 'Completed activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_completion_reviewer_body'] = 'The following activity has been completed by all participants:
+
+$Activity name$/$Activity type$: $subject full name$
+
+Thank you for your participation.
+
+You can review the completed activity through this link: $Activity link$';
+$string['template_completion_reviewer_subject'] = 'Completed activity - $Activity name$/$Activity type$: $subject full name$';
+
 $string['template_completion_subject_body'] = 'Your $Activity name$/$Activity type$ has been completed by all participants.
 
 You can review the completed activity through this link: $Activity link$';
@@ -578,6 +614,42 @@ You were selected to participate in this activity as $subject full name$’s $re
 
 You can access the activity through this link: $Activity link$';
 $string['template_due_date_manager_subject'] = 'Due today - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_mentor_body'] = 'The following activity is due to be completed today :
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by the end of the day.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_mentor_subject'] = 'Due today - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_peer_body'] = 'The following activity is due to be completed today :
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by the end of the day.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_peer_subject'] = 'Due today - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_perform_external_body'] = 'The following activity is due to be completed today :
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by the end of the day.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_perform_external_subject'] = 'Due today - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_reviewer_body'] = 'The following activity is due to be completed today :
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by the end of the day.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_reviewer_subject'] = 'Due today - $Activity name$/$Activity type$: $subject full name$';
 
 $string['template_due_date_subject_body'] = 'Your $Activity name$/$Activity type$ is due to be completed today.
 
@@ -603,6 +675,42 @@ You were selected to participate in this activity as $subject full name$’s $re
 
 You can access the activity through this link: $Activity link$';
 $string['template_due_date_reminder_manager_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_reminder_mentor_body'] = 'The following activity is due to be completed in $days$:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_reminder_mentor_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_reminder_peer_body'] = 'The following activity is due to be completed in $days$:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_reminder_peer_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_reminder_perform_external_body'] = 'The following activity is due to be completed in $days$:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_reminder_perform_external_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_reminder_reviewer_body'] = 'The following activity is due to be completed in $days$:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_reminder_reviewer_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
 
 $string['template_due_date_reminder_subject_body'] = 'Your $Activity name$/$Activity type$ is due to be completed in $days$.
 
@@ -638,6 +746,42 @@ This needs to be completed by {$a->instance_duedate}.
 You can access the activity through this link: {$a->activity_url}';
 $string['template_instance_created_managers_manager_subject'] = '{$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
 
+$string['template_instance_created_mentor_body'] = 'As $subject full name$’s $relationship name$, you have been selected to participate in the following activity:
+
+$Activity name$/$Activity type$
+
+This needs to be completed by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_mentor_subject'] = '$Activity name$/$Activity type$: $subject full name$';
+
+$string['template_instance_created_peer_body'] = 'As $subject full name$’s $relationship name$, you have been selected to participate in the following activity:
+
+$Activity name$/$Activity type$
+
+This needs to be completed by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_peer_subject'] = '$Activity name$/$Activity type$: $subject full name$';
+
+$string['template_instance_created_perform_external_body'] = 'As $subject full name$’s $relationship name$, you have been selected to participate in the following activity:
+
+$Activity name$/$Activity type$
+
+This needs to be completed by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_perform_external_subject'] = '$Activity name$/$Activity type$: $subject full name$';
+
+$string['template_instance_created_reviewer_body'] = 'As $subject full name$’s $relationship name$, you have been selected to participate in the following activity:
+
+$Activity name$/$Activity type$
+
+This needs to be completed by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_reviewer_subject'] = '$Activity name$/$Activity type$: $subject full name$';
+
 $string['template_instance_created_subject_body'] = 'Your $Activity name$/$Activity type$ is ready for you to complete.
 
 This needs to be completed by $due date$.
@@ -672,6 +816,42 @@ Please ensure you complete it by {$a->instance_duedate}.
 You can access the activity through this link: {$a->activity_url}';
 $string['template_instance_created_reminder_managers_manager_subject'] = 'Reminder - {$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
 
+$string['template_instance_created_reminder_mentor_body'] = '$days ago$ you were selected to participate in the following activity as $subject full name$’s $relationship name$:
+
+$Activity name$/$Activity type$
+
+Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_reminder_mentor_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_instance_created_reminder_peer_body'] = '$days ago$ you were selected to participate in the following activity as $subject full name$’s $relationship name$:
+
+$Activity name$/$Activity type$
+
+Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_reminder_peer_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_instance_created_reminder_perform_external_body'] = '$days ago$ you were selected to participate in the following activity as $subject full name$’s $relationship name$:
+
+$Activity name$/$Activity type$
+
+Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_reminder_perform_external_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_instance_created_reminder_reviewer_body'] = '$days ago$ you were selected to participate in the following activity as $subject full name$’s $relationship name$:
+
+$Activity name$/$Activity type$
+
+Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_reminder_reviewer_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
 $string['template_instance_created_reminder_subject_body'] = '$days ago$ you were sent your $Activity name$/$Activity type$ to complete.
 
 Please ensure you complete it by $due date$.
@@ -697,12 +877,109 @@ You were selected to participate in this activity as $subject full name$’s $re
 You can access the activity through this link: $Activity link$';
 $string['template_overdue_reminder_manager_subject'] = 'Overdue - $Activity name$/$Activity type$: $subject full name$';
 
+$string['template_overdue_reminder_mentor_body'] = 'The following activity was due to be completed on $due date$ and is now overdue:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it as soon as possible.
+
+You can access the activity through this link: $Activity link$';
+$string['template_overdue_reminder_mentor_subject'] = 'Overdue - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_overdue_reminder_peer_body'] = 'The following activity was due to be completed on $due date$ and is now overdue:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it as soon as possible.
+
+You can access the activity through this link: $Activity link$';
+$string['template_overdue_reminder_peer_subject'] = 'Overdue - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_overdue_reminder_perform_external_body'] = 'The following activity was due to be completed on $due date$ and is now overdue:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it as soon as possible.
+
+You can access the activity through this link: $Activity link$';
+$string['template_overdue_reminder_perform_external_subject'] = 'Overdue - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_overdue_reminder_reviewer_body'] = 'The following activity was due to be completed on $due date$ and is now overdue:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it as soon as possible.
+
+You can access the activity through this link: $Activity link$';
+$string['template_overdue_reminder_reviewer_subject'] = 'Overdue - $Activity name$/$Activity type$: $subject full name$';
+
 $string['template_overdue_reminder_subject_body'] = 'Your $Activity name$/$Activity type$ was due to be completed on $due date$ and is now overdue.
 
 Please ensure you complete it as soon as possible.
 
 You can access the activity through this link: $Activity link$';
 $string['template_overdue_reminder_subject_subject'] = 'Overdue - $Activity name$/$Activity type$';
+
+$string['template_participant_selection_appraiser_body'] = 'As $subject full name$’s $relationship name$, you need to select who should participate in the following activity:
+
+$Activity name$/$Activity type$
+
+Please complete this as soon as possible, to give participants time to provide their input. Their input is required by $due date$.
+
+You can select participants through this link: $Participant selection link$';
+$string['template_participant_selection_appraiser_subject'] = 'Select participants for $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_participant_selection_manager_body'] = 'As $subject full name$’s $relationship name$, you need to select who should participate in the following activity:
+
+$Activity name$/$Activity type$
+
+Please complete this as soon as possible, to give participants time to provide their input. Their input is required by $due date$.
+
+You can select participants through this link: $Participant selection link$';
+$string['template_participant_selection_manager_subject'] = 'Select participants for $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_participant_selection_mentor_body'] = 'As $subject full name$’s $relationship name$, you need to select who should participate in the following activity:
+
+$Activity name$/$Activity type$
+
+Please complete this as soon as possible, to give participants time to provide their input. Their input is required by $due date$.
+
+You can select participants through this link: $Participant selection link$';
+$string['template_participant_selection_mentor_subject'] = 'Select participants for $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_participant_selection_peer_body'] = 'As $subject full name$’s $relationship name$, you need to select who should participate in the following activity:
+
+$Activity name$/$Activity type$
+
+Please complete this as soon as possible, to give participants time to provide their input. Their input is required by $due date$.
+
+You can select participants through this link: $Participant selection link$';
+$string['template_participant_selection_peer_subject'] = 'Select participants for $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_participant_selection_perform_external_body'] = 'As $subject full name$’s $relationship name$, you need to select who should participate in the following activity:
+
+$Activity name$/$Activity type$
+
+Please complete this as soon as possible, to give participants time to provide their input. Their input is required by $due date$.
+
+You can select participants through this link: $Participant selection link$';
+$string['template_participant_selection_perform_external_subject'] = 'Select participants for $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_participant_selection_reviewer_body'] = 'As $subject full name$’s $relationship name$, you need to select who should participate in the following activity:
+
+$Activity name$/$Activity type$
+
+Please complete this as soon as possible, to give participants time to provide their input. Their input is required by $due date$.
+
+You can select participants through this link: $Participant selection link$';
+$string['template_participant_selection_reviewer_subject'] = 'Select participants for $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_participant_selection_subject_body'] = 'You need to select who you want to participate in your $Activity name$/$Activity type$.
+
+Please complete this as soon as possible, to give participants time to provide their input. Their input is required by $due date$.
+
+You can select participants through this link: $Participant selection link$';
+$string['template_participant_selection_subject_subject'] = 'Select participants for $Activity name$/$Activity type$';
 
 $string['template_reopened_appraiser_body'] = 'The following activity has been reopened:
 
@@ -721,6 +998,42 @@ As $subject full name$’s $relationship name$, it requires further action from 
 
 You can access the activity through this link: $Activity link$';
 $string['template_reopened_manager_subject'] = 'Reopened activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_reopened_mentor_body'] = 'The following activity has been reopened:
+
+$Activity name$/$Activity type$: $subject full name$
+
+As $subject full name$’s $relationship name$, it requires further action from you to complete it.
+
+You can access the activity through this link: $Activity link$';
+$string['template_reopened_mentor_subject'] = 'Reopened activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_reopened_peer_body'] = 'The following activity has been reopened:
+
+$Activity name$/$Activity type$: $subject full name$
+
+As $subject full name$’s $relationship name$, it requires further action from you to complete it.
+
+You can access the activity through this link: $Activity link$';
+$string['template_reopened_peer_subject'] = 'Reopened activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_reopened_perform_external_body'] = 'The following activity has been reopened:
+
+$Activity name$/$Activity type$: $subject full name$
+
+As $subject full name$’s $relationship name$, it requires further action from you to complete it.
+
+You can access the activity through this link: $Activity link$';
+$string['template_reopened_perform_external_subject'] = 'Reopened activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_reopened_reviewer_body'] = 'The following activity has been reopened:
+
+$Activity name$/$Activity type$: $subject full name$
+
+As $subject full name$’s $relationship name$, it requires further action from you to complete it.
+
+You can access the activity through this link: $Activity link$';
+$string['template_reopened_reviewer_subject'] = 'Reopened activity - $Activity name$/$Activity type$: $subject full name$';
 
 $string['template_reopened_subject_body'] = 'Your $$Activity name$/$Activity type$ has been reopened and requires further action from you to complete it.
 
