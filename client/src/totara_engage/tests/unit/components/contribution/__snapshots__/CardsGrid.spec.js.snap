@@ -10,10 +10,10 @@ exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`]
     role="feed"
     style="display: block; padding: 0px 0px 0px; overflow-y: false;"
   >
-    <ul
+    <div
       class="tui-totaraEngage-cardsGrid__row tui-grid tui-grid--horizontal tui-grid--horizontal-gap"
     >
-      <li
+      <div
         class="tui-grid-item tui-totaraEngage-cardsGrid__card tui-grid-item--first"
       >
         <span
@@ -33,8 +33,8 @@ exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`]
           userprofileimagealt=""
           userprofileimageurl="http://example.com"
         />
-      </li>
-      <li
+      </div>
+      <div
         class="tui-grid-item tui-totaraEngage-cardsGrid__card"
       >
         <span
@@ -54,12 +54,12 @@ exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`]
           userprofileimagealt=""
           userprofileimageurl="http://example.com"
         />
-      </li>
-    </ul>
-    <ul
+      </div>
+    </div>
+    <div
       class="tui-totaraEngage-cardsGrid__row tui-grid tui-grid--horizontal tui-grid--horizontal-gap"
     >
-      <li
+      <div
         class="tui-grid-item tui-totaraEngage-cardsGrid__card tui-grid-item--first"
       >
         <span
@@ -79,8 +79,8 @@ exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`]
           userprofileimagealt=""
           userprofileimageurl="http://example.com"
         />
-      </li>
-      <li
+      </div>
+      <div
         class="tui-grid-item tui-totaraEngage-cardsGrid__card"
       >
         <span
@@ -100,8 +100,8 @@ exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`]
           userprofileimagealt=""
           userprofileimageurl="http://example.com"
         />
-      </li>
-    </ul>
+      </div>
+    </div>
     <div
       class="tui-loader tui-loader--active"
     >
