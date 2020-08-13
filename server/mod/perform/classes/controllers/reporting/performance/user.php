@@ -36,11 +36,12 @@ use moodle_url;
 use totara_mvc\has_report;
 use totara_mvc\renders_components;
 use totara_mvc\view;
+use totara_tui\output\component;
 
 class user extends perform_controller {
 
     use has_report;
-    use renders_components;
+    use renders_performance_reports;
 
     public function setup_context(): context {
         $category_id = util::get_default_category_id();
@@ -55,11 +56,10 @@ class user extends perform_controller {
             $link_url = new moodle_url('/mod/perform/reporting/performance/');
             return self::create_view('mod_perform/no_report', [
                 'content' => view::core_renderer()->notification(
-                    get_string('activity_report_no_params_warning_message', 'mod_perform', (object)['url' => $link_url->out(true)]),
+                    get_string('activity_report_no_params_warning_message', 'mod_perform', (object) ['url' => $link_url->out(true)]),
                     notification::NOTIFY_WARNING
                 )
             ]);
-
         }
 
         if (!util::can_report_on_user($subject_user_id, $this->currently_logged_in_user()->id)) {
@@ -86,53 +86,26 @@ class user extends perform_controller {
         // Current filtered count
         $filtered_count = $report->get_filtered_count();
 
-        $action_card_component = '';
-        // Only show the action card if there are results.
-        if ($filtered_count > 0) {
-            $action_card_props = [
-                'additional-export-href-params' => [
-                    'subject_user_id' => $subject_user_id,
-                ],
-                'row-count' => $filtered_count,
-                'embedded-shortname' => $report_shortname,
-                'filter-hash' => $report->get_search_hash(), // Hash of current filtered state, ensures we're not using stale data.
-                'export-row-limit' => self::BULK_EXPORT_MAX_ROWS,
-            ];
-
-            $action_card_component = $this->get_rendered_component(
-                'mod_perform/components/report/element_response/ExportActionCard', $action_card_props
-            );
-        }
+        $action_card_component = $this->get_rendered_action_card(
+            $filtered_count,
+            $report->get_search_hash(),
+            'subject_instance',
+            ['subject_user_id' => $subject_user_id]
+        );
 
         $subject_user = \core_user::get_user($subject_user_id);
         $subject_user_name = fullname($subject_user);
-
-        $a = (object)[
-            'target' => $subject_user_name,
-            'count' => $filtered_count,
-        ];
-        $string_identifier = $filtered_count == 1 ? 'performance_data_for' : 'performance_data_for_plural';
-        $new_heading = get_string($string_identifier, 'mod_perform', $a);
+        $heading = $this->get_heading($filtered_count, $subject_user_name);
 
         $report_view = embedded_report_view::create_from_report($report, $debug, 'mod_perform/bulk_exportable_report')
             ->add_override(new override_nav_breadcrumbs())
-            ->set_title(get_string('performance_data_for', 'mod_perform', $subject_user_name))
+            ->set_title($heading)
+            ->set_back_to(...$this->get_back_to_user_tab())
             ->set_additional_data(['action_card_component' => $action_card_component]);
 
-        $report_renderer = $report_view->get_page()->get_renderer('totara_reportbuilder');
 
-        // We want to replace the default report heading but want to keep any reporting amd, etc.
-        // Thus making use of the existing report_heading template
-        $rendered_heading = $report_renderer->render_from_template(
-            'totara_reportbuilder/report_heading',
-            [
-                'reportid' => $report->get_id(),
-                'heading' => $new_heading,
-                'fullname' => $report->fullname,
-            ]
-        );
+        $report_view->set_report_heading($this->get_report_heading($report, $report_view, $heading));
 
-        $report_view->set_report_heading($rendered_heading);
         return $report_view;
     }
 

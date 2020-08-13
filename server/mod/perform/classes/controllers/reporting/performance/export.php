@@ -43,15 +43,15 @@ class export extends perform_controller {
      * mod_perform\models\activity\activity instance
      * @var activity $activity
      */
-    private $activity = null;
+    private $activity;
 
     public function setup_context(): context {
         if ($this->get_optional_param('activity_id', null, PARAM_INT)) {
             return $this->get_activity()->get_context();
-        } else {
-            $category_id = util::get_default_category_id();
-            return context_coursecat::instance($category_id);
         }
+
+        $category_id = util::get_default_category_id();
+        return context_coursecat::instance($category_id);
     }
 
     /**
@@ -82,16 +82,16 @@ class export extends perform_controller {
         $extra_data = compact($activity_id, $subject_user_id, $subject_instance_id, $element_id);
 
         // This triggers the export because export and format params are set.
-        // Stuff below this is to output to the screen for debugging purposes.
-        // TODO remove support for on screen view?
-        $report = $this->load_embedded_report('response_export_performance_reporting', $extra_data);
+        $report = $this->load_embedded_report('response_export_performance_reporting', $extra_data, true, true);
 
+        // Comment out the next line and uncomment the block below to output to screen instead of file for debugging.
+        return $this->handle_export($report, 'csv');
+
+        /*
         $debug = $this->get_optional_param('debug', 0, PARAM_INT);
-
         $this->set_url(static::get_url($extra_data));
-
-        return self::create_report_view($report, $debug)
-            ->set_title(get_string('export', 'mod_perform'));
+        return self::create_report_view($report, $debug);
+        */
     }
 
     public function action_bulk() {
@@ -102,11 +102,23 @@ class export extends perform_controller {
             throw new moodle_exception('error_export_permission_missing', 'mod_perform');
         }
 
-        $filtered_report_embedded_shortname = $this->get_required_param('filtered_report_embedded_shortname', PARAM_ALPHANUMEXT);
+        $export_type = $this->get_required_param('filtered_report_export_type', PARAM_ALPHAEXT);
         $filtered_report_filter_hash = $this->get_required_param('filtered_report_filter_hash', PARAM_ALPHANUM);
 
+        switch ($export_type) {
+            case 'element':
+            case 'element_identifier':
+                $source_shortname = 'element_performance_reporting';
+                break;
+            case 'subject_instance':
+                $source_shortname = 'subject_instance_performance_reporting';
+                break;
+            default:
+                throw new moodle_exception('bulk_export_type_incorrect', 'mod_perform');
+        }
+
         // Pass prevent_export=true here to stop has_report trait exporting this report.
-        $report = $this->load_embedded_report($filtered_report_embedded_shortname, [], true, true);
+        $report = $this->load_embedded_report($source_shortname, [], true, true);
 
         $active_filter_hash = $report->get_search_hash();
 
@@ -121,40 +133,86 @@ class export extends perform_controller {
             ]);
         }
 
-        list($sql, $params) = $report->build_query(false, true, false);
+        [$sql, $params] = $report->build_query(false, true, false);
 
         $data = $DB->get_records_sql($sql, $params, 0, self::BULK_EXPORT_MAX_ROWS);
-        $ids = array_map(function ($item) { return $item->id; }, $data);
+        $ids = array_map(function ($item) {
+            return $item->id;
+        }, $data);
 
-        switch ($filtered_report_embedded_shortname) {
-            case 'element_performance_reporting':
-                $extra_data['element_id'] = $ids;
+        switch ($export_type) {
+            case 'element':
+                if (!empty($ids)) {
+                    $extra_data['element_id'] = $ids;
+                }
                 $extra_data['activity_id'] = $this->get_required_param('activity_id', PARAM_INT);
                 break;
-            case 'subject_instance_performance_reporting':
-                $extra_data['subject_instance_id'] = $ids;
+            case 'subject_instance':
+                if (!empty($ids)) {
+                    $extra_data['subject_instance_id'] = $ids;
+                }
                 $extra_data['subject_user_id'] = $this->get_required_param('subject_user_id', PARAM_INT);
                 break;
-            case 'element_ids_performance_reporting':
-                $extra_data['element_id'] = $ids;
-                // TODO add in element identifier restriction
-                //      issue at the moment, can't handle array of strings
+            case 'element_identifier':
+                $extra_data['element_identifier'] = required_param_array('element_identifier', PARAM_INT);
+                if (!empty($ids)) {
+                    $extra_data['element_id'] = $ids;
+                }
                 break;
             default:
                 throw new moodle_exception('bulk_export_shortname_incorrect', 'mod_perform');
         }
 
-        // This triggers the export because export and format params are set.
-        // Stuff below this is to output to the screen for debugging purposes.
-        // TODO remove support for on screen view?
-        $report = $this->load_embedded_report('response_export_performance_reporting', $extra_data);
+        $report = $this->load_embedded_report('response_export_performance_reporting', $extra_data, true, true);
 
+        // Comment out the next line and uncomment the block below to output to screen instead of file for debugging.
+        return $this->handle_export($report, 'csv');
+
+        /*
         $debug = $this->get_optional_param('debug', 0, PARAM_INT);
-
         $this->set_url(static::get_url());
+        return self::create_report_view($report, $debug);
+        */
+    }
 
-        return self::create_report_view($report, $debug)
-            ->set_title(get_string('bulk_export', 'mod_perform'));
+    /**
+     * Method to deal with exporting a report. This includes checking the format is supported and
+     * rendering an error if not.
+     *
+     * @param $report
+     * @param $format
+     * @return view
+     * @throws \coding_exception
+     */
+    protected function handle_export($report, $format) {
+        // Only support CSV for now as there is no interface for selecting export format. Could potentially
+        // add as a setting later if required.
+        if ($format != 'csv') {
+            $this->set_url(static::get_url());
+            return self::create_view('mod_perform/no_report', [
+                'content' => view::core_renderer()->notification(
+                    get_string('export_unsupported_format_warning_message', 'mod_perform'),
+                    notification::NOTIFY_WARNING
+                )
+            ]);
+        }
+
+        $current_export_options = $report->get_report_export_options();
+        $all_export_options = \reportbuilder::get_all_general_export_options(true);
+        $format_name = $all_export_options[$format] ?? $format;
+        if (!in_array($format, array_keys($current_export_options))) {
+            // Invalid format for this report - tell them to get admin to add to export options or override in source.
+            $this->set_url(static::get_url());
+            return self::create_view('mod_perform/no_report', [
+                'content' => view::core_renderer()->notification(
+                    get_string('export_invalid_format_warning_message', 'mod_perform', $format_name),
+                    notification::NOTIFY_WARNING
+                )
+            ]);
+        }
+
+        // All okay, export the data.
+        return $report->export_data($format);
     }
 
     public static function get_base_url(): string {

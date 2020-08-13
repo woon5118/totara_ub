@@ -28,6 +28,9 @@ use tabtree;
 
 trait activity_response_data_tabs {
 
+    public static $by_content_tab_uri = '/mod/perform/reporting/performance/activity_responses_by_content.php';
+    public static $by_user_tab_uri = '/mod/perform/reporting/performance/activity_responses_by_user.php';
+
     /**
      * @param string $selected_tab
      * @return tabtree
@@ -37,13 +40,13 @@ trait activity_response_data_tabs {
 
         $tabs[] = new tabobject(
             'by_user',
-            new \moodle_url('/mod/perform/reporting/performance/activity_responses_by_user.php'),
+            new \moodle_url(self::$by_user_tab_uri),
             get_string('browse_records_by_user', 'mod_perform')
         );
 
         $tabs[] = new tabobject(
             'by_content',
-            new \moodle_url('/mod/perform/reporting/performance/activity_responses_by_content.php'),
+            new \moodle_url(self::$by_content_tab_uri),
             get_string('browse_records_by_content', 'mod_perform')
         );
 

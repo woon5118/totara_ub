@@ -106,7 +106,7 @@ trait element_trait {
             'LEFT',
             '{perform_element_identifier}',
             "{$join}.identifier_id = {$identifier_table_alias}.id",
-            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            REPORT_BUILDER_RELATION_MANY_TO_ONE,
             $join
         );
     }
@@ -221,7 +221,7 @@ trait element_trait {
     protected function get_element_type_options(): array {
         $respondable_elements = element_plugin::get_element_plugins(true, false);
 
-        return array_map(function ($element) {
+        return array_map(function (element_plugin $element) {
             return $element->get_name();
         }, $respondable_elements);
     }

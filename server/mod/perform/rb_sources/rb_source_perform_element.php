@@ -308,6 +308,10 @@ class rb_source_perform_element extends rb_base_source {
                 'section_element.element_id',
                 'section_element'
             ),
+            new rb_param_option(
+                'element_identifier',
+                'base.identifier_id'
+            )
         ];
 
         return $paramoptions;

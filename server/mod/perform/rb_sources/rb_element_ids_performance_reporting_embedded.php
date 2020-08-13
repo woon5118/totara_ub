@@ -26,39 +26,23 @@ use mod_perform\util;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_response.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_element.php');
 
-class rb_response_export_performance_reporting_embedded extends rb_base_embedded {
-
-    /**
-     * @var string {report_builder}.defaultsortcolumn
-     */
-    public $defaultsortcolumn = '';
+class rb_element_ids_performance_reporting_embedded extends rb_base_embedded {
 
     public function __construct($data) {
-        $this->url = '/mod/perform/reporting/performance/export.php';
-        $this->source = 'response_performance_reporting';
-        $this->shortname = 'response_export_performance_reporting';
-        $this->fullname = get_string('embedded_response_export_performance_reporting', 'mod_perform');
+
+        $this->url = '/mod/perform/reporting/performance/activity.php';
+        $this->source = 'perform_element';
+        $this->shortname = 'element_ids_performance_reporting';
+        $this->fullname = get_string('embedded_element_ids_performance_reporting', 'mod_perform');
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
-        $this->defaultsortcolumn = 'response_default_sort';
+        $this->defaultsortcolumn = 'element_default_sort';
 
-        // Pass any restrictions applied in $data through as embedded params.
-        if (isset($data['element_id'])) {
-            $this->embeddedparams['element_id'] = $data['element_id'];
-        }
-        if (isset($data['activity_id'])) {
-            $this->embeddedparams['activity_id'] = $data['activity_id'];
-        }
-        if (isset($data['subject_user_id'])) {
-            $this->embeddedparams['subject_user_id'] = $data['subject_user_id'];
-        }
-        if (isset($data['subject_instance_id'])) {
-            $this->embeddedparams['subject_instance_id'] = $data['subject_instance_id'];
-        }
         if (isset($data['element_identifier'])) {
-            $this->embeddedparams['element_identifier'] = $data['element_identifier'];
+            $element_identifiers_array = explode(',', $data['element_identifier']);
+            $this->embeddedparams['element_identifier'] = $element_identifiers_array;
         }
 
         parent::__construct();
@@ -70,7 +54,33 @@ class rb_response_export_performance_reporting_embedded extends rb_base_embedded
      * @return array
      */
     protected function define_columns() {
-        return \rb_source_perform_response::get_default_columns();
+        return [
+            [
+                'type' => 'element',
+                'value' => 'title',
+                'heading' => get_string('element_title', 'mod_perform'),
+            ],
+            [
+                'type' => 'section',
+                'value' => 'title',
+                'heading' => get_string('section_title', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'is_required',
+                'heading' => get_string('element_is_required', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'identifier',
+                'heading' => get_string('element_identifier', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'actions',
+                'heading' => get_string('actions', 'mod_perform'),
+            ],
+        ];
     }
 
     /**
@@ -79,7 +89,20 @@ class rb_response_export_performance_reporting_embedded extends rb_base_embedded
      * @return array
      */
     protected function define_filters() {
-        return \rb_source_perform_response::get_default_filters();
+        return [
+            [
+                'type' => 'section',
+                'value' => 'title',
+            ],
+            [
+                'type' => 'element',
+                'value' => 'title',
+            ],
+            [
+                'type' => 'element',
+                'value' => 'identifier',
+            ],
+        ];
     }
 
     /**

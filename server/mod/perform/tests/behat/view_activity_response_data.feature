@@ -3,29 +3,33 @@ Feature: Test viewing Performance activity response data
 
   Background:
     Given the following "users" exist:
-      | username    | firstname   | lastname | email                   |
-      | user1       | User1       | Last1    | user1@example.com       |
-      | user2       | User2       | Last2    | user2@example.com       |
-      | user3       | User3       | Last3    | user3@example.com       |
-      | user4       | User4       | Last4    | user4@example.com       |
-      | manager     | manager     | user     | manager.one@example.com |
-      | sitemanager | sitemanager | user     | sitemanager@example.com |
+      | username             | firstname            | lastname | email                                |
+      | user1                | User1                | Last1    | user1@example.com                    |
+      | user2                | User2                | Last2    | user2@example.com                    |
+      | user3                | User3                | Last3    | user3@example.com                    |
+      | user4                | User4                | Last4    | user4@example.com                    |
+      | user5                | User5                | Last5    | user5@example.com                    |
+      | manager              | manager              | user     | manager.one@example.com              |
+      | manager-reporting-id | manager-reporting-id | user     | manager-reporting-id.one@example.com |
+      | sitemanager          | sitemanager          | user     | sitemanager@example.com              |
     And the following "role assigns" exist:
       | user        | role    | contextlevel | reference |
       | sitemanager | manager | System       |           |
     And the following job assignments exist:
-      | user  | manager | appraiser |
-      | user1 | manager |           |
-      | user2 | manager |           |
-      | user3 |         | manager   |
+      | user  | manager              | appraiser |
+      | user1 | manager              |           |
+      | user2 | manager              |           |
+      | user3 |                      | manager   |
+      | user5 | manager-reporting-id |           |
     And the following "permission overrides" exist:
       | capability                                   | permission | role         | contextlevel | reference |
       | mod/perform:report_on_subject_responses      | Allow      | staffmanager | System       |           |
       | mod/perform:report_on_all_subjects_responses | Allow      | manager      | System       |           |
     And the following "subject instances" exist in "mod_perform" plugin:
-      | activity_name                      | subject_username | subject_is_participating | include_questions | include_required_questions | activity_status |
-      | Simple optional questions activity | user1            | true                     | true              |                            | Active          |
-      | Simple required questions activity | user1            | true                     | true              | true                       | Active          |
+      | activity_name                      | subject_username | subject_is_participating | include_questions | include_required_questions | include_reporting_ids | activity_status |
+      | Simple optional questions activity | user1            | true                     | true              |                            |                       | Active          |
+      | Simple required questions activity | user1            | true                     | true              | true                       |                       | Active          |
+      | With reporting ids                 | user5            | true                     | true              |                            | true                  | Active          |
 
   Scenario: A user with the global capability can access the performance activity response data from the admin menu
     Given I log in as "sitemanager"
@@ -63,6 +67,7 @@ Feature: Test viewing Performance activity response data
     And the "Select activity" select box should contain "Simple optional questions activity"
     And I set the following fields to these values:
       | Select activity | Simple optional questions activity |
+
     When I click on "Load records" "button" in the ".tui-performReportPerformanceResponseByContent__activity" "css_element"
     Then I should see "Performance data for Simple optional questions activity"
 
@@ -84,12 +89,41 @@ Feature: Test viewing Performance activity response data
     When I click on "view or export" "link"
     Then I should see "Performance activity response data"
 
-  Scenario: I can see question data and view question previews
+  Scenario: I can browse records by reporting ID
+    Given I log in as "sitemanager"
+    When I am on "Team" page
+    And I click on "view or export" "link"
+    And I switch to "Browse records by content" tab
+
+    When I select from the tui taglist in the ".tui-performReportPerformanceResponseByContent__id" "css_element":
+      | With reporting ids-id-1 |
+    And I click on "Load records" "link_or_button" in the ".tui-performReportPerformanceResponseByContent__id" "css_element"
+
+    Then I should see "Performance data for selected reporting IDs: 1 record shown"
+
+    # Ensure top level filter banner is there and chowing our choice.
+    And I should see "Reporting ID" in the ".tui-performReportPerformanceReportingIdBanner" "css_element"
+    And I should see "With reporting ids-id-1" in the ".tui-performReportPerformanceReportingIdBanner" "css_element"
+
+    # Ensure this version does not show the element id filter option.
+    And "element-identifier" "field" should not exist
+
+    Then I should see "1 record selected" in the ".tui-elementResponseReportingActionCard" "css_element"
+    And the following should exist in the "element_performance_reporting_by_reporting_id" table:
+      | Question text | Section title | Element type | Responding relationships | Required | Reporting ID            |
+      | Question one  | Part one      | Short text   | 1                        | No       | With reporting ids-id-1 |
+
+    # Check back link goes to the correct tab (by content).
+    When I click on "All performance data records" "link"
+    Then I should see "Select activity"
+    Then I should see "Select reporting IDs"
+
+  Scenario: I can see data by activity and view question previews
     Given I log in as "manager"
 
     # First check the optional questions activity.
     When I navigate to the mod perform response data report for "Simple optional questions activity" activity
-    Then I should see "2 records selected"
+    Then I should see "Performance data for Simple optional questions activity: 2 records shown"
     And the following should exist in the "element_performance_reporting" table:
       | Question text | Section title | Element type | Responding relationships | Required | Reporting ID |
       | Question one  | Part one      | Short text   | 1                        | No       |              |
@@ -117,7 +151,7 @@ Feature: Test viewing Performance activity response data
     When I set the following fields to these values:
       | section-involved_relationships | Subject |
     And I click on "submitgroupstandard[addfilter]" "button"
-    Then I should see "2 records selected"
+    Then I should see "2 records selected" in the ".tui-elementResponseReportingActionCard" "css_element"
     And the following should exist in the "element_performance_reporting" table:
       | Question text | Section title | Element type | Responding relationships | Required | Reporting ID |
       | Question one  | Part one      | Short text   | 1                        | No       |              |
@@ -157,6 +191,11 @@ Feature: Test viewing Performance activity response data
     And the following fields match these values:
       | [answer_text] |  |
 
+    # Check back link goes to the correct tab (by content).
+    When I close the tui modal
+    And I click on "All performance data records" "link"
+    Then I should see "Select activity"
+
   Scenario: I can see the subject instance for subject report when I have sufficient permission
     Given I log in as "sitemanager"
 
@@ -166,6 +205,10 @@ Feature: Test viewing Performance activity response data
       | Activity name                      | Instance number | Participants | Progress    | Availability |
       | Simple optional questions activity | 1               | 1            | Not started | Open         |
       | Simple required questions activity | 1               | 1            | Not started | Open         |
+
+    # Check back link goes to the correct tab (by user).
+    When I click on "All performance data records" "link"
+    Then I should see "Subject users: 9 records shown"
 
     When I navigate to the mod perform subject instance report for user "user3"
     Then I should see "Performance data for User3 Last3: 0 records shown"

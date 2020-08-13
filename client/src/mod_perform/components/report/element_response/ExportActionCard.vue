@@ -169,14 +169,14 @@ export default {
         action: 'bulk',
         export: 'Export',
         format: 'csv',
-        filtered_report_embedded_shortname: this.embeddedShortname,
+        filtered_report_export_type: this.embeddedShortname,
         filtered_report_filter_hash: this.filterHash,
       });
       return this.$url('/mod/perform/reporting/performance/export.php', params);
     },
     countString() {
       if (this.rowCount === 1) {
-        return this.$str('x_record_selected', 'mod_perform');
+        return this.$str('x_record_selected', 'mod_perform', this.rowCount);
       }
 
       return this.$str('x_records_selected', 'mod_perform', this.rowCount);

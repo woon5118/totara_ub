@@ -913,16 +913,35 @@ class mod_perform_generator extends component_generator_base {
 
         if ($include_questions) {
             $required_question = $data['include_required_questions'] ?? false;
+
+            $include_reporting_ids = $data['include_reporting_ids'] ?? false;
+            $reporting_id1 = null;
+            $reporting_id2 = null;
+
+            if ($include_reporting_ids) {
+                $reporting_id1 = $activity->name . '-id-1';
+                $reporting_id2 = $activity->name . '-id-2';
+            }
+
             // String conversion for behat, defaulting to false.
             if (is_string($required_question) && $required_question !== 'true') {
                 $required_question = false;
             }
             $section1 = $this->create_section($activity, ['title' => 'Part one']);
 
-            $element = $this->create_element(['title' => 'Question one', 'is_required' => (bool)$required_question]);
+            $element = $this->create_element([
+                'title' => 'Question one',
+                'is_required' => (bool) $required_question,
+                'identifier' => $reporting_id1,
+            ]);
+
             $this->create_section_element($section1, $element);
 
-            $element2 = $this->create_element(['title' => 'Question two', 'is_required' => (bool)$required_question]);
+            $element2 = $this->create_element([
+                'title' => 'Question two',
+                'is_required' => (bool)$required_question,
+                'identifier' => $reporting_id2
+            ]);
             $this->create_section_element($section1, $element2, 2);
 
             $participant_instances = [$subjects_participant_instance, $other_participant_instance, $third_participant_instance];

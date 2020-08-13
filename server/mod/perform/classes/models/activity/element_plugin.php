@@ -62,7 +62,7 @@ abstract class element_plugin {
      *
      * @param bool $get_respondable
      * @param bool $get_non_respondable
-     * @return array
+     * @return element_plugin[]
      * @throws \coding_exception
      */
     final public static function get_element_plugins(bool $get_respondable = true, bool $get_non_respondable = true): array {

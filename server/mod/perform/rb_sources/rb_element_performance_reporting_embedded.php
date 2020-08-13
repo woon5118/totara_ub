@@ -121,7 +121,7 @@ class rb_element_performance_reporting_embedded extends rb_base_embedded {
             [
                 'type' => 'element',
                 'value' => 'identifier',
-            ],
+            ]
         ];
     }
 

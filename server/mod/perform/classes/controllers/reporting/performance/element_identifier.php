@@ -27,41 +27,31 @@ use context;
 use context_coursecat;
 use core\output\notification;
 use mod_perform\controllers\perform_controller;
-use mod_perform\models\activity\activity as activity_model;
+use mod_perform\entities\activity\element_identifier as element_identifier_entity;
 use mod_perform\util;
 use mod_perform\views\embedded_report_view;
 use mod_perform\views\override_nav_breadcrumbs;
-use moodle_exception;
 use moodle_url;
 use totara_mvc\has_report;
 use totara_mvc\renders_components;
 use totara_mvc\view;
-use mod_perform\data_providers\activity\reportable_activities;
+use totara_tui\output\component;
 
-class activity extends perform_controller {
+class element_identifier extends perform_controller {
 
     use has_report;
     use renders_performance_reports;
 
-    /**
-     * mod_perform\models\activity\activity instance
-     * @var activity_model $activity
-     */
-    private $activity;
-
     public function setup_context(): context {
-        if ($this->get_optional_param('activity_id', null, PARAM_INT)) {
-            return $this->get_activity()->get_context();
-        }
-
         $category_id = util::get_default_category_id();
         return context_coursecat::instance($category_id);
     }
 
     public function action() {
-        $activity_id = $this->get_optional_param('activity_id', null, PARAM_INT);
+        $element_identifier = $this->get_optional_param('element_identifier', null, PARAM_RAW);
+        $element_identifier = preg_replace('/[^0-9,]/', '', $element_identifier);
 
-        if ($activity_id === null) {
+        if (empty($element_identifier)) {
             $this->set_url(static::get_url());
             $link_url = new moodle_url('/mod/perform/reporting/performance/');
             return self::create_view('mod_perform/no_report', [
@@ -72,58 +62,56 @@ class activity extends perform_controller {
             ]);
         }
 
-        $reportable_activities = (new reportable_activities())->fetch()->get();
-        if (!$reportable_activities->find('id', $activity_id)) {
-            // Current user can't report on any subject users within this activity.
-            throw new moodle_exception('error_activity_unavailable', 'mod_perform');
-        }
-
-        $activity_name = $this->get_activity()->name;
+        // Must be higher level admin to access this report.
+        $this->require_capability('mod/perform:report_on_all_subjects_responses', $this->get_context());
 
         $extra_data = [
-            'activity_id' => $activity_id,
+            'element_identifier' => $element_identifier,
         ];
+
+        $report = $this->load_embedded_report('element_performance_reporting_by_reporting_id', $extra_data);
+        $debug = $this->get_optional_param('debug', 0, PARAM_INT);
 
         $this->set_url(static::get_url($extra_data));
 
-        $report = $this->load_embedded_report('element_performance_reporting', $extra_data);
-        $debug = $this->get_optional_param('debug', 0, PARAM_INT);
+        // Names of element identifiers this report is being filtered by.
+        $filtered_report_element_identifier_names = (element_identifier_entity::repository())
+            ->filter_by_identifier_id(explode(',', $element_identifier))
+            ->get()
+            ->pluck('identifier');
+
+        $reporting_id_banner_component = $this->get_reporting_id_banner_component($filtered_report_element_identifier_names);
 
         $filtered_count = $report->get_filtered_count();
-
         $action_card_component = $this->get_rendered_action_card(
             $filtered_count,
             $report->get_search_hash(),
-            'element',
-            ['activity_id' => $activity_id]
+            'element_identifier',
+            ['element_identifier' => $filtered_report_element_identifier_names]
         );
 
-        $heading = $this->get_heading($filtered_count, $activity_name);
+        $heading = $this->get_heading($filtered_count, get_string('selected_reporting_ids', 'mod_perform'));
 
         $report_view = embedded_report_view::create_from_report($report, $debug, 'mod_perform/bulk_exportable_report')
             ->add_override(new override_nav_breadcrumbs())
             ->set_title($heading)
             ->set_back_to(...$this->get_back_to_by_content_tab())
-            ->set_additional_data(['action_card_component' => $action_card_component]);
+            ->set_additional_data([
+                'reporting_id_banner_component' => $reporting_id_banner_component,
+                'action_card_component' => $action_card_component
+            ]);
 
         $report_view->set_report_heading($this->get_report_heading($report, $report_view, $heading));
         return $report_view;
     }
 
     public static function get_base_url(): string {
-        return '/mod/perform/reporting/performance/activity.php';
+        return '/mod/perform/reporting/performance/element_identifier.php';
     }
 
-    private function get_activity(): activity_model {
-        if (!isset($this->activity)) {
-            try {
-                $activity_id = $this->get_required_param('activity_id', PARAM_INT);
-                $this->activity = activity_model::load_by_id($activity_id);
-            } catch (\Exception $e) {
-                throw new moodle_exception('error_activity_id_wrong', 'mod_perform', '', null, $e);
-            }
-        }
-        return $this->activity;
+    private function get_reporting_id_banner_component(array $reporting_ids): string {
+        return $this->get_rendered_component('mod_perform/components/report/performance/ReportingIdFilterBanner', [
+            'reporting-ids' => $reporting_ids,
+        ]);
     }
-
 }
