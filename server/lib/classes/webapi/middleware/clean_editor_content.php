@@ -47,16 +47,26 @@ final class clean_editor_content implements middleware {
     private $content_format_key;
 
     /**
+     * Whether the content's key must exist in the payload or not
+     *
+     * @var bool
+     */
+    private $content_key_required;
+
+    /**
      * Passing down the keys to get the content value and its format value from the payload
      * when the middleware is running thru.
      *
      * clean_json_editor constructor.
      * @param string        $content_key
      * @param string|null   $content_format_key
+     * @param bool          $content_key_required
      */
-    public function __construct(string $content_key, ?string $content_format_key = null) {
+    public function __construct(string $content_key, ?string $content_format_key = null,
+                                bool $content_key_required = true) {
         $this->content_key = $content_key;
         $this->content_format_key = $content_format_key;
+        $this->content_key_required = $content_key_required;
     }
 
     /**
@@ -67,9 +77,16 @@ final class clean_editor_content implements middleware {
      */
     public function handle(payload $payload, Closure $next): result {
         if (!$payload->has_variable($this->content_key)) {
-            throw new \coding_exception(
-                "Cannot find the content variable at key '{$this->content_key}'"
-            );
+            if ($this->content_key_required) {
+                // Content is missing from payload and it is required.
+                throw new \coding_exception(
+                    "Cannot find the content variable at key '{$this->content_key}'"
+                );
+            }
+
+            // Otherwise sometimes the field is not required - meaning that the field can be missing
+            // within the payload depending on the persist operation implementation.
+            return $next->__invoke($payload);
         }
 
         $format = FORMAT_PLAIN;

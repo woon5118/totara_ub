@@ -37,12 +37,14 @@ final class playlist_provider extends provider {
     }
 
     /**
-     * @inheritDoc
+     * @param playlist|shareable    $instance
+     * @param int                   $access
+     * @param int                   $userid
+     *
+     * @return void
      */
     public function update_access(shareable $instance, int $access, int $userid): void {
-        /** @var playlist $instance */
-        $instance->set_access($access);
-        $instance->update($userid);
+        $instance->update(null, $access, null, null, $userid);
     }
 
     /**

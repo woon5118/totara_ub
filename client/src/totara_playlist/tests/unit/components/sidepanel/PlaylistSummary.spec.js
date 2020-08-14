@@ -16,15 +16,19 @@
  * @module totara_playlist
  */
 
+import Vue from 'vue';
 import PlaylistSummary from 'totara_playlist/components/sidepanel/PlaylistSummary';
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
+
+Vue.directive('focus-within', {});
 
 describe('totara_playlist/components/sidepanel/PlaylistSummary', () => {
   let wrapper;
 
   beforeAll(() => {
-    wrapper = shallowMount(PlaylistSummary, {
+    wrapper = mount(PlaylistSummary, {
       propsData: {
+        instanceId: 1,
         summary: 'Hello world',
       },
     });

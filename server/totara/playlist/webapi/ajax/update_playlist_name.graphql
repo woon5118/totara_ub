@@ -24,7 +24,7 @@ mutation totara_playlist_update_playlist_name(
     }
     id
     bookmarked
-    summary(format: PLAIN)
+    summary(format: HTML)
     access
     timedescription
     contextid

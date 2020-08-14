@@ -2,7 +2,7 @@
 
 exports[`engage_article/components/content/ArticleContent.vue Checks snapshot 1`] = `
 <div class="tui-articleContent">
-  <inlineediting-stub buttonarialabel="[edit-moodle]" fullwidth="true" updateable="true">
+  <inlineediting-stub buttonarialabel="[edit-moodle]" fullwidth="true" restrictedmode="true" updateable="true">
     <div class="tui-articleContent__content"></div>
   </inlineediting-stub>
   <!---->

@@ -48,7 +48,7 @@ final class playlist_formatter extends formatter {
         $record->contextid = $context->id;
         $record->timecreated = $playlist->get_timecreated();
         $record->timemodified = $playlist->get_timemodified();
-        $record->summaryformat = $playlist->get_summayformat();
+        $record->summaryformat = $playlist->get_summaryformat();
 
         parent::__construct($record, $context);
     }
@@ -86,6 +86,7 @@ final class playlist_formatter extends formatter {
         return [
             'id' => null,
             'name' => string_field_formatter::class,
+            'summaryformat' => null,
             'summary' => function (?string $value, text_field_formatter $formatter) use ($that): string {
                 if (null === $value || '' === $value) {
                     return '';

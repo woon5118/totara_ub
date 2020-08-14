@@ -81,8 +81,6 @@ class totara_playlist_share_graphql_testcase extends advanced_testcase {
      *   1. We can share a playlist during update.
      */
     public function test_playlist_update() {
-        global $DB;
-
         $gen = $this->getDataGenerator();
         /** @var totara_playlist_generator $playlistgen */
         $playlistgen = $gen->get_plugin_generator('totara_playlist');

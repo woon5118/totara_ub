@@ -17,10 +17,17 @@
 -->
 
 <style lang="scss">
+:root {
+  --tui-playlistView-min-height: 78vh;
+}
+
 .tui-playlistView {
   display: flex;
   flex-direction: column;
-  min-height: 70vh;
+
+  .tui-responsive > .tui-grid > .tui-grid-item--first {
+    min-height: var(--tui-playlistView-min-height);
+  }
 
   // Getting rid of the title
   .tui-layoutOneColumnWithSidepanel__heading {

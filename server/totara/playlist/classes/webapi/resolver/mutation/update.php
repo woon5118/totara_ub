@@ -29,11 +29,13 @@ use totara_engage\access\access;
 use totara_engage\share\manager as share_manager;
 use totara_engage\share\recipient\manager as recipient_manager;
 use totara_playlist\playlist;
+use core\webapi\resolver\has_middleware;
+use core\webapi\middleware\clean_editor_content;
 
 /**
  * Mutation resolver for totara_playlist_update
  */
-final class update implements mutation_resolver {
+final class update implements mutation_resolver, has_middleware {
     /**
      * @param array             $args
      * @param execution_context $ec
@@ -41,33 +43,36 @@ final class update implements mutation_resolver {
      * @return playlist
      */
     public static function resolve(array $args, execution_context $ec): playlist {
-        global $DB, $USER;
+        global $USER;
         require_login();
         advanced_feature::require('engage_resources');
 
-        $transaction = $DB->start_delegated_transaction();
-
         $playlist = playlist::from_id($args['id'], true);
 
+        $name = $playlist->get_name(false);
+        $access = $playlist->get_access();
+        $summary = null;
+        $summary_format = null;
+
         if (!empty($args['name'])) {
-            $playlist->set_name($args['name']);
+            $name = $args['name'];
         }
 
         if (isset($args['access'])) {
-            $access = $args['access'];
-
-            if (!is_numeric($access) && is_string($access)) {
-                // Type totara_engage_access is a string name of the constant. Therefore, we should
-                // format that constant into a value that machine can understand.
-                $playlist->set_access(access::get_value($access));
-            }
+            // Type totara_engage_access is a string name of the constant. Therefore, we should
+            // format that constant into a value that machine can understand.
+            $access = access::get_value($args['access']);
         }
 
         if (isset($args['summary'])) {
-            $playlist->set_summary($args['summary']);
+            $summary = $args['summary'];
         }
 
-        $playlist->update($USER->id);
+        if (isset($args['summary_format'])) {
+            $summary_format = $args['summary_format'];
+        }
+
+        $playlist->update($name, $access, $summary, $summary_format, $USER->id);
 
         // Add/remove topics.
         if (!empty($args['topics'])) {
@@ -82,8 +87,16 @@ final class update implements mutation_resolver {
             share_manager::share($playlist, 'totara_playlist', $recipients);
         }
 
-        $transaction->allow_commit();
-
         return $playlist;
+    }
+
+    /**
+     * @return array
+     */
+    public static function get_middleware(): array {
+        return [
+            // summary field is an optional for this operation. Hence we will not require it.
+            new clean_editor_content('summary', 'summary_format', false)
+        ];
     }
 }

@@ -82,7 +82,7 @@ final class playlist_observer {
         $handler->handle_with_params(
             $playlist->get_name(),
             $playlist->get_summary(),
-            $playlist->get_summayformat(),
+            $playlist->get_summaryformat(),
             $playlist->get_id(),
             'totara_playlist',
             'playlist',

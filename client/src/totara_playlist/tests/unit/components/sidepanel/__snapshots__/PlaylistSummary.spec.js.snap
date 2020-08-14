@@ -4,8 +4,46 @@ exports[`totara_playlist/components/sidepanel/PlaylistSummary Checks snapshot 1`
 <div
   class="tui-playlistSummary"
 >
-  <p>
-    Hello world
-  </p>
+  <div
+    class="tui-inlineEditing tui-inlineEditing--fullWidth"
+  >
+    <div
+      class="tui-playlistSummary__placeholder"
+    >
+      
+      [[adddescription, totara_playlist]]
+    
+    </div>
+     
+    <button
+      aria-label="[[adddescription, totara_playlist]]"
+      class="tui-iconBtn tui-inlineEditing__btn tui-iconBtn--small tui-iconBtn--transparent"
+      style="display: none;"
+      title="[[adddescription, totara_playlist]]"
+      type="button"
+    >
+      <span
+        class="tui-iconBtn__wrap"
+      >
+        <span
+          class="tui-iconBtn__label"
+        >
+          <span
+            aria-hidden="true"
+            class="tui-iconBtn__icon"
+          >
+            <img
+              class="icon"
+              src="http://foo/theme/image.php/ventura/core/1001/edit"
+            />
+          </span>
+           
+          <!---->
+        </span>
+         
+        <!---->
+      </span>
+    </button>
+  </div>
 </div>
 `;

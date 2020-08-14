@@ -77,6 +77,11 @@ final class mention_processor extends processor {
      */
     public function process_format_json_editor(content $content): void {
         $contentvalue = $content->get_content();
+        if (empty($contentvalue)) {
+            // Empty content. We will skip it.
+            return;
+        }
+
         $document = document::create($contentvalue);
 
         $nodes = $document->find_nodes(mention::get_type());

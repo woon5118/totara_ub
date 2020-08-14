@@ -71,7 +71,8 @@ final class totara_playlist_generator extends component_generator_base implement
             $summary = $parameters['summary'];
         }
 
-        $playlist = playlist::create($name, $access, $contextid, $userid, $summary);
+        $summary_format = $parameters['summaryformat'] ?? null;
+        $playlist = playlist::create($name, $access, $contextid, $userid, $summary, $summary_format);
 
         if (isset($parameters['topics']) && !empty($parameters['topics'])) {
             $playlist->add_topics_by_ids($parameters['topics']);
@@ -94,14 +95,14 @@ final class totara_playlist_generator extends component_generator_base implement
         $items = [
             'Security',
             'Kali linux',
-            'Chicken Wasabi',
-            'How to Dota2 - 101',
-            'How to hack your HR',
+            'How to Python - 102',
+            'How to Python - 101',
+            'How to deal with your HR',
             'How to cook Ruby ?',
-            'How to CS:GO - 201',
+            'How to programming with Python - 201',
             'Gaming industries ?',
-            'How to WOW your HR ?',
-            'How to REKT your co-worker ?',
+            'How to avoid your HR ?',
+            'How to REKT your machine ?',
             'God of War is awesome !'
         ];
 

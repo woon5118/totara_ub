@@ -2,6 +2,7 @@ type totara_playlist_playlist {
   id: core_id!
   name(format: core_format!): String!
   summary(format: core_format!): String
+  summaryformat: Int!
   access: totara_engage_access!
   user: core_user!
   timedescription: String!
@@ -125,6 +126,7 @@ extend type Mutation {
     id: param_integer!
     name: param_text
     summary: param_text
+    summary_format: param_integer
     access: totara_engage_access
     topics: [param_integer!]
     shares: [totara_engage_recipient_in!]

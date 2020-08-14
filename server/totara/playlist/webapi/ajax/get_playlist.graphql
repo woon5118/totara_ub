@@ -28,7 +28,7 @@ query totara_playlist_get_playlist($id: param_integer!) {
     }
     name(format: PLAIN)
     access
-    summary(format: PLAIN)
+    summary(format: HTML)
     rating {
       itemid
       rating

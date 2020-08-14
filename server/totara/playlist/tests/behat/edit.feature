@@ -22,3 +22,18 @@ Feature: Edit playlist instance
     When I click on "Done" "button" in the ".tui-playlistTitleForm" "css_element"
     Then I should not see "Playlist 101"
     And I should see "Playlist 102"
+
+  @javascript
+  Scenario: User edit the playlist's summary
+    Given I log in as "userone"
+    And I click on "Your Library" in the totara menu
+    When I follow "Playlist 101"
+    Then I should see "Playlist 101"
+    And I click on "Expand" "button"
+    And I click on "Add a description (optional)" "button"
+    And I activate the weka editor with css ".tui-playlistSummary__editor"
+    And I type "Best playlist ever" in the weka editor
+    And I wait for the next second
+    And I click on "Done" "button"
+    And I should see "Best playlist ever"
+    And I should not see "paragraph" in the ".tui-playlistSummary__content" "css_element"

@@ -23,5 +23,9 @@
   > p {
     margin: 0;
   }
+
+  &__placeholder {
+    color: var(--tui-color-state);
+  }
 }
 </style>

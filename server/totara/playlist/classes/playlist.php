@@ -159,6 +159,8 @@ final class playlist implements accessible, shareable {
         } else if (!access::is_valid($access)) {
             debugging("Access value is invalid with value '{$access}'", DEBUG_DEVELOPER);
             $access = access::PRIVATE;
+        } else if (empty($name)) {
+            throw playlist_exception::create('create');
         }
 
         if (null == $userid) {
@@ -646,50 +648,8 @@ final class playlist implements accessible, shareable {
     /**
      * @return int
      */
-    public function get_summayformat(): int {
+    public function get_summaryformat(): int {
         return $this->playlist->summaryformat;
-    }
-
-    /**
-     * @param string|null $summary
-     * @return void
-     */
-    public function set_summary(?string $summary): void {
-        if (null === $summary) {
-            // We use strict comparision here because we do allow the playlist's summary to be
-            // an empty string.
-            return;
-        }
-
-        $this->playlist->summary = $summary;
-    }
-
-    /**
-     * @param int|null $access
-     * @return void
-     */
-    public function set_access(?int $access): void {
-        if (null === $access) {
-            return;
-        }
-
-        if (!access_manager::can_update_access($this->playlist->access, $access)) {
-            throw playlist_exception::create('updateaccess');
-        }
-
-        $this->playlist->access = $access;
-    }
-
-    /**
-     * @param string|null $name
-     * @return void
-     */
-    public function set_name(?string $name): void {
-        if (null == $name) {
-            return;
-        }
-
-        $this->playlist->name = $name;
     }
 
     /**
@@ -705,11 +665,18 @@ final class playlist implements accessible, shareable {
     }
 
     /**
-     * @param int|null $userid
+     * @param string|null   $name
+     * @param int|null      $access
+     * @param string|null   $summary
+     * @param int|null      $summary_format
+     * @param int|null      $userid
+     *
      * @return void
      */
-    public function update(?int $userid = null): void {
-        global $USER;
+    public function update(?string $name = null, ?int $access = null, ?string $summary = null,
+                           ?int $summary_format = null, ?int $userid = null): void {
+        global $USER, $DB;
+        $transaction = $DB->start_delegated_transaction();
 
         if (null == $userid) {
             $userid = $USER->id;
@@ -719,14 +686,59 @@ final class playlist implements accessible, shareable {
             throw playlist_exception::create('update');
         }
 
-        // Updating the inner playlist.
-        $this->playlist->update();
+        if (null === $access) {
+            $access = $this->playlist->access;
+        }
 
-        $event = playlist_updated::from_playlist($this);
-        $event->trigger();
+        $old_access = $this->playlist->access;
+        if (!access_manager::can_update_access($old_access, $access)) {
+            throw playlist_exception::create('update');
+        }
+
+        if (empty($name)) {
+            // Fallback to the current name of playlist.
+            $name = $this->playlist->name;
+        }
+
+        // Updating the inner playlist.
+        $this->do_update($name, $access, $summary, $summary_format);
 
         // Resources might need to have their access and shares updated.
         $this->update_resources();
+        $transaction->allow_commit();
+
+        // Note: we don't care much about the processes after everything related to the playlist
+        // had done updated. Hence no transaction from here.
+        $event = playlist_updated::from_playlist($this);
+        $event->trigger();
+    }
+
+    /**
+     * Note that this function does do any logic checks but just purely write to data layer.
+     *
+     * @param string $name
+     * @param int $access
+     * @param string|null $summary
+     * @param int|null $summary_format
+     *
+     * @return void
+     */
+    protected function do_update(string $name, int $access, ?string $summary = null,
+                                 ?int $summary_format = null): void {
+        $this->playlist->name = $name;
+        $this->playlist->access = $access;
+
+        if (null !== $summary) {
+            // If it is empty string - we still want it.
+            // We only don't like the null value pretty much.
+            $this->playlist->summary = $summary;
+        }
+
+        if (null !== $summary_format) {
+            $this->playlist->summaryformat = $summary_format;
+        }
+
+        $this->playlist->update();
     }
 
     /**

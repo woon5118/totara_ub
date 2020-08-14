@@ -65,8 +65,8 @@ class totara_playlist_mentions_testcase extends advanced_testcase {
         // UPDATE
         $sink = $this->redirectMessages();
 
-        $playlist->set_summary('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"UPDATED SUMMARY"},{"type":"mention","attrs":{"id":"' . $user2->id . '","display":"Receiver Two"}},{"type":"mention","attrs":{"id":"' . $user3->id . '","display":"Another Three"}}]}]}');
-        $playlist->update();
+        $summary = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"UPDATED SUMMARY"},{"type":"mention","attrs":{"id":"' . $user2->id . '","display":"Receiver Two"}},{"type":"mention","attrs":{"id":"' . $user3->id . '","display":"Another Three"}}]}]}';
+        $playlist->update(null, null, $summary, FORMAT_JSON_EDITOR);
 
         $this->execute_adhoc_tasks();
         $messages = $sink->get_messages();
