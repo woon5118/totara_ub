@@ -24,7 +24,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
     'engage/survey:create' => [
-        'riskbitmask' => RISK_SPAM,
         'captype' => 'write',
         // Each of survey instance will need to be added into a self container of a user.
         'contextlevel' => CONTEXT_USER,
@@ -34,7 +33,6 @@ $capabilities = [
     ],
 
     'engage/survey:update' => [
-        'riskbitmask' => RISK_SPAM,
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
@@ -43,7 +41,6 @@ $capabilities = [
     ],
 
     'engage/survey:delete' => [
-        'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
@@ -52,6 +49,7 @@ $capabilities = [
     ],
 
     'engage/survey:share' => [
+        'riskbitmask' => RISK_SPAM,
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [

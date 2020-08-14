@@ -1,4 +1,4 @@
-@totara @totara_msteams @javascript
+@engage @totara @totara_msteams @javascript
 Feature: Customise admin settings
   As an admin
   I would like to have access to a frontend admin settings interface

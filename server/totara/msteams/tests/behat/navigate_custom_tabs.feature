@@ -1,4 +1,4 @@
-@totara @totara_msteams @totara_catalog @totara_program @totara_engage @block_current_learning @mod_facetoface @javascript
+@engage @totara @totara_msteams @totara_catalog @totara_program @totara_engage @block_current_learning @mod_facetoface @javascript
 Feature: Navigate a learning item in a custom tab
   As a user
   I would like to see my current learning, Find Learning catalogue and Your Library as tabs within MS Teams

@@ -34,11 +34,11 @@ Feature: Contribute new resource and share with workspace
 
     # Create new resource.
     When I follow "Resource"
-    And I set the field "Article title" to "Test Article 1"
+    And I set the field "Enter resource title" to "Test Article 1"
     And I activate the weka editor with css ".tui-articleForm__description"
     And I set the weka editor to "New article"
     And I wait for the next second
-    And I click on "Create article" "button"
+    And I click on "Next" "button"
     And I wait for the next second
 
     # Confirm that we can see the automatically added workspace recipient.

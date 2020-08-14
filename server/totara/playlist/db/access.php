@@ -24,7 +24,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
     'totara/playlist:create' => [
-        'riskbitmask' => RISK_SPAM,
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
@@ -33,7 +32,6 @@ $capabilities = [
     ],
 
     'totara/playlist:delete' => [
-        'riskbitmask' => RISK_DATALOSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
@@ -42,6 +40,7 @@ $capabilities = [
     ],
 
     'totara/playlist:share' => [
+        'riskbitmask' => RISK_SPAM,
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [

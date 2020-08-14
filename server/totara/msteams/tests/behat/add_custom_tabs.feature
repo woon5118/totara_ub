@@ -1,4 +1,4 @@
-@totara @totara_msteams @totara_catalog @totara_program @totara_engage @core_course @javascript
+@engage @totara @totara_msteams @totara_catalog @totara_program @totara_engage @core_course @javascript
 Feature: Add a tab to Teams Channel
   As a course co-ordinator
   I would like to add a course, programme, certification or playlist to a Teams channel

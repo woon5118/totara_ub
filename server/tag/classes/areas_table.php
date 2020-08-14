@@ -71,8 +71,8 @@ class core_tag_areas_table extends html_table {
                 $areaname = core_tag_area::display_name($record->component, $record->itemtype);
 
                 // Totara: Extending the ability to prevent show any update interface, when the area is belong to topic.
-                $enabled = null;
-                if (!\core_tag_collection::is_editable($record->tagcollid)) {
+                $enabled = '';
+                if (\core_tag_collection::is_editable($record->tagcollid)) {
                     $tmpl = new \core_tag\output\tagareaenabled($record);
                     $enabled = $OUTPUT->render_from_template('core/inplace_editable', $tmpl->export_for_template($OUTPUT));
                 }

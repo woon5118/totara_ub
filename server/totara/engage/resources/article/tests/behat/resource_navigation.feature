@@ -35,7 +35,7 @@ Feature: Users can navigate back to the parent page from a resource.
 
     # Open the workspace
     And I click on "Your Workspaces" in the totara menu
-    And I click on "Workspace 1" "link" in the ".tui-workspaceMenu__items" "css_element"
+    And I click on "Workspace 1" "link" in the ".tui-workspaceMenu__group" "css_element"
     And I click on "Library" "link" in the ".tui-tabs__tabs" "css_element"
     Then I should see "Article 1"
 

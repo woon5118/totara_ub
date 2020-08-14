@@ -34,7 +34,7 @@ Feature: Users can navigate back to the parent page from a survey.
 
     # Open the workspace
     And I click on "Your Workspaces" in the totara menu
-    And I click on "Workspace 1" "link" in the ".tui-workspaceMenu__items" "css_element"
+    And I click on "Workspace 1" "link" in the ".tui-workspaceMenu" "css_element"
     And I click on "Library" "link" in the ".tui-tabs__tabs" "css_element"
     Then I should see "Survey 1"
 
@@ -43,7 +43,7 @@ Feature: Users can navigate back to the parent page from a survey.
     Then I should see "Workspace 1" in the ".tui-resourceNavigationBar__backLink" "css_element"
 
     When I click on "Workspace 1" "link" in the ".tui-resourceNavigationBar" "css_element"
-    Then I should see "Workspace 1" in the ".tui-workspacePageHeader__head" "css_element"
+    Then I should see "Workspace 1" in the ".tui-workspacePageHeader__content" "css_element"
 
   Scenario: Survey shows the correct back button when opening from the dashboard/home page.
     Given I log in as "admin"

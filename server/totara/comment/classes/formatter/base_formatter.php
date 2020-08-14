@@ -119,7 +119,7 @@ abstract class base_formatter extends formatter {
             'reportable' => null,
             'totalreactions' => null,
             'content' => function(?string $content, text_field_formatter $formatter) use ($that): string {
-                if (null === $content && $that->object->deleted) {
+                if (empty($content) && $that->object->deleted) {
                     $reason = $that->object->reasondeleted;
                     $reported_reasons = [comment::REASON_DELETED_REPORTED, comment::REASON_DELETED_PARENT_REPORTED];
 
@@ -132,7 +132,6 @@ abstract class base_formatter extends formatter {
                     debugging("Content is empty, even though the comment was not deleted yet", DEBUG_DEVELOPER);
                     return '';
                 }
-
                 $textformat = $that->object->format;
 
                 $formatter->set_additional_options(['formatter' => 'totara_tui']);

@@ -54,6 +54,7 @@ $string['resources'] = "Resources";
 $string['tagarea_engage_article'] = 'Resource';
 $string['deletewarningmsg'] = 'This action is permanent. People with access to this resource will no longer be able to view it.';
 $string['deletewarningtitle'] = 'Are you sure you want to delete the resource?';
+$string['tagarea_engage_resource'] = 'Engage resource';
 $string['timelessthanfive'] = 'Less than 5 mins';
 $string['timefivetoten'] = '5-10 mins';
 $string['timemorethanten'] = '10+ mins';

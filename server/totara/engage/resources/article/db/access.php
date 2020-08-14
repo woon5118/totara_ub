@@ -25,7 +25,6 @@ defined('MOODLE_INTERNAL') || die;
 
 $capabilities = [
     'engage/article:create' => [
-        'riskbitmask' => RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
@@ -34,6 +33,7 @@ $capabilities = [
     ],
 
     'engage/article:share' => [
+        'riskbitmask' => RISK_SPAM,
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [

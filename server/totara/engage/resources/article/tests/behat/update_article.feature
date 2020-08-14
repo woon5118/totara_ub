@@ -31,7 +31,7 @@ Feature: Update article
     Given I log in as "user1"
     And I view article "Test Article 1"
     And I click on "Test Article 1" "text" in the ".tui-articleTitle" "css_element"
-    And I set the field "Article title" to "Updated test article 1"
+    And I set the field "Enter resource title" to "Updated test article 1"
     And I should see "Done"
     And I press "Done"
     And I should see "Updated test article 1"

@@ -126,5 +126,5 @@ Feature: Managers can create and manage tag collections
     And I navigate to "Manage tags" node in "Site administration > Appearance"
     And I click on "Change searchable" "link" in the "Hobbies" "table_row"
     And I navigate to "Tags" node in "Site pages"
-    And "Select tag collection" "select" should not exist
+    And the "Select tag collection" select box should not contain "Hobbies"
     And I log out

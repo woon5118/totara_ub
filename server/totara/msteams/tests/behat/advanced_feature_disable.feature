@@ -1,4 +1,4 @@
-@totara @totara_msteams @javascript
+@engage @totara @totara_msteams @javascript
 Feature: Microsoft Teams settings pages will not show if the feature is disabled.
 
   Background:
