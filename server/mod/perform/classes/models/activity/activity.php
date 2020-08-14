@@ -450,7 +450,7 @@ class activity extends model {
      * @return bool
      */
     public function is_draft(): bool {
-        return $this->get_status_state()::get_code() === draft::get_code();
+        return $this->get_status_state() instanceof draft;
     }
 
     /**
@@ -459,7 +459,7 @@ class activity extends model {
      * @return bool
      */
     public function is_active(): bool {
-        return $this->get_status_state()::get_code() === active::get_code();
+        return $this->get_status_state() instanceof active;
     }
 
     /**

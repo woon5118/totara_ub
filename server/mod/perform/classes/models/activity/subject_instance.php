@@ -44,6 +44,7 @@ use mod_perform\state\subject_instance\pending;
 use mod_perform\state\subject_instance\subject_instance_availability;
 use mod_perform\state\subject_instance\subject_instance_manual_status;
 use mod_perform\state\subject_instance\subject_instance_progress;
+use moodle_exception;
 use stdClass;
 use totara_core\relationship\relationship;
 use totara_job\job_assignment;
@@ -238,12 +239,63 @@ class subject_instance extends model {
     }
 
     /**
+     * Returns true if this instance is open
+     *
+     * @return bool
+     */
+    public function is_open(): bool {
+        return $this->get_availability_state() instanceof open;
+    }
+
+    /**
+     * Returns true if this instance is closed
+     *
+     * @return bool
+     */
+    public function is_closed(): bool {
+        return $this->get_availability_state() instanceof closed;
+    }
+
+    /**
      * Get the current manual status state.
      *
      * @return subject_instance_manual_status|state
      */
     public function get_manual_state(): state {
         return $this->get_state(subject_instance_manual_status::get_type());
+    }
+
+    /**
+     * Returns true if this instance is in active state
+     *
+     * @return bool
+     */
+    public function is_active(): bool {
+        return $this->get_manual_state() instanceof active;
+    }
+
+    /**
+     * Returns true if this instance is in pending state
+     *
+     * @return bool
+     */
+    public function is_pending(): bool {
+        return $this->get_manual_state() instanceof pending;
+    }
+
+    /**
+     * Check whether manual participants can be added
+     *
+     * @return bool
+     */
+    public function can_add_participants(): bool {
+        // Cannot add participants to pending subject instances
+        if ($this->is_pending()
+            || !$this->activity->is_active()
+        ) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -256,7 +308,7 @@ class subject_instance extends model {
         global $DB;
         $manual_participant_helper = manual_participant_helper::for_user($by_user);
 
-        if ((int) $this->status !== pending::get_code()) {
+        if (!$this->is_pending()) {
             throw new coding_exception("Subject instance {$this->id} is not pending.");
         }
 
@@ -315,8 +367,11 @@ class subject_instance extends model {
      * - If participant sections progress is "Not yet started" or "In progress" then set progress to "Not submitted"
      */
     public function manually_close(): void {
-        if (!$this->get_availability_state() instanceof open) {
+        if (!$this->is_open()) {
             throw new coding_exception('This function can only be called if the subject instance is open');
+        }
+        if ($this->is_pending()) {
+            throw new coding_exception('Cannot close a pending subject instance.');
         }
 
         $this->get_availability_state()->close();
@@ -346,8 +401,11 @@ class subject_instance extends model {
      * @param bool $open_children
      */
     public function manually_open(bool $open_children = true): void {
-        if (!$this->get_availability_state() instanceof closed) {
+        if (!$this->is_closed()) {
             throw new coding_exception('This function can only be called if the subject instance is closed');
+        }
+        if ($this->is_pending()) {
+            throw new coding_exception('Cannot open a pending subject instance.');
         }
 
         if ($open_children) {

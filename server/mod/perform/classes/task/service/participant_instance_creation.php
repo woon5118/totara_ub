@@ -158,6 +158,12 @@ class participant_instance_creation {
         int $subject_instance_id,
         array $participant_relationship_map
     ): array {
+        $subject_instance = subject_instance_model::load_by_id($subject_instance_id);
+        // Skip instances which are pending
+        if ($subject_instance->is_pending()) {
+            return [];
+        }
+
         $added_instances_data = [];
         $subject_instance_has_new_participant_instance = false;
         foreach ($participant_relationship_map as $participant_relationship) {
@@ -190,7 +196,6 @@ class participant_instance_creation {
             ];
         }
         if ($subject_instance_has_new_participant_instance) {
-            $subject_instance = subject_instance_model::load_by_id($subject_instance_id);
             if ($subject_instance->get_availability_state() instanceof closed) {
                 // Re-open subject instance if it was closed. Also takes care of progress state.
                 $subject_instance->manually_open(false);

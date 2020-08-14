@@ -28,6 +28,7 @@ use core\entities\user;
 use mod_perform\controllers\perform_controller;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\subject_instance;
+use mod_perform\state\subject_instance\pending;
 use mod_perform\util;
 use moodle_exception;
 use moodle_url;
@@ -52,10 +53,6 @@ class add_participants extends perform_controller {
 
         $this->subject_instance = subject_instance::load_by_entity($entity);
 
-        if (!$this->subject_instance->activity->is_active()) {
-            throw new moodle_exception('invalid_activity', 'mod_perform');
-        }
-
         return $this->subject_instance->activity->get_context();
     }
 
@@ -63,6 +60,11 @@ class add_participants extends perform_controller {
      * @return tui_view
      */
     public function action(): tui_view {
+        // Cannot add participants to pending subject instances
+        if (!$this->subject_instance->can_add_participants()) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
+
         util::require_can_manage_participation(user::logged_in()->id, $this->subject_instance->subject_user_id);
 
         $this->set_url(self::get_url(['subject_instance_id' => $this->subject_instance->id]));

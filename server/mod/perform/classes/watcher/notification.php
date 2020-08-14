@@ -32,7 +32,7 @@ class notification {
     public static function create_subject_instances(subject_instances_created $hook): void {
         foreach ($hook->get_dtos() as $dto) {
             /** @var subject_instance_dto $dto */
-            if ($dto->status === pending::get_code()) {
+            if ($dto->status == pending::get_code()) {
                 // Don't dispatch notifications until the instance is activated. Once it is activated,
                 // notifications are dispatched in \mod_perform\observers\subject_instance_manual_status::subject_instance_activated
                 continue;
