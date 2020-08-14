@@ -157,7 +157,8 @@ class rb_source_perform_subject_instance extends rb_base_source {
                     'iscompound' => true,
                     'issubquery' => true,
                     'extrafields' => [
-                        'subject_instance_id' => "base.id"
+                        'subject_instance_id' => "base.id",
+                        'status' => 'base.status'
                     ]
                 ]
             ),

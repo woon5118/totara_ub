@@ -88,7 +88,8 @@ class rb_source_subject_instance_manage_participation extends rb_source_perform_
                 'issubquery' => true,
                 'extrafields' => [
                     'subject_instance_id' => "base.id",
-                    'activity_id' => "perform.id"
+                    'activity_id' => "perform.id",
+                    'status' => 'base.status'
                 ]
             ]
         );
@@ -107,7 +108,8 @@ class rb_source_subject_instance_manage_participation extends rb_source_perform_
                 'extrafields' => [
                     'activity_id' => 'perform.id',
                     'subject_instance_id' => "base.id",
-                    'subject_instance_availability' => "base.availability"
+                    'subject_instance_availability' => "base.availability",
+                    'status' => 'base.status'
                 ],
             ]
         );

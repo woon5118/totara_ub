@@ -26,6 +26,7 @@ namespace mod_perform\rb\display;
 use html_writer;
 use mod_perform\state\subject_instance\pending;
 use moodle_url;
+use stdClass;
 use totara_reportbuilder\rb\display\base;
 
 class participant_count extends base {
@@ -34,13 +35,15 @@ class participant_count extends base {
      *
      * @param string $count
      * @param string $format
-     * @param \stdClass $row
+     * @param stdClass $row
      * @param \rb_column $column
      * @param \reportbuilder $report
      * @return string
      */
-    public static function display($count, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        if ((int)$count < 0) {
+    public static function display($count, $format, stdClass $row, \rb_column $column, \reportbuilder $report) {
+        $extrafields = self::get_extrafields_row($row, $column);
+
+        if ($extrafields->status == pending::get_code()) {
             // This happens for subject instances that still need manual participant assignments.
             return pending::get_display_name();
         }
@@ -55,12 +58,18 @@ class participant_count extends base {
             return $text;
         }
 
-        $extrafields = self::get_extrafields_row($row, $column);
-        $url = new moodle_url(
+        return html_writer::link(static::get_url($extrafields), $text);
+    }
+
+    /**
+     * @param stdClass $extrafields
+     * @return moodle_url
+     */
+    protected static function get_url(stdClass $extrafields): moodle_url {
+        return new moodle_url(
             '/mod/perform/reporting/participation/participants.php',
             ['subject_instance_id' => $extrafields->subject_instance_id]
         );
-        return html_writer::link($url, $text);
     }
 
     /**

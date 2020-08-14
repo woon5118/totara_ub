@@ -44,8 +44,14 @@ class section_count_manage_participation extends base {
      * @return string
      */
     public static function display($count, $format, stdClass $row, rb_column $column, reportbuilder $report) {
-        if ($format !== 'html') {
-            return $count;
+        if ((int) $count == 1) {
+            $text = get_string('sections_one', 'mod_perform');
+        } else {
+            $text = get_string('sections', 'mod_perform', $count);
+        }
+
+        if ($count == 0 || $format !== 'html') {
+            return $text;
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
@@ -56,7 +62,7 @@ class section_count_manage_participation extends base {
                 'participant_instance_id' => $extrafields->participant_instance_id,
             ]
         );
-        return html_writer::link($url, $count);
+        return html_writer::link($url, $text);
     }
 
     /**

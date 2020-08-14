@@ -23,6 +23,7 @@
 
 namespace mod_perform\rb\display;
 
+use mod_perform\state\subject_instance\pending;
 use rb_column;
 use rb_column_option;
 use reportbuilder;
@@ -54,6 +55,11 @@ class subject_instance_manage_participation_actions extends base {
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
+
+        // Do not allow to do any actions on pending instances
+        if ($extrafields->status == pending::get_code()) {
+            return '';
+        }
 
         $is_open = $extrafields->subject_instance_availability != closed::get_code();
 

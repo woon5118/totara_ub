@@ -23,48 +23,19 @@
 
 namespace mod_perform\rb\display;
 
-use html_writer;
 use moodle_url;
-use rb_column;
-use rb_column_option;
-use reportbuilder;
 use stdClass;
-use totara_reportbuilder\rb\display\base;
 
-class participant_count_manage_participation extends base {
+class participant_count_manage_participation extends participant_count {
 
     /**
-     * Handles the display
-     *
-     * @param string $count
-     * @param string $format
-     * @param stdClass $row
-     * @param rb_column $column
-     * @param reportbuilder $report
-     * @return string
+     * @inheritDoc
      */
-    public static function display($count, $format, stdClass $row, rb_column $column, reportbuilder $report) {
-        if ($format !== 'html') {
-            return $count;
-        }
-
-        $extrafields = self::get_extrafields_row($row, $column);
-        $url = new moodle_url(
+    protected static function get_url(stdClass $extrafields): moodle_url {
+        return new moodle_url(
             '/mod/perform/manage/participation/participant_instances.php',
             ['activity_id' => $extrafields->activity_id, 'subject_instance_id' => $extrafields->subject_instance_id]
         );
-        return html_writer::link($url, $count);
     }
 
-    /**
-     * Is this column graphable?
-     *
-     * @param rb_column $column
-     * @param rb_column_option $option
-     * @param reportbuilder $report
-     * @return bool
-     */
-    public static function is_graphable(rb_column $column, rb_column_option $option, reportbuilder $report) {
-        return false;
-    }
 }
