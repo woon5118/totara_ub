@@ -35,6 +35,10 @@ $string['prefix_help'] = 'This prefix is used for all key names on the Redis ser
 * If you only have one Totara instance using this server, you can leave this value default.
 * Due to key length restrictions, a maximum of five characters is permitted.';
 $string['prefixinvalid'] = 'Invalid prefix. You can only use a-z A-Z 0-9-_.';
+$string['read_password'] = 'Read replica password';
+$string['read_password_help'] = 'This sets the password of the read replica Redis server.';
+$string['read_server'] = 'Read replica server';
+$string['read_server_help'] = 'If you have an environment with redis read replicas please specify the replica load-balancer address here';
 $string['sentinelhosts'] = 'Sentinel hosts';
 $string['sentinelhosts_help'] = 'Redis Sentinel is a high availability solution for Redis.
 It provides monitoring, failover and simplifies configuration.
@@ -61,8 +65,12 @@ $string['test_sentinelpassword'] = 'Redis test Sentinel password';
 $string['test_sentinelpassword_desc'] = 'Redis Sentinel password used for MUC testing.';
 $string['test_server'] = 'Redis test server';
 $string['test_server_desc'] = 'Redis server to use for testing.';
+$string['test_read_server'] = 'Redis read replica test server';
+$string['test_read_server_desc'] = 'Redis read replica server to use for testing.';
 $string['test_password'] = 'Redis test server password';
 $string['test_password_desc'] = 'Redis test server password.';
+$string['test_read_password'] = 'Redis read replica password';
+$string['test_read_password_desc'] = 'Redis read replica password.';
 $string['test_serializer'] = 'Serializer';
 $string['test_serializer_desc'] = 'Serializer to use for testing.';
 $string['useserializer'] = 'Use serializer';

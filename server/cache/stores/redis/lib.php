@@ -80,11 +80,25 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
     protected $redis;
 
     /**
+     * Connection to Redis read replica for this store.
+     *
+     * @var Redis
+     */
+    protected $replica;
+
+    /**
      * Serializer for this store.
      *
      * @var int
      */
     protected $serializer;
+
+    /**
+     * A flag whether the cache store supposed to use a read replica
+     *
+     * @var bool
+     */
+    protected $using_replica = false;
 
     /**
      * Determines if the requirements for this type of store are met.
@@ -153,12 +167,15 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
         $sentinelpassword = isset($configuration['sentinelpassword']) ? $configuration['sentinelpassword'] : '';
         $sentinelmaster = isset($configuration['sentinelmaster']) ? $configuration['sentinelmaster'] : '';
 
+        $replica = isset($configuration['read_server']) ? $configuration['read_server'] : '';
+
         if (!sentinel::is_supported()) {
             $sentinelhosts = '';
         }
 
         $server = isset($configuration['server']) ? $configuration['server'] : '';
         $password = isset($configuration['password']) ? $configuration['password'] : '';
+        $read_password = isset($configuration['read_password']) ? $configuration['read_password'] : '';
         $prefix = isset($configuration['prefix']) ? $configuration['prefix'] : '';
 
         $redis = null;
@@ -204,6 +221,46 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
         } catch (Throwable $e) {
             error_log("Error connecting Redis store '{$this->name}'");
         }
+
+        // Let's attempt to establish connection to a read replica if configured.
+        // If something fails along the way we fall back to use master for reads, as it will work
+        // We should add some alert or store an error or something. But the failure isn't critical
+        if (!empty($replica)) {
+
+            $this->using_replica = true;
+
+            // Let's get a host and a port if provided, socket isn't supported as we are talking about a clustered environment.
+            $replica = explode(':', $replica);
+            if (!isset($replica[1])) {
+                $replica[1] = '6379';
+            }
+
+            try {
+                $this->replica = new Redis();
+
+                if (!$success = $this->replica->connect($replica[0], $replica[1], 3)) {
+                    throw new moodle_exception('Can not connect to redis replica, falling back to use write master');
+                }
+
+                if ($read_password !== '') {
+                    $this->replica->auth($read_password);
+                }
+
+                $this->replica->select($this->database);
+                $this->replica->setOption(Redis::OPT_SERIALIZER, $this->serializer);
+
+                if (!empty($prefix)) {
+                    $this->replica->setOption(Redis::OPT_PREFIX, $prefix);
+                }
+
+            } catch (Throwable $e) {
+                $this->replica = $this->redis;
+                error_log("Error connecting Redis store read replica, at '{$replica[0]}:{$replica[1]}' falling back to master '{$this->name}'");
+            }
+        } else {
+            $this->replica = $this->redis;
+        }
+
     }
 
     /**
@@ -252,7 +309,7 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
      * @return mixed The value of the key, or false if there is no value associated with the key.
      */
     public function get($key) {
-        return $this->redis->hGet($this->hash, $key);
+        return $this->replica->hGet($this->hash, $key);
     }
 
     /**
@@ -262,7 +319,7 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
      * @return array An array of the values of the given keys.
      */
     public function get_many($keys) {
-        return $this->redis->hMGet($this->hash, $keys);
+        return $this->replica->hMGet($this->hash, $keys);
     }
 
     /**
@@ -332,6 +389,12 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
         $this->purge();
         $this->redis->close();
         $this->redis = null; // Totara: do not unset declared object properties!
+
+        // Let's see whether we had a read connection
+        if ($this->replica !== null) {
+            $this->replica->close();
+            $this->replica = null;
+        }
     }
 
     /**
@@ -342,7 +405,7 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
      * @return bool True if the key exists, false if it does not.
      */
     public function has($key) {
-        return !empty($this->redis->hExists($this->hash, $key));
+        return !empty($this->replica->hExists($this->hash, $key));
     }
 
     /**
@@ -399,6 +462,7 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
      *      exist, and false otherwise.
      */
     public function check_lock_state($key, $ownerid) {
+        // Leaving here as connection to 'redis' and not read replica
         $result = $this->redis->get($key);
         if ($result === $ownerid) {
             return true;
@@ -415,7 +479,7 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
      * @return array of all keys in the hash as a numbered array.
      */
     public function find_all() {
-        return $this->redis->hKeys($this->hash);
+        return $this->replica->hKeys($this->hash);
     }
 
     /**
@@ -463,6 +527,8 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
             'sentinelmaster' => $data->sentinelmaster,
             'sentinelpassword' => $data->sentinelpassword,
             'server' => $data->server,
+            'read_server' => $data->read_server,
+            'read_password' => $data->read_password,
             'database' => $data->database,
             'prefix' => $data->prefix,
             'password' => $data->password,
@@ -483,9 +549,11 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
         $data['sentinelmaster'] = isset($config['sentinelmaster']) ? $config['sentinelmaster'] : '';
         $data['sentinelpassword'] = isset($config['sentinelpassword']) ? $config['sentinelpassword'] : '';
         $data['server'] = $config['server'];
+        $data['read_server'] = $config['read_server'];
         $data['database'] = isset($config['database']) ? $config['database'] : 0;
         $data['prefix'] = isset($config['prefix']) ? $config['prefix'] : '';
         $data['password'] = isset($config['password']) ? $config['password'] : '';
+        $data['read_password'] = isset($config['read_password']) ? $config['read_password'] : '';
         if (isset($config['serializer'])) {
             $data['serializer'] = $config['serializer'];
         }
@@ -540,9 +608,14 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
             throw new moodle_exception('TEST_CACHESTORE_REDIS_TESTSERVERS not configured, unable to create test configuration');
         }
 
-        return ['server' => TEST_CACHESTORE_REDIS_TESTSERVERS,
-                'prefix' => $DB->get_prefix(),
+        return [
+            'server' => TEST_CACHESTORE_REDIS_TESTSERVERS,
+            'prefix' => $DB->get_prefix(),
+            'password' => defined('TEST_CACHESTORE_REDIS_PASSWORD') ? TEST_CACHESTORE_REDIS_PASSWORD : '',
+            'read_server' => defined('TEST_CACHESTORE_REDIS_READ_SERVER') ? TEST_CACHESTORE_REDIS_READ_SERVER : '',
+            'read_password' => defined('TEST_CACHESTORE_REDIS_READ_PASSWORD') ? TEST_CACHESTORE_REDIS_READ_PASSWORD : '',
         ];
+
     }
 
     /**
@@ -569,5 +642,15 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
             $options[Redis::SERIALIZER_IGBINARY] = get_string('serializer_igbinary', 'cachestore_redis');
         }
         return $options;
+    }
+
+    /**
+     * Check whether the read replica is actually used.
+     * We check whether we had read replica configured and whether master and replica objects are different.
+     *
+     * @return bool
+     */
+    public function has_read_replica() {
+        return $this->using_replica && $this->redis !== $this->replica;
     }
 }

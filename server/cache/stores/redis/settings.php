@@ -83,6 +83,25 @@ $settings->add(
     )
 );
 
+$settings->add(
+    new admin_setting_configtext(
+        'cachestore_redis/test_read_server',
+        get_string('test_read_server', 'cachestore_redis'),
+        get_string('test_read_server_desc', 'cachestore_redis'),
+        '',
+        PARAM_RAW,
+        16
+    )
+);
+$settings->add(
+    new admin_setting_configpasswordunmask(
+        'cachestore_redis/test_read_password',
+        get_string('test_read_password', 'cachestore_redis'),
+        get_string('test_read_password_desc', 'cachestore_redis'),
+        ''
+    )
+);
+
 // Totara: do not use optional extension classes for default settings,
 //         if they ever decide to change the constant values the db values would break anyway.
 $options = array(1 => get_string('serializer_php', 'cachestore_redis')); // Redis::SERIALIZER_PHP == 1

@@ -135,4 +135,36 @@ class cachestore_redis_test extends cachestore_tests {
         $this->assertFalse($store->release_lock('lock', '321'));
         $this->assertTrue($store->release_lock('lock', '123'));
     }
+
+    public function test_read_replica() {
+        if (!defined('TEST_CACHESTORE_REDIS_READ_SERVER') || empty(TEST_CACHESTORE_REDIS_READ_SERVER)) {
+            $this->markTestSkipped('Redis read replica not configured');
+        }
+
+        $this->assertTrue($this->create_cachestore_redis()->has_read_replica(), 'Connection to read replica is not established');
+    }
+
+    public function test_read_from_replica_is_correct() {
+        if (!defined('TEST_CACHESTORE_REDIS_READ_SERVER') || empty(TEST_CACHESTORE_REDIS_READ_SERVER)) {
+            $this->markTestSkipped('Redis read replica not configured');
+        }
+
+        $store = $this->create_cachestore_redis();
+
+        $values = [];
+
+        for ($i = 0; $i < 10; $i++) {
+            $values['test_key_' . $i] = rand(0, 10000);
+        }
+
+        // Well, I wish it would take just a an associative array
+        $store->set_many(array_map(function ($key) use ($values) {
+            return [
+                'key' => $key,
+                'value' => $values[$key]
+            ];
+        }, array_keys($values)));
+
+        $this->assertEquals($values, $store->get_many(array_keys($values)));
+    }
 }

@@ -77,6 +77,17 @@ class cachestore_redis_addinstance_form extends cachestore_addinstance_form {
         $form->setType('password', PARAM_RAW);
         $form->addHelpButton('password', 'password', 'cachestore_redis');
 
+        // Adding a configuration for a read replica
+        $form->addElement('text', 'read_server', get_string('read_server', 'cachestore_redis'), array('size' => 24));
+        $form->setType('read_server', PARAM_RAW);
+        $form->addHelpButton('read_server', 'read_server', 'cachestore_redis');
+
+        $form->addElement('passwordunmask', 'read_password', get_string('password', 'cachestore_redis'));
+        $form->setType('read_password', PARAM_RAW);
+        $form->addHelpButton('read_password', 'read_password', 'cachestore_redis');
+        // End read replica configuration
+
+
         $form->addElement('text', 'database', get_string('database', 'cachestore_redis'));
         $form->setType('database', PARAM_INT);
         $form->setDefault('database', 0);
