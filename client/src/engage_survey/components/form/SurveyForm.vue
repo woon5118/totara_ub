@@ -21,6 +21,7 @@
     class="tui-totaraEngage-surveyForm"
     :initial-values="initialValues"
     :vertical="true"
+    input-width="full"
     @submit="submit"
     @change="change"
   >

@@ -43,6 +43,7 @@
         :label="$str('content', 'engage_article')"
         :required="true"
         class="tui-articleForm__description__formRow"
+        :is-stacked="false"
       >
         <Weka
           v-if="draftId"

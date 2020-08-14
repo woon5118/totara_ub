@@ -20,37 +20,32 @@
   <FormScope :path="path">
     <div class="tui-elementEditNumericRatingScaleParticipantForm">
       <div class="tui-elementEditNumericRatingScaleParticipantForm__input">
-        <FormRow>
-          <FormNumber
-            name="answer_value"
-            :min="min"
-            :max="max"
-            :validations="v => [v.min(min), v.max(max)]"
-          />
-        </FormRow>
-      </div>
-      <FormRow>
-        <FormRange
+        <FormNumber
           name="answer_value"
-          :default-value="element.data.defaultValue"
-          :show-labels="false"
           :min="min"
           :max="max"
-          :validations="rangeValidations"
+          :validations="v => [v.min(min), v.max(max)]"
         />
-      </FormRow>
+      </div>
+      <FormRange
+        name="answer_value"
+        :default-value="element.data.defaultValue"
+        :show-labels="false"
+        :min="min"
+        :max="max"
+        :validations="rangeValidations"
+      />
     </div>
   </FormScope>
 </template>
 
 <script>
 import FormScope from 'tui/components/reform/FormScope';
-import { FormRow, FormRange, FormNumber } from 'tui/components/uniform';
+import { FormRange, FormNumber } from 'tui/components/uniform';
 
 export default {
   components: {
     FormScope,
-    FormRow,
     FormRange,
     FormNumber,
   },

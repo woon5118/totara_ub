@@ -25,7 +25,7 @@
 
   &__title {
     display: flex;
-    margin-bottom: var(--tui-gap-8);
+    padding-bottom: var(--tui-gap-4);
   }
 
   &__optionType {

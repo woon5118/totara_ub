@@ -28,7 +28,7 @@
         <Uniform
           v-slot="{ getSubmitting }"
           :initial-values="formValues"
-          :vertical="false"
+          :vertical="true"
           validation-mode="submit"
           input-width="full"
           @change="formValues = $event"
@@ -55,7 +55,6 @@
 
           <!-- Scale numeric values -->
           <FormRow
-            v-slot="{ labelId }"
             :label="
               $str(
                 'scale_numeric_values',
@@ -65,21 +64,22 @@
             :helpmsg="numericValuesHelp"
             required
           >
-            <FieldGroup
-              :aria-labelledby="labelId"
-              class="tui-elementEditNumericRatingScale__values"
-            >
-              <FormNumber
-                name="lowValue"
-                :aria-label="lowValueLabel"
-                :validations="lowValueValidations"
-              />
-              <FormNumber
-                name="highValue"
-                :aria-label="highValueLabel"
-                :validations="highValueValidations"
-              />
-            </FieldGroup>
+            <InputSet char-length="30">
+              <div class="tui-elementEditNumericRatingScale__values">
+                <FormNumber
+                  name="lowValue"
+                  :aria-label="lowValueLabel"
+                  :validations="lowValueValidations"
+                  char-length="10"
+                />
+                <FormNumber
+                  name="highValue"
+                  :aria-label="highValueLabel"
+                  :validations="highValueValidations"
+                  char-length="10"
+                />
+              </div>
+            </InputSet>
           </FormRow>
 
           <!-- Preview -->
@@ -87,15 +87,17 @@
             :label="$str('preview', 'performelement_numeric_rating_scale')"
             :helpmsg="previewHelp"
           >
-            <Range
-              name="preview"
-              :disabled="true"
-              :value="null"
-              :default-value="formValues.defaultValue"
-              :show-labels="false"
-              :min="formValues.lowValue"
-              :max="formValues.highValue"
-            />
+            <InputSet char-length="30">
+              <Range
+                name="preview"
+                :disabled="true"
+                :value="null"
+                :default-value="formValues.defaultValue"
+                :show-labels="false"
+                :min="formValues.lowValue"
+                :max="formValues.highValue"
+              />
+            </InputSet>
           </FormRow>
 
           <!-- Default value -->
@@ -109,18 +111,17 @@
             :helpmsg="defaultValueHelp"
             required
           >
-            <div class="tui-elementEditNumericRatingScale__values">
-              <FormNumber
-                name="defaultValue"
-                :validations="
-                  v => [
-                    v.number(),
-                    v.required(),
-                    between(formValues.lowValue, formValues.highValue),
-                  ]
-                "
-              />
-            </div>
+            <FormNumber
+              name="defaultValue"
+              :validations="
+                v => [
+                  v.number(),
+                  v.required(),
+                  between(formValues.lowValue, formValues.highValue),
+                ]
+              "
+              char-length="10"
+            />
           </FormRow>
 
           <!-- Reporting ID -->
@@ -158,7 +159,7 @@ import {
   FormCheckbox,
 } from 'tui/components/uniform';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
-import FieldGroup from 'tui/components/form/FieldGroup';
+import InputSet from 'tui/components/form/InputSet';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
 import IdentifierInput from 'mod_perform/components/element/admin_form/IdentifierInput';
@@ -168,7 +169,7 @@ export default {
   components: {
     ElementAdminForm,
     Uniform,
-    FieldGroup,
+    InputSet,
     FormRow,
     FormText,
     FormNumber,

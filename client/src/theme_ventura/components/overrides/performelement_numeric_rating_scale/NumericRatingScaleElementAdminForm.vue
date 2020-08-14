@@ -22,10 +22,6 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-
-    > * {
-      flex-basis: 30%;
-    }
   }
 }
 </style>

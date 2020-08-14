@@ -20,5 +20,9 @@
 .tui-elementEditNumericRatingScaleParticipantForm {
   display: flex;
   flex-direction: column-reverse;
+
+  &__input {
+    margin-top: var(--tui-gap-2);
+  }
 }
 </style>

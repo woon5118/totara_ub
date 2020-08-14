@@ -22,9 +22,11 @@
       $str('reporting_id_help_text', 'performelement_multi_choice_multi')
     "
   >
-    <div>
-      <FormText name="identifier" :validations="v => [v.maxLength(1024)]" />
-    </div>
+    <FormText
+      name="identifier"
+      :validations="v => [v.maxLength(1024)]"
+      char-length="20"
+    />
   </FormRow>
 </template>
 
