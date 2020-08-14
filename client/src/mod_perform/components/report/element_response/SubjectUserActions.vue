@@ -12,39 +12,34 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @author Matthias Bonk <matthias.bonk@totaralearning.com>
   @module mod_perform
 -->
+
 <template>
-  <div class="tui-performReportPerformanceReportingIdBanner">
-    <strong>{{ $str('element_identifier', 'mod_perform') }}</strong>
-    <Tag
-      v-for="reportingId in reportingIds"
-      :key="reportingId"
-      :text="reportingId"
-      class="tui-performReportPerformanceReportingIdBanner__tag"
-    />
+  <div>
+    <ExportRowAction :additional-export-href-params="exportHrefParams" />
   </div>
 </template>
 <script>
-import Tag from 'tui/components/tag/Tag';
+import ExportRowAction from 'mod_perform/components/report/element_response/ExportRowAction';
 
 export default {
   components: {
-    Tag,
+    ExportRowAction,
   },
   props: {
-    reportingIds: {
-      type: Array,
+    subjectUserId: {
       required: true,
+      type: Number,
+    },
+  },
+  computed: {
+    exportHrefParams() {
+      return {
+        subject_user_id: this.subjectUserId,
+      };
     },
   },
 };
 </script>
-<lang-strings>
-{
-  "mod_perform": [
-    "element_identifier"
-  ]
-}
-</lang-strings>

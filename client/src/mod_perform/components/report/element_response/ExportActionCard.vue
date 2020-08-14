@@ -34,41 +34,11 @@
         <DownloadIcon />
       </ButtonIcon>
 
-      <ModalPresenter
+      <ExportConfirmModal
         :open="exportConfirmModal"
+        :export-href="exportHref"
         @request-close="closeExportConfirmModal"
-      >
-        <Modal
-          :aria-labelledby="$id('question-element-preview-modal')"
-          class="tui-elementResponseReportingExportConfirmModal"
-          size="normal"
-        >
-          <ModalContent
-            :title="$str('export_confirm_modal_title', 'mod_perform')"
-            :title-id="$id('element-response-reporting-export-confirm-modal')"
-          >
-            <p>
-              {{ $str('export_confirm_modal_text', 'mod_perform') }}
-            </p>
-
-            <template v-slot:buttons>
-              <Button
-                :disabled="exporting"
-                :styleclass="{
-                  primary: true,
-                }"
-                :text="$str('export', 'mod_perform')"
-                @click="doExport"
-              />
-              <Button
-                :disabled="exporting"
-                :text="$str('button_cancel', 'mod_perform')"
-                @click="closeExportConfirmModal"
-              />
-            </template>
-          </ModalContent>
-        </Modal>
-      </ModalPresenter>
+      />
 
       <ModalPresenter
         :open="exportLimitExceededModal"
@@ -112,16 +82,18 @@ import ActionCard from 'tui/components/card/ActionCard';
 import Button from 'tui/components/buttons/Button';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import DownloadIcon from 'tui/components/icons/common/Download';
+import ExportConfirmModal from 'mod_perform/components/report/element_response/ExportConfirmModal';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 
 export default {
   components: {
+    ActionCard,
     Button,
     ButtonIcon,
-    ActionCard,
     DownloadIcon,
+    ExportConfirmModal,
     Modal,
     ModalContent,
     ModalPresenter,
@@ -152,7 +124,6 @@ export default {
     return {
       exportConfirmModal: false,
       exportLimitExceededModal: false,
-      exporting: false,
     };
   },
   computed: {
@@ -189,14 +160,6 @@ export default {
       } else {
         this.openExportConfirmModal();
       }
-    },
-    doExport() {
-      this.exporting = true;
-
-      window.location = this.exportHref;
-      this.closeExportConfirmModal();
-
-      this.exporting = false;
     },
     openExportConfirmModal() {
       this.exportConfirmModal = true;

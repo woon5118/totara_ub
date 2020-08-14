@@ -13,26 +13,20 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Matthias Bonk <matthias.bonk@totaralearning.com>
-  @module totara_perform
+  @module mod_perform
 -->
 
 <template>
   <div>
-    <a
-      :href="exportUrl"
-      :aria-label="$str('button_export', 'mod_perform')"
-      :title="$str('button_export', 'mod_perform')"
-    >
-      <DownloadIcon />
-    </a>
+    <ExportRowAction :additional-export-href-params="exportHrefParams" />
   </div>
 </template>
 <script>
-import DownloadIcon from 'tui/components/icons/common/Download';
+import ExportRowAction from 'mod_perform/components/report/element_response/ExportRowAction';
 
 export default {
   components: {
-    DownloadIcon,
+    ExportRowAction,
   },
   props: {
     subjectInstanceId: {
@@ -41,21 +35,11 @@ export default {
     },
   },
   computed: {
-    exportUrl() {
-      return this.$url('/mod/perform/reporting/performance/export.php', {
-        action: 'item',
-        export: 'Export',
-        format: 'csv',
+    exportHrefParams() {
+      return {
         subject_instance_id: this.subjectInstanceId,
-      });
+      };
     },
   },
 };
 </script>
-<lang-strings>
-{
-  "mod_perform": [
-    "button_export"
-  ]
-}
-</lang-strings>

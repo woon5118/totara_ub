@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Jaron Steenson <jaron.steenson@totaralearning.com>
-  @module totara_perform
+  @module mod_perform
 -->
 
 <template>
@@ -26,13 +26,7 @@
       <PreviewIcon />
     </ButtonIcon>
 
-    <a
-      :href="exportUrl"
-      :aria-label="$str('button_export', 'mod_perform')"
-      :title="$str('button_export', 'mod_perform')"
-    >
-      <DownloadIcon />
-    </a>
+    <ExportRowAction :additional-export-href-params="exportHrefParams" />
 
     <ModalPresenter :open="openPreviewModal" @request-close="closePreviewModal">
       <QuestionElementPreviewModal
@@ -43,19 +37,19 @@
   </div>
 </template>
 <script>
-import QuestionElementPreviewModal from 'mod_perform/components/report/element_response/QuestionElementPreviewModal';
-import DownloadIcon from 'tui/components/icons/common/Download';
-import PreviewIcon from 'tui/components/icons/common/Preview';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import ExportRowAction from 'mod_perform/components/report/element_response/ExportRowAction';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import PreviewIcon from 'tui/components/icons/common/Preview';
+import QuestionElementPreviewModal from 'mod_perform/components/report/element_response/QuestionElementPreviewModal';
 
 export default {
   components: {
     ButtonIcon,
-    DownloadIcon,
+    ExportRowAction,
+    ModalPresenter,
     PreviewIcon,
     QuestionElementPreviewModal,
-    ModalPresenter,
   },
   props: {
     elementId: {
@@ -69,12 +63,10 @@ export default {
     };
   },
   computed: {
-    exportUrl() {
-      return this.$url('/mod/perform/reporting/performance/export.php', {
+    exportHrefParams() {
+      return {
         element_id: this.elementId,
-        action: 'item',
-        format: 'csv',
-      });
+      };
     },
   },
   methods: {
@@ -90,9 +82,6 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "activity_participants_add",
-      "subject_instance_availability_reopen",
-      "button_export",
       "preview"
     ]
   }

@@ -129,7 +129,16 @@ Feature: Test viewing Performance activity response data
       | Question one  | Part one      | Short text   | 1                        | No       |              |
       | Question two  | Part one      | Short text   | 1                        | No       |              |
 
+    # Check export confirmation modal for "Export all"
     When I click on "Export all" "button"
+    Then I should see "Export performance response records" in the tui modal
+    And I should see "The selected records will be exported to CSV" in the tui modal
+
+    When I click on "Cancel" "button" in the ".tui-modal" "css_element"
+    Then I should not see "Export performance response records"
+
+    # Check export confirmation modal for one row
+    When I click on "Export" "button" in the "Question one" "table_row"
     Then I should see "Export performance response records" in the tui modal
     And I should see "The selected records will be exported to CSV" in the tui modal
 

@@ -68,7 +68,7 @@ class subject_instance_reporting_actions extends base {
 
         return $OUTPUT->render(
             new component(
-                'mod_perform/components/report/element_response/SubjectInstanceReportingActions',
+                'mod_perform/components/report/element_response/SubjectInstanceActions',
                 $props
             )
         );
