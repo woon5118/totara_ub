@@ -24,6 +24,7 @@
 namespace mod_perform\rb\traits;
 
 use coding_exception;
+use mod_perform\models\activity\participant_source;
 use mod_perform\state\participant_instance\closed;
 use mod_perform\state\participant_instance\complete;
 use mod_perform\state\participant_instance\participant_instance_availability;
@@ -131,7 +132,21 @@ trait participant_instance_trait {
         }
         */
 
-        $this->add_core_user_tables($this->joinlist, $join, 'participant_id', 'participant_user');
+        $this->add_core_user_tables(
+            $this->joinlist,
+            $join,
+            "participant_id AND {$join}.participant_source = " . participant_source::INTERNAL,
+            'participant_user'
+        );
+
+        $this->joinlist[] = new \rb_join(
+            'external_participant',
+            'LEFT',
+            '{perform_participant_external}',
+            "external_participant.id = $join.participant_id AND $join.participant_source = " . participant_source::EXTERNAL,
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            $join
+        );
     }
 
     /**
@@ -253,7 +268,109 @@ trait participant_instance_trait {
             ]
         );
 
+        // Add columns for participants (internal / external)
+        $this->add_participant_columns($join);
+
         $this->add_core_user_columns($this->columnoptions, 'participant_user', 'participant_user', true);
+    }
+
+    private function add_participant_columns(string $join) {
+        global $DB;
+
+        $this->columnoptions[] = new rb_column_option(
+            'participant_instance',
+            'participant_source',
+            get_string('participant_source', 'rb_source_perform_participant_instance'),
+            "$join.participant_source",
+            [
+                'joins' => $join,
+                'dbdatatype' => 'char',
+                'displayfunc' => 'participant_source',
+            ]
+        );
+
+        $usednamefields = totara_get_all_user_name_fields_join('participant_user', null, true);
+        $allnamefields = totara_get_all_user_name_fields_join('participant_user');
+
+        $this->columnoptions[] = new rb_column_option(
+            'participant_instance',
+            'participant_name',
+            get_string('participant_name', 'rb_source_perform_participant_instance'),
+            "CASE
+                    WHEN
+                        {$join}.participant_source = " . participant_source::EXTERNAL . "
+                    THEN external_participant.name
+                    ELSE ".$DB->sql_concat_join("' '", $usednamefields)."
+                END",
+            [
+                'joins' => [$join, 'external_participant', 'participant_user'],
+                'dbdatatype' => 'char',
+                'displayfunc' => 'participant_link',
+                'extrafields' => array_merge(
+                    [
+                        'participant_source' => "{$join}.participant_source",
+                        'id' => "participant_user.id",
+                        'deleted' => "participant_user.deleted"
+                    ],
+                    $allnamefields
+                ),
+            ]
+        );
+
+        $this->columnoptions[] = new rb_column_option(
+            'participant_instance',
+            'participant_email',
+            get_string('participant_email', 'rb_source_perform_participant_instance'),
+            // use CASE to include/exclude email in SQL
+            // so search won't reveal hidden results
+            "CASE
+                    WHEN
+                        {$join}.participant_source = " . participant_source::EXTERNAL . "
+                    THEN external_participant.email
+                    ELSE CASE WHEN participant_user.maildisplay <> 1 THEN '-' ELSE participant_user.email END
+                END",
+            [
+                'joins' => [$join, 'external_participant', 'participant_user'],
+                'displayfunc' => 'participant_email',
+                'extrafields' => [
+                    'participant_source' => "{$join}.participant_source",
+                    'emailstop' => "participant_user.emailstop",
+                    'maildisplay' => "participant_user.maildisplay",
+                ],
+                'dbdatatype' => 'char',
+                'outputformat' => 'text',
+            ]
+        );
+
+        // Only include this column if email is among fields allowed by showuseridentity setting or
+        // if the current user has the 'moodle/site:config' capability.
+        $canview = !empty($CFG->showuseridentity) && in_array('email', explode(',', $CFG->showuseridentity));
+        $canview |= has_capability('moodle/site:config', \context_system::instance());
+        if ($canview) {
+            $this->columnoptions[] = new \rb_column_option(
+                'participant_instance',
+                'participant_email_unobscured',
+                get_string('participant_email_unobscured', 'rb_source_perform_participant_instance'),
+                "CASE
+                    WHEN
+                        {$join}.participant_source = " . participant_source::EXTERNAL . "
+                    THEN external_participant.email
+                    ELSE participant_user.email
+                END",
+                [
+                    'joins' => [$join, 'external_participant', 'participant_user'],
+                    'displayfunc' => 'participant_email_unobscured',
+                    'extrafields' => [
+                        'participant_source' => "{$join}.participant_source",
+                    ],
+                    // Users must have viewuseridentity to see the
+                    // unobscured email address.
+                    'capability' => 'moodle/site:viewuseridentity',
+                    'dbdatatype' => 'char',
+                    'outputformat' => 'text',
+                ]
+            );
+        }
     }
 
     /**
@@ -320,6 +437,46 @@ trait participant_instance_trait {
                 'simplemode' => true,
             ]
         );
+
+        $this->filteroptions[] = new rb_filter_option(
+            'participant_instance',
+            'participant_source',
+            get_string('participant_source', 'rb_source_perform_participant_instance'),
+            'select',
+            [
+                'selectchoices' => [
+                    participant_source::EXTERNAL => get_string('participant_source_external', 'rb_source_perform_participant_instance'),
+                    participant_source::INTERNAL => get_string('participant_source_internal', 'rb_source_perform_participant_instance'),
+                ]
+            ]
+        );
+
+        $this->filteroptions[] = new rb_filter_option(
+            'participant_instance',
+            'participant_name',
+            get_string('participant_name', 'rb_source_perform_participant_instance'),
+            'text'
+        );
+
+        $this->filteroptions[] = new rb_filter_option(
+            'participant_instance',
+            'participant_email',
+            get_string('participant_email', 'rb_source_perform_participant_instance'),
+            'text'
+        );
+
+        // Only include this column if email is among fields allowed by showuseridentity setting or
+        // if the current user has the 'moodle/site:config' capability.
+        $canview = !empty($CFG->showuseridentity) && in_array('email', explode(',', $CFG->showuseridentity));
+        $canview |= has_capability('moodle/site:config', \context_system::instance());
+        if ($canview) {
+            $this->filteroptions[] = new rb_filter_option(
+                'participant_instance',
+                'participant_email_unobscured',
+                get_string('participant_email_unobscured', 'rb_source_perform_participant_instance'),
+                'text'
+            );
+        }
 
         $this->add_core_user_filters($this->filteroptions, 'participant_user', true);
     }

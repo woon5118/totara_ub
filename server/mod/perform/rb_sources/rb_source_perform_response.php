@@ -24,6 +24,7 @@
  */
 
 use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\participant_source;
 use mod_perform\rb\traits\activity_trait;
 use mod_perform\rb\traits\element_trait;
 use mod_perform\rb\traits\participant_instance_trait;
@@ -66,7 +67,11 @@ class rb_source_perform_response extends rb_base_source {
 
         // Apply global user restrictions.
         $this->add_global_report_restriction_join('subject_instance', 'subject_user_id', 'subject_instance');
-        $this->add_global_report_restriction_join('participant_instance', 'participant_id', 'participant_instance');
+        $this->add_global_report_restriction_join(
+            'participant_instance',
+            'participant_id AND participant_instance.participant_source = ' . participant_source::INTERNAL,
+            'participant_instance'
+        );
 
         // This source is not available for user selection - it is used by the embedded report only.
         $this->selectable = false;
@@ -206,7 +211,17 @@ class rb_source_perform_response extends rb_base_source {
                 get_string('default_sort', 'mod_perform'),
                 // This will ensure elements are grouped by activity and order within but isn't perfect, particularly for
                 // multiple identically named activities (which we don't prevent). Having an activity.sort_order would be better.
-                $DB->sql_concat_join("' '", ['perform.name', 'perform_section.sort_order', 'section_element.sort_order', 'totara_core_relationship.sort_order', 'participant_instance.participant_id']),
+                $DB->sql_concat_join(
+                    "' '",
+                    [
+                        'perform.name',
+                        'perform_section.sort_order',
+                        'section_element.sort_order',
+                        'totara_core_relationship.sort_order',
+                        'participant_instance.participant_source',
+                        'participant_instance.participant_id'
+                    ]
+                ),
                 [
                     'joins' => ['perform', 'perform_section', 'section_element', 'participant_instance', 'totara_core_relationship'],
                     'hidden' => true,
@@ -293,9 +308,9 @@ class rb_source_perform_response extends rb_base_source {
                 'heading' => get_string('subject_user', 'mod_perform'),
             ],
             [
-                'type' => 'participant_user',
-                'value' => 'namelink',
-                'heading' => get_string('participant_user', 'mod_perform'),
+                'type' => 'participant_instance',
+                'value' => 'participant_name',
+                'heading' => get_string('participant_name', 'rb_source_perform_participant_instance'),
             ],
             [
                 'type' => 'response',

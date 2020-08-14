@@ -209,8 +209,8 @@ class rb_source_perform_participant_section extends rb_base_source {
         return [
             // Participant name
             [
-                'type' => 'participant_user',
-                'value' => 'namelink',
+                'type' => 'participant_instance',
+                'value' => 'participant_name',
                 'heading' => get_string('participant_name', 'rb_source_perform_participant_instance'),
             ],
             // Participant section name
@@ -260,8 +260,8 @@ class rb_source_perform_participant_section extends rb_base_source {
     public static function get_default_filters() {
         $default_filters = [
             [
-                'type' => 'participant_user',
-                'value' => 'fullname',
+                'type' => 'participant_instance',
+                'value' => 'participant_name',
             ],
             [
                 'type' => 'section',

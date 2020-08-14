@@ -25,11 +25,16 @@ $string['sourcelabel'] = 'Participant Instance (Perform)';
 $string['sourcesummary'] = 'Participant progress in performance activities';
 $string['sourcetitle'] = 'Participant Instance (Perform)';
 
-$string['participant_name'] = 'Participant name';
+$string['participant_email'] = 'Participant\'s email';
+$string['participant_email_unobscured'] = 'Participant\'s email (ignoring user display setting)';
+$string['participant_name'] = 'Participant\'s name';
+$string['participant_source'] = 'Participant source';
+$string['participant_source_external'] = 'External';
+$string['participant_source_internal'] = 'Internal';
 
+$string['type_activity'] = 'Performance activity';
 $string['type_participant_instance'] = 'Participant instance';
 $string['type_participant_user'] = 'Participant user';
-$string['type_activity'] = 'Performance activity';
 $string['type_subject_instance'] = 'Subject instance';
 $string['type_subject_user'] = 'Subject user';
 $string['type_track'] = 'Track';
