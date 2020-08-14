@@ -18,9 +18,8 @@ Before installing Totara you should have a server with:
   * If your database is MSSQL, your database user must have the permissions: ALTER SETTINGS(SERVER), full text search must be enabled.
 * A domain name that resolves to your server, use of SSL/TLS is strongly recommended
 
-Supported desktop browsers: recent Google Chrome, recent Firefox, recent Safari, Microsoft Internet Explorer 11, recent Microsoft Edge
-
-NOTE: Support for IE 11 and EdgeHTML based MS Edge may be reevaluated after release of new Chromium based Microsoft Edge.
+Supported desktop browsers: Totara 13 supports Internet Explorer 11, Microsoft Edge 16 through 18, Safari 11.3+, and Microsoft Chromium Edge, Firefox and Google Chrome latest versions.
+Supported mobile web browsers: Google Chrome latest versions and Safari on iOS 11+.
 
 1. If you are planning to use Totara in multiple user languages, you should ensure that the server is properly configured with the correct locales.
    This is important to ensure that date, number and currency data is displayed correctly for each language.
