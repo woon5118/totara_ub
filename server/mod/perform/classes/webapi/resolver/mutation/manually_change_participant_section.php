@@ -33,6 +33,7 @@ use mod_perform\models\response\participant_section;
 use mod_perform\state\participant_section\closed;
 use mod_perform\state\participant_section\open;
 use mod_perform\util;
+use mod_perform\webapi\middleware\require_activity;
 
 class manually_change_participant_section implements mutation_resolver, has_middleware {
     /**
@@ -48,8 +49,6 @@ class manually_change_participant_section implements mutation_resolver, has_midd
         if (!util::can_manage_participation($manager_id, $subject_user_id)) {
             throw new \coding_exception('You do not have permission to manage participation of the subject');
         }
-
-        $ec->set_relevant_context($participant_section->get_context());
 
         switch ($input['availability']) {
             case open::get_name():
@@ -71,7 +70,7 @@ class manually_change_participant_section implements mutation_resolver, has_midd
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            new require_login()
+            require_activity::by_participant_section_id('input.participant_section_id', true)
         ];
     }
 }

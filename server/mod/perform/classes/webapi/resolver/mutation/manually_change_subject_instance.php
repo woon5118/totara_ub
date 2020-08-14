@@ -33,6 +33,7 @@ use mod_perform\models\activity\subject_instance;
 use mod_perform\state\subject_instance\closed;
 use mod_perform\state\subject_instance\open;
 use mod_perform\util;
+use mod_perform\webapi\middleware\require_activity;
 
 class manually_change_subject_instance implements mutation_resolver, has_middleware {
     /**
@@ -48,8 +49,6 @@ class manually_change_subject_instance implements mutation_resolver, has_middlew
         if (!util::can_manage_participation($manager_id, $subject_user_id)) {
             throw new \coding_exception('You do not have permission to manage participation of the subject');
         }
-
-        $ec->set_relevant_context($subject_instance->get_context());
 
         switch ($input['availability']) {
             case open::get_name():
@@ -71,7 +70,7 @@ class manually_change_subject_instance implements mutation_resolver, has_middlew
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            new require_login()
+            require_activity::by_subject_instance_id('input.subject_instance_id', true)
         ];
     }
 }

@@ -44,7 +44,6 @@ use mod_perform\state\subject_instance\pending;
 use mod_perform\state\subject_instance\subject_instance_availability;
 use mod_perform\state\subject_instance\subject_instance_manual_status;
 use mod_perform\state\subject_instance\subject_instance_progress;
-use moodle_exception;
 use stdClass;
 use totara_core\relationship\relationship;
 use totara_job\job_assignment;

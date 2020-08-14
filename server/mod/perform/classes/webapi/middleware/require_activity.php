@@ -33,8 +33,10 @@ use mod_perform\entities\activity\subject_instance;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\helpers\access_checks;
+use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\track;
+use mod_perform\models\response\participant_section;
 use moodle_exception;
 
 /**
@@ -166,6 +168,38 @@ class require_activity implements middleware {
         return new require_activity($retriever, $set_relevant_context);
     }
 
+    /**
+     * Factory method to get an instance by a given subject_instance_id
+     *
+     * @param string $payload_keys
+     * @param bool $set_relevant_context
+     * @return require_activity
+     */
+    public static function by_subject_instance_id(
+        string $payload_keys,
+        bool $set_relevant_context = false
+    ): require_activity {
+        $retriever = function (payload $payload) use ($payload_keys): activity {
+            $subject_instance_id = self::get_payload_value($payload_keys, $payload);
+
+            /** @var subject_instance $subject_instance */
+            $subject_instance = subject_instance::repository()->find_or_fail($subject_instance_id);
+
+            $activity = $subject_instance->activity();
+
+            return new activity($activity);
+        };
+
+        return new require_activity($retriever, $set_relevant_context);
+    }
+
+    /**
+     * Factory method to get an instance by an array of subject_instance_ids
+     *
+     * @param string $payload_keys
+     * @param bool $set_relevant_context
+     * @return require_activity
+     */
     public static function by_subject_instance_ids(
         string $payload_keys,
         bool $set_relevant_context = false
@@ -189,6 +223,50 @@ class require_activity implements middleware {
             }
 
             return new activity($activity);
+        };
+
+        return new require_activity($retriever, $set_relevant_context);
+    }
+
+    /**
+     * Factory method to get an instance by a given participant_section_id
+     *
+     * @param string $payload_keys
+     * @param bool $set_relevant_context
+     * @return require_activity
+     */
+    public static function by_participant_section_id(
+        string $payload_keys,
+        bool $set_relevant_context = false
+    ): require_activity {
+        $retriever = function (payload $payload) use ($payload_keys): activity {
+            $participant_section_id = self::get_payload_value($payload_keys, $payload);
+
+            $participant_section = participant_section::load_by_id($participant_section_id);
+
+            return $participant_section->section->get_activity();
+        };
+
+        return new require_activity($retriever, $set_relevant_context);
+    }
+
+    /**
+     * Factory method to get an instance by a given participant_instance_id
+     *
+     * @param string $payload_keys
+     * @param bool $set_relevant_context
+     * @return require_activity
+     */
+    public static function by_participant_instance_id(
+        string $payload_keys,
+        bool $set_relevant_context = false
+    ): require_activity {
+        $retriever = function (payload $payload) use ($payload_keys): activity {
+            $participant_instance_id = self::get_payload_value($payload_keys, $payload);
+
+            $participant_instance = participant_instance::load_by_id($participant_instance_id);
+
+            return $participant_instance->get_subject_instance()->get_activity();
         };
 
         return new require_activity($retriever, $set_relevant_context);
