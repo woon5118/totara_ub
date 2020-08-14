@@ -34,42 +34,5 @@ function xmldb_totara_msteams_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2020040100) {
-
-        // Just drop old tables and create new tables :P
-        $xmldbfile = new xmldb_file($CFG->dirroot . '/totara/msteams/db/install.xml');
-        $xmldbfile->setDTD($CFG->dirroot . '/lib/xmldb/xmldb.dtd');
-        $xmldbfile->setSchema($CFG->dirroot . '/lib/xmldb/xmldb.xsd');
-        $xmldbfile->loadXMLStructure();
-        $structure = $xmldbfile->getStructure();
-
-        $droptables = [];
-        foreach ($structure->getTables() as $table) {
-            $droptables[$table->getName()] = 1;
-            foreach ($table->getKeys() as $key) {
-                // Watch out foreign key references!
-                if ($key->getType() == XMLDB_KEY_FOREIGN) {
-                    $reftable = $key->getRefTable();
-                    unset($droptables[$reftable]);
-                    $droptables[$reftable] = 1;
-                }
-            }
-        }
-        foreach ($droptables as $tablename => $unused) {
-            if (strpos($tablename, 'totara_msteams_') === 0) {
-                $table = new xmldb_table($tablename);
-                if ($dbman->table_exists($table)) {
-                    $dbman->drop_table($table);
-                }
-            }
-        }
-
-        foreach ($structure->getTables() as $table) {
-            $dbman->create_table($table);
-        }
-
-        upgrade_plugin_savepoint(true, 2020040100, 'totara', 'msteams');
-    }
-
     return true;
 }
