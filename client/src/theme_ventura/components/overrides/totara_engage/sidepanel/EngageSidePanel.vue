@@ -39,5 +39,10 @@
     // Therefore we just need another '--tui-gap-4'.
     margin-top: var(--tui-gap-4);
   }
+
+  &__related {
+    max-height: 71vh;
+    overflow-y: auto;
+  }
 }
 </style>
