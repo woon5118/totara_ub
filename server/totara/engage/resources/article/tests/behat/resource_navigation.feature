@@ -44,7 +44,7 @@ Feature: Users can navigate back to the parent page from a resource.
     Then I should see "Workspace 1" in the ".tui-resourceNavigationBar__backLink" "css_element"
 
     When I click on "Workspace 1" "link" in the ".tui-resourceNavigationBar" "css_element"
-    Then I should see "Workspace 1" in the ".tui-workspacePageHeader__head" "css_element"
+    Then I should see "Workspace 1" in the ".tui-workspacePageHeader__content" "css_element"
 
   Scenario: Resource shows the correct back button when opening from the dashboard/home page.
     Given I log in as "admin"
