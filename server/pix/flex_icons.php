@@ -2357,6 +2357,20 @@ $icons = array(
                 array (
                     'classes' => 'fa-reply'
                 )
+        ),
+    'notification-non-filled' =>
+        array (
+            'data' =>
+                array (
+                    'classes' => 'fa-bell-o'
+                )
+        ),
+    'notification-slash-non-filled' =>
+        array (
+            'data' =>
+                array (
+                    'classes' => 'fa-bell-slash-o'
+                )
         )
 );
 

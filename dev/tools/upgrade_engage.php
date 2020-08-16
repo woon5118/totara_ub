@@ -69,9 +69,11 @@ if (!$db_manager->field_exists("engage_resource", "contextid")) {
     $records = $DB->get_records('engage_resource');
     foreach ($records as $record) {
         $context = context_user::instance($record->userid);
+
         $obj = new \stdClass();
-        $obj->contextid = $context->id;
         $obj->id = $record->id;
+        $obj->contextid = $context->id;
+
         $DB->update_record('engage_resource', $obj);
     }
 
@@ -103,6 +105,28 @@ if (!$db_manager->field_exists($discussion_table, $time_deleted)) {
 $reason_deleted = new xmldb_field('reason_deleted', XMLDB_TYPE_INTEGER, '1');
 if (!$db_manager->field_exists($discussion_table, $reason_deleted)) {
     $db_manager->add_field($discussion_table, $reason_deleted);
+}
+
+if (!$db_manager->table_exists('workspace_off_notification')) {
+    // Define table workspace_off_notification to be created.
+    $table = new xmldb_table('workspace_off_notification');
+
+    // Adding fields to table workspace_off_notification.
+    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+    $table->add_field('course_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('time_created', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+    // Adding keys to table workspace_off_notification.
+    $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+    $table->add_key('course_fk', XMLDB_KEY_FOREIGN, ['course_id'], 'course', ['id']);
+    $table->add_key('user_fk', XMLDB_KEY_FOREIGN, ['user_id'], 'user', ['id']);
+
+    // Adding indexes to table workspace_off_notification.
+    $table->add_index('time_created_idx', XMLDB_INDEX_NOTUNIQUE, ['time_created']);
+    $table->add_index('user_course_idx', XMLDB_INDEX_UNIQUE, ['user_id', 'course_id']);
+
+    $db_manager->create_table($table);
 }
 
 return 0;

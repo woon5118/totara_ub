@@ -128,13 +128,19 @@ final class member_request extends item {
      * @return int
      */
     protected static function purge(target_user $user, \context $context): int {
+        global $DB;
         $builder = builder::table(workspace_member_request::TABLE);
 
         switch ($context->contextlevel) {
             case CONTEXT_COURSECAT:
-                $builder->join('course', 'course_id', 'id');
-                $builder->where('category', $context->instanceid);
+                $course_ids = $DB->get_fieldset_select(
+                    'course',
+                    'id',
+                    'category = :category_id',
+                    ['category_id' => $context->instanceid]
+                );
 
+                $builder->where_in('course_id', $course_ids);
                 break;
 
             case CONTEXT_COURSE:
@@ -153,5 +159,12 @@ final class member_request extends item {
      */
     public static function get_fullname_string() {
         return ['user_data_item_member_request', 'container_workspace'];
+    }
+
+    /**
+     * @return array
+     */
+    public static function get_compatible_context_levels(): array {
+        return [CONTEXT_SYSTEM, CONTEXT_COURSECAT, CONTEXT_COURSE];
     }
 }

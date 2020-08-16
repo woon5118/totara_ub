@@ -97,10 +97,15 @@
       &__subTitle {
         display: flex;
         align-items: center;
+
         &__text {
           @include tui-font-body();
           margin-top: var(--tui-gap-2);
           color: var(--tui-color-neutral-6);
+        }
+
+        &__button {
+          margin-left: var(--tui-gap-4);
         }
       }
     }

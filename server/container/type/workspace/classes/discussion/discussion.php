@@ -635,4 +635,14 @@ final class discussion {
     public static function get_entity_table(): string {
         return workspace_discussion::TABLE;
     }
+
+    /**
+     * @return \moodle_url
+     */
+    public function get_url(): \moodle_url {
+        return new \moodle_url(
+            "/container/type/workspace/discussion.php",
+            ['id' => $this->entity->id]
+        );
+    }
 }

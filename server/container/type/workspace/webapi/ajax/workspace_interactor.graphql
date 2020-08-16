@@ -20,6 +20,7 @@ query container_workspace_workspace_interactor($workspace_id: param_integer!) {
     can_view_member_requests
     can_share_resources
     can_unshare_resources
+    muted
     user {
       __typename
       id

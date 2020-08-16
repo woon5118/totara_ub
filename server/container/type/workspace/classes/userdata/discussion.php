@@ -162,4 +162,11 @@ final class discussion extends item {
     public static function get_fullname_string(): array {
         return ['user_data_item_discussion', 'container_workspace'];
     }
+
+    /**
+     * @return array
+     */
+    public static function get_compatible_context_levels(): array {
+        return [CONTEXT_SYSTEM, CONTEXT_COURSECAT, CONTEXT_COURSE];
+    }
 }

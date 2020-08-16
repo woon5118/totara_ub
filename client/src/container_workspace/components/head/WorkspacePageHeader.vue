@@ -52,6 +52,13 @@
           <p class="tui-workspacePageHeader__content__head__subTitle__text">
             {{ subTitle }}
           </p>
+
+          <WorkspaceMuteButton
+            v-if="showMuteButton"
+            class="tui-workspacePageHeader__content__head__subTitle__button"
+            :muted="workspaceMuted"
+            @update="updateMuteStatus"
+          />
         </div>
       </div>
 
@@ -69,12 +76,18 @@ import WorkspaceMenu from 'container_workspace/components/sidepanel/WorkspaceMen
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import ShowIcon from 'tui/components/icons/common/Show';
 import { PUBLIC, PRIVATE, HIDDEN } from 'container_workspace/access';
+import WorkspaceMuteButton from 'container_workspace/components/action/WorkspaceMuteButton';
+
+// GraphQL queries
+import muteWorkspace from 'container_workspace/graphql/mute_workspace';
+import unmuteWorkspace from 'container_workspace/graphql/unmute_workspace';
 
 export default {
   components: {
     WorkspaceMenu,
     ButtonIcon,
     ShowIcon,
+    WorkspaceMuteButton,
   },
 
   props: {
@@ -95,17 +108,21 @@ export default {
         return [PUBLIC, HIDDEN, PRIVATE].includes(prop);
       },
     },
+
     workspaceName: {
       type: String,
       required: true,
     },
 
+    showMuteButton: Boolean,
+    workspaceMuted: Boolean,
     showNavigation: Boolean,
   },
 
   data() {
     return {
       showMenu: false,
+      submitting: false,
     };
   },
 
@@ -131,6 +148,33 @@ export default {
       }
 
       return this.$str('hidden_workspace', 'container_workspace');
+    },
+  },
+
+  methods: {
+    /**
+     *
+     * @param {Boolean} status
+     * @return {Promise<void>}
+     */
+    async updateMuteStatus(status) {
+      if (this.submitting) {
+        return;
+      }
+
+      this.submitting = true;
+      const variables = {
+        workspace_id: this.workspaceId,
+      };
+
+      try {
+        let mutation = status ? muteWorkspace : unmuteWorkspace;
+        await this.$apollo.mutate({ mutation, variables });
+
+        this.$emit('update-mute-status', status);
+      } finally {
+        this.submitting = false;
+      }
     },
   },
 };

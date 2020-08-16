@@ -102,6 +102,9 @@ final class workspace_interactor implements type_resolver {
             case 'can_unshare_resources':
                 return $source->can_unshare_resources();
 
+            case 'muted':
+                return $source->has_turned_off_notification();
+
             default:
                 debugging("Invalid field '{$field}' that is not in supported yet", DEBUG_DEVELOPER);
                 return null;

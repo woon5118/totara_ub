@@ -194,7 +194,7 @@ final class workspace extends container implements category_name_provider {
      * @return \moodle_url
      */
     public function get_view_url(): \moodle_url {
-        return new \moodle_url("/container/type/workspace/workspace.php", ['id' => $this->id]);
+        return $this->get_workspace_url();
     }
 
     /**

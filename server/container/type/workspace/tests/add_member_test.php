@@ -23,6 +23,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use container_workspace\member\member;
+use core\entity\user_enrolment;
 
 class container_workspace_add_member_testcase extends advanced_testcase {
     /**
@@ -83,5 +84,37 @@ class container_workspace_add_member_testcase extends advanced_testcase {
 
         $member = member::added_to_workspace($workspace, $user_two->id);
         $this->assertEquals($user_two->id, $member->get_user_id());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_add_member_do_not_trigger_adhoc_tasks(): void {
+        global $DB;
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $this->setUser($user_one);
+
+        $workspace = $workspace_generator->create_workspace();
+
+        // Make sure that we clear out the adhoc tasks first.
+        $this->execute_adhoc_tasks();
+
+        $message_sink = phpunit_util::start_message_redirection();
+        $member = member::added_to_workspace($workspace, $user_two->id, false);
+
+        $this->execute_adhoc_tasks();
+        $messages = $message_sink->get_messages();
+
+        $this->assertEmpty($messages);
+        $this->assertNotEmpty($member->get_id());
+        $this->assertTrue(
+            $DB->record_exists(user_enrolment::TABLE, ['id' => $member->get_id()])
+        );
     }
 }

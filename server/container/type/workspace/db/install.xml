@@ -59,5 +59,22 @@
         <INDEX NAME="time_declined_idx" UNIQUE="false" FIELDS="time_declined"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="workspace_off_notification" COMMENT="Table to store the record whether user want to stop receiving notification about workspace or not">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="time_created" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="course_fk" TYPE="foreign" FIELDS="course_id" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="user_fk" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="time_created_idx" UNIQUE="false" FIELDS="time_created"/>
+        <INDEX NAME="user_course_idx" UNIQUE="true" FIELDS="user_id, course_id"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

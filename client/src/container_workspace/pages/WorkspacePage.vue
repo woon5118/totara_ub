@@ -41,7 +41,10 @@
           :workspace-image="workspace.image"
           :workspace-name="workspace.name"
           :workspace-access="workspace.access"
+          :workspace-muted="workspace.interactor.muted"
+          :show-mute-button="workspace.interactor.joined"
           class="tui-workspacePage__mainContent__head"
+          @update-mute-status="updateMuteStatus"
         />
 
         <div class="tui-workspacePage__mainContent__primaryAction">
@@ -54,6 +57,7 @@
             @cancel-request-to-join-workspace="reloadWorkspace"
             @added-member="reloadWorkspace"
             @deleted-workspace="redirectToSpacePage"
+            @update-mute-status="updateMuteStatus"
           />
         </div>
 
@@ -304,6 +308,32 @@ export default {
         '/container/type/workspace/workspace.php',
         { id: id }
       );
+    },
+
+    /**
+     *
+     * @param {Boolean} status
+     */
+    updateMuteStatus(status) {
+      let { workspace } = apolloClient.readQuery({
+        query: getWorkspace,
+        variables: {
+          id: this.workspaceId,
+        },
+      });
+
+      workspace = Object.assign({}, workspace);
+      workspace.interactor = Object.assign({}, workspace.interactor);
+
+      workspace.interactor.muted = status;
+      apolloClient.writeQuery({
+        query: getWorkspace,
+        variables: {
+          id: this.workspaceId,
+        },
+
+        data: { workspace },
+      });
     },
   },
 };

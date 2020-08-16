@@ -24,6 +24,7 @@ namespace container_workspace\member;
 
 use container_workspace\entity\workspace_member_request;
 use container_workspace\entity\workspace_member_request as entity;
+use container_workspace\task\notify_join_request_task;
 use container_workspace\task\send_accept_request_task;
 use container_workspace\workspace;
 use core_container\factory;
@@ -126,7 +127,9 @@ final class member_request {
         $old_entity = $repository->get_current_pending_request($workspace_id, $user_id);
 
         if (null !== $old_entity) {
-            // Re-using the current one.
+            // Re-using the current one. Note that when we are reusing the old request entity, we assume
+            // that the adhoc tasks had already been queued - meaning that we would not want to queue the
+            // adhoc taks again.
             return static::from_entity($old_entity);
         }
 
@@ -135,6 +138,11 @@ final class member_request {
         $entity->course_id = $workspace_id;
 
         $entity->save();
+
+        // Id attribute should be populated for us.
+        $task = notify_join_request_task::from_member_request($entity->id);
+        manager::queue_adhoc_task($task);
+
         return static::from_entity($entity);
     }
 
@@ -214,8 +222,9 @@ final class member_request {
         $this->entity->time_accepted = $time;
         $this->entity->save();
 
-        // Add user to the workspace
-        member::added_to_workspace($workspace, $this->entity->user_id, $actor_id);
+        // Add user to the workspace. Note that we do not trigger any tasks here when adding users to the workspace.
+        // This is because we do not want to send notification to users twice about one thing.
+        member::added_to_workspace($workspace, $this->entity->user_id, false, $actor_id);
 
         $task = new send_accept_request_task();
         $task->set_component(workspace::get_type());

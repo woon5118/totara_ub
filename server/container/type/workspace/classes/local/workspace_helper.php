@@ -124,7 +124,7 @@ final class workspace_helper {
         $manager->enable_manual_enrolment();
 
         // Then enrol this very user as an owner for the workspace.
-        member::join_workspace($workspace, $actor_id, true);
+        member::join_workspace($workspace, $actor_id);
 
         if (null !== $draft_id && 0 !== $draft_id) {
             $workspace->save_image($draft_id, $actor_id);

@@ -23,6 +23,7 @@
 namespace container_workspace\observer;
 
 use container_workspace\discussion\discussion;
+use container_workspace\task\notify_discussion_new_comment_task;
 use totara_comment\event\comment_created;
 use container_workspace\workspace;
 use totara_comment\comment;
@@ -31,6 +32,7 @@ use totara_comment\event\comment_updated;
 use totara_comment\event\reply_created;
 use totara_comment\event\reply_soft_deleted;
 use totara_core\content\content_handler;
+use core\task\manager as task_manager;
 
 /**
  * Observer class for comment's events.
@@ -73,6 +75,18 @@ final class comment_observer {
 
         static::touch_discussion($comment);
         static::handle_comment($comment);
+
+        $component = $comment->get_component();
+        $area = $comment->get_area();
+
+        if (workspace::get_type() !== $component || discussion::AREA !== $area) {
+            return;
+        }
+
+        // Queue adhoc task to notify the owner of discussion.
+        $comment_id = $comment->get_id();
+        $task = notify_discussion_new_comment_task::from_comment($comment_id);
+        task_manager::queue_adhoc_task($task);
     }
 
     /**

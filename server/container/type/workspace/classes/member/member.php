@@ -28,6 +28,8 @@ use container_workspace\workspace;
 use core\entity\user_enrolment;
 use core_container\factory;
 use totara_core\visibility_controller;
+use core\task\manager as task_manager;
+use container_workspace\task\notify_added_to_workspace_task;
 
 /**
  * A model class for workspace's member.
@@ -115,17 +117,22 @@ final class member {
      *
      * @param workspace $workspace
      * @param int|null $actor_id If this is null, then $user in session will be used.
-     * @param bool $is_owner If true, this user will join with the workspace owner role
+     *
      * @return member
      */
-    public static function join_workspace(workspace $workspace, ?int $actor_id = null, bool $is_owner = false): member {
+    public static function join_workspace(workspace $workspace, ?int $actor_id = null): member {
         global $USER, $CFG;
 
-        if (null === $actor_id || 0 === $actor_id) {
+        if (empty($actor_id)) {
             $actor_id = $USER->id;
         }
 
+        $owner_id = $workspace->get_user_id();
+        $is_owner = ($actor_id == $owner_id);
+
         if (!$workspace->is_public() && (!$is_owner && !is_siteadmin($actor_id))) {
+            // Note: do not try to convert this part into itneractor, because at this point, user creator
+            // might not be able to enrolled to the workspace yet.
             throw new \coding_exception("Cannot join the non-public workspace");
         }
 
@@ -153,22 +160,8 @@ final class member {
         $manager = $workspace->get_enrolment_manager();
         $manager->self_enrol_user($actor_id, $role->id);
 
-        // Hidden workspaces requires the viewhiddencourses capability in the course for the role.
-        // Regular user has no specific hiddencourses capability, and there's no workspacemember role
-        // yet. This will be removed when workspacemember role is introduced.
-        if ($workspace->is_hidden()) {
-            $context = $workspace->get_context();
-            assign_capability(
-                'moodle/course:viewhiddencourses',
-                CAP_ALLOW,
-                $role->id,
-                $context->id
-            );
-
-            // We need to rebuild the visibility
-            $map = visibility_controller::course()->map();
-            $map->recalculate_map_for_instance($workspace->get_id());
-        }
+        // Assign view hidden capability for hidden workspace.
+        static::assign_view_hidden_capability($workspace, $role->id);
 
         $workspace_id = $workspace->get_id();
         return static::from_user($actor_id, $workspace_id);
@@ -178,13 +171,19 @@ final class member {
      * Target user is being added to the workspace by the actor.
      *
      * @param workspace $workspace
-     * @param int $user_id
-     * @param int|null $actor_id
+     * @param int       $user_id
+     * @param bool      $trigger_notification
+     * @param int|null  $actor_id
      *
      * @return member
      */
-    public static function added_to_workspace(workspace $workspace, int $user_id, ?int $actor_id = null): member {
-        global $CFG;
+    public static function added_to_workspace(workspace $workspace, int $user_id,
+                                              bool $trigger_notification = true, ?int $actor_id = null): member {
+        global $USER;
+        if (empty($actor_id)) {
+            $actor_id = $USER->id;
+        }
+
         $owner_id = $workspace->get_user_id();
         if ($user_id == $owner_id) {
             throw new \coding_exception("Owner of a workspace should not be able to add self to a workspace");
@@ -196,7 +195,28 @@ final class member {
         }
 
         $role = reset($roles);
+        $member = static::do_added_to_workspace($workspace, $user_id, $role->id, $actor_id);
 
+        if ($trigger_notification) {
+            // Queue adhoc task to send the message out to the target user.
+            $task = notify_added_to_workspace_task::from_member($member);
+            task_manager::queue_adhoc_task($task);
+        }
+
+        return $member;
+    }
+
+    /**
+     * @param workspace $workspace
+     * @param int $user_id
+     * @param int $role_id
+     * @param int $actor_id
+     *
+     * @return member
+     */
+    protected static function do_added_to_workspace(workspace $workspace, int $user_id,
+                                                    int $role_id, int $actor_id): member {
+        global $CFG;
         if ($CFG->tenantsenabled) {
             // Only checking this if multi-tenancy is enabled.
             $target_workspace_interactor = new interactor($workspace, $user_id);
@@ -207,27 +227,41 @@ final class member {
         }
 
         $manager = $workspace->get_enrolment_manager();
-        $manager->manual_enrol_user($user_id, $role->id, $actor_id);
+        $manager->manual_enrol_user($user_id, $role_id, $actor_id);
 
-        // Hidden workspaces requires the viewhiddencourses capability in the course for the role.
-        // Regular user has no specific hiddencourses capability, and there's no workspacemember role
-        // yet. This will be removed when workspacemember role is introduced.
-        if ($workspace->is_hidden()) {
-            $context = $workspace->get_context();
-            assign_capability(
-                'moodle/course:viewhiddencourses',
-                CAP_ALLOW,
-                $role->id,
-                $context->id
-            );
-
-            // We need to rebuild the visibility
-            $map = visibility_controller::course()->map();
-            $map->recalculate_map_for_instance($workspace->get_id());
-        }
+        static::assign_view_hidden_capability($workspace, $role_id);
 
         $workspace_id = $workspace->get_id();
         return static::from_user($user_id, $workspace_id);
+    }
+
+    /**
+     * Hidden workspaces requires the viewhiddencourses capability in the course for the role.
+     * Regular user has no specific hiddencourses capability, and there's no workspacemember role
+     * yet. This will be removed when workspacemember role is introduced.
+     *
+     * @param workspace $workspace
+     * @param int $role_id
+     *
+     * @return void
+     */
+    private static function assign_view_hidden_capability(workspace $workspace, int $role_id): void {
+        if (!$workspace->is_hidden()) {
+            // Skip if the workspace is not a hidden one.
+            return;
+        }
+
+        $context = $workspace->get_context();
+        assign_capability(
+            'moodle/course:viewhiddencourses',
+            CAP_ALLOW,
+            $role_id,
+            $context->id
+        );
+
+        // We need to rebuild the visibility
+        $map = visibility_controller::course()->map();
+        $map->recalculate_map_for_instance($workspace->get_id());
     }
 
     /**
@@ -242,6 +276,17 @@ final class member {
         }
 
         return $this->workspace_id;
+    }
+
+    /**
+     * @return workspace
+     */
+    public function get_workspace(): workspace {
+        $workspace_id = $this->get_workspace_id();
+
+        /** @var workspace $workspace */
+        $workspace = factory::from_id($workspace_id);
+        return $workspace;
     }
 
     /**
@@ -298,6 +343,7 @@ final class member {
     /**
      * Remove a user from a workspace.
      * Note: There are no capability checks performed here.
+     *
      * @param int|null $actor_id
      * @return bool
      */

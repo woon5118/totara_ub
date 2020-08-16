@@ -106,18 +106,15 @@ export default {
     };
   },
 
-  computed: {
-    innerSelectedWorkspaceId: {
-      get() {
-        return this.selectedWorkspaceId;
-      },
+  data() {
+    return {
+      innerSelectedWorkspaceId: this.selectedWorkspaceId,
+    };
+  },
 
-      /**
-       * @param {Number} value
-       */
-      set(value) {
-        this.$emit('update-selected-workspace-id', value);
-      },
+  watch: {
+    selectedWorkspaceId(value) {
+      this.innerSelectedWorkspaceId = value;
     },
   },
 

@@ -119,6 +119,10 @@ type container_workspace_workspace_interactor {
   Whether the user can unshare items from the workspace library
   """
   can_unshare_resources: Boolean!
+  """
+  Whether the current user had muted the workspace or not.
+  """
+  muted: Boolean!
 }
 
 """

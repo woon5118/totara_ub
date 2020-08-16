@@ -52,6 +52,7 @@ class container_workspace_accept_member_request_testcase extends advanced_testca
         $member_request->accept();
 
         $sink = phpunit_util::start_message_redirection();
+        $sink->clear();
         $this->execute_adhoc_tasks();
 
         $messages = $sink->get_messages();

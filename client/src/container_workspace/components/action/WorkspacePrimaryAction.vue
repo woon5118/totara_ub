@@ -100,6 +100,16 @@
         >
           {{ $str('delete_workspace', 'container_workspace') }}
         </DropdownItem>
+
+        <DropdownItem @click="updateMuteStatus(!interactor.muted)">
+          <!-- Drop down item to toggle the mute status -->
+          <template v-if="!interactor.muted">
+            {{ $str('mute_notifications', 'container_workspace') }}
+          </template>
+          <template v-else>
+            {{ $str('unmute_notifications', 'container_workspace') }}
+          </template>
+        </DropdownItem>
       </Dropdown>
       <!-- End of owner section -->
 
@@ -159,6 +169,15 @@
           <DropdownItem @click="modal.leaveConfirm = true">
             {{ $str('leave_workspace', 'container_workspace') }}
           </DropdownItem>
+          <DropdownItem @click="updateMuteStatus(!interactor.muted)">
+            <!-- Drop down item to toggle the mute status -->
+            <template v-if="!interactor.muted">
+              {{ $str('mute_notifications', 'container_workspace') }}
+            </template>
+            <template v-else>
+              {{ $str('unmute_notifications', 'container_workspace') }}
+            </template>
+          </DropdownItem>
         </Dropdown>
       </template>
       <!-- End of normal user section -->
@@ -186,6 +205,8 @@ import deleteWorkspace from 'container_workspace/graphql/delete_workspace';
 import requestToJoinWorkspace from 'container_workspace/graphql/request_to_join';
 import cancelMemberRequest from 'container_workspace/graphql/cancel_member_request';
 import addMembers from 'container_workspace/graphql/add_members';
+import muteWorkspace from 'container_workspace/graphql/mute_workspace';
+import unmuteWorkspace from 'container_workspace/graphql/unmute_workspace';
 
 export default {
   components: {
@@ -465,6 +486,46 @@ export default {
         this.innerSubmitting = false;
       }
     },
+
+    /**
+     *
+     * @param {Boolean} status
+     * @return {Promise<void>}
+     */
+    async updateMuteStatus(status) {
+      if (this.innerSubmitting) {
+        return;
+      }
+
+      this.innerSubmitting = true;
+
+      try {
+        const variables = {
+          workspace_id: this.workspaceId,
+        };
+
+        let mutation = status ? muteWorkspace : unmuteWorkspace;
+        await this.$apollo.mutate({
+          mutation,
+          variables,
+          update: proxy => {
+            proxy.writeQuery({
+              query: getWorkspaceInteractor,
+              variables: variables,
+              data: {
+                interactor: Object.assign({}, this.interactor, {
+                  muted: status,
+                }),
+              },
+            });
+          },
+        });
+
+        this.$emit('update-mute-status', status);
+      } finally {
+        this.innerSubmitting = false;
+      }
+    },
   },
 };
 </script>
@@ -491,6 +552,8 @@ export default {
     "error:request_to_join",
     "error:cancel_member_request",
     "add_members",
+    "mute_notifications",
+    "unmute_notifications",
     "error:add_members"
   ],
   "moodle": [

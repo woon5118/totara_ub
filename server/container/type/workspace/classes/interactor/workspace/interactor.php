@@ -20,11 +20,11 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package container_workspace
  */
-
 namespace container_workspace\interactor\workspace;
 
 use container_workspace\entity\workspace_member_request;
 use container_workspace\loader\member\loader;
+use container_workspace\notification\workspace_notification;
 use container_workspace\workspace;
 use core_container\factory;
 
@@ -207,6 +207,27 @@ final class interactor {
         // Anyone with the capability can join the workspace
         $context = $this->workspace->get_context();
         return has_capability('container/workspace:joinpublic', $context, $this->user_id);
+    }
+
+    /**
+     * @return bool
+     */
+    public function can_join_private_workspace(): bool {
+        if ($this->workspace->is_public()) {
+            debugging("The workspace is not a private workspace", DEBUG_DEVELOPER);
+            return false;
+        }
+
+        if ($this->is_joined()) {
+            return false;
+        }
+
+        if (!$this->can_view_workspace_with_tenant_check()) {
+            return false;
+        }
+
+        // Note that only admin user is able to join the workspace as admin.
+        return $this->can_administrate();
     }
 
     /**
@@ -444,5 +465,13 @@ final class interactor {
     public function can_unshare_resources(): bool {
         $context = $this->workspace->get_context();
         return has_capability('container/workspace:libraryremove', $context, $this->user_id);
+    }
+
+    /**
+     * @return bool
+     */
+    public function has_turned_off_notification(): bool {
+        $workspace_id = $this->workspace->get_id();
+        return workspace_notification::is_off($workspace_id, $this->user_id);
     }
 }

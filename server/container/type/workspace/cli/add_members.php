@@ -116,7 +116,7 @@ $user_ids = $DB->get_fieldset_sql(
 
 foreach ($user_ids as $user_id) {
     echo "Adding member '{$user_id}' to workspace\n";
-    member::added_to_workspace($workspace, $user_id, $USER->id);
+    member::added_to_workspace($workspace, $user_id, false, $USER->id);
 }
 
 return 0;

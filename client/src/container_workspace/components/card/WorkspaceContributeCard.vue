@@ -39,7 +39,6 @@
       :workspace-id="instanceId"
       :show-adder="showAdder"
       :units="12"
-      @update-show-adder="showAdder = $event"
       @close="showAdder = false"
     />
   </div>
