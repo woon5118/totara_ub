@@ -203,9 +203,10 @@ export default {
         title: this.title,
         rawTitle: this.rawTitle,
         identifier: this.identifier,
-        lowValue: this.data ? this.data.lowValue || 0 : 0,
-        highValue: this.data ? this.data.highValue || 0 : 0,
-        defaultValue: this.data ? this.data.defaultValue || 0 : 0,
+        lowValue: this.data && this.data.lowValue ? this.data.lowValue : '0',
+        highValue: this.data && this.data.highValue ? this.data.highValue : '0',
+        defaultValue:
+          this.data && this.data.defaultValue ? this.data.defaultValue : '0',
         responseRequired: true, // Always required.
       },
       numericValuesHelp: this.$str(
