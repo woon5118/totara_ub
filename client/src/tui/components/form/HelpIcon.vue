@@ -18,7 +18,7 @@
 
 <template>
   <div class="tui-formHelpIcon">
-    <Popover position="top">
+    <Popover position="top" :triggers="['click']">
       <template v-slot:trigger>
         <a href="javascript:;" class="tui-formHelpIcon__icon">
           <Info
