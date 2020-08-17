@@ -20,16 +20,16 @@
   <div
     :class="['tui-navigationPanel', `tui-navigationPanel__${gridDirection}`]"
   >
-    <section v-if="showMenuControl" class="tui-navigationPanel__selected">
+    <div v-if="showMenuControl" class="tui-navigationPanel__selected">
       <span class="tui-navigationPanel__selected__wrapper" @click="toggleMenu">
         <span class="tui-navigationPanel__selected__text">
           {{ title }}
         </span>
         <Show />
       </span>
-    </section>
+    </div>
     <div
-      v-if="showMenu"
+      v-show="showMenu"
       ref="navigationPanelMenu"
       class="tui-navigationPanel__menu"
     >
