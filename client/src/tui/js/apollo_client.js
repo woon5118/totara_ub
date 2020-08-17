@@ -23,6 +23,7 @@ import { createHttpLink } from 'apollo-link-http';
 import { BatchHttpLink } from 'apollo-link-batch-http';
 import { createTuiContextLink } from './internal/apollo/tui_context_link';
 import { createDevLink } from './internal/apollo/dev_link';
+import { errorLink } from './internal/apollo/error_link';
 import { config } from './config';
 import { totaraUrl } from './util';
 
@@ -39,6 +40,7 @@ const httpLinkOptions = {
 const link = ApolloLink.from([
   createTuiContextLink(),
   createDevLink(),
+  errorLink,
   ApolloLink.split(
     operation => operation.getContext().batch,
     new BatchHttpLink(httpLinkOptions),
