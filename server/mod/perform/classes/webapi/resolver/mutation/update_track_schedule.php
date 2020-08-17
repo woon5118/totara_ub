@@ -31,6 +31,9 @@ use core\webapi\resolver\has_middleware;
 use totara_core\dates\date_time_setting;
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
+use mod_perform\event\track_schedule_changed;
+use mod_perform\event\track_subject_instance_generation_changed;
+use mod_perform\event\helper\track_schedule;
 use mod_perform\models\activity\track;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
@@ -45,10 +48,12 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         $track = track::load_by_id($track_id);
 
         $errors = static::validate_inputs($track_schedule, $track);
-
         if ($errors) {
             throw new coding_exception(implode(', ', $errors));
         }
+
+        $original_schedule = new track_schedule($track);
+        $original_ja_setting = $track->is_per_job_subject_instance_generation();
 
         // Fixed and dynamic schedules.
         if ($track_schedule['schedule_is_fixed']) {
@@ -146,6 +151,20 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         );
 
         $track->update();
+
+        // The track model just records schedule changes and does not actually
+        // persist them until it is saved. This is why the event is fired here
+        // instead of conventional place - in the model.
+        $new_schedule = new track_schedule($track);
+        if ($new_schedule != $original_schedule) {
+            track_schedule_changed::create_from_track_schedules($original_schedule, $new_schedule)
+                ->trigger();
+        }
+
+        if ($track->is_per_job_subject_instance_generation() !== $original_ja_setting) {
+            track_subject_instance_generation_changed::create_from_track($track)
+                ->trigger();
+        }
 
         return [
             'track' => $track,

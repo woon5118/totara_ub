@@ -24,6 +24,7 @@
 
 use mod_perform\constants;
 use mod_perform\entities\activity\track as track_entity;
+use mod_perform\event\track_subject_instance_generation_changed;
 use totara_core\dates\date_time_setting;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -35,6 +36,8 @@ require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
  */
 class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generation_testcase
     extends mod_perform_webapi_resolver_mutation_update_track_schedule_base {
+
+    private const MUTATION = 'mod_perform_update_track_schedule';
 
     use webapi_phpunit_helper;
 
@@ -59,10 +62,7 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
         self::assertCount(4, $before_tracks);
         unset($before_tracks[$this->track1_id]->updated_at);
 
-        $result = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule',
-            $args
-        );
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $result_track = $result['track'];
 
         // Verify the resulting graphql data.
@@ -118,10 +118,7 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
         self::assertCount(4, $before_tracks);
         unset($before_tracks[$this->track1_id]->updated_at);
 
-        $result = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule',
-            $args
-        );
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $result_track = $result['track'];
 
         // Verify the resulting graphql data.
@@ -153,4 +150,33 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
         self::assertEquals($before_tracks, $after_tracks);
     }
 
+    public function test_subject_instance_generation_changed_event(): void {
+        set_config('totara_job_allowmultiplejobs', 1);
+
+        $args = [
+            'track_schedule' => [
+                'track_id' => $this->track1_id,
+                'subject_instance_generation' => constants::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB,
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => ['iso' => (new date_time_setting(222))->get_iso()],
+                'due_date_is_enabled' => false,
+                'repeating_is_enabled' => false,
+            ],
+        ];
+
+        $sink = $this->redirectEvents();
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
+
+        $events = $sink->get_events();
+        $this->assertCount(2, $events);
+
+        $event = end($events);
+        $this->assertInstanceOf(track_subject_instance_generation_changed::class, $event);
+        $this->assertEquals($this->track1_id, $event->objectid);
+        $this->assertEquals(get_admin()->id, $event->userid);
+        $this->assertTrue($event->other['is_per_job']);
+
+        $sink->close();
+    }
 }

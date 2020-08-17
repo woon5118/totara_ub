@@ -23,6 +23,7 @@
 
 namespace mod_perform\models\activity;
 
+use DateTime;
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
@@ -61,7 +62,7 @@ use moodle_exception;
  * @property-read bool $due_date_is_fixed
  * @property-read int $due_date_fixed
  * @property-read string|null $due_date_timezone
- * @property-read dynamic_source|null $due_date_offset
+ * @property-read date_offset|null $due_date_offset
  * @property-read bool $repeating_is_enabled
  * @property-read int $repeating_type
  * @property-read date_offset|null $repeating_offset
@@ -137,6 +138,10 @@ class track extends model {
             throw new moodle_exception('nopermissions', '', '', 'create track');
         }
 
+        $now = (new DateTime())
+            ->setTime(0, 0, 0, 0)
+            ->getTimestamp();
+
         $entity = new track_entity();
         $entity->activity_id = $parent->get_id();
         $entity->description = $description;
@@ -144,7 +149,7 @@ class track extends model {
         $entity->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
         $entity->schedule_is_open = true;
         $entity->schedule_is_fixed = true;
-        $entity->schedule_fixed_from = time();
+        $entity->schedule_fixed_from = $now;
         $entity->schedule_fixed_to = null;
         $entity->schedule_dynamic_from = null;
         $entity->schedule_dynamic_to = null;

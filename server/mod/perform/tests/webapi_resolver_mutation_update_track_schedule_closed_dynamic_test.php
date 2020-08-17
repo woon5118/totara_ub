@@ -27,9 +27,10 @@ require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
 use mod_perform\constants;
 use mod_perform\dates\date_offset;
-use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\entities\activity\track as track_entity;
+use mod_perform\event\track_schedule_changed;
 use totara_core\advanced_feature;
+use totara_core\dates\date_time_setting;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -272,5 +273,68 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $args['track_schedule']['track_id'] = $track_id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
         $this->assert_webapi_operation_failed($result, "Invalid activity");
+    }
+
+    public function test_schedule_changed_event(): void {
+        [$dynamic_source, $dynamic_source_input] = $this->get_user_creation_date_dynamic_source();
+
+        $from = [
+            'count' => 1,
+            'unit' => date_offset::UNIT_WEEK,
+            'direction' => date_offset::DIRECTION_BEFORE,
+        ];
+        $to = [
+            'count' => 3,
+            'unit' => date_offset::UNIT_WEEK,
+            'direction' => date_offset::DIRECTION_AFTER,
+        ];
+
+        $args = [
+            'track_schedule' => [
+                'track_id' => $this->track1_id,
+                'schedule_is_open' => false,
+                'schedule_is_fixed' => false,
+                'schedule_dynamic_from' => $from,
+                'schedule_dynamic_to' => $to,
+                'schedule_dynamic_source' => $dynamic_source_input,
+                'schedule_use_anniversary' => true,
+                'due_date_is_enabled' => false,
+                'repeating_is_enabled' => false,
+                'subject_instance_generation' => constants::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
+            ],
+        ];
+
+        $sink = $this->redirectEvents();
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
+
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+
+        $event = reset($events);
+        $this->assertInstanceOf(track_schedule_changed::class, $event);
+        $this->assertEquals($this->track1_id, $event->objectid);
+        $this->assertEquals(get_admin()->id, $event->userid);
+
+        $initial_schedule_time = (new date_time_setting(-1))->get_iso();
+        $expected = [
+            'is_open' => [false, false],
+            'is_fixed' => [true, false],
+            'fixed_from' => [$initial_schedule_time, ''],
+            'fixed_to' => [$initial_schedule_time, ''],
+            'dynamic_source' => ['', $dynamic_source->get_display_name()],
+            'dynamic_from' => ['', '1 week before'],
+            'dynamic_to' => ['', '3 weeks after'],
+            'due_date' => [$initial_schedule_time, '']
+        ];
+
+        $raw = $event->other;
+        foreach ($expected as $key => $values) {
+            [$pre_value, $post_value] = $values;
+
+            $this->assertEquals($raw["pre_$key"], $pre_value, "wrong pre'$key' value");
+            $this->assertEquals($raw["post_$key"], $post_value, "wrong post '$key' value");
+        }
+
+        $sink->close();
     }
 }

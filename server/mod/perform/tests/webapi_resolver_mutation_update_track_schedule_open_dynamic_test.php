@@ -24,8 +24,9 @@
 
 use mod_perform\constants;
 use mod_perform\dates\date_offset;
-use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\entities\activity\track as track_entity;
+use mod_perform\event\track_schedule_changed;
+use totara_core\dates\date_time_setting;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
@@ -119,4 +120,60 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         // None currently, but we will have when additional fields are added.
     }
 
+    public function test_schedule_changed_event(): void {
+        [$dynamic_source, $dynamic_source_input] = $this->get_user_creation_date_dynamic_source();
+
+        $from = [
+            'count' => 1,
+            'unit' => date_offset::UNIT_WEEK,
+            'direction' => date_offset::DIRECTION_AFTER
+        ];
+
+        $args = [
+            'track_schedule' => [
+                'track_id' => $this->track1_id,
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => false,
+                'schedule_dynamic_from' => $from,
+                'schedule_dynamic_source' => $dynamic_source_input,
+                'schedule_use_anniversary' => true,
+                'due_date_is_enabled' => false,
+                'repeating_is_enabled' => false,
+                'subject_instance_generation' => constants::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
+            ],
+        ];
+
+        $sink = $this->redirectEvents();
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
+
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+
+        $event = reset($events);
+        $this->assertInstanceOf(track_schedule_changed::class, $event);
+        $this->assertEquals($this->track1_id, $event->objectid);
+        $this->assertEquals(get_admin()->id, $event->userid);
+
+        $initial_schedule_time = (new date_time_setting(-1))->get_iso();
+        $expected = [
+            'is_open' => [false, true],
+            'is_fixed' => [true, false],
+            'fixed_from' => [$initial_schedule_time, ''],
+            'fixed_to' => [$initial_schedule_time, ''],
+            'dynamic_source' => ['', $dynamic_source->get_display_name()],
+            'dynamic_from' => ['', '1 week after'],
+            'dynamic_to' => ['', ''],
+            'due_date' => [$initial_schedule_time, '']
+        ];
+
+        $raw = $event->other;
+        foreach ($expected as $key => $values) {
+            [$pre_value, $post_value] = $values;
+
+            $this->assertEquals($raw["pre_$key"], $pre_value, "wrong pre'$key' value");
+            $this->assertEquals($raw["post_$key"], $post_value, "wrong post '$key' value");
+        }
+
+        $sink->close();
+    }
 }

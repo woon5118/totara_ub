@@ -24,8 +24,9 @@
 
 use mod_perform\constants;
 use mod_perform\entities\activity\track as track_entity;
+use mod_perform\event\track_schedule_changed;
 use mod_perform\dates\date_offset;
-use mod_perform\entities\activity\track as track_entitty;
+use totara_core\dates\date_time_setting;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
@@ -36,6 +37,8 @@ require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
  */
 class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
     extends mod_perform_webapi_resolver_mutation_update_track_schedule_base {
+
+    private const MUTATION = 'mod_perform_update_track_schedule';
 
     use webapi_phpunit_helper;
 
@@ -61,10 +64,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         self::assertCount(4, $before_tracks);
         unset($before_tracks[$this->track1_id]->updated_at);
 
-        $result = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule',
-            $args
-        );
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $result_track = $result['track'];
 
         // Verify the resulting graphql data.
@@ -75,7 +75,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         self::assertNull($result_track->due_date_offset);
 
         // Manually make the changes that we expect to make.
-        /** @var track_entitty $affected_track */
+        /** @var track_entity $affected_track */
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 1;
         $affected_track->schedule_is_fixed = 1;
@@ -133,10 +133,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         self::assertCount(4, $before_tracks);
         unset($before_tracks[$this->track1_id]->updated_at);
 
-        $result = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule',
-            $args
-        );
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $result_track = $result['track'];
 
         // Verify the resulting graphql data.
@@ -154,7 +151,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         self::assertNull($result_track->due_date_offset);
 
         // Manually make the changes that we expect to make.
-        /** @var track_entitty $affected_track */
+        /** @var track_entity $affected_track */
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 1;
@@ -207,10 +204,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         self::assertCount(4, $before_tracks);
         unset($before_tracks[$this->track1_id]->updated_at);
 
-        $result = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule',
-            $args
-        );
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $result_track = $result['track'];
 
         // Verify the resulting graphql data.
@@ -263,4 +257,72 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         self::assertEquals($before_tracks, $after_tracks);
     }
 
+    public function test_schedule_changed_event(): void {
+        $from = [
+            'iso' => '2030-12-04',
+            'timezone' => 'UTC',
+        ];
+
+        $to = [
+            'iso' => '2030-12-05',
+            'timezone' => 'UTC',
+        ];
+
+        $args = [
+            'track_schedule' => [
+                'track_id' => $this->track1_id,
+                'schedule_is_open' => false,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => $from,
+                'schedule_fixed_to' => $to,
+                'due_date_is_enabled' => true,
+                'due_date_is_fixed' => false,
+                'due_date_offset' => [
+                    'count' => 2,
+                    'unit' => date_offset::UNIT_WEEK
+                ],
+                'repeating_is_enabled' => false,
+                'subject_instance_generation' => constants::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
+            ],
+        ];
+
+        $sink = $this->redirectEvents();
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
+
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+
+        $event = reset($events);
+        $this->assertInstanceOf(track_schedule_changed::class, $event);
+        $this->assertEquals($this->track1_id, $event->objectid);
+        $this->assertEquals(get_admin()->id, $event->userid);
+
+        $initial_schedule_time = (new date_time_setting(-1))->get_iso();
+        $changed_schedule_from_time = date_time_setting::create_from_array($from)
+            ->get_iso();
+        $changed_schedule_to_time = date_time_setting::create_from_array($to)
+            ->to_end_of_day()
+            ->get_iso();
+
+        $expected = [
+            'is_open' => [false, false],
+            'is_fixed' => [true, true],
+            'fixed_from' => [$initial_schedule_time, $changed_schedule_from_time],
+            'fixed_to' => [$initial_schedule_time, $changed_schedule_to_time],
+            'dynamic_source' => ['', ''],
+            'dynamic_from' => ['', ''],
+            'dynamic_to' => ['', ''],
+            'due_date' => [$initial_schedule_time, '2 weeks after each instance creation date']
+        ];
+
+        $raw = $event->other;
+        foreach ($expected as $key => $values) {
+            [$pre_value, $post_value] = $values;
+
+            $this->assertEquals($raw["pre_$key"], $pre_value, "wrong pre'$key' value");
+            $this->assertEquals($raw["post_$key"], $post_value, "wrong post '$key' value");
+        }
+
+        $sink->close();
+    }
 }
