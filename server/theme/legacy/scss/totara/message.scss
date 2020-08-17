@@ -322,7 +322,7 @@
           line-height: $line-height-base;
           border: 1px solid transparent;
           border-radius: $border-radius-base $border-radius-base 0 0;
-          color: $link-color;
+          color: var(--legacy-link-color);
           &:hover,
           &:focus {
             text-decoration: none;

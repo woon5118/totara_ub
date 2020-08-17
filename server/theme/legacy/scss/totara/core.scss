@@ -264,14 +264,14 @@ a.dimmed,
   &:link,
   &:visited {
     .ft {
-      color: $link-color;
+      color: var(--legacy-link-color);
     }
   }
   &:hover,
   &:active,
   &:focus {
     .ft {
-      color: $link-hover-color;
+      color: var(--legacy-link-color-hover);
     }
   }
 }
@@ -1814,7 +1814,7 @@ ul.dragdrop-keyboard-drag li {
 }
 
 .moodle-core-dragdrop-draghandle {
-  color: $link-color;
+  color: var(--legacy-link-color);
 }
 
 .navbar-header {

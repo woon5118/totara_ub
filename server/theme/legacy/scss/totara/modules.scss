@@ -483,5 +483,5 @@ div#dock {
 
 // override '.label a' when viewing a label activity in a course
 .modtype_label a {
-  color: $link-color;
+  color: var(--legacy-link-color);
 }

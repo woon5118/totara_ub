@@ -124,7 +124,7 @@
   .header {
     @extend .popover-title;
     .close {
-      color: $link-color;
+      color: var(--legacy-link-color);
       background: inherit;
       font-size: 20px;
       margin-bottom: 10px;

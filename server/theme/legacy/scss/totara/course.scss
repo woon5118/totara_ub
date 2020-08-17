@@ -1134,7 +1134,7 @@ input.titleeditor {
 
 .course-being-dragged-proxy {
   border: 0;
-  color: $link-color;
+  color: var(--legacy-link-color);
   vertical-align: middle;
   padding: 0 0 0 4em;
 }
