@@ -19,24 +19,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author David Curry <david.curry@totaralearning.com>
- * @package mod_resource
+ * @package totara_mobile
  */
 
-namespace mod_resource\webapi\formatter;
+namespace totara_mobile\webapi\resolver\query;
 
-use core\webapi\formatter\formatter;
-use core\webapi\formatter\field\date_field_formatter;
-use core\webapi\formatter\field\string_field_formatter;
-use core\webapi\formatter\field\text_field_formatter;
+use mod_resource\webapi\resolver\query\resource as resource_query;
 
-class resource_formatter extends formatter {
-
-    protected function get_map(): array {
-        return [
-            'id' => null, // core_id!
-            'size' => null, // Default - Integer.
-            'mimetype' => string_field_formatter::class,
-            'fileurl' => string_field_formatter::class,
-        ];
-    }
+/**
+ * Class resource extends mod_resource_resource query
+ *
+ * @package totara_mobile\webapi\resolver\query
+ */
+class resource extends resource_query {
+    // Simply brings the class into this namespace.
 }

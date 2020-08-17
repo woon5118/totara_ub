@@ -188,5 +188,20 @@ class mod_resource_webapi_resolver_type_resource_testcase extends advanced_testc
         $this->assertEquals('18', $value); // 18 bytes, this is a tiny text test file.
     }
 
+    /**
+     * Test the type resolver for the size field
+     */
+    public function test_resolve_fileurl() {
+        global $CFG;
+        list($resource, $user) = $this->create_resource_data();
 
+        $data = $this->format_resource($resource);
+
+        $cm = get_coursemodule_from_instance('resource', $resource->id, null, true, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+        $value = $this->resolve_graphql_type('mod_resource_resource', 'fileurl', $data, ['format' => format::FORMAT_PLAIN], $context);
+        $this->assertTrue(is_string($value));
+        $expected = $CFG->wwwroot . '/pluginfile.php/'.$context->id.'/mod_resource/content/0/mainfile';
+        $this->assertEquals($expected, $value);
+    }
 }

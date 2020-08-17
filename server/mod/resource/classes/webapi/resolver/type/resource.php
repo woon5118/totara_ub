@@ -33,7 +33,6 @@ class resource implements \core\webapi\type_resolver {
     public static function resolve(string $field, $resource, array $args, execution_context $ec) {
         global $DB, $USER, $CFG;
 
-
         // Note: mdl_resource record called moduleinfo so it doesn't get confused with a modinfo class.
         if (!isset($resource['moduleinfo']) || !$resource['moduleinfo'] instanceof \stdclass) {
             throw new \coding_exception('Resource file type resolver did not recieve expected data');
@@ -56,12 +55,18 @@ class resource implements \core\webapi\type_resolver {
             return $fileinfo->get_filesize();
         }
 
+        if ($field == 'fileurl') {
+            $revision = $moduleinfo->revision;
+            $path = '/' . $fileinfo->get_contextid() . '/mod_resource/content/' . $revision . $fileinfo->get_filepath() . $fileinfo->get_filename();
+            $moduleinfo->fileurl = file_encode_url($CFG->wwwroot.'/pluginfile.php', $path, false);
+        }
+
         $formatter = new resource_formatter($moduleinfo, $context);
         $formatted = $formatter->format($field, $format);
 
         // For mobile execution context, rewrite pluginfile urls in description and image_src fields.
         // This is clearly a hack, please suggest something more elegant.
-        if (is_a($ec, 'totara_mobile\webapi\execution_context') && in_array($field, ['download_url'])) {
+        if (is_a($ec, 'totara_mobile\webapi\execution_context') && in_array($field, ['fileurl'])) {
             $formatted = str_replace($CFG->wwwroot . '/pluginfile.php', $CFG->wwwroot . '/totara/mobile/pluginfile.php', $formatted);
         }
 

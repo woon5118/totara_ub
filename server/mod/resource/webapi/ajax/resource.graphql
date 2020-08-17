@@ -3,5 +3,6 @@ query mod_resource_resource($resourceid: core_id!) {
     id
     mimetype
     size
+    fileurl
   }
 }

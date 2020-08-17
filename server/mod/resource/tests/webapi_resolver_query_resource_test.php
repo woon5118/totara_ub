@@ -179,4 +179,31 @@ class mod_resource_webapi_resolver_query_resource_testcase extends advanced_test
         $results = $this->resolve_graphql_query('mod_resource_resource', ['resourceid' => $resource->id]);
         $this->assertSame($resource->id, $results->id);
     }
+
+    /**
+     * Test the results of the AJAX query through the GraphQL stack.
+     */
+    public function test_ajax_query() {
+        global $CFG;
+
+        list($resource, $user) = $this->create_resource_data();
+        $this->setUser($user);
+
+        $cm = get_coursemodule_from_instance('resource', $resource->id, null, true, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+        $fileurl = $CFG->wwwroot . '/pluginfile.php/'.$context->id.'/mod_resource/content/0/mainfile';
+
+
+        $result = $this->execute_graphql_operation('mod_resource_resource', ['resourceid' => $resource->id]);
+        $data = $result->toArray()['data'];
+        $expected = [
+            "mod_resource_resource" => [
+                "id" => "{$resource->id}",
+                "mimetype" => "text/plain",
+                "size" => 18,
+                "fileurl" => $fileurl
+            ]
+        ];
+        $this->assertSame($expected, $data);
+    }
 }
