@@ -109,39 +109,44 @@ export default {
   :validate="validate"
   @submit="submit"
 >
-  <FormRowFieldset label="Start date">
-    <FormDateSelector
-      v-modal="startValue"
-      name="startDate"
-      :initial-current-date="true"
-      type="date"
-      :validations="v => [v.required()]"
-    />
-  </FormRowFieldset>
+  <FormRow label="Start date" v-slot="{ labelId }">
+    <FieldGroup :aria-labelledby="labelId">
+      <FormDateSelector
+        v-modal="startValue"
+        name="startDate"
+        :initial-current-date="true"
+        type="date"
+        :validations="v => [v.required()]"
+      />
+    </FieldGroup>
+  </FormRow>
 
-  <FormRowFieldset label="End date">
-    <FormDateSelector
-      v-modal="endValue"
-      name="endDate"
-      :initial-current-date="true"
-      type="date"
-      :validations="v => [v.required()]"
-    />
-  </FormRowFieldset>
+  <FormRow label="End date" v-slot="{ labelId }">
+    <FieldGroup :aria-labelledby="labelId">
+      <FormDateSelector
+        v-modal="endValue"
+        name="endDate"
+        :initial-current-date="true"
+        type="date"
+        :validations="v => [v.required()]"
+      />
+    </FieldGroup>
+  </FormRow>
   <FormRowActionButtons :submitting="getSubmitting()" />
 </Uniform>`,
       codeScript: `import {
   FormDateSelector,
-  FormRowFieldset,
   Uniform,
 } from 'tui/components/uniform';
+import FieldGroup from 'tui/components/form/FieldGroup';
 // Utils
 import { isIsoAfter } from 'tui/date';
 
 export default {
   components: {
     FormDateSelector,
-    FormRowFieldset,
+    FormRow,
+    FieldGroup,
     Uniform,
   },
 },
