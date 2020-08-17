@@ -22,6 +22,8 @@ query container_workspace_get_discussion($id: param_integer!) {
       can_comment
       can_delete
       can_update
+      can_report
+      removed
       can_react
       reacted
     }

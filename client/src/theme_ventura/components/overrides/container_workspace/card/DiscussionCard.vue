@@ -69,6 +69,13 @@
         }
       }
 
+      &__body {
+        &--deleted {
+          @include tui-font-body-small();
+          font-style: italic;
+        }
+      }
+
       &__buttons {
         display: flex;
 

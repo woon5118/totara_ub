@@ -21,31 +21,34 @@
  * @package totara_reportedcontent
  */
 
-namespace totara_reportedcontent\hook;
+namespace totara_reportedcontent\webapi\resolver\type;
 
-use totara_reportedcontent\review;
+use core\webapi\execution_context;
+use core\webapi\type_resolver;
 
 /**
- * Class remove_review_content
- *
- * @package totara_reportedcontent\hook
+ * Type resolver for created reportedcontent reviews
  */
-class remove_review_content extends  \totara_core\hook\base {
+final class review_create_status implements type_resolver {
     /**
-     * @var review
+     * @param string $field
+     * @param array $source
+     * @param array $args
+     * @param execution_context $ec
+     *
+     * @return mixed
      */
-    public $review;
+    public static function resolve(string $field, $source, array $args, execution_context $ec) {
+        if (!is_array($source)) {
+            throw new \coding_exception(
+                "Expecting parameter \$source to be an array"
+            );
+        }
 
-    /**
-     * @var bool
-     */
-    public $success;
+        if (!array_key_exists($field, $source)) {
+            throw new \coding_exception("Unknown field '{$field}'");
+        }
 
-    /**
-     * @param review $review
-     */
-    public function __construct(review $review) {
-        $this->review = $review;
-        $this->success = false;
+        return $source[$field];
     }
 }

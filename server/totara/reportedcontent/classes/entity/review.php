@@ -44,6 +44,7 @@ use totara_reportedcontent\repository\review_repository;
  * @property int $context_id
  * @property string $component
  * @property string $area
+ * @method static review_repository repository()
  */
 final class review extends entity {
     /**

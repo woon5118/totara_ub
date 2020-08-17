@@ -22,18 +22,21 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use totara_reportedcontent\entity\review as review_entity;
-use totara_webapi\graphql;
 use core\webapi\execution_context;
-use totara_reportedcontent\review;
 use totara_comment\comment;
+use totara_reportedcontent\entity\review as review_entity;
+use totara_reportedcontent\hook\get_review_context;
+use totara_webapi\graphql;
+use totara_core\hook\manager;
 
 class totara_reportedcontent_create_review_testcase extends advanced_testcase {
     /**
      * @return void
      */
     public function test_create_review(): void {
-        global $DB;
+        global $DB, $CFG;
+
+        require_once("{$CFG->dirroot}/totara/reportedcontent/tests/fixtures/review_content_watcher.php");
 
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
@@ -52,10 +55,18 @@ class totara_reportedcontent_create_review_testcase extends advanced_testcase {
         $create_variables = [
             'component' => 'test_component',
             'area' => 'comment',
-            'instance_id' => 1,
             'item_id' => $comment->get_id(),
             'url' => 'https://example.com'
         ];
+
+        // Use a fake watcher instead
+        $watchers = [
+            [
+                'hookname' => get_review_context::class,
+                'callback' => [review_content_watcher::class, 'get_content']
+            ]
+        ];
+        manager::phpunit_replace_watchers($watchers);
 
         $ec = execution_context::create('ajax', 'totara_reportedcontent_create_review');
         $result = graphql::execute_operation($ec, $create_variables);
@@ -67,11 +78,12 @@ class totara_reportedcontent_create_review_testcase extends advanced_testcase {
         $this->assertArrayHasKey('review', $result->data);
 
         $review = $result->data['review'];
+
         $this->assertArrayHasKey('id', $review);
-        $this->assertArrayHasKey('status', $review);
+        $this->assertArrayHasKey('success', $review);
 
         $this->assertNotEmpty($review['id']);
-        $this->assertSame(0, $review['status']);
+        $this->assertTrue($review['success']);
 
         // Now check the stored review is what we expect
         $id = $review['id'];
@@ -81,9 +93,25 @@ class totara_reportedcontent_create_review_testcase extends advanced_testcase {
 
         $this->assertSame('test_component', $record->component);
         $this->assertSame('comment', $record->area);
-        $this->assertSame($comment->get_id(), (int)$record->item_id);
+        $this->assertSame($comment->get_id(), (int) $record->item_id);
         $this->assertSame('https://example.com', $record->url);
         $this->assertSame($user->id, $record->complainer_id);
         $this->assertSame($target_user->id, $record->target_user_id);
+
+        // Now do it again! We want to check that a second report will returna  false / the ID
+        $ec = execution_context::create('ajax', 'totara_reportedcontent_create_review');
+        $result = graphql::execute_operation($ec, $create_variables);
+
+        $this->assertEmpty($result->errors);
+        $this->assertNotEmpty($result->data);
+
+        $review = $result->data['review'];
+
+        $this->assertArrayHasKey('id', $review);
+        $this->assertArrayHasKey('success', $review);
+
+        $this->assertNotEmpty($review['id']);
+        $this->assertEquals($id, $review['id']);
+        $this->assertFalse($review['success']);
     }
 }

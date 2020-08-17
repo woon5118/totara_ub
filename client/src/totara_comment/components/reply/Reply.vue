@@ -105,6 +105,11 @@ export default {
       required: true,
     },
 
+    component: {
+      type: String,
+      required: true,
+    },
+
     submitting: Boolean,
 
     userFullName: {
@@ -306,27 +311,36 @@ export default {
 
       this.innerSubmitting = true;
       try {
-        await this.$apollo.mutate({
-          mutation: createReview,
-          refetchAll: false,
-          variables: {
-            component: this.component,
-            area: this.area,
-            item_id: this.commentId,
-            instance_id: this.instanceId,
-            url: window.location.href,
-          },
-        });
+        let response = await this.$apollo
+          .mutate({
+            mutation: createReview,
+            refetchAll: false,
+            variables: {
+              // Comments & replies are all handled in the same place
+              component: this.component,
+              area: 'reply',
+              item_id: this.replyId,
+              url: window.location.href,
+            },
+          })
+          .then(response => response.data.review);
 
-        await notify({
-          duration: 2000,
-          message: this.$str('reported', 'totara_reportedcontent'),
-          type: 'success',
-        });
+        if (response.success) {
+          await notify({
+            duration: 2000,
+            message: this.$str('reported', 'totara_reportedcontent'),
+            type: 'success',
+          });
+        } else {
+          await notify({
+            duration: 2000,
+            message: this.$str('reported_failed', 'totara_reportedcontent'),
+            type: 'error',
+          });
+        }
       } catch (e) {
         await notify({
-          duration: 2000,
-          message: this.$str('reported_failed', 'totara_reportedcontent'),
+          message: this.$str('error:reportreply', 'totara_comment'),
           type: 'error',
         });
       } finally {
@@ -350,6 +364,9 @@ export default {
 
 <lang-strings>
   {
+    "totara_comment": [
+      "error:reportreply"
+    ],
     "totara_reportedcontent": [
       "reported",
       "reported_failed"

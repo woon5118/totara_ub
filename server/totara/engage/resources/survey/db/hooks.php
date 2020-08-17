@@ -26,5 +26,13 @@ $watchers = [
     [
         'hookname' => '\totara_topic\hook\get_deleted_topic_usages',
         'callback' => ['\engage_survey\watcher\totara_topic_watcher', 'on_deleted_topic_get_usage']
-    ]
+    ],
+    [
+        'hookname' => '\totara_reportedcontent\hook\get_review_context',
+        'callback' => ['\engage_survey\watcher\reportedcontent_watcher', 'get_content']
+    ],
+    [
+        'hookname' => '\totara_reportedcontent\hook\remove_review_content',
+        'callback' => ['\engage_survey\watcher\reportedcontent_watcher', 'delete_survey']
+    ],
 ];

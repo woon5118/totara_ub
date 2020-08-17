@@ -60,6 +60,7 @@ $string['discussions'] = 'Discussions';
 $string['discussion_actions'] = 'Discussion\'s actions';
 $string['discussion_created'] = 'Discussion created';
 $string['discussion_deleted'] = 'Discussion deleted';
+$string['discussion_soft_deleted'] = 'Discussion soft-deleted';
 $string['discussions_list'] = "Discussion list";
 $string['discussion_updated'] = 'Discussion updated';
 $string['discuss_tab_label'] = 'Discussions';
@@ -130,6 +131,8 @@ $string['recent_joined'] = 'Recently joined';
 $string['recommended_spaces'] = 'Recommended workspaces';
 $string['remove_like_discussion'] = 'Remove like for discussion';
 $string['remove_member_warning_msg'] = 'Are you sure you want to remove {$a} from this workspace?';
+$string['removed_discussion'] = 'This discussion has been removed.';
+$string['report_discussion'] = 'Report';
 $string['requested_to_join'] = 'Requested';
 $string['request_to_join'] = "Request to join";
 $string['requests_to_join'] = "Requests to join";
@@ -225,6 +228,7 @@ $string['error:update_discussion'] = 'Cannot update the discussion';
 $string['error:upload_image'] = 'Sorry, the file failed to upload. Please try again';
 $string['error:remove_user'] = 'Cannot remove the user';
 $string['error:request_to_join'] = 'Cannot request to join the workspace';
+$string['error:report_discussion'] = 'Cannot report the discussion';
 $string['error:view_workspace'] = 'You don\'t have permission to view this page.';
 
 // Strings for Library

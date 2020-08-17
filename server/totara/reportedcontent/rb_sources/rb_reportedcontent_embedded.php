@@ -53,9 +53,9 @@ final class rb_reportedcontent_embedded extends rb_base_embedded {
         $this->fullname = get_string('reportedcontentreport', 'totara_reportedcontent');
         $this->columns = array(
             array(
-                'type' => 'user',
+                'type' => 'creator',
                 'value' => 'namelink',
-                'heading' => get_string('type_user', 'totara_reportbuilder'),
+                'heading' => get_string('type_creator', 'rb_source_reportedcontent'),
             ),
             array(
                 'type' => 'reportedcontent',
@@ -81,9 +81,10 @@ final class rb_reportedcontent_embedded extends rb_base_embedded {
 
         $this->filters = array(
             array(
-                'type' => 'user',
+                'type' => 'creator',
                 'value' => 'fullname',
                 'advanced' => 0,
+                'fieldname' => get_string('type_creator_fullname', 'rb_source_reportedcontent'),
             ),
             array(
                 'type' => 'reportedcontent',

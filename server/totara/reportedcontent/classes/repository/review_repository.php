@@ -23,19 +23,37 @@
 
 namespace totara_reportedcontent\repository;
 
-use core\orm\entity\entity;
 use core\orm\entity\repository;
-use totara_reportedcontent\entity\review;
+use totara_reportedcontent\entity\review as review_entity;
+use totara_reportedcontent\review;
 
 /**
  * Repository for entity comment
  */
 final class review_repository extends repository {
     /**
-     * @param review|entity $entity
-     * @return review
+     * Helper method to check to see if the user has already reported this item.
+     * Will return the ID of the existing report, otherwise a null.
+     *
+     * @param string $component
+     * @param string $area
+     * @param int $item_id
+     * @param int $context_id
+     * @param int $complainer_id
+     * @return int|null
      */
-    public function save_entity(entity $entity): entity {
-        return parent::save_entity($entity);
+    public function get_existing_review_id(string $component, string $area, int $item_id, int $context_id, int $complainer_id): ?int {
+        global $DB;
+
+        $review_id = $DB->get_field(review_entity::TABLE, 'id', [
+            'component' => $component,
+            'area' => $area,
+            'item_id' => $item_id,
+            'context_id' => $context_id,
+            'complainer_id' => $complainer_id,
+            'status' => review::DECISION_PENDING,
+        ]);
+
+        return $review_id !== false ? $review_id : null;
     }
 }

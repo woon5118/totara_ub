@@ -94,14 +94,13 @@ final class comment_helper {
     }
 
     /**
-     * Purging a single comment.
+     * Purging a single comment. If a reason is provided then the comment will be soft-deleted.
      *
      * @param comment $comment
+     * @param int|null $delete_reason
      * @return void
      */
-    public static function purge_comment(comment $comment): void {
-        global $CFG;
-
+    public static function purge_comment(comment $comment, ?int $delete_reason = null): void {
         if ($comment->is_reply()) {
             debugging("Comment is a reply which it will not be purged", DEBUG_DEVELOPER);
             return;
@@ -109,17 +108,6 @@ final class comment_helper {
 
         // Purge all the replies related to the comment.
         static::purge_all_replies_of_comment($comment);
-
-        // Purge all the reactions of the comment.
-        $comment_id = $comment->get_id();
-        reaction_helper::purge_area_reactions(
-            'totara_comment',
-            comment::COMMENT_AREA,
-            $comment_id
-        );
-
-        // Purge all the files that are uploaded to the comment.
-        require_once("{$CFG->dirroot}/lib/filelib.php");
 
         $component = $comment->get_component();
         $resolver = resolver_factory::create_resolver($component);
@@ -129,24 +117,23 @@ final class comment_helper {
             $comment->get_area()
         );
 
-        $fs = get_file_storage();
-        $fs->delete_area_files(
-            $context_id,
-            'totara_comment',
-            comment::COMMENT_AREA,
-            $comment_id
-        );
+        static::remove_related_content($comment, $context_id);
 
         // Delete reported content records
         reported_content_helper::purge_area_review(
-            $comment_id,
+            $comment->get_id(),
             'totara_comment',
             comment::COMMENT_AREA,
             $context_id
         );
 
-        // Now start deleting the comment itself.
-        $comment->delete();
+        // If a reason is provided, then this is a soft-delete
+        // Otherwise purge it properly
+        if (null !== $delete_reason) {
+            $comment->soft_delete(null, $delete_reason);
+        } else {
+            $comment->delete();
+        }
     }
 
     /**
@@ -176,8 +163,6 @@ final class comment_helper {
      * @return void
      */
     public static function purge_reply(comment $reply): void {
-        global $CFG;
-
         if (!$reply->is_reply()) {
             debugging("Reply is a comment, which it will not be purged", DEBUG_DEVELOPER);
             return;
@@ -187,28 +172,12 @@ final class comment_helper {
         $component = $reply->get_component();
 
         $resolver = resolver_factory::create_resolver($component);
-
-        // Purge all of the reaction related to this reply id despite of any area
-        reaction_helper::purge_area_reactions(
-            'totara_comment',
-            comment::REPLY_AREA,
-            $reply_id
-        );
-
-        // Start purging files.
-        require_once("{$CFG->dirroot}/lib/filelib.php");
         $context_id = $resolver->get_context_id(
             $reply->get_instanceid(),
             $reply->get_area()
         );
 
-        $fs = get_file_storage();
-        $fs->delete_area_files(
-            $context_id,
-            'totara_comment',
-            comment::REPLY_AREA,
-            $reply_id
-        );
+        self::remove_related_content($reply, $context_id);
 
         // Delete reported content records
         reported_content_helper::purge_area_review(
@@ -217,7 +186,6 @@ final class comment_helper {
             comment::REPLY_AREA,
             $context_id
         );
-
 
         // Finally, start deleting the record of reply.
         $reply->delete();
@@ -592,9 +560,10 @@ final class comment_helper {
      * @param int $comment_id
      * @param int|null $actor_id
      *
+     * @param int|null $delete_reason
      * @return comment
      */
-    public static function soft_delete(int $comment_id, ?int $actor_id = null): comment {
+    public static function soft_delete(int $comment_id, ?int $actor_id = null, ?int $delete_reason = null): comment {
         global $USER;
 
         if (null === $actor_id || 0 === $actor_id) {
@@ -620,6 +589,11 @@ final class comment_helper {
             $comment->get_area()
         );
 
+        if ($delete_reason === comment::REASON_DELETED_REPORTED) {
+            // This is an administrative delete, we need to remove any files & likes/reactions
+            self::remove_related_content($comment, $context_id);
+        }
+
         if ($comment->is_reply()) {
             $event = reply_soft_deleted::from_reply($comment, $context_id, $actor_id);
             $event->add_record_snapshot(comment::get_entity_table(), $comment->to_record());
@@ -632,8 +606,58 @@ final class comment_helper {
             $event->trigger();
         }
 
-        $comment->soft_delete();
+        $comment->soft_delete(null, $delete_reason ?? comment::REASON_DELETED_USER);
         return $comment;
+    }
+
+    /**
+     * Will perform a hard-delete of a comment or reply.
+     * Note: No capability check is performed here, you need to verify with the
+     * interactor beforehand.
+     *
+     * Child replies of this comment will not be removed.
+     *
+     * @param comment $comment
+     */
+    public static function delete(comment $comment): void {
+        $component = $comment->get_component();
+        $resolver = resolver_factory::create_resolver($component);
+
+        $context_id = $resolver->get_context_id(
+            $comment->get_instanceid(),
+            $comment->get_area()
+        );
+
+        // Remove files & reactions
+        self::remove_related_content($comment, $context_id);
+
+        $comment->delete();
+    }
+
+    /**
+     * Will perform a hard-delete of all replies attached to a comment
+     *
+     * @param comment $comment
+     */
+    public static function delete_replies_of_comment(comment $comment): void {
+        if ($comment->is_reply()) {
+            debugging("Cannot delete replies of a reply, must provid a comment.", DEBUG_DEVELOPER);
+            return;
+        }
+
+        // Doing deletion of replies with 100 replies per time.
+        $paginator = comment_loader::get_replies($comment, 1, 100);
+        $replies = $paginator->get_items()->all();
+
+        while (!empty($replies)) {
+            /** @var comment $reply */
+            foreach ($replies as $reply) {
+                static::delete($reply);
+            }
+
+            $paginator = comment_loader::get_replies($comment, 1, 100);
+            $replies = $paginator->get_items()->all();
+        }
     }
 
     /**
@@ -705,5 +729,35 @@ final class comment_helper {
         }
 
         return (int) $format;
+    }
+
+    /**
+     * Delete any related items, including files and reactions.
+     *
+     * @param comment $comment
+     * @param int $context_id
+     */
+    private static function remove_related_content(comment $comment, int $context_id): void {
+        global $CFG;
+
+        $comment_id = $comment->get_id();
+        $area = $comment->is_reply() ? comment::REPLY_AREA : comment::COMMENT_AREA;
+
+        // Purge all the reactions of the comment.
+        reaction_helper::purge_area_reactions(
+            'totara_comment',
+            $area,
+            $comment_id
+        );
+
+        // Purge all the files that are uploaded to the comment.
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+        $fs = get_file_storage();
+        $fs->delete_area_files(
+            $context_id,
+            'totara_comment',
+            $area,
+            $comment_id
+        );
     }
 }

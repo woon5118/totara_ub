@@ -121,10 +121,8 @@ abstract class base_formatter extends formatter {
             'content' => function(?string $content, text_field_formatter $formatter) use ($that): string {
                 if (empty($content) && $that->object->deleted) {
                     $reason = $that->object->reasondeleted;
-                    $reported_reasons = [comment::REASON_DELETED_REPORTED, comment::REASON_DELETED_PARENT_REPORTED];
-
                     // Different phrasing for removed versus user deleted comments
-                    if (null !== $reason && in_array($reason, $reported_reasons)) {
+                    if (null !== $reason && comment::REASON_DELETED_REPORTED == $reason) {
                         return get_string('removedcomment', 'totara_comment');
                     }
                     return get_string('deletedcomment', 'totara_comment');

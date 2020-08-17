@@ -49,6 +49,8 @@ final class discussion_formatter extends formatter {
         $record->time_modified = $discussion->get_time_modified();
         $record->total_reactions = $discussion->get_total_reactions();
         $record->total_comments = $discussion->get_total_comments();
+        $record->deleted = $discussion->is_soft_deleted();
+        $record->reason_deleted = $discussion->get_reason_deleted();
 
         $context = \context_course::instance($workspace_id);
         parent::__construct($record, $context);
@@ -102,7 +104,15 @@ final class discussion_formatter extends formatter {
                 return $formatter->format($time_created);
             },
             'content' => function (?string $content, text_field_formatter $formatter) use ($that): string {
-                if (null === $content || '' === $content) {
+                if ($that->object->deleted) {
+                    $reason = $that->object->reason_deleted;
+
+                    // Different phrasing for removed versus user deleted comments
+                    if (null !== $reason && discussion::REASON_DELETED_REPORTED == $reason) {
+                        return get_string('removed_discussion', 'container_workspace');
+                    }
+                    return '';
+                } else if (empty($content)) {
                     return '';
                 }
 

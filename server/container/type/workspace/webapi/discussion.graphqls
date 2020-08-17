@@ -90,6 +90,14 @@ type container_workspace_discussion_interactor {
   Whether this user had already been reacted to the workspace's discussion or not.
   """
   reacted: Boolean!
+  """
+  Whether this user able to report the discussion or not.
+  """
+  can_report: Boolean!
+  """
+  Whether this discussion has already been removed.
+  """
+  removed: Boolean!
 }
 
 extend type Query {

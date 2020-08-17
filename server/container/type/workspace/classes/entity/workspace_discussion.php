@@ -35,6 +35,8 @@ use core\orm\entity\entity;
  * @property int|null   $time_modified
  * @property int        $timestamp
  * @property int|null   $time_pinned;
+ * @property int|null   $time_deleted;
+ * @property int|null   $reason_deleted;
  *
  * @method static discussion_repository repository
  */

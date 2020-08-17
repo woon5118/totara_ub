@@ -18,42 +18,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Cody Finegan <cody.finegan@totaralearning.com>
- * @package totara_playlist
+ * @package totara_reportedcontent
  */
 
-namespace totara_playlist\watcher;
-
-use totara_comment\comment;
-use totara_playlist\playlist;
 use totara_reportedcontent\hook\get_review_context;
+use totara_reportedcontent\hook\remove_review_content;
 
 /**
- * Get the context & content for a playlist comment
- *
- * @package totara_playlist\watcher
+ * Simple watcher to return some fake content
  */
-final class reportedcontent_watcher {
+final class review_content_watcher {
     /**
+     * Return the requested fake comment
+     *
      * @param get_review_context $hook
      * @return void
      */
-    public static function get_context(get_review_context $hook): void {
-        $area = $hook->area;
-        if ('totara_playlist' !== $hook->component || !in_array($area, ['comment', 'reply'])) {
+    public static function get_content(get_review_context $hook): void {
+        // Valid only for unit tests
+        if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
+            throw new coding_exception("Cannot run the code outside of phpunit environment");
+        }
+
+        if ($hook->component !== 'test_component') {
             return;
         }
 
-        $comment = comment::from_id($hook->item_id);
-        $instance_id = $comment->get_instanceid();
+        // It should be a comment (we're not testing the comment, rather the hook reacts appropriately)
+        $comment = \totara_comment\comment::from_id($hook->item_id);
 
+        $hook->context_id = CONTEXT_SYSTEM; // Fake
         $hook->content = $comment->get_content();
         $hook->format = $comment->get_format();
         $hook->time_created = $comment->get_timecreated();
         $hook->user_id = $comment->get_userid();
-
-        // Get the playlist for the context
-        $playlist = playlist::from_id($instance_id);
-        $hook->context_id = $playlist->get_context()->id;
 
         $hook->success = true;
     }

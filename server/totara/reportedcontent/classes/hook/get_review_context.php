@@ -2,7 +2,7 @@
 /**
  * This file is part of Totara Learn
  *
- * Copyright (C) $today.year onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,24 +23,21 @@
 
 namespace totara_reportedcontent\hook;
 
+use totara_core\hook\base;
+
 /**
- * Hook designed to fetch context of a particular reported item
+ * Hook designed to fetch context & content of a particular reported item
  *
  * @package totara_reportedcontent\hook
  */
-class get_review_context extends \totara_core\hook\base {
+class get_review_context extends base {
     /**
      * @var string
      */
     public $component;
 
     /**
-     * @var int
-     */
-    public $instance_id;
-
-    /**
-     * @var string
+     * @var string|null
      */
     public $area;
 
@@ -55,19 +52,37 @@ class get_review_context extends \totara_core\hook\base {
     public $context_id;
 
     /**
+     * @var string
+     */
+    public $content;
+
+    /**
+     * @var int
+     */
+    public $format;
+
+    /**
+     * @var int
+     */
+    public $time_created;
+
+    /**
+     * @var int
+     */
+    public $user_id;
+
+    /**
      * @var bool
      */
     public $success;
 
     /**
      * @param string $component
-     * @param int $instance_id
-     * @param string $area
+     * @param string|null $area
      * @param int $item_id
      */
-    public function __construct(string $component, int $instance_id, string $area, int $item_id) {
+    public function __construct(string $component, ?string $area, int $item_id) {
         $this->component = $component;
-        $this->instance_id = $instance_id;
         $this->area = $area;
         $this->item_id = $item_id;
         $this->success = false;

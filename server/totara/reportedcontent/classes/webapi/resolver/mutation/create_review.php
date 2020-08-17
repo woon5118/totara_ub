@@ -39,60 +39,60 @@ final class create_review implements mutation_resolver {
     /**
      * @param array $args
      * @param execution_context $ec
-     * @return review
+     * @return array
      */
-    public static function resolve(array $args, execution_context $ec): review {
+    public static function resolve(array $args, execution_context $ec): array {
         global $USER;
         require_login();
 
         $item_id = $args['item_id'];
-        $instance_id = $args['instance_id'];
         $component = $args['component'];
-        $area = $args['area'];
+        $area = $args['area'] ?? '';
         $url = $args['url'];
+        $complainer_id = $USER->id;
 
-        // The assumption here is we're working with a totara_comment
-        // That's true for now, but this will have to be split out into a hook or something
-        // if we want to expand into reporting other non-comment items
-        $comment = comment::from_id($item_id);
-        if (!$comment || !$comment->exists()) {
-            throw new \coding_exception("Could not find the comment to create a review for.");
+        // Get the review details from the appropriate hook
+        $hook = new get_review_context($component, $area, $item_id);
+        $hook->execute();
+
+        if (!$hook->success) {
+            throw new \coding_exception("Was unable to create a review, no hook observer was found or executed");
         }
 
-        // Get the correct context
-        if ($component === 'test_component') {
-            if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
-                // Not a unit test, so we just throw our exception.
-                throw new \coding_exception("'test_component' is only available for unit tests");
-            }
-            $context_id = \context_system::instance()->id;
-        } else {
-            $hook = new get_review_context(
-                $component,
-                $instance_id,
-                $area,
-                $item_id
-            );
-            $hook->execute();
+        $context_id = $hook->context_id;
+        $content = $hook->content;
+        $format = $hook->format;
+        $time_created = $hook->time_created;
+        $user_id = $hook->user_id;
 
-            if (!$hook->success) {
-                throw new \coding_exception("Was unable to create a review, no hook observer was found or executed");
-            }
+        $response = [
+            'id' => null,
+            'success' => false,
+        ];
 
-            $context_id = $hook->context_id;
+        // Do a check for a unique
+        $repo = \totara_reportedcontent\entity\review::repository();
+        $existing_id = $repo->get_existing_review_id($component, $area, $item_id, $context_id, $complainer_id);
+        if (null !== $existing_id) {
+            $response['id'] = $existing_id;
+            return $response;
         }
 
-        return review::create(
+        $review = review::create(
             $item_id,
             $context_id,
             $component,
-            $area,
+            $area ?? '',
             $url,
-            $comment->get_content(),
-            $comment->get_format(),
-            $comment->get_timecreated(),
-            $comment->get_userid(),
-            $USER->id
+            $content,
+            $format,
+            $time_created,
+            $user_id,
+            $complainer_id
         );
+        $response['id'] = $review->get_id();
+        $response['success'] = true;
+
+        return $response;
     }
 }

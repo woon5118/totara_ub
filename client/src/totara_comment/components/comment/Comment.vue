@@ -373,27 +373,36 @@ export default {
 
       this.innerSubmitting = true;
       try {
-        await this.$apollo.mutate({
-          mutation: createReview,
-          refetchAll: false,
-          variables: {
-            component: this.component,
-            area: this.area,
-            item_id: this.commentId,
-            instance_id: this.instanceId,
-            url: window.location.href,
-          },
-        });
+        let response = await this.$apollo
+          .mutate({
+            mutation: createReview,
+            refetchAll: false,
+            variables: {
+              // Comments & replies are all handled in the same place
+              component: this.component,
+              area: 'comment',
+              item_id: this.commentId,
+              url: window.location.href,
+            },
+          })
+          .then(response => response.data.review);
 
-        await notify({
-          duration: 2000,
-          message: this.$str('reported', 'totara_reportedcontent'),
-          type: 'success',
-        });
+        if (response.success) {
+          await notify({
+            duration: 2000,
+            message: this.$str('reported', 'totara_reportedcontent'),
+            type: 'success',
+          });
+        } else {
+          await notify({
+            duration: 2000,
+            message: this.$str('reported_failed', 'totara_reportedcontent'),
+            type: 'error',
+          });
+        }
       } catch (e) {
         await notify({
-          duration: 2000,
-          message: this.$str('reported_failed', 'totara_reportedcontent'),
+          message: this.$str('error:reportcomment', 'totara_comment'),
           type: 'error',
         });
       } finally {
@@ -451,6 +460,9 @@ export default {
 
 <lang-strings>
 {
+  "totara_comment": [
+    "error:reportcomment"
+  ],
   "totara_reportedcontent": [
     "reported",
     "reported_failed"

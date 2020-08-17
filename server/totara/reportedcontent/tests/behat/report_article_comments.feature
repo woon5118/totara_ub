@@ -45,6 +45,6 @@ Feature: Report & remove comments in engage articles
     Then I should see "Report"
     And I should not see "Edit"
 
-    When I click on "Report" "link"
+    When I click on "Report" "link" in the ".tui-commentCard__comment" "css_element"
     And I wait for the next second
     Then I should see "Content has been reported"

@@ -57,6 +57,7 @@
             :total-comments="discussion.total_comments"
             :time-description="discussion.time_description"
             :reacted="discussion.discussion_interactor.reacted"
+            :removed="discussion.discussion_interactor.removed"
             :comment-able="discussion.discussion_interactor.can_comment"
             :update-able="discussion.discussion_interactor.can_update"
             :delete-able="discussion.discussion_interactor.can_delete"

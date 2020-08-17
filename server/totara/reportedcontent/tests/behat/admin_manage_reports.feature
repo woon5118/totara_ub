@@ -17,6 +17,13 @@ Feature: Admin can remove or approve comments that have been reported.
     And the following "playlists" exist in "totara_playlist" plugin:
       | name       | username | summary       | access | topics  |
       | Playlist 1 | user1    | Test Playlist | PUBLIC | Topic 1 |
+    And the following "surveys" exist in "engage_survey" plugin:
+      | question | username | access | topics  |
+      | Survey 1 | user1    | PUBLIC | Topic 1 |
+    And "engage_survey" "Survey 1" is shared with the following users:
+      | sharer | recipient |
+      | user1  | admin     |
+      | user1  | user2     |
     And the following "comments" exist in "totara_comment" plugin:
       | name       | username | component       | area    | content          |
       | Article 1  | user1    | engage_article  | comment | article comment  |
@@ -30,15 +37,27 @@ Feature: Admin can remove or approve comments that have been reported.
     And I log in as "user2"
     And I view article "Article 1"
     And I click on "Comments" "link"
-    And I click on "[aria-label='Menu trigger']" "css_element"
-    And I click on "Report" "link"
+    And I click on "Menu trigger" "button"
+    And I click on "Report" "link" in the ".tui-commentCard__comment" "css_element"
 
     And I view playlist "Playlist 1"
     And I click on "Comments" "link"
-    And I click on "[aria-label='Menu trigger']" "css_element"
-    And I click on "Report" "link"
+    And I click on "Menu trigger" "button"
+    And I click on "Report" "link" in the ".tui-commentCard__comment" "css_element"
+
+    # Survey
+    And I click on "Your Library" in the totara menu
+    And I click on "Shared with you" "link"
+    And I click on "Vote" "link"
+    And I press "Actions"
+    And I click on "Report content" "link"
+
+    # Article
+    And I view article "Article 1"
+    And I press "Actions"
+    And I click on "Report content" "link"
     # This step handles the toast interfering with the logout link
-    And I view playlist "Playlist 1"
+    And I view article "Article 1"
     And I log out
 
   Scenario: As an admin, I can choose to allow reported comments to remain.
@@ -53,8 +72,8 @@ Feature: Admin can remove or approve comments that have been reported.
     And I should see "playlist comment"
 
     # Approve both
-    When I click on "#reportedcontent tr:nth-child(1) [data-action='approve']" "css_element"
-    And I click on "#reportedcontent tr:nth-child(2) [data-action='approve']" "css_element"
+    When I click on "#reportedcontent tr:nth-child(3) [data-action='approve']" "css_element"
+    And I click on "#reportedcontent tr:nth-child(4) [data-action='approve']" "css_element"
     Then I should see "Allowed"
 
     # Filter on "Allowed" and make sure our results show up
@@ -84,12 +103,12 @@ Feature: Admin can remove or approve comments that have been reported.
     And I should see "playlist comment"
 
     # Remove both the reports
-    When I click on "#reportedcontent tr:nth-child(1) [data-action='remove']" "css_element"
+    When I click on "#reportedcontent tr:nth-child(3) [data-action='remove']" "css_element"
     And I press "Confirm"
 
     # Modal goes funky with behat, so refresh the page for the second remove
     And I press "id_submitgroupstandard_addfilter"
-    And I click on "#reportedcontent tr:nth-child(1) [data-action='remove']" "css_element"
+    And I click on "#reportedcontent tr:nth-child(3) [data-action='remove']" "css_element"
     And I press "Confirm"
     Then I should see "Removed"
 
@@ -109,3 +128,34 @@ Feature: Admin can remove or approve comments that have been reported.
     And I click on "Comments" "link"
     Then I should not see "playlist comment"
     And I should see "This comment has been removed."
+
+  Scenario: As an admin, I can remove reported resources & surveys.
+    Given I log in as "admin"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports"
+    And I set the field "report-name" to "Inappropriate content"
+    And I press "id_submitgroupstandard_addfilter"
+    And I follow "Inappropriate content"
+    And I follow "View This Report"
+
+    # Remove both the survey & resource report
+    When I click on "#reportedcontent tr:nth-child(1) [data-action='remove']" "css_element"
+    And I press "Confirm"
+
+    # Modal goes funky with behat, so refresh the page for the second remove
+    And I press "id_submitgroupstandard_addfilter"
+    And I click on "#reportedcontent tr:nth-child(1) [data-action='remove']" "css_element"
+    And I press "Confirm"
+    Then I should see "Removed"
+
+    # Filter on "Removed" and make sure our results show up
+    When I set the field "reportedcontent-status" to "1"
+    And I press "id_submitgroupstandard_addfilter"
+    Then I should see "Survey 1"
+    And I should see "Article 1"
+
+    # Now log in as user1 and check that they can't see it anymore
+    When I log out
+    And I log in as "user1"
+    And I click on "Your Library" in the totara menu
+    Then I should not see "Article 1"
+    And I should not see "Survey 1"

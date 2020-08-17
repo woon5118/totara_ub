@@ -63,6 +63,8 @@ final class loader {
             "wd.time_pinned AS discussion_time_pinned",
             "wd.time_created AS discussion_time_created",
             "wd.time_modified AS discussion_time_modified",
+            "wd.time_deleted AS discussion_time_deleted",
+            "wd.reason_deleted AS discussion_reason_deleted",
             "wd.timestamp AS discussion_timestamp",
             "u.id AS user_id",
             "u.email AS user_email",
@@ -154,7 +156,9 @@ final class loader {
             'content_text' => 'discussion_content_text',
             'time_pinned' => 'discussion_time_pinned',
             'time_created' => 'discussion_time_created',
-            'time_modified' => 'discussion_time_modified'
+            'time_modified' => 'discussion_time_modified',
+            'time_deleted' => 'discussion_time_deleted',
+            'reason_deleted' => 'discussion_reason_deleted',
         ];
 
         $entity = new workspace_discussion();

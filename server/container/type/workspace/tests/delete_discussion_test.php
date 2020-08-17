@@ -134,4 +134,63 @@ class container_workspace_delete_discussion_testcase extends advanced_testcase {
 
         $this->assertFalse($DB->record_exists('workspace_discussion', ['id' => $discussion_id]));
     }
+
+    /**
+     * Given a discussion with more than one comments, expecting that the deletion
+     * of the discussion will also purge the comments as well if it was soft-deleted.
+     *
+     * @return void
+     */
+    public function test_soft_delete_discussion_that_has_comments(): void {
+        global $DB;
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace('Workspace 101', null, null, $user_one->id);
+
+        $workspace_id = $workspace->get_id();
+
+        // Create the first discussion
+        $discussion = $workspace_generator->create_discussion($workspace_id);
+        $discussion_id = $discussion->get_id();
+
+        member::join_workspace($workspace, $user_two->id);
+        $this->setUser($user_two);
+
+        /** @var totara_comment_generator $comment_generator */
+        $comment_generator = $generator->get_plugin_generator('totara_comment');
+
+        // Start creating 10 comments
+        for ($i = 0; $i < 5; $i++) {
+            $comment_generator->create_comment(
+                $discussion_id,
+                workspace::get_type(),
+                discussion::AREA,
+                null,
+                null,
+                $user_two->id
+            );
+        }
+
+        // Now delete the discussion.
+        discussion_helper::soft_delete_discussion($discussion, $user_one->id, discussion::REASON_DELETED_REPORTED);
+
+        $this->assertTrue($DB->record_exists('workspace_discussion', ['id' => $discussion_id]));
+        $this->assertFalse(
+            $DB->record_exists(
+                'totara_comment',
+                [
+                    'instanceid' => $discussion_id,
+                    'component' => workspace::get_type(),
+                    'area' => discussion::AREA
+                ]
+            )
+        );
+    }
 }

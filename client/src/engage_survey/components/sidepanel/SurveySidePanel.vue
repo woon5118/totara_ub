@@ -34,9 +34,12 @@
         :display="survey.resource.user.card_display"
         class="tui-surveySidePanel__profile"
       >
-        <template v-if="survey.owned" v-slot:drop-down-items>
-          <DropdownItem @click="openModalFromAction = true">
+        <template v-slot:drop-down-items>
+          <DropdownItem v-if="survey.owned" @click="openModalFromAction = true">
             {{ $str('deletesurvey', 'engage_survey') }}
+          </DropdownItem>
+          <DropdownItem v-else @click="reportSurvey">
+            {{ $str('reportsurvey', 'engage_survey') }}
           </DropdownItem>
         </template>
       </MiniProfileCard>
@@ -98,11 +101,13 @@ import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import Tabs from 'tui/components/tabs/Tabs';
 import Tab from 'tui/components/tabs/Tab';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
+import { notify } from 'tui/notifications';
 
 // GraphQL
 import getSurvey from 'engage_survey/graphql/get_survey';
 import deleteSurvey from 'engage_survey/graphql/delete_survey';
 import updateSurvey from 'engage_survey/graphql/update_survey';
+import createReview from 'totara_reportedcontent/graphql/create_review';
 
 export default {
   components: {
@@ -244,6 +249,52 @@ export default {
         data: { survey: survey },
       });
     },
+
+    /**
+     * Report the attached survey
+     * @returns {Promise<void>}
+     */
+    async reportSurvey() {
+      if (this.submitting) {
+        return;
+      }
+      this.submitting = true;
+      try {
+        let response = await this.$apollo
+          .mutate({
+            mutation: createReview,
+            refetchAll: false,
+            variables: {
+              component: 'engage_survey',
+              area: '',
+              item_id: this.resourceId,
+              url: window.location.href,
+            },
+          })
+          .then(response => response.data.review);
+
+        if (response.success) {
+          await notify({
+            duration: 2000,
+            message: this.$str('reported', 'totara_reportedcontent'),
+            type: 'success',
+          });
+        } else {
+          await notify({
+            duration: 2000,
+            message: this.$str('reported_failed', 'totara_reportedcontent'),
+            type: 'error',
+          });
+        }
+      } catch (e) {
+        await notify({
+          message: this.$str('error:reportsurvey', 'engage_survey'),
+          type: 'error',
+        });
+      } finally {
+        this.submitting = false;
+      }
+    },
   },
 };
 </script>
@@ -253,10 +304,16 @@ export default {
       "deletewarningmsg",
       "likesurvey",
       "removelikesurvey",
-      "deletesurvey"
+      "deletesurvey",
+      "reportsurvey",
+      "error:reportsurvey"
     ],
     "totara_engage": [
       "overview"
+    ],
+    "totara_reportedcontent": [
+      "reported",
+      "reported_failed"
     ]
   }
 </lang-strings>

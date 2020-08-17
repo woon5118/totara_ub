@@ -32,7 +32,9 @@
       :delete-able="deleteAble"
       :update-able="updateAble"
       :comment-able="commentAble"
+      :report-able="reportAble"
       :reacted="reacted"
+      :removed="removed"
       :edited="edited"
       :label-id="labelId"
       class="tui-discussionWithCommentCard__discussionCard"
@@ -116,6 +118,7 @@ export default {
     pinned: Boolean,
     reportAble: Boolean,
     reacted: Boolean,
+    removed: Boolean,
 
     totalComments: {
       type: [String, Number],

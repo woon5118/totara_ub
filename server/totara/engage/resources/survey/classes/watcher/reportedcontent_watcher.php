@@ -18,58 +18,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Cody Finegan <cody.finegan@totaralearning.com>
- * @package engage_article
+ * @package engage_survey
  */
 
-namespace engage_article\watcher;
+namespace engage_survey\watcher;
 
-use engage_article\totara_engage\resource\article;
-use totara_comment\comment;
+use engage_survey\totara_engage\resource\survey;
 use totara_reportedcontent\hook\get_review_context;
 use totara_reportedcontent\hook\remove_review_content;
 
 /**
  * Get the content & context of a resource/article comment
  *
- * @package engage_article\watcher
+ * @package engage_survey\watcher
  */
 final class reportedcontent_watcher {
     /**
-     * Articles can have either comments or the whole thing reported
+     * Whole surveys are reportable
      *
      * @param get_review_context $hook
      * @return void
      */
     public static function get_content(get_review_context $hook): void {
-        // Valid for articles only, for body & hook
-        $area = $hook->area;
-        $valid_areas = ['', 'comment', 'reply'];
-        if ('engage_article' !== $hook->component || !in_array($area, $valid_areas)) {
+        // Only valid for whole surveys
+        if ('engage_survey' !== $hook->component || '' !== $hook->area) {
             return;
         }
 
-        if ($hook->area === '') {
-            // It's the article itself
-            $article = article::from_resource_id($hook->item_id);
+        // It's the survey itself
+        $survey = survey::from_resource_id($hook->item_id);
 
-            $content = $article->get_name(FORMAT_PLAIN);
-            $format = FORMAT_PLAIN;
-            $time_created = $article->get_timecreated();
-            $user_id = $article->get_userid();
-        } else {
-            // It's a comment on an article
-            $comment = comment::from_id($hook->item_id);
-            $instance_id = $comment->get_instanceid();
+        $content = $survey->get_name(FORMAT_PLAIN);
+        $format = FORMAT_PLAIN;
+        $time_created = $survey->get_timecreated();
+        $user_id = $survey->get_userid();
 
-            $content = $comment->get_content();
-            $format = $comment->get_format();
-            $time_created = $comment->get_timecreated();
-            $user_id = $comment->get_userid();
-
-            $article = article::from_resource_id($instance_id);
-        }
-
-        $hook->context_id = $article->get_context()->id;
+        $hook->context_id = $survey->get_context()->id;
         $hook->content = $content;
         $hook->format = $format;
         $hook->time_created = $time_created;
@@ -82,11 +66,11 @@ final class reportedcontent_watcher {
      * @param remove_review_content $hook
      * @return void
      */
-    public static function delete_article(remove_review_content $hook): void {
+    public static function delete_survey(remove_review_content $hook): void {
         global $DB;
 
-        // Only valid for articles, comments are handled by the comment plugin
-        if ('engage_article' !== $hook->review->get_component() || '' !== $hook->review->get_area()) {
+        // Only valid for surveys
+        if ('engage_survey' !== $hook->review->get_component() || '' !== $hook->review->get_area()) {
             return;
         }
 
@@ -97,8 +81,9 @@ final class reportedcontent_watcher {
             return;
         }
 
-        $article = article::from_resource_id($hook->review->get_item_id());
-        $article->delete();
+        /** @var survey $survey */
+        $survey = survey::from_resource_id($hook->review->get_item_id());
+        $survey->delete();
 
         $hook->success = true;
     }

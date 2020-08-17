@@ -17,6 +17,11 @@ type totara_reportedcontent_review {
   area: String!
 }
 
+type totara_reportedcontent_review_create_status {
+  success: Boolean!
+  id: core_id
+}
+
 extend type Query {
   totara_reportedcontent_reviews(
     component: param_component!
@@ -38,10 +43,9 @@ extend type Mutation {
   totara_reportedcontent_create_review(
     component: param_component!
     area: param_area!
-    instance_id: param_integer!
     item_id: param_integer!
     url: param_url!
-  ): totara_reportedcontent_review
+  ): totara_reportedcontent_review_create_status!
 
   totara_reportedcontent_approve_review(
     review_id: param_integer!

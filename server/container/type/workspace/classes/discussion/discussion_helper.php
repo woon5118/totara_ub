@@ -24,6 +24,7 @@ namespace container_workspace\discussion;
 
 use container_workspace\event\discussion_created;
 use container_workspace\event\discussion_deleted;
+use container_workspace\event\discussion_soft_deleted;
 use container_workspace\event\discussion_updated;
 use container_workspace\exception\discussion_exception;
 use container_workspace\interactor\discussion\interactor as discussion_interactor;
@@ -84,7 +85,6 @@ final class discussion_helper {
     /**
      * @param discussion $discussion
      * @param int|null $actor_id
-     *
      * @return void
      */
     public static function delete_discussion(discussion $discussion, ?int $actor_id = null): void {
@@ -114,25 +114,41 @@ final class discussion_helper {
      * @return void
      */
     public static function do_delete_discussion(discussion $discussion): void {
-        $workspace_component = workspace::get_type();
-        $discussion_id = $discussion->get_id();
-
-        // Start deleting the comments first.
-        comment_helper::purge_area_comments(
-            $workspace_component,
-            discussion::AREA,
-            $discussion_id
-        );
-
-        // Then deleting the reactions that associated with this discussion.
-        reaction_helper::purge_area_reactions(
-            $workspace_component,
-            discussion::AREA,
-            $discussion_id
-        );
-
-        // Delete the discussion.
+        self::remove_related_content($discussion);
         $discussion->delete();
+    }
+
+    /**
+     * Soft-delete the provided discussion.
+     *
+     * @param discussion $discussion
+     * @param int|null $actor_id
+     * @param int|null $delete_reason
+     * @return void
+     */
+    public static function soft_delete_discussion(discussion $discussion, ?int $actor_id = null,
+                                                  ?int $delete_reason = null): void {
+        global $USER;
+
+        if (null === $actor_id || 0 === $actor_id) {
+            $actor_id = $USER->id;
+        }
+
+        $interactor = new discussion_interactor($discussion, $actor_id);
+        if (!$interactor->can_delete()) {
+            throw discussion_exception::on_delete();
+        }
+
+        if ($delete_reason === discussion::REASON_DELETED_REPORTED) {
+            // This is an administrative delete, therefore we need to remove any files & likes/reactions & comments
+            self::remove_related_content($discussion);
+        }
+
+        // Trigger event before deleting first.
+        $event = discussion_soft_deleted::from_discussion($discussion, $actor_id);
+        $event->trigger();
+
+        $discussion->soft_delete($delete_reason);
     }
 
     /**
@@ -166,5 +182,47 @@ final class discussion_helper {
         $event->trigger();
 
         return $discussion;
+    }
+
+    /**
+     * Delete any related items, including files and reactions.
+     *
+     * @param discussion $discussion
+     */
+    private static function remove_related_content(discussion $discussion): void {
+        global $CFG;
+
+        $discussion_id = $discussion->get_id();
+        $workspace_component = workspace::get_type();
+        $area = discussion::AREA;
+        $context_id = $discussion->get_workspace()->get_context()->id;
+
+        // Purge all the reactions of the discussion.
+        reaction_helper::purge_area_reactions(
+            $workspace_component,
+            $area,
+            $discussion_id
+        );
+
+        // Purge all the files that are uploaded to the discussion.
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+        $fs = get_file_storage();
+        $fs->delete_area_files(
+            $context_id,
+            $workspace_component,
+            $area,
+            $discussion_id
+        );
+
+        // Comments as well
+        $workspace_component = workspace::get_type();
+        $discussion_id = $discussion->get_id();
+
+        // Start deleting the comments first.
+        comment_helper::purge_area_comments(
+            $workspace_component,
+            discussion::AREA,
+            $discussion_id
+        );
     }
 }

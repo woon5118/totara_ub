@@ -55,7 +55,13 @@
         </div>
 
         <div
-          v-if="!edit"
+          v-if="removed"
+          class="tui-discussionCard__card__content__body--deleted"
+        >
+          <p>{{ $str('removed_discussion', 'container_workspace') }}</p>
+        </div>
+        <div
+          v-else-if="!edit"
           ref="discussion-content"
           class="tui-discussionCard__card__content__body"
           v-html="discussionContent"
@@ -132,6 +138,10 @@
           {{ $str('delete', 'moodle') }}
         </DropdownItem>
 
+        <DropdownItem v-if="reportAble" @click="reportDiscussion">
+          {{ $str('report_discussion', 'container_workspace') }}
+        </DropdownItem>
+
         <DropdownItem v-if="showDiscussionLink" :href="discussionUrl">
           {{ $str('view_full_discussion', 'container_workspace') }}
         </DropdownItem>
@@ -162,6 +172,7 @@ import WorkspaceWarningModal from 'container_workspace/components/modal/Workspac
 // GraphQL queries
 import updateDiscussionContent from 'container_workspace/graphql/update_discussion_content';
 import deleteDiscussion from 'container_workspace/graphql/delete_discussion';
+import createReview from 'totara_reportedcontent/graphql/create_review';
 
 export default {
   components: {
@@ -249,10 +260,13 @@ export default {
       type: Boolean,
       default: false,
     },
+
     commentAble: {
       type: Boolean,
       default: true,
     },
+
+    removed: Boolean,
 
     showDiscussionLink: {
       type: Boolean,
@@ -432,6 +446,52 @@ export default {
         this.submitting = false;
       }
     },
+
+    /**
+     * Report the attached discussion
+     * @returns {Promise<void>}
+     */
+    async reportDiscussion() {
+      if (this.submitting) {
+        return;
+      }
+      this.submitting = true;
+      try {
+        let response = await this.$apollo
+          .mutate({
+            mutation: createReview,
+            refetchAll: false,
+            variables: {
+              component: 'container_workspace',
+              area: 'discussion',
+              item_id: this.discussionId,
+              url: window.location.href,
+            },
+          })
+          .then(response => response.data.review);
+
+        if (response.success) {
+          await notify({
+            duration: 2000,
+            message: this.$str('reported', 'totara_reportedcontent'),
+            type: 'success',
+          });
+        } else {
+          await notify({
+            duration: 2000,
+            message: this.$str('reported_failed', 'totara_reportedcontent'),
+            type: 'error',
+          });
+        }
+      } catch (e) {
+        await notify({
+          message: this.$str('error:report_discussion', 'container_workspace'),
+          type: 'error',
+        });
+      } finally {
+        this.submitting = false;
+      }
+    },
   },
 };
 </script>
@@ -454,13 +514,19 @@ export default {
       "pinned_post",
       "delete_discussion_warning_msg",
       "delete_warning_title",
-      "error:delete_discussion"
+      "error:delete_discussion",
+      "report_discussion",
+      "error:report_discussion",
+      "removed_discussion"
     ],
-
     "moodle": [
       "edit",
       "delete",
       "confirm"
+    ],
+    "totara_reportedcontent": [
+      "reported",
+      "reported_failed"
     ]
   }
 </lang-strings>

@@ -28,6 +28,8 @@
         <FIELD NAME="time_pinned" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The time that this discussion was pinned. If it is null, then this dicussion is not pinned"/>
         <FIELD NAME="time_created" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="time_modified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="This is the field where we can tell that this discussion had been updated or not"/>
+        <FIELD NAME="time_deleted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="reason_deleted" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Reason why the discussion was deleted"/>
         <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="This is the field where we can tell it is being updated by other action such as comment on its own and replies of the comment. In short, a field that we can sort for option last updated"/>
       </FIELDS>
       <KEYS>

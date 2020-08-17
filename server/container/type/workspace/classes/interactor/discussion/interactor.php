@@ -83,6 +83,11 @@ final class interactor {
             return true;
         }
 
+        // If it's already been removed, we can't update
+        if ($this->is_removed()) {
+            return false;
+        }
+
         $workspace_id = $this->discussion->get_workspace_id();
         $workspace_interactor = workspace_interactor::from_workspace_id($workspace_id, $this->actor_id);
 
@@ -109,6 +114,11 @@ final class interactor {
      * @return bool
      */
     public function can_delete(): bool {
+        // If it's already been removed, we can't delete
+        if ($this->is_removed()) {
+            return false;
+        }
+
         if ($this->can_manage()) {
             return true;
         }
@@ -184,6 +194,11 @@ final class interactor {
      * @return bool
      */
     public function can_react(): bool {
+        // If it's already been removed, we can't react
+        if ($this->is_removed()) {
+            return false;
+        }
+
         // Creator of the post should not be able to like the post itself.
         $owner_id = $this->discussion->get_user_id();
         if ($owner_id == $this->actor_id) {
@@ -202,6 +217,11 @@ final class interactor {
      * @return bool
      */
     public function can_pin(): bool {
+        // If it's already been removed, we can't pin
+        if ($this->is_removed()) {
+            return false;
+        }
+
         if ($this->can_manage()) {
             return true;
         }
@@ -220,5 +240,35 @@ final class interactor {
     private function can_manage(): bool {
         $workspace_context = $this->discussion->get_workspace()->get_context();
         return has_capability('container/workspace:discussionmanage', $workspace_context, $this->actor_id);
+    }
+
+    /**
+     * Anyone except the owner can report this content (including non-members)
+     *
+     * @return bool
+     */
+    public function can_report(): bool {
+        // If it's already been removed, we can't report
+        if ($this->is_removed()) {
+            return false;
+        }
+
+        $owner_id = $this->discussion->get_user_id();
+        if ($owner_id == $this->actor_id) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * This discussion was removed via an admin action
+     * such as the inappropriate content report and not by
+     * the owner choosing the "delete" option.
+     *
+     * @return bool
+     */
+    public function is_removed(): bool {
+        return $this->discussion->get_reason_deleted() == discussion::REASON_DELETED_REPORTED;
     }
 }

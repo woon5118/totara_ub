@@ -23,10 +23,12 @@
 
 $watchers = [
     [
-        // Provide reportedcontent with the correct information
         'hookname' => '\totara_reportedcontent\hook\get_review_context',
-        'callback' => '\engage_article\watcher\reportedcontent_watcher::get_context',
-        'priority' => 100,
+        'callback' => ['\engage_article\watcher\reportedcontent_watcher', 'get_content']
+    ],
+    [
+        'hookname' => '\totara_reportedcontent\hook\remove_review_content',
+        'callback' => ['\engage_article\watcher\reportedcontent_watcher', 'delete_article']
     ],
     [
         'hookname' => '\editor_weka\hook\find_context',

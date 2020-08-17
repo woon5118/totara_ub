@@ -23,9 +23,12 @@
       :display="user.card_display"
       :no-border="true"
     >
-      <template v-if="article.owned" v-slot:drop-down-items>
-        <DropdownItem @click="openModalFromAction = true">
+      <template v-slot:drop-down-items>
+        <DropdownItem v-if="article.owned" @click="openModalFromAction = true">
           {{ $str('delete', 'moodle') }}
+        </DropdownItem>
+        <DropdownItem v-else @click="reportResource">
+          {{ $str('reportresource', 'engage_article') }}
         </DropdownItem>
       </template>
     </MiniProfileCard>
@@ -120,12 +123,14 @@ import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import ArticlePlaylistBox from 'engage_article/components/sidepanel/content/ArticlePlaylistBox';
 import Related from 'engage_article/components/sidepanel/Related';
+import { notify } from 'tui/notifications';
 
 // GraphQL queries
 import getArticle from 'engage_article/graphql/get_article';
 import updateArticle from 'engage_article/graphql/update_article';
 import deleteArticle from 'engage_article/graphql/delete_article';
 import engageAdvancedFeatures from 'totara_engage/graphql/advanced_features';
+import createReview from 'totara_reportedcontent/graphql/create_review';
 
 export default {
   components: {
@@ -284,6 +289,52 @@ export default {
         data: { article: article },
       });
     },
+
+    /**
+     * Report the attached resource
+     * @returns {Promise<void>}
+     */
+    async reportResource() {
+      if (this.submitting) {
+        return;
+      }
+      this.submitting = true;
+      try {
+        let response = await this.$apollo
+          .mutate({
+            mutation: createReview,
+            refetchAll: false,
+            variables: {
+              component: 'engage_article',
+              area: '',
+              item_id: this.resourceId,
+              url: window.location.href,
+            },
+          })
+          .then(response => response.data.review);
+
+        if (response.success) {
+          await notify({
+            duration: 2000,
+            message: this.$str('reported', 'totara_reportedcontent'),
+            type: 'success',
+          });
+        } else {
+          await notify({
+            duration: 2000,
+            message: this.$str('reported_failed', 'totara_reportedcontent'),
+            type: 'error',
+          });
+        }
+      } catch (e) {
+        await notify({
+          message: this.$str('error:reportresource', 'engage_article'),
+          type: 'error',
+        });
+      } finally {
+        this.submitting = false;
+      }
+    },
   },
 };
 </script>
@@ -296,11 +347,16 @@ export default {
       "timefivetoten",
       "timemorethanten",
       "likearticle",
-      "removelikearticle"
+      "removelikearticle",
+      "reportresource",
+      "error:reportresource"
     ],
-
     "moodle": [
       "delete"
+    ],
+    "totara_reportedcontent": [
+      "reported",
+      "reported_failed"
     ]
   }
 </lang-strings>

@@ -48,6 +48,7 @@
           :reply-id="reply.id"
           :content="reply.content"
           :comment-id="reply.commentid"
+          :component="component"
           :time-description="reply.timedescription"
           :user-full-name="reply.user.fullname"
           :user-profile-image-url="reply.user.profileimageurl"

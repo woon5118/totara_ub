@@ -45,6 +45,8 @@ query container_workspace_get_discussions(
       can_comment
       can_delete
       can_update
+      can_report
+      removed
       can_react
       reacted
     }

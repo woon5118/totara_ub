@@ -253,6 +253,11 @@ final class question {
      * @return bool
      */
     public function can_delete(int $userid): bool {
+        // Workaround for missing capability, will be removed
+        if (is_siteadmin()) {
+            return true;
+        }
+
         $creator = $this->question->userid;
 
         // Site admin can do anything.

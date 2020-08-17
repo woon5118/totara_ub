@@ -129,7 +129,7 @@ class rb_source_reportedcontent extends rb_base_source {
         $columnoptions = [];
 
         // Include some standard columns.
-        $this->add_core_user_columns($columnoptions, 'auser');
+        $this->add_core_user_columns($columnoptions, 'auser', 'creator');
         $this->add_totara_job_columns($columnoptions);
 
         // Report specific columns.
@@ -183,7 +183,8 @@ class rb_source_reportedcontent extends rb_base_source {
                 'outputformat' => 'html',
                 'displayfunc' => 'reportedcontent_content',
                 'extrafields' => array(
-                    'format' => "base.format",
+                    'format' => 'base.format',
+                    'area' => 'base.area',
                 ),
             ]
         );
@@ -240,7 +241,7 @@ class rb_source_reportedcontent extends rb_base_source {
     protected function define_filteroptions() {
         $filteroptions = array();
 
-        $this->add_core_user_filters($filteroptions);
+        $this->add_core_user_filters($filteroptions, 'creator');
         $this->add_core_user_filters($filteroptions, 'complainer');
         $this->add_core_user_filters($filteroptions, 'reviewer');
         $this->add_totara_job_filters($filteroptions, 'base', 'target_user_id');
@@ -285,7 +286,7 @@ class rb_source_reportedcontent extends rb_base_source {
      */
     protected function define_defaultcolumns() {
         $defaultcolumns = array();
-        $defaultcolumns[] = array('type' => 'user', 'value' => 'fullname');
+        $defaultcolumns[] = array('type' => 'creator', 'value' => 'fullname');
         $defaultcolumns[] = array('type' => 'reportedcontent', 'value' => 'content');
         $defaultcolumns[] = array('type' => 'reportedcontent', 'value' => 'url');
         $defaultcolumns[] = array('type' => 'reportedcontent', 'value' => 'time_created');
@@ -302,7 +303,7 @@ class rb_source_reportedcontent extends rb_base_source {
     protected function define_defaultfilters() {
         return array(
             array(
-                'type' => 'user',
+                'type' => 'creator',
                 'value' => 'fullname',
                 'advanced' => 0,
             ),

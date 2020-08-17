@@ -72,6 +72,12 @@ final class discussion_interactor implements type_resolver {
             case 'can_pin':
                 return $source->can_pin();
 
+            case 'can_report':
+                return $source->can_report();
+
+            case 'removed':
+                return $source->is_removed();
+
             default:
                 debugging("The field '{$field}' is not supported yet", DEBUG_DEVELOPER);
                 return null;

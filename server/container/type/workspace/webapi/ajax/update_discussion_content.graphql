@@ -32,6 +32,8 @@ mutation container_workspace_update_discussion_content(
             can_update
             can_react
             reacted
+            can_report
+            removed
         }
         edited
         comment_cursor

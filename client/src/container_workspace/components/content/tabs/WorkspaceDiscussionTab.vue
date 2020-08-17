@@ -66,6 +66,8 @@
           :delete-able="item.discussion_interactor.can_delete"
           :comment-able="item.discussion_interactor.can_comment"
           :react-able="item.discussion_interactor.can_react"
+          :report-able="item.discussion_interactor.can_report"
+          :removed="item.discussion_interactor.removed"
           :edited="item.edited"
           :aria-posinset="posInSet"
           :aria-setsize="setSize"

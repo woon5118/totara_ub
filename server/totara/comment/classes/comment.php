@@ -49,12 +49,6 @@ final class comment {
     public const REASON_DELETED_REPORTED = 1;
 
     /**
-     * (Replies only) Parent comment was deleted via the reportedcontent report
-     * @var int
-     */
-    public const REASON_DELETED_PARENT_REPORTED = 2;
-
-    /**
      * Using for comment instance that communicate with other plugins
      * @var string
      */

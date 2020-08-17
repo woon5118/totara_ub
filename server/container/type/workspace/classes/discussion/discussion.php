@@ -48,6 +48,15 @@ final class discussion {
     public const AREA = 'discussion';
 
     /**
+     * Comment was deleted via the reportedcontent report.
+     * Kept at 1 to be consistent with the same type of values in
+     * other components.
+     *
+     * @var int
+     */
+    public const REASON_DELETED_REPORTED = 1;
+
+    /**
      * @var workspace_discussion
      */
     private $entity;
@@ -305,10 +314,6 @@ final class discussion {
                                    ?int $actor_id = null): void {
         global $USER, $CFG;
 
-        if (empty($content)) {
-            throw new \coding_exception("Cannot update the discussion as content is empty");
-        }
-
         if (null === $content_format) {
             $content_format = $this->entity->content_format;
         }
@@ -369,6 +374,41 @@ final class discussion {
         );
 
         $this->entity->delete();
+    }
+
+    /**
+     * Delete the discussion, but keep the base discussion record.
+     * Used when it's deleted via the reportedcontent report.
+     *
+     * @param int $reason Status code indicating why the comment was deleted. Defaults to by user.
+     * @param int|null $time_deleted
+     * @return bool
+     */
+    public function soft_delete(int $reason = self::REASON_DELETED_USER, ?int $time_deleted = null): bool {
+        global $CFG;
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+
+        // Start deleting the files related to the discussion.
+        $fs = get_file_storage();
+        $context = \context_course::instance($this->entity->course_id);
+
+        $fs->delete_area_files(
+            $context->id,
+            workspace::get_type(),
+            discussion::AREA,
+            $this->entity->id
+        );
+
+        $this->entity->content = null;
+        $this->entity->content_format = FORMAT_PLAIN;
+
+        $this->entity->time_deleted = $time_deleted ?? time();
+        $this->entity->reason_deleted = $reason;
+
+        $this->entity->update_timestamps(false);
+        $this->entity->update();
+
+        return $this->is_soft_deleted();
     }
 
     /**
@@ -440,9 +480,9 @@ final class discussion {
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function get_content(): string {
+    public function get_content(): ?string {
         return $this->entity->content;
     }
 
@@ -573,6 +613,20 @@ final class discussion {
      */
     public function get_context(): \context {
         return $this->get_workspace()->get_context();
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_soft_deleted(): bool {
+        return !!$this->entity->time_deleted;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function get_reason_deleted(): ?int {
+        return $this->entity->reason_deleted;
     }
 
     /**

@@ -51,6 +51,7 @@ $string['numberwithinplaylist'] = 'Appears in {$a} playlist(s)';
 $string['pluginadministration'] = 'Resource administration';
 $string['pluginname'] = 'Article';
 $string['removelikearticle'] = 'Remove like for resource "{$a}"';
+$string['reportresource'] = 'Report content';
 $string['resource'] = "Resource";
 $string['resources'] = "Resources";
 $string['user_data_item_article'] = 'Resource';
@@ -72,6 +73,7 @@ $string['error:delete'] = "Cannot delete the resource";
 $string['error:sharecapability'] = 'You do not have the required capabilities to share this resource.';
 $string['error:shareprivate'] = 'This resource is viewable by only you. Change who can view this resource in order to share it.';
 $string['error:sharerestricted'] = 'This resource is not viewable by everyone and only the owner is allowed to share it.';
+$string['error:reportresource'] = "Cannot report the resource";
 $string['error:update'] = "Cannot update the resource";
 
 // Field names
