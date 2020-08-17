@@ -212,6 +212,7 @@ $string['topic'] = 'Topic';
 $string['type'] = 'Type';
 $string['unbookmark'] = 'Unbookmark';
 $string['userdataitembookmark'] = 'Bookmark';
+$string['userdataitemshare'] = 'Share';
 $string['usersresources'] = '{$a}\'s library';
 $string['viewprivate'] = 'Only you can view';
 $string['viewpublic'] = 'Everyone can view';

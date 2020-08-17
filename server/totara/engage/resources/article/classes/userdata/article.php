@@ -22,6 +22,7 @@
  */
 namespace engage_article\userdata;
 
+use engage_article\local\helper;
 use engage_article\local\loader;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\target_user;
@@ -39,7 +40,7 @@ final class article extends item {
      * @return array parameters of get_string($identifier, $component) to get full item name and optionally help.
      */
     public static function get_fullname_string() {
-        return ['pluginname', 'engage_article'];
+        return ['user_data_item_article', 'engage_article'];
     }
 
     /**
@@ -49,7 +50,7 @@ final class article extends item {
      * @return bool
      */
     public static function is_purgeable(int $userstatus): bool {
-        return ($userstatus === target_user::STATUS_DELETED);
+        return true;
     }
 
     /**
@@ -63,12 +64,11 @@ final class article extends item {
      * @return int result self::RESULT_STATUS_SUCCESS, self::RESULT_STATUS_ERROR or status::RESULT_STATUS_SKIPPED
      */
     protected static function purge(target_user $user, \context $context) {
-        $paginator = loader::load_all_article_of_user($user->id, 0);
-        $resources = $paginator->get_items()->all();
+        $paginator = loader::load_all_article_of_user((int)$user->id, 0);
+        $articles = $paginator->get_items()->all();
 
-        /** @var article_resource $resource */
-        foreach ($resources as $resource) {
-            $resource->delete();
+        foreach ($articles as $article) {
+            helper::purge_article($article);
         }
 
         return self::RESULT_STATUS_SUCCESS;
@@ -91,7 +91,7 @@ final class article extends item {
      * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, \context $context) {
-        $paginator = loader::load_all_article_of_user($user->id, 0);
+        $paginator = loader::load_all_article_of_user((int)$user->id, 0);
         $resources = $paginator->get_items()->all();
 
         $export = new export();
@@ -99,7 +99,12 @@ final class article extends item {
 
         /** @var article_resource $resource */
         foreach ($resources as $resource) {
-            $export->data[] = $resource->to_array();
+            $export->data[] = [
+                'name' => $resource->get_name(),
+                'content' => content_to_text($resource->get_content(), $resource->get_format()),
+                'timecreated' => $resource->get_timecreated(),
+                'timemodified' => $resource->get_timemodified()
+            ];
         }
 
         return $export;
@@ -122,7 +127,7 @@ final class article extends item {
      * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, \context $context): int {
-        $paginator = loader::load_all_article_of_user($user->id);
+        $paginator = loader::load_all_article_of_user((int)$user->id);
         return $paginator->get_total();
     }
 }

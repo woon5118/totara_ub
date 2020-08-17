@@ -22,7 +22,6 @@
  */
 namespace engage_survey\event;
 
-
 final class survey_updated extends base_survey_event {
     /**
      * @return void

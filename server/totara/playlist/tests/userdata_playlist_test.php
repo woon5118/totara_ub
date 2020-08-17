@@ -105,6 +105,9 @@ class totara_playlist_userdata_playlist_testcase extends advanced_testcase {
 
         foreach ($export->data as $record) {
             $this->assertArrayHasKey('Numberofresources', $record);
+            $this->assertArrayHasKey('name', $record);
+            $this->assertArrayHasKey('summary', $record);
+            $this->assertArrayHasKey('time_created', $record);
             $this->assertEquals(3, $record['Numberofresources']);
         }
     }

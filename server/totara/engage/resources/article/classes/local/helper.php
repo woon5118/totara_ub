@@ -22,7 +22,19 @@
  */
 namespace engage_article\local;
 
+use engage_article\totara_engage\resource\article;
+use totara_comment\comment_helper;
+use totara_engage\share\manager;
+use totara_reaction\reaction_helper;
+
 final class helper {
+    /**
+     * helper constructor.
+     */
+    private function __construct() {
+        // Prevent the construction directly.
+    }
+
     /**
      * @param \context $context
      * @return array
@@ -45,5 +57,59 @@ final class helper {
         }
 
         return $options;
+    }
+
+    /**
+     * As the method is for purging, we do not need capability check.
+     *
+     * @param article $article
+     */
+    public static function purge_article(article $article): void {
+        global $DB;
+
+        // Delete resource.
+        $DB->delete_records('engage_resource', ['id' => $article->get_id()]);
+
+        // Delete shares.
+        manager::delete($article->get_id(), article::get_resource_type());
+
+        // Deleting comments.
+        comment_helper::purge_area_comments(
+            article::get_resource_type(),
+            'comment',
+            $article->get_id()
+        );
+
+        // Deleting reaction from the article.
+        reaction_helper::purge_area_reactions(
+            article::get_resource_type(),
+            'media',
+            $article->get_id()
+        );
+
+        // Delete files.
+        self::delete_files($article);
+
+        // Delete the attached image file.
+        $processor = image_processor::make($article->get_id(), $article->get_context_id());
+        $processor->delete_existing_image();
+
+        // Delete itself.
+        $DB->delete_records('engage_article', ['id' => $article->get_instanceid()]);
+    }
+
+    /**
+     * @param article $article
+     * @return bool
+     */
+    public static function delete_files(article $article): bool {
+        $fs = get_file_storage();
+
+        return $fs->delete_area_files(
+            $article->get_context_id(),
+            article::get_resource_type(),
+            false,
+            $article->get_id()
+        );
     }
 }

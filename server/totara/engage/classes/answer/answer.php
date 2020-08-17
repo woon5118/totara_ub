@@ -75,7 +75,7 @@ abstract class answer {
      * @return bool
      */
     public function can_delete(int $userid): bool {
-        if ($userid == $this->userid) {
+        if ($userid == $this->userid || is_siteadmin($userid)) {
             // Same owner can delete an answer of self.
             return true;
         } else if ($this->question->can_delete($userid)) {

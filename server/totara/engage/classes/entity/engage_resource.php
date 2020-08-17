@@ -37,6 +37,7 @@ use totara_engage\access\access;
  * @property int        $timemodified
  * @property string     $extra
  * @property int        $countusage
+ * @property int        $contextid
  */
 final class engage_resource extends entity {
     /**

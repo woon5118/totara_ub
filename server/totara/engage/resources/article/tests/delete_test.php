@@ -27,26 +27,66 @@ use totara_engage\access\access;
 use totara_engage\exception\resource_exception;
 use totara_engage\timeview\time_view;
 use totara_reaction\reaction_helper;
+use core\json_editor\node\image;
 
 class engage_article_delete_testcase extends advanced_testcase {
     /**
      * @return void
      */
     public function test_delete_article(): void {
-        global $DB;
+        global $DB, $CFG, $USER;
 
         $generator = $this->getDataGenerator();
         $user = $generator->create_user();
         $this->setUser($user);
 
-        $data = [
-            'name' => 'hello world',
-            'content' => 'xx!xxoojfifwq kopdqw d[wq kfgop]k qfpgo[q',
-            'timeview' => time_view::LESS_THAN_FIVE,
-            'access' => access::PUBLIC
+        $doc = [
+            'type' => 'doc',
+            'content' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' =>  'This is an article'
+                        ]
+                    ],
+                ]
+            ]
         ];
 
-        $resource = article::create($data);
+        $resource = article::create(
+            [
+                'format' => FORMAT_JSON_EDITOR,
+                'content' => json_encode($doc),
+                'timeview' => time_view::LESS_THAN_FIVE,
+                'draft_id' => 25,
+                'name' => 'Is this random enuf ?'
+            ],
+            $USER->id
+        );
+
+        // Creating a draft file.
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+
+        $fs = get_file_storage();
+        $record = new \stdClass();
+        $record->contextid = $resource->get_context_id();
+        $record->component = 'user';
+        $record->filearea = 'draft';
+        $record->itemid = 42;
+        $record->filename = 'admin.png';
+        $record->userid = $USER->id;
+        $record->filepath = '/';
+
+        $file = $fs->create_file_from_string($record, 'hello world');
+        $doc['content'][] = image::create_raw_node_from_image($file);
+
+        $resource->update([
+            'content' => json_encode($doc),
+            'draft_id' => 42,
+            'access' => access::PRIVATE
+        ]);
 
         /** @var totara_comment_generator $comment_generator */
         $comment_generator = $generator->get_plugin_generator('totara_comment');
@@ -93,12 +133,15 @@ class engage_article_delete_testcase extends advanced_testcase {
             'articleid' => $resource->get_instanceid()
         ];
 
+        $fs = get_file_storage();
 
         $id = $comment->get_id();
         $reply_id = $reply->get_id();
         $reaction_id = $reaction->get_id();
         $reaction_comment_id = $reaction_comment->get_id();
         $reaction_reply_id = $reaction_reply->get_id();
+        $context_id = $resource->get_context_id();
+        $resource_id = $resource->get_id();
 
         $this->assertTrue($DB->record_exists('totara_comment', ['id' => $id]));
         $this->assertTrue($DB->record_exists('totara_comment', ['id' => $reply_id]));
@@ -106,9 +149,11 @@ class engage_article_delete_testcase extends advanced_testcase {
         $this->assertTrue($DB->record_exists('reaction', ['id' => $reaction_comment_id]));
         $this->assertTrue($DB->record_exists('reaction', ['id' => $reaction_reply_id]));
         $this->assertTrue($DB->record_exists_sql($sql, $params));
+        $this->assertNotNull($fs->get_file($context_id, 'enegage_article', 'image', $resource_id, '/', 'admin.png'));
 
         $resource->delete();
 
+        $this->assertFalse($fs->get_file($context_id, 'enegage_article', 'image', $resource_id, '/', 'admin.png'));
         $this->assertFalse($DB->record_exists_sql($sql, $params));
         $this->assertFalse($DB->record_exists('totara_comment', ['id' => $id]));
         $this->assertFalse($DB->record_exists('totara_comment', ['id' => $reply_id]));

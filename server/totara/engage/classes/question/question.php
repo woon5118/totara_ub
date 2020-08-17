@@ -255,6 +255,11 @@ final class question {
     public function can_delete(int $userid): bool {
         $creator = $this->question->userid;
 
+        // Site admin can do anything.
+        if (is_siteadmin($userid)) {
+            return true;
+        }
+
         if ($creator != $userid) {
             return false;
         }

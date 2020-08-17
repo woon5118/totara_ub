@@ -26,7 +26,6 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 $observers = [
-
     [
         'eventname' => \engage_article\event\article_created::class,
         'callback'  => 'engage_article\totara_catalog\article::object_update_observer',
@@ -75,4 +74,8 @@ $observers = [
         'eventname' => '\totara_reaction\event\reaction_created',
         'callback' => ['engage_article\observer\reaction_observer', 'on_reaction_created']
     ],
+    [
+        'eventname' => '\engage_article\event\article_viewed',
+        'callback' => ['engage_article\observer\article_observer', 'on_view_created']
+    ]
 ];

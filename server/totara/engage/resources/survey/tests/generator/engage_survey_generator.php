@@ -52,6 +52,7 @@ final class engage_survey_generator extends component_generator_base implements 
     public function create_survey(?string $question = null, array $options = [],
                                   int $answertype = answer_type::MULTI_CHOICE,
                                   $parameters = []): survey {
+
         if (null === $question) {
             $question = $this->generate_question();
         }
@@ -68,6 +69,11 @@ final class engage_survey_generator extends component_generator_base implements 
                 'options' => $options
             ]
         ];
+
+        if (isset($parameters['userid'])) {
+            $context = \context_user::instance($parameters['userid']);
+            $data['contextid'] = $context->id;
+        }
 
         /** @var survey $survey */
         $survey = survey::create($data, $parameters['userid'] ?? null);

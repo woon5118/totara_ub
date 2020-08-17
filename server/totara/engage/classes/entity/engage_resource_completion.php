@@ -18,20 +18,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Qingyang Liu <qingyang.liu@totaralearning.com>
- * @package engage_survey
+ * @package totara_engage
  */
+namespace totara_engage\entity;
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+use core\orm\entity\entity;
+use totara_engage\repository\resource_completion;
+
+/**
+ * @property int        $id
+ * @property int        $resourceid
+ * @property int        $userid
+ * @property int        $timecreated
+ */
+final class engage_resource_completion extends entity {
+    /**
+     * @var string
+     */
+    public const TABLE = 'engage_resource_completion';
+
+    /**
+     * @var string
+     */
+    public const CREATED_TIMESTAMP = 'timecreated';
+
+    /**
+     * @return string
+     */
+    public static function repository_class_name(): string {
+        return resource_completion::class;
+    }
 }
-
-$observers = [
-    [
-        'eventname' => '\totara_reaction\event\reaction_created',
-        'callback' => ['engage_survey\observer\reaction_observer', 'on_reaction_created']
-    ],
-    [
-        'eventname' => '\engage_survey\event\vote_created',
-        'callback' => ['engage_survey\observer\survey_observer', 'on_vote_created']
-    ]
-];

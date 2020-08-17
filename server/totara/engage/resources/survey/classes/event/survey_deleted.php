@@ -22,7 +22,6 @@
  */
 namespace engage_survey\event;
 
-use engage_survey\event\base_survey_event;
 
 final class survey_deleted extends base_survey_event {
     /**

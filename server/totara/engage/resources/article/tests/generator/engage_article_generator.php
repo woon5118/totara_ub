@@ -42,6 +42,8 @@ final class engage_article_generator extends component_generator_base implements
      * @return article
      */
     public function create_article($parameters = []): article {
+        global $USER;
+
         if ($parameters instanceof \stdClass) {
             $parameters = get_object_vars($parameters);
         }
@@ -59,14 +61,21 @@ final class engage_article_generator extends component_generator_base implements
         if (isset($parameters['userid'])) {
             $userid = $parameters['userid'];
             unset($parameters['userid']);
+        } else {
+            $userid = $USER->id;
         }
 
         if (!isset($parameters['content'])) {
             $parameters['content'] = "This is content";
         }
 
-        if (!isset($args['timeview'])) {
+        if (!isset($parameters['timeview'])) {
             $parameters['timeview'] = time_view::LESS_THAN_FIVE;
+        }
+
+        if (!isset($parameters['contextid'])) {
+            $context = \context_user::instance($userid);
+            $parameters['contextid'] = $context->id;
         }
 
         /** @var article $article */

@@ -2,7 +2,7 @@
 /**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
- * @package engage_article
+ * @author Qingyang Liu <qingyang.liu@totaralearning.com>
+ * @package engage_survey
  */
-namespace engage_article\local;
+
+namespace engage_survey\local;
 
 use core\orm\paginator;
 use core\orm\query\builder;
-use engage_article\totara_engage\resource\article;
+use engage_survey\entity\survey as entity;
+use engage_survey\totara_engage\resource\survey;
 use totara_engage\entity\engage_resource;
-use engage_article\entity\article as entity;
 
 final class loader {
     /**
@@ -38,15 +39,15 @@ final class loader {
 
     /**
      * @param int $userid
-     * @param int $page     Setting $page to zero means that it will query all the record.
+     * @param int $page
      *
      * @return paginator
      */
-    public static function load_all_article_of_user(int $userid, int $page = 1): paginator {
+    public static function load_all_survey_of_user(int $userid, int $page = 1): paginator {
         $builder = builder::table(engage_resource::TABLE, 'er');
-        $builder->join([entity::TABLE, 'a'], 'er.instanceid', 'a.id');
+        $builder->join([entity::TABLE, 's'], 'er.instanceid', 's.id');
 
-        $builder->where('er.resourcetype', article::get_resource_type());
+        $builder->where('er.resourcetype', survey::get_resource_type());
         $builder->where('er.userid', $userid);
         $builder->results_as_arrays();
 
@@ -63,10 +64,9 @@ final class loader {
                 'er.timemodified',
                 'er.extra',
                 'er.contextid',
-
-                // Article fields.
-                'a.content',
-                'a.format'
+                
+                // Survey fields.
+                's.timeexpired'
             ]
         );
 
@@ -76,10 +76,9 @@ final class loader {
 
                 $entity = new entity();
                 $entity->id = $resource->instanceid;
-                $entity->content = $record['content'];
-                $entity->format = $record['format'];
-
-                return article::from_entity($entity, $resource);
+                $entity->timeexpired = $record['timeexpired'];
+                
+                return survey::from_entity($entity, $resource);
             }
         );
 

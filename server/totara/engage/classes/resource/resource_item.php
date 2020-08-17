@@ -117,6 +117,9 @@ abstract class resource_item implements accessible, shareable {
         $record->name = $data['name'];
         $record->userid = $userid;
 
+        $context = \context_user::instance($userid);
+        $record->contextid = $context->id;
+
         // By defaullt, all the resource should be private.
         $record->access = access::PRIVATE;
         if (isset($data['access'])) {
@@ -466,6 +469,13 @@ abstract class resource_item implements accessible, shareable {
      */
     public function get_context(): \context {
         return \context_user::instance($this->resource->userid);
+    }
+
+    /**
+     * @return int
+     */
+    public function get_context_id(): int {
+        return $this->resource->contextid;
     }
 
     /**

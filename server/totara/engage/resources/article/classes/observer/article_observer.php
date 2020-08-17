@@ -26,13 +26,15 @@ use engage_article\event\article_created;
 use engage_article\event\article_updated;
 use engage_article\totara_engage\resource\article;
 use totara_core\content\content_handler;
+use engage_article\event\article_viewed;
+use totara_engage\resource\resource_completion;
 
 /**
- * Observer for comment component
+ * Observer for article component
  */
 final class article_observer {
     /**
-     * comment_observer constructor.
+     * article_observer constructor.
      */
     private function __construct() {
         // Preventing this class from construction
@@ -72,5 +74,28 @@ final class article_observer {
             $article->get_context()->id,
             $article->get_url()
         );
+    }
+
+    /**
+     * @param article_viewed $event
+     */
+    public static function on_view_created(article_viewed $event): void {
+        global $DB;
+
+        $actor_id = $event->get_user_id();
+        $others = $event->other;
+        $owner_id = $others['owner_id'];
+        $resource_id = $event->get_item_id();
+
+        $instance = resource_completion::instance($resource_id, $owner_id);
+
+        $transaction = $DB->start_delegated_transaction();
+        if ($instance->can_create($actor_id)) {
+            $instance->create();
+        }
+        $transaction->allow_commit();
+
+        // Clear instance.
+        unset($instance);
     }
 }

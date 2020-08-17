@@ -94,7 +94,7 @@ final class article extends resource_item implements time_viewable {
      *
      * @return article
      */
-    public static function from_instances(article_entity $article, engage_resource $entity): article {
+    public static function from_entity(article_entity $article, engage_resource $entity): article {
         $resourcetype = static::get_resource_type();
         if ($resourcetype != $entity->resourcetype) {
             throw new \coding_exception("Invalid resource record that is used for different component");
@@ -244,9 +244,14 @@ final class article extends resource_item implements time_viewable {
             debugging("Reaction not being deleted from Sidepanel", DEBUG_DEVELOPER);
         }
 
-        // Delete the attached image file
+        $result = helper::delete_files($this);
+        if (!$result) {
+            debugging("Files not being deleted from {$this->get_name()}", DEBUG_DEVELOPER);
+        }
+
+        // Delete the attached image file.
         $resourceid = $this->get_id();
-        $contextid = $this->get_context()->id;
+        $contextid = $this->get_context_id();
         $processor = image_processor::make($resourceid, $contextid);
         $processor->delete_existing_image();
 

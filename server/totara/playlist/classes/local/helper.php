@@ -23,6 +23,7 @@
 namespace totara_playlist\local;
 
 use totara_comment\comment_helper;
+use totara_engage\entity\rating;
 use totara_engage\rating\rating_manager;
 use totara_engage\resource\resource_factory;
 use totara_engage\share\manager as share_manager;
@@ -58,11 +59,13 @@ final class helper {
     }
 
     /**
-     *  It's for purging playlist and all related to playlist.
+     * It's for purging playlist and all related to playlist.
      *
      * @param playlist $playlist
+     * @param int $user_id
+     * @return void
      */
-    public static function purge_playlist(playlist $playlist): void {
+    public static function purge_playlist(playlist $playlist, int $user_id): void {
         global $DB;
 
         // Decrement usage.
@@ -101,6 +104,9 @@ final class helper {
         /** @var playlist_resource_repository $repo */
         $repo = playlist_resource::repository();
         $repo->delete_resources_by_playlistid($playlist->get_id());
+
+        // Delete rating made by that user.
+        $DB->delete_records(rating::TABLE, ['userid' => $user_id]);
 
         //Delete itself.
         $DB->delete_records('playlist', ['id' => $playlist->get_id()]);

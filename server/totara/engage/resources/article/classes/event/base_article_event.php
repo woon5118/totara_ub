@@ -62,7 +62,8 @@ abstract class base_article_event extends base implements interaction_event{
             'userid' => $actorid,
             'other' => [
                 'name' => $resource->get_name(false),
-                'resourceid'=> $resource->get_id()
+                'resourceid' => $resource->get_id(),
+                'owner_id' => $resource->get_userid()
             ]
         ];
 

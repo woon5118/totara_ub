@@ -20,18 +20,29 @@
  * @author Qingyang Liu <qingyang.liu@totaralearning.com>
  * @package engage_survey
  */
+namespace engage_survey\event;
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+final class vote_created extends base_survey_event {
+    /**
+     * @return void
+     */
+    protected function init(): void {
+        parent::init();
+        $this->data['crud'] = 'c';
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
+    }
+
+    /**
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('surveyvoted', 'engage_survey');
+    }
+
+    /**
+     * @return string
+     */
+    public function get_interaction_type(): string {
+        return 'voting';
+    }
 }
-
-$observers = [
-    [
-        'eventname' => '\totara_reaction\event\reaction_created',
-        'callback' => ['engage_survey\observer\reaction_observer', 'on_reaction_created']
-    ],
-    [
-        'eventname' => '\engage_survey\event\vote_created',
-        'callback' => ['engage_survey\observer\survey_observer', 'on_vote_created']
-    ]
-];

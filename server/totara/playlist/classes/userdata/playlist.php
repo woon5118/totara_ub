@@ -78,7 +78,7 @@ final class playlist extends item {
         $playlists = $repo->load_models_by_userid((int)$user->id);
 
         foreach ($playlists as $playlist) {
-            helper::purge_playlist($playlist);
+            helper::purge_playlist($playlist, (int)$user->id);
         }
 
         return self::RESULT_STATUS_SUCCESS;
@@ -101,6 +101,9 @@ final class playlist extends item {
         $repo = playlist_resource::repository();
         foreach ($playlists as $playlist) {
             $export->data[] = [
+                'name' => $playlist->name,
+                'summary' => content_to_text($playlist->summary, $playlist->summaryformat),
+                'time_created' => $playlist->timecreated,
                 'Numberofresources' => $repo->get_total_of_resources($playlist->id)
             ];
         }

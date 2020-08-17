@@ -121,6 +121,29 @@ final class survey extends resource_item {
 
         return $resource;
     }
+    
+    /**
+     * @param survey_entity $survey
+     * @param engage_resource $entity
+     * @return survey
+     */
+    public static function from_entity(survey_entity $survey, engage_resource $entity): survey {
+        $resourcetype = static::get_resource_type();
+        if ($resourcetype != $entity->resourcetype) {
+            throw new \coding_exception("Invalid resource record that is used for different component");
+        }
+        
+        if (!$entity->exists() || !$survey->exists()) {
+            throw new \coding_exception("Either resource record or the survey record is not being populated");
+        } else if ($entity->instanceid != $survey->id) {
+            throw new \coding_exception("Resource record is not meant for the survey");
+        }
+        
+        $resource = new static($entity);
+        $resource->survey = $survey;
+        
+        return $resource;
+    }
 
     /**
      * @param array           $data
