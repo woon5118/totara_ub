@@ -617,7 +617,21 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
      * @dataProvider data_messaging_extension_search
      */
     public function test_messaging_extension_search(bool $group, bool $forcelogin, bool $publishimage, bool $hasimage) {
-        global $CFG;
+        global $CFG, $DB;
+        if ($DB->get_dbfamily() == 'mssql') {
+            $this->markTestSkipped("Skipped as catalog is not indexed properly in phpunit environment.");
+
+            // To check that word 'art' present is in catalog:
+            // var_dump($DB->get_records_sql("SELECT id, ftshigh FROM {catalog}", []));
+            // To check that it cannot be found:
+            // var_dump($DB->get_records_sql('SELECT * FROM FREETEXTTABLE({catalog},ftshigh, \'art\',LANGUAGE \'English\')', []));die();
+            //
+            // Run same queries in mssql client on phpunit tables and data will be found.
+            // Repopulating indexes didn't help:
+            // $DB->execute("ALTER FULLTEXT CATALOG {$prefix} search_catalog REBUILD");
+            // $DB->execute('ALTER FULLTEXT INDEX ON {catalog} START FULL POPULATION');
+        }
+
         $CFG->forcelogin = $forcelogin;
         $CFG->publishgridcatalogimage = $publishimage;
 

@@ -66,6 +66,13 @@ class totara_msteams_catalog_helper_testcase extends advanced_testcase {
     }
 
     public function test_search() {
+        global $DB;
+
+        if ($DB->get_dbfamily() == 'mssql') {
+            // See my_router_test::test_messaging_extension_search()
+            $this->markTestSkipped("Skipped as catalog is not indexed properly in phpunit environment.");
+        }
+
         // We don't need thorough testing as this function is just a thin wrapper around the catalogue interface.
 
         $items = catalog_helper::search(null, 0, 3);

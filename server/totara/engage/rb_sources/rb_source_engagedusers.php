@@ -26,17 +26,15 @@ defined('MOODLE_INTERNAL') || die();
 use container_workspace\totara_engage\share\recipient\library;
 use totara_core\advanced_feature;
 use totara_engage\access\access;
-use totara_job\rb\source\report_trait;
 
 /**
  * Engaged users is management interface for engaged users
  */
 class rb_source_engagedusers extends rb_base_source {
-    use report_trait;
+    use totara_job\rb\source\report_trait;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
-        global $DB;
-
+        global $CFG;
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
         }
@@ -44,19 +42,11 @@ class rb_source_engagedusers extends rb_base_source {
         $this->globalrestrictionset = $globalrestrictionset;
 
         // Apply global user restrictions.
-        $this->add_global_report_restriction_join('base', 'userid');
+        $this->add_global_report_restriction_join('base', 'id');
 
         $this->usedcomponents[] = 'totara_engage';
 
-        $this->base = '(SELECT '.$DB->sql_group_concat('c.fullname', ' , ' ).' 
-        AS workspace, u.id, u.firstname, u.lastname,
-        '.$DB->sql_group_concat('c.id', ',' ).' AS courseids 
-        FROM {user} u 
-        LEFT JOIN {user_enrolments} ue ON ue.userid = u.id
-        LEFT JOIN {enrol} e ON ue.enrolid = e.id
-        LEFT JOIN {course} c ON c.id = e.courseid 
-        GROUP BY u.id
-        )';
+        $this->base = '(SELECT id FROM {user})';
 
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -72,7 +62,7 @@ class rb_source_engagedusers extends rb_base_source {
 
         $this->sourcewhere = 'base.id <> :userid';
         // Get rid of guest user.
-        $this->sourceparams = ['userid' => 1];
+        $this->sourceparams = ['userid' => $CFG->siteguest];
         parent::__construct();
     }
 
@@ -88,7 +78,26 @@ class rb_source_engagedusers extends rb_base_source {
      * @return array
      */
     protected function define_joinlist() {
+        global $DB;
         $joinlist = [];
+
+        $joinlist[] = new rb_join(
+            'workspacelist',
+            'LEFT',
+            '(
+                SELECT
+                ue.userid, 
+                ' . $DB->sql_group_concat($DB->sql_cast_2char('c.fullname'), ", <br/>") . ' AS workspaces,
+                ' . $DB->sql_group_concat('c.id', ',') . ' AS courseids
+                FROM {user_enrolments} ue 
+                LEFT JOIN {enrol} e ON ue.enrolid = e.id
+                LEFT JOIN {course} c ON c.id = e.courseid 
+                WHERE ue.status = 0 AND e.status = 0
+                GROUP BY ue.userid
+            )',
+            'workspacelist.userid = base.id',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE
+        );
 
         $this->add_core_user_tables($joinlist, 'base','id');
 
@@ -99,34 +108,35 @@ class rb_source_engagedusers extends rb_base_source {
      * @return array
      */
     protected function define_columnoptions() {
+        global $DB;
         $columnoptions = [];
 
         $has_resources = advanced_feature::is_enabled('engage_resources');
         $has_workspaces = advanced_feature::is_enabled('container_workspace');
 
-        $columnoptions[] = new rb_column_option(
-            'engagedusers',
-            'creator',
-            get_string('creator', 'rb_source_engagedusers'),
-            "base.id",
-            [
-                'displayfunc' => 'engagedusers_namelink',
-                'dbdatatype' => 'char',
-                'outputformat' => 'html',
-                'extrafields' => [
-                    'firstname' => 'base.firstname',
-                    'lastname' => 'base.lastname'
-                ]
-            ]
-        );
+        $this->add_core_user_columns($columnoptions);
 
         if ($has_resources) {
+            $usednamefields = totara_get_all_user_name_fields_join('auser');
+            $columnoptions[] = new \rb_column_option(
+                'engagedusers',
+                'creator',
+                get_string('creator', 'rb_source_engagedusers'),
+                $DB->sql_concat_join("' '", $usednamefields),
+                [
+                    'joins' => 'auser',
+                    'displayfunc' => 'engagedusers_namelink',
+                    'extrafields' => array_merge(['id' => "base.id", 'deleted' => "auser.deleted"], $usednamefields),
+                    'outputformat' => 'html'
+                ]
+            );
+
             $columnoptions[] = new rb_column_option(
                 'engagedusers',
                 'created_resource',
                 get_string('createdresource', 'rb_source_engagedusers'),
                 "(SELECT COUNT(r.id) FROM {engage_resource} r
-            WHERE r.userid = base.id)",
+                WHERE r.userid = base.id)",
                 [
                     'displayfunc' => 'plaintext',
                     'dbdatatype' => 'text',
@@ -140,7 +150,7 @@ class rb_source_engagedusers extends rb_base_source {
                 'public_resource',
                 get_string('publicresource', 'rb_source_engagedusers'),
                 "(SELECT COUNT(r.id) FROM {engage_resource} r
-            WHERE r.userid = base.id AND r.access = '{$public}')",
+                WHERE r.userid = base.id AND r.access = '{$public}')",
                 [
                     'displayfunc' => 'plaintext',
                     'dbdatatype' => 'text',
@@ -154,7 +164,7 @@ class rb_source_engagedusers extends rb_base_source {
                 'private_resource',
                 get_string('privateresource', 'rb_source_engagedusers'),
                 "(SELECT COUNT(r.id) FROM {engage_resource} r
-            WHERE r.userid = base.id AND r.access = '{$private}')",
+                WHERE r.userid = base.id AND r.access = '{$private}')",
                 [
                     'displayfunc' => 'plaintext',
                     'dbdatatype' => 'text',
@@ -168,7 +178,7 @@ class rb_source_engagedusers extends rb_base_source {
                 'restricted_resource',
                 get_string('restrictedresource', 'rb_source_engagedusers'),
                 "(SELECT COUNT(r.id) FROM {engage_resource} r
-            WHERE r.userid = base.id AND r.access = '{$restricted}')",
+                WHERE r.userid = base.id AND r.access = '{$restricted}')",
                 [
                     'displayfunc' => 'plaintext',
                     'dbdatatype' => 'text',
@@ -182,11 +192,13 @@ class rb_source_engagedusers extends rb_base_source {
                 'engagedusers',
                 'created_comment',
                 get_string('createdcomment', 'rb_source_engagedusers'),
-                "(SELECT COUNT(c.id) FROM {totara_comment} c
-            INNER JOIN {engage_resource} r ON c.instanceid = r.id
-            WHERE r.userid <> base.id AND c.userid = base.id
-            AND (c.component = '{$playlist}'
-            OR c.component = '{$artcle}'))",
+                "(
+                SELECT COUNT(c.id) FROM {totara_comment} c
+                INNER JOIN {engage_resource} r ON c.instanceid = r.id
+                WHERE r.userid <> base.id AND c.userid = base.id
+                AND 
+                (c.component = '{$playlist}'OR c.component = '{$artcle}')
+                )",
                 [
                     'displayfunc' => 'plaintext',
                     'dbdatatype' => 'text',
@@ -198,8 +210,10 @@ class rb_source_engagedusers extends rb_base_source {
                 'engagedusers',
                 'created_playlist',
                 get_string('createdplaylist', 'rb_source_engagedusers'),
-                "(SELECT COUNT(p.id) FROM {playlist} p
-            WHERE p.userid = base.id)",
+                "(
+                SELECT COUNT(p.id) FROM {playlist} p
+                WHERE p.userid = base.id
+                )",
                 [
                     'displayfunc' => 'plaintext',
                     'dbdatatype' => 'text',
@@ -216,12 +230,12 @@ class rb_source_engagedusers extends rb_base_source {
                 'resource_in_workspace',
                 get_string('resourceinworkspace', 'rb_source_engagedusers'),
                 "(SELECT COUNT(r.id)
-            FROM {engage_share_recipient} r
-            INNER JOIN {engage_share} s
-            ON s.id = r.shareid
-            WHERE r.sharerid = base.id
-            AND (r.area = '{$area}'
-            OR r.component = '{$component}'))",
+                FROM {engage_share_recipient} r
+                INNER JOIN {engage_share} s
+                ON s.id = r.shareid
+                WHERE r.sharerid = base.id
+                AND (r.area = '{$area}'
+                OR r.component = '{$component}'))",
                 [
                     'displayfunc' => 'plaintext',
                     'dbdatatype' => 'text',
@@ -236,9 +250,9 @@ class rb_source_engagedusers extends rb_base_source {
                 'created_workspace',
                 get_string('createdworkspace', 'rb_source_engagedusers'),
                 "(SELECT COUNT(c.id) FROM {course} c
-            INNER JOIN {workspace} o
-            ON c.id = o.course_id
-            WHERE o.user_id = base.id)",
+                INNER JOIN {workspace} o
+                ON c.id = o.course_id
+                WHERE o.user_id = base.id)",
                 [
                     'displayfunc' => 'plaintext',
                     'dbdatatype' => 'text',
@@ -250,19 +264,19 @@ class rb_source_engagedusers extends rb_base_source {
                 'engagedusers',
                 'memberofworkspace',
                 get_string('memberworkspaces', 'rb_source_engagedusers'),
-                'base.workspace',
+                'workspacelist.workspaces',
                 [
+                    'joins' => 'workspacelist',
                     'displayfunc' => 'engagedusers_workspacelink',
                     'dbdatatype' => 'text',
                     'outputformat' => 'html',
                     'extrafields' => [
-                        'ids' => 'base.courseids'
+                        'ids' => 'workspacelist.courseids'
                     ]
                 ]
             );
         }
 
-        $this->add_core_user_columns($columnoptions);
         return $columnoptions;
     }
 
@@ -386,7 +400,7 @@ class rb_source_engagedusers extends rb_base_source {
                 'type' => 'user',
                 'value' => 'fullname',
                 'advanced' => 0
-            ]
+            ],
         ];
     }
 

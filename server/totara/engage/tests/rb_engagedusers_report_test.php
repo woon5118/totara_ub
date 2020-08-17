@@ -266,7 +266,7 @@ class totara_engage_rb_engagedusers_report_testcase extends advanced_testcase {
         $this->assertCount(4, $records);
 
         foreach ($records as $record) {
-            if ($record->engagedusers_creator === $user1->id) {
+            if ($record->id === $user1->id) {
                 // 4 artciles and 2 surveys.
                 $this->assertEquals(6, $record->engagedusers_created_resource);
 
@@ -295,7 +295,7 @@ class totara_engage_rb_engagedusers_report_testcase extends advanced_testcase {
                 // User1 created 3 workspaces, so he has to be a member of 3 workspaces.
                 $this->assertNotEmpty($record->engagedusers_memberofworkspace);
                 $this->assertCount(3, explode(',', $record->engagedusers_memberofworkspace));
-            } else if ($record->engagedusers_creator === $user2->id) {
+            } else if ($record->id === $user2->id) {
                 // 4 artciles and 2 surveys.
                 $this->assertEquals(6, $record->engagedusers_created_resource);
 
@@ -321,7 +321,7 @@ class totara_engage_rb_engagedusers_report_testcase extends advanced_testcase {
                 // User2 created 2 workspaces, so he has to be a member of 2 workspaces.
                 $this->assertNotEmpty($record->engagedusers_memberofworkspace);
                 $this->assertCount(2, explode(',', $record->engagedusers_memberofworkspace));
-            } else if ($record->engagedusers_creator === $user3->id) {
+            } else if ($record->id === $user3->id) {
                 // 4 artciles and 2 surveys.
                 $this->assertEquals(6, $record->engagedusers_created_resource);
 
@@ -350,8 +350,7 @@ class totara_engage_rb_engagedusers_report_testcase extends advanced_testcase {
                 $this->assertNotEmpty($record->engagedusers_memberofworkspace);
                 $this->assertCount(4, explode(',', $record->engagedusers_memberofworkspace));
             } else {
-                // This must be admin user and admin user ID is 2 as default.
-                $this->assertEquals(2, $record->engagedusers_creator);
+                $this->assertEquals(2, $record->id);
                 $this->assertEquals(0, $record->engagedusers_created_resource);
                 $this->assertEquals(0, $record->engagedusers_public_resource);
                 $this->assertEquals(0, $record->engagedusers_private_resource);

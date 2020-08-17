@@ -41,16 +41,25 @@ final class engagedusers_namelink extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report): string {
-        $extra = self::get_extrafields_row($row, $column);
-        $fullname = $extra->firstname.' '.$extra->lastname;
+        $extrafields = self::get_extrafields_row($row, $column);
+        $fullname = fullname($extrafields);
 
         if ($format !== 'html') {
             return $fullname;
         }
 
-        $url = new \moodle_url("/totara/engage/user_library.php", ['id' => $value]);
-        $fullname = format_string::display($fullname, $format, $row, $column, $report);
-        return html_writer::link($url->out(true), $fullname);
+        if (isset($extrafields->deleted)) {
+            $is_deleted = $extrafields->deleted;
+        }
+
+        if ($is_deleted) {
+            return $fullname;
+        }
+
+        $user_id = $extrafields->id;
+        $url = new \moodle_url("/totara/engage/user_library.php", ['id' => (int)$user_id]);
+
+        return \html_writer::link($url, $fullname);
     }
     
     /**

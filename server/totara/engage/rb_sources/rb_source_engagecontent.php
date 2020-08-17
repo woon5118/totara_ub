@@ -25,18 +25,15 @@ defined('MOODLE_INTERNAL') || die();
 
 use container_workspace\totara_engage\share\recipient\library;
 use totara_core\advanced_feature;
-use totara_job\rb\source\report_trait;
 use totara_engage\access\access;
 
 /**
  * Engage content is management interface for engage resources
  */
 class rb_source_engagecontent extends rb_base_source {
-    use report_trait;
+    use totara_job\rb\source\report_trait;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
-        global $DB;
-
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
         }
@@ -47,11 +44,8 @@ class rb_source_engagecontent extends rb_base_source {
         $this->add_global_report_restriction_join('base', 'userid');
 
         $this->usedcomponents[] = 'totara_engage';
-        $this->base = '(SELECT r.*, '.$DB->sql_group_concat('t.name', ' , ').'
-        As tagname FROM {engage_resource} r
-        LEFT JOIN {tag_instance} ti ON ti.itemid = r.id
-        LEFT JOIN {tag} t ON t.id = ti.tagid
-        GROUP BY r.id)';
+
+        $this->base = "{engage_resource}";
 
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
@@ -80,9 +74,25 @@ class rb_source_engagecontent extends rb_base_source {
      * @return array
      */
     protected function define_joinlist() {
+        global $DB;
+
         $joinlist = [];
 
         $this->add_core_user_tables($joinlist, 'base','userid');
+
+        $joinlist[] = new rb_join(
+            'taglist',
+            'LEFT',
+            '(
+                SELECT ti.itemid, 
+                ' . $DB->sql_group_concat('t.name', ' , ') . ' AS tagname 
+                FROM {tag_instance} ti
+                INNER JOIN {tag} t ON t.id = ti.tagid
+                WHERE itemtype = \'engage_resource\' GROUP BY ti.itemid
+            )',
+            'taglist.itemid = base.id',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE
+        );
 
         return $joinlist;
     }
@@ -113,13 +123,12 @@ class rb_source_engagecontent extends rb_base_source {
             'engagecontent',
             'likes',
             get_string('likes', 'rb_source_engagecontent'),
-            "(SELECT COUNT(r.instanceid) FROM {reaction} r
-            WHERE r.instanceid = base.id AND r.component = base.resourcetype)",
+            '(SELECT COUNT(r.instanceid) FROM {reaction} r
+            WHERE r.instanceid = base.id AND r.component = base.resourcetype)',
             [
                 'displayfunc' => 'plaintext',
                 'dbdatatype' => 'text',
                 'iscompound' => true,
-
             ]
         );
 
@@ -154,13 +163,16 @@ class rb_source_engagecontent extends rb_base_source {
             'engagecontent',
             'shares',
             get_string('shares', 'rb_source_engagecontent'),
-            "(SELECT COUNT(r.shareid)
+            "(
+            SELECT COUNT(r.shareid)
             FROM {engage_share_recipient} r
             INNER JOIN {engage_share} s
             ON s.id = r.shareid
-            WHERE s.itemid = base.id
-            AND (r.area <> '{$area}'
-            OR r.component <> '{$component}'))",
+            WHERE 
+            s.itemid = base.id
+            AND 
+            (r.area <> '{$area}' OR r.component <> '{$component}')
+            )",
             [
                 'displayfunc' => 'plaintext',
                 'dbdatatype' => 'text',
@@ -173,13 +185,16 @@ class rb_source_engagecontent extends rb_base_source {
                 'engagecontent',
                 'workspaces',
                 get_string('workspaces', 'rb_source_engagecontent'),
-                "(SELECT COUNT(r.instanceid)
-            FROM {engage_share_recipient} r
-            INNER JOIN {engage_share} s
-            ON s.id = r.shareid
-            WHERE s.itemid = base.id
-            AND (r.area = '{$area}'
-            OR r.component = '{$component}'))",
+                "(
+                SELECT COUNT(r.instanceid)
+                FROM {engage_share_recipient} r
+                INNER JOIN {engage_share} s
+                ON s.id = r.shareid
+                WHERE 
+                s.itemid = base.id
+                AND 
+                (r.area = '{$area}' OR r.component = '{$component}')
+                )",
                 [
                     'displayfunc' => 'plaintext',
                     'dbdatatype' => 'text',
@@ -207,7 +222,7 @@ class rb_source_engagecontent extends rb_base_source {
             get_string('create_date', 'rb_source_engagecontent'),
             'base.timecreated',
             [
-                'displayfunc' => 'engagecontent_datetime',
+                'displayfunc' => 'nice_datetime',
                 'dbdatatype' => 'timestamp',
                 'outputformat' => 'text',
             ]
@@ -218,10 +233,15 @@ class rb_source_engagecontent extends rb_base_source {
             'engagecontent',
             'views',
             get_string('views', 'rb_source_engagecontent'),
-            "(SELECT COUNT(rt.id) FROM {ml_recommender_interactions} rt WHERE
+            "(
+            SELECT COUNT(rt.id) FROM {ml_recommender_interactions} rt 
+            WHERE
             rt.item_id = base.id
-            AND rt.user_id <> base.userid
-            AND rt.interaction = '{$interaction}')",
+            AND 
+            rt.user_id <> base.userid
+            AND 
+            rt.interaction = '{$interaction}'
+            )",
             [
                 'displayfunc' => 'plaintext',
                 'dbdatatype' => 'text',
@@ -233,8 +253,9 @@ class rb_source_engagecontent extends rb_base_source {
             'engagecontent',
             'topics',
             get_string('topics', 'rb_source_engagecontent'),
-            "base.tagname",
+            "taglist.tagname",
             [
+                'joins' => 'taglist',
                 'displayfunc' => 'plaintext',
                 'dbdatatype' => 'text',
             ]
