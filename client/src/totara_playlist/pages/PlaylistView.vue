@@ -34,7 +34,7 @@
           <HeaderBox
             :playlist-id="playlistId"
             :title="playlist.name"
-            :update-able="playlist.owned"
+            :update-able="canUpdate"
             @update-playlist="updatePlaylist"
           />
         </template>
@@ -56,7 +56,7 @@
             :cards="contribution.cards"
             :contributable="playlist.contributable"
             :access="playlist.access"
-            :update-able="playlist.owned"
+            :update-able="canUpdate"
             :is-loading="$apollo.loading"
             @refetch="refetchCards"
             @resource-added="refetchCards"
@@ -182,6 +182,12 @@ export default {
       isLoadMoreVisible: false,
       loadingMore: false,
     };
+  },
+
+  computed: {
+    canUpdate() {
+      return this.playlist.owned || this.playlist.manageable;
+    },
   },
 
   methods: {

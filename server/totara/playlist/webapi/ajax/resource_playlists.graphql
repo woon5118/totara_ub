@@ -39,6 +39,7 @@ query totara_playlist_resource_playlists(
     sharedbycount
     owned
     bookmarked
+    manageable
     url(source: $source, library_view: false)
   }
 

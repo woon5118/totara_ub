@@ -40,5 +40,6 @@ mutation totara_playlist_update_playlist(
     totalresources
     owned
     sharedbycount
+    manageable
   }
 }

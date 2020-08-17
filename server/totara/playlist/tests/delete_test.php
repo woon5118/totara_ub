@@ -116,4 +116,27 @@ class totara_playlist_delete_testcase extends advanced_testcase {
         $sql = 'SELECT 1 FROM "ttr_playlist" p WHERE p.id = :id';
         $this->assertFalse($DB->record_exists_sql($sql, $parameters));
     }
+
+    /**
+     * @return void
+     */
+    public function test_delete_playlist_by_admin(): void {
+        global $DB;
+
+        $gen = $this->getDataGenerator();
+        $user = $gen->create_user();
+
+        $this->setUser($user);
+        $playlist = playlist::create('Hello world');
+
+        $this->assertTrue($DB->record_exists('playlist', ['id' => $playlist->get_id()]));
+        $this->assertEquals((int)$user->id, $playlist->get_userid());
+
+        $id = $playlist->get_id();
+
+        // Login as admin.
+        $this->setAdminUser();
+        $playlist->delete();
+        $this->assertFalse($DB->record_exists('playlist', ['id' => $id]));
+    }
 }

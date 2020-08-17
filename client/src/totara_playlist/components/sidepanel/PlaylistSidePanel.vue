@@ -23,7 +23,7 @@
         :no-border="true"
         class="tui-playlistSidePanel__profile"
       >
-        <template v-if="playlist.owned" v-slot:drop-down-items>
+        <template v-if="canManage" v-slot:drop-down-items>
           <DropdownItem @click="modal.confirm = true">
             {{ $str('delete', 'moodle') }}
           </DropdownItem>
@@ -52,7 +52,7 @@
         </p>
 
         <AccessSetting
-          v-if="playlist.owned"
+          v-if="canManage"
           :item-id="playlistId"
           component="totara_playlist"
           :access-value="playlist.access"
@@ -70,7 +70,7 @@
         />
 
         <PlaylistSummary
-          :update-able="playlist.updateable"
+          :update-able="canUpdate"
           :summary="playlist.summary"
           class="tui-playlistSidePanel__overview__summary"
         />
@@ -85,7 +85,7 @@
           />
 
           <MediaSetting
-            :owned="playlist.owned"
+            :owned="canManage"
             :access-value="playlist.access"
             :instance-id="playlistId"
             :shared-by-count="playlist.sharedbycount"
@@ -200,6 +200,14 @@ export default {
 
     featureRecommenders() {
       return this.features && this.features.recommenders;
+    },
+
+    canManage() {
+      return this.playlist.owned || this.playlist.manageable;
+    },
+
+    canUpdate() {
+      return this.playlist.updatable || this.playlist.manageable;
     },
   },
 

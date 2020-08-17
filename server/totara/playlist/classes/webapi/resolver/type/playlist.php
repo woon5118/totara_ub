@@ -84,6 +84,9 @@ final class playlist implements type_resolver {
                 $ownerid = $source->get_userid();
                 return $USER->id == $ownerid;
 
+            case 'manageable':
+                return $source->can_update($USER->id) && $source->can_delete($USER->id);
+
             case 'sharedbycount':
                 /** @var share_repository $repo */
                 $repo = share::repository();

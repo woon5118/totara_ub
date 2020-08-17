@@ -37,5 +37,6 @@ mutation totara_playlist_create_playlist(
     updateable
     contributable
     sharedbycount
+    manageable
   }
 }

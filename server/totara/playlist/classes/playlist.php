@@ -287,6 +287,11 @@ final class playlist implements accessible, shareable {
     public function can_delete(int $userid): bool {
         $context = $this->get_context();
 
+        // Admin can do anything.
+        if (is_siteadmin($userid)) {
+            return true;
+        }
+
         if (CONTEXT_USER == $context->contextlevel) {
             if ($this->playlist->userid != $userid) {
                 return false;

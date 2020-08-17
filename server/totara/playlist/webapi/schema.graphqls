@@ -15,6 +15,7 @@ type totara_playlist_playlist {
   owned: Boolean!
   sharedbycount: Int!
   bookmarked: Boolean!
+  manageable: Boolean!
 }
 
 """
