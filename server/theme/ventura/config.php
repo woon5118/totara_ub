@@ -174,6 +174,10 @@ $THEME->layouts = array(
             'nosubnav' => true,
         ),
     ),
+    'webview' => array(
+        'file' => 'webview.php',
+        'regions' => array(),
+    ),
     // This layout can be used for external users accessing the page.
     // This should also be combined with setting no cookies so that
     // the user won't be logged in and wouldn't see the user menu or other
