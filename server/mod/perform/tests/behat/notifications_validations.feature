@@ -87,7 +87,7 @@ Feature: Perform activity validation in the notifications tab
     Then I should not see "Set trigger from 1 to 365 days" in the "Participant instance creation reminder" tui "collapsible"
     When I set the field "trigger-instance_created_reminder[1]" to "0"
     Then I should see "Set trigger from 1 to 365 days" in the "Participant instance creation reminder" tui "collapsible"
-    # Set two or more digits blows up behat until the debouncing function is aware of pending_js.
+    # Setting two or more digits blows up behat because debounce() is not aware of pending_js at the moment.
     # When I set the field "trigger-instance_created_reminder[1]" to "366"
     # Then I should see "Set trigger from 1 to 365 days" in the "Participant instance creation reminder" tui "collapsible"
     When I set the field "trigger-instance_created_reminder[1]" to "1"

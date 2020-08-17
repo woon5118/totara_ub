@@ -51,6 +51,7 @@ Feature: Perform activity notifications - manual relationships
       | mod_perform | template_instance_created_manager_subject            | Ný tilkynning um virkni              | Icelandic  |
       | mod_perform | template_instance_created_perform_peer_subject       | Uue tegevuse teatis                  | Estonian   |
       | mod_perform | template_instance_created_perform_mentor_subject     | Ny aktivitetsmeddelelse              | Danish     |
+      | mod_perform | template_instance_created_perform_external_subject   | Yeni etkinlik bildirimi              | Turkish    |
     And I log in as "admin"
     And I navigate to the manage perform activities page
     And I follow "Activity test"
@@ -155,3 +156,55 @@ Feature: Perform activity notifications - manual relationships
     When I log in as "manager"
     And I open the notification popover
     Then I should see "Ny aktivitetsmeddelelse"
+
+  Scenario: mod_perform_notification_102: External participation notification
+    And I switch to "Content" tui tab
+    And I click the add participant button
+    And I click on the "External respondent" tui checkbox
+    And I click on "Done" "button"
+    And I close the tui notification toast
+
+    And I switch to "Notifications" tui tab
+    And I toggle the "Participant instance creation" tui collapsible
+    And I click on the "Participant instance creation notification" tui toggle button
+    And I click on "Subject" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
+    And I click on "External respondent" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
+    # Let's turn on the participant selection notification also.
+    And I toggle the "Participant selection" tui collapsible
+    And I click on the "Participant selection notification" tui toggle button
+    And I click on "Subject" tui "toggle_button" in the "Participant selection" tui "collapsible"
+
+    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    And I confirm the tui confirmation modal
+    And I wait for the next second
+    And I trigger cron
+    And I press the "back" button in the browser
+    And I log out
+
+    When I log in as "user1"
+    And I open the notification popover
+    Then I should not see "New activity notice"
+    # TODO: Fix the behat steps in TL-25417
+    And I should see "Wybierz uczestników" exactly "1" times
+    When I navigate to the outstanding perform activities list page
+    And I follow "Select participants"
+    And I click on "Add" "button" in the ".tui-performUserActivitiesExternalUserSelector" "css_element"
+    And I set the following fields to these values:
+      | External respondent 1's name          | External One             |
+      | External respondent 1's email address | external.one@example.com |
+      | External respondent 2's name          | External Two             |
+      | External respondent 2's email address | external.two@example.com |
+    And I click on "Save" "button"
+    And I wait for the next second
+    And I trigger cron
+    And I press the "back" button in the browser
+    And I reload the page
+    And I open the notification popover
+    # Make sure the instance creation notification is not sent twice.
+    Then I should see "New activity notice" exactly "1" times
+    And I log out
+
+    And I log in as "admin"
+    And I navigate to "Logs" node in "Site administration > Server"
+    And I press "Get these logs"
+    Then I should see "The user with id '0' sent a message to the user with id '-45'." exactly "2" times

@@ -37,7 +37,7 @@ $notifications = [
         'name' => ['notification_broker_instance_created', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\instance_created::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
-        'recipients' => \mod_perform\notification\recipient::STANDARD | \mod_perform\notification\recipient::MANUAL,
+        'recipients' => \mod_perform\notification\recipient::ALL,
     ],
     'instance_created_reminder' => [ // 19
         'name' => ['notification_broker_instance_created_reminder', 'mod_perform'],
@@ -78,7 +78,7 @@ $notifications = [
         'name' => ['notification_broker_completion', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\completion::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
-        'recipients' => \mod_perform\notification\recipient::STANDARD,
+        'recipients' => \mod_perform\notification\recipient::STANDARD | \mod_perform\notification\recipient::MANUAL,
     ],
     'reopened' => [ // 26
         'name' => ['notification_broker_reopened', 'mod_perform'],
