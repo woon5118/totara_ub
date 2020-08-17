@@ -24,7 +24,6 @@
 
   &__container {
     display: flex;
-    flex-grow: 1;
     align-items: stretch;
 
     &__inputs {

@@ -29,8 +29,9 @@
       </SidePanel>
     </template>
 
-    <template v-if="!$apollo.loading" v-slot:right="{ units }">
+    <template v-if="!$apollo.loading" v-slot:right="{ direction, units }">
       <WorkspaceContentLayout
+        :grid-direction="direction"
         :max-units="units"
         class="tui-workspaceDiscussionPage__column"
       >

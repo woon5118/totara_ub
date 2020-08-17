@@ -323,8 +323,7 @@ export default {
       let textArea = document.createElement('textarea');
       textArea.value = this.discussionUrl;
 
-      this.$el.appendChild(textArea);
-      textArea.focus();
+      document.body.appendChild(textArea);
       textArea.select();
 
       try {
@@ -340,7 +339,7 @@ export default {
           type: 'error',
         });
       } finally {
-        this.$el.removeChild(textArea);
+        document.body.removeChild(textArea);
       }
     },
 

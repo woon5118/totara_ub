@@ -45,7 +45,8 @@
     }
 
     &__content {
-      flex: 1;
+      flex-grow: 1;
+      width: 100%;
 
       &__head {
         display: flex;

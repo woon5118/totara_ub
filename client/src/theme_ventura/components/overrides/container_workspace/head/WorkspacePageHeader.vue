@@ -76,8 +76,13 @@
         align-items: center;
 
         &__text {
-          @include tui-font-heading-small();
+          width: 100%;
           margin: 0;
+          -ms-word-break: break-all;
+          word-break: break-word;
+          hyphens: none;
+
+          @include tui-font-heading-small();
 
           @media (min-width: $tui-screen-lg) {
             @include tui-font-heading-medium();
