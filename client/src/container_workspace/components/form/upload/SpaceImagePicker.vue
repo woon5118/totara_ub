@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import Upload from 'totara_engage/components/form/Upload';
+import Upload from 'tui/components/form/Upload';
 import Button from 'tui/components/buttons/Button';
 import Spinner from 'tui/components/icons/common/Spinner';
 import PageLoader from 'tui/components/loader/Loader';

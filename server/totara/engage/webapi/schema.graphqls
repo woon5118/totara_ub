@@ -194,20 +194,11 @@ extend type Query {
 }
 
 extend type Mutation {
-  totara_engage_delete_draft_file(
-    draftid: param_integer!
-    filename: param_text!
-  ): totara_engage_delete_draft_file_result!
-
   totara_engage_update_bookmark(
     itemid: param_integer!
     component: param_component!
     bookmarked: param_boolean!
   ): Boolean!
-}
-
-type totara_engage_delete_draft_file_result {
-  success: Boolean!
 }
 
 type totara_engage_people {
