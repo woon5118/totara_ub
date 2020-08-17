@@ -27,7 +27,8 @@ function xmldb_totara_job_install() {
     require_once($CFG->dirroot . '/totara/core/db/upgradelib.php');
 
     totara_core_upgrade_create_relationship('totara_job\relationship\resolvers\manager', 'manager', 2);
-    totara_core_upgrade_create_relationship('totara_job\relationship\resolvers\appraiser', 'appraiser', 3);
+    totara_core_upgrade_create_relationship('totara_job\relationship\resolvers\managers_manager', 'managers_manager', 3);
+    totara_core_upgrade_create_relationship('totara_job\relationship\resolvers\appraiser', 'appraiser', 4);
 
     return true;
 }

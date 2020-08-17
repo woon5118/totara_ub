@@ -98,7 +98,7 @@ class totara_job_totara_core_relationship_resolvers_manager_testcase extends \ad
         // user3 is not managed by anyone
         $this->assertEquals(
             [],
-            $manager_resolver->get_users(['user_id' => $user2->id])
+            $manager_resolver->get_users(['user_id' => $user3->id])
         );
     }
 

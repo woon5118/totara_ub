@@ -69,5 +69,17 @@ function xmldb_totara_job_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020070300, 'totara', 'job');
     }
 
+    if ($oldversion < 2020081700) {
+        require_once($CFG->dirroot . '/totara/core/db/upgradelib.php');
+
+        if (!$DB->record_exists('totara_core_relationship', ['idnumber' => 'managers_manager'])) {
+            $DB->execute("UPDATE {totara_core_relationship} SET sort_order = sort_order + 1 WHERE sort_order > 2");
+            totara_core_upgrade_create_relationship(['totara_job\relationship\resolvers\managers_manager'], 'managers_manager', 3);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2020081700, 'totara', 'job');
+    }
+
     return true;
 }

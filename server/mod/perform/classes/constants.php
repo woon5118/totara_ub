@@ -33,6 +33,7 @@ abstract class constants {
 
     public const RELATIONSHIP_SUBJECT = 'subject';
     public const RELATIONSHIP_MANAGER = 'manager';
+    public const RELATIONSHIP_MANAGERS_MANAGER = 'managers_manager';
     public const RELATIONSHIP_APPRAISER = 'appraiser';
     public const RELATIONSHIP_PEER = 'perform_peer';
     public const RELATIONSHIP_REVIEWER = 'perform_reviewer';

@@ -451,6 +451,16 @@ This needs to be completed by $due date$.
 
 You can access the activity through this link: $Activity link$';
 $string['template_instance_created_manager_subject'] = '$Activity name$/$Activity type$: $subject full name$';
+
+$string['template_instance_created_managers_manager_body'] = 'As {$a->subject_fullname}’s {$a->participant_relationship}, you have been selected to participate in the following activity:
+
+{$a->activity_name} {$a->activity_type}
+
+This needs to be completed by {$a->instance_duedate}.
+
+You can access the activity through this link: {$a->activity_url}';
+$string['template_instance_created_managers_manager_subject'] = '{$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
+
 $string['template_instance_created_subject_body'] = 'Your $Activity name$/$Activity type$ is ready for you to complete.
 
 This needs to be completed by $due date$.
@@ -473,6 +483,16 @@ Please ensure you complete it by $due date$.
 
 You can access the activity through this link: $Activity link$';
 $string['template_instance_created_reminder_manager_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_instance_created_reminder_managers_manager_body'] = '{$a->instance_days_active} you were selected to participate in the following activity as {$a->subject_fullname}’s {$a->participant_relationship}:
+
+{$a->activity_name} {$a->activity_type}
+
+Please ensure you complete it by {$a->instance_duedate}.
+
+You can access the activity through this link: {$a->activity_url}';
+$string['template_instance_created_reminder_managers_manager_subject'] = 'Reminder - {$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
+
 $string['template_instance_created_reminder_subject_body'] = '$days ago$ you were sent your $Activity name$/$Activity type$ to complete.
 
 Please ensure you complete it by $due date$.

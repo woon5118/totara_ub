@@ -31,6 +31,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I click the add responding participant button
     And I click on the "Subject" tui checkbox
     And I click on the "Manager" tui checkbox
+    And I click on the "Manager's manager" tui checkbox
     And I click on the "Appraiser" tui checkbox
     And I click on the "Peer" tui checkbox
     And I click on the "Mentor" tui checkbox

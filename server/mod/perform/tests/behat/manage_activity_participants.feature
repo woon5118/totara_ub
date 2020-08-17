@@ -19,10 +19,11 @@ Feature: Adding and removing participant to a perform activity section
 
     When I click the add responding participant button
     Then the mod perform responding participants popover should match:
-      | name      | checked | enabled |
-      | Subject   | 0       | 1       |
-      | Manager   | 0       | 1       |
-      | Appraiser | 0       | 1       |
+      | name              | checked | enabled |
+      | Subject           | 0       | 1       |
+      | Manager           | 0       | 1       |
+      | Manager's manager | 0       | 1       |
+      | Appraiser         | 0       | 1       |
 
     When I select "Subject" in the responding participants popover then click cancel
     Then I should not see "Activity saved"
@@ -30,10 +31,11 @@ Feature: Adding and removing participant to a perform activity section
     # Test canceling out of selections does not retain them (selections are blown away on every open of the popover).
     When I click the add responding participant button
     Then the mod perform responding participants popover should match:
-      | name      | checked | enabled |
-      | Subject   | 0       | 1       |
-      | Manager   | 0       | 1       |
-      | Appraiser | 0       | 1       |
+      | name              | checked | enabled |
+      | Subject           | 0       | 1       |
+      | Manager           | 0       | 1       |
+      | Manager's manager | 0       | 1       |
+      | Appraiser         | 0       | 1       |
 
     When I select "Subject" in the responding participants popover
     Then I should see "Activity saved" in the tui success notification toast and close it
@@ -49,10 +51,11 @@ Feature: Adding and removing participant to a perform activity section
 
     When I click the add responding participant button
     Then the mod perform responding participants popover should match:
-      | name      | checked | enabled |
-      | Subject   | 0       | 1       |
-      | Manager   | 0       | 1       |
-      | Appraiser | 0       | 1       |
+      | name              | checked | enabled |
+      | Subject           | 0       | 1       |
+      | Manager           | 0       | 1       |
+      | Manager's manager | 0       | 1       |
+      | Appraiser         | 0       | 1       |
 
     When I select "Manager" in the responding participants popover
     Then I should see "Activity saved" in the tui success notification toast
@@ -61,10 +64,11 @@ Feature: Adding and removing participant to a perform activity section
     And I click the add view-only participant button
     # Note that despite Manager belonging to the responding group it will is intending to not show checked in the view-only group.
     Then the mod perform view-only participants popover should match:
-      | name      | checked | enabled |
-      | Subject   | 0       | 1       |
-      | Manager   | 0       | 0       |
-      | Appraiser | 0       | 1       |
+      | name              | checked | enabled |
+      | Subject           | 0       | 1       |
+      | Manager           | 0       | 0       |
+      | Manager's manager | 0       | 1       |
+      | Appraiser         | 0       | 1       |
 
     When I select "Subject" in the view-only participants popover
     Then I should see "Activity saved" in the tui success notification toast
@@ -74,10 +78,11 @@ Feature: Adding and removing participant to a perform activity section
 
     # Note that despite Manager already being selected in this group it should still not show ticked, this is intentional.
     Then the mod perform responding participants popover should match:
-      | name      | checked | enabled |
-      | Subject   | 0       | 0       |
-      | Manager   | 0       | 0       |
-      | Appraiser | 0       | 1       |
+      | name              | checked | enabled |
+      | Subject           | 0       | 0       |
+      | Manager           | 0       | 0       |
+      | Manager's manager | 0       | 1       |
+      | Appraiser         | 0       | 1       |
 
     When I reload the page
     Then I should see "Manager" as the perform activity responding participants
@@ -89,13 +94,14 @@ Feature: Adding and removing participant to a perform activity section
     And I should see no perform activity participants
     When I click the add responding participant button
     Then the mod perform responding participants popover should match:
-      | name      | checked | enabled |
-      | Subject   | 0       | 1       |
-      | Manager   | 0       | 1       |
-      | Appraiser | 0       | 1       |
-      | Peer      | 0       | 1       |
-      | Mentor    | 0       | 1       |
-      | Reviewer  | 0       | 1       |
+      | name              | checked | enabled |
+      | Subject           | 0       | 1       |
+      | Manager           | 0       | 1       |
+      | Manager's manager | 0       | 1       |
+      | Appraiser         | 0       | 1       |
+      | Peer              | 0       | 1       |
+      | Mentor            | 0       | 1       |
+      | Reviewer          | 0       | 1       |
 
     When I select "Subject, Manager" in the responding participants popover
     Then I should see "Activity saved" in the tui success notification toast and close it
@@ -103,13 +109,14 @@ Feature: Adding and removing participant to a perform activity section
 
     When I click the add responding participant button
     Then the mod perform responding participants popover should match:
-      | name      | checked | enabled |
-      | Subject   | 0       | 0       |
-      | Manager   | 0       | 0       |
-      | Appraiser | 0       | 1       |
-      | Peer      | 0       | 1       |
-      | Mentor    | 0       | 1       |
-      | Reviewer  | 0       | 1       |
+      | name              | checked | enabled |
+      | Subject           | 0       | 0       |
+      | Manager           | 0       | 0       |
+      | Manager's manager | 0       | 1       |
+      | Appraiser         | 0       | 1       |
+      | Peer              | 0       | 1       |
+      | Mentor            | 0       | 1       |
+      | Reviewer          | 0       | 1       |
 
     When I select "Appraiser" in the responding participants popover
     Then I should see "Activity saved" in the tui success notification toast and close it
@@ -136,17 +143,18 @@ Feature: Adding and removing participant to a perform activity section
     And I should not see "Cancel"
     And I click the add responding participant button
     Then the mod perform responding participants popover should match:
-      | name      | checked | enabled |
-      | Subject   | 0       | 1       |
-      | Manager   | 0       | 1       |
-      | Appraiser | 0       | 1       |
-      | Peer      | 0       | 1       |
-      | Mentor    | 0       | 1       |
-      | Reviewer  | 0       | 1       |
+      | name              | checked | enabled |
+      | Subject           | 0       | 1       |
+      | Manager           | 0       | 1       |
+      | Manager's manager | 0       | 1       |
+      | Appraiser         | 0       | 1       |
+      | Peer              | 0       | 1       |
+      | Mentor            | 0       | 1       |
+      | Reviewer          | 0       | 1       |
 
-    When I select "Subject, Manager, Appraiser, Peer, Mentor, Reviewer, External respondent" in the responding participants popover
+    When I select "Subject, Manager, Manager's manager, Appraiser, Peer, Mentor, Reviewer, External respondent" in the responding participants popover
     Then I should see "Activity saved" in the tui success notification toast and close it
-    And I should see "Subject, Manager, Appraiser, Peer, Mentor, Reviewer" as the perform activity participants
+    And I should see "Subject, Manager, Manager's manager, Appraiser, Peer, Mentor, Reviewer" as the perform activity participants
     And I should see the add participant button is disabled
 
     # Toggle can view other responses for Subject
@@ -158,10 +166,10 @@ Feature: Adding and removing participant to a perform activity section
     Then I should see "Activity saved" in the tui success notification toast and close it
 
     # Toggle can view other responses for Appraiser
-    When I click on ".tui-performActivitySectionRelationship:nth-of-type(3) .tui-checkbox__label" "css_element"
+    When I click on ".tui-performActivitySectionRelationship:nth-of-type(4) .tui-checkbox__label" "css_element"
     Then I should see "Activity saved" in the tui success notification toast and close it
 
     # Remove a participant
     When I remove "Subject" as a perform activity participant
     Then I should see "Activity saved" in the tui success notification toast and close it
-    And I should see "Manager, Appraiser" as the perform activity participants
+    And I should see "Manager, Manager's manager, Appraiser, Peer, Mentor, Reviewer" as the perform activity participants

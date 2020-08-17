@@ -886,7 +886,7 @@ class behat_mod_perform extends behat_base {
         $group_container = $this->find_participant_group_container($group);
 
         foreach ($table->getHash() as $hash) {
-            $input = $group_container->find('css', "input[name='{$hash['name']}']");
+            $input = $group_container->find('css', "input[name=\"{$hash['name']}\"]");
 
             if ($hash['checked'] && !$input->isChecked()) {
                 $this->fail("{$hash['name']} did not have the correct checked value");
@@ -916,7 +916,7 @@ class behat_mod_perform extends behat_base {
         foreach ($relationships as $relationship) {
             $relationship = trim($relationship);
 
-            $input = $group_container->find('css', "input[name='{$relationship}']");
+            $input = $group_container->find('css', "input[name=\"{$relationship}\"]");
             $input->getParent()->find('css', 'label')->click();
         }
 

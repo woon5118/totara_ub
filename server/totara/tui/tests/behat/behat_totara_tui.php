@@ -601,7 +601,12 @@ class behat_totara_tui extends behat_base {
      */
     public function i_click_the_tui_checkbox(string $name, string $parent_locator = null, string $parent_selector = null): void {
         behat_hooks::set_step_readonly(false);
-        $locator = self::CHECKBOX_LOCATOR . "[name='{$name}']";
+
+        if (strpos($name, "'") !== false) {
+            $locator = self::CHECKBOX_LOCATOR . "[name=\"{$name}\"]";
+        } else {
+            $locator = self::CHECKBOX_LOCATOR . "[name='{$name}']";
+        }
 
         $parent_element = $this;
         if (isset($parent_locator, $parent_selector)) {
