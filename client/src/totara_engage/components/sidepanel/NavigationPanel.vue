@@ -21,12 +21,16 @@
     :class="['tui-navigationPanel', `tui-navigationPanel__${gridDirection}`]"
   >
     <div v-if="showMenuControl" class="tui-navigationPanel__selected">
-      <span class="tui-navigationPanel__selected__wrapper" @click="toggleMenu">
-        <span class="tui-navigationPanel__selected__text">
-          {{ title }}
-        </span>
-        <Show />
-      </span>
+      <h2 class="tui-navigationPanel__header">
+        <Button
+          :text="title"
+          :caret="true"
+          class="tui-navigationPanel__btn"
+          :styleclass="{ transparent: true }"
+          :aria-expanded="showMenu.toString()"
+          @click="toggleMenu"
+        />
+      </h2>
     </div>
     <div
       v-show="showMenu"
@@ -53,6 +57,7 @@
 
 <script>
 import tui from 'tui/tui';
+import Button from 'tui/components/buttons/Button';
 import Show from 'tui/components/icons/common/Show';
 import EngageSection from 'totara_engage/components/sidepanel/navigation/EngageSection';
 
@@ -66,6 +71,7 @@ const has = Object.prototype.hasOwnProperty;
 
 export default {
   components: {
+    Button,
     Show,
     EngageSection,
   },

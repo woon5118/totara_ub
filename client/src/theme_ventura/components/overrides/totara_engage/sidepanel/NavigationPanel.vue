@@ -21,19 +21,6 @@
   &__selected {
     margin-top: var(--tui-gap-6);
     margin-bottom: var(--tui-gap-2);
-
-    &__wrapper {
-      display: inline-flex;
-      align-items: center;
-      color: var(--tui-color-state);
-      cursor: pointer;
-    }
-
-    &__text {
-      @include tui-font-heading-small;
-      padding-right: var(--tui-gap-2);
-      color: var(--tui-color-text);
-    }
   }
 
   &__menu {
@@ -63,6 +50,13 @@
     margin-top: 0;
     margin-bottom: 0;
     @include tui-font-heading-label();
+    & .tui-navigationPanel__btn {
+      @include tui-font-heading-small;
+      color: var(--tui-color-text);
+      .tui-caret {
+        color: var(--tui-color-state);
+      }
+    }
   }
 
   &__contribute {
