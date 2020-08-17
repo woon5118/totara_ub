@@ -42,6 +42,7 @@
           :id="id"
           :key="index"
           :name="name"
+          :always-render="true"
         >
           <component
             :is="component"

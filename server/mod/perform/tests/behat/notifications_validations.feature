@@ -4,7 +4,7 @@ Feature: Perform activity validation in the notifications tab
     Given I am on a totara site
     And the following "activities" exist in "mod_perform" plugin:
       | activity_name | activity_type | activity_status | create_section | create_track |
-      | Activity test | feedback      | Draft           | false          | false        |
+      | Activity test | feedback      | Draft           | false          | true         |
     And the following "activity sections" exist in "mod_perform" plugin:
       | activity_name | section_name |
       | Activity test | section 1    |
@@ -17,20 +17,40 @@ Feature: Perform activity validation in the notifications tab
     And I switch to "Notifications" tui tab
 
   Scenario: mod_perform_notification_901: Only participants are displayed as recipients
-    And I click on "Participant instance creation notification" tui "toggle_switch"
-    When I toggle the "Participant instance creation" tui collapsible
-    Then I should see "No recipients. Go to Content tab: Responding participants, to add recipients" in the "Participant instance creation" tui "collapsible"
-    And I switch to "Content" tui tab
+    And I click on "Participant instance creation reminder notification" tui "toggle_switch"
+    When I toggle the "Participant instance creation reminder" tui collapsible
+    Then I should see "No recipients. Go to Content tab: Responding participants, to add recipients" in the "Participant instance creation reminder" tui "collapsible"
+    Given I switch to "Content" tui tab
     And I click on "Add participants" "button"
     And I click on "Subject" tui "checkbox" in the "Select participants" tui "popover"
     And I click on "Appraiser" tui "checkbox" in the "Select participants" tui "popover"
+    And I click on "Peer" tui "checkbox" in the "Select participants" tui "popover"
+    And I click on "Reviewer" tui "checkbox" in the "Select participants" tui "popover"
+    And I click on "External respondent" tui "checkbox" in the "Select participants" tui "popover"
     And I click on "Done" tui "button" in the "Select participants" tui "popover"
     And I should see "Activity saved" in the tui "success" notification banner
-    And I reload the page
-    Given I switch to "Notifications" tui tab
-    # Make sure they are clickable
-    And I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
+    And I close the tui notification toast
+    When I switch to "Notifications" tui tab
+    Then I should see "Subject" in the "Participant instance creation reminder" tui "collapsible"
+    And I should see "Appraiser" in the "Participant instance creation reminder" tui "collapsible"
+    And I should see "Peer" in the "Participant instance creation reminder" tui "collapsible"
+    And I should see "Reviewer" in the "Participant instance creation reminder" tui "collapsible"
+    And I should see "External respondent" in the "Participant instance creation reminder" tui "collapsible"
+    But I should not see "Manager" in the "Participant instance creation reminder" tui "collapsible"
+    But I should not see "Mentor" in the "Participant instance creation reminder" tui "collapsible"
+    Given I switch to "Content" tui tab
+    And I click on "Delete Subject" "button"
+    And I close the tui notification toast
+    And I click on "Delete Appraiser" "button"
+    And I close the tui notification toast
+    And I click on "Delete Peer" "button"
+    And I close the tui notification toast
+    And I click on "Delete Reviewer" "button"
+    And I close the tui notification toast
+    And I click on "Delete External respondent" "button"
+    And I close the tui notification toast
+    When I switch to "Notifications" tui tab
+    Then I should see "No recipients. Go to Content tab: Responding participants, to add recipients" in the "Participant instance creation reminder" tui "collapsible"
 
   Scenario: mod_perform_notification_902: Trigger events are displayed only on the reminders
     And I click on "Participant instance creation notification" tui "toggle_switch"
