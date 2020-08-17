@@ -21,7 +21,7 @@
     <Toolbar v-if="showToolbar" :items="toolbarItems" />
     <div
       ref="editorHost"
-      class="tui-rendered"
+      class="tui-weka__editorHost tui-rendered"
       :data-placeholder="placeholder"
     />
 

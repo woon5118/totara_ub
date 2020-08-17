@@ -22,6 +22,8 @@
 }
 
 .tui-weka {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   background-color: var(--tui-color-neutral-1);
   border: var(--tui-border-width-thin) solid var(--tui-form-input-border-color);
@@ -31,6 +33,16 @@
     &:before {
       color: var(--tui-color-neutral-6);
       content: attr(data-placeholder);
+    }
+  }
+
+  &__editorHost {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    > .tui-weka-editor {
+      flex-grow: 1;
     }
   }
 

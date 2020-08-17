@@ -10,7 +10,7 @@ exports[`editor_weka/components/Weka.vue toolbar is showing and render correctly
   />
    
   <div
-    class="tui-rendered"
+    class="tui-weka__editorHost tui-rendered"
     data-placeholder=""
   >
     <div
