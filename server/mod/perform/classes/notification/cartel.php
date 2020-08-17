@@ -69,7 +69,8 @@ class cartel {
             }
             $user = $instance->get_participant();
             $relationship = $instance->get_core_relationship();
-            $dealer->post($user, $relationship);
+            $placeholders = placeholder::from_participant_instance($instance);
+            $dealer->post($user, $relationship, $placeholders);
         }
     }
 }

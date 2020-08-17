@@ -57,6 +57,7 @@ use totara_job\job_assignment;
  * @property-read participant $subject_user The user that this activity is about
  * @property-read int $subject_user_id The user id for the user this instance is about
  * @property-read int $created_at When this instance was created.
+ * @property-read int $due_date When this instance is due to be completed.
  * @property-read int $status Whether the instance is pending or not
  * @property-read int $progress The progress status code
  * @property-read int $availability The availability status code

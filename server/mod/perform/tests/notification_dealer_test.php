@@ -26,6 +26,7 @@ use mod_perform\constants;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\notification\factory;
 use mod_perform\notification\internals\message;
+use mod_perform\notification\placeholder;
 use totara_job\job_assignment;
 
 require_once(__DIR__ . '/notification_testcase.php');
@@ -63,9 +64,10 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $this->assertNotNull($dealer);
         $this->redirect_messages();
         $time = time();
-        $dealer->post($user, $relationships[constants::RELATIONSHIP_SUBJECT]);
-        $dealer->post($manager, $relationships[constants::RELATIONSHIP_MANAGER]);
-        $dealer->post($appraiser, $relationships[constants::RELATIONSHIP_APPRAISER]);
+        $placeholders = new placeholder();
+        $dealer->post($user, $relationships[constants::RELATIONSHIP_SUBJECT], $placeholders);
+        $dealer->post($manager, $relationships[constants::RELATIONSHIP_MANAGER], $placeholders);
+        $dealer->post($appraiser, $relationships[constants::RELATIONSHIP_APPRAISER], $placeholders);
         $messages = $this->get_messages();
 
         $this->assertCount(2, $messages);

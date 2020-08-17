@@ -24,6 +24,7 @@
 
 use core\orm\query\builder;
 use mod_perform\constants;
+use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track_user_assignment;
@@ -209,10 +210,16 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      *
      * @param activity $activity parent activity.
      * @param integer[] $userids
+     * @param bool $use_duedate
      * @return track $track the generated track.
      */
-    public function create_single_activity_track_and_assignment(activity $activity, array $userids): track {
+    public function create_single_activity_track_and_assignment(activity $activity, array $userids, bool $use_duedate = false): track {
         $track = track::create($activity, "test track");
+        if ($use_duedate) {
+            $dateoffset = new date_offset(2, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER);
+            $track->set_due_date_relative($dateoffset);
+            $track->update();
+        }
         return $this->perfgen->create_track_assignments_with_existing_groups($track, [], [], [], $userids);
     }
 

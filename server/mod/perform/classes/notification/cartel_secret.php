@@ -29,6 +29,7 @@ use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
 use totara_core\relationship\relationship;
 
 /**
@@ -64,6 +65,7 @@ class cartel_secret extends cartel {
                 // The notification is not active, recipients are not set, etc.
                 continue;
             }
+            $placeholders = placeholder::from_subject_instance(subject_instance_model::load_by_entity($instance));
             $recipients = notification_recipient_model::load_by_notification($notification, true);
             /** @var relationship[] $relationships */
             $relationships = [];
@@ -74,7 +76,8 @@ class cartel_secret extends cartel {
                 $selector_relationship = $relationships[$progress->manual_relationship_selection->selector_relationship_id] ?? false;
                 if ($selector_relationship) {
                     foreach ($progress->manual_relationship_selectors as $selector) {
-                        $dealer->post($selector->user, $selector_relationship);
+                        $placeholders->set_participant($selector->user, $selector_relationship);
+                        $dealer->post($selector->user, $selector_relationship, $placeholders);
                     }
                 }
             }

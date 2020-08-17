@@ -80,12 +80,25 @@ Feature: Perform activity notifications - core relationships
     When I log in as "user1"
     And I open the notification popover
     Then I should see "New activity notice" exactly "1" times
+    When I follow "View full notification"
+    Then I should see "Hi User One"
+    And I should see "Your Activity test Feedback is ready for you to complete"
+    And I should see "This needs to be completed by"
+    When I follow "Activity test"
+    Then I should see "Your response"
     And I log out
 
     # appraiser should receive a notification
     When I log in as "appraiser"
     And I open the notification popover
     Then I should see "Nuwe aktiwiteitskennisgewing" exactly "1" times
+    When I follow "View full notification"
+    Then I should see "Hi Appra Iser"
+    And I should see "As User One’s Appraiser, you have been selected"
+    And I should see "Activity test Feedback"
+    And I should see "This needs to be completed by"
+    When I follow "Activity test"
+    Then I should see "Your response"
     And I log out
 
     # user2 should not receive any notifications
@@ -145,6 +158,13 @@ Feature: Perform activity notifications - core relationships
     And I reload the page
     And I open the notification popover
     Then I should see "Te manatu mō te whakarite" exactly "1" times
+    When I follow "View full notification"
+    Then I should see "Hi User One"
+    And I should see "0 days ago you were sent your Activity test Feedback to complete"
+    And I should see "This needs to be completed by"
+    When I follow "Activity test"
+    Then I should see "Your response"
+    And I am on site homepage
 
     # 1 day 23 hour
     Given I time travel to "22 hours future" for perform activity notification
@@ -260,6 +280,13 @@ Feature: Perform activity notifications - core relationships
     And I open the notification popover
     # And pause to check the time for perform activity notification
     Then I should see "Si avvicina la scadenza" exactly "1" times
+    When I follow "View full notification"
+    Then I should see "Hi User One"
+    And I should see "Your Activity test Feedback is due to be completed in 14 days"
+    And I should see "Please ensure you complete it by"
+    When I follow "Activity test"
+    Then I should see "Your response"
+    And I am on site homepage
 
     # day 9 (5 days before due)
     Given I time travel to "1 day future" for perform activity notification
@@ -380,6 +407,13 @@ Feature: Perform activity notifications - core relationships
     And I reload the page
     And I open the notification popover
     Then I should see "Notificación de fecha de vencimiento" exactly "1" times
+    When I follow "View full notification"
+    Then I should see "Hi User One"
+    And I should see "Your Activity test Feedback is due to be completed today"
+    And I should see "Please ensure you complete it by the end of the day"
+    When I follow "Activity test"
+    Then I should see "Your response"
+    And I am on site homepage
 
     # day 15 (overdue)
     Given I time travel to "1 days future" for perform activity notification
@@ -469,6 +503,12 @@ Feature: Perform activity notifications - core relationships
     And I reload the page
     And I open the notification popover
     Then I should see "Försenad påminnelse" exactly "1" times
+    When I follow "View full notification"
+    Then I should see "Hi User One"
+    And I should see "Your Activity test Feedback was due to be completed on"
+    When I follow "Activity test"
+    Then I should see "Your response"
+    And I am on site homepage
 
     # day 16 (2 day overdue)
     Given I time travel to "1 days future" for perform activity notification
@@ -586,7 +626,11 @@ Feature: Perform activity notifications - core relationships
     # user1 should receive a notification
     And I open the notification popover
     Then I should see "Ukončení činnosti" exactly "1" times
-    And I am on homepage
+    When I follow "View full notification"
+    Then I should see "Hi User One"
+    And I should see "Your Activity test Feedback has been completed by all participants"
+    When I follow "Activity test"
+    Then I should see "Your response"
     And I log out
 
     # user3 should receive a notification
@@ -599,6 +643,12 @@ Feature: Perform activity notifications - core relationships
     When I log in as "appraiser"
     And I open the notification popover
     Then I should see "Finalizarea activității" exactly "1" times
+    When I follow "View full notification"
+    Then I should see "Hi Appra Iser"
+    And I should see "The following activity has been completed by all participants"
+    And I should see "Activity test Feedback: User One"
+    When I follow "Activity test"
+    Then I should see "Your response"
     And I log out
 
     # user2 should not receive any notifications
@@ -696,7 +746,11 @@ Feature: Perform activity notifications - core relationships
     When I log in as "user1"
     And I open the notification popover
     Then I should see "Ua toe tatalaina se gaoioiga" exactly "1" times
-    And I am on homepage
+    When I follow "View full notification"
+    Then I should see "Hi User One"
+    And I should see "Your Activity test Feedback has been reopened"
+    When I follow "Activity test"
+    Then I should see "Your response"
     And I log out
 
     # user3 should receive a notification
@@ -709,6 +763,12 @@ Feature: Perform activity notifications - core relationships
     When I log in as "appraiser"
     And I open the notification popover
     Then I should see "Dejavnost je bila znova odprta" exactly "1" times
+    When I follow "View full notification"
+    Then I should see "Hi Appra Iser"
+    And I should see "The following activity has been reopened"
+    And I should see "Activity test Feedback: User One"
+    When I follow "Activity test"
+    Then I should see "Your response"
     And I log out
 
     # user2 should not receive any notifications

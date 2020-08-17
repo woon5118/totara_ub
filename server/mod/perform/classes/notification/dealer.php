@@ -74,9 +74,10 @@ class dealer {
      *
      * @param user_entity|stdClass|participant_model|external_participant_model $user
      * @param relationship_model $relationship
+     * @param placeholder $placeholders
      * @return boolean
      */
-    public function post($user, relationship_model $relationship): bool {
+    public function post($user, relationship_model $relationship, placeholder $placeholders): bool {
         $recipient = $this->resolve_recipient($relationship);
         if (!$recipient) {
             return false;
@@ -96,7 +97,7 @@ class dealer {
             $user = $user->get_record();
         }
         $is_reminder = $this->composer->is_reminder();
-        $message = $this->composer->compose($relationship);
+        $message = $this->composer->compose($placeholders);
         $this->send_notification(core_user::NOREPLY_USER, $user, $message, $is_reminder);
         $this->save_history($recipient, time());
         return true;

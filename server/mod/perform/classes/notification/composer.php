@@ -96,19 +96,21 @@ class composer {
     }
 
     /**
+     * @param placeholder $placeholders
      * @return lang_string
      * @throws coding_exception
      */
-    public function get_subject_lang_string(): lang_string {
-        return new lang_string($this->get_subject_lang_key(), 'mod_perform');
+    public function get_subject_lang_string(placeholder $placeholders): lang_string {
+        return new lang_string($this->get_subject_lang_key(), 'mod_perform', $placeholders);
     }
 
     /**
+     * @param placeholder $placeholders
      * @return lang_string
      * @throws coding_exception
      */
-    public function get_body_lang_string(): lang_string {
-        return new lang_string($this->get_body_lang_key(), 'mod_perform');
+    public function get_body_lang_string(placeholder $placeholders): lang_string {
+        return new lang_string($this->get_body_lang_key(), 'mod_perform', $placeholders);
     }
 
     /**
@@ -121,19 +123,20 @@ class composer {
     }
 
     /**
-     * @param relationship $relationship
+     * @param placeholder $placeholders
      * @return message
      * @throws coding_exception
      */
-    public function compose(): message {
-        $subject = $this->get_subject_lang_string()->out();
-        $body = $this->get_body_lang_string()->out();
+    public function compose(placeholder $placeholders): message {
+        $subject = $this->get_subject_lang_string($placeholders)->out();
+        $html = text_to_html($this->get_body_lang_string($placeholders)->out());
+        $text = format_text_email($html, FORMAT_HTML);
         $message = new message();
         $message->subject = $subject;
-        $message->fullmessage = $body;
+        $message->fullmessage = $text;
         $message->fullmessageformat = FORMAT_PLAIN;
-        $message->fullmessagehtml = text_to_html($body);
-        $message->smallmessage = $body;
+        $message->fullmessagehtml = $html;
+        $message->smallmessage = $text;
         return $message;
     }
 }

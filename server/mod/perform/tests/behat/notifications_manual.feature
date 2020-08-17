@@ -108,13 +108,12 @@ Feature: Perform activity notifications - manual relationships
     And I open the notification popover
     Then I should not see "New activity notice"
     And I should see "Wybierz uczestników" exactly "1" times
-    # TODO: Fix the behat steps as follows in TL-25417:
-    # Click the "See all" link to visit the notification page
-    # Click the "select participants" link in the notification message
-    # Then you should see the select participants page
-    When I navigate to the outstanding perform activities list page
-    And I click on "Select participants" tui "link_or_button" in the "You must select participants" tui "action_card"
-    When I select from the tui taglist in the ".tui-formRow" "css_element":
+    When I follow "View full notification"
+    Then I should see "Hi User One"
+    And I should see "You need to select who you want to participate in your Activity test Feedback"
+    And I should see "Their input is needed by"
+    When I follow "Select participants"
+    And I select from the tui taglist in the ".tui-formRow" "css_element":
       | Appra Iser |
     And I click on "Save" "button"
     And I close the tui notification toast
@@ -125,10 +124,13 @@ Feature: Perform activity notifications - manual relationships
     And I open the notification popover
     Then I should not see "Nuwe aktiwiteitskennisgewing"
     And I should see "Pasirinkite dalyvius" exactly "1" times
-    # TODO: Fix the behat steps as follows in TL-25417
-    When I navigate to the outstanding perform activities list page
-    And I click on "Select participants" tui "link_or_button" in the "You must select participants" tui "action_card"
-    When I select from the tui taglist in the ".tui-formRow" "css_element":
+    When I follow "View full notification"
+    Then I should see "Hi Appra Iser"
+    And I should see "As User One’s Appraiser, you need to select who should participate in the following activity"
+    And I should see "Activity test Feedback"
+    And I should see "Their input is needed by"
+    When I follow "Select participants"
+    And I select from the tui taglist in the ".tui-formRow" "css_element":
       | Mana Ger |
     And I click on "Save" "button"
     And I close the tui notification toast
@@ -184,10 +186,12 @@ Feature: Perform activity notifications - manual relationships
     When I log in as "user1"
     And I open the notification popover
     Then I should not see "New activity notice"
-    # TODO: Fix the behat steps in TL-25417
     And I should see "Wybierz uczestników" exactly "1" times
-    When I navigate to the outstanding perform activities list page
-    And I click on "Select participants" tui "link_or_button" in the "You must select participants" tui "action_card"
+    When I follow "View full notification"
+    Then I should see "Hi User One"
+    And I should see "You need to select who you want to participate in your Activity test Feedback"
+    And I should see "Their input is needed by"
+    When I follow "Select participants"
     And I click on "Add" tui "button" in the "External respondent" tui "form"
     And I set the following fields to these values:
       | External respondent 1's name          | External One             |
