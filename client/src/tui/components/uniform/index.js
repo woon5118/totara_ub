@@ -23,7 +23,6 @@ export { default as FieldArray } from 'tui/components/reform/FieldArray';
 export { default as FormScope } from 'tui/components/reform/FormScope';
 export { default as FormRow } from 'tui/components/form/FormRow';
 export { default as FormRowStack } from 'tui/components/form/FormRowStack';
-export { default as FormRowFieldset } from 'tui/components/form/FormRowFieldset';
 
 // inputs
 export { default as FormCheckbox } from 'tui/components/uniform/FormCheckbox';
