@@ -86,7 +86,7 @@ class element_identifier extends perform_controller {
         $action_card_component = $this->get_rendered_action_card(
             $filtered_count,
             $report->get_search_hash(),
-            'element_identifier',
+            export::SHORT_NAME_ELEMENT_IDENTIFIER,
             ['element_identifier' => $filtered_report_element_identifier_names]
         );
 

@@ -86,7 +86,7 @@ class activity extends perform_controller {
 
         $this->set_url(static::get_url($extra_data));
 
-        $report = $this->load_embedded_report('element_performance_reporting', $extra_data);
+        $report = $this->load_embedded_report('element_performance_reporting_by_activity', $extra_data);
         $debug = $this->get_optional_param('debug', 0, PARAM_INT);
 
         $filtered_count = $report->get_filtered_count();
@@ -94,7 +94,7 @@ class activity extends perform_controller {
         $action_card_component = $this->get_rendered_action_card(
             $filtered_count,
             $report->get_search_hash(),
-            'element',
+            export::SHORT_NAME_ELEMENT,
             ['activity_id' => $activity_id]
         );
 

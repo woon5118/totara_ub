@@ -17,29 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\controllers\reporting\performance;
 
-use context;
-use context_coursecat;
-use core\output\notification;
-use mod_perform\controllers\perform_controller;
-use mod_perform\models\activity\activity as activity_model;
-use mod_perform\util;
 use mod_perform\views\embedded_report_view;
-use mod_perform\views\override_nav_breadcrumbs;
-use moodle_exception;
 use moodle_url;
 use reportbuilder;
-use totara_competency\webapi\resolver\mutation\archive_user_assignment;
-use totara_mvc\has_report;
 use totara_mvc\renders_components;
-use totara_mvc\view;
-use totara_tui\output\component;
-use mod_perform\data_providers\activity\reportable_activities;
 
 trait renders_performance_reports {
 

@@ -149,6 +149,7 @@ class rb_subject_instance_performance_reporting_embedded extends rb_base_embedde
      * @return boolean true if the user can access this report
      */
     public function is_capable($reportfor, $report): bool {
-        return util::can_potentially_report_on_subjects($reportfor);
+        $subject_user_id = $report->get_param_value('subject_user_id');
+        return util::can_report_on_user($subject_user_id, $reportfor);
     }
 }

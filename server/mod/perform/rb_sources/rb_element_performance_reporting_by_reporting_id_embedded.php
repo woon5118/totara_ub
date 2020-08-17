@@ -21,12 +21,14 @@
  * @package: mod_perform
  */
 
+use mod_perform\util;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_element_performance_reporting_embedded.php');
+require_once(__DIR__ . '/rb_element_performance_reporting_base.php');
 
-class rb_element_performance_reporting_by_reporting_id_embedded extends rb_element_performance_reporting_embedded {
+class rb_element_performance_reporting_by_reporting_id_embedded extends rb_element_performance_reporting_base {
 
     public function __construct($data) {
         if (isset($data['element_identifier'])) {
@@ -34,36 +36,70 @@ class rb_element_performance_reporting_by_reporting_id_embedded extends rb_eleme
             $this->embeddedparams['element_identifier'] = $element_identifiers_array;
         }
 
-        parent::__construct($data);
-        $this->shortname = 'element_performance_reporting_by_reporting_id';
-        $this->fullname = get_string('embedded_element_performance_reporting_by_reporting_id', 'mod_perform');
+        parent::__construct();
     }
 
     /**
-     * Define the default filters for this report.
+     * Define the default columns for this report.
      *
      * @return array
      */
-    protected function define_filters() {
-        // This is the same as rb_element_performance_reporting_embedded but with reporting id (identifier) removed.
+    protected function define_columns(): array {
         return [
             [
-                'type' => 'section',
+                'type' => 'element',
                 'value' => 'title',
+                'heading' => get_string('question_title', 'mod_perform'),
             ],
             [
                 'type' => 'element',
                 'value' => 'type',
+                'heading' => get_string('element_reporting_title_element_type', 'mod_perform'),
             ],
             [
                 'type' => 'section',
-                'value' => 'involved_relationships',
+                'value' => 'title',
+                'heading' => get_string('element_reporting_title_section_title', 'mod_perform'),
+            ],
+            [
+                'type' => 'activity',
+                'value' => 'name',
+                'heading' => get_string('element_reporting_title_activity', 'mod_perform'),
+            ],
+            [
+                'type' => 'section',
+                'value' => 'responding_relationship_count',
+                'heading' => get_string('element_reporting_title_responding_relationships', 'mod_perform'),
             ],
             [
                 'type' => 'element',
-                'value' => 'title',
+                'value' => 'identifier',
+                'heading' => get_string('element_identifier', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'actions',
+                'heading' => get_string('actions', 'mod_perform'),
             ],
         ];
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function is_capable($reportfor, $report): bool {
+        return util::has_report_on_all_subjects_capability($reportfor);
+    }
+
+    protected function get_url(): string {
+        return '/mod/perform/reporting/performance/element_identifier.php';
+    }
+
+    protected function get_short_name(): string {
+        return 'element_performance_reporting_by_reporting_id';
+    }
+
+    protected function get_full_name(): string {
+        return get_string('embedded_element_performance_reporting_by_reporting_id', 'mod_perform');
+    }
 }

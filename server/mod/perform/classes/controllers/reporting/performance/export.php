@@ -39,6 +39,10 @@ class export extends perform_controller {
 
     use has_report;
 
+    public const SHORT_NAME_ELEMENT_IDENTIFIER = 'element_identifier';
+    public const SHORT_NAME_ELEMENT = 'element';
+    public const SHORT_NAME_SUBJECT_INSTANCE = 'subject_instance';
+
     /**
      * mod_perform\models\activity\activity instance
      * @var activity $activity
@@ -106,11 +110,13 @@ class export extends perform_controller {
         $filtered_report_filter_hash = $this->get_required_param('filtered_report_filter_hash', PARAM_ALPHANUM);
 
         switch ($export_type) {
-            case 'element':
-            case 'element_identifier':
-                $source_shortname = 'element_performance_reporting';
+            case self::SHORT_NAME_ELEMENT_IDENTIFIER:
+                $source_shortname = 'element_performance_reporting_by_reporting_id';
                 break;
-            case 'subject_instance':
+            case self::SHORT_NAME_ELEMENT:
+                $source_shortname = 'element_performance_reporting_by_activity';
+                break;
+            case self::SHORT_NAME_SUBJECT_INSTANCE:
                 $source_shortname = 'subject_instance_performance_reporting';
                 break;
             default:
@@ -141,20 +147,23 @@ class export extends perform_controller {
         }, $data);
 
         switch ($export_type) {
-            case 'element':
+            case self::SHORT_NAME_ELEMENT:
                 if (!empty($ids)) {
                     $extra_data['element_id'] = $ids;
                 }
                 $extra_data['activity_id'] = $this->get_required_param('activity_id', PARAM_INT);
                 break;
-            case 'subject_instance':
+            case self::SHORT_NAME_SUBJECT_INSTANCE:
                 if (!empty($ids)) {
                     $extra_data['subject_instance_id'] = $ids;
                 }
                 $extra_data['subject_user_id'] = $this->get_required_param('subject_user_id', PARAM_INT);
                 break;
-            case 'element_identifier':
-                $extra_data['element_identifier'] = required_param_array('element_identifier', PARAM_INT);
+            case self::SHORT_NAME_ELEMENT_IDENTIFIER:
+                $extra_data[self::SHORT_NAME_ELEMENT_IDENTIFIER] = required_param_array(
+                    self::SHORT_NAME_ELEMENT_IDENTIFIER,
+                    PARAM_INT
+                );
                 if (!empty($ids)) {
                     $extra_data['element_id'] = $ids;
                 }

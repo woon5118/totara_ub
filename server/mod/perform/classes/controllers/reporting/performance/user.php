@@ -89,7 +89,7 @@ class user extends perform_controller {
         $action_card_component = $this->get_rendered_action_card(
             $filtered_count,
             $report->get_search_hash(),
-            'subject_instance',
+            export::SHORT_NAME_SUBJECT_INSTANCE,
             ['subject_user_id' => $subject_user_id]
         );
 

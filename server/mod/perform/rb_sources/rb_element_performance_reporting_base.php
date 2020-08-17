@@ -17,58 +17,64 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Simon Coggins <simon.coggins@totaralearning.com>
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package: mod_perform
  */
-
-use mod_perform\util;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_element.php');
 
-class rb_element_ids_performance_reporting_embedded extends rb_base_embedded {
+abstract class rb_element_performance_reporting_base extends rb_base_embedded {
 
-    public function __construct($data) {
-
-        $this->url = '/mod/perform/reporting/performance/activity.php';
+    public function __construct() {
+        $this->url = $this->get_url();
         $this->source = 'perform_element';
-        $this->shortname = 'element_ids_performance_reporting';
-        $this->fullname = get_string('embedded_element_ids_performance_reporting', 'mod_perform');
+        $this->shortname = $this->get_short_name();
+        $this->fullname = $this->get_full_name();
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
         $this->defaultsortcolumn = 'element_default_sort';
 
-        if (isset($data['element_identifier'])) {
-            $element_identifiers_array = explode(',', $data['element_identifier']);
-            $this->embeddedparams['element_identifier'] = $element_identifiers_array;
-        }
-
         parent::__construct();
     }
+
+    abstract protected function get_url(): string;
+    abstract protected function get_short_name(): string;
+    abstract protected function get_full_name(): string;
 
     /**
      * Define the default columns for this report.
      *
      * @return array
      */
-    protected function define_columns() {
+    protected function define_columns(): array {
         return [
             [
                 'type' => 'element',
                 'value' => 'title',
-                'heading' => get_string('element_title', 'mod_perform'),
+                'heading' => get_string('question_title', 'mod_perform'),
             ],
             [
                 'type' => 'section',
                 'value' => 'title',
-                'heading' => get_string('section_title', 'mod_perform'),
+                'heading' => get_string('element_reporting_title_section_title', 'mod_perform'),
+            ],
+            [
+                'type' => 'element',
+                'value' => 'type',
+                'heading' => get_string('element_reporting_title_element_type', 'mod_perform'),
+            ],
+            [
+                'type' => 'section',
+                'value' => 'responding_relationship_count',
+                'heading' => get_string('element_reporting_title_responding_relationships', 'mod_perform'),
             ],
             [
                 'type' => 'element',
                 'value' => 'is_required',
-                'heading' => get_string('element_is_required', 'mod_perform'),
+                'heading' => get_string('element_reporting_title_required', 'mod_perform'),
             ],
             [
                 'type' => 'element',
@@ -88,7 +94,7 @@ class rb_element_ids_performance_reporting_embedded extends rb_base_embedded {
      *
      * @return array
      */
-    protected function define_filters() {
+    protected function define_filters(): array {
         return [
             [
                 'type' => 'section',
@@ -96,12 +102,16 @@ class rb_element_ids_performance_reporting_embedded extends rb_base_embedded {
             ],
             [
                 'type' => 'element',
-                'value' => 'title',
+                'value' => 'type',
+            ],
+            [
+                'type' => 'section',
+                'value' => 'involved_relationships',
             ],
             [
                 'type' => 'element',
-                'value' => 'identifier',
-            ],
+                'value' => 'title',
+            ]
         ];
     }
 
@@ -111,7 +121,7 @@ class rb_element_ids_performance_reporting_embedded extends rb_base_embedded {
      *
      * @return boolean
      */
-    public function embedded_global_restrictions_supported() {
+    public function embedded_global_restrictions_supported(): bool {
         return true;
     }
 
@@ -124,14 +134,4 @@ class rb_element_ids_performance_reporting_embedded extends rb_base_embedded {
         return false;
     }
 
-    /**
-     * Check if the user is capable of accessing this report.
-     *
-     * @param int $reportfor userid of the user that this report is being generated for
-     * @param reportbuilder $report the report object - can use get_param_value to get params
-     * @return boolean true if the user can access this report
-     */
-    public function is_capable($reportfor, $report): bool {
-        return util::can_potentially_report_on_subjects($reportfor);
-    }
 }
