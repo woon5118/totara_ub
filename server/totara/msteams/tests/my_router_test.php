@@ -146,7 +146,7 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
             ->build();
         $this->bot->set_hook($this->hook);
         $this->course1 = $this->getDataGenerator()->create_course([
-            'fullname' => 'Culinary arts',
+            'fullname' => 'Culinary art',
             'shortname' => 'culinaryarts',
             'summary' => "Let's cook"
         ]);
@@ -643,7 +643,7 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
                 'value' => "{$CFG->wwwroot}/course/view.php?id={$this->course1->id}"
             ], JSON_UNESCAPED_SLASHES))
         ]));
-        $deeplinkurl = "https://teams.microsoft.com/l/entity/{$this->manifest_app_id}/catalog?label=Culinary%20arts&context={$context}";
+        $deeplinkurl = "https://teams.microsoft.com/l/entity/{$this->manifest_app_id}/catalog?label=Culinary%20art&context={$context}";
 
         $this->set_up_subscription();
         $activity = $this->messaging_extension($group, 'art');
@@ -656,7 +656,7 @@ class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
         $this->assertEquals('result', $json->composeExtension->type);
         $this->assertEquals('list', $json->composeExtension->attachmentLayout);
         $this->assertCount(1, $json->composeExtension->attachments);
-        $this->assertStringContainsString('Culinary arts', $json->composeExtension->attachments[0]->content->title);
+        $this->assertStringContainsString('Culinary art', $json->composeExtension->attachments[0]->content->title);
         $this->assertEquals('Courses', $json->composeExtension->attachments[0]->content->subtitle);
         $this->assertStringContainsString("Let's cook", $json->composeExtension->attachments[0]->content->text);
         $this->assertCount(0, $json->composeExtension->attachments[0]->content->buttons);
