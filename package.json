@@ -15,6 +15,7 @@
         "tui-test-legacy": "cross-env BABEL_LEGACY=1 jest",
         "tui-test-watch": "jest --watch",
         "tui-ci": "npm run tui-build && npm run tui-test && npm run tui-style-check",
+        "tui-clean": "git clean -fdx client/component/*/build",
         "setup-hooks": "node ./client/tooling/tasks/setup-hooks.js",
         "remove-hooks": "node ./client/tooling/tasks/remove-hooks.js",
         "generate-configs": "node ./client/tooling/tasks/generate-configs.js",

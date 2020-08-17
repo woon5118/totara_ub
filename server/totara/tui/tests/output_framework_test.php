@@ -49,7 +49,6 @@ class totara_tui_output_framework_test extends advanced_testcase {
     }
 
     public function test_get_head_code() {
-        global $CFG;
         $page = new moodle_page();
         /** @var core_renderer $renderer */
         $renderer = $page->get_renderer('core');
@@ -61,7 +60,7 @@ class totara_tui_output_framework_test extends advanced_testcase {
         $property->setAccessible(true);
         $urls = $property->getValue($framework);
 
-        if (file_exists($CFG->srcroot . '/client/build/tui')) {
+        if (file_exists(\totara_tui\local\locator\bundle::get_vendors_file())) {
             self::assertIsArray($urls);
             self::assertCount(2, $urls);
             /** @var moodle_url[] $urls */
@@ -76,8 +75,6 @@ class totara_tui_output_framework_test extends advanced_testcase {
      * Tui styles/javascript loads resources for the current theme, and in the same request for the theme parents.
      */
     public function test_get_head_code_unknown_theme() {
-        global $CFG;
-
         $theme = $this->createMock('theme_config');
         $theme->name = 'bananas';
         $theme->parents = ['ventura', 'legacy', 'base'];
@@ -97,7 +94,7 @@ class totara_tui_output_framework_test extends advanced_testcase {
         $property->setAccessible(true);
         $urls = $property->getValue($framework);
 
-        if (file_exists($CFG->srcroot . '/client/build/tui')) {
+        if (file_exists(\totara_tui\local\locator\bundle::get_vendors_file())) {
             self::assertIsArray($urls);
             self::assertCount(2, $urls);
             /** @var moodle_url[] $urls */
@@ -107,7 +104,6 @@ class totara_tui_output_framework_test extends advanced_testcase {
     }
 
     public function test_inject_css_urls() {
-        global $CFG;
         $a = ['a', 'b/tui_scss', 'c'];
 
         $page = new moodle_page();
@@ -121,23 +117,15 @@ class totara_tui_output_framework_test extends advanced_testcase {
         $framework->inject_css_urls($a);
         /** @var string[]|moodle_url[] $a */
 
-        if (file_exists($CFG->srcroot . '/client/build/tui')) {
-            self::assertCount(5, $a);
-            self::assertSame('a', $a[0]);
-            self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/tui', $a[1]->out_as_local_url());
-            self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/theme_ventura', $a[2]->out_as_local_url());
-            self::assertSame('b/tui_scss', $a[3]);
-            self::assertSame('c', $a[4]);
-        } else {
-            self::assertCount(3, $a);
-            self::assertSame('a', $a[0]);
-            self::assertSame('b/tui_scss', $a[1]);
-            self::assertSame('c', $a[2]);
-        }
+        self::assertCount(5, $a);
+        self::assertSame('a', $a[0]);
+        self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/tui', $a[1]->out_as_local_url());
+        self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/theme_ventura', $a[2]->out_as_local_url());
+        self::assertSame('b/tui_scss', $a[3]);
+        self::assertSame('c', $a[4]);
     }
 
     public function test_inject_js_urls() {
-        global $CFG;
         $a = ['a', 'b/tui', 'c'];
 
         $page = new moodle_page();
@@ -151,27 +139,16 @@ class totara_tui_output_framework_test extends advanced_testcase {
         $framework->inject_js_urls($a, true);
         /** @var string[]|moodle_url[] $a */
 
-        if (file_exists($CFG->srcroot . '/client/build/tui')) {
-            self::assertCount(6, $a);
-            self::assertSame('a', $a[0]);
-            self::assertSame('b/tui', $a[1]);
-            self::assertSame('c', $a[2]);
-            self::assertSame('/totara/tui/javascript.php/1/p/vendors', $a[3]->out_as_local_url());
-            self::assertSame('/totara/tui/javascript.php/1/p/tui', $a[4]->out_as_local_url());
-            self::assertSame('/totara/tui/javascript.php/1/p/theme_ventura', $a[5]->out_as_local_url());
-        } else {
-            self::assertCount(3, $a);
-            self::assertSame('a', $a[0]);
-            self::assertSame('b/tui', $a[1]);
-            self::assertSame('c', $a[2]);
-        }
+        self::assertCount(6, $a);
+        self::assertSame('a', $a[0]);
+        self::assertSame('b/tui', $a[1]);
+        self::assertSame('c', $a[2]);
+        self::assertSame('/totara/tui/javascript.php/1/p/vendors', $a[3]->out_as_local_url());
+        self::assertSame('/totara/tui/javascript.php/1/p/tui', $a[4]->out_as_local_url());
+        self::assertSame('/totara/tui/javascript.php/1/p/theme_ventura', $a[5]->out_as_local_url());
 
         $framework->inject_js_urls($a, false);
-        if (file_exists($CFG->srcroot . '/client/build/tui')) {
-            self::assertCount(6, $a);
-        } else {
-            self::assertCount(3, $a);
-        }
+        self::assertCount(6, $a);
     }
 
     public function test_require_component() {

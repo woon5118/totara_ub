@@ -36,7 +36,7 @@ const args = require('yargs')
       .default('vendor', 'totara');
   }).argv;
 
-const clientDir = 'client/src/' + args.component;
+const clientDir = 'client/component/' + args.component + '/src';
 const fullDir = path.join(rootDir, clientDir);
 
 if (fs.existsSync(fullDir)) {

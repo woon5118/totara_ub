@@ -62,8 +62,7 @@ class totara_tui_webapi_resolver_query_bundles_testcase extends advanced_testcas
     }
 
     public function test_resolve_multiple_components() {
-        global $CFG;
-        if (!file_exists($CFG->srcroot . '/client/build/tui')) {
+        if (!file_exists(\totara_tui\local\locator\bundle::get_vendors_file())) {
             $this->markTestSkipped('Tui build files must exist for this test to complete.');
         }
         $result = $this->resolve_graphql_query('totara_tui_bundles', ['components' => ['tui', 'tui_charts'], 'theme' => 'ventura']);
@@ -81,8 +80,7 @@ class totara_tui_webapi_resolver_query_bundles_testcase extends advanced_testcas
      * @coversNothing This is required because the test stack trace is too large for code coverage.
      */
     public function test_graphql_totara_tui_bundles() {
-        global $CFG;
-        if (!file_exists($CFG->srcroot . '/client/build/tui')) {
+        if (!file_exists(\totara_tui\local\locator\bundle::get_vendors_file())) {
             $this->markTestSkipped('Tui build files must exist for this test to complete.');
         }
         $result = $this->execute_graphql_operation('totara_tui_bundles_nosession', ['components' => ['tui', 'tui_charts'], 'theme' => 'ventura']);

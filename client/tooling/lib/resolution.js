@@ -54,7 +54,7 @@ function getClientDir(component) {
   if (!component) {
     return null;
   }
-  const dir = 'client/src/' + component;
+  const dir = 'client/component/' + component + '/src';
   if (!clientDirExists.has(component)) {
     clientDirExists.set(component, fs.existsSync(dir));
   }

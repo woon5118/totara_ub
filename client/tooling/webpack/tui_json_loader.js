@@ -20,7 +20,6 @@ const path = require('path');
 const fs = require('fs');
 const { stringifyRequest, getOptions } = require('loader-utils');
 const { dirMaps } = require('../lib/resolution');
-const { rootDir } = require('../lib/common');
 
 // exclude __mocks__ dir and /internal/ dir
 const bundleExclusionsRegex = /__[a-z]*__|[/\\]internal[/\\]/;
@@ -112,7 +111,7 @@ module.exports = function(jsonSource, map) {
   // would be better to derive from entry filename, but i can't find a way to
   // get that (probably by design as a module could be used by multiple entries)
   this.emitFile(
-    path.join(config.component, 'dependencies.json'),
+    path.join(config.component, 'build/dependencies.json'),
     genDependenciesJson(config)
   );
 

@@ -103,7 +103,7 @@ class totara_tui_local_locator_bundle_test extends advanced_testcase {
         $method = new ReflectionMethod(bundle::class, 'anticipated_bundle_location');
         $method->setAccessible(true);
         $actual = $method->invoke(null, 'test');
-        self::assertTrue((new path($CFG->srcroot, 'client/build/test'))->equals($actual));
+        self::assertTrue((new path($CFG->srcroot, 'client/component/test'))->equals($actual));
     }
 
     public function test_get_js_suffix_for_url() {

@@ -76,10 +76,9 @@ class totara_tui_local_requirement_vendors_js_testcase extends advanced_testcase
     }
 
     public function test_required() {
-        global $CFG;
-
         $requirement = new vendors_js();
-        if (file_exists($CFG->srcroot . '/client/build/tui/tui_bundle.js')) {
+
+        if (file_exists(bundle::get_vendors_file())) {
             self::assertTrue($requirement->has_resources_to_load());
         } else {
             self::assertFalse($requirement->has_resources_to_load());

@@ -61,7 +61,7 @@ final class bundle {
     /**
      * The directory containing loadable bundles, relative to $CFG->srcroot
      */
-    private const SOURCE_DIRECTORY = '/client/build';
+    private const DIR_BUNDLE = '/client/component';
 
     /**
      * A singleton.
@@ -196,7 +196,7 @@ final class bundle {
         if ($bundle !== framework::clean_bundle_name($bundle)) {
             throw new coding_exception('Invalid bundle name provided.');
         }
-        return new path($CFG->srcroot, self::SOURCE_DIRECTORY, $bundle);
+        return new path($CFG->srcroot, self::DIR_BUNDLE, $bundle);
     }
 
     /**
@@ -424,7 +424,7 @@ final class bundle {
             $suffixes_imports[$suffix] = [];
         }
 
-        $directory = new path($CFG->srcroot, self::SOURCE_DIRECTORY);
+        $directory = new path($CFG->srcroot, self::DIR_BUNDLE);
         if (!$directory->is_readable() || !$directory->is_directory()) {
             throw new coding_exception('Unable to read bundle directory');
         }

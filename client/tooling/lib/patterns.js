@@ -19,15 +19,15 @@
 // glob patterns used for linters/tooling
 const patterns = {
   eslint: [
-    'client/src/**/*.{js,vue}'
+    'client/component/*/src/**/*.{js,vue}'
   ],
-  stylelint: ['client/src/**/*.{css,scss,vue}'],
+  stylelint: ['client/component/*/src/**/*.{css,scss,vue}'],
   prettier: [
-    'client/src/**/*.{js,css,scss,vue}',
+    'client/component/*/src/**/*.{js,css,scss,vue}',
   ],
   // single pattern that will match all of the files in the above patterns, even
   // if some of them will get filtered out later
-  allGreedyPattern: 'client/src/**/*.{js,css,scss,vue,graphql,graphqls}',
+  allGreedyPattern: 'client/component/*/src/**/*.{js,css,scss,vue,graphql,graphqls}',
 };
 
 module.exports = patterns;

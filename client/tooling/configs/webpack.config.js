@@ -34,9 +34,22 @@ let entryCache = null;
 const getEntry = () =>
   entryCache ? entryCache : (entryCache = scanEntry({ rootDir }));
 
-const coreBundle = 'tui/tui_bundle';
-const isCoreBundleChunk = x =>
-  x.name.replace(/\\/g, '/').startsWith(coreBundle);
+const isCoreBundleChunk = function (x) {
+  return x.name === 'tui' || x.name.startsWith('tui.');
+}
+
+const separateNameAndSuffix = function(name) {
+  let suffix = '';
+  let dotIndex = name.indexOf('.');
+  if (dotIndex !== -1) {
+    suffix = name.substr(dotIndex);
+    name = name.substr(0, dotIndex);
+  }
+  return {
+    name: name,
+    suffix: suffix
+  };
+}
 
 /**
  * Create a webpack config with the specified options.
@@ -76,7 +89,11 @@ function createConfig({
   const plugins = [
     new VueLoaderPlugin(),
     new MiniCssExtractPlugin({
-      filename: '[name].scss',
+      moduleFilename: function({name}) {
+        let bits = separateNameAndSuffix(name);
+        name = bits.name + '/build/tui_bundle' + bits.suffix + '.scss';
+        return name;
+      },
     }),
     new webpack.DefinePlugin({
       'process.env.LEGACY_BUNDLE': 'false',
@@ -180,13 +197,14 @@ function createConfig({
         if (!bundleChunk) {
           return false;
         }
-        const index = bundleChunk.name.indexOf('tui_bundle');
-        if (index === -1) throw new Error('Unexpected chunk name');
-        // '' or '.legacy'
-        const bundleSuffix = bundleChunk.name.slice(
-          index + 'tui_bundle'.length
-        );
-        return 'tui/vendors' + bundleSuffix;
+        let vendorName = 'tui/build/vendors';
+        if (bundleChunk.name !== 'tui') {
+          // '' or '.legacy' or '.development' or '.legacy.development'
+          const index = bundleChunk.name.indexOf('.');
+          if (index === -1) throw new Error('Unexpected chunk name ' + bundleChunk.name);
+          vendorName = 'tui/build/vendors' + bundleChunk.name.slice(index);
+        }
+        return vendorName;
       },
     },
   };
@@ -207,7 +225,13 @@ function createConfig({
     performance: { hints: false },
 
     output: {
-      path: path.join(rootDir, 'client/build'),
+      path: path.resolve(rootDir, 'client/component'),
+      filename: (pathData) => {
+        let bits = separateNameAndSuffix(pathData.chunk.name);
+        name = bits.name + '/build/tui_bundle' + bits.suffix + '.js';
+        return name;
+      },
+      chunkFilename: '[name].js'
     },
 
     resolve: {
@@ -278,7 +302,7 @@ function scssToScssConfig({ mode, watch }) {
           return;
         }
         const out = path.join(
-          dir.replace(/^\.[\/\\]client[\/\\]src/, './client/build'),
+          dir.replace(/^\.[\/\\]client[\/\\]component[\/\\]([^\/\\]+)[\/\\]src/, './client/component/$1/build'),
           'styles',
           x.slice('styles/'.length).replace(/\.scss$/, '')
         );

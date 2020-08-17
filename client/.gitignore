@@ -1,2 +1,3 @@
 # Webpack aliases file used to help PHPStorm: npm run generate-config
 /tooling/generated/webpack_aliases.js
+/component/*/build

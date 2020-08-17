@@ -22,7 +22,7 @@ const { escapeRegExp } = require('../lib/common');
 const { vueFolders } = require('../lib/resolution');
 
 const themeOverrideRegex = new RegExp(
-  '(server\\/theme\\/[^/]+\\/tui|client\\/src\\/theme_[^/]+)\\/(' +
+  '(server\\/theme\\/[^/]+\\/tui|client\\/bundle\\/theme_[^/]+)\\/src\\/(' +
     vueFolders.map(x => escapeRegExp(x)).join('|') +
     ')\\/overrides\\/(.*).vue$'
 );
