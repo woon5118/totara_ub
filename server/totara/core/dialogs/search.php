@@ -316,8 +316,7 @@ switch ($searchtype) {
             }
         }
         //always exclude site course
-        $search_info->sql .= " AND c.id <> :siteid AND c.containertype = :container";
-        $params['siteid'] = SITEID;
+        $search_info->sql .= " AND c.containertype = :container";
         $params['container'] = \container_course\course::get_type();
         $search_info->order = " ORDER BY c.sortorder ASC";
         $search_info->params = $params;
@@ -616,7 +615,7 @@ switch ($searchtype) {
         $search_info->sql = "
             FROM
                 {course} c
-            WHERE c.category > 0 AND
+            WHERE
                 {$searchsql}
                 AND c.containertype = ?
         ";

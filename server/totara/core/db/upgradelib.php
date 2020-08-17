@@ -455,7 +455,7 @@ function totara_core_upgrade_delete_moodle_plugins() {
     );
 
     foreach ($deleteplugins as $deleteplugin) {
-        [$plugintype, $pluginname] = explode('_', $deleteplugin, 2);
+        list($plugintype, $pluginname) = explode('_', $deleteplugin, 2);
         $dir = core_component::get_plugin_directory($plugintype, $pluginname);
         if ($dir and file_exists("$dir/version.php")) {
             // This should not happen, this is not a standard distribution!
