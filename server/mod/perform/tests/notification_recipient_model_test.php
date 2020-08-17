@@ -28,6 +28,11 @@ use mod_perform\models\activity\notification_recipient;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
+/**
+ * Class mod_perform_notification_recipient_model_testcase
+ *
+ * @group perform
+ */
 class mod_perform_notification_recipient_model_testcase extends mod_perform_notification_testcase {
     public function test_create() {
         $activity = $this->create_activity();

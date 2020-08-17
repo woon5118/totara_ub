@@ -25,13 +25,13 @@ use mod_perform\constants;
 use totara_core\relationship\relationship;
 use mod_perform\relationship\resolvers\peer;
 
-require_once(__DIR__ . '/perform_relationship_resolver_test.php');
+require_once(__DIR__ . '/perform_relationship_resolver_testcase.php');
 
 /**
  * @group perform
  * @covers peer
  */
-class relationship_resolver_peer_testcase extends perform_relationship_resolver_test {
+class relationship_resolver_peer_testcase extends perform_relationship_resolver_testcase {
 
     public function test_get_users_by_subject_instance_id() {
         [$user1, $subject_instance] = $this->create_relationship_resolver_data(constants::RELATIONSHIP_PEER);

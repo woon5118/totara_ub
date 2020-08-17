@@ -27,6 +27,11 @@ use mod_perform\notification\factory;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
+/**
+ * Class mod_perform_notification_broker_testcase
+ *
+ * @group perform
+ */
 class mod_perform_notification_broker_testcase extends mod_perform_notification_testcase {
     public function test_instance_created_reminder_check_trigger_condition() {
         $activity = $this->create_activity();

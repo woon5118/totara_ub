@@ -33,6 +33,11 @@ use totara_core\relationship\relationship;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
+/**
+ * Class mod_perform_notification_message_model_testcase
+ *
+ * @group perform
+ */
 class mod_perform_notification_message_model_testcase extends mod_perform_notification_testcase {
     /** @var activity */
     private $activity;

@@ -26,6 +26,11 @@ use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 
+/**
+ * Class mod_perform_user_creation_date_resolver_testcase
+ *
+ * @group perform
+ */
 class mod_perform_user_creation_date_resolver_testcase extends advanced_testcase {
 
     public function test_get_option(): void {

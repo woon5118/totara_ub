@@ -29,6 +29,11 @@ use mod_perform\notification\brokers\overdue_reminder;
 use mod_perform\notification\loader;
 use mod_perform\notification\trigger;
 
+/**
+ * Class mod_perform_notification_loader_testcase
+ *
+ * @group perform
+ */
 class mod_perform_notification_loader_testcase extends advanced_testcase {
     /**
      * Ensure that the $child class inherits the $parent class.

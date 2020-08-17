@@ -25,7 +25,7 @@ use mod_perform\constants;
 use mod_perform\models\activity\subject_instance_manual_participant;
 use totara_core\relationship\relationship;
 
-abstract class perform_relationship_resolver_test extends advanced_testcase {
+abstract class perform_relationship_resolver_testcase extends advanced_testcase {
     /**
      * create manual relationship resolver data
      *

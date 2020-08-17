@@ -24,6 +24,11 @@
 use mod_perform\dates\resolvers\anniversary_of;
 use mod_perform\dates\resolvers\fixed_range_resolver;
 
+/**
+ * Class mod_perform_anniversary_of_date_resolver_testcase
+ *
+ * @group perform
+ */
 class mod_perform_anniversary_of_date_resolver_testcase extends advanced_testcase {
 
     /**

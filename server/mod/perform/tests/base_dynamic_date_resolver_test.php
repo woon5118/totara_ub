@@ -27,6 +27,11 @@ use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\base_dynamic_date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
 
+/**
+ * Class mod_perform_base_dynamic_date_resolver_testcase
+ *
+ * @group perform
+ */
 class mod_perform_base_dynamic_date_resolver_testcase extends advanced_testcase {
 
     /**

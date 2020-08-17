@@ -30,6 +30,11 @@ use mod_perform\expand_task;
 use mod_perform\models\activity\track;
 use mod_perform\task\service\subject_instance_creation;
 
+/**
+ * Class mod_perform_date_resolver_dynamic_source_another_activity_testcase
+ *
+ * @group perform
+ */
 class mod_perform_date_resolver_dynamic_source_another_activity_testcase extends advanced_testcase {
 
     public function test_get_option() {

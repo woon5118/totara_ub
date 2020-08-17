@@ -30,6 +30,11 @@ use totara_job\job_assignment;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
+/**
+ * Class mod_perform_notification_dealer_testcase
+ *
+ * @group perform
+ */
 class mod_perform_notification_dealer_testcase extends mod_perform_notification_testcase {
     public function test_post() {
         $activity = $this->create_activity();

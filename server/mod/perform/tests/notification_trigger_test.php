@@ -26,6 +26,11 @@ use mod_perform\notification\trigger;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
+/**
+ * Class mod_perform_notification_trigger_testcase
+ *
+ * @group perform
+ */
 class mod_perform_notification_trigger_testcase extends mod_perform_notification_testcase {
     public function setUp(): void {
         parent::setUp();

@@ -24,6 +24,11 @@
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
 
+/**
+ * Class mod_perform_date_resolver_dynamic_source_user_custom_field_testcase
+ *
+ * @group perform
+ */
 class mod_perform_date_resolver_dynamic_source_user_custom_field_testcase extends advanced_testcase {
 
     public function test_get_option() {

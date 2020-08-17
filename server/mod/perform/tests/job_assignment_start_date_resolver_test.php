@@ -25,6 +25,11 @@ use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\job_assignment_start_date;
 use totara_job\job_assignment;
 
+/**
+ * Class mod_perform_job_assignment_start_date_resolver_testcase
+ *
+ * @group perform
+ */
 class mod_perform_job_assignment_start_date_resolver_testcase extends advanced_testcase {
 
     public function test_get_option() {

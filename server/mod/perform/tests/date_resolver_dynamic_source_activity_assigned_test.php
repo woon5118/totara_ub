@@ -28,6 +28,11 @@ use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\track;
 
+/**
+ * Class mod_perform_date_resolver_dynamic_source_activity_assigned_testcase
+ *
+ * @group perform
+ */
 class mod_perform_date_resolver_dynamic_source_activity_assigned_testcase extends advanced_testcase {
 
     public function test_get_option(): void {

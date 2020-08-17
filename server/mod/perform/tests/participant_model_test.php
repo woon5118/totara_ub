@@ -31,8 +31,9 @@ use mod_perform\models\activity\external_participant;
  * Tests the participant model.
  *
  * @covers participant
+ * @group perform
 */
-class mod_perform_participant_model_test extends advanced_testcase {
+class mod_perform_participant_model_testcase extends advanced_testcase {
 
     public function test_load_with_user() {
         $user_data = [
