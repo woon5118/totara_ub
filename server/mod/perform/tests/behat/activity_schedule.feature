@@ -24,7 +24,7 @@ Feature: Define track schedules to perform activities
 
     When I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
@@ -45,7 +45,7 @@ Feature: Define track schedules to perform activities
     When I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
@@ -66,7 +66,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
@@ -97,7 +97,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I close the tui notification toast
     And I click on "Limited" "button"
@@ -106,7 +106,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
   Scenario: Save and view limited dynamic performance activity schedule
     Given I log in as "admin"
@@ -126,7 +126,7 @@ Feature: Define track schedules to perform activities
     When I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
@@ -158,7 +158,7 @@ Feature: Define track schedules to perform activities
     When I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
@@ -185,7 +185,7 @@ Feature: Define track schedules to perform activities
     When I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
@@ -254,7 +254,7 @@ Feature: Define track schedules to perform activities
     When I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
   Scenario: Check remembered toggling between fixed and dynamic options
     Given I log in as "admin"
@@ -304,7 +304,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     And I reload the page
     And I click on "Assignments" "link"
     Then I should see "Due date enabled"
@@ -331,7 +331,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
@@ -353,7 +353,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
@@ -378,7 +378,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
@@ -397,7 +397,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     When I reload the page
     And I click on "Assignments" "link"
 
@@ -419,7 +419,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     When I reload the page
     And I click on "Assignments" "link"
     # The radio group for dueDateIsFixed is special, it does not have a proper label
@@ -439,7 +439,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
@@ -457,7 +457,7 @@ Feature: Define track schedules to perform activities
     When I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     And I reload the page
     And I click on "Assignments" "link"
     Then I should see "Repeating enabled"
@@ -478,7 +478,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I reload the page
     And I click on "Assignments" "link"
@@ -496,7 +496,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I reload the page
     And I click on "Assignments" "link"
@@ -545,7 +545,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I reload the page
     And I click on "Assignments" "link"
@@ -580,7 +580,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
 
     When I reload the page
     And I click on "Assignments" "link"
@@ -609,7 +609,7 @@ Feature: Define track schedules to perform activities
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
-    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
+    Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:

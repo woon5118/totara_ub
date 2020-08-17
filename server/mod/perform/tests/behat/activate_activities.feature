@@ -70,7 +70,7 @@ Feature: Activation of activities
     And I should see "2 users will be assigned on activation" in the tui modal
 
     When I click on "Activate" "button"
-    Then I should see " was successfully activated." in the tui "success" notification toast
+    Then I should see " was successfully activated." in the tui success notification toast
     And I should see the tui datatable contains:
       | Name                    | Type      | Status |
       | Active activity         | Check-in  | Active |
@@ -102,7 +102,7 @@ Feature: Activation of activities
     Then I should see "This activity is currently in a draft state" in the tui action card
     When I click on "Activate" "button" in the ".tui-actionCard" "css_element"
     And I confirm the tui confirmation modal
-    Then I should see " was successfully activated." in the tui "success" notification toast
+    Then I should see " was successfully activated." in the tui success notification toast
     And I should see "This activity is active." in the tui action card
     And I should see "Any changes made will be applied to future subject instances only, except for title and description, which apply to all." in the tui action card
     And I should not see "Activate" in the tui action card
@@ -118,9 +118,9 @@ Feature: Activation of activities
     And "View content elements" "button" in the "1" activity section should not exist
 
     When I click on the "On completion" tui toggle button
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
     When I click on the "On completion" tui toggle button
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
     When I close the tui notification toast
 
     When I click on "Activate" "button"
@@ -137,4 +137,4 @@ Feature: Activation of activities
     When I click on the "On completion" tui toggle button
     Then I should see "Confirm workflow change" in the tui modal
     When I confirm the tui confirmation modal
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast

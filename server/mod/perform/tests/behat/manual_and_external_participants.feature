@@ -40,7 +40,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I close the tui notification toast
     # Toggle "View other responses"
     And I click on ".tui-performActivitySectionRelationship:nth-of-type(2) .tui-checkbox__label" "css_element"
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     And I click on "Edit content elements" "button"
     And I click on "Add element" "button"
@@ -75,7 +75,7 @@ Feature: Allow users to select manual (internal and external) participants for a
       | Reviewer             | Appraiser |
       | External respondent  | Manager   |
     And I click on "Save" "button"
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
     When I reload the page
     And I click on "General" "link"
     Then the following fields match these values:
@@ -112,7 +112,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     When I select from the tui taglist in the ".tui-formRow" "css_element":
       | Appraiser User |
     And I click on "Save" "button"
-    Then I should see "The participants have been successfully saved." in the tui "success" notification toast
+    Then I should see "The participants have been successfully saved." in the tui success notification toast
     And I should not see "Act1 for Subject User"
     And I should see "You have no remaining participants to select."
     When I click on "Back to all performance activities" "link"
@@ -149,7 +149,7 @@ Feature: Allow users to select manual (internal and external) participants for a
       | External respondent 1's email address | mark.metcalfe@totaralearning.com |
     And I click on "Save" "button"
 
-    Then I should see "The participants have been successfully saved." in the tui "success" notification toast
+    Then I should see "The participants have been successfully saved." in the tui success notification toast
     When I click on "Back to all performance activities" "link"
     Then I should not see "Select participants"
     When I click on "Activities about others" "link"
@@ -242,7 +242,6 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I answer "short text" question "Question 1" with "External participant was here"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
-    And I close the tui notification toast
     Then I should see "Thank you"
     And I should see "Your responses have been submitted"
     And "Review your responses." "link" should exist
@@ -274,7 +273,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I click on "Act1" "link"
     And I click on the "On completion" tui toggle button
     And I confirm the tui confirmation modal
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
     When I close the tui notification toast
     And I log out
 
@@ -372,7 +371,6 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I answer "short text" question "Question 1" with "External participant 1 was here"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
-    And I close the tui notification toast
     Then I should see "Thank you"
     And I should see "Your responses have been submitted"
     And "Review your responses." "link" should exist
@@ -385,7 +383,6 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I answer "short text" question "Question 1" with "External participant 2 was here"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
-    And I close the tui notification toast
     Then I should see "Thank you"
     And I should see "Your responses have been submitted"
     And "Review your responses." "link" should not exist

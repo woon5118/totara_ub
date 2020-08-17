@@ -65,9 +65,8 @@ Feature: Multiple answers element supports multi-lang filters in titles and opti
     And I should not see "erste geaenderte Option"
     And I should see "it's the second changed option"
     And I should not see "zweite geaenderte Option"
-    When I close the tui notification toast
     # Going back to edit mode and saving without changes should not change anything
-    And I close the tui modal
+    When I close the tui modal
     And I click on "Edit content elements" "button"
     Then I should see "changed & updated"
     And I should not see "geaendert & gespeichert"

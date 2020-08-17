@@ -22,7 +22,7 @@ Feature: Adding, Updating, Removing activity elements.
       | rawTitle   | Question 1   |
       | identifier | Identifier 1 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
-    Then I should see "Element saved." in the tui "success" notification toast
+    Then I should see "Element saved." in the tui success notification toast
     When I close the tui notification toast
     And I click on "Add element" "button"
     And I click on "Short text" "link"
@@ -39,7 +39,7 @@ Feature: Adding, Updating, Removing activity elements.
     When I set the following fields to these values:
       | rawTitle | Question 3 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
-    Then I should see "Element saved." in the tui "success" notification toast
+    Then I should see "Element saved." in the tui success notification toast
     When I close the tui notification toast
     And I close the tui modal
     And I click on "Edit content elements" "button"
@@ -86,18 +86,16 @@ Feature: Adding, Updating, Removing activity elements.
     Then I should see "Identifier A"
     And I close popovers
     And I should not see identifier icon for question "Test 2"
-    And I close the tui notification toast
-
-    And I click on delete icon for question "Test 1"
 
     # Deletion confirmation modal.
+    When I click on delete icon for question "Test 1"
     Then I should see "Confirm delete element" in the tui modal
     And I should see "This cannot be undone." in the tui modal
     When I close the tui modal
     Then I should not see "Element deleted."
     And I click on delete icon for question "Test 1"
     And I confirm the tui confirmation modal
-    Then I should see "Element deleted." in the tui "success" notification toast
+    Then I should see "Element deleted." in the tui success notification toast
     And I close the tui notification toast
 
     # Unsaved changes dialog should not be triggered
@@ -112,7 +110,7 @@ Feature: Adding, Updating, Removing activity elements.
     Then I should see "Confirm delete element" in the tui modal
     And I should see "This cannot be undone." in the tui modal
     And I confirm the tui confirmation modal
-    Then I should see "Element deleted." in the tui "success" notification toast
+    Then I should see "Element deleted." in the tui success notification toast
     And I close the tui notification toast
 
     # Only one element should remain

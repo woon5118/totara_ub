@@ -61,8 +61,10 @@ class behat_totara_tui extends behat_base {
     private const POPOVER_LOCATOR = '.tui-popoverFrame';
     private const POPOVER_CONTENT_LOCATOR = '.tui-popoverFrame__content';
 
+    private const NOTIFICATION_TOAST_CONTAINER_LOCATOR = '.tui-toastContainer';
+    private const NOTIFICATION_TOAST_LOCATOR = '.tui-notificationToast';
     private const NOTIFICATION_BANNER_LOCATOR = '.tui-notificationBanner';
-    private const NOTIFICATION_TOAST_LOCATOR = '.tui-notificationBanner--toast';
+    private const NOTIFICATION_DISMISS_LOCATOR = '__dismiss button';
 
     private const MODAL_WRAPPER_SELECTOR = 'body > .tui-modal';
     private const MODAL_CONTENT_SELECTOR = '.tui-modalContent';
@@ -867,33 +869,41 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
-     * @Then /^I should see "([^"]*)" in the tui "([^"]*)" notification banner$/
-     * @param string $expected_text
-     * @param string $banner_type
-     * @throws Exception
+     * Get the locator css for a tui notification.
+     *
+     * @param string $notification_type E.g. 'banner' or 'toast'
+     * @param string $message_type E.g. 'success', 'warning' or 'error'
+     * @return string
      */
-    public function i_should_see_in_the_tui_notification_banner(string $expected_text, string $banner_type): void {
-        $locator = self::NOTIFICATION_BANNER_LOCATOR . '--' . $banner_type;
+    private function get_notification_locator(string $notification_type, string $message_type = null): string {
+        if ($notification_type === 'banner') {
+            $locator = self::NOTIFICATION_BANNER_LOCATOR;
+        } else {
+            $locator = self::NOTIFICATION_TOAST_CONTAINER_LOCATOR . ' ' . self::NOTIFICATION_TOAST_LOCATOR;
+        }
 
-        $this->execute('behat_general::assert_element_contains_text',
-            [$expected_text, $locator, 'css_element']
-        );
+        if ($message_type) {
+            $locator .= '--' . $message_type;
+        }
+
+        return $locator;
     }
 
     /**
-     * @Then /^I should see "([^"]*)" in the tui "([^"]*)" notification toast(| and close it)$/
+     * @Then /^I should see "([^"]*)" in the tui (success|warning|error) notification (banner|toast)(| and close it)$/
      * @param string $expected_text
-     * @param string $toast_type
+     * @param string $message_type
+     * @param string $notification_type
      * @param string $and_close_it
      * @throws Exception
      */
-    public function i_should_see_in_the_tui_notification_toast(
+    public function i_should_see_in_the_tui_notification(
         string $expected_text,
-        string $toast_type,
+        string $message_type,
+        string $notification_type,
         string $and_close_it
     ): void {
-        $locator = self::NOTIFICATION_BANNER_LOCATOR . '--' . $toast_type;
-        $locator .= self::NOTIFICATION_TOAST_LOCATOR;
+        $locator = $this->get_notification_locator($notification_type, $message_type);
 
         $this->execute('behat_general::assert_element_contains_text',
             [$expected_text, $locator, 'css_element']
@@ -901,36 +911,31 @@ class behat_totara_tui extends behat_base {
 
         if ($and_close_it) {
             try {
-                $this->i_close_the_tui_notification_toast();
+                $this->i_close_the_tui_notification($notification_type);
             } catch (Throwable $t) {
             }
         }
     }
 
     /**
-     * This closes all tui notification toasts if it finds any
+     * This closes all tui notification if it finds any
      *
-     * @When /^I close the tui notification toast$/
+     * @When /^I close the tui notification (toast|banner)$/
+     * @param string $notification_type E.g. 'banner' or 'toast'
      */
-    public function i_close_the_tui_notification_toast() {
+    public function i_close_the_tui_notification(string $notification_type): void {
         \behat_hooks::set_step_readonly(false);
 
-        $locator = self::NOTIFICATION_BANNER_LOCATOR.self::NOTIFICATION_TOAST_LOCATOR;
+        $locator = $this->get_notification_locator($notification_type);
+        $locator .= self::NOTIFICATION_DISMISS_LOCATOR;
 
-        try {
-            $toasts = $this->find_all('css', $locator);
-        } catch (ElementNotFoundException $e) {
-            // It can happen that the toast already vanished
-            // in this case we ignore the error
-            return;
-        } catch (NoSuchElement $e) {
-            // Sometimes you get different errors
-            return;
-        }
-        foreach ($toasts as $toast) {
+        $dismiss_buttons = $this->find_all('css', $locator,
+            new ExpectationException("No {$notification_type} notifications are visible", $this->getSession())
+        );
+
+        foreach ($dismiss_buttons as $button) {
             try {
-                $button = $toast->find('css', '.tui-notificationBanner__dismiss button', true);
-                if ($button && $button->isVisible()) {
+                if ($button->isVisible()) {
                     $button->click();
                     $this->wait_for_pending_js();
                 }

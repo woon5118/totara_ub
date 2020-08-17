@@ -36,11 +36,11 @@ Feature: Adding and removing participant to a perform activity section
       | Appraiser | 0       | 1       |
 
     When I select "Subject" in the responding participants popover
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
     And I should see "Subject" as the perform activity participants
 
     When I remove "Subject" as a perform activity participant
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
 
   Scenario: I can mix and match responding and view-only participant types
     When I click on "Participant set up test" "link"
@@ -55,7 +55,7 @@ Feature: Adding and removing participant to a perform activity section
       | Appraiser | 0       | 1       |
 
     When I select "Manager" in the responding participants popover
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
 
     When I close the tui notification toast
     And I click the add view-only participant button
@@ -67,7 +67,7 @@ Feature: Adding and removing participant to a perform activity section
       | Appraiser | 0       | 1       |
 
     When I select "Subject" in the view-only participants popover
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
 
     When I close the tui notification toast
     And I click the add responding participant button
@@ -98,7 +98,7 @@ Feature: Adding and removing participant to a perform activity section
       | Reviewer  | 0       | 1       |
 
     When I select "Subject, Manager" in the responding participants popover
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
     And I should see "Subject, Manager" as the perform activity participants
 
     When I click the add responding participant button
@@ -112,17 +112,17 @@ Feature: Adding and removing participant to a perform activity section
       | Reviewer  | 0       | 1       |
 
     When I select "Appraiser" in the responding participants popover
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
     And I should see "Subject, Manager, Appraiser" as the perform activity participants
 
     When I remove "Subject" as a perform activity participant
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
 
     When I remove "Manager" as a perform activity participant
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
 
     When I remove "Appraiser" as a perform activity participant
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
 
     When I click the add responding participant button
     And I select "Subject" in the responding participants popover
@@ -145,23 +145,23 @@ Feature: Adding and removing participant to a perform activity section
       | Reviewer  | 0       | 1       |
 
     When I select "Subject, Manager, Appraiser, Peer, Mentor, Reviewer, External respondent" in the responding participants popover
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
     And I should see "Subject, Manager, Appraiser, Peer, Mentor, Reviewer" as the perform activity participants
     And I should see the add participant button is disabled
 
     # Toggle can view other responses for Subject
     When I click on ".tui-performActivitySectionRelationship:nth-of-type(1) .tui-checkbox__label" "css_element"
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
 
     # Toggle can view other responses for Manager
     When I click on ".tui-performActivitySectionRelationship:nth-of-type(2) .tui-checkbox__label" "css_element"
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
 
     # Toggle can view other responses for Appraiser
     When I click on ".tui-performActivitySectionRelationship:nth-of-type(3) .tui-checkbox__label" "css_element"
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
 
     # Remove a participant
     When I remove "Subject" as a perform activity participant
-    Then I should see "Activity saved" in the tui "success" notification toast and close it
+    Then I should see "Activity saved" in the tui success notification toast and close it
     And I should see "Manager, Appraiser" as the perform activity participants

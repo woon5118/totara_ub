@@ -25,7 +25,7 @@ Feature: Manually add participants as a manager
     And I should see "1 additional participant instance will be generated" in the ".tui-modalContent" "css_element"
 
     When I click on "Create" "button"
-    Then I should see "1 participant instance created" in the tui "success" notification toast
+    Then I should see "1 participant instance created" in the tui success notification toast
     And I should see "Manage participation: “Subject and manager”"
 
     # We can rely on user id 2 being the admin's account. When proper user selector is implemented,

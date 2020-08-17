@@ -27,7 +27,7 @@ Feature: Managing an activity with multiple sections
     And I click on "Done" "button" in the ".tui-popoverPositioner" "css_element" of the "1" activity section
     And I click on ".tui-performActivitySectionRelationship:nth-of-type(2) .tui-checkbox__label" "css_element" in the "1" activity section
     And I click on "Done" "button" in the ".tui-formBtnGroup" "css_element" of the "1" activity section
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
 
     # Edit relationships for second section.
@@ -38,7 +38,7 @@ Feature: Managing an activity with multiple sections
     And I click on "Done" "button" in the ".tui-popoverPositioner" "css_element" of the "2" activity section
     And I click on ".tui-performActivitySectionRelationship:nth-child(2) .tui-checkbox__label" "css_element" in the "2" activity section
     And I click on "Done" "button" in the ".tui-formBtnGroup" "css_element" of the "2" activity section
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
 
     # Subject added to first section and not second.
@@ -56,7 +56,7 @@ Feature: Managing an activity with multiple sections
     And I click on the "Multiple sections" tui toggle button
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     And I confirm the tui confirmation modal
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     Then I should see "Done"
     And I should see "Cancel"
@@ -109,7 +109,7 @@ Feature: Managing an activity with multiple sections
     Then I should see "All sections' content will be merged and section headings removed. Participant settings will be removed. This cannot be undone." in the tui modal
 
     When I confirm the tui confirmation modal
-    And I should see "Activity saved" in the tui "success" notification toast
+    And I should see "Activity saved" in the tui success notification toast
 
     And I close the tui notification toast
     Then I should not see "Section #1"
@@ -128,7 +128,6 @@ Feature: Managing an activity with multiple sections
     # Renable multi-section; test can save a section title without changing the title
     # for the first section to be created.
     When I close the tui modal
-    And I close the tui notification toast
     And I click on the "Multiple sections" tui toggle button
     And I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -252,7 +251,7 @@ Feature: Managing an activity with multiple sections
     # Test can save a section title without changing the title if it is the first section to be created
     When I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
     And I wait until the page is ready
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
     And I should see "Untitled section" in the "1" activity section
     When I reload the page
     Then I should see "Untitled section" in the "1" activity section
@@ -262,7 +261,7 @@ Feature: Managing an activity with multiple sections
     And I set the title of activity section "2" to '<span lang="en" class="multilang">English</span><span lang="de" class="multilang">German</span> Title'
     And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "2" activity section
     And I wait until the page is ready
-    Then I should see "Activity saved" in the tui "success" notification toast
+    Then I should see "Activity saved" in the tui success notification toast
     And I should see "English Title" in the "2" activity section
     When I reload the page
     Then I should see "Untitled section" in the "1" activity section

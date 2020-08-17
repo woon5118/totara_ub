@@ -62,7 +62,7 @@ Feature: Respond to activity with multiple sections
     And I click on "Submit" "button"
     Then I should see "You will not be able to update your responses after submission."
     And I confirm the tui confirmation modal
-    Then I should see "Section submitted and closed." in the tui "success" notification toast
+    Then I should see "Section submitted and closed." in the tui success notification toast
     And I close the tui notification toast
 
     # Section 2
@@ -71,7 +71,7 @@ Feature: Respond to activity with multiple sections
     And I click on "Submit" "button"
     Then I should see "You will not be able to update your responses after submission."
     And I confirm the tui confirmation modal
-    Then I should see "Section submitted and closed." in the tui "success" notification toast
+    Then I should see "Section submitted and closed." in the tui success notification toast
     And I close the tui notification toast
     And I should see "section 3"
 
@@ -81,7 +81,7 @@ Feature: Respond to activity with multiple sections
     Then I should see "You will not be able to update your responses after submission."
     And I confirm the tui confirmation modal
     And I should see "Performance activities"
-    And I should see "Section submitted and closed." in the tui "success" notification toast
+    And I should see "Section submitted and closed." in the tui success notification toast
     And I close the tui notification toast
 
     # View participant section in read-only mode.
@@ -130,7 +130,7 @@ Feature: Respond to activity with multiple sections
     And I click on "Submit" "button"
     Then I should see "You will not be able to update your responses after submission."
     And I confirm the tui confirmation modal
-    And I should see "Section submitted and closed." in the tui "success" notification toast
+    And I should see "Section submitted and closed." in the tui success notification toast
 
   Scenario: Does not display close on completion confirmation text when close on completion is disabled.
     Given I log in as "user1"
@@ -142,7 +142,7 @@ Feature: Respond to activity with multiple sections
     Then I should see "Once submitted, your responses will be visible to other users who have permission to view them."
     And I should not see "You will not be able to update your responses after submission."
     And I confirm the tui confirmation modal
-    And I should see "Section submitted." in the tui "success" notification toast
+    And I should see "Section submitted." in the tui success notification toast
 
   Scenario: Navigate to next section from side panel
     Given I log in as "user1"

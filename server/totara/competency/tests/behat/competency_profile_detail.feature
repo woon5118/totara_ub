@@ -108,4 +108,4 @@ Feature: Competency profile detail page - an overview of their progress (or lack
     And I navigate to the competency profile details page for competency id "9999"
 
     Then I should see "Back to your competency profile"
-    And I should see "The requested competency does not exist." in the tui "error" notification banner
+    And I should see "The requested competency does not exist." in the tui error notification banner

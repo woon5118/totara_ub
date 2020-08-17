@@ -34,7 +34,6 @@ Feature: Viewing and responding to perform activities
     When I answer "short text" question "Question one" with "My first answer"
     And I answer "short text" question "Question two" with "1025" characters
     And I click on "Submit" "button"
-    And I close the tui notification toast
     Then I should see "Question two" has the validation error "Please enter at no more than 1024 characters"
 
     When I answer "short text" question "Question two" with "1024" characters
@@ -43,7 +42,7 @@ Feature: Viewing and responding to perform activities
 
     Then I should see "Performance activities"
     And the "Your activities" tui tab should be active
-    And I should see "Section submitted" in the tui "success" notification toast
+    And I should see "Section submitted" in the tui success notification toast
     And I should see the tui datatable contains:
       | Activity title                | Type      | Overall progress | Your progress   |
       | single user manager-appraiser | Appraisal | Not yet started  | Not yet started |
@@ -71,7 +70,7 @@ Feature: Viewing and responding to perform activities
     When I click on "Submit" "button"
     And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Section submitted." in the tui "success" notification toast
+    And I should see "Section submitted." in the tui success notification toast
     And the "Activities about others" tui tab should be active
     And I should see the tui datatable contains:
       | Activity title   | Type      | User      | Overall progress | Your progress |
@@ -100,7 +99,7 @@ Feature: Viewing and responding to perform activities
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Section submitted." in the tui "success" notification toast
+    And I should see "Section submitted." in the tui success notification toast
 
     When I click on "single user manager-appraiser" "button"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
@@ -118,7 +117,7 @@ Feature: Viewing and responding to perform activities
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Section submitted." in the tui "success" notification toast
+    And I should see "Section submitted." in the tui success notification toast
 
     When I click on "single user manager-appraiser" "button"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"

@@ -24,7 +24,7 @@ Feature: Deleting perform activities
     And I should see "Are you sure you would like to delete this activity?" in the tui modal
 
     When I click on "Delete" "button"
-    Then I should see "Draft activity successfully deleted." in the tui "success" notification toast
+    Then I should see "Draft activity successfully deleted." in the tui success notification toast
 
     And I should see "1" rows in the tui datatable
     And I should see the tui datatable contains:
@@ -52,7 +52,7 @@ Feature: Deleting perform activities
     And I should see "Are you sure you would like to delete this activity?" in the tui modal
 
     When I click on "Delete" "button"
-    Then I should see "Activity and all associated user records successfully deleted." in the tui "success" notification toast
+    Then I should see "Activity and all associated user records successfully deleted." in the tui success notification toast
     And I should not see "Active activity"
     And I should see "1" rows in the tui datatable
     And I should see the tui datatable contains:

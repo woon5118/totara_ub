@@ -64,7 +64,7 @@ Feature: Perform activity notifications
       | trigger-instance_created_reminder[1] | 2 |
       | trigger-instance_created_reminder[2] | 4 |
       | trigger-instance_created_reminder[3] | 6 |
-    And I should see "Activity saved" in the tui "success" notification banner
+    And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
     And I confirm the tui confirmation modal
