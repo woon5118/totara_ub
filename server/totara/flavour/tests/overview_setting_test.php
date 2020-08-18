@@ -70,7 +70,7 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
 
         // We need some flavours for testing.
-        $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/enterprise/classes/definition.php");
+        $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/learn/classes/definition.php");
         if ($this->testflavouravailable) {
             $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/test/classes/definition.php");
         }
@@ -88,7 +88,7 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
 
         helper::set_active_flavour('flavour_test');
         $overview = new overview();
-        $this->assertCount(19, $overview->settings);
+        $this->assertCount(25, $overview->settings);
 
         foreach ($overview->settings as $setting) {
             $name = $setting->get_name();
@@ -121,7 +121,6 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertSame('moodle', $setting->component);
         $this->assertEquals(advanced_feature::DISABLED, $setting->currentvalue);
         $this->assertTrue($setting->is_prohibited('flavour_test'));
-        $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertFalse($setting->is_on());
         $this->assertFalse($setting->is_set_in_configphp());
 
@@ -133,7 +132,6 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertSame('moodle', $setting->component);
         $this->assertEquals(advanced_feature::ENABLED, $setting->currentvalue);
         $this->assertTrue($setting->is_prohibited('flavour_test'));
-        $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertTrue($setting->is_on());
         $this->assertFalse($setting->is_set_in_configphp());
 
@@ -147,7 +145,6 @@ class totara_flavour_overview_setting_testcase extends advanced_testcase {
         $this->assertSame('moodle', $setting->component);
         $this->assertEquals(advanced_feature::ENABLED, $setting->currentvalue);
         $this->assertTrue($setting->is_prohibited('flavour_test'));
-        $this->assertFalse($setting->is_prohibited('flavour_enterprise'));
         $this->assertTrue($setting->is_on());
         $this->assertTrue($setting->is_set_in_configphp());
     }

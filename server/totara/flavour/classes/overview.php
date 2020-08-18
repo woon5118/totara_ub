@@ -23,6 +23,8 @@
 
 namespace totara_flavour;
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -59,9 +61,13 @@ class overview implements \renderable {
 
         $this->currentflavour = helper::get_active_flavour_component();
         $flavours = helper::get_available_flavour_definitions();
+        $flavour_shortnames = array_map(function ($component) {
+            list($unused, $name) = explode('_', $component, 2);
+            return $name;
+        }, array_keys($flavours));
 
         // By default show the enterprise flavour only.
-        $showflavours = isset($CFG->showflavours) ? $CFG->showflavours : 'enterprise';
+        $showflavours = isset($CFG->showflavours) ? $CFG->showflavours : implode(',', $flavour_shortnames);
 
         // Hide the flavours that are not supposed to be visible.
         if (empty($showflavours)) {
@@ -99,22 +105,28 @@ class overview implements \renderable {
                 'feature_organisationalhierarchy' => '1',   // Fake setting to mimic organisational hierarchies.
                 'feature_audiencemanagement'      => '1',   // Fake setting to mimic audience management.
                 'feature_facetoface'              => '1',   // Fake setting to mimic facetoface.
-                'enablecourserpl'                 => null,  // Totara.
                 'enablebadges'                    => null,  // Totara.
                 'audiencevisibility'              => null,  // Totara.
                 'feature_reportbuilder'           => '1',   // Fake setting to mimic Report Builder.
                 'enableglobalrestrictions'        => null,  // Totara.
-                'enablegoals'                     => null,  // Totara.
                 'enablepositions'                 => null,  // Totara.
                 'enablemyteam'                    => null,  // Totara.
-                'enablecompetencies'              => null,  // Totara.
-                'enablecompetency_assignment'     => null,  // Totara.
-                'enableappraisals'                => null,  // Totara.
-                'enablefeedback360'               => null,  // Totara.
-                'enablelearningplans'             => null,  // Totara.
-                'enableprograms'                  => null,  // Totara.
-                'enablecertifications'            => null,  // Totara.
                 'enabletotaradashboard'           => null,  // Totara.
+                'enablecompetencies'              => null,  // Totara.
+                'enablecourserpl'                 => null,  // Learn.
+                'enablelearningplans'             => null,  // Learn.
+                'enableprograms'                  => null,  // Learn.
+                'enablecertifications'            => null,  // Learn.
+                'enablecompetency_assignment'     => null,  // Perform.
+                'enableperformance_activities'    => null,  // Perform.
+                'enablegoals'                     => null,  // Perform.
+                'enableevidence'                  => null,  // Perform.
+                'enableappraisals'                => null,  // Perform.
+                'enablefeedback360'               => null,  // Perform.
+                'enableengage_resources' => null, // Engage.
+                'enablecontainer_workspace' => null, // Engage.
+                'enabletotara_msteams' => null, // Engage.
+                'enableml_recommender' => null, // Engage.
             )
         );
 

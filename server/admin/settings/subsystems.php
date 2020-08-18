@@ -150,12 +150,12 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablegoals',
         new lang_string('enablegoals', 'totara_hierarchy'),
         new lang_string('configenablegoals', 'totara_hierarchy'),
-        advanced_feature::ENABLED));
+        advanced_feature::DISABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableperformance_activities',
         new lang_string('enable_performance_activities', 'mod_perform'),
         new lang_string('enable_performance_activities_description', 'mod_perform'),
-        advanced_feature::ENABLED));
+        advanced_feature::DISABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecompetencies',
         new lang_string('enablecompetencies', 'totara_hierarchy'),
@@ -165,7 +165,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecompetency_assignment',
         new lang_string('enablecompetency_assignment', 'totara_competency'),
         new lang_string('enablecompetency_assignment_desc', 'totara_competency'),
-        advanced_feature::ENABLED));
+        advanced_feature::DISABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableappraisals',
         new lang_string('enablelegacyappraisals', 'totara_appraisal'),
@@ -271,25 +271,25 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableengage_resources',
         new lang_string('enable_resources', 'totara_engage'),
         new lang_string('enable_resources_description', 'totara_engage'),
-        advanced_feature::ENABLED,
+        advanced_feature::DISABLED,
         array('totara_menu_reset_all_caches', 'totara_rb_purge_ignored_reports')
     ));
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecontainer_workspace',
         new lang_string('enable_workspaces', 'container_workspace'),
         new lang_string('enable_workspaces_description', 'container_workspace'),
-        advanced_feature::ENABLED,
+        advanced_feature::DISABLED,
         array('totara_menu_reset_all_caches', 'totara_rb_purge_ignored_reports')
     ));
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableml_recommender',
         new lang_string('enable_recommenders', 'ml_recommender'),
         new lang_string('enable_recommenders_description', 'ml_recommender'),
-        advanced_feature::ENABLED,
+        advanced_feature::DISABLED,
         array(array('\core_ml\settings_helper', 'recommender_advanced_features_callback'))
     ));
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enabletotara_msteams',
         new lang_string('enable_msteams', 'totara_msteams'),
         new lang_string('enable_msteams_description', 'totara_msteams'),
-        advanced_feature::ENABLED,
+        advanced_feature::DISABLED,
         array(array('\totara_msteams\settings_helper', 'advanced_features_callback'))
     ));
 }

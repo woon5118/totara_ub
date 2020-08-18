@@ -100,11 +100,11 @@ class totara_core_register_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey('edition', $data); // Removed in registration, we can use version number.
 
         // Optional fields/
-        $this->assertArrayNotHasKey('flavour', $data);
+        $this->assertArrayHasKey('flavour', $data);
         $this->assertArrayNotHasKey('sitetype', $data);
         $this->assertArrayNotHasKey('registrationcode', $data);
 
-        set_config('currentflavour', 'enterprise', 'totara_flavour');
+        set_config('currentflavour', 'perform', 'totara_flavour');
         set_config('sitetype', 'production');
         set_config('registrationcode', 'aaaaaaaaaaaa12');
 
@@ -112,7 +112,7 @@ class totara_core_register_testcase extends advanced_testcase {
         $this->assertSame($CFG->wwwroot, $data['wwwroot']);
         $this->assertSame($CFG->sitetype, $data['sitetype']);
         $this->assertSame($CFG->registrationcode, $data['registrationcode']);
-        $this->assertSame('enterprise', $data['flavour']);
+        $this->assertSame('perform', $data['flavour']);
         $this->assertArrayHasKey('addons', $data);
     }
 

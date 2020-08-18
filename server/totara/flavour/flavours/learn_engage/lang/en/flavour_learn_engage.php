@@ -1,8 +1,8 @@
 <?php
-/*
- * This file is part of Totara LMS
+/**
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Sam Hemelryk <sam.hemelryk@totaralms.com>
- * @package flavour_enterprise
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @package flavour_learn_engage
  */
-
-namespace flavour_enterprise;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * The enterprise Totara flavour.
- *
- * This flavour allows for everything, but doesn't necessarily turn everything on.
- *
- * @package flavour_enterprise
- */
-class definition extends \totara_flavour\definition {
-
-    /**
-     * Returns the component name.
-     * @return string
-     */
-    public function get_component() {
-        return 'flavour_enterprise';
-    }
-}
+$string['activenoticeinfo'] = 'Totara Learn + Engage combines a learning management platform with social learning';
+$string['activenoticetitle'] = 'Totara Learn + Engage';
+$string['pluginname'] = 'Learn + Engage';
+$string['settinglocked'] = 'Please upgrade your subscription in order to unlock this functionality.';

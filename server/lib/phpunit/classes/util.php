@@ -560,6 +560,16 @@ class phpunit_util extends testing_util {
         $DB->delete_records('log_display');
         $DB->delete_records('upgrade_log');
 
+        // Need to enable all product features so they don't need to be turned on to test.
+        // TL-26867 improvements to enforcing flavour defaults would avoid the need to specify every feature here.
+        set_config('enableperformance_activities', 1);
+        set_config('enablecompetency_assignment', 1);
+        set_config('enablegoals', 1);
+        set_config('enableengage_resources', 1);
+        set_config('enablecontainer_workspace', 1);
+        set_config('enabletotara_msteams', 1);
+        set_config('enableml_recommender', 1);
+
         // Totara: there is no need to save filedir files, we do not delete them in tests!
 
         // Store version hash in the database and in a file.

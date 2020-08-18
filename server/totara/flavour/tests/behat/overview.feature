@@ -4,10 +4,10 @@ Feature: Flavours overview and activation
   As an admin
   I need to be able to see flavour overview
 
-  Scenario: Verify only enterprise flavour is displayed by default
+  Scenario: Verify learn flavour is displayed by default
     Given I log in as "admin"
     When I navigate to "Feature overview" node in "Site administration > System information"
-    Then I should see "Enterprise" in the "table.flavour-overview-table" "css_element"
+    Then I should see "Learn" in the "table.flavour-overview-table" "css_element"
     And I should not see "Testing" in the "table.flavour-overview-table" "css_element"
 
   @javascript

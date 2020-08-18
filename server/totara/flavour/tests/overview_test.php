@@ -70,7 +70,7 @@ class totara_flavour_overview_testcase extends advanced_testcase {
         $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
 
         // We need some flavours for testing.
-        $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/enterprise/classes/definition.php");
+        $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/learn/classes/definition.php");
         if ($this->testflavouravailable) {
             $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/test/classes/definition.php");
         }
@@ -80,8 +80,9 @@ class totara_flavour_overview_testcase extends advanced_testcase {
         global $CFG;
         $this->setAdminUser();
 
+        // Defaults to learn
         $overview = new overview();
-        $this->assertNull($overview->currentflavour);
+        $this->assertSame('flavour_learn', $overview->currentflavour);
 
         if ($this->testflavouravailable) {
             $CFG->forceflavour = 'test';
@@ -91,9 +92,9 @@ class totara_flavour_overview_testcase extends advanced_testcase {
         }
 
         unset($CFG->forceflavour);
-        helper::set_active_flavour('flavour_enterprise');
+        helper::set_active_flavour('flavour_perform');
         $overview = new overview();
-        $this->assertSame('flavour_enterprise', $overview->currentflavour);
+        $this->assertSame('flavour_perform', $overview->currentflavour);
     }
 
     public function test_flavours() {
@@ -107,35 +108,53 @@ class totara_flavour_overview_testcase extends advanced_testcase {
 
         $this->setAdminUser();
 
-        // Show enterprise if nothing configured.
+        // Show learn if nothing configured.
         $overview = new overview();
-        $this->assertSame(array('flavour_enterprise'), array_keys($overview->flavours));
-        $this->assertInstanceOf('flavour_enterprise\\definition', $overview->flavours['flavour_enterprise']);
+        $this->assertSame(array(
+            'flavour_learn',
+            'flavour_engage',
+            'flavour_learn_engage',
+            'flavour_learn_perform',
+            'flavour_learn_perform_engage',
+            'flavour_perform',
+            'flavour_perform_engage',
+            'flavour_test',
+        ), array_keys($overview->flavours));
+        $this->assertInstanceOf('flavour_learn\\definition', $overview->flavours['flavour_learn']);
 
         // Show configured in specified order.
-        $CFG->showflavours = 'test,enterprise';
+        $CFG->showflavours = 'test,learn';
         $overview = new overview();
-        $this->assertSame(array('flavour_test', 'flavour_enterprise'), array_keys($overview->flavours));
-        $this->assertInstanceOf('flavour_enterprise\\definition', $overview->flavours['flavour_enterprise']);
+        $this->assertSame(array('flavour_test', 'flavour_learn'), array_keys($overview->flavours));
+        $this->assertInstanceOf('flavour_learn\\definition', $overview->flavours['flavour_learn']);
         $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
 
-        // Hide all flavours.
+        // Hide all flavours (default still shown).
         $CFG->showflavours = '';
         $overview = new overview();
-        $this->assertSame(array(), array_keys($overview->flavours));
+        $this->assertSame(array('flavour_learn'), array_keys($overview->flavours));
 
         // Make sure active is included, as last if not in the list.
         helper::set_active_flavour('flavour_test');
         unset($CFG->showflavours);
         $overview = new overview();
-        $this->assertSame(array('flavour_enterprise', 'flavour_test'), array_keys($overview->flavours));
-        $this->assertInstanceOf('flavour_enterprise\\definition', $overview->flavours['flavour_enterprise']);
+        $this->assertSame(array(
+            'flavour_test',
+            'flavour_engage',
+            'flavour_learn',
+            'flavour_learn_engage',
+            'flavour_learn_perform',
+            'flavour_learn_perform_engage',
+            'flavour_perform',
+            'flavour_perform_engage',
+        ), array_keys($overview->flavours));
+        $this->assertInstanceOf('flavour_learn\\definition', $overview->flavours['flavour_learn']);
         $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
 
-        $CFG->showflavours = 'test,enterprise';
+        $CFG->showflavours = 'test,learn';
         $overview = new overview();
-        $this->assertSame(array('flavour_test', 'flavour_enterprise'), array_keys($overview->flavours));
-        $this->assertInstanceOf('flavour_enterprise\\definition', $overview->flavours['flavour_enterprise']);
+        $this->assertSame(array('flavour_test', 'flavour_learn'), array_keys($overview->flavours));
+        $this->assertInstanceOf('flavour_learn\\definition', $overview->flavours['flavour_learn']);
         $this->assertInstanceOf('flavour_test\\definition', $overview->flavours['flavour_test']);
 
         $CFG->showflavours = '';
@@ -157,7 +176,7 @@ class totara_flavour_overview_testcase extends advanced_testcase {
 
         $overview = new overview();
         $result = $overview->get_flavour_to_enforce();
-        $this->assertNull($result);
+        $this->assertSame('flavour_learn', $result);
 
         $CFG->forceflavour = 'test';
         $overview = new overview();

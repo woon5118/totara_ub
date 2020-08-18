@@ -3361,7 +3361,7 @@ class core_course_courselib_testcase extends advanced_testcase {
         $this->assertFalse($adminoptions->files);
         $this->assertTrue($adminoptions->tags);
         $this->assertTrue($adminoptions->gradebook);
-        $this->assertFalse($adminoptions->outcomes);
+        $this->assertTrue($adminoptions->outcomes);
         $this->assertTrue($adminoptions->badges);
         $this->assertTrue($adminoptions->import);
         //$this->assertTrue($adminoptions->publish); // Totara: we don't publish courses any more.

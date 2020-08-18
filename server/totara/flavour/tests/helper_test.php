@@ -21,6 +21,8 @@
  * @package totara_flavour
  */
 
+use flavour_learn\definition as learn_definition;
+use flavour_perform\definition as perform_definition;
 use totara_core\advanced_feature;
 use \totara_flavour\helper;
 
@@ -69,7 +71,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
 
         // We need some flavours for testing.
-        $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/enterprise/classes/definition.php");
+        $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/learn/classes/definition.php");
 
         if ($this->testflavouravailable) {
             // We can only test this if the test flavour is installed.
@@ -86,9 +88,9 @@ class totara_flavour_helper_testcase extends advanced_testcase {
             return true; // Not needed but keeps it clear.
         }
 
-        // Nothing active.
+        // Nothing active - learn is default.
         $result = helper::get_active_flavour_definition();
-        $this->assertNull($result);
+        $this->assertInstanceOf('flavour_learn\\definition', $result);
 
         // Forced flavour.
         set_config('currentflavour', 'flavour_test', 'totara_flavour');
@@ -100,9 +102,9 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $result = helper::get_active_flavour_definition();
         $this->assertInstanceOf('flavour_test\\definition', $result);
 
-        $CFG->forceflavour = 'enterprise';
+        $CFG->forceflavour = 'learn';
         $result = helper::get_active_flavour_definition();
-        $this->assertInstanceOf('flavour_enterprise\\definition', $result);
+        $this->assertInstanceOf('flavour_learn\\definition', $result);
 
         // Nothing during initial install unless forced.
         set_config('currentflavour', 'flavour_test', 'totara_flavour');
@@ -115,12 +117,12 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $result = helper::get_active_flavour_definition();
         $this->assertNull($result);
 
-        $CFG->forceflavour = 'enterprise';
+        $CFG->forceflavour = 'learn';
         $result = helper::get_active_flavour_definition();
-        $this->assertInstanceOf('flavour_enterprise\\definition', $result);
+        $this->assertInstanceOf('flavour_learn\\definition', $result);
 
         // Invalid forced.
-        $CFG->forceflavour = 'enterprisexxx';
+        $CFG->forceflavour = 'learnxxx';
         $result = helper::get_active_flavour_definition();
         $this->assertNull($result);
         $this->assertDebuggingCalled('Invalid flavour specified in $CFG->forceflavour');
@@ -128,6 +130,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
 
     public function test_get_active_flavour_definition_manual() {
         // Nothing active.
+        set_config('currentflavour', '', 'totara_flavour');
         $result = helper::get_active_flavour_definition();
         $this->assertNull($result);
 
@@ -138,9 +141,9 @@ class totara_flavour_helper_testcase extends advanced_testcase {
             $this->assertInstanceOf('flavour_test\\definition', $result);
         }
 
-        set_config('currentflavour', 'flavour_enterprise', 'totara_flavour');
+        set_config('currentflavour', 'flavour_learn', 'totara_flavour');
         $result = helper::get_active_flavour_definition();
-        $this->assertInstanceOf('flavour_enterprise\\definition', $result);
+        $this->assertInstanceOf('flavour_learn\\definition', $result);
 
         unset_config('currentflavour', 'totara_flavour');
         $result = helper::get_active_flavour_definition();
@@ -158,7 +161,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         if ($this->testflavouravailable) {
             $this->assertArrayHasKey('flavour_test', $result);
         }
-        $this->assertArrayHasKey('flavour_enterprise', $result);
+        $this->assertArrayHasKey('flavour_learn', $result);
         foreach ($result as $component => $flavour) {
             $this->assertStringStartsWith('flavour_', $component);
             $this->assertInstanceOf('totara_flavour\\definition', $flavour);
@@ -172,13 +175,13 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $output = $PAGE->get_renderer('core', 'admin');
 
         // No flavour.
+        set_config('currentflavour', '', 'totara_flavour');
         $result = helper::get_active_flavour_notice($output);
         $this->assertNull($result);
 
-        // Enterprise means everything enabled === no notice.
-        $CFG->forceflavour = 'enterprise';
+        $CFG->forceflavour = 'learn';
         $result = helper::get_active_flavour_notice($output);
-        $this->assertNull($result);
+        $this->assertNotNull($result);
 
         if ($this->testflavouravailable) {
             // Upgrade notice to full.
@@ -191,25 +194,27 @@ class totara_flavour_helper_testcase extends advanced_testcase {
     public function test_get_active_flavour_component() {
         global $CFG;
 
-        // No flavour.
+        // No flavour - defaults to learn.
         $result = helper::get_active_flavour_component();
-        $this->assertNull($result);
+        $this->assertEquals('flavour_learn', $result);
 
-        $CFG->forceflavour = 'enterprise';
+        $CFG->forceflavour = 'perform';
         $result = helper::get_active_flavour_component();
-        $this->assertSame('flavour_enterprise', $result);
+        $this->assertSame('flavour_perform', $result);
     }
 
     public function test_get_default_settings() {
         global $CFG;
 
-        // No flavour.
+        // No flavour - defaults to learn.
+        $learn_definition = new learn_definition();
         $result = helper::get_defaults_setting();
-        $this->assertSame(array(), $result);
+        $this->assertSame($learn_definition->get_default_settings(), $result);
 
-        $CFG->forceflavour = 'enterprise';
+        $CFG->forceflavour = 'perform';
+        $perform_definition = new perform_definition();
         $result = helper::get_defaults_setting();
-        $this->assertSame(array(), $result);
+        $this->assertSame($perform_definition->get_default_settings(), $result);
 
         if ($this->testflavouravailable) {
             $CFG->forceflavour = 'test';
@@ -227,13 +232,15 @@ class totara_flavour_helper_testcase extends advanced_testcase {
             return true; // Not needed but keeps it clear.
         }
 
-        // No flavour.
+        // No flavour set - uses learn by default.
         $result = helper::get_enforced_settings();
-        $this->assertSame(array(), $result);
+        $learn_definition = new learn_definition();
+        $this->assertSame($learn_definition->get_enforced_settings(), $result);
 
-        $CFG->forceflavour = 'enterprise';
+        $CFG->forceflavour = 'perform';
         $result = helper::get_enforced_settings();
-        $this->assertSame(array(), $result);
+        $perform_definition = new perform_definition();
+        $this->assertSame($perform_definition->get_enforced_settings(), $result);
 
         $CFG->forceflavour = 'test';
         $result = helper::get_enforced_settings();
@@ -242,7 +249,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey('', $result);
         // Test a few settings to verify the format.
         $this->assertSame(advanced_feature::DISABLED, $result['moodle']['enableappraisals']);
-        $this->assertSame('', $result['theme_ventura']['customcss']);
+        $this->assertSame('', $result['theme_customtotararesponsive']['customcss']);
     }
 
     public function test_get_prohibited_settings() {
@@ -254,13 +261,15 @@ class totara_flavour_helper_testcase extends advanced_testcase {
             return true; // Not needed but keeps it clear.
         }
 
-        // No flavour.
+        // No flavour defaults to learn.
+        $learn_definition = new learn_definition();
         $result = helper::get_prohibited_settings();
-        $this->assertSame(array(), $result);
+        $this->assertSame($learn_definition->get_prohibited_settings(), $result);
 
-        $CFG->forceflavour = 'enterprise';
+        $CFG->forceflavour = 'perform';
+        $perform_definition = new perform_definition();
         $result = helper::get_prohibited_settings();
-        $this->assertSame(array(), $result);
+        $this->assertSame($perform_definition->get_prohibited_settings(), $result);
 
         $CFG->forceflavour = 'test';
         $result = helper::get_prohibited_settings();
@@ -269,7 +278,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey('', $result);
         // Test a few settings to verify the format.
         $this->assertSame(true, $result['moodle']['enableappraisals']);
-        $this->assertSame(true, $result['theme_ventura']['customcss']);
+        $this->assertSame(true, $result['theme_customtotararesponsive']['customcss']);
     }
 
     public function test_execute_post_install_steps() {
@@ -342,9 +351,9 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $this->assertSame('flavour_test', get_config('totara_flavour', 'currentflavour'));
         $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
 
-        helper::set_active_flavour('flavour_enterprise');
+        helper::set_active_flavour('flavour_learn');
 
-        $this->assertSame('flavour_enterprise', get_config('totara_flavour', 'currentflavour'));
+        $this->assertSame('flavour_learn', get_config('totara_flavour', 'currentflavour'));
         $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
 
         // Invalid value.

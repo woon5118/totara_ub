@@ -155,6 +155,16 @@ class behat_util extends testing_util {
         set_config('sitetype', 'development');
         set_config('registrationcode', '');
 
+        // Need to enable all product features so they don't need to be turned on to test.
+        // TL-26867 improvements to enforcing flavour defaults would avoid the need to specify every feature here.
+        set_config('enableperformance_activities', 1);
+        set_config('enablecompetency_assignments', 1);
+        set_config('enablegoals', 1);
+        set_config('enableengage_resources', 1);
+        set_config('enablecontainer_workspace', 1);
+        set_config('enabletotara_msteams', 1);
+        set_config('enableml_recommender', 1);
+
         // Totara: purge log tables to speed up DB resets.
         $DB->delete_records('config_log');
         $DB->delete_records('log_display');

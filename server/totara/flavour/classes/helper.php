@@ -23,6 +23,8 @@
 
 namespace totara_flavour;
 
+use core_plugin_manager;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -32,6 +34,12 @@ defined('MOODLE_INTERNAL') || die();
  * @package totara_flavour
  */
 class helper {
+
+    /**
+     * Use Learn as default flavour
+     */
+    const DEFAULT_FLAVOUR = 'learn';
+
     /**
      * Activates Totara flavour.
      *
@@ -39,8 +47,7 @@ class helper {
      */
     public static function set_active_flavour($component) {
         if ($component === '') {
-            unset_config('currentflavour', 'totara_flavour');
-            return;
+            throw new \moodle_exception('error_missing_flavour_name', 'totara_flavour');
         }
 
         if ($component !== clean_param($component, PARAM_COMPONENT) or strpos($component, 'flavour_') !== 0) {
@@ -62,7 +69,6 @@ class helper {
         global $CFG;
 
         if (isset($CFG->forceflavour) and $CFG->forceflavour !== '') {
-
             $component = 'flavour_' . $CFG->forceflavour;
             // As we are during installation check that the set flavour is available for trying to set it.
             if ($component !== clean_param($component, PARAM_COMPONENT) or strpos($component, 'flavour_') !== 0) {
@@ -76,10 +82,12 @@ class helper {
             return;
         }
 
+        // We enforce a default flavour if none provided
         $flavour = self::get_active_flavour_definition();
-        if ($flavour) {
-            self::enforce_flavour($flavour, true);
+        if (!$flavour) {
+            $flavour = self::get_flavour_definition('flavour_' . self::DEFAULT_FLAVOUR);
         }
+        self::enforce_flavour($flavour, true);
     }
 
     /**
@@ -88,8 +96,10 @@ class helper {
     public static function execute_post_upgrade_steps() {
         global $CFG;
 
+        // We do not allow disabling flavours, you have to be on one
+        // either the default one or one of the product ones.
         if (isset($CFG->forceflavour) and $CFG->forceflavour === '') {
-            self::set_active_flavour('');
+            self::set_active_flavour(self::DEFAULT_FLAVOUR);
             return;
         }
 
@@ -156,6 +166,10 @@ class helper {
         } else {
             $flavour->additional_upgrade_steps();
         }
+
+        // We need to reset the plugin caches as enforcing the flavour can have an effect
+        // on the list of enabled plugins
+        core_plugin_manager::reset_caches();
     }
 
     /**
@@ -207,7 +221,7 @@ class helper {
     public static function get_enforced_settings() {
         $flavour = self::get_active_flavour_definition();
         if (!$flavour) {
-            return array();
+            return [];
         }
         return $flavour->get_enforced_settings();
     }
@@ -220,7 +234,7 @@ class helper {
     public static function get_prohibited_settings() {
         $flavour = self::get_active_flavour_definition();
         if (!$flavour) {
-            return array();
+            return [];
         }
         return $flavour->get_prohibited_settings();
     }
