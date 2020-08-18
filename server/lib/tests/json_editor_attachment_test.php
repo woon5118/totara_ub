@@ -52,11 +52,31 @@ class core_json_editor_attachment_testcase extends advanced_testcase {
                 'filename' => 'some_file.png',
                 'url' => 'http://example.com',
                 'size' => 150,
-                'options' => []
+                'option' => []
             ]
         ]);
 
         $this->assertTrue($result);
+    }
+
+    /**
+     * Make sure that the key `options` is not allowed in attachment node.
+     * @return void
+     */
+    public function test_validate_schema_with_options_keys(): void {
+        $this->assertFalse(
+            attachment::validate_schema([
+                'type' => attachment::get_type(),
+                'attrs' => [
+                    'filename' => 'some_file.png',
+                    'url' => 'http://example.com',
+                    'size' => 150,
+                    'options' => []
+                ]
+            ])
+        );
+
+        $this->assertDebuggingCalled();
     }
 
     /**

@@ -58,8 +58,8 @@ final class attachment extends base_file {
             throw new \coding_exception("No attachment size was found");
         }
 
-        if (array_key_exists('options', $attrs) && !is_null($attrs['options'])) {
-            $attachment->options = $attrs['options'];
+        if (array_key_exists('option', $attrs) && !is_null($attrs['option'])) {
+            $attachment->options = $attrs['option'];
         }
 
         $attachment->size = (int) $attrs['size'];
@@ -82,7 +82,7 @@ final class attachment extends base_file {
             return false;
         }
 
-        return node_helper::check_keys_match_against_data($attrs, ['filename', 'url', 'size'], ['options']);
+        return node_helper::check_keys_match_against_data($attrs, ['filename', 'url', 'size'], ['option']);
     }
 
     /**
@@ -158,7 +158,7 @@ final class attachment extends base_file {
                 'filename' => $file->get_filename(),
                 'url' => $file_url->out(false),
                 'size' => $file->get_filesize(),
-                'options' => []
+                'option' => []
             ],
         ];
     }
