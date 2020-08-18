@@ -21,6 +21,7 @@
  * @package theme_ventura
  */
 
+$string['choosereadme'] = 'Ventura, the default theme for Totara.';
 $string['pluginname'] = 'Ventura';
 $string['region-bottom'] = 'Bottom';
 $string['region-main'] = 'Main';
