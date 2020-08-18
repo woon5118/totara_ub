@@ -98,7 +98,7 @@
             :key="activeParticipantSection.id"
             v-slot="{ getSubmitting }"
             :initial-values="initialValues"
-            @submit="openModal"
+            @submit="handleSubmit"
             @change="handleChange"
           >
             <div class="tui-participantContent__section">
@@ -189,7 +189,13 @@
               v-if="!activeSectionIsClosed"
               class="tui-participantContent__buttons"
             >
-              <ButtonSubmit :submitting="getSubmitting()" />
+              <ButtonSubmit @click="fullSubmit(getSubmitting)" />
+              <Button
+                v-if="hasSaveDraft"
+                :text="$str('participant_section_button_draft', 'mod_perform')"
+                type="submit"
+                @click="draftSubmit(getSubmitting)"
+              />
               <ButtonCancel
                 v-if="!isExternalParticipant"
                 @click="goBackToListCancel"
@@ -265,6 +271,8 @@ import SectionResponsesQuery from 'mod_perform/graphql/participant_section';
 import SectionResponsesQueryExternal from 'mod_perform/graphql/participant_section_external_participant_nosession';
 import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_responses';
 import UpdateSectionResponsesMutationExternalParticipant from 'mod_perform/graphql/update_section_responses_external_participant_nosession';
+
+const PARTICIPANT_SECTION_STATUS_COMPLETE = 'COMPLETE';
 
 export default {
   components: {
@@ -359,6 +367,7 @@ export default {
         section_elements: [],
       },
       sectionElements: [],
+      progressStatus: null,
       showOtherResponse: false,
       modalOpen: false,
       formValues: {},
@@ -366,6 +375,7 @@ export default {
       hasChanges: false,
       responsesAreVisibleTo: [],
       selectedParticipantSectionId: this.participantSectionId,
+      isDraft: false,
     };
   },
 
@@ -397,6 +407,7 @@ export default {
         this.answerableParticipantInstances =
           result.answerable_participant_instances;
         this.activeParticipantSection = result;
+        this.progressStatus = result.progress_status;
         this.participantSections =
           result.participant_instance.participant_sections;
         this.responsesAreVisibleTo = result.responses_are_visible_to;
@@ -520,6 +531,15 @@ export default {
       return previousSectionId !== null;
     },
 
+    /**
+     * Checks draft savings is available
+     *
+     * @return {Boolean}
+     */
+    hasSaveDraft() {
+      return this.progressStatus !== PARTICIPANT_SECTION_STATUS_COMPLETE;
+    },
+
     /*
      * Get the participant instance we are currently answering as.
      */
@@ -563,6 +583,7 @@ export default {
         props.data = JSON.parse(sectionElement.response_data);
         props.class = 'tui-participantContent__readonly';
       } else {
+        props.isDraft = this.isDraft;
         props.path = ['sectionElements', sectionElement.id];
         props.error = this.errors && this.errors[sectionElement.id];
       }
@@ -588,6 +609,9 @@ export default {
       let message = this.activity.settings.close_on_completion
         ? 'toast_success_save_close_on_completion_response'
         : 'toast_success_save_response';
+      if (this.isDraft) {
+        message = 'participant_section_draft_saved';
+      }
       notify({
         duration: NOTIFICATION_DURATION,
         message: this.$str(message, 'mod_perform'),
@@ -596,12 +620,18 @@ export default {
     },
 
     /**
-     * Shows Confirmation Modal
+     * Handle full and draft submit
+     *
      * @param {Object} values Form values.
      */
-    openModal(values) {
+    handleSubmit(values) {
       this.formValues = values;
-      this.modalOpen = true;
+      if (!this.isDraft) {
+        this.modalOpen = true;
+      } else {
+        this.submit(this.formValues);
+        this.hasUnsavedChanges = false;
+      }
     },
 
     /**
@@ -658,15 +688,20 @@ export default {
 
         //show validation if no errors
         if (!this.errors) {
-          if (nextParticipantSectionId) {
-            // Redirect to next section.
+          if (this.isDraft) {
+            //stay same page and show notification
             this.showSuccessNotification();
-            await this.loadParticipantSection(nextParticipantSectionId);
-            this.selectedParticipantSectionId = nextParticipantSectionId;
-            this.updateUrlParam(nextParticipantSectionId);
           } else {
-            // Go back to activity list
-            this.goBackToListCompletionSuccess();
+            if (nextParticipantSectionId) {
+              // Redirect to next section.
+              this.showSuccessNotification();
+              await this.loadParticipantSection(nextParticipantSectionId);
+              this.selectedParticipantSectionId = nextParticipantSectionId;
+              this.updateUrlParam(nextParticipantSectionId);
+            } else {
+              // Go back to activity list
+              this.goBackToListCompletionSuccess();
+            }
           }
         }
       } catch (e) {
@@ -691,6 +726,7 @@ export default {
 
       let inputVariables = {
         participant_section_id: this.activeParticipantSection.id,
+        is_draft: this.isDraft,
         update: update,
       };
 
@@ -916,6 +952,26 @@ export default {
       e.returnValue = discardUnsavedChanges;
       return discardUnsavedChanges;
     },
+
+    /**
+     * Handle full submit
+     *
+     * @param handleSubmit
+     */
+    fullSubmit(handleSubmit) {
+      this.isDraft = false;
+      handleSubmit();
+    },
+
+    /**
+     * Handle draft submit
+     *
+     * @param handleSubmit
+     */
+    draftSubmit(handleSubmit) {
+      this.isDraft = true;
+      handleSubmit();
+    },
   },
 };
 </script>
@@ -925,6 +981,8 @@ export default {
       "button_close",
       "next_section",
       "previous_section",
+      "participant_section_button_draft",
+      "participant_section_draft_saved",
       "relation_to_subject_self",
       "section_element_response_optional",
       "section_element_response_required",

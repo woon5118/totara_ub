@@ -460,6 +460,66 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
         $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
+    public function test_successful_draft_saving(): void {
+        self::setAdminUser();
+
+        $subject = self::getDataGenerator()->create_user();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $subject_instance = $generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id'          => $subject->id,
+            'other_participant_id'     => user::logged_in()->id,
+        ]);
+
+        /** @var participant_instance $other_participant_instance */
+        $other_participant_instance = $subject_instance->participant_instances()
+            ->where('participant_id', user::logged_in()->id)
+            ->one();
+
+        /** @var participant_section_entity $participant_section */
+        $participant_section =  $other_participant_instance->participant_sections()->one();
+
+        /** @var collection|section_element[] $section_elements */
+        $section_elements = $participant_section->section_elements()->get();
+
+        /** @var section_element $section_element1 */
+        $section_element1 = $section_elements->first();
+
+        /** @var section_element $section_element2 */
+        $section_element2 = $section_elements->last();
+
+        $encoded_response1 = json_encode(['answer_text' => 'A quick brown fox']);
+        participant_section::load_by_entity($participant_section)->get_progress_state()->on_participant_access();
+
+        $args = [
+            'input' => [
+                'participant_section_id' => $participant_section->id,
+                'is_draft' => true,
+                'update' => [
+                    [
+                        'section_element_id' => $section_element1->id,
+                        'response_data' => $encoded_response1,
+                    ],
+                    [
+                        'section_element_id' => $section_element2->id,
+                        'response_data' => "",
+                    ],
+                ],
+            ],
+        ];
+
+
+        // Initial save of responses.
+        /** @var participant_section $initial_save_result */
+        $initial_save_result = $this->resolve_graphql_mutation(self::MUTATION, $args)['participant_section'];
+
+        self::assertEquals('IN_PROGRESS', $initial_save_result->get_progress_status());
+        self::assertCount(2, $initial_save_result->get_section_element_responses());
+    }
+
     public function test_can_not_save_responses_for_section_elements_that_belong_to_a_different_section(): void {
         self::setAdminUser();
 

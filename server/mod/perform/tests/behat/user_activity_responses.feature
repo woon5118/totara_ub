@@ -93,3 +93,12 @@ Feature: Viewing other responses
     And I should see "Section submitted." in the tui success notification toast
     And the "Your activities" tui tab should be active
 
+  Scenario: I can save as a draft
+    When I log in as "john"
+    And I navigate to the outstanding perform activities list page
+    And I click on "John is participating subject" "link"
+    Then I should see perform "Question one" question is "required"
+    And I should see perform "Question two" question is "required"
+    And I answer "short text" question "Question one" with "John Answer one"
+    When I click on "Save as draft" "button"
+    Then I should see "Draft saved" in the tui success notification toast

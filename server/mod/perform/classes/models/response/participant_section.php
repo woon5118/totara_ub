@@ -36,6 +36,7 @@ use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\section;
 use mod_perform\state\participant_instance\closed as participant_instance_closed;
+use mod_perform\state\participant_section\in_progress;
 use mod_perform\state\participant_section\closed;
 use mod_perform\state\participant_section\complete;
 use mod_perform\state\participant_section\open;
@@ -286,6 +287,27 @@ class participant_section extends model {
             $state->complete();
         });
 
+        $this->refresh();
+
+        return true;
+    }
+
+    /**
+     * Save participant section responses as a draft which ignore all validation rules
+     * manually triggered progress updated event
+     *
+     * @return bool
+     */
+    public function draft(): bool {
+        if (!$this->get_progress_state() instanceof in_progress) {
+            throw new coding_exception('This function can only be called if the participant section is in in_progress status');
+        }
+
+        builder::get_db()->transaction(function () {
+            foreach ($this->element_responses as $element_response) {
+                $element_response->save();
+            }
+        });
         $this->refresh();
 
         return true;

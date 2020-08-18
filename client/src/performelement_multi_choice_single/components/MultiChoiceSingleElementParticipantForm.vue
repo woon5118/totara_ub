@@ -43,6 +43,7 @@ export default {
   props: {
     path: [String, Array],
     error: String,
+    isDraft: Boolean,
     element: Object,
   },
   methods: {
@@ -53,6 +54,10 @@ export default {
      */
     answerValidator(val) {
       if (this.element.is_required) {
+        //no validation required if it's in draft status
+        if (this.isDraft) {
+          return null;
+        }
         const isEmpty =
           !val || (typeof val === 'string' && val.trim().length === 0);
         if (isEmpty)

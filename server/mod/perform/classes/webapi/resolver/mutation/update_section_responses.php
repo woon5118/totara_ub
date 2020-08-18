@@ -43,6 +43,8 @@ class update_section_responses implements mutation_resolver, has_middleware {
 
         $participant_id = user::logged_in()->id;
         $participant_section_id = $input['participant_section_id'];
+        $is_draft = $input['is_draft'] ?? false;
+
         $participant_section = (new participant_section($participant_id, participant_source::INTERNAL))->find_by_section_id($participant_section_id);
 
         if (!$participant_section) {
@@ -53,7 +55,11 @@ class update_section_responses implements mutation_resolver, has_middleware {
         $ec->set_relevant_context($participant_section_with_responses->get_context());
 
         $participant_section_with_responses->set_responses_data_from_request($input['update']);
-        $participant_section_with_responses->complete();
+        if ($is_draft) {
+            $participant_section->draft();
+        } else {
+            $participant_section->complete();
+        }
 
         return [
             'participant_section' => $participant_section_with_responses

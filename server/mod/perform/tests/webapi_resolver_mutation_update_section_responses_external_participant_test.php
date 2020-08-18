@@ -155,6 +155,56 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_external_par
         $this->assertNull($result);
     }
 
+    public function test_successful_draft_saving(): void {
+        $external_section = $this->create_test_data();
+
+        $this->setUser(null);
+
+        $section_elements = $external_section->section_elements;
+
+        $token = $external_section->participant_instance->external_participant->token;
+
+        $expected_responses = [];
+        $answers = [];
+        $i = 1;
+        foreach ($section_elements as $section_element) {
+            $encoded_response = json_encode(['answer_text' => 'response '.$i]);
+            $expected_responses[] = $encoded_response;
+            $answers[] = [
+                'section_element_id' => $section_element->id,
+                'response_data' => $encoded_response,
+            ];
+            $i++;
+        }
+
+        $args = [
+            'input' => [
+                'participant_section_id' => $external_section->id,
+                'is_draft' => true,
+                'token' => $token,
+                'update' => $answers,
+            ],
+        ];
+
+        participant_section::load_by_entity($external_section)->get_progress_state()->on_participant_access();
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
+        $this->assertArrayHasKey('participant_section', $result);
+        $result = $result['participant_section'];
+        $this->assertInstanceOf(participant_section::class, $result);
+        $this->assertEquals('IN_PROGRESS', $result->get_progress_status());
+        $this->assertEquals('OPEN', $result->get_availability_status());
+        $this->assertCount(2, $result->get_section_element_responses());
+
+        $actual_responses = $result->get_section_element_responses()->pluck('response_data');
+        $this->assertEqualsCanonicalizing($expected_responses, $actual_responses);
+
+        $actual_responses = element_response_entity::repository()
+            ->where('participant_instance_id', $external_section->participant_instance_id)
+            ->get()
+            ->pluck('response_data');
+        $this->assertEqualsCanonicalizing($expected_responses, $actual_responses);
+    }
+
     /**
      * Tests exception is thrown when updating a closed participant section.
      *

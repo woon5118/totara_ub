@@ -48,6 +48,7 @@ class update_section_responses_external_participant implements mutation_resolver
 
         $participant_section_id = $input['participant_section_id'];
         $token = $input['token'] ?? null;
+        $is_draft = $input['is_draft'] ?? false;
         if (empty($token)) {
             return null;
         }
@@ -70,7 +71,11 @@ class update_section_responses_external_participant implements mutation_resolver
         $ec->set_relevant_context($participant_section_with_responses->get_context());
 
         $participant_section_with_responses->set_responses_data_from_request($input['update']);
-        $participant_section_with_responses->complete();
+        if ($is_draft) {
+            $participant_section->draft();
+        } else {
+            $participant_section->complete();
+        }
 
         return [
             'participant_section' => $participant_section

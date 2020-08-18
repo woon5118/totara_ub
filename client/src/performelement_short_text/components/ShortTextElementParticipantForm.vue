@@ -38,6 +38,7 @@ export default {
   props: {
     path: [String, Array],
     error: String,
+    isDraft: Boolean,
     element: Object,
   },
   methods: {
@@ -58,6 +59,10 @@ export default {
      */
     answerRequired(val) {
       if (this.element.is_required) {
+        //no validation required if it's in draft status
+        if (this.isDraft) {
+          return null;
+        }
         const requiredValidation = validation.required();
 
         if (requiredValidation.validate(val)) {

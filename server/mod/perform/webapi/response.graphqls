@@ -44,6 +44,7 @@ Update a section's responses
 """
 input mod_perform_update_section_responses_input {
   participant_section_id: core_id!
+  is_draft: param_boolean
   update: [mod_perform_update_element_response_input!]!
 }
 
@@ -52,6 +53,7 @@ Update a section's responses
 """
 input mod_perform_update_section_responses_external_participant_input {
   participant_section_id: core_id!
+  is_draft: param_boolean
   update: [mod_perform_update_element_response_input!]!
   token: String!
 }

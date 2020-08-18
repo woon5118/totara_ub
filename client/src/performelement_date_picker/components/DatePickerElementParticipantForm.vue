@@ -48,6 +48,7 @@ export default {
   props: {
     path: [String, Array],
     element: Object,
+    isDraft: Boolean,
     error: String,
   },
   data() {
@@ -69,7 +70,11 @@ export default {
      * @return {function[]}
      */
     answerValidator(val) {
+      //no validation required if it's in draft status
       if (this.element.is_required) {
+        if (this.isDraft) {
+          return null;
+        }
         if (!val || typeof val === 'undefined')
           return this.$str(
             'error_you_must_answer_this_question',

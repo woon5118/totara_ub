@@ -53,6 +53,7 @@ export default {
   props: {
     path: [String, Array],
     error: String,
+    isDraft: Boolean,
     element: {
       type: Object,
       required: true,
@@ -76,6 +77,10 @@ export default {
 
   methods: {
     rangeValidations(v) {
+      //no validation required if it's in draft status
+      if (this.isDraft) {
+        return [];
+      }
       return this.element.is_required ? [v.required()] : [];
     },
   },
