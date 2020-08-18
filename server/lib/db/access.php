@@ -870,6 +870,7 @@ $capabilities = array(
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
             'performanceactivitymanager' => CAP_ALLOW,
+            'performanceactivitycreator' => CAP_ALLOW,
         )
     ),
 

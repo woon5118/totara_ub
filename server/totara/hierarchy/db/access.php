@@ -181,7 +181,8 @@ $capabilities = array(
                 'archetypes' => array(
                     'manager' => CAP_ALLOW,
                     'student' => CAP_ALLOW,
-                    'user' => CAP_ALLOW
+                    'user' => CAP_ALLOW,
+                    'performanceactivitycreator' => CAP_ALLOW,
                     ),
                 ),
         'totara/hierarchy:createposition' => array(
@@ -271,8 +272,9 @@ $capabilities = array(
                 'archetypes' => array(
                     'manager' => CAP_ALLOW,
                     'student' => CAP_ALLOW,
-                    'user' => CAP_ALLOW
-                    ),
+                    'user' => CAP_ALLOW,
+                    'performanceactivitycreator' => CAP_ALLOW,
+                ),
                 ),
         'totara/hierarchy:createorganisation' => array(
                 'captype'       => 'write',
@@ -609,7 +611,8 @@ $capabilities = array(
             'captype' => 'read',
             'contextlevel' => CONTEXT_SYSTEM,
             'archetypes' => array(
-                'manager' => CAP_ALLOW
+                'manager' => CAP_ALLOW,
+                'performanceactivitycreator' => CAP_ALLOW,
             ),
             'clonepermissionsfrom' => 'totara/hierarchy:updatepositionframeworks'
         ),
@@ -617,7 +620,8 @@ $capabilities = array(
             'captype' => 'read',
             'contextlevel' => CONTEXT_SYSTEM,
             'archetypes' => array(
-                'manager' => CAP_ALLOW
+                'manager' => CAP_ALLOW,
+                'performanceactivitycreator' => CAP_ALLOW,
             ),
             'clonepermissionsfrom' => 'totara/hierarchy:updateorganisationframeworks'
         ),
