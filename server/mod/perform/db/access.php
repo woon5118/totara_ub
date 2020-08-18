@@ -30,6 +30,7 @@ $capabilities = [
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => [
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
             'performanceactivitycreator' => CAP_ALLOW,
         ]
     ],
@@ -39,6 +40,8 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
             'performanceactivitycreator' => CAP_ALLOW,
         ]
     ],
@@ -51,6 +54,7 @@ $capabilities = [
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
             'performanceactivitymanager' => CAP_ALLOW,
         ]
     ],
@@ -61,6 +65,7 @@ $capabilities = [
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
             'performanceactivitymanager' => CAP_ALLOW,
         ]
     ],
@@ -84,6 +89,7 @@ $capabilities = [
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
     // Report on answers given for a specific subject user. Checked against a specific user.

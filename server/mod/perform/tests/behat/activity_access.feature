@@ -29,8 +29,8 @@ Feature: Checking access to performance activities in different situations
       | David is subject              |
       | John is not participating     |
     And "Participation reporting" "link" should exist
-    # Site manager cannot create new activities by default
-    And I should not see "Add activity"
+    # Site managers can create new activities by default
+    And I should see "Add activity"
     When I click on "John is participating subject" "link"
     Then I should see "John is participating subject"
 
