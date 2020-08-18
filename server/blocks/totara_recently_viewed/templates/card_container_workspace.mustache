@@ -32,6 +32,7 @@
 
     Context variables required for this template:
     * is_tile: Boolean, indicate if we're rendering in tile mode
+    * url: URL to the item
     * title: Title to show at the top of the card
     * subtitle: Subtitle to show at the top of the card
     * image: URL to the card image
@@ -41,6 +42,7 @@
     Example context (json):
     {
         "is_tile": false,
+        "url":  "https://example.com/item"
         "title": "Workspace Title",
         "subtitle": "Workspace subtitle",
         "image": "https://example.com/image.png",
@@ -61,7 +63,7 @@
                 </div>
             {{/is_tile}}
             <div class="block-trv-content">
-                <p class="block-trv-title">{{ title }}</p>
+                <p class="block-trv-title"><a href="{{ url }}">{{ title }}</a></p>
                 {{^is_tile}}
                     <p class="block-trv-subtitle">{{ subtitle }}</p>
                 {{/is_tile}}
