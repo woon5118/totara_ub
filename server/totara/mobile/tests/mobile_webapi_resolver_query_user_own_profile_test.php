@@ -80,7 +80,7 @@ class totara_mobile_webapi_resolver_query_user_own_profile_testcase extends adva
         $this->getDataGenerator()->role_assign($roleid, $u3->id, $context->id);
 
         $users = [$u1, $u2, $u3];
-        return [$users, $users];
+        return $users;
     }
 
     /**
@@ -88,7 +88,7 @@ class totara_mobile_webapi_resolver_query_user_own_profile_testcase extends adva
      */
     public function test_embedded_query() {
         global $PAGE;
-        list($users, $users) = $this->create_faux_users();
+        $users = $this->create_faux_users();
 
         $user = array_shift($users);
         $this->setUser($user->id);
@@ -113,6 +113,7 @@ class totara_mobile_webapi_resolver_query_user_own_profile_testcase extends adva
                 'country' => "{$user->country}",
                 'timezone' => "{$user->timezone}",
                 'description' => "{$user->description}",
+                'descriptionformat' => 'HTML',
                 'webpage' => "{$user->url}",
                 'skypeid' => "{$user->skype}",
                 'institution' => "{$user->institution}",
@@ -120,6 +121,7 @@ class totara_mobile_webapi_resolver_query_user_own_profile_testcase extends adva
                 'phone' => "{$user->phone1}",
                 'mobile' => "{$user->phone2}",
                 'address' => "{$user->address}",
+                '__typename' => 'core_user'
             ]
         ];
         $this->assertSame($expected, $data);

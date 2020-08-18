@@ -163,7 +163,7 @@ class user implements \core\webapi\type_resolver {
         // This is clearly a hack, please suggest something more elegant.
         $urlfields = ['description', 'profileimageurl', 'profileimageurlsmall', 'url'];
         if (is_a($ec, 'totara_mobile\webapi\execution_context') && in_array($field, $urlfields)) {
-            $formatted = str_replace($CFG->wwwroot . '/pluginfile.php', $CFG->wwwroot . '/totara/mobile/pluginfile.php', $formatted);
+            $value = str_replace($CFG->wwwroot . '/pluginfile.php', $CFG->wwwroot . '/totara/mobile/pluginfile.php', $value);
         }
 
         return $value;
