@@ -13,64 +13,51 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
   @module mod_perform
 -->
 
 <template>
   <div class="tui-performAddParticipants">
+    <a :href="$url(goBackLink)">{{
+      $str('back_to_manage_participation', 'mod_perform')
+    }}</a>
+
     <h2 class="tui-performAddParticipants__title">
       {{ $str('add_participants_page_title', 'mod_perform') }}
     </h2>
-    <Loader :loading="$apollo.loading">
-      <Card class="tui-performAddParticipants__card">
-        <h3 class="tui-performAddParticipants__card-title">{{ cardTitle }}</h3>
 
-        <template v-if="!$apollo.loading">
-          <Form
-            v-if="distinctRelationships.length > 0"
-            class="tui-performAddParticipants__form"
-          >
-            <FormRow
-              v-for="relationship in distinctRelationships"
-              :key="relationship.id"
-              v-slot="{ id, label }"
-              :label="relationship.name"
-            >
-              <InputText
-                :id="id"
-                :value="getNewParticipantsAsCsv(relationship.id)"
-                @input="updateNewParticipants(relationship.id, $event)"
-              />
-            </FormRow>
-          </Form>
-          <p v-else>
-            {{ $str('manual_participant_add_no_relationships', 'mod_perform') }}
-          </p>
-        </template>
-      </Card>
-    </Loader>
+    <Loader :loading="$apollo.loading" />
 
-    <ButtonGroup class="tui-performAddParticipants__action-buttons">
-      <Button
-        :styleclass="{ primary: true }"
-        :text="$str('save', 'mod_perform')"
-        :disabled="isSaving"
-        type="submit"
-        @click.prevent="showConfirmModal"
-      />
-      <ActionLink
-        :href="goBackLink"
-        :text="$str('button_cancel', 'mod_perform')"
-        :disabled="isSaving"
-      />
-    </ButtonGroup>
+    <ActivityParticipants
+      v-if="subjectInstance"
+      ref="form"
+      :subject-instance="subjectInstance"
+      :relationships="relationships"
+      :require-input="false"
+      :is-saving="isSaving"
+      :validate="validate"
+      @submit="showConfirmModal"
+    >
+      <template v-if="relationships.length === 0" v-slot:meta>
+        <p>
+          {{ $str('manual_participant_add_no_relationships', 'mod_perform') }}
+        </p>
+      </template>
+      <template v-slot:buttons>
+        <ActionLink
+          :href="goBackLink"
+          :text="$str('button_cancel', 'mod_perform')"
+        />
+      </template>
+    </ActivityParticipants>
 
     <ConfirmationModal
       :open="openConfirmationModal"
       :title="$str('manual_participant_add_confirmation_title', 'mod_perform')"
       :confirm-button-text="$str('button_create', 'mod_perform')"
       :loading="isSaving"
-      @confirm="trySave"
+      @confirm="save"
       @cancel="closeConfirmModal"
     >
       <p>{{ confirmationMessage }}</p>
@@ -79,33 +66,30 @@
 </template>
 
 <script>
+// components
 import ActionLink from 'tui/components/links/ActionLink';
-import AddParticipantsMutation from 'mod_perform/graphql/add_participants';
-import Button from 'tui/components/buttons/Button';
-import ButtonGroup from 'tui/components/buttons/ButtonGroup';
-import Card from 'tui/components/card/Card';
+import ActivityParticipants from 'mod_perform/components/user_activities/participant_selector/ActivityParticipants';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
-import Form from 'tui/components/form/Form';
-import FormRow from 'tui/components/form/FormRow';
-import InputText from 'tui/components/form/InputText';
 import Loader from 'tui/components/loader/Loader';
-import subjectInstanceForParticipationQuery from 'mod_perform/graphql/subject_instance_for_participation';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
+// util
+import {
+  RELATIONSHIP_SUBJECT,
+  RELATIONSHIP_PERFORM_EXTERNAL,
+} from 'mod_perform/constants';
 import { notify } from 'tui/notifications';
 import { redirectWithPost } from 'mod_perform/redirect';
+// graphQL
+import AddParticipantsMutation from 'mod_perform/graphql/add_participants';
+import subjectInstanceForParticipationQuery from 'mod_perform/graphql/subject_instance_for_participation';
 
 export default {
   components: {
-    ConfirmationModal,
+    ActivityParticipants,
     ActionLink,
-    Button,
-    ButtonGroup,
-    Form,
-    FormRow,
-    Card,
+    ConfirmationModal,
     Loader,
-    InputText,
   },
+
   props: {
     subjectInstanceId: {
       required: true,
@@ -116,66 +100,40 @@ export default {
       type: String,
     },
   },
+
   data() {
     return {
       subjectInstance: null,
-      newParticipantsByCoreRelationship: {},
-      isSaving: false,
+      relationships: [],
+      selectedUsers: [],
       openConfirmationModal: false,
+      isSaving: false,
     };
   },
+
+  apollo: {
+    subjectInstance: {
+      query: subjectInstanceForParticipationQuery,
+      variables() {
+        return {
+          subject_instance_id: this.subjectInstanceId,
+        };
+      },
+      update({ mod_perform_subject_instance_for_participant: data }) {
+        this.initialiseRelationships(data);
+        return data;
+      },
+    },
+  },
+
   computed: {
-    cardTitle() {
-      if (!this.subjectInstance) {
-        return '';
-      }
-
-      const activity_name = this.subjectInstance.activity.name;
-      const subject_name = this.subjectInstance.subject_user.fullname;
-
-      return this.$str('activity_title_for_subject', 'mod_perform', {
-        activity_name,
-        subject_name,
-      });
-    },
-    distinctRelationships() {
-      if (!this.subjectInstance) {
-        return [];
-      }
-
-      const sectionRelationships = this.subjectInstance.activity.sections.map(
-        section => section.section_relationships
-      );
-
-      const foundCoreRelationshipIds = {};
-      const distinctCoreRelationships = [];
-
-      sectionRelationships.forEach(sectionRelationship => {
-        sectionRelationship.forEach(relationship => {
-          const coreRelationshipId = relationship.core_relationship.id;
-
-          if (
-            !relationship.is_subject &&
-            !foundCoreRelationshipIds[coreRelationshipId]
-          ) {
-            distinctCoreRelationships.push(relationship.core_relationship);
-          }
-        });
-      });
-
-      return distinctCoreRelationships;
-    },
-    participantInstanceCount() {
-      return Object.entries(this.newParticipantsByCoreRelationship).reduce(
-        (accumulator, entry) => {
-          const userIds = entry[1];
-          return accumulator + userIds.length;
-        },
-        0
-      );
-    },
+    /**
+     * Show grammatically correct message based upon how many users were selected.
+     *
+     * @return {String}
+     */
     confirmationMessage() {
-      if (this.participantInstanceCount === 1) {
+      if (this.selectedUsers.length === 1) {
         return this.$str(
           'manual_participant_add_confirmation_message_singular',
           'mod_perform'
@@ -185,109 +143,124 @@ export default {
       return this.$str(
         'manual_participant_add_confirmation_message',
         'mod_perform',
-        this.participantInstanceCount
+        this.selectedUsers.length
       );
     },
   },
-  apollo: {
-    subjectInstance: {
-      query: subjectInstanceForParticipationQuery,
-      variables() {
-        return {
-          subject_instance_id: this.subjectInstanceId,
-        };
-      },
-      update: data => data['mod_perform_subject_instance_for_participant'],
-    },
-  },
+
   methods: {
-    getNewParticipantsAsCsv(coreRelationshipId) {
-      if (this.newParticipantsByCoreRelationship[coreRelationshipId]) {
-        return this.newParticipantsByCoreRelationship[coreRelationshipId].join(
-          ', '
-        );
-      }
-
-      return '';
-    },
-    updateNewParticipants(coreRelationshipId, value) {
-      const userIds = value
-        .split(',')
-        .map(userId => userId.trim())
-        .filter(userId => userId !== '');
-
-      this.$set(
-        this.newParticipantsByCoreRelationship,
-        coreRelationshipId,
-        userIds
-      );
-    },
-    showConfirmModal() {
+    /**
+     * Confirm adding participants.
+     * Queues participant users to be saved.
+     *
+     * @param {Object} data Form data
+     */
+    showConfirmModal(data) {
+      this.selectedUsers = this.getParticipantsToSave(data);
       this.openConfirmationModal = true;
     },
+
+    /**
+     * Cancel adding participants.
+     */
     closeConfirmModal() {
+      this.selectedUsers = [];
       this.openConfirmationModal = false;
     },
-    prepareParticipantsDataForSaving() {
-      let participantsDataPreparedForSaving = [];
-      Object.entries(this.newParticipantsByCoreRelationship).forEach(entry => {
-        const coreRelationshipId = entry[0];
-        const userIds = entry[1];
-        userIds.forEach(userId => {
-          participantsDataPreparedForSaving.push({
-            core_relationship_id: coreRelationshipId,
-            participant_id: userId,
+
+    /**
+     * Get and set the unique relationships defined in the sections for the activity.
+     *
+     * @param {Object} subjectInstance
+     */
+    initialiseRelationships(subjectInstance) {
+      const relationships = {};
+      subjectInstance.activity.sections
+        .map(section =>
+          section.section_relationships.map(
+            sectionRelationship => sectionRelationship.core_relationship
+          )
+        )
+        .forEach(sectionRelationships => {
+          sectionRelationships.forEach(relationship => {
+            if (
+              relationship.idnumber !== RELATIONSHIP_SUBJECT &&
+              relationship.idnumber !== RELATIONSHIP_PERFORM_EXTERNAL // For now we don't support external participants.
+            ) {
+              relationships[relationship.id] = relationship;
+            }
           });
         });
-      });
-      return participantsDataPreparedForSaving;
+      this.relationships = Object.values(relationships);
     },
-    /**
-     * Show a generic saving error toast.
-     */
-    showMutationErrorNotification() {
-      notify({
-        duration: NOTIFICATION_DURATION,
-        message: this.$str('toast_error_generic_update', 'mod_perform'),
-        type: 'error',
-      });
-    },
-    async trySave() {
-      this.isSaving = true;
 
+    /**
+     * Check the form upon saving and show a validation error if no users were selected.
+     *
+     * @param {Object} data Form data
+     * @return {Object} Form errors
+     */
+    validate(data) {
+      if (Object.values(data).some(users => users.length > 0)) {
+        return {};
+      }
+
+      return {
+        error: this.$str(
+          'manual_participant_add_require_at_least_one',
+          'mod_perform'
+        ),
+      };
+    },
+
+    /**
+     * Send off the users to add to the server!
+     */
+    async save() {
+      this.isSaving = true;
       try {
-        const addedParticipantInstances = await this.save();
+        const { data: result } = await this.$apollo.mutate({
+          mutation: AddParticipantsMutation,
+          variables: {
+            input: {
+              subject_instance_ids: [this.subjectInstanceId],
+              participants: this.selectedUsers,
+            },
+          },
+          refetchAll: false, // Don't refetch all the data again
+        });
+        this.$refs.form.hasChanges = false;
         redirectWithPost(this.goBackLink, {
-          participant_instance_created_count: addedParticipantInstances.length,
+          participant_instance_created_count:
+            result.mod_perform_add_participants.participant_instances.length,
         });
       } catch (e) {
-        this.showMutationErrorNotification();
+        notify({
+          message: this.$str('toast_error_generic_update', 'mod_perform'),
+          type: 'error',
+        });
         this.isSaving = false;
         this.closeConfirmModal();
       }
     },
 
     /**
-     * Mutation call to add participants.
-     * @return {Object}
+     * Arrange the users in sets of relationship and user for the graphQL mutation.
+     *
+     * @param {Array} data Form data
+     * @return {Array} User data to save
      */
-    async save() {
-      const {
-        data: {
-          mod_perform_add_participants: { participant_instances },
-        },
-      } = await this.$apollo.mutate({
-        mutation: AddParticipantsMutation,
-        variables: {
-          input: {
-            subject_instance_ids: [this.subjectInstanceId],
-            participants: this.prepareParticipantsDataForSaving(),
-          },
-        },
-        refetchAll: false, // Don't refetch all the data again
+    getParticipantsToSave(data) {
+      let toSave = [];
+      data.forEach(relationship => {
+        relationship.users.forEach(user => {
+          toSave.push({
+            core_relationship_id: relationship.relationship_id,
+            participant_id: user.user_id,
+          });
+        });
       });
-
-      return participant_instances;
+      return toSave;
     },
   },
 };
@@ -296,15 +269,15 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "activity_title_for_subject",
       "add_participants_page_title",
+      "back_to_manage_participation",
       "button_cancel",
       "button_create",
       "manual_participant_add_confirmation_message",
       "manual_participant_add_confirmation_message_singular",
       "manual_participant_add_confirmation_title",
       "manual_participant_add_no_relationships",
-      "save",
+      "manual_participant_add_require_at_least_one",
       "toast_error_generic_update"
     ]
   }

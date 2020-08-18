@@ -25,7 +25,6 @@
       :rows="items"
       :delete-icon="true"
       :allow-deleting-first-items="true"
-      class="tui-performUserActivitiesExternalUserSelector"
       @add="push({ email: '', name: '' })"
       @remove="
         (item, i) => {
@@ -37,22 +36,24 @@
       "
     >
       <template v-slot="{ row, index }">
-        <FormText
-          :name="[index, 'name']"
-          :aria-label="
-            $str('external_user_name_help', 'mod_perform', index + 1)
-          "
-          :placeholder="$str('external_user_name', 'mod_perform')"
-          :validations="v => [v.required(), v.maxLength(255)]"
-        />
-        <FormEmail
-          :name="[index, 'email']"
-          :aria-label="
-            $str('external_user_email_help', 'mod_perform', index + 1)
-          "
-          :placeholder="$str('external_user_email', 'mod_perform')"
-          :validations="v => [v.required(), v.maxLength(100), v.email()]"
-        />
+        <InputSet split :stack-below="25" :char-length="30">
+          <FormText
+            :name="[index, 'name']"
+            :aria-label="
+              $str('external_user_name_help', 'mod_perform', index + 1)
+            "
+            :placeholder="$str('external_user_name', 'mod_perform')"
+            :validations="v => [v.required(), v.maxLength(255)]"
+          />
+          <FormEmail
+            :name="[index, 'email']"
+            :aria-label="
+              $str('external_user_email_help', 'mod_perform', index + 1)
+            "
+            :placeholder="$str('external_user_email', 'mod_perform')"
+            :validations="v => [v.required(), v.maxLength(100), v.email()]"
+          />
+        </InputSet>
       </template>
     </Repeater>
   </FieldArray>
@@ -60,6 +61,7 @@
 
 <script>
 import FieldArray from 'tui/components/reform/FieldArray';
+import InputSet from 'tui/components/form/InputSet';
 import Repeater from 'tui/components/form/Repeater';
 import { FormEmail, FormText } from 'tui/components/uniform';
 
@@ -68,6 +70,7 @@ export default {
     FieldArray,
     FormEmail,
     FormText,
+    InputSet,
     Repeater,
   },
 

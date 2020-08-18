@@ -18,32 +18,9 @@
 
 <style lang="scss">
 .tui-performUserActivitiesSelectParticipants {
-  &__header {
+  &__title {
     @include tui-font-heading-medium;
     padding-top: var(--tui-gap-2);
-  }
-
-  & > * + *,
-  &__instance {
-    margin-top: var(--tui-gap-4);
-  }
-
-  &__instance {
-    padding: var(--tui-gap-4);
-    border: 1px solid var(--tui-card-border-color);
-
-    &-title {
-      @include tui-font-heading-small;
-      margin: 0;
-    }
-
-    &-meta {
-      margin-top: var(--tui-gap-2);
-    }
-
-    &-form {
-      margin-top: var(--tui-gap-4);
-    }
   }
 }
 </style>

@@ -2,7 +2,7 @@
 Mutation return type including the participants just added
 """
 type mod_perform_add_participants_result {
-    participant_instances: [mod_perform_participant_instance!]!
+  participant_instances: [mod_perform_participant_instance!]!
 }
 
 """
@@ -18,12 +18,12 @@ input mod_perform_add_participant_input {
 Add participants input type
 """
 input mod_perform_add_participants_input {
-    subject_instance_ids: [core_id!]!
-    participants: [mod_perform_add_participant_input!]!
+  subject_instance_ids: [core_id!]!
+  participants: [mod_perform_add_participant_input!]!
 }
 
 extend type Mutation {
-    mod_perform_add_participants(
-        input: mod_perform_add_participants_input!
-    ): mod_perform_add_participants_result!
+  mod_perform_add_participants(
+    input: mod_perform_add_participants_input!
+  ): mod_perform_add_participants_result!
 }

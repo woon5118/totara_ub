@@ -11,13 +11,14 @@ query mod_perform_subject_instance_for_participation(
         section_relationships {
           core_relationship {
             id
+            idnumber
             name
           }
-          is_subject
         }
       }
     }
     subject_user {
+      id
       fullname
     }
     participant_instances {

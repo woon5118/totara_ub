@@ -22,7 +22,7 @@
       $str('back_to_all_activities', 'mod_perform')
     }}</a>
 
-    <h2 class="tui-performUserActivitiesSelectParticipants__header">
+    <h2 class="tui-performUserActivitiesSelectParticipants__title">
       {{
         $str('user_activities_select_participants_page_title', 'mod_perform')
       }}
@@ -41,10 +41,22 @@
         :key="selectionInstance.subject_instance.id"
         :subject-instance="selectionInstance.subject_instance"
         :relationships="selectionInstance.manual_relationships"
-        :current-user-id="currentUserId"
-        @submit="submit"
-        @error="error"
-      />
+        :require-input="true"
+        :is-saving="savingId === selectionInstance.subject_instance.id"
+        @submit="submit($event, selectionInstance.subject_instance.id)"
+      >
+        <template v-slot:meta>
+          <p>
+            {{
+              $str(
+                'user_activities_created_at',
+                'mod_perform',
+                selectionInstance.subject_instance.created_at
+              )
+            }}
+          </p>
+        </template>
+      </ActivityParticipants>
     </Loader>
 
     <p v-else>
@@ -57,6 +69,7 @@
 import ActivityParticipants from 'mod_perform/components/user_activities/participant_selector/ActivityParticipants';
 import Loader from 'tui/components/loader/Loader';
 import ManualParticipantSelectionInstancesQuery from 'mod_perform/graphql/manual_participant_selection_instances';
+import SetManualParticipantsMutation from 'mod_perform/graphql/set_manual_participants';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import { notify } from 'tui/notifications';
 
@@ -80,6 +93,7 @@ export default {
   data() {
     return {
       participantSelectionInstances: [],
+      savingId: null,
     };
   },
 
@@ -101,27 +115,41 @@ export default {
     /**
      * Reload the activities query and show a success notification.
      */
-    submit() {
-      this.refetch();
+    async submit(data, subjectInstanceId) {
+      this.savingId = subjectInstanceId;
 
-      notify({
-        duration: NOTIFICATION_DURATION,
-        message: this.$str('toast_success_participants_saved', 'mod_perform'),
-        type: 'success',
+      const participants = data.map(participant => {
+        return {
+          manual_relationship_id: participant.relationship_id,
+          users: participant.users,
+        };
       });
-    },
 
-    /**
-     * Reload the activities query and show an error notification.
-     */
-    error() {
+      try {
+        await this.$apollo.mutate({
+          mutation: SetManualParticipantsMutation,
+          variables: {
+            subject_instance_id: subjectInstanceId,
+            participants,
+          },
+        });
+
+        notify({
+          duration: NOTIFICATION_DURATION,
+          message: this.$str('toast_success_participants_saved', 'mod_perform'),
+          type: 'success',
+        });
+      } catch (e) {
+        notify({
+          duration: NOTIFICATION_DURATION,
+          message: this.$str('toast_error_generic_update', 'mod_perform'),
+          type: 'error',
+        });
+      }
+
+      this.savingId = null;
+
       this.refetch();
-
-      notify({
-        duration: NOTIFICATION_DURATION,
-        message: this.$str('toast_error_generic_update', 'mod_perform'),
-        type: 'error',
-      });
     },
   },
 };
@@ -133,6 +161,7 @@ export default {
       "back_to_all_activities",
       "toast_error_generic_update",
       "toast_success_participants_saved",
+      "user_activities_created_at",
       "user_activities_select_participants_none",
       "user_activities_select_participants_note",
       "user_activities_select_participants_page_title"

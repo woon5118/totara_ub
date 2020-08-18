@@ -895,7 +895,7 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
-     * @Then /^I should see "((?:[^"]|\\")*)" in the tui (success|warning|error) notification (banner|toast)(| and close it)$/
+     * @Then /^I should see "((?:[^"]|\\")*)" in the tui (info|success|warning|error) notification (banner|toast)(| and close it)$/
      * @param string $expected_text
      * @param string $message_type
      * @param string $notification_type

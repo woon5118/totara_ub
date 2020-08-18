@@ -17,36 +17,30 @@
 -->
 
 <template>
-  <div class="tui-performUserActivitiesSelectParticipants__instance">
-    <h3 class="tui-performUserActivitiesSelectParticipants__instance-title">
+  <div class="tui-performActivityParticipantSelector">
+    <h3 class="tui-performActivityParticipantSelector-title">
       {{ instanceTitle }}
     </h3>
 
-    <div class="tui-performUserActivitiesSelectParticipants__instance-meta">
-      <p>
-        {{
-          $str(
-            'user_activities_created_at',
-            'mod_perform',
-            subjectInstance.created_at
-          )
-        }}
-      </p>
+    <div v-if="$slots.meta" class="tui-performActivityParticipantSelector-meta">
+      <slot name="meta" />
     </div>
 
     <Uniform
       :initial-values="initialValues"
       :validate="validateExternal"
       input-width="full"
-      class="tui-performUserActivitiesSelectParticipants__instance-form"
+      class="tui-performActivityParticipantSelector-form"
       @change="updateHasChanges"
       @submit="submit"
     >
+      <FormField v-if="validate" name="error" />
+
       <FormRow
         v-for="relationship in relationships"
         :key="relationship.id"
         :label="relationship.name"
-        :required="true"
+        :required="requireInput"
       >
         <ExternalUserSelector
           v-if="isExternal(relationship)"
@@ -58,6 +52,7 @@
           v-slot="{ id, value, update }"
           :name="relationship.id"
           :validate="validateInternal"
+          :char-length="30"
         >
           <UserSelector
             v-model="value"
@@ -67,7 +62,7 @@
         </FormField>
       </FormRow>
 
-      <FormRow>
+      <FormRow v-if="relationships.length > 0">
         <ButtonGroup>
           <Button
             :styleclass="{ primary: 'true' }"
@@ -75,6 +70,7 @@
             :disabled="isSaving"
             type="submit"
           />
+          <slot name="buttons" />
         </ButtonGroup>
       </FormRow>
     </Uniform>
@@ -87,7 +83,6 @@ import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import ExternalUserSelector from 'mod_perform/components/user_activities/participant_selector/ExternalUserSelector';
 import UserSelector from 'mod_perform/components/user_activities/participant_selector/UserSelector';
 import { FormField, FormRow, Uniform } from 'tui/components/uniform';
-import SetManualParticipantsMutation from 'mod_perform/graphql/set_manual_participants';
 import { RELATIONSHIP_PERFORM_EXTERNAL } from 'mod_perform/constants';
 
 export default {
@@ -110,9 +105,17 @@ export default {
       required: true,
       type: Array,
     },
-    currentUserId: {
+    requireInput: {
       required: true,
-      type: Number,
+      type: Boolean,
+    },
+    isSaving: {
+      required: true,
+      type: Boolean,
+    },
+    validate: {
+      type: Function,
+      default: null,
     },
   },
 
@@ -120,7 +123,6 @@ export default {
     return {
       initialValues: this.getInitialValues(),
       hasChanges: false,
-      isSaving: false,
     };
   },
 
@@ -131,14 +133,10 @@ export default {
      * @returns {String}
      */
     instanceTitle() {
-      return this.$str(
-        'user_activities_select_participants_subject_instance_title',
-        'mod_perform',
-        {
-          activity: this.subjectInstance.activity.name,
-          user: this.subjectInstance.subject_user.fullname,
-        }
-      );
+      return this.$str('activity_title_for_subject', 'mod_perform', {
+        activity: this.subjectInstance.activity.name,
+        user: this.subjectInstance.subject_user.fullname,
+      });
     },
   },
 
@@ -162,11 +160,7 @@ export default {
     isExternal(relationship) {
       if (!isNaN(relationship)) {
         // Find the relationship object from it's ID.
-        relationship = this.relationships
-          .filter(r => {
-            return r.id === relationship;
-          })
-          .shift();
+        relationship = this.relationships.find(r => r.id === relationship);
       }
 
       return relationship.idnumber === RELATIONSHIP_PERFORM_EXTERNAL;
@@ -178,11 +172,9 @@ export default {
      * @param {Object} data The submitted form data.
      */
     async submit(data) {
-      this.isSaving = true;
-
       const participants = Object.keys(data).map(relationshipId => {
         return {
-          manual_relationship_id: relationshipId,
+          relationship_id: relationshipId,
           users: data[relationshipId].map(user => {
             if (this.isExternal(relationshipId)) {
               return user;
@@ -193,23 +185,7 @@ export default {
           }),
         };
       });
-
-      try {
-        await this.$apollo.mutate({
-          mutation: SetManualParticipantsMutation,
-          variables: {
-            subject_instance_id: this.subjectInstance.id,
-            participants,
-          },
-        });
-        this.hasChanges = false;
-        this.$emit('submit');
-      } catch (e) {
-        this.hasChanges = false;
-        this.$emit('error');
-      }
-
-      this.isSaving = false;
+      this.$emit('submit', participants);
     },
 
     /**
@@ -219,7 +195,7 @@ export default {
      * @returns {Object} validation errors
      */
     validateInternal(values) {
-      if (values.length === 0) {
+      if (this.requireInput && values.length === 0) {
         return this.$str('error_no_participants_selected', 'mod_perform');
       }
       return false;
@@ -232,7 +208,11 @@ export default {
      * @returns {Object} validation errors
      */
     validateExternal(values) {
-      const errors = {};
+      let errors = {};
+      if (this.validate != null) {
+        errors = this.validate(values);
+      }
+
       Object.keys(values).forEach(relationshipId => {
         if (this.isExternal(relationshipId)) {
           errors[relationshipId] = {};
@@ -267,7 +247,7 @@ export default {
       let values = {};
       this.relationships.forEach(relationship => {
         values[relationship.id] = [];
-        if (this.isExternal(relationship)) {
+        if (this.requireInput && this.isExternal(relationship)) {
           values[relationship.id] = [
             {
               email: '',
@@ -324,6 +304,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "activity_title_for_subject",
       "error_external_participant_duplicate_email",
       "error_no_participants_selected",
       "external_user_email",
@@ -331,8 +312,7 @@ export default {
       "external_user_name",
       "external_user_name_help",
       "unsaved_changes_warning",
-      "user_activities_created_at",
-      "user_activities_select_participants_subject_instance_title"
+      "user_activities_created_at"
     ],
     "totara_core": [
       "save"

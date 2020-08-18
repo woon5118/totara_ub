@@ -101,8 +101,8 @@ Feature: Allow users to select manual (internal and external) participants for a
     Then I should see "Select participants"
     And I should see "Note: None of these activities can start until participants are selected."
     And I should see "Act1 for Subject User"
-    And I should see "Created" in the ".tui-performUserActivitiesSelectParticipants__instance-meta" "css_element"
-    And I should see the current date in format "j F Y" in the ".tui-performUserActivitiesSelectParticipants__instance-meta" "css_element"
+    And I should see "Created" in the ".tui-performActivityParticipantSelector-meta" "css_element"
+    And I should see the current date in format "j F Y" in the ".tui-performActivityParticipantSelector-meta" "css_element"
     # Subject can select themselves
     And I should see the following options in the tui taglist in the ".tui-formRow" "css_element":
       | Appraiser User |

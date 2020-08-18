@@ -17,25 +17,22 @@
 -->
 
 <style lang="scss">
-.tui-performUserActivitiesExternalUserSelector {
-  & .tui-repeater__row {
-    flex-direction: column;
+.tui-performActivityParticipantSelector {
+  margin-top: var(--tui-gap-4);
+  padding: var(--tui-gap-4);
+  border: var(--tui-border-width-thin) solid var(--tui-card-border-color);
 
-    & > .tui-formField + .tui-formField {
-      margin: var(--tui-gap-2) 0 0 0;
-    }
+  &-title {
+    @include tui-font-heading-small;
+    margin: 0;
   }
-}
 
-@media (min-width: $tui-screen-xs) {
-  .tui-performUserActivitiesExternalUserSelector {
-    & .tui-repeater__row {
-      flex-direction: row;
+  &-meta {
+    margin-top: var(--tui-gap-2);
+  }
 
-      & > .tui-formField + .tui-formField {
-        margin: 0 0 0 var(--tui-gap-2);
-      }
-    }
+  &-form {
+    margin-top: var(--tui-gap-4);
   }
 }
 </style>

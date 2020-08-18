@@ -20,24 +20,7 @@
 .tui-performAddParticipants {
   &__title {
     @include tui-font-heading-medium;
-  }
-
-  &__card {
-    display: block;
-    padding: var(--tui-gap-4);
-  }
-
-  &__form {
-    margin-top: var(--tui-gap-8);
-  }
-
-  &__action-buttons {
-    margin-top: var(--tui-gap-8);
-  }
-
-  &__card-title {
-    @include tui-font-heading-small;
-    margin-top: 0;
+    padding-top: var(--tui-gap-2);
   }
 }
 </style>
