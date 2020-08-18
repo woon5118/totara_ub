@@ -28,6 +28,9 @@ use core\orm\query\builder;
 use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\section;
 use mod_perform\entities\activity\section_relationship;
+use mod_perform\state\participant_section\availability_not_applicable;
+use mod_perform\state\participant_section\open;
+use mod_perform\state\participant_section\progress_not_applicable;
 use mod_perform\state\participant_section\not_started;
 use stdClass;
 
@@ -60,19 +63,35 @@ class participant_section_creation {
     public function generate_sections(collection $participant_instances): void {
         builder::get_db()->transaction(
             function () use ($participant_instances) {
-                $section_ids = $this->get_section_ids_for_core_relationships($participant_instances);
+                $section_relationships = $this->get_section_relationships_for_core_relationships($participant_instances);
 
                 foreach ($participant_instances as $participant_instance) {
-                    $participant_section_ids = $section_ids->filter(function ($section) use ($participant_instance) {
-                        return (int) $section->activity_id === $participant_instance->activity_id
-                            && (int) $section->core_relationship_id === $participant_instance->core_relationship_id;
-                    })->pluck('section_id');
-                    foreach ($participant_section_ids as $section_id) {
+                    $participant_section_relationships = $section_relationships->filter(
+                        function ($sr) use ($participant_instance) {
+                            return (int) $sr->activity_id === $participant_instance->activity_id
+                                && (int) $sr->core_relationship_id === $participant_instance->core_relationship_id;
+                        }
+                    );
+                    foreach ($participant_section_relationships as $section_relationship) {
+                        if ((int)$section_relationship->can_answer === 1) {
+                            $progress = not_started::get_code();
+                            $availability = open::get_code();
+                        } else if ((int)$section_relationship->can_view === 1) {
+                            $progress = progress_not_applicable::get_code();
+                            $availability = availability_not_applicable::get_code();
+                        } else {
+                            throw new \coding_exception(
+                                'Tried to create participant section for relationship which cannot view or answer'
+                            );
+                        }
+
                         $data = new stdClass();
-                        $data->section_id = $section_id;
-                        $data->status = not_started::get_code();
+                        $data->section_id = $section_relationship->section_id;
+                        $data->progress = $progress;
+                        $data->availability = $availability;
                         $data->created_at = time();
                         $data->participant_instance_id = $participant_instance->id;
+
                         $this->aggregate_participant_section($data);
                     }
                 }
@@ -82,12 +101,12 @@ class participant_section_creation {
     }
 
     /**
-     * Get section ids for the core relationship ids.
+     * Get section relationships for the core relationship ids.
      *
      * @param collection $participant_instances
-     * @return collection of section ids, grouped by core relationship id
+     * @return collection of section relationships, grouped by core relationship id
      */
-    private function get_section_ids_for_core_relationships(collection $participant_instances): collection {
+    private function get_section_relationships_for_core_relationships(collection $participant_instances): collection {
         $core_relationship_ids = array_unique($participant_instances->pluck('core_relationship_id'));
         $activity_ids = array_unique($participant_instances->pluck('activity_id'));
 
@@ -95,7 +114,7 @@ class participant_section_creation {
             ->join([section_relationship::TABLE, 'sr'], 'id', 'sr.section_id')
             ->where_in('activity_id', $activity_ids)
             ->where_in('sr.core_relationship_id', $core_relationship_ids)
-            ->select(['sr.section_id', 'activity_id', 'sr.core_relationship_id'])
+            ->select(['sr.section_id', 'sr.can_view', 'sr.can_answer', 'activity_id', 'sr.core_relationship_id'])
             ->get(true);
     }
 

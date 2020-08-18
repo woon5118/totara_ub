@@ -42,9 +42,13 @@ use mod_perform\models\activity\participant_instance as participant_instance_mod
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\state\activity\active;
+use mod_perform\state\participant_instance\availability_not_applicable;
 use mod_perform\state\participant_instance\not_started;
+use mod_perform\state\participant_instance\open;
+use mod_perform\state\participant_instance\progress_not_applicable;
 use mod_perform\state\subject_instance\closed;
 use mod_perform\state\subject_instance\pending;
+use stdClass;
 use totara_core\relationship\helpers\relationship_collection_manager as core_relationship_collection_manager;
 use totara_core\relationship\relationship as core_relationship;
 use totara_core\relationship\relationship_resolver_dto;
@@ -182,10 +186,18 @@ class participant_instance_creation {
                 'id' => $subject_instance_id,
                 'activity_id' => $activity_id,
             ];
+
+            $section_relationships = section_relationship::repository()
+                ->where('core_relationship_id', $participant_relationship['core_relationship_id'])
+                ->join([section::TABLE, 'section'], 'section_id', 'id')
+                ->where('section.activity_id', $activity_id)
+                ->get();
+
             $this->create_participant_instances_for_user_list(
                 $this->build_participant_instance_data(
                     $participant_relationship['core_relationship_id'],
-                    $subject_instance_data
+                    $subject_instance_data,
+                    $section_relationships
                 ),
                 [new relationship_resolver_dto($participant_relationship['participant_id'])]
             );
@@ -350,8 +362,8 @@ class participant_instance_creation {
 
         // Find all the activities that are related to the subject instances.
         $activity_ids = array_unique($subject_instance_dtos->pluck('activity_id'), SORT_NUMERIC);
-        $activity_relationships = $this->get_activity_relationships($activity_ids);
-        $core_relationship_ids = array_unique($activity_relationships->pluck('core_relationship_id'));
+        $section_relationships = $this->get_section_relationships($activity_ids);
+        $core_relationship_ids = array_unique($section_relationships->pluck('core_relationship_id'));
 
         if (empty($core_relationship_ids)) {
             return;
@@ -359,12 +371,13 @@ class participant_instance_creation {
 
         // Initialise the core relationship manager with the core relationships that we will be using.
         $relationship_manager = new core_relationship_collection_manager($core_relationship_ids);
-        $relationships_per_activity = $this->group_relationship_ids_by_activity($activity_relationships);
+        $section_relationships_per_core_relationship_per_activity = $this->group_relationships_by_activity($section_relationships);
 
         // Process each subject instance, one at a time.
         foreach ($subject_instance_dtos as $subject_instance) {
             // If there are no relationships defined for the activity then there is nothing to do.
-            $has_no_relationships_for_activity = !isset($relationships_per_activity[$subject_instance->activity_id]);
+            $has_no_relationships_for_activity =
+                !isset($section_relationships_per_core_relationship_per_activity[$subject_instance->activity_id]);
             if ($has_no_relationships_for_activity) {
                 continue;
             }
@@ -373,12 +386,15 @@ class participant_instance_creation {
 
             $participant_ids_for_relationships = $relationship_manager->get_users_for_relationships(
                 $relationship_arguments,
-                $relationships_per_activity[$subject_instance->activity_id]
+                array_keys($section_relationships_per_core_relationship_per_activity[$subject_instance->activity_id])
             );
             $relationship_data = [
-                'core_relationship_ids' => $relationships_per_activity[$subject_instance->activity_id],
-                'subject_instance' => $subject_instance,
-                'participant_dtos' => $participant_ids_for_relationships,
+                'section_relationships_per_core_relationship' =>
+                    $section_relationships_per_core_relationship_per_activity[$subject_instance->activity_id],
+                'subject_instance' =>
+                    $subject_instance,
+                'participant_dtos' =>
+                    $participant_ids_for_relationships,
             ];
 
             $this->create_participant_instances_for_relationships($relationship_data);
@@ -386,37 +402,34 @@ class participant_instance_creation {
     }
 
     /**
-     * Get core_relationships for all activities.
+     * Get section_relationships for all activities.
      *
      * @param array $activity_ids
      * @return collection
      */
-    private function get_activity_relationships(array $activity_ids): collection {
+    private function get_section_relationships(array $activity_ids): collection {
         return section_relationship::repository()
-            ->select(['id', 'section.activity_id', 'core_relationship_id'])
+            ->with('section')
             ->join([section::TABLE, 'section'], 'section_id', 'id')
             ->where_in('section.activity_id', $activity_ids)
             ->get();
     }
 
     /**
-     * Get activity relationships for subject instance.
+     * Get the distinct list of core relationships used in the given sections, grouped by activity
      *
-     * @param collection $activity_relationships
+     * @param collection $section_relationships
      * @return array
      */
-    private function group_relationship_ids_by_activity(collection $activity_relationships): array {
+    private function group_relationships_by_activity(collection $section_relationships): array {
         $relationships_per_activity = [];
 
-        foreach ($activity_relationships as $activity_relationship) {
-            if (!isset($relationships_per_activity[$activity_relationship->activity_id]) ||
-                !in_array(
-                    $activity_relationship->core_relationship_id,
-                    $relationships_per_activity[$activity_relationship->activity_id]
-                )
-            ) {
-                $relationships_per_activity[$activity_relationship->activity_id][] = $activity_relationship->core_relationship_id;
-            }
+        /** @var section_relationship $section_relationship */
+        foreach ($section_relationships as $section_relationship) {
+            $activity_id = $section_relationship->section->activity_id;
+            $core_relationship_id = $section_relationship->core_relationship_id;
+
+            $relationships_per_activity[$activity_id][$core_relationship_id][] = $section_relationship;
         }
 
         return $relationships_per_activity;
@@ -454,16 +467,24 @@ class participant_instance_creation {
      * @return void
      */
     private function create_participant_instances_for_relationships(array $relationship_data): void {
-        $core_relationship_ids = $relationship_data['core_relationship_ids'];
+        $section_relationships_per_core_relationship = $relationship_data['section_relationships_per_core_relationship'];
         $subject_instance = $relationship_data['subject_instance'];
         $participant_dtos = $relationship_data['participant_dtos'];
 
-        foreach ($core_relationship_ids as $core_relationship_id) {
+        /**
+         * @var int $core_relationship_id
+         * @var section_relationship[] $section_relationships
+         */
+        foreach ($section_relationships_per_core_relationship as $core_relationship_id => $section_relationships) {
             $relationship_participants = $participant_dtos[$core_relationship_id] ?? null;
 
             if (!empty($relationship_participants)) {
                 $this->create_participant_instances_for_user_list(
-                    $this->build_participant_instance_data($core_relationship_id, $subject_instance),
+                    $this->build_participant_instance_data(
+                        $core_relationship_id,
+                        $subject_instance,
+                        $section_relationships
+                    ),
                     $relationship_participants
                 );
             }
@@ -475,16 +496,43 @@ class participant_instance_creation {
     /**
      * Build participant instance data.
      *
-     * @param $core_relationship_id
-     * @param $subject_instance
+     * @param int $core_relationship_id
+     * @param subject_instance_dto|stdClass $subject_instance
+     * @param section_relationship[]|collection $section_relationships
      * @return array
      */
-    private function build_participant_instance_data($core_relationship_id, $subject_instance): array {
+    private function build_participant_instance_data(
+        int $core_relationship_id,
+        $subject_instance,
+        $section_relationships
+    ): array {
+        $can_view = false;
+        $can_answer = false;
+
+        // If any related section_relationship.can_answer then the participant instance should be can_answer.
+        foreach ($section_relationships as $section_relationship) {
+            $can_view |= (int)$section_relationship->can_view === 1;
+            $can_answer |= (int)$section_relationship->can_answer === 1;
+        }
+
+        if ($can_answer) {
+            $progress = not_started::get_code();
+            $availability = open::get_code();
+        } else if ($can_view) {
+            $progress = progress_not_applicable::get_code();
+            $availability = availability_not_applicable::get_code();
+        } else {
+            throw new \coding_exception(
+                'Tried to create participant instance related to no sections which can view or answer'
+            );
+        }
+
         return [
             'participant_data' => [
                 'core_relationship_id' => $core_relationship_id,
                 'subject_instance_id' => $subject_instance->id,
-                'status' => not_started::get_code(),
+                'availability' => $availability,
+                'progress' => $progress,
                 'created_at' => time(),
             ],
             'activity_id' => $subject_instance->activity_id,
@@ -571,6 +619,7 @@ class participant_instance_creation {
      * participant instances for them at this point
      *
      * @param collection $subject_instance_dtos
+     * @return collection
      */
     private function filter_out_pending_instances(collection $subject_instance_dtos): collection {
         return $subject_instance_dtos->filter(function (subject_instance_dto $subject_instance) {

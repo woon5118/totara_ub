@@ -32,10 +32,11 @@ use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\participant_section;
 use mod_perform\state\invalid_state_switch_exception;
-use mod_perform\state\state_helper;
-use mod_perform\state\participant_section\open;
+use mod_perform\state\participant_section\availability_not_applicable;
 use mod_perform\state\participant_section\closed;
+use mod_perform\state\participant_section\open;
 use mod_perform\state\participant_section\participant_section_availability;
+use mod_perform\state\state_helper;
 
 require_once(__DIR__ . '/relationship_testcase.php');
 require_once(__DIR__ . '/state_testcase.php');
@@ -51,10 +52,17 @@ class mod_perform_participant_section_availability_testcase extends state_testca
 
     public function state_transitions_data_provider(): array {
         return [
-            'Open to Closed' => [open::class, closed::class, true],
-            'Closed to Open' => [closed::class, open::class, true],
             'Open to Open' => [open::class, open::class, false],
+            'Open to Closed' => [open::class, closed::class, true],
+            'Open to Not applicable' => [open::class, availability_not_applicable::class, false],
+
             'Closed to Closed' => [closed::class, closed::class, false],
+            'Closed to Open' => [closed::class, open::class, true],
+            'Closed to Not applicable' => [closed::class, availability_not_applicable::class, false],
+
+            'Not applicable to Not applicable' => [availability_not_applicable::class, availability_not_applicable::class, false],
+            'Not applicable to Closed' => [availability_not_applicable::class, closed::class, false],
+            'Not applicable to Open' => [availability_not_applicable::class, open::class, false],
         ];
     }
 
@@ -133,6 +141,7 @@ class mod_perform_participant_section_availability_testcase extends state_testca
 
     public function test_get_all_translated() {
         $this->assertEqualsCanonicalizing([
+            70 => 'Not applicable',
             10 => 'Closed',
             0 => 'Open',
         ], state_helper::get_all_display_names('participant_section', participant_section_availability::get_type()));

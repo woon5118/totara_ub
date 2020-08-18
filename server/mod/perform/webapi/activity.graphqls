@@ -193,6 +193,7 @@ enum mod_perform_subject_instance_progress_status {
   IN_PROGRESS
   COMPLETE
   NOT_SUBMITTED
+  PROGRESS_NOT_APPLICABLE
 }
 """
 A list of possible availability states that a subject instance can be in
@@ -200,6 +201,7 @@ A list of possible availability states that a subject instance can be in
 enum mod_perform_subject_instance_availability_status {
   OPEN
   CLOSED
+  AVAILABILITY_NOT_APPLICABLE
 }
 
 """
@@ -210,6 +212,7 @@ enum mod_perform_participant_instance_progress_status {
   IN_PROGRESS
   COMPLETE
   NOT_SUBMITTED
+  PROGRESS_NOT_APPLICABLE
 }
 
 """
@@ -218,6 +221,7 @@ A list of possible availability states that a participant instance can be in
 enum mod_perform_participant_instance_availability_status {
   OPEN
   CLOSED
+  AVAILABILITY_NOT_APPLICABLE
 }
 
 """

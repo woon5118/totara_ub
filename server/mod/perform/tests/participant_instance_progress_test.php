@@ -31,14 +31,15 @@ use mod_perform\models\activity\participant_instance;
 use mod_perform\models\response\participant_section;
 use mod_perform\models\response\section_element_response;
 use mod_perform\state\invalid_state_switch_exception;
-use mod_perform\state\participant_instance\complete;
+use mod_perform\state\participant_instance\complete as complete_instance;
 use mod_perform\state\participant_instance\condition\all_sections_complete;
 use mod_perform\state\participant_instance\condition\at_least_one_section_started;
 use mod_perform\state\participant_instance\condition\not_all_sections_complete;
-use mod_perform\state\participant_instance\in_progress;
-use mod_perform\state\participant_instance\not_started;
-use mod_perform\state\participant_instance\not_submitted;
+use mod_perform\state\participant_instance\in_progress as in_progress_instance;
+use mod_perform\state\participant_instance\not_started as not_started_instance;
+use mod_perform\state\participant_instance\not_submitted as not_submitted_instance;
 use mod_perform\state\participant_instance\participant_instance_progress;
+use mod_perform\state\participant_instance\progress_not_applicable as progress_not_applicable_instance;
 use mod_perform\state\participant_section\complete as complete_section;
 use mod_perform\state\participant_section\in_progress as in_progress_section;
 use mod_perform\state\participant_section\not_started as not_started_section;
@@ -167,8 +168,8 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
         // Make sure we actually have two different users for the two instances.
         $this->assertNotEquals($subject_user1->id, $subject_user2->id);
         $this->assert_participant_instance_progress([
-            $participant_instance1->id => not_started::get_code(),
-            $participant_instance2->id => not_started::get_code(),
+            $participant_instance1->id => not_started_instance::get_code(),
+            $participant_instance2->id => not_started_instance::get_code(),
         ]);
 
         $participant_section1 = participant_section::load_by_entity($participant_section1_entity);
@@ -179,31 +180,31 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
         // Progress section1 to in_progress - instance is expected to be in_progress as a result.
         $participant_section1->switch_state(in_progress_section::class);
         $this->assert_participant_instance_progress([
-            $participant_instance1->id => in_progress::get_code(),
-            $participant_instance2->id => not_started::get_code(),
+            $participant_instance1->id => in_progress_instance::get_code(),
+            $participant_instance2->id => not_started_instance::get_code(),
         ]);
 
         // Progress section1 to complete - no change to instance (still in_progress).
         $this->mark_answers_complete($participant_section1);
         $participant_section1->switch_state(complete_section::class);
         $this->assert_participant_instance_progress([
-            $participant_instance1->id => in_progress::get_code(),
-            $participant_instance2->id => not_started::get_code(),
+            $participant_instance1->id => in_progress_instance::get_code(),
+            $participant_instance2->id => not_started_instance::get_code(),
         ]);
 
         // Progress section2 to in_progress - no change to instance (still in_progress).
         $participant_section2->switch_state(in_progress_section::class);
         $this->assert_participant_instance_progress([
-            $participant_instance1->id => in_progress::get_code(),
-            $participant_instance2->id => not_started::get_code(),
+            $participant_instance1->id => in_progress_instance::get_code(),
+            $participant_instance2->id => not_started_instance::get_code(),
         ]);
 
         // Progress section2 to complete - instance should progress to complete.
         $this->mark_answers_complete($participant_section2);
         $participant_section2->switch_state(complete_section::class);
         $this->assert_participant_instance_progress([
-            $participant_instance1->id => complete::get_code(),
-            $participant_instance2->id => not_started::get_code(),
+            $participant_instance1->id => complete_instance::get_code(),
+            $participant_instance2->id => not_started_instance::get_code(),
         ]);
 
         // Add a new (not_started) participant section to the participant instance.
@@ -217,8 +218,8 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
         $participant_instance1_model->update_progress_status();
         // Participant instance should be regressed back to "in_progress".
         $this->assert_participant_instance_progress([
-            $participant_instance1->id => in_progress::get_code(),
-            $participant_instance2->id => not_started::get_code(),
+            $participant_instance1->id => in_progress_instance::get_code(),
+            $participant_instance2->id => not_started_instance::get_code(),
         ]);
     }
 
@@ -254,6 +255,7 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
 
     public function test_get_all_translated() {
         $this->assertEqualsCanonicalizing([
+            70 => 'Not applicable',
             50 => 'Not submitted',
             20 => 'Complete',
             10 => 'In progress',
@@ -273,25 +275,60 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
 
     public function state_transitions_data_provider(): array {
         return [
-            'Not started to not started' => [not_started::class, not_started::class, false, 'NONE_COMPLETE'],
-            'Not started to in progress' => [not_started::class, in_progress::class, true, 'SOME_COMPLETE'],
-            'Not started to complete' => [not_started::class, complete::class, true, 'ALL_COMPLETE'],
-            'Not started to not submitted' => [not_started::class, not_submitted::class, true, 'NONE_COMPLETE'],
+            'Not started to not started' =>
+                [not_started_instance::class, not_started_instance::class, false, 'NONE_COMPLETE'],
+            'Not started to in progress' =>
+                [not_started_instance::class, in_progress_instance::class, true, 'SOME_COMPLETE'],
+            'Not started to complete' =>
+                [not_started_instance::class, complete_instance::class, true, 'ALL_COMPLETE'],
+            'Not started to not submitted' =>
+                [not_started_instance::class, not_submitted_instance::class, true, 'NONE_COMPLETE'],
+            'Not started to not applicable' =>
+                [not_started_instance::class, progress_not_applicable_instance::class, false, 'NONE_COMPLETE'],
 
-            'In progress to in progress' => [in_progress::class, in_progress::class, false, 'SOME_COMPLETE'],
-            'In progress to not started' => [in_progress::class, not_started::class, false, 'NONE_COMPLETE'],
-            'In progress to complete' => [in_progress::class, complete::class, true, 'ALL_COMPLETE'],
-            'In progress to not submitted' => [in_progress::class, not_submitted::class, true, 'SOME_COMPLETE'],
+            'In progress to in progress' =>
+                [in_progress_instance::class, in_progress_instance::class, false, 'SOME_COMPLETE'],
+            'In progress to not started' =>
+                [in_progress_instance::class, not_started_instance::class, false, 'NONE_COMPLETE'],
+            'In progress to complete' =>
+                [in_progress_instance::class, complete_instance::class, true, 'ALL_COMPLETE'],
+            'In progress to not submitted' =>
+                [in_progress_instance::class, not_submitted_instance::class, true, 'SOME_COMPLETE'],
+            'In progress to not applicable' =>
+                [in_progress_instance::class, progress_not_applicable_instance::class, false, 'NONE_COMPLETE'],
 
-            'Complete to complete' => [complete::class, complete::class, true, 'ALL_COMPLETE'],
-            'Complete to not started' => [complete::class, not_started::class, true, 'NONE_COMPLETE'],
-            'Complete to in progress' => [complete::class, in_progress::class, true, 'SOME_COMPLETE'],
-            'Complete to not submitted' => [complete::class, not_submitted::class, false, 'ALL_COMPLETE'],
+            'Complete to complete' =>
+                [complete_instance::class, complete_instance::class, true, 'ALL_COMPLETE'],
+            'Complete to not started' =>
+                [complete_instance::class, not_started_instance::class, true, 'NONE_COMPLETE'],
+            'Complete to in progress' =>
+                [complete_instance::class, in_progress_instance::class, true, 'SOME_COMPLETE'],
+            'Complete to not submitted' =>
+                [complete_instance::class, not_submitted_instance::class, false, 'ALL_COMPLETE'],
+            'Complete to not applicable' =>
+                [complete_instance::class, progress_not_applicable_instance::class, false, 'NONE_COMPLETE'],
 
-            'Not submitted to not submitted' => [not_submitted::class, not_submitted::class, false, 'SOME_COMPLETE'],
-            'Not submitted to not started' => [not_submitted::class, not_started::class, true, 'NONE_COMPLETE'],
-            'Not submitted to in progress' => [not_submitted::class, in_progress::class, true, 'SOME_COMPLETE'],
-            'Not submitted to complete' => [not_submitted::class, complete::class, false, 'SOME_COMPLETE'],
+            'Not submitted to not submitted' =>
+                [not_submitted_instance::class, not_submitted_instance::class, false, 'SOME_COMPLETE'],
+            'Not submitted to not started' =>
+                [not_submitted_instance::class, not_started_instance::class, true, 'NONE_COMPLETE'],
+            'Not submitted to in progress' =>
+                [not_submitted_instance::class, in_progress_instance::class, true, 'SOME_COMPLETE'],
+            'Not submitted to complete' =>
+                [not_submitted_instance::class, complete_instance::class, false, 'SOME_COMPLETE'],
+            'Not submitted to not applicable' =>
+                [not_submitted_instance::class, progress_not_applicable_instance::class, false, 'NONE_COMPLETE'],
+
+            'Not applicable to not started' =>
+                [progress_not_applicable_instance::class, not_started_instance::class, false, 'NONE_COMPLETE'],
+            'Not applicable to in progress' =>
+                [progress_not_applicable_instance::class, in_progress_instance::class, false, 'NONE_COMPLETE'],
+            'Not applicable to complete' =>
+                [progress_not_applicable_instance::class, complete_instance::class, false, 'NONE_COMPLETE'],
+            'Not applicable to not submitted' =>
+                [progress_not_applicable_instance::class, not_submitted_instance::class, false, 'NONE_COMPLETE'],
+            'Not applicable to not applicable' =>
+                [progress_not_applicable_instance::class, progress_not_applicable_instance::class, false, 'NONE_COMPLETE'],
         ];
     }
 

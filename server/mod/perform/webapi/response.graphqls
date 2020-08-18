@@ -141,6 +141,7 @@ enum mod_perform_participant_section_progress_status {
   IN_PROGRESS
   NOT_STARTED
   NOT_SUBMITTED
+  PROGRESS_NOT_APPLICABLE
 }
 
 """
@@ -149,4 +150,5 @@ A list of possible availability status states that a user participant section ca
 enum mod_perform_participant_section_availability_status {
   OPEN
   CLOSED
+  AVAILABILITY_NOT_APPLICABLE
 }

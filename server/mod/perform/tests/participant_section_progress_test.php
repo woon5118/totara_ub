@@ -42,6 +42,7 @@ use mod_perform\state\participant_section\in_progress;
 use mod_perform\state\participant_section\not_started;
 use mod_perform\state\participant_section\not_submitted;
 use mod_perform\state\participant_section\participant_section_progress;
+use mod_perform\state\participant_section\progress_not_applicable;
 use mod_perform\state\state_helper;
 
 require_once(__DIR__ . '/relationship_testcase.php');
@@ -58,25 +59,60 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
 
     public function state_transitions_data_provider(): array {
         return [
-            'Not started to not started' => [not_started::class, not_started::class, false, 'NONE_COMPLETE'],
-            'Not started to in progress' => [not_started::class, in_progress::class, true, 'SOME_COMPLETE'],
-            'Not started to complete' => [not_started::class, complete::class, true, 'ALL_COMPLETE'],
-            'Not started to not submitted' => [not_started::class, not_submitted::class, true, 'NONE_COMPLETE'],
+            'Not started to not started' =>
+                [not_started::class, not_started::class, false, 'NONE_COMPLETE'],
+            'Not started to in progress' =>
+                [not_started::class, in_progress::class, true, 'SOME_COMPLETE'],
+            'Not started to complete' =>
+                [not_started::class, complete::class, true, 'ALL_COMPLETE'],
+            'Not started to not submitted' =>
+                [not_started::class, not_submitted::class, true, 'NONE_COMPLETE'],
+            'Not started to not applicable' =>
+                [not_started::class, progress_not_applicable::class, false, 'NONE_COMPLETE'],
 
-            'In progress to in progress' => [in_progress::class, in_progress::class, false, 'SOME_COMPLETE'],
-            'In progress to not started' => [in_progress::class, not_started::class, false, 'NONE_COMPLETE'],
-            'In progress to complete' => [in_progress::class, complete::class, true, 'ALL_COMPLETE'],
-            'In progress to not submitted' => [in_progress::class, not_submitted::class, true, 'SOME_COMPLETE'],
+            'In progress to in progress' =>
+                [in_progress::class, in_progress::class, false, 'SOME_COMPLETE'],
+            'In progress to not started' =>
+                [in_progress::class, not_started::class, false, 'NONE_COMPLETE'],
+            'In progress to complete' =>
+                [in_progress::class, complete::class, true, 'ALL_COMPLETE'],
+            'In progress to not submitted' =>
+                [in_progress::class, not_submitted::class, true, 'SOME_COMPLETE'],
+            'In progress to not applicable' =>
+                [in_progress::class, progress_not_applicable::class, false, 'NONE_COMPLETE'],
 
-            'Complete to complete' => [complete::class, complete::class, true, 'ALL_COMPLETE'],
-            'Complete to not started' => [complete::class, not_started::class, false, 'NONE_COMPLETE'],
-            'Complete to in progress' => [complete::class, in_progress::class, true, 'SOME_COMPLETE'],
-            'Complete to not submitted' => [complete::class, not_submitted::class, false, 'ALL_COMPLETE'],
+            'Complete to complete' =>
+                [complete::class, complete::class, true, 'ALL_COMPLETE'],
+            'Complete to not started' =>
+                [complete::class, not_started::class, false, 'NONE_COMPLETE'],
+            'Complete to in progress' =>
+                [complete::class, in_progress::class, true, 'SOME_COMPLETE'],
+            'Complete to not submitted' =>
+                [complete::class, not_submitted::class, false, 'ALL_COMPLETE'],
+            'Complete to not applicable' =>
+                [complete::class, progress_not_applicable::class, false, 'NONE_COMPLETE'],
 
-            'Not submitted to not submitted' => [not_submitted::class, not_submitted::class, false, 'SOME_COMPLETE'],
-            'Not submitted to not started' => [not_submitted::class, not_started::class, true, 'NONE_COMPLETE'],
-            'Not submitted to in progress' => [not_submitted::class, in_progress::class, true, 'SOME_COMPLETE'],
-            'Not submitted to complete' => [not_submitted::class, complete::class, true, 'ALL_COMPLETE'],
+            'Not submitted to not submitted' =>
+                [not_submitted::class, not_submitted::class, false, 'SOME_COMPLETE'],
+            'Not submitted to not started' =>
+                [not_submitted::class, not_started::class, true, 'NONE_COMPLETE'],
+            'Not submitted to in progress' =>
+                [not_submitted::class, in_progress::class, true, 'SOME_COMPLETE'],
+            'Not submitted to complete' =>
+                [not_submitted::class, complete::class, true, 'ALL_COMPLETE'],
+            'Not submitted to not applicable' =>
+                [not_submitted::class, progress_not_applicable::class, false, 'NONE_COMPLETE'],
+
+            'Not applicable to not started' =>
+                [progress_not_applicable::class, not_started::class, false, 'NONE_COMPLETE'],
+            'Not applicable to in progress' =>
+                [progress_not_applicable::class, in_progress::class, false, 'NONE_COMPLETE'],
+            'Not applicable to complete' =>
+                [progress_not_applicable::class, complete::class, false, 'NONE_COMPLETE'],
+            'Not applicable to not submitted' =>
+                [progress_not_applicable::class, not_submitted::class, false, 'NONE_COMPLETE'],
+            'Not applicable to not applicable' =>
+                [progress_not_applicable::class, progress_not_applicable::class, false, 'NONE_COMPLETE'],
         ];
     }
 
@@ -153,6 +189,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
 
     public function test_get_all_translated() {
         $this->assertEqualsCanonicalizing([
+            70 => 'Not applicable',
             50 => 'Not submitted',
             20 => 'Complete',
             10 => 'In progress',

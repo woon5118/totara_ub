@@ -32,6 +32,7 @@ use mod_perform\models\activity\participant_instance;
 use mod_perform\observers\participant_instance_availability;
 use mod_perform\state\participant_instance\closed;
 use mod_perform\state\participant_instance\complete;
+use mod_perform\state\participant_instance\availability_not_applicable;
 use mod_perform\state\participant_instance\in_progress;
 use mod_perform\state\participant_instance\not_started;
 use mod_perform\state\participant_instance\open;
@@ -51,10 +52,17 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
 
     public function state_transitions_data_provider(): array {
         return [
-            'Open to Closed' => [open::class, closed::class, true],
-            'Closed to Open' => [closed::class, open::class, true],
             'Open to Open' => [open::class, open::class, false],
+            'Open to Closed' => [open::class, closed::class, true],
+            'Open to Not applicable' => [open::class, availability_not_applicable::class, false],
+
             'Closed to Closed' => [closed::class, closed::class, false],
+            'Closed to Open' => [closed::class, open::class, true],
+            'Closed to Not applicable' => [closed::class, availability_not_applicable::class, false],
+
+            'Not applicable to Not applicable' => [availability_not_applicable::class, availability_not_applicable::class, false],
+            'Not applicable to Closed' => [availability_not_applicable::class, closed::class, false],
+            'Not applicable to Open' => [availability_not_applicable::class, open::class, false],
         ];
     }
 
