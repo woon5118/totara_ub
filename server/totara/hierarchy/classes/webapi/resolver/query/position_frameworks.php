@@ -24,6 +24,7 @@
 namespace totara_hierarchy\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_user_capability;
 use core\webapi\query_resolver;
 use core\webapi\middleware\require_login;
@@ -52,6 +53,7 @@ class position_frameworks implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
+            new require_advanced_feature('positions'),
             new require_user_capability('totara/hierarchy:viewpositionframeworks'),
         ];
     }

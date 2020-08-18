@@ -3,6 +3,8 @@ mutation mod_perform_create_track($details: mod_perform_create_track_input!) {
     id
     description
     status
+    can_assign_positions
+    can_assign_organisations
     subject_instance_generation
     schedule_is_open
     schedule_is_fixed
@@ -33,6 +35,7 @@ mutation mod_perform_create_track($details: mod_perform_create_track_input!) {
       custom_data
       resolver_base
     }
+    schedule_use_anniversary
     due_date_is_enabled
     due_date_is_fixed
     due_date_fixed {
@@ -59,6 +62,7 @@ mutation mod_perform_create_track($details: mod_perform_create_track_input!) {
         type
         type_label
         name
+        size
       }
     }
   }

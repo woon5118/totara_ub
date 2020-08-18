@@ -25,11 +25,13 @@ namespace mod_perform\models\activity;
 
 use DateTime;
 use coding_exception;
+use context_system;
 use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\constants;
 use mod_perform\dates\constants as date_constants;
 use mod_perform\dates\date_offset;
+use totara_core\advanced_feature;
 use totara_core\dates\date_time_setting;
 use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
@@ -68,6 +70,8 @@ use moodle_exception;
  * @property-read date_offset|null $repeating_offset
  * @property-read bool $repeating_is_limited
  * @property-read int $repeating_limit
+ * @property-read bool $can_assign_positions
+ * @property-read bool $can_assign_organisations
  * @property-read int $created_at
  * @property-read int $updated_at
  *
@@ -111,6 +115,8 @@ class track extends model {
         'schedule_fixed_from_setting',
         'schedule_fixed_to_setting',
         'due_date_fixed_setting',
+        'can_assign_positions',
+        'can_assign_organisations'
     ];
 
     /**
@@ -307,6 +313,37 @@ class track extends model {
         }
 
         return $this->refresh();
+    }
+
+    /**
+     * Returns true if the current user can assign positions
+     *
+     * @return bool
+     */
+    public function get_can_assign_positions(): bool {
+        $has_capabilities = has_all_capabilities(
+            [
+                'totara/hierarchy:viewpositionframeworks',
+                'totara/hierarchy:viewposition',
+            ],
+            context_system::instance()
+        );
+        return advanced_feature::is_enabled('positions') && $has_capabilities;
+    }
+
+    /**
+     * Returns true if the current user can assign organisations
+     *
+     * @return bool
+     */
+    public function get_can_assign_organisations(): bool {
+        return has_all_capabilities(
+            [
+                'totara/hierarchy:vieworganisationframeworks',
+                'totara/hierarchy:vieworganisation',
+            ],
+            context_system::instance()
+        );
     }
 
     /**

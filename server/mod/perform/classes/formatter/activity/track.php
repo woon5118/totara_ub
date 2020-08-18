@@ -72,7 +72,9 @@ class track extends entity_model_formatter {
             'repeating_limit' => null,
             'created_at' => null,
             'updated_at' => null,
-            'assignments' => null
+            'assignments' => null,
+            'can_assign_positions' => null,
+            'can_assign_organisations' => null
         ];
     }
 

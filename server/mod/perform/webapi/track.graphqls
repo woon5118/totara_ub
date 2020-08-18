@@ -76,6 +76,8 @@ type mod_perform_track {
   repeating_is_limited: Boolean
   repeating_limit: Int
   assignments: [mod_perform_track_assignment!]!
+  can_assign_positions: Boolean!
+  can_assign_organisations: Boolean!
 }
 
 extend type Query {

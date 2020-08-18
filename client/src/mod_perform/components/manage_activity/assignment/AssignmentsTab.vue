@@ -43,10 +43,16 @@
         <DropdownItem @click="openAdder">
           {{ $str('user_group_assignment_group_cohort', 'mod_perform') }}
         </DropdownItem>
-        <DropdownItem @click="openOrgAdder">
+        <DropdownItem
+          v-if="track && track.can_assign_organisations"
+          @click="openOrgAdder"
+        >
           {{ $str('user_group_assignment_group_organisation', 'mod_perform') }}
         </DropdownItem>
-        <DropdownItem @click="openPosAdder">
+        <DropdownItem
+          v-if="track && track.can_assign_positions"
+          @click="openPosAdder"
+        >
           {{ $str('user_group_assignment_group_position', 'mod_perform') }}
         </DropdownItem>
       </Dropdown>

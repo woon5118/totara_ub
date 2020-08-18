@@ -24,6 +24,7 @@
 namespace totara_hierarchy\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
 use core\webapi\query_resolver;
 use core\webapi\middleware\require_login;
 use core\webapi\resolver\has_middleware;
@@ -51,7 +52,8 @@ class position_types implements query_resolver, has_middleware {
      */
     public static function get_middleware(): array {
         return [
-            new require_login()
+            new require_login(),
+            new require_advanced_feature('positions'),
         ];
     }
 }

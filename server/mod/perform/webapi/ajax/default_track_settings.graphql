@@ -3,6 +3,8 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
     id
     description
     status
+    can_assign_positions
+    can_assign_organisations
     subject_instance_generation
     schedule_is_open
     schedule_is_fixed

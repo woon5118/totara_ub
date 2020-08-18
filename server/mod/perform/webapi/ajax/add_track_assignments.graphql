@@ -3,6 +3,8 @@ mutation mod_perform_add_track_assignments(
 ) {
   mod_perform_add_track_assignments(assignments: $assignments) {
     id
+    can_assign_organisations
+    can_assign_positions
     assignments {
       type
       group {
