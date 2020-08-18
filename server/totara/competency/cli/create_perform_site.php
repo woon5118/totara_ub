@@ -45,6 +45,9 @@ use totara_job\job_assignment;
 define('CLI_SCRIPT', 1);
 
 require __DIR__ . '/../../../config.php';
+
+/** @var core_config $CFG */
+
 require_once($CFG->dirroot . '/lib/clilib.php');
 require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
 
@@ -52,6 +55,7 @@ global $options;
 [$options, $cli_unrecognized] = cli_get_params([
     'help' => false,
     'multilang' => false,
+    'multitenancy' => false,
 ]);
 
 if ($options['help']) {
@@ -63,6 +67,7 @@ Usage: php totara/competency/cli/create_perform_site.php [options]
 Options:
 
   --multilang        Enable multilang header and content strings for generated data
+  --multitenancy     Enable multitenancy on this site and put users into tenants
   --help             Show this screen
 
 ";
@@ -87,6 +92,10 @@ echo "\nSite setup complete!\n";
 function create_data() {
     global $options;
 
+    if ($options['multitenancy']) {
+        enable_multitenancy();
+    }
+
     if ($options['multilang']) {
         enable_multilang();
     }
@@ -99,6 +108,7 @@ function create_data() {
     $admin_user = get_admin();
 
     $data = [
+        'tenants' => null,
         'users' => [],
         'pos' => [],
         'orgs' => [],
@@ -113,6 +123,8 @@ Feel free to browse, list of users is below, their password is 12345.
 </p>'
     ];
 
+    $data['tenants'] = create_tenants();
+
     // First we need to create a few users
     $users = [
         'jm' => [
@@ -122,6 +134,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile',
             ],
             'description' => multilang('Has all available assignments (no archived) and has completed every course.'),
+            'tenant' => 2,
         ],
         'ss' => [
             'firstname' => 'Steven',
@@ -130,6 +143,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile',
             ],
             'description' => multilang('Has all available assignments, some archived.'),
+            'tenant' => 2,
         ],
         'dt' => [
             'firstname' => 'Denny',
@@ -138,6 +152,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile',
             ],
             'description' => multilang('Has one current and one archived assignment.'),
+            'tenant' => 1,
         ],
         'jt' => [
             'firstname' => 'John',
@@ -146,6 +161,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile',
             ],
             'description' => multilang('Has 7 assignments'),
+            'tenant' => 1,
         ],
         'ut' => [
             'firstname' => 'Uma',
@@ -154,6 +170,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile'
             ],
             'description' => multilang('Has 10 assignments + archived'),
+            'tenant' => 2,
         ],
         'sj' => [
             'firstname' => 'Samuel',
@@ -162,6 +179,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile'
             ],
             'description' => multilang('Has 3 assignments'),
+            'tenant' => 2,
         ],
         'tr' => [
             'firstname' => 'Tim',
@@ -170,6 +188,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile'
             ],
             'description' => multilang('Has something.'),
+            'tenant' => 2,
         ],
         'bw' => [
             'firstname' => 'Bruce',
@@ -178,6 +197,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile'
             ],
             'description' => multilang('Has a self-assignment and an audience assignment.'),
+            'tenant' => 2,
         ],
         'vp' => [
             'firstname' => 'Vladimir',
@@ -186,6 +206,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile'
             ],
             'description' => multilang('Has no assignments.'),
+            'tenant' => 1,
         ],
         'bo' => [
             'firstname' => 'Barack',
@@ -193,6 +214,7 @@ Feel free to browse, list of users is below, their password is 12345.
             'caps' => [
             ],
             'description' => multilang('Has assignments, but cannot view his competency profile.'),
+            'tenant' => 1,
         ],
         'gb' => [
             'firstname' => 'George',
@@ -201,6 +223,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile'
             ],
             'description' => multilang('Has only archived assignments.'),
+            'tenant' => 1,
         ],
         'gm' => [
             'firstname' => 'Glenn',
@@ -209,11 +232,12 @@ Feel free to browse, list of users is below, their password is 12345.
                 'totara/competency:view_own_profile'
             ],
             'description' => multilang('Has exactly one current assignment'),
+            'tenant' => 1,
         ],
     ];
 
     foreach ($users as $key => $user) {
-        $data['users'][$key] = create_user($user, $key);
+        $data['users'][$key] = create_user($user, $key, $data['tenants']);
     }
 
     // Then we need to create a few scale values
@@ -613,7 +637,7 @@ Feel free to browse, list of users is below, their password is 12345.
                 'bw',
             ],
             appraiser::class => [
-                'vp',
+                'ut',
             ],
         ],
         'dt' => [
@@ -938,8 +962,8 @@ Feel free to browse, list of users is below, their password is 12345.
     // Then we need to create a few audiences
     $audiences = [
         'cr' => [
-            'name' => multilang('Content makers'),
-            'description' => multilang('This audience is for creative staff members'),
+            'name' => 'Content makers',
+            'description' => 'This audience is for creative staff members',
             'members' => [
                 'jm' => get_user('jm', $data),
                 'ss' => get_user('ss', $data),
@@ -966,8 +990,8 @@ Feel free to browse, list of users is below, their password is 12345.
             ],
         ],
         'it' => [
-            'name' => multilang('IT Department'),
-            'description' => multilang('Every respectful company needs to have at least one in-house IT department'),
+            'name' => 'IT Department',
+            'description' => 'Every respectful company needs to have at least one in-house IT department',
             'members' => [
                 'jm' => get_user('jm', $data),
                 'ss' => get_user('ss', $data),
@@ -985,8 +1009,8 @@ Feel free to browse, list of users is below, their password is 12345.
             ]
         ],
         'vip' => [
-            'name' => multilang('VIP'),
-            'description' => multilang('Privileged members group'),
+            'name' => 'VIP',
+            'description' => 'Privileged members group',
             'members' => [
                 'jm' => get_user('jm', $data),
                 'ss' => get_user('ss', $data),
@@ -1005,7 +1029,7 @@ Feel free to browse, list of users is below, their password is 12345.
     ];
 
     foreach ($audiences as $key => $audience) {
-        $data['audiences'][$key] = create_audience($audience);
+        $data['audiences'][$key] = create_audience($audience, $data);
     }
 
     // Let's create individual assignments:
@@ -3331,8 +3355,6 @@ Feel free to browse, list of users is below, their password is 12345.
 
     run_tasks();
 
-    set_theme_to_ventura();
-
     create_info_block($data);
     create_competency_block();
 }
@@ -3342,16 +3364,26 @@ Feel free to browse, list of users is below, their password is 12345.
  *
  * @param array $attributes
  * @param null $username
+ * @param array|null $tenants
  * @return stdClass
  * @throws coding_exception
  * @throws dml_exception
  */
-function create_user($attributes, $username = null) {
+function create_user($attributes, $username = null, ?array $tenants = null) {
 
     $defaults = [
         'password' => '12345',
         'username' => $username
     ];
+
+    if (!is_null($tenants) && isset($attributes['tenant'])) {
+        if (!isset($tenants[$attributes['tenant']])) {
+            throw new coding_exception('Unknown tenant '.$attributes['tenant'].' for user');
+        }
+        $tenant = $tenants[$attributes['tenant']];
+        $attributes['tenantid'] = $tenant->id;
+        unset($attributes['tenant']);
+    }
 
     $user = generator()->create_user($attributes = array_merge($defaults, $attributes));
 
@@ -3579,26 +3611,53 @@ function create_job_assignment(string $type, $target, $user) {
  * Create audience
  *
  * @param $attributes
- * @return stdClass
+ * @return stdClass|array
  */
-function create_audience($attributes) {
-    $audience = generator()->create_cohort($attributes);
-
-    if (is_array($attributes['members'] ?? null)) {
-        foreach ($attributes['members'] as $member) {
-            cohort_add_member($audience->id, $member->id);
+function create_audience($attributes, $data) {
+    $create_audience = function ($tenant = null) use ($attributes, $data) {
+        // Make sure the audience is in the tenant context if multi tenancy is activated
+        if (!empty($tenant)) {
+            $attributes['contextid'] = context_coursecat::instance($tenant->categoryid)->id;
+            $attributes['name'] .= ' ('.$tenant->name.')';
+        } else {
+            $attributes['contextid'] = context_system::instance()->id;
         }
-    }
 
-    if (is_array($attributes['competencies'] ?? null)) {
-        $audience->competencies = [];
+        $attributes['name'] = multilang($attributes['name']);
+        $attributes['description'] = multilang($attributes['description']);
 
-        foreach ($attributes['competencies'] as $key => $competency) {
-            $audience->competencies[$key] = assignment_generator()->create_cohort_assignment($competency->id, $audience->id);
+        $audience = generator()->create_cohort($attributes);
+
+        if (is_array($attributes['members'] ?? null)) {
+            foreach ($attributes['members'] as $member) {
+                // If multi tenancy is enabled only add members of that tenant to the audience
+                if (!$tenant || $member->tenantid == $tenant->id) {
+                    cohort_add_member($audience->id, $member->id);
+                }
+            }
         }
-    }
 
-    return $audience;
+        if (is_array($attributes['competencies'] ?? null)) {
+            $audience->competencies = [];
+
+            foreach ($attributes['competencies'] as $key => $competency) {
+                $audience->competencies[$key] = assignment_generator()->create_cohort_assignment($competency->id, $audience->id);
+            }
+        }
+
+        return $audience;
+    };
+
+    // For tenants we want every audience to be present in both tenants
+    if (!empty($data['tenants'])) {
+        $audiences = [];
+        foreach ($data['tenants'] as $key => $tenant) {
+            $audiences[$key] = $create_audience($tenant);
+        }
+        return $audiences;
+    } else {
+        return $create_audience();
+    }
 }
 
 function create_individual_assignment($competency, $user, bool $legacy = false) {
@@ -3753,7 +3812,12 @@ function get_evidence_item($user, $index, $data) {
 function get_assignment($type, $fw, $item, $key, $data) {
 
     if ($type === 'audience') {
-        $ass = $data['audiences'][$item]->competencies[$key] ?? null;
+        if (!empty($data['tenants'])) {
+            $audience = array_shift($data['audiences'][$item]);
+        } else {
+            $audience = $data['audiences'][$item];
+        }
+        $ass = $audience->competencies[$key] ?? null;
         $error = 'Requested assignment $data[\'' . $type . '\'][\'' . $item . '\']->competencies[\'' . $key . '\'] not found';
     } else {
         $plural = '';
@@ -4218,26 +4282,52 @@ function create_info_block($data) {
     if ($data['description']) {
         $html .= $data['description'];
     }
-    // Let's build description.
-    foreach ($data['users'] as $key => $user) {
-        $html .= '<div>
+
+    $render_users = function($data, $tenant = null) {
+        $html = '';
+
+        // Let's build description.
+        foreach ($data['users'] as $key => $user) {
+            if (!is_null($tenant)) {
+                if ($user->tenantid != $tenant->id) {
+                    continue;
+                }
+            }
+            $html .= '<div>
 <p>
     <strong>' . $user->firstname . ' ' . $user->lastname . '</strong> - login: <storng>' . $user->username . '</storng>';
 
-        if ($user->description) {
-            $html .= '<br/>' . $user->description;
+            if ($user->description) {
+                $html .= '<br/>' . $user->description;
+            }
+
+            $html .= '</p>
+</div>';
         }
 
-        $html .= '</p>
-</div>';
+        return $html;
+    };
+
+    if (!empty($data['tenants'])) {
+        foreach ($data['tenants'] as $key => $tenant) {
+            $html .= '<div><h3>'.$tenant->name.'</h3>';
+
+            $html .= "<h4>Domain manager - login: t{$key}dm</h4>";
+            $html .= "<h4>User manager - login: t{$key}um</h4>";
+
+            $html .= $render_users($data, $tenant);
+            $html .= '</div>';
+        }
+    } else {
+        $html .= $render_users($data);
     }
 
     $object = [
         'blockname' => 'html',
-        'parentcontextid' => 2,
+        'parentcontextid' => context_system::instance()->id,
         'showinsubcontexts' => 0,
         'requiredbytheme' => 0,
-        'pagetypepattern' => 'site-index',
+        'pagetypepattern' => 'totara-dashboard-1',
         'defaultregion' => 'main',
         'defaultweight' => 1,
         'configdata' => base64_encode(serialize((object) [
@@ -4292,16 +4382,6 @@ function create_competency_block() {
 }
 
 /**
- * Set the site-wide theme to ventura.
- * This is necessary in order to display some tui components correctly.
- */
-function set_theme_to_ventura() {
-    $device_theme = core_useragent::get_device_type_cfg_var_name('default');
-    $ventura_theme = theme_config::load('ventura');
-    set_config($device_theme, $ventura_theme->name);
-}
-
-/**
  * If multilang is enabled, create a multilang string out of the given string.
  *
  * @param string $string
@@ -4350,6 +4430,87 @@ function enable_multilang() {
 
     filter_set_global_state('multilang', TEXTFILTER_ON);
     filter_set_applies_to_strings('multilang', true);
+}
+
+/**
+ * Enable multi tenancy
+ */
+function enable_multitenancy() {
+    /** @var totara_tenant_generator $multitenancy */
+    $multitenancy = generator()->get_plugin_generator('totara_tenant');
+
+    $multitenancy->enable_tenants();
+}
+
+/**
+ * Create tenants (if multi tenancy is enabled)
+ *
+ * @return array|null
+ */
+function create_tenants(): ?array {
+    global $options;
+    if (!$options['multitenancy']) {
+        return null;
+    }
+
+    $generator = generator();
+
+    /** @var totara_tenant_generator $multitenancy */
+    $multitenancy = $generator->get_plugin_generator('totara_tenant');
+
+    $tenant1 = $multitenancy->create_tenant(['name' => 'Tenant 1']);
+
+    $tenant1_cat_context = context_coursecat::instance($tenant1->categoryid);
+
+    $tenant2 =  $multitenancy->create_tenant(['name' => 'Tenant 2']);
+
+    $tenant2_cat_context = context_coursecat::instance($tenant2->categoryid);
+
+    $tenants = [1 => $tenant1, 2 => $tenant2];
+
+    // Now create the domain managers
+    $domain_manager_role = builder::table('role')->where('shortname', 'tenantdomainmanager')->one(true);
+
+    $dm1 = create_user([
+        'firstname' => 'Tenant 1',
+        'lastname' => 'Domain manager',
+        'description' => multilang('Can manage the tenant 1 in all regards'),
+        'tenant' => 1,
+    ], 't1dm', $tenants);
+
+    $generator->role_assign($domain_manager_role->id, $dm1->id, $tenant1_cat_context);
+
+    $dm2 = create_user([
+        'firstname' => 'Tenant 2',
+        'lastname' => 'Domain manager',
+        'description' => multilang('Can manage the tenant 2 in all regards'),
+        'tenant' => 2,
+    ], 't2dm', $tenants);
+
+    $generator->role_assign($domain_manager_role->id, $dm2->id, $tenant2_cat_context);
+
+    // Now create the user managers
+    $user_manager_role = builder::table('role')->where('shortname', 'tenantusermanager')->one(true);
+
+    $um1 = create_user([
+        'firstname' => 'Tenant 1',
+        'lastname' => 'User manager',
+        'description' => multilang('Can manage the users of tenant 1'),
+        'tenant' => 1,
+    ], 't1um', $tenants);
+
+    $generator->role_assign($user_manager_role->id, $um1->id, context_tenant::instance($tenant1->id));
+
+    $um2 = create_user([
+        'firstname' => 'Tenant 2',
+        'lastname' => 'User manager',
+        'description' => multilang('Can manage the users of tenant 2'),
+        'tenant' => 2,
+    ], 't2um', $tenants);
+
+    $generator->role_assign($user_manager_role->id, $um2->id, context_tenant::instance($tenant2->id));
+
+    return $tenants;
 }
 
 /**
