@@ -161,6 +161,15 @@ export default {
      * if customQuery is passed
      */
     customQueryKey: String,
+    /**
+     * Pass the context id along if you want to show audiences
+     * from a specific context or higher. If omitted it will
+     * load all system audiences (if the current user has the capability
+     * to see them)
+     */
+    contextId: {
+      type: Number,
+    },
   },
 
   data() {
@@ -206,6 +215,7 @@ export default {
       variables() {
         return {
           query: {
+            context_id: this.contextId,
             filters: {
               name: this.filters.search,
             },
@@ -232,6 +242,7 @@ export default {
       variables() {
         return {
           query: {
+            context_id: this.contextId,
             filters: {
               ids: [],
             },
@@ -262,6 +273,7 @@ export default {
       this.$apollo.queries.audiences.fetchMore({
         variables: {
           query: {
+            context_id: this.contextId,
             cursor: this.nextPage,
             filters: {
               name: this.filters.search,
@@ -311,6 +323,7 @@ export default {
       try {
         await this.$apollo.queries.selectedAudiences.refetch({
           query: {
+            context_id: this.contextId,
             filters: {
               ids: selection,
             },

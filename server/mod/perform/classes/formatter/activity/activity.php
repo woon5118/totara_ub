@@ -50,6 +50,7 @@ class activity extends entity_model_formatter {
             'can_potentially_activate' => null,
             'can_clone' => null,
             'visibility_condition_options' => null,
+            'context_id' => null,
         ];
     }
 }

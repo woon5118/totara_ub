@@ -23,27 +23,29 @@
 
 namespace core\webapi\resolver\query;
 
-use context;
-use context_system;
-use context_tenant;
 use coding_exception;
 use cohort;
+use context;
+use context_system;
+use core\data_providers\cohorts as cohorts_provider;
 use core\pagination\cursor;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
-use core\data_providers\cohorts as cohorts_provider;
+use core\webapi\resolver\has_middleware;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Handles the "core_cohorts" GraphQL query.
  */
-class cohorts implements query_resolver {
+class cohorts implements query_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
         $query = $args['query'] ?? [];
+        $context_id = $query['context_id'] ?? null;
         $order_by = $query['order_by'] ?? 'name';
         $order_dir = $query['order_dir'] ?? 'ASC';
         $result_size = $query['result_size'] ?? cohorts_provider::DEFAULT_PAGE_SIZE;
@@ -68,7 +70,15 @@ class cohorts implements query_resolver {
             }
         }
 
-        $context = self::setup_env($ec);
+        if (!empty($context_id)) {
+            $context = context::instance_by_id($context_id);
+        } else {
+            $context = context_system::instance();
+        }
+
+        if (!$context instanceof context_system) {
+            $ec->set_relevant_context($context);
+        }
 
         return (new cohorts_provider($context))
             ->set_page_size($result_size)
@@ -77,24 +87,10 @@ class cohorts implements query_resolver {
             ->fetch_paginated($cursor);
     }
 
-    /**
-     * Checks whether the user is authenticated and sets the correct context for
-     * the graphql execution.
-     *
-     * @param execution_context $ec graphql execution context to update.
-     */
-    private static function setup_env(execution_context $ec): context {
-        global $USER;
-        require_login(null, false, null, false, true);
-
-        $context = empty($USER->tenantid)
-            ? context_system::instance()
-            : context_tenant::instance($USER->tenantid);
-
-        if ($context->contextlevel !== CONTEXT_SYSTEM) {
-            $ec->set_relevant_context($context);
-        }
-
-        return $context;
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
     }
+
 }

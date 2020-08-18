@@ -83,6 +83,7 @@ use totara_core\relationship\relationship_provider;
  * @property-read bool anonymous_responses
  * @property bool multisection_setting
  * @property-read bool $can_clone
+ * @property-read int $context_id
  *
  * @package mod_perform\models\activity
  */
@@ -113,6 +114,7 @@ class activity extends model {
         'multisection_setting',
         'can_clone',
         'visibility_condition_options',
+        'context_id',
     ];
 
     public const NAME_MAX_LENGTH = 1024;
@@ -312,6 +314,15 @@ class activity extends model {
         $cm = $instances[$this->id];
 
         return context_module::instance($cm->id);
+    }
+
+    /**
+     * Gets the id of the context
+     *
+     * @return int
+     */
+    public function get_context_id(): int {
+        return $this->get_context()->id;
     }
 
     /**

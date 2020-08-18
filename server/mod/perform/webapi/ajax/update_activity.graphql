@@ -48,6 +48,7 @@ mutation mod_perform_update_activity(
           name
         }
       }
+      context_id
     }
   }
 }

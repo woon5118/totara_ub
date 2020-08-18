@@ -61,5 +61,6 @@ query mod_perform_activity($activity_id: core_id!) {
       name
       value
     }
+    context_id
   }
 }

@@ -48,6 +48,7 @@
             v-model="activity"
             :activity-id="activityId"
             :activity-state="activityState"
+            :activity-context-id="activity.context_id"
             @mutation-error="showMutationErrorNotification"
             @mutation-success="showMutationSuccessNotification"
           />

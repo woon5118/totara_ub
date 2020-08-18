@@ -26,10 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 use core\collection;
 use core\entities\cohort as cohort_entity;
-use core\webapi\execution_context;
+use core\orm\query\builder;
 use core\webapi\resolver\query\cohorts;
-use core\webapi\resolver\type\cohort as cohort_type;
-use totara_webapi\graphql;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @coversDefaultClass cohorts.
@@ -37,19 +36,34 @@ use totara_webapi\graphql;
  * @group core_cohort
  */
 class core_webapi_query_cohorts_testcase extends advanced_testcase {
+
+    private const QUERY = 'core_cohorts';
+
+    use webapi_phpunit_helper;
+
+    public static function setUpBeforeClass(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/cohort/lib.php');
+    }
+
     /**
      * @covers ::resolve
      */
     public function test_find_default_params(): void {
         $no_of_cohorts = 2;
         $expected = $this->setup_env($no_of_cohorts)->pluck('name');
-        $context = $this->get_webapi_context();
 
-        [
-            "items" => $items,
-            "total" => $total,
-            "next_cursor" => $enc_cursor
-        ] = cohorts::resolve([], $context);
+        $result = $this->resolve_graphql_query(self::QUERY, []);
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('items', $result);
+        $this->assertArrayHasKey('total', $result);
+        $this->assertArrayHasKey('next_cursor', $result);
+
+        $items = $result['items'];
+        $total = $result['total'];
+        $enc_cursor = $result['next_cursor'];
+
         $this->assertEquals($no_of_cohorts, $total, 'wrong total count');
         $this->assertEmpty($enc_cursor, 'non empty cursor');
 
@@ -64,37 +78,7 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
     /**
      * @covers ::resolve
      */
-    public function test_ajax_default_params(): void {
-        $no_of_cohorts = 2;
-        $cohorts_by_ids = $this->setup_env($no_of_cohorts)->key_by('id');
-        $context = $this->get_webapi_context();
-
-        $args = ['query' => null];
-        [
-            "items" => $items,
-            "total" => $total,
-            "next_cursor" => $enc_cursor
-        ] = $this->exec_graphql($context, $args);
-        $this->assertCount($no_of_cohorts, $items, 'wrong item count');
-        $this->assertEquals($no_of_cohorts, $total, 'wrong total count');
-        $this->assertEmpty($enc_cursor, 'non empty cursor');
-
-        foreach ($items as $item) {
-            $item_id = $item['id'] ?? null;
-            $this->assertNotNull($item_id, 'no retrieved item id');
-
-            $expected_item = $cohorts_by_ids->item($item_id);
-            $this->assertNotNull($expected_item, 'no retrieved item id');
-
-            $raw = $this->graphql_return($expected_item, $context);
-            $this->assertEquals($raw, $item, 'wrong graphql return');
-        }
-    }
-
-    /**
-     * @covers ::resolve
-     */
-    public function test_ajax_sorted_pagination(): void {
+    public function test_sorted_pagination(): void {
         $no_of_cohorts = 10;
         $order_direction = 'DESC';
         $cohort_ids = $this->setup_env($no_of_cohorts)
@@ -102,7 +86,6 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
             ->pluck('id');
 
         $page_size = $no_of_cohorts - 1;
-        $context = $this->get_webapi_context();
 
         $args = [
             'query' => [
@@ -119,16 +102,13 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
             "items" => $items,
             "total" => $total,
             "next_cursor" => $enc_cursor
-        ] = $this->exec_graphql($context, $args);
+        ] = $this->resolve_graphql_query(self::QUERY, $args);
 
         $this->assertEquals($no_of_cohorts, $total, 'wrong total count');
         $this->assertCount($page_size, $items, 'wrong current page count');
         $this->assertNotEmpty($enc_cursor, 'empty cursor');
 
-        $retrieved = [];
-        foreach ($items as $item) {
-            $retrieved[] = $item['id'];
-        }
+        $retrieved = array_column($items, 'id');
 
         // 2nd round.
         $args = [
@@ -145,15 +125,13 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
             "items" => $items,
             "total" => $total,
             "next_cursor" => $enc_cursor
-        ] = $this->exec_graphql($context, $args);
+        ] = $this->resolve_graphql_query(self::QUERY, $args);
 
         $this->assertEquals($no_of_cohorts, $total, 'wrong total count');
         $this->assertCount(1, $items, 'wrong current page count');
         $this->assertEmpty($enc_cursor, 'non empty cursor');
 
-        foreach ($items as $item) {
-            $retrieved[] = $item['id'];
-        }
+        $retrieved = array_merge($retrieved, array_column($items, 'id'));
 
         // See if items were retrieved in the correct order.
         $this->assertEquals($cohort_ids, $retrieved, 'retrieved in wrong order');
@@ -162,11 +140,10 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
     /**
      * @covers ::resolve
      */
-    public function test_ajax_filters(): void {
+    public function test_filters(): void {
         $all_cohorts = $this->setup_env();
 
         // Filter by single value.
-        $context = $this->get_webapi_context();
         $args = [
             'query' => [
                 'filters' => [
@@ -182,14 +159,13 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
             "items" => $items,
             "total" => $total,
             "next_cursor" => $enc_cursor
-        ] = $this->exec_graphql($context, $args);
+        ] = $this->resolve_graphql_query(self::QUERY, $args);
+
         $this->assertEquals(count($expected), $total, 'wrong total count');
         $this->assertEmpty($enc_cursor, 'non empty cursor');
         $this->assertCount(count($expected), $items, 'wrong item count');
 
-        foreach ($items as $item) {
-            $this->assertContains($item['id'], $expected, 'wrong item retrieved');
-        }
+        $this->assertEqualsCanonicalizing($expected, array_column($items, 'id'));
 
         // Filter combination.
         $cohort = $all_cohorts->last();
@@ -206,7 +182,8 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
             "items" => $items,
             "total" => $total,
             "next_cursor" => $enc_cursor
-        ] = $this->exec_graphql($context, $args);
+        ] = $this->resolve_graphql_query(self::QUERY, $args);
+
         $this->assertEquals(1, $total, 'wrong total count');
         $this->assertEmpty($enc_cursor, 'non empty cursor');
         $this->assertCount(1, $items, 'wrong item count');
@@ -225,7 +202,8 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
             "items" => $items,
             "total" => $total,
             "next_cursor" => $enc_cursor
-        ] = $this->exec_graphql($context, $args);
+        ] = $this->resolve_graphql_query(self::QUERY, $args);
+
         $this->assertEquals(0, $total, 'wrong total count');
         $this->assertEmpty($enc_cursor, 'non empty cursor');
         $this->assertCount(0, $items, 'wrong item count');
@@ -233,17 +211,127 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
 
     /**
      * @covers ::resolve
-    */
+     */
+    public function test_ajax_default_params(): void {
+        $no_of_cohorts = 2;
+        $cohorts_by_ids = $this->setup_env($no_of_cohorts)->key_by('id');
+
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
+
+        $items = $result['items'];
+        $total = $result['total'];
+        $enc_cursor = $result['next_cursor'];
+
+        $this->assertCount($no_of_cohorts, $items, 'wrong item count');
+        $this->assertEquals($no_of_cohorts, $total, 'wrong total count');
+        $this->assertEmpty($enc_cursor, 'non empty cursor');
+
+        $item_ids = array_column($items, 'id');
+        $this->assertEqualsCanonicalizing($cohorts_by_ids->pluck('id'), $item_ids);
+    }
+
+    /**
+     * @covers ::resolve
+     */
     public function test_failed_ajax_query(): void {
         // No input.
         $args = [
             'query' => ['type' => "UNKNOWN"]
         ];
 
-        $context = $this->get_webapi_context();
-        $actual = $this->exec_graphql($context, $args);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString('type', $actual, 'wrong error');
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, 'Field "type" is not defined by type core_cohorts_query');
+    }
+
+    public function test_using_context_id(): void {
+        $no_of_cohorts = 2;
+        $cohorts_by_ids = $this->setup_env($no_of_cohorts)->key_by('id');
+
+        $generator = $this->getDataGenerator();
+
+        $cat1 = $generator->create_category([
+            'name' => 'cat1'
+        ]);
+
+        $cat11 = $generator->create_category([
+            'parent' => $cat1->id,
+            'name' => 'cat11'
+        ]);
+
+        $cat2 = $generator->create_category([
+            'name' => 'cat2'
+        ]);
+
+        $aud1 = $generator->create_cohort([
+            'contextid' => $cat1->get_context()->id,
+            'name' => 'aud1'
+        ]);
+
+        $aud11 = $generator->create_cohort([
+            'contextid' => $cat11->get_context()->id,
+            'name' => 'aud11'
+        ]);
+
+        $aud2 = $generator->create_cohort([
+            'contextid' => $cat2->get_context()->id,
+            'name' => 'aud2'
+        ]);
+
+        $args = [
+            'query' => [
+                'context_id' => $cat2->get_context()->id
+            ]
+        ];
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
+
+        $items = $result['items'];
+        $total = $result['total'];
+        $enc_cursor = $result['next_cursor'];
+
+        $this->assertCount($no_of_cohorts + 1, $items, 'wrong item count');
+        $this->assertEquals($no_of_cohorts + 1, $total, 'wrong total count');
+        $this->assertEmpty($enc_cursor, 'non empty cursor');
+
+        $item_ids = array_column($items, 'id');
+        $this->assertEqualsCanonicalizing(array_merge($cohorts_by_ids->pluck('id'), [$aud2->id]), $item_ids);
+
+        $args = [
+            'query' => [
+                'context_id' => $cat11->get_context()->id,
+            ]
+        ];
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
+
+        $items = $result['items'];
+        $total = $result['total'];
+        $enc_cursor = $result['next_cursor'];
+
+        $this->assertCount($no_of_cohorts + 2, $items, 'wrong item count');
+        $this->assertEquals($no_of_cohorts + 2, $total, 'wrong total count');
+        $this->assertEmpty($enc_cursor, 'non empty cursor');
+
+        $item_ids = array_column($items, 'id');
+        $this->assertEqualsCanonicalizing(
+            array_merge(
+                $cohorts_by_ids->pluck('id'),
+                [
+                    $aud1->id,
+                    $aud11->id
+                ]
+            ),
+            $item_ids
+        );
     }
 
     /**
@@ -256,12 +344,14 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
     private function setup_env(int $count = 10): collection {
         $this->setAdminUser();
 
+        $generator = $this->getDataGenerator();
+
         $cohorts = [];
         foreach (range(0, $count - 1) as $i) {
             $cohort_type = $i % 3 === 0 ? cohort::TYPE_DYNAMIC : cohort::TYPE_STATIC;
             $base = sprintf('Test cohort #%02d', $i);
 
-            $entity = new cohort_entity([
+            $cohort = $generator->create_cohort([
                 'active' => true,
                 'component' => '',
                 'contextid' => context_system::instance()->id,
@@ -273,73 +363,10 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
                 'visible' => true
             ]);
 
-            $entity->save();
-
-            $cohorts[] = $entity;
+            $cohorts[] = new cohort_entity($cohort);
         }
 
         return collection::new($cohorts);
     }
 
-    /**
-     * Given the input cohort, returns the data the graphql call is supposed to
-     * return.
-     *
-     * @param cohort_entity $cohort source datea.
-     * @param execution_context $context graphql execution context.
-     *
-     * @return array the expected graphql data values.
-     */
-    private function graphql_return(cohort_entity $cohort, execution_context $context): array {
-        $resolve = function (string $field) use ($cohort, $context) {
-            return cohort_type::resolve($field, $cohort, [], $context);
-        };
-
-        return [
-            'active' => $resolve('active'),
-            'description' => $resolve('description'),
-            'id' => $resolve('id'),
-            'idnumber' => $resolve('idnumber'),
-            'name' => $resolve('name'),
-            'type' => $resolve('type')
-        ];
-    }
-
-    /**
-     * Executes the test query via AJAX.
-     *
-     * @param execution_context $context graphql execution context.
-     * @param array $args ajax arguments if any.
-     *
-     * @return array|string either the retrieved items or the error string for
-     *         failures.
-     */
-    private function exec_graphql(execution_context $context, array $args=[]) {
-        $result = graphql::execute_operation($context, $args)->toArray(true);
-
-        $op = $context->get_operationname();
-        $errors = $result['errors'] ?? null;
-        if ($errors) {
-            $error = $errors[0];
-            $msg = $error['debugMessage'] ?? $error['message'];
-
-            return sprintf(
-                "invocation of %s://%s failed: %s",
-                $context->get_type(),
-                $op,
-                $msg
-            );
-        }
-
-        return $result['data'][$op];
-    }
-
-    /**
-     * Creates an graphql execution context.
-     *
-     * @return execution_context the context.
-     */
-    private function get_webapi_context(): execution_context {
-        return execution_context::create('ajax', 'core_cohorts');
-    }
 }

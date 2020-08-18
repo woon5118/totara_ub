@@ -31,6 +31,7 @@ input core_cohorts_filter {
 }
 
 input core_cohorts_query {
+  context_id: core_id
   filters: core_cohorts_filter
   order_by: String
   order_dir: core_cohort_order_dir

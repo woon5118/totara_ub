@@ -28,6 +28,7 @@ use context;
 use context_system;
 use core\entities\cohort;
 use core\entities\cohort_filters;
+use core\orm\entity\repository;
 use core\orm\pagination\cursor_paginator;
 use core\pagination\cursor;
 use moodle_exception;
@@ -48,33 +49,32 @@ class cohorts {
     private $order_direction = 'asc';
     private $filters = [];
     private $mandatory_filters = [];
+    private $include_tenant_cohorts = true;
 
     /**
      * Default constructor.
      *
-     * @param context $context the context to use when retrieving cohorts. Only
+     * @param context|null $context $context the context to use when retrieving cohorts. Only
      *        cohorts in this and its parents will be considered.
      */
     public function __construct(?context $context = null) {
         $this->mandatory_filters = ['visible' => true];
         $leaf_context = $context ? $context : context_system::instance();
 
-        if ($leaf_context->contextlevel !== CONTEXT_SYSTEM) {
-            $contexts = [];
-            foreach ($leaf_context->get_parent_contexts(true) as $id => $parent) {
-                if ($this->can_view_cohorts($parent)) {
-                    $contexts[] = $id;
-                }
-            }
+        $contexts = [];
 
-            if (!$contexts) {
-                throw new moodle_exception('nopermissions', '', '', 'list cohorts');
+        foreach ($leaf_context->get_parent_contexts(true) as $id => $parent) {
+            if ($this->can_view_cohorts($parent)) {
+                $contexts[] = $id;
             }
-
-            $this->mandatory_filters['context_ids'] = cohort_filters::for('context_ids', $contexts);
-        } else if (!has_capability("moodle/cohort:view", $leaf_context)) {
-            throw new moodle_exception('nopermissions', '', '', 'list cohorts');
         }
+
+        if (empty($contexts)) {
+            // Make sure we get an empty result
+            $contexts = [0];
+        }
+
+        $this->mandatory_filters['context_ids'] = cohort_filters::for('context_ids', $contexts);
 
         $this->set_filters([]);
     }
@@ -88,13 +88,7 @@ class cohorts {
      * @return boolean true if the user can view the cohorts in this context.
      */
     private function can_view_cohorts(context $context): bool {
-        global $CFG, $USER;
-        $tenant_id = empty($CFG->tenantsenabled) ? null : $USER->tenantid;
-        if ($tenant_id && $context->tenantid !== $tenant_id) {
-            return false;
-        }
-
-        return has_capability("moodle/cohort:view", $context);
+        return has_capability('moodle/cohort:view', $context);
     }
 
     /**
@@ -131,6 +125,17 @@ class cohorts {
             throw new coding_exception("order must be one of these: $allowed");
         }
         $this->order_direction = $order_direction;
+
+        return $this;
+    }
+
+    /**
+     * By default tenant cohorts are included, use this method to exclude them
+     *
+     * @return cohorts
+     */
+    public function exclude_tenant_cohorts(): cohorts {
+        $this->include_tenant_cohorts = false;
 
         return $this;
     }
@@ -194,12 +199,15 @@ class cohorts {
     /**
      * Returns a list of cohorts meeting the previously set search criteria.
      *
-     * @param cursor $cursor indicates which "page" of cohorts to retrieve.
+     * @param cursor|null $cursor $cursor indicates which "page" of cohorts to retrieve.
      *
      * @return array[cohort] the retrieved cohort entities.
      */
     public function fetch_paginated(?cursor $cursor = null): array {
         $repository = cohort::repository()
+            ->when(!$this->include_tenant_cohorts, function (repository $repository) {
+                $repository->where('component', '<>', 'totara_tenant');
+            })
             ->set_filters($this->filters)
             ->order_by($this->order_by, $this->order_direction);
 

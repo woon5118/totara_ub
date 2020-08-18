@@ -55,6 +55,7 @@
     <AudienceAdder
       :open="isAudienceAdderOpen"
       :existing-items="audienceAddedIds"
+      :context-id="activityContextId"
       @added="
         selection =>
           updateSelectionFromAdder(selection, audienceAddedIds, cohortEnum)
@@ -224,6 +225,7 @@ export default {
       type: String,
       required: true,
     },
+    activityContextId: Number,
   },
 
   data() {

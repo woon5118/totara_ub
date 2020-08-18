@@ -39,7 +39,7 @@ final class cohort_filters {
      * Returns the appropriate filter given the query key.
      *
      * @param string $key query key.
-     * @param $value search value(s) .
+     * @param mixed $value search value(s) .
      *
      * @return filter the filter if it was found or null if it wasn't.
      */
@@ -132,6 +132,9 @@ final class cohort_filters {
      * @return filter the filter instance.
      */
     public static function create_type_filter(int $value): filter {
+        global $CFG;
+        require_once($CFG->dirroot . '/cohort/lib.php');
+
         $cohort_types = [cohort::TYPE_STATIC, cohort::TYPE_DYNAMIC];
         if (!in_array($value, $cohort_types, true)) {
             $allowed = implode(', ', $cohort_types);

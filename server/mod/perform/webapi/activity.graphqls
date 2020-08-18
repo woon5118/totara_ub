@@ -45,6 +45,7 @@ type mod_perform_activity {
   visibility_condition_options: [mod_perform_visibility_condition_option!]
   anonymous_responses: Boolean! # If true all responses will be anonymized
   manual_relationships: [mod_perform_manual_relationship!]!
+  context_id: core_id!
 }
 
 """
