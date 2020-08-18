@@ -97,7 +97,7 @@ class behat_performelement_multi_choice_multi extends behat_base {
     public function i_delete_multiple_answers_question_option(): void {
         behat_hooks::set_step_readonly(false);
 
-        $delete_button = $this->find('css', '.tui-elementEditMultiChoiceMulti .tui-iconBtn--stealth');
+        $delete_button = $this->find('css', '.tui-elementEditMultiChoiceMulti .tui-repeater__delete:not([disabled])');
         $delete_button->click();
     }
 }

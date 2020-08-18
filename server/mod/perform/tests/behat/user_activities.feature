@@ -34,7 +34,7 @@ Feature: Viewing and responding to perform activities
     When I answer "short text" question "Question one" with "My first answer"
     And I answer "short text" question "Question two" with "1025" characters
     And I click on "Submit" "button"
-    Then I should see "Question two" has the validation error "Please enter at no more than 1024 characters"
+    Then I should see "Question two" has the validation error "Please enter no more than 1024 characters"
 
     When I answer "short text" question "Question two" with "1024" characters
     And I click on "Submit" "button"

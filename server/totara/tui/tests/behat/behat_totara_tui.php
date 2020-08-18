@@ -1149,7 +1149,7 @@ class behat_totara_tui extends behat_base {
     public function the_form_row_toggle_switch_should_be(string $form_row_label, string $expected_value): void {
         $toggle_button = $this->find_form_row_toggle_button($form_row_label);
 
-        if ($toggle_button->hasClass('tui-toggleBtn__ui--aria-pressed') && $expected_value !== 'on') {
+        if ($toggle_button->hasClass('tui-toggleSwitch__ui--aria-pressed') && $expected_value !== 'on') {
             $this->fail('Toggle button was not ' . $expected_value);
         }
     }
@@ -1503,9 +1503,14 @@ class behat_totara_tui extends behat_base {
 
         $found_label = reset($found_labels);
 
-        $form_row = $found_label->getParent()->getParent();
+        $form_row = $found_label;
+        while ($form_row = $form_row->getParent()) {
+            if ($form_row->hasClass(self::TUI_FORM_ROW_CLASS)) {
+                break;
+            }
+        }
 
-        if (!$form_row->hasClass(self::TUI_FORM_ROW_CLASS)) {
+        if (!$form_row || !$form_row->hasClass(self::TUI_FORM_ROW_CLASS)) {
             $this->fail('Label was not inside of a form row');
         }
 

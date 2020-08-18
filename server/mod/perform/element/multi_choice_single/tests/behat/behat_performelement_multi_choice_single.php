@@ -96,7 +96,7 @@ class behat_performelement_multi_choice_single extends behat_base {
     public function i_delete_multi_choice_single_question_option(): void {
         behat_hooks::set_step_readonly(false);
 
-        $delete_button = $this->find('css', '.tui-elementEditMultiChoiceSingle .tui-iconBtn--stealth');
+        $delete_button = $this->find('css', '.tui-elementEditMultiChoiceSingle .tui-repeater__delete:not([disabled])');
         $delete_button->click();
     }
 }

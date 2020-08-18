@@ -48,7 +48,7 @@
           :style="{ visibility: showDeleteIcon(index) ? null : 'hidden' }"
           :aria-label="$str('delete', 'moodle')"
           :styleclass="{ small: true, stealth: true }"
-          :disabled="disabled"
+          :disabled="disabled || !showDeleteIcon(index)"
           @click="$emit('remove', row, index)"
         >
           <DeleteIcon />
