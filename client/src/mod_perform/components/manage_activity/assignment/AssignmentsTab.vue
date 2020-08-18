@@ -163,6 +163,7 @@
       :default-fixed-date="defaultFixedDateSetting"
       :activity-id="activityId"
       :activity-state="activityState"
+      @unsaved-changes="hasUnsavedChanges"
     />
 
     <ConfirmationModal
@@ -199,7 +200,6 @@ import PositionAdder from 'tui/components/adder/PositionAdder';
 import Table from 'tui/components/datatable/Table';
 import Schedule from 'mod_perform/components/manage_activity/assignment/Schedule';
 import { ACTIVITY_STATUS_ACTIVE } from 'mod_perform/constants';
-
 //GraphQL
 import TrackSettingsQuery from 'mod_perform/graphql/default_track_settings';
 import AddTrackAssignmentMutation from 'mod_perform/graphql/add_track_assignments';
@@ -232,6 +232,7 @@ export default {
       required: true,
     },
     activityContextId: Number,
+    activityHasUnsavedChanges: Boolean,
   },
 
   data() {
@@ -315,6 +316,16 @@ export default {
         this.dynamicDateSources = newValue.dynamicDateSources;
       }
     },
+  },
+
+  mounted() {
+    // Confirm navigation away if user is currently editing.
+    window.addEventListener('beforeunload', this.unloadHandler);
+  },
+
+  beforeDestroy() {
+    // Modal will no longer exist so remove the navigation warning.
+    window.removeEventListener('beforeunload', this.unloadHandler);
   },
 
   methods: {
@@ -489,6 +500,30 @@ export default {
       this.assignmentToRemove = null;
       this.confirmationModalOpen = false;
     },
+
+    hasUnsavedChanges(value) {
+      this.$emit('unsaved-changes', value);
+    },
+
+    /**
+     * Displays a warning message if the user tries to navigate away without saving.
+     * @param {Event} e
+     * @returns {String|void}
+     */
+    unloadHandler(e) {
+      if (!this.activityHasUnsavedChanges) {
+        return;
+      }
+
+      // For older browsers that still show custom message.
+      const discardUnsavedChanges = this.$str(
+        'unsaved_changes_warning',
+        'mod_perform'
+      );
+      e.preventDefault();
+      e.returnValue = discardUnsavedChanges;
+      return discardUnsavedChanges;
+    },
   },
 
   apollo: {
@@ -516,6 +551,7 @@ export default {
   {
     "mod_perform" : [
       "deleted_dynamic_source_label",
+      "unsaved_changes_warning",
       "user_group_assignment_add_group",
       "user_group_assignment_confirm_modal_remove",
       "user_group_assignment_confirm_remove_active",

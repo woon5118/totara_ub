@@ -244,6 +244,7 @@ export default {
         );
       },
     },
+    activityHasUnsavedChanges: Boolean,
   },
 
   data() {
@@ -341,6 +342,15 @@ export default {
     },
   },
 
+  watch: {
+    form: {
+      deep: true,
+      handler() {
+        this.handleChanges(this.hasUnsavedChanges());
+      },
+    },
+  },
+
   created() {
     this.ACTIVITY_NAME_MAX_LENGTH = ACTIVITY_NAME_MAX_LENGTH;
   },
@@ -348,6 +358,11 @@ export default {
   mounted() {
     // Confirm navigation away if user is currently editing.
     window.addEventListener('beforeunload', this.unloadHandler);
+  },
+
+  beforeDestroy() {
+    // Modal will no longer exist so remove the navigation warning.
+    window.removeEventListener('beforeunload', this.unloadHandler);
   },
 
   apollo: {
@@ -410,6 +425,7 @@ export default {
       try {
         const savedActivity = await this.save();
         this.updateActivity(savedActivity);
+        this.handleChanges(false);
         this.$emit('mutation-success', savedActivity);
       } catch (e) {
         this.$emit('mutation-error', e);
@@ -485,6 +501,8 @@ export default {
         this.form.description !== this.value.edit_description ||
         this.form.type_id !== this.value.type.id ||
         this.form.anonymousResponse !== this.value.anonymous_responses ||
+        this.form.visibilityConditionValue !==
+          this.value.settings.visibility_condition.value ||
         this.hasChangesToRelationshipSelection()
       );
     },
@@ -519,7 +537,7 @@ export default {
      * @returns {String|void}
      */
     unloadHandler(e) {
-      if (!this.hasUnsavedChanges()) {
+      if (!this.activityHasUnsavedChanges) {
         return;
       }
 
@@ -569,6 +587,13 @@ export default {
       if (this.form.anonymousResponse) {
         this.form.visibilityConditionValue = VISIBILITY_CONDITION_ALL_PARTICIPANT_CLOSED;
       }
+    },
+
+    /**
+     * Emit has unsave changes to parent
+     */
+    handleChanges(hasUnsavedChanges) {
+      this.$emit('unsaved-changes', hasUnsavedChanges);
     },
   },
 };

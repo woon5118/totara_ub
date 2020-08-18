@@ -33,10 +33,16 @@
       <ActivityStatusBanner
         v-if="activity"
         :activity="activity"
-        @refetch="refetch"
+        :disabled="activateModalLoading"
+        @activate="activateActivity"
       />
 
-      <Tabs v-if="activity" :selected="initialTabId">
+      <Tabs
+        v-if="activity"
+        :selected="currentTabId"
+        :controlled="true"
+        @input="changeTabRequest"
+      >
         <Tab
           v-for="({ component, name, id }, index) in tabs"
           :id="id"
@@ -50,16 +56,29 @@
             :activity-id="activityId"
             :activity-state="activityState"
             :activity-context-id="parseInt(activity.context_id)"
+            :activity-has-unsaved-changes="unsavedChanges"
+            @unsaved-changes="setUnsavedChanges"
             @mutation-error="showMutationErrorNotification"
             @mutation-success="showMutationSuccessNotification"
           />
         </Tab>
       </Tabs>
+
+      <ActivateActivityModal
+        v-if="activity"
+        :activity="activity"
+        :trigger-open="showActivateModal"
+        @close-activate-modal="updateShowActivateModal"
+        @update-loading="uploadLoading"
+        @unsaved-changes="setUnsavedChanges"
+        @refetch="refetch"
+      />
     </Loader>
   </div>
 </template>
 
 <script>
+import ActivateActivityModal from 'mod_perform/components/manage_activity/ActivateActivityModal';
 import ActivityContentTab from 'mod_perform/components/manage_activity/content/ActivityContentTab';
 import ActivityStatusBanner from 'mod_perform/components/manage_activity/ActivityStatusBanner';
 import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/AssignmentsTab';
@@ -77,6 +96,7 @@ import activityQuery from 'mod_perform/graphql/activity';
 
 export default {
   components: {
+    ActivateActivityModal,
     ActivityContentTab,
     ActivityStatusBanner,
     AssignmentsTab,
@@ -102,7 +122,7 @@ export default {
   data() {
     return {
       activity: null,
-      initialTabId: this.$id('content-tab'),
+      currentTabId: this.$id('content-tab'),
       tabs: [
         {
           id: this.$id('genral-info-tab'),
@@ -128,6 +148,9 @@ export default {
           ),
         },
       ],
+      unsavedChanges: false,
+      showActivateModal: false,
+      activateModalLoading: false,
     };
   },
   computed: {
@@ -158,6 +181,26 @@ export default {
   },
   methods: {
     /**
+     * Change tab request has been made
+     *
+     * @param {String} id
+     */
+    changeTabRequest(id) {
+      if (this.unsavedChanges) {
+        const message = this.$str('unsaved_changes_warning', 'mod_perform');
+        let answer = window.confirm(message);
+        if (answer) {
+          this.currentTabId = id;
+          this.unsavedChanges = false;
+        } else {
+          return;
+        }
+      } else {
+        this.currentTabId = id;
+      }
+    },
+
+    /**
      * Re-fetch the activity from the server.
      */
     refetch() {
@@ -182,6 +225,38 @@ export default {
         message: this.$str('toast_success_activity_update', 'mod_perform'),
         type: 'success',
       });
+    },
+
+    /**
+     * Set if there is unsaved changes or not
+     */
+    setUnsavedChanges(hasUnsavedChanges) {
+      this.unsavedChanges = hasUnsavedChanges;
+    },
+
+    /**
+     * Check unsaved changes when click activate button from manage activity
+     */
+    activateActivity() {
+      if (this.unsavedChanges) {
+        const message = this.$str('unsaved_changes_warning', 'mod_perform');
+        let answer = window.confirm(message);
+        if (answer) {
+          this.showActivateModal = true;
+        } else {
+          return;
+        }
+      } else {
+        this.showActivateModal = true;
+      }
+    },
+
+    updateShowActivateModal(value) {
+      this.showActivateModal = value;
+    },
+
+    uploadLoading(value) {
+      this.activateModalLoading = value;
     },
   },
 };

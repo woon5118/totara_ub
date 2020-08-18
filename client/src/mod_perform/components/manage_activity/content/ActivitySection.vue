@@ -450,6 +450,10 @@ export default {
     },
   },
 
+  updated() {
+    this.$emit('has-unsaved-changes');
+  },
+
   methods: {
     /**
      * Gets section relationships.

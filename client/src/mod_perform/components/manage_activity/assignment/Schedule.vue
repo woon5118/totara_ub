@@ -178,6 +178,7 @@ export default {
       },
       dynamicDateSourceName: this.getDynamicDateSourceName(),
       formValuesToSave: null,
+      hasMounted: false,
       isSaving: false,
       isUsingJobBasedDynamicSource: this.isDynamicDateSourceJobBased(),
       initialValues: this.getInitialValues(this.track),
@@ -196,11 +197,24 @@ export default {
     },
   },
 
+  watch: {
+    toggleValues() {
+      this.hasUnsavedChanges(true);
+    },
+  },
+
+  mounted() {
+    this.hasMounted = true;
+  },
+
   methods: {
     /**
      * React to changes in the form.
      */
     onChange(values) {
+      if (!this.hasMounted) {
+        return;
+      }
       // if limited and fixed use value otherwise it's relative
       if (
         !this.toggleValues.scheduleIsOpen &&
@@ -230,6 +244,7 @@ export default {
           selectedDynamicSource
         );
       }
+      this.hasUnsavedChanges(true);
     },
 
     /**
@@ -731,6 +746,7 @@ export default {
         this.hideConfirmationModal();
         this.showSuccessNotification();
         this.isSaving = false;
+        this.hasUnsavedChanges(false);
       } catch (e) {
         this.hideConfirmationModal();
         this.showErrorNotification();
@@ -823,6 +839,10 @@ export default {
         }
       }
       return {};
+    },
+
+    hasUnsavedChanges(hasUnsavedChanges) {
+      this.$emit('unsaved-changes', hasUnsavedChanges);
     },
   },
 };

@@ -80,6 +80,7 @@ export default {
       required: true,
       type: Object,
     },
+    triggerOpen: Boolean,
   },
 
   data() {
@@ -89,6 +90,18 @@ export default {
       usersToAssignCount: 0,
       loading: false,
     };
+  },
+
+  watch: {
+    triggerOpen() {
+      if (this.triggerOpen) {
+        this.open();
+      }
+    },
+
+    loading() {
+      this.$emit('update-loading', this.loading);
+    },
   },
 
   methods: {
@@ -133,6 +146,7 @@ export default {
      */
     closeConfirmActivationModal() {
       this.confirmActivateModalOpen = false;
+      this.$emit('close-activate-modal', false);
     },
 
     /**
@@ -147,6 +161,7 @@ export default {
      */
     closeDraftNotReadyModal() {
       this.draftNotReadyModalOpen = false;
+      this.$emit('close-activate-modal', false);
     },
 
     /**
@@ -168,6 +183,7 @@ export default {
         this.showErrorNotification();
       }
       this.$emit('refetch');
+      this.$emit('unsaved-changes', false);
       this.closeConfirmActivationModal();
       this.loading = false;
     },

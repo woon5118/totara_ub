@@ -52,6 +52,7 @@
         @add_above="addSectionAbove(i)"
         @add_below="addSectionBelow(i)"
         @delete-section="deleteSection(i)"
+        @has-unsaved-changes="detectChanges"
       />
     </div>
 
@@ -91,6 +92,7 @@ export default {
       type: Object,
       required: true,
     },
+    activityHasUnsavedChanges: Boolean,
   },
 
   data() {
@@ -137,6 +139,11 @@ export default {
   mounted() {
     // Confirm navigation away if user is currently editing.
     window.addEventListener('beforeunload', this.unloadHandler);
+  },
+
+  beforeDestroy() {
+    // Modal will no longer exist so remove the navigation warning.
+    window.removeEventListener('beforeunload', this.unloadHandler);
   },
 
   methods: {
@@ -220,7 +227,6 @@ export default {
      */
     updateActivity(update) {
       const newValue = Object.assign({}, this.value, update);
-
       this.$emit('input', newValue);
     },
 
@@ -277,7 +283,7 @@ export default {
               add_before: sectionAddBefore,
             },
           },
-          refetchAll: false,
+          refetchAll: true,
         });
 
         if (sectionIndex !== null) {
@@ -345,7 +351,7 @@ export default {
      * @returns {String|void}
      */
     unloadHandler(e) {
-      if (!this.hasUnsavedChanges) {
+      if (!this.activityHasUnsavedChanges) {
         return;
       }
 
@@ -364,6 +370,15 @@ export default {
      */
     deleteSection(sectionIndex) {
       this.sectionStates.splice(sectionIndex, 1);
+
+      let updatedSections = this.sectionStates.map(sectionState => {
+        return sectionState.section;
+      });
+      this.updateActivity({ sections: updatedSections });
+    },
+
+    detectChanges() {
+      this.$emit('unsaved-changes', this.hasUnsavedChanges);
     },
   },
 

@@ -212,7 +212,7 @@ Feature: Respond to activity with multiple sections
     # test popup confirm when it has unsaved changes
     When I answer "short text" question "test element title" with "John Answer two"
     And I click on "section 1" "button"
-    Then I should see "You have unsaved changes" in browser confirmation popup
+    Then I should see "Your unsaved changes will be lost." in browser confirmation popup
     # test click "OK" on popup confirm, then show correct section
     When I confirm the browser confirmation popup
     Then I should see "section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"

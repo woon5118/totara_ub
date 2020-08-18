@@ -48,22 +48,17 @@
     </template>
 
     <template v-if="activity.can_potentially_activate" v-slot:card-action>
-      <ActivateActivityModal :activity="activity" @refetch="$emit('refetch')">
-        <template v-slot:trigger="{ open, loading }">
-          <Button
-            :text="$str('activity_action_activate', 'mod_perform')"
-            :disabled="loading"
-            @click="open"
-          />
-        </template>
-      </ActivateActivityModal>
+      <Button
+        :text="$str('activity_action_activate', 'mod_perform')"
+        :disabled="disabled"
+        @click="$emit('activate')"
+      />
     </template>
   </ActionCard>
 </template>
 
 <script>
 import ActionCard from 'tui/components/card/ActionCard';
-import ActivateActivityModal from 'mod_perform/components/manage_activity/ActivateActivityModal';
 import Button from 'tui/components/buttons/Button';
 import HelpIcon from 'tui/components/form/HelpIcon';
 import {
@@ -74,7 +69,6 @@ import {
 export default {
   components: {
     ActionCard,
-    ActivateActivityModal,
     Button,
     HelpIcon,
   },
@@ -84,6 +78,7 @@ export default {
       required: true,
       type: Object,
     },
+    disabled: Boolean,
   },
 
   data() {
