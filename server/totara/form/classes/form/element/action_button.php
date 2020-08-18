@@ -42,6 +42,9 @@ class action_button extends element {
     /** @var int $type */
     private $type;
 
+    /** @var bool $primarybutton */
+    private $primarybutton = false;
+
     /** Button does regular form submission  */
     const TYPE_SUBMIT = 0;
 
@@ -131,6 +134,7 @@ class action_button extends element {
             'name' => $this->get_name(),
             'id' => $this->get_id(),
             'frozen' => $this->is_frozen(),
+            'primarybutton' => $this->is_primarybutton(),
         );
 
         $attributes = $this->get_attributes();
@@ -169,5 +173,23 @@ class action_button extends element {
         } else {
             return true;
         }
+    }
+
+    /**
+     * Set primary button attribute
+     *
+     * @param bool $primarybutton
+     */
+    public function set_primarybutton(bool $primarybutton) {
+        $this->primarybutton = $primarybutton;
+    }
+
+    /**
+     * Is this a primary button
+     *
+     * @return bool
+     */
+    public function is_primarybutton() {
+        return $this->primarybutton;
     }
 }

@@ -49,5 +49,5 @@
 }}
 <div class="tf_element totara_form_element_action_button">
     {{> totara_form/validation_errors}}{{> totara_form/help_button}}
-    <input type="submit" id="{{id}}" {{#frozen}}disabled data-{{/frozen}}name="{{name}}" value="{{value}}" {{#formnovalidate}}formnovalidate{{/formnovalidate}} />
+    <input type="submit" id="{{id}}" {{#primarybutton}}class="btn-primary"{{/primarybutton}} {{#frozen}}disabled data-{{/frozen}}name="{{name}}" value="{{value}}" {{#formnovalidate}}formnovalidate{{/formnovalidate}} />
 </div>
