@@ -242,8 +242,11 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
 
             if ($rowcount >= TOTARA_SYNC_DBROWS) {
                 // bulk insert
-                if (!totara_sync_bulk_insert($temptable, $datarows)) {
-                    $this->addlog(get_string('couldnotimportallrecords', 'tool_totara_sync'), 'error', 'populatesynctabledb');
+                try {
+                    totara_sync_bulk_insert($temptable, $datarows);
+                } catch (dml_exception $e) {
+                    $msg = debugging() ? $e->getMessage()."\n".$e->debuginfo : $e->getMessage();
+                    $this->addlog(get_string('couldnotimportallrecords', 'tool_totara_sync', $msg), 'error', 'populatesynctabledb');
                     $database_connection->dispose();
                     return false;
                 }
@@ -257,8 +260,11 @@ class totara_sync_source_comp_database extends totara_sync_source_comp {
         }
 
         // Insert remaining rows
-        if (!totara_sync_bulk_insert($temptable, $datarows)) {
-            $this->addlog(get_string('couldnotimportallrecords', 'tool_totara_sync'), 'error', 'populatesynctabledb');
+        try {
+            totara_sync_bulk_insert($temptable, $datarows);
+        } catch (dml_exception $e) {
+            $msg = debugging() ? $e->getMessage()."\n".$e->debuginfo : $e->getMessage();
+            $this->addlog(get_string('couldnotimportallrecords', 'tool_totara_sync', $msg), 'error', 'populatesynctabledb');
             $database_connection->dispose();
             return false;
         }

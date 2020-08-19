@@ -245,7 +245,8 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
                 try {
                     totara_sync_bulk_insert($temptable, $datarows);
                 } catch (dml_exception $e) {
-                    throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'couldnotimportallrecords', $e->getMessage());
+                    $debuginfo = debugging() ? $e->debuginfo : '';
+                    throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'couldnotimportallrecords', $e->getMessage(), $debuginfo);
                 }
 
                 $rowcount = 0;
@@ -261,7 +262,8 @@ class totara_sync_source_org_csv extends totara_sync_source_org {
         try {
             totara_sync_bulk_insert($temptable, $datarows);
         } catch (dml_exception $e) {
-            throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'couldnotimportallrecords', $e->getMessage());
+            $debuginfo = debugging() ? $e->debuginfo : '';
+            throw new totara_sync_exception($this->get_element_name(), 'populatesynctablecsv', 'couldnotimportallrecords', $e->getMessage(), $debuginfo);
         }
         unset($fieldmappings);
 
