@@ -64,12 +64,12 @@ class track_schedule_start_date_fixed {
     }
 
     /**
-     * Returns the start date as an ISO date string.
+     * Returns the start date as a formatted string.
      *
-     * @return string the ISO date string.
+     * @return string the formatted date string.
      */
-    public function get_start_date_as_iso(): string {
-        return $this->start->get_iso();
+    public function get_start_date_formatted(): string {
+        return $this->formatted_date($this->start);
     }
 
     /**
@@ -83,12 +83,23 @@ class track_schedule_start_date_fixed {
     }
 
     /**
-     * Returns the end date as an ISO date string.
+     * Returns the end date as as a formatted string.
      *
-     * @return string the ISO date string or an empty string if there is no end
-     *         date.
+     * @return string the formatted date string or an empty string if there is
+     *         no end date.
      */
-    public function get_end_date_as_iso(): string {
-        return $this->end ? $this->end->get_iso() : '';
+    public function get_end_date_formatted(): string {
+        return $this->end ? $this->formatted_date($this->end) : '';
+    }
+
+    /**
+     * Returns the date as a formatted string.
+     *
+     * @param date_time_setting $date date to format.
+     *
+     * @return string the formatted date string.
+     */
+    private function formatted_date(date_time_setting $date): string {
+        return $date->get_iso() . ' ' . $date->get_timezone();
     }
 }

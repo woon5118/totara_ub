@@ -154,7 +154,9 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $this->assertEquals($this->track1_id, $event->objectid);
         $this->assertEquals(get_admin()->id, $event->userid);
 
-        $initial_schedule_time = (new date_time_setting(-1))->get_iso();
+        $time = new date_time_setting(-1);
+        $initial_schedule_time = $time->get_iso() . ' ' . $time->get_timezone();
+
         $expected = [
             'is_open' => [false, true],
             'is_fixed' => [true, false],

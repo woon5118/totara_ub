@@ -95,20 +95,23 @@ class track_schedule_changed extends base {
 
         $subject_instance_schedule = $schedule->get_schedule();
         if ($subject_instance_schedule) {
+            $start_date = $subject_instance_schedule->get_start_date_formatted();
+            $end_date = $subject_instance_schedule->get_end_date_formatted();
+
             if ($is_fixed) {
-                $raw['fixed_from'] = $subject_instance_schedule->get_start_date_as_iso();
-                $raw['fixed_to'] = $subject_instance_schedule->get_end_date_as_iso();
+                $raw['fixed_from'] = $start_date;
+                $raw['fixed_to'] = $end_date;
             } else {
                 $raw['dynamic_source'] = $subject_instance_schedule->get_trigger_name();
-                $raw['dynamic_from'] = $subject_instance_schedule->get_start_date_formatted();
-                $raw['dynamic_to'] = $subject_instance_schedule->get_end_date_formatted();
+                $raw['dynamic_from'] = $start_date;
+                $raw['dynamic_to'] = $end_date;
             }
         }
 
         $due_date = $schedule->get_due_date();
         if ($due_date) {
             $raw['due_date'] = $schedule->is_due_date_fixed()
-                ? $due_date->get_date_as_iso()
+                ? $due_date->get_date_formatted()
                 : $due_date->get_formatted() . ' each instance creation date';
         }
 

@@ -53,11 +53,11 @@ class track_schedule_due_date_fixed {
     }
 
     /**
-     * Returns the due date as an ISO date string.
+     * Returns the due date as a formatted string.
      *
-     * @return string the ISO date string.
+     * @return string the formatted date string.
      */
-    public function get_date_as_iso(): string {
-        return $this->date->get_iso();
+    public function get_date_formatted(): string {
+        return $this->date->get_iso() . ' ' . $this->date->get_timezone();
     }
 }
