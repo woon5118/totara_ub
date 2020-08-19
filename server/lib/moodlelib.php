@@ -6037,6 +6037,8 @@ function get_mailer($action='get') {
                 $mailer->Body             = "";
                 $mailer->AltBody          = "";
                 $mailer->ConfirmReadingTo = "";
+                $mailer->MessageID        = ""; // Totara: message id must be unique, it cannot be reused!
+                $mailer->MessageDate      = "";
 
                 $mailer->clearAllRecipients();
                 $mailer->clearReplyTos();
