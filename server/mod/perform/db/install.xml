@@ -344,21 +344,6 @@
         <INDEX NAME="notification_recipient_ix" UNIQUE="true" FIELDS="notification_id, core_relationship_id"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="perform_notification_message" COMMENT="Represents a notification message that has been sent">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="sent_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="notification_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="core_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="notification_fk" TYPE="foreign" FIELDS="notification_id" REFTABLE="perform_notification" REFFIELDS="id" ONDELETE="cascade"/>
-        <KEY NAME="core_relationship_fk" TYPE="foreign" FIELDS="core_relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id" ONDELETE="cascade"/>
-      </KEYS>
-    </TABLE>
     <TABLE NAME="perform_manual_relation_selection" COMMENT="Indicates the roles who need to manually choose participant roles">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>

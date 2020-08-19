@@ -231,9 +231,9 @@ function xmldb_perform_upgrade($oldversion) {
         $activities_without_manual = $DB->get_records_sql(
             "
                 SELECT a.*
-                FROM {perform} a 
+                FROM {perform} a
                 LEFT JOIN {perform_manual_relation_selection} mr ON a.id = mr.activity_id
-                WHERE mr.id IS NULL                 
+                WHERE mr.id IS NULL
             "
         );
 
@@ -503,6 +503,16 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020082000, 'perform');
+    }
+
+    if ($oldversion < 2020082600) {
+        $table = new xmldb_table('perform_notification_message');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020082600, 'perform');
     }
 
     return true;

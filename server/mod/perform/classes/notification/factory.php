@@ -31,6 +31,7 @@ use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\details\subject_instance_notification;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\participant_instance;
+use mod_perform\notification\internals\sink;
 use mod_perform\task\service\participant_instance_dto;
 use mod_perform\task\service\subject_instance_dto;
 use stdClass;
@@ -40,10 +41,13 @@ use stdClass;
  */
 abstract class factory {
     /** @var loader|null */
-    protected static $loader;
+    protected static $loader = null;
 
     /** @var clock|null */
-    protected static $clock;
+    protected static $clock = null;
+
+    /** @var sink|null|false */
+    protected static $sink = false;
 
     /**
      * Create a broker instance.
@@ -204,5 +208,21 @@ abstract class factory {
         // Always override the singleton instance.
         self::$clock = new clock();
         return self::$clock;
+    }
+
+    /**
+     * Return the notification message sink for testing.
+     *
+     * @return sink|null the singleton instance or null if not available
+     */
+    public static function create_sink(): ?sink {
+        if (self::$sink === false) {
+            if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+                self::$sink = new sink();
+            } else {
+                self::$sink = null;
+            }
+        }
+        return self::$sink;
     }
 }

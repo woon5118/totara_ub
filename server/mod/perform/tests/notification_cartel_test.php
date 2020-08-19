@@ -23,14 +23,11 @@
  */
 
 use core\orm\query\builder;
-use core\orm\query\sql\query;
 use mod_perform\constants;
 use mod_perform\entities\activity\notification;
-use mod_perform\entities\activity\notification_message;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\expand_task;
 use mod_perform\notification\exceptions\class_key_not_available;
-use mod_perform\notification\cartel;
 use mod_perform\notification\factory;
 use totara_job\job_assignment;
 
@@ -77,34 +74,25 @@ class mod_perform_notification_cartel_testcase extends mod_perform_notification_
         $this->assertEquals(2, subject_instance::repository()->count());
         $cartel = factory::create_cartel_on_participant_instances($entities);
 
-        $repo = function (string $class_key = null) {
-            return builder::table(notification_message::TABLE, 'm')
-                ->where('notification_id', 'IN',
-                    builder::table(notification::TABLE, 'n')
-                        ->select('id')
-                        ->where('class_key', 'IN',
-                            $class_key !== null
-                                ? [$class_key]
-                                : ['mock_one', 'mock_two', 'mock_three']));
-        };
+        $sink = factory::create_sink();
 
-        $repo()->delete();
+        $sink->clear();
         $cartel->dispatch('mock_one');
-        $this->assertEquals(0, $repo('mock_one')->count());
-        $this->assertEquals(0, $repo('mock_two')->count());
-        $this->assertEquals(0, $repo('mock_three')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_one')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_two')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_three')->count());
 
-        $repo()->delete();
+        $sink->clear();
         $cartel->dispatch('mock_two');
-        $this->assertEquals(0, $repo('mock_one')->count());
-        $this->assertEquals(3, $repo('mock_two')->count());
-        $this->assertEquals(0, $repo('mock_three')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_one')->count());
+        $this->assertEquals(3, $sink->get_by_class_key('mock_two')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_three')->count());
 
-        $repo()->delete();
+        $sink->clear();
         $cartel->dispatch('mock_three');
-        $this->assertEquals(0, $repo('mock_one')->count());
-        $this->assertEquals(0, $repo('mock_two')->count());
-        $this->assertEquals(0, $repo('mock_three')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_one')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_two')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_three')->count());
 
         try {
             $cartel->dispatch('mock_zero');

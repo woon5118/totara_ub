@@ -23,9 +23,9 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\notification_message as notification_message_entity;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\notification\factory;
+use mod_perform\notification\internals\message;
 use totara_job\job_assignment;
 
 require_once(__DIR__ . '/notification_testcase.php');
@@ -41,6 +41,7 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $section = $this->create_section($activity);
         $notification = $this->create_notification($activity, 'instance_created', true);
         $relationships = $this->create_section_relationships($section);
+        $sink = factory::create_sink();
 
         $user = $this->getDataGenerator()->create_user(['username' => 'subject']);
         $manager = $this->getDataGenerator()->create_user(['username' => 'manager']);
@@ -57,6 +58,7 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $recipients = notification_recipient::load_by_notification($notification, true);
         $this->assertCount(2, $recipients);
 
+        $sink->clear();
         $dealer = factory::create_dealer_on_notification($notification);
         $this->assertNotNull($dealer);
         $this->redirect_messages();
@@ -83,29 +85,21 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $this->assertNotEmpty($message);
         $this->assertStringContainsString(' you have been selected to participate in the following activity', $message->fullmessage);
 
-        $entities = notification_message_entity::repository()->get();
-        $this->assertCount(2, $entities);
+        $messages = $sink->get_all();
+        $this->assertCount(2, $messages);
 
-        $entity = $entities->find(
-            'core_relationship_id',
-            $this->perfgen->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id
-        );
-        /** @var notification_message_entity $entity */
-        $this->assertNotNull($entity);
-        $this->assertEqualsWithDelta($time, $entity->sent_at, 2);
+        $message = $sink->get_by_relationship(constants::RELATIONSHIP_SUBJECT)->first();
+        /** @var message|null $message */
+        $this->assertNotNull($message);
+        $this->assertEqualsWithDelta($time, $message->sent_at, 2);
 
-        $entity = $entities->find(
-            'core_relationship_id',
-            $this->perfgen->get_core_relationship(constants::RELATIONSHIP_MANAGER)->id
-        );
-        $this->assertNull($entity);
+        $message = $sink->get_by_relationship(constants::RELATIONSHIP_MANAGER)->first();
+        /** @var message|null $message */
+        $this->assertNull($message);
 
-        $entity = $entities->find(
-            'core_relationship_id',
-            $this->perfgen->get_core_relationship(constants::RELATIONSHIP_APPRAISER)->id
-        );
-        /** @var notification_message_entity $entity */
-        $this->assertNotNull($entity);
-        $this->assertEqualsWithDelta($time, $entity->sent_at, 2);
+        $message = $sink->get_by_relationship(constants::RELATIONSHIP_APPRAISER)->first();
+        /** @var message|null $message */
+        $this->assertNotNull($message);
+        $this->assertEqualsWithDelta($time, $message->sent_at, 2);
     }
 }

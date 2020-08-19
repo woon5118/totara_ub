@@ -48,6 +48,8 @@ class composer {
     }
 
     /**
+     * Set the relationship.
+     *
      * @param relationship $relationship
      * @return boolean
      */
@@ -59,6 +61,16 @@ class composer {
         }
         $this->lang_key_prefix = 'template_' .  $this->class_key . '_' . $resolver_idnumber . '_';
         return true;
+    }
+
+    /**
+     * Get the class key of the current instance.
+     *
+     * @return string
+     * @internal Do not use this function in production code!!
+     */
+    public function get_class_key(): string {
+        return $this->class_key;
     }
 
     /**

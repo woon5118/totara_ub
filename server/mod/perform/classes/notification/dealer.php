@@ -30,7 +30,6 @@ use core_user;
 use dml_exception;
 use mod_perform\models\activity\external_participant as external_participant_model;
 use mod_perform\models\activity\notification as notification_model;
-use mod_perform\models\activity\notification_message as notification_message_model;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 use mod_perform\models\activity\participant as participant_model;
 use stdClass;
@@ -104,13 +103,14 @@ class dealer {
     }
 
     /**
-     * Create a historical record.
+     * Save a historical record for testing.
      *
      * @param notification_recipient_model $recipient
      */
     private function save_history(notification_recipient_model $recipient): void {
-        if ($recipient->notification_id) {
-            notification_message_model::create($recipient, time());
+        $sink = factory::create_sink();
+        if ($sink) {
+            $sink->push($recipient, $this->composer, time());
         }
     }
 
