@@ -131,6 +131,7 @@ export default function(editor) {
             'Home',
             'End',
             'Escape',
+            'Spacebar', // For ie11
           ].find(key => key === event.key) !== undefined;
 
         if (hashtag.apply) {
