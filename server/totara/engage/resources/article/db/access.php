@@ -28,7 +28,8 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
-            'user' => CAP_ALLOW
+            'user' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
 
@@ -37,7 +38,8 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
-            'user' => CAP_ALLOW
+            'user' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
 ];

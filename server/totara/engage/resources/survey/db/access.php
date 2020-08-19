@@ -28,7 +28,8 @@ $capabilities = [
         // Each of survey instance will need to be added into a self container of a user.
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
-            'user' => CAP_ALLOW
+            'user' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
 
@@ -36,7 +37,8 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
-            'user' => CAP_ALLOW
+            'user' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
 
@@ -44,7 +46,8 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
-            'user' => CAP_ALLOW
+            'user' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
 
@@ -53,7 +56,8 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
-            'user' => CAP_ALLOW
+            'user' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
 ];

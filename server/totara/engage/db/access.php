@@ -30,6 +30,7 @@ $capabilities = [
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ],
     ],
     /* View engaged users content */
@@ -38,6 +39,7 @@ $capabilities = [
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
             'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
         ],
     ],
 ];
