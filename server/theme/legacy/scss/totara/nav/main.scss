@@ -24,7 +24,7 @@
 .totaraNav {
   margin-bottom: var(--legacy-gap-2);
   box-shadow: var(--legacy-shadow-2);
-  z-index: 1;
+  z-index: var(--legacy-zindex-navbar);
 
   .pagelayout-legacynolayout & {
     margin-bottom: 0;
