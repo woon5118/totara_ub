@@ -14,9 +14,13 @@ Feature: Test performance activity embedded reports
     And I should see "My Activity"
 
     And I navigate to "Manage embedded reports" node in "Site administration > Reports"
-    When I click on "View" "link" in the "Performance Subject Instance (Perform)" "table_row"
+    When I set the field "Report Name value" to "Performance Subject Instance"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
+    And I click on "View" "link" in the "Performance Subject Instance (Perform)" "table_row"
     Then I should see "This report page can only show details for a single activity at a time - to select which activity's report to view,"
 
     And I navigate to "Manage embedded reports" node in "Site administration > Reports"
-    When I click on "View" "link" in the "Participant Instance (Perform)" "table_row"
+    When I set the field "Report Name value" to "Participant Instance"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
+    And I click on "View" "link" in the "Participant Instance (Perform)" "table_row"
     Then I should see "This report page can only show details for a single subject instance at a time - to select which subject instance's report to view,"
