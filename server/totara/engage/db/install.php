@@ -2,7 +2,7 @@
 /**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author  Johannes Cilliers <johannes.cilliers@totaralearning.com>
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package totara_engage
  */
-
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2020081900;          // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017051509;         // Requires this Totara version.
-$plugin->component = 'totara_engage';
+function xmldb_totara_engage_install() {
+    global $CFG;
+    require_once("{$CFG->dirroot}/totara/engage/db/upgradelib.php");
 
-$plugin->dependencies = [
-    'totara_reaction' => 2019081200,
-    'totara_topic'=> 2019112700
-];
+    // Automatically add a new user profile block instance to the user Profile Page.
+    totara_engage_create_engage_profile_block();
+}

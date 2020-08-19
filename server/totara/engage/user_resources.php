@@ -1,0 +1,49 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @package totara_engage
+ */
+require_once(__DIR__ . "/../../config.php");
+global $PAGE, $OUTPUT, $USER;
+
+// Required user's id.
+$user_id = required_param('user_id', PARAM_INT);
+require_login();
+
+if ($user_id == $USER->id) {
+    // Same user origin
+    $your_resource_url = new moodle_url("/totara/engage/your_resources.php");
+    redirect($your_resource_url);
+
+    // Safety die the script
+    die();
+}
+
+
+$target_user = core_user::get_user($user_id, '*', MUST_EXIST);
+$context = context_system::instance();
+
+$PAGE->set_context($context);
+$PAGE->set_url("/totara/engage/user_resources.php", ['user_id' => $user_id]);
+$PAGE->set_title(get_string('usersresources', 'totara_engage', fullname($target_user)));
+
+echo $OUTPUT->header();
+echo $OUTPUT->heading("FIX_ME: to implement user's library page");
+echo $OUTPUT->footer();
