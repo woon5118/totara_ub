@@ -593,4 +593,12 @@ final class workspace extends container implements category_name_provider {
     public function can_move_to_public(): bool {
         return $this->is_public();
     }
+
+    /**
+     * Remove the user
+     */
+    public function remove_user(): void {
+        $this->entity->user_id = null;
+        $this->entity->update();
+    }
 }

@@ -23,9 +23,10 @@
 namespace container_workspace\local;
 
 use container_workspace\exception\workspace_exception;
+use container_workspace\interactor\workspace\category_interactor;
 use container_workspace\interactor\workspace\interactor;
-use container_workspace\member\member;
 use container_workspace\loader\member\loader;
+use container_workspace\member\member;
 use container_workspace\query\member\query;
 use container_workspace\workspace;
 
@@ -67,8 +68,10 @@ final class workspace_helper {
             $category_id = workspace::get_default_category_id();
         }
 
-        $context = \context_coursecat::instance($category_id);
-        if (!has_capability('container/workspace:create', $context, $actor_id)) {
+        $category_interactor = category_interactor::from_category_id($category_id);
+        if ((!$is_private && !$category_interactor->can_create_public()) ||
+            ($is_private && !$category_interactor->can_create_private()) ||
+            ($is_hidden && !$category_interactor->can_create_hidden())) {
             throw workspace_exception::on_create();
         }
 
@@ -106,7 +109,7 @@ final class workspace_helper {
         $manager->enable_self_enrolment();
         $manager->enable_manual_enrolment();
 
-        // Then enrol this very owner as an editing teacher for the workspace.
+        // Then enrol this very owner as an owner for the workspace.
         member::join_workspace($workspace, $actor_id);
 
         if (null !== $draft_id && 0 !== $draft_id) {

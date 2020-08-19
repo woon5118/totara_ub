@@ -24,7 +24,6 @@ mutation container_workspace_request_to_join(
             can_invite
             can_join
             joined
-            workspaces_admin
             own
             can_request_to_join
             has_requested_to_join
@@ -33,6 +32,8 @@ mutation container_workspace_request_to_join(
             can_view_library
             can_view_members
             can_view_member_requests
+            can_share_resources
+            can_unshare_resources
             user {
                 __typename
                 id

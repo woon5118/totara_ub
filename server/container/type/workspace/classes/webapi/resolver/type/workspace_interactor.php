@@ -69,12 +69,6 @@ final class workspace_interactor implements type_resolver {
             case 'joined':
                 return $source->is_joined();
 
-            case 'workspaces_admin':
-                // Todo - capability check against the COURSECAT context - not course context.
-
-                $user_id = $source->get_user_id();
-                return is_siteadmin($user_id);
-
             case 'can_request_to_join':
                 return $source->can_request_to_join();
 
@@ -95,6 +89,12 @@ final class workspace_interactor implements type_resolver {
 
             case 'can_view_member_requests':
                 return $source->can_accept_member_request() && $source->can_decline_member_request();
+
+            case 'can_share_resources':
+                return $source->can_share_resources();
+
+            case 'can_unshare_resources':
+                return $source->can_unshare_resources();
 
             default:
                 debugging("Invalid field '{$field}' that is not in supported yet", DEBUG_DEVELOPER);

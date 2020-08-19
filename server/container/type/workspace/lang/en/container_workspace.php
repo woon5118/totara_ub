@@ -185,11 +185,20 @@ $string['workspace_viewed'] = 'Workspace viewed';
 $string['your_spaces'] = 'Your Workspaces';
 
 // String for capabilities
+$string['workspace:addmember'] = 'Add member to workspace';
 $string['workspace:create'] = 'Create workspace';
+$string['workspace:createhidden'] = 'Create hidden workspace';
+$string['workspace:createprivate'] = 'Create private workspace';
 $string['workspace:delete'] = 'Remove workspace';
-$string['workspace:update'] = 'Update workspace';
+$string['workspace:discussionmanage'] = 'Moderate discussions';
 $string['workspace:invite'] = 'Invite user to workspace';
-$string['workspace:removemember'] = 'Remove user from workspace';
+$string['workspace:joinpublic'] = 'Join a public workspace';
+$string['workspace:joinprivate'] = 'Request to join private workspace';
+$string['workspace:libraryadd'] = 'Link a resource/survey with workspace';
+$string['workspace:libraryremove'] = 'Unlink a resource/survey from workspace';
+$string['workspace:update'] = 'Update workspace';
+$string['workspace:removemember'] = 'Remove member from workspace';
+$string['workspace:owner'] = 'Workspace owner';
 
 // Strings for errors
 $string['error:accept_member_request'] = 'Cannot approve the member request for user {$a}';

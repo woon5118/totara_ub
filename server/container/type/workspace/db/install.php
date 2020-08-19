@@ -17,21 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author Cody Finegan <cody.finegan@totaralearning.com>
  * @package container_workspace
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-/* NOTE: the following version number must be bumped during each major or minor Totara release. */
-
-$plugin->version  = 2020082100;                 // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017051509;                 // Requires this Moodle version.
-$plugin->component = 'container_workspace';          // To check on upgrade, that module sits in correct place
-
-$plugin->dependencies = [
-    'totara_engage' => 2019101202,
-    'editor_weka' => 2019111800,
-    'totara_job' => 2020032300,
-    'totara_comment' => 2019101500
-];
+function xmldb_container_workspace_install() {
+    // Add the workspace roles
+    \container_workspace\util::add_missing_workspace_roles();
+}

@@ -257,6 +257,32 @@ final class container_workspace_generator extends component_generator_base imple
     }
 
     /**
+     * Behat helper to add a user to a workspace
+     *
+     * @param array $parameters
+     */
+    public function create_workspace_owners(array $parameters): void {
+        global $DB;
+
+        if (empty($parameters['username']) || empty($parameters['workspace'])) {
+            throw new \coding_exception('`workspace` and `username` are required');
+        }
+
+        $user = core_user::get_user_by_username($parameters['username']);
+        $workspace_id = $DB->get_field('course', 'id', ['shortname' => strtolower($parameters['workspace'])]);
+        $workspace = workspace::from_id($workspace_id);
+
+        $roles = get_archetype_roles('workspaceowner');
+        if (empty($roles)) {
+            throw new \coding_exception("No role for archetype 'workspaceowner'");
+        }
+        $role = reset($roles);
+
+        $manager = $workspace->get_enrolment_manager();
+        $manager->self_enrol_user($user->id, $role->id);
+    }
+
+    /**
      * @param int $permission
      * @param int $userid
      */
@@ -268,5 +294,4 @@ final class container_workspace_generator extends component_generator_base imple
             assign_capability('container/workspace:create', $permission, $role->id, $user_context, true);
         }
     }
-
 }

@@ -78,8 +78,9 @@ final class interactor {
      * @return bool
      */
     public function can_update(): bool {
-        if (is_siteadmin($this->actor_id)) {
-            // Site admin is a super power actor
+        // If you have the super capability to moderate discussions, you're able to edit regardless of status
+        $workspace_context = $this->discussion->get_workspace()->get_context();
+        if (has_capability('container/workspace:discussionmanage', $workspace_context, $this->actor_id)) {
             return true;
         }
 
@@ -109,8 +110,7 @@ final class interactor {
      * @return bool
      */
     public function can_delete(): bool {
-        if (is_siteadmin($this->actor_id)) {
-            // Site admin is a super power actor
+        if ($this->can_manage()) {
             return true;
         }
 
@@ -150,6 +150,10 @@ final class interactor {
      * @return bool
      */
     public function can_comment(): bool {
+        if ($this->can_manage()) {
+            return true;
+        }
+
         $workspace_id = $this->discussion->get_workspace_id();
         $interactor = workspace_interactor::from_workspace_id($workspace_id, $this->actor_id);
 
@@ -199,7 +203,7 @@ final class interactor {
      * @return bool
      */
     public function can_pin(): bool {
-        if (is_siteadmin($this->actor_id)) {
+        if ($this->can_manage()) {
             return true;
         }
 
@@ -207,5 +211,15 @@ final class interactor {
         $interactor = workspace_interactor::from_workspace_id($workspace_id, $this->actor_id);
 
         return $interactor->is_owner();
+    }
+
+    /**
+     * Super capability to manage discussions. Held by workspace owner & admin typically
+     * @return bool
+     * @throws \coding_exception
+     */
+    private function can_manage(): bool {
+        $workspace_context = $this->discussion->get_workspace()->get_context();
+        return has_capability('container/workspace:discussionmanage', $workspace_context, $this->actor_id);
     }
 }

@@ -2182,6 +2182,10 @@ $string['coursedefaultimage_help'] = 'Set a default image to display in the Grid
 $string['courseimagedefault'] = 'Default image';
 $string['courseimage'] = 'Image';
 $string['courseimage_help'] = 'Upload an image that will get displayed with the course in the Grid Catalogue. If no image is uploaded a default image from theme will be used.';
+$string['workspaceowner'] = 'Workspace owner';
+$string['workspaceownerdescription'] = 'Responsible for managing workspaces, including membership.';
+$string['workspacecreator'] = 'Workspace creator';
+$string['workspacecreatordescription'] = 'Responsible for creating new workspaces.';
 
 // Deprecated since Moodle 3.1.
 $string['filetoolarge'] = 'is too large to upload';

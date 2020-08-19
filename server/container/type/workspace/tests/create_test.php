@@ -22,6 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use container_workspace\exception\workspace_exception;
 use core\webapi\execution_context;
 use totara_webapi\graphql;
 use container_workspace\local\workspace_helper;
@@ -246,5 +247,46 @@ class container_workspace_create_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage("The settings for workspace's access and visibility are miss matched");
         workspace::create($record);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_workspace_capabilities(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $cases = [
+            ['cap' => 'create', 'private' => false, 'hidden' => false],
+            ['cap' => 'createprivate', 'private' => true, 'hidden' => false],
+            ['cap' => 'createhidden', 'private' => true, 'hidden' => true],
+        ];
+
+        $context = \context_coursecat::instance(workspace::get_default_category_id());
+
+        // We're going to make a role to work with
+        $role_id = $this->getDataGenerator()->create_role();
+        $this->getDataGenerator()->role_assign($role_id, $user->id, $context->id);
+
+        foreach ($cases as $case) {
+            // Run it with the permission enabled
+            $capability = 'container/workspace:' . $case['cap'];
+            assign_capability($capability, CAP_ALLOW, $role_id, $context);
+            $workspace = workspace_helper::create_workspace(
+                'Test' . $case['cap'],
+                $user->id
+            );
+
+            $this->assertSame('Test' . $case['cap'], $workspace->get_name());
+
+            // Now deny it
+            assign_capability($capability, CAP_PROHIBIT, $role_id, $context, true);
+
+            $this->expectException(workspace_exception::class);
+            $workspace = workspace_helper::create_workspace(
+                'Test' . $case['cap'],
+                $user->id
+            );
+        }
     }
 }

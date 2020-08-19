@@ -33,7 +33,7 @@
         :styleclass="{ primary: true }"
       />
 
-      <p>
+      <p v-if="canCreate">
         <span>{{ $str('or', 'container_workspace') }}</span>
         <a href="#" @click.prevent="openModal = true">
           {{ $str('create_space', 'container_workspace') }}
@@ -53,6 +53,10 @@ export default {
     ActionLink,
     ModalPresenter,
     WorkspaceModal,
+  },
+
+  props: {
+    canCreate: Boolean,
   },
 
   data() {

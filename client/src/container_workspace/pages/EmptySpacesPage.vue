@@ -34,7 +34,10 @@
       slot-scope="{ units }"
       class="tui-emptySpacesPage__content"
     >
-      <EmptySpacesHeader class="tui-emptySpacesPage__content__header" />
+      <EmptySpacesHeader
+        :can-create="canCreate"
+        class="tui-emptySpacesPage__content__header"
+      />
 
       <hr
         v-if="showRecommended"
@@ -61,6 +64,7 @@ import { notify } from 'tui/notifications';
 
 // GraphQL queries
 import notifications from 'container_workspace/graphql/notifications';
+import getCategoryInteractor from 'container_workspace/graphql/workspace_category_interactor';
 
 export default {
   components: {
@@ -95,12 +99,31 @@ export default {
         });
       },
     },
+
+    categoryInteractor: {
+      query: getCategoryInteractor,
+      variables() {
+        return {
+          workspace_id: null,
+        };
+      },
+      update({ category_interactor }) {
+        return category_interactor;
+      },
+    },
   },
 
   data() {
     return {
       notifications: [],
+      categoryInteractor: {},
     };
+  },
+
+  computed: {
+    canCreate() {
+      return this.categoryInteractor.can_create;
+    },
   },
 
   methods: {

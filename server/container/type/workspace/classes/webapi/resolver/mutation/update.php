@@ -23,8 +23,8 @@
 namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\exception\workspace_exception;
+use container_workspace\interactor\workspace\category_interactor;
 use container_workspace\interactor\workspace\interactor;
-use container_workspace\local\workspace_helper;
 use container_workspace\workspace;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
@@ -66,6 +66,17 @@ final class update implements mutation_resolver {
 
         $is_private = $args['private'] ?? $workspace->is_private();
         $is_hidden = $args['hidden'] ?? $workspace->is_hidden();
+
+        $category_interactor = category_interactor::from_category_id($workspace->category);
+        if ($is_hidden && !$category_interactor->can_create_hidden()) {
+            throw new \coding_exception("Do not have capability to have a hidden workspace");
+        }
+        if ($is_private && !$category_interactor->can_create_private()) {
+            throw new \coding_exception("Do not have capability to have a private workspace");
+        }
+        if ((!$is_private && !$is_hidden) && !$category_interactor->can_create_public()) {
+            throw new \coding_exception("Do not have capability to have a public workspace");
+        }
 
         // Check for the access settings config, to find out if update is possible or not.
         if (!$is_private && $is_hidden) {

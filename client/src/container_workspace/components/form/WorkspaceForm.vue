@@ -78,11 +78,11 @@
             :horizontal="true"
             :required="true"
           >
-            <Radio :value="false">
+            <Radio v-if="canSetPublic" :value="false">
               {{ $str('public', 'container_workspace') }}
             </Radio>
 
-            <Radio :value="true">
+            <Radio v-if="canSetPrivate" :value="true">
               {{ $str('private', 'container_workspace') }}
             </Radio>
           </RadioGroup>
@@ -239,6 +239,14 @@ export default {
       default: true,
     },
     showUnhiddenCheckBox: Boolean,
+    canSetPublic: {
+      type: Boolean,
+      default: true,
+    },
+    canSetPrivate: {
+      type: Boolean,
+      default: true,
+    },
     workspacePrivate: Boolean,
     workspaceHidden: Boolean,
     workspaceId: [String, Number],
@@ -259,7 +267,7 @@ export default {
       },
       descriptionFormat: this.workspaceDescriptionFormat,
       draftId: null,
-      innerWorkspacePrivate: this.workspacePrivate,
+      innerWorkspacePrivate: this.workspacePrivate || !this.canSetPublic,
       innerWorkspaceHidden: this.workspaceHidden || false,
       error: {
         upload: null,

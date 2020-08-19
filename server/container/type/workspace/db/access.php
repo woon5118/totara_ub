@@ -24,48 +24,148 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
+    // Create public workspaces
     'container/workspace:create' => [
-        'captype'=> 'write',
+        'captype' => 'write',
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => [
             'user' => CAP_ALLOW,
+            'workspacecreator' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
 
+    // Create private workspaces
+    'container/workspace:createprivate' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => [
+            'user' => CAP_ALLOW,
+            'workspacecreator' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ]
+    ],
+
+    // Create hidden workspaces
+    'container/workspace:createhidden' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => [
+            'user' => CAP_ALLOW,
+            'workspacecreator' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ]
+    ],
+
+    // Edit the workspace description/title/picture
     'container/workspace:update' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
+            'workspaceowner' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
 
+    // Delete the workspace
     'container/workspace:delete' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
+            'workspaceowner' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
 
+    // Invite other users to join the workspace
     'container/workspace:invite' => [
         'captype' => 'write',
-        'contextlevel'=> CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
+            'workspaceowner' => CAP_ALLOW,
             'student' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
 
+    // Can join public workspaces
+    'container/workspace:joinpublic' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => [
+            'workspaceowner' => CAP_ALLOW,
+            'user' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ]
+    ],
+
+    // Can request to join private workspaces
+    'container/workspace:joinprivate' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => [
+            'workspaceowner' => CAP_ALLOW,
+            'user' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ]
+    ],
+
+    // Can add other members to a workspace (without confirmation)
+    'container/workspace:addmember' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'workspaceowner' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ],
+    ],
+
+    // Can remove members from a workspace
     'container/workspace:removemember' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
+            'workspaceowner' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ],
+    ],
+
+    // Can share resources with a workspace
+    'container/workspace:libraryadd' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'workspaceowner' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ],
+    ],
+
+    // Can unshare resources with a workspace
+    'container/workspace:libraryremove' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'workspaceowner' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ],
+    ],
+
+    // Can manage/moderate all discussions
+    'container/workspace:discussionmanage' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'workspaceowner' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ],
+    ],
+
+    // Owner of a workspace
+    'container/workspace:owner' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'workspaceowner' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
         ],
     ],

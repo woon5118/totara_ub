@@ -1195,6 +1195,8 @@ function get_role_archetypes() {
         'tenantusermanager' => 'tenantusermanager',
         'performanceactivitycreator' => 'performanceactivitycreator',
         'performanceactivitymanager' => 'performanceactivitymanager',
+        'workspacecreator' => 'workspacecreator',
+        'workspaceowner' => 'workspaceowner',
     );
 }
 
@@ -2560,6 +2562,8 @@ function get_default_role_archetype_allows($type, $archetype) {
             'tenantusermanager' => array('tenantusermanager'),
             'performanceactivitycreator' => array(),
             'performanceactivitymanager' => array(),
+            'workspaceowner' => array(),
+            'workspacecreator' => array(),
         ),
         'override' => array(
             'manager'        => array('manager', 'coursecreator', 'editingteacher', 'teacher', 'student', 'guest', 'user', 'frontpage', 'staffmanager', 'assessor', 'regionalmanager', 'regionaltrainer', 'tenantusermanager', 'tenantdomainmanager'),
@@ -2576,6 +2580,8 @@ function get_default_role_archetype_allows($type, $archetype) {
             'tenantusermanager' => array(),
             'performanceactivitycreator' => array(),
             'performanceactivitymanager' => array(),
+            'workspaceowner' => array(),
+            'workspacecreator' => array(),
         ),
         'switch' => array(
             'manager'        => array('editingteacher', 'teacher', 'student', 'guest', 'staffmanager'),
@@ -2592,6 +2598,8 @@ function get_default_role_archetype_allows($type, $archetype) {
             'tenantusermanager' => array(),
             'performanceactivitycreator' => array(),
             'performanceactivitymanager' => array(),
+            'workspaceowner' => array(),
+            'workspacecreator' => array(),
         ),
     );
 
@@ -3917,6 +3925,8 @@ function get_default_contextlevels($rolearchetype) {
         'tenantusermanager' => array(CONTEXT_TENANT),
         'performanceactivitycreator' => array(CONTEXT_SYSTEM, CONTEXT_COURSECAT),
         'performanceactivitymanager' => array(CONTEXT_SYSTEM, CONTEXT_COURSECAT, CONTEXT_COURSE, CONTEXT_MODULE),
+        'workspaceowner' => array(CONTEXT_COURSE),
+        'workspacecreator' => array(CONTEXT_SYSTEM, CONTEXT_COURSECAT),
     );
 
     if (isset($defaults[$rolearchetype])) {
@@ -4871,6 +4881,9 @@ function role_get_name(stdClass $role, $context = null, $rolenamedisplay = ROLEN
             case 'tenantusermanager': $original = get_string('tenantusermanager', 'role'); break;
             case 'performanceactivitycreator': $original = get_string('performanceactivitycreator'); break;
             case 'performanceactivitymanager': $original = get_string('performanceactivitymanager'); break;
+            // Workspace roles
+            case 'workspaceowner': $original = get_string('workspaceowner'); break;
+            case 'workspacecreator': $original = get_string('workspacecreator'); break;
             // We should not get here, the role UI should require the name for custom roles!
             default:                $original = $role->shortname; break;
         }
@@ -4940,6 +4953,9 @@ function role_get_description(stdClass $role) {
         // Performance activity roles
         case 'performanceactivitycreator': return get_string('performanceactivitycreatordescription');
         case 'performanceactivitymanager': return get_string('performanceactivitymanagerdescription');
+        // Workspace roles
+        case 'workspacecreator': return get_string('workspacecreatordescription');
+        case 'workspaceowner': return get_string('workspaceownerdescription');
         default:                return '';
     }
 }

@@ -1009,6 +1009,8 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
+            'workspacecreator' => CAP_ALLOW,
+            'workspaceowner' => CAP_ALLOW,
         )
     ),
 

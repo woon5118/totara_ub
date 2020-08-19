@@ -34,6 +34,10 @@
       <WorkspaceForm
         class="tui-workspaceModal__content__form"
         :submitting="submitting"
+        :can-set-public="canPublic"
+        :can-set-private="canPrivate"
+        :show-private-box="canPrivate"
+        :show-hidden-check-box="canPrivate && canHidden"
         @submit="createWorkspace"
         @cancel="$emit('request-close')"
       />
@@ -49,6 +53,7 @@ import { notify } from 'tui/notifications';
 
 // GraphQL queries
 import createWorkspace from 'container_workspace/graphql/create_workspace';
+import getCategoryInteractor from 'container_workspace/graphql/workspace_category_interactor';
 
 export default {
   components: {
@@ -57,10 +62,48 @@ export default {
     WorkspaceForm,
   },
 
+  apollo: {
+    categoryInteractor: {
+      query: getCategoryInteractor,
+      variables() {
+        return {
+          workspace_id: null,
+        };
+      },
+      update({ category_interactor }) {
+        return category_interactor;
+      },
+    },
+  },
+
   data() {
     return {
       submitting: false,
+      categoryInteractor: {},
     };
+  },
+
+  computed: {
+    /**
+     * Can create private workspaces
+     */
+    canPrivate() {
+      return this.categoryInteractor.can_create_private;
+    },
+
+    /**
+     * Can create hidden workspaces
+     */
+    canHidden() {
+      return this.categoryInteractor.can_create_hidden;
+    },
+
+    /**
+     * Can create public workspaces
+     */
+    canPublic() {
+      return this.categoryInteractor.can_create_public;
+    },
   },
 
   methods: {

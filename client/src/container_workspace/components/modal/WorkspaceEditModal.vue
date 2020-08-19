@@ -47,7 +47,7 @@
         :submit-button-label="$str('save_changes', 'container_workspace')"
         :show-private-box="false"
         :show-hidden-check-box="false"
-        :show-unhidden-check-box="isHidden"
+        :show-unhidden-check-box="isHidden && canUnhide"
         :workspace-private="isPrivate || isHidden"
         :workspace-hidden="isHidden"
         class="tui-workspaceEditModal__content__form"
@@ -69,6 +69,7 @@ import { isPublic, isPrivate, isHidden } from 'container_workspace/index';
 import getWorkspaceRaw from 'container_workspace/graphql/workspace_raw';
 import updateWorkspace from 'container_workspace/graphql/update_workspace';
 import myWorkspaceUrls from 'container_workspace/graphql/my_workspace_urls';
+import getCategoryInteractor from 'container_workspace/graphql/workspace_category_interactor';
 
 export default {
   components: {
@@ -94,12 +95,25 @@ export default {
         };
       },
     },
+
+    categoryInteractor: {
+      query: getCategoryInteractor,
+      variables() {
+        return {
+          workspace_id: this.workspaceId,
+        };
+      },
+      update({ category_interactor }) {
+        return category_interactor;
+      },
+    },
   },
 
   data() {
     return {
       submitting: false,
       workspace: {},
+      categoryInteractor: {},
     };
   },
 
@@ -123,6 +137,13 @@ export default {
      */
     isHidden() {
       return isHidden(this.workspace.access);
+    },
+
+    /**
+     * @return {Boolean}
+     */
+    canUnhide() {
+      return this.categoryInteractor.can_create_hidden;
     },
   },
 

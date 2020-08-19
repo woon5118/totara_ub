@@ -109,7 +109,7 @@ final class member {
     }
 
     /**
-     * If the actor is match with the owner of the workspace, then the actor will be enrolled as editingteacher
+     * If the actor is match with the owner of the workspace, then the actor will be enrolled as workspaceowner
      * role. Otherwise student role will be used for any other user.
      *
      * @param workspace $workspace
@@ -141,7 +141,7 @@ final class member {
         $archetype = 'student';
 
         if ($is_owner) {
-            $archetype = 'editingteacher';
+            $archetype = 'workspaceowner';
         }
 
         $roles = get_archetype_roles($archetype);
@@ -313,6 +313,10 @@ final class member {
 
             if (!has_capability('container/workspace:removemember', $context, $actor_id)) {
                 throw new \coding_exception("No capability to remove the member");
+            }
+
+            if ($user_id == $owner_id) {
+                $workspace->remove_user();
             }
         }
 

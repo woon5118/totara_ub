@@ -37,20 +37,23 @@ use core_container\factory;
 final class interactor {
     /**
      * The workspace's id that we are going to check against.
+     *
      * @var workspace
      */
     private $workspace;
 
     /**
      * The user's id that act as an actor interact with the workspace.
+     *
      * @var int
      */
     private $user_id;
 
     /**
      * actor constructor.
+     *
      * @param workspace $workspace
-     * @param int|null $user_id     If null is set for this field, then user in session will be used.
+     * @param int|null $user_id If null is set for this field, then user in session will be used.
      */
     public function __construct(workspace $workspace, ?int $user_id = null) {
         global $USER;
@@ -83,17 +86,13 @@ final class interactor {
     }
 
     /**
-     * Whether this interactor is an owner of the workspace or not.
+     * Use has the owner capability
+     *
      * @return bool
      */
     public function is_owner(): bool {
-        $owner_id = $this->workspace->get_user_id();
-        if (null === $owner_id) {
-            // Workspace does not have owner.
-            return false;
-        }
-
-        return $owner_id == $this->user_id;
+        $context = $this->workspace->get_context();
+        return has_capability('container/workspace:owner', $context, $this->user_id);
     }
 
     /**
@@ -118,10 +117,6 @@ final class interactor {
      * @return bool
      */
     public function can_update(): bool {
-        if ($this->is_owner()) {
-            return true;
-        }
-
         $context = $this->workspace->get_context();
         return has_capability('container/workspace:update', $context, $this->user_id);
     }
@@ -130,10 +125,6 @@ final class interactor {
      * @return bool
      */
     public function can_delete(): bool {
-        if ($this->is_owner()) {
-            return true;
-        }
-
         $context = $this->workspace->get_context();
         return has_capability('container/workspace:delete', $context, $this->user_id);
     }
@@ -142,11 +133,6 @@ final class interactor {
      * @return bool
      */
     public function can_invite(): bool {
-        if ($this->is_owner()) {
-            // Owner can invite other user.
-            return true;
-        }
-
         if (!$this->can_view_workspace()) {
             return false;
         }
@@ -159,8 +145,8 @@ final class interactor {
      * @return bool
      */
     public function can_join(): bool {
-        if ($this->is_owner() || $this->is_joined()) {
-            // Nope, owner and member is already part of the workspace.
+        if ($this->is_joined()) {
+            // Nope, members cannot join again
             return false;
         }
 
@@ -173,8 +159,9 @@ final class interactor {
             return false;
         }
 
-        // Everyone is able to join the workspace so far now.
-        return true;
+        // Anyone with the capability can join the workspace
+        $context = $this->workspace->get_context();
+        return has_capability('container/workspace:joinpublic', $context, $this->user_id);
     }
 
     /**
@@ -183,27 +170,27 @@ final class interactor {
      * @return bool
      */
     public function can_request_to_join(): bool {
-        if ($this->is_owner() || $this->is_joined()) {
+        if ($this->is_joined()) {
             return false;
         }
 
         if ($this->workspace->is_public()) {
             return false;
-        } else if (!$this->can_view_workspace()) {
+        }
+
+        if (!$this->can_view_workspace()) {
             // Unable to see the workspace meaning that user should not be able to request.
             return false;
         }
 
+        // Hidden workspaces cannot be seen to get a request
         if ($this->workspace->is_hidden()) {
-            // Has to check if the user is able to see hidden workspace or not.
-            $context = $this->workspace->get_context();
-            if (!has_capability('moodle/course:viewhiddencourses', $context, $this->user_id)) {
-                return false;
-            }
+            return false;
         }
 
-        // Every one has the ability to request to join.
-        return true;
+        // Anyone with the capability can join the workspace
+        $context = $this->workspace->get_context();
+        return has_capability('container/workspace:joinprivate', $context, $this->user_id);
     }
 
     /**
@@ -215,6 +202,7 @@ final class interactor {
 
     /**
      * Returning the user's id who is interacting with the workspace so far.
+     *
      * @return int
      */
     public function get_user_id(): int {
@@ -229,12 +217,9 @@ final class interactor {
             return false;
         }
 
-        if (is_siteadmin($this->user_id)) {
-            return true;
-        }
-
-        $owner_id = $this->workspace->get_user_id();
-        return $owner_id == $this->user_id;
+        // Anyone who can add members can accept them
+        $context = $this->workspace->get_context();
+        return has_capability('container/workspace:addmember', $context, $this->user_id);
     }
 
     /**
@@ -249,8 +234,9 @@ final class interactor {
             return true;
         }
 
-        $owner_id = $this->workspace->get_user_id();
-        return $owner_id == $this->user_id;
+        // Anyone who can remove members can decline them
+        $context = $this->workspace->get_context();
+        return has_capability('container/workspace:removemember', $context, $this->user_id);
     }
 
     /**
@@ -350,32 +336,42 @@ final class interactor {
      * @return bool
      */
     public function can_view_discussions(): bool {
-        if (is_siteadmin($this->user_id)) {
+        if ($this->is_owner() || $this->is_joined() || $this->workspace->is_public()) {
             return true;
         }
 
-        return $this->is_owner() || $this->is_joined() || $this->workspace->is_public();
+        // Otherwise you'll need the discussion manage capability (rare)
+        $context = $this->workspace->get_context();
+        return has_capability('container/workspace:discussionmanage', $context, $this->user_id);
     }
 
     /**
      * @return bool
      */
     public function can_view_library(): bool {
-        if (is_siteadmin($this->user_id)) {
-            return true;
-        }
-
-        return $this->is_owner() || $this->is_joined() || $this->workspace->is_public();
+        return $this->workspace->is_public() || $this->is_joined();
     }
 
     /**
      * @return bool
      */
     public function can_view_members(): bool {
-        if (is_siteadmin($this->user_id)) {
-            return true;
-        }
+        return $this->workspace->is_public() || $this->is_joined();
+    }
 
-        return $this->is_owner() || $this->is_joined() || $this->workspace->is_public();
+    /**
+     * @return bool
+     */
+    public function can_share_resources(): bool {
+        $context = $this->workspace->get_context();
+        return has_capability('container/workspace:libraryadd', $context, $this->user_id);
+    }
+
+    /**
+     * @return bool
+     */
+    public function can_unshare_resources(): bool {
+        $context = $this->workspace->get_context();
+        return has_capability('container/workspace:libraryremove', $context, $this->user_id);
     }
 }

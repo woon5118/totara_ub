@@ -27,6 +27,7 @@
       class="tui-workspaceMenu__group"
     >
       <ContributeWorkspace
+        v-if="canCreate"
         slot="heading-side"
         class="tui-workspaceMenu__group__contribute"
         :disabled="$apollo.queries.workspaces.loading"
@@ -67,6 +68,7 @@ import SidePanelNavLinkItem from 'tui/components/sidepanel/SidePanelNavLinkItem'
 
 // GraphQL queries
 import getWorkspaces from 'container_workspace/graphql/my_workspace_urls';
+import getCategoryInteractor from 'container_workspace/graphql/workspace_category_interactor';
 
 export default {
   components: {
@@ -84,6 +86,24 @@ export default {
     workspaces: {
       query: getWorkspaces,
     },
+
+    categoryInteractor: {
+      query: getCategoryInteractor,
+      variables() {
+        return {
+          workspace_id: null,
+        };
+      },
+      update({ category_interactor }) {
+        return category_interactor;
+      },
+    },
+  },
+
+  data() {
+    return {
+      categoryInteractor: {},
+    };
   },
 
   computed: {
@@ -121,6 +141,13 @@ export default {
 
       // Chaining it up to the parent.
       this.$emit('create-workspace', workspace);
+    },
+
+    /**
+     * @returns {boolean}
+     */
+    canCreate() {
+      return this.categoryInteractor.can_create;
     },
   },
 };

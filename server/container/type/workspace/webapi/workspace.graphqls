@@ -9,7 +9,7 @@ type container_workspace_workspace {
   """
   The owner of the workspace.
   """
-  owner: core_user!
+  owner: core_user
   """
   Url to the workspace
   """
@@ -80,10 +80,6 @@ type container_workspace_workspace_interactor {
   """
   joined: Boolean!
   """
-  Whether the user is an admin within workspaces or not.
-  """
-  workspaces_admin: Boolean!
-  """
   Whether the user actor is able to request to join or not.
   """
   can_request_to_join: Boolean!
@@ -111,6 +107,40 @@ type container_workspace_workspace_interactor {
   Whether the user actor is able to view the member requests block or not.
   """
   can_view_member_requests: Boolean!
+  """
+  Whether the user can share items to the workspace library
+  """
+  can_share_resources: Boolean!
+  """
+  Whether the user can unshare items from the workspace library
+  """
+  can_unshare_resources: Boolean!
+}
+
+"""
+All the action available for a user within a workspace category.
+"""
+type container_workspace_workspace_category_interactor {
+  """
+  Current actor.
+  """
+  user: core_user!
+  """
+  Whether the user has capability to create a public workspace or not.
+  """
+  can_create_public: Boolean!
+  """
+  Whether the user has capability to create a private workspace or not.
+  """
+  can_create_private: Boolean!
+  """
+  Whether the user has capability to create a hidden workspace or not.
+  """
+  can_create_hidden: Boolean!
+  """
+  Whether the user has the ability to create any style of workspace or not.
+  """
+  can_create: Boolean!
 }
 
 extend type Query {
@@ -180,6 +210,14 @@ extend type Query {
     workspace_id: param_integer!
     user_id: param_integer
   ): container_workspace_workspace_interactor!
+
+  """
+  Query to get interactor category instance. If no workspace_id is provided, the default is used.
+  """
+  container_workspace_workspace_category_interactor(
+    workspace_id: param_integer
+    user_id: param_integer
+  ): container_workspace_workspace_category_interactor!
 }
 
 enum container_workspace_access {

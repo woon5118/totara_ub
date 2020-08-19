@@ -232,6 +232,14 @@ final class manager {
         $instance = (object) $enrol->to_array();
         $user_id = $user_enrolment->userid;
 
+        // Remove their assigned roles
+        $context = \context_course::instance($enrol->courseid);
+        $roles = get_user_roles($context, $user_id, false);
+
+        foreach ($roles as $role) {
+            role_unassign($role->roleid, $user_id, $context->id, 'container_workspace');
+        }
+
         $plugin->update_user_enrol($instance, $user_id, ENROL_USER_SUSPENDED);
     }
 

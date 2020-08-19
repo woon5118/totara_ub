@@ -89,7 +89,7 @@ export default {
 
   computed: {
     canContribute() {
-      return this.interactor.joined;
+      return this.interactor.can_share_resources;
     },
   },
 
