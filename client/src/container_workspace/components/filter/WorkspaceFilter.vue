@@ -30,6 +30,7 @@
             :show-label="true"
             :options="options.accesses"
             :stacked="stacked"
+            @input="filterChanged"
           />
 
           <SelectFilter
@@ -38,6 +39,7 @@
             :show-label="true"
             :options="options.sources"
             :stacked="stacked"
+            @input="filterChanged"
           />
         </template>
 
@@ -161,6 +163,10 @@ export default {
   methods: {
     submitSearch() {
       this.$emit('submit-search', this.selection);
+    },
+
+    filterChanged() {
+      this.$emit('filter', this.selection);
     },
   },
 };

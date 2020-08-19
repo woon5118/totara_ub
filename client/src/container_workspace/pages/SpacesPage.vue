@@ -34,6 +34,7 @@
       :search-term="inner.searchTerm"
       class="tui-spacesPage__filter"
       @submit-search="updateFilter"
+      @filter="updateFilter"
     />
 
     <SpaceCardsGrid
