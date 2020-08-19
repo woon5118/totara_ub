@@ -34,6 +34,13 @@ defined('MOODLE_INTERNAL') || die();
  * NOTE: This is not a public API - do not use in plugins or 3rd party code!
  */
 final class util {
+    /** @var string delete users when deleting tenant */
+    const DELETE_TENANT_USER_DELETE = 'delete';
+    /** @var string suspend users when deleting tenant */
+    const DELETE_TENANT_USER_SUSPEND = 'suspend';
+    /** @var string migrate users when deleting tenant */
+    const DELETE_TENANT_USER_MIGRATE = 'migrate';
+
     /**
      * Is this a valid tenant name?
      *
@@ -298,15 +305,14 @@ final class util {
     /**
      * Delete tenant.
      *
-     * NOTE: existing users are migrated to global users and suspended,
-     *       top category and audience are kept.
-     *
      * @param int $id
+     * @param string $useraction one of DELETE_TENANT_USER_XXX constants
      * @return bool success
      */
-    public static function delete_tenant(int $id) {
+    public static function delete_tenant(int $id, string $useraction) {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/user/lib.php');
+        require_once($CFG->dirroot . '/cohort/lib.php');
         require_once($CFG->dirroot . '/totara/dashboard/lib.php');
 
         $tenant = $DB->get_record('tenant', ['id' => $id]);
@@ -316,16 +322,51 @@ final class util {
         $context = \context_tenant::instance($tenant->id);
 
         // Migrate users away, do not use transactions, this may take a long time, interruption is not fatal.
-        $DB->set_field('user', 'tenantid', null, ['tenantid' => $tenant->id, 'deleted' => 1]);
-        $users = $DB->get_records('user', ['tenantid' => $tenant->id, 'deleted' => 0], 'id ASC', 'id, suspended');
-        foreach ($users as $user) {
-            if (!$user->suspended) {
-                $user->suspended = 1;
-                user_update_user($user, false, false);
-                \core\session\manager::kill_user_sessions($user->id);
+        // Unfortunately if we get interrupted only part of the users will get migrated/deleted.
+        \core_php_time_limit::raise(60*60);
+        raise_memory_limit(MEMORY_EXTRA);
+
+        if ($useraction === self::DELETE_TENANT_USER_DELETE) {
+            $users = $DB->get_records('user', ['tenantid' => $tenant->id, 'deleted' => 0], 'id ASC', 'id, username');
+            foreach ($users as $user) {
+                delete_user($user);
             }
-            $DB->set_field('user', 'tenantid', null, ['id' => $user->id]);
-            \core\event\user_updated::create_from_userid($user->id)->trigger();
+
+        } else if ($useraction === self::DELETE_TENANT_USER_MIGRATE) {
+            $users = $DB->get_records('user', ['tenantid' => $tenant->id, 'deleted' => 0], 'id ASC', 'id, suspended');
+            foreach ($users as $user) {
+                self::set_user_participation($user->id, []);
+            }
+
+        } else if ($useraction === self::DELETE_TENANT_USER_SUSPEND) {
+            $users = $DB->get_records('user', ['tenantid' => $tenant->id, 'deleted' => 0], 'id ASC', 'id, suspended');
+            foreach ($users as $user) {
+                $logout = false;
+                if (!$user->suspended) {
+                    $logout = true;
+                    $user->suspended = 1;
+                    user_update_user($user, false, true);
+                }
+                self::set_user_participation($user->id, []);
+                if ($logout) {
+                    \core\session\manager::kill_user_sessions($user->id);
+                }
+            }
+
+        } else {
+            throw new \coding_exception('Invalid $useraction parameter');
+        }
+        $DB->set_field('user', 'tenantid', null, ['tenantid' => $tenant->id, 'deleted' => 1]);
+
+        // Prevent partial deletion of tenant, this will error out if any users are added in the meantime.
+        $prevignore = ignore_user_abort(true);
+        $trans = $DB->start_delegated_transaction();
+
+        // For the same of consistency delete all participants from the tenant audience,
+        // otherwise only the tenant members would be removed from the audience when migrating them to regular accounts.
+        $participants = $DB->get_fieldset_select('cohort_members', 'userid', 'cohortid = ?', [$tenant->cohortid]);
+        foreach ($participants as $userid) {
+            cohort_remove_member($tenant->cohortid, $userid);
         }
 
         // Delete dashboards and related blocks.
@@ -334,8 +375,6 @@ final class util {
             $d = new \totara_dashboard($dashboard->id);
             $d->delete();
         }
-
-        $trans = $DB->start_delegated_transaction();
 
         $DB->set_field('course_categories', 'visible', '0', ['id' => $tenant->categoryid]);
         $DB->set_field('cohort', 'component', '', ['id' => $tenant->cohortid]);
@@ -351,6 +390,7 @@ final class util {
 
         \context_helper::build_all_paths(true, false);
 
+        ignore_user_abort($prevignore);
         return true;
     }
 
@@ -422,6 +462,8 @@ final class util {
     /**
      * Adding users to multiple tenants, and removing the current tenants only if the list of
      * tenant ids are not providing any id(s) of the current ones.
+     *
+     * Use empty tenant ids array to make migrate tenant member to regular user.
      *
      * @param int $userid
      * @param int[] $tenantids

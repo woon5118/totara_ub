@@ -27,8 +27,6 @@ require(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 $id = required_param('id', PARAM_INT);
-$confirm = optional_param('confirm', 0, PARAM_BOOL);
-$id = required_param('id', PARAM_INT);
 
 require_login(null, false);
 require_capability('totara/tenant:config', context_system::instance());
@@ -36,14 +34,18 @@ if (empty($CFG->tenantsenabled)) {
     redirect(new moodle_url('/'));
 }
 
-admin_externalpage_setup('tenantsmanage', '', null, new moodle_url('/totara/tenant/tenant_delete.php', ['id' => $id]));
+admin_externalpage_setup('tenantsmanage', '', null, new moodle_url('/totara/tenant/tenant_delete.php', ['id' => $id]), ['pagelayout' => 'noblocks']);
 
 $returnurl = new moodle_url('/totara/tenant/index.php');
 $tenant = \core\record\tenant::fetch($id);
 
-if ($confirm) {
-    require_sesskey();
-    $success = util::delete_tenant($id);
+$confirmform = new \totara_tenant\form\tenant_delete(['id' => $tenant->id], ['tenant' => $tenant]);
+
+if ($confirmform->is_cancelled()) {
+    redirect($returnurl);
+}
+if ($data = $confirmform->get_data()) {
+    $success = util::delete_tenant($data->id, $data->useraction);
     if ($success) {
         redirect($returnurl);
     }
@@ -54,12 +56,17 @@ if ($confirm) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('tenantdelete', 'totara_tenant'));
 
-$a = new stdClass();
-$a->name = format_string($tenant->name);
-$message = get_string('tenantdeleteconfirm', 'totara_tenant', $a);
-
-$yesurl = new moodle_url('/totara/tenant/tenant_delete.php', array('id' => $id, 'confirm' => 1, 'sesskey' => sesskey()));
-$yebutton = new single_button($yesurl, get_string('delete'), 'post', true);
-echo $OUTPUT->confirm($message, $yebutton, $returnurl);
+// Hack alert: create fake confirmation similar to \core_renderer::confirm()
+$output = $OUTPUT->box_start('generalbox modal modal-dialog modal-in-page show', 'notice');
+$output .= $OUTPUT->box_start('modal-content', 'modal-content');
+$output .= $OUTPUT->box_start('modal-header', 'modal-header');
+$output .= html_writer::tag('h4', get_string('confirm'));
+$output .= $OUTPUT->box_end();
+$output .= $OUTPUT->box_start('modal-body', 'modal-body');
+$output .= $confirmform->render();
+$output .= $OUTPUT->box_end();
+$output .= $OUTPUT->box_end();
+$output .= $OUTPUT->box_end();
+echo $output;
 
 echo $OUTPUT->footer();

@@ -250,7 +250,7 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $this->assertSame((string)$coursecatcontext->id, $audience->contextid);
     }
 
-    public function test_delete() {
+    public function test_delete_tenant_delete() {
         global $DB;
 
         /** @var totara_tenant_generator $generator */
@@ -261,9 +261,11 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
 
         $tenant = $generator->create_tenant();
         $user = $this->getDataGenerator()->create_user(['tenantid' => $tenant->id]);
+        $user2 = $this->getDataGenerator()->create_user(['tenantparticipant' => $tenant->idnumber]);
         $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $user->id]));
+        $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $user2->id]));
 
-        util::delete_tenant($tenant->id);
+        util::delete_tenant($tenant->id, util::DELETE_TENANT_USER_DELETE);
         $this->assertFalse($DB->record_exists('tenant', ['id' => $tenant->id]));
 
         $coursecat = $DB->get_record('course_categories', ['id' => $tenant->categoryid], '*', MUST_EXIST);
@@ -274,6 +276,78 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $audience = $DB->get_record('cohort', ['id' => $tenant->cohortid], '*', MUST_EXIST);
         $this->assertSame('1', $audience->cohorttype);
         $this->assertSame('', $audience->component);
+        $this->assertSame(0, $DB->count_records('cohort_members', ['cohortid' => $tenant->cohortid]));
+
+        $user = $DB->get_record('user', ['id' => $user->id], '*', MUST_EXIST);
+        $this->assertSame('1', $user->deleted);
+        $this->assertSame('0', $user->suspended);
+        $this->assertNull($user->tenantid);
+        $this->assertFalse($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $user->id]));
+    }
+
+    public function test_delete_tenant_migrate() {
+        global $DB;
+
+        /** @var totara_tenant_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
+        $generator->enable_tenants();
+
+        $this->setAdminUser();
+
+        $tenant = $generator->create_tenant();
+        $user = $this->getDataGenerator()->create_user(['tenantid' => $tenant->id]);
+        $user2 = $this->getDataGenerator()->create_user(['tenantparticipant' => $tenant->idnumber]);
+        $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $user->id]));
+        $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $user2->id]));
+
+        util::delete_tenant($tenant->id, util::DELETE_TENANT_USER_MIGRATE);
+        $this->assertFalse($DB->record_exists('tenant', ['id' => $tenant->id]));
+
+        $coursecat = $DB->get_record('course_categories', ['id' => $tenant->categoryid], '*', MUST_EXIST);
+        $coursecatcontext = context_coursecat::instance($coursecat->id);
+        $this->assertNull($coursecatcontext->tenantid);
+        $this->assertSame('0', $coursecat->visible);
+
+        $audience = $DB->get_record('cohort', ['id' => $tenant->cohortid], '*', MUST_EXIST);
+        $this->assertSame('1', $audience->cohorttype);
+        $this->assertSame('', $audience->component);
+        $this->assertSame(0, $DB->count_records('cohort_members', ['cohortid' => $tenant->cohortid]));
+
+        $user = $DB->get_record('user', ['id' => $user->id], '*', MUST_EXIST);
+        $usercontext = context_user::instance($user->id);
+        $this->assertSame('0', $user->deleted);
+        $this->assertSame('0', $user->suspended);
+        $this->assertNull($user->tenantid);
+        $this->assertNull($usercontext->tenantid);
+    }
+
+    public function test_delete_tenant_suspend() {
+        global $DB;
+
+        /** @var totara_tenant_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
+        $generator->enable_tenants();
+
+        $this->setAdminUser();
+
+        $tenant = $generator->create_tenant();
+        $user = $this->getDataGenerator()->create_user(['tenantid' => $tenant->id]);
+        $user2 = $this->getDataGenerator()->create_user(['tenantparticipant' => $tenant->idnumber]);
+        $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $user->id]));
+        $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $user2->id]));
+
+        util::delete_tenant($tenant->id, util::DELETE_TENANT_USER_SUSPEND);
+        $this->assertFalse($DB->record_exists('tenant', ['id' => $tenant->id]));
+
+        $coursecat = $DB->get_record('course_categories', ['id' => $tenant->categoryid], '*', MUST_EXIST);
+        $coursecatcontext = context_coursecat::instance($coursecat->id);
+        $this->assertNull($coursecatcontext->tenantid);
+        $this->assertSame('0', $coursecat->visible);
+
+        $audience = $DB->get_record('cohort', ['id' => $tenant->cohortid], '*', MUST_EXIST);
+        $this->assertSame('1', $audience->cohorttype);
+        $this->assertSame('', $audience->component);
+        $this->assertSame(0, $DB->count_records('cohort_members', ['cohortid' => $tenant->cohortid]));
 
         $user = $DB->get_record('user', ['id' => $user->id], '*', MUST_EXIST);
         $usercontext = context_user::instance($user->id);
@@ -281,7 +355,6 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $this->assertSame('1', $user->suspended);
         $this->assertNull($user->tenantid);
         $this->assertNull($usercontext->tenantid);
-        $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $user->id]));
     }
 
     public function test_add_other_participant() {

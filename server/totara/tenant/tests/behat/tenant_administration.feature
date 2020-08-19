@@ -17,6 +17,7 @@ Feature: Tenant administration
       | totara/tenant:config                 | Allow      | tenantadmin  | System       |           |
       | moodle/category:viewhiddencategories | Allow      | tenantadmin  | System       |           |
       | moodle/user:viewalldetails           | Allow      | tenantadmin  | System       |           |
+      | totara/tenant:usercreate             | Allow      | tenantadmin  | System       |           |
       | totara/tenant:view                   | Allow      | tenantviewer | System       |           |
     And the following "users" exist:
       | username     |
@@ -212,3 +213,171 @@ Feature: Tenant administration
     Then "First tenant" row "Tenant identifier" column of "tenants" table should contain "t1"
     Then "Second tenant" row "Tenant identifier" column of "tenants" table should contain "t2"
     And I should not see "Add tenant"
+
+  Scenario: Delete tenant with members suspended
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | tenantsenabled | 1 |
+    And I log out
+    And I log in as "tenantadmin"
+    And I click on "[aria-label='Show admin menu window']" "css_element"
+    And I click on "Tenants" "link" in the "#quickaccess-popover-content" "css_element"
+    And I press "Add tenant"
+    And I set the following Totara form fields to these values:
+      | Name                  | First tenant              |
+      | Tenant identifier     | t1                        |
+      | Description           | Details about this tenant |
+      | Suspended             | 1                         |
+      | Tenant category name  | First T Category          |
+      | Tenant participants audience name | First T Audience |
+      | Tenant dashboard name | First T Dashboard         |
+      | Clone dashboard       | My Learning               |
+    And I press "Add tenant"
+    And I press "Add tenant"
+    And I set the following Totara form fields to these values:
+      | Name                  | Second tenant             |
+      | Tenant identifier     | t2                        |
+      | Description           | Details about this tenant |
+      | Suspended             | 0                         |
+      | Tenant category name  | Second T Category         |
+      | Tenant participants audience name | Second T Audience |
+      | Tenant dashboard name | Second T Dashboard        |
+      | Clone dashboard       | My Learning               |
+    And I press "Add tenant"
+    And I click on "0" "link" in the "First tenant" "table_row"
+    And I press "Create user"
+    And I set the following fields to these values:
+      | Username     | member1              |
+      | New password | Member1+             |
+      | First name   | Test                 |
+      | Surname      | User                 |
+      | Email        | member1@example.com  |
+    And I press "Create user"
+
+    When I click on "[aria-label='Show admin menu window']" "css_element"
+    And I click on "Tenants" "link" in the "#quickaccess-popover-content" "css_element"
+    And I click on "Delete" "link" in the "First tenant" "table_row"
+    And I press "Delete tenant"
+    And I should see "Form could not be submitted, validation failed"
+    And I set the following Totara form fields to these values:
+      | Tenant member status change | Suspend all members |
+    And I press "Delete tenant"
+    Then I should not see "First tenant"
+    And I log out
+    And I log in as "admin"
+    And I navigate to "Manage users" node in "Site administration > Users"
+    And I set the field "User Status" to "Suspended"
+    And I press "id_submitgroupstandard_addfilter"
+    And I should see "Test User"
+
+  Scenario: Delete tenant with members deleted
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | tenantsenabled | 1 |
+    And I log out
+    And I log in as "tenantadmin"
+    And I click on "[aria-label='Show admin menu window']" "css_element"
+    And I click on "Tenants" "link" in the "#quickaccess-popover-content" "css_element"
+    And I press "Add tenant"
+    And I set the following Totara form fields to these values:
+      | Name                  | First tenant              |
+      | Tenant identifier     | t1                        |
+      | Description           | Details about this tenant |
+      | Suspended             | 1                         |
+      | Tenant category name  | First T Category          |
+      | Tenant participants audience name | First T Audience |
+      | Tenant dashboard name | First T Dashboard         |
+      | Clone dashboard       | My Learning               |
+    And I press "Add tenant"
+    And I press "Add tenant"
+    And I set the following Totara form fields to these values:
+      | Name                  | Second tenant             |
+      | Tenant identifier     | t2                        |
+      | Description           | Details about this tenant |
+      | Suspended             | 0                         |
+      | Tenant category name  | Second T Category         |
+      | Tenant participants audience name | Second T Audience |
+      | Tenant dashboard name | Second T Dashboard        |
+      | Clone dashboard       | My Learning               |
+    And I press "Add tenant"
+    And I click on "0" "link" in the "First tenant" "table_row"
+    And I press "Create user"
+    And I set the following fields to these values:
+      | Username     | member1              |
+      | New password | Member1+             |
+      | First name   | Test                 |
+      | Surname      | User                 |
+      | Email        | member1@example.com  |
+    And I press "Create user"
+
+    When I click on "[aria-label='Show admin menu window']" "css_element"
+    And I click on "Tenants" "link" in the "#quickaccess-popover-content" "css_element"
+    And I click on "Delete" "link" in the "First tenant" "table_row"
+    And I press "Delete tenant"
+    And I should see "Form could not be submitted, validation failed"
+    And I set the following Totara form fields to these values:
+      | Tenant member status change | Delete all members |
+    And I press "Delete tenant"
+    Then I should not see "First tenant"
+    And I log out
+    And I log in as "admin"
+    And I navigate to "Manage users" node in "Site administration > Users"
+    And I set the field "User Status" to "any value"
+    And I press "id_submitgroupstandard_addfilter"
+    And I should not see "Test User"
+
+  Scenario: Delete tenant with members migrated
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | tenantsenabled | 1 |
+    And I log out
+    And I log in as "tenantadmin"
+    And I click on "[aria-label='Show admin menu window']" "css_element"
+    And I click on "Tenants" "link" in the "#quickaccess-popover-content" "css_element"
+    And I press "Add tenant"
+    And I set the following Totara form fields to these values:
+      | Name                  | First tenant              |
+      | Tenant identifier     | t1                        |
+      | Description           | Details about this tenant |
+      | Suspended             | 1                         |
+      | Tenant category name  | First T Category          |
+      | Tenant participants audience name | First T Audience |
+      | Tenant dashboard name | First T Dashboard         |
+      | Clone dashboard       | My Learning               |
+    And I press "Add tenant"
+    And I press "Add tenant"
+    And I set the following Totara form fields to these values:
+      | Name                  | Second tenant             |
+      | Tenant identifier     | t2                        |
+      | Description           | Details about this tenant |
+      | Suspended             | 0                         |
+      | Tenant category name  | Second T Category         |
+      | Tenant participants audience name | Second T Audience |
+      | Tenant dashboard name | Second T Dashboard        |
+      | Clone dashboard       | My Learning               |
+    And I press "Add tenant"
+    And I click on "0" "link" in the "First tenant" "table_row"
+    And I press "Create user"
+    And I set the following fields to these values:
+      | Username     | member1              |
+      | New password | Member1+             |
+      | First name   | Test                 |
+      | Surname      | User                 |
+      | Email        | member1@example.com  |
+    And I press "Create user"
+
+    When I click on "[aria-label='Show admin menu window']" "css_element"
+    And I click on "Tenants" "link" in the "#quickaccess-popover-content" "css_element"
+    And I click on "Delete" "link" in the "First tenant" "table_row"
+    And I press "Delete tenant"
+    And I should see "Form could not be submitted, validation failed"
+    And I set the following Totara form fields to these values:
+      | Tenant member status change | Keep as users without tenant |
+    And I press "Delete tenant"
+    Then I should not see "First tenant"
+    And I log out
+    And I log in as "admin"
+    And I navigate to "Manage users" node in "Site administration > Users"
+    And I set the field "User Status" to "Active"
+    And I press "id_submitgroupstandard_addfilter"
+    And I should see "Test User"
