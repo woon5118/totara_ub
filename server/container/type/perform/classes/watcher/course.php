@@ -1,12 +1,4 @@
 <?php
-
-namespace container_perform\watcher;
-
-use container_perform\perform;
-use core_container\hook\base_redirect;
-use core_course\hook\course_edit_view;
-use moodle_url;
-
 /**
  * This file is part of Totara Learn
  *
@@ -26,17 +18,59 @@ use moodle_url;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_userstatus
+ * @package container_perform
  */
+
+namespace container_perform\watcher;
+
+use container_perform\perform;
+use core\notification;
+use core_container\hook\base_redirect;
+use mod_perform\controllers\activity\edit_activity;
+use mod_perform\models\activity\activity;
+use mod_perform\views\override_nav_breadcrumbs;
+use moodle_url;
 
 class course {
 
-    public static function redirect_to_other_page(base_redirect $hook) {
+    /**
+     * Redirect this page back to the activity edit page (if has permission) with an error message.
+     *
+     * @param base_redirect $hook
+     */
+    public static function redirect_with_error(base_redirect $hook): void {
         $container = $hook->get_container();
-        if ($container->is_typeof(perform::get_type())) {
-            // TODO: Add a new page to redirect to with proper error message
-            redirect(new moodle_url('/mod/perform/manage/activity/index.php'));
+        if (!$container->is_typeof(perform::get_type())) {
+            return;
         }
+
+        notification::error('The specified page is not supported by performance activities.');
+
+        $activity = activity::load_by_container_id($container->get_id());
+        if ($activity->can_manage()) {
+            redirect(edit_activity::get_url(['activity_id' => $activity->id]));
+        } else {
+            redirect(new moodle_url('/'));
+        }
+    }
+
+    /**
+     * Show the page, but remove the course navigation and settings blocks.
+     *
+     * @param base_redirect $hook
+     */
+    public static function remove_nav_breadcrumbs(base_redirect $hook): void {
+        global $PAGE;
+
+        $container = $hook->get_container();
+        if (!$container->is_typeof(perform::get_type())) {
+            return;
+        }
+
+        // Context hasn't actually been set yet. Need to do this before removing the navigation nodes.
+        $PAGE->set_context($container->get_context());
+
+        override_nav_breadcrumbs::remove_nav_breadcrumbs($PAGE);
     }
 
 }

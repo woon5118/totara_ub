@@ -23,6 +23,7 @@
 
 namespace mod_perform\views;
 
+use moodle_page;
 use totara_mvc\view;
 use totara_mvc\view_override;
 
@@ -32,8 +33,15 @@ class override_nav_breadcrumbs implements view_override {
      * @inheritDoc
      */
     public function apply(view $view): void {
-        $page = $view->get_page();
+        self::remove_nav_breadcrumbs($view->get_page());
+    }
 
+    /**
+     * Remove course navigation and settings blocks from the page.
+     *
+     * @param moodle_page $page
+     */
+    public static function remove_nav_breadcrumbs(moodle_page $page): void {
         $settings = $page->settingsnav->children;
         // Remove course-related settings blocks.
         $settings->remove('categorysettings');
