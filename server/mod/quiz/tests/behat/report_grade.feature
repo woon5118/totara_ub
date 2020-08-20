@@ -39,6 +39,8 @@ Feature: Check that the Grade display in the Set a quiz to be marked complete wh
   Scenario: Check grade in Record of Learning: Courses report source
     Given I log in as "admin"
     And I navigate to "Manage embedded reports" node in "Site administration > Reports"
+    And I set the field "Report Name value" to "Record of Learning"
+    And I click on "Search" "button" in the ".fitem_actionbuttons" "css_element"
     And I click on "Settings" "link" in the "Record of Learning: Courses (View)" "table_row"
     And I click on "Columns" "link" in the ".tabtree" "css_element"
     And I add the "Grade" column to the report
