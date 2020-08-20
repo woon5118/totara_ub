@@ -53,7 +53,7 @@ class edit_activity extends perform_controller {
         ];
 
         return self::create_tui_view('mod_perform/pages/ManageActivity', $props)
-            ->set_title(get_string('manage_activity_page_title', 'mod_perform'));
+            ->set_title(get_string('manage_activity_for_page_title', 'mod_perform', $this->get_activity_from_param()->name));
     }
 
     public static function get_base_url(): string {

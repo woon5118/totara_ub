@@ -248,6 +248,7 @@ $string['manage_activities_tabs_content'] = 'Content';
 $string['manage_activities_tabs_general'] = 'General';
 $string['manage_activities_tabs_notifications'] = 'Notifications';
 $string['manage_activity_page_title'] = 'Manage performance activity';
+$string['manage_activity_for_page_title'] = 'Manage performance activity: {$a}';
 $string['manage_participation'] = 'Manage participation';
 $string['manage_participation_heading'] = 'Manage participation: “{$a}”';
 $string['manage_participation_no_activities'] = 'No activities to display. When a user whose activity participation you have permission to manage has an instance generated for them, that activity will be listed here.';
