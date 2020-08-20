@@ -787,6 +787,7 @@ $string['eventuserlistviewed'] = 'User list viewed';
 $string['eventuserloggedout'] = 'User logged out';
 $string['eventuserpasswordupdated'] = 'User password updated';
 $string['eventuserprofileviewed'] = 'User profile viewed';
+$string['eventusertenantmembershipchanged'] = 'Tenant membership changed';
 $string['eventuserupdated'] = 'User updated';
 $string['everybody'] = 'Everybody';
 $string['executeat'] = 'Execute at';

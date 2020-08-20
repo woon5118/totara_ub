@@ -24,18 +24,35 @@
 namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
+use mod_perform\models\activity\activity as activity_model;
+use mod_perform\webapi\middleware\require_activity;
+use mod_perform\webapi\middleware\require_manage_capability;
 
-class activity_users_to_assign_count extends activity {
+class activity_users_to_assign_count implements query_resolver, has_middleware {
 
     /**
-     * Fetch the number of users that will be assigned to an activity upon activation.
-     *
-     * @param array $args
-     * @param execution_context $ec
-     * @return int|null
+     * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        return parent::resolve($args, $ec)->get_users_to_assign_count();
+        // The require_activity middleware loads the activity and passes it along via the args
+        /** @var activity_model $activity */
+        $activity = $args['activity'];
+
+        return $activity->get_users_to_assign_count();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_activity_id('activity_id', true),
+            require_manage_capability::class
+        ];
     }
 
 }

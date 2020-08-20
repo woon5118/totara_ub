@@ -103,7 +103,7 @@ class mod_perform_generator extends component_generator_base {
 
         $container_data = new stdClass();
         $container_data->name = $data['container_name'] ?? "test performance container";
-        $container_data->category = util::get_default_category_id();
+        $container_data->category = $data['category'] ?? util::get_default_category_id();
 
         return $DB->transaction(function () use ($data, $container_data) {
             $container = perform_container::create($container_data);

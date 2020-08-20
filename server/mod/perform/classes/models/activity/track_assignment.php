@@ -23,6 +23,7 @@
 
 namespace mod_perform\models\activity;
 
+use coding_exception;
 use core\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\track_assignment as track_assignment_entity;
@@ -33,7 +34,7 @@ use mod_perform\user_groups\grouping;
 
 /**
  * Represents a single performance activity track assignment.
- *
+ * @property-read grouping $group
  * @property-read track $track
  * @property-read \core\orm\collection|track_user_assignment[] $user_assignments
  */
@@ -59,8 +60,9 @@ class track_assignment extends model {
     ];
 
     protected $model_accessor_whitelist = [
-        'track',
         'user_assignments',
+        'track',
+        'group'
     ];
 
     /**
@@ -87,7 +89,7 @@ class track_assignment extends model {
         global $USER;
 
         if (!in_array($type, track_assignment_type::get_allowed())) {
-            throw new \coding_exception("unknown assignment type: '$type'");
+            throw new coding_exception("unknown assignment type: '$type'");
         }
 
         $parent->require_manage('create track assignment');
@@ -114,9 +116,9 @@ class track_assignment extends model {
      * Retrieves assignments by their parent track.
      *
      * @param track $parent parent track.
-     * @param int $type optional assignment type to filter by; one of the
+     * @param int|null $type optional assignment type to filter by; one of the
      *        track_assignment_type enums.
-     * @param grouping $group optional assignment group details to filter by.
+     * @param grouping|null $group optional assignment group details to filter by.
      *
      * @return collection retrieved assignments.
      */
@@ -126,7 +128,7 @@ class track_assignment extends model {
         ?grouping $group = null
     ): collection {
         if ($type && !in_array($type, track_assignment_type::get_allowed())) {
-            throw new \coding_exception("unknown assignment type: '$type'");
+            throw new coding_exception("unknown assignment type: '$type'");
         }
 
         $parent->require_manage('load assignments by track');
@@ -162,17 +164,25 @@ class track_assignment extends model {
     }
 
     /**
-     * {@inheritdoc}
+     * Get the track this assignment belongs to
+     *
+     * @return track
      */
-    public function __get($name) {
-        if ($name === 'group') {
-            return grouping::by_type(
-                $this->entity->user_group_type,
-                $this->entity->user_group_id
-            );
-        }
+    public function get_track(): track {
+        return track::load_by_entity($this->entity->track);
+    }
 
-        return parent::__get($name);
+    /**
+     * Get the group for this assignment
+     *
+     * @return grouping
+     */
+    public function get_group(): grouping {
+        return grouping::by_type(
+            $this->entity->user_group_type,
+            $this->entity->user_group_id,
+            $this
+        );
     }
 
     /**
@@ -211,12 +221,4 @@ class track_assignment extends model {
             ->map_to(track_assignment::class);
     }
 
-    /**
-     * Get the track model that this track assignment belongs to
-     *
-     * @return track the parent track.
-     */
-    public function get_track(): track {
-        return track::load_by_entity($this->entity->track);
-    }
 }

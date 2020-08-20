@@ -51,6 +51,8 @@ class mod_perform_track_assignment_model_testcase extends advanced_testcase {
         $assignment_type = track_assignment_type::ADMIN;
         $assignment = track_assignment::create($track, $assignment_type, $grouping);
 
+        $grouping->set_assignment($assignment);
+
         $this->assertEquals($track->id, $assignment->track_id, 'wrong parent');
         $this->assertEquals($assignment_type, $assignment->type, 'wrong assign type');
         $this->assertEquals($grouping, $assignment->group, 'wrong group');

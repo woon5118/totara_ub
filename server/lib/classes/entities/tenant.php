@@ -18,26 +18,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package core
+ * @package totara_tenant
  */
 
 namespace core\entities;
 
-use context;
+use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 
-interface expandable {
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Tenant entity
+ *
+ * @property string $name
+ * @property string $idnumber
+ * @property string $description
+ * @property string $descriptionformat
+ * @property int $suspended
+ * @property int $categoryid
+ * @property int $cohortid
+ * @property int $timecreated
+ * @property int $usercreated
+ *
+ * @property-read cohort $cohort
+ */
+class tenant extends entity {
+
+    public const CREATED_TIMESTAMP = 'timecreated';
+
+    public const TABLE = 'tenant';
 
     /**
-     * @param context|null $context for multi tenancy compatibility you need to pass a context
-     * @return array
+     * Audience relation
+     *
+     * @return belongs_to
      */
-    public function expand(?context $context = null): array;
-
-    /**
-     * @param int[] $ids
-     * @param context|null $context for multi tenancy compatibility you need to pass a context
-     * @return array
-     */
-    public static function expand_multiple(array $ids, ?context $context = null): array;
+    public function cohort(): belongs_to {
+        return $this->belongs_to(cohort::class, 'cohortid', 'id');
+    }
 
 }

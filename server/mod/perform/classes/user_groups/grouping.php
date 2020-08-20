@@ -23,11 +23,14 @@
 
 namespace mod_perform\user_groups;
 
+use coding_exception;
 use core\entities\cohort;
+use core\entities\expand;
 use core\entities\user;
 use core\orm\entity\entity;
 use hierarchy_organisation\entities\organisation;
 use hierarchy_position\entities\position;
+use mod_perform\models\activity\track_assignment;
 
 /**
  * Convenience class to handle user grouping operations.
@@ -41,6 +44,13 @@ final class grouping {
     public const ORG = 2;
     public const POS = 3;
     public const USER = 4;
+
+    /**
+     * The assignment this grouping belongs to
+     *
+     * @var track_assignment|null
+     */
+    protected $assignment;
 
     /**
      * @var int group id.
@@ -86,25 +96,29 @@ final class grouping {
      *
      * @param int $type the group type.
      * @param int $id the group id.
-     *
-     * @return grouping the grouping.
+     * @param track_assignment|null $assignment
+     * @return self
      */
-    public static function by_type(int $type, int $id): grouping {
+    public static function by_type(
+        int $type,
+        int $id,
+        track_assignment $assignment = null
+    ): grouping {
         switch ($type) {
             case self::COHORT:
-                return self::cohort($id);
+                return self::cohort($id, $assignment);
 
             case self::ORG:
-                return self::org($id);
+                return self::org($id, $assignment);
 
             case self::POS:
-                return self::pos($id);
+                return self::pos($id, $assignment);
 
             case self::USER:
-                return self::user($id);
+                return self::user($id, $assignment);
         }
 
-        throw new \coding_exception("Unknown grouping type: '$type'");
+        throw new coding_exception("Unknown grouping type: '$type'");
     }
 
     /**
@@ -136,44 +150,44 @@ final class grouping {
      * Returns the grouping for a cohort.
      *
      * @param int $id the cohort id.
-     *
+     * @param track_assignment|null $assignment
      * @return grouping the grouping.
      */
-    public static function cohort(int $id): grouping {
-        return new grouping($id, self::COHORT);
+    public static function cohort(int $id, ?track_assignment $assignment = null): grouping {
+        return new grouping($id, self::COHORT, $assignment);
     }
 
     /**
      * Returns the grouping for an organisation.
      *
      * @param int $id the organisation id.
-     *
+     * @param track_assignment|null $assignment
      * @return grouping the grouping.
      */
-    public static function org(int $id): grouping {
-        return new grouping($id, self::ORG);
+    public static function org(int $id, ?track_assignment $assignment = null): grouping {
+        return new grouping($id, self::ORG, $assignment);
     }
 
     /**
      * Returns the grouping for a position.
      *
      * @param int $id the position id.
-     *
+     * @param track_assignment|null $assignment
      * @return grouping the grouping.
      */
-    public static function pos(int $id): grouping {
-        return new grouping($id, self::POS);
+    public static function pos(int $id, ?track_assignment $assignment = null): grouping {
+        return new grouping($id, self::POS, $assignment);
     }
 
     /**
      * Returns the grouping for an individual user.
      *
      * @param int $id the user.
-     *
+     * @param track_assignment|null $assignment
      * @return grouping the grouping.
      */
-    public static function user(int $id): grouping {
-        return new grouping($id, self::USER);
+    public static function user(int $id, ?track_assignment $assignment = null): grouping {
+        return new grouping($id, self::USER, $assignment);
     }
 
     /**
@@ -229,10 +243,12 @@ final class grouping {
      *
      * @param int $id group id.
      * @param int $type grouping type.
+     * @param track_assignment|null $assignment
      */
-    private function __construct(int $id, int $type) {
+    private function __construct(int $id, int $type, ?track_assignment $assignment = null) {
         $this->id = $id;
         $this->type = $type;
+        $this->assignment = $assignment;
 
         $lang_string_key = null;
         switch ($type) {
@@ -316,12 +332,17 @@ final class grouping {
      * @return int the group size.
      */
     public function get_size(): int {
+        $context = null;
+        if ($this->assignment) {
+            $context = $this->assignment->track->activity->get_context();
+        }
         if (is_null($this->size)) {
             if ($this->type === self::USER) {
                 $this->size = 1;
             } else {
+                /** @var expand|entity $entity */
                 $entity = self::get_entity_class_by_user_group_type($this->type);
-                $this->size = count($entity::expand_multiple([$this->id]));
+                $this->size = count($entity::expand_multiple([$this->id], $context));
             }
         }
 
@@ -354,9 +375,24 @@ final class grouping {
         }
 
         if (!class_exists($class_name)) {
-            throw new \coding_exception('Invalid entity found!');
+            throw new coding_exception('Invalid entity found!');
         }
 
         return $class_name;
+    }
+
+    /**
+     * Set the assignment this group belongs to
+     *
+     * @param track_assignment $assignment
+     * @return $this
+     */
+    public function set_assignment(track_assignment $assignment): self {
+        if (!is_null($this->assignment)) {
+            throw new coding_exception('The assignment is already set for this grouping.');
+        }
+        $this->assignment = $assignment;
+
+        return $this;
     }
 }

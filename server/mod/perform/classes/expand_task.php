@@ -23,23 +23,25 @@
 
 namespace mod_perform;
 
+use context;
 use core\entities\expandable;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
+use mod_perform\dates\constants;
 use mod_perform\dates\resolvers\anniversary_of;
-use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_assignment_repository;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\entities\activity\track_user_assignment_via;
 use mod_perform\event\track_user_assigned_bulk;
 use mod_perform\event\track_user_unassigned;
+use mod_perform\models\activity\activity;
+use mod_perform\models\activity\track;
 use mod_perform\task\expand_task\assignment_parameters;
 use mod_perform\task\expand_task\assignment_parameters_collection;
 use mod_perform\task\service\track_schedule_sync;
 use mod_perform\user_groups\grouping;
-use mod_perform\dates\constants;
 
 class expand_task {
 
@@ -126,7 +128,13 @@ class expand_task {
         // already exists.
         $existing_user_assignments = $this->load_current_entries($assignment);
 
-        $expanded_user_ids = $this->get_expanded_users($assignment->user_group_type, $assignment->user_group_id);
+        $context = activity::load_by_entity($assignment->track->activity)->get_context();
+
+        $expanded_user_ids = $this->get_expanded_users(
+            $assignment->user_group_type,
+            $assignment->user_group_id,
+            $context
+        );
 
         $track = track::load_by_entity($assignment->track);
         $assignment_parameter_collection = $this->get_assignment_parameters_collection($track, $expanded_user_ids);
@@ -185,13 +193,18 @@ class expand_task {
      * Expand the user group. We cache the result of the user groups to speed up subsequent assignments for
      * the same user group (but with a different track)
      *
-     * @param string $user_group_type one of the grouping enums.
+     * @param int $user_group_type one of the grouping enums.
      * @param int $user_group_id
+     * @param context $context we need the context for multi tenancy compatibility
      * @return array
      */
-    private function get_expanded_users(int $user_group_type, int $user_group_id): array {
+    private function get_expanded_users(
+        int $user_group_type,
+        int $user_group_id,
+        context $context
+    ): array {
         if (!$expanded_records = $this->get_cache_entry($user_group_type, $user_group_id)) {
-            $expanded_records = $this->expand_entity($user_group_type, $user_group_id);
+            $expanded_records = $this->expand_entity($user_group_type, $user_group_id, $context);
             $this->add_cache_entry($user_group_type, $user_group_id, $expanded_records);
         }
         return $expanded_records;
@@ -253,9 +266,10 @@ class expand_task {
      *
      * @param string $type
      * @param int $target_id
+     * @param context $context we need the context for multi tenancy compatibility
      * @return array
      */
-    private function expand_entity(string $type, int $target_id): array {
+    private function expand_entity(string $type, int $target_id, context $context): array {
         /** @var entity $class_name */
         $class_name = grouping::get_entity_class_by_user_group_type($type);
         if (is_subclass_of($class_name, expandable::class)) {
@@ -271,7 +285,7 @@ class expand_task {
                 // of all users still assigned to that group
                 return [];
             }
-            return $entity->expand();
+            return $entity->expand($context);
         }
         return [$target_id];
     }

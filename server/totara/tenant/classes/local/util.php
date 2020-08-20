@@ -24,6 +24,7 @@
 namespace totara_tenant\local;
 
 use context_helper;
+use core\event\user_tenant_membership_changed;
 use core\record\tenant;
 
 defined('MOODLE_INTERNAL') || die();
@@ -504,6 +505,19 @@ final class util {
         $trans->allow_commit();
 
         if ($moved) {
+            $event = user_tenant_membership_changed::create([
+                'objectid' => $user->id,
+                'context' => $usercontext,
+                'relateduserid' => $user->id,
+                'other' => [
+                    'oldtenantid' => $user->tenantid,
+                    'newtenantid' => null
+                ]
+            ]);
+            $event->trigger();
+        }
+
+        if ($moved) {
             \core\session\manager::kill_user_sessions($user->id);
         }
     }
@@ -560,6 +574,17 @@ final class util {
         }
 
         $trans->allow_commit();
+
+        $event = user_tenant_membership_changed::create([
+            'objectid' => $user->id,
+            'context' => $usercontext,
+            'relateduserid' => $user->id,
+            'other' => [
+                'oldtenantid' => $user->tenantid,
+                'newtenantid' => $tenantid
+            ]
+        ]);
+        $event->trigger();
 
         \core\session\manager::kill_user_sessions($user->id);
     }

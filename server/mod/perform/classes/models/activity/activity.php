@@ -574,7 +574,10 @@ class activity extends model {
         // Expand each user group for the total user count.
         foreach ($user_groups as $user_group_type => $user_group_ids) {
             /** @var expandable $user_group_type */
-            $user_ids[] = $user_group_type::expand_multiple($user_group_ids);
+            $user_ids[] = $user_group_type::expand_multiple(
+                $user_group_ids,
+                $this->get_context()
+            );
         }
         $user_ids = array_unique(array_merge(...$user_ids));
 

@@ -22,6 +22,7 @@
  * @category test
  */
 
+use core\entities\tenant;
 use core\entities\user;
 use core\orm\entity\repository as entity_repository;
 use core\orm\query\builder;
@@ -30,7 +31,6 @@ use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
 use mod_perform\entities\activity\activity;
-use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_user_assignment;
@@ -38,11 +38,15 @@ use mod_perform\event\track_user_assigned_bulk;
 use mod_perform\event\track_user_unassigned;
 use mod_perform\expand_task;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\models\activity\track_status;
 use mod_perform\state\activity\draft;
 use mod_perform\user_groups\grouping;
+use mod_perform\util;
 use totara_core\dates\date_time_setting;
+use totara_job\job_assignment;
+use totara_tenant\local\util as tenant_util;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -106,6 +110,114 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         // Should have been expanded
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        // Should have been expanded
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user2->id);
+    }
+
+    public function test_expand_single_audience_assignment_with_multi_tenancy_enabled(): void {
+        $test_data = $this->prepare_assignments_for_multi_tenancy();
+
+        $track1_id = $test_data->track1->id;
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // No user added to cohort so nothing should happen
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // Add the users to the cohort
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        // This should now result in a user assignment
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
+        // The other user is not in a cohort yet
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
+        // The other user is in a different tenant so is not expanded
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+    }
+
+    public function test_expand_single_position_assignment_with_multi_tenancy_enabled(): void {
+        $test_data = $this->prepare_assignments_for_multi_tenancy();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $fw = $hierarchy_generator->create_pos_frame(['fullname' => 'FW 1']);
+        $pos = $hierarchy_generator->create_pos(['frameworkid' => $fw->id]);
+
+        $assignment = new track_assignment([
+            'track_id' => $test_data->track1->id,
+            'type' => track_assignment_type::ADMIN,
+            'user_group_type' => grouping::POS,
+            'user_group_id' => $pos->id,
+            'created_by' => 0,
+            'expand' => true,
+        ]);
+        $assignment->save();
+
+        $track1_id = $test_data->track1->id;
+
+        // No user added to cohort so nothing should happen
+        (new expand_task())->expand_single($assignment->id);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+
+        // Assign both users to the same job assignment
+        job_assignment::create([
+            'userid' => $test_data->user1->id,
+            'idnumber' => 'job1',
+            'positionid' => $pos->id
+        ]);
+
+        job_assignment::create([
+            'userid' => $test_data->user2->id,
+            'idnumber' => 'job2',
+            'positionid' => $pos->id
+        ]);
+
+        // This should now result in a user assignment
+        (new expand_task())->expand_single($assignment->id);
+
+        // Only the first user is assigned as he's in the same tenant as the activity
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+
+        // Now migrate user 1 to tenant 2
+        tenant_util::migrate_user_to_tenant($test_data->user1->id, $test_data->tenant2->id);
+
+        (new expand_task())->expand_single($assignment->id);
+
+        // Now the user should have a deleted assignment
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+
+        // Expand and check that it's still the same
+        $assignment->expand = true;
+        $assignment->save();
+
+        (new expand_task())->expand_single($assignment->id);
+
+        // Now the user should have a deleted assignment
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
     }
 
     public function test_expand_single_assignment_based_on_job_assignment(): void {
@@ -1045,5 +1157,88 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         return $test_data;
     }
+
+    private function prepare_assignments_for_multi_tenancy(
+        $subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT
+    ) {
+        $test_data = new class() {
+            public $tenant1, $tenant2;
+            public $user1, $user2;
+            public $cohort1, $cohort2;
+            public $activity1;
+            public $track1;
+            public $assignment1, $assignment2;
+        };
+
+        $generator = $this->getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $generator->get_plugin_generator('mod_perform');
+
+        $this->setAdminUser();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+
+        $tenant_generator->enable_tenants();
+
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        $test_data->tenant1 = new tenant($tenant1);
+        $test_data->tenant2 = new tenant($tenant2);
+
+        $tenant1_category_context = context_coursecat::instance($test_data->tenant1->categoryid);
+        $tenant2_category_context = context_coursecat::instance($test_data->tenant2->categoryid);
+
+        $test_data->user1 = $this->generator()->create_user(['tenantid' => $test_data->tenant1->id]);
+        $test_data->user2 = $this->generator()->create_user(['tenantid' => $test_data->tenant2->id]);
+        $test_data->cohort1 = $this->generator()->create_cohort(['contextid' => $tenant1_category_context->id]);
+        $test_data->cohort2 = $this->generator()->create_cohort(['contextid' => $tenant2_category_context->id]);
+
+        // Make sure we have the categories created
+        $this->setUser($test_data->user1);
+        $default_category_id1 = util::get_default_category_id();
+
+        $this->setUser($test_data->user2);
+        $default_category_id2 = util::get_default_category_id();
+
+        $this->setAdminUser();
+
+        // Activity is in tenant 1
+        $test_data->activity1 = $perform_generator->create_activity_in_container([
+            'category' => $default_category_id1
+        ]);
+
+        $test_data->track1 = $perform_generator
+            ->create_activity_tracks($test_data->activity1)
+            ->first();
+
+        $track1 = new track_entity($test_data->track1->id);
+        $track1->subject_instance_generation = $subject_instance_generation;
+        $track1->save();
+
+        $test_data->assignment1 = new track_assignment([
+            'track_id' => $test_data->track1->id,
+            'type' => track_assignment_type::ADMIN,
+            'user_group_type' => grouping::COHORT,
+            'user_group_id' => $test_data->cohort1->id,
+            'created_by' => 0,
+            'expand' => true,
+        ]);
+        $test_data->assignment1->save();
+
+        $test_data->assignment2 = new track_assignment([
+            'track_id' => $test_data->track1->id,
+            'type' => track_assignment_type::ADMIN,
+            'user_group_type' => grouping::COHORT,
+            'user_group_id' => $test_data->cohort2->id,
+            'created_by' => 0,
+            'expand' => false
+        ]);
+        $test_data->assignment2->save();
+
+        return $test_data;
+    }
+
 
 }

@@ -23,6 +23,7 @@
 
 namespace totara_competency;
 
+use context_system;
 use core\entities\expandable;
 use core\orm\collection;
 use core\orm\entity\entity;
@@ -269,7 +270,7 @@ class expand_task {
                 // of all users still assigned to that group
                 return [];
             }
-            return $entity->expand();
+            return $entity->expand(context_system::instance());
         }
         return [$target_id];
     }
