@@ -51,7 +51,7 @@ abstract class expanded_users_testcase extends advanced_testcase {
             public $user1, $user2, $user3, $user4, $user5;
             public $user6, $user7, $user8, $user9, $user10;
             public $user11, $user12, $user13, $user14, $user15;
-            public $user16, $user17, $user18;
+            public $user16, $user17, $user18, $user19, $user20;
             public $cohort1, $cohort2;
             public $pos1, $pos2;
             public $org1, $org2;
@@ -164,6 +164,9 @@ abstract class expanded_users_testcase extends advanced_testcase {
         $data->user16 = $generator->create_user();
         $data->user17 = $generator->create_user();
         $data->user18 = $generator->create_user();
+
+        $data->user19 = $generator->create_user(['firstname' => 'Omaru', 'lastname' => 'Fog']);
+        $data->user20 = $generator->create_user(['firstname' => 'Tomaru', 'lastname' => 'Cloud']);
 
         return $data;
     }

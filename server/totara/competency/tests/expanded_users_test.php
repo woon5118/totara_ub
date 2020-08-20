@@ -225,7 +225,33 @@ class core_expanded_users_testcase extends expanded_users_testcase {
             ->fetch_paginated(0);
 
         foreach ($expanded_users as $user) {
-            $this->assertRegExp("/{$data->user16->firstname}/", $user['firstname']);
+            $this->assertRegExp("/{$data->user16->firstname}/i", $user['firstname']);
+        }
+    }
+
+    /**
+     * Tests a bug in the previous test caused by case-sensitive matching.
+     */
+    public function test_expanded_users_filtered_by_name_case_sensitive() {
+        $data = $this->generate_data();
+
+        // Combination of all
+        $expanded_users = (new expanded_users())
+            ->set_audience_ids([$data->cohort1->id])
+            ->set_organisation_ids([$data->org2->id])
+            ->set_position_ids([$data->pos1->id])
+            ->set_user_ids([$data->user19->id, $data->user20->id])
+            ->filter_by_name($data->user19->firstname)
+            ->fetch_paginated(0);
+
+        $this->assertCount(2, $expanded_users);
+        foreach ($expanded_users as $user) {
+            if ($user['firstname'] == 'Tomaru') {
+                $this->assertNotRegExp("/{$data->user19->firstname}/", $user['firstname']);
+                $this->assertRegExp("/{$data->user19->firstname}/i", $user['firstname']);
+            } else {
+                $this->assertRegExp("/{$data->user19->firstname}/", $user['firstname']);
+            }
         }
     }
 
