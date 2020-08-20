@@ -16,14 +16,18 @@
   @module performelement_short_text
 -->
 <template>
-  <ElementAdminForm :type="type" :error="error" @remove="$emit('remove')">
+  <ElementAdminForm
+    :type="type"
+    :error="error"
+    :activity-state="activityState"
+    @remove="$emit('remove')"
+  >
     <template v-slot:content>
       <div class="tui-elementEditShortText">
         <Uniform
           v-slot="{ getSubmitting }"
           :initial-values="initialValues"
           :vertical="true"
-          :activity-state="activityState"
           validation-mode="submit"
           input-width="full"
           @submit="handleSubmit"
