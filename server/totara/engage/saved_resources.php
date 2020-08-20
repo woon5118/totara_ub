@@ -29,10 +29,13 @@ global $USER, $OUTPUT, $PAGE;
 require_login();
 advanced_feature::require('engage_resources');
 
+$context = \context_user::instance($USER->id);
+require_capability('totara/engage:viewlibrary', $context, $USER->id);
+
 $title = get_string('savedresources', 'totara_engage');
 
 // Set page properties.
-$PAGE->set_context(\context_user::instance($USER->id));
+$PAGE->set_context($context);
 $PAGE->set_title($title);
 $PAGE->set_pagelayout('legacynolayout');
 $PAGE->set_url(new moodle_url('/totara/engage/saved_resources.php'));

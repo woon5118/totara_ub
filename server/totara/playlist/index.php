@@ -30,10 +30,13 @@ use totara_playlist\totara_engage\link\nav_helper;
 use totara_tui\output\component;
 
 require_once(__DIR__ . "/../../config.php");
-global $OUTPUT, $PAGE;
+global $OUTPUT, $PAGE, $USER;
 
 require_login();
 advanced_feature::require('engage_resources');
+
+$context = \context_user::instance($USER->id);
+require_capability('totara/engage:viewlibrary', $context, $USER->id);
 
 $id = required_param('id', PARAM_INT);
 $library_view = optional_param('libraryView', false, PARAM_BOOL);

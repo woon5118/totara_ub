@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    /* View resource content */
+    // View resource content
     'totara/engage:view_resource_reporting' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -33,13 +33,21 @@ $capabilities = [
             'tenantdomainmanager' => CAP_ALLOW,
         ],
     ],
-    /* View engaged users content */
+    // View engaged users content
     'totara/engage:view_engagedusers_reporting' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
+        ],
+    ],
+    // View engage library
+    'totara/engage:viewlibrary' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'user' => CAP_ALLOW,
         ],
     ],
 ];

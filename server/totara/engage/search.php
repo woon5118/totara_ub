@@ -29,6 +29,9 @@ global $USER, $OUTPUT, $PAGE;
 require_login();
 advanced_feature::require('engage_resources');
 
+$context = \context_user::instance($USER->id);
+require_capability('totara/engage:viewlibrary', $context, $USER->id);
+
 $search = optional_param('search', '', PARAM_TEXT);
 
 // Set page properties.

@@ -101,10 +101,13 @@ final class playlist extends provider {
             $access_items = [];
         }
 
+        // Library capability should be enabled
+        $can_view = has_capability('totara/engage:viewlibrary', \context_user::instance($USER->id), $USER->id);
+
         // Lightweight visibility checks.
         // Note: the visibility is being checked in a local switch like this to avoid several class loads.
         foreach ($objects as $object) {
-            if (!isset($access_items[$object->objectid])) {
+            if (!isset($access_items[$object->objectid]) || !$can_view) {
                 // No visibility was found. Therefore, we will skip it.
                 $results[$object->objectid] = false;
                 continue;

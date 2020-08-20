@@ -29,6 +29,9 @@ global $USER, $OUTPUT, $PAGE;
 require_login();
 advanced_feature::require('engage_resources');
 
+$context = \context_user::instance($USER->id);
+require_capability('totara/engage:viewlibrary', $context, $USER->id);
+
 $title = get_string('sharedwithyou', 'totara_engage');
 
 // Set page properties.

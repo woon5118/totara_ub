@@ -249,6 +249,7 @@ $string['error:updatequestion'] = "Cannot update the question";
 
 //Capability string
 $string['engage:view_engagedusers_reporting'] = 'View report for the most engaged users';
+$string['engage:viewlibrary'] = 'View library';
 $string['engage:view_resource_reporting'] = 'View report for the most engaging content';
 
 // Strings for message component

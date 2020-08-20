@@ -99,10 +99,13 @@ final class article extends provider {
         $cache = \cache::make('engage_article', 'catalog_visibility');
         $cached_access_items = $cache->get($USER->id);
 
+        // Library capability should be enabled
+        $can_view = has_capability('totara/engage:viewlibrary', \context_user::instance($USER->id), $USER->id);
+
         // Lightweight visibility checks.
         // Note: the visibility is being checked in a local switch like this to avoid several class loads.
         foreach ($objects as $object) {
-            if (!isset($cached_access_items[$object->objectid])) {
+            if (!isset($cached_access_items[$object->objectid]) || !$can_view) {
                 // The object is not appearing in the list of access-able items.
                 $results[$object->objectid] = false;
                 continue;

@@ -31,6 +31,9 @@ global $OUTPUT, $PAGE, $USER;
 require_login();
 advanced_feature::require('engage_resources');
 
+$context = \context_user::instance($USER->id);
+require_capability('totara/engage:viewlibrary', $context, $USER->id);
+
 $id = required_param("id", PARAM_INT);
 $page = optional_param("page", 'vote', PARAM_ALPHA);
 $source = optional_param("source", '', PARAM_TEXT);

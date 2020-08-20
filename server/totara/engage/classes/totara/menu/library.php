@@ -51,6 +51,7 @@ class library extends \totara_core\totara\menu\item {
     }
 
     protected function check_visibility() {
+        global $USER;
         if (!isloggedin() or isguestuser()) {
             return false;
         }
@@ -59,7 +60,8 @@ class library extends \totara_core\totara\menu\item {
             return false;
         }
 
-        return true;
+        $context = \context_user::instance($USER->id);
+        return has_capability('totara/engage:viewlibrary', $context, $USER->id);
     }
 
     protected function get_default_parent() {
