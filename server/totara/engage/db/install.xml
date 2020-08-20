@@ -39,7 +39,6 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="user_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" ONDELETE="cascade"/>
-        <KEY NAME="resource_fk" TYPE="foreign" FIELDS="resourceid" REFTABLE="engage_resource" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="user_resource_idx" UNIQUE="true" FIELDS="resourceid, userid"/>
