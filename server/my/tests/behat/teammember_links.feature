@@ -22,7 +22,7 @@ Feature: Show only links to member information the manager has permission to see
     Given I log in as "manager1"
     When I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
-    And I should see the "Picture of User 1" image in the "User 1" "table_row"
+    And I should see the "User 1" image in the "User 1" "table_row"
     And "Plans" "link" should exist in the "User 1" "table_row"
     And "Profile" "link" should exist in the "User 1" "table_row"
     And "Bookings" "link" should exist in the "User 1" "table_row"
@@ -75,7 +75,7 @@ Feature: Show only links to member information the manager has permission to see
     And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Appraisals (legacy)" "link" should not exist in the "User 1" "table_row"
-    And I should see the "Picture of User 1" image in the "User 1" "table_row"
+    And I should see the "User 1" image in the "User 1" "table_row"
     And "Plans" "link" should exist in the "User 1" "table_row"
     And "Profile" "link" should exist in the "User 1" "table_row"
     And "Bookings" "link" should exist in the "User 1" "table_row"
