@@ -387,11 +387,15 @@ export default {
     },
 
     searchOnChange(value) {
-      if (value) {
+      if (value.length === 1 && this.filters.parent_id !== null) {
         Object.assign(this.cachedFilters, this.filters);
+      }
+
+      if (value) {
         this.filters.parent_id = null;
       } else {
         this.filters.parent_id = this.cachedFilters.parent_id;
+        this.cachedFilters = {};
       }
     },
 
