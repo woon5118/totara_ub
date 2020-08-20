@@ -50,3 +50,5 @@ $string['response_required_help'] = "Rating scale questions always require an an
 // Errors
 $string['error:answer_invalid'] = 'Answer is not valid';
 $string['error:answer_required'] = 'Answer is required';
+$string['error:question_required'] = 'Question is required';
+$string['error:question_length_exceeded'] = 'Question text is too long';
