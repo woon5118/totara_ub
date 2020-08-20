@@ -483,5 +483,27 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020081900, 'perform');
     }
 
+    if ($oldversion < 2020082000) {
+
+        $DB->execute("
+            UPDATE {report_builder}
+               SET source = 'subject_instance_manage_participation'
+             WHERE source = 'perform_restricted_subject_instance'
+        ");
+        $DB->execute("
+            UPDATE {report_builder}
+               SET source = 'participant_section_manage_participation'
+             WHERE source = 'perform_restricted_participant_section'
+        ");
+        $DB->execute("
+            UPDATE {report_builder}
+               SET source = 'participant_instance_manage_participation'
+             WHERE source = 'perform_restricted_participant_instance'
+        ");
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020082000, 'perform');
+    }
+
     return true;
 }
