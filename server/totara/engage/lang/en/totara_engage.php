@@ -115,6 +115,7 @@ $string['engage'] = 'Engage';
 $string['engage_category'] = 'Social';
 $string['engagecontent'] = 'Most/least engaging content';
 $string['engagedusers'] = 'Most/least engaged users';
+$string['engagedworkspace'] = 'Workspaces Engagement and Activity';
 $string['engagegenerator'] = 'Engage generator';
 $string['expand'] = 'Expand';
 $string['filteraccess'] = 'Visibility';
@@ -211,6 +212,7 @@ $string['timetoread'] = 'Time to read';
 $string['title'] = 'Title';
 $string['topic'] = 'Topic';
 $string['type'] = 'Type';
+$string['unassigned'] = 'Unassigned';
 $string['unbookmark'] = 'Unbookmark';
 $string['userdataitembookmark'] = 'Bookmark';
 $string['userdataitemshare'] = 'Share';
@@ -251,6 +253,7 @@ $string['error:updatequestion'] = "Cannot update the question";
 $string['engage:view_engagedusers_reporting'] = 'View report for the most engaged users';
 $string['engage:viewlibrary'] = 'View library';
 $string['engage:view_resource_reporting'] = 'View report for the most engaging content';
+$string['engage:view_engagedworkspace_reporting'] = 'View workspaces engagement and activity';
 
 // Strings for message component
 $string['messageprovider:comment_notification'] = "Comments on your resources and playlists";

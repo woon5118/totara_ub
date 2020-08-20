@@ -42,6 +42,17 @@ $capabilities = [
             'tenantdomainmanager' => CAP_ALLOW,
         ],
     ],
+
+    /* View workspace content */
+    'totara/engage:view_engagedworkspace_reporting' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'tenantusermanager' => CAP_ALLOW,
+        ],
+    ],
+
     // View engage library
     'totara/engage:viewlibrary' => [
         'captype' => 'read',
