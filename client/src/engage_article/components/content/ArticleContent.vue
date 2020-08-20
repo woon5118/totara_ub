@@ -20,8 +20,6 @@
     <InlineEditing
       v-show="!editing"
       :full-width="true"
-      :restricted-mode="true"
-      :absolute-button="true"
       :update-able="updateAble"
       @click="editing = true"
     >

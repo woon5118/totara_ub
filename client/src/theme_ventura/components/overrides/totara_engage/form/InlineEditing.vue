@@ -44,7 +44,7 @@
 
   &:not(:hover) {
     .tui-inlineEditing__btn:not(:focus) {
-      visibility: hidden;
+      @include sr-only();
     }
   }
 }
