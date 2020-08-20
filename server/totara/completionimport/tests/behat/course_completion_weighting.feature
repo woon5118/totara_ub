@@ -25,6 +25,8 @@ Feature: Make sure the grade column of CSV differs
       | CCIH report | ccih_report | course_completion_all | 0          |
     And I log in as "admin"
     And I navigate to "Manage embedded reports" node in "Site administration > Reports"
+    And I set the field "report-name" to "Record of Learning: Courses"
+    And I press "id_submitgroupstandard_addfilter"
     And I click on "Record of Learning: Courses" "link"
     And I switch to "Columns" tab
     And I add the "Grade" column to the report

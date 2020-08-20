@@ -265,12 +265,16 @@ Feature: Verify the User System Role filter.
 
     # Check you can't add the filter to the alerts report.
     Given I navigate to "Manage embedded reports" node in "Site administration > Reports"
+    And I set the field "report-name" to "Alerts"
+    And I press "id_submitgroupstandard_addfilter"
     And I click on "Settings" "link" in the "Alerts" "table_row"
     And I switch to "Filters" tab
     Then I should not see "User System Role" in the "newstandardfilter" "select"
 
     # Add the filter to the Manage users embedded report.
     When I follow "Manage embedded reports"
+    And I set the field "report-name" to "Manage users"
+    And I press "id_submitgroupstandard_addfilter"
     And I click on "Settings" "link" in the "Manage users" "table_row"
     And I switch to "Filters" tab
     And I set the field "newstandardfilter" to "User System Role"
