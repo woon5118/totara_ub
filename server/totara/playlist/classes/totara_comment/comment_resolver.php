@@ -63,10 +63,8 @@ final class comment_resolver extends resolver {
      * @return bool
      */
     public function is_allow_to_delete(comment $comment, int $actorid): bool {
-        $instanceid = $comment->get_instanceid();
-
-        $playlist = playlist::from_id($instanceid);
-        return access_manager::can_access($playlist, $actorid);
+        $owner_id = $comment->get_userid();
+        return (is_siteadmin($actorid) || $actorid == $owner_id);
     }
 
     /**
@@ -76,10 +74,8 @@ final class comment_resolver extends resolver {
      * @return bool
      */
     public function is_allow_to_update(comment $comment, int $actorid): bool {
-        $instanceid = $comment->get_instanceid();
-
-        $playlist = playlist::from_id($instanceid);
-        return access_manager::can_access($playlist);
+        $owner_id = $comment->get_userid();
+        return (is_siteadmin($actorid) || $actorid == $owner_id);
     }
 
     /**

@@ -24,6 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 function xmldb_container_workspace_install() {
-    // Add the workspace roles
-    \container_workspace\util::add_missing_workspace_roles();
+    global $CFG;
+    require_once $CFG->dirroot . '/container/type/workspace/db/upgradelib.php';
+
+    container_workspace_add_missing_roles();
 }

@@ -23,6 +23,7 @@
 
 namespace container_workspace\totara\menu;
 
+use container_workspace\workspace;
 use totara_core\advanced_feature;
 use totara_core\totara\menu\item;
 
@@ -62,10 +63,17 @@ final class find_spaces extends item {
      * @return bool|void
      */
     protected function check_visibility(): bool {
+        global $USER;
         if (!isloggedin()) {
             return false;
         }
 
-        return advanced_feature::is_enabled('container_workspace');
+        if (!advanced_feature::is_enabled('container_workspace')) {
+            return false;
+        }
+
+        // Must have the view capability
+        $context = \context_user::instance($USER->id);
+        return has_capability('container/workspace:workspacesview', $context, $USER->id);
     }
 }

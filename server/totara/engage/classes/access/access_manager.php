@@ -22,6 +22,7 @@
  */
 namespace totara_engage\access;
 
+use totara_core\advanced_feature;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\share\recipient\recipient;
 use totara_engage\share\shareable;
@@ -48,6 +49,12 @@ final class access_manager {
         }
 
         $ownerid = $item->get_userid();
+
+        // Check to see if they're allowed to view the library
+        $context = \context_user::instance($user_id);
+        if (!has_capability('totara/engage:viewlibrary', $context, $user_id)) {
+            return false;
+        }
 
         if (is_siteadmin($user_id)) {
             return true;
@@ -152,5 +159,17 @@ final class access_manager {
         }
 
         return true;
+    }
+
+    /**
+     * Checks whether the view user can view the library or not. Will trigger
+     * a capability exception if not allowed.
+     */
+    public static function require_library_capability(): void {
+        global $USER;
+
+        // Check to see if they're allowed to view the library
+        $context = \context_user::instance($USER->id);
+        require_capability('totara/engage:viewlibrary', $context, $USER->id);
     }
 }

@@ -21,18 +21,17 @@
  * @package engage_survey
  */
 
+use totara_core\advanced_feature;
+use totara_engage\access\access_manager;
+
 // This file is a helper for the link generator so it has one page to target.
 // We expect to see a $page property
-use totara_core\advanced_feature;
-
 require_once(__DIR__ . "/../../../../config.php");
 global $OUTPUT, $PAGE, $USER;
 
 require_login();
 advanced_feature::require('engage_resources');
-
-$context = \context_user::instance($USER->id);
-require_capability('totara/engage:viewlibrary', $context, $USER->id);
+access_manager::require_library_capability();
 
 $id = required_param("id", PARAM_INT);
 $page = optional_param("page", 'vote', PARAM_ALPHA);

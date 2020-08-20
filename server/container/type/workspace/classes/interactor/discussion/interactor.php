@@ -79,8 +79,7 @@ final class interactor {
      */
     public function can_update(): bool {
         // If you have the super capability to moderate discussions, you're able to edit regardless of status
-        $workspace_context = $this->discussion->get_workspace()->get_context();
-        if (has_capability('container/workspace:discussionmanage', $workspace_context, $this->actor_id)) {
+        if ($this->can_manage()) {
             return true;
         }
 
@@ -127,8 +126,8 @@ final class interactor {
             return true;
         }
 
-        // Other than that workspace owner can do this
-        return $workspace_interactor->is_owner();
+        // Other than that anyone with workspace manage can delete
+        return $workspace_interactor->can_manage();
     }
 
     /**
@@ -157,7 +156,7 @@ final class interactor {
         $workspace_id = $this->discussion->get_workspace_id();
         $interactor = workspace_interactor::from_workspace_id($workspace_id, $this->actor_id);
 
-        return $interactor->is_joined();
+        return $interactor->can_create_discussions();
     }
 
     /**
@@ -210,7 +209,7 @@ final class interactor {
         $workspace_id = $this->discussion->get_workspace_id();
         $interactor = workspace_interactor::from_workspace_id($workspace_id, $this->actor_id);
 
-        return $interactor->is_owner();
+        return $interactor->can_manage();
     }
 
     /**

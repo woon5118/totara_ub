@@ -86,19 +86,64 @@ final class interactor {
     }
 
     /**
-     * Use has the owner capability
+     * User has the manage capability.
      *
      * @return bool
      */
-    public function is_owner(): bool {
+    public function can_manage(): bool {
+        // If you can administrate, you can manage
+        if ($this->can_administrate()) {
+            return true;
+        }
+
         $context = $this->workspace->get_context();
-        return has_capability('container/workspace:owner', $context, $this->user_id);
+        return has_capability('container/workspace:manage', $context, $this->user_id);
+    }
+
+    /**
+     * Primary owner is the owner held against the workspace
+     * @return bool
+     */
+    public function is_primary_owner(): bool {
+        return $this->workspace->get_user_id() == $this->user_id;
+    }
+
+    /**
+     * You are either the owner if you have manage capabilities, or you're the primary owner
+     * @return bool
+     */
+    public function is_owner(): bool {
+        // Primary is already an owner
+        if ($this->is_primary_owner()) {
+            return true;
+        }
+        $context = $this->workspace->get_context();
+        $roles = get_user_roles($context, $this->user_id);
+        $workspace_owner_roles = get_archetype_roles('workspaceowner');
+
+        // Check to see if they've already got the role
+        foreach ($roles as $role) {
+            if (isset($workspace_owner_roles[$role->roleid])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Like manage, but across the whole category/site. Super admin privilege
+     * @return bool
+     */
+    public function can_administrate(): bool {
+        $context = \context_coursecat::instance($this->workspace->category);
+        return has_capability('container/workspace:administrate', $context, $this->user_id);
     }
 
     /**
      * @return bool
      */
     public function is_joined(): bool {
+        // Owner is considered to automatically be joined
         if ($this->is_owner()) {
             // Save us another cycle of fetching.
             return true;
@@ -235,6 +280,13 @@ final class interactor {
         }
 
         // Anyone who can remove members can decline them
+        return $this->can_remove_members();
+    }
+
+    /**
+     * @return bool
+     */
+    public function can_remove_members(): bool {
         $context = $this->workspace->get_context();
         return has_capability('container/workspace:removemember', $context, $this->user_id);
     }
@@ -243,7 +295,7 @@ final class interactor {
      * @return bool
      */
     public function can_view_workspace(): bool {
-        if ($this->is_owner() || $this->is_joined()) {
+        if ($this->can_manage() || $this->is_joined()) {
             return true;
         }
 
@@ -268,7 +320,7 @@ final class interactor {
      */
     public function can_view_workspace_with_tenant_check(): bool {
         global $CFG, $DB;
-        if (!$CFG->tenantsenabled || is_siteadmin($this->user_id)) {
+        if (!$CFG->tenantsenabled || $this->can_administrate()) {
             // Multi tenancy is not enabled - so we skip the rest.
             return true;
         }
@@ -316,11 +368,6 @@ final class interactor {
      * @return bool
      */
     public function has_requested_to_join(): bool {
-        if ($this->is_owner()) {
-            // Skip the fetching.
-            return false;
-        }
-
         $repository = workspace_member_request::repository();
 
         $workspace_id = $this->workspace->get_id();
@@ -336,7 +383,7 @@ final class interactor {
      * @return bool
      */
     public function can_view_discussions(): bool {
-        if ($this->is_owner() || $this->is_joined() || $this->workspace->is_public()) {
+        if ($this->can_manage() || $this->is_joined() || $this->workspace->is_public()) {
             return true;
         }
 
@@ -348,14 +395,38 @@ final class interactor {
     /**
      * @return bool
      */
+    public function can_create_discussions(): bool {
+        // You can create if you can see them + have the create capability.
+        if (!$this->can_view_discussions()) {
+            return false;
+        }
+
+        $context = $this->workspace->get_context();
+        return has_capability('container/workspace:discussioncreate', $context, $this->user_id);
+    }
+
+    /**
+     * @return bool
+     */
     public function can_view_library(): bool {
-        return $this->workspace->is_public() || $this->is_joined();
+        if ($this->can_manage()) {
+            return true;
+        }
+
+        $context = \context_user::instance($this->user_id);
+        $view_library = has_capability('totara/engage:viewlibrary', $context, $this->user_id);
+
+        return $view_library && ($this->workspace->is_public() || $this->is_joined());
     }
 
     /**
      * @return bool
      */
     public function can_view_members(): bool {
+        if ($this->can_manage()) {
+            return true;
+        }
+
         return $this->workspace->is_public() || $this->is_joined();
     }
 

@@ -137,6 +137,7 @@ $capabilities = [
         'archetypes' => [
             'workspaceowner' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
         ],
     ],
 
@@ -160,13 +161,44 @@ $capabilities = [
         ],
     ],
 
-    // Owner of a workspace
-    'container/workspace:owner' => [
+    // Can create discussions
+    'container/workspace:discussioncreate' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
             'workspaceowner' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+        ],
+    ],
+
+    // Can perform almost any ability in a workspace
+    'container/workspace:manage' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'workspaceowner' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ],
+    ],
+
+    // Can administrate any workspace
+    'container/workspace:administrate' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => [
+            'tenantdomainmanager' => CAP_ALLOW,
+        ],
+    ],
+
+    // Can view workspaces in general (used to limit workspaces to just some users)
+    // It's not called "view" so it's not confused as a course-level view
+    'container/workspace:workspacesview' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'tenantdomainmanager' => CAP_ALLOW,
+            'user' => CAP_ALLOW,
         ],
     ],
 ];

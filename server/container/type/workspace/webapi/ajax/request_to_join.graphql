@@ -24,11 +24,13 @@ mutation container_workspace_request_to_join(
             can_invite
             can_join
             joined
+            workspaces_admin
             own
             can_request_to_join
             has_requested_to_join
             can_view
             can_view_discussions
+            can_create_discussions
             can_view_library
             can_view_members
             can_view_member_requests

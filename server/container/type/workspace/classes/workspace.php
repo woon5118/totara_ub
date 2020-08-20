@@ -595,7 +595,7 @@ final class workspace extends container implements category_name_provider {
     }
 
     /**
-     * Remove the user
+     * Remove the primary owner.
      */
     public function remove_user(): void {
         $this->entity->user_id = null;

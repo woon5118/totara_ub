@@ -124,8 +124,14 @@ final class comment_interactor {
             return false;
         }
 
-        $owner_id = $this->comment->get_userid();
-        return (is_siteadmin($this->actor_id) || $this->actor_id == $owner_id);
+        if ($this->actor_id == $this->comment->get_userid()) {
+            return true;
+        }
+
+        $component = $this->comment->get_component();
+        $resolver = resolver_factory::create_resolver($component);
+
+        return $resolver->is_allow_to_delete($this->comment, $this->actor_id);
     }
 
     /**
@@ -136,8 +142,14 @@ final class comment_interactor {
             return false;
         }
 
-        $owner_id = $this->comment->get_userid();
-        return (is_siteadmin($this->actor_id) || $this->actor_id == $owner_id);
+        if ($this->actor_id == $this->comment->get_userid()) {
+            return true;
+        }
+
+        $component = $this->comment->get_component();
+        $resolver = resolver_factory::create_resolver($component);
+
+        return $resolver->is_allow_to_update($this->comment, $this->actor_id);
     }
 
     /**

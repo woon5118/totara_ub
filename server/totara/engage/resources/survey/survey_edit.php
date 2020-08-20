@@ -24,6 +24,7 @@
 use engage_survey\event\survey_viewed;
 use engage_survey\totara_engage\resource\survey;
 use totara_core\advanced_feature;
+use totara_engage\access\access_manager;
 use totara_playlist\totara_engage\link\nav_helper;
 
 require_once(__DIR__ . "/../../../../config.php");
@@ -31,9 +32,7 @@ global $OUTPUT, $PAGE, $USER;
 
 require_login();
 advanced_feature::require('engage_resources');
-
-$context = \context_user::instance($USER->id);
-require_capability('totara/engage:viewlibrary', $context, $USER->id);
+access_manager::require_library_capability();
 
 $id = required_param("id", PARAM_INT);
 $source = optional_param("source", '', PARAM_TEXT);
@@ -47,7 +46,7 @@ $url = new \moodle_url("/totara/engage/resources/survey/survey_edit.php", ['id' 
 $context = $survey->get_context();
 
 $PAGE->set_url($url);
-$PAGE->set_context($context);
+$PAGE->set_context(\context_user::instance($USER->id));
 $PAGE->set_title($survey->get_name());
 $PAGE->set_pagelayout('legacynolayout');
 

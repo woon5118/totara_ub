@@ -70,9 +70,5 @@ class container_workspace_multi_tenancy_access_testcase extends advanced_testcas
         $this->assertNotEmpty($result->data);
 
         $this->assertArrayHasKey('workspace', $result->data);
-        $this->assertArrayHasKey('owner', $result->data['workspace']);
-        $this->assertArrayHasKey('fullname', $result->data['workspace']['owner']);
-
-        $this->assertEquals(fullname($user_one), $result->data['workspace']['owner']['fullname']);
     }
 }

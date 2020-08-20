@@ -33,9 +33,7 @@ require_once(__DIR__ . "/../../../../config.php");
 global $OUTPUT, $PAGE, $USER;
 require_login();
 advanced_feature::require('engage_resources');
-
-$context = \context_user::instance($USER->id);
-require_capability('totara/engage:viewlibrary', $context, $USER->id);
+access_manager::require_library_capability();
 
 // {ttr_engage_resource}'s id
 $id = required_param("id", PARAM_INT);

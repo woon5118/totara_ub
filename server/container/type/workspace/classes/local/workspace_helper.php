@@ -69,12 +69,26 @@ final class workspace_helper {
         }
 
         $category_interactor = category_interactor::from_category_id($category_id);
-        if ((!$is_private && !$category_interactor->can_create_public()) ||
-            ($is_private && !$category_interactor->can_create_private()) ||
-            ($is_hidden && !$category_interactor->can_create_hidden())) {
+        // The three types of workspaces (private, public & hidden) have individual capabilities
+        // to work with. If you're trying to create a specific type of workspace, the matching
+        // capability must be assigned.
+
+        // Create hidden check
+        if ($is_hidden && !$category_interactor->can_create_hidden()) {
             throw workspace_exception::on_create();
         }
 
+        // Create private check
+        if ($is_private && !$category_interactor->can_create_private()) {
+            throw workspace_exception::on_create();
+        }
+
+        // Finally public check. Public is assumed if we're not private (since hidden is a child of private)
+        if (!$is_private && !$category_interactor->can_create_public()) {
+            throw workspace_exception::on_create();
+        }
+
+        // Final sanity check - you can't make a hidden public workspace.
         if (!$is_private && $is_hidden) {
             throw new \coding_exception("Cannot create a hidden public workspace");
         }
@@ -109,8 +123,8 @@ final class workspace_helper {
         $manager->enable_self_enrolment();
         $manager->enable_manual_enrolment();
 
-        // Then enrol this very owner as an owner for the workspace.
-        member::join_workspace($workspace, $actor_id);
+        // Then enrol this very user as an owner for the workspace.
+        member::join_workspace($workspace, $actor_id, true);
 
         if (null !== $draft_id && 0 !== $draft_id) {
             $workspace->save_image($draft_id, $actor_id);

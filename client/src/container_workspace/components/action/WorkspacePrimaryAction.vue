@@ -58,7 +58,7 @@
 
     <!-- We are only enable the user adder if the actor is either owner or a site admin -->
     <WorkspaceUserAdder
-      v-if="interactor.own"
+      v-if="interactor.own || interactor.workspaces_admin"
       :open="modal.adder"
       :workspace-id="workspaceId"
       @cancel="modal.adder = false"
@@ -70,7 +70,7 @@
     <template v-else>
       <!-- Owner section -->
       <Dropdown
-        v-if="interactor.own"
+        v-if="interactor.own || interactor.workspaces_admin"
         position="bottom-right"
         class="tui-workspacePrimaryAction__dropDown"
       >

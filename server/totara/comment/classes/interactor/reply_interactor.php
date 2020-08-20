@@ -23,6 +23,7 @@
 namespace totara_comment\interactor;
 
 use totara_comment\comment;
+use totara_comment\resolver_factory;
 use totara_reaction\loader\reaction_loader;
 use totara_reaction\resolver\resolver_factory as reaction_resolver_factory;
 use totara_comment\resolver_factory as comment_resolver_factory;
@@ -69,8 +70,14 @@ final class reply_interactor {
             return false;
         }
 
-        $owner_id = $this->reply->get_userid();
-        return (is_siteadmin($this->actor_id) || $this->actor_id == $owner_id);
+        if ($this->actor_id == $this->reply->get_userid()) {
+            return true;
+        }
+
+        $component = $this->reply->get_component();
+        $resolver = resolver_factory::create_resolver($component);
+
+        return $resolver->is_allow_to_delete($this->reply, $this->actor_id);
     }
 
     /**
@@ -81,8 +88,14 @@ final class reply_interactor {
             return false;
         }
 
-        $owner_id = $this->reply->get_userid();
-        return (is_siteadmin($this->actor_id) || $this->actor_id == $owner_id);
+        if ($this->actor_id == $this->reply->get_userid()) {
+            return true;
+        }
+
+        $component = $this->reply->get_component();
+        $resolver = resolver_factory::create_resolver($component);
+
+        return $resolver->is_allow_to_delete($this->reply, $this->actor_id);
     }
 
     /**

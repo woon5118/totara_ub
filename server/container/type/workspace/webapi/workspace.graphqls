@@ -7,10 +7,6 @@ type container_workspace_workspace {
   """
   description_format: Int!
   """
-  The owner of the workspace.
-  """
-  owner: core_user
-  """
   Url to the workspace
   """
   url: String!
@@ -80,6 +76,10 @@ type container_workspace_workspace_interactor {
   """
   joined: Boolean!
   """
+  Whether the user is an admin within workspaces or not.
+  """
+  workspaces_admin: Boolean!
+  """
   Whether the user actor is able to request to join or not.
   """
   can_request_to_join: Boolean!
@@ -95,6 +95,10 @@ type container_workspace_workspace_interactor {
   Whether user is able to view the discussion tab
   """
   can_view_discussions: Boolean!
+  """
+  Whether the user is able to create discussions
+  """
+  can_create_discussions: Boolean!
   """
   Whether the user actor is able to view the member tab
   """

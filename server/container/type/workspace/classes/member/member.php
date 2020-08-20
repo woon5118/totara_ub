@@ -27,6 +27,7 @@ use container_workspace\tracker\tracker;
 use container_workspace\workspace;
 use core\entity\user_enrolment;
 use core_container\factory;
+use totara_core\visibility_controller;
 
 /**
  * A model class for workspace's member.
@@ -113,20 +114,18 @@ final class member {
      * role. Otherwise student role will be used for any other user.
      *
      * @param workspace $workspace
-     * @param int|null $actor_id    If this is null, then $user in session will be used.
-     *
+     * @param int|null $actor_id If this is null, then $user in session will be used.
+     * @param bool $is_owner If true, this user will join with the workspace owner role
      * @return member
      */
-    public static function join_workspace(workspace $workspace, ?int $actor_id = null): member {
+    public static function join_workspace(workspace $workspace, ?int $actor_id = null, bool $is_owner = false): member {
         global $USER, $CFG;
 
         if (null === $actor_id || 0 === $actor_id) {
             $actor_id = $USER->id;
         }
 
-        $owner_id = $workspace->get_user_id();
-
-        if (!$workspace->is_public() && ($owner_id != $actor_id && !is_siteadmin($actor_id))) {
+        if (!$workspace->is_public() && (!$is_owner && !is_siteadmin($actor_id))) {
             throw new \coding_exception("Cannot join the non-public workspace");
         }
 
@@ -137,9 +136,8 @@ final class member {
             }
         }
 
-        $is_owner = ($actor_id == $owner_id);
+        // Join as a learner/student, unless they're the owner
         $archetype = 'student';
-
         if ($is_owner) {
             $archetype = 'workspaceowner';
         }
@@ -155,19 +153,21 @@ final class member {
         $manager = $workspace->get_enrolment_manager();
         $manager->self_enrol_user($actor_id, $role->id);
 
-        // Need to add capability viewhiddencourses to this workspace if it is a hidden one for the
-        // user owner. This happened because authenticated user does not have any capabilities to see
-        // any hidden workspaces/courses by default - therefore we have to add this cap for the specific context
-        // of the course.
-        if ($workspace->is_hidden() && $is_owner) {
+        // Hidden workspaces requires the viewhiddencourses capability in the course for the role.
+        // Regular user has no specific hiddencourses capability, and there's no workspacemember role
+        // yet. This will be removed when workspacemember role is introduced.
+        if ($workspace->is_hidden()) {
             $context = $workspace->get_context();
-
             assign_capability(
                 'moodle/course:viewhiddencourses',
                 CAP_ALLOW,
                 $role->id,
                 $context->id
             );
+
+            // We need to rebuild the visibility
+            $map = visibility_controller::course()->map();
+            $map->recalculate_map_for_instance($workspace->get_id());
         }
 
         $workspace_id = $workspace->get_id();
@@ -208,6 +208,23 @@ final class member {
 
         $manager = $workspace->get_enrolment_manager();
         $manager->manual_enrol_user($user_id, $role->id, $actor_id);
+
+        // Hidden workspaces requires the viewhiddencourses capability in the course for the role.
+        // Regular user has no specific hiddencourses capability, and there's no workspacemember role
+        // yet. This will be removed when workspacemember role is introduced.
+        if ($workspace->is_hidden()) {
+            $context = $workspace->get_context();
+            assign_capability(
+                'moodle/course:viewhiddencourses',
+                CAP_ALLOW,
+                $role->id,
+                $context->id
+            );
+
+            // We need to rebuild the visibility
+            $map = visibility_controller::course()->map();
+            $map->recalculate_map_for_instance($workspace->get_id());
+        }
 
         $workspace_id = $workspace->get_id();
         return static::from_user($user_id, $workspace_id);
@@ -279,6 +296,8 @@ final class member {
     }
 
     /**
+     * Remove a user from a workspace.
+     * Note: There are no capability checks performed here.
      * @param int|null $actor_id
      * @return bool
      */
@@ -305,19 +324,10 @@ final class member {
 
         /** @var workspace $workspace */
         $workspace = factory::from_id($workspace_id);
-        $owner_id = $workspace->get_user_id();
-
-        if ($owner_id != $actor_id) {
-            // Not the owner of the workspace. Time to check for capability.
-            $context = $workspace->get_context();
-
-            if (!has_capability('container/workspace:removemember', $context, $actor_id)) {
-                throw new \coding_exception("No capability to remove the member");
-            }
-
-            if ($user_id == $owner_id) {
-                $workspace->remove_user();
-            }
+        $interactor = interactor::from_workspace_id($workspace_id, $actor_id);
+        // To remove another user you must either manage the workspace or can remove members
+        if (!$interactor->can_manage() && !$interactor->can_remove_members()) {
+            throw new \coding_exception("No capability to remove the member");
         }
 
         $manager = $workspace->get_enrolment_manager();

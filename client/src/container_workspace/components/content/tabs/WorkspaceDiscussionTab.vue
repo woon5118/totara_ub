@@ -213,7 +213,7 @@ export default {
      * @return {Boolean}
      */
     canPostDiscussion() {
-      return this.interactor.joined;
+      return this.interactor.can_create_discussions;
     },
 
     /**

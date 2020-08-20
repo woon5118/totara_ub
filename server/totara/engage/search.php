@@ -22,15 +22,14 @@
  */
 
 use totara_core\advanced_feature;
+use totara_engage\access\access_manager;
 
 require_once(__DIR__ . '/../../config.php');
 global $USER, $OUTPUT, $PAGE;
 
 require_login();
 advanced_feature::require('engage_resources');
-
-$context = \context_user::instance($USER->id);
-require_capability('totara/engage:viewlibrary', $context, $USER->id);
+access_manager::require_library_capability();
 
 $search = optional_param('search', '', PARAM_TEXT);
 

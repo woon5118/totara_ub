@@ -20,31 +20,12 @@ mutation container_workspace_create_workspace(
     description(format: PLAIN)
     description_format
     time_description
-
-    owner {
-      __typename
-      id
-      fullname
-      card_display {
-        __typename
-        profile_picture_alt
-        profile_picture_url
-        profile_url
-        display_fields {
-          __typename
-          value
-          label
-          is_custom
-          associate_url
-        }
-      }
-    }
-
     image
     total_members
     interactor {
       __typename
       joined
+      workspaces_admin
       own
       can_update
       can_delete

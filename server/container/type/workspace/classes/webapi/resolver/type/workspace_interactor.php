@@ -66,6 +66,9 @@ final class workspace_interactor implements type_resolver {
             case 'own':
                 return $source->is_owner();
 
+            case 'workspaces_admin':
+                return $source->can_administrate();
+
             case 'joined':
                 return $source->is_joined();
 
@@ -80,6 +83,9 @@ final class workspace_interactor implements type_resolver {
 
             case 'can_view_discussions':
                 return $source->can_view_discussions();
+
+            case 'can_create_discussions':
+                return $source->can_create_discussions();
 
             case 'can_view_members':
                 return $source->can_view_members();

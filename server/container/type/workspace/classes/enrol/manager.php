@@ -217,7 +217,10 @@ final class manager {
     }
 
     /**
-     * Note: this function  is not checking any capability in here, as it is being reused by self enrolment as well
+     * Enrollment will be suspended and any roles assigned in the workspace will be removed.
+     * There are no capability checks performed, those must be performed beforehand.
+     *
+     * If the primary owner is removed, then they'll be removed from the workspace record as well.
      *
      * @param user_enrolment $user_enrolment
      * @return void
@@ -232,12 +235,17 @@ final class manager {
         $instance = (object) $enrol->to_array();
         $user_id = $user_enrolment->userid;
 
-        // Remove their assigned roles
+        // Remove their assigned roles. It does not matter what roles are assigned
         $context = \context_course::instance($enrol->courseid);
         $roles = get_user_roles($context, $user_id, false);
 
         foreach ($roles as $role) {
             role_unassign($role->roleid, $user_id, $context->id, 'container_workspace');
+        }
+
+        // If we've removed the primary owner, update the workspace
+        if ($this->workspace->get_user_id() == $user_id) {
+            $this->workspace->remove_user();
         }
 
         $plugin->update_user_enrol($instance, $user_id, ENROL_USER_SUSPENDED);

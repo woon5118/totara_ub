@@ -23,6 +23,7 @@
 
 namespace container_workspace\totara\menu;
 
+use container_workspace\workspace;
 use totara_core\advanced_feature;
 use totara_core\totara\menu\container;
 
@@ -46,5 +47,23 @@ final class collaborate extends container {
      */
     protected function get_default_title(): string {
         return get_string('collaborate', 'container_workspace');
+    }
+
+    /**
+     * @return bool|void
+     */
+    protected function check_visibility(): bool {
+        global $USER;
+        if (!isloggedin()) {
+            return false;
+        }
+
+        if (!advanced_feature::is_enabled('container_workspace')) {
+            return false;
+        }
+
+        // Must have the view capability
+        $context = \context_user::instance($USER->id);
+        return has_capability('container/workspace:workspacesview', $context, $USER->id);
     }
 }

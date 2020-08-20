@@ -22,13 +22,6 @@ mutation container_workspace_update_workspace(
         description(format: HTML)
         description_format
         time_description
-
-        owner {
-            __typename
-            id
-            fullname
-        }
-
         image
         total_members
         interactor {
@@ -38,11 +31,13 @@ mutation container_workspace_update_workspace(
             can_invite
             can_join
             joined
+            workspaces_admin
             own
             can_request_to_join
             has_requested_to_join
             can_view
             can_view_discussions
+            can_create_discussions
             can_view_library
             can_view_members
             can_view_member_requests
