@@ -38,12 +38,12 @@
 
   &__description {
     display: flex;
-    flex: 1;
     flex-direction: column;
+    flex-grow: 1;
     margin-top: var(--tui-gap-8);
 
     &__formRow {
-      flex: 1;
+      flex-grow: 1;
       // Reset margin of itself.
       &.tui-formRow {
         margin-bottom: 0;
@@ -57,7 +57,7 @@
 
         &__action {
           // Expand the box.
-          flex: 1;
+          flex-grow: 1;
         }
       }
     }
