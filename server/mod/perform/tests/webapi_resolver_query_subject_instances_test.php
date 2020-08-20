@@ -67,7 +67,10 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activity = $perform_generator->create_full_activities()->first();
         /** @var participant_instance $participant_instance */
-        $participant_instance = participant_instance::repository()->get()->first();
+        $participant_instance = participant_instance::repository()
+            ->order_by('id')
+            ->get()
+            ->first();
         /** @var subject_instance $subject_instance */
         $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
 
@@ -178,6 +181,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         // Get the internal user
         $participant_instance = participant_instance::repository()
             ->where('participant_source', participant_source::INTERNAL)
+            ->order_by('id')
             ->get()
             ->first();
 
