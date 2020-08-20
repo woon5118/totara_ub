@@ -105,7 +105,6 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
                 'noexport' => true,
                 'nosort' => true,
                 'joins' => 'track',
-                'capability' => ['mod/perform:manage_subject_user_participation'],
                 'extrafields' => [
                     'activity_id' => 'track.activity_id',
                     'participant_instance_id' => 'base.id',

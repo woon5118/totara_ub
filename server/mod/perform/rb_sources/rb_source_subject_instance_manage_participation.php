@@ -104,7 +104,6 @@ class rb_source_subject_instance_manage_participation extends rb_source_perform_
                 'noexport' => true,
                 'nosort' => true,
                 'joins' => 'perform',
-                'capability' => ['mod/perform:manage_subject_user_participation'],
                 'extrafields' => [
                     'activity_id' => 'perform.id',
                     'subject_instance_id' => "base.id",

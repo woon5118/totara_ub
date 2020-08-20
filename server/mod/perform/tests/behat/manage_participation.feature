@@ -192,3 +192,29 @@ Feature: Test management of activity participation
     Then I should not see "Showing results for 1 participant instance only"
     And I should see "User Two"
     And I should see "User Three"
+
+  Scenario: Manager has access to manage participation feature via user activities page
+    When I log in as "manager1"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Manage participation" "link_or_button"
+    Then I should see "Select activity"
+    And the following fields match these values:
+      | manage-participation-activity-select | 3 participants |
+
+    When I click on "Continue" "link"
+    Then I should see "Manage participation: “3 participants”"
+    And the following should exist in the "subject_instance_manage_participation" table:
+      | Subject name | Instance number | Participants |
+      | User Four    | 3               | 3            |
+      | User Four    | 2               | 3            |
+      | User Four    | 1               | 3            |
+      | User Two     | 3               | 2            |
+      | User Two     | 2               | 2            |
+      | User Two     | 1               | 2            |
+
+    # Make sure the "Actions" column is shown (this used to be a bug).
+    And I should see "Actions" in the ".reportbuilder-table" "css_element"
+    When I click on "Participant instances" "link"
+    Then I should see "Actions" in the ".reportbuilder-table" "css_element"
+    When I click on "Participant sections" "link"
+    Then I should see "Actions" in the ".reportbuilder-table" "css_element"

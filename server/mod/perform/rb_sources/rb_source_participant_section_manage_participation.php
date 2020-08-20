@@ -84,7 +84,6 @@ class rb_source_participant_section_manage_participation extends rb_source_perfo
                 'noexport' => true,
                 'nosort' => true,
                 'joins' => 'track',
-                'capability' => ['mod/perform:manage_subject_user_participation'],
                 'extrafields' => [
                     'activity_id' => 'track.activity_id',
                     'participant_section_id' => 'base.id',
