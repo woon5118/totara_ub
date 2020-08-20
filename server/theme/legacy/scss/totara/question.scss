@@ -256,6 +256,7 @@ body.path-question-type .fitem_fgroup .accesshide {
   clear: left;
   text-align: left;
   margin: 0 auto 1.8em auto;
+  border-bottom: 1px solid var(--legacy-color-neutral-5);
 }
 
 .que .info {
@@ -303,16 +304,10 @@ body.path-question-type .mform fieldset.hidden {
   margin: 0 0 0 8.5em;
 }
 
-.que .formulation,
 .que .outcome,
 .que .comment {
   @extend .alert;
   @extend .alert-warning;
-}
-
-.que .formulation {
-  @extend .alert-info;
-  color: var(--legacy-color-neutral-7);
 }
 
 .formulation input[type='text'],
