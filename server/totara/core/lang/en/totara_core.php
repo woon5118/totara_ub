@@ -287,6 +287,7 @@ $string['error:pagerender'] = 'An error occurred while rendering the page.';
 $string['error:parentnotexists'] = '"{$a}" parent item does not exists, please check your settings';
 $string['error:staffmanagerroleexists'] = 'A role "staffmanager" already exists. This role must be renamed before the upgrade can proceed.';
 $string['error:unknownbuttonclicked'] = 'Unknown button clicked';
+$string['error:upload_failed'] = 'Sorry, the file failed to upload. Please try again';
 $string['error:useridincorrect'] = 'User id is incorrect.';
 $string['error:usernotfound'] = 'User not found';
 $string['error:userprofilecapability'] = 'You do not have permission to edit the user profile. Please contact the site administrator.';

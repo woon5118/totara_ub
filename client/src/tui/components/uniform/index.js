@@ -29,6 +29,7 @@ export { default as FormCheckbox } from 'tui/components/uniform/FormCheckbox';
 export { default as FormCheckboxGroup } from 'tui/components/uniform/FormCheckboxGroup';
 export { default as FormDateSelector } from 'tui/components/uniform/FormDateSelector';
 export { default as FormEmail } from 'tui/components/uniform/FormEmail';
+export { default as FormImageUpload } from 'tui/components/uniform/FormImageUpload';
 export { default as FormNumber } from 'tui/components/uniform/FormNumber';
 export { default as FormPassword } from 'tui/components/uniform/FormPassword';
 export { default as FormRadioGroup } from 'tui/components/uniform/FormRadioGroup';

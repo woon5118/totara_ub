@@ -110,6 +110,7 @@ export default {
               if (result.error) {
                 this.$emit('error', {
                   file: file,
+                  error: result.error,
                 });
               } else {
                 if (result.url) {
@@ -209,6 +210,9 @@ export default {
     return this.$scopedSlots.default({
       files: this.files,
       isDrag: this.isDrag,
+      pickFile: () => {
+        this.$_getFileInput().click();
+      },
       selectEvents: {
         click: () => {
           this.$_getFileInput().click();

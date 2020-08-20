@@ -31,8 +31,8 @@
       }"
     >
       <div
-        class="tui-UploadWrapper"
-        :class="{ 'tui-UploadWrapper--highlight': isDrag }"
+        class="tui-uploadWrapper"
+        :class="{ 'tui-uploadWrapper--highlight': isDrag }"
         v-on="dragEvents"
       >
         <input
@@ -47,7 +47,7 @@
           <li
             v-for="file in files"
             :key="file.name"
-            :class="{ 'tui-UploadWrapper__file--done': file.done }"
+            :class="{ 'tui-uploadWrapper__file--done': file.done }"
           >
             {{ file.name }} {{ file.progress }}%
             <ButtonIcon
