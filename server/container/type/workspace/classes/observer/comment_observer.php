@@ -24,6 +24,7 @@ namespace container_workspace\observer;
 
 use container_workspace\discussion\discussion;
 use container_workspace\task\notify_discussion_new_comment_task;
+use container_workspace\local\workspace_helper;
 use totara_comment\event\comment_created;
 use container_workspace\workspace;
 use totara_comment\comment;
@@ -62,6 +63,10 @@ final class comment_observer {
             $discussion = discussion::from_id($discussion_id);
 
             $discussion->touch();
+
+            // Update workspace timestamp as well.
+            $workspace = $discussion->get_workspace();
+            workspace_helper::update_workspace_timestamp($workspace);
         }
     }
 

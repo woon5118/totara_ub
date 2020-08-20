@@ -54,7 +54,10 @@ final class loader {
         $builder = builder::table('course', 'c');
         $builder->join(['workspace', 'wo'], 'c.id', 'wo.course_id');
 
-        $builder->select_raw("DISTINCT c.*, wo.id AS w_id, wo.user_id, wo.private AS workspace_private");
+        $builder->select_raw(
+            "DISTINCT c.*, wo.id AS w_id, wo.user_id, wo.private AS workspace_private, wo.timestamp AS timestamp"
+        );
+
         $builder->map_to([workspace::class, 'from_record']);
 
         $source = $query->get_source();

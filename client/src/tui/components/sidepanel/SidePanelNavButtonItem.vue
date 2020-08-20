@@ -22,10 +22,18 @@
     class="tui-sidePanelNavButtonItem"
     :class="{ 'tui-sidePanelNavButtonItem--active': activeItem }"
   >
+    <span v-if="notification" class="tui-sidePanelNavButtonItem__notification">
+      <Dot :aria-hidden="true" />
+      <span :id="notificationTextId" class="sr-only">
+        {{ notificationText }}
+      </span>
+    </span>
+
     <Button
       class="tui-sidePanelNavButtonItem__action"
       :aria-current="activeItem ? 'location' : null"
       :text="text"
+      :aria-describedby="notification ? notificationTextId : false"
       :styleclass="{
         transparent: true,
       }"
@@ -40,10 +48,12 @@
 
 <script>
 import Button from 'tui/components/buttons/Button';
+import Dot from 'tui/components/icons/common/Dot';
 
 export default {
   components: {
     Button,
+    Dot,
   },
 
   props: {
@@ -54,13 +64,26 @@ export default {
       required: true,
     },
     text: String,
+    notification: Boolean,
+    notificationText: {
+      type: String,
+      default() {
+        return this.$str('updated_recently', 'totara_core');
+      },
+    },
+  },
+
+  data() {
+    return {
+      notificationTextId: this.$id('notification-dot'),
+    };
   },
 
   computed: {
     /**
      * Check if this is the active item
      *
-     * @return {Bool}
+     * @return {Boolean}
      */
     activeItem() {
       if (this.active == this.id) {
@@ -71,3 +94,11 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+{
+  "totara_core": [
+    "updated_recently"
+  ]
+}
+</lang-strings>

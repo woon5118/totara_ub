@@ -84,9 +84,15 @@ final class tracker {
 
     /**
      * @param workspace $workspace
+     * @param int|null  $time
+     *
      * @return void
      */
-    public function visit_workspace(workspace $workspace): void {
+    public function visit_workspace(workspace $workspace, ?int $time = null): void {
+        if (empty($time)) {
+            $time = time();
+        }
+
         $workspace_id = $workspace->get_id();
         $builder = builder::table(user_last_access::TABLE);
 
@@ -98,7 +104,7 @@ final class tracker {
         $last_access = $builder->one();
 
         if (null !== $last_access) {
-            $last_access->timeaccess = time();
+            $last_access->timeaccess = $time;
             $last_access->save();
 
             return;
@@ -153,6 +159,35 @@ final class tracker {
         }
 
         return $last_access->courseid;
+    }
+
+    /**
+     * Returning the last time visit of a given workspace.
+     *
+     * @param int $workspace_id
+     * @return int|null
+     */
+    public function get_last_time_visit_workspace(int $workspace_id): ?int {
+        $builder = builder::table(user_last_access::TABLE, 'ul');
+        $builder->join(
+            ['course', 'c'],
+            function (builder $builder): void {
+                $builder->where_field('c.id', 'ul.courseid');
+                $builder->where('c.containertype', workspace::get_type());
+            }
+        );
+
+        $builder->where('ul.courseid', $workspace_id);
+        $builder->where('ul.userid', $this->user_id);
+        $builder->map_to(user_last_access::class);
+
+        /** @var user_last_access $last_access */
+        $last_access = $builder->one();
+        if (null === $last_access) {
+            return null;
+        }
+
+        return $last_access->timeaccess;
     }
 
     /**

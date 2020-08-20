@@ -25,6 +25,7 @@ namespace container_workspace\interactor\workspace;
 use container_workspace\entity\workspace_member_request;
 use container_workspace\loader\member\loader;
 use container_workspace\notification\workspace_notification;
+use container_workspace\tracker\tracker;
 use container_workspace\workspace;
 use core_container\factory;
 
@@ -53,7 +54,7 @@ final class interactor {
      * actor constructor.
      *
      * @param workspace $workspace
-     * @param int|null $user_id If null is set for this field, then user in session will be used.
+     * @param int|null $user_id     If null is set for this field, then user in session will be used.
      */
     public function __construct(workspace $workspace, ?int $user_id = null) {
         global $USER;
@@ -473,5 +474,32 @@ final class interactor {
     public function has_turned_off_notification(): bool {
         $workspace_id = $this->workspace->get_id();
         return workspace_notification::is_off($workspace_id, $this->user_id);
+    }
+
+    /**
+     * A function to check whether the workspace had been updated ever since the last time user visited it.
+     * The parameter $last_check_time is in place to help not refetching from the table "ttr_user_lastaccess".
+     * If it is not provided - then we are  going to fetch from table "ttr_user_lastaccess"
+     *
+     * @param int|null $last_check_time
+     * @return bool
+     */
+    public function has_seen(?int $last_check_time = null): bool {
+        if (null === $last_check_time) {
+            $workspace_id = $this->workspace->get_id();
+
+            $tracker = new tracker($this->user_id);
+            $last_check_time = $tracker->get_last_time_visit_workspace($workspace_id);
+
+            if (null === $last_check_time) {
+                // User had not access to this workspace yet.
+                return false;
+            }
+        }
+
+        // If the last check time is not greater than the workspace time stamp then it means that user
+        // had not yet visit this very workspace.
+        $workspace_timestamp = $this->workspace->get_timestamp();
+        return $last_check_time >= $workspace_timestamp;
     }
 }

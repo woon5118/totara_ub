@@ -28,6 +28,7 @@ use container_workspace\interactor\workspace\interactor;
 use container_workspace\loader\member\loader;
 use container_workspace\member\member;
 use container_workspace\query\member\query;
+use container_workspace\tracker\tracker;
 use container_workspace\workspace;
 
 /**
@@ -207,5 +208,42 @@ final class workspace_helper {
         // As long as workspace is a public workspace, then from either private or hidden can go up to
         // this status of access.
         return !$workspace->is_public();
+    }
+
+    /**
+     * Function to update the workspace time stamp and also update the user's tracker.
+     * We have to update user's tracker because:
+     * + user visit workspace can happen before he/she add any content to the workspace. This means that when
+     *   the workspace was updated with timestamp then timestamp will be higher than the user last access time.
+     *   Meaning that it can cause the error calculation.
+     *
+     * @param workspace $workspace
+     * @param int|null $actor_id
+     * @param int|null $time
+     *
+     * @return void
+     */
+    public static function update_workspace_timestamp(workspace $workspace, ?int $actor_id = null,
+                                                       ?int $time = null): void {
+        global $USER;
+        if (empty($actor_id)) {
+            $actor_id = $USER->id;
+        }
+
+        if (empty($time)) {
+            $time = time();
+        }
+
+        $workspace->touch($time);
+
+        $interactor = new interactor($workspace, $actor_id);
+        if (!$interactor->is_joined() && !$interactor->can_update()) {
+            // This is to prevent the tracker being updated if user is not either any.
+            debugging("User is not a member nor someone who has capability to update the workspace", DEBUG_DEVELOPER);
+            return;
+        }
+
+        $tracker = new tracker($actor_id);
+        $tracker->visit_workspace($workspace, $time);
     }
 }

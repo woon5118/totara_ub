@@ -149,6 +149,10 @@ type container_workspace_workspace_category_interactor {
   Whether the user has the ability to create any style of workspace or not.
   """
   can_create: Boolean!
+  """
+  Whether the user actor has already seen this workspace or not.
+  """
+  has_seen(last_check_time: param_integer): Boolean!
 }
 
 extend type Query {

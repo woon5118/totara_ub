@@ -8,5 +8,9 @@ query container_workspace_my_workspace_urls {
     name(format: PLAIN)
     url
     id
+    interactor {
+      __typename
+      has_seen
+    }
   }
 }

@@ -22,10 +22,18 @@
     class="tui-sidePanelNavLinkItem"
     :class="{ 'tui-sidePanelNavLinkItem--active': activeItem }"
   >
+    <span v-if="notification" class="tui-sidePanelNavLinkItem__notification">
+      <Dot :aria-hidden="true" />
+      <span :id="notificationTextId" class="sr-only">{{
+        notificationText
+      }}</span>
+    </span>
+
     <a
       :href="url"
       class="tui-sidePanelNavLinkItem__action"
       :aria-current="activeItem ? 'location' : null"
+      :aria-describedby="notification ? notificationTextId : false"
       @click="$emit('select', { action: url, id: id })"
     >
       {{ text }}
@@ -38,7 +46,11 @@
 </template>
 
 <script>
+import Dot from 'tui/components/icons/common/Dot';
 export default {
+  components: {
+    Dot,
+  },
   props: {
     active: [Boolean, Number, String],
     id: {
@@ -47,13 +59,27 @@ export default {
     },
     text: String,
     url: String,
+
+    notification: Boolean,
+    notificationText: {
+      type: String,
+      default() {
+        return this.$str('updated_recently', 'totara_core');
+      },
+    },
+  },
+
+  data() {
+    return {
+      notificationTextId: this.$id('notification-dot'),
+    };
   },
 
   computed: {
     /**
      * Check if this is the active item
      *
-     * @return {Bool}
+     * @return {Boolean}
      */
     activeItem() {
       if (this.active == this.id) {
@@ -64,3 +90,11 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+{
+  "totara_core": [
+    "updated_recently"
+  ]
+}
+</lang-strings>

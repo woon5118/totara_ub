@@ -2371,6 +2371,13 @@ $icons = array(
                 array (
                     'classes' => 'fa-bell-slash-o'
                 )
+        ),
+    'circle' =>
+        array (
+            'data' =>
+                array(
+                    'classes' => 'fa-circle'
+                )
         )
 );
 

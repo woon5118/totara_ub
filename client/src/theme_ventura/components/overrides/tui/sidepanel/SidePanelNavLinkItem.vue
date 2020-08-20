@@ -18,6 +18,7 @@
 
 <style lang="scss">
 .tui-sidePanelNavLinkItem {
+  position: relative;
   display: flex;
   align-items: center;
   color: var(--tui-side-panel-nav-item-text-color);
@@ -37,10 +38,21 @@
     padding-right: var(--tui-gap-4);
   }
 
+  &__notification {
+    position: absolute;
+    display: flex;
+    // The same as padding left of actioin plus another tui-gap-4 to make sure there is a padding between
+    // the action link and the dot.
+    width: var(--tui-sidepanel-navigation-item-padding-left);
+    color: var(--tui-color-prompt-alert);
+    pointer-events: none;
+  }
+
   // Item link
   &__action {
     flex-grow: 1;
     padding: var(--tui-gap-2) var(--tui-gap-4);
+    padding-left: var(--tui-sidepanel-navigation-item-padding-left);
     color: inherit;
     line-height: 1;
     -ms-word-break: break-all;

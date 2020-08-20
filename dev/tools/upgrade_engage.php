@@ -129,4 +129,29 @@ if (!$db_manager->table_exists('workspace_off_notification')) {
     $db_manager->create_table($table);
 }
 
+if (!$db_manager->field_exists('workspace', 'timestamp')) {
+    $table = new xmldb_table('workspace');
+    $field = new xmldb_field('timestamp', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'private');
+
+    $db_manager->add_field($table, $field);
+    $workspaces = $DB->get_records('workspace');
+
+    foreach ($workspaces as $workspace) {
+        $new_record = new stdClass();
+        $new_record->id = $workspace->id;
+        $new_record->timestamp = time();
+
+        $DB->update_record('workspace', $new_record);
+    }
+
+    $field->setNotNull(XMLDB_NOTNULL);
+    $db_manager->change_field_notnull($table, $field);
+}
+
+if (!$db_manager->field_exists('totara_comment', 'contenttext')) {
+    $table = new xmldb_table('totara_comment');
+    $field = new xmldb_field('contenttext', XMLDB_TYPE_TEXT, null, null, null, null, null, 'format');
+
+    $db_manager->add_field($table, $field);
+}
 return 0;

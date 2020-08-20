@@ -105,6 +105,10 @@ final class workspace_interactor implements type_resolver {
             case 'muted':
                 return $source->has_turned_off_notification();
 
+            case 'has_seen':
+                $last_check_time = $args['last_check_time'] ?? null;
+                return $source->has_seen($last_check_time);
+
             default:
                 debugging("Invalid field '{$field}' that is not in supported yet", DEBUG_DEVELOPER);
                 return null;

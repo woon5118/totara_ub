@@ -17,6 +17,9 @@
 -->
 
 <style lang="scss">
+:root {
+  --tui-sidepanel-navigation-item-padding-left: var(--tui-gap-8);
+}
 .tui-sidePanelNav {
   padding: var(--tui-gap-4) 0;
   background: var(--tui-side-panel-nav-bg-color);

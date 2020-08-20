@@ -199,6 +199,7 @@ Anyone can join and participate in Public workspaces.
 Private workspaces require approval from the owner to join and content is only visible to members. They can also be hidden from search. To become a member of a hidden workspace, the owner must directly add them
 ';
 $string['workspace_updated'] = 'Workspace updated';
+$string['workspace_updated_notification'] = '{$a} workspace had been updated recently';
 $string['workspace_navigation'] = 'Workspace navigation';
 $string['workspace_viewed'] = 'Workspace viewed';
 $string['your_spaces'] = 'Your Workspaces';

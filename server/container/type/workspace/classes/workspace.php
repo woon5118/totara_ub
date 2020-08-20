@@ -63,7 +63,8 @@ final class workspace extends container implements category_name_provider {
                 c.*, 
                 wo.user_id, 
                 wo.id AS w_id,
-                wo.private AS workspace_private
+                wo.private AS workspace_private,
+                wo.timestamp as timestamp
             FROM "ttr_course" c
             INNER JOIN "ttr_workspace" wo ON wo.course_id = c.id
             WHERE c.id = :course_id
@@ -161,6 +162,7 @@ final class workspace extends container implements category_name_provider {
         $entity->user_id = $user_id;
         $entity->course_id = $new_id;
         $entity->private = 0;
+        $entity->timestamp = time();
 
         if (isset($data->workspace_private) && $data->workspace_private) {
             $entity->private = 1;
@@ -298,6 +300,11 @@ final class workspace extends container implements category_name_provider {
             // Convert it to boolean - so that we can make sure all the invalid number will be stripped out.
             $this->entity->private = clean_param($record->workspace_private, PARAM_BOOL);
             unset($record->workspace_private);
+        }
+
+        if (property_exists($record, 'timestamp')) {
+            $this->entity->timestamp = $record->timestamp;
+            unset($record->timestamp);
         }
 
         parent::map_record($record);
@@ -600,5 +607,27 @@ final class workspace extends container implements category_name_provider {
     public function remove_user(): void {
         $this->entity->user_id = null;
         $this->entity->update();
+    }
+
+    /**
+     * Update the timestamp of itself.
+     *
+     * @param int|null $now
+     * @return void
+     */
+    public function touch(?int $now = null): void {
+        if (empty($now)) {
+            $now = time();
+        }
+
+        $this->entity->timestamp = $now;
+        $this->entity->update();
+    }
+
+    /**
+     * @return int
+     */
+    public function get_timestamp(): int {
+        return $this->entity->timestamp;
     }
 }

@@ -51,6 +51,8 @@ query container_workspace_find_workspaces(
       can_view_member_requests
       can_share_resources
       can_unshare_resources
+      has_seen
+      muted
       user {
         __typename
         id

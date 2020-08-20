@@ -36,11 +36,15 @@
 
       <template v-if="!$apollo.queries.workspaces.loading">
         <SidePanelNavLinkItem
-          v-for="({ url, name, id }, index) in workspaces"
+          v-for="({ url, name, id, interactor }, index) in workspaces"
           :id="id"
           :key="index"
           :text="name"
           :url="url"
+          :notification="innerSelectedWorkspaceId != id && !interactor.has_seen"
+          :notification-text="
+            $str('workspace_updated_notification', 'container_workspace', name)
+          "
           class="tui-workspaceMenu__group__link"
         />
       </template>
@@ -155,7 +159,8 @@ export default {
     "container_workspace": [
       "your_spaces",
       "find_spaces",
-      "workspace_navigation"
+      "workspace_navigation",
+      "workspace_updated_notification"
     ]
   }
 </lang-strings>

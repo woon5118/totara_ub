@@ -71,13 +71,17 @@ final class create_discussion implements mutation_resolver, has_middleware {
             $draft_id = (int) $args['draft_id'];
         }
 
-        return discussion_helper::create_discussion(
+        $discussion = discussion_helper::create_discussion(
             $workspace,
             $args['content'],
             $draft_id,
             $content_format,
             $USER->id
         );
+
+        // We need to update
+
+        return $discussion;
     }
 
     /**

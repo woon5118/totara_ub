@@ -96,6 +96,7 @@ import Bookmark from 'tui/components/icons/common/Bookmark';
 import BookmarkActive from 'tui/components/icons/common/BookmarkActive';
 import Notification from 'tui/components/icons/common/Notification';
 import NotificationDisabled from 'tui/components/icons/common/NotificationDisabled';
+import Dot from 'tui/components/icons/common/Dot';
 
 import Cell from 'tui/components/datatable/Cell';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
@@ -277,6 +278,11 @@ export default {
         {
           icon: NotificationDisabled,
           name: 'Notification disabled',
+          desc: '...',
+        },
+        {
+          icon: Dot,
+          name: 'Dot',
           desc: '...',
         },
       ],

@@ -29,6 +29,7 @@ use container_workspace\event\discussion_updated;
 use container_workspace\exception\discussion_exception;
 use container_workspace\interactor\discussion\interactor as discussion_interactor;
 use container_workspace\interactor\workspace\interactor as workspace_interactor;
+use container_workspace\local\workspace_helper;
 use container_workspace\workspace;
 use totara_comment\comment_helper;
 use totara_reaction\reaction_helper;
@@ -76,6 +77,9 @@ final class discussion_helper {
           $actor_id
         );
 
+        // Update the timestamp of the workspace.
+        workspace_helper::update_workspace_timestamp($workspace, $actor_id);
+
         $event = discussion_created::from_discussion($discussion, $actor_id);
         $event->trigger();
 
@@ -98,6 +102,10 @@ final class discussion_helper {
         if (!$interactor->can_delete()) {
             throw discussion_exception::on_delete();
         }
+
+        // Update the timestamp of the workspace.
+        $workspace = $discussion->get_workspace();
+        workspace_helper::update_workspace_timestamp($workspace, $actor_id);
 
         // Trigger event before deleting first.
         $event = discussion_deleted::from_discussion($discussion, $actor_id);
@@ -176,6 +184,10 @@ final class discussion_helper {
         }
 
         $discussion->update_content($content, $draft_id, $content_format, $actor_id);
+
+        // Update the timestamp of the workspace.
+        $workspace = $discussion->get_workspace();
+        workspace_helper::update_workspace_timestamp($workspace, $actor_id);
 
         // Triggering an event.
         $event = discussion_updated::from_discussion($discussion);

@@ -25,10 +25,11 @@ namespace container_workspace\entity;
 use core\orm\entity\entity;
 
 /**
- * @property int|null  $user_id
- * @property int       $course_id
- * @property int       $id
- * @property bool      $private
+ * @property int|null   $user_id
+ * @property int        $course_id
+ * @property int        $id
+ * @property bool       $private
+ * @property int        $timestamp
  */
 final class workspace extends entity {
     /**

@@ -26,6 +26,7 @@
     display: flex;
     align-items: center;
     padding: 0 var(--tui-gap-4);
+    padding-left: var(--tui-sidepanel-navigation-item-padding-left);
 
     &-title {
       margin: 0;
