@@ -33,6 +33,7 @@ use mod_perform\models\activity\notification_recipient as notification_recipient
  * @property-read integer $relationship_id
  * @property-read string $class_key
  * @property-read integer $sent_at
+ * @codeCoverageIgnore
  */
 final class message {
     /** @var integer */

@@ -32,6 +32,10 @@ use mod_perform\notification\triggerable;
  * due_date handler
  */
 class due_date implements broker, triggerable {
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
     public function get_default_triggers(): array {
         return [];
     }

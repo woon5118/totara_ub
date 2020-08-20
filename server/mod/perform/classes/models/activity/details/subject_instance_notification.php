@@ -100,7 +100,6 @@ class subject_instance_notification {
             ->where_null('si.completed_at')
             ->where('tua.deleted', false)
             ->select(['si.id', 'tua.subject_user_id', 'tua.job_assignment_id', 'si.due_date AS due_date'])
-            // how can I get an instance creation time?
             ->add_select('si.created_at AS instance_created_at')
             ->map_to(function ($item) {
                 return new self($item);

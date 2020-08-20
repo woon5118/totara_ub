@@ -29,6 +29,10 @@ use mod_perform\notification\broker;
  * instance_created handler
  */
 class instance_created implements broker {
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
     public function get_default_triggers(): array {
         return [];
     }

@@ -29,6 +29,9 @@ use mod_perform\notification\factory;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
+/**
+ * @group perform
+ */
 class mod_perform_notification_condition_testcase extends mod_perform_notification_testcase {
     public function data_days_before_after(): array {
         return [
@@ -106,7 +109,10 @@ class mod_perform_notification_condition_testcase extends mod_perform_notificati
     public function test_after_midnight_for() {
         $tz = \core_date::get_server_timezone_object();
         $midnight = (new DateTime('midnight', $tz))->getTimestamp();
-        $six_am = (new DateTime('6am today', $tz))->getTimestamp();
+        $six_am = (new DateTime('today 6am', $tz))->getTimestamp();
+        $two_pm = (new DateTime('today 2pm', $tz))->getTimestamp();
+        $yesterday = (new DateTime('yesterday 7pm', $tz))->getTimestamp();
+        $tomorrow = (new DateTime('tomorrow 3am', $tz))->getTimestamp();
         //                -4 ,   0 ,  +4 ,  +8 ,  +12,  +16,  +20,  +24,  +28
         $expectation = [false, true, true, true, true, true, true, true, true];
         for ($i = 0; $i < 9; $i++) {
@@ -114,6 +120,12 @@ class mod_perform_notification_condition_testcase extends mod_perform_notificati
             $clock = new mod_perform_mock_clock($time);
             $condition = new after_midnight($clock, [], 0);
             $this->assertEquals($expectation[$i], $condition->pass($six_am), sprintf('Failure at #%d (%02dh)', $i, (int)(($time - $midnight) / HOURSECS)));
+            $condition = new after_midnight($clock, [], $yesterday);
+            $this->assertEquals($expectation[$i], $condition->pass($six_am), sprintf('Failure at #%d (%02dh)', $i, (int)(($time - $midnight) / HOURSECS)));
+            $condition = new after_midnight($clock, [], $two_pm);
+            $this->assertFalse($condition->pass($six_am), sprintf('Failure at #%d (%02dh)', $i, (int)(($time - $midnight) / HOURSECS)));
+            $condition = new after_midnight($clock, [], $tomorrow);
+            $this->assertFalse($condition->pass($six_am), sprintf('Failure at #%d (%02dh)', $i, (int)(($time - $midnight) / HOURSECS)));
         }
     }
 

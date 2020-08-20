@@ -1750,32 +1750,47 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
+     * Checks, that element of specified type inside a container is enabled, disabled, on or off.
+     *
+     * @Then /^the "([^"]*)" tui "([^"]*)" should be (enabled|disabled|on|off) in the "([^"]*)" tui "([^"]*)"$/
+     * @param string $element
+     * @param string $selector
+     * @param string $state
+     * @param string $container
+     * @param string $container_selector
+     */
+    public function the_tui_element_should_be_in_the_tui($element, $selector, $state, $container, $container_selector): void {
+        behat_hooks::set_step_readonly(true);
+
+        if ($selector !== 'toggle_switch') {
+            $this->fail('not implemented');
+        }
+
+        $parent = $this->find_tui_element($container, $container_selector);
+        $node = $this->find_tui_element($element, $selector, $parent);
+
+        $button = $this->find('css', self::TOGGLE_BUTTON_LABEL_LOCATOR, false, $node->getParent());
+        if ($state === 'enabled') {
+            $result = !$node->hasAttribute('disabled');
+        } else if ($state === 'disabled') {
+            $result = $node->hasAttribute('disabled');
+        } else if ($state === 'on') {
+            $result = $button->hasAttribute('aria-pressed') && $button->getAttribute('aria-pressed') === 'true';
+        } else if ($state === 'off') {
+            $result = !$button->hasAttribute('aria-pressed') || $button->getAttribute('aria-pressed') !== 'true';
+        }
+        if (!$result) {
+            $this->fail('The element "' . $element . '" is not ' . $state);
+        }
+    }
+
+    /**
      * @param string $label
      * @param string $tui_selector
      * @param NodeElement|null $container
      * @return NodeElement
      */
     private function find_tui_element(string $label, string $tui_selector, ?NodeElement $container = null): NodeElement {
-        $find_toggle_switch = function () use ($label, $tui_selector, $container) {
-            $toggles = $this->find_all('css', self::TOGGLE_BUTTON_LABEL_LOCATOR, false, $container);
-            $specified_toggle = null;
-            foreach ($toggles as $toggle) {
-                if ($toggle->getText() === $label) {
-                    $specified_toggle = $toggle;
-                }
-            }
-            if ($specified_toggle === null && $container === null) {
-                $specified_toggle = $this->find_single_visible(
-                    self::TOGGLE_BUTTON_LABEL_LOCATOR . "[aria-label='{$label}']",
-                    'toggle'
-                );
-            }
-            if ($specified_toggle) {
-                return $this->find('css', self::TOGGLE_BUTTON_LOCATOR, false, $specified_toggle->getParent());
-            }
-            return null;
-        };
-
         $find_default = function () use ($label, $tui_selector, $container) {
             [$selector, $locator] = $this->transform_selector($tui_selector, $label);
             return $this->find($selector, $locator, false, $container);
@@ -1818,8 +1833,25 @@ class behat_totara_tui extends behat_base {
                 return $this->find('xpath', $locator, false, $container);
             },
 
-            'toggle_button' => $find_toggle_switch,
-            'toggle_switch' => $find_toggle_switch,
+            'toggle_switch' => function () use ($label, $tui_selector, $container) {
+                $toggles = $this->find_all('css', self::TOGGLE_BUTTON_LABEL_LOCATOR, false, $container);
+                $specified_toggle = null;
+                foreach ($toggles as $toggle) {
+                    if ($toggle->getText() === $label) {
+                        $specified_toggle = $toggle;
+                    }
+                }
+                if ($specified_toggle === null && $container === null) {
+                    $specified_toggle = $this->find_single_visible(
+                        self::TOGGLE_BUTTON_LABEL_LOCATOR . "[aria-label='{$label}']",
+                        'toggle'
+                    );
+                }
+                if ($specified_toggle) {
+                    return $this->find('css', self::TOGGLE_BUTTON_LOCATOR, false, $specified_toggle->getParent());
+                }
+                return null;
+            },
 
             'text' => $find_default,
             'link' => $find_default,

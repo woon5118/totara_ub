@@ -26,11 +26,12 @@ namespace mod_perform\notification\internals;
 use core\collection;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 use mod_perform\notification\composer;
-use totara_core\entities\relationship as relationship_entity;
 use totara_core\relationship\relationship as relationship_model;
 
 /**
  * The notification message sink for testing.
+ *
+ * @codeCoverageIgnore
  */
 final class sink {
     /** @var collection<message> */
@@ -70,19 +71,12 @@ final class sink {
     /**
      * Get entries filtered by a relationship.
      *
-     * @param relationship_entity|relationship_model|string|int $relationship
+     * @param string $idnumber
      * @return collection<message>
      * @internal
      */
-    public function get_by_relationship($relationship): collection {
-        if (is_string($relationship)) {
-            $relationship = relationship_model::load_by_idnumber($relationship);
-        }
-        if ($relationship instanceof relationship_entity) {
-            $relationship = $relationship->id;
-        } else if ($relationship instanceof relationship_model) {
-            $relationship = $relationship->id;
-        }
+    public function get_by_relationship(string $idnumber): collection {
+        $relationship = relationship_model::load_by_idnumber($idnumber)->id;
         return $this->messages->filter('relationship_id', $relationship);
     }
 

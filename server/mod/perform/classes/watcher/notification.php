@@ -23,6 +23,7 @@
 
 namespace mod_perform\watcher;
 
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\hook\participant_instances_created;
 use mod_perform\notification\factory;
 
@@ -31,15 +32,10 @@ class notification {
      * @param participant_instances_created $hook
      */
     public static function create_participant_instances(participant_instances_created $hook): void {
-        // FIXME: This code added to create_subject_instances() is no longer necessary.
-        // FIXME: However, there is no phpunit/behat test to cover the scenario.
-        // FIXME: Please remove the whole comment block once the test case(s) are added.
-        // if ($subject_instance_dto->status === pending::get_code()) {
-        //     // Don't dispatch notifications until the instance is activated. Once it is activated,
-        //     // notifications are dispatched in \mod_perform\observers\subject_instance_manual_status::subject_instance_activated
-        //     return;
-        // }
-        $cartel = factory::create_cartel_on_participant_instances($hook->get_dtos()->all());
-        $cartel->dispatch('instance_created');
+        $participant_instances = participant_instance_entity::repository()->where_in('id', $hook->get_dtos()->map_to(function ($dto) {
+            return $dto->id;
+        })->all())->get()->all();
+        $dealer = factory::create_dealer_on_participant_instances($participant_instances);
+        $dealer->dispatch('instance_created');
     }
 }

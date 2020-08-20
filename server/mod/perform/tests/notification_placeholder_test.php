@@ -23,16 +23,17 @@
 
 use mod_perform\controllers\activity\user_activities_select_participants;
 use mod_perform\controllers\activity\view_user_activity;
-use mod_perform\models\activity\participant_instance;
+use mod_perform\dates\date_offset;
 use mod_perform\expand_task;
-use totara_job\job_assignment;
+use mod_perform\models\activity\participant_instance;
+use mod_perform\notification\factory;
 use mod_perform\notification\placeholder;
+use totara_job\job_assignment;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
 /**
- * Class participant_section_creation_service_test
- *
+ * @coversDefaultClass mod_perform\notification\placeholder
  * @group perform
  */
 class mod_perform_notification_placeholder_testcase extends mod_perform_notification_testcase {
@@ -43,7 +44,7 @@ class mod_perform_notification_placeholder_testcase extends mod_perform_notifica
      * @param bool $use_duedate
      * @return array
      */
-    private function create_instances(bool $use_duedate = false): array {
+    private function create_instances(date_offset $dateoffset = null): array {
         $this->setAdminUser();
         $users['user1'] = $this->getDataGenerator()->create_user(['username' => 'user1', 'firstname'=>'User', 'lastname' => 'One']);
         $users['user2'] = $this->getDataGenerator()->create_user(['username' => 'user2', 'firstname'=>'User', 'lastname' => 'Two']);
@@ -57,7 +58,7 @@ class mod_perform_notification_placeholder_testcase extends mod_perform_notifica
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
         $this->create_section_relationships($section);
-        $track = $this->create_single_activity_track_and_assignment($activity, [$users['user1']->id, $users['user2']->id], $use_duedate);
+        $track = $this->create_single_activity_track_and_assignment($activity, [$users['user1']->id, $users['user2']->id], $dateoffset);
         $element = $this->perfgen->create_element(['title' => 'Question one', 'plugin_name' => 'short_text']);
         $this->perfgen->create_section_element($section, $element);
 
@@ -77,9 +78,52 @@ class mod_perform_notification_placeholder_testcase extends mod_perform_notifica
     }
 
     /**
+     * @covers ::from_data
+     */
+    public function test_from_data() {
+        $placeholders = placeholder::from_data([
+            'recipient_fullname' => 'User One',
+            'activity_name' => 'My activity',
+            'activity_type' => 'Beer',
+            'subject_fullname' => 'Any One',
+            'participant_fullname' => 'Some One',
+            'participant_relationship' => 'Mom',
+            'instance_duedate' => '01-01-1111',
+            'conditional_duedate' => 'Just complete now!',
+            'instance_created_at' => '02-02-2222',
+            'instance_days_active' => 3,
+            'instance_days_remaining' => 1,
+            'instance_days_overdue' => 4,
+            'activity_url' => 'http://example.com/kia/ora.php',
+            'participant_selection_url' => 'http://example.com/haere/mai.php',
+        ]);
+        $this->assertEquals('User One', $placeholders->recipient_fullname);
+        $this->assertEquals('My activity', $placeholders->activity_name);
+        $this->assertEquals('Beer', $placeholders->activity_type);
+        $this->assertEquals('Any One', $placeholders->subject_fullname);
+        $this->assertEquals('Some One', $placeholders->participant_fullname);
+        $this->assertEquals('Mom', $placeholders->participant_relationship);
+        $this->assertEquals('01-01-1111', $placeholders->instance_duedate);
+        $this->assertEquals('Just complete now!', $placeholders->conditional_duedate);
+        $this->assertEquals('02-02-2222', $placeholders->instance_created_at);
+        $this->assertEquals(3, $placeholders->instance_days_active);
+        $this->assertEquals(1, $placeholders->instance_days_remaining);
+        $this->assertEquals(4, $placeholders->instance_days_overdue);
+        $this->assertEquals('http://example.com/kia/ora.php', $placeholders->activity_url);
+        $this->assertEquals('http://example.com/haere/mai.php', $placeholders->participant_selection_url);
+
+        try {
+            placeholder::from_data(['i_do_not_exist' => 'what?']);
+            $this->fail('coding_exception expected');
+        } catch (coding_exception $ex) {
+            $this->assertStringContainsString('i_do_not_exist is not a valid placeholder name', $ex->getMessage());
+        }
+    }
+
+    /**
      * Tests that placeholders are correct for participant instances created without due date.
      *
-     * @return void
+     * @covers ::from_participant_instance
      */
     public function test_correct_placeholder_values_from_open_participant_instance(): void {
         list($activity, $users, $participant_instances) = $this->create_instances();
@@ -116,29 +160,44 @@ class mod_perform_notification_placeholder_testcase extends mod_perform_notifica
     /**
      * Tests that placeholders are correct for participant instances created with due date set.
      *
-     * @return void
+     * @covers ::from_participant_instance
      */
     public function test_correct_placeholder_values_from_participant_instance_with_duedate(): void {
         // Expected to be due in two weeks.
-        $duedate = time() + (2 * WEEKSECS);
+        $clock = factory::create_clock();
+        $duedate_offset = new date_offset(2, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER);
+        $duedate = $duedate_offset->apply($clock->get_time());
         $strftimedate = get_string('strftimedate');
         $formatted_duedate = userdate($duedate, $strftimedate);
         $a = new stdClass();
         $a->duedate = $formatted_duedate;
         $conditional_duedate = get_string('conditional_duedate_participant_placeholder', 'mod_perform', $a);
-        list($activity, $users, $participant_instances) = $this->create_instances(true);
+        list($activity, $users, $participant_instances) = $this->create_instances($duedate_offset);
         $this->assertCount(5, $participant_instances);
-        foreach ($participant_instances as $px => $participant_instance) {
-            $placeholders = placeholder::from_participant_instance($participant_instance);
-            $this->assertEquals($formatted_duedate, $placeholders->instance_duedate);
-            $this->assertEquals($conditional_duedate, $placeholders->conditional_duedate);
-            $this->assertEquals(14, $placeholders->instance_days_remaining);
-            $this->assertEquals(0, $placeholders->instance_days_overdue);
-        }
+
+        $check = function ($active, $remaining, $overdue) use ($participant_instances, $formatted_duedate, $conditional_duedate) {
+            foreach ($participant_instances as $px => $participant_instance) {
+                $placeholders = placeholder::from_participant_instance($participant_instance);
+                $this->assertEquals($formatted_duedate, $placeholders->instance_duedate);
+                $this->assertEquals($conditional_duedate, $placeholders->conditional_duedate);
+                $this->assertEquals($active, $placeholders->instance_days_active);
+                $this->assertEquals($remaining, $placeholders->instance_days_remaining);
+                $this->assertEquals($overdue, $placeholders->instance_days_overdue);
+            }
+        };
+
+        $check(0, 14, 0);
+        $clock = factory::create_clock_with_time_offset(5 * DAYSECS);
+        $check(5, 9, 0);
+        $clock = factory::create_clock_with_time_offset(12 * DAYSECS);
+        $check(17, 0, 3);
     }
 
     /**
      * Tests that placehoders are correct when created from subject instance without a due date.
+     *
+     * @covers ::from_subject_instance
+     * @covers ::set_participant
      */
     public function test_correct_placeholder_values_from_subject_instance(): void {
         list($activity, $users, $participant_instances) = $this->create_instances();
@@ -196,29 +255,52 @@ class mod_perform_notification_placeholder_testcase extends mod_perform_notifica
     /**
      * Tests that placeholders are correct when created from a subject instance with a due date set.
      *
-     * @return void
+     * @covers ::from_subject_instance
+     * @covers ::set_participant
      */
     public function test_correct_placeholder_values_from_subject_instance_with_duedate(): void {
         // Expected to be due in two weeks.
-        $duedate = time() + (2 * WEEKSECS);
+        $clock = factory::create_clock();
+        $duedate_offset = new date_offset(2, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER);
+        $duedate = $duedate_offset->apply($clock->get_time());
         $strftimedate = get_string('strftimedate');
         $formatted_duedate = userdate($duedate, $strftimedate);
         $a = new stdClass();
         $a->duedate = $formatted_duedate;
         $conditional_duedate = get_string('conditional_duedate_subject_placeholder', 'mod_perform', $a);
-        list($activity, $users, $participant_instances) = $this->create_instances(true);
+        list($activity, $users, $participant_instances) = $this->create_instances($duedate_offset);
+        $this->assertCount(5, $participant_instances);
         $subject_instance = $participant_instances->first()->get_subject_instance();
-        $placeholders = placeholder::from_subject_instance($subject_instance);
-        $this->assertEquals($formatted_duedate, $placeholders->instance_duedate);
-        $this->assertEquals($conditional_duedate, $placeholders->conditional_duedate);
-        $this->assertEquals(14, $placeholders->instance_days_remaining);
-        $this->assertEquals(0, $placeholders->instance_days_overdue);
+
+        $check = function ($active, $remaining, $overdue) use ($subject_instance, $participant_instances, $formatted_duedate, $conditional_duedate) {
+            $placeholders = placeholder::from_subject_instance($subject_instance);
+            $this->assertEquals($formatted_duedate, $placeholders->instance_duedate);
+            $this->assertEquals($conditional_duedate, $placeholders->conditional_duedate);
+            $this->assertEquals($active, $placeholders->instance_days_active);
+            $this->assertEquals($remaining, $placeholders->instance_days_remaining);
+            $this->assertEquals($overdue, $placeholders->instance_days_overdue);
+            // Also test updating the placeholders with a participant and relationship.
+            foreach ($participant_instances as $px => $participant_instance) {
+                $placeholders->set_participant($participant_instance->get_participant()->get_user(), $participant_instance->get_core_relationship());
+                $this->assertEquals($formatted_duedate, $placeholders->instance_duedate);
+                $this->assertEquals($conditional_duedate, $placeholders->conditional_duedate);
+                $this->assertEquals($active, $placeholders->instance_days_active);
+                $this->assertEquals($remaining, $placeholders->instance_days_remaining);
+                $this->assertEquals($overdue, $placeholders->instance_days_overdue);
+            }
+        };
+
+        $check(0, 14, 0);
+        $clock = factory::create_clock_with_time_offset(5 * DAYSECS);
+        $check(5, 9, 0);
+        $clock = factory::create_clock_with_time_offset(12 * DAYSECS);
+        $check(17, 0, 3);
     }
 
     /**
      * Tests the placeholder::format_duration method.
      *
-     * @return void
+     * @covers ::format_duration
      */
     public function test_placeholder_duration_in_days_formatter(): void {
         $now = time();

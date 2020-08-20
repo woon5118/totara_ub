@@ -29,6 +29,10 @@ use mod_perform\notification\broker;
  * completion handler
  */
 class completion implements broker {
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
     public function get_default_triggers(): array {
         return [];
     }

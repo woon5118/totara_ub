@@ -42,6 +42,7 @@ class composer {
      * Constructor. *Do not instantiate this class directly. Use the factory class.*
      *
      * @param string $class_key
+     * @internal
      */
     public function __construct(string $class_key) {
         $this->class_key = $class_key;
@@ -67,15 +68,17 @@ class composer {
      * Get the class key of the current instance.
      *
      * @return string
-     * @internal Do not use this function in production code!!
+     * @codeCoverageIgnore
      */
     public function get_class_key(): string {
         return $this->class_key;
     }
 
     /**
+     * Get the language string id of the message subject.
+     *
      * @return string
-     * @throws coding_exception
+     * @throws coding_exception thrown when a valid relationship is not set
      */
     public function get_subject_lang_key(): string {
         if (!$this->lang_key_prefix) {
@@ -85,8 +88,10 @@ class composer {
     }
 
     /**
+     * Get the language string id of the message body.
+     *
      * @return string
-     * @throws coding_exception
+     * @throws coding_exception thrown when a valid relationship is not set
      */
     public function get_body_lang_key(): string {
         if (!$this->lang_key_prefix) {
@@ -96,6 +101,8 @@ class composer {
     }
 
     /**
+     * Get the language string of the message subject.
+     *
      * @param placeholder $placeholders
      * @return lang_string
      * @throws coding_exception
@@ -105,6 +112,8 @@ class composer {
     }
 
     /**
+     * Get the language string of the message body.
+     *
      * @param placeholder $placeholders
      * @return lang_string
      * @throws coding_exception
@@ -114,18 +123,21 @@ class composer {
     }
 
     /**
+     * Return whether the current instance is a reminder.
+     *
      * @return bool
      * @throws coding_exception
      */
-
     public function is_reminder(): bool {
         return factory::create_loader()->is_reminder($this->class_key);
     }
 
     /**
+     * Generate a message.
+     *
      * @param placeholder $placeholders
      * @return message
-     * @throws coding_exception
+     * @throws coding_exception thrown when a valid relationship is not set
      */
     public function compose(placeholder $placeholders): message {
         $subject = $this->get_subject_lang_string($placeholders)->out();

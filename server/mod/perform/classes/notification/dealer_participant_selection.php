@@ -33,9 +33,9 @@ use mod_perform\models\activity\subject_instance as subject_instance_model;
 use totara_core\relationship\relationship;
 
 /**
- * The cartel_secret class.
+ * The dealer_participant_selection class.
  */
-class cartel_secret extends cartel {
+class dealer_participant_selection extends dealer {
     /** @var subject_instance_entity[] */
     private $subject_instances;
 
@@ -43,8 +43,15 @@ class cartel_secret extends cartel {
      * Constructor. *Do not instantiate this class directly. Use the factory class.*
      *
      * @param subject_instance_entity[] $subject_instances
+     * @throws coding_exception
+     * @internal
      */
     public function __construct(array $subject_instances) {
+        if (!empty(array_filter($subject_instances, function ($x) {
+            return !($x instanceof subject_instance_entity);
+        }))) {
+            throw new coding_exception('subject_instances must be an array of subject_instance entities');
+        }
         $collection = new collection($subject_instances);
         subject_instance_entity::repository()
             ->with('manual_relationship_selection_progress.manual_relationship_selectors.user')
@@ -53,15 +60,14 @@ class cartel_secret extends cartel {
     }
 
     /**
-     * @param string $class_key
-     * @throws coding_exception
+     * @inheritDoc
      */
     public function dispatch(string $class_key): void {
         foreach ($this->subject_instances as $instance) {
             $activity = activity_model::load_by_entity($instance->activity());
             $notification = notification_model::load_by_activity_and_class_key($activity, $class_key);
-            $dealer = factory::create_dealer_on_notification($notification);
-            if (!$dealer) {
+            $mailer = factory::create_mailer_on_notification($notification);
+            if (!$mailer) {
                 // The notification is not active, recipients are not set, etc.
                 continue;
             }
@@ -77,7 +83,7 @@ class cartel_secret extends cartel {
                 if ($selector_relationship) {
                     foreach ($progress->manual_relationship_selectors as $selector) {
                         $placeholders->set_participant($selector->user, $selector_relationship);
-                        $dealer->post($selector->user, $selector_relationship, $placeholders);
+                        $mailer->post($selector->user, $selector_relationship, $placeholders);
                     }
                 }
             }

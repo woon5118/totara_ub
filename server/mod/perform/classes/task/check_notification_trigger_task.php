@@ -87,10 +87,12 @@ class check_notification_trigger_task extends scheduled_task {
                     if (!$broker->is_triggerable_now($condition, $record)) {
                         continue;
                     }
-                    $cartel = factory::create_cartel_on_subject_instance($record->id);
-                    $cartel->dispatch($class_key);
+                    $entity = subject_instance_entity::repository()->find($record->id);
+                    /** @var subject_instance_entity $entity */
+                    $dealer = factory::create_dealer_on_participant_instances($entity->participant_instances->all());
+                    $dealer->dispatch($class_key);
                 }
-                $notification->set_last_run_time($clock->get_time());
+                $notification->set_last_run_at($clock->get_time());
             }
         }
     }

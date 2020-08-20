@@ -27,8 +27,7 @@ use mod_perform\notification\trigger;
 require_once(__DIR__ . '/notification_testcase.php');
 
 /**
- * Class mod_perform_notification_trigger_testcase
- *
+ * @coversDefaultClass mod_perform\notification\trigger
  * @group perform
  */
 class mod_perform_notification_trigger_testcase extends mod_perform_notification_testcase {
@@ -37,12 +36,18 @@ class mod_perform_notification_trigger_testcase extends mod_perform_notification
         $this->mock_loader(null);
     }
 
+    /**
+     * @cover ::are_triggers_available
+     */
     public function test_are_triggers_available() {
         $this->assertFalse((new trigger('mock_one'))->are_triggers_available());
         $this->assertTrue((new trigger('mock_two'))->are_triggers_available());
         $this->assertTrue((new trigger('mock_three'))->are_triggers_available());
     }
 
+    /**
+     * @cover ::translate_outgoing
+     */
     public function test_translate_outgoing() {
         $input = [259200, 86400, 345600];
         $this->assertEquals([], (new trigger('mock_one'))->translate_outgoing($input));
@@ -50,6 +55,9 @@ class mod_perform_notification_trigger_testcase extends mod_perform_notification
         $this->assertEquals([3, 1, 4], (new trigger('mock_three'))->translate_outgoing($input));
     }
 
+    /**
+     * @cover ::translate_incoming
+     */
     public function test_translate_incoming() {
         $this->assertEmpty((new trigger('mock_one'))->translate_incoming([]));
         $this->assertEmpty((new trigger('mock_two'))->translate_incoming([]));

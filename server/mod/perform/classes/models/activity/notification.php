@@ -27,7 +27,6 @@ use coding_exception;
 use core\orm\collection;
 use core\orm\query\builder;
 use core\orm\query\exceptions\record_not_found_exception;
-use mod_perform\models\activity\details\notification_secret;
 use mod_perform\notification\factory;
 use mod_perform\models\activity\details\notification_interface as notification_interface;
 use mod_perform\models\activity\details\notification_real;
@@ -58,7 +57,7 @@ final class notification implements notification_interface {
      * @param notification_interface $input
      */
     private function __construct(notification_interface $input) {
-        if (!($input instanceof notification_real || $input instanceof notification_sparse || $input instanceof notification_secret)) {
+        if (!($input instanceof notification_real || $input instanceof notification_sparse)) {
             throw new coding_exception('invalid instance passed');
         }
         $this->current = $input;
@@ -88,9 +87,6 @@ final class notification implements notification_interface {
         $models = notification_real::load_by_activity($activity);
         $results = new collection();
         foreach ($classes as $class_key => $unused) {
-            if ($loader->is_secret($class_key)) {
-                continue;
-            }
             $model = $models->find('class_key', $class_key)
                    ?? new notification_sparse($activity, $class_key);
             $results->append(new self($model));
@@ -106,12 +102,9 @@ final class notification implements notification_interface {
      * @return self
      */
     public static function load_by_activity_and_class_key(activity $activity, string $class_key): self {
-        $loader = factory::create_loader();
-        if ($loader->is_secret($class_key)) {
-            $model = new notification_secret($activity, $class_key);
-        } else {
-            $model = notification_real::load_by_activity_and_class_key($activity, $class_key, false)
-                ?? new notification_sparse($activity, $class_key);
+        $model = notification_real::load_by_activity_and_class_key($activity, $class_key, false);
+        if ($model === null) {
+            $model = new notification_sparse($activity, $class_key);
         }
         return new self($model);
     }
@@ -238,6 +231,13 @@ final class notification implements notification_interface {
     /**
      * @inheritDoc
      */
+    public function set_last_run_at(int $time): notification_interface {
+        return $this->current->set_last_run_at($time);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function delete(): notification_interface {
         $this->current = $this->current->delete();
         return $this;
@@ -298,21 +298,5 @@ final class notification implements notification_interface {
         return array_map(function ($trigger) {
             return $trigger * DAYSECS;
         }, $this->get_triggers());
-    }
-
-    /**
-     * Update the last run time.
-     *
-     * @param integer $time
-     * @return self
-     * @throws coding_exception
-     */
-    public function set_last_run_time(int $time): self {
-        if (!$this->exists()) {
-            throw new coding_exception('not available');
-        }
-        // FIXME: add set_last_run_time() to notification_interface??
-        \core\orm\query\builder::table(\mod_perform\entities\activity\notification::TABLE)->update_record(['id' => $this->get_id(), 'last_run_at' => $time]);
-        return $this->refresh();
     }
 }

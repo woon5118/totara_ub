@@ -23,85 +23,147 @@
  */
 
 use mod_perform\constants;
-use mod_perform\models\activity\notification_recipient;
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\expand_task;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
+use mod_perform\notification\dealer;
+use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\notification\factory;
-use mod_perform\notification\internals\message;
-use mod_perform\notification\placeholder;
 use totara_job\job_assignment;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
 /**
- * Class mod_perform_notification_dealer_testcase
- *
+ * @coversDefaultClass mod_perform\notification\dealer
+ * @covers mod_perform\notification\factory
  * @group perform
  */
 class mod_perform_notification_dealer_testcase extends mod_perform_notification_testcase {
-    public function test_post() {
-        $activity = $this->create_activity();
-        $section = $this->create_section($activity);
-        $notification = $this->create_notification($activity, 'instance_created', true);
-        $relationships = $this->create_section_relationships($section);
-        $sink = factory::create_sink();
+    public function setUp(): void {
+        parent::setUp();
+        $this->mock_loader(null);
+        $this->setAdminUser();
+    }
 
-        $user = $this->getDataGenerator()->create_user(['username' => 'subject']);
+    /**
+     * @covers ::__construct
+     */
+    public function test_constructor() {
+        $user1 = $this->getDataGenerator()->create_user(['username' => 'user1']);
         $manager = $this->getDataGenerator()->create_user(['username' => 'manager']);
         $appraiser = $this->getDataGenerator()->create_user(['username' => 'appraiser']);
+        $supervisor = $this->getDataGenerator()->create_user(['username' => 'supervisor']);
+        $manmanja = job_assignment::create_default($supervisor->id);
+        $manja = job_assignment::create_default($manager->id, ['managerjaid' => $manmanja->id]);
+        $user1ja = job_assignment::create_default($user1->id, ['appraiserid' => $appraiser->id, 'managerjaid' => $manja->id]);
+        $activity = $this->create_activity();
+        $section = $this->create_section($activity);
+        $this->create_section_relationships($section);
+        $track = $this->create_single_activity_track_and_assignment($activity, [$user1->id]);
+        $element = $this->perfgen->create_element(['title' => 'Question one', 'plugin_name' => 'short_text']);
+        $this->perfgen->create_section_element($section, $element);
+        (new expand_task())->expand_all();
 
-        $userja = job_assignment::create_default($user->id, ['appraiserid' => $appraiser->id]);
-        job_assignment::create_default($manager->id, ['managerjaid' => $userja->id]);
+        $entities = $this->create_participant_instances_on_track($track);
+        $this->assertCount(4, $entities);
+        $this->assertCount(1, $entities->filter('core_relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id));
+        $this->assertCount(1, $entities->filter('core_relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_APPRAISER)->id));
+        $this->assertEquals(1, subject_instance_entity::repository()->count());
 
-        $this->toggle_recipients($notification, [
-            constants::RELATIONSHIP_SUBJECT => true,
-            // constants::RELATIONSHIP_MANAGER => default to false,
-            constants::RELATIONSHIP_APPRAISER => true,
-        ]);
-        $recipients = notification_recipient::load_by_notification($notification, true);
-        $this->assertCount(2, $recipients);
+        $prop = new ReflectionProperty(dealer::class, 'participant_instances');
+        $prop->setAccessible(true);
+
+        $dealer = factory::create_dealer_on_participant_instances($entities->all());
+        $this->assertCount(4, $prop->getValue($dealer));
+
+        $dealer = new dealer($entities->map_to(participant_instance_model::class)->all());
+        $this->assertCount(4, $prop->getValue($dealer));
+
+        // passing an empty array succeeds.
+        $dealer = new dealer([]);
+        $this->assertCount(0, $prop->getValue($dealer));
+
+        try {
+            new dealer($entities->all());
+            $this->fail('coding_exception expected');
+        } catch (coding_exception $ex) {
+            $this->assertStringContainsString('participant_instances must be an array of participant_instance models', $ex->getMessage());
+        }
+
+        try {
+            factory::create_dealer_on_participant_instances($entities->map(function(participant_instance_entity $e) {
+                return $e->id;
+            })->all());
+            $this->fail('coding_exception expected');
+        } catch (coding_exception $ex) {
+            $this->assertStringContainsString('unknown element at 0', $ex->getMessage());
+        }
+    }
+
+    /**
+     * @covers ::dispatch
+     */
+    public function test_dispatch() {
+        $user1 = $this->getDataGenerator()->create_user(['username' => 'user1']);
+        $user2 = $this->getDataGenerator()->create_user(['username' => 'user2']);
+        $manager = $this->getDataGenerator()->create_user(['username' => 'manager']);
+        $appraiser = $this->getDataGenerator()->create_user(['username' => 'appraiser']);
+        $manja = job_assignment::create_default($manager->id);
+        $user1ja = job_assignment::create_default($user1->id, ['appraiserid' => $appraiser->id, 'managerjaid' => $manja->id]);
+        $user2ja = job_assignment::create_default($user2->id, ['managerjaid' => $manja->id]);
+
+        $activity = $this->create_activity();
+        $section = $this->create_section($activity);
+        $this->create_section_relationships($section);
+        $track = $this->create_single_activity_track_and_assignment($activity, [$user1->id, $user2->id]);
+        $element = $this->perfgen->create_element(['title' => 'Question one', 'plugin_name' => 'short_text']);
+        $this->perfgen->create_section_element($section, $element);
+
+        (new expand_task())->expand_multiple($track->assignments->map(function ($ass) {
+            return $ass->id;
+        })->all());
+
+        $notif1 = $this->create_notification($activity, 'mock_one', false);
+        $notif2 = $this->create_notification($activity, 'mock_two', true);
+        $this->toggle_recipients($notif1, [constants::RELATIONSHIP_SUBJECT => true]);
+        $this->toggle_recipients($notif2, [constants::RELATIONSHIP_SUBJECT => true, constants::RELATIONSHIP_APPRAISER => true]);
+
+        $activity->activate();
+        $this->assertTrue($activity->is_active());
+
+        $entities = $this->create_participant_instances_on_track($track);
+        $this->assertCount(5, $entities);
+        $this->assertCount(2, $entities->filter('core_relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id));
+        $this->assertCount(1, $entities->filter('core_relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_APPRAISER)->id));
+        $this->assertCount(2, $entities->filter('core_relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_MANAGER)->id));
+        $this->assertEquals(2, subject_instance_entity::repository()->count());
+        $dealer = factory::create_dealer_on_participant_instances($entities->all());
+
+        $sink = factory::create_sink();
 
         $sink->clear();
-        $dealer = factory::create_dealer_on_notification($notification);
-        $this->assertNotNull($dealer);
-        $this->redirect_messages();
-        $time = time();
-        $placeholders = new placeholder();
-        $dealer->post($user, $relationships[constants::RELATIONSHIP_SUBJECT], $placeholders);
-        $dealer->post($manager, $relationships[constants::RELATIONSHIP_MANAGER], $placeholders);
-        $dealer->post($appraiser, $relationships[constants::RELATIONSHIP_APPRAISER], $placeholders);
-        $messages = $this->get_messages();
+        $dealer->dispatch('mock_one');
+        $this->assertEquals(0, $sink->get_by_class_key('mock_one')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_two')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_three')->count());
 
-        $this->assertCount(2, $messages);
-        $filter_by_user = function (int $userid) {
-            return function ($e) use ($userid) {
-                return $e->useridto == $userid;
-            };
-        };
+        $sink->clear();
+        $dealer->dispatch('mock_two');
+        $this->assertEquals(0, $sink->get_by_class_key('mock_one')->count());
+        $this->assertEquals(3, $sink->get_by_class_key('mock_two')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_three')->count());
 
-        // user
-        $message = current(array_filter($messages, $filter_by_user($user->id)));
-        $this->assertNotEmpty($message);
-        $this->assertStringContainsString(' is ready for you to complete', $message->fullmessage);
+        $sink->clear();
+        $dealer->dispatch('mock_three');
+        $this->assertEquals(0, $sink->get_by_class_key('mock_one')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_two')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_three')->count());
 
-        // appraiser
-        $message = current(array_filter($messages, $filter_by_user($appraiser->id)));
-        $this->assertNotEmpty($message);
-        $this->assertStringContainsString(' you have been selected to participate in the following activity', $message->fullmessage);
-
-        $messages = $sink->get_all();
-        $this->assertCount(2, $messages);
-
-        $message = $sink->get_by_relationship(constants::RELATIONSHIP_SUBJECT)->first();
-        /** @var message|null $message */
-        $this->assertNotNull($message);
-        $this->assertEqualsWithDelta($time, $message->sent_at, 2);
-
-        $message = $sink->get_by_relationship(constants::RELATIONSHIP_MANAGER)->first();
-        /** @var message|null $message */
-        $this->assertNull($message);
-
-        $message = $sink->get_by_relationship(constants::RELATIONSHIP_APPRAISER)->first();
-        /** @var message|null $message */
-        $this->assertNotNull($message);
-        $this->assertEqualsWithDelta($time, $message->sent_at, 2);
+        try {
+            $dealer->dispatch('mock_zero');
+            $this->fail('class_key_not_available expected');
+        } catch (class_key_not_available $ex) {
+        }
     }
 }

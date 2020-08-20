@@ -91,9 +91,11 @@ class loader {
 
     /**
      * Create a loader instance.
+     * **Call factory::create_loader() instead of this function.**
      *
      * @param array|null $notifications array or null to load from notifications.php
      * @return self
+     * @internal
      */
     public static function create(?array $notifications = null): self {
         global $CFG;
@@ -261,17 +263,5 @@ class loader {
     public function is_reminder(string $class_key): bool {
         $info = $this->get_information($class_key);
         return !empty($info['is_reminder']);
-    }
-
-    /**
-     * Return whether a broker is hidden from a user.
-     *
-     * @param string $class_key
-     * @return boolean
-     * @throws class_key_not_available
-     */
-    public function is_secret(string $class_key): bool {
-        $info = $this->get_information($class_key);
-        return !empty($info['secret']);
     }
 }

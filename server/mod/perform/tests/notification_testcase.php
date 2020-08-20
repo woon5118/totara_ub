@@ -22,7 +22,7 @@
  * @category test
  */
 
-use core\orm\query\builder;
+use core\orm\collection;
 use mod_perform\constants;
 use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\participant_instance;
@@ -36,7 +36,6 @@ use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_relationship;
 use mod_perform\models\activity\track;
 use mod_perform\notification\broker;
-use mod_perform\notification\dealer;
 use mod_perform\notification\clock;
 use mod_perform\notification\condition;
 use mod_perform\notification\factory;
@@ -44,9 +43,10 @@ use mod_perform\notification\loader;
 use mod_perform\notification\recipient;
 use mod_perform\notification\trigger;
 use mod_perform\notification\triggerable;
-use totara_core\relationship\relationship;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
+use totara_core\entities\relationship as relationship_entity;
+use totara_core\relationship\relationship;
 
 abstract class mod_perform_notification_testcase extends advanced_testcase {
     /** @var mod_perform_generator */
@@ -58,16 +58,30 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
     /** @var boolean */
     private $loader_mocked = false;
 
+    /** @var array */
+    private $factory_values = [];
+
     public function setUp(): void {
         $this->setAdminUser();
         $this->perfgen = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        // Unfortunately, there's no way to reset static properties across test functions.
+        // We need to capture initial values and set them back on tearDown.
+        $class = new ReflectionClass(factory::class);
+        foreach ($class->getProperties(ReflectionProperty::IS_STATIC) as $prop) {
+            $prop->setAccessible(true);
+            $this->factory_values[$prop->getName()] = $prop->getValue(null);
+        }
     }
 
     public function tearDown(): void {
         $this->perfgen = null;
-        if ($this->loader_mocked) {
-            $this->reset_loader();
+        // Reset the internal bookkeeping of the factory class.
+        foreach ($this->factory_values as $name => $value) {
+            $prop = new ReflectionProperty(factory::class, $name);
+            $prop->setAccessible(true);
+            $prop->setValue(null, $value);
         }
+        $this->factory_values = [];
     }
 
     /**
@@ -97,7 +111,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
                     'name' => 'm0c1< #3',
                     'trigger_type' => trigger::TYPE_AFTER,
                     'trigger_label' => ['learner'],
-                    'condition' => mod_perform_mock_condition_fail::class,
+                    'condition' => mod_perform_mock_condition_pass::class,
                     'recipients' => recipient::STANDARD,
                 ],
             ];
@@ -124,7 +138,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      * Add mocked lang strings to shut up debugging messages.
      * @param string[]|null $relationships
      */
-    protected function add_mock_lang_strings(?array $relationships = null) {
+    protected function add_mock_lang_strings(?array $relationships = null): void {
         if (!$this->loader_mocked) {
             return;
         }
@@ -136,6 +150,31 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
                     $id = "template_{$class_key}_{$relationship}_{$what}";
                     $this->overrideLangString($id, 'mod_perform', 'mock:'.$id, true);
                 }
+            }
+        }
+    }
+
+    /**
+     * Override notification template strings for testing.
+     *
+     * @param string $class_key
+     */
+    protected function override_template_strings(string $class_key): void {
+        $idnumbers = [
+            constants::RELATIONSHIP_SUBJECT,
+            constants::RELATIONSHIP_MANAGER,
+            constants::RELATIONSHIP_APPRAISER,
+            constants::RELATIONSHIP_MANAGERS_MANAGER,
+            constants::RELATIONSHIP_PEER,
+            constants::RELATIONSHIP_MENTOR,
+            constants::RELATIONSHIP_REVIEWER,
+            constants::RELATIONSHIP_EXTERNAL,
+        ];
+        foreach ($idnumbers as $idnumber) {
+            foreach (['subject', 'body'] as $what) {
+                $id = "template_{$class_key}_{$idnumber}_{$what}";
+                // FIXME: do not pass the third parameter
+                $this->overrideLangString($id, 'mod_perform', "{$what} of {$class_key} as {$idnumber} : " . '{$a->recipient_fullname} to {$a->subject_fullname}', true);
             }
         }
     }
@@ -183,6 +222,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
             constants::RELATIONSHIP_SUBJECT,
             constants::RELATIONSHIP_APPRAISER,
             constants::RELATIONSHIP_MANAGER,
+            constants::RELATIONSHIP_MANAGERS_MANAGER,
         ];
     }
 
@@ -210,14 +250,13 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      *
      * @param activity $activity parent activity.
      * @param integer[] $userids
-     * @param bool $use_duedate
+     * @param date_offset|null $due_offset
      * @return track $track the generated track.
      */
-    public function create_single_activity_track_and_assignment(activity $activity, array $userids, bool $use_duedate = false): track {
+    public function create_single_activity_track_and_assignment(activity $activity, array $userids, ?date_offset $due_offset = null): track {
         $track = track::create($activity, "test track");
-        if ($use_duedate) {
-            $dateoffset = new date_offset(2, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER);
-            $track->set_due_date_relative($dateoffset);
+        if ($due_offset) {
+            $track->set_due_date_relative($due_offset);
             $track->update();
         }
         return $this->perfgen->create_track_assignments_with_existing_groups($track, [], [], [], $userids);
@@ -228,9 +267,9 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      * This will not trigger any notifications.
      *
      * @param track $track
-     * @return participant_instance[] array of participant instance entities
+     * @return collection<participant_instance> array of participant instance entities
      */
-    public function create_participant_instances_on_track(track $track): array {
+    public function create_participant_instances_on_track(track $track): collection {
         $collection = track_user_assignment::repository()
             ->filter_by_track_id($track->id)
             ->get()
@@ -252,8 +291,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
             ->where_in('subject_instance_id', $collection->map(function (subject_instance_dto $sid) {
                 return $sid->id;
             })->all())
-            ->get()
-            ->all();
+            ->get();
     }
 
     /**
@@ -264,6 +302,15 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      */
     protected function get_core_relationship(string $idnumber): relationship {
         return $this->perfgen->get_core_relationship($idnumber);
+    }
+
+    /**
+     * Get all available relationships keyed by the idnumber.
+     *
+     * @return array<string, relationship>
+     */
+    protected function get_all_relationships(): array {
+        return relationship_entity::repository()->select('idnumber, *')->order_by('sort_order')->get()->map_to(relationship::class)->all();
     }
 
     /**
@@ -317,7 +364,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
 }
 
 class mod_perform_mock_broker implements broker, triggerable {
-    /** @var integer */
+    /** @var array<string, boolean> */
     private static $triggerable = [];
 
     public function set_triggerable(bool $value): void {
@@ -347,6 +394,10 @@ class mod_perform_mock_broker_three extends mod_perform_mock_broker {
     // nothing to extend
 }
 
+class mod_perform_mock_broker_four extends mod_perform_mock_broker {
+    // nothing to extend
+}
+
 class mod_perform_mock_clock extends clock {
     /** @var integer */
     private $time;
@@ -361,26 +412,29 @@ class mod_perform_mock_clock extends clock {
 }
 
 class mod_perform_mock_condition extends condition {
-    /** @var boolean */
-    private $should_pass = false;
+    /** @var array<string, boolean> */
+    protected static $should_pass = [];
 
-    public function __construct(bool $should_pass) {
-        $this->should_pass = $should_pass;
+    public static function set_condition($class, bool $pass): void {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+        static::$should_pass[$class] = $pass;
     }
 
     public function pass(int $base_time): bool {
-        return $this->should_pass;
+        return static::$should_pass[get_class($this)] ?? false;
     }
 }
 
 class mod_perform_mock_condition_fail extends mod_perform_mock_condition {
     public function __construct() {
-        parent::__construct(false);
+        parent::set_condition($this, false);
     }
 }
 
 class mod_perform_mock_condition_pass extends mod_perform_mock_condition {
     public function __construct() {
-        parent::__construct(true);
+        parent::set_condition($this, true);
     }
 }

@@ -33,11 +33,9 @@ use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\notification\loader;
 use mod_perform\notification\recipient;
 use mod_perform\notification\trigger;
-use totara_core\entities\relationship;
 
 /**
- * Class mod_perform_notification_loader_testcase
- *
+ * @coversDefaultClass mod_perform\notification\loader
  * @group perform
  */
 class mod_perform_notification_loader_testcase extends advanced_testcase {
@@ -100,6 +98,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
      * @param array $notifications
      * @param string $expected_message
      * @dataProvider data_validate_failure
+     * @covers ::validate
      */
     public function test_validate_throws_exception(array $notifications, string $expected_message) {
         try {
@@ -110,6 +109,9 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * @covers ::get_classes
+     */
     public function test_get_classes_default() {
         $loader = loader::create();
         $brokers = $loader->get_classes();
@@ -118,6 +120,9 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * @coversNothing
+     */
     private function create_loader() {
         $notifications = [
             'test_instance_created' => [
@@ -125,7 +130,6 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'name' => ['notification_broker_instance_created', 'mod_perform'],
                 'trigger_type' => trigger::TYPE_ONCE,
                 'is_reminder' => false,
-                'secret' => false,
                 'recipients' => recipient::ALL,
             ],
             'test_overdue_reminder' => [
@@ -153,42 +157,63 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'trigger_label' => ['ok'],
                 'condition' => after_midnight::class,
                 'is_reminder' => false,
-                'secret' => true,
                 'recipients' => recipient::EXTERNAL,
             ],
+            'kia_kaha' => [
+                'class' => mod_perform_mock_broker::class,
+                'name' => ['cancel'],
+                'trigger_type' => -42,
+                'trigger_label' => ['cancel'],
+                'condition' => mod_perform_mock_condition::class,
+                'is_reminder' => false,
+                'recipients' => recipient::MANUAL | recipient::EXTERNAL,
+            ]
         ];
         return loader::create($notifications);
     }
 
+    /**
+     * @covers ::get_classes
+     */
     public function test_get_classes_custom() {
         $loader = $this->create_loader();
         $brokers = $loader->get_classes();
-        $this->assertCount(4, $brokers);
+        $this->assertCount(5, $brokers);
         $keys = array_keys($brokers);
         $this->assertEquals('test_instance_created', $keys[0]);
         $this->assertEquals('test_overdue_reminder', $keys[1]);
         $this->assertEquals('test_due_date_reminder', $keys[2]);
         $this->assertEquals('kia_ora_koutou_katoa', $keys[3]);
+        $this->assertEquals('kia_kaha', $keys[4]);
         $values = array_values($brokers);
         $this->assertEquals(instance_created::class, $values[0]);
         $this->assertEquals(overdue_reminder::class, $values[1]);
         $this->assertEquals(due_date_reminder::class, $values[2]);
         $this->assertEquals(mod_perform_notification_loader_testcase::class, $values[3]);
+        $this->assertEquals(mod_perform_mock_broker::class, $values[4]);
     }
 
+    /**
+     * @covers ::get_class_keys
+     */
     public function test_get_class_keys() {
         $loader = $this->create_loader();
-        $this->assertEquals(['test_instance_created', 'test_overdue_reminder', 'test_due_date_reminder', 'kia_ora_koutou_katoa'], $loader->get_class_keys());
-        $this->assertEquals(['test_overdue_reminder', 'test_due_date_reminder'], $loader->get_class_keys(loader::HAS_TRIGGERS));
-        $this->assertEquals(['test_overdue_reminder', 'test_due_date_reminder', 'kia_ora_koutou_katoa'], $loader->get_class_keys(loader::HAS_CONDITION));
+        $this->assertEquals(['test_instance_created', 'test_overdue_reminder', 'test_due_date_reminder', 'kia_ora_koutou_katoa', 'kia_kaha'], $loader->get_class_keys());
+        $this->assertEquals(['test_overdue_reminder', 'test_due_date_reminder', 'kia_kaha'], $loader->get_class_keys(loader::HAS_TRIGGERS));
+        $this->assertEquals(['test_overdue_reminder', 'test_due_date_reminder', 'kia_ora_koutou_katoa', 'kia_kaha'], $loader->get_class_keys(loader::HAS_CONDITION));
     }
 
+    /**
+     * @covers ::get_class_of
+     * @covers ::ensure_class_key_exists
+     */
     public function test_get_class_of() {
         $loader = $this->create_loader();
         $this->assertEquals(instance_created::class, $loader->get_class_of('test_instance_created'));
         $this->assertEquals(overdue_reminder::class, $loader->get_class_of('test_overdue_reminder'));
         $this->assertEquals(due_date_reminder::class, $loader->get_class_of('test_due_date_reminder'));
         $this->assertEquals(mod_perform_notification_loader_testcase::class, $loader->get_class_of('kia_ora_koutou_katoa'));
+        $this->assertEquals(mod_perform_mock_broker::class, $loader->get_class_of('kia_kaha'));
         try {
             $loader->get_class_of('he_who_must_not_be_named');
             $this->fail('invalid_parameter_exception expected');
@@ -197,12 +222,16 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * @covers ::get_name_of
+     */
     public function test_get_name_of() {
         $loader = $this->create_loader();
         $this->assertEquals(get_string('notification_broker_instance_created', 'mod_perform'), $loader->get_name_of('test_instance_created'));
         $this->assertEquals(get_string('screenshot', 'moodle'), $loader->get_name_of('test_overdue_reminder'));
         $this->assertEquals(get_string('downloadfile'), $loader->get_name_of('test_due_date_reminder'));
         $this->assertEquals(get_string('ok'), $loader->get_name_of('kia_ora_koutou_katoa'));
+        $this->assertEquals(get_string('cancel'), $loader->get_name_of('kia_kaha'));
         try {
             $loader->get_name_of('he_who_must_not_be_named');
             $this->fail('invalid_parameter_exception expected');
@@ -211,36 +240,57 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * @covers ::get_trigger_type_of
+     */
     public function test_get_trigger_type_of() {
         $loader = $this->create_loader();
         $this->assertEquals(trigger::TYPE_ONCE, $loader->get_trigger_type_of('test_instance_created'));
         $this->assertEquals(trigger::TYPE_AFTER, $loader->get_trigger_type_of('test_overdue_reminder'));
         $this->assertEquals(trigger::TYPE_BEFORE, $loader->get_trigger_type_of('test_due_date_reminder'));
         $this->assertEquals(trigger::TYPE_ONCE, $loader->get_trigger_type_of('kia_ora_koutou_katoa'));
+        $this->assertEquals(-42, $loader->get_trigger_type_of('kia_kaha'));
     }
 
+    /**
+     * @covers ::get_trigger_label_of
+     */
     public function test_get_trigger_label_of() {
         $loader = $this->create_loader();
         $this->assertNull($loader->get_trigger_label_of('test_instance_created'));
         $this->assertEquals(get_string('trigger_after', 'mod_perform', ['name' => get_string('readme')]), $loader->get_trigger_label_of('test_overdue_reminder'));
         $this->assertEquals(get_string('trigger_before', 'mod_perform', ['name' => get_string('tags', 'moodle')]), $loader->get_trigger_label_of('test_due_date_reminder'));
         $this->assertNull($loader->get_trigger_label_of('kia_ora_koutou_katoa'));
+        try {
+            $loader->get_trigger_label_of('kia_kaha');
+            $this->fail('coding_exception expected');
+        } catch (coding_exception $ex) {
+            $this->assertStringContainsString('unsupported trigger type', $ex->getMessage());
+        }
     }
 
+    /**
+     * @covers ::get_condition_class_of
+     */
     public function test_get_condition_class_of() {
         $loader = $this->create_loader();
         $this->assertNull($loader->get_condition_class_of('test_instance_created'));
         $this->assertEquals(days_after::class, $loader->get_condition_class_of('test_overdue_reminder'));
         $this->assertEquals(days_before::class, $loader->get_condition_class_of('test_due_date_reminder'));
         $this->assertEquals(after_midnight::class, $loader->get_condition_class_of('kia_ora_koutou_katoa'));
+        $this->assertEquals(mod_perform_mock_condition::class, $loader->get_condition_class_of('kia_kaha'));
     }
 
+    /**
+     * @covers ::support_triggers
+     */
     public function test_support_triggers() {
         $loader = $this->create_loader();
         $this->assertFalse($loader->support_triggers('test_instance_created'));
         $this->assertTrue($loader->support_triggers('test_overdue_reminder'));
         $this->assertTrue($loader->support_triggers('test_due_date_reminder'));
         $this->assertFalse($loader->support_triggers('kia_ora_koutou_katoa'));
+        $this->assertTrue($loader->support_triggers('kia_kaha'));
         try {
             $loader->support_triggers('he_who_must_not_be_named');
             $this->fail('class_key_not_available expected');
@@ -249,12 +299,16 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * @covers ::get_possible_recipients_of
+     */
     public function test_get_possible_recipients_of() {
         $loader = $this->create_loader();
         $this->assertSame(recipient::STANDARD | recipient::MANUAL | recipient::EXTERNAL, $loader->get_possible_recipients_of('test_instance_created'));
         $this->assertSame(recipient::STANDARD | recipient::MANUAL, $loader->get_possible_recipients_of('test_overdue_reminder'));
         $this->assertSame(recipient::STANDARD, $loader->get_possible_recipients_of('test_due_date_reminder'));
         $this->assertSame(recipient::EXTERNAL, $loader->get_possible_recipients_of('kia_ora_koutou_katoa'));
+        $this->assertSame(recipient::MANUAL | recipient::EXTERNAL, $loader->get_possible_recipients_of('kia_kaha'));
         try {
             $loader->get_possible_recipients_of('he_who_must_not_be_named');
             $this->fail('class_key_not_available expected');
@@ -263,30 +317,20 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * @covers ::is_reminder
+     */
     public function test_is_reminder() {
         $loader = $this->create_loader();
         $this->assertFalse($loader->is_reminder('test_instance_created'));
         $this->assertTrue($loader->is_reminder('test_overdue_reminder'));
         $this->assertTrue($loader->is_reminder('test_due_date_reminder'));
         $this->assertFalse($loader->is_reminder('kia_ora_koutou_katoa'));
+        $this->assertFalse($loader->is_reminder('kia_kaha'));
         try {
             $loader->is_reminder('he_who_must_not_be_named');
             $this->fail('invalid_parameter_exception expected');
         } catch (invalid_parameter_exception $ex) {
-            $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
-        }
-    }
-
-    public function test_is_secret() {
-        $loader = $this->create_loader();
-        $this->assertFalse($loader->is_secret('test_instance_created'));
-        $this->assertFalse($loader->is_secret('test_overdue_reminder'));
-        $this->assertFalse($loader->is_secret('test_due_date_reminder'));
-        $this->assertTrue($loader->is_secret('kia_ora_koutou_katoa'));
-        try {
-            $loader->is_secret('he_who_must_not_be_named');
-            $this->fail('class_key_not_available expected');
-        } catch (class_key_not_available $ex) {
             $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
         }
     }

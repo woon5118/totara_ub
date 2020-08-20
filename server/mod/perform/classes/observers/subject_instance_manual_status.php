@@ -24,10 +24,8 @@
 namespace mod_perform\observers;
 
 use core\collection;
-use core\event\base;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\event\subject_instance_activated;
-use mod_perform\notification\factory;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 
@@ -48,9 +46,6 @@ class subject_instance_manual_status {
         $subject_instance_dto = subject_instance_dto::create_from_entity($subject_instance);
 
         self::generate_instances($subject_instance_dto);
-        // FIXME: Someone added this code please remove this function as it could send the instance creation notification twice.
-        // FIXME: Also please add some phpunit/behat test(s) to confirm the notification on this scenario.
-        // self::trigger_notifications($subject_instance_dto);
     }
 
     /**
@@ -63,15 +58,4 @@ class subject_instance_manual_status {
         (new participant_instance_creation())
             ->generate_instances($subject_instance_dto_collection);
     }
-
-    /**
-     * Trigger notifications to be sent to the participant users.
-     *
-     * @param subject_instance_dto $subject_instance_dto
-     */
-    private static function trigger_notifications(subject_instance_dto $subject_instance_dto): void {
-        $cartel = factory::create_cartel_on_subject_instance($subject_instance_dto);
-        $cartel->dispatch('instance_created');
-    }
-
 }

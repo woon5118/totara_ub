@@ -101,6 +101,14 @@ interface notification_interface {
     public function set_triggers(array $values): notification_interface;
 
     /**
+     * Update the last run time.
+     *
+     * @param integer $time
+     * @return notification_interface
+     */
+    public function set_last_run_at(int $time): notification_interface;
+
+    /**
      * Delete the current notification setting.
      *
      * @return notification_interface

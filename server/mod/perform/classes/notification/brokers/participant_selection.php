@@ -29,6 +29,10 @@ use mod_perform\notification\broker;
  * participant_selection handler
  */
 class participant_selection implements broker {
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
     public function get_default_triggers(): array {
         return [];
     }

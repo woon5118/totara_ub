@@ -58,8 +58,10 @@ use mod_perform\models\activity\section_relationship as section_relationship_mod
 use mod_perform\models\activity\subject_instance;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
+use mod_perform\notification\factory;
 use mod_perform\notification\loader as notification_loader;
 use mod_perform\models\activity\element_identifier as element_identifier_model;
+use mod_perform\models\activity\subject_instance_manual_participant;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\activity_state;
 use mod_perform\state\activity\draft;
@@ -587,12 +589,9 @@ class mod_perform_generator extends component_generator_base {
             $activity = $this->create_activity_in_container($data);
 
             // Create all notifications.
-            $loader = notification_loader::create();
-            $key_classes = $loader->get_classes();
-            $notifications = [];
-            foreach ($key_classes as $key => $class) {
-                $notifications[] = notification::create($activity, $key, true);
-            }
+            $notifications = array_map(function ($class_key) use ($activity) {
+                return notification::create($activity, $class_key, true);
+            }, factory::create_loader()->get_class_keys());
 
             if ($configuration->get_number_of_sections_per_activity() > 1) {
                 $activity->get_settings()->update([activity_setting::MULTISECTION => true]);
@@ -1155,14 +1154,19 @@ class mod_perform_generator extends component_generator_base {
      *
      * @param user|object $participant_user
      * @param int $subject_instance_id
-     * @param int $core_relationship_id
+     * @param int|string $core_relationship core_relationship id or idnumber
      * @return participant_instance_entity
      */
     public function create_participant_instance(
         $participant_user,
         int $subject_instance_id,
-        int $core_relationship_id
+        $core_relationship
     ): participant_instance_entity {
+        if (is_int($core_relationship)) {
+            $core_relationship_id = (int)$core_relationship;
+        } else {
+            $core_relationship_id = core_relationship::load_by_idnumber($core_relationship)->id;
+        }
         $participant_instance = new participant_instance_entity();
         $participant_instance->core_relationship_id = $core_relationship_id;
         $participant_instance->participant_source = participant_source::INTERNAL;

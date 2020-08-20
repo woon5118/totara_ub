@@ -29,11 +29,16 @@ use totara_core\entities\relationship as relationship_entity;
 use totara_core\relationship\relationship as relationship_model;
 
 
+/**
+ * @coversDefaultClass mod_perform\notification\recipient
+ * @group perform
+ */
 class mod_perform_notification_recipient_testcase extends advanced_testcase {
     private function get_data(): array {
         $idnumbers = [
             constants::RELATIONSHIP_APPRAISER,
             constants::RELATIONSHIP_MANAGER,
+            constants::RELATIONSHIP_MANAGERS_MANAGER,
             constants::RELATIONSHIP_SUBJECT,
             constants::RELATIONSHIP_PEER,
             constants::RELATIONSHIP_REVIEWER,
@@ -41,17 +46,20 @@ class mod_perform_notification_recipient_testcase extends advanced_testcase {
             constants::RELATIONSHIP_EXTERNAL,
         ];
         $expects_list = [
-            'S' => [recipient::STANDARD, [1, 1, 1, 0, 0, 0, 0]],
-            'M' => [recipient::MANUAL, [0, 0, 0, 1, 1, 1, 0]],
-            'X' => [recipient::EXTERNAL, [0, 0, 0, 0, 0, 0, 1]],
-            'S,M' => [recipient::STANDARD | recipient::MANUAL, [1, 1, 1, 1, 1, 1, 0]],
-            'S,X' => [recipient::STANDARD | recipient::EXTERNAL, [1, 1, 1, 0, 0, 0, 1]],
-            'M,X' => [recipient::MANUAL | recipient::EXTERNAL, [0, 0, 0, 1, 1, 1, 1]],
-            'S,M,X' => [recipient::STANDARD | recipient::MANUAL | recipient::EXTERNAL, [1, 1, 1, 1, 1, 1, 1]],
+            'S' => [recipient::STANDARD, [1, 1, 1, 1, 0, 0, 0, 0]],
+            'M' => [recipient::MANUAL, [0, 0, 0, 0, 1, 1, 1, 0]],
+            'X' => [recipient::EXTERNAL, [0, 0, 0, 0, 0, 0, 0, 1]],
+            'S,M' => [recipient::STANDARD | recipient::MANUAL, [1, 1, 1, 1, 1, 1, 1, 0]],
+            'S,X' => [recipient::STANDARD | recipient::EXTERNAL, [1, 1, 1, 1, 0, 0, 0, 1]],
+            'M,X' => [recipient::MANUAL | recipient::EXTERNAL, [0, 0, 0, 0, 1, 1, 1, 1]],
+            'S,M,X' => [recipient::STANDARD | recipient::MANUAL | recipient::EXTERNAL, [1, 1, 1, 1, 1, 1, 1, 1]],
         ];
         return [$idnumbers, $expects_list];
     }
 
+    /**
+     * @covers ::is_available
+     */
     public function test_is_available() {
         [$idnumbers, $expects_list] = $this->get_data();
         $relationships = relationship_entity::repository()->select_raw('idnumber, *')->get()->map_to(relationship_model::class)->all(true);
@@ -61,8 +69,17 @@ class mod_perform_notification_recipient_testcase extends advanced_testcase {
                 $this->assertEquals($expects[$i], $outcome, "$what: $idnumber");
             }
         }
+        try {
+            recipient::is_available(0, reset($relationships));
+            $this->fail('coding_exception expected');
+        } catch (coding_exception $ex) {
+            $this->assertStringContainsString('recipients are not set', $ex->getMessage());
+        }
     }
 
+    /**
+     * @covers ::where_available
+     */
     public function test_where_available() {
         [$idnumbers, $expects_list] = $this->get_data();
         foreach ($expects_list as $what => [$recipients, $expects]) {
@@ -73,6 +90,13 @@ class mod_perform_notification_recipient_testcase extends advanced_testcase {
                 $outcome = isset($relationships[$idnumber]);
                 $this->assertEquals($expects[$i], $outcome, "$what: $idnumber");
             }
+        }
+        try {
+            $builder = builder::table(relationship_entity::TABLE, 'rel')->select_raw('idnumber, *')->map_to(relationship_entity::class);
+            recipient::where_available(0, $builder, 'rel');
+            $this->fail('coding_exception expected');
+        } catch (coding_exception $ex) {
+            $this->assertStringContainsString('recipients are not set', $ex->getMessage());
         }
     }
 }

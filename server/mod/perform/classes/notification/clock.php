@@ -31,7 +31,9 @@ class clock {
     private $bias = 0;
 
     /**
-     * Constructor.
+     * Constructor. *Do not instantiate this class directly. Use the factory class.*
+     *
+     * @internal
      */
     public function __construct() {
         global $CFG;

@@ -29,6 +29,10 @@ use mod_perform\notification\broker;
  * reopened handler
  */
 class reopened implements broker {
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
     public function get_default_triggers(): array {
         return [];
     }

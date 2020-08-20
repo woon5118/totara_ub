@@ -16,7 +16,7 @@ Feature: Perform activity validation in the notifications tab
     And I follow "Activity test"
     And I switch to "Notifications" tui tab
 
-  Scenario: mod_perform_notification_901: Only participants are displayed as recipients
+  Scenario: mod_perform_notification_001: Only participants are displayed as recipients
     And I click on "Participant instance creation reminder notification" tui "toggle_switch"
     When I toggle the "Participant instance creation reminder" tui collapsible
     Then I should see "No recipients. Go to Content tab: Responding participants, to add recipients" in the "Participant instance creation reminder" tui "collapsible"
@@ -52,7 +52,7 @@ Feature: Perform activity validation in the notifications tab
     When I switch to "Notifications" tui tab
     Then I should see "No recipients. Go to Content tab: Responding participants, to add recipients" in the "Participant instance creation reminder" tui "collapsible"
 
-  Scenario: mod_perform_notification_902: Trigger events are displayed only on the reminders
+  Scenario: mod_perform_notification_002: Trigger events are displayed only on the reminders
     And I click on "Participant selection notification" tui "toggle_switch"
     And I click on "Participant instance creation notification" tui "toggle_switch"
     And I click on "Participant instance creation reminder notification" tui "toggle_switch"
@@ -81,7 +81,7 @@ Feature: Perform activity validation in the notifications tab
     But I should not see "Trigger events" in the "Completion of subject instance" tui "collapsible"
     But I should not see "Trigger events" in the "Reopened activity" tui "collapsible"
 
-  Scenario: mod_perform_notification_903: Trigger events must be unique and between 1 and 365
+  Scenario: mod_perform_notification_003: Trigger events must be unique and between 1 and 365
     When I toggle the "Participant instance creation reminder" tui collapsible
     And I click on "Add" tui "button" in the "Participant instance creation reminder" tui "collapsible"
     Then I should not see "Set trigger from 1 to 365 days" in the "Participant instance creation reminder" tui "collapsible"
@@ -97,7 +97,7 @@ Feature: Perform activity validation in the notifications tab
     But I should not see "Set trigger from 1 to 365 days" in the "Participant instance creation reminder" tui "collapsible"
     But I should not see "Duplicate trigger" in the "Participant instance creation reminder" tui "collapsible"
 
-  Scenario: mod_perform_notification_904: Trigger events are sorted after reloading the page
+  Scenario: mod_perform_notification_004: Trigger events are sorted after reloading the page
     And I click on "Due date approaching reminder notification" tui "toggle_switch"
     And I click on "Overdue reminder notification" tui "toggle_switch"
     And I toggle the "Due date approaching reminder" tui collapsible

@@ -30,8 +30,7 @@ use mod_perform\notification\trigger;
 require_once(__DIR__ . '/notification_testcase.php');
 
 /**
- * Class mod_perform_notification_model_testcase
- *
+ * @covers mod_perform\models\activity\notification
  * @group perform
  */
 class mod_perform_notification_model_testcase extends mod_perform_notification_testcase {

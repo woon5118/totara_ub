@@ -218,6 +218,15 @@ class notification_real extends model implements notification_interface {
     /**
      * @inheritDoc
      */
+    public function set_last_run_at(int $time): notification_interface {
+        $this->entity->last_run_at = $time;
+        $this->entity->save();
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function delete(): notification_interface {
         $inst = new notification_sparse($this->get_activity(), $this->entity->class_key);
         $this->entity->delete();

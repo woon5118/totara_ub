@@ -1,0 +1,239 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
+ * @package mod_perform
+ * @category test
+ */
+
+use core\collection;
+use mod_perform\constants;
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
+use mod_perform\event\subject_instance_progress_updated;
+use mod_perform\hook\participant_instances_created;
+use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
+use mod_perform\notification\factory;
+use mod_perform\notification\recipient;
+use mod_perform\notification\trigger;
+use mod_perform\observers\notification as notification_observer;
+use mod_perform\state\activity\draft;
+use mod_perform\state\subject_instance\complete;
+use mod_perform\state\subject_instance\pending;
+use mod_perform\task\service\participant_instance_dto;
+use mod_perform\watcher\notification as notification_watcher;
+use totara_job\job_assignment;
+
+require_once(__DIR__ . '/notification_testcase.php');
+
+/**
+ * @group perform
+ */
+class mod_perform_notification_watcher_testcase extends mod_perform_notification_testcase {
+    /** @var stdClass */
+    private $user;
+
+    /** @var stdClass */
+    private $manager;
+
+    /** @var stdClass */
+    private $appraiser;
+
+    /** @var activity_model */
+    private $activity1;
+
+    /** @var subject_instance_entity */
+    private $subject_instance1;
+
+    /** @var array<string, participant_instance_entity> */
+    private $participant_instances1;
+
+    /** @var activity_model */
+    private $activity2;
+
+    /** @var subject_instance_entity */
+    private $subject_instance2;
+
+    /** @var array<string, participant_instance_entity> */
+    private $participant_instances2;
+
+    public function setUp(): void {
+        parent::setUp();
+        $this->mock_loader([
+            'instance_created' => [
+                'class' => mod_perform_mock_broker_one::class,
+                'name' => 'instance creation notification',
+                'trigger_type' => trigger::TYPE_ONCE,
+                'recipients' => recipient::ALL,
+            ],
+            'completion' => [
+                'class' => mod_perform_mock_broker_two::class,
+                'name' => 'instance completion notification',
+                'trigger_type' => trigger::TYPE_ONCE,
+                'recipients' => recipient::ALL,
+            ],
+        ]);
+        $this->setAdminUser();
+
+        $this->user = $this->getDataGenerator()->create_user(['username' => 'subject']);
+        $this->manager = $this->getDataGenerator()->create_user(['username' => 'manager']);
+        $this->appraiser = $this->getDataGenerator()->create_user(['username' => 'appraiser']);
+        $userja = job_assignment::create_default($this->user->id, ['appraiserid' => $this->appraiser->id]);
+        job_assignment::create_default($this->manager->id, ['managerjaid' => $userja->id]);
+
+        [$this->activity1, $this->subject_instance1, $this->participant_instances1] = $this->create_data([
+            constants::RELATIONSHIP_SUBJECT => $this->user,
+            constants::RELATIONSHIP_MANAGER => $this->manager,
+            constants::RELATIONSHIP_APPRAISER => $this->appraiser,
+        ]);
+        [$this->activity2, $this->subject_instance2, $this->participant_instances2] = $this->create_data([
+            constants::RELATIONSHIP_SUBJECT => $this->user,
+            constants::RELATIONSHIP_MANAGER => $this->manager,
+        ]);
+    }
+
+    public function tearDown(): void {
+        parent::tearDown();
+        $this->user = $this->manager = $this->appraiser = null;
+        $this->activity1 = $this->subject_instance1 = $this->participant_instances1 = null;
+        $this->activity2 = $this->subject_instance2 = $this->participant_instances2 = null;
+    }
+
+    /**
+     * @param array<string, stdClass> $relationships
+     * @return array of [activity, subject_instance, participant_instances]
+     */
+    private function create_data(array $relationships): array {
+        $activity = $this->create_activity(['activity_status' => draft::get_code()]);
+        $section = $this->create_section($activity);
+        $this->create_section_relationships($section);
+        $track = $this->perfgen->create_activity_tracks($activity, 1)->first(true);
+
+        $user_assignment = new track_user_assignment_entity();
+        $user_assignment->track_id = $track->id;
+        $user_assignment->subject_user_id = $this->user->id;
+        $user_assignment->deleted = false;
+        $user_assignment->save();
+
+        $subject_instance = new subject_instance_entity();
+        $subject_instance->track_user_assignment_id = $user_assignment->id;
+        $subject_instance->subject_user_id = $this->user->id;
+        $subject_instance->status = pending::get_code();
+        $subject_instance->save();
+        $subject_instance->refresh();
+
+        $notifications = [
+            $this->create_notification($activity, 'instance_created', true),
+            $this->create_notification($activity, 'completion', true),
+        ];
+
+        $participant_instances = [];
+        foreach ($relationships as $idnumber => $user) {
+            $relationship = $this->get_core_relationship($idnumber);
+            $participant_instances[$idnumber] = $this->perfgen->create_participant_instance($user, $subject_instance->id, $relationship->id);
+            foreach ($notifications as $notification) {
+                $this->toggle_recipients($notification, [$idnumber => true]);
+            }
+        }
+        return [$activity, $subject_instance, $participant_instances];
+    }
+
+    /**
+     * @covers mod_perform\watcher\notification::create_participant_instances
+     * @covers mod_perform\notification\factory::create_dealer_on_participant_instances
+     */
+    public function test_create_participant_instances() {
+        $hook = new participant_instances_created(new collection([
+            participant_instance_dto::create_from_data([
+                'id' => $this->participant_instances1[constants::RELATIONSHIP_SUBJECT]->id,
+                'activity_id' => $this->activity1->id,
+                'core_relationship_id' => $this->participant_instances1[constants::RELATIONSHIP_SUBJECT]->core_relationship_id,
+            ]),
+            participant_instance_dto::create_from_data([
+                'id' => $this->participant_instances1[constants::RELATIONSHIP_MANAGER]->id,
+                'activity_id' => $this->activity1->id,
+                'core_relationship_id' => $this->participant_instances1[constants::RELATIONSHIP_MANAGER]->core_relationship_id,
+            ]),
+            participant_instance_dto::create_from_data([
+                'id' => $this->participant_instances1[constants::RELATIONSHIP_APPRAISER]->id,
+                'activity_id' => $this->activity1->id,
+                'core_relationship_id' => $this->participant_instances1[constants::RELATIONSHIP_APPRAISER]->core_relationship_id,
+            ]),
+            participant_instance_dto::create_from_data([
+                'id' => $this->participant_instances2[constants::RELATIONSHIP_SUBJECT]->id,
+                'activity_id' => $this->activity2->id,
+                'core_relationship_id' => $this->participant_instances1[constants::RELATIONSHIP_SUBJECT]->core_relationship_id,
+            ]),
+            participant_instance_dto::create_from_data([
+                'id' => $this->participant_instances2[constants::RELATIONSHIP_MANAGER]->id,
+                'activity_id' => $this->activity2->id,
+                'core_relationship_id' => $this->participant_instances1[constants::RELATIONSHIP_MANAGER]->core_relationship_id,
+            ]),
+        ]));
+
+        $sink = factory::create_sink();
+        $sink->clear();
+        notification_watcher::create_participant_instances($hook);
+        $this->assertCount(5, $sink->get_all());
+        $creation = $sink->get_by_class_key('instance_created');
+        $this->assertCount(5, $creation);
+        $this->assertCount(2, $creation->filter('relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id));
+        $this->assertCount(2, $creation->filter('relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_MANAGER)->id));
+        $this->assertCount(1, $creation->filter('relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_APPRAISER)->id));
+    }
+
+    /**
+     * @covers mod_perform\observers\notification::send_completion_notification
+     * @covers mod_perform\notification\factory::create_dealer_on_subject_instance
+     */
+    public function test_send_completion_notification() {
+        $sink = factory::create_sink();
+        $event1 = subject_instance_progress_updated::create_from_subject_instance(subject_instance_model::load_by_entity($this->subject_instance1));
+        $event2 = subject_instance_progress_updated::create_from_subject_instance(subject_instance_model::load_by_entity($this->subject_instance2));
+
+        $sink->clear();
+        notification_observer::send_completion_notification($event1);
+        $this->assertCount(0, $sink->get_all());
+        $sink->clear();
+        notification_observer::send_completion_notification($event2);
+
+        $this->assertCount(0, $sink->get_all());
+        $this->subject_instance1->progress = complete::get_code();
+        $this->subject_instance1->save();
+        $this->subject_instance2->progress = complete::get_code();
+        $this->subject_instance2->save();
+        $sink->clear();
+        notification_observer::send_completion_notification($event1);
+        $this->assertCount(3, $sink->get_all());
+        $completion = $sink->get_by_class_key('completion');
+        $this->assertCount(3, $completion);
+        $this->assertCount(1, $completion->filter('relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id));
+        $this->assertCount(1, $completion->filter('relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_MANAGER)->id));
+        $this->assertCount(1, $completion->filter('relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_APPRAISER)->id));
+        $sink->clear();
+        notification_observer::send_completion_notification($event2);
+        $this->assertCount(2, $sink->get_all());
+        $completion = $sink->get_by_class_key('completion');
+        $this->assertCount(2, $completion);
+        $this->assertCount(1, $completion->filter('relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id));
+        $this->assertCount(1, $completion->filter('relationship_id', $this->get_core_relationship(constants::RELATIONSHIP_MANAGER)->id));
+    }
+}

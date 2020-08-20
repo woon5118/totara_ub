@@ -40,11 +40,12 @@ abstract class condition {
     private $last_run_time;
 
     /**
-     * Constructor.
+     * Constructor. *Do not instantiate this class directly. Use the factory class.*
      *
      * @param clock $clock
      * @param array $triggers trigger values in seconds
      * @param integer $last_run_time
+     * @internal
      */
     public function __construct(clock $clock, array $triggers, int $last_run_time) {
         $this->clock = $clock;

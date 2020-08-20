@@ -578,17 +578,6 @@ Thank you for your participation.
 You can review the completed activity through this link: {$a->activity_link}';
 $string['template_completion_managers_manager_subject'] = 'Completed activity - {$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
 
-$string['template_completion_perform_external_body'] = 'Hi {$a->recipient_fullname},
-
-The following activity has been completed by all participants:
-
-{$a->activity_name} {$a->activity_type}: {$a->subject_fullname}
-
-Thank you for your participation.
-
-You can review the completed activity through this link: {$a->activity_link}';
-$string['template_completion_perform_external_subject'] = 'Completed activity - {$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
-
 $string['template_completion_perform_mentor_body'] = 'Hi {$a->recipient_fullname},
 
 The following activity has been completed by all participants:
@@ -1061,50 +1050,6 @@ Please complete this as soon as possible, to give participants time to provide t
 {$a->conditional_duedate}
 You can select participants through this link: {$a->participant_selection_link}';
 $string['template_participant_selection_managers_manager_subject'] = 'Select participants for {$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
-
-$string['template_participant_selection_perform_external_body'] = 'Hi {$a->recipient_fullname},
-
-As {$a->subject_fullname}’s {$a->participant_relationship}, you need to select who should participate in the following activity:
-
-{$a->activity_name} {$a->activity_type}
-
-Please complete this as soon as possible, to give participants time to provide their input.
-{$a->conditional_duedate}
-You can select participants through this link: {$a->participant_selection_link}';
-$string['template_participant_selection_perform_external_subject'] = 'Select participants for {$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
-
-$string['template_participant_selection_perform_mentor_body'] = 'Hi {$a->recipient_fullname},
-
-As {$a->subject_fullname}’s {$a->participant_relationship}, you need to select who should participate in the following activity:
-
-{$a->activity_name} {$a->activity_type}
-
-Please complete this as soon as possible, to give participants time to provide their input.
-{$a->conditional_duedate}
-You can select participants through this link: {$a->participant_selection_link}';
-$string['template_participant_selection_perform_mentor_subject'] = 'Select participants for {$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
-
-$string['template_participant_selection_perform_peer_body'] = 'Hi {$a->recipient_fullname},
-
-As {$a->subject_fullname}’s {$a->participant_relationship}, you need to select who should participate in the following activity:
-
-{$a->activity_name} {$a->activity_type}
-
-Please complete this as soon as possible, to give participants time to provide their input.
-{$a->conditional_duedate}
-You can select participants through this link: {$a->participant_selection_link}';
-$string['template_participant_selection_perform_peer_subject'] = 'Select participants for {$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
-
-$string['template_participant_selection_perform_reviewer_body'] = 'Hi {$a->recipient_fullname},
-
-As {$a->subject_fullname}’s {$a->participant_relationship}, you need to select who should participate in the following activity:
-
-{$a->activity_name} {$a->activity_type}
-
-Please complete this as soon as possible, to give participants time to provide their input.
-{$a->conditional_duedate}
-You can select participants through this link: {$a->participant_selection_link}';
-$string['template_participant_selection_perform_reviewer_subject'] = 'Select participants for {$a->activity_name} {$a->activity_type}: {$a->subject_fullname}';
 
 $string['template_participant_selection_subject_body'] = 'Hi {$a->recipient_fullname},
 

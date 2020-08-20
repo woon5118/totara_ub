@@ -29,8 +29,7 @@ use mod_perform\models\activity\notification_recipient;
 require_once(__DIR__ . '/notification_testcase.php');
 
 /**
- * Class mod_perform_notification_recipient_model_testcase
- *
+ * @covers mod_perform\models\activity\notification_recipient
  * @group perform
  */
 class mod_perform_notification_recipient_model_testcase extends mod_perform_notification_testcase {
@@ -81,7 +80,7 @@ class mod_perform_notification_recipient_model_testcase extends mod_perform_noti
         notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_SUBJECT], false);
         notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_APPRAISER], true);
 
-        $this->assertCount(3, notification_recipient::load_by_notification($notification, false));
+        $this->assertCount(4, notification_recipient::load_by_notification($notification, false));
         $this->assertCount(1, notification_recipient::load_by_notification($notification, true));
     }
 

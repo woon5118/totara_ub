@@ -25,16 +25,14 @@ namespace mod_perform\notification;
 
 use coding_exception;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\activity\details\subject_instance_notification;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\notification\internals\sink;
 use mod_perform\task\service\participant_instance_dto;
-use mod_perform\task\service\subject_instance_dto;
-use stdClass;
 
 /**
  * factory class
@@ -77,83 +75,71 @@ abstract class factory {
      *
      * @param notification_model $notification
      * @return condition
+     * @throws coding_exception
      */
     public static function create_condition(notification_model $notification): condition {
         $class_key = $notification->get_class_key();
         $condition_class = self::create_loader()->get_condition_class_of($class_key);
+        if ($condition_class === null) {
+            throw new coding_exception('condition is not supported for '. $class_key);
+        }
         return new $condition_class(self::create_clock(), $notification->get_triggers_in_seconds(), $notification->last_run_at);
     }
 
     /**
-     * Create a cartel instance.
+     * Create a dealer instance.
      *
-     * @param integer|subject_instance_dto|subject_instance_entity $subject_instance
-     * @return cartel
+     * @param subject_instance_entity $subject_instance
+     * @return dealer
      */
-    public static function create_cartel_on_subject_instance($subject_instance): cartel {
-        if ($subject_instance instanceof subject_instance_entity) {
-            $participant_instances = $subject_instance->participant_instances->all();
-        } else {
-            if ($subject_instance instanceof subject_instance_dto) {
-                $subject_instance = $subject_instance->id;
-            }
-            $participant_instances = participant_instance_entity::repository()->where('subject_instance_id', $subject_instance)->get()->all();
-        }
-        return self::create_cartel_on_participant_instances($participant_instances);
+    public static function create_dealer_on_subject_instance(subject_instance_entity $subject_instance): dealer {
+        $participant_instances = $subject_instance->participant_instances->map_to(participant_instance::class)->all();
+        return self::create_dealer_on_participant_instances($participant_instances);
     }
 
     /**
-     * Create a cartel instance.
+     * Create a dealer instance for manual participant selection.
      *
      * @param subject_instance_entity[] $subject_instances
-     * @return cartel
+     * @return dealer
      */
-    public static function create_cartel_on_subject_instances_for_manual_participants(array $subject_instances): cartel {
+    public static function create_dealer_on_subject_instances_for_manual_participants(array $subject_instances): dealer {
         // Need a different class because participant instances are not available.
-        return new cartel_secret($subject_instances);
+        return new dealer_participant_selection($subject_instances);
     }
 
     /**
-     * Create a cartel instance.
+     * Create a dealer instance.
      *
-     * @param (integer|participant_instance_dto|participant_instance|participant_instance_entity|stdClass)[] $participant_instances
-     * @return cartel
+     * @param (participant_instance|participant_instance_entity)[] $participant_instances
+     * @return dealer
      */
-    public static function create_cartel_on_participant_instances(array $participant_instances): cartel {
+    public static function create_dealer_on_participant_instances(array $participant_instances): dealer {
         $instances = array_map(function ($e, $i) {
-            if ($e instanceof participant_instance_dto) {
-                return participant_instance::load_by_id($e->get_id());
-            }
             if ($e instanceof participant_instance) {
                 return $e;
             }
             if ($e instanceof participant_instance_entity) {
                 return participant_instance::load_by_entity($e);
             }
-            if ($e instanceof stdClass) {
-                return participant_instance::load_by_id($e->id);
-            }
-            if (is_int($e)) {
-                return participant_instance::load_by_id($e);
-            }
             throw new coding_exception('unknown element at ' . $i);
         }, $participant_instances, array_keys($participant_instances));
         /** @var participant_instance[] $instances */
-        return new cartel($instances);
+        return new dealer($instances);
     }
 
     /**
-     * Create a dealer instance.
+     * Create a mailer instance.
      *
      * @param notification_model $notification
-     * @return dealer|null The dealer instance or null if the notification cannot be sent
+     * @return mailer|null The mailer instance or null if the notification cannot be sent
      */
-    public static function create_dealer_on_notification(notification_model $notification): ?dealer {
+    public static function create_mailer_on_notification(notification_model $notification): ?mailer {
         if ($notification->active) {
-            $dealer = new dealer($notification);
+            $mailer = new mailer($notification);
             // Optimise out when no recipients are enabled.
-            if ($dealer->has_recipients()) {
-                return $dealer;
+            if ($mailer->has_recipients()) {
+                return $mailer;
             }
         }
         return null;
@@ -220,7 +206,7 @@ abstract class factory {
             if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
                 self::$sink = new sink();
             } else {
-                self::$sink = null;
+                self::$sink = null; // @codeCoverageIgnore
             }
         }
         return self::$sink;

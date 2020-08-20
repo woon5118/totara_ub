@@ -32,11 +32,18 @@ use mod_perform\notification\triggerable;
  * instance_created_reminder handler
  */
 class instance_created_reminder implements broker, triggerable {
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
     public function get_default_triggers(): array {
         return [DAYSECS];
     }
 
     public function is_triggerable_now(condition $condition, subject_instance_notification $record): bool {
+        if (empty($record->instance_created_at)) {
+            return false;
+        }
         return $condition->pass($record->instance_created_at);
     }
 }

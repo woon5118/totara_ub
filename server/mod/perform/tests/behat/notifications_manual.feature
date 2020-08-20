@@ -56,7 +56,7 @@ Feature: Perform activity notifications - manual relationships
     And I navigate to the manage perform activities page
     And I follow "Activity test"
 
-  Scenario: mod_perform_notification_101: Select participants notification
+  Scenario: mod_perform_notification_201: Select participants notification
     And I switch to "Content" tui tab
     And I click on "Add participants" "button"
     And I click on "Manager" tui "checkbox"
@@ -73,16 +73,16 @@ Feature: Perform activity notifications - manual relationships
     And I switch to "Notifications" tui tab
     And I toggle the "Participant selection" tui collapsible
     And I click on "Participant selection notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "Participant selection" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_button" in the "Participant selection" tui "collapsible"
-    And I click on "Manager" tui "toggle_button" in the "Participant selection" tui "collapsible"
+    And I click on "Subject" tui "toggle_switch" in the "Participant selection" tui "collapsible"
+    And I click on "Appraiser" tui "toggle_switch" in the "Participant selection" tui "collapsible"
+    And I click on "Manager" tui "toggle_switch" in the "Participant selection" tui "collapsible"
     # Also activate the instance creation notification.
     And I toggle the "Participant instance creation" tui collapsible
     And I click on "Participant instance creation notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
-    And I click on "Peer" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
-    And I click on "Mentor" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
+    And I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
+    And I click on "Appraiser" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
+    And I click on "Peer" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
+    And I click on "Mentor" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
 
     And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
@@ -159,7 +159,7 @@ Feature: Perform activity notifications - manual relationships
     And I open the notification popover
     Then I should see "Ny aktivitetsmeddelelse"
 
-  Scenario: mod_perform_notification_102: External participation notification
+  Scenario: mod_perform_notification_202: External participation notification
     And I switch to "Content" tui tab
     And I click on "Add participants" "button"
     And I click on "External respondent" tui "checkbox"
@@ -169,12 +169,12 @@ Feature: Perform activity notifications - manual relationships
     And I switch to "Notifications" tui tab
     And I toggle the "Participant instance creation" tui collapsible
     And I click on "Participant instance creation notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
-    And I click on "External respondent" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
+    And I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
+    And I click on "External respondent" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
     # Let's turn on the participant selection notification also.
     And I toggle the "Participant selection" tui collapsible
     And I click on "Participant selection notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "Participant selection" tui "collapsible"
+    And I click on "Subject" tui "toggle_switch" in the "Participant selection" tui "collapsible"
 
     And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
@@ -211,4 +211,5 @@ Feature: Perform activity notifications - manual relationships
     And I log in as "admin"
     And I navigate to "Logs" node in "Site administration > Server"
     And I press "Get these logs"
-    Then I should see "The user with id '0' sent a message to the user with id '-45'." exactly "2" times
+    # See if there are two records of "The user with id '0' sent a message with id 'X' to the user with id '-45'."
+    Then I should see "to the user with id '-45'." exactly "2" times

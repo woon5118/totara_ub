@@ -72,8 +72,8 @@ class manual_participant_progress {
         if (!empty($this->selectors_to_insert)) {
             builder::get_db()->insert_records_via_batch(manual_relationship_selector::TABLE, $this->selectors_to_insert);
             // Send notifications.
-            $cartel = factory::create_cartel_on_subject_instances_for_manual_participants($pending_subject_instances->all());
-            $cartel->dispatch('participant_selection');
+            $dealer = factory::create_dealer_on_subject_instances_for_manual_participants($pending_subject_instances->all());
+            $dealer->dispatch('participant_selection');
         }
     }
 

@@ -37,8 +37,8 @@ class notification {
         $entity = new subject_instance_entity($event->objectid);
         $inst = subject_instance_model::load_by_entity($entity);
         if ($inst->is_completed()) {
-            $cartel = factory::create_cartel_on_subject_instance($entity);
-            $cartel->dispatch('completion');
+            $dealer = factory::create_dealer_on_subject_instance($entity);
+            $dealer->dispatch('completion');
         }
     }
 }

@@ -78,7 +78,7 @@ class notification_sparse implements notification_interface {
     /**
      * {@inheritDoc}
      *
-     * NOTE: the function always returns false.
+     * NOTE: the function just returns false.
      */
     public function get_active(): bool {
         return false;
@@ -102,7 +102,9 @@ class notification_sparse implements notification_interface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * NOTE: the function just throws a coding_exception.
      */
     public function get_last_run_at(): int {
         throw new coding_exception('not available');
@@ -111,7 +113,7 @@ class notification_sparse implements notification_interface {
     /**
      * {@inheritDoc}
      *
-     * NOTE: the function always returns false.
+     * NOTE: the function just returns false.
      */
     public function exists(): bool {
         return false;
@@ -126,9 +128,20 @@ class notification_sparse implements notification_interface {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * NOTE: the function just throws a coding_exception.
      */
     public function set_triggers(array $values): notification_interface {
+        throw new coding_exception('not available');
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * NOTE: the function just throws a coding_exception.
+     */
+    public function set_last_run_at(int $time): notification_interface {
         throw new coding_exception('not available');
     }
 

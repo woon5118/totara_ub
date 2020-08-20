@@ -24,148 +24,56 @@
 namespace mod_perform\notification;
 
 use coding_exception;
-use core\entities\user as user_entity;
-use core\message\message;
-use core_user;
-use dml_exception;
-use mod_perform\models\activity\external_participant as external_participant_model;
 use mod_perform\models\activity\notification as notification_model;
-use mod_perform\models\activity\notification_recipient as notification_recipient_model;
-use mod_perform\models\activity\participant as participant_model;
-use stdClass;
-use totara_core\relationship\relationship as relationship_model;
-use totara_core\totara_user;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
 
 /**
  * The dealer class.
  */
 class dealer {
-    /** @var notification_recipient_model[] */
-    private $recipients;
-
-    /** @var composer */
-    private $composer;
-
-    /** @var integer */
-    private $course_id;
+    /** @var participant_instance_model[] */
+    private $participant_instances;
 
     /**
      * Constructor. *Do not instantiate this class directly. Use the factory class.*
      *
-     * @param notification_model $notification
-     */
-    public function __construct(notification_model $notification) {
-        $this->recipients = notification_recipient_model::load_by_notification($notification, true);
-        $this->composer = factory::create_composer($notification->class_key);
-        $this->course_id = $notification->activity->course;
-    }
-
-    /**
-     * Return true if the notification has any recipients.
-     *
-     * @return boolean
-     */
-    public function has_recipients(): bool {
-        return count($this->recipients) > 0;
-    }
-
-    /**
-     * Post a notification.
-     *
-     * @param user_entity|stdClass|participant_model|external_participant_model $user
-     * @param relationship_model $relationship
-     * @param placeholder $placeholders
-     * @return boolean
-     */
-    public function post($user, relationship_model $relationship, placeholder $placeholders): bool {
-        $recipient = $this->resolve_recipient($relationship);
-        if (!$recipient) {
-            return false;
-        }
-        if (!$this->composer->set_relationship($relationship)) {
-            return false;
-        }
-        if ($user instanceof participant_model) {
-            // Set $user to either user_entity or external_participant_model.
-            $user = $user->get_user();
-        }
-        if ($user instanceof external_participant_model) {
-            // Convert $user from external_participant_model to the good-old stdClass.
-            $user = totara_user::get_external_user($user->email);
-        } else if ($user instanceof user_entity) {
-            // Convert $user from user_entity to the good-old stdClass.
-            $user = $user->get_record();
-        }
-        $is_reminder = $this->composer->is_reminder();
-        $message = $this->composer->compose($placeholders);
-        $this->send_notification(core_user::NOREPLY_USER, $user, $message, $is_reminder);
-        $this->save_history($recipient, time());
-        return true;
-    }
-
-    /**
-     * Save a historical record for testing.
-     *
-     * @param notification_recipient_model $recipient
-     */
-    private function save_history(notification_recipient_model $recipient): void {
-        $sink = factory::create_sink();
-        if ($sink) {
-            $sink->push($recipient, $this->composer, time());
-        }
-    }
-
-    /**
-     * Send a notification.
-     *
-     * @param stdClass|integer|string $from user object or user id or NOREPLY_USER or SUPPORT_USER
-     * @param stdClass|integer|string $to user object or user id or NOREPLY_USER or SUPPORT_USER
-     * @param message $message
-     * @param bool $is_reminder set true to send through the reminder channel instead of the notification channel
-     */
-    private function send_notification($from, $to, message $message, bool $is_reminder): void {
-        $from = self::resolve_user($from);
-        $to = self::resolve_user($to);
-
-        $eventdata = clone $message;
-        $eventdata->courseid         = $this->course_id;
-        $eventdata->modulename       = 'perform';
-        $eventdata->userfrom         = $from;
-        $eventdata->userto           = $to;
-
-        $eventdata->name = $is_reminder ? 'activity_reminder' : 'activity_notification';
-        $eventdata->component       = 'mod_perform';
-        $eventdata->notification    = 1;
-
-        message_send($eventdata);
-    }
-
-    /**
-     * @param relationship_model $relationship
-     * @return notification_recipient_model|null
-     */
-    private function resolve_recipient(relationship_model $relationship): ?notification_recipient_model {
-        foreach ($this->recipients as $recipient) {
-            if ($recipient->get_relationship_id() == $relationship->id) {
-                return $recipient;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param stdClass|integer|string $user
-     * @return stdClass
+     * @param participant_instance_model[] $participant_instances
      * @throws coding_exception
-     * @throws dml_exception
+     * @internal
      */
-    private static function resolve_user($user): stdClass {
-        if (is_object($user)) {
-            return $user;
+    public function __construct(array $participant_instances) {
+        if (!empty(array_filter($participant_instances, function ($x) {
+            return !($x instanceof participant_instance_model);
+        }))) {
+            throw new coding_exception('participant_instances must be an array of participant_instance models');
         }
-        if (is_number($user)) {
-            return core_user::get_user($user, '*', MUST_EXIST);
+        $this->participant_instances = $participant_instances;
+    }
+
+    /**
+     * Fire a notification associated to the class key.
+     *
+     * @param string $class_key
+     * @throws coding_exception
+     */
+    public function dispatch(string $class_key): void {
+        $subject_instance_id = false;
+        $mailer = null;
+
+        foreach ($this->participant_instances as $instance) {
+            if ($instance->subject_instance_id !== $subject_instance_id) {
+                $notification = notification_model::load_by_activity_and_class_key($instance->get_subject_instance()->get_activity(), $class_key);
+                $mailer = factory::create_mailer_on_notification($notification);
+                $subject_instance_id = $instance->subject_instance_id;
+            }
+            if (!$mailer) {
+                // The notification is not active, recipients are not set, etc.
+                continue;
+            }
+            $user = $instance->get_participant();
+            $relationship = $instance->get_core_relationship();
+            $placeholders = placeholder::from_participant_instance($instance);
+            $mailer->post($user, $relationship, $placeholders);
         }
-        throw new coding_exception('invalid user passed');
     }
 }

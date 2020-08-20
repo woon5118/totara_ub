@@ -23,6 +23,7 @@
 
 namespace mod_perform\notification;
 
+use coding_exception;
 use core\entities\user;
 use mod_perform\controllers\activity\user_activities_select_participants;
 use mod_perform\controllers\activity\view_user_activity;
@@ -83,6 +84,25 @@ class placeholder {
     /** @var string HTML link */
     public $participant_selection_link;
 
+    /**
+     * Factory method to initialise placeholder values from an array of [key => value].
+     * **Do not use this function in production code!!**
+     *
+     * @param string[] $values
+     * @return placeholder
+     * @throws coding_exception thrown when a placeholder name is invalid
+     * @internal
+     */
+    public static function from_data(array $values): placeholder {
+        $new = new placeholder();
+        foreach ($values as $key => $value) {
+            if (!property_exists($new, $key)) {
+                throw new coding_exception("{$key} is not a valid placeholder name");
+            }
+            $new->{$key} = $value;
+        }
+        return $new;
+    }
 
     /**
      * Factory method to initialise placeholder values from a participant instance.
@@ -91,6 +111,7 @@ class placeholder {
      * @return placeholder
      */
     public static function from_participant_instance(participant_instance $participant_instance): placeholder {
+        $time = factory::create_clock()->get_time();
         $participant = $participant_instance->get_participant();
         $subject_instance = $participant_instance->get_subject_instance();
         $activity = $subject_instance->get_activity();
@@ -104,10 +125,10 @@ class placeholder {
         $new->participant_relationship = $participant_instance->get_core_relationship()->get_name();
         $new->instance_duedate = $subject_instance->due_date ?? 0;
         $new->instance_created_at = $subject_instance->created_at;
-        $new->instance_days_active = $new->format_duration($new->instance_created_at, time());
+        $new->instance_days_active = $new->format_duration($new->instance_created_at, $time);
         if ($new->instance_duedate) {
-            $due_delta = $new->format_duration(time(), $new->instance_duedate);
-            if (time() >= $new->instance_duedate) {
+            $due_delta = $new->format_duration($time, $new->instance_duedate);
+            if ($time >= $new->instance_duedate) {
                 // Due date is here or has passed.
                 $new->instance_days_remaining = 0;
                 $new->instance_days_overdue = $due_delta;
@@ -142,6 +163,7 @@ class placeholder {
      * @return placeholder
      */
     public static function from_subject_instance(subject_instance $subject_instance): placeholder {
+        $time = factory::create_clock()->get_time();
         $subject = $subject_instance->get_subject_user();
         $activity = $subject_instance->get_activity();
 
@@ -154,10 +176,10 @@ class placeholder {
         $new->participant_relationship = 'subject';
         $new->instance_duedate = $subject_instance->due_date ?? 0;
         $new->instance_created_at = $subject_instance->created_at;
-        $new->instance_days_active = $new->format_duration($new->instance_created_at, time());
+        $new->instance_days_active = $new->format_duration($new->instance_created_at, $time);
         if ($new->instance_duedate) {
-            $due_delta = $new->format_duration(time(), $new->instance_duedate);
-            if (time() >= $new->instance_duedate) {
+            $due_delta = $new->format_duration($time, $new->instance_duedate);
+            if ($time >= $new->instance_duedate) {
                 // Due date is here or has passed.
                 $new->instance_days_remaining = 0;
                 $new->instance_days_overdue = $due_delta;

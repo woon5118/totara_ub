@@ -121,7 +121,10 @@ class message_output_popup extends message_output {
     public static function message_viewed(\core\event\base $event) {
         global $DB;
 
-        if ($record = $DB->get_record('message_popup', ['messageid' => $event->other['messageid']])) {
+        // Totara: For some reason, probably a race condition, two records are sometimes found and behat doesn't like it.
+        // Because the one has isread = 0, while the other one has isread = 1,
+        // adding the isread condition appears to stop the 'Error: get_record() found more than one record!' debugging message.
+        if ($record = $DB->get_record('message_popup', ['messageid' => $event->other['messageid'], 'isread' => 0])) {
             // The id can change when the moving to the message_read table.
             $record->messageid = $event->objectid;
             $record->isread = 1;

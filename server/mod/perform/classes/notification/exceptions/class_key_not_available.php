@@ -36,6 +36,7 @@ class class_key_not_available extends invalid_parameter_exception {
      * Constructor.
      *
      * @param string $class_key
+     * @codeCoverageIgnore
      */
     public function __construct(string $class_key) {
         $this->class_key = $class_key;

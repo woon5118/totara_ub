@@ -64,11 +64,11 @@ Feature: Perform activity notifications - core relationships
     And I follow "Activity test"
     And I switch to "Notifications" tui tab
 
-  Scenario: mod_perform_notification_001: Instance creation notification
+  Scenario: mod_perform_notification_101: Instance creation notification
     And I toggle the "Participant instance creation" tui collapsible
     And I click on "Participant instance creation notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
+    And I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
+    And I click on "Appraiser" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
     And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
@@ -83,9 +83,9 @@ Feature: Perform activity notifications - core relationships
     When I follow "View full notification"
     Then I should see "Hi User One"
     And I should see "Your Activity test Feedback is ready for you to complete"
-    And I should see "This needs to be completed by"
+    And I should see date "2 weeks" formatted "This needs to be completed by %d %B %Y"
     When I follow "Activity test"
-    Then I should see "Your response"
+    Then I should see "Performance activities" in the page title
     And I log out
 
     # appraiser should receive a notification
@@ -96,9 +96,9 @@ Feature: Perform activity notifications - core relationships
     Then I should see "Hi Appra Iser"
     And I should see "As User One’s Appraiser, you have been selected"
     And I should see "Activity test Feedback"
-    And I should see "This needs to be completed by"
+    And I should see date "2 weeks" formatted "This needs to be completed by %d %B %Y"
     When I follow "Activity test"
-    Then I should see "Your response"
+    Then I should see "Performance activities" in the page title
     And I log out
 
     # user2 should not receive any notifications
@@ -112,21 +112,19 @@ Feature: Perform activity notifications - core relationships
     And I open the notification popover
     Then I should see "You have no notifications"
 
-  Scenario: mod_perform_notification_002: Instance creation reminder
+  Scenario: mod_perform_notification_102: Instance creation reminder
     And I toggle the "Participant instance creation reminder" tui collapsible
     And I click on "Participant instance creation reminder notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "Participant instance creation reminder" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_button" in the "Participant instance creation reminder" tui "collapsible"
-    And I click on "Add" tui "button" in the "Participant instance creation reminder" tui "collapsible"
+    And I click on "Subject" tui "toggle_switch" in the "Participant instance creation reminder" tui "collapsible"
+    And I click on "Appraiser" tui "toggle_switch" in the "Participant instance creation reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Participant instance creation reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Participant instance creation reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Participant instance creation reminder" tui "collapsible"
     And I set the following fields to these values:
       | trigger-instance_created_reminder[0] | 1 |
       | trigger-instance_created_reminder[1] | 2 |
-      | trigger-instance_created_reminder[2] | 3 |
-      | trigger-instance_created_reminder[3] | 4 |
-      | trigger-instance_created_reminder[4] | 6 |
+      | trigger-instance_created_reminder[2] | 4 |
+      | trigger-instance_created_reminder[3] | 6 |
     And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     And I click on "Activate" tui "button" in the "draft state" tui "action_card"
@@ -134,12 +132,6 @@ Feature: Perform activity notifications - core relationships
     And I wait for the next second
     And I trigger cron
     And I press the "back" button in the browser
-
-    # Delete an event trigger after activation
-    And I switch to "Notifications" tui tab
-    And I click on ".tui-repeater__row:nth-child(3) button[title=Delete]" "css_element"
-    And I should see "Activity saved" in the tui success notification toast
-    And I close the tui notification toast
     And I log out
 
     # 0 day 0 hour
@@ -158,12 +150,6 @@ Feature: Perform activity notifications - core relationships
     And I reload the page
     And I open the notification popover
     Then I should see "Te manatu mō te whakarite" exactly "1" times
-    When I follow "View full notification"
-    Then I should see "Hi User One"
-    And I should see "0 days ago you were sent your Activity test Feedback to complete"
-    And I should see "This needs to be completed by"
-    When I follow "Activity test"
-    Then I should see "Your response"
     And I am on site homepage
 
     # 1 day 23 hour
@@ -193,7 +179,6 @@ Feature: Perform activity notifications - core relationships
     # 5 day 1 hour (notification is not sent on day 4 because cron is not run)
     Given I time travel to "26 hours future" for perform activity notification
     And I reload the page
-    # And pause to check the time for perform activity notification
     And I open the notification popover
     Then I should see "Te manatu mō te whakarite" exactly "2" times
 
@@ -202,6 +187,12 @@ Feature: Perform activity notifications - core relationships
     And I reload the page
     And I open the notification popover
     Then I should see "Te manatu mō te whakarite" exactly "3" times
+    When I follow "View full notification"
+    Then I should see "Hi User One"
+    And I should see "6 days ago you were sent your Activity test Feedback to complete"
+    And I should see date "2 weeks" formatted "This needs to be completed by %d %B %Y"
+    When I follow "Activity test"
+    Then I should see "Performance activities" in the page title
     And I log out
 
     # appraiser should receive as many notifications as user1 does
@@ -221,21 +212,19 @@ Feature: Perform activity notifications - core relationships
     And I open the notification popover
     Then I should see "You have no notifications"
 
-  Scenario: mod_perform_notification_003: Due date approaching reminder
+  Scenario: mod_perform_notification_103: Due date approaching reminder
     And I toggle the "Due date approaching reminder" tui collapsible
     And I click on "Due date approaching reminder notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "Due date approaching reminder" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_button" in the "Due date approaching reminder" tui "collapsible"
-    And I click on "Add" tui "button" in the "Due date approaching reminder" tui "collapsible"
+    And I click on "Subject" tui "toggle_switch" in the "Due date approaching reminder" tui "collapsible"
+    And I click on "Appraiser" tui "toggle_switch" in the "Due date approaching reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Due date approaching reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Due date approaching reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Due date approaching reminder" tui "collapsible"
     And I set the following fields to these values:
       | trigger-due_date_reminder[0] | 1 |
       | trigger-due_date_reminder[1] | 2 |
-      | trigger-due_date_reminder[2] | 3 |
-      | trigger-due_date_reminder[3] | 4 |
-      | trigger-due_date_reminder[4] | 6 |
+      | trigger-due_date_reminder[2] | 4 |
+      | trigger-due_date_reminder[3] | 6 |
     And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     # Explicitly check the due date setting in case someone messes up with the generator
@@ -248,12 +237,6 @@ Feature: Perform activity notifications - core relationships
     And I wait for the next second
     And I trigger cron
     And I press the "back" button in the browser
-
-    # Delete an event trigger after activation
-    And I switch to "Notifications" tui tab
-    And I click on ".tui-repeater__row:nth-child(3) button[title=Delete]" "css_element"
-    And I should see "Activity saved" in the tui success notification toast
-    And I close the tui notification toast
     And I log out
 
     # day 0
@@ -278,14 +261,13 @@ Feature: Perform activity notifications - core relationships
     Given I time travel to "1 day future" for perform activity notification
     And I reload the page
     And I open the notification popover
-    # And pause to check the time for perform activity notification
     Then I should see "Si avvicina la scadenza" exactly "1" times
     When I follow "View full notification"
     Then I should see "Hi User One"
-    And I should see "Your Activity test Feedback is due to be completed in 14 days"
-    And I should see "Please ensure you complete it by"
+    And I should see "Your Activity test Feedback is due to be completed in 6 days"
+    And I should see date "2 weeks" formatted "Please ensure you complete it by %d %B %Y"
     When I follow "Activity test"
-    Then I should see "Your response"
+    Then I should see "Performance activities" in the page title
     And I am on site homepage
 
     # day 9 (5 days before due)
@@ -348,16 +330,11 @@ Feature: Perform activity notifications - core relationships
     And I open the notification popover
     Then I should see "You have no notifications"
 
-  Scenario: mod_perform_notification_004: On due date reminder
+  Scenario: mod_perform_notification_104: On due date reminder
     And I toggle the "On due date reminder" tui collapsible
     And I click on "On due date reminder notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "On due date reminder" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_button" in the "On due date reminder" tui "collapsible"
-    # Explicitly check the due date setting in case someone messes up with the generator
-    When I switch to "Assignments" tui tab
-    Then the following fields match these values:
-      | dueDateOffset[value] | 2     |
-      | dueDateOffset[range] | weeks |
+    And I click on "Subject" tui "toggle_switch" in the "On due date reminder" tui "collapsible"
+    And I click on "Appraiser" tui "toggle_switch" in the "On due date reminder" tui "collapsible"
     And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I trigger cron
@@ -397,7 +374,6 @@ Feature: Perform activity notifications - core relationships
     # day 13, 23:00 (1 day before due)
     Given I time travel to "midnight future" for perform activity notification
     And I time travel to "23 hours future" for perform activity notification
-    # And pause to check the time for perform activity notification
     And I reload the page
     And I open the notification popover
     Then I should see "You have no notifications"
@@ -412,7 +388,7 @@ Feature: Perform activity notifications - core relationships
     And I should see "Your Activity test Feedback is due to be completed today"
     And I should see "Please ensure you complete it by the end of the day"
     When I follow "Activity test"
-    Then I should see "Your response"
+    Then I should see "Performance activities" in the page title
     And I am on site homepage
 
     # day 15 (overdue)
@@ -445,39 +421,26 @@ Feature: Perform activity notifications - core relationships
     And I open the notification popover
     Then I should see "You have no notifications"
 
-  Scenario: mod_perform_notification_005: Overdue reminder
+  Scenario: mod_perform_notification_105: Overdue reminder
     And I toggle the "Overdue reminder" tui collapsible
     And I click on "Overdue reminder notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "Overdue reminder" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_button" in the "Overdue reminder" tui "collapsible"
-    And I click on "Add" tui "button" in the "Overdue reminder" tui "collapsible"
+    And I click on "Subject" tui "toggle_switch" in the "Overdue reminder" tui "collapsible"
+    And I click on "Appraiser" tui "toggle_switch" in the "Overdue reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Overdue reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Overdue reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Overdue reminder" tui "collapsible"
     And I set the following fields to these values:
       | trigger-overdue_reminder[0] | 1 |
       | trigger-overdue_reminder[1] | 2 |
-      | trigger-overdue_reminder[2] | 3 |
-      | trigger-overdue_reminder[3] | 4 |
-      | trigger-overdue_reminder[4] | 6 |
+      | trigger-overdue_reminder[2] | 4 |
+      | trigger-overdue_reminder[3] | 6 |
     And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
-    # Explicitly check the due date setting in case someone messes up with the generator
-    When I switch to "Assignments" tui tab
-    Then the following fields match these values:
-      | dueDateOffset[value] | 2     |
-      | dueDateOffset[range] | weeks |
     And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
     And I trigger cron
     And I press the "back" button in the browser
-
-    # Delete an event trigger after activation
-    And I switch to "Notifications" tui tab
-    And I click on ".tui-repeater__row:nth-child(3) button[title=Delete]" "css_element"
-    And I should see "Activity saved" in the tui success notification toast
-    And I close the tui notification toast
     And I log out
 
     # day 0
@@ -505,9 +468,9 @@ Feature: Perform activity notifications - core relationships
     Then I should see "Försenad påminnelse" exactly "1" times
     When I follow "View full notification"
     Then I should see "Hi User One"
-    And I should see "Your Activity test Feedback was due to be completed on"
+    And I should see date "2 weeks" formatted "Your Activity test Feedback was due to be completed on %d %B %Y"
     When I follow "Activity test"
-    Then I should see "Your response"
+    Then I should see "Performance activities" in the page title
     And I am on site homepage
 
     # day 16 (2 day overdue)
@@ -564,11 +527,11 @@ Feature: Perform activity notifications - core relationships
     And I open the notification popover
     Then I should see "You have no notifications"
 
-  Scenario: mod_perform_notification_006: Completion notification
+  Scenario: mod_perform_notification_106: Completion notification
     And I toggle the "Completion of subject instance" tui collapsible
     And I click on "Completion of subject instance notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "Completion of subject instance" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_button" in the "Completion of subject instance" tui "collapsible"
+    And I click on "Subject" tui "toggle_switch" in the "Completion of subject instance" tui "collapsible"
+    And I click on "Appraiser" tui "toggle_switch" in the "Completion of subject instance" tui "collapsible"
     And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
@@ -579,7 +542,7 @@ Feature: Perform activity notifications - core relationships
     And I log in as "user3"
     And I navigate to the outstanding perform activities list page
     And I click on "Activity test" "link"
-    And I set the field "Your response" to "Kia ora koutou katoa"
+    And I set the field "Your response" to "여보세요"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -589,7 +552,7 @@ Feature: Perform activity notifications - core relationships
     And I navigate to the outstanding perform activities list page
     And I switch to "Activities about others" tui tab
     And I click on "Activity test" "link"
-    And I set the field "Your response" to "Nau mai haere mai"
+    And I set the field "Your response" to "हैलो"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -599,7 +562,7 @@ Feature: Perform activity notifications - core relationships
     And I navigate to the outstanding perform activities list page
     And I switch to "Activities about others" tui tab
     And I click on "Activity test" "link"
-    And I set the field "Your response" to "Haere ra"
+    And I set the field "Your response" to "שלום"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -630,7 +593,7 @@ Feature: Perform activity notifications - core relationships
     Then I should see "Hi User One"
     And I should see "Your Activity test Feedback has been completed by all participants"
     When I follow "Activity test"
-    Then I should see "Your response"
+    Then I should see "Performance activities" in the page title
     And I log out
 
     # user3 should receive a notification
@@ -648,7 +611,7 @@ Feature: Perform activity notifications - core relationships
     And I should see "The following activity has been completed by all participants"
     And I should see "Activity test Feedback: User One"
     When I follow "Activity test"
-    Then I should see "Your response"
+    Then I should see "Performance activities" in the page title
     And I log out
 
     # user2 should not receive any notifications
@@ -663,11 +626,11 @@ Feature: Perform activity notifications - core relationships
     And I open the notification popover
     Then I should see "You have no notifications"
 
-  Scenario: mod_perform_notification_007: Reopened activity notification
+  Scenario: mod_perform_notification_107: Reopened activity notification
     And I toggle the "Reopened activity" tui collapsible
     And I click on "Reopened activity notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_button" in the "Reopened activity" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_button" in the "Reopened activity" tui "collapsible"
+    And I click on "Subject" tui "toggle_switch" in the "Reopened activity" tui "collapsible"
+    And I click on "Appraiser" tui "toggle_switch" in the "Reopened activity" tui "collapsible"
     And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
@@ -688,7 +651,7 @@ Feature: Perform activity notifications - core relationships
     And I navigate to the outstanding perform activities list page
     And I switch to "Activities about others" tui tab
     And I click on "Activity test" "link"
-    And I set the field "Your response" to "Nau mai haere mai"
+    And I set the field "Your response" to "再见"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -698,7 +661,7 @@ Feature: Perform activity notifications - core relationships
     And I navigate to the outstanding perform activities list page
     And I switch to "Activities about others" tui tab
     And I click on "Activity test" "link"
-    And I set the field "Your response" to "Haere ra"
+    And I set the field "Your response" to "Прощай"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -719,15 +682,13 @@ Feature: Perform activity notifications - core relationships
     When I log in as "user1"
     And I open the notification popover
     Then I should see "You have no notifications"
-    # When I navigate to the outstanding perform activities list page
-    # Then behat dies due to an AJAX error 😥
+    And I navigate to the outstanding perform activities list page
     And I log out
 
     When I log in as "user3"
     And I open the notification popover
     Then I should see "You have no notifications"
-    # When I navigate to the outstanding perform activities list page
-    # Then behat dies due to an AJAX error 😥
+    And I navigate to the outstanding perform activities list page
     And I log out
 
     When I log in as "admin"
@@ -750,7 +711,7 @@ Feature: Perform activity notifications - core relationships
     Then I should see "Hi User One"
     And I should see "Your Activity test Feedback has been reopened"
     When I follow "Activity test"
-    Then I should see "Your response"
+    Then I should see "Performance activities" in the page title
     And I log out
 
     # user3 should receive a notification
@@ -768,7 +729,7 @@ Feature: Perform activity notifications - core relationships
     And I should see "The following activity has been reopened"
     And I should see "Activity test Feedback: User One"
     When I follow "Activity test"
-    Then I should see "Your response"
+    Then I should see "Performance activities" in the page title
     And I log out
 
     # user2 should not receive any notifications
