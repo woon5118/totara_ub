@@ -31,27 +31,32 @@ use mod_perform\constants;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\external_participant;
 use mod_perform\entities\activity\filters\subject_instances_about;
-use mod_perform\entities\activity\participant_instance;
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\expand_task;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\activity\participant_source;
-use mod_perform\models\activity\subject_instance;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\models\response\participant_section as participant_section_model;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\state\participant_instance\in_progress as participant_instance_in_progress;
 use mod_perform\state\participant_instance\not_started as participant_instance_not_started;
+use mod_perform\state\participant_instance\not_submitted as participant_instance_not_submitted;
 use mod_perform\state\participant_instance\open as participant_instance_open;
-use mod_perform\state\participant_section\in_progress as section_in_progress;
-use mod_perform\state\participant_section\not_started as section_not_started;
-use mod_perform\state\participant_section\open;
+use mod_perform\state\participant_section\in_progress as participant_section_in_progress;
+use mod_perform\state\participant_section\not_started as participant_section_not_started;
+use mod_perform\state\participant_section\not_submitted as participant_section_not_submitted;
+use mod_perform\state\participant_section\open as participant_section_open;
 use mod_perform\state\subject_instance\in_progress as subject_instance_in_progress;
+use mod_perform\state\subject_instance\not_submitted as subject_instance_not_submitted;
 use mod_perform\state\subject_instance\open as subject_instance_open;
 use mod_perform\task\service\subject_instance_creation;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+
+require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 
 /**
  * @group perform
@@ -66,13 +71,13 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activity = $perform_generator->create_full_activities()->first();
-        /** @var participant_instance $participant_instance */
-        $participant_instance = participant_instance::repository()
+        /** @var participant_instance_entity $participant_instance */
+        $participant_instance = participant_instance_entity::repository()
             ->order_by('id')
             ->get()
             ->first();
-        /** @var subject_instance $subject_instance */
-        $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
+        /** @var subject_instance_model $subject_instance */
+        $subject_instance = subject_instance_model::load_by_id($participant_instance->subject_instance_id);
 
         $subject_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
 
@@ -156,8 +161,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         ],
                         'is_for_current_user' => true,
                     ],
-                    'progress_status' => section_not_started::get_name(),
-                    'availability_status' => open::get_name(),
+                    'progress_status' => participant_section_not_started::get_name(),
+                    'availability_status' => participant_section_open::get_name(),
                     'is_overdue' => false,
                 ],
             ],
@@ -177,16 +182,16 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
             ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_EXTERNAL]);
 
         $activity = $perform_generator->create_full_activities($configuration)->first();
-        /** @var participant_instance $participant_instance */
+        /** @var participant_instance_entity $participant_instance */
         // Get the internal user
-        $participant_instance = participant_instance::repository()
+        $participant_instance = participant_instance_entity::repository()
             ->where('participant_source', participant_source::INTERNAL)
             ->order_by('id')
             ->get()
             ->first();
 
-        /** @var subject_instance $subject_instance */
-        $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
+        /** @var subject_instance_model $subject_instance */
+        $subject_instance = subject_instance_model::load_by_id($participant_instance->subject_instance_id);
 
         $subject_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
         $external_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_EXTERNAL);
@@ -294,8 +299,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         ],
                         'is_for_current_user' => true,
                     ],
-                    'progress_status' => section_not_started::get_name(),
-                    'availability_status' => open::get_name(),
+                    'progress_status' => participant_section_not_started::get_name(),
+                    'availability_status' => participant_section_open::get_name(),
                     'is_overdue' => false,
                 ],
                 [
@@ -313,8 +318,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         ],
                         'is_for_current_user' => false,
                     ],
-                    'progress_status' => section_not_started::get_name(),
-                    'availability_status' => open::get_name(),
+                    'progress_status' => participant_section_not_started::get_name(),
+                    'availability_status' => participant_section_open::get_name(),
                     'is_overdue' => false,
                 ],
             ],
@@ -348,12 +353,12 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
 
         $subject_core_relationship_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
 
-        /** @var participant_instance $subject_participant_instance */
-        $subject_participant_instance = participant_instance::repository()
+        /** @var participant_instance_entity $subject_participant_instance */
+        $subject_participant_instance = participant_instance_entity::repository()
             ->where('core_relationship_id', $subject_core_relationship_id)
             ->one();
 
-        $subject_instance = subject_instance::load_by_id($subject_participant_instance->subject_instance_id);
+        $subject_instance = subject_instance_model::load_by_id($subject_participant_instance->subject_instance_id);
 
         $subject_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
 
@@ -361,7 +366,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         self::setUser($participant_id);
 
         $appraiser_core_relationship_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER)->id;
-        $appraiser_participant_instance = participant_instance::repository()
+        /** @var participant_instance_entity $appraiser_participant_instance */
+        $appraiser_participant_instance = participant_instance_entity::repository()
             ->where('core_relationship_id', $appraiser_core_relationship_id)
             ->one();
 
@@ -451,8 +457,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         ],
                         'is_for_current_user' => true,
                     ],
-                    'progress_status' => section_not_started::get_name(),
-                    'availability_status' => open::get_name(),
+                    'progress_status' => participant_section_not_started::get_name(),
+                    'availability_status' => participant_section_open::get_name(),
                     'is_overdue' => false,
                 ],
                 [
@@ -464,8 +470,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'core_relationship' => null,
                         'is_for_current_user' => false,
                     ],
-                    'progress_status' => section_not_started::get_name(),
-                    'availability_status' => open::get_name(),
+                    'progress_status' => participant_section_not_started::get_name(),
+                    'availability_status' => participant_section_open::get_name(),
                     'is_overdue' => false,
                 ],
             ],
@@ -546,11 +552,11 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
             ->order_by('created_at', 'desc')
             ->order_by('id', 'desc')
             ->get()
-            ->map_to(subject_instance::class);
+            ->map_to(subject_instance_model::class);
 
         $this->assertCount(1, $subject_instances);
 
-        /** @var subject_instance $subject_instance */
+        /** @var subject_instance_model $subject_instance */
         $subject_instance = $subject_instances->first();
 
         $participant_instances = $subject_instance->participant_instances;
@@ -584,7 +590,6 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $manager_user = new user($user1->id);
         $manager_user_profile_image_url = (new user_picture($user1, 0))->get_url($GLOBALS['PAGE'])->out(false);
 
-
         // Now fetch the users own instances
 
         $this->setUser($user2);
@@ -603,7 +608,11 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
 
         $subject = $actual[0];
 
-        $expected_subject = function (subject_instance $subject_instance, collection $participant_instances, int $user_id): array {
+        $expected_subject = function (
+            subject_instance_model $subject_instance,
+            collection $participant_instances,
+            int $user_id
+        ): array {
             $expected_relationships = [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER];
 
             $expected_participant_instances = [];
@@ -687,8 +696,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             ],
                             'is_for_current_user' => false,
                         ],
-                        'progress_status' => section_not_started::get_name(),
-                        'availability_status' => open::get_name(),
+                        'progress_status' => participant_section_not_started::get_name(),
+                        'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
                     ],
                 ],
@@ -716,8 +725,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             ],
                             'is_for_current_user' => true,
                         ],
-                        'progress_status' => section_not_started::get_name(),
-                        'availability_status' => open::get_name(),
+                        'progress_status' => participant_section_not_started::get_name(),
+                        'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
                     ],
                     [
@@ -735,8 +744,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             ],
                             'is_for_current_user' => false,
                         ],
-                        'progress_status' => section_not_started::get_name(),
-                        'availability_status' => open::get_name(),
+                        'progress_status' => participant_section_not_started::get_name(),
+                        'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
                     ],
                 ],
@@ -764,8 +773,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             ],
                             'is_for_current_user' => true,
                         ],
-                        'progress_status' => section_in_progress::get_name(),
-                        'availability_status' => open::get_name(),
+                        'progress_status' => participant_section_in_progress::get_name(),
+                        'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
                     ],
                 ],
@@ -833,8 +842,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             ],
                             'is_for_current_user' => true,
                         ],
-                        'progress_status' => section_not_started::get_name(),
-                        'availability_status' => open::get_name(),
+                        'progress_status' => participant_section_not_started::get_name(),
+                        'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
                     ],
                 ],
@@ -862,8 +871,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             ],
                             'is_for_current_user' => false,
                         ],
-                        'progress_status' => section_not_started::get_name(),
-                        'availability_status' => open::get_name(),
+                        'progress_status' => participant_section_not_started::get_name(),
+                        'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
                     ],
                     [
@@ -881,8 +890,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             ],
                             'is_for_current_user' => true,
                         ],
-                        'progress_status' => section_not_started::get_name(),
-                        'availability_status' => open::get_name(),
+                        'progress_status' => participant_section_not_started::get_name(),
+                        'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
                     ],
                 ],
@@ -910,8 +919,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             ],
                             'is_for_current_user' => false,
                         ],
-                        'progress_status' => section_in_progress::get_name(),
-                        'availability_status' => open::get_name(),
+                        'progress_status' => participant_section_in_progress::get_name(),
+                        'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
                     ],
                 ],
@@ -921,6 +930,61 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
 
         $this->assertCount(3, $subject['sections'], 'wrong sections count');
         $this->assertEquals($expected_sections, $subject['sections']);
+    }
+
+    public function test_when_manually_closed() {
+        $this->setAdminUser();
+
+        // Set up an activity with a single participant, the subject.
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(1)
+            ->set_number_of_sections_per_activity(1)
+            ->set_relationships_per_section(['subject'])
+            ->set_number_of_users_per_user_group_type(1)
+            ->set_number_of_elements_per_section(0);
+
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $generator->create_full_activities($configuration);
+
+        // Mark the subject instance manually close.
+        /** @var subject_instance_entity $subject_instance */
+        $subject_instance_entity = subject_instance_entity::repository()->get()->first();
+        $subject_instance_model = subject_instance_model::load_by_entity($subject_instance_entity);
+        $subject_instance_model->manually_close();
+
+        // The query uses the current user, so set it to the subject/participant.
+        self::setUser($subject_instance_model->subject_user_id);
+
+        // Retrieve the data.
+        $args = [
+            'filters' => [
+                'about' => [subject_instances_about::VALUE_ABOUT_SELF]
+            ]
+        ];
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        // Check the progress status of the subject instance.
+        $actual = $this->get_webapi_operation_data($result);
+
+        // Subject instance progress.
+        $this->assertEquals(
+            subject_instance_not_submitted::get_name(),
+            $actual[0]['subject']['progress_status']
+        );
+
+        // Participant instance progress.
+        $this->assertEquals(
+            participant_instance_not_submitted::get_name(),
+            $actual[0]['subject']['participant_instances'][0]['progress_status']
+        );
+
+        // Participant section progress.
+        $this->assertEquals(
+            participant_section_not_submitted::get_name(),
+            $actual[0]['sections'][0]['participant_sections'][0]['participant_instance']['progress_status']
+        );
     }
 
     public function test_query_invalid_filter(): void {

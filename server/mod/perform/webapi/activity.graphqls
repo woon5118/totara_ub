@@ -167,6 +167,7 @@ enum mod_perform_subject_instance_progress_status {
   NOT_STARTED
   IN_PROGRESS
   COMPLETE
+  NOT_SUBMITTED
 }
 """
 A list of possible availability states that a subject instance can be in
@@ -183,6 +184,7 @@ enum mod_perform_participant_instance_progress_status {
   NOT_STARTED
   IN_PROGRESS
   COMPLETE
+  NOT_SUBMITTED
 }
 
 """
@@ -259,7 +261,7 @@ extend type Query {
   the ones the user is not the subject in but participating.
   """
   mod_perform_my_subject_instances(
-    filters: mod_perform_subject_instance_filters!
+    filters: mod_perform_subject_instance_filters
   ): [mod_perform_subject_sections!]!
 
   """
