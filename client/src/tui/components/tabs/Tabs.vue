@@ -112,6 +112,7 @@ export default {
   },
 
   props: {
+    controlled: Boolean,
     selected: [String, Number],
     direction: {
       type: String,
@@ -192,7 +193,9 @@ export default {
     },
 
     selectTabId(id) {
-      this.currentSelected = id;
+      if (!this.controlled) {
+        this.currentSelected = id;
+      }
       this.$emit('input', id);
     },
 
@@ -270,7 +273,11 @@ export default {
      */
     $_setSelectedTab(tab) {
       const id = this.$_tabIdFromProps(tab);
-      this.currentSelected = id;
+
+      if (!this.controlled) {
+        this.currentSelected = id;
+      }
+
       this.$emit('input', id);
     },
 
