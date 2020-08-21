@@ -71,7 +71,7 @@ final class playlist_provider implements queryable, container {
      * @inheritDoc
      */
     public static function provide_query_type(query $query): bool {
-        if ($query->is_search() || $query->is_shared() || $query->is_adder() || $query->is_libray_from_workspace()) {
+        if ($query->is_search() || $query->is_shared() || $query->is_adder() || $query->is_library_from_workspace() || $query->is_other_users_resources()) {
             return true;
         }
         return false;
@@ -88,8 +88,8 @@ final class playlist_provider implements queryable, container {
             $result = $query->is_search() ||
                     $query->is_shared() ||
                     $query->is_adder() ||
-                    $query->is_libray_from_workspace();
-
+                    $query->is_library_from_workspace() ||
+                    $query->is_other_users_resources();
             if (!$result) {
                 return null;
             }
@@ -209,6 +209,19 @@ final class playlist_provider implements queryable, container {
                     $builder->add_select('esr.timecreated AS dateshared');
                 }
                 $builder = $this->add_shared($builder, $userid, !$this->entire_library);
+            }
+
+            // Shared via other user's library
+            if ($query->is_other_users_resources()) {
+                $builder->where('p.userid', $userid);
+                // Playlists shared with the recipient
+                $builder = $this->add_shared($builder, $query->get_share_recipient_id());
+
+                // Add public
+                $builder->or_where(function (builder $builder) use ($userid) {
+                    $builder->where('p.access', access::PUBLIC);
+                    $builder->where('p.userid', $userid);
+                });
             }
 
             // Saved.

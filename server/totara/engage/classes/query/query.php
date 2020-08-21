@@ -69,6 +69,12 @@ final class query {
     private $area = null;
 
     /**
+     * When looking up shared resources, the id of the user who was shared with
+     * @var int|null
+     */
+    private $share_recipient_id;
+
+    /**
      * @var offset_cursor|null
      */
     private $cursor;
@@ -166,7 +172,7 @@ final class query {
             ]
         ];
 
-        if ($this->is_shared() || $this->is_libray_from_workspace()) {
+        if ($this->is_shared() || $this->is_library_from_workspace()) {
             $options[] =
                 [
                     'id' => sort::DATESHARED,
@@ -432,7 +438,7 @@ final class query {
      * @return bool
      */
     public function include_entire_library(): bool {
-        $filters = $this->is_saved() || $this->is_shared() || $this->is_owned() || $this->section;
+        $filters = $this->is_saved() || $this->is_shared() || $this->is_owned() || $this->section || $this->is_other_users_resources();
         return !$filters || $this->is_allsite();
     }
 
@@ -502,7 +508,28 @@ final class query {
     /**
      * @return bool
      */
-    public function is_libray_from_workspace(): bool {
+    public function is_library_from_workspace(): bool {
         return $this->component === 'container_workspace' && strtolower($this->area) === 'library';
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_other_users_resources(): bool {
+        return $this->area === 'otheruserlib';
+    }
+
+    /**
+     * @return int|null
+     */
+    public function get_share_recipient_id(): ?int {
+        return $this->share_recipient_id;
+    }
+
+    /**
+     * @param int|null $share_recipient_id
+     */
+    public function set_share_recipient_id(?int $share_recipient_id): void {
+        $this->share_recipient_id = $share_recipient_id;
     }
 }

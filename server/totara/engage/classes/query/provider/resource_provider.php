@@ -182,6 +182,20 @@ abstract class resource_provider implements queryable {
                 $builder = $this->add_shared($builder, $userid, !$this->entire_library);
             }
 
+            // Shared via other user's library
+            if ($query->is_other_users_resources()) {
+                // Resources owned by userid
+                $builder->where('er.userid', $userid);
+                // Resources shared with the recipient
+                $builder = $this->add_shared($builder, $query->get_share_recipient_id());
+
+                // Add public
+                $builder->or_where(function (builder $builder) use ($userid) {
+                    $builder->where('er.access', access::PUBLIC);
+                    $builder->where('er.userid', $userid);
+                });
+            }
+
             // Saved.
             if ($query->is_saved() || section::is_savedresources($this->section) || $this->entire_library) {
                 $builder = $this->add_saved($builder, $userid, !$this->entire_library);

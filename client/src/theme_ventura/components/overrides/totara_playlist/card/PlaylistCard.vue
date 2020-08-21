@@ -18,6 +18,8 @@
 
 <style lang="scss">
 .tui-totaraPlaylist-playlistCard {
+  min-height: var(--tui-totaraEngage-card-height);
+
   &__imageHeader {
     position: relative;
     width: 100%;

@@ -62,7 +62,6 @@
         <CardsGrid
           v-else
           :cards="cards"
-          :units="units"
           :is-loading="loading"
           :show-footnotes="showFootnotes"
           @scrolledtobottom="scrolledToBottom"
@@ -106,10 +105,6 @@ export default {
   },
 
   props: {
-    units: {
-      type: [Number, String],
-      required: true,
-    },
     loading: {
       type: Boolean,
       required: true,

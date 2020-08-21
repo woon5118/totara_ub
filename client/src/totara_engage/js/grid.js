@@ -91,7 +91,7 @@ export const engageGrid = {
     name: 'xlarge',
     boundaries: [1397, 1672],
     direction: 'horizontal',
-    maxItemsPerRow: 4,
+    maxItemsPerRow: 5,
     cardUnits: 2,
   },
 };

@@ -165,8 +165,7 @@ final class library_destination extends destination_generator {
                 if (empty($user_id)) {
                     throw new coding_exception('User\'s resources page requires the user_id attribute to be set.');
                 }
-                // User library doesn't exist yet
-                return new moodle_url('/totara/engage/your_resources.php', ['id' => $user_id]);
+                return new moodle_url('/totara/engage/user_resources.php', ['user_id' => $user_id]);
 
             case self::PAGE_SHARED:
                 return new moodle_url('/totara/engage/shared_with_you.php');

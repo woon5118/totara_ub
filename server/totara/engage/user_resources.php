@@ -17,33 +17,47 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author Cody Finegan <cody.finegan@totaralearning.com>
  * @package totara_engage
  */
-require_once(__DIR__ . "/../../config.php");
-global $PAGE, $OUTPUT, $USER;
 
-// Required user's id.
-$user_id = required_param('user_id', PARAM_INT);
+use totara_core\advanced_feature;
+
+require_once(__DIR__ . '/../../config.php');
+global $USER, $OUTPUT, $PAGE;
+
 require_login();
+advanced_feature::require('engage_resources');
 
+$user_id = required_param('user_id', PARAM_INT);
+
+// Bounce the active user to their own page
 if ($user_id == $USER->id) {
-    // Same user origin
     $your_resource_url = new moodle_url("/totara/engage/your_resources.php");
     redirect($your_resource_url);
-
-    // Safety die the script
-    die();
+    exit;
 }
 
+$user = core_user::get_user($user_id, '*', MUST_EXIST);
+$title = get_string('usersresources', 'totara_engage', fullname($user));
 
-$target_user = core_user::get_user($user_id, '*', MUST_EXIST);
-$context = context_system::instance();
+// Set page properties.
+$PAGE->set_context(\context_user::instance($USER->id));
+$PAGE->set_title($title);
+$PAGE->set_pagelayout('legacynolayout');
+$PAGE->set_url(new moodle_url('/totara/engage/user_resources.php'));
 
-$PAGE->set_context($context);
-$PAGE->set_url("/totara/engage/user_resources.php", ['user_id' => $user_id]);
-$PAGE->set_title(get_string('usersresources', 'totara_engage', fullname($target_user)));
+$tui = new \totara_tui\output\component(
+    'totara_engage/pages/OtherUserLibrary',
+    [
+        'id' => 'userslibrary',
+        'name' => fullname($user),
+        'userId' => $user_id,
+        'pageId' => 'userslibrary',
+    ]
+);
+$tui->register($PAGE);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading("FIX_ME: to implement user's library page");
+echo $OUTPUT->render($tui);
 echo $OUTPUT->footer();

@@ -57,7 +57,7 @@ final class engagedusers_namelink extends base {
         }
 
         $user_id = $extrafields->id;
-        $url = new \moodle_url("/totara/engage/user_library.php", ['id' => (int)$user_id]);
+        $url = new \moodle_url("/totara/engage/user_resources.php", ['user_id' => (int)$user_id]);
 
         return \html_writer::link($url, $fullname);
     }
