@@ -21,7 +21,28 @@
  * @package ml_recommender
  */
 
+use ml_recommender\local\environment;
+
 defined('MOODLE_INTERNAL') || die;
+
+// List of integers 1 through 50.
+$options = [];
+for ($i = 1; $i < 51; $i++) {
+    $options[$i] = $i;
+}
+
+// Periods for interactions - 2 weeks to a year.
+$periods = [];
+for ($i = 2; $i < 53; $i++) {
+    $periods[$i] = new lang_string('interactions_period_option','ml_recommender', $i);
+}
+
+// ML queries.
+$queries = [
+    'hybrid' => new lang_string('query_option_hybrid','ml_recommender'),
+    'partial' => new lang_string('query_option_partial','ml_recommender'),
+    'mf' => new lang_string('query_option_mf','ml_recommender'),
+];
 
 // Recommender system configuration.
 $settings->add(
@@ -32,18 +53,12 @@ $settings->add(
     )
 );
 
-// Number of items-for-users records to return from recommender.
-$options = [];
-for ($i = 1; $i < 50; $i++) {
-    $options[$i] = $i;
-}
-
 $settings->add(
     new admin_setting_configselect(
         'ml_recommender/user_result_count',
         new lang_string('user_result_count_label','ml_recommender'),
         new lang_string('user_result_count_help', 'ml_recommender'),
-        25,
+        environment::get_user_result_count(),
         $options
     )
 );
@@ -54,7 +69,69 @@ $settings->add(
         'ml_recommender/item_result_count',
         new lang_string('item_result_count_label','ml_recommender'),
         new lang_string('item_result_count_help', 'ml_recommender'),
-        15,
+        environment::get_item_result_count(),
         $options
+    )
+);
+
+// Related items.
+$settings->add(
+    new admin_setting_configselect(
+        'ml_recommender/related_items_count',
+        new lang_string('related_items_count_label','ml_recommender'),
+        new lang_string('related_items_count_help', 'ml_recommender'),
+        environment::get_related_items_count(),
+        $options
+    )
+);
+
+// ML query.
+$settings->add(
+    new admin_setting_configselect(
+        'ml_recommender/query',
+        new lang_string('query_label','ml_recommender'),
+        new lang_string('query_help', 'ml_recommender'),
+        environment::get_query(),
+        $queries
+    )
+);
+
+// Time to analyse.
+$settings->add(
+    new admin_setting_configselect(
+        'ml_recommender/interactions_period',
+        new lang_string('interactions_period_label','ml_recommender'),
+        new lang_string('interactions_period_help', 'ml_recommender'),
+        environment::get_interactions_period(),
+        $periods
+    )
+);
+
+// Python executable.
+$settings->add(
+    new admin_setting_configexecutable('ml_recommender/py3path',
+        new lang_string('py3path_label', 'ml_recommender'),
+        new lang_string('py3path_help', 'ml_recommender'),
+        environment::get_py3path()
+    )
+);
+
+// Threads.
+$settings->add(
+    new admin_setting_configselect(
+        'ml_recommender/threads',
+        new lang_string('threads_label','ml_recommender'),
+        new lang_string('threads_help', 'ml_recommender'),
+        environment::get_threads(),
+        $options
+    )
+);
+
+// Data path.
+$settings->add(
+    new admin_setting_configdirectory('ml_recommender/data_path',
+        new lang_string('data_path_label', 'ml_recommender'),
+        new lang_string('data_path_help', 'ml_recommender'),
+        environment::get_data_path()
     )
 );

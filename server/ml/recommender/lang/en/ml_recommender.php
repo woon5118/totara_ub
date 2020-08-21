@@ -23,13 +23,29 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['data_path_label'] = 'Data directory';
+$string['data_path_help'] = 'Path to directory where recommender system data will be stored.';
 $string['enable_recommenders'] = 'Recommendations';
 $string['enable_recommenders_description'] = 'When enabled this will allow users to discover content specifically recommended for them (e.g. playlists, resources, surveys, workspaces). If disabled, the Recommended learning block will be hidden from site menus and API services will not be accessible.';
+$string['interactions_period_label'] = 'Time to analyse interactions';
+$string['interactions_period_help'] = 'Number of weeks from which to draw user-item interactions data.';
+$string['interactions_period_option'] = '{$a} weeks';
 $string['item_result_count_label'] = 'Number of items-to-item recommendations';
 $string['item_result_count_help'] = 'Number of items-to-item recommendations to be returned by recommender system.';
 $string['pluginname'] = 'Recommendation engine';
+$string['py3path_label'] = 'File path for python executable';
+$string['py3path_help'] = 'Path to the python executable that will run the recommendations script.';
+$string['query_label'] = 'Recommendation algorithm';
+$string['query_help'] = '<ul><li>Full hybrid utilises content data, user meta-data and user-content interaction data. It takes the longest time to process, but has the highest granularity.</li><li>Partial hybrid utilises content meta-data and user-content interaction data.</li><li>Matrix factorisation utilises user-content interaction data only.  It has the fastest processing time, but the also the lowest granularity.</li></ul>';
+$string['query_option_hybrid'] = 'Full hybrid';
+$string['query_option_mf'] = 'Matrix factorisation';
+$string['query_option_partial'] = 'Partial hybrid';
 $string['recommendations'] = 'Engage recommendations';
 $string['recsysconfigs'] = 'Recommendation engine configuration';
+$string['related_items_count_label'] = 'Number of related items';
+$string['related_items_count_help'] = 'Number of related items to list in Related panes.';
+$string['threads_label'] = 'Processing threads';
+$string['threads_help'] = 'Number of cores/threads that may be utilised by the recommendations library.  It should be less than the number of physical cores.';
 $string['userdataiteminteraction'] = 'Interaction';
 $string['userdataitemrecommended_user'] = 'Recommendation';
 $string['user_result_count_label'] = 'Number of items-to-user recommendations';

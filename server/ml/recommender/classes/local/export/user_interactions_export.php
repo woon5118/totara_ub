@@ -22,6 +22,8 @@
  */
 namespace ml_recommender\local\export;
 
+use ml_recommender\local\environment;
+
 /**
  * Export class for interaction table.
  */
@@ -34,6 +36,9 @@ class user_interactions_export extends export {
     public function export(\csv_export_writer $writer): bool {
         global $DB;
 
+        // Get the minimum unix epoch timestamp for this export (after expressing weeks as seconds).
+        $min_timestamp = time() - (environment::get_interactions_period() * 7 * 86400);
+
         // Build sql.
         $components = ['engage_article', 'totara_playlist'];
         list($componentinorequal, $params) = $DB->get_in_or_equal($components);
@@ -41,7 +46,7 @@ class user_interactions_export extends export {
         $sql = '
             SELECT user_id, item_id, component, MAX(time_created) AS mytimestamp, SUM(rating) AS myrating
             FROM {ml_recommender_interactions}';
-        $sql .= ' WHERE component ' . $componentinorequal . ' ';
+        $sql .= ' WHERE component ' . $componentinorequal . ' AND time_created >= ' . $min_timestamp . ' ';
         $sql .= 'GROUP BY user_id, item_id, component ORDER BY user_id, item_id, component, mytimestamp, myrating ASC';
 
         // Set recordset cursor.

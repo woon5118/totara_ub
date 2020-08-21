@@ -23,6 +23,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core\webapi\execution_context;
+use ml_recommender\local\environment;
 use totara_core\advanced_feature;
 use totara_engage\access\access;
 use totara_webapi\graphql;
@@ -101,7 +102,7 @@ class ml_recommender_get_recommended_articles_test extends advanced_testcase {
         $results = $result->data['articles'];
 
         $this->assertEquals(5, $cursor['total']);
-        $this->assertCount(5, $results);
+        $this->assertCount(environment::get_related_items_count(), $results);
 
         // Quick check
         $expected = ['A5', 'A6', 'A7', 'A8', 'A9', 'A10'];

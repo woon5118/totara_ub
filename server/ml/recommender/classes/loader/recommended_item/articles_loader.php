@@ -28,6 +28,7 @@ use core\orm\query\builder;
 use engage_article\totara_engage\resource\article;
 use ml_recommender\entity\recommended_item;
 use ml_recommender\entity\recommended_user_item;
+use ml_recommender\local\environment;
 use ml_recommender\query\recommended_item\item_query;
 use ml_recommender\query\recommended_item\user_query;
 use totara_engage\card\card_resolver;
@@ -58,6 +59,7 @@ final class articles_loader {
         $builder->where('r.target_area', $query->get_target_area());
 
         $cursor = $query->get_cursor();
+        $cursor->set_limit(environment::get_related_items_count());
         return new offset_cursor_paginator($builder, $cursor);
     }
 

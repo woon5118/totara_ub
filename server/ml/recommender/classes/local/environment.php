@@ -122,4 +122,34 @@ final class environment {
 
         return (int) $threads;
     }
+
+    /**
+     * Number of related items to show in Related pane.
+     *
+     * @return int
+     */
+    public static function get_related_items_count(): int {
+        $related_items_count = get_config('ml_recommender', 'related_items_count');
+
+        if (false === $related_items_count) {
+            throw new \coding_exception("Cannot fetch related items count config");
+        }
+
+        return (int) $related_items_count;
+    }
+
+    /**
+     * Number of weeks worth of user-item interactions to analyse.
+     *
+     * @return int
+     */
+    public static function get_interactions_period(): int {
+        $interactions_period = get_config('ml_recommender', 'interactions_period');
+
+        if (false === $interactions_period) {
+            throw new \coding_exception("Cannot fetch interactions period config");
+        }
+
+        return (int) $interactions_period;
+    }
 }

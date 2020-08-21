@@ -40,14 +40,20 @@ function xmldb_ml_recommender_install(): bool {
     // Number of recommended items per item to cache.
     set_config('item_result_count', 15, 'ml_recommender');
 
-    // Path to python (settings page?).
+    // Path to python.
     set_config('py3path', '/usr/bin/python3', 'ml_recommender');
 
-    // Recommender algorithm type (settings page?).
+    // Recommender algorithm type.
     set_config('query', 'mf', 'ml_recommender');
 
-    // Threads/cores to use (settings page?).
-    set_config('threads', 6, 'ml_recommender');
+    // Threads/cores to use.
+    set_config('threads', 2, 'ml_recommender');
+
+    // Number of related items to list.
+    set_config('related_items_count', 3, 'ml_recommender');
+
+    // Number of weeks worth of user-item interactions to analyse.
+    set_config('interactions_period', 16, 'ml_recommender');
 
     return true;
 }
