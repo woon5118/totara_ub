@@ -18,20 +18,21 @@
 
 <style lang="scss">
 .tui-performActivityActions {
-  &__actionIcons {
-    display: flex;
-    justify-content: flex-start;
+  display: flex;
+  justify-content: flex-start;
 
-    &__link {
-      padding-right: var(--tui-gap-1);
-    }
+  &__item {
+    margin-right: var(--tui-gap-2);
+    padding: 0 var(--tui-gap-1);
   }
 }
 
 @media screen and (min-width: $tui-screen-xs) {
   .tui-performActivityActions {
-    &__actionIcons {
-      justify-content: flex-end;
+    justify-content: flex-end;
+
+    &__item {
+      margin-right: 0;
     }
   }
 }

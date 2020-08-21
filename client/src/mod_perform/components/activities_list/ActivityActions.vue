@@ -17,12 +17,12 @@
 -->
 
 <template>
-  <div class="tui-performActivityActions__actionIcons">
+  <div class="tui-performActivityActions">
     <a
       v-if="!activityIsDraft"
       :href="participationManagementUrl"
       :title="$str('manage_participation', 'mod_perform')"
-      class="tui-performActivityActions__actionIcons__link"
+      class="tui-performActivityActions__item"
     >
       <Users
         :alt="$str('manage_participation', 'mod_perform')"
@@ -31,10 +31,10 @@
       />
     </a>
     <a
-      v-if="activity.can_view_participation_reporting"
+      v-if="activity.can_view_participation_reporting && !activityIsDraft"
       :href="participationReportingUrl"
       :title="$str('participation_reporting', 'mod_perform')"
-      class="tui-performActivityActions__actionIcons__link"
+      class="tui-performActivityActions__item"
     >
       <ParticipationReportingIcon
         :alt="$str('participation_reporting', 'mod_perform')"
@@ -43,9 +43,14 @@
       />
     </a>
 
-    <Dropdown v-if="activity.can_manage" position="bottom-right">
+    <Dropdown
+      v-if="activity.can_manage"
+      position="bottom-right"
+      class="tui-performActivityActions__item"
+    >
       <template v-slot:trigger="{ toggle }">
         <MoreButton
+          no-padding="true"
           :aria-label="$str('activity_action_options', 'mod_perform')"
           @click="toggle"
         />
@@ -85,9 +90,11 @@
       <template v-else>
         <p>{{ $str('modal_delete_message', 'mod_perform') }}</p>
         <p>
-          <strong>{{
-            $str('modal_delete_message_data_recovery_warning', 'mod_perform')
-          }}</strong>
+          <strong>
+            {{
+              $str('modal_delete_message_data_recovery_warning', 'mod_perform')
+            }}
+          </strong>
         </p>
       </template>
       <p>{{ $str('modal_delete_confirmation_line', 'mod_perform') }}</p>

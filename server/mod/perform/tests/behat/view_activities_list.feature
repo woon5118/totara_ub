@@ -64,7 +64,7 @@ Feature: Manage performance activity page
       | Name             | Type     | Status |
       | My Test Activity | Feedback | Draft |
     # For activities created by the user the reporting link should be there
-    And "Participation reporting" "link" should exist in the ".tui-performActivityActions__actionIcons" "css_element"
+    And "Participation reporting" "link" should not exist in the ".tui-performActivityActions" "css_element"
 
   Scenario: User can access the activity management page and manage activities given the right capabilities
     Given I log in as "admin"
@@ -96,6 +96,7 @@ Feature: Manage performance activity page
       | Name             | Type     | Status |
       | Draft activity   | Feedback | Draft  |
       | Active activity  | Feedback | Active |
-    # Now the user should see the link to the report page
-    And "Participation reporting" "link" should exist in the ".tui-performActivityActions__actionIcons" "css_element"
+    # Now the user should see the link to the report page in the second row but not the first
+    And "Participation reporting" "link" should not exist in the ".tui-dataTableRow:nth-child(1) .tui-performActivityActions" "css_element"
+    And "Participation reporting" "link" should exist in the ".tui-dataTableRow:nth-child(2) .tui-performActivityActions" "css_element"
     Then I log out
