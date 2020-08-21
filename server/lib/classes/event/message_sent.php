@@ -116,12 +116,15 @@ class message_sent extends base {
      * @return string
      */
     public function get_description() {
+        // Totara: messageid is shown in the description for audit purposes.
+        $message_id = $this->other['messageid'];
+
         // Check if we are sending from a valid user.
         if (\core_user::is_real_user($this->userid)) {
-            return "The user with id '$this->userid' sent a message to the user with id '$this->relateduserid'.";
+            return "The user with id '$this->userid' sent a message with id '$message_id' to the user with id '$this->relateduserid'.";
         }
 
-        return "A message was sent by the system to the user with id '$this->relateduserid'.";
+        return "A message with id '$message_id' was sent by the system to the user with id '$this->relateduserid'.";
     }
 
     /**
