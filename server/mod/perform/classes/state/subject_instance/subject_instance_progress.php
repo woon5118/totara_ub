@@ -67,7 +67,12 @@ abstract class subject_instance_progress extends state implements state_event {
     public function get_event(): base {
         /** @var subject_instance $subject_instance */
         $subject_instance = $this->get_object();
-        return subject_instance_progress_updated::create_from_subject_instance($subject_instance);
+        $previous_state = $this->previous_state;
+
+        return subject_instance_progress_updated::create_from_subject_instance(
+            $subject_instance,
+            $previous_state ? $previous_state::get_name() : null
+        );
     }
 
 }

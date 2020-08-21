@@ -154,6 +154,7 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
          * @var activity $activity
          */
         [$participant1, $participant2, $participant1_entity, $activity] = $this->create_data();
+        $previous_progress_status = $participant1->progress_status;
 
         $activity->settings->update([activity_setting::CLOSE_ON_COMPLETION => false]);
 
@@ -162,9 +163,24 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
         $participant1_entity->refresh();
         $event_sink->close();
         $events = $event_sink->get_events();
-
         $this->assertCount(1, $events);
-        $this->assertInstanceOf(participant_instance_progress_updated::class, reset($events));
+
+        $event = reset($events);
+        $this->assertInstanceOf(participant_instance_progress_updated::class,$event);
+        $this->assertEquals($participant1->id, $event->objectid);
+        $this->assertEquals($participant1->participant_id, $event->relateduserid);
+        $this->assertEquals(get_admin()->id, $event->userid);
+        $this->assertEquals($participant1->get_context(), $event->get_context());
+
+        $anonymous = $participant1
+            ->subject_instance
+            ->activity
+            ->anonymous_responses;
+
+        $this->assertEquals($previous_progress_status, $event->other['previous_progress']);
+        $this->assertEquals($participant1->progress_status, $event->other['progress']);
+        $this->assertEquals($anonymous, $event->other['anonymous']);
+        $this->assertEquals($participant1->participant_source, $event->other['participant_source']);
 
         $this->assertEquals(open::get_code(), $participant1->availability_state::get_code());
         $this->assertEquals(open::get_code(), $participant2->availability_state::get_code());

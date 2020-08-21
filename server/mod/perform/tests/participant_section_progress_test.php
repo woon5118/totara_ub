@@ -184,7 +184,12 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
         $this->assertInstanceOf($target_state_class, $participant_section->get_progress_state());
 
         // Check that event has been triggered.
-        $this->assert_participant_section_updated_event($sink, $participant_section, $subject_user->id);
+        $this->assert_participant_section_updated_event(
+            $sink,
+            $participant_section,
+            $subject_user->id,
+            $initial_state_class::get_name()
+        );
     }
 
     public function test_get_all_translated() {
@@ -203,11 +208,13 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
      * @param phpunit_event_sink $sink
      * @param participant_section $participant_section
      * @param int $user_id
+     * @param string $previous_progress_status
      */
     private function assert_participant_section_updated_event(
         phpunit_event_sink $sink,
         participant_section $participant_section,
-        int $user_id
+        int $user_id,
+        string $previous_progress_status
     ): void {
         $events = $sink->get_events();
         $this->assertCount(1, $events);
@@ -215,12 +222,20 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
         $this->assertInstanceOf('mod_perform\event\participant_section_progress_updated', $event);
         $this->assertEquals($participant_section->get_id(), $event->objectid);
         $this->assertEquals($user_id, $event->relateduserid);
+        $this->assertEquals($user_id, $event->userid);
 
         $this->assertEquals($participant_section->get_context(), $event->get_context());
 
         $only_activity = activity::load_by_entity(activity_entity::repository()->one());
 
         $this->assertEquals($only_activity->get_context(), $event->get_context());
+
+        $participant_instance = $participant_section->participant_instance;
+
+        $this->assertEquals($previous_progress_status, $event->other['previous_progress']);
+        $this->assertEquals($participant_section->progress_status, $event->other['progress']);
+        $this->assertEquals($participant_instance->anonymise_responses, $event->other['anonymous']);
+        $this->assertEquals($participant_instance->participant_source, $event->other['participant_source']);
 
         $sink->close();
     }

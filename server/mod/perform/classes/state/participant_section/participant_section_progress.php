@@ -72,7 +72,11 @@ abstract class participant_section_progress extends state implements state_event
     public function get_event(): base {
         /** @var participant_section $participant_section */
         $participant_section = $this->get_object();
-        return participant_section_progress_updated::create_from_participant_section($participant_section);
-    }
+        $previous_state = $this->previous_state;
 
+        return participant_section_progress_updated::create_from_participant_section(
+            $participant_section,
+            $previous_state ? $previous_state::get_name() : null
+        );
+    }
 }

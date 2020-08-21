@@ -33,8 +33,7 @@ use mod_perform\models\activity\subject_instance;
  *
  * This event is fired when the progress status of a subject instance changes.
  */
-class subject_instance_progress_updated extends base {
-
+class subject_instance_progress_updated extends progress_updated_event {
     /**
      * Initialise required event data properties.
      */
@@ -48,16 +47,39 @@ class subject_instance_progress_updated extends base {
      * Create event by subject instance.
      *
      * @param subject_instance $subject_instance
+     * @param string $from_progress_state the name of previous progress state.
+     *
      * @return self|base
      */
-    public static function create_from_subject_instance(subject_instance $subject_instance): self {
+    public static function create_from_subject_instance(
+        subject_instance $subject_instance,
+        ?string $from_progress_state = null
+    ): self {
+        $other = static::data_other(
+            $subject_instance->progress_status,
+            $from_progress_state
+        );
+
         $data = [
             'objectid' => $subject_instance->get_id(),
             'relateduserid' => $subject_instance->subject_user->id,
-            'other' => [],
+            'userid' => \core\session\manager::get_realuser()->id,
+            'other' => $other,
             'context' => $subject_instance->get_context(),
         ];
 
         return static::create($data);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_description() {
+        $with_progress = $this->get_progress_change_description();
+
+        return "The user with id '$this->userid' progressed the"
+             . " subject instance with id '$this->objectid'"
+             . " for the user with id '$this->relateduserid'"
+             . " $with_progress";
     }
 }

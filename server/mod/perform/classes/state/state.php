@@ -38,6 +38,11 @@ abstract class state {
     protected $object = null;
 
     /**
+     * @var state
+     */
+    protected $previous_state = null;
+
+    /**
      * Get possible transitions with conditions from current state.
      * @return transition[]
      */
@@ -116,7 +121,7 @@ abstract class state {
     final public function transition_to(string $target_state_class): state {
         $transition = $this->get_transition_to($target_state_class);
         if ($transition && $transition->is_possible()) {
-            return $transition->get_to();
+            return $transition->get_to()->set_previous_state($this);
         }
         throw new invalid_state_switch_exception(get_class($this), $target_state_class);
     }
@@ -145,5 +150,18 @@ abstract class state {
      */
     public function on_enter(): void {
         // Override if required.
+    }
+
+    /**
+     * Indicates the triggering state that caused the system to move into this
+     * state.
+     *
+     * @param state $state the triggering state.
+     *
+     * @return state this updated object.
+     */
+    public function set_previous_state(?state $state): state {
+        $this->previous_state = $state;
+        return $this;
     }
 }

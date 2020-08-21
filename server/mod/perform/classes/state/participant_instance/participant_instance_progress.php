@@ -67,7 +67,12 @@ abstract class participant_instance_progress extends state implements state_even
     public function get_event(): base {
         /** @var participant_instance $participant_instance */
         $participant_instance = $this->get_object();
-        return participant_instance_progress_updated::create_from_participant_instance($participant_instance);
+        $previous_state = $this->previous_state;
+
+        return participant_instance_progress_updated::create_from_participant_instance(
+            $participant_instance,
+            $previous_state ? $previous_state::get_name() : null
+        );
     }
 
 }

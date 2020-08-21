@@ -245,6 +245,8 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
 
         $sink = $this->redirectEvents();
         $subject_instance_model = subject_instance::load_by_entity($participant_instance->subject_instance);
+        $previous_subject_progress = $subject_instance_model->progress_status;
+
         $subject_instance_model->switch_state($subject_instance_progress_target_state);
 
         $events = $sink->get_events();
@@ -253,7 +255,11 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
         $this->assertInstanceOf(subject_instance_progress_updated::class, $event);
         $this->assertEquals($subject_instance_model->get_id(), $event->objectid);
         $this->assertEquals($subject_instance_model->subject_user->id, $event->relateduserid);
+        $this->assertEquals(get_admin()->id, $event->userid);
         $this->assertEquals($subject_instance_model->get_context(), $event->get_context());
+        $this->assertEquals($subject_instance_model->progress_status, $event->other['progress']);
+        $this->assertEquals($previous_subject_progress, $event->other['previous_progress']);
+
         $sink->close();
     }
 

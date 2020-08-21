@@ -29,8 +29,7 @@ use core\event\base;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\participant_instance;
 
-class participant_instance_progress_updated extends base {
-
+class participant_instance_progress_updated extends progress_updated_event {
     /**
      * Initialise required event data properties.
      */
@@ -44,16 +43,44 @@ class participant_instance_progress_updated extends base {
      * Create event by participant instance.
      *
      * @param participant_instance $participant_instance
+     * @param string $from_progress_state the name of previous progress state.
+     *
      * @return self|base
      */
-    public static function create_from_participant_instance(participant_instance $participant_instance): self {
+    public static function create_from_participant_instance(
+        participant_instance $participant_instance,
+        ?string $from_progress_state = null
+    ): self {
+        $other = static::data_other(
+            $participant_instance->progress_status,
+            $from_progress_state,
+            $participant_instance->anonymise_responses,
+            $participant_instance->participant_source
+        );
+
         $data = [
             'objectid' => $participant_instance->get_id(),
             'relateduserid' => $participant_instance->participant_id,
-            'other' => [],
+            'userid' => \core\session\manager::get_realuser()->id,
+            'other' => $other,
             'context' => $participant_instance->get_context(),
         ];
 
         return static::create($data);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_description() {
+        $with_progress = $this->get_progress_change_description();
+        $source = $this->get_participant_source();
+        $participant_id = $this->get_anonymised_user($this->relateduserid);
+        $user_id = $this->get_anonymised_user($this->userid);
+
+        return "The user with id '$user_id' progressed the"
+             . " participant instance with id '$this->objectid'"
+             . " for the $source user with id '$participant_id'"
+             . " $with_progress";
     }
 }

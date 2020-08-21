@@ -58,6 +58,7 @@ use totara_core\relationship\relationship as relationship_model;
  * @property-read collection|participant_section[] $participant_sections
  * @property-read string $progress_status internal name of current progress state
  * @property-read moodle_url $participation_url
+ * @property-read bool $anonymise_responses whether this participant's responses are to be anonymised
  * @property-read participant_instance_progress|state $progress_state Current progress state
  * @property-read participant_instance_availability|state $availability_state Current availability state
  * @property-read relationship_model $core_relationship The core relationship
@@ -95,7 +96,8 @@ class participant_instance extends model {
         'is_for_current_user',
         'is_overdue',
         'subject_instance',
-        'participation_url'
+        'participation_url',
+        'anonymise_responses'
     ];
 
     protected static function get_entity_class(): string {
@@ -319,4 +321,12 @@ class participant_instance extends model {
         }
     }
 
+    /**
+     * Indicates if this participant's responses are to be anonymised.
+     *
+     * @return bool true if the responses are to be anonymised.
+     */
+    public function get_anonymise_responses(): bool {
+        return $this->subject_instance->activity->anonymous_responses;
+    }
 }

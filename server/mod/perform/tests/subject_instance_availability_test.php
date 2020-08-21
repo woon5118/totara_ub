@@ -147,6 +147,7 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
          * @var activity $activity
          */
         [$subject1, $subject2, $subject1_entity, $activity] = $this->create_data();
+        $previous_subject_progress = $subject1->progress_status;
 
         $activity->settings->update([activity_setting::CLOSE_ON_COMPLETION => false]);
 
@@ -155,9 +156,16 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
         $subject1_entity->refresh();
         $event_sink->close();
         $events = $event_sink->get_events();
-
         $this->assertCount(1, $events);
-        $this->assertInstanceOf(subject_instance_progress_updated::class, reset($events));
+
+        $event = reset($events);
+        $this->assertInstanceOf(subject_instance_progress_updated::class, $event);
+        $this->assertEquals($subject1->id, $event->objectid);
+        $this->assertEquals($activity->get_context()->id, $event->contextid);
+        $this->assertEquals(get_admin()->id, $event->userid);
+        $this->assertEquals($subject1->subject_user_id, $event->relateduserid);
+        $this->assertEquals($subject1->progress_status, $event->other['progress']);
+        $this->assertEquals($previous_subject_progress, $event->other['previous_progress']);
 
         $this->assertEquals(open::get_code(), $subject1->availability);
         $this->assertEquals(open::get_code(), $subject2->availability);
