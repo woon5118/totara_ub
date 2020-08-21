@@ -234,7 +234,11 @@ class mod_perform_activity_users_to_assign_count_testcase extends advanced_testc
     private function create_activity_with_track_assignment(array $cohorts = [], array $orgs = [],
                                                            array $pos = [], array $users = []): activity {
         // We need the activity to be a draft - since we are making the assigned count check before activation.
-        $activity = $this->generator()->create_activity_in_container(['activity_status' => draft::get_code()]);
+        $activity = $this->generator()->create_activity_in_container([
+            'activity_status' => draft::get_code(),
+            'create_section' => false,
+            'create_track' => false
+        ]);
 
         // Must create a section with an element and a relationship in order to allow an activity to be activated
         $section = $this->generator()->create_section($activity);

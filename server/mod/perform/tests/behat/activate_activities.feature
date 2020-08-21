@@ -17,10 +17,10 @@ Feature: Activation of activities
       | user1 | aud1   |
       | user2 | aud1   |
     And the following "activities" exist in "mod_perform" plugin:
-      | activity_name           | activity_type | activity_status |
-      | Active activity         | check-in      | Active          |
-      | Empty draft activity    | appraisal     | Draft           |
-      | Complete draft activity | feedback      | Draft           |
+      | activity_name           | activity_type | activity_status | create_track | create_section |
+      | Active activity         | check-in      | Active          | true         | true           |
+      | Empty draft activity    | appraisal     | Draft           | false        | false          |
+      | Complete draft activity | feedback      | Draft           | false        | false          |
     And the following "activity sections" exist in "mod_perform" plugin:
       | activity_name           | section_name |
       | Complete draft activity | section 1    |
@@ -54,7 +54,7 @@ Feature: Activation of activities
     When I click on "Activate" option in the dropdown menu
     Then I should see "Activity cannot be activated" in the tui modal
     And I should see "Activation of this draft activity will only be possible once all of the following criteria are met:" in the tui modal
-    And I should see "At least one question element added" in the tui modal
+    And I should see "At least one question element added per section" in the tui modal
 
     When I close the tui modal
     And I close any visible tui dropdowns
@@ -84,13 +84,13 @@ Feature: Activation of activities
 
     When I click on the tui form help icon in the ".tui-actionCard" "css_element"
     Then I should see "It can be activated once all of the following criteria are met:" in the tui popover
-    And I should see "At least one question element added" in the tui popover
+    And I should see "At least one question element added per section" in the tui popover
     When I close the tui popover
 
     And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
     Then I should see "Activity cannot be activated" in the tui modal
     And I should see "Activation of this draft activity will only be possible once all of the following criteria are met:" in the tui modal
-    And I should see "At least one question element added" in the tui modal
+    And I should see "At least one question element added per section" in the tui modal
     When I close the tui modal
 
     When I navigate to the edit perform activities page for activity "Complete draft activity"
@@ -110,7 +110,10 @@ Feature: Activation of activities
   @javascript @vuejs
   Scenario: Editing of sections is disabled when activity is active
     When I navigate to the edit perform activities page for activity "Complete draft activity"
-
+    # lets make it multisection
+    And I click on the "Multiple sections" tui toggle button
+    And I confirm the tui confirmation modal
+    And I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
     Then I should see "Multiple sections"
     Then "Edit section" "button" in the "1" activity section should exist
     And "Section dropdown menu" "button" in the "1" activity section should exist
@@ -131,7 +134,7 @@ Feature: Activation of activities
     And "Section dropdown menu" "button" in the "1" activity section should not exist
     And "Edit content elements" "button" in the "1" activity section should not exist
     And "View content elements" "button" in the "1" activity section should exist
-    And I should see "Subject" in the "2" activity section
+    And I should see "Subject" in the "1" activity section
 
     # On completion setting has a confirm modal when in archived state
     When I click on the "On completion" tui toggle button

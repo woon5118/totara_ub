@@ -271,7 +271,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         $this->setUser($user1);
 
         // A draft activity which fulfills all conditions can be activated, EXCEPT the element is static.
-        $draft_activity = $this->create_valid_activity(null, 'static_content');
+        $draft_activity = $this->create_valid_activity(draft::get_code(), 'static_content');
 
         $this->assertTrue($draft_activity->can_potentially_activate());
         $this->assertFalse($draft_activity->can_activate());
@@ -280,26 +280,38 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
     /**
      * Create a basic activity without any sections or questions in it
      *
-     * @param int|null $status defaults to draft
+     * @param int $status defaults to draft
+     * @param bool $create_section default to false
+     * @param bool $create_track default to false
      * @return activity
      */
-    protected function create_activity(int $status = null): activity {
+    protected function create_activity(
+        int $status = 0,
+        bool $create_section = false,
+        bool $create_track = false
+    ): activity {
         $perform_generator = $this->generator();
 
         return $perform_generator->create_activity_in_container([
             'activity_name' => 'User1 One',
-            'activity_status' => $status ?? draft::get_code()
+            'activity_status' => $status,
+            'create_section' => $create_section,
+            'create_track' => $create_track
         ]);
     }
 
     /**
      * Creates an activity with one section, one question and one relationship
      *
-     * @param int|null $status defaults to draft
+     * @param int $status defaults to draft
      * @param string $element_plugin_name
      * @return activity
      */
-    protected function create_valid_activity(int $status = null, $element_plugin_name = 'short_text'): activity {
+    protected function create_valid_activity(
+        int $status = 0,
+        $element_plugin_name = 'short_text'
+    ): activity {
+
         $perform_generator = $this->generator();
 
         $activity = $this->create_activity($status);
@@ -322,12 +334,12 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
     /**
      * Creates an activity with one section, one question and one relationship
      *
-     * @param int|null $status defaults to draft
+     * @param int $status defaults to draft
      * @param string $element_plugin_name
      * @return activity
      */
     protected function create_activity_with_view_only_relationship(
-        int $status = null,
+        int $status = 0,
         $element_plugin_name = 'short_text'
     ): activity {
         $perform_generator = $this->generator();

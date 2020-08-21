@@ -93,7 +93,11 @@ class mod_perform_webapi_resolver_query_activity_users_to_assign_count_testcase 
 
         /** @var mod_perform_generator|component_generator_base $generator */
         $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
-        $activity = $generator->create_activity_in_container(['activity_status' => draft::get_code()]);
+        $activity = $generator->create_activity_in_container([
+            'activity_status' => draft::get_code(),
+            'create_section' => false,
+            'create_track' => false
+        ]);
 
         // Must create a section with an element and a relationship in order to allow an activity to be activated
         $section = $generator->create_section($activity);

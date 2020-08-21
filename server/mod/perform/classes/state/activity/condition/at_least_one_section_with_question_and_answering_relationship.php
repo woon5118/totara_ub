@@ -38,18 +38,20 @@ class at_least_one_section_with_question_and_answering_relationship extends cond
         $activity = $this->object;
 
         $sections = $activity->get_sections();
+        if ($sections->count() == 0) {
+            return false;
+        }
 
         // Check whether the activity has at least one respondable section element
         // and one answering relationship for a section
         foreach ($sections as $section) {
             $relationships = $section->get_answering_section_relationships();
             $respondable_section_elements = $section->get_respondable_section_elements();
-
-            if ($relationships->count() >= 1 && $respondable_section_elements->count() >= 1) {
-                return true;
+            if ($relationships->count() < 1 || $respondable_section_elements->count() < 1) {
+                // One of the section does not meet criteria.
+                return false;
             }
         }
-
-        return false;
+        return true;
     }
 }

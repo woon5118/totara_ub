@@ -169,7 +169,9 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
 
         $activity = $perform_generator->create_activity_in_container([
             'activity_name' => 'User1 One',
-            'activity_status' => $status ?? draft::get_code()
+            'activity_status' => $status ?? draft::get_code(),
+            'create_section' => false,
+            'create_track' => false
         ]);
 
         $args = [
