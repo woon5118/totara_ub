@@ -61,13 +61,15 @@ class update_section_responses_external_participant implements mutation_resolver
         $participant_instance = $validator->get_participant_instance();
         $participant_id = $participant_instance->participant_id;
 
-        $participant_section = (new participant_section($participant_id, participant_source::EXTERNAL))->find_by_section_id($participant_section_id);
+        $participant_section = (new participant_section($participant_id, participant_source::EXTERNAL))
+            ->find_by_section_id($participant_section_id);
 
         // Something is not valid, we do only return null to not reveal anything through error messages
         if ($participant_section === null) {
             return null;
         }
-        $participant_section_with_responses = (new participant_section_with_responses($participant_section))->build();
+        $participant_section_with_responses = (new participant_section_with_responses($participant_section))
+            ->process_for_response_submission()->build();
         $ec->set_relevant_context($participant_section_with_responses->get_context());
 
         $participant_section_with_responses->set_responses_data_from_request($input['update']);

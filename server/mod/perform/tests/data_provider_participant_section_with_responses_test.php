@@ -32,6 +32,8 @@ use mod_perform\entities\activity\subject_instance;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\participant_source;
+use mod_perform\models\activity\section;
+use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\settings\visibility_conditions\all_responses;
 use mod_perform\models\activity\settings\visibility_conditions\none;
 use mod_perform\models\activity\settings\visibility_conditions\own_response;
@@ -238,8 +240,18 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         $section = $generator->create_section($activity, ['title' => 'Part one']);
 
         // Always create both the manager and appraiser section_relationships
-        $manager_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_MANAGER]);
-        $appraiser_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_APPRAISER]);
+        $manager_section_relationship = $generator->create_section_relationship(
+            $section,
+            [
+                'relationship' => constants::RELATIONSHIP_MANAGER
+            ]
+        );
+        $appraiser_section_relationship = $generator->create_section_relationship(
+            $section,
+            [
+                'relationship' => constants::RELATIONSHIP_APPRAISER
+            ]
+        );
         $subject_section_relationship = $generator->create_section_relationship(
             $section,
             ['relationship' => constants::RELATIONSHIP_SUBJECT],
@@ -324,6 +336,64 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         ];
     }
 
+
+    public function test_non_respondable_section_element_is_included() {
+        $participant_section = $this->create_participant_section_with_respondable_and_non_respondable_elements();
+        $elements_in_section = $participant_section->section->get_section_elements();
+
+        $data_provider = new participant_section_with_responses($participant_section);
+        $participant_section_with_response = $data_provider->build();
+
+        $this->assertEquals(
+            $elements_in_section->count(),
+            $participant_section_with_response->get_section_element_responses()->count()
+        );
+    }
+
+    public function test_non_respondable_element_is_hidden_when_built_for_submitting_response() {
+        $participant_section = $this->create_participant_section_with_respondable_and_non_respondable_elements();
+
+        $elements_in_section = $participant_section->section->get_section_elements();
+        $respondable_elements = $elements_in_section->filter(function ($section_element) {
+            /**@var section_element $section_element*/
+            return $section_element->element->is_respondable;
+        });
+
+        $data_provider = new participant_section_with_responses($participant_section);
+        $participant_section_with_response = $data_provider->process_for_response_submission()->build();
+
+        $this->assertEquals(
+            $respondable_elements->count(),
+            $participant_section_with_response->get_section_element_responses()->count()
+        );
+    }
+
+    private function create_participant_section_with_respondable_and_non_respondable_elements(): participant_section {
+
+        self::setAdminUser();
+
+        $data_generator = self::getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+
+        /** @var activity $activity */
+        $activity = $perform_generator->create_full_activities()->first();
+        /** @var section $section */
+        $section = $activity->sections->first();
+
+        $element = $perform_generator->create_element();
+        $perform_generator->create_section_element($section, $element);
+
+        $static_element = $perform_generator->create_element(['plugin_name' => 'static_content']);
+        $perform_generator->create_section_element($section, $static_element);
+
+        return participant_section::load_by_entity(
+            participant_section_entity::repository()
+            ->order_by('id', 'desc')
+            ->get()->first()
+        );
+    }
+
     /**
      * @dataProvider responder_group_population_for_non_subject_provider
      * @param string $fetching_as
@@ -348,9 +418,24 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         $section = $generator->create_section($activity, ['title' => 'Part one']);
 
-        $manager_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_MANAGER]);
-        $appraiser_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_APPRAISER]);
-        $subject_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
+        $manager_section_relationship = $generator->create_section_relationship(
+            $section,
+            [
+                'relationship' => constants::RELATIONSHIP_MANAGER
+            ]
+        );
+        $appraiser_section_relationship = $generator->create_section_relationship(
+            $section,
+            [
+                'relationship' => constants::RELATIONSHIP_APPRAISER
+            ]
+        );
+        $subject_section_relationship = $generator->create_section_relationship(
+            $section,
+            [
+                'relationship' => constants::RELATIONSHIP_SUBJECT
+            ]
+        );
 
         $element = $generator->create_element(['title' => 'Question one']);
         $generator->create_section_element($section, $element);
@@ -471,8 +556,18 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         $section = $generator->create_section($activity, ['title' => 'Part one']);
 
-        $manager_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_MANAGER]);
-        $subject_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
+        $manager_section_relationship = $generator->create_section_relationship(
+            $section,
+            [
+                'relationship' => constants::RELATIONSHIP_MANAGER
+            ]
+        );
+        $subject_section_relationship = $generator->create_section_relationship(
+            $section,
+            [
+                'relationship' => constants::RELATIONSHIP_SUBJECT
+            ]
+        );
 
         $element = $generator->create_element(['title' => 'Question one']);
         $generator->create_section_element($section, $element);
@@ -613,7 +708,8 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         $subject_instance = $generator->create_subject_instance(
             [
                 'activity_name'            => 'anonymous activity',
-                'subject_is_participating' => false, // The subject actually is participating, but we will create the instance below.
+                // The subject actually is participating, but we will create the instance below.
+                'subject_is_participating' => false,
                 'subject_user_id'          => $subject_user->id,
                 'other_participant_id'     => null,
                 'include_questions'        => false,
@@ -711,18 +807,27 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         foreach ($subject_participant_section_availabilities as $availability) {
             $this->set_participant_instance_availability($subject_participant_section->participant_instance_id, $availability);
-            $this->set_all_other_participant_instances_availability($subject_participant_section->participant_instance_id, open::get_code());
+            $this->set_all_other_participant_instances_availability(
+                $subject_participant_section->participant_instance_id,
+                open::get_code()
+            );
             $subject_participant_section->refresh();
 
             // all other participant_sections open.
             $this->assert_responder_groups_are_not_empty($subject_participant_section);
 
             // Set 1 of the other participant_sections as closed.
-            $this->set_one_of_other_participant_instances_availability($subject_participant_section->participant_instance_id, closed::get_code());
+            $this->set_one_of_other_participant_instances_availability(
+                $subject_participant_section->participant_instance_id,
+                closed::get_code()
+            );
             $this->assert_responder_groups_are_not_empty($subject_participant_section);
 
             // Set all the other participant_sections as closed.
-            $this->set_all_other_participant_instances_availability($subject_participant_section->participant_instance_id, closed::get_code());
+            $this->set_all_other_participant_instances_availability(
+                $subject_participant_section->participant_instance_id,
+                closed::get_code()
+            );
             $this->assert_responder_groups_are_not_empty($subject_participant_section);
         }
     }
@@ -743,7 +848,10 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         foreach ($subject_participant_section_availabilities as $availability) {
             $this->set_participant_instance_availability($subject_participant_section->participant_instance_id, $availability);
-            $this->set_all_other_participant_instances_availability($subject_participant_section->participant_instance_id, open::get_code());
+            $this->set_all_other_participant_instances_availability(
+                $subject_participant_section->participant_instance_id,
+                open::get_code()
+            );
             $subject_participant_instance = participant_instance::load_by_id($subject_participant_section->participant_instance_id);
 
             // all other participant_sections open.
@@ -752,13 +860,19 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
                 : $this->assert_responder_groups_are_not_empty($subject_participant_section);
 
             // Set 1 of the other participant_sections as closed.
-            $this->set_one_of_other_participant_instances_availability($subject_participant_section->participant_instance_id, closed::get_code());
+            $this->set_one_of_other_participant_instances_availability(
+                $subject_participant_section->participant_instance_id,
+                closed::get_code()
+            );
             $subject_participant_instance->get_availability_state()::get_code() === open::get_code()
                 ? $this->assert_responder_groups_are_empty($subject_participant_section)
                 : $this->assert_responder_groups_are_not_empty($subject_participant_section);
 
             // Set all the other participant_sections as closed.
-            $this->set_all_other_participant_instances_availability($subject_participant_section->participant_instance_id, closed::get_code());
+            $this->set_all_other_participant_instances_availability(
+                $subject_participant_section->participant_instance_id,
+                closed::get_code()
+            );
             $subject_participant_instance->get_availability_state()::get_code() === open::get_code()
                 ? $this->assert_responder_groups_are_empty($subject_participant_section)
                 : $this->assert_responder_groups_are_not_empty($subject_participant_section);
@@ -780,34 +894,52 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         $availability = open::get_code();
         $this->set_participant_instance_availability($subject_participant_section->participant_instance_id, $availability);
-        $this->set_all_other_participant_instances_availability($subject_participant_section->participant_instance_id, open::get_code());
+        $this->set_all_other_participant_instances_availability(
+            $subject_participant_section->participant_instance_id,
+            open::get_code()
+        );
 
         // all other participant_sections open.
         $this->assert_responder_groups_are_empty($subject_participant_section);
 
         // Set 1 of the other participant_sections as closed.
-        $this->set_one_of_other_participant_instances_availability($subject_participant_section->participant_instance_id, closed::get_code());
+        $this->set_one_of_other_participant_instances_availability(
+            $subject_participant_section->participant_instance_id,
+            closed::get_code()
+        );
         $this->assert_responder_groups_are_empty($subject_participant_section);
 
         // Set all the other participant_sections as closed.
-        $this->set_all_other_participant_instances_availability($subject_participant_section->participant_instance_id, closed::get_code());
+        $this->set_all_other_participant_instances_availability(
+            $subject_participant_section->participant_instance_id,
+            closed::get_code()
+        );
         $this->assert_responder_groups_are_empty($subject_participant_section);
 
 
         //test when subject participant section is closed.
         $availability = closed::get_code();
         $this->set_participant_instance_availability($subject_participant_section->participant_instance_id, $availability);
-        $this->set_all_other_participant_instances_availability($subject_participant_section->participant_instance_id, open::get_code());
+        $this->set_all_other_participant_instances_availability(
+            $subject_participant_section->participant_instance_id,
+            open::get_code()
+        );
 
         // all other participant_sections open.
         $this->assert_responder_groups_are_empty($subject_participant_section);
 
         // Set 1 of the other participant_sections as closed.
-        $this->set_one_of_other_participant_instances_availability($subject_participant_section->participant_instance_id, closed::get_code());
+        $this->set_one_of_other_participant_instances_availability(
+            $subject_participant_section->participant_instance_id,
+            closed::get_code()
+        );
         $this->assert_responder_groups_are_empty($subject_participant_section);
 
         // Set all the other participant_sections as closed.
-        $this->set_all_other_participant_instances_availability($subject_participant_section->participant_instance_id, closed::get_code());
+        $this->set_all_other_participant_instances_availability(
+            $subject_participant_section->participant_instance_id,
+            closed::get_code()
+        );
         $this->assert_responder_groups_are_not_empty($subject_participant_section);
 
         // test when activity is anonymous
@@ -871,7 +1003,13 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
         $activity_config = new mod_perform_activity_generator_configuration();
         $activity_config->set_number_of_elements_per_section(2)
-            ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER])
+            ->set_relationships_per_section(
+                [
+                    constants::RELATIONSHIP_SUBJECT,
+                    constants::RELATIONSHIP_MANAGER,
+                    constants::RELATIONSHIP_APPRAISER
+                ]
+            )
             ->set_activity_status(active::get_code())
             ->set_number_of_users_per_user_group_type(1)
             ->enable_appraiser_for_each_subject_user()

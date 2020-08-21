@@ -47,6 +47,9 @@ class participant_section_with_responses {
     /** @var collection|section_element_response[] */
     private $others_section_element_responses;
 
+    /** @var bool*/
+    private $load_responses_for_submission = false;
+
     /**
      * responses_for_participant_section constructor.
      *
@@ -55,6 +58,17 @@ class participant_section_with_responses {
     public function __construct(participant_section $participant_section) {
         $this->participant_section = $participant_section;
         $this->others_section_element_responses = new collection();
+    }
+
+    /**
+     * Process only participant's response. Used for submitting responses.
+     *
+     * @return $this
+     */
+    public function process_for_response_submission(): self {
+        $this->load_responses_for_submission = true;
+
+        return $this;
     }
 
     /**
@@ -106,7 +120,7 @@ class participant_section_with_responses {
         $process_other_responses = false;
         $participant_can_view = $this->participant_section_relationship_can_view();
 
-        if ($participant_can_view) {
+        if (!$this->load_responses_for_submission && $participant_can_view) {
             $other_participant_instances = $this->fetch_other_participant_instances();
             $process_other_responses = $this->visibility_conditions_pass($other_participant_instances);
             if ($other_participant_instances->count() > 0) {
@@ -178,39 +192,41 @@ class participant_section_with_responses {
         collection $existing_responses,
         bool $include_other_responder_groups = false
     ): collection {
-        return $section_elements
-            ->filter(function (section_element $section_element_entity) {
+        if ($this->load_responses_for_submission) {
+            $section_elements = $section_elements->filter(function (section_element $section_element_entity) {
                 // We are only interested in respondable elements
                 return $section_element_entity->element->is_respondable;
-            })
-            ->map(
-                function (section_element $section_element) use (
-                    $participant_instance,
+            });
+        }
+
+        return $section_elements->map(
+            function (section_element $section_element) use (
+                $participant_instance,
+                $existing_responses,
+                $include_other_responder_groups
+            ) {
+                // The element response model will accept missing entities
+                // in the case where a question has not yet been answered.
+                $element_response_entity = $this->find_existing_response_entity(
                     $existing_responses,
-                    $include_other_responder_groups
-                ) {
-                    // The element response model will accept missing entities
-                    // in the case where a question has not yet been answered.
-                    $element_response_entity = $this->find_existing_response_entity(
-                        $existing_responses,
-                        $section_element->id,
-                        $participant_instance->id
-                    );
+                    $section_element->id,
+                    $participant_instance->id
+                );
 
-                    $other_responder_groups = new collection();
+                $other_responder_groups = new collection();
 
-                    if ($include_other_responder_groups) {
-                        $other_responder_groups = $this->create_other_responder_groups($section_element->id);
-                    }
-
-                    return new section_element_response(
-                        $participant_instance,
-                        $section_element,
-                        $element_response_entity,
-                        $other_responder_groups
-                    );
+                if ($include_other_responder_groups && $section_element->element->is_respondable) {
+                    $other_responder_groups = $this->create_other_responder_groups($section_element->id);
                 }
-            );
+
+                return new section_element_response(
+                    $participant_instance,
+                    $section_element,
+                    $element_response_entity,
+                    $other_responder_groups
+                );
+            }
+        );
     }
 
     /**

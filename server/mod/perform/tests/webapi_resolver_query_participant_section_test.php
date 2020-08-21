@@ -184,7 +184,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                                 'performelement_static_content/components/StaticContentElementParticipant',
                         ],
                     'title' => 'test element title',
-                    'data' => '{"textValue":null}',
+                    'data' => null,
                     'is_required' => false,
                     'is_respondable' => false,
                 ],
@@ -220,20 +220,17 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $section_element_responses = $result['section_element_responses'];
 
         $this->assertCount(
-            1,
+            $participant_section->section->section_elements->count(),
             $section_element_responses,
-            'Expected one section element'
+            'Expected section elements count do not match'
         );
-
-        $this->assertContains(
+        $this->assertEquals(
             $this->create_section_element_response($section_element->id),
-            $section_element_responses
+            $section_element_responses[0]
         );
-
-        // Non-respondable elements won't have a section element response model
-        $this->assertNotContains(
+        $this->assertEquals(
             $this->create_static_section_element_response($static_section_element->id),
-            $section_element_responses
+            $section_element_responses[1]
         );
     }
 }

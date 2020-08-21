@@ -45,13 +45,15 @@ class update_section_responses implements mutation_resolver, has_middleware {
         $participant_section_id = $input['participant_section_id'];
         $is_draft = $input['is_draft'] ?? false;
 
-        $participant_section = (new participant_section($participant_id, participant_source::INTERNAL))->find_by_section_id($participant_section_id);
+        $participant_section = (new participant_section($participant_id, participant_source::INTERNAL))
+            ->find_by_section_id($participant_section_id);
 
         if (!$participant_section) {
             throw new coding_exception(sprintf('Participant section not found for id %d', $participant_section_id));
         }
 
-        $participant_section_with_responses = (new participant_section_with_responses($participant_section))->build();
+        $participant_section_with_responses = (new participant_section_with_responses($participant_section))
+            ->process_for_response_submission()->build();
         $ec->set_relevant_context($participant_section_with_responses->get_context());
 
         $participant_section_with_responses->set_responses_data_from_request($input['update']);
