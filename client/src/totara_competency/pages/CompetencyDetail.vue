@@ -136,6 +136,7 @@ import Modal from 'tui/components/modal/Modal';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import Progress from 'totara_competency/components/details/Progress';
+import { notify } from 'tui/notifications';
 // GraphQL
 import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';
 
@@ -175,6 +176,9 @@ export default {
     showActivityLogByDefault: {
       default: false,
       type: Boolean,
+    },
+    toastMessage: {
+      type: String,
     },
   },
 
@@ -296,6 +300,9 @@ export default {
   },
 
   mounted() {
+    if (this.toastMessage) {
+      notify({ message: this.toastMessage });
+    }
     this.activityLogModalOpen = this.showActivityLogByDefault;
   },
 

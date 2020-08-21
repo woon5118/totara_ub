@@ -107,6 +107,7 @@ Feature: Test competencies can be user assigned
 
     When I confirm the tui confirmation modal
     Then I should be on my competency profile
+    And I should see "2 competencies have been assigned." in the tui success notification toast
 
     When I change the competency profile to list view
     Then I should see the tui datatable contains:

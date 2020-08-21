@@ -22,23 +22,6 @@
 
     <h2>{{ pageHeading }}</h2>
 
-    <!-- TODO use alert component when created -->
-    <div
-      v-if="mutationError"
-      class="alert alert-danger alert-with-icon alert-dismissable fade-in"
-      role="alert"
-    >
-      <button type="button" class="close" data-dismiss="alert">
-        <FlexIcon icon="delete-ns" />
-      </button>
-      <div class="alert-icon">
-        <FlexIcon icon="notification-error" />
-      </div>
-      <div class="alert-message">
-        {{ $str('error_generic_mutation', 'totara_competency') }}
-      </div>
-    </div>
-
     <Grid :stack-at="900" class="tui-competencySelfAssignment__actions">
       <GridItem :units="3">
         <SelectFilter
@@ -136,6 +119,7 @@
     <ConfirmationModal
       :title="$str('assign_competencies', 'totara_competency')"
       :open="isShowingConfirmationModal"
+      :loading="isSaving"
       @confirm="confirmAssignment"
       @cancel="isShowingConfirmationModal = false"
     >
@@ -158,7 +142,6 @@ import ClearIcon from 'tui/components/icons/common/Clear';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import CreateUserAssignmentMutation from 'totara_competency/graphql/create_user_assignments';
 import FilterSidePanel from 'tui/components/filters/FilterSidePanel';
-import FlexIcon from 'tui/components/icons/FlexIcon';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import Loader from 'tui/components/loader/Loader';
@@ -167,6 +150,7 @@ import SearchFilter from 'tui/components/filters/SearchFilter';
 import SelectFilter from 'tui/components/filters/SelectFilter';
 import SelectionTable from 'totara_competency/components/user_assignment/SelectionTable';
 import UserAssignableCompetenciesQuery from 'totara_competency/graphql/user_assignable_competencies';
+import { notify } from 'tui/notifications';
 
 export default {
   components: {
@@ -176,7 +160,6 @@ export default {
     ClearIcon,
     ConfirmationModal,
     FilterSidePanel,
-    FlexIcon,
     Grid,
     GridItem,
     Loader,
@@ -235,7 +218,6 @@ export default {
       isViewingSelections: false,
       isShowingConfirmationModal: false,
       isSaving: false,
-      mutationError: null,
       data: {
         items: [],
         total: null,
@@ -358,10 +340,6 @@ export default {
       deep: true,
       handler: 'applyFilter',
     },
-    data() {
-      // Remove genetic mutation error message when data is re-fetched.
-      this.mutationError = null;
-    },
   },
   methods: {
     async viewSelections() {
@@ -391,19 +369,21 @@ export default {
     },
     async tryAssign() {
       this.isSaving = true;
-      this.mutationError = null;
-
       try {
-        await this.assign();
+        const { data: result } = await this.assign();
+        this.isSaving = false;
 
-        // TODO when adding proper notifications in please note:
-        // Due to this being a batch api designed to tolerate partial success,
-        // single assignment can silently fail, indicated by no results being returned.
-        // We may want to warn the user of only partial success.
-        window.location.href = this.goBackLink;
+        const assignedCount =
+          result.totara_competency_create_user_assignments.length;
+        if (assignedCount === 0) {
+          this.showErrorNotification();
+        } else {
+          window.location.href = this.$url(this.goBackLink, {
+            assign_success: assignedCount,
+          });
+        }
       } catch (e) {
-        this.mutationError = e;
-      } finally {
+        this.showErrorNotification();
         this.isSaving = false;
       }
     },
@@ -448,6 +428,16 @@ export default {
             },
           };
         },
+      });
+    },
+
+    /**
+     * Show generic save/update error toast.
+     */
+    showErrorNotification() {
+      notify({
+        message: this.$str('error_generic_mutation', 'totara_competency'),
+        type: 'error',
       });
     },
   },

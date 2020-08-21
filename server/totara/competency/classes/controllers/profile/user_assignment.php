@@ -102,4 +102,19 @@ class user_assignment extends base {
         return get_string('user_assignment_page_heading_other', 'totara_competency');
     }
 
+    /**
+     * If we have come from this page after saving, get the relevant success toast message.
+     * Relies on it being specified via URL param.
+     *
+     * @return string|null
+     */
+    public static function get_toast_message_from_url(): ?string {
+        if ($assigned_count = optional_param('assign_success', 0, PARAM_INT)) {
+            return $assigned_count > 1 ?
+                get_string('notification_self_assignment_successful_plural', 'totara_competency', $assigned_count)
+                : get_string('notification_self_assignment_successful_singular', 'totara_competency');
+        }
+        return null;
+    }
+
 }

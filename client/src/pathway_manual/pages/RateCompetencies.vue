@@ -33,7 +33,8 @@
       :current-user-id="currentUserId"
       :assignment-id="assignmentId"
       @has-unsaved-ratings="has => (hasUnsavedRatings = has)"
-      @go-back="goBack"
+      @go-back="goBack(0)"
+      @saved="goBack($event)"
     />
   </div>
 </template>
@@ -101,8 +102,14 @@ export default {
       this.role = selectedRole;
     },
 
-    goBack() {
-      window.location = this.returnUrl;
+    goBack(ratingsSaved) {
+      if (ratingsSaved === 0) {
+        window.location = this.returnUrl;
+      } else {
+        window.location = this.$url(this.returnUrl, {
+          rating_success: ratingsSaved,
+        });
+      }
     },
   },
 };

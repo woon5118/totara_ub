@@ -57,6 +57,7 @@
           :title="
             $str('modal_submit_ratings_confirmation_title', 'pathway_manual')
           "
+          :loading="isSaving"
           @confirm="submitRatings"
           @cancel="showSubmitRatingsModal = false"
         >
@@ -95,6 +96,7 @@ import Loader from 'tui/components/loader/Loader';
 import RateableCompetenciesQuery from 'pathway_manual/graphql/user_rateable_competencies';
 import UserCompetenciesFilters from 'pathway_manual/components/UserCompetenciesFilters';
 import { NONE_OPTION_VALUE, ROLE_SELF } from 'pathway_manual/constants';
+import { notify } from 'tui/notifications';
 
 /**
  * If there are more than this amount of competencies available to rate,
@@ -140,6 +142,7 @@ export default {
       showSubmitRatingsModal: false,
       selectedRatings: [],
       isRatingSingleCompetency: false,
+      isSaving: false,
     };
 
     if (this.assignmentId != null) {
@@ -304,11 +307,10 @@ export default {
     /**
      * Save the draft ratings the user has made.
      */
-    submitRatings() {
-      window.removeEventListener('beforeunload', this.unloadHandler);
-      this.showSubmitRatingsModal = false;
-      this.$apollo
-        .mutate({
+    async submitRatings() {
+      this.isSaving = true;
+      try {
+        const { data: result } = await this.$apollo.mutate({
           // Query
           mutation: CreateManualRatingsMutation,
           // Parameters
@@ -318,20 +320,30 @@ export default {
             ratings: this.getRatingsForSaving(),
           },
           refetchAll: false,
-        })
-        .then(data => {
-          if (data.data && data.data.pathway_manual_create_manual_ratings) {
-            this.$emit('go-back');
-          } else {
-            // TODO Handle this case.
-            alert('Something went wrong. Saving failed.');
-          }
-        })
-        .catch(error => {
-          // TODO Handle error case
-          console.log('error');
-          console.error(error);
         });
+
+        if (result && result.pathway_manual_create_manual_ratings) {
+          window.removeEventListener('beforeunload', this.unloadHandler);
+          this.$emit('saved', this.selectedRatings.length);
+        } else {
+          this.showErrorNotification();
+        }
+      } catch (e) {
+        this.showErrorNotification();
+      } finally {
+        this.isSaving = false;
+        this.showSubmitRatingsModal = false;
+      }
+    },
+
+    /**
+     * Show generic save/update error toast.
+     */
+    showErrorNotification() {
+      notify({
+        message: this.$str('error_ratings_not_saved', 'pathway_manual'),
+        type: 'error',
+      });
     },
   },
 
@@ -359,6 +371,7 @@ export default {
 <lang-strings>
   {
     "pathway_manual": [
+      "error_ratings_not_saved",
       "filter_no_competencies",
       "modal_submit_ratings_confirmation_title",
       "modal_submit_ratings_confirmation_question",

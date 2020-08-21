@@ -50,6 +50,7 @@ Feature: Test rating a competency for a user as different roles via the competen
     And I click on "Submit" "button"
     And I click on "OK" "button"
     Then I should see "Competency profile"
+    And I should see "Your rating has been saved." in the tui success notification toast
 
   Scenario: As an appraiser, make a rating for a user via the competencies block
     Given I log in as "user3"
@@ -72,3 +73,4 @@ Feature: Test rating a competency for a user as different roles via the competen
     And I click on "Submit" "button"
     And I click on "OK" "button"
     Then I should see "Competency profile"
+    And I should see "Your rating has been saved." in the tui success notification toast

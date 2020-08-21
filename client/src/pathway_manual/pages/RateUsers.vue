@@ -33,6 +33,7 @@
 <script>
 import RateUsersList from 'pathway_manual/components/RateUsersList';
 import RoleSelector from 'pathway_manual/components/RoleSelector';
+import { notify } from 'tui/notifications';
 
 export default {
   components: { RateUsersList, RoleSelector },
@@ -45,12 +46,21 @@ export default {
       required: true,
       type: Number,
     },
+    toastMessage: {
+      type: String,
+    },
   },
 
   data() {
     return {
       role: this.specifiedRole,
     };
+  },
+
+  mounted() {
+    if (this.toastMessage) {
+      notify({ message: this.toastMessage });
+    }
   },
 
   methods: {

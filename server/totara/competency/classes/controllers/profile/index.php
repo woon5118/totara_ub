@@ -25,6 +25,7 @@ namespace totara_competency\controllers\profile;
 
 use core\format;
 use core\webapi\formatter\field\string_field_formatter;
+use pathway_manual\controllers\rate_competencies;
 use pathway_manual\models\user_competencies;
 use totara_competency\helpers\capability_helper;
 use totara_mvc\tui_view;
@@ -50,6 +51,7 @@ class index extends base {
             'base-url' => (string) $this->get_base_url(),
             'can-assign' => capability_helper::can_assign($this->user->id, $this->context),
             'can-rate-competencies' => user_competencies::can_rate_competencies($this->user->id),
+            'toast-message' => user_assignment::get_toast_message_from_url() ?? rate_competencies::get_toast_message_from_url(),
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyProfile', $props)

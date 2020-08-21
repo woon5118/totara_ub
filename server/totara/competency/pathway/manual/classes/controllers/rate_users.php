@@ -53,7 +53,10 @@ class rate_users extends controller {
         $page_title = get_string('rate_competencies', 'pathway_manual');
         $this->get_page()->navbar->add($page_title);
 
-        $vue_props = ['current-user-id' => user::logged_in()->id];
+        $vue_props = [
+            'current-user-id' => user::logged_in()->id,
+            'toast-message' => rate_competencies::get_toast_message_from_url(),
+        ];
 
         if ($this->role) {
             $vue_props['specified-role'] = $this->role::get_name();

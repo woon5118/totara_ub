@@ -194,4 +194,19 @@ class rate_competencies extends controller {
             ->one();
     }
 
+    /**
+     * If we have come from this page after saving, get the relevant success toast message.
+     * Relies on it being specified via URL param.
+     *
+     * @return string|null
+     */
+    public static function get_toast_message_from_url(): ?string {
+        if ($ratings_count = optional_param('rating_success', 0, PARAM_INT)) {
+            return $ratings_count > 1 ?
+                get_string('notification_ratings_saved_plural', 'pathway_manual') :
+                get_string('notification_ratings_saved_singular', 'pathway_manual');
+        }
+        return null;
+    }
+
 }

@@ -141,6 +141,7 @@ import ToggleSet from 'tui/components/toggle/ToggleSet';
 import CurrentProgress from 'totara_competency/components/profile/CurrentProgress';
 import UserHeader from 'totara_competency/components/UserHeader';
 import ProgressQuery from 'totara_competency/graphql/progress_for_user';
+import { notify } from 'tui/notifications';
 import { pick, groupBy } from 'tui/util';
 
 const ACTIVE_ASSIGNMENT = 1;
@@ -191,6 +192,9 @@ export default {
     canRateCompetencies: {
       required: true,
       type: Boolean,
+    },
+    toastMessage: {
+      type: String,
     },
   },
 
@@ -319,6 +323,12 @@ export default {
         user_id: this.userId,
       });
     },
+  },
+
+  mounted() {
+    if (this.toastMessage) {
+      notify({ message: this.toastMessage });
+    }
   },
 
   methods: {

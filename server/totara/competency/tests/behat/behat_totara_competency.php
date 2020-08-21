@@ -90,7 +90,7 @@ class behat_totara_competency extends behat_base {
         $expected_path = $this->locate_path(self::TOTARA_COMPETENCY_PROFILE_PATH);
         $actual_url = $this->getSession()->getCurrentUrl();
 
-        if ($expected_path !== $actual_url) {
+        if (strpos($actual_url, $expected_path) === false) {
             $exception_message = "Expected the current url to be {$expected_path}, instead was {$actual_url}";
             throw new ExpectationException($exception_message, $this->getSession());
         }

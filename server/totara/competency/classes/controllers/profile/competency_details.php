@@ -23,6 +23,7 @@
 
 namespace totara_competency\controllers\profile;
 
+use pathway_manual\controllers\rate_competencies;
 use totara_competency\entities\competency;
 use totara_mvc\tui_view;
 
@@ -57,6 +58,7 @@ class competency_details extends base {
             'go-back-link'                 => (string)$this->get_profile_url(),
             'go-back-text'                 => $this->get_back_to_profile_text(),
             'show-activity-log-by-default' => $show_activity_log_by_default,
+            'toast-message'                => rate_competencies::get_toast_message_from_url(),
         ];
 
         return tui_view::create('totara_competency/pages/CompetencyDetail', $props)
