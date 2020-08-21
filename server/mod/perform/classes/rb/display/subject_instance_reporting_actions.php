@@ -23,6 +23,7 @@
 
 namespace mod_perform\rb\display;
 
+use mod_perform\state\subject_instance\pending;
 use mod_perform\util;
 use totara_reportbuilder\rb\display\base;
 use totara_tui\output\component;
@@ -48,6 +49,13 @@ class subject_instance_reporting_actions extends base {
 
         if ($format !== 'html') {
             // Only applicable to the HTML format.
+            return '';
+        }
+
+        $extrafields = self::get_extrafields_row($row, $column);
+
+        // Exporting pending subject instance does not make sense as there won't be responses
+        if ($extrafields->status == pending::get_code()) {
             return '';
         }
 

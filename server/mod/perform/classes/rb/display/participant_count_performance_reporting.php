@@ -23,19 +23,31 @@
 
 namespace mod_perform\rb\display;
 
-use moodle_url;
+use mod_perform\state\subject_instance\pending;
 use stdClass;
+use totara_reportbuilder\rb\display\base;
 
-class participant_count_manage_participation extends participant_count {
+class participant_count_performance_reporting extends base {
 
     /**
-     * @inheritDoc
+     * Handles the display
+     *
+     * @param string $count
+     * @param string $format
+     * @param stdClass $row
+     * @param \rb_column $column
+     * @param \reportbuilder $report
+     * @return string
      */
-    protected static function get_url(stdClass $extrafields): moodle_url {
-        return new moodle_url(
-            '/mod/perform/manage/participation/participant_instances.php',
-            ['activity_id' => $extrafields->activity_id, 'subject_instance_id' => $extrafields->subject_instance_id]
-        );
+    public static function display($count, $format, stdClass $row, \rb_column $column, \reportbuilder $report) {
+        $extrafields = self::get_extrafields_row($row, $column);
+
+        if ($extrafields->status == pending::get_code()) {
+            // This happens for subject instances that still need manual participant assignments.
+            return pending::get_display_name();
+        }
+
+        return $count;
     }
 
 }

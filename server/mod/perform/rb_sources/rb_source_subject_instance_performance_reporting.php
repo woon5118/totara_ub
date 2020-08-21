@@ -77,7 +77,8 @@ class rb_source_subject_instance_performance_reporting extends rb_source_perform
             [
                 'displayfunc' => 'subject_instance_name_linked_to_view_form',
                 'extrafields' => [
-                    'subject_instance_id' => "base.id"
+                    'subject_instance_id' => "base.id",
+                    'status' => 'base.status',
                 ],
                 'defaultheading' => get_string('activity_name', 'mod_perform'),
                 'joins' => 'perform',
@@ -94,9 +95,12 @@ class rb_source_subject_instance_performance_reporting extends rb_source_perform
             WHERE ppi.subject_instance_id = base.id)",
             [
                 'dbdatatype' => 'integer',
-                'displayfunc' => 'integer',
+                'displayfunc' => 'participant_count_performance_reporting',
                 'iscompound' => true,
                 'issubquery' => true,
+                'extrafields' => [
+                    'status' => "base.status"
+                ],
             ]
         );
 
@@ -109,6 +113,9 @@ class rb_source_subject_instance_performance_reporting extends rb_source_perform
                 'displayfunc' => 'subject_instance_reporting_actions',
                 'noexport' => true,
                 'nosort' => true,
+                'extrafields' => [
+                    'status' => "base.status"
+                ],
             ]
         );
 

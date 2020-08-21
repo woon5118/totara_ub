@@ -25,6 +25,7 @@ namespace mod_perform\rb\display;
 
 use html_writer;
 use mod_perform\controllers\reporting\performance\view_only_user_activity;
+use mod_perform\state\subject_instance\pending;
 use mod_perform\util;
 use rb_column;
 use rb_column_option;
@@ -59,11 +60,12 @@ class subject_instance_name_linked_to_view_form extends base {
             self::$can_view_form = util::can_potentially_report_on_subjects($report->reportfor);
         }
 
-        if (!self::$can_view_form) {
+        $extrafields = self::get_extrafields_row($row, $column);
+
+        if (!self::$can_view_form || $extrafields->status == pending::get_code()) {
             return format_string($activity_name);
         }
 
-        $extrafields = self::get_extrafields_row($row, $column);
         $subject_instance_id = $extrafields->subject_instance_id;
 
         return html_writer::link(
