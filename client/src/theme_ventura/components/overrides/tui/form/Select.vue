@@ -181,10 +181,6 @@
       background-color: transparent;
     }
 
-    & option {
-      background: var(--tui-color-neutral-1);
-    }
-
     .tui-contextInvalid & {
       border-color: var(--tui-form-input-border-color-invalid);
       box-shadow: var(--tui-form-input-shadow-invalid);
