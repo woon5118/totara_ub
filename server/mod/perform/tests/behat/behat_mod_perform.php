@@ -1020,7 +1020,7 @@ class behat_mod_perform extends behat_base {
      * @return void
      */
     public function i_should_see_the_subject_instance_is_due(string $date, string $element, string $selector_type): void {
-        $date_text = sprintf("Complete before %s", $date);
+        $date_text = sprintf("Due date: %s", $date);
         $this->execute('behat_general::assert_element_contains_text',
             [$date_text, $element, $selector_type]
         );

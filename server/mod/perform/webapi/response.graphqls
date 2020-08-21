@@ -14,11 +14,12 @@ type mod_perform_participant_section implements participant_section_response {
   id: core_id!
   section: mod_perform_section!
   participant_instance: mod_perform_participant_instance!
-  answerable_participant_instances: [mod_perform_participant_instance!]! # All participant instances the linked user (particiapnt_instance) can asnwer as
+  answerable_participant_instances: [mod_perform_participant_instance!]! # All participant instances the linked user (participant_instance) can answer as
   section_element_responses: [mod_perform_section_element_response!]!
   progress_status: mod_perform_participant_section_progress_status!
   availability_status: mod_perform_participant_section_availability_status!
   is_overdue: Boolean!
+  can_answer: Boolean!
   responses_are_visible_to: [totara_core_relationship!]!
 }
 

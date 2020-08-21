@@ -337,11 +337,15 @@ class mod_perform_generator extends component_generator_base {
     public function create_section_relationship_from_name(array $data): void {
         $relationship_name = strtolower($data['relationship']);
         $relationships = (new core_relationship_provider())->get();
+        $can_view = isset($data['can_view']) ? $data['can_view'] === 'yes' : true;
+        $can_answer = isset($data['can_answer']) ? $data['can_answer'] === 'yes' : true;
         foreach ($relationships as $relationship) {
             if (strtolower($relationship->get_name()) === $relationship_name) {
                 $this->create_section_relationship(
                     $this->get_section_from_title($data['section_name']),
-                    ['relationship' => $relationship->idnumber]
+                    ['relationship' => $relationship->idnumber],
+                    $can_view,
+                    $can_answer
                 );
                 return;
             }

@@ -26,35 +26,40 @@
         v-if="isMultiSectionActive"
         class="tui-performUserActivityListSection__header"
       >
-        <Button
-          v-if="
-            subjectSection.canParticipate &&
-              currentUserHasMultipleRelationships(subjectSection)
-          "
-          :styleclass="{ transparent: true }"
-          :text="subjectSection.section.display_title"
-          @click.prevent="showRelationshipSelector(subjectSection)"
-        />
-        <a
-          v-else-if="subjectSection.canParticipate"
-          :href="
-            $url(viewUrl, {
-              participant_section_id: getFirstSectionIdToParticipate(
-                subjectSection
-              ),
-            })
-          "
-        >
-          {{ subjectSection.section.display_title }}
-        </a>
+        <template v-if="subjectSection.canParticipate">
+          <Button
+            v-if="currentUserHasMultipleRelationships(subjectSection)"
+            :styleclass="{ transparent: true }"
+            :text="subjectSection.section.display_title"
+            @click.prevent="showRelationshipSelector(subjectSection)"
+          />
+          <a
+            v-else
+            :href="
+              $url(viewUrl, {
+                participant_section_id: getFirstSectionIdToParticipate(
+                  subjectSection
+                ),
+              })
+            "
+          >
+            {{ subjectSection.section.display_title }}
+          </a>
+          <span v-if="!subjectSection.canCurrentUserAnswer">
+            {{ $str('user_activities_section_view_only', 'mod_perform') }}
+          </span>
+        </template>
         <template v-else>
           {{ subjectSection.section.display_title }}
         </template>
       </h3>
 
       <Table
-        v-if="!anonymousResponses || subjectSection.participation.length > 0"
-        :data="subjectSection.participation"
+        v-if="
+          !anonymousResponses ||
+            subjectSection.participationToDisplay.length > 0
+        "
+        :data="subjectSection.participationToDisplay"
         class="tui-performUserActivityListSection__data"
         :border-bottom-hidden="true"
         :border-separator-hidden="true"
@@ -211,6 +216,10 @@ export default {
       required: true,
       type: Boolean,
     },
+    activityId: {
+      required: true,
+      type: String,
+    },
   },
 
   data() {
@@ -251,6 +260,7 @@ export default {
               progressStatus: participantSection.progress_status,
               availabilityStatus: participantSection.availability_status,
               isOverdue: participantSection.is_overdue,
+              canAnswer: participantSection.can_answer,
               participant,
               relationship,
               relationship_id,
@@ -268,15 +278,28 @@ export default {
           }
         );
 
+        const participationToDisplay = this.filterToCanAnswer(
+          filteredParticipation
+        );
+
+        const canCurrentUserAnswer =
+          this.filterToCurrentUser(participationToDisplay).length > 0;
+
         return {
           canParticipate: item.can_participate,
+          canCurrentUserAnswer,
           participation: filteredParticipation,
+          participationToDisplay,
           summary: this.getParticipantSummary(participation),
           participant_sections: item.participant_sections,
           section: item.section,
         };
       });
     },
+  },
+
+  mounted() {
+    this.checkSingleSectionViewOnly();
   },
 
   methods: {
@@ -347,18 +370,29 @@ export default {
     },
 
     /**
-     * Filter participant instances to only ones that belong to the logged in user.
+     * Filter section participation to only ones that belong to the logged in user.
      *
-     * @param {Object[]} participantSections
+     * @param {Object[]} participation
      * @return {Object[]}
      */
-    filterToCurrentUser(participantSections) {
-      return participantSections.filter(ps => ps.isForCurrentUser);
+    filterToCurrentUser(participation) {
+      return participation.filter(ps => ps.isForCurrentUser);
+    },
+
+    /**
+     * Filter section participation to only ones that can answer.
+     *
+     * @param {Object[]} participation
+     * @return {Object[]}
+     */
+    filterToCanAnswer(participation) {
+      return participation.filter(ps => ps.canAnswer);
     },
 
     getParticipantSummary(participation) {
-      const totalRespondents = participation.length;
-      const totalCompleted = participation.filter(
+      const respondents = this.filterToCanAnswer(participation);
+      const totalRespondents = respondents.length;
+      const totalCompleted = respondents.filter(
         item => item.progressStatus === 'COMPLETE'
       ).length;
 
@@ -366,6 +400,19 @@ export default {
         totalRespondents,
         totalCompleted,
       };
+    },
+
+    /**
+     * Let parent component know when we find out that we only have one section and it is view-only for the
+     * current user.
+     */
+    checkSingleSectionViewOnly() {
+      if (
+        this.subjectSectionsSubset.length === 1 &&
+        !this.subjectSectionsSubset[0].canCurrentUserAnswer
+      ) {
+        this.$emit('single-section-view-only', this.activityId);
+      }
     },
   },
 };
@@ -376,6 +423,7 @@ export default {
     "mod_perform": [
       "is_overdue",
       "user_activities_closed",
+      "user_activities_section_view_only",
       "user_activities_status_complete",
       "user_activities_status_header_relationship",
       "user_activities_status_header_section_progress",

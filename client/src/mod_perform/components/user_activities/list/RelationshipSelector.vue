@@ -225,6 +225,11 @@ export default {
           return this.$str('user_activities_status_in_progress', 'mod_perform');
         case 'COMPLETE':
           return this.$str('user_activities_status_complete', 'mod_perform');
+        case 'PROGRESS_NOT_APPLICABLE':
+          return this.$str(
+            'user_activities_status_not_applicable_for_relationship_selector',
+            'mod_perform'
+          );
         default:
           return '';
       }
@@ -268,6 +273,7 @@ export default {
       "select_relationship_to_respond_as_title",
       "user_activities_status_complete",
       "user_activities_status_in_progress",
+      "user_activities_status_not_applicable_for_relationship_selector",
       "user_activities_status_not_started"
     ],
     "moodle": [

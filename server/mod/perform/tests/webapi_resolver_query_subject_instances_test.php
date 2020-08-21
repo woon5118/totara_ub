@@ -114,6 +114,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'display_name' => $activity->type->display_name
                 ],
                 'anonymous_responses' => false,
+                'id' => $activity->id,
             ],
             'subject_user' => [
                 'fullname' => $subject_instance->subject_user->fullname
@@ -164,6 +165,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'progress_status' => participant_section_not_started::get_name(),
                     'availability_status' => participant_section_open::get_name(),
                     'is_overdue' => false,
+                    'can_answer' => true,
                 ],
             ],
             'can_participate' => true,
@@ -236,6 +238,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'display_name' => $activity->type->display_name
                 ],
                 'anonymous_responses' => false,
+                'id' => $activity->id,
             ],
             'subject_user' => [
                 'fullname' => $subject_instance->subject_user->fullname
@@ -302,6 +305,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'progress_status' => participant_section_not_started::get_name(),
                     'availability_status' => participant_section_open::get_name(),
                     'is_overdue' => false,
+                    'can_answer' => true,
                 ],
                 [
                     'id' => $external_participant_instance->participant_sections->first()->id,
@@ -321,6 +325,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'progress_status' => participant_section_not_started::get_name(),
                     'availability_status' => participant_section_open::get_name(),
                     'is_overdue' => false,
+                    'can_answer' => true,
                 ],
             ],
             'can_participate' => true,
@@ -401,6 +406,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'display_name' => $activity->type->display_name
                 ],
                 'anonymous_responses' => true,
+                'id' => $activity->id,
             ],
             'subject_user' => [
                 'fullname' => $subject_instance->subject_user->fullname
@@ -460,6 +466,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'progress_status' => participant_section_not_started::get_name(),
                     'availability_status' => participant_section_open::get_name(),
                     'is_overdue' => false,
+                    'can_answer' => true,
                 ],
                 [
                     'id' => $appraiser_participant_instance->participant_sections->first()->id,
@@ -473,6 +480,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'progress_status' => participant_section_not_started::get_name(),
                     'availability_status' => participant_section_open::get_name(),
                     'is_overdue' => false,
+                    'can_answer' => true,
                 ],
             ],
             'can_participate' => true,
@@ -661,6 +669,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'display_name' => $subject_instance->activity->type->display_name
                     ],
                     'anonymous_responses' => false,
+                    'id' => $subject_instance->activity->id,
                 ],
                 'subject_user' => [
                     'fullname' => $subject_instance->subject_user->fullname
@@ -699,6 +708,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'progress_status' => participant_section_not_started::get_name(),
                         'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
+                        'can_answer' => true,
                     ],
                 ],
                 'can_participate' => false,
@@ -728,6 +738,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'progress_status' => participant_section_not_started::get_name(),
                         'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
+                        'can_answer' => true,
                     ],
                     [
                         'id' => $participant_section1_manager->id,
@@ -747,6 +758,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'progress_status' => participant_section_not_started::get_name(),
                         'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
+                        'can_answer' => true,
                     ],
                 ],
                 'can_participate' => true,
@@ -776,6 +788,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'progress_status' => participant_section_in_progress::get_name(),
                         'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
+                        'can_answer' => true,
                     ],
                 ],
                 'can_participate' => true,
@@ -845,6 +858,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'progress_status' => participant_section_not_started::get_name(),
                         'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
+                        'can_answer' => true,
                     ],
                 ],
                 'can_participate' => true,
@@ -874,6 +888,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'progress_status' => participant_section_not_started::get_name(),
                         'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
+                        'can_answer' => true,
                     ],
                     [
                         'id' => $participant_section1_manager->id,
@@ -893,6 +908,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'progress_status' => participant_section_not_started::get_name(),
                         'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
+                        'can_answer' => true,
                     ],
                 ],
                 'can_participate' => true,
@@ -922,6 +938,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'progress_status' => participant_section_in_progress::get_name(),
                         'availability_status' => participant_section_open::get_name(),
                         'is_overdue' => false,
+                        'can_answer' => true,
                     ],
                 ],
                 'can_participate' => false,

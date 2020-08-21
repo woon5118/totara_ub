@@ -163,8 +163,19 @@
               )
             }}
           </span>
+          <span
+            v-if="isSingleSectionViewOnly(subjectInstance.subject.activity.id)"
+          >
+            {{
+              $str(
+                'user_activities_single_section_view_only_activity',
+                'mod_perform'
+              )
+            }}
+          </span>
         </p>
         <SectionsList
+          :activity-id="subjectInstance.subject.activity.id"
           :subject-sections="subjectInstance.sections"
           :is-multi-section-active="
             subjectInstance.subject.activity.settings.multisection
@@ -175,6 +186,7 @@
           :anonymous-responses="
             subjectInstance.subject.activity.anonymous_responses
           "
+          @single-section-view-only="flagActivitySingleSectionViewOnly"
         />
       </template>
     </Table>
@@ -250,6 +262,7 @@ export default {
       isRelationshipSelectorShown: false,
       selectedParticipantSections: [],
       selectedSubjectUser: {},
+      singleSectionViewOnlyActivities: [],
     };
   },
 
@@ -357,6 +370,11 @@ export default {
           return this.$str('user_activities_status_in_progress', 'mod_perform');
         case 'COMPLETE':
           return this.$str('user_activities_status_complete', 'mod_perform');
+        case 'PROGRESS_NOT_APPLICABLE':
+          return this.$str(
+            'user_activities_status_not_applicable',
+            'mod_perform'
+          );
         default:
           return '';
       }
@@ -373,6 +391,7 @@ export default {
      * @returns {string}
      */
     getYourProgressText(participantInstances) {
+      let allNotApplicable = true;
       let allComplete = true;
       let allNotStarted = true;
       this.filterToCurrentUser(participantInstances).forEach(function(
@@ -380,17 +399,22 @@ export default {
       ) {
         switch (participant_instance.progress_status) {
           case 'NOT_STARTED':
+            allNotApplicable = false;
             allComplete = false;
             break;
           case 'IN_PROGRESS':
+            allNotApplicable = false;
             allComplete = false;
             allNotStarted = false;
             break;
           case 'COMPLETE':
+            allNotApplicable = false;
             allNotStarted = false;
         }
       });
-      let calcStatus = allNotStarted
+      let calcStatus = allNotApplicable
+        ? 'PROGRESS_NOT_APPLICABLE'
+        : allNotStarted
         ? 'NOT_STARTED'
         : allComplete
         ? 'COMPLETE'
@@ -460,6 +484,25 @@ export default {
     filterToCurrentUser(participantInstances) {
       return participantInstances.filter(pi => pi.is_for_current_user);
     },
+
+    /**
+     * Add to the list of activities that only have one section where current user has view-only access.
+     *
+     * @param {Number} activityId
+     */
+    flagActivitySingleSectionViewOnly(activityId) {
+      this.singleSectionViewOnlyActivities.push(activityId);
+    },
+
+    /**
+     * Find out if an activity has only one section where current user has view-only access.
+     *
+     * @param activityId
+     * @returns {boolean}
+     */
+    isSingleSectionViewOnly(activityId) {
+      return this.singleSectionViewOnlyActivities.includes(activityId);
+    },
   },
 };
 </script>
@@ -470,11 +513,13 @@ export default {
       "user_activities_closed",
       "user_activities_complete_before",
       "user_activities_created_at",
+      "user_activities_single_section_view_only_activity",
       "user_activities_status_complete",
       "user_activities_status_header_activity",
       "user_activities_status_header_participation",
       "user_activities_status_header_relationship",
       "user_activities_status_in_progress",
+      "user_activities_status_not_applicable",
       "user_activities_status_not_started",
       "user_activities_subject_header",
       "user_activities_title_header",

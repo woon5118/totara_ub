@@ -10,6 +10,7 @@ query mod_perform_my_subject_instances(
       due_date
       is_overdue
       activity {
+        id
         name
         type {
           display_name
@@ -47,6 +48,7 @@ query mod_perform_my_subject_instances(
         progress_status
         availability_status
         is_overdue
+        can_answer
         participant_instance {
           progress_status
           participant_id

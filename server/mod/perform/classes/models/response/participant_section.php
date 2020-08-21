@@ -102,6 +102,7 @@ class participant_section extends model implements section_response_interface {
         'is_overdue',
         'responses_are_visible_to',
         'participation_url',
+        'can_answer',
     ];
 
     /**
@@ -385,6 +386,16 @@ class participant_section extends model implements section_response_interface {
         return !$this->is_completed()
             && $this->participant_instance->is_overdue;
     }
+
+    /**
+     * Get value for can_answer
+     *
+     * @return bool
+     */
+    public function get_can_answer(): bool {
+        return $this->can_answer();
+    }
+
 
     /**
      * Get url for a user to participate in this section
