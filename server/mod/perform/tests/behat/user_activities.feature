@@ -164,17 +164,3 @@ Feature: Viewing and responding to perform activities
     When I click on "Continue" "link"
     Then I should see "Manage participation: “John is participating subject”"
 
-  Scenario: I can navigate to my performance activities from my profile but not others
-    Given the "miscellaneous" user profile block exists
-    And I log in as "john"
-    When I follow "Profile" in the user menu
-    And I click on "Performance activities" "link"
-    And I should see "Performance activities"
-    And I should see "Your activities"
-    And I should see "Activities about others"
-
-    When I log out
-    And I log in as "admin"
-    And I navigate to "Users > Manage users" in site administration
-    And I click on "John One" "link"
-    Then I should not see "Performance activities"

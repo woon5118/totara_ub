@@ -27,19 +27,29 @@ function xmldb_block_totara_user_profile_install() {
 
     $blocksdata = [
         [
-            'category' => 'administration',
-            'defaultregion' => 'side-pre',
-            'defaultweight' => 1,
-        ],
-        [
             'category' => 'contact',
             'defaultregion' => 'main',
             'defaultweight' => 1,
         ],
         [
             'category' => 'jobassignment',
+            'defaultregion' => 'main',
+            'defaultweight' => 2,
+        ],
+        [
+            'category' => 'administration',
             'defaultregion' => 'side-post',
             'defaultweight' => 1,
+        ],
+        [
+            'category' => 'mylearning',
+            'defaultregion' => 'side-post',
+            'defaultweight' => 2,
+        ],
+        [
+            'category' => 'development',
+            'defaultregion' => 'side-post',
+            'defaultweight' => 3,
         ],
     ];
     $page = new moodle_page();

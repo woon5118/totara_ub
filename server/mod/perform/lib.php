@@ -21,9 +21,9 @@
  * @package mod_perform
  */
 
+use core_user\output\myprofile\category;
 use core_user\output\myprofile\node;
 use core_user\output\myprofile\tree;
-use mod_perform\controllers\activity\user_activities;
 use mod_perform\controllers\reporting\performance\activity_response_data;
 use mod_perform\util;
 use totara_core\advanced_feature;
@@ -54,33 +54,22 @@ function perform_delete_instance($id) {
  * @throws moodle_exception
  */
 function mod_perform_myprofile_navigation(tree $tree, $user, $is_current_user) {
-    if (advanced_feature::is_disabled('performance_activities')) {
-        return false;
-    }
 
-    // You can only view your own performance activities for now.
-    if ($is_current_user) {
-        $tree->add_node(
-            new node(
-                'miscellaneous',
-                'performance_activities',
-                get_string('user_activities_page_title', 'mod_perform'),
-                null,
-                user_activities::get_url()
-            )
-        );
-    }
+    $category = new category('development', get_string('development', 'mod_perform'), 'mylearning');
+    $tree->add_category($category);
 
-    if ($is_current_user && util::can_potentially_report_on_subjects($user->id)) {
-        $tree->add_node(
-            new node(
-                'miscellaneous',
-                'performance_activities_response_data_report_export',
-                get_string('response_data_report_export_link', 'mod_perform'),
-                null,
-                activity_response_data::get_url()
-            )
-        );
+    if (!advanced_feature::is_disabled('performance_activities')) {
+        if ($is_current_user && util::can_potentially_report_on_subjects($user->id)) {
+            $tree->add_node(
+                new node(
+                    'development',
+                    'performance_activities_response_data_report_export',
+                    get_string('response_data_report_export_link', 'mod_perform'),
+                    null,
+                    activity_response_data::get_url()
+                )
+            );
+        }
     }
 
     return true;

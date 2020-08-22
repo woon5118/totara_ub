@@ -1843,16 +1843,15 @@ function check_learningplan_enabled() {
 function totara_plan_myprofile_navigation(\core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
     global $USER;
 
-    $currentuser = ($user->id == $USER->id);
     $usercontext = context_user::instance($user->id);
 
     // Add category. This node should appear after 'contact' so that administration block appears towards the end. Refer MDL-49928.
-    $category = new core_user\output\myprofile\category('mylearning', get_string($currentuser ? 'mylearning' : 'learning' , 'totara_core'), 'contact');
+    $category = new core_user\output\myprofile\category('mylearning', get_string('learning', 'totara_core'), 'contact');
     $tree->add_category($category);
 
     // Record of learning.
     if (advanced_feature::is_enabled('recordoflearning')) {
-        if ($currentuser || \totara_job\job_assignment::is_managing($USER->id, $user->id) || has_capability('totara/core:viewrecordoflearning', $usercontext)) {
+        if ($iscurrentuser || \totara_job\job_assignment::is_managing($USER->id, $user->id) || has_capability('totara/core:viewrecordoflearning', $usercontext)) {
             $title = get_string('recordoflearning', 'totara_core');
             $url = new moodle_url('/totara/plan/record/index.php', array('userid' => $user->id));
             $content =  html_writer::link($url, $title);

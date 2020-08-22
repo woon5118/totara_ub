@@ -69,3 +69,35 @@ Feature: Test exporting performance response data
     And I should see "The selected records will be exported to CSV" in the tui modal
     And I click on "Export" "button" in the ".tui-modal" "css_element"
     Then I should see "\"Reporting ID\",\"Element type\",\"Element text\",\"Activity name\",\"Subject name\",\"Participant name\",\"Participant relationship to subject\",\"Participant email address\",\"Element response\",\"Date of section submission\""
+
+  Scenario: Access Performance response data via user profile
+    # Can see link on my own profile
+    Given I log in as "sitemanager"
+    And I am on profile page for user "sitemanager"
+    When I click on "Performance activity response data (export)" "link" in the ".block_totara_user_profile_category_development" "css_element"
+    Then I should see "Performance activity response data" in the "#page h1" "css_element"
+    # Do not see link on other user's profiles (even if they are allowed to see it themselves)
+    Given I am on profile page for user "manager"
+    Then I should not see "Performance activity response data (export)"
+    # Can't see own link when feature disabled
+    Given I log out
+    And I log in as "admin"
+    And I navigate to "System information > Advanced features" in site administration
+    And I set the field "Enable Performance Activities" to "Disable"
+    And I press "Save changes"
+    And I log out
+    And I log in as "sitemanager"
+    When I am on profile page for user "sitemanager"
+    Then I should not see "Performance activity response data (export)"
+
+  # Note managers aren't given permission by default, but there is an override in background for this feature
+  Scenario: Able to access Performance response data with limited permission
+    Given I log in as "manager"
+    Given I am on profile page for user "manager"
+    When I click on "Performance activity response data (export)" "link" in the ".block_totara_user_profile_category_development" "css_element"
+    Then I should see "Performance activity response data" in the "#page h1" "css_element"
+
+  Scenario: Unable to access Performance response data without permission
+    Given I log in as "user1"
+    Given I am on profile page for user "user1"
+    Then I should not see "Performance activity response data (export)"

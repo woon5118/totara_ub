@@ -15,13 +15,12 @@ Feature: Disable performance activities feature at site-level
     When I toggle open the admin quick access menu
     Then I should not see "Activity Management" in the admin quick access menu
 
-  Scenario: Hide performance activities link in users profile
-    Given the "miscellaneous" user profile block exists
-    When I am on profile page for user "admin"
-    Then I should see "Performance activities" in the "Miscellaneous" "block"
-    When I disable the "performance_activities" advanced feature
-    And I reload the page
-    Then I should not see "Performance activities" in the "Miscellaneous" "block"
+  Scenario: Hide performance activities link in top menu
+    Given I should see "Activities" in the totara menu
+    When I navigate to "System information > Advanced features" in site administration
+    And I set the field "Enable Performance Activities" to "Disable"
+    And I press "Save changes"
+    Then I should not see "Activities" in the totara menu
 
   Scenario: Hide report source in user reports interface
     When I navigate to "Reports > Manage user reports" in site administration

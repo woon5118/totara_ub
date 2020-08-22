@@ -115,6 +115,7 @@ $string['default_sort'] = 'Default sort';
 $string['delete_element'] = 'Delete element';
 $string['delete_relationship'] = 'Delete {$a}';
 $string['deleted_dynamic_source_label'] = '{$a} (deleted)';
+$string['development'] = 'Development';
 $string['due_date'] = 'Due date';
 $string['due_date_disabled'] = 'Due date disabled';
 $string['due_date_disabled_description'] = 'Participants are not expected to submit their responses by a certain date.';
