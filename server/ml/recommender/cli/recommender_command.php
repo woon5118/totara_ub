@@ -18,17 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Vernon Denny <vernon.denny@totaralearning.com>
- * @package core
+ * @package ml_recommender
  */
 
 use ml_recommender\local\environment;
 
 define('CLI_SCRIPT', true);
 
-require(__DIR__.'/../../../../server/config.php');
-require_once($CFG->libdir.'/clilib.php');
-
-$exit_status = 0;
+require_once(realpath(__DIR__ . "/../../../config.php"));
+require_once($CFG->libdir . '/clilib.php');
 
 // Retrieve cli call arguments.
 $py3path = realpath(environment::get_py3path());
@@ -48,14 +46,10 @@ $args = [
     '--data_path' => $data_path
 ];
 
-$cmd = escapeshellarg(trim($py3path)) . ' ' . escapeshellarg(trim($pyscript_path)) . ' ';
+$cmd = escapeshellcmd(trim($py3path)) . ' ' . escapeshellarg(trim($pyscript_path)) . ' ';
 foreach ($args as $key => $value) {
     $cmd .= ' ' . $key . ' ' . escapeshellarg(trim($value));
 }
 
 // Output the command line call.
-echo("\r\nRecommender command line call:\r\n");
-echo($cmd. "\r\n");
-
-// And we're done.
-exit($exit_status);
+echo($cmd);

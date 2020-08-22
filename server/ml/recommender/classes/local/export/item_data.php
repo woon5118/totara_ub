@@ -22,44 +22,26 @@
  */
 namespace ml_recommender\local\export;
 
+use ml_recommender\local\csv\writer;
 
 /**
  * Export class for item (i.e. articles, playlists) data.
  */
-class item_data_export extends export {
+class item_data extends export {
+
+    public function get_name(): string {
+        return 'item_data';
+    }
 
     /**
-     * @param \csv_export_writer $writer
+     * @param writer $writer
      * @return bool
      */
-    public function export(\csv_export_writer $writer): bool {
+    public function export(writer $writer): bool {
         global $DB;
-
-        // Build sql.
-        $unique_article_id = $DB->sql_concat("'engage_article'", 'er.id');
-        $unique_playlist_id = $DB->sql_concat("'totara_playlist'", 'tp.id');
-        $unique_workspace_id = $DB->sql_concat("'container_workspace'", 'cw.id');
-        $unique_course_id = $DB->sql_concat("'container_course'", 'cc.id');
-        $sql = "
-        SELECT {$unique_article_id} AS uniqueid, er.id, er.name AS title, ea.content AS content, ea.format as summaryformat
-        FROM {engage_resource} er
-        JOIN {engage_article} ea ON er.instanceid = ea.id
-        WHERE er.resourcetype = 'engage_article'
-        UNION ALL
-        SELECT {$unique_playlist_id} AS uniqueid, tp.id, tp.name AS title, tp.summary AS content, tp.summaryformat
-        FROM {playlist} tp
-        UNION ALL
-        SELECT {$unique_workspace_id} AS uniqueid, cw.id, cw.fullname AS title, cw.summary AS content, cw.summaryformat
-        FROM {course} cw WHERE cw.containertype = 'container_workspace'
-        UNION ALL
-        SELECT {$unique_course_id} AS uniqueid, cc.id, cc.fullname AS title, cc.summary AS content, cc.summaryformat
-        FROM {course} cc
-        JOIN {enrol} te on cc.id = te.courseid
-        WHERE cc.containertype = 'container_course' AND te.enrol = 'self'
-        ";
-
         // Set recordset cursor.
-        $recordset = $DB->get_recordset_sql($sql);
+
+        $recordset = $this->get_export_recordset();
         if (!$recordset->valid()) {
             return false;
         }
@@ -78,7 +60,6 @@ class item_data_export extends export {
             'container_course' => 'course'
         ];
 
-        // List of topics.
         $topics = $this->get_topics();
 
         // Build headings -> id, [components], [topics], document.
@@ -91,10 +72,8 @@ class item_data_export extends export {
         }
         $headings[] = 'document';
 
-        // Column headings for csv file.
         $writer->add_data($headings);
 
-        // Write the feature data for each item.
         foreach ($recordset as $item) {
             $cells = [$item->uniqueid];
 
@@ -106,12 +85,10 @@ class item_data_export extends export {
                 }
             }
 
-            // One-hot encode component for this item.
             foreach ($component_onehot as $id => $onehot) {
                 $cells[] = $onehot;
             }
 
-            // Retrieve topics for this specific item.
             $resource_topics = [];
             if (isset($tag_component_names[$component])) {
                 $select = 'itemid = ? and itemtype = ?';
@@ -121,10 +98,8 @@ class item_data_export extends export {
                 $this_item_topics = $DB->get_fieldset_select('tag_instance', 'tagid', $select, [$item->id, $component]);
             }
 
-            // Ensure integer index.
             foreach ($this_item_topics as $index => $id) {
-                $id *= 1;
-                $resource_topics[$id] = true;
+                $resource_topics[(int)$id] = true;
             }
 
             // One-hot encode topics for item.
@@ -146,6 +121,84 @@ class item_data_export extends export {
         $recordset->close();
 
         return true;
+    }
+
+    /**
+     * Prepare and run SQL query to database to get users
+     * @return \moodle_recordset
+     */
+    private function get_export_recordset() {
+        global $DB, $CFG;
+
+        $params_sql = [];
+
+        $tenant_er_join_sql = '';
+        $tenant_tp_join_sql = '';
+        $tenant_cw_join_sql = '';
+        $tenant_cc_join_sql = '';
+        if ($this->tenant) {
+            // For user content use tenant cohort.
+            $cohortid = $this->tenant->cohortid;
+            $tenant_er_join_sql = "INNER JOIN {cohort_members} cm ON (cm.cohortid = $cohortid AND er.userid = cm.userid)";
+            $tenant_tp_join_sql = "INNER JOIN {cohort_members} cm ON (cm.cohortid = $cohortid AND tp.userid = cm.userid)";
+
+            $courselevel = CONTEXT_COURSE;
+            $tenantid = $this->tenant->id;
+
+            $ornotenant = '';
+            if (empty($CFG->tenantsisolated)) {
+                $ornotenant = 'OR c.tenantid IS NULL';
+            }
+
+            $tenant_cw_join_sql = "
+            INNER JOIN {context} c ON (
+                c.contextlevel = $courselevel 
+                AND cw.id = c.instanceid 
+                AND (c.tenantid = $tenantid $ornotenant))
+            ";
+
+            $tenant_cc_join_sql = "
+            INNER JOIN {context} c ON (
+                c.contextlevel = $courselevel 
+                AND cc.id = c.instanceid 
+                AND (c.tenantid = $tenantid $ornotenant))
+            ";
+        }
+
+        // Build sql.
+        $unique_article_id = $DB->sql_concat("'engage_article'", 'er.id');
+        $unique_playlist_id = $DB->sql_concat("'totara_playlist'", 'tp.id');
+        $unique_workspace_id = $DB->sql_concat("'container_workspace'", 'cw.id');
+        $unique_course_id = $DB->sql_concat("'container_course'", 'cc.id');
+
+        $public = \totara_engage\access\access::PUBLIC;
+
+        $sql = "
+        SELECT $unique_article_id AS uniqueid, er.id, er.name AS title, ea.content AS content, ea.format as summaryformat 
+        FROM {engage_resource} er 
+        JOIN {engage_article} ea ON er.instanceid = ea.id
+        $tenant_er_join_sql
+        WHERE er.resourcetype = 'engage_article' AND er.access = $public
+        UNION ALL
+        SELECT $unique_playlist_id AS uniqueid, tp.id, tp.name AS title, tp.summary AS content, tp.summaryformat
+        FROM {playlist} tp
+        $tenant_tp_join_sql
+        WHERE tp.access = $public
+        UNION ALL 
+        SELECT $unique_workspace_id AS uniqueid, cw.id, cw.fullname AS title, cw.summary AS content, cw.summaryformat
+        FROM {course} cw
+        INNER JOIN {workspace} w ON (w.course_id = cw.id AND w.private = 0)
+        $tenant_cw_join_sql
+        WHERE cw.containertype = 'container_workspace'
+        UNION ALL
+        SELECT DISTINCT $unique_course_id AS uniqueid, cc.id, cc.fullname AS title, cc.summary AS content, cc.summaryformat
+        FROM {course} cc
+        INNER JOIN {enrol} te on cc.id = te.courseid 
+        $tenant_cc_join_sql
+        WHERE cc.containertype = 'container_course' AND te.enrol = 'self' AND te.status = 0
+        ";
+
+        return $DB->get_recordset_sql($sql, $params_sql);
     }
 
     /**

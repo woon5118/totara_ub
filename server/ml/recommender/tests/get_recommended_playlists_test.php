@@ -30,7 +30,7 @@ use totara_webapi\graphql;
 /**
  * Test the endpoints for recommending playlists by playlist or user
  */
-class ml_recommender_get_recommended_playlists_test extends advanced_testcase {
+class ml_recommender_get_recommended_playlists_testcase extends advanced_testcase {
     /**
      * Test playlists are recommended by playlist id
      */

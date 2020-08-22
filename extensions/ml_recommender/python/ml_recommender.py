@@ -42,6 +42,7 @@ from pathlib import Path
 import re
 from sklearn.model_selection import train_test_split
 import sys
+import time
 
 from lightfm import LightFM
 from lightfm.data import Dataset
@@ -281,6 +282,26 @@ def _get_interactions(data_home, data_file=None, num_users=0, num_items=0, train
 
     return train, test, num_users, num_items
 
+def _get_tenants(data_home, data_file):
+    """
+    Load tenants id's (or return list with value "0" (no tenants)
+
+    Parameters
+    ----------
+    data_home : string
+                CSV directory
+    data_file : string
+                CSV file name
+    """
+    file_path = os.path.join(os.path.abspath(data_home), data_file)
+    result = []
+    if os.path.exists(file_path):
+        tenants = pd.read_csv(file_path, sep=',', encoding='utf-8')
+        result = tenants['tenants'].tolist()
+    if not result:
+        return [0]
+    return result
+
 
 def _make_item_features(item_features=None, item_feature_labels=None):
     feature_variant_names = []
@@ -412,151 +433,179 @@ num_items = None
 item_features = None
 item_feature_names = None
 
-# Load user/item interaction data into training and test sets.
-raw_interactions_train, raw_interactions_test, num_users, num_items = \
-    _get_interactions(data_home, 'user_interactions.csv', num_users, num_items, training_size)
+tenants = _get_tenants(data_home, 'tenants.csv')
 
-# Load user and item data for hybrid algorithm.
-if query == 'hybrid':
-    # Load and pre-process user data.
-    users_raw = _get_users(data_home, 'user_data.csv')
-    num_users = users_raw.shape[0]
-    unique_users = users_raw['user_id']
-    users_raw = None
+started_file_path = os.path.join(os.path.abspath(data_home), 'ml_started')
+if (os.path.exists(started_file_path)):
+    print("Processing already started. If it was crashed before and need restart, reexport data or delete " + started_file_path)
+    exit()
 
-    # Load and pre-process item data.
-    items_raw = _get_items(data_home, 'item_data.csv', nlp_active=True, top_x_word_count=top_x_word_count)
-    num_items = items_raw.shape[0]
-    unique_items = items_raw['item_id']
-    item_feature_names = list(items_raw.columns.values)
-    item_feature_names.pop(0)
-    item_feature_possible_values = _make_item_features(items_raw, item_feature_names)
-else:
-    all_interactions = pd.concat([raw_interactions_train, raw_interactions_test])
-    unique_items = all_interactions['item_id'].unique()
-    unique_users = all_interactions['user_id'].unique()
-    all_interactions = None
+started_file = open(started_file_path, "w")
+started_file.write(str(int(time.time())))
+started_file.close()
 
-# ------------------------------------------------------------------------------
+for tenant in tenants:
+    tenant = str(tenant)
+    print('Processing tenant ' + tenant)
+    # Load user/item interaction data into training and test sets.
+    try:
+        raw_interactions_train, raw_interactions_test, num_users, num_items = \
+            _get_interactions(data_home, 'user_interactions_' + tenant + '.csv', num_users, num_items, training_size)
+    except:
+        print('Cannot process tenant ' + tenant + '. Perhaps not enough data yet.')
+        continue
+    # Load user and item data for hybrid algorithm.
+    if query == 'hybrid':
+        # Load and pre-process user data.
+        users_raw = _get_users(data_home, 'user_data_' + tenant + '.csv')
+        num_users = users_raw.shape[0]
+        unique_users = users_raw['user_id']
+        users_raw = None
 
-# Fit the training and test datasets, then build their respective interaction matrices.
-if query == 'hybrid':
-    dataset = Dataset()
-    dataset.fit(unique_users, unique_items, item_features=item_feature_possible_values)
-else:
-    dataset = Dataset()
-    dataset.fit(unique_users, unique_items)
+        # Load and pre-process item data.
+        items_raw = _get_items(data_home, 'item_data_' + tenant + '.csv', nlp_active=True, top_x_word_count=top_x_word_count)
+        num_items = items_raw.shape[0]
+        unique_items = items_raw['item_id']
+        item_feature_names = list(items_raw.columns.values)
+        item_feature_names.pop(0)
+        item_feature_possible_values = _make_item_features(items_raw, item_feature_names)
+    else:
+        all_interactions = pd.concat([raw_interactions_train, raw_interactions_test])
+        unique_items = all_interactions['item_id'].unique()
+        unique_users = all_interactions['user_id'].unique()
+        all_interactions = None
 
-# Fit interactions.
-(train_interactions, train_weights) = dataset.build_interactions(
-    [(x[0], x[1], x[2]) for x in raw_interactions_train.values])
-(test_interactions, test_weights) = dataset.build_interactions(
-    [(x[0], x[1], x[2]) for x in raw_interactions_test.values])
+    # ------------------------------------------------------------------------------
+    print('Training model')
+    # Fit the training and test datasets, then build their respective interaction matrices.
+    if query == 'hybrid':
+        dataset = Dataset()
+        dataset.fit(unique_users, unique_items, item_features=item_feature_possible_values)
+    else:
+        dataset = Dataset()
+        dataset.fit(unique_users, unique_items)
 
-# ------------------------------------------------------------------------------
+    # Fit interactions.
+    (train_interactions, train_weights) = dataset.build_interactions(
+        [(x[0], x[1], x[2]) for x in raw_interactions_train.values])
+    (test_interactions, test_weights) = dataset.build_interactions(
+        [(x[0], x[1], x[2]) for x in raw_interactions_test.values])
 
-# Add in the features.
-if query == 'hybrid':
-    # Prep user features (excluding item_id).
-    features_only = items_raw[item_feature_names]
-    features_list = [list(value) for value in features_only.values]
-    feature_list = []
-    for feature_row in features_list:
-        feature_list.append(_feature_list(item_feature_names, feature_row))
+    # ------------------------------------------------------------------------------
 
-    # Form tuples and build features.
-    item_tuples = list(zip(items_raw.item_id, feature_list))
-    item_features = dataset.build_item_features(item_tuples, normalize=False)
+    # Add in the features.
+    if query == 'hybrid':
+        # Prep user features (excluding item_id).
+        features_only = items_raw[item_feature_names]
+        features_list = [list(value) for value in features_only.values]
+        feature_list = []
+        for feature_row in features_list:
+            feature_list.append(_feature_list(item_feature_names, feature_row))
 
-# ------------------------------------------------------------------------------
+        # Form tuples and build features.
+        item_tuples = list(zip(items_raw.item_id, feature_list))
+        item_features = dataset.build_item_features(item_tuples, normalize=False)
 
-# Model hyperparameter optimisation.
-(score, hyperparams, model) = max(_random_search(train_interactions, test_interactions, num_threads=num_threads),
-                                  key=lambda x: x[0])
+    # ------------------------------------------------------------------------------
 
-# Fit model on all interactions using calculated optimum parameters.
-model = LightFM(
-    no_components=hyperparams['no_components'],
-    learning_schedule=hyperparams['learning_schedule'],
-    loss=hyperparams['loss'],
-    learning_rate=hyperparams['learning_rate'],
-    item_alpha=hyperparams['item_alpha'],
-    user_alpha=hyperparams['user_alpha'],
-    max_sampled=hyperparams['max_sampled']
-)
+    # Model hyperparameter optimisation.
+    try:
+        (score, hyperparams, model) = max(_random_search(train_interactions, test_interactions, num_threads=num_threads), key=lambda x: x[0])
+    except:
+        print('Could not prepare model. Perhaps not enough data yet.')
+        continue
 
-if query == 'hybrid':
-    model.fit(train_interactions, user_features=user_features, item_features=item_features, epochs=hyperparams['num_epochs'],
-              num_threads=num_threads)
-    model.fit_partial(test_interactions, user_features=user_features, item_features=item_features, epochs=hyperparams['num_epochs'],
-                      num_threads=num_threads)
-else:
-    model.fit(train_interactions, epochs=hyperparams['num_epochs'], num_threads=num_threads)
-    model.fit_partial(test_interactions, epochs=hyperparams['num_epochs'], num_threads=num_threads)
+    # Fit model on all interactions using calculated optimum parameters.
+    model = LightFM(
+        no_components=hyperparams['no_components'],
+        learning_schedule=hyperparams['learning_schedule'],
+        loss=hyperparams['loss'],
+        learning_rate=hyperparams['learning_rate'],
+        item_alpha=hyperparams['item_alpha'],
+        user_alpha=hyperparams['user_alpha'],
+        max_sampled=hyperparams['max_sampled']
+    )
 
-# ------------------------------------------------------------------------------
+    if query == 'hybrid':
+        model.fit(train_interactions, user_features=user_features, item_features=item_features, epochs=hyperparams['num_epochs'],
+                  num_threads=num_threads)
+        model.fit_partial(test_interactions, user_features=user_features, item_features=item_features, epochs=hyperparams['num_epochs'],
+                          num_threads=num_threads)
+    else:
+        model.fit(train_interactions, epochs=hyperparams['num_epochs'], num_threads=num_threads)
+        model.fit_partial(test_interactions, epochs=hyperparams['num_epochs'], num_threads=num_threads)
 
-# Get id maps.
-user_id_map, user_feature_map, item_id_map, item_feature_map = dataset.mapping()
+    # ------------------------------------------------------------------------------
 
-# Prepare user and item id lookup tables.
-lookup_uid = {lfm_id: totara_id for totara_id, lfm_id in user_id_map.items()}
-lookup_iid = {lfm_id: totara_id for totara_id, lfm_id in item_id_map.items()}
+    # Get id maps.
+    user_id_map, user_feature_map, item_id_map, item_feature_map = dataset.mapping()
 
-# ------------------------------------------------------------------------------
+    # Prepare user and item id lookup tables.
+    lookup_uid = {lfm_id: totara_id for totara_id, lfm_id in user_id_map.items()}
+    lookup_iid = {lfm_id: totara_id for totara_id, lfm_id in item_id_map.items()}
 
-# Items to item (I2I) recommendations.
-i2i = pd.DataFrame({'target_iid': [], 'similar_iid': [], 'totara_target_iid': [], 'totara_similar_iid': [], 'ranking': []})
-i2i.totara_target_iid = i2i.totara_target_iid.astype(str)
-i2i.totara_similar_iid = i2i.totara_similar_iid.astype(str)
+    # ------------------------------------------------------------------------------
+    print('Making I2I recommendations')
 
-item_result_count += 1
-for totara_iid, lfm_iid in item_id_map.items():
+    # Items to item (I2I) recommendations.
+    i2i = pd.DataFrame({'target_iid': [], 'similar_iid': [], 'totara_target_iid': [], 'totara_similar_iid': [], 'ranking': []})
+    i2i.totara_target_iid = i2i.totara_target_iid.astype(str)
+    i2i.totara_similar_iid = i2i.totara_similar_iid.astype(str)
 
-    similars = _similar_items(lfm_iid, model, num_results=item_result_count, num_items=num_items)
-    predictions = pd.DataFrame(similars, columns=['similar_iid', 'ranking'])
-    predictions['target_iid'] = lfm_iid
-    predictions['totara_target_iid'] = lookup_iid[lfm_iid]
+    item_result_count += 1
+    for totara_iid, lfm_iid in item_id_map.items():
 
-    for i, row in predictions.iterrows():
-        totara_similar_iid = lookup_iid[row['similar_iid']]
-        predictions.at[i, 'totara_similar_iid'] = totara_similar_iid
-    i2i = pd.concat([i2i, predictions])
+        similars = _similar_items(lfm_iid, model, num_results=item_result_count, num_items=num_items)
+        predictions = pd.DataFrame(similars, columns=['similar_iid', 'ranking'])
+        predictions['target_iid'] = lfm_iid
+        predictions['totara_target_iid'] = lookup_iid[lfm_iid]
 
-i2i = i2i.drop(['similar_iid'], axis=1)
-i2i = i2i.drop(['target_iid'], axis=1)
-file_path = os.path.join(os.path.abspath(data_home), 'i2i.csv')
-with open(file_path, 'w', newline='') as csv_out:
-    i2i.to_csv(csv_out, columns=['totara_target_iid', 'totara_similar_iid', 'ranking'], header=['target_iid', 'similar_iid', 'ranking'],
-               index=False, encoding='utf-8', float_format='%.12f', mode='w')
-    csv_out.close()
-i2i = None
+        for i, row in predictions.iterrows():
+            totara_similar_iid = lookup_iid[row['similar_iid']]
+            predictions.at[i, 'totara_similar_iid'] = totara_similar_iid
+        i2i = pd.concat([i2i, predictions])
 
-# ------------------------------------------------------------------------------
+    i2i = i2i.drop(['similar_iid'], axis=1)
+    i2i = i2i.drop(['target_iid'], axis=1)
+    file_path = os.path.join(os.path.abspath(data_home), 'i2i_' + tenant + '.csv')
+    with open(file_path, 'w', newline='') as csv_out:
+        i2i.to_csv(csv_out, columns=['totara_target_iid', 'totara_similar_iid', 'ranking'], header=['target_iid', 'similar_iid', 'ranking'],
+                   index=False, encoding='utf-8', float_format='%.12f', mode='w')
+        csv_out.close()
+    i2i = None
 
-# Items to user (I2U) recommendations.
-i2u = pd.DataFrame({'uid': [], 'iid': [], 'totara_iid': [], 'ranking': []})
-i2u.totara_iid = i2u.totara_iid.astype(str)
+    # ------------------------------------------------------------------------------
+    print('Making I2U recommendations')
 
-for totara_uid, lfm_uid in user_id_map.items():
-    predictions = pd.DataFrame({'uid': [], 'iid': [], 'totara_iid': [], 'ranking': []})
-    predictions['iid'] = np.arange(num_items)
-    predictions['uid'] = totara_uid
-    predictions.totara_iid = predictions.totara_iid.astype(str)
-    predictions['ranking'] = model.predict(lfm_uid, np.arange(num_items), num_threads=num_threads)
-    predictions = predictions.sort_values(by=['ranking', 'iid'],
-                                          ignore_index=True, ascending=False).iloc[:user_result_count, :]
+    # Items to user (I2U) recommendations.
+    i2u = pd.DataFrame({'uid': [], 'iid': [], 'totara_iid': [], 'ranking': []})
+    i2u.totara_iid = i2u.totara_iid.astype(str)
 
-    for i, row in predictions.iterrows():
-        totara_iid = lookup_iid[row['iid']]
-        predictions.at[i, 'totara_iid'] = totara_iid
-    i2u = pd.concat([i2u, predictions])
+    for totara_uid, lfm_uid in user_id_map.items():
+        predictions = pd.DataFrame({'uid': [], 'iid': [], 'totara_iid': [], 'ranking': []})
+        predictions['iid'] = np.arange(num_items)
+        predictions['uid'] = totara_uid
+        predictions.totara_iid = predictions.totara_iid.astype(str)
+        predictions['ranking'] = model.predict(lfm_uid, np.arange(num_items), num_threads=num_threads)
+        predictions = predictions.sort_values(by=['ranking', 'iid'],
+                                              ignore_index=True, ascending=False).iloc[:user_result_count, :]
 
-# Write to csv.
-i2u = i2u.drop(['iid'], axis=1)
-file_path = os.path.join(os.path.abspath(data_home), 'i2u.csv')
-with open(file_path, 'w', newline='') as csv_out:
-    i2u.to_csv(csv_out, columns=['uid', 'totara_iid', 'ranking'], header=['uid', 'iid', 'ranking'],
-               index=False, encoding='utf-8', float_format='%.12f', mode='w')
-    csv_out.close()
-i2u = None
+        for i, row in predictions.iterrows():
+            totara_iid = lookup_iid[row['iid']]
+            predictions.at[i, 'totara_iid'] = totara_iid
+        i2u = pd.concat([i2u, predictions])
+
+    # Write to csv.
+    i2u = i2u.drop(['iid'], axis=1)
+    file_path = os.path.join(os.path.abspath(data_home), 'i2u_' + tenant + '.csv')
+    with open(file_path, 'w', newline='') as csv_out:
+        i2u.to_csv(csv_out, columns=['uid', 'totara_iid', 'ranking'], header=['uid', 'iid', 'ranking'],
+                   index=False, encoding='utf-8', float_format='%.12f', mode='w')
+        csv_out.close()
+    i2u = None
+
+completed_file = open(os.path.join(os.path.abspath(data_home), 'ml_completed'), "w")
+completed_file.write(str(int(time.time())))
+completed_file.close()
+
+print("Done")

@@ -22,21 +22,38 @@
  */
 namespace ml_recommender\local\export;
 
+use ml_recommender\local\csv\writer;
+
 /**
  * Using for exporting data.
  */
 abstract class export {
+
     /**
-     * Preventing this class's children from having complicated constructor.
-     * export constructor.
+     * @var \stdClass Limit export to specific tenant
      */
-    final public function __construct() {
+    protected $tenant = null;
+
+    /**
+     * Get export name
+     * Typically used for csv file naming
+     * @return string
+     */
+    abstract public function get_name(): string;
+
+    /**
+     * Limit export to data relevant to specific tenant
+     * @param \stdClass $tenant
+     * @return void
+     */
+    public function set_tenant(\stdClass $tenant = null) {
+        $this->tenant = $tenant;
     }
 
     /**
-     * @param \csv_export_writer $writer
+     * @param writer $writer
      * @return bool
      */
-    abstract public function export(\csv_export_writer $writer): bool;
+    abstract public function export(writer $writer): bool;
 
 }

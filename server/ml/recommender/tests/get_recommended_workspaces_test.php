@@ -29,7 +29,7 @@ use totara_webapi\graphql;
 /**
  * Test the endpoints for recommending workspaces by workspace or user
  */
-class ml_recommender_get_recommended_workspaces_test extends advanced_testcase {
+class ml_recommender_get_recommended_workspaces_testcase extends advanced_testcase {
     /**
      * Test workspaces are recommended by workspace id
      */

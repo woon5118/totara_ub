@@ -17,34 +17,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @author Valerii Kuznetsov <valerii.kuznetsov@totaralearning.com>
  * @author Vernon Denny <vernon.denny@totaralearning.com>
- * @package core
+ * @package ml_recommender
  */
 
 use ml_recommender\local\environment;
-use ml_recommender\local\import\bulk_item_predictions;
-use ml_recommender\local\import\bulk_user_predictions;
+use ml_recommender\local\flag;
 
 define('CLI_SCRIPT', true);
 
-require(__DIR__.'/../../../../server/config.php');
-require_once($CFG->libdir.'/clilib.php');
+require(__DIR__ . '/../../../config.php');
+require_once($CFG->libdir . '/clilib.php');
 
 $usage = "
 Upload bulk user and item recommendations as delivered by recommender system prediction.
 
-Example:
+Options:
+  --help, -h    Output this help
+  --force, -f   Do not bother about locks, continue anyway
 
-    # php admin/cli/ml_recommender_upload.php
+Example:
+    # sudo -u apache php ml/recommender/cli/import_recommendations.php
         Uploads model generated predictions from csv file.
         Note: Needs to be run after a model predictions have been run.
 ";
 
-list($options, $unrecognised) = cli_get_params([
-    'help' => false,
-], [
-    'h' => 'help'
-]);
+[$options, $unrecognised] = cli_get_params(
+    [
+        'help' => false,
+        'force' => false,
+    ],
+    [
+        'h' => 'help',
+        'f' => 'force',
+    ]
+);
 
 if ($unrecognised) {
     $unrecognised = implode(PHP_EOL.'  ', $unrecognised);
@@ -53,40 +61,16 @@ if ($unrecognised) {
 
 if ($options['help']) {
     cli_writeln($usage);
-    exit(2);
+    exit();
 }
 
-// Assume things will end well.
-$exit_status = 0;
+$data_path = rtrim(environment::get_data_path(), '/\\') . '/';
 
-// Check that required ML files are present.
-$data_path = environment::get_data_path();
-$mlfiles = [
-    'i2u.csv',
-    'i2i.csv'
-];
-
-foreach ($mlfiles as $filename) {
-    $filepath = $data_path . '/' . $filename;
-    if (!file_exists($filepath)) {
-        cli_problem('Missing ML upload data file: ' . $filepath);
-        $exit_status += 1;
-    }
+if ($options['force']) {
+    $data_path = rtrim(environment::get_data_path(), '/\\') . '/';
+    flag::clean_all($data_path);
 }
 
-// Are we good to go?
-if ($exit_status > 0) {
-    // Nope, quit now.
-    cli_error('Error - ML prerequisites not met.', $exit_status);
-}
+$task = \core\task\manager::get_scheduled_task(\ml_recommender\task\import::class);
+$task->execute();
 
-// Upload items per user.
-$user_recommendations = new bulk_user_predictions('i2u');
-$user_recommendations->upload();
-
-// Upload items per item.
-$item_recommendations = new bulk_item_predictions('i2i');
-$item_recommendations->upload();
-
-// And we're done.
-exit($exit_status);

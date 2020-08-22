@@ -31,7 +31,7 @@ use totara_webapi\graphql;
 /**
  * test the endpoints for recommending articles by article or user
  */
-class ml_recommender_get_recommended_articles_test extends advanced_testcase {
+class ml_recommender_get_recommended_articles_testcase extends advanced_testcase {
     /**
      * Test articles are recommended by article id
      */

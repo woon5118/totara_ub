@@ -22,29 +22,29 @@
  */
 namespace ml_recommender\local\export;
 
+use ml_recommender\local\csv\writer;
+
 /**
  * Export class for user data.
  */
-class user_data_export extends export {
+class user_data extends export {
+
+    public function get_name(): string {
+        return 'user_data';
+    }
 
     /**
-     * @param \csv_export_writer $writer
+     * @param writer $writer
      * @return bool
      */
-    public function export(\csv_export_writer $writer): bool {
-        global $DB;
-
-        // Build sql.
-        $sql = 'SELECT u.id, u.lang FROM {user} u WHERE u.deleted = 0 AND u.suspended = 0';
-
-        // Set recordset cursor.
-        $recordset = $DB->get_recordset_sql($sql);
+    public function export(writer $writer): bool {
+        $recordset = $this->get_export_recordset();
         if (!$recordset->valid()) {
             return false;
         }
 
         // Column headings for csv file.
-        $writer->add_data([
+        $writer->add_headings([
             'user_id',
             'lang'
         ]);
@@ -56,8 +56,35 @@ class user_data_export extends export {
                 $user->lang
             ]);
         }
+        $writer->close();
         $recordset->close();
 
         return true;
+    }
+
+    /**
+     * Prepare and run SQL query to database to get users
+     * @return \moodle_recordset
+     */
+    private function get_export_recordset() {
+        global $CFG, $DB;
+
+        $params_sql = [];
+        // Tenant restrictions.
+        $tenant_join_sql = '';
+        if ($this->tenant) {
+            $tenant_join_sql = 'INNER JOIN {cohort_members} cm ON (cm.cohortid = :cohort_id AND u.id = cm.userid)';
+            $params_sql['cohort_id'] = $this->tenant->cohortid;
+        }
+
+        $guest_id = $CFG->siteguest;
+        $sql = "
+            SELECT u.id, u.lang 
+            FROM {user} u
+            $tenant_join_sql 
+            WHERE u.deleted = 0 AND u.suspended = 0 AND u.id <> $guest_id
+        ";
+
+        return $DB->get_recordset_sql($sql, $params_sql);
     }
 }
