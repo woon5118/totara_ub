@@ -92,8 +92,8 @@ Feature: Evidence item creation and editing for another user as a manager
     Then I should see "Evidence bank for Evidence User"
 
   Scenario: View others evidence bank via link in user profile
-    Given the "miscellaneous" user profile block exists
+    Given the "mylearning" user profile block exists
     When I am on profile page for user "user"
-    And I click on "Evidence" "link" in the ".block_totara_user_profile_category_miscellaneous" "css_element"
+    And I click on "Evidence bank" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Evidence bank for Evidence User" in the ".tw-evidence__header" "css_element"
     And I should see "No evidence items have been added yet."

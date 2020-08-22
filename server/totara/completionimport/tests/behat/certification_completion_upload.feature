@@ -54,7 +54,7 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Certifications" tab
     Then I should see "Expired" in the "Certification 1" "table_row"
-    And I should not see "Other Evidence"
+    And I should not see "Other Evidence" in the ".tabtree" "css_element"
     When I click on "Record of Learning" in the totara menu
     Then I should see "There are no records"
 

@@ -176,8 +176,8 @@ Feature: Evidence item creation and editing
     And I should see "No description available" in the "div.tw-evidence__select_type_info_metadata_description" "css_element"
 
   Scenario: View own evidence bank via link in user profile
-    Given the "miscellaneous" user profile block exists
+    Given the "mylearning" user profile block exists
     When I am on profile page for user "evidence_user"
-    And I click on "Evidence" "link" in the ".block_totara_user_profile_category_miscellaneous" "css_element"
+    And I click on "Evidence bank" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Evidence bank" in the ".tw-evidence__header" "css_element"
     And I should see "No evidence items have been added yet."

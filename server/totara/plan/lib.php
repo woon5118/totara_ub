@@ -1048,6 +1048,12 @@ function dp_display_plans_menu($userid, $selectedid=0, $role='learner', $rolpage
         $out .= dp_record_status_menu($rolpage, $rolstatus, $userid, $role);
     }
 
+    // Print evidence menu link
+    $showevidence = advanced_feature::is_enabled('evidence') && evidence_item_capability_helper::for_user($userid)->can_view_list();
+    if ($showevidence) {
+        $out .= dp_evidence_menu($userid, $role);
+    }
+
     $out .= $OUTPUT->container_end();
 
     $fake_block = new block_contents();
@@ -1251,6 +1257,30 @@ function dp_record_status_menu($pagename, $status, $userid=null, $role) {
     $out .= html_writer::alist($items);
     return $out;
 }
+
+/**
+ * Display a link to the evidence bank.
+ * @param null $userid
+ * @param $role
+ * @return string
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
+function dp_evidence_menu($userid=null, $role) {
+    global $OUTPUT;
+
+    if ($role == 'manager') {
+        $out = $OUTPUT->heading(get_string('allevidence', 'totara_plan'), 4, 'dp-plans-menu-sub-header');
+    } else {
+        $out = $OUTPUT->heading(get_string('allevidence', 'totara_plan'), 3, 'main');
+    }
+
+    $item = $OUTPUT->action_link(new moodle_url("/totara/evidence/index.php", array('user_id' => $userid)), get_string('evidence_bank', 'totara_evidence'));
+    $out .= html_writer::alist([$item]);
+    return $out;
+}
+
+
 
 /**
  * Add lowest levels of breadcrumbs to plan

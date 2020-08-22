@@ -82,11 +82,11 @@ function totara_evidence_myprofile_navigation(myprofile\tree $tree, $user, $iscu
 
     $tree->add_node(
         new myprofile\node(
-            'miscellaneous',
+            'mylearning',
             'evidence',
             get_string('evidence_bank', 'totara_evidence'),
             null,
-            new moodle_url('/totara/evidence/index.php', ['user_id' => $user->id])
+            new moodle_url('/totara/evidence/index.php', $iscurrentuser ? []: ['user_id' => $user->id])
         )
     );
 

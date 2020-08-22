@@ -53,6 +53,7 @@ class my_evidence extends item {
     }
 
     public function is_disabled() {
-        return advanced_feature::is_disabled('evidence');
+        return advanced_feature::is_disabled('evidence')
+            || (advanced_feature::is_disabled('competency_assignment') && advanced_feature::is_disabled('performance_activities'));
     }
 }
