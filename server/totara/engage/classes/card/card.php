@@ -362,11 +362,11 @@ abstract class card {
      * @return array
      */
     public function get_footnotes(array $args): array {
+        global $USER;
         $footnotes = [];
 
         // What type of footnotes are we looking for.
         if (!empty($args['type'])) {
-
             // Search results card footnotes.
             if ($args['type'] === 'search') {
                 $footnotes[] = [
@@ -380,13 +380,44 @@ abstract class card {
 
             // Shared with you card footnotes.
             elseif ($args['type'] === 'shared') {
+                $info = $this->get_share_info($args['item_id'], $args['area'], $args['component']);
+                if (!empty($info)) {
+                    list($sharer, $recipient) = $info;
+
+                    if ($recipient->area !== user::AREA) {
+                        $library = \totara_engage\share\recipient\helper::get_recipient_class($recipient->component, $recipient->area );
+                        $library = new $library($recipient->instanceid);
+                        $data = $library->get_data();
+                        $has_capability = $data['unshare'];
+
+                        // If current user is sharer, we still need to allow sharer to unshare resource.
+                        if ($USER->id == $recipient->sharerid) {
+                            $has_capability = true;
+                        }
+                    }
+
+                }
+
                 $footnotes[] = [
                     'component' => 'CardSharedByFootnote',
                     'tuicomponent' => 'totara_engage/components/card/footnote/SharedByFootnote',
                     'props' => json_encode([
                         'instanceId' => $this->get_instanceid(),
                         'component' => $this->get_component(),
-                        'sharer' => $this->get_sharer($args['item_id'], $args['area'], $args['component'])
+                        'sharer' => $sharer,
+                        'recipientId' => (int)$recipient->id ?? null,
+                        'area' => $recipient->area ?? null,
+                        'showButton' => $has_capability ?? true
+                    ]),
+                ];
+            } else if ($args['type'] === 'playlist') {
+                // Playlist owner card footnotes.
+                $footnotes[] = [
+                    'component' => 'PlaylistFootnote',
+                    'tuicomponent' => 'totara_playlist/components/card/PlaylistFootnote',
+                    'props' => json_encode([
+                        'instanceId' => $this->get_instanceid(),
+                        'playlistId' => $args['item_id']
                     ]),
                 ];
             }
@@ -444,9 +475,9 @@ abstract class card {
      * @param int|null $item_id
      * @param string|null $area
      * @param string|null $component
-     * @return \stdClass|null
+     * @return array|null
      */
-    private function get_sharer(?int $item_id, ?string $area, ?string $component): ?\stdClass {
+    private function get_share_info(?int $item_id, ?string $area, ?string $component): ?array {
         global $USER;
 
         // Default user recipient item.
@@ -465,7 +496,7 @@ abstract class card {
             $repo = share_recipient::repository();
 
             // Check if the item is a recipient of this share.
-            $recipient = $repo->get_recipient(
+            $recipient = $repo->get_recipient_by_visibility(
                 $share->id, $item_id, $area, $component
             );
 
@@ -478,7 +509,8 @@ abstract class card {
 
                 $url = new \moodle_url("/user/profile.php", ['id' => $recipient->sharerid]);
                 $sharer->url = $url->out();
-                return $sharer;
+
+                return [$sharer, $recipient];
             }
         }
 

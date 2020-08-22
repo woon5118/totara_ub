@@ -23,6 +23,7 @@
 
 namespace container_workspace\totara_engage\share\recipient;
 
+use container_workspace\interactor\workspace\interactor;
 use container_workspace\workspace;
 use container_workspace\loader\workspace\loader as workspace_loader;
 use core\orm\query\builder;
@@ -70,13 +71,17 @@ class library extends recipient {
      * @inheritDoc
      */
     public function get_data() {
+        global $USER;
+
         $workspace = $this->get_workspace();
+        $interactor = new interactor($workspace, $USER->id);
 
         return [
             'category' => 'WORKSPACE',
             'fullname' => $workspace->get_name(),
             'imageurl' => $workspace->get_image(),
             'imagealt' => get_string('workspace_image_alt', 'container_workspace'),
+            'unshare' => $interactor->can_unshare_resources()
         ];
     }
 

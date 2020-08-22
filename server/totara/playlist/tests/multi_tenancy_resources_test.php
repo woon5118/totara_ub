@@ -104,7 +104,7 @@ class totara_playlist_multi_tenancy_resources_testcase extends advanced_testcase
         $this->setUser($user_one);
 
         $ec = execution_context::create('ajax', 'totara_playlist_cards');
-        $result = graphql::execute_operation($ec, ['id' => $playlist->get_id()]);
+        $result = graphql::execute_operation($ec, ['id' => $playlist->get_id(), 'include_footnotes' => true]);
 
         $this->assertEmpty($result->errors);
         $this->assertNotEmpty($result->data);
@@ -120,7 +120,7 @@ class totara_playlist_multi_tenancy_resources_testcase extends advanced_testcase
 
         // Check if user one is still able to see the resources or not. Which should not be.
         $this->setUser($user_one);
-        $result = graphql::execute_operation($ec, ['id' => $playlist->get_id()]);
+        $result = graphql::execute_operation($ec, ['id' => $playlist->get_id(), 'include_footnotes' => true]);
         $this->assertEmpty($result->errors);
         $this->assertNotEmpty($result->data);
 

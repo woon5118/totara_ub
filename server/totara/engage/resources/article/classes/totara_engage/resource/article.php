@@ -504,4 +504,20 @@ final class article extends resource_item implements time_viewable {
     public function get_url(): string {
         return builder::to(self::get_resource_type(), ['id' => $this->get_id()])->out(true);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function can_unshare(int $sharer_id, ?bool $is_container = false): bool {
+        // Sharer can not be owner of resources If resource is shared to share_with_me,
+        // but sharer can be the owner if resource is shared to the container.
+        if (!$is_container) {
+            if ($sharer_id == $this->get_userid()) {
+                return false;
+            }
+        }
+
+        $context = \context_user::instance($sharer_id);
+        return has_capability('engage/article:unshare', $context, $sharer_id);
+    }
 }

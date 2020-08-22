@@ -60,4 +60,14 @@ $capabilities = [
             'tenantusermanager' => CAP_ALLOW,
         ],
     ],
+
+    /* Unshare playlist */
+    'totara/playlist:unshare' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'user' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        ]
+    ]
 ];

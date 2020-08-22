@@ -71,11 +71,12 @@ final class share extends entity {
 
     /**
      * Relationship with recipients.
-     *
+     * @param int|null $visibility
      * @return has_many
      */
-    public function recipients(): has_many {
-        return $this->has_many(share_recipient::class, 'shareid');
+    public function recipients(?int $visibility = 1): has_many {
+        return $this->has_many(share_recipient::class, 'shareid')
+            ->where('visibility', $visibility);
     }
 
 }

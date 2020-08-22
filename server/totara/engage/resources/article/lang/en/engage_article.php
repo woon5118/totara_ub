@@ -66,11 +66,12 @@ $string['viewedresources'] = 'You\'ve viewed {$a} of';
 // Capability strings
 $string['article:create'] = 'Create resource';
 $string['article:share'] = "Share resource";
+$string['article:unshare'] = "Unlink resource";
 
 // Error strings
 $string['error:create'] = "Cannot create a resource";
 $string['error:delete'] = "Cannot delete the resource";
-$string['error:sharecapability'] = 'You do not have the required capabilities to share this resource.';
+$string['error:sharecapability'] = 'You do not have the required capabilities to share/unshare this resource.';
 $string['error:shareprivate'] = 'This resource is viewable by only you. Change who can view this resource in order to share it.';
 $string['error:sharerestricted'] = 'This resource is not viewable by everyone and only the owner is allowed to share it.';
 $string['error:reportresource'] = "Cannot report the resource";

@@ -150,6 +150,9 @@ export default {
         return {
           id: this.pageProps.playlistId,
           source: UrlSourceType.playlist(this.pageProps.playlistId),
+          footnotes_type: 'playlist',
+          footnotes_item_id: this.pageProps.playlistId,
+          include_footnotes: true,
         };
       },
     },

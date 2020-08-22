@@ -23,6 +23,7 @@
     :show-footnotes="showFootnotes"
     :footnotes="footnotes"
     class="tui-totaraPlaylist-playlistCard"
+    @remove-resource="$emit('remove-resource', $event)"
     @mouseover="$_handleHovered(true)"
     @mouseleave="$_handleHovered(false)"
   >

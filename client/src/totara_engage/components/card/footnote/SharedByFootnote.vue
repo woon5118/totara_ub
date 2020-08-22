@@ -18,17 +18,52 @@
 
 <template>
   <div v-show="sharer" class="tui-cardSharedByFootnote">
-    <span class="tui-cardSharedByFootnote__text">
-      {{ $str('from', 'moodle') }}
-    </span>
-    <a class="tui-cardSharedByFootnote__url" :href="sharer.url">
-      {{ sharer.fullname }}
-    </a>
+    <div class="tui-cardSharedByFootnote__sharer">
+      <span class="tui-cardSharedByFootnote__text">
+        {{ $str('from', 'moodle') }}
+      </span>
+      <a class="tui-cardSharedByFootnote__url" :href="sharer.url">
+        {{ sharer.fullname }}
+      </a>
+    </div>
+    <ButtonIcon
+      v-if="showButton"
+      class="tui-cardSharedByFootnote__deleteButton"
+      :aria-label="
+        $str(
+          area === 'USER' ? 'removefromsharedwithyou' : 'removefromlibary',
+          'totara_engage'
+        )
+      "
+      :styleclass="{
+        small: true,
+        transparentNoPadding: true,
+        alert: true,
+      }"
+      :disabled="loading"
+      @click.stop.prevent="unshare"
+    >
+      <Loading v-if="loading" />
+      <Delete v-else />
+    </ButtonIcon>
   </div>
 </template>
 
 <script>
+import Delete from 'tui/components/icons/common/Delete';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Loading from 'tui/components/icons/common/Loading';
+
+//graphQL
+import unShare from 'totara_engage/graphql/unshare';
+
 export default {
+  components: {
+    Delete,
+    ButtonIcon,
+    Loading,
+  },
+
   props: {
     instanceId: {
       type: Number,
@@ -43,6 +78,54 @@ export default {
       default: () => ({}),
       validator: sharer => ['fullname', 'url'].every(prop => prop in sharer),
     },
+    area: {
+      type: String,
+      required: true,
+    },
+    recipientId: {
+      type: Number,
+      required: true,
+    },
+    showButton: {
+      type: Boolean,
+      required: true,
+    },
+  },
+
+  data() {
+    return {
+      loading: false,
+    };
+  },
+
+  methods: {
+    async unshare() {
+      if (!this.loading) {
+        this.loading = true;
+      }
+
+      let refetchQueries = ['totara_engage_contribution_cards'];
+      if (this.area !== 'USER') {
+        refetchQueries = [
+          'container_workspace_contribution_cards',
+          'container_workspace_shared_cards',
+        ];
+      }
+
+      try {
+        await this.$apollo.mutate({
+          mutation: unShare,
+          refetchQueries,
+          variables: {
+            recipient_id: this.recipientId,
+            component: this.component,
+            item_id: this.instanceId,
+          },
+        });
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 };
 </script>
@@ -51,6 +134,10 @@ export default {
 {
   "moodle": [
     "from"
+  ],
+  "totara_engage": [
+    "removefromlibary",
+    "removefromsharedwithyou"
   ]
 }
 </lang-strings>

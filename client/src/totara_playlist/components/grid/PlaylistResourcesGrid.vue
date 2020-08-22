@@ -84,6 +84,7 @@
                         :label-id="$id(`row-${index}-${i}-label`)"
                         :aria-posinset="index * itemsPerRow + i + 1"
                         :aria-setsize="cards.length"
+                        :show-footnotes="updateAble"
                         @refetch="$emit('refetch', $event)"
                       />
                     </div>

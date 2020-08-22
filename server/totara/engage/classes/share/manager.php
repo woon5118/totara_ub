@@ -22,7 +22,9 @@
  */
 namespace totara_engage\share;
 
+use core_user\totara_engage\share\recipient\user;
 use totara_engage\entity\share as share_entity;
+use totara_engage\entity\share_recipient;
 use totara_engage\entity\share_recipient as recipient_entity;
 use totara_engage\event\share_created;
 use totara_engage\exception\share_exception;
@@ -180,7 +182,8 @@ final class manager {
     }
 
     /**
-     * Retrieve recipient or otherwise create a new recipient.
+     * Create a new recipient. as recipients can have multiple sharers with same shareid, we do not need to check
+     * recipient exits or not.
      *
      * @param int $shareid
      * @param int $sharerid
@@ -190,9 +193,10 @@ final class manager {
     private static function create_recipient(int $shareid, int $sharerid, recipient $recipient): recipient_entity {
         /** @var share_recipient_repository $repo */
         $repo = recipient_entity::repository();
-        $recipient_entity = $repo->get_recipient(
+        $recipient_entity = $repo->get_recipient_by_visibility(
             $shareid, $recipient->get_id(), $recipient->get_area(), $recipient->get_component()
         );
+
         if (empty($recipient_entity)) {
             $recipient_entity = new recipient_entity();
             $recipient_entity->shareid = $shareid;
@@ -270,5 +274,32 @@ final class manager {
 
         $share_repo->delete_share_by_id($entity->id);
         $recipient_repo->delete_recipient_by_shareid($entity->id);
+    }
+
+    /**
+     * Hide visibility for the recipient.
+     *
+     * @param int $recipient_id
+     * @param shareable $instance
+     */
+    public static function unshare(int $recipient_id, shareable $instance): void {
+        global $USER;
+
+        /** @var share_recipient_repository $repo */
+        $repo = recipient_entity::repository();
+        /** @var share_recipient $entity */
+        $recipient = $repo->get_recipient_by_id($recipient_id);
+
+        if (empty($recipient)) {
+            throw new \coding_exception("No recipient with {$recipient_id} is found");
+        }
+
+        if (!$instance->can_unshare($recipient->instanceid, $recipient->area !== user::AREA)) {
+            throw new share_exception('error:sharecapability', $instance::get_resource_type());
+        }
+
+
+        $recipient->visibility = 0;
+        $recipient->update();
     }
 }

@@ -24,7 +24,9 @@ namespace totara_engage\repository;
 
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use totara_engage\entity\share;
 use totara_engage\entity\share_recipient;
+use totara_engage\share\share as share_model;
 
 final class share_recipient_repository extends repository {
 
@@ -39,6 +41,7 @@ final class share_recipient_repository extends repository {
         $builder = builder::table(share_recipient::TABLE)
             ->select_raw('area, count(*) as total')
             ->where('shareid', $shareid)
+            ->where('visibility', share_model::VISIBILITY_VISIBLE)
             ->group_by('area');
 
         return $builder->fetch();
@@ -49,17 +52,19 @@ final class share_recipient_repository extends repository {
      * @param int $instanceid
      * @param string $area
      * @param string $component
+     * @param int|null $visibility
      * @return share_recipient|null
      */
-    public function get_recipient(
-        int $shareid, int $instanceid, string $area, string $component
+    public function get_recipient_by_visibility(
+        int $shareid, int $instanceid, string $area, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE
     ): ?share_recipient {
         $builder = builder::table(share_recipient::TABLE)
             ->map_to(share_recipient::class)
             ->where('shareid', $shareid)
             ->where('instanceid', $instanceid)
             ->where('area', $area)
-            ->where('component', $component);
+            ->where('component', $component)
+            ->where('visibility', $visibility);
 
         /** @var share_recipient $entity */
         $entity = $builder->one();
@@ -70,12 +75,14 @@ final class share_recipient_repository extends repository {
      * Get all users with whom the item was shared.
      *
      * @param int $shareid
+     * @param int|null $visibility
      * @return array
      */
-    public function get_recipients(int $shareid): array {
+    public function get_recipients(int $shareid, ?int $visibility = share_model::VISIBILITY_VISIBLE): array {
         $builder = builder::table(static::get_table())
             ->map_to(share_recipient::class)
-            ->where('shareid', $shareid);
+            ->where('shareid', $shareid)
+            ->where('visibility', $visibility);
 
         return $builder->fetch();
     }
@@ -109,5 +116,19 @@ final class share_recipient_repository extends repository {
         builder::table(share_recipient::TABLE)
             ->where('shareid', $shareid)
             ->delete();
+    }
+
+    /**
+     * @param int $recipient_id
+     * @return share_recipient
+     */
+    public function get_recipient_by_id(int $recipient_id): share_recipient {
+        $entity = builder::table(share_recipient::TABLE)
+            ->map_to(share_recipient::class)
+            ->where('id', $recipient_id)
+            ->one();
+
+        /** @var share_recipient $entity */
+        return $entity;
     }
 }

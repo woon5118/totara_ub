@@ -26,6 +26,7 @@ namespace totara_playlist\totara_engage\query\provider;
 use core\orm\query\builder;
 use core\orm\query\field;
 use core\orm\query\raw_field;
+use core\orm\query\sql\where;
 use core\orm\query\subquery;
 use core\orm\query\table;
 use core_tag\entity\tag_instance;
@@ -451,7 +452,8 @@ final class playlist_provider implements queryable, container {
             $joining->where_raw('esr.shareid = es.id')
                 ->where('esr.instanceid', $userid)
                 ->where('esr.area', user::AREA)
-                ->where('esr.component', local_helper::get_component_name(user::class));
+                ->where('esr.component', local_helper::get_component_name(user::class))
+                ->where('esr.visibility', 1);
         });
 
         if ($must_exist) {

@@ -70,6 +70,7 @@ $string['survey:create'] = "Create survey";
 $string['survey:delete'] = "Delete survey";
 $string['survey:share'] = "Share survey";
 $string['survey:update'] = "Update survey";
+$string['survey:unshare'] = "Unlink survey";
 
 // For error usage, mostly will be invoked at the parent level - totara_engage.
 $string['error:create'] = "Cannot create survey";

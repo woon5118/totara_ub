@@ -60,4 +60,12 @@ $capabilities = [
             'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
+
+    'engage/survey:unshare' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'user' => CAP_ALLOW
+        ]
+    ],
 ];

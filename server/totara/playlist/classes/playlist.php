@@ -44,6 +44,7 @@ use totara_playlist\event\playlist_updated;
 use totara_playlist\exception\playlist_exception;
 use totara_playlist\local\helper;
 use totara_playlist\local\image_processor;
+use totara_playlist\repository\playlist_repository;
 use totara_playlist\repository\playlist_resource_repository;
 use totara_engage\resource\resource_item;
 use totara_topic\provider\topic_provider;
@@ -371,6 +372,21 @@ final class playlist implements accessible, shareable {
     }
 
     /**
+     * @param int           $userid
+     * @param resource_item $resource
+     *
+     * @return bool
+     */
+    public function can_user_remove_resource(int $userid, resource_item $resource): bool {
+        if (!$this->can_user_contribute($userid)) {
+            return false;
+        }
+
+        return access_manager::can_access($resource, $userid);
+    }
+
+
+    /**
      * @param resource_item $resource
      * @param int|null      $userid
      *
@@ -408,6 +424,26 @@ final class playlist implements accessible, shareable {
         // Update the image
         $processor = image_processor::make();
         $processor->update_playlist_images($this);
+    }
+
+    public function remove_resource(resource_item $resource, ?int $user_id = null): void {
+        global $USER;
+
+        if (null == $user_id || $user_id == 0) {
+            $user_id = $USER->id;
+        }
+
+        if (!$this->can_user_remove_resource($user_id, $resource)) {
+            throw playlist_exception::create('removeResource');
+        }
+
+        // Remove resource.
+        /** @var playlist_resource_repository $repo */
+        $repo = playlist_resource::repository();
+        $repo->remove_resource($this->get_id(), $resource->get_id());
+
+        // Decrease resource usage.
+        $resource->decrease_resource_usage();
     }
 
     /**
@@ -817,5 +853,21 @@ final class playlist implements accessible, shareable {
     public function reshare(int $userid): void {
         $event = playlist_reshared::from_playlist($this, $userid);
         $event->trigger();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function can_unshare(int $sharer_id, ?bool $is_container = false): bool {
+        // Sharer can not be owner of resources If resource is shared to share_with_me,
+        // but sharer can be the owner if resource is shared to the container.
+        if (!$is_container) {
+            if ($sharer_id == $this->get_userid()) {
+                return false;
+            }
+        }
+
+        $context = \context_user::instance($sharer_id);
+        return has_capability('engage/article:unshare', $context, $sharer_id);
     }
 }

@@ -58,6 +58,7 @@ $string['ratings'] = 'ratings';
 $string['rating_message'] = 'You have a new rating on your playlist {$a}.';
 $string['rating_message_view'] = 'View playlist: ';
 $string['rating_message_subject'] = 'Someone has rated your playlist';
+$string['removeitem'] = 'Remove from playlist';
 $string['restricted'] = "Limited people";
 $string['savedplaylists'] = "Saved playlists";
 $string['selectcontent'] = "Select content to add into playlist";
@@ -89,6 +90,7 @@ $string['field:topics'] = 'Topics';
 $string['playlist:create'] = 'Create playlist';
 $string['playlist:delete'] = 'Remove playlist';
 $string['playlist:share'] = 'Share playlist';
+$string['playlist:unshare'] = 'Unlink playlist';
 $string['playlist:view_playlist_report'] = 'View playlists engagement report';
 
 // Strings for message component

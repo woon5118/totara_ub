@@ -1,5 +1,23 @@
-query totara_playlist_cards($id: param_integer!, $cursor: String, $source: String) {
-  contribution: totara_playlist_cards(id: $id, cursor: $cursor) {
+query totara_playlist_cards(
+  $id: param_integer!,
+  $cursor: String,
+  $source: String
+  $include_footnotes: Boolean!
+  $footnotes_type: param_text
+  $footnotes_item_id: core_id
+  $footnotes_area: param_text
+  $footnotes_component: param_component
+) {
+  contribution: totara_playlist_cards(
+    id: $id,
+    cursor: $cursor
+    footnotes: {
+      type: $footnotes_type
+      item_id: $footnotes_item_id
+      area: $footnotes_area
+      component: $footnotes_component
+    }
+  ) {
     cursor {
       total
       next
@@ -27,6 +45,16 @@ query totara_playlist_cards($id: param_integer!, $cursor: String, $source: Strin
       topics {
         id
         value(format: PLAIN)
+      }
+      footnotes(
+        type: $footnotes_type
+        item_id: $footnotes_item_id
+        area: $footnotes_area
+        component: $footnotes_component
+      ) @include(if: $include_footnotes) {
+        component
+        tuicomponent
+        props
       }
       url(source: $source)
     }

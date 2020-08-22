@@ -127,22 +127,23 @@ final class shareto_recipients implements query_resolver {
      * @param string $component
      * @param recipient[] $recipients
      * @param int $access
+     * @param int|null $visibility
      * @return array
      */
     private static function get_already_recipients(int $itemid, string $component, array $recipients,
-                                                   int $access): array {
+                                                   int $access, ?int $visibility = 1): array {
         // Setup builder
         $builder = builder::table('engage_share', 'es')
             ->join(['engage_share_recipient', 'esr'], 'esr.shareid', 'es.id')
             ->select([
                 'esr.instanceid',
                 'esr.area',
-                'esr.component',
+                'esr.component'
             ])
             ->where('es.itemid', $itemid)
             ->where('es.component', $component);
 
-        $builder->where(function(builder $builder) use($recipients, $access) {
+        $builder->where(function (builder $builder) use ($recipients, $access, $visibility) {
             // Flag recipients that are already recipients of the share.
             foreach ($recipients as $recipient) {
                 // Allow only recipients that matches at least the item's access level.
@@ -150,10 +151,11 @@ final class shareto_recipients implements query_resolver {
                     continue;
                 }
 
-                $builder->or_where(function (builder $builder) use ($recipient) {
+                $builder->or_where(function (builder $builder) use ($recipient, $visibility) {
                     $builder->where('esr.instanceid', $recipient->get_id())
                         ->where('esr.area', $recipient->get_area())
-                        ->where('esr.component', $recipient->get_component());
+                        ->where('esr.component', $recipient->get_component())
+                        ->where('esr.visibility', $visibility);
                 });
             }
         });

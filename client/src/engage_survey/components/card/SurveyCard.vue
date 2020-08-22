@@ -21,6 +21,10 @@
     <CoreCard
       :clickable="!editAble && voted"
       class="tui-surveyCard__cardContent"
+      :class="{
+        'tui-surveyCard__cardContent__calcHeight': showFootnotes,
+        'tui-surveyCard__cardContent__height': !showFootnotes,
+      }"
     >
       <div class="tui-surveyCard__cardContent__inner">
         <div class="tui-surveyCard__cardContent__inner__header">

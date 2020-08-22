@@ -96,6 +96,7 @@ extend type Query {
     id: param_integer!
     cursor: String
     source: String
+    footnotes: totara_engage_footnotes
   ): totara_engage_cards!
 
   """
@@ -149,5 +150,10 @@ extend type Mutation {
     id: param_integer!
     instanceid: param_integer!
     order: param_integer!
+  ): Boolean!
+
+  totara_playlist_remove_resource(
+    id: param_integer!
+    instanceid: param_integer!
   ): Boolean!
 }

@@ -480,7 +480,8 @@ abstract class resource_provider implements queryable {
             $joining->where_raw('esr.shareid = es.id')
                 ->where('esr.instanceid', $userid)
                 ->where('esr.area', user::AREA)
-                ->where('esr.component', 'core_user');
+                ->where('esr.component', 'core_user')
+                ->where('esr.visibility', \totara_engage\share\share::VISIBILITY_VISIBLE);
         });
 
         if ($must_exist) {

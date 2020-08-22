@@ -29,7 +29,14 @@
 
   &__cardContent {
     width: 100%;
-    height: calc(var(--tui-totaraEngage-card-height) + 9px);
+
+    &__calcHeight {
+      height: calc(var(--tui-totaraEngage-card-height) - 22px);
+    }
+
+    &__height {
+      height: var(--tui-totaraEngage-card-height);
+    }
 
     &:hover {
       box-shadow: var(--tui-shadow-2);

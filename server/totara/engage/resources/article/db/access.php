@@ -42,4 +42,12 @@ $capabilities = [
             'tenantdomainmanager' => CAP_ALLOW,
         ]
     ],
+
+    'engage/article:unshare' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'user' => CAP_ALLOW
+        ]
+    ],
 ];

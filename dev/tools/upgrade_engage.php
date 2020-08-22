@@ -154,4 +154,18 @@ if (!$db_manager->field_exists('totara_comment', 'contenttext')) {
 
     $db_manager->add_field($table, $field);
 }
+
+if ($db_manager->table_exists('engage_share_recipient')) {
+    // Change unique index to not unique.
+    $table = new xmldb_table('engage_share_recipient');
+    $index = new xmldb_index('recipient_unique', XMLDB_INDEX_UNIQUE, array('shareid', 'sharerid', 'instanceid', 'area', 'component'));
+
+    if ($db_manager->index_exists($table, $index)) {
+        // Drop old index, Add new index to table
+        $db_manager->drop_index($table, $index);
+        $index = new xmldb_index('recipient_unique', XMLDB_INDEX_NOTUNIQUE, array('shareid', 'sharerid', 'instanceid', 'area', 'component'));
+        $table->addIndex($index);
+    }
+}
+
 return 0;

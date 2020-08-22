@@ -33,6 +33,7 @@ use totara_engage\query\provider\helper;
 use totara_engage\query\provider\queryable;
 use totara_engage\query\query;
 use totara_engage\share\recipient\recipient;
+use totara_engage\share\share as share_model;
 
 class card_loader {
 
@@ -206,7 +207,8 @@ class card_loader {
                 $joining->where_raw('sr.shareid = s.id')
                     ->where('sr.instanceid', $recipient->get_id())
                     ->where('sr.area', $recipient->get_area())
-                    ->where('sr.component', $recipient->get_component());
+                    ->where('sr.component', $recipient->get_component())
+                    ->where('sr.visibility', share_model::VISIBILITY_VISIBLE);
             });
 
         // Sort the results.

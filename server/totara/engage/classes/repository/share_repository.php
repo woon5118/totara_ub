@@ -27,6 +27,7 @@ use core\orm\query\builder;
 use totara_core\advanced_feature;
 use totara_engage\entity\share;
 use totara_engage\entity\share_recipient;
+use totara_engage\share\share as share_model;
 
 final class share_repository extends repository {
 
@@ -61,9 +62,10 @@ final class share_repository extends repository {
      *
      * @param int $itemid
      * @param string $component
+     * @param int|null $visibility
      * @return int
      */
-    public function get_total_sharers(int $itemid, string $component): int {
+    public function get_total_sharers(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): int {
         $builder = builder::table(share::TABLE, 's')
             ->join([share_recipient::TABLE, 'sr'], function(builder $joining) {
                 $joining
@@ -73,6 +75,7 @@ final class share_repository extends repository {
             ->select('sr.sharerid')
             ->where('s.itemid', $itemid)
             ->where('s.component', $component)
+            ->where('sr.visibility', $visibility)
             ->group_by('sr.sharerid');
 
         return $builder->count();
@@ -83,9 +86,10 @@ final class share_repository extends repository {
      *
      * @param int $itemid
      * @param string $component
+     * @param int|null $visibility
      * @return array
      */
-    public function get_sharers(int $itemid, string $component): array {
+    public function get_sharers(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): array {
         $builder = builder::table(share::TABLE, 's')
             ->join([share_recipient::TABLE, 'sr'], function(builder $joining) {
                 $joining
@@ -95,6 +99,7 @@ final class share_repository extends repository {
             ->select('sr.sharerid')
             ->where('s.itemid', $itemid)
             ->where('s.component', $component)
+            ->where('sr.visibility', $visibility)
             ->group_by('sr.sharerid');
 
         return $builder->get()->to_array();
@@ -105,11 +110,12 @@ final class share_repository extends repository {
      *
      * @param int $itemid
      * @param string $component
+     * @param int|null $visibility
      * @return int
      */
-    public function get_total_recipients(int $itemid, string $component): int {
+    public function get_total_recipients(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): int {
         $share = $this->get_share($itemid, $component);
-        return $share ? $share->recipients()->count() : 0;
+        return $share ? $share->recipients($visibility)->count() : 0;
     }
 
     /**
@@ -117,14 +123,16 @@ final class share_repository extends repository {
      *
      * @param int $itemid
      * @param string $component
+     * @param int|null $visibility
      * @return array
      */
-    public function get_total_recipients_per_area(int $itemid, string $component): array {
+    public function get_total_recipients_per_area(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): array {
         $builder = builder::table(share_recipient::TABLE, 'sr')
             ->join([share::TABLE, 's'], 'shareid', '=', 'id')
             ->select_raw('sr.area, count(*) as total')
             ->where('s.itemid', $itemid)
             ->where('s.component', $component)
+            ->where('sr.visibility', $visibility)
             ->group_by('sr.area');
 
         return $builder->fetch();
@@ -140,6 +148,13 @@ final class share_repository extends repository {
     public function get_recipients(int $itemid, string $component): array {
         $share = $this->get_share($itemid, $component);
         $recipients = $share ? $share->recipients()->get()->to_array() : [];
+
+        // As unlinked item can be reshared with recipients, we need to filter the recipients.
+        if (!empty($recipients)) {
+            $recipients = array_filter($recipients, function ($recipient) {
+                return $recipient['visibility'] == 1;
+            });
+        }
 
         // If workspaces aren't enabled, filter out any previous workspace shares
         if ($recipients && advanced_feature::is_disabled('container_workspace')) {
@@ -158,10 +173,11 @@ final class share_repository extends repository {
      * @param int $recipient_instance_id
      * @param string $recipient_area
      * @param string $recipient_component
+     * @param int|null $visibility
      * @return bool
      */
     public function is_recipient(int $itemid, string $component, int $recipient_instance_id,
-        string $recipient_area, string $recipient_component
+        string $recipient_area, string $recipient_component,  ?int $visibility = share_model::VISIBILITY_VISIBLE
     ): bool {
         $builder = builder::table(share_recipient::TABLE, 'sr')
             ->join([share::TABLE, 's'], 'shareid', '=', 'id')
@@ -169,6 +185,7 @@ final class share_repository extends repository {
             ->where('s.component', $component)
             ->where('sr.instanceid', $recipient_instance_id)
             ->where('sr.area', $recipient_area)
+            ->where('sr.visibility', $visibility)
             ->where('sr.component', $recipient_component);
 
         return $builder->exists();

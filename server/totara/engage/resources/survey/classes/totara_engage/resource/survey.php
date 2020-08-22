@@ -563,4 +563,20 @@ final class survey extends resource_item {
             }
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function can_unshare(int $sharer_id, ?bool $is_container = false): bool {
+        // Sharer can not be owner of resources If resource is shared to share_with_me,
+        // but sharer can be the owner if resource is shared to the container.
+        if (!$is_container) {
+            if ($sharer_id == $this->get_userid()) {
+                return false;
+            }
+        }
+
+        $context = \context_user::instance($sharer_id);
+        return has_capability('engage/article:unshare', $context, $sharer_id);
+    }
 }

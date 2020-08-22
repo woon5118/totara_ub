@@ -79,4 +79,13 @@ interface shareable {
      * @return string
      */
     public static function get_resource_type(): string;
+
+    /**
+     * Validates if the user has capability to unshare this resource.
+     *
+     * @param int $sharer_id
+     * @param bool|null $is_container
+     * @return bool
+     */
+    public function can_unshare(int $sharer_id, ?bool $is_container = false): bool;
 }

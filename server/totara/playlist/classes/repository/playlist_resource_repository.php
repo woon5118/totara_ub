@@ -155,4 +155,15 @@ final class playlist_resource_repository extends repository {
         $entities = $builder->fetch();
         return $entities;
     }
+
+    /**
+     * @param int $playlist_id
+     * @param int $resource_id
+     */
+    public function remove_resource(int $playlist_id, int $resource_id): void {
+        builder::table(static::get_table())
+            ->where('resourceid', $resource_id)
+            ->where('playlistid', $playlist_id)
+            ->delete();
+    }
 }
