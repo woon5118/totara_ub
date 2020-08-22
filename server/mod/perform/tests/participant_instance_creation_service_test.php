@@ -22,6 +22,7 @@
  */
 
 use core\collection;
+use core\event\message_sent;
 use mod_perform\constants;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\external_participant;
@@ -700,11 +701,15 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             ->key_by('id');
 
         $events = $sink->get_events();
-        $this->assertCount(count($relationships), $events);
+        $events_perform = array_filter($events, function ($event) {
+            return $event instanceof participant_instance_manually_added;
+        });
+        $events_message = array_filter($events, function ($event) {
+            return $event instanceof message_sent;
+        });
+        $this->assertCount(count($relationships), $events_message);
 
-        foreach ($events as $event) {
-            $this->assertInstanceOf(participant_instance_manually_added::class, $event);
-
+        foreach ($events_perform as $event) {
             $expected = $manual_participant_instances->item($event->objectid);
             $this->assertNotNull($expected, "Unknown participant id: '$event->objectid'");
             $this->assertEquals($expected->participant_id, $event->relateduserid, 'wrong participant id');

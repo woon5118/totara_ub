@@ -28,7 +28,7 @@ Feature: Perform activity validation in the notifications tab
     And I click on "Reviewer" tui "checkbox" in the "Select participants" tui "popover"
     And I click on "External respondent" tui "checkbox" in the "Select participants" tui "popover"
     And I click on "Done" tui "button" in the "Select participants" tui "popover"
-    And I should see "Activity saved" in the tui "success" notification banner
+    And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     When I switch to "Notifications" tui tab
     Then I should see "Subject" in the "Participant instance creation reminder" tui "collapsible"
@@ -93,7 +93,7 @@ Feature: Perform activity validation in the notifications tab
     When I set the field "trigger-instance_created_reminder[1]" to "1"
     Then I should see "Duplicate trigger. Delete or change number" exactly "2" times
     When I set the field "trigger-instance_created_reminder[1]" to "3"
-    Then I should see "Activity saved" in the tui "success" notification banner
+    Then I should see "Activity saved" in the tui success notification toast
     But I should not see "Set trigger from 1 to 365 days" in the "Participant instance creation reminder" tui "collapsible"
     But I should not see "Duplicate trigger" in the "Participant instance creation reminder" tui "collapsible"
 
@@ -113,7 +113,7 @@ Feature: Perform activity validation in the notifications tab
       | trigger-overdue_reminder[0]  | 3 |
       | trigger-overdue_reminder[1]  | 1 |
       | trigger-overdue_reminder[2]  | 4 |
-    Then I should see "Activity saved" in the tui "success" notification banner
+    Then I should see "Activity saved" in the tui success notification toast
     And I reload the page
     Given I switch to "Notifications" tui tab
     Then the following fields match these values:

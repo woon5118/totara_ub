@@ -66,10 +66,10 @@ Feature: Perform activity notifications - core relationships
 
   Scenario: mod_perform_notification_001: Instance creation notification
     And I toggle the "Participant instance creation" tui collapsible
-    And I click on the "Participant instance creation notification" tui toggle button
+    And I click on "Participant instance creation notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
     And I click on "Appraiser" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
-    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
     And I trigger cron
@@ -101,7 +101,7 @@ Feature: Perform activity notifications - core relationships
 
   Scenario: mod_perform_notification_002: Instance creation reminder
     And I toggle the "Participant instance creation reminder" tui collapsible
-    And I click on the "Participant instance creation reminder notification" tui toggle button
+    And I click on "Participant instance creation reminder notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "Participant instance creation reminder" tui "collapsible"
     And I click on "Appraiser" tui "toggle_button" in the "Participant instance creation reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Participant instance creation reminder" tui "collapsible"
@@ -114,9 +114,9 @@ Feature: Perform activity notifications - core relationships
       | trigger-instance_created_reminder[2] | 3 |
       | trigger-instance_created_reminder[3] | 4 |
       | trigger-instance_created_reminder[4] | 6 |
-    And I should see "Activity saved" in the tui "success" notification banner
+    And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
-    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
     And I trigger cron
@@ -125,7 +125,7 @@ Feature: Perform activity notifications - core relationships
     # Delete an event trigger after activation
     And I switch to "Notifications" tui tab
     And I click on ".tui-repeater__row:nth-child(3) button[title=Delete]" "css_element"
-    And I should see "Activity saved" in the tui "success" notification banner
+    And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     And I log out
 
@@ -203,7 +203,7 @@ Feature: Perform activity notifications - core relationships
 
   Scenario: mod_perform_notification_003: Due date approaching reminder
     And I toggle the "Due date approaching reminder" tui collapsible
-    And I click on the "Due date approaching reminder notification" tui toggle button
+    And I click on "Due date approaching reminder notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "Due date approaching reminder" tui "collapsible"
     And I click on "Appraiser" tui "toggle_button" in the "Due date approaching reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Due date approaching reminder" tui "collapsible"
@@ -216,14 +216,14 @@ Feature: Perform activity notifications - core relationships
       | trigger-due_date_reminder[2] | 3 |
       | trigger-due_date_reminder[3] | 4 |
       | trigger-due_date_reminder[4] | 6 |
-    And I should see "Activity saved" in the tui "success" notification banner
+    And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     # Explicitly check the due date setting in case someone messes up with the generator
     When I switch to "Assignments" tui tab
     Then the following fields match these values:
-      | dueDateOffset[from_count] | 2     |
-      | dueDateOffset[from_unit]  | weeks |
-    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+      | dueDateOffset[value] | 2     |
+      | dueDateOffset[range] | weeks |
+    And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
     And I trigger cron
@@ -232,7 +232,7 @@ Feature: Perform activity notifications - core relationships
     # Delete an event trigger after activation
     And I switch to "Notifications" tui tab
     And I click on ".tui-repeater__row:nth-child(3) button[title=Delete]" "css_element"
-    And I should see "Activity saved" in the tui "success" notification banner
+    And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     And I log out
 
@@ -323,15 +323,15 @@ Feature: Perform activity notifications - core relationships
 
   Scenario: mod_perform_notification_004: On due date reminder
     And I toggle the "On due date reminder" tui collapsible
-    And I click on the "On due date reminder notification" tui toggle button
+    And I click on "On due date reminder notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "On due date reminder" tui "collapsible"
     And I click on "Appraiser" tui "toggle_button" in the "On due date reminder" tui "collapsible"
     # Explicitly check the due date setting in case someone messes up with the generator
     When I switch to "Assignments" tui tab
     Then the following fields match these values:
-      | dueDateOffset[from_count] | 2     |
-      | dueDateOffset[from_unit]  | weeks |
-    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+      | dueDateOffset[value] | 2     |
+      | dueDateOffset[range] | weeks |
+    And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I trigger cron
     And I press the "back" button in the browser
@@ -413,7 +413,7 @@ Feature: Perform activity notifications - core relationships
 
   Scenario: mod_perform_notification_005: Overdue reminder
     And I toggle the "Overdue reminder" tui collapsible
-    And I click on the "Overdue reminder notification" tui toggle button
+    And I click on "Overdue reminder notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "Overdue reminder" tui "collapsible"
     And I click on "Appraiser" tui "toggle_button" in the "Overdue reminder" tui "collapsible"
     And I click on "Add" tui "button" in the "Overdue reminder" tui "collapsible"
@@ -426,14 +426,14 @@ Feature: Perform activity notifications - core relationships
       | trigger-overdue_reminder[2] | 3 |
       | trigger-overdue_reminder[3] | 4 |
       | trigger-overdue_reminder[4] | 6 |
-    And I should see "Activity saved" in the tui "success" notification banner
+    And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     # Explicitly check the due date setting in case someone messes up with the generator
     When I switch to "Assignments" tui tab
     Then the following fields match these values:
-      | dueDateOffset[from_count] | 2     |
-      | dueDateOffset[from_unit]  | weeks |
-    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+      | dueDateOffset[value] | 2     |
+      | dueDateOffset[range] | weeks |
+    And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
     And I trigger cron
@@ -442,7 +442,7 @@ Feature: Perform activity notifications - core relationships
     # Delete an event trigger after activation
     And I switch to "Notifications" tui tab
     And I click on ".tui-repeater__row:nth-child(3) button[title=Delete]" "css_element"
-    And I should see "Activity saved" in the tui "success" notification banner
+    And I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     And I log out
 
@@ -526,10 +526,10 @@ Feature: Perform activity notifications - core relationships
 
   Scenario: mod_perform_notification_006: Completion notification
     And I toggle the "Completion of subject instance" tui collapsible
-    And I click on the "Completion of subject instance notification" tui toggle button
+    And I click on "Completion of subject instance notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "Completion of subject instance" tui "collapsible"
     And I click on "Appraiser" tui "toggle_button" in the "Completion of subject instance" tui "collapsible"
-    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
     And I trigger cron
@@ -615,10 +615,10 @@ Feature: Perform activity notifications - core relationships
 
   Scenario: mod_perform_notification_007: Reopened activity notification
     And I toggle the "Reopened activity" tui collapsible
-    And I click on the "Reopened activity notification" tui toggle button
+    And I click on "Reopened activity notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "Reopened activity" tui "collapsible"
     And I click on "Appraiser" tui "toggle_button" in the "Reopened activity" tui "collapsible"
-    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
     And I trigger cron

@@ -1808,9 +1808,22 @@ class behat_totara_tui extends behat_base {
                 return null;
             },
 
+            'action_card' => function () use ($label, $tui_selector, $container) {
+                $locator = ".//div[contains(concat(' ', normalize-space(@class), ' '), ' tui-actionCard ') and contains(., " . behat_context_helper::escape($label) . ")]";
+                return $this->find('xpath', $locator, false, $container);
+            },
+
+            'form' => function () use ($label, $tui_selector, $container) {
+                $locator = ".//form[contains(concat(' ', normalize-space(@class), ' '), ' tui-form ') and contains(., " . behat_context_helper::escape($label) . ")]";
+                return $this->find('xpath', $locator, false, $container);
+            },
+
             'toggle_button' => $find_toggle_switch,
             'toggle_switch' => $find_toggle_switch,
 
+            'text' => $find_default,
+            'link' => $find_default,
+            'link_or_button' => $find_default,
             'button' => $find_default,
             'checkbox' => $find_default,
         ];

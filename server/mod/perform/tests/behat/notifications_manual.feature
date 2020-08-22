@@ -58,10 +58,10 @@ Feature: Perform activity notifications - manual relationships
 
   Scenario: mod_perform_notification_101: Select participants notification
     And I switch to "Content" tui tab
-    And I click the add participant button
-    And I click on the "Manager" tui checkbox
-    And I click on the "Peer" tui checkbox
-    And I click on the "Mentor" tui checkbox
+    And I click on "Add participants" "button"
+    And I click on "Manager" tui "checkbox"
+    And I click on "Peer" tui "checkbox"
+    And I click on "Mentor" tui "checkbox"
     And I click on "Done" "button"
     And I close the tui notification toast
 
@@ -72,19 +72,19 @@ Feature: Perform activity notifications - manual relationships
 
     And I switch to "Notifications" tui tab
     And I toggle the "Participant selection" tui collapsible
-    And I click on the "Participant selection notification" tui toggle button
+    And I click on "Participant selection notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "Participant selection" tui "collapsible"
     And I click on "Appraiser" tui "toggle_button" in the "Participant selection" tui "collapsible"
     And I click on "Manager" tui "toggle_button" in the "Participant selection" tui "collapsible"
     # Also activate the instance creation notification.
     And I toggle the "Participant instance creation" tui collapsible
-    And I click on the "Participant instance creation notification" tui toggle button
+    And I click on "Participant instance creation notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
     And I click on "Appraiser" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
     And I click on "Peer" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
     And I click on "Mentor" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
 
-    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
     And I trigger cron
@@ -113,7 +113,7 @@ Feature: Perform activity notifications - manual relationships
     # Click the "select participants" link in the notification message
     # Then you should see the select participants page
     When I navigate to the outstanding perform activities list page
-    And I click on "Select participants" "link" in the ".tui-actionCard" "css_element"
+    And I click on "Select participants" tui "link_or_button" in the "You must select participants" tui "action_card"
     When I select from the tui taglist in the ".tui-formRow" "css_element":
       | Appra Iser |
     And I click on "Save" "button"
@@ -127,7 +127,7 @@ Feature: Perform activity notifications - manual relationships
     And I should see "Pasirinkite dalyvius" exactly "1" times
     # TODO: Fix the behat steps as follows in TL-25417
     When I navigate to the outstanding perform activities list page
-    And I click on "Select participants" "link" in the ".tui-actionCard" "css_element"
+    And I click on "Select participants" tui "link_or_button" in the "You must select participants" tui "action_card"
     When I select from the tui taglist in the ".tui-formRow" "css_element":
       | Mana Ger |
     And I click on "Save" "button"
@@ -159,22 +159,22 @@ Feature: Perform activity notifications - manual relationships
 
   Scenario: mod_perform_notification_102: External participation notification
     And I switch to "Content" tui tab
-    And I click the add participant button
-    And I click on the "External respondent" tui checkbox
+    And I click on "Add participants" "button"
+    And I click on "External respondent" tui "checkbox"
     And I click on "Done" "button"
     And I close the tui notification toast
 
     And I switch to "Notifications" tui tab
     And I toggle the "Participant instance creation" tui collapsible
-    And I click on the "Participant instance creation notification" tui toggle button
+    And I click on "Participant instance creation notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
     And I click on "External respondent" tui "toggle_button" in the "Participant instance creation" tui "collapsible"
     # Let's turn on the participant selection notification also.
     And I toggle the "Participant selection" tui collapsible
-    And I click on the "Participant selection notification" tui toggle button
+    And I click on "Participant selection notification" tui "toggle_switch"
     And I click on "Subject" tui "toggle_button" in the "Participant selection" tui "collapsible"
 
-    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal
     And I wait for the next second
     And I trigger cron
@@ -187,8 +187,8 @@ Feature: Perform activity notifications - manual relationships
     # TODO: Fix the behat steps in TL-25417
     And I should see "Wybierz uczestników" exactly "1" times
     When I navigate to the outstanding perform activities list page
-    And I follow "Select participants"
-    And I click on "Add" "button" in the ".tui-performUserActivitiesExternalUserSelector" "css_element"
+    And I click on "Select participants" tui "link_or_button" in the "You must select participants" tui "action_card"
+    And I click on "Add" tui "button" in the "External respondent" tui "form"
     And I set the following fields to these values:
       | External respondent 1's name          | External One             |
       | External respondent 1's email address | external.one@example.com |
