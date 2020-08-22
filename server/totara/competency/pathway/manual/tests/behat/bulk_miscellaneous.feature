@@ -40,11 +40,8 @@ Feature: Test miscellaneous bulk manual rating features.
 
   Scenario: Show last rating help for another user
     Given I log in as "user3"
-    When I am on "Dashboard" page
-    And I press "Customise this page"
-    And I add the "Competencies" block
-    And I press "Stop customising this page"
-    And I click on "Rate competencies" "link" in the "Competencies" "block"
+    And I am on profile page for user "user3"
+    When I click on "Rate others' competencies" "link" in the ".block_totara_user_profile_category_development" "css_element"
 
     Then I should see "Rate competencies" in the "#page h2" "css_element"
     Then I should see "Last rated"
@@ -72,11 +69,8 @@ Feature: Test miscellaneous bulk manual rating features.
 
   Scenario: Show the last rating made for a user
     When I log in as "user2"
-    And I am on "Dashboard" page
-    And I press "Customise this page"
-    And I add the "Competencies" block
-    And I press "Stop customising this page"
-    And I click on "Rate competencies" "link" in the "Competencies" "block"
+    Given I am on profile page for user "user2"
+    And I click on "Rate others' competencies" "link" in the ".block_totara_user_profile_category_development" "css_element"
     Then I should not see "January 2020"
     Given the following "manual ratings" exist in "totara_competency" plugin:
       | competency | subject_user | rater_user | role      | scale_value | date       |

@@ -40,11 +40,8 @@ Feature: Test filtering by users, roles, assignments etc. functions as expected.
     And I log in as "rater"
 
   Scenario: View team list and filter the users
-    When I am on "Dashboard" page
-    And I press "Customise this page"
-    And I add the "Competencies" block
-    And I press "Stop customising this page"
-    When I click on "Rate competencies" "link" in the "Competencies" "block"
+    Given I am on profile page for user "rater"
+    When I click on "Rate others' competencies" "link" in the ".block_totara_user_profile_category_development" "css_element"
 
     Then I should see "Rate competencies" in the "#page h2" "css_element"
     And I should see "User 1-One" in the "//div[@class='tui-dataTableRow'][1]" "xpath_element"

@@ -313,6 +313,7 @@ $string['proficient'] = 'Proficient';
 $string['proficient_level'] = 'Proficient level';
 $string['proficient_on'] = 'Proficient {$a}';
 $string['progress_name_by_user'] = '{$a->progress_name} by {$a->user_fullname_role}';
+$string['rate_others_competencies'] = 'Rate others\' competencies';
 $string['rating_none'] = 'None';
 $string['rating_scale'] = 'Rating scale';
 $string['rating_scale_help'] = 'Show information about the rating scale';

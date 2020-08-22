@@ -23,6 +23,7 @@
 
 use core_user\output\myprofile\node;
 use core_user\output\myprofile\tree;
+use pathway_manual\models\roles;
 use totara_competency\helpers\capability_helper;
 use totara_core\advanced_feature;
 
@@ -45,15 +46,29 @@ function totara_competency_myprofile_navigation(tree $tree, $user, $this_user, $
 
     $can_view = capability_helper::can_view_profile($user->id);
 
-    $can_view && $tree->add_node(
-        new node(
-            'miscellaneous',
-            'competency_profile',
-            get_string('competency_profile', 'totara_competency'),
-            null,
-            new moodle_url('/totara/competency/profile/index.php', $this_user ? [] : ['user_id' => $user->id])
-        )
-    );
+    if ($can_view) {
+        $tree->add_node(
+            new node(
+                'development',
+                'competency_profile',
+                get_string('competency_profile', 'totara_competency'),
+                null,
+                new moodle_url('/totara/competency/profile/index.php', $this_user ? [] : ['user_id' => $user->id])
+            )
+        );
+    }
+
+    if ($this_user && !empty(roles::get_current_user_roles_for_any())) {
+        $tree->add_node(
+            new node(
+                'development',
+                'rate_others_competencies',
+                get_string('rate_others_competencies', 'totara_competency'),
+                null,
+                new moodle_url('/totara/competency/rate_users.php')
+            )
+        );
+    }
 
     return true;
 }

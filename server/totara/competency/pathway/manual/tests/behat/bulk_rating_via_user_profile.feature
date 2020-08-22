@@ -1,5 +1,5 @@
 @totara @perform @totara_competency @pathway_manual @javascript @vuejs
-Feature: Test rating a competency for a user as different roles via the competencies dashboard block.
+Feature: Test rating a competency for a user as different roles via the rate competencies user profile link.
   Ensures that the basic navigation workflow can be followed.
 
   Background:
@@ -31,11 +31,8 @@ Feature: Test rating a competency for a user as different roles via the competen
 
   Scenario: As a manager, make a rating for a user via the competencies block
     Given I log in as "user2"
-    When I am on "Dashboard" page
-    And I press "Customise this page"
-    And I add the "Competencies" block
-    And I press "Stop customising this page"
-    And I click on "Rate competencies" "link" in the "Competencies" "block"
+    And I am on profile page for user "user2"
+    When I click on "Rate others' competencies" "link" in the ".block_totara_user_profile_category_development" "css_element"
     Then I should see "Rate competencies" in the "#page h2" "css_element"
     And I should see "Rating as a manager"
     When I click on "User One" "link"
@@ -54,11 +51,8 @@ Feature: Test rating a competency for a user as different roles via the competen
 
   Scenario: As an appraiser, make a rating for a user via the competencies block
     Given I log in as "user3"
-    When I am on "Dashboard" page
-    And I press "Customise this page"
-    And I add the "Competencies" block
-    And I press "Stop customising this page"
-    And I click on "Rate competencies" "link" in the "Competencies" "block"
+    And I am on profile page for user "user3"
+    When I click on "Rate others' competencies" "link" in the ".block_totara_user_profile_category_development" "css_element"
     Then I should see "Rate competencies" in the "#page h2" "css_element"
     And I should see "Rating as an appraiser"
     When I click on "User One" "link"
