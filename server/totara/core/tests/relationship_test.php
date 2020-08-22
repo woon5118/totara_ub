@@ -245,7 +245,7 @@ class totara_core_relationship_testcase extends advanced_testcase {
             'input_field_two' => $dummy_id,
         ];
 
-        $relationship_resolver_dtos = $relationship->get_users($input);
+        $relationship_resolver_dtos = $relationship->get_users($input, context_system::instance());
         $this->assertEquals([$dummy_id], [$relationship_resolver_dtos[0]->get_user_id()]);
     }
 

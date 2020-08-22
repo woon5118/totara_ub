@@ -24,6 +24,7 @@
 namespace totara_core\relationship;
 
 use coding_exception;
+use context;
 
 /**
  * Abstract class relationship_resolver.
@@ -131,25 +132,26 @@ abstract class relationship_resolver {
      * Get the list of users.
      *
      * @param array $data containing the fields specified by {@see get_accepted_fields}
+     * @param context $context
      * @return relationship_resolver_dto[]
      */
-    abstract protected function get_data(array $data): array;
+    abstract protected function get_data(array $data, context $context): array;
 
     /**
      * Validate the input and get the list of users.
      *
      * @param array $data containing the fields specified by {@see get_accepted_fields}
+     * @param context $context
      * @return relationship_resolver_dto[]
-     * @throws coding_exception
      */
-    final public function get_users(array $data): array {
+    final public function get_users(array $data, context $context): array {
         global $CFG;
         if ($CFG->debugdeveloper) {
             // Don't validate the input on production sites for better performance.
             static::validate_input(array_keys($data));
         }
 
-        $relationship_resolver_dtos = $this->get_data($data);
+        $relationship_resolver_dtos = $this->get_data($data, $context);
 
         if ($CFG->debugdeveloper) {
             //validate get_data() returns an array consisting only of dtos

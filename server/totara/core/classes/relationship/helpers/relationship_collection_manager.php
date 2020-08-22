@@ -24,6 +24,9 @@
 namespace totara_core\relationship\helpers;
 
 use coding_exception;
+use context;
+use context_system;
+use context_user;
 use core\collection;
 use totara_core\entities\relationship as relationship_entity;
 use totara_core\relationship\relationship;
@@ -43,15 +46,22 @@ class relationship_collection_manager {
      */
     private $relationships = [];
 
+    /** @var context|null */
+    private $context;
+
     /**
      * Loads a list of relationships that can be used to get users.
      *
      * @param int[]|relationship[]|collection $relationships
+     * @param context|null $context pass optional context as a fall back if relationship cannot determine it's own
+     * @throws coding_exception
      */
-    public function __construct($relationships) {
+    public function __construct($relationships, ?context $context = null) {
         if (empty($relationships)) {
             throw new coding_exception('Relationships required.');
         }
+
+        $this->context = $context;
 
         if ($relationships instanceof collection) {
             // Collection of relationship models
@@ -80,8 +90,9 @@ class relationship_collection_manager {
      * Provides the list of users for each relationship in the relationship_id list provided.
      *
      * @param array $args Relationship input values to provide to {@see relationship::get_users}
-     * @param array $relationship_ids (Optional) Resolve only a sub-selection of the specified relationships.
+     * @param array|null $relationship_ids (Optional) Resolve only a sub-selection of the specified relationships.
      * @return array|relationship_resolver_dto[]
+     * @throws coding_exception
      */
     public function get_users_for_relationships(array $args, array $relationship_ids = null): array {
         if ($relationship_ids === null) {
@@ -93,7 +104,20 @@ class relationship_collection_manager {
             if (!isset($this->relationships[$relationship_id])) {
                 throw new coding_exception('Relationship ID not loaded.');
             }
-            $users_per_relationship[$relationship_id] = $this->relationships[$relationship_id]->get_users($args);
+            // As this class deals with multiple users it tries to determine it's
+            // own contexts per relationship unless a context was provided.
+            if ($this->context) {
+                $context = $this->context;
+            } else {
+                $context = $args['user_id']
+                    ? context_user::instance($args['user_id'])
+                    : context_system::instance();
+            }
+
+            $users_per_relationship[$relationship_id] = $this->relationships[$relationship_id]->get_users(
+                $args,
+                $context
+            );
         }
 
         return $users_per_relationship;

@@ -37,7 +37,10 @@ class relationship_resolver_reviewer_testcase extends perform_relationship_resol
         [$user1, $subject_instance] = $this->create_relationship_resolver_data(constants::RELATIONSHIP_REVIEWER);
 
         $reviewer_resolver = relationship::load_by_idnumber(constants::RELATIONSHIP_REVIEWER);
-        $relationship_resolver_dtos = $reviewer_resolver->get_users(['subject_instance_id' => $subject_instance->id]);
+        $relationship_resolver_dtos = $reviewer_resolver->get_users(
+            ['subject_instance_id' => $subject_instance->id],
+            context_user::instance($subject_instance->subject_user_id)
+        );
 
         $this->assertEquals([$user1->id], [$relationship_resolver_dtos[0]->get_user_id()]);
     }
@@ -47,7 +50,8 @@ class relationship_resolver_reviewer_testcase extends perform_relationship_resol
 
         $reviewer_resolver = relationship::load_by_idnumber(constants::RELATIONSHIP_REVIEWER);
         $relationship_resolver_dtos = $reviewer_resolver->get_users(
-            ['subject_instance_id' => $subject_instance->id, 'user_id' => $user1->id]
+            ['subject_instance_id' => $subject_instance->id, 'user_id' => $user1->id],
+            context_user::instance($user1->id)
         );
 
         $this->assertEquals([$user1->id], [$relationship_resolver_dtos[0]->get_user_id()]);

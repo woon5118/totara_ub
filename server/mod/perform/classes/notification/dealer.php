@@ -24,6 +24,7 @@
 namespace mod_perform\notification;
 
 use coding_exception;
+use context_user;
 use core\message\message;
 use core\orm\collection;
 use core_user;
@@ -111,7 +112,8 @@ class dealer {
                 continue;
             }
             $user_dtos = $relationship->get_users(
-                ['user_id' => $this->user_id, 'job_assignment_id' => $this->job_assignment_id]
+                ['user_id' => $this->user_id, 'job_assignment_id' => $this->job_assignment_id],
+                context_user::instance($this->user_id)
             );
             if (empty($user_dtos)) {
                 continue;

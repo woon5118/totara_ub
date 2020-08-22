@@ -23,6 +23,7 @@
 
 namespace totara_core\relationship\resolvers;
 
+use context;
 use totara_core\relationship\relationship_resolver;
 use totara_core\relationship\relationship_resolver_dto;
 
@@ -62,12 +63,9 @@ class subject extends relationship_resolver {
     }
 
     /**
-     * Return the specified user(s).
-     *
-     * @param array
-     * @return relationship_resolver_dto[]
+     * @inheritDoc
      */
-    protected function get_data(array $data): array {
+    protected function get_data(array $data, context $context): array {
         $dto = new relationship_resolver_dto($data['user_id']);
 
         return [$dto];

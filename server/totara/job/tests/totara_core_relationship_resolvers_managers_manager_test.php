@@ -21,6 +21,7 @@
  * @package totara_job
  */
 
+use core\entities\tenant;
 use totara_core\relationship\relationship;
 use totara_core\relationship\relationship_resolver_dto;
 use totara_job\job_assignment;
@@ -93,14 +94,20 @@ class totara_job_totara_core_relationship_resolvers_managers_manager_test extend
         $data = $this->create_data();
 
         // Managersmanager1 is the manager's manager of user1 in ja1.
-        $relationship_resolver_dtos = $data->resolver->get_users(['job_assignment_id' => $data->user1_ja1->id]);
+        $relationship_resolver_dtos = $data->resolver->get_users(
+            ['job_assignment_id' => $data->user1_ja1->id],
+            context_user::instance($data->user1->id)
+        );
         $this->assertEquals(
             [$data->managersmanager1->id],
             relationship_resolver_dto::get_user_ids($relationship_resolver_dtos)
         );
 
         // Managersmanager3 is the manager's manager of user1 in ja2.
-        $relationship_resolver_dtos = $data->resolver->get_users(['job_assignment_id' => $data->user1_ja2->id]);
+        $relationship_resolver_dtos = $data->resolver->get_users(
+            ['job_assignment_id' => $data->user1_ja2->id],
+            context_user::instance($data->user1->id)
+        );
         $this->assertEquals(
             [$data->managersmanager3->id],
             relationship_resolver_dto::get_user_ids($relationship_resolver_dtos)
@@ -109,13 +116,19 @@ class totara_job_totara_core_relationship_resolvers_managers_manager_test extend
         // User2 is not managed by anyone (they have no manager).
         $this->assertEquals(
             [],
-            $data->resolver->get_users(['job_assignment_id' => $data->user2_ja1->id])
+            $data->resolver->get_users(
+                ['job_assignment_id' => $data->user2_ja1->id],
+                context_user::instance($data->user2->id)
+            )
         );
 
         // User3 is not manager's managed by anyone (they have a manager, but no manager's manager).
         $this->assertEquals(
             [],
-            $data->resolver->get_users(['job_assignment_id' => $data->user3_ja1->id])
+            $data->resolver->get_users(
+                ['job_assignment_id' => $data->user3_ja1->id],
+                context_user::instance($data->user3->id)
+            )
         );
     }
 
@@ -123,7 +136,10 @@ class totara_job_totara_core_relationship_resolvers_managers_manager_test extend
         $data = $this->create_data();
 
         // User1 has two manager's managers.
-        $relationship_resolver_dtos = $data->resolver->get_users(['user_id' => $data->user1->id]);
+        $relationship_resolver_dtos = $data->resolver->get_users(
+            ['user_id' => $data->user1->id],
+            context_user::instance($data->user1->id)
+        );
         $this->assertEqualsCanonicalizing(
             [$data->managersmanager1->id, $data->managersmanager3->id],
             relationship_resolver_dto::get_user_ids($relationship_resolver_dtos)
@@ -132,31 +148,55 @@ class totara_job_totara_core_relationship_resolvers_managers_manager_test extend
         // User2 is not managed by anyone (they have no manager).
         $this->assertEquals(
             [],
-            $data->resolver->get_users(['user_id' => $data->user2->id])
+            $data->resolver->get_users(
+                ['user_id' => $data->user2->id],
+                context_user::instance($data->user2->id)
+            )
         );
 
         // User3 is not manager's managed by anyone (they have a manager, but no manager's manager).
         $this->assertEquals(
             [],
-            $data->resolver->get_users(['user_id' => $data->user3->id])
+            $data->resolver->get_users(
+                ['user_id' => $data->user3->id],
+                context_user::instance($data->user3->id)
+            )
         );
     }
 
     public function test_get_users_with_incorrect_attributes(): void {
         $data = $this->create_data();
 
-        $data->resolver->get_users(['job_assignment_id' => -1]);
-        $data->resolver->get_users(['user_id' => -1]);
-        $data->resolver->get_users(['job_assignment_id' => -1, 'user_id' => -1]);
-        $data->resolver->get_users(['job_assignment_id' => -1, 'incorrect attribute' => -1]);
-        $data->resolver->get_users(['user_id' => -1, 'incorrect attribute' => -1]);
+        $data->resolver->get_users(
+            ['job_assignment_id' => -1],
+            context_user::instance($data->user1->id)
+        );
+        $data->resolver->get_users(
+            ['user_id' => -1],
+            context_user::instance($data->user1->id)
+        );
+        $data->resolver->get_users(
+            ['job_assignment_id' => -1, 'user_id' => -1],
+            context_user::instance($data->user1->id)
+        );
+        $data->resolver->get_users(
+            ['job_assignment_id' => -1, 'incorrect attribute' => -1],
+            context_user::instance($data->user1->id)
+        );
+        $data->resolver->get_users(
+            ['user_id' => -1, 'incorrect attribute' => -1],
+            context_user::instance($data->user1->id)
+        );
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage(
             'The fields inputted into the ' . managers_manager::class . ' relationship resolver are invalid'
         );
 
-        $data->resolver->get_users(['incorrect attribute' => -1]);
+        $data->resolver->get_users(
+            ['incorrect attribute' => -1],
+            context_user::instance($data->user1->id)
+        );
     }
 
     public function test_get_users_with_no_attributes(): void {
@@ -167,7 +207,136 @@ class totara_job_totara_core_relationship_resolvers_managers_manager_test extend
             'The fields inputted into the ' . managers_manager::class . ' relationship resolver are invalid'
         );
 
-        $data->resolver->get_users([]);
+        $data->resolver->get_users(
+            [],
+            context_user::instance($data->user1->id)
+        );
+    }
+
+    public function test_get_users_with_multi_tenancy_enabled(): void {
+        $generator = $this->getDataGenerator();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+
+        $tenant_generator->enable_tenants();
+
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        $tenant1 = new tenant($tenant1);
+        $tenant2 = new tenant($tenant2);
+
+        $user1 = self::getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $user2 = self::getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $user2_manager = self::getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $user3 = self::getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $user3_manager = self::getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $system_user = self::getDataGenerator()->create_user();
+        $system_user_manager = self::getDataGenerator()->create_user();
+
+        $user2managerja = job_assignment::create_default($user2_manager->id);
+        $user3managerja = job_assignment::create_default($user3_manager->id);
+        $system_user_manager_ja = job_assignment::create_default($system_user_manager->id);
+
+        $user2ja = job_assignment::create_default($user2->id, ['managerjaid' => $user2managerja->id]);
+        $user3ja = job_assignment::create_default($user3->id, ['managerjaid' => $user3managerja->id]);
+        $system_user_ja = job_assignment::create_default($system_user->id, ['managerjaid' => $system_user_manager_ja->id]);
+
+        job_assignment::create_default($user1->id, ['managerjaid' => $user2ja->id]);
+        job_assignment::create_default($user1->id, ['managerjaid' => $user3ja->id]);
+
+        $relationship = relationship::load_by_idnumber('managers_manager');
+        $manager_resolver = new managers_manager($relationship);
+
+        $users = $manager_resolver->get_users(
+            ['user_id' => $user1->id],
+            context_user::instance($user1->id)
+        );
+
+        $this->assertCount(1, $users);
+        $dto = $users[0];
+        $this->assertEquals($user2_manager->id, $dto->get_user_id());
+
+        // If we pass the system context we should also get the manager from the other tenant
+        $users = $manager_resolver->get_users(
+            ['user_id' => $user1->id],
+            context_system::instance()
+        );
+
+        $this->assertCount(2, $users);
+        $actual_user_ids = [];
+        foreach ($users as $user) {
+            $actual_user_ids[] = $user->get_user_id();
+        }
+        $this->assertEqualsCanonicalizing(
+            [$user2_manager->id, $user3_manager->id],
+            $actual_user_ids
+        );
+
+        // Assign a manager who is in the system context
+        job_assignment::create_default($user1->id, ['managerjaid' => $system_user_ja->id]);
+
+        // We should still get only the ones in the same tenant if we pass a context which is in a tenant
+        $users = $manager_resolver->get_users(
+            ['user_id' => $user1->id],
+            context_user::instance($user1->id)
+        );
+
+        $this->assertCount(1, $users);
+        $dto = $users[0];
+        $this->assertEquals($user2_manager->id, $dto->get_user_id());
+
+        // If we pass the system context we should also get the system user
+        $users = $manager_resolver->get_users(
+            ['user_id' => $user1->id],
+            context_system::instance()
+        );
+
+        $this->assertCount(3, $users);
+        $actual_user_ids = [];
+        foreach ($users as $user) {
+            $actual_user_ids[] = $user->get_user_id();
+        }
+        $this->assertEqualsCanonicalizing(
+            [$user2_manager->id, $user3_manager->id, $system_user_manager->id],
+            $actual_user_ids
+        );
+
+        // Now with tenant isolation mode on
+        set_config('tenantsisolated', 1);
+
+        // If checked in system context we should only get NON-tenant users
+        $users = $manager_resolver->get_users(
+            ['user_id' => $user1->id],
+            context_system::instance()
+        );
+
+        $this->assertCount(1, $users);
+        $actual_user_ids = [];
+        foreach ($users as $user) {
+            $actual_user_ids[] = $user->get_user_id();
+        }
+        $this->assertEqualsCanonicalizing(
+            [$system_user_manager->id],
+            $actual_user_ids
+        );
+
+        // If inside a tenant we should get only tenant users
+        $users = $manager_resolver->get_users(
+            ['user_id' => $user1->id],
+            context_user::instance($user1->id)
+        );
+
+        $this->assertCount(1, $users);
+        $actual_user_ids = [];
+        foreach ($users as $user) {
+            $actual_user_ids[] = $user->get_user_id();
+        }
+        $this->assertEqualsCanonicalizing(
+            [$user2_manager->id],
+            $actual_user_ids
+        );
     }
 
 }

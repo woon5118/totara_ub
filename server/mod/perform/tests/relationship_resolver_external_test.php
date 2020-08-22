@@ -36,7 +36,10 @@ class relationship_resolver_external_testcase extends perform_relationship_resol
         [$user1, $subject_instance] = $this->create_relationship_resolver_data(constants::RELATIONSHIP_EXTERNAL);
 
         $external_resolver = relationship::load_by_idnumber(constants::RELATIONSHIP_EXTERNAL);
-        $relationship_resolver_dtos = $external_resolver->get_users(['subject_instance_id' => $subject_instance->id]);
+        $relationship_resolver_dtos = $external_resolver->get_users(
+            ['subject_instance_id' => $subject_instance->id],
+            context_user::instance($subject_instance->subject_user_id)
+        );
 
         $this->assertEquals($user1->email, $relationship_resolver_dtos[0]->get_meta()['email']);
         $this->assertEquals($user1->username, $relationship_resolver_dtos[0]->get_meta()['name']);

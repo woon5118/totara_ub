@@ -24,6 +24,7 @@
 namespace totara_core\relationship;
 
 use coding_exception;
+use context;
 use core\orm\entity\model;
 use core\orm\query\builder;
 use core_component;
@@ -138,14 +139,14 @@ final class relationship extends model {
      * Get the users from the given raw data.
      *
      * @param array $data e.g. ['job_assignment_id' => 2]
-     *
+     * @param context $context
      * @return relationship_resolver_dto[]
      */
-    public function get_users(array $data): array {
+    public function get_users(array $data, context $context): array {
         /** @var relationship_resolver_dto[] $relationship_resolver_dtos */
         $relationship_resolver_dtos = [];
         foreach ($this->get_resolvers() as $relationship_resolver) {
-            $relationship_resolver_dtos[] = $relationship_resolver->get_users($data);
+            $relationship_resolver_dtos[] = $relationship_resolver->get_users($data, $context);
         }
         // NOTE: It is possible for a relationship to return duplicate user_ids if there are multiple resolvers.
         // The resolvers themselves should always return unique user_ids, so it is not a problem for now.
@@ -173,8 +174,8 @@ final class relationship extends model {
      * @param string[] $resolver_class_names Array of relationship resolver class names, e.g. [subject::class, manager::class]
      * @param string $idnumber Unique string identifier for this relationship.
      * @param int $sort_order
-     * @param int $type Optional type identifier - defaults to standard type.
-     * @param string $component Plugin that the relationship is exclusive to. Defaults to being available for all.
+     * @param int|null $type Optional type identifier - defaults to standard type.
+     * @param string|null $component Plugin that the relationship is exclusive to. Defaults to being available for all.
      * @return relationship
      */
     public static function create(

@@ -23,6 +23,9 @@
 
 namespace totara_job\relationship\resolvers;
 
+use context;
+use core\orm\entity\repository;
+use core\tenant_orm_helper;
 use totara_core\relationship\relationship_resolver;
 use totara_core\relationship\relationship_resolver_dto;
 use totara_job\entities\job_assignment;
@@ -58,12 +61,9 @@ class manager extends relationship_resolver {
     }
 
     /**
-     * Get the list of managers.
-     *
-     * @param array $data containing the fields specified by {@see get_accepted_fields}
-     * @return relationship_resolver_dto[]
+     * @inheritDoc
      */
-    protected function get_data(array $data): array {
+    protected function get_data(array $data, context $context): array {
         $repository = job_assignment::repository();
 
         if (!empty($data['job_assignment_id'])) {
@@ -76,6 +76,13 @@ class manager extends relationship_resolver {
             ->select_raw('DISTINCT manager_job.userid')
             ->join([job_assignment::TABLE, 'manager_job'], 'managerjaid', 'id')
             ->where_not_null('manager_job.userid')
+            ->when(true, function (repository $repository) use ($context) {
+                tenant_orm_helper::restrict_users(
+                    $repository,
+                    'manager_job.userid',
+                    $context
+                );
+            })
             ->get()
             ->map(
                 function ($item) {

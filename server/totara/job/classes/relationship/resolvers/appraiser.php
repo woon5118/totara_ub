@@ -23,6 +23,10 @@
 
 namespace totara_job\relationship\resolvers;
 
+use context;
+use core\orm\entity\repository;
+use core\orm\query\field;
+use core\tenant_orm_helper;
 use totara_core\relationship\relationship_resolver;
 use totara_core\relationship\relationship_resolver_dto;
 use totara_job\entities\job_assignment;
@@ -58,12 +62,9 @@ class appraiser extends relationship_resolver {
     }
 
     /**
-     * Get the list of appraisers.
-     *
-     * @param array $data containing the fields specified by {@see get_accepted_fields}
-     * @return relationship_resolver_dto[]
+     * @inheritDoc
      */
-    protected function get_data(array $data): array {
+    protected function get_data(array $data, context $context): array {
         $repository = job_assignment::repository();
 
         if (!empty($data['job_assignment_id'])) {
@@ -75,6 +76,13 @@ class appraiser extends relationship_resolver {
         return $repository
             ->select_raw('DISTINCT appraiserid')
             ->where_not_null('appraiserid')
+            ->when(true, function (repository $repository) use ($context) {
+                tenant_orm_helper::restrict_users(
+                    $repository,
+                    new field('appraiserid', $repository->get_builder()),
+                    $context
+                );
+            })
             ->get()
             ->map(
                 function ($item) {

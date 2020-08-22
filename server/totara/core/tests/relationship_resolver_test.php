@@ -131,7 +131,7 @@ class test_resolver_one extends relationship_resolver {
     public static function get_name_plural(): string {
         return 'resolver_ones';
     }
-    protected function get_data(array $data): array {
+    protected function get_data(array $data, context $context): array {
         return [new relationship_resolver_dto($data['input_field_one'])];
     }
     public static function get_accepted_fields(): array {
@@ -145,7 +145,7 @@ class test_resolver_two extends relationship_resolver {
     public static function get_name_plural(): string {
         return 'resolver_twos';
     }
-    protected function get_data(array $data): array {
+    protected function get_data(array $data, context $context): array {
         return [new relationship_resolver_dto($data['input_field_two'])];
     }
     public static function get_accepted_fields(): array {
@@ -167,7 +167,7 @@ class test_resolver_four extends relationship_resolver {
     public static function get_name_plural(): string {
         return 'resolver_fours';
     }
-    protected function get_data(array $data): array {
+    protected function get_data(array $data, context $context): array {
         return [new relationship_resolver_dto($data)];
     }
     public static function get_accepted_fields(): array {
@@ -184,7 +184,7 @@ class test_resolver_five extends test_resolver_one {
     public static function get_name_plural(): string {
         return 'resolver_fives';
     }
-    protected function get_data(array $data): array {
+    protected function get_data(array $data, context $context): array {
         $relationship_resolver_dto = null;
         if (isset($data['input_field_one'])) {
             $relationship_resolver_dto = new relationship_resolver_dto($data['input_field_one']);

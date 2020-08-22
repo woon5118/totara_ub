@@ -205,9 +205,8 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
                 /** @var core_relationship_model $core_relationship */
                 $core_relationship = $section_relationship->get_core_relationship();
                 $participants = $core_relationship->get_users(
-                    [
-                        'user_id' => $subject_instance->subject_user_id,
-                    ]
+                    [ 'user_id' => $subject_instance->subject_user_id ],
+                    context_user::instance($subject_instance->subject_user_id)
                 );
 
                 foreach ($participants as $participant) {

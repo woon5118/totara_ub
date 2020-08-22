@@ -23,6 +23,7 @@
 
 namespace mod_perform\relationship\resolvers;
 
+use context;
 use mod_perform\entities\activity\subject_instance_manual_participant;
 use totara_core\relationship\relationship_resolver;
 use totara_core\relationship\relationship_resolver_dto;
@@ -64,9 +65,10 @@ class external extends relationship_resolver {
      * Returns simple objects that have a name and email attribute.
      *
      * @param array $data
+     * @param context $context
      * @return relationship_resolver_dto[]
      */
-    protected function get_data(array $data): array {
+    protected function get_data(array $data, context $context): array {
         return subject_instance_manual_participant::repository()
             ->select(['name', 'email'])
             ->where('subject_instance_id', $data['subject_instance_id'])
