@@ -23,7 +23,9 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
       <div
         class="tui-competencyRatingScaleOverview__proficientStatus"
       >
-        <!---->
+        <checksuccess-stub
+          size="200"
+        />
       </div>
        
       <div
@@ -60,7 +62,9 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
       <div
         class="tui-competencyRatingScaleOverview__proficientStatus"
       >
-        <!---->
+        <checksuccess-stub
+          size="200"
+        />
       </div>
        
       <div
@@ -97,7 +101,9 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
       <div
         class="tui-competencyRatingScaleOverview__proficientStatus"
       >
-        <!---->
+        <checksuccess-stub
+          size="200"
+        />
       </div>
        
       <div
@@ -133,7 +139,7 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - with descriptions:
         class="tui-competencyRatingScaleOverview__proficientStatus"
       >
         <checksuccess-stub
-          size="300"
+          size="200"
         />
       </div>
        
@@ -260,7 +266,9 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
       <div
         class="tui-competencyRatingScaleOverview__proficientStatus"
       >
-        <!---->
+        <checksuccess-stub
+          size="200"
+        />
       </div>
        
       <div
@@ -291,7 +299,9 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
       <div
         class="tui-competencyRatingScaleOverview__proficientStatus"
       >
-        <!---->
+        <checksuccess-stub
+          size="200"
+        />
       </div>
        
       <div
@@ -322,7 +332,9 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
       <div
         class="tui-competencyRatingScaleOverview__proficientStatus"
       >
-        <!---->
+        <checksuccess-stub
+          size="200"
+        />
       </div>
        
       <div
@@ -354,7 +366,7 @@ exports[`components/RatingScaleOverview.vue Checks snapshot - without descriptio
         class="tui-competencyRatingScaleOverview__proficientStatus"
       >
         <checksuccess-stub
-          size="300"
+          size="200"
         />
       </div>
        

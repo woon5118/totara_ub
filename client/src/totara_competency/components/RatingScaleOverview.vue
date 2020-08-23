@@ -34,7 +34,7 @@
         class="tui-competencyRatingScaleOverview__list-item"
       >
         <div class="tui-competencyRatingScaleOverview__proficientStatus">
-          <CheckSuccess v-if="isMinProficientValue(scaleValue)" size="300" />
+          <CheckSuccess v-if="scaleValue.proficient" size="200" />
         </div>
         <div class="tui-competencyRatingScaleOverview__scaleValue">
           <p class="tui-competencyRatingScaleOverview__scaleValue-name">
@@ -90,17 +90,6 @@ export default {
         return this.scale.values;
       }
     },
-
-    /**
-     * Get the scale value that is the minimum required for the competency to be proficient.
-     * @returns {Object}
-     */
-    minProficientValue() {
-      return this.scaleValues
-        .slice(0)
-        .reverse()
-        .find(({ proficient }) => proficient);
-    },
   },
 
   methods: {
@@ -113,20 +102,6 @@ export default {
       return (
         this.showDescriptions && description != null && description.length > 0
       );
-    },
-
-    /**
-     * Is the specified value the minimum needed to be proficient?
-     * Used to show the tick box.
-     * @param {Object} value
-     * @returns {boolean}
-     */
-    isMinProficientValue(value) {
-      if (!this.minProficientValue) {
-        return false;
-      }
-
-      return this.minProficientValue.id === value.id;
     },
   },
 };

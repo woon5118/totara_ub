@@ -19,25 +19,29 @@
 <style lang="scss">
 .tui-competencyRatingScaleOverview {
   &__title {
+    margin: 0;
     @include tui-font-heading-x-small;
-    margin-top: 0;
-    margin-bottom: var(--tui-gap-2);
   }
 
   &__list {
-    margin: 0;
+    margin: var(--tui-gap-4) 0 0;
+
+    & > * + * {
+      margin-top: var(--tui-gap-2);
+    }
 
     &-item {
       display: flex;
-
-      &:not(:last-child) {
-        padding-bottom: var(--tui-gap-2);
-      }
     }
   }
 
   &__proficientStatus {
     min-width: var(--tui-gap-8);
+
+    .flex-icon {
+      position: relative;
+      top: -1px;
+    }
   }
 
   &__scaleValue {
@@ -50,8 +54,7 @@
     }
 
     &-description {
-      padding-top: var(--tui-gap-1);
-      padding-left: var(--tui-gap-3);
+      margin: var(--tui-gap-1) 0 0 var(--tui-gap-3);
     }
   }
 }
