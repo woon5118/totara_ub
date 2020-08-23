@@ -1373,6 +1373,10 @@ class core_plugin_manager {
                 'weka'
             ),
 
+            'engage' => array(
+                'article', 'survey',
+            ),
+
             'enrol' => array(
                 'category', 'cohort', 'database', 'flatfile',
                 'guest', 'imsenterprise', 'ldap', 'lti', 'manual', 'meta', 'mnet',
