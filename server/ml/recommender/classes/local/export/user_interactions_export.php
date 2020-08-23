@@ -40,14 +40,28 @@ class user_interactions_export extends export {
         $min_timestamp = time() - (environment::get_interactions_period() * 7 * 86400);
 
         // Build sql.
-        $components = ['engage_article', 'totara_playlist'];
+        $components = ['engage_article', 'totara_playlist', 'container_workspace'];
         list($componentinorequal, $params) = $DB->get_in_or_equal($components);
 
+        // Interactions with Engage content.
         $sql = '
             SELECT user_id, item_id, component, MAX(time_created) AS mytimestamp, SUM(rating) AS myrating
             FROM {ml_recommender_interactions}';
         $sql .= ' WHERE component ' . $componentinorequal . ' AND time_created >= ' . $min_timestamp . ' ';
-        $sql .= 'GROUP BY user_id, item_id, component ORDER BY user_id, item_id, component, mytimestamp, myrating ASC';
+        $sql .= 'GROUP BY user_id, item_id, component';
+
+        // Interactions with self-enrol courses.
+        $self_enrol_positive_rating = 2;
+        $sql .= "
+            UNION ALL
+            SELECT ue.userid AS user_id,
+                e.courseid AS item_id,
+                'container_course' AS component,
+                ue.timecreated AS mytimestamp,
+                " . $self_enrol_positive_rating . " AS myrating
+            FROM {user_enrolments} ue
+            JOIN {enrol} e ON (ue.enrolid = e.id)
+            WHERE e.enrol = 'self' AND e.status = " . ENROL_USER_ACTIVE;
 
         // Set recordset cursor.
         $recordset = $DB->get_recordset_sql($sql, $params);
@@ -59,13 +73,15 @@ class user_interactions_export extends export {
         $writer->add_data([
             'user_id',
             'item_id',
-            'rating'
+            'rating',
+            'timestamp'
         ]);
 
         foreach ($recordset as $interaction) {
             // Get the mapped item and user ids.
             $user_id = $interaction->user_id;
             $item_id = $interaction->component . $interaction->item_id;
+            $timestamp = $interaction->mytimestamp;
 
             // Normalise "rating" - more than 1 interaction is positive - implicit feedback.  See:
             // Collaborative prediction and ranking with non-random missing data (Benjamin M. Marlin, Richard S. Zemel)
@@ -79,7 +95,8 @@ class user_interactions_export extends export {
             $writer->add_data([
                 $user_id,
                 $item_id,
-                $rating
+                $rating,
+                $timestamp
             ]);
         }
         $recordset->close();

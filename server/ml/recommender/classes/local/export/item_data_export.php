@@ -38,13 +38,24 @@ class item_data_export extends export {
         // Build sql.
         $unique_article_id = $DB->sql_concat("'engage_article'", 'er.id');
         $unique_playlist_id = $DB->sql_concat("'totara_playlist'", 'tp.id');
+        $unique_workspace_id = $DB->sql_concat("'container_workspace'", 'cw.id');
+        $unique_course_id = $DB->sql_concat("'container_course'", 'cc.id');
         $sql = "
-        SELECT {$unique_article_id} AS uniqueid, er.id, er.name AS title, ea.content AS content 
-        FROM {engage_resource} er 
+        SELECT {$unique_article_id} AS uniqueid, er.id, er.name AS title, ea.content AS content, ea.format as summaryformat
+        FROM {engage_resource} er
         JOIN {engage_article} ea ON er.instanceid = ea.id
+        WHERE er.resourcetype = 'engage_article'
         UNION ALL
-        SELECT {$unique_playlist_id} AS uniqueid, tp.id, tp.name AS title, tp.summary AS content 
+        SELECT {$unique_playlist_id} AS uniqueid, tp.id, tp.name AS title, tp.summary AS content, tp.summaryformat
         FROM {playlist} tp
+        UNION ALL
+        SELECT {$unique_workspace_id} AS uniqueid, cw.id, cw.fullname AS title, cw.summary AS content, cw.summaryformat
+        FROM {course} cw WHERE cw.containertype = 'container_workspace'
+        UNION ALL
+        SELECT {$unique_course_id} AS uniqueid, cc.id, cc.fullname AS title, cc.summary AS content, cc.summaryformat
+        FROM {course} cc
+        JOIN {enrol} te on cc.id = te.courseid
+        WHERE cc.containertype = 'container_course' AND te.enrol = 'self'
         ";
 
         // Set recordset cursor.
@@ -53,12 +64,29 @@ class item_data_export extends export {
             return false;
         }
 
-        // List of topics.
-        $this->get_topics();
+        // Components.
+        $component_names = [
+            'container_course',
+            'container_workspace',
+            'engage_article',
+            'totara_playlist'
+        ];
+        $component_names = $this->one_hot_components($component_names);
 
-        // Build headings -> id, [topics], document.
+        // Component names are not consistently applied in tags table - note differences here.
+        $tag_component_names = [
+            'container_course' => 'course'
+        ];
+
+        // List of topics.
+        $topics = $this->get_topics();
+
+        // Build headings -> id, [components], [topics], document.
         $headings = ['item_id'];
-        foreach ($this->topics as $key => $topic) {
+        foreach ($component_names as $component_name => $onehot) {
+            $headings[] = $component_name;
+        }
+        foreach ($topics as $key => $topic) {
             $headings[] = $topic;
         }
         $headings[] = 'document';
@@ -66,27 +94,41 @@ class item_data_export extends export {
         // Column headings for csv file.
         $writer->add_data($headings);
 
+        // Write the feature data for each item.
         foreach ($recordset as $item) {
             $cells = [$item->uniqueid];
 
-            // Reformat item content & set component name.
-            $component = 'totara_playlist';
-            if (strpos($item->uniqueid, 'engage_article') === 0) {
-                $component = 'engage_article';
-                $item->content = $this->gettext(json_decode($item->content));
+            foreach ($component_names as $component_name => $onehot) {
+                if (strpos($item->uniqueid, $component_name) === 0) {
+                    $component = $component_name;
+                    $component_onehot = $onehot;
+                    break;
+                }
             }
 
-            // Retrive topics for this item.
+            // One-hot encode component for this item.
+            foreach ($component_onehot as $id => $onehot) {
+                $cells[] = $onehot;
+            }
+
+            // Retrieve topics for this specific item.
             $resource_topics = [];
-            $select = 'itemid = ? and component = ?';
-            $this_item_topics = $DB->get_fieldset_select('tag_instance', 'tagid', $select, [$item->id, $component]);
+            if (isset($tag_component_names[$component])) {
+                $select = 'itemid = ? and itemtype = ?';
+                $this_item_topics = $DB->get_fieldset_select('tag_instance', 'tagid', $select, [$item->id, $tag_component_names[$component]]);
+            } else {
+                $select = 'itemid = ? and component = ?';
+                $this_item_topics = $DB->get_fieldset_select('tag_instance', 'tagid', $select, [$item->id, $component]);
+            }
+
+            // Ensure integer index.
             foreach ($this_item_topics as $index => $id) {
                 $id *= 1;
                 $resource_topics[$id] = true;
             }
 
             // One-hot encode topics for item.
-            foreach ($this->topics as $id => $topic) {
+            foreach ($topics as $id => $topic) {
                 if(isset($resource_topics[$id])) {
                     $cells[] = 1;
                 } else {
@@ -95,6 +137,7 @@ class item_data_export extends export {
             }
 
             // Clean up text data after prepending title as an additional sentence.
+            $item->content = html_to_text(format_text($item->content, $item->summaryformat));
             $cells[] = $this->scrubtext($item->title . ' ' . $item->content);
 
             // Create CSV record.
@@ -103,28 +146,6 @@ class item_data_export extends export {
         $recordset->close();
 
         return true;
-    }
-
-    /**
-     * Parse article json data tree to extract text content.
-     *
-     * @param object $object    A decoded JSON object.
-     * @return string           The extracted text.
-     */
-    private function gettext(object $object) :string {
-        $text = '';
-
-        if ($object->type == 'text') {
-            $text .= $object->text . ' ';
-        } else {
-            if (isset($object->content)) {
-                foreach($object->content as $content) {
-                    $text .= $this->gettext($content);
-                }
-            }
-        }
-
-        return $text;
     }
 
     /**
@@ -139,7 +160,9 @@ class item_data_export extends export {
     }
 
     /**
-     * Get a scrubbed list of registered topics to include as item metadata.
+     * Get a scrubbed list of registered topics and tags to include as item metadata.
+     *
+     * We want only tags for those courses where self-enrolment is enabled, but all Engage topics.
      *
      * @throws \dml_exception
      */
@@ -147,15 +170,40 @@ class item_data_export extends export {
         global $DB;
 
         // Set up database cursor and process records.
-        $topics = $DB->get_records_sql("
+        $system_topics = $DB->get_records_sql("
             SELECT id, name FROM {tag}
                 WHERE tagcollid = (SELECT id FROM {tag_coll} WHERE component = 'totara_topic')
-                ORDER BY id
+            UNION ALL
+            SELECT DISTINCT(ti.tagid), tg.name FROM {tag_instance} ti
+            JOIN {enrol} te on ti.itemid = te.courseid
+            JOIN {tag} tg on ti.tagid = tg.id
+                WHERE ti.itemtype = 'course' AND ti.component = 'core' AND te.enrol = 'self'
         ");
 
-        $this->topics = [];
-        foreach ($topics as $id => $topic) {
-            $this->topics[$id] = 'topic_' . str_replace(['"', "'", '-', ',', '.', '  ', ' '],'', $topic->name);
+        $topics = [];
+        foreach ($system_topics as $id => $topic) {
+            $topics[$id] = 'topic_' . str_replace(['"', "'", '-', ',', '.', '  ', ' '],'', $topic->name);
         }
+
+        return $topics;
+    }
+
+    /**
+     * Build one-hot encodings for
+     * @param array $component_names
+     * @return array
+     */
+    private function one_hot_components(array $component_names) {
+        $hot = 0;
+        $components = [];
+        $default = array_fill(0, count($component_names), 0);
+
+        foreach ($component_names as $component_name) {
+            $components[$component_name] = $default;
+            $components[$component_name][$hot] = 1;
+            $hot += 1;
+        }
+
+        return $components;
     }
 }

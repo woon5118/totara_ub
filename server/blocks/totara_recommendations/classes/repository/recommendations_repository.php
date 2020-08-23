@@ -71,24 +71,51 @@ final class recommendations_repository {
      * @return array
      */
     public static function get_recommended_courses(int $max_count, int $user_id = null): array {
-        global $USER, $CFG;
-        require_once("{$CFG->dirroot}/lib/enrollib.php");
+        global $USER;
 
         if (!$user_id) {
             $user_id = $USER->id;
         }
 
+        return static::get_recommended_container($max_count, $user_id, 'container_course');
+    }
+
+    /**
+     * @param int $max_count
+     * @param int|null $user_id
+     * @return array
+     */
+    public static function get_recommended_workspaces(int $max_count, int $user_id = null): array {
+        global $USER;
+
+        if (!$user_id) {
+            $user_id = $USER->id;
+        }
+
+        return static::get_recommended_container($max_count, $user_id, 'container_workspace');
+    }
+
+    /**
+     * @param int $max_count
+     * @param int $user_id
+     * @param string $container_type
+     * @return array
+     */
+    private static function get_recommended_container(int $max_count, int $user_id, string $container_type): array {
+        global $CFG;
+        require_once("{$CFG->dirroot}/lib/enrollib.php");
+
         $builder = static::get_base_builder();
-        $builder->join(['course', 'c'], function(builder $joining) {
+        $builder->join(['course', 'c'], function (builder $joining) use ($container_type) {
             $joining->where_raw('c.id = ru.item_id')
-                ->where('ru.component', 'container_course')
+                ->where('ru.component', $container_type)
                 ->where_raw('(c.containertype = ru.component OR c.containertype IS NULL)');
         });
 
         $builder->where('ru.user_id', $user_id);
 
         // Exclude courses that don't have self-enrollment enabled
-        $builder->join([enrol::TABLE, 'e'], function(builder $joining) {
+        $builder->join([enrol::TABLE, 'e'], function (builder $joining) {
             $joining->where_raw('c.id = e.courseid')
                 ->where('e.enrol', 'self')
                 ->where('e.status', ENROL_INSTANCE_ENABLED);

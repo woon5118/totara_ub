@@ -245,6 +245,8 @@ def _get_users(data_home, data_file=None):
     # Load items data.
     file_path = os.path.join(os.path.abspath(data_home), data_file)
     users = pd.read_csv(file_path, sep=',', encoding='utf-8')
+
+    # This implementation considers user language id a redundant feature.
     users = pd.concat([users.drop('lang', axis=1), pd.get_dummies(users['lang'])], axis=1)
 
     return users
@@ -265,6 +267,9 @@ def _get_interactions(data_home, data_file=None, num_users=0, num_items=0, train
     # Read raw data.
     file_path = os.path.join(os.path.abspath(data_home), data_file)
     interactions = pd.read_csv(file_path, sep=',', encoding='utf-8')
+
+    # This model implementation does not consider timestamp.
+    interactions.drop(['timestamp'], axis=1, inplace=True)
 
     # In matrix-factorisation mode these values would not be known yet.
     if num_users == None:

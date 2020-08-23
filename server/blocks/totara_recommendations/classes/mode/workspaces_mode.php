@@ -23,6 +23,8 @@
 
 namespace block_totara_recommendations\mode;
 
+use block_totara_recommendations\repository\recommendations_repository;
+
 /**
  * Populate the block with micro learning
  *
@@ -50,6 +52,6 @@ class workspaces_mode implements block_mode {
      * @return array
      */
     public function get_items(int $count, int $user_id): array {
-        return [];
+        return recommendations_repository::get_recommended_workspaces($count, $user_id);
     }
 }
