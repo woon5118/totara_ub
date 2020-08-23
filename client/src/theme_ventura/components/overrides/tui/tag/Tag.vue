@@ -17,20 +17,25 @@
 -->
 
 <style lang="scss">
+:root {
+  --tui-tag-height: 24px;
+  --tui-tag-border-radius: 12px; // --tui-tag-height / 2 - for some reason IE calc wasn't working correctly here
+}
+
 .tui-tag {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  height: 24px;
+  height: var(--tui-tag-height);
   white-space: nowrap;
   background-color: var(--tui-tag-bg-color);
-  border: 1px solid var(--tui-tag-border-color);
-  border-radius: 12px;
+  border: var(--tui-border-width-thin) solid var(--tui-tag-border-color);
+  border-radius: var(--tui-tag-border-radius);
 
   &__content {
     padding: 0 var(--tui-gap-2);
     color: var(--tui-tag-active-color);
-    font-size: 13px;
+    font-size: var(--tui-font-size-13);
 
     &--withButton {
       padding-right: 0;
