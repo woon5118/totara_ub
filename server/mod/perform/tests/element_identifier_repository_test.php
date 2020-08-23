@@ -84,10 +84,6 @@ class mod_perform_element_identifier_respository_testcase extends advanced_testc
         $this->assertEquals(1, $match->count());
         $this->assertEquals($element1->element_identifier->identifier, ($match->first())->identifier);
 
-        // Search is case sensitive.
-        $match = (element_identifier::repository())->filter_by_identifier('a1 element')->get();
-        $this->assertEquals(0, $match->count());
-
         // Should get no results if no identifier matches.
         $match = (element_identifier::repository())->filter_by_identifier('missing identifier')->get();
         $this->assertEquals(0, $match->count());
