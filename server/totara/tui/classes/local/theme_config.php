@@ -42,6 +42,12 @@ use totara_tui\local\scss\scss_options;
 final class theme_config extends \theme_config {
 
     /**
+     * If set to true, when resolving SCSS it will not be compiled
+     * @var bool
+     */
+    private $skip_scss_compilation = false;
+
+    /**
      * Get CSS content for type and subtype. Called by styles.php.
      *
      * @param string $type
@@ -80,6 +86,13 @@ final class theme_config extends \theme_config {
     }
 
     /**
+     * Skips the compilation of SCSS
+     */
+    public function skip_scss_compilation() {
+        $this->skip_scss_compilation = true;
+    }
+
+    /**
      * Get the compiled TUI CSS content for the provided Totara component
      *
      * @param string $component
@@ -99,6 +112,10 @@ final class theme_config extends \theme_config {
         $scss_options->set_themes($this->get_tui_theme_chain());
         $scss_options->set_legacy($this->legacybrowser);
         $scss_options->set_sourcemap_enabled(false);
+
+        if ($this->skip_scss_compilation) {
+            $scss_options->set_skip_compile(true);
+        }
 
         return new scss($scss_options);
     }

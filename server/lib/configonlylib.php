@@ -183,7 +183,7 @@ function min_get_slash_argument($clean = true) {
 
         return $relativepath;
 
-    } else if (stripos($_SERVER['SERVER_SOFTWARE'], 'iis') !== false) {
+    } else if (isset($_SERVER['SERVER_SOFTWARE']) && stripos($_SERVER['SERVER_SOFTWARE'], 'iis') !== false) {
         if (isset($_SERVER['PATH_INFO']) and $_SERVER['PATH_INFO'] !== '') {
             $relativepath = urldecode($_SERVER['PATH_INFO']);
         }

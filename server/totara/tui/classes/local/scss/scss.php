@@ -83,10 +83,10 @@ class scss {
             $legacy_var_values = $this->options->get_cssvars()->get_custom_property_values($css_realvars_legacy);
         }
 
-        $output = $this->compile(
-            $this->build_import_code($import_data->imports),
-            $this->options->get_sourcemap_enabled()
-        );
+        $output = $this->build_import_code($import_data->imports);
+        if (!$this->options->get_skip_compile()) {
+            $output = $this->compile($output, $this->options->get_sourcemap_enabled());
+        }
 
         if ($this->options->get_legacy()) {
             $output = $this->options->get_cssvars()->transform($output, ['override_values' => $legacy_var_values]);

@@ -1,0 +1,122 @@
+<?php
+/**
+ * This file is part of Totara Core
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
+ * @package totara_tui
+ */
+
+namespace totara_tui\local\mediation\javascript;
+
+use totara_tui\local\mediation\file;
+use totara_tui\local\locator\bundle;
+
+/**
+ * JavaScript resolver
+ */
+final class resolver extends \totara_tui\local\mediation\resolver {
+
+    /**
+     * @var string The component that was requested.
+     */
+    private $component;
+
+    /**
+     * @var string The suffix that was requested (production|development)
+     */
+    private $suffix;
+
+    /**
+     * JavaScript constructor.
+     * @param string $mediator The class name of the mediator to use to deliver content.
+     * @param string $rev The revision number for this resource request.
+     * @param string $suffix The suffix that was requested (production|development)
+     * @param string $component The component that was requested.
+     * @throws \coding_exception If mediator is not available or of the correct type.
+     */
+    public function __construct(string $mediator, string $rev, string $suffix, string $component) {
+        $this->suffix = $suffix;
+        $this->component = $component;
+        parent::__construct($mediator, $rev);
+    }
+
+    /**
+     * @inheritDoc
+     * @return string
+     */
+    protected function calculate_etag(): string {
+        $etag = sha1('tui ' . $this->get_rev() . ' ' . $this->component . ' ' . $this->suffix);
+        return $etag;
+    }
+
+    /**
+     * @inheritDoc
+     * @return string
+     */
+    protected function calculate_cachefile(): string {
+        global $CFG;
+        return $CFG->localcachedir . '/totara_tui-javascript/' . $this->get_etag();
+    }
+
+    /**
+     * Returns the file that is being requested, null if it is not known.
+     * @return file|null
+     */
+    private function get_file(): ?file {
+        if ($this->component === 'vendors') {
+            $file = bundle::get_vendors_file();
+        } else {
+            $file = bundle::get_bundle_js_file($this->component);
+        }
+        if ($file) {
+            return new file($file);
+        }
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     * @return string
+     */
+    protected function get_sha_for_etag_comparison(): string {
+        $file = $this->get_file();
+        if (!$file || !$file->exists()) {
+            return 'unknown';
+        }
+        return sha1_file((string)$file);
+    }
+
+    /**
+     * @inheritDoc
+     * @return string|file
+     */
+    protected function get_content_to_cache() {
+        $file = $this->get_file();
+        if ($file && $file->exists()) {
+            return $file;
+        }
+        return '/** File not found */';
+    }
+}

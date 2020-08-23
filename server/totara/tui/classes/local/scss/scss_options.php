@@ -61,6 +61,11 @@ class scss_options {
      */
     private $cssvars;
 
+    /**
+     * @var bool Skip SCSS compilation.
+     */
+    private $skip_compile = false;
+
     public function __construct() {
         $this->compiler = new compiler();
         $this->cssvars = new cssvars();
@@ -154,5 +159,21 @@ class scss_options {
      */
     public function set_cssvars(cssvars $cssvars) {
         $this->cssvars = $cssvars;
+    }
+
+    /**
+     * Sets whether SCSS compilation should be skipped.
+     * @param bool $newvalue
+     */
+    public function set_skip_compile(bool $newvalue) {
+        $this->skip_compile = $newvalue;
+    }
+
+    /**
+     * Returns true if SCSS compilation should be skipped.
+     * @return bool
+     */
+    public function get_skip_compile() {
+        return $this->skip_compile;
     }
 }
