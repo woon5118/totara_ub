@@ -2182,7 +2182,7 @@ class core_renderer extends renderer_base {
         }
 
         if ($userpicture->alttext) {
-            if (!empty($user->imagealt)) {
+            if (!empty($user->imagetitle)) {
                 $title = $user->imagetitle;
             } else if (!$userpicture->visibletoscreenreaders) {
                 $title = '';   
