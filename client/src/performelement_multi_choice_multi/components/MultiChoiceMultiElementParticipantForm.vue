@@ -126,7 +126,7 @@ export default {
         );
       } else {
         // if it isn't required, but participant try submit the data and we have the restrictions.
-        if (val.length > 0) {
+        if (val !== null && val.length > 0) {
           if (typeof this.element.data.settings !== 'undefined') {
             return this.valid_for_restriction(val, this.element.data.settings);
           }
