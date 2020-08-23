@@ -86,7 +86,7 @@ class client_aware_exception extends Exception implements ClientAware {
         $exception_data = $this->parse_data($data);
 
         $this->exception = $exception;
-        $this->category = $exception_data['category'];
+        $this->process_category($exception_data['category']);
         $this->http_status_code = $exception_data['http_status_code'];
         $this->is_client_safe = $exception_data['category'] !== $this->default_category;
         parent::__construct($exception->getMessage(), $exception->getCode());
@@ -116,7 +116,7 @@ class client_aware_exception extends Exception implements ClientAware {
 
     /**
      * @inheritdoc
-    */
+     */
     // phpcs:ignore
     public function getCategory() {
         return $this->category;
@@ -129,5 +129,44 @@ class client_aware_exception extends Exception implements ClientAware {
      */
     public function get_http_status_code(): int {
         return $this->http_status_code;
+    }
+
+
+    /**
+     * Sets and run the category post action.
+     *
+     * @param string $category
+     */
+    private function process_category(string $category): void {
+        $this->set_category($category);
+        $this->run_category_action($category);
+    }
+
+    /**
+     * Set category.
+     *
+     * @param string $category
+     * @return void
+     */
+    public function set_category(string $category): void {
+        $this->category = $category;
+    }
+
+    /**
+     * Run action based on the category.
+     *
+     * @param string $category
+     * @return void
+     */
+    private function run_category_action($category): void {
+        global $SESSION;
+
+        switch ($category) {
+            case 'require_login':
+                $SESSION->wantsurl = get_local_referer(false);
+                break;
+            default:
+                break;
+        }
     }
 }
