@@ -58,7 +58,7 @@
     flex-grow: 1;
     min-height: 0;
     margin-top: var(--tui-modal-content-separation);
-    padding: 0 var(--tui-modal-content-outer-padding);
+    padding: 0 var(--tui-modal-content-outer-padding) 2px;
     overflow-y: auto;
   }
 

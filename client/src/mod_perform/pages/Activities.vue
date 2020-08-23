@@ -21,6 +21,7 @@
     <h2 v-text="$str('perform:manage_activity', 'mod_perform')" />
     <Button
       v-if="canAdd"
+      :disabled="$apollo.loading"
       :text="$str('add_activity', 'mod_perform')"
       @click="showCreateModal()"
     />
