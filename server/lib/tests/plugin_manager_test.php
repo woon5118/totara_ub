@@ -401,7 +401,7 @@ class core_plugin_manager_testcase extends advanced_testcase {
         foreach ($allplugins as $type => $plugins) {
             foreach ($plugins as $plugin) {
                 /** @var \core\plugininfo\base $plugin */
-                if ($plugin->source == core_plugin_manager::PLUGIN_SOURCE_EXTENSION) {
+                if ($plugin->source !== core_plugin_manager::PLUGIN_SOURCE_STANDARD) {
                     $additions[] = $plugin->type . '_' . $plugin->name;
                 }
             }
