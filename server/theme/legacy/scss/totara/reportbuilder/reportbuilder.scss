@@ -106,6 +106,10 @@ $reportbuilder_minimum_size: 200px !default;
 
 .totara-table-container {
   border: none;
+
+  .userpicture {
+    border-radius: 50%;
+  }
 }
 
 #rb_export_form {
