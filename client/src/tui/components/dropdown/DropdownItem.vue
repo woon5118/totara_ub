@@ -23,8 +23,7 @@
     class="tui-dropdownItem"
     :class="{
       'tui-dropdownItem--disabled': disabled,
-      'tui-dropdownItem--paddingless': paddingless,
-      'tui-dropdownItem--small': small,
+      'tui-dropdownItem--noPadding': noPadding,
     }"
     :aria-disabled="disabled"
     :role="role"
@@ -43,9 +42,7 @@ export default {
     },
     disabled: Boolean,
     href: String,
-    paddingless: Boolean,
-    isDropdown: Boolean,
-    small: Boolean,
+    noPadding: Boolean,
   },
 
   methods: {

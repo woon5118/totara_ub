@@ -18,48 +18,46 @@
 
 <style lang="scss">
 .tui-dropdownItem {
+  @include tui-font-body();
   width: 100%;
-  margin: 0.1rem 0;
   padding: var(--tui-gap-2) var(--tui-gap-4);
   overflow: hidden;
   color: var(--tui-dropdown-item-text-color);
-  font-size: var(--tui-font-size-16);
   line-height: 1.4;
   white-space: nowrap;
   text-overflow: ellipsis;
   cursor: pointer;
 
-  &:hover {
-    color: var(--tui-dropdown-item-text-color-focus);
+  &:hover,
+  &:focus {
+    color: var(--tui-dropdown-item-text-color-hover);
     text-decoration: none;
-    background-color: var(--tui-dropdown-item-bg-color-focus);
+    background-color: var(--tui-dropdown-item-bg-color-hover);
     outline: 0;
   }
 
   &:focus {
-    @include tui-focus();
-    text-decoration: none;
+    color: var(--tui-dropdown-item-text-color-focus);
     background-color: var(--tui-dropdown-item-bg-color-focus);
   }
 
   &--disabled,
   &--disabled:hover,
   &--disabled:focus {
-    color: var(--tui-btn-text-color-disabled);
-    background-color: var(--tui-btn-bg-color-disabled);
+    color: var(--tui-dropdown-item-text-color-disabled);
+    background-color: transparent;
     cursor: not-allowed;
+  }
+
+  &--disabled:focus {
+    background-color: var(--tui-dropdown-item-bg-color-disabled-focus);
   }
 
   &--disabled:active {
     pointer-events: none;
   }
 
-  &--small {
-    padding: var(--tui-gap-1) var(--tui-gap-2);
-    font-size: var(--tui-font-size-14);
-  }
-
-  &--paddingless {
+  &--noPadding {
     padding: 0;
   }
 }

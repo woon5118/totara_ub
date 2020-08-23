@@ -17,6 +17,11 @@
  */
 
 import { Point, Rect, Size } from 'tui/geometry';
+import { closestEl } from './traversal';
+
+/**
+ * @typedef {{ top: number, right: number, bottom: number, left: number }} Spacing
+ */
 
 /**
  * Get the position of an element relative to the document.
@@ -82,7 +87,7 @@ export function getViewportRect() {
  * @param {Object} [options]
  * @param {boolean} [options.transformed=false] Get the position post-transform? (default false)
  * @param {boolean} [options.viewport=false] Get the position relative to the viewport? (default false)
- * @returns {{ marginBox: Rect, borderBox: Rect }}
+ * @returns {{ marginBox: Rect, borderBox: Rect, paddingBox: Rect, margin: Spacing, padding: Spacing }}
  */
 export function getBox(el, { transformed = false, viewport = false } = {}) {
   let position;
@@ -111,10 +116,19 @@ export function getBox(el, { transformed = false, viewport = false } = {}) {
     left: parseSize(style.marginLeft),
   };
 
+  const padding = {
+    top: parseSize(style.paddingTop),
+    right: parseSize(style.paddingRight),
+    bottom: parseSize(style.paddingBottom),
+    left: parseSize(style.paddingLeft),
+  };
+
   return {
     marginBox: alterRect(borderBox, margin, 1),
     borderBox,
+    paddingBox: alterRect(borderBox, padding, -1),
     margin,
+    padding,
   };
 }
 
@@ -144,4 +158,65 @@ function parseSize(str) {
   // computed styles are in px when visible, original values otherwise.
   // if it's not visible, treat everything as 0
   return str.slice(-2) == 'px' ? Number(str.slice(0, -2)) : 0;
+}
+
+/**
+ * Get containing block for element.
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_Block
+ *
+ * @param {Element} el
+ * @param {{ position: 'fixed' }} options
+ * @returns {{ el: ?Element, rect: Rect }}
+ */
+export function getContainingBlockInfo(el, { position }) {
+  if (position != 'fixed') {
+    throw new Error('Unsupported position: ' + position);
+  }
+
+  const blockEl = closestEl(
+    el.parentNode,
+    x => {
+      const style = getComputedStyle(x);
+      // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_Block#Identifying_the_containing_block
+      if (
+        !isNoneTransform(style.transform) ||
+        style.perspective != 'none' ||
+        style.contain == 'paint'
+      ) {
+        return true;
+      }
+      if (style.willChange) {
+        const willChange = style.willChange.split(', ');
+        if (
+          willChange.includes('transform') ||
+          willChange.includes('perspective')
+        ) {
+          return true;
+        }
+      }
+      return false;
+    },
+    x => x == document.body
+  );
+
+  if (blockEl) {
+    return {
+      el: blockEl,
+      rect: getBox(blockEl).paddingBox,
+    };
+  } else {
+    return {
+      el: null,
+      rect: getViewportRect(),
+    };
+  }
+}
+
+function isNoneTransform(transform) {
+  return (
+    transform == 'none' ||
+    // the computed value for "none" in IE, apparently
+    transform == 'matrix(1, 0, 0, 1, 0, 0)'
+  );
 }

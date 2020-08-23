@@ -16,6 +16,8 @@
  * @module tui
  */
 
+import { closestEl } from './traversal';
+
 /**
  * Measure the width of the browser scrollbar.
  *
@@ -54,4 +56,45 @@ export function documentHasScrollbar() {
   // handles body margin better. rect.width won't handle body margin, but
   // rect.left + rect.right will as long as the margin is the same on each side
   return rect.left + rect.right < window.innerWidth;
+}
+
+/**
+ * Check if the provided element is scrollable in the provided direction.
+ *
+ * @param {Element} el
+ * @param {"x"|"y"|"xy"} direction
+ * @returns {boolean}
+ */
+function isScrollable(el, direction) {
+  if (process.env.NODE_ENV !== 'production') {
+    if (direction != 'xy' && direction != 'x' && direction != 'y')
+      throw new Error('Unexpected direction');
+  }
+  const style = getComputedStyle(el);
+  let match = false;
+  const checkX = direction == 'x' || direction == 'xy';
+  const checkY = direction == 'y' || direction == 'xy';
+  match =
+    (checkX && isScrollableOverflow(style.overflowX)) ||
+    (checkY && isScrollableOverflow(style.overflowY));
+  return match;
+}
+
+const isScrollableOverflow = value => value === 'auto' || value === 'scroll';
+
+/**
+ * Get the closest scrollable element.
+ *
+ * If there are none (other than html/body) it will return null.
+ *
+ * @param {Element} el
+ * @param {"x"|"y"|"xy"} [direction="xy"]
+ * @returns {?Element}
+ */
+export function getClosestScrollable(el, direction = 'xy') {
+  return closestEl(
+    el,
+    x => isScrollable(x, direction),
+    x => x == document.body
+  );
 }

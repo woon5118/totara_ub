@@ -24,7 +24,7 @@ import { langSide, isRtl } from 'tui/i18n';
  * @typedef {Object} PositionResult
  * @property {string} side Side of the reference to display the popover on.
  * @property {Point} location Location to render the popover.
- * @property {Number} arrowDistance Distance along the side to render the arrow at.
+ * @property {number} arrowDistance Distance along the side to render the arrow at.
  */
 
 /**
@@ -38,10 +38,18 @@ import { langSide, isRtl } from 'tui/i18n';
  * @param {Rect} ref Rect describing the element to position the popover relative to.
  * @param {Rect} viewport Rect describing the visible part of the document.
  * @param {Size} size Size of the popover.
- * @param {Number} padding Padding around the popover (subtracted from size for some calculations).
+ * @param {number} padding Padding around the popover (subtracted from size for some calculations).
+ * @param {boolean} preferSide Prefer to slide along same side before moving to a different side.
  * @returns {PositionResult}
  */
-export function position({ position, ref, viewport, size, padding }) {
+export function position({
+  position,
+  ref,
+  viewport,
+  size,
+  padding,
+  preferSlide,
+}) {
   let [direction, subDirection] = position;
 
   direction = langSide(direction);
@@ -51,30 +59,73 @@ export function position({ position, ref, viewport, size, padding }) {
   const tries = fallbackOrders[direction] || [direction];
 
   // try each side until we find one that fits
-  for (var i = 0; i < tries.length; i++) {
-    const offset = calculateOffset(
-      tries[i],
-      subDirection,
-      ref,
-      viewport,
-      size,
-      padding
-    );
-    if (offset) {
-      return offset;
-    }
+  const context = { subDirection, ref, viewport, size, padding };
+  let offset = null;
+  if (!preferSlide) {
+    // try all sides without sliding
+    offset = trySides(tries, context, { allowSlide: false });
+    if (offset) return offset;
   }
+  // try all sides with sliding (so long as we can stay within bounds)
+  offset = trySides(tries, context, { allowSlide: true });
+  if (offset) return offset;
+  // try on all sides with sliding (out of bounds allowed so long as that bound is the right or bottom bound)
+  offset = trySides(tries, context, { allowSlide: true, allowSlideOOB: true });
+  if (offset) return offset;
 
-  // fallback: no room for popover in any direction :(
+  // fallback: no room for popover in any direction, force a result to be
+  // generated
   return calculateOffset(
     'bottom',
-    subDirection,
+    subDirection == 'right' ? 'right' : 'left',
     ref,
     viewport,
     size,
     padding,
+    true,
+    true,
     true
   );
+}
+
+/**
+ * Try popover sides.
+ *
+ * @param {string[]} tries
+ * @param {{ subDirection, ref, viewport, size, padding }} context
+ * @param {{allowSlide, allowSlideOOB}} variant
+ * @returns {?PositionResult}
+ */
+function trySides(tries, context, variant) {
+  for (var i = 0; i < tries.length; i++) {
+    let offset = calculateOffset(
+      tries[i],
+      context.subDirection,
+      context.ref,
+      context.viewport,
+      context.size,
+      context.padding,
+      variant.allowSlide,
+      variant.allowSlideOOB
+    );
+    // try other subDirection before trying a different primary direction
+    if (!offset) {
+      offset = calculateOffset(
+        tries[i],
+        directionInvert[context.subDirection],
+        context.ref,
+        context.viewport,
+        context.size,
+        context.padding,
+        variant.allowSlide,
+        variant.allowSlideOOB
+      );
+    }
+    if (offset) {
+      return offset;
+    }
+  }
+  return null;
 }
 
 // fallbacks for each side
@@ -83,6 +134,13 @@ const fallbackOrders = {
   top: ['top', 'bottom', 'right', 'left'],
   left: ['left', 'right', 'bottom', 'top'],
   right: ['right', 'left', 'top', 'bottom'],
+};
+
+const directionInvert = {
+  bottom: 'top',
+  top: 'bottom',
+  left: 'right',
+  right: 'left',
 };
 
 /**
@@ -94,11 +152,23 @@ const fallbackOrders = {
  * @param {Rect} ref Rect describing the element to position the popover relative to.
  * @param {Rect} viewport Rect describing the visible part of the document.
  * @param {Size} size Size of the popover.
- * @param {Number} padding Padding around the popover (subtracted from size for some calculations).
+ * @param {number} padding Padding around the popover (subtracted from size for some calculations).
+ * @param {?bool} allowSlide Allow to slide along secondary axis.
+ * @param {?bool} allowSlideOOB Allow slide if it would be out of bounds (only allows out of bounds on the right/bottom side).
  * @param {?bool} force Return result even if it won't fit.
- * @returns {PositionResult}
+ * @returns {?PositionResult}
  */
-function calculateOffset(side, secDir, ref, viewport, size, padding, force) {
+function calculateOffset(
+  side,
+  secDir,
+  ref,
+  viewport,
+  size,
+  padding,
+  allowSlide,
+  allowSlideOOB,
+  force
+) {
   const loc = { left: 0, top: 0 };
   let arrowPos = 0;
 
@@ -152,10 +222,29 @@ function calculateOffset(side, secDir, ref, viewport, size, padding, force) {
   } else {
     loc[secSide] = ref[secSide] + (ref[secSize] - size[secSize]) / 2;
   }
+  // slide the secondary axis if it won't fit
   if (loc[secSide] < viewport[secSide]) {
-    loc[secSide] = viewport[secSide];
+    // left side is outside viewport
+    if (allowSlide || force) {
+      loc[secSide] = viewport[secSide];
+    } else {
+      return null;
+    }
   } else if (loc[secSide] + size[secSize] > viewport[secOtherSide]) {
-    loc[secSide] = viewport[secOtherSide] - size[secSize];
+    // right side is outside viewport
+    if (allowSlide || force) {
+      loc[secSide] = viewport[secOtherSide] - size[secSize];
+      if (loc[secSide] < viewport[secSide]) {
+        // left side is outside viewport
+        if (allowSlideOOB || force) {
+          loc[secSide] = viewport[secSide];
+        } else {
+          return null;
+        }
+      }
+    } else {
+      return null;
+    }
   }
 
   // position the arrow

@@ -13,11 +13,18 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Alvin Smith <alvin.smith@totaralearning.com>
+  @author Simon Chester <simon.chester@totaralearning.com>
   @module tui
 -->
 
 <template>
-  <div class="tui-dropdown" :class="interactiveClasses">
+  <div
+    class="tui-dropdown"
+    :class="{
+      'tui-dropdown--open': isOpen,
+      'tui-dropdown--disabled': disabled,
+    }"
+  >
     <div
       v-if="$scopedSlots.trigger"
       :id="$id('trigger')"
@@ -27,9 +34,14 @@
       <slot name="trigger" :toggle="toggle" :isOpen="isOpen" />
     </div>
 
-    <transition :name="'tui-dropdown__animation-' + animation">
+    <PopoverPositioner
+      v-if="!disabled && this.$scopedSlots.default"
+      :position="position"
+      :open="isOpen"
+      :reference-element="this.$refs.trigger"
+      transition="dropdown"
+    >
       <div
-        v-show="!disabled && isOpen && this.$scopedSlots.default"
         ref="dropdownMenu"
         class="tui-dropdown__menu"
         :aria-hidden="!isOpen"
@@ -49,23 +61,26 @@
           </PropsProvider>
         </div>
       </div>
-    </transition>
+    </PopoverPositioner>
   </div>
 </template>
 
 <script>
 import PropsProvider from 'tui/components/util/PropsProvider';
-import { getTabbableElements } from '../../js/dom/focus';
+import PopoverPositioner from 'tui/components/popover/PopoverPositioner';
+import { getTabbableElements } from 'tui/dom/focus';
 
 const DEFAULT_CLOSE_OPTIONS = ['escape', 'outside'];
 
 export default {
   components: {
     PropsProvider,
+    PopoverPositioner,
   },
+
   props: {
+    // eslint-disable-next-line vue/require-prop-types
     value: {
-      type: [String, Number, Boolean, Object, Array, Function],
       default: null,
     },
     disabled: Boolean,
@@ -75,13 +90,9 @@ export default {
     },
     position: {
       type: String,
-      validator(value) {
-        return (
-          ['top-right', 'top-left', 'bottom-left', 'bottom-right'].indexOf(
-            value
-          ) > -1
-        );
-      },
+      default: 'bottom-left',
+      validator: x =>
+        ['top-right', 'top-left', 'bottom-left', 'bottom-right'].includes(x),
     },
     separator: {
       type: Boolean,
@@ -102,22 +113,15 @@ export default {
     },
     open: Boolean,
   },
+
   data() {
     return {
       toggleOpen: false,
       activeNodeIndex: null,
     };
   },
+
   computed: {
-    interactiveClasses() {
-      return [
-        this.position && 'tui-dropdown--' + this.position,
-        {
-          'tui-dropdown--disabled': this.disabled,
-          'tui-dropdown--open': this.isOpen,
-        },
-      ];
-    },
     cancelOptions() {
       return typeof this.canClose === 'boolean'
         ? this.canClose
@@ -129,6 +133,7 @@ export default {
       return this.open || this.toggleOpen;
     },
   },
+
   watch: {
     isOpen: {
       handler() {
@@ -144,12 +149,14 @@ export default {
       immediate: true,
     },
   },
+
   beforeDestroy() {
     if (typeof document !== 'undefined') {
       document.removeEventListener('click', this.$_clickedOutside);
       document.removeEventListener('keydown', this.$_keyPress);
     }
   },
+
   methods: {
     provide() {
       return {
@@ -163,10 +170,18 @@ export default {
      * Close dropdown if clicked outside.
      */
     $_clickedOutside(event) {
+      if (!this.$refs.dropdownMenu) {
+        return;
+      }
       // work around bug in Bootstrap < 3.3.5: https://github.com/twbs/bootstrap/issues/16090
       if (event.target !== this.$refs.dropdownMenu) {
-        if (this.cancelOptions.indexOf('outside') < 0) return;
-        if (!this.$refs.trigger || !this.$refs.trigger.contains(event.target)) {
+        if (!this.cancelOptions.includes('outside')) return;
+        if (
+          !this.$refs.trigger ||
+          // treat direct click on trigger div (*not* content) as click outside
+          this.$refs.trigger === event.target ||
+          !this.$refs.trigger.contains(event.target)
+        ) {
           if (!this.closeOnClick) {
             // not close after click when we set the closeOnClick prop to false
             if (this.$refs.dropdownMenu.contains(event.target)) {
@@ -212,6 +227,10 @@ export default {
         if (this.cancelOptions.indexOf('escape') < 0) return;
         this.$_focusTrigger();
         this.dismiss();
+        return;
+      }
+
+      if (!this.$refs.dropdownContent) {
         return;
       }
 

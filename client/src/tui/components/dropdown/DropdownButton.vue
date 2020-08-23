@@ -23,6 +23,7 @@
     type="button"
     :class="{
       'tui-dropdownButton--disabled': disabled,
+      'tui-dropdownItem--noPadding': noPadding,
     }"
     :disabled="disabled"
     @click="clickDropdownButton"
@@ -35,6 +36,7 @@
 export default {
   props: {
     disabled: Boolean,
+    noPadding: Boolean,
   },
 
   methods: {

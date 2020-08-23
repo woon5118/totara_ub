@@ -33,18 +33,24 @@
               :caret="true"
               text="Dropdown"
               @click="toggle"
-            >
-              <AddIcon />
-            </Button>
+            />
           </template>
           <DropdownItem @click="doThing">Action</DropdownItem>
           <DropdownItem disabled @click="doThing">Another action</DropdownItem>
           <DropdownItem @click="doThing">
             This is an extra long dropdown item
           </DropdownItem>
-          <DropdownItem href="https://www.google.com/"
-            >External link</DropdownItem
-          >
+          <DropdownButton @click="doThing">
+            Button
+          </DropdownButton>
+          <DropdownItem href="https://www.google.com/">
+            External link
+          </DropdownItem>
+          <template v-if="values.many">
+            <DropdownItem v-for="i in 10" :key="i" @click="doThing">
+              Action
+            </DropdownItem>
+          </template>
         </Dropdown>
 
         <Dropdown
@@ -65,8 +71,47 @@
           </template>
           <DropdownItem @click="doThing">Action</DropdownItem>
           <DropdownItem @click="doThing">Another action</DropdownItem>
+          <template v-if="values.many">
+            <DropdownItem v-for="i in 10" :key="i" @click="doThing">
+              Action
+            </DropdownItem>
+          </template>
         </Dropdown>
+
+        <Button text="Show modal" @click="modalOpen = true" />
       </div>
+
+      <ModalPresenter :open="modalOpen" @request-close="modalOpen = false">
+        <Modal :aria-labelledby="$id('title')">
+          <ModalContent title="Modal" :title-id="$id('title')">
+            <Dropdown
+              :separator="values.separator"
+              :disabled="values.disabled"
+              :position="values.position"
+            >
+              <template v-slot:trigger="{ toggle, isOpen }">
+                <Button
+                  :aria-expanded="isOpen ? 'true' : 'false'"
+                  aria-label="Dropdown"
+                  :caret="true"
+                  text="Dropdown"
+                  @click="toggle"
+                />
+              </template>
+              <DropdownItem>Action</DropdownItem>
+              <DropdownItem disabled>Another action</DropdownItem>
+              <DropdownItem>
+                This is an extra long dropdown item
+              </DropdownItem>
+              <template v-if="values.many">
+                <DropdownItem v-for="i in 10" :key="i" @click="doThing">
+                  Action
+                </DropdownItem>
+              </template>
+            </Dropdown>
+          </ModalContent>
+        </Modal>
+      </ModalPresenter>
     </SamplesExample>
 
     <SamplesPropCtl>
@@ -80,6 +125,13 @@
 
         <FormRow label="Disabled">
           <FormRadioGroup name="disabled" :horizontal="true">
+            <Radio :value="true">True</Radio>
+            <Radio :value="false">False</Radio>
+          </FormRadioGroup>
+        </FormRow>
+
+        <FormRow label="Many items">
+          <FormRadioGroup name="many" :horizontal="true">
             <Radio :value="true">True</Radio>
             <Radio :value="false">False</Radio>
           </FormRadioGroup>
@@ -107,10 +159,14 @@
 import Button from 'tui/components/buttons/Button';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
+import DropdownButton from 'tui/components/dropdown/DropdownButton';
 import { Uniform, FormRow, FormRadioGroup } from 'tui/components/uniform';
 import Radio from 'tui/components/form/Radio';
 import AddIcon from 'tui/components/icons/common/Add';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
 import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
 import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
@@ -120,12 +176,16 @@ export default {
     Button,
     Dropdown,
     DropdownItem,
+    DropdownButton,
     Uniform,
     FormRow,
     FormRadioGroup,
     Radio,
     AddIcon,
     ButtonIcon,
+    Modal,
+    ModalContent,
+    ModalPresenter,
     SamplesCode,
     SamplesExample,
     SamplesPropCtl,
@@ -137,7 +197,10 @@ export default {
         position: undefined,
         separator: false,
         disabled: false,
+        many: false,
       },
+
+      modalOpen: false,
 
       codeTemplate: `<Dropdown
   :separator="separator"
@@ -152,9 +215,7 @@ export default {
       :caret="true"
       text="Dropdown"
       @click="toggle"
-    >
-      <AddIcon />
-    </Button>
+    />
   </template>
   <DropdownItem @click="doThing">Action</DropdownItem>
 </Dropdown>`,

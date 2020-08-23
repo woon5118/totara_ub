@@ -55,10 +55,8 @@ $tui-modal-sheetBreakpoint: 768px !default;
   }
 
   &.tui-modal--size-sheet {
-    &.tui-modal--animated {
-      &.tui-modal--in .tui-modal__inner {
-        overflow: scroll;
-      }
+    .tui-modal__inner {
+      overflow: auto;
     }
   }
 

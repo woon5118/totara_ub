@@ -46,7 +46,6 @@
           :key="i"
           :selected="item.active"
           :disabled="!item.active && !item.enabled"
-          :small="true"
           @click="itemClick(item)"
         >
           {{ item.label.toString() }}

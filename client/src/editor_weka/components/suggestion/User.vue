@@ -27,7 +27,7 @@
         <DropdownItem
           v-for="(user, index) in users"
           :key="index"
-          :paddingless="true"
+          :no-padding="true"
           @click="pickUser(user)"
         >
           <MiniProfileCard :no-border="true" :display="user.card_display" />

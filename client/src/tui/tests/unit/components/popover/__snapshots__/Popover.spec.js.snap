@@ -10,6 +10,7 @@ exports[`Popover matches snapshot 1`] = `
    
   <popoverpositioner-stub
     position="bottom"
+    preferslide="true"
     transition="default"
   />
 </div>

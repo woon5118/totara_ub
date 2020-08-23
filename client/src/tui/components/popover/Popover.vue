@@ -32,6 +32,7 @@
       :position="position"
       :open="isOpen"
       :reference-element="getReference()"
+      :prefer-slide="true"
     >
       <PopoverFrame
         ref="frame"

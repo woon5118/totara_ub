@@ -32,9 +32,7 @@ exports[`totara_engage/components/form/RecipientsSelector.vue matches snapshot 1
           <!----></span></button>
       </div>
     </div>
-    <div aria-hidden="true" aria-labelledby="abc123" aria-orientation="vertical" role="menu" class="tui-dropdown__menu" style="display: none;">
-      <div class="tui-dropdown__content tui-dropdown__content--separator"></div>
-    </div>
+    <!---->
   </div>
 </div>
 `;

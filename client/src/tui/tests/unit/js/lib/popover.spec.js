@@ -177,7 +177,7 @@ describe('position', () => {
     const viewport = new Rect(0, 500, 1920, 1080);
     const size = new Size(200, 100);
     const padding = 10;
-    const options = { viewport, size, padding };
+    const options = { viewport, size, padding, preferSlide: true };
 
     let result;
 

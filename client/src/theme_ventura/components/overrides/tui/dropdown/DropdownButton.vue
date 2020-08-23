@@ -23,7 +23,10 @@
   text-align: left;
   border: none;
   border-radius: 0;
-  &:hover {
+  &:hover,
+  &:focus,
+  &:active,
+  &:focus:active {
     border-color: transparent;
     box-shadow: none;
   }
@@ -31,33 +34,43 @@
 
 // tui-dropdownButton styles
 .tui-dropdownButton {
-  margin: 0.1rem 0;
+  @include tui-font-body();
   padding: var(--tui-gap-2) var(--tui-gap-4);
   overflow: hidden;
-  font-size: var(--tui-font-size-16);
   line-height: 1.4;
   text-overflow: ellipsis;
 
-  &:hover {
-    color: var(--tui-dropdown-item-text-color-focus);
-    background-color: var(--tui-dropdown-item-bg-color-focus);
+  &:hover,
+  &:focus,
+  &:active,
+  &:focus:active {
+    color: var(--tui-dropdown-item-text-color-hover);
+    text-decoration: none;
+    background-color: var(--tui-dropdown-item-bg-color-hover);
+    outline: 0;
   }
 
-  &:focus {
-    @include tui-focus();
+  &:focus,
+  &:active,
+  &:focus:active {
+    color: var(--tui-dropdown-item-text-color-focus);
     background-color: var(--tui-dropdown-item-bg-color-focus);
   }
 
   &--disabled,
   &--disabled:hover,
   &--disabled:focus {
-    color: var(--tui-btn-text-color-disabled);
-    background-color: var(--tui-btn-bg-color-disabled);
+    color: var(--tui-dropdown-item-text-color-disabled);
+    background-color: transparent;
     cursor: not-allowed;
   }
 
   &--disabled:active {
     pointer-events: none;
+  }
+
+  &--noPadding {
+    padding: 0;
   }
 }
 </style>

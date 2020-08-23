@@ -18,15 +18,11 @@
 
 <style lang="scss">
 .tui-dropdown {
-  position: relative;
-
   &__menu {
-    position: absolute;
     z-index: var(--tui-zindex-dropdown-menu);
-    display: none;
-    width: 100%;
-    min-width: 200px;
-    max-height: 50vh;
+    min-width: 15rem;
+    max-width: 35rem;
+    max-height: 40vh;
     overflow-y: auto;
     background-color: var(--tui-dropdown-menu-bg-color);
     background-clip: padding-box;
@@ -37,55 +33,15 @@
   &__content {
     display: flex;
     flex-direction: column;
-    padding: 0.1rem 0.2rem;
     &--separator > * + * {
       border-top: 1px solid var(--tui-dropdown-menu-border-color);
     }
   }
 
-  &--open {
-    .tui-dropdown__menu {
-      display: block;
-    }
-  }
-
   &--disabled {
-    color: var(--tui-dropdown-item-text-color-disabled);
     cursor: not-allowed;
     .tui-dropdown__trigger {
       pointer-events: none;
-    }
-  }
-
-  &--top-right {
-    .tui-dropdown__menu {
-      top: auto;
-      right: 0;
-      bottom: 100%;
-      left: auto;
-    }
-  }
-
-  &--top-left {
-    .tui-dropdown__menu {
-      top: auto;
-      right: auto;
-      bottom: 100%;
-      left: 0;
-    }
-  }
-
-  &--bottom-left {
-    .tui-dropdown__menu {
-      right: auto;
-      left: 0;
-    }
-  }
-
-  &--bottom-right {
-    .tui-dropdown__menu {
-      right: 0;
-      left: auto;
     }
   }
 }

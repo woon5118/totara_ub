@@ -23,7 +23,10 @@
     <div
       v-show="shouldBeOpen"
       class="tui-popoverPositioner"
-      :class="[transition && 'tui-popoverPositioner--transition-' + transition]"
+      :class="[
+        transition && 'tui-popoverPositioner--transition-' + transition,
+        isFixed && 'tui-popoverPositioner--fixed',
+      ]"
       :style="style"
     >
       <slot
@@ -43,9 +46,12 @@ import {
   getDocumentPosition,
   getOffsetRect,
   getViewportRect,
-} from '../../js/dom/position';
+  getBox,
+  getContainingBlockInfo,
+} from 'tui/dom/position';
+import { getClosestScrollable } from 'tui/dom/scroll';
 import { position } from 'tui/lib/popover';
-import { Point, Size } from 'tui/geometry';
+import { Point, Size, Rect } from 'tui/geometry';
 
 export default {
   props: {
@@ -57,6 +63,9 @@ export default {
       type: String,
       default: 'default',
     },
+    // allow popover to slide along the side in preference to moving to different side
+    // if this is true, it will still slide if it can't fit on any side
+    preferSlide: Boolean,
   },
 
   data() {
@@ -67,6 +76,7 @@ export default {
       shouldBeOpen: false,
       computedSide: null,
       arrowDistance: 0,
+      isFixed: false,
     };
   },
 
@@ -83,15 +93,20 @@ export default {
   },
 
   watch: {
-    open(open) {
-      if (open) {
-        Vue.nextTick(() => {
-          this.shouldBeOpen = true;
-          this.handleResize();
-        });
-      } else {
-        this.shouldBeOpen = false;
-      }
+    open: {
+      immediate: true,
+      handler(open) {
+        if (open) {
+          Vue.nextTick(() => {
+            this.shouldBeOpen = true;
+            this.$_setupOpen();
+            this.handleResize();
+          });
+        } else {
+          this.$_closeCleanup();
+          this.shouldBeOpen = false;
+        }
+      },
     },
 
     referenceElement() {
@@ -116,6 +131,7 @@ export default {
   destroyed() {
     window.removeEventListener('resize', this.handleResizeThrottled);
     window.removeEventListener('scroll', this.handleResizeThrottled);
+    this.$_closeCleanup();
     this.resizeObserver.disconnect();
   },
 
@@ -123,13 +139,63 @@ export default {
     updatePosition() {
       if (!this.referenceElement) return;
 
-      const refRect = getOffsetRect(this.referenceElement);
-      const offsetParentPosition = getDocumentPosition(
-        this.referenceElement.offsetParent
-      );
-      const viewport = getViewportRect(offsetParentPosition).sub(
-        offsetParentPosition
-      );
+      let refRect;
+      let viewport = null;
+      if (this.isFixed) {
+        const containingBlock = getContainingBlockInfo(this.$el, {
+          position: 'fixed',
+        });
+        if (process.env.NODE_ENV !== 'production') {
+          const referenceContainingBlock = getContainingBlockInfo(
+            this.referenceElement,
+            { position: 'fixed' }
+          );
+          if (containingBlock.el != referenceContainingBlock.el) {
+            console.warn(
+              '[PopoverPositioner] Reference element and PopoverPositioner are not in the same containing block.'
+            );
+            console.log('Reference element', this.referenceElement);
+            console.log(
+              'Reference element containing block',
+              referenceContainingBlock.el
+            );
+            console.log('PopoverPositioner', this.$el);
+            console.log(
+              'PopoverPositioner containing block',
+              containingBlock.el
+            );
+          }
+        }
+        refRect = getBox(this.referenceElement).borderBox;
+        viewport = new Rect(
+          0,
+          0,
+          containingBlock.rect.width,
+          containingBlock.rect.height
+        );
+      } else {
+        if (
+          process.env.NODE_ENV !== 'production' &&
+          this.$el.offsetParent &&
+          this.referenceElement.offsetParent != this.$el.offsetParent
+        ) {
+          console.warn(
+            '[PopoverPositioner] Reference element and PopoverPositioner are not in the same offset parent.'
+          );
+          console.log('Reference element', this.referenceElement);
+          console.log(
+            'Reference element offset parent',
+            this.referenceElement.offsetParent
+          );
+          console.log('PopoverPositioner', this.$el);
+          console.log('PopoverPositioner offset parent', this.$el.offsetParent);
+        }
+        refRect = getOffsetRect(this.referenceElement);
+        const offsetParentPosition = getDocumentPosition(
+          this.referenceElement.offsetParent
+        );
+        viewport = getViewportRect().sub(offsetParentPosition);
+      }
 
       const pos = position({
         position: this.position.split('-'),
@@ -157,6 +223,33 @@ export default {
           : 0;
         this.updatePosition();
       });
+    },
+
+    $_setupOpen() {
+      this.$_closeCleanup();
+      this.isFixed = this.$_useFixedPositioning();
+      if (this.isFixed) {
+        this.scrollableContainers = [];
+        let scrollable = getClosestScrollable(this.$el.parentNode);
+        while (scrollable) {
+          this.scrollableContainers.push(scrollable);
+          scrollable.addEventListener('scroll', this.handleResize);
+          scrollable = getClosestScrollable(scrollable.parentNode);
+        }
+      }
+    },
+
+    $_closeCleanup() {
+      if (this.scrollableContainers) {
+        this.scrollableContainers.forEach(x =>
+          x.removeEventListener('scroll', this.handleResize)
+        );
+        this.scrollableContainers = null;
+      }
+    },
+
+    $_useFixedPositioning() {
+      return !!this.$el.closest('.tui-modalContent');
     },
   },
 };

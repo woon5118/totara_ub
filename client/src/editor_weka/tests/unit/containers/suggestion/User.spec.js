@@ -17,22 +17,14 @@
  */
 
 import User from 'editor_weka/components/suggestion/User';
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 describe('editor_weka/components/suggestion/User.vue', function() {
   let wrapper = null;
 
   beforeAll(function() {
-    wrapper = mount(User, {
+    wrapper = shallowMount(User, {
       mocks: {
-        $str(id, component) {
-          return `${id}, ${component}`;
-        },
-
-        $id(random) {
-          return `something-${random}`;
-        },
-
         $apollo: {
           loading: false,
         },

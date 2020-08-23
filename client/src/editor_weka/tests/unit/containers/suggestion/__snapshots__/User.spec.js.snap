@@ -5,30 +5,23 @@ exports[`editor_weka/components/suggestion/User.vue Checks snapshot 1`] = `
   class="tui-editorWeka-user"
   style="left: 1px; top: 1px;"
 >
-  <div
-    class="tui-dropdown tui-dropdown--open"
+  <dropdown-stub
+    animation="default"
+    canclose="true"
+    closeonclick="true"
+    open="true"
+    position="bottom-left"
+    role="menu"
+    separator="true"
   >
-    <!---->
-     
-    <div
-      aria-labelledby="something-trigger"
-      aria-orientation="vertical"
-      class="tui-dropdown__menu"
-      role="menu"
+    <span
+      class="sr-only"
     >
-      <div
-        class="tui-dropdown__content tui-dropdown__content--separator"
-      >
-        <span
-          class="sr-only"
-        >
-          
-      matching_users, editor_weka:
+      
+      [[matching_users, editor_weka]]:
     
-        </span>
-         
-      </div>
-    </div>
-  </div>
+    </span>
+     
+  </dropdown-stub>
 </div>
 `;

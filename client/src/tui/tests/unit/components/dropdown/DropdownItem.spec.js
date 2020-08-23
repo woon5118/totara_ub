@@ -46,13 +46,13 @@ describe('DropdownItem', () => {
   it('returns item classes accordingly', async () => {
     const value = dropdownSelected;
     const disabled = false;
-    const paddingless = true;
+    const noPadding = true;
     wrapper.setProps({
       value,
       disabled,
-      paddingless,
+      noPadding,
     });
     await Vue.nextTick();
-    expect(wrapper.classes()).toContain('tui-dropdownItem--paddingless');
+    expect(wrapper.classes()).toContain('tui-dropdownItem--noPadding');
   });
 });
