@@ -36,7 +36,6 @@ Feature: Update article
     And I press "Done"
     And I should see "Updated test article 1"
     And I click on "Test Article" "text" in the ".tui-articleContent" "css_element"
-    And I click on ".tui-inlineEditing" "css_element" in the ".tui-articleContent" "css_element"
     And I wait for the next second
     And I activate the weka editor with css ".tui-editArticleContentForm__editor"
     And I type "Edit article" in the weka editor
