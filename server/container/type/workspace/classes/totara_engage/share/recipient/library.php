@@ -26,6 +26,7 @@ namespace container_workspace\totara_engage\share\recipient;
 use container_workspace\workspace;
 use container_workspace\loader\workspace\loader as workspace_loader;
 use core\orm\query\builder;
+use core_container\factory;
 use totara_core\advanced_feature;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\access\access;
@@ -43,6 +44,8 @@ class library extends recipient {
      * @inheritDoc
      */
     public function validate(): void {
+        advanced_feature::require('container_workspace');
+
         // Make sure that this is a valid workspace.
         if (!workspace_loader::exists($this->instanceid)) {
             throw new \coding_exception("Invalid workspace with ID {$this->instanceid}");
@@ -67,7 +70,7 @@ class library extends recipient {
      * @inheritDoc
      */
     public function get_data() {
-        $workspace = workspace::from_id($this->instanceid);
+        $workspace = $this->get_workspace();
 
         return [
             'category' => 'WORKSPACE',
@@ -78,13 +81,34 @@ class library extends recipient {
     }
 
     /**
+     * @return workspace
+     */
+    protected function get_workspace(): workspace {
+        /** @var workspace $workspace */
+        $workspace = factory::from_id($this->instanceid);
+
+        if (!$workspace->is_typeof(workspace::get_type())) {
+            throw new \coding_exception("Cannot find workspace with id '{$this->instanceid}'");
+        }
+
+        return $workspace;
+    }
+
+    /**
      * @inheritDoc
      */
     public function get_minimum_access(): int {
-        // TODO: determine access of workspace once workspace access is properly implemented
-        // $workspace = workspace::from_id($this->instanceid);
-        // return $workspace->get_access();
-        return access::PUBLIC;
+        $workspace = $this->get_workspace();
+        if ($workspace->is_public()) {
+            return access::PUBLIC;
+        }
+
+        if ($workspace->is_private() || $workspace->is_hidden()) {
+            return access::RESTRICTED;
+        }
+
+        // This should never be happened - but who knows :shrug:
+        throw new \coding_exception("Invalid workspace's access");
     }
 
     /**

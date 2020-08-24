@@ -31,8 +31,8 @@ use totara_engage\repository\share_repository;
 use totara_engage\share\recipient\manager as recipient_manager;
 use totara_engage\share\recipient\recipient;
 use totara_engage\task\share_item_task;
-use totara_engage\task\shared_item_task;
 use core\task\manager as task_manager;
+use totara_engage\local\helper as engage_helper;
 
 final class manager {
 
@@ -71,13 +71,19 @@ final class manager {
      * @param shareable $instance
      * @param string $component
      * @param recipient[] $recipients
+     * @param int|null $actor_id
      * @return int
      */
-    public static function share(shareable $instance, string $component, array $recipients): int {
+    public static function share(shareable $instance, string $component,
+                                 array $recipients, ?int $actor_id = null): int {
         global $USER;
 
+        if (empty($actor_id)) {
+            $actor_id = $USER->id;
+        }
+
         // First check if user is allowed to share this instance.
-        if (!$instance->can_share($USER->id)) {
+        if (!$instance->can_share($actor_id)) {
             throw new share_exception('error:sharecapability', $component);
         }
 
@@ -97,7 +103,7 @@ final class manager {
 
         // Create shares for this resource.
         $shares = self::create($instance->get_id(), $instance->get_userid(), $component, $recipients, $context->id);
-        
+
         foreach ($shares as $share) {
             if ($share->get_recipient_component() === 'core_user' && $share->get_recipient_area() === 'USER') {
                 $task = new share_item_task();
@@ -130,12 +136,23 @@ final class manager {
         }
 
         // Re-share occurs if the user isn't the same as the resource owner
-        if ($instance->can_reshare($USER->id)) {
-            $instance->reshare($USER->id);
+        if ($instance->can_reshare($actor_id)) {
+            $instance->reshare($actor_id);
         }
 
         // Return the share id.
         return reset($shares)->get_id();
+    }
+
+    /**
+     * @param shareable $item
+     * @param recipient $recipient
+     * @param int|null $actor_id
+     * @return int
+     */
+    public static function share_to_recipient(shareable $item, recipient $recipient, ?int $actor_id = null): int {
+        $component = engage_helper::get_component_name($item);
+        return self::share($item, $component, [$recipient], $actor_id);
     }
 
     /**

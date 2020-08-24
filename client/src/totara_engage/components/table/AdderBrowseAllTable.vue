@@ -32,12 +32,15 @@
   >
     <template v-slot:header-row>
       <HeaderCell size="2" valign="center" />
-      <HeaderCell size="8" valign="center">{{
-        $str('title', 'totara_engage')
-      }}</HeaderCell>
-      <HeaderCell size="6" valign="center">{{
-        $str('contributor', 'totara_engage')
-      }}</HeaderCell>
+      <HeaderCell size="8" valign="center">
+        {{ $str('title', 'totara_engage') }}
+      </HeaderCell>
+      <HeaderCell size="4" valign="center">
+        {{ $str('filteraccess', 'totara_engage') }}
+      </HeaderCell>
+      <HeaderCell size="6" valign="center">
+        {{ $str('contributor', 'totara_engage') }}
+      </HeaderCell>
     </template>
 
     <template v-slot:row="{ row }">
@@ -49,13 +52,29 @@
         />
       </Cell>
 
-      <Cell size="8" column-header="Name" valign="center">
+      <Cell
+        size="8"
+        :column-header="$str('title', 'totara_engage')"
+        valign="center"
+      >
         <span class="tui-engageAdderModal__browseTable__title">
           {{ row.name }}
         </span>
       </Cell>
 
-      <Cell size="6" column-header="Language" valign="center">
+      <Cell
+        size="4"
+        :column-header="$str('filteraccess', 'totara_engage')"
+        valign="center"
+      >
+        <AccessIcon :access="row.access" size="300" />
+      </Cell>
+
+      <Cell
+        size="6"
+        :column-header="$str('contributor', 'totara_engage')"
+        valign="center"
+      >
         {{ row.user.fullname }}
       </Cell>
     </template>
@@ -66,12 +85,14 @@
 import SelectTable from 'tui/components/datatable/SelectTable';
 import Cell from 'tui/components/datatable/Cell';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
+import AccessIcon from 'totara_engage/components/icons/access/computed/AccessIcon';
 
 // Mixins
 import AdderMixin from 'totara_engage/mixins/adder_mixin';
 
 export default {
   components: {
+    AccessIcon,
     Cell,
     HeaderCell,
     SelectTable,
@@ -112,7 +133,8 @@ export default {
   "totara_engage": [
     "contributor",
     "title",
-    "adder_image_alt"
+    "adder_image_alt",
+    "filteraccess"
   ]
 }
 </lang-strings>

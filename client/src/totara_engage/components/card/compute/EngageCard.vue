@@ -75,7 +75,12 @@ export default {
       const card = Object.assign({}, this.cardAttribute);
       let extra = {};
       if (card.extra) {
-        extra = JSON.parse(card.extra);
+        if (typeof card.extra === 'string') {
+          // Convert from json string to obj
+          extra = JSON.parse(card.extra);
+        } else if (typeof card.extra === 'object') {
+          extra = card.extra;
+        }
       }
 
       return {

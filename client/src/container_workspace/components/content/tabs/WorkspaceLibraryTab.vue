@@ -138,15 +138,23 @@ export default {
   },
 
   methods: {
+    /**
+     *
+     * @param {Array} cards
+     * @return {Array}
+     */
     $_addContributeCard(cards) {
-      let contributeCard = {
-        instanceid: this.workspaceId,
-        component: 'WorkspaceContributeCard',
-        tuicomponent:
-          'container_workspace/components/card/WorkspaceContributeCard',
-        user: {},
-      };
-      return Array.prototype.concat([contributeCard], cards);
+      return [
+        {
+          instanceid: this.workspaceId,
+          component: 'WorkspaceContributeCard',
+          tuicomponent:
+            'container_workspace/components/card/WorkspaceContributeCard',
+          // Populate all the default data.
+          name: '',
+          user: {},
+        },
+      ].concat(cards);
     },
 
     adderOpen() {

@@ -24,6 +24,8 @@
     <ModalContent
       :close-button="closeButton"
       :title-id="id"
+      :title="title"
+      :title-visible="false"
       @dismiss="$emit('request-close')"
     >
       <div class="tui-workspaceWarningModal__container">

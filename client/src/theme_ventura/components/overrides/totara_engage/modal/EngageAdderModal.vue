@@ -20,7 +20,7 @@
 .tui-engageAdderModal {
   &__browseTable {
     &__img {
-      width: 84px;
+      width: 100%;
       height: 45px;
     }
 

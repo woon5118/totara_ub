@@ -39,6 +39,7 @@
       :workspace-id="instanceId"
       :show-adder="showAdder"
       :units="12"
+      @update-show-adder="showAdder = $event"
       @close="showAdder = false"
     />
   </div>
@@ -49,6 +50,7 @@ import Card from 'tui/components/card/Card';
 import Contribute from 'totara_engage/components/contribution/Contribute';
 import { AccessManager } from 'totara_engage/index';
 import Share from 'container_workspace/components/contribution/Share';
+import { isPrivate, isHidden } from 'container_workspace/index';
 
 // GraphQL
 import getWorkspace from 'container_workspace/graphql/get_workspace';
@@ -90,13 +92,26 @@ export default {
       return {
         instanceId: this.instanceId,
         component: 'container_workspace',
-        // TODO: this needs to be the access of the workspace. For now we just assume public.
-        access: AccessManager.PUBLIC,
+        access: this.accessStatus,
         autoShareRecipient: true,
         area: 'LIBRARY',
         name: this.workspace.name,
         showModal: true,
       };
+    },
+
+    accessStatus() {
+      if (this.workspace.access) {
+        if (
+          isPrivate(this.workspace.access) ||
+          isHidden(this.workspace.access)
+        ) {
+          return AccessManager.RESTRICTED;
+        }
+      }
+
+      // Otherwise default to public.
+      return AccessManager.PUBLIC;
     },
   },
 };

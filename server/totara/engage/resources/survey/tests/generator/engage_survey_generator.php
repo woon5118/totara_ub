@@ -81,6 +81,19 @@ final class engage_survey_generator extends component_generator_base implements 
     }
 
     /**
+     * @param string|null   $question
+     * @param array         $options
+     * @param int           $answer_type
+     *
+     * @return survey
+     */
+    public function create_restricted_survey(?string $question = null, array $options = [],
+                                             int $answer_type = answer_type::MULTI_CHOICE): survey {
+        $parameters = ['access' => access::RESTRICTED];
+        return $this->create_survey($question, $options, $answer_type, $parameters);
+    }
+
+    /**
      * @return void
      */
     public function generate_random(): void {

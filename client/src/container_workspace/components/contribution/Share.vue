@@ -17,27 +17,41 @@
 -->
 
 <template>
-  <EngageAdderModal
-    :title="$str('workspace:add_library', 'container_workspace')"
-    :open="showAdder"
-    :cards="contribution.cards"
-    :filter-value="filterValue"
-    filter-component="container_workspace"
-    filter-area="adder"
-    @added="adderUpdate"
-    @cancel="$emit('close', $event)"
-    @topic="filterTopic"
-    @search="filterSearch"
-    @section="filterSection"
-  />
+  <div>
+    <ModalPresenter :open="warning.modal" @request-close="closeWarning">
+      <WorkspaceWarningModal
+        :title="$str('warning_change_title', 'container_workspace')"
+        :message-content="warning.message"
+        :close-button="false"
+        :confirm-button-text="$str('continue', 'moodle')"
+        @confirm="shareItems(currentItems)"
+      />
+    </ModalPresenter>
+    <EngageAdderModal
+      :title="$str('workspace:add_library', 'container_workspace')"
+      :open="showAdder"
+      :cards="contribution.cards"
+      :filter-value="filterValue"
+      filter-component="container_workspace"
+      filter-area="adder"
+      @added="processAddingItems"
+      @cancel="$emit('close', $event)"
+      @topic="filterTopic"
+      @search="filterSearch"
+      @section="filterSection"
+    />
+  </div>
 </template>
 
 <script>
 import EngageAdderModal from 'totara_engage/components/modal/EngageAdderModal';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import WorkspaceWarningModal from 'container_workspace/components/modal/WorkspaceWarningModal';
 
 // GraphQL
 import shareWithRecipient from 'totara_engage/graphql/share_with_recipient';
 import contributionCards from 'container_workspace/graphql/contribution_cards';
+import checkLibraryAccess from 'container_workspace/graphql/check_share_access_for_library';
 
 // Mixins
 import ContributionMixin from 'totara_engage/mixins/contribution_mixin';
@@ -45,6 +59,8 @@ import ContributionMixin from 'totara_engage/mixins/contribution_mixin';
 export default {
   components: {
     EngageAdderModal,
+    ModalPresenter,
+    WorkspaceWarningModal,
   },
 
   mixins: [ContributionMixin],
@@ -55,6 +71,17 @@ export default {
       required: true,
     },
     showAdder: Boolean,
+  },
+
+  data() {
+    return {
+      // This variable is to keep track of the current selection.
+      currentItems: [],
+      warning: {
+        message: '',
+        modal: false,
+      },
+    };
   },
 
   watch: {
@@ -92,24 +119,85 @@ export default {
   },
 
   methods: {
-    adderUpdate(selection) {
-      this.$apollo
-        .mutate({
+    /**
+     * @param {String[]} selection
+     */
+    async processAddingItems(selection) {
+      let items = selection.map(item => JSON.parse(item));
+      this.currentItems = items;
+
+      let { warning, message } = await this.checkAccessSetting(items);
+
+      if (warning) {
+        this.warning.message = message;
+        this.warning.modal = true;
+
+        this.$emit('close');
+        return;
+      }
+
+      await this.shareItems(items);
+    },
+
+    /**
+     * Check the access settings of the items before actually submitting the sharing item to the workspaces.
+     * @param {Object} items
+     * @return {{warning: String, message: String}}
+     */
+    async checkAccessSetting(items) {
+      const {
+        data: {
+          result: { warning, message },
+        },
+      } = await this.$apollo.query({
+        query: checkLibraryAccess,
+        variables: {
+          items: items,
+          workspace_id: this.workspaceId,
+        },
+      });
+
+      return {
+        warning: warning,
+        message: message,
+      };
+    },
+
+    /**
+     * Note that we do not want to usee the local variable {@see currentItems} because if there is something wrong
+     * with the cache invalidation then currentIems will just cause some un-expected behaviour.
+     *
+     * @param {Object[]} items
+     * @return {Promise<void>}
+     */
+    async shareItems(items) {
+      try {
+        await this.$apollo.mutate({
           mutation: shareWithRecipient,
           refetchAll: false,
           refetchQueries: ['container_workspace_shared_cards'],
           variables: {
-            items: selection.map(item => JSON.parse(item)),
+            items: items,
             recipient: {
               instanceid: this.workspaceId,
               component: 'container_workspace',
               area: 'LIBRARY',
             },
           },
-        })
-        .finally(() => {
-          this.$emit('close');
         });
+
+        this.warning.modal = false;
+        this.warning.message = '';
+      } finally {
+        this.$emit('close');
+      }
+    },
+
+    closeWarning() {
+      this.warning.modal = false;
+      this.warning.message = '';
+
+      this.currentItems = [];
     },
   },
 };
@@ -118,7 +206,11 @@ export default {
 <lang-strings>
 {
   "container_workspace": [
-    "workspace:add_library"
+    "workspace:add_library",
+    "warning_change_title"
+  ],
+  "moodle": [
+    "continue"
   ]
 }
 </lang-strings>
