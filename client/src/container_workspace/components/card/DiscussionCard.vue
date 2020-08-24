@@ -335,6 +335,7 @@ export default {
 
     async handleCopyLink() {
       let textArea = document.createElement('textarea');
+      textArea.classList.add('tui-sr-only');
       textArea.value = this.discussionUrl;
 
       document.body.appendChild(textArea);

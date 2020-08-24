@@ -20,6 +20,7 @@
     class="tui-workspaceContentLayout"
     :direction="gridDirection"
     :max-units="maxUnits"
+    :stack-at="stackAt"
   >
     <GridItem :units="leftUnits">
       <!-- 60% of the grid system is for the content-->
@@ -49,6 +50,11 @@ export default {
     maxUnits: {
       type: [Number, String],
       required: true,
+    },
+
+    stackAt: {
+      type: Number,
+      default: 764,
     },
 
     gridDirection: String,

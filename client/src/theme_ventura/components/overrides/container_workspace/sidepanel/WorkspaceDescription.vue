@@ -19,9 +19,6 @@
 <style lang="scss">
 .tui-workspaceDescription {
   &__body {
-    display: flex;
-    flex-direction: column;
-
     &__time {
       @include tui-font-body-small();
       margin-bottom: var(--tui-gap-4);

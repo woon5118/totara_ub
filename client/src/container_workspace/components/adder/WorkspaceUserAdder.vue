@@ -31,7 +31,7 @@
     @cancel="$emit('cancel')"
     @selected-tab-active="selectedUserIds = $event"
     @load-more="fetchMore"
-    @added="$emit('add-members', $event)"
+    @added="addedUsers($event)"
   >
     <FilterBar
       slot="browse-filters"
@@ -262,6 +262,11 @@ export default {
           };
         },
       });
+    },
+
+    addedUsers(event) {
+      this.$emit('add-members', event);
+      this.$apollo.queries.users.refetch();
     },
   },
 };

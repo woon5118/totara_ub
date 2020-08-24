@@ -16,14 +16,9 @@
   @module container_workspace
 -->
 <template>
-  <Modal
-    :dismissable="dismissable"
-    :aria-labelledby="id"
-    class="tui-workspaceWarningModal"
-  >
+  <Modal :dismissable="dismissable" class="tui-workspaceWarningModal">
     <ModalContent
       :close-button="closeButton"
-      :title-id="id"
       :title="title"
       :title-visible="false"
       @dismiss="$emit('request-close')"
@@ -119,7 +114,6 @@ export default {
         esc: true,
         backdropClick: false,
       },
-      id: this.$id(this.title),
     };
   },
 };
