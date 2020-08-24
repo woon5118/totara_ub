@@ -36,7 +36,11 @@ Feature: User activity anonymise responses
     When I log in as "subject"
     And I navigate to the outstanding perform activities list page
     And I click on "Anonymise responses activity" "link"
-    And I click show others responses
+    And I answer "short text" question "Question one" with "My Answer one"
+    And I answer "short text" question "Question two" with "My Answer two"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I click on "Anonymise responses activity" "link"
     Then I should not see "Manager response"
     And I should not see "Appraiser response"
     And I should see "Others’ responses"
@@ -52,9 +56,9 @@ Feature: User activity anonymise responses
 
     # The missing ("No response submitted") answers should be last.
     And I should see "Manager Answer one" in the ".tui-otherParticipantResponses:first-child .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(1)" "css_element"
-    And I should see "No response submitted" in the ".tui-otherParticipantResponses:first-child .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(2)" "css_element"
+    And I should see "My Answer one" in the ".tui-otherParticipantResponses:first-child .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(2)" "css_element"
     And I should see "No response submitted" in the ".tui-otherParticipantResponses:first-child .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(3)" "css_element"
 
     And I should see "Manager Answer one" in the ".tui-otherParticipantResponses:last-child  .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(1)" "css_element"
-    And I should see "No response submitted" in the ".tui-otherParticipantResponses:last-child  .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(2)" "css_element"
+    And I should see "My Answer one" in the ".tui-otherParticipantResponses:last-child  .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(2)" "css_element"
     And I should see "No response submitted" in the ".tui-otherParticipantResponses:last-child  .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(3)" "css_element"

@@ -70,6 +70,8 @@ use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\manual_participant_progress;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
+use mod_perform\state\participant_section\complete as participant_section_complete;
+use mod_perform\state\participant_section\in_progress as participant_section_in_progress;
 use mod_perform\util;
 use totara_core\entities\relationship;
 use totara_core\relationship\relationship as core_relationship;
@@ -921,12 +923,13 @@ class mod_perform_generator extends component_generator_base {
             $section1 = $this->include_elements_in_subject_instance($data, $activity);
 
             $participant_instances = [$subjects_participant_instance, $other_participant_instance, $third_participant_instance];
+            $participant_sections = [];
             foreach ($participant_instances as $participant_instance) {
                 if ($participant_instance === null) {
                     continue;
                 }
 
-                $this->create_participant_section($activity, $participant_instance, false, $section1);
+                $participant_sections[] = $this->create_participant_section($activity, $participant_instance, false, $section1);
             }
 
             $relationships_can_view = $data['relationships_can_view'] ?? 'subject, manager, appraiser';
@@ -970,8 +973,16 @@ class mod_perform_generator extends component_generator_base {
                 $third_participant_instance->core_relationship_id = $appraiser_relationship->core_relationship_id;
                 $third_participant_instance->save();
             }
-        }
+            $update_participant_sections_status = $data['update_participant_sections_status'] ?? false;
+            if ($update_participant_sections_status) {
+                foreach ($participant_sections as $participant_section) {
+                    $status = ($update_participant_sections_status == 'draft') ? participant_section_in_progress::get_code() : participant_section_complete::get_code();
 
+                    $participant_section->progress = $status;
+                    $participant_section->save();
+                }
+            }
+        }
         // Returning the last subject instance when repeating
         return end($subject_instances);
     }

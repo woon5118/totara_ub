@@ -289,6 +289,7 @@ class mod_perform_userdata_export_responses_testcase  extends advanced_testcase 
             'subject_user_id' => $subject->id,
             'other_participant_id' => $participant->id,
             'include_questions' => true,
+            'update_participant_sections_status' => 'draft',
         ]);
         $generator->create_responses($subject_subject_instance);
 

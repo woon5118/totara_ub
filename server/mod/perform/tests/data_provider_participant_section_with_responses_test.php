@@ -64,6 +64,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             'subject_user_id' => $subject->id,
             'other_participant_id' => user::logged_in()->id,
             'include_questions' => true,
+            'update_participant_sections_status' => true,
         ]);
 
         $participant_section = new participant_section(
@@ -101,6 +102,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             'subject_user_id' => $subject->id,
             'other_participant_id' => user::logged_in()->id,
             'include_questions' => true,
+            'update_participant_sections_status' => 'complete',
         ]);
 
         $participant_section = new participant_section(
@@ -130,6 +132,80 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         }
     }
 
+    public function test_not_getting_draft_answers(): void {
+        self::setAdminUser();
+
+        $subject = self::getDataGenerator()->create_user();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject->id,
+            'other_participant_id' => user::logged_in()->id,
+            'include_questions' => true,
+            'update_participant_sections_status' => 'draft',
+        ]);
+
+
+        $participant_section = new participant_section(
+            participant_section_entity::repository()
+                ->with(['section_elements', 'participant_instance'])
+                ->get()
+                ->first()
+        );
+
+        $data_provider = new participant_section_with_responses($participant_section);
+
+        $main_responses =  $data_provider->build()->get_section_element_responses();
+        self::assertCount(2, $main_responses);
+
+        // Set the manager's response on each question.
+        foreach ($main_responses->all(false) as $question_number => $main_response) {
+            self::assertNull($main_response->response_data);
+
+            $other_responder_groups = $main_response->get_other_responder_groups();
+            self::assertCount(1, $other_responder_groups);
+
+            /** @var responder_group $manager_response_group */
+            $manager_response_group = $other_responder_groups->first();
+            self::assertEquals($manager_response_group->get_relationship_name(), 'Manager');
+
+            $manager_responses =  $manager_response_group->get_responses();
+            self::assertCount(1, $manager_responses);
+
+            /** @var section_element_response $manager_response */
+            $manager_response = $manager_responses->first();
+            self::assertNull($manager_response->response_data);
+
+            $manager_response->set_response_data($question_number);
+            $manager_response->save();
+        }
+
+        $main_responses =  $data_provider->build()->get_section_element_responses();
+        self::assertCount(2, $main_responses);
+
+        // Set the manager's response on each question.
+        foreach ($main_responses->all(false) as $question_number => $main_response) {
+            self::assertNull($main_response->response_data);
+
+            $other_responder_groups = $main_response->get_other_responder_groups();
+            self::assertCount(1, $other_responder_groups);
+
+            /** @var responder_group $manager_response_group */
+            $manager_response_group = $other_responder_groups->first();
+            self::assertEquals($manager_response_group->get_relationship_name(), 'Manager');
+
+            $manager_responses =  $manager_response_group->get_responses();
+            self::assertCount(1, $manager_responses);
+
+            /** @var section_element_response $manager_response */
+            $manager_response = $manager_responses->first();
+            self::assertNull($manager_response->response_data);
+        }
+    }
+
     public function test_get_others_answered_responses(): void {
         self::setAdminUser();
 
@@ -143,6 +219,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             'subject_user_id' => $subject->id,
             'other_participant_id' => user::logged_in()->id,
             'include_questions' => true,
+            'update_participant_sections_status' => 'complete',
         ]);
 
         $participant_section = new participant_section(
@@ -233,6 +310,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             'subject_user_id' => $subject_user_id,
             'other_participant_id' => null,
             'include_questions' => false,
+            'update_participant_sections_status' => 'complete',
         ]);
 
         $activity = new activity($subject_instance->activity());
@@ -412,6 +490,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             'subject_user_id' => $subject_user_id,
             'other_participant_id' => null,
             'include_questions' => false,
+            'update_participant_sections_status' => 'complete',
         ]);
 
         $activity = new activity($subject_instance->activity());
@@ -550,6 +629,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             'subject_user_id' => $subject_user_id,
             'other_participant_id' => null,
             'include_questions' => false,
+            'update_participant_sections_status' => 'complete',
         ]);
 
         $activity = new activity($subject_instance->activity());
@@ -714,6 +794,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
                 'other_participant_id'     => null,
                 'include_questions'        => false,
                 'anonymous_responses'      => 'true',
+                'update_participant_sections_status' => 'complete',
             ]
         );
 

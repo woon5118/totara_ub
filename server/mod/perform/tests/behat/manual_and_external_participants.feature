@@ -261,9 +261,15 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I click on "Act1" "button"
     Then the "Manager (In progress)" radio button is selected
     When I click on "Continue" "button"
+    Then I should see that show others responses is toggled "off"
+    And I answer "short text" question "Question 1" with "My Answer one"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I click on "Act1" "button"
+    Then the "Manager (Complete)" radio button is selected
+    When I click on "Continue" "button"
     And I wait until ".tui-otherParticipantResponses" "css_element" exists
     Then I should see that show others responses is toggled "off"
-    When I click show others responses
     Then I should see "Mark Metcalfe"
     And I should see perform "short text" question "Question 1" is answered by "External respondent" with "External participant was here"
     When I log out
@@ -342,9 +348,9 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I should not see "No items to display"
     When I click on "Act1" "button"
     Then I should see "Select relationship to continue"
-    And I should see "Manager (In progress)"
+    And I should see "Manager (Complete)"
     And I should see "Reviewer (In progress)"
-    And the "Manager (In progress)" radio button is selected
+    And the "Manager (Complete)" radio button is selected
     When I click on "Continue" "button"
     Then I should see perform activity relationship to user "Manager"
     When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists

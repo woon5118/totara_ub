@@ -38,6 +38,7 @@ use mod_perform\models\activity\settings\visibility_conditions\visibility_option
 use mod_perform\models\response\participant_section;
 use mod_perform\models\response\responder_group;
 use mod_perform\models\response\section_element_response;
+use mod_perform\state\participant_section\complete as participant_section_complete;
 
 class participant_section_with_responses {
 
@@ -182,6 +183,7 @@ class participant_section_with_responses {
      * @param collection $section_elements
      * @param collection $existing_responses
      * @param bool $include_other_responder_groups
+     * @param bool $include_draft
      *
      * @return collection|section_element_response[]
      */
@@ -189,7 +191,8 @@ class participant_section_with_responses {
         participant_instance_model $participant_instance,
         collection $section_elements,
         collection $existing_responses,
-        bool $include_other_responder_groups = false
+        bool $include_other_responder_groups = false,
+        bool $include_draft = true
     ): collection {
         if ($this->load_responses_for_submission) {
             $section_elements = $section_elements->filter(function (section_element $section_element_entity) {
@@ -202,15 +205,20 @@ class participant_section_with_responses {
             function (section_element $section_element) use (
                 $participant_instance,
                 $existing_responses,
-                $include_other_responder_groups
+                $include_other_responder_groups,
+                $include_draft
             ) {
                 // The element response model will accept missing entities
                 // in the case where a question has not yet been answered.
-                $element_response_entity = $this->find_existing_response_entity(
-                    $existing_responses,
-                    $section_element->id,
-                    $participant_instance->id
-                );
+                if ($include_draft || $this->participant_section->get_progress_state() instanceof participant_section_complete) {
+                    $element_response_entity = $this->find_existing_response_entity(
+                        $existing_responses,
+                        $section_element->id,
+                        $participant_instance->id
+                    );
+                } else {
+                    $element_response_entity = null;
+                }
 
                 $other_responder_groups = new collection();
 
@@ -274,6 +282,7 @@ class participant_section_with_responses {
                 $other_participant_instance,
                 $section_elements,
                 $existing_responses,
+                false,
                 false
             );
 

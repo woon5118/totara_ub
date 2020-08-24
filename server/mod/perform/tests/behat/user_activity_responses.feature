@@ -8,10 +8,11 @@ Feature: Viewing other responses
       | david    | David     | Two      | david.two@example.com   |
       | harry    | Harry     | Three    | harry.three@example.com |
     And the following "subject instances" exist in "mod_perform" plugin:
-      | activity_name                 | subject_username | subject_is_participating | other_participant_username | include_required_questions | include_static_content | activity_status |
-      | John is participating subject | john             | true                     | david                      | true                       | true                   | Draft           |
-      | David is subject              | david            | false                    | admin                      | true                       | true                   | Draft           |
-      | John is not participating     | harry            | true                     | david                      | false                      | true                   | Draft           |
+      | activity_name                 | subject_username | subject_is_participating | other_participant_username | include_required_questions | include_static_content | activity_status | update_participant_sections_status |
+      | John is participating subject | john             | true                     | david                      | true                       | true                   | Draft           | complete                           |
+      | David is subject              | david            | false                    | admin                      | true                       | true                   | Draft           | complete                           |
+      | John is not participating     | harry            | true                     | david                      | false                      | true                   | Draft           | complete                           |
+      | John draft                    | john             | true                     | david                      | true                       | true                   | Draft           | draft                              |
 
   Scenario: I can respond to my activities and view other non-respond activities
     When I log in as "john"
@@ -92,9 +93,12 @@ Feature: Viewing other responses
     And I log in as "john"
     And I navigate to the outstanding perform activities list page
     And I click on "John is participating subject" "link"
+    And I answer "short text" question "Question one" with "My Answer one"
+    And I answer "short text" question "Question two" with "My  Answer two"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I click on "John is participating subject" "link"
     Then I should see that show others responses is toggled "off"
-
-    When I click show others responses
     And I wait until ".tui-otherParticipantResponses" "css_element" exists
     Then I should see perform "short text" question "Question one" is answered by "Manager" with "Manager Answer one"
     And I should see perform "short text" question "Question two" is answered by "Manager" with "Manager Answer two"
@@ -126,9 +130,18 @@ Feature: Viewing other responses
   Scenario: I can save as a draft
     When I log in as "john"
     And I navigate to the outstanding perform activities list page
-    And I click on "John is participating subject" "link"
+    And I click on "John draft" "link"
     Then I should see perform "Question one" question is "required"
     And I should see perform "Question two" question is "required"
     And I answer "short text" question "Question one" with "John Answer one"
     When I click on "Save as draft" "button"
     Then I should see "Draft saved" in the tui success notification toast
+    And I log out
+    When I log in as "david"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Activities about others" "link"
+    And I click on "John draft" "link"
+    And I should see that show others responses is toggled "off"
+    And I click show others responses
+    And I wait until ".tui-otherParticipantResponses" "css_element" exists
+    Then I should see "No response submitted"

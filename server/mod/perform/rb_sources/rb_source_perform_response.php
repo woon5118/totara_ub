@@ -33,6 +33,7 @@ use mod_perform\rb\traits\section_element_trait;
 use mod_perform\rb\traits\section_trait;
 use mod_perform\rb\traits\subject_instance_trait;
 use totara_core\advanced_feature;
+use mod_perform\state\participant_section\complete;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -87,7 +88,13 @@ class rb_source_perform_response extends rb_base_source {
         $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_response');
 
         $this->usedcomponents[] = 'mod_perform';
-        $this->base = '{perform_element_response}';
+        $this->base = "(SELECT es.*
+                        FROM {perform_element_response} es
+                        JOIN {perform_section_element} se ON es.section_element_id = se.id
+                        JOIN {perform_participant_section} ps
+                            ON ps.section_id = se.section_id AND ps.participant_instance_id = es.participant_instance_id
+                                AND ps.progress = ".complete::get_code()."
+                        )";
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
 
@@ -426,6 +433,7 @@ class rb_source_perform_response extends rb_base_source {
             'subject_is_participating' => true,
             'subject_user_id' => \core\entities\user::repository()->get()->last()->id,
             'include_questions' => true,
+            'update_participant_sections_status' => 'complete',
         ]);
         (new mod_perform_generator(new testing_data_generator()))->create_responses($si, 1);
     }
