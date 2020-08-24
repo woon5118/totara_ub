@@ -47,6 +47,10 @@ export default {
   },
 
   props: {
+    subjectInstanceId: {
+      required: true,
+      type: [Number, String],
+    },
     value: {
       type: Array,
       default() {
@@ -73,6 +77,7 @@ export default {
       query: SelectableUsersQuery,
       variables() {
         return {
+          subject_instance_id: this.subjectInstanceId,
           filters: {
             fullname: this.fullnameFilter,
             exclude_users: this.excludeUsers,

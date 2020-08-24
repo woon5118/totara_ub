@@ -20,14 +20,18 @@ Input for filtering what users can be selected.
 """
 input mod_perform_selectable_users_filters {
   fullname: String
-  exclude_users: [core_id]
+  exclude_users: [core_id!]
 }
 
 extend type Query {
   """
   Get the users that are visible and selectable by the current user.
+  Please be aware that the number of users returned by this query is limited
+  to make sure it performs well. It is not designed to list all users
+  nor does it support pagination at the moment.
   """
   mod_perform_selectable_users(
+    subject_instance_id: core_id!
     filters: mod_perform_selectable_users_filters
   ): [core_user]!
 }

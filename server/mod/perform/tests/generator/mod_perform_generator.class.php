@@ -27,6 +27,7 @@ use core\collection;
 use core\entities\cohort;
 use core\entities\user;
 use core\orm\query\builder;
+use core_container\container_category_helper;
 use core_container\module\module;
 use hierarchy_organisation\entities\organisation;
 use hierarchy_position\entities\position;

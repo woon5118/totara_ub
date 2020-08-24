@@ -105,7 +105,9 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I should see the current date in format "j F Y" in the ".tui-performActivityParticipantSelector-meta" "css_element"
     # Subject can select themselves
     And I should see the following options in the tui taglist in the ".tui-formRow" "css_element":
+      | Admin User |
       | Appraiser User |
+      | Colleague User |
       | Manager User   |
     And I should see "Peer" in the ".tui-formRow" "css_element"
     When I click on "Save" "button"
@@ -129,6 +131,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     Then I should see "Mentor" in the ".tui-formRow:nth-child(1)" "css_element"
     And I should see "External respondent" in the ".tui-formRow:nth-child(2)" "css_element"
     And I should see the following options in the tui taglist in the ".tui-formRow:nth-child(1)" "css_element":
+      | Admin User |
       | Appraiser User |
       | Colleague User |
       | Manager User   |
@@ -164,7 +167,9 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I click on "Select participants" "link" in the ".tui-actionCard" "css_element"
     Then I should see "Reviewer" in the ".tui-formRow" "css_element"
     And I should see the following options in the tui taglist in the ".tui-formRow" "css_element":
+      | Admin User |
       | Appraiser User |
+      | Colleague User |
       | Manager User   |
     When I select from the tui taglist in the ".tui-formRow" "css_element":
       | Manager User |

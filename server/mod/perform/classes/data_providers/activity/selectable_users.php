@@ -18,18 +18,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com?
  * @package mod_perform
  */
 
 namespace mod_perform\data_providers\activity;
 
-use core\collection;
 use core\entities\user;
 use core\entities\user_repository;
 use core\orm\entity\repository;
-use core_user\access_controller;
-use Dompdf\FrameReflower\Page;
+use core\orm\query\field;
+use core\tenant_orm_helper;
 use mod_perform\data_providers\provider;
+use mod_perform\models\activity\activity as activity_model;
 
 /**
  * Class selectable_users
@@ -41,17 +42,34 @@ use mod_perform\data_providers\provider;
 class selectable_users extends provider {
 
     /**
+     * @var activity_model
+     */
+    protected $activity;
+
+    public function __construct(activity_model $activity) {
+        $this->activity = $activity;
+    }
+
+    /**
      * @inheritDoc
      */
     protected function build_query(): repository {
         $repository = user::repository()
-            ->select_profile_summary_card_fields()
             ->filter_by_not_guest()
             ->filter_by_not_deleted()
+            ->filter_by_not_suspended()
+            ->when(true, function (repository $repository) {
+                tenant_orm_helper::restrict_users(
+                    $repository,
+                    new field('id', $repository->get_builder()),
+                    $this->activity->get_context()
+                );
+            })
             ->order_by_full_name();
 
-        // Somewhat arbitrary number - we want to make the result set small-ish for performance.
-        // TODO: Evaluate performance and see if we still need this in TL-26294
+        // We limit the number of users this returns to make sure it
+        // performs well. This query is not designed to list
+        // all users nor does it support pagination
         $repository->limit(30);
 
         return $repository;
@@ -71,20 +89,6 @@ class selectable_users extends provider {
      */
     protected function filter_query_by_exclude_users(repository $repository, array $user_ids_to_exclude): void {
         $repository->where_not_in('id', $user_ids_to_exclude);
-    }
-
-    /**
-     * Restrict the returned users to what the current user is allowed to view.
-     *
-     * @return collection|user[]
-     */
-    protected function process_fetched_items(): collection {
-        return $this->items
-            ->filter(static function (user $user) {
-                // TODO: Improve performance and make sure it works with multi-tenancy in TL-26294
-                return access_controller::for($user->get_record())
-                    ->can_view_field('fullname');
-            });
     }
 
 }

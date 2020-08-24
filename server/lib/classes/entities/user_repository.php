@@ -56,6 +56,17 @@ class user_repository extends repository {
     }
 
     /**
+     * Filter only users not marked as suspended
+     *
+     * @return $this
+     */
+    public function filter_by_not_suspended(): self {
+        $this->where('suspended', 0);
+
+        return $this;
+    }
+
+    /**
      * Only real users
      *
      * @return $this

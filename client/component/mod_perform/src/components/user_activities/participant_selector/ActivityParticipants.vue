@@ -56,6 +56,7 @@
         >
           <UserSelector
             v-model="value"
+            :subject-instance-id="subjectInstance.id"
             :exclude-users="[subjectInstance.subject_user.id]"
             @input="update"
           />

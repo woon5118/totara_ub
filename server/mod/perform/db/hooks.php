@@ -22,6 +22,7 @@
  */
 
 use core_container\hook\module_supported_in_container;
+use core_user\hook\allow_view_profile;
 use mod_perform\watcher\activity;
 use mod_perform\hook\subject_instances_created;
 use mod_perform\watcher\participant_instances;
@@ -49,6 +50,10 @@ $watchers = [
     [
         'hookname' => allow_view_profile_field::class,
         'callback' => [user::class, 'allow_view_profile_field'],
+    ],
+    [
+        'hookname' => allow_view_profile::class,
+        'callback' => [user::class, 'allow_view_profile'],
     ],
     [
         'hookname' => participant_instances_created::class,

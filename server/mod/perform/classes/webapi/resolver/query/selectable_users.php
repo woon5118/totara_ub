@@ -23,14 +23,13 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use context_coursecat;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
-use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\activity\selectable_users as selectable_users_provider;
-use mod_perform\util;
+use mod_perform\models\activity\activity as activity_model;
+use mod_perform\webapi\middleware\require_activity;
 
 /**
  * Get the users that the current user can see and can select.
@@ -43,9 +42,10 @@ class selectable_users implements query_resolver, has_middleware {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        $ec->set_relevant_context(context_coursecat::instance(util::get_default_category_id()));
+        /** @var activity_model $activity */
+        $activity = $args['activity'];
 
-        return (new selectable_users_provider())
+        return (new selectable_users_provider($activity))
             ->add_filters($args['filters'] ?? [])
             ->get();
     }
@@ -56,7 +56,7 @@ class selectable_users implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            new require_login(),
+            require_activity::by_subject_instance_id('subject_instance_id', true),
         ];
     }
 

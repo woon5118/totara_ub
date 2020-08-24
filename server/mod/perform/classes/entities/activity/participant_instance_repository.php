@@ -40,23 +40,28 @@ class participant_instance_repository extends repository {
      * @return bool
      */
     public function user_can_view_other_users_profile(int $viewing_user_id, int $target_user_id): bool {
-        $shared_subject_instance = participant_instance::repository()
+        $shared_subject_instance = builder::table(participant_instance::TABLE)
             ->as('other_pi')
             ->select('id')
-            ->where_raw('main_pi.subject_instance_id = other_pi.subject_instance_id')
-            ->where_raw('other_pi.id != main_pi.id')
-            ->get_builder();
+            ->where('participant_id', $target_user_id)
+            ->where('participant_source', participant_source::INTERNAL)
+            ->where_field('subject_instance_id', 'main_pi.subject_instance_id')
+            ->where_field('id', '<>', 'main_pi.id');
 
-        $participant_in_subject_about_target = subject_instance::repository()
-            ->as('si')
-            ->select('id')
-            ->where('si.subject_user_id', $target_user_id)
-            ->where_raw('si.id = main_pi.subject_instance_id')
-            ->get_builder();
+        $participant_in_subject_about_target = builder::table(subject_instance::TABLE)
+            ->as('si2')
+            ->where('subject_user_id', $target_user_id)
+            ->where_field('id', 'main_pi.subject_instance_id');
 
-        return participant_instance::repository()
+        return builder::table(participant_instance::TABLE)
             ->as('main_pi')
-            ->where('main_pi.participant_id', $viewing_user_id)
+            ->join([subject_instance::TABLE, 'si'], 'subject_instance_id', 'id')
+            ->join([track_user_assignment::TABLE, 'tua'], 'si.track_user_assignment_id', 'id')
+            ->join([track::TABLE, 't'], 'tua.track_id', 'id')
+            ->join([activity::TABLE, 'a'], 't.activity_id', 'id')
+            ->where('participant_id', $viewing_user_id)
+            ->where('participant_source', participant_source::INTERNAL)
+            ->where('a.anonymous_responses', 0)
             ->where(function (builder $builder) use ($shared_subject_instance, $participant_in_subject_about_target) {
                 return $builder->where_exists($shared_subject_instance)
                     ->or_where_exists($participant_in_subject_about_target);

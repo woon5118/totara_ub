@@ -65,13 +65,23 @@ class mod_perform_participant_instance_repository_testcase extends advanced_test
         $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 
         $subject_user = self::getDataGenerator()->create_user();
+        $subject_user2 = self::getDataGenerator()->create_user();
         $main_user = self::getDataGenerator()->create_user();
         $other_user = self::getDataGenerator()->create_user();
+        $other_user2 = self::getDataGenerator()->create_user();
 
         $subject_instance = $generator->create_subject_instance([
             'subject_is_participating' => false,
             'subject_user_id' => $subject_user->id,
             'other_participant_id' => $other_user->id,
+            'include_questions' => false,
+        ]);
+
+        // Create a control instance
+        $subject_instance2 = $generator->create_subject_instance([
+            'subject_is_participating' => false,
+            'subject_user_id' => $subject_user2->id,
+            'other_participant_id' => $other_user2->id,
             'include_questions' => false,
         ]);
 
@@ -83,9 +93,47 @@ class mod_perform_participant_instance_repository_testcase extends advanced_test
         $other_participant_instance->progress = not_started::get_code();
         $other_participant_instance->save();
 
-        $can_view = participant_instance::repository()->user_can_view_other_users_profile($main_user->id, $other_user->id);
+        $can_view = participant_instance::repository()
+            ->user_can_view_other_users_profile($main_user->id, $other_user->id);
 
         self::assertTrue($can_view);
+
+        $can_view = participant_instance::repository()
+            ->user_can_view_other_users_profile($main_user->id, $other_user2->id);
+
+        self::assertFalse($can_view);
+    }
+
+    public function test_user_can_not_view_other_users_profile_when_anonymous_setting_is_on(): void {
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $subject_user = self::getDataGenerator()->create_user();
+        $main_user = self::getDataGenerator()->create_user();
+        $other_user = self::getDataGenerator()->create_user();
+
+        $subject_instance = $generator->create_subject_instance([
+            'subject_is_participating' => false,
+            'subject_user_id' => $subject_user->id,
+            'other_participant_id' => $other_user->id,
+            'include_questions' => false,
+            'anonymous_responses' => true,
+        ]);
+
+        $other_participant_instance = new participant_instance();
+        $other_participant_instance->core_relationship_id = 0; // stubbed
+        $other_participant_instance->participant_source = participant_source::INTERNAL;
+        $other_participant_instance->participant_id = $main_user->id;
+        $other_participant_instance->subject_instance_id = $subject_instance->id;
+        $other_participant_instance->progress = not_started::get_code();
+        $other_participant_instance->save();
+
+        $can_view = participant_instance::repository()
+            ->user_can_view_other_users_profile($main_user->id, $other_user->id);
+
+        self::assertFalse($can_view);
     }
 
     public function test_user_can_view_other_users_profile_when_other_is_subject(): void {
