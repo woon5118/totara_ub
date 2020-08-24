@@ -29,10 +29,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// extra execution prevention
+if (isset($_SERVER['REMOTE_ADDR'])) {
+    exit(1);
+}
+
 // Force OPcache reset if used, we do not want any stale caches
 // when detecting if upgrade necessary or when running upgrade.
 if (function_exists('opcache_reset') and !isset($_SERVER['REMOTE_ADDR'])) {
     opcache_reset();
+}
+
+// Check that config.php exists, if not then call the install script
+if (!file_exists(__DIR__ . '/../../../config.php')) {
+    echo "config.php file does not exist";
+    exit(1);
+}
+
+// Make sure admin has upgraded the config.php properly to new format.
+if (strpos(file_get_contents(__DIR__ . '/../../../config.php'), "require_once(__DIR__ . '/lib/setup.php');") !== false) {
+    echo "Legacy config.php file format detected, please remove require_once(__DIR__ . '/lib/setup.php'); to match new format documented in config.example.php file.";
+    exit(1);
 }
 
 define('CLI_SCRIPT', true);

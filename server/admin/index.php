@@ -24,9 +24,15 @@
  */
 
 // Check that config.php exists, if not then call the install script
-if (!file_exists('../../config.php')) {
+if (!file_exists(__DIR__ . '/../../config.php')) {
     header('Location: ../install.php');
     die();
+}
+
+// Make sure admin has upgraded the config.php properly to new format.
+if (strpos(file_get_contents(__DIR__ . '/../../config.php'), "require_once(__DIR__ . '/lib/setup.php');") !== false) {
+    echo "Legacy config.php file format detected, please remove require_once(__DIR__ . '/lib/setup.php'); to match new format documented in config.example.php file.";
+    die;
 }
 
 // Make sure we have everything necessary for standard libraries.
