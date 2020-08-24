@@ -23,7 +23,7 @@
 
 $string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Section progress in performance activities';
-$string['sourcetitle'] = 'Participant Section (Perform)';
+$string['sourcetitle'] = 'Participant Section';
 
 $string['type_activity'] = 'Performance activity';
 $string['type_participant_instance'] = 'Participant instance';

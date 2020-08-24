@@ -25,7 +25,7 @@
 
 $string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Questions from performance activities.';
-$string['sourcetitle'] = 'Performance Questions (Perform)';
+$string['sourcetitle'] = 'Performance Questions';
 $string['type_activity'] = 'Performance activity';
 $string['type_element'] = 'Element';
 $string['type_section'] = 'Section';

@@ -23,7 +23,7 @@
 
 $string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Participant progress in performance activities';
-$string['sourcetitle'] = 'Participant Instance (Perform)';
+$string['sourcetitle'] = 'Participant Instance';
 
 $string['participant_email'] = 'Participant\'s email';
 $string['participant_email_unobscured'] = 'Participant\'s email (ignoring user display setting)';

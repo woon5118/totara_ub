@@ -26,7 +26,7 @@
 $string['response_data'] = 'Response data';
 $string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Response data from performance activities.';
-$string['sourcetitle'] = 'Performance Responses (Perform)';
+$string['sourcetitle'] = 'Performance Responses';
 $string['type_activity'] = 'Performance activity';
 $string['type_element'] = 'Element';
 $string['type_participant_instance'] = 'Participant instance';

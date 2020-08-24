@@ -25,16 +25,16 @@ Feature: Disable performance activities feature at site-level
   Scenario: Hide report source in user reports interface
     When I navigate to "Reports > Manage user reports" in site administration
     And I click on "Create report" "button"
-    And I set the field with xpath "//input[@id='search_input']" to "Perform"
+    And I set the field with xpath "//input[@id='search_input']" to "Instance"
     And I click on "button.tw-selectSearchText__btn" "css_element"
     And I wait for pending js
-    Then I should see "Performance Subject Instance (Perform)" in the ".totara_reportbuilder__createreport_list" "css_element"
-    And I should see "Participant Instance (Perform)" in the ".totara_reportbuilder__createreport_list" "css_element"
+    Then I should see "Performance Subject Instance" in the ".totara_reportbuilder__createreport_list" "css_element"
+    And I should see "Participant Instance" in the ".totara_reportbuilder__createreport_list" "css_element"
 
     When I disable the "performance_activities" advanced feature
     And I reload the page
     And I set the field with xpath "//input[@id='search_input']" to "Perform"
     And I click on "button.tw-selectSearchText__btn" "css_element"
     And I wait for pending js
-    Then I should not see "Performance Subject Instance (Perform)" in the ".totara_reportbuilder__createreport_list" "css_element"
-    And I should not see "Participant Instance (Perform)" in the ".totara_reportbuilder__createreport_list" "css_element"
+    Then I should not see "Performance Subject Instance" in the ".totara_reportbuilder__createreport_list" "css_element"
+    And I should not see "Participant Instance" in the ".totara_reportbuilder__createreport_list" "css_element"

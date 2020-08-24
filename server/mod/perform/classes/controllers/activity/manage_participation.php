@@ -24,6 +24,7 @@
 namespace mod_perform\controllers\activity;
 
 use context;
+use context_coursecat;
 use context_system;
 use core\output\notification;
 use mod_perform\controllers\perform_controller;
@@ -31,6 +32,7 @@ use mod_perform\models\activity\activity;
 use mod_perform\rb\display\participant_instance_manage_participation_actions;
 use mod_perform\rb\display\participant_section_manage_participation_actions;
 use mod_perform\rb\display\subject_instance_manage_participation_actions;
+use mod_perform\util;
 use mod_perform\views\embedded_report_view;
 use mod_perform\views\override_nav_breadcrumbs;
 use moodle_url;

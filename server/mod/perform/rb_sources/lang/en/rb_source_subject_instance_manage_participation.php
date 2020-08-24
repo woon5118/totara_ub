@@ -23,7 +23,7 @@
 
 $string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Version of subject instance report source restricted to subjects where the viewing user can manage participation';
-$string['sourcetitle'] = 'Subject Instance Manage Participation (Perform)';
+$string['sourcetitle'] = 'Subject Instance Manage Participation';
 
 $string['actions'] = 'Actions';
 $string['add_participants'] = 'Add participants';

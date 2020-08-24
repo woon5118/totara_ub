@@ -26,7 +26,7 @@
 $string['name_linked_to_performance_reporting'] = 'User\'s name (linked to performance reporting)';
 $string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Version of user report source restricted to records where the viewing user can manage performance data for the users.';
-$string['sourcetitle'] = 'Performance User Reporting (Perform)';
+$string['sourcetitle'] = 'Performance User Reporting';
 $string['type_deleted_purge_type'] = 'Deleted user purge type';
 $string['type_suspended_purge_type'] = 'Suspended user purge type';
 $string['type_statistics'] = 'Statistics';
