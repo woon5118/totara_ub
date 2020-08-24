@@ -90,6 +90,7 @@
               :color-odd="colorOddRows && !draggableRows"
               :draggable="draggableRows"
               :dragging="dragging"
+              :expanded="id == expanded"
               v-bind="attrs"
             >
               <Cell
