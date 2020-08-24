@@ -21,6 +21,7 @@
  * @package totara_playlist
  */
 
+use totara_engage\rating\rating_manager;
 use totara_engage\share\shareable;
 use totara_playlist\playlist;
 use totara_engage\access\access;
@@ -228,5 +229,29 @@ final class totara_playlist_generator extends component_generator_base implement
         }
 
         return $this->create_playlist($data);
+    }
+
+    /**
+     * @param playlist $playlist
+     * @param int $rating
+     * @param int|null $user_id
+     */
+    public function add_rating(playlist $playlist, int $rating, ?int $user_id = null): void {
+        global $USER;
+        if (null == $user_id) {
+            $user_id = $USER->id;
+        }
+
+        $manager = rating_manager::instance(
+            $playlist->get_id(),
+            'totara_playlist',
+            $playlist::RATING_AREA
+        );
+
+        if (!$manager->can_rate($playlist->get_userid())) {
+            throw new \coding_exception("Current user with id '{$playlist->get_userid()}' can not rate the playlist");
+        }
+
+        $manager->add($rating, $user_id);
     }
 }

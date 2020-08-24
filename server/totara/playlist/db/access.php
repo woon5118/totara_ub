@@ -49,5 +49,15 @@ $capabilities = [
             'user' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
         ]
-    ]
+    ],
+
+    /* View playlist report */
+    'totara/playlist:view_playlist_report' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'tenantusermanager' => CAP_ALLOW,
+        ],
+    ],
 ];
