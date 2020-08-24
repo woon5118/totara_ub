@@ -20,5 +20,5 @@
  * @package block_totara_user_profile
  */
  .block_totara_user_profile .content .profile_tree .node_category h3 {
-    @include tui-font-heading-medium();
+    @include tui-font-heading-small();
 }
