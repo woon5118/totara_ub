@@ -29,6 +29,9 @@
     align-items: center;
     width: 100%;
     min-width: 0;
+    min-height: calc(
+      var(--tui-tag-height) + (2 * var(--tui-border-width-thin))
+    );
   }
 
   &__tagItems {
