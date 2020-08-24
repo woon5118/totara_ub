@@ -38,9 +38,11 @@ final class environment {
      * @return string
      */
     public static function get_data_path(): string {
+        global $CFG;
+
         $data_path = get_config('ml_recommender', 'data_path');
         if ($data_path == '' || $data_path === false) {
-            throw new \coding_exception("The data path for recommender is not set");
+            $data_path = "{$CFG->dataroot}/recommender/data";
         }
 
         return $data_path;
@@ -54,7 +56,7 @@ final class environment {
     public static function get_user_result_count(): int {
         $result_count = get_config('ml_recommender', 'user_result_count');
         if (false === $result_count) {
-            throw new \coding_exception("Cannot fetch the user result count config");
+            $result_count = 25;
         }
 
         return (int) $result_count;
@@ -69,7 +71,7 @@ final class environment {
         $result_count = get_config('ml_recommender', 'item_result_count');
 
         if (false === $result_count) {
-            throw new \coding_exception("Cannot fetch the user result count config");
+            $result_count = 15;
         }
 
         return (int) $result_count;
@@ -85,7 +87,7 @@ final class environment {
         $py3path = get_config('ml_recommender', 'py3path');
 
         if (false === $py3path) {
-            throw new \coding_exception("Cannot fetch py3 path config");
+            $py3path = '/usr/bin/python3';
         }
 
         return $py3path;
@@ -101,7 +103,7 @@ final class environment {
         $query = get_config('ml_recommender', 'query');
 
         if (false === $query) {
-            throw new \coding_exception("Cannot fetch query config");
+            $query = 'mf';
         }
 
         return $query;
@@ -117,7 +119,7 @@ final class environment {
         $threads = get_config('ml_recommender', 'threads');
 
         if (false === $threads) {
-            throw new \coding_exception("Cannot fetch threads config");
+            $threads = 2;
         }
 
         return (int) $threads;
@@ -132,7 +134,7 @@ final class environment {
         $related_items_count = get_config('ml_recommender', 'related_items_count');
 
         if (false === $related_items_count) {
-            throw new \coding_exception("Cannot fetch related items count config");
+            $related_items_count = 3;
         }
 
         return (int) $related_items_count;
@@ -147,7 +149,7 @@ final class environment {
         $interactions_period = get_config('ml_recommender', 'interactions_period');
 
         if (false === $interactions_period) {
-            throw new \coding_exception("Cannot fetch interactions period config");
+            $interactions_period = 16;
         }
 
         return (int) $interactions_period;
