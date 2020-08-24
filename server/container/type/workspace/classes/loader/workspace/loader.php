@@ -120,7 +120,7 @@ final class loader {
 
         $search_term = $query->get_search_term();
         if (null !== $search_term && '' !== $search_term) {
-            $builder->where_like('c.fullname', $search_term);
+            $builder->where('c.fullname', 'ilike', $search_term);
         }
 
         $access = $query->get_access();
