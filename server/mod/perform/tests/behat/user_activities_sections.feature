@@ -295,17 +295,16 @@ Feature: Viewing the section list in the user activities view and navigating to 
     And the "Appraiser (Not yet started)" radio button is not selected
     When I click on the "Appraiser (Not yet started)" tui radio
     And I click on "Continue" "button"
-#    TODO uncomment with TL-26092, this currently will crash, but should be resolved once TL-26092 is implemented
-#    Then I should see "Anonymous responses - Multiple section Activity" in the ".tui-participantContent__header" "css_element"
-#    And I should see "Section anon 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
-#    And I should see "Question 1"
-#    And I should see perform activity relationship to user "Appraiser"
-#    When I click on "Cancel" "button"
-#    Then I should see the tui datatable contains:
-#      | Activity title                                  | Type      | User     | Relationship to user | Overall progress | Your progress   |
-#      | Single section Activity                         | Feedback  | John One | Manager              | Not yet started  | Not yet started |
-#      | Multiple section Activity                       | Appraisal | John One | Manager, Appraiser   | Not yet started  | Not yet started |
-#      | Anonymous responses - Multiple section Activity | Appraisal | John One | Manager, Appraiser   | In progress      | In progress     |
+    Then I should see "Anonymous responses - Multiple section Activity" in the ".tui-participantContent__header" "css_element"
+    And I should see "Section anon 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
+    And I should see "Question 1"
+    And I should see perform activity relationship to user "Appraiser"
+    When I click on "Cancel" "button"
+    Then I should see the tui datatable contains:
+      | Activity title                                  | Type      | User     | Relationship to user | Overall progress | Your progress   |
+      | Single section Activity                         | Feedback  | John One | Manager              | Not yet started  | Not yet started |
+      | Multiple section Activity                       | Appraisal | John One | Manager, Appraiser   | Not yet started  | Not yet started |
+      | Anonymous responses - Multiple section Activity | Appraisal | John One | Manager, Appraiser   | In progress      | In progress     |
 
   Scenario: List and complete sections as the manager
     Given I log in as "manager-appraiser"

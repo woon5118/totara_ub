@@ -66,7 +66,7 @@ use totara_core\relationship\relationship;
  *
  * @package mod_perform\models\activity
  */
-class participant_section extends model {
+class participant_section extends model implements section_response_interface {
 
     use state_aware;
 
@@ -82,9 +82,8 @@ class participant_section extends model {
 
     protected $entity_attribute_whitelist = [
         'id',
-        'section_id',
-        'participant_instance_id',
         'progress',
+        'participant_instance_id',
         'availability',
         'created_at',
         'updated_at',
@@ -93,6 +92,7 @@ class participant_section extends model {
 
     protected $model_accessor_whitelist = [
         'section',
+        'section_id',
         'section_element_responses',
         'progress_status',
         'participant_instance',
@@ -124,6 +124,11 @@ class participant_section extends model {
 
     public function get_section(): section {
         return section::load_by_entity($this->entity->section);
+    }
+
+    public function get_section_id(): int {
+        // Done with accessor rather than attribute whitelist so we can satisfy the section_response interface.
+        return $this->entity->section_id;
     }
 
     public function get_participant_instance(): participant_instance {
@@ -394,11 +399,12 @@ class participant_section extends model {
     }
 
     /**
-     * Checks if subject instance is completed.
+     * Checks if participant section is completed.
+     * This means it is not in a "draft" state.
      *
      * @return bool
      */
-    private function is_completed(): bool {
+    public function is_completed(): bool {
         return $this->get_progress_state() instanceof complete;
     }
 

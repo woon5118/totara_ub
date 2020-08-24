@@ -23,6 +23,7 @@
 
 namespace mod_perform\entities\activity;
 
+use core\orm\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
 use mod_perform\models\activity\participant_source;
@@ -183,5 +184,14 @@ class element_response_repository extends repository {
             ])
             ->add_select_raw('COALESCE(subject_relationship.can_view, 0) AS subject_can_view')
             ->add_select_raw('COALESCE(subject_relationship.can_answer, 0) AS subject_can_answer');
+    }
+
+    public function find_for_participants_and_section_elements(
+        array $participant_instance_ids,
+        array $section_element_ids
+    ): collection {
+        return $this->where_in('section_element_id', $section_element_ids)
+            ->where_in('participant_instance_id', $participant_instance_ids)
+            ->get();
     }
 }

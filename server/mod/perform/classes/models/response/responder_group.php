@@ -70,4 +70,16 @@ class responder_group {
         return $this->responses;
     }
 
+    /**
+     * Add another response.
+     *
+     * @param section_element_response $response
+     * @return $this
+     */
+    public function append_response(section_element_response $response): self {
+        $this->responses->append($response);
+
+        return $this;
+    }
+
 }

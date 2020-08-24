@@ -84,6 +84,14 @@ extend type Query {
     participant_instance_id: core_id
     participant_section_id: core_id
   ): mod_perform_participant_section
+
+  """
+  A section for a view-only participant or someone who is not a participant at all
+  """
+  mod_perform_view_only_section_responses(
+    section_id: core_id
+    subject_instance_id: core_id!
+  ): mod_perform_view_only_section
 }
 
 """

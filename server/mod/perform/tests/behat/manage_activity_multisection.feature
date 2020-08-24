@@ -56,9 +56,8 @@ Feature: Managing an activity with multiple sections
     And I click on the "Multiple sections" tui toggle button
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     And I confirm the tui confirmation modal
-    Then I should see "Activity saved" in the tui success notification toast
-    And I close the tui notification toast
-    Then I should see "Done"
+    Then I should see "Activity saved" in the tui success notification toast and close it
+    And I should see "Done"
     And I should see "Cancel"
 
     # Activity section in read-only mode

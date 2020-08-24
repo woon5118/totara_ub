@@ -28,7 +28,6 @@ use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use mod_perform\formatter\activity\participant_instance as participant_instance_formatter;
 use mod_perform\models\activity\anonymous_participant_instance;
-use mod_perform\models\activity\helpers\external_participant_token_validator;
 use mod_perform\models\activity\helpers\external_participation;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 

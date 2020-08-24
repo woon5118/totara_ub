@@ -69,7 +69,7 @@
       <FormRow
         v-for="(group, index) in responderGroups"
         :key="index"
-        :label="$str('response_other', 'mod_perform')"
+        :label="anonymousGroupLabel"
       >
         <div class="tui-otherParticipantResponses__anonymousResponse">
           <div
@@ -107,6 +107,7 @@ export default {
   },
 
   props: {
+    viewOnly: Boolean,
     sectionElement: {
       type: Object,
       required: true,
@@ -117,12 +118,18 @@ export default {
     },
   },
 
-  data() {
-    return {
-      responderGroups: this.sectionElement.other_responder_groups,
-    };
-  },
+  computed: {
+    responderGroups() {
+      return this.sectionElement.other_responder_groups;
+    },
+    anonymousGroupLabel() {
+      if (this.viewOnly) {
+        return this.$str('responses', 'mod_perform');
+      }
 
+      return this.$str('response_other', 'mod_perform');
+    },
+  },
   methods: {
     /**
      * Get an async component for participant response component
@@ -150,6 +157,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "responses",
       "response_other",
       "user_activities_other_response_response",
       "user_activities_other_response_no_participants_identified"

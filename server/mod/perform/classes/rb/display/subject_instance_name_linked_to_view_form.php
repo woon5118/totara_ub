@@ -23,46 +23,51 @@
 
 namespace mod_perform\rb\display;
 
+use html_writer;
+use mod_perform\controllers\reporting\performance\view_only_user_activity;
 use mod_perform\util;
+use rb_column;
+use rb_column_option;
+use reportbuilder;
+use stdClass;
 use totara_reportbuilder\rb\display\base;
 
 class subject_instance_name_linked_to_view_form extends base {
 
     /**
+     * @var bool
+     */
+    private static $can_view_form;
+
+    /**
      * Handles the display
      *
-     * @param $subject_instance_id
+     * @param $activity_name
      * @param string $format
-     * @param \stdClass $row
-     * @param \rb_column $column
-     * @param \reportbuilder $report
+     * @param stdClass $row
+     * @param rb_column $column
+     * @param reportbuilder $report
      * @return string
-     * @throws \coding_exception
-     * @throws \moodle_exception
      */
-    public static function display($activity_name, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        global $OUTPUT;
-
+    public static function display($activity_name, $format, stdClass $row, rb_column $column, reportbuilder $report) {
         if ($format !== 'html') {
             return $activity_name;
         }
 
         // Static to prevent expensive check once per row.
-        if (!isset($can_view_form)) {
-            static $can_view_form = false;
-            $can_view_form = util::can_potentially_report_on_subjects($report->reportfor);
+        if (self::$can_view_form === null) {
+            self::$can_view_form = util::can_potentially_report_on_subjects($report->reportfor);
         }
 
-        if (!$can_view_form) {
+        if (!self::$can_view_form) {
             return format_string($activity_name);
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
         $subject_instance_id = $extrafields->subject_instance_id;
 
-        return \html_writer::link(
-            // TODO put the right URL here once we have it.
-            new \moodle_url('/mod/perform/reporting/performance/view_form.php', array('subject_instance_id' => $subject_instance_id)),
+        return html_writer::link(
+            view_only_user_activity::get_url(['subject_instance_id' => $subject_instance_id]),
             format_string($activity_name)
         );
     }
@@ -70,12 +75,12 @@ class subject_instance_name_linked_to_view_form extends base {
     /**
      * Is this column graphable?
      *
-     * @param \rb_column $column
-     * @param \rb_column_option $option
-     * @param \reportbuilder $report
+     * @param rb_column $column
+     * @param rb_column_option $option
+     * @param reportbuilder $report
      * @return bool
      */
-    public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
+    public static function is_graphable(rb_column $column, rb_column_option $option, reportbuilder $report) {
         return false;
     }
 

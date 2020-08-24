@@ -9,6 +9,7 @@ query mod_perform_subject_instance_for_participant(
     created_at
     instance_count
     activity {
+      id
       name
       settings {
         close_on_completion

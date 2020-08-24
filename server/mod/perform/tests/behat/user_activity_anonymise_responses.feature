@@ -42,3 +42,19 @@ Feature: User activity anonymise responses
     And I should see "Others’ responses"
     And I should see "Manager Answer one"
     And I should see "Manager Answer two"
+
+    # Check view-only reporting view
+    When I log out
+    And I log in as "admin"
+    And I navigate to the view only report view of performance activity "Anonymise responses activity" where "subject" is the subject
+
+    Then I should see "All responses anonymised" in the ".tui-participantContent__user" "css_element"
+
+    # The missing ("No response submitted") answers should be last.
+    And I should see "Manager Answer one" in the ".tui-otherParticipantResponses:first-child .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(1)" "css_element"
+    And I should see "No response submitted" in the ".tui-otherParticipantResponses:first-child .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(2)" "css_element"
+    And I should see "No response submitted" in the ".tui-otherParticipantResponses:first-child .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(3)" "css_element"
+
+    And I should see "Manager Answer one" in the ".tui-otherParticipantResponses:last-child  .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(1)" "css_element"
+    And I should see "No response submitted" in the ".tui-otherParticipantResponses:last-child  .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(2)" "css_element"
+    And I should see "No response submitted" in the ".tui-otherParticipantResponses:last-child  .tui-otherParticipantResponses__anonymousResponse-participant:nth-child(3)" "css_element"

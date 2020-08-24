@@ -34,6 +34,7 @@ use mod_perform\controllers\activity\manage_participation;
 use mod_perform\controllers\activity\user_activities;
 use mod_perform\controllers\activity\view_external_participant_activity;
 use mod_perform\controllers\activity\view_user_activity;
+use mod_perform\controllers\reporting\performance\view_only_user_activity;
 use mod_perform\entities\activity\activity;
 use mod_perform\entities\activity\external_participant;
 use mod_perform\entities\activity\track;
@@ -54,7 +55,7 @@ class behat_mod_perform extends behat_base {
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
     public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceSingleParticipantResponse__answer';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
-    public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR = '.tui-participantContent__sectionHeading-other-response-switch button';
+    public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR = '.tui-participantContent__sectionHeading-otherResponseSwitch button';
     public const MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR = '.tui-performActivitySectionRelationship__item-name';
     public const MANAGE_CONTENT_ADD_RESPONDING_PARTICIPANTS_BUTTON_LABEL = '.tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d) [aria-label=\'Add participants\']';
     public const MANAGE_CONTENT_ADD_VIEW_ONLY_PARTICIPANTS_BUTTON_LABEL = '.tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d) [aria-label=\'Add view-only participants\']';
@@ -473,18 +474,36 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @Then /^I should see perform "([^"]*)" question "([^"]*)" is unanswered by "([^"]*)"$/
+     * @param $element_type
+     * @param $question_text
+     * @param $expected_relation
+     */
+    public function i_should_see_perform_question_is_unanswered_by(
+        string $element_type,
+        string $question_text,
+        string $expected_relation
+    ): void {
+        $this->i_should_see_perform_question_is_answered_by_with(
+            $element_type,
+            $question_text,
+            $expected_relation,
+            null
+        );
+    }
+
+    /**
      * @Then /^I should see perform "([^"]*)" question "([^"]*)" is answered by "([^"]*)" with "([^"]*)"$/
      * @param $element_type
      * @param $question_text
      * @param $expected_relation
      * @param $expected_answer_text
-     * @throws ExpectationException
      */
     public function i_should_see_perform_question_is_answered_by_with(
         string $element_type,
         string $question_text,
         string $expected_relation,
-        string $expected_answer_text
+        ?string $expected_answer_text
     ): void {
         $has_relation = false;
         $has_answer = false;
@@ -497,6 +516,10 @@ class behat_mod_perform extends behat_base {
                 continue;
             }
             $has_relation = true;
+        }
+
+        if ($expected_answer_text === null && $has_relation) {
+            return;
         }
 
         $other_responses = $this->find_question_other_responses_by_element($element_type, $other_response_element);
@@ -1230,9 +1253,37 @@ class behat_mod_perform extends behat_base {
         return $heading->getParent();
     }
 
+    /**
+     * @Given /^I navigate to the view only report view of performance activity "([^"]*)" where "([^"]*)" is the subject$/
+     * @param string $activity_name
+     * @param string $subject_user_name
+     */
+    public function i_navigate_to_the_read_only_report_view_of_performance_activity_for(
+        string $activity_name,
+        string $subject_user_name
+    ): void {
+        $target_subject_instance = $this->get_subject_instance_from_activity_and_subject($activity_name, $subject_user_name);
+
+        $url = view_only_user_activity::get_url(['subject_instance_id' => $target_subject_instance->id]);
+
+        $this->navigate_to_page($url);
+    }
+
     private function get_user_by_username(string $user_name): entity {
         return user::repository()
             ->where('username', $user_name)
+            ->one(true);
+    }
+
+    private function get_subject_instance_from_activity_and_subject(string $activity_name, string $subject_user_name): entity {
+        return subject_instance::repository()
+            ->as('si')
+            ->join([track_user_assignment::TABLE, 'tua'], 'tua.id', 'si.track_user_assignment_id')
+            ->join([track::TABLE, 't'], 't.id', 'tua.id')
+            ->join([activity::TABLE, 'a'], 'a.id', 't.activity_id')
+            ->where('a.name', $activity_name)
+            ->join([user::TABLE, 'u'], 'u.id', 'si.subject_user_id')
+            ->where('u.username', $subject_user_name)
             ->one(true);
     }
 

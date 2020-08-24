@@ -22,6 +22,11 @@ extend type Query {
   mod_perform_relationships(activity_id: core_id!): [totara_core_relationship!]!
 
   """
+  Returns all responding relationships involved in a subject instance.
+  """
+  mod_perform_responding_relationships_involved_in_subject_instance(subject_instance_id: core_id!): [totara_core_relationship!]!
+
+  """
   Get the relationship options for manual relationships to be set at an activity level by an admin.
   """
   mod_perform_manual_relationship_selector_options(

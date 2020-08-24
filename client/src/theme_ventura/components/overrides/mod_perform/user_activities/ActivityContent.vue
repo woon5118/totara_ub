@@ -41,6 +41,10 @@
     border: var(--tui-border-width-thin) solid var(--tui-color-border);
     border-radius: var(--tui-border-radius-normal);
 
+    & > * + * {
+      margin-top: var(--tui-gap-4);
+    }
+
     &-relationship {
       display: flex;
       padding-top: var(--tui-gap-3);
@@ -76,7 +80,7 @@
     }
   }
 
-  &__sectionHeadingOtherResponsesBar {
+  &__infoBar {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -90,17 +94,17 @@
     margin: 0;
   }
 
-  &__sectionHeading-other-response-switch {
+  &__sectionHeading-otherResponseSwitch {
     margin-top: var(--tui-gap-4);
     margin-left: 0;
   }
 
   &__section {
-    &-required-container {
+    &-requiredContainer {
       margin-top: var(--tui-gap-2);
     }
 
-    &-response-required {
+    &-responseRequired {
       display: inline-flex;
       @include tui-font-heading-label();
       color: var(--tui-color-prompt-alert);
@@ -140,6 +144,11 @@
     // Spit the avatar and relationship blurb on tablet an larger.
     &__user {
       flex-direction: row;
+      align-items: center;
+
+      & > * + * {
+        margin-top: 0;
+      }
 
       &-info {
         padding-right: var(--tui-gap-4);
@@ -156,12 +165,12 @@
       }
     }
 
-    &__sectionHeadingOtherResponsesBar {
+    &__infoBar {
       flex-wrap: nowrap;
       margin-top: var(--tui-gap-6);
     }
 
-    &__sectionHeading-other-response-switch {
+    &__sectionHeading-otherResponseSwitch {
       flex-shrink: 0;
       margin-top: 0;
       margin-left: var(--tui-gap-6);

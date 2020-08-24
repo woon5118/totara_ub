@@ -26,6 +26,8 @@ namespace mod_perform\entities\activity;
 use core\collection;
 use core\orm\entity\repository;
 use mod_perform\state\activity\draft;
+use totara_core\entities\relationship;
+
 class activity_repository extends repository {
 
     /**
@@ -58,6 +60,23 @@ class activity_repository extends repository {
             ->where('track_user_assignment.subject_user_id', $subject_user_ids)
             ->where_not_in('activity.status', [draft::get_code()])
             ->filter_by_visible()
+            ->get();
+    }
+
+    /**
+     * Get all the relationships involved in an activity.
+     *
+     * @param int $activity_id
+     * @return collection|relationship[]
+     */
+    public function get_responding_relationships(int $activity_id): collection {
+        return relationship::repository()->as('r')
+            ->select_raw('distinct r.*')
+            ->join([section_relationship::TABLE, 'sr'], 'sr.core_relationship_id', 'r.id')
+            ->join([section::TABLE, 's'], 's.id', 'sr.section_id')
+            ->where('s.activity_id', $activity_id)
+            ->where('sr.can_answer', true)
+            ->order_by('r.sort_order')
             ->get();
     }
 

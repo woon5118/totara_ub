@@ -34,8 +34,12 @@ use mod_perform\models\activity\respondable_element_plugin;
 use mod_perform\models\activity\section_element;
 
 /**
- * Represents the response or lack of to a question or other element which
- * can be displayed to users within a performance activity.
+ * Represents the responses (or lack of) to an element from the
+ * perspective of a participant.
+ *
+ * response_data holds the participants response,
+ * other participants (or all participants in the case of a view-only
+ * observer) are held in other_responder_groups.
  *
  * @property-read int section_element_id Foreign key
  * @property-read section_element $section_element The parent section element
@@ -48,15 +52,15 @@ use mod_perform\models\activity\section_element;
  * @property-read int $sort_order The order this element should appear in the section
  * @package mod_perform\models\activity
  */
-class section_element_response extends model {
+class section_element_response extends model implements section_element_responses_interface {
 
-    protected $entity_attribute_whitelist = [
-        'response_data', // as a JSON encoded string
-    ];
+    protected $entity_attribute_whitelist = [];
 
     protected $model_accessor_whitelist = [
+        'section_element_id',
         'section_element',
         'section_element_id',
+        'response_data', // as a JSON encoded string
         'element',
         'validation_errors',
         'participant_instance',
@@ -159,11 +163,15 @@ class section_element_response extends model {
         }
     }
 
+    public function get_response_data(): ?string {
+        return $this->entity->response_data;
+    }
+
     public function get_section_element(): section_element {
         return $this->section_element;
     }
 
-    public function get_section_element_id() {
+    public function get_section_element_id(): int {
         return $this->section_element->id;
     }
 

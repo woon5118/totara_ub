@@ -88,7 +88,7 @@ Feature: Respond to activity with multiple sections
     And I click on "Closed activity" "link"
 
     # Section 1
-    Then I should see "section 1"
+    Then I should see "section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should not see "Submit"
     And I should not see "Cancel"
     And I should see "John Answer one" in the ".tui-performElementResponse" "css_element"
@@ -98,7 +98,7 @@ Feature: Respond to activity with multiple sections
     And I click on "Next section" "button"
 
     # Section 2
-    Then I should see "section 2"
+    Then I should see "section 2" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should not see "Submit"
     And I should not see "Cancel"
     And I should see "John Answer two" in the ".tui-performElementResponse" "css_element"
@@ -108,7 +108,7 @@ Feature: Respond to activity with multiple sections
     And I click on "Next section" "button"
 
     # Section 3
-    Then I should see "section 3"
+    Then I should see "section 3" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should not see "Submit"
     And I should not see "Cancel"
     Then I should see "John Answer three" in the ".tui-performElementResponse" "css_element"
@@ -120,6 +120,24 @@ Feature: Respond to activity with multiple sections
     And I should see "Closed activity"
     And I should see "Open activity"
 
+    # Check view-only report version
+    When I log out
+    And I log in as "admin"
+    And I navigate to the view only report view of performance activity "Closed activity" where "user1" is the subject
+
+    Then I should see "section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
+    Then I should see the "Responses by relationship" tui select filter has the following options "All, Subject"
+    Then I should see perform "short text" question "test element title" is answered by "Subject" with "John Answer one"
+
+    When I click on "Next section" "button"
+    Then I should see "section 2" in the ".tui-participantContent__sectionHeading-title" "css_element"
+    Then I should see the "Responses by relationship" tui select filter has the following options "All, Subject"
+    Then I should see perform "short text" question "test element title" is answered by "Subject" with "John Answer two"
+
+    When I click on "Next section" "button"
+    Then I should see "section 3" in the ".tui-participantContent__sectionHeading-title" "css_element"
+    Then I should see the "Responses by relationship" tui select filter has the following options "All, Subject"
+    Then I should see perform "short text" question "test element title" is answered by "Subject" with "John Answer three"
 
   Scenario: Displays close on completion confirmation text when close on completion is enabled.
     Given I log in as "user1"
@@ -153,6 +171,38 @@ Feature: Respond to activity with multiple sections
     And I should see "section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
     When I click on "section 2" "button"
     Then I should see "section 2" in the ".tui-participantContent__sectionHeading-title" "css_element"
+
+    # Check view-only report version
+    When I log out
+    And I log in as "admin"
+    And I navigate to the view only report view of performance activity "Closed activity" where "user1" is the subject
+
+    Then I should see "section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
+
+    When I click on "section 2" "button"
+    Then I should see "section 2" in the ".tui-participantContent__sectionHeading-title" "css_element"
+
+    When I click on "section 3" "button"
+    Then I should see "section 3" in the ".tui-participantContent__sectionHeading-title" "css_element"
+
+    When I click on "section 1" "button"
+    Then I should see "section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
+
+    # Test push/pop state
+    When I press the "back" button in the browser
+    Then I should see "section 3" in the ".tui-participantContent__sectionHeading-title" "css_element"
+
+    When I press the "back" button in the browser
+    Then I should see "section 2" in the ".tui-participantContent__sectionHeading-title" "css_element"
+
+    When I press the "back" button in the browser
+    Then I should see "section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
+
+    When I press the "forward" button in the browser
+    Then I should see "section 2" in the ".tui-participantContent__sectionHeading-title" "css_element"
+
+    When I press the "forward" button in the browser
+    Then I should see "section 3" in the ".tui-participantContent__sectionHeading-title" "css_element"
 
   Scenario: Show browser based warning message when navigate to different section with unsaved change
     Given I log in as "user1"

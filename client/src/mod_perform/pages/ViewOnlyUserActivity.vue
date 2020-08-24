@@ -13,7 +13,6 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Jaron Steenson <jaron.steenson@totaralearning.com>
-  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
   @module mod_perform
 -->
 
@@ -29,20 +28,18 @@
         type="error"
       />
       <ActivityContent
-        v-else-if="subjectInstance"
+        v-else-if="activityFound"
         :current-user-id="currentUserId"
         :activity="subjectInstance.activity"
-        :participant-instance-id="participantInstanceId"
-        :participant-section-id="participantSectionId"
+        :subject-instance-id="subjectInstanceId"
+        :section-id="sectionId"
         :subject-user="subjectInstance.subject_user"
-        :token="token"
       />
     </Loader>
   </div>
 </template>
 
 <script>
-import externalSubjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_external_participant_nosession';
 import subjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_participant';
 import Loader from 'tui/components/loader/Loader';
 import NotificationBanner from 'tui/components/notifications/NotificationBanner';
@@ -59,26 +56,25 @@ export default {
      * The id of the logged in user.
      */
     currentUserId: {
-      required: false,
+      required: true,
       type: Number,
       default: null,
     },
-    participantInstanceId: {
-      required: false,
-      type: Number,
-    },
-    participantSectionId: {
-      required: false,
-      type: Number,
-    },
+
+    /**
+     * For gql data look up.
+     */
     subjectInstanceId: {
-      required: false,
+      required: true,
       type: Number,
     },
-    token: {
+
+    /**
+     * For gql data look up.
+     */
+    sectionId: {
       required: false,
-      type: String,
-      default: '',
+      type: Number,
     },
   },
 
@@ -93,9 +89,7 @@ export default {
   apollo: {
     subjectInstance: {
       query() {
-        return this.isExternalParticipant
-          ? externalSubjectInstanceQuery
-          : subjectInstanceQuery;
+        return subjectInstanceQuery;
       },
       skip() {
         return !this.subjectInstanceId;
@@ -103,29 +97,17 @@ export default {
       variables() {
         return {
           subject_instance_id: this.subjectInstanceId,
-          token: this.token,
         };
       },
       update(data) {
         this.hasLoaded = true;
 
-        return this.isExternalParticipant
-          ? data['mod_perform_subject_instance_for_external_participant']
-          : data['mod_perform_subject_instance_for_participant'];
+        return data['mod_perform_subject_instance_for_participant'];
       },
     },
   },
 
   computed: {
-    /**
-     * Returns true if the current user is an external participant,
-     * means the token is set
-     * @return {Boolean}
-     */
-    isExternalParticipant() {
-      return this.token.length > 0;
-    },
-
     /**
      * Trying to load the activity from the server resulted in either
      * the activity not being found at all or the user not having permission
@@ -138,9 +120,17 @@ export default {
 
       return !this.$apollo.loading && this.subjectInstance === null;
     },
+    activityFound() {
+      if (this.subjectInstanceId === null) {
+        return false;
+      }
+
+      return !this.$apollo.loading && this.subjectInstance !== null;
+    },
   },
 };
 </script>
+
 <lang-strings>
   {
     "mod_perform": [

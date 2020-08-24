@@ -32,7 +32,6 @@ use mod_perform\controllers\activity\view_external_participant_activity;
 use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\response\participant_section;
-use mod_perform\state\participant_instance\closed;
 use mod_perform\state\participant_instance\complete;
 use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_instance\participant_instance_availability;

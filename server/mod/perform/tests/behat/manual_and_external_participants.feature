@@ -315,7 +315,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     When I click on "Act1" "link"
     Then I should see perform activity relationship to user "Self"
     When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
-    And I answer "short text" question "Question 1" with "Manager was here"
+    And I answer "short text" question "Question 1" with "Subject was here"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -394,3 +394,26 @@ Feature: Allow users to select manual (internal and external) participants for a
 
     When I navigate to the external participants form for user "Mark Metcalfe"
     Then I should see "This performance activity is no longer available."
+
+    # Check view-only report view of the completed and closed activity
+    When I log in as "admin"
+    And I navigate to the view only report view of performance activity "Act1" where "subject" is the subject
+    Then I should see the "Responses by relationship" tui select filter has the following options "All, Subject, Manager, Manager's manager, Appraiser, Peer, Mentor, Reviewer, External respondent"
+
+    Then I should see perform "short text" question "Question 1" is answered by "Subject" with "Subject was here"
+    Then I should see perform "short text" question "Question 1" is answered by "Manager" with "Manager was here"
+    # More accurately "No participants identified for manager's manager"
+    Then I should see perform "short text" question "Question 1" is unanswered by "Manager's manager"
+    Then I should see perform "short text" question "Question 1" is answered by "Appraiser" with "Appraiser was here"
+    Then I should see perform "short text" question "Question 1" is answered by "Peer" with "Peer was here"
+    Then I should see perform "short text" question "Question 1" is answered by "Mentor" with "Mentor was here"
+    Then I should see perform "short text" question "Question 1" is answered by "Reviewer" with "Reviewer was here"
+    And I should see "External participant 1 was here"
+    And I should see "External participant 2 was here"
+
+    When I choose "Manager's manager" in the "Responses by relationship" tui select filter
+    Then I should see "No participants identified"
+
+    When I choose "External respondent" in the "Responses by relationship" tui select filter
+    And I should see "External participant 1 was here"
+    And I should see "External participant 2 was here"

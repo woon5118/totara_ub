@@ -530,7 +530,7 @@ class mod_perform_generator extends component_generator_base {
      * Create full activities including assignments, subject, participant instances and notifications
      *
      * @param mod_perform_activity_generator_configuration $configuration
-     * @return collection
+     * @return collection|activity[]
      */
     public function create_full_activities(mod_perform_activity_generator_configuration $configuration = null) {
         global $USER;
@@ -914,37 +914,7 @@ class mod_perform_generator extends component_generator_base {
         }
 
         if ($include_questions) {
-            $required_question = $data['include_required_questions'] ?? false;
-
-            $include_reporting_ids = $data['include_reporting_ids'] ?? false;
-            $reporting_id1 = null;
-            $reporting_id2 = null;
-
-            if ($include_reporting_ids) {
-                $reporting_id1 = $activity->name . '-id-1';
-                $reporting_id2 = $activity->name . '-id-2';
-            }
-
-            // String conversion for behat, defaulting to false.
-            if (is_string($required_question) && $required_question !== 'true') {
-                $required_question = false;
-            }
-            $section1 = $this->create_section($activity, ['title' => 'Part one']);
-
-            $element = $this->create_element([
-                'title' => 'Question one',
-                'is_required' => (bool) $required_question,
-                'identifier' => $reporting_id1,
-            ]);
-
-            $this->create_section_element($section1, $element);
-
-            $element2 = $this->create_element([
-                'title' => 'Question two',
-                'is_required' => (bool)$required_question,
-                'identifier' => $reporting_id2
-            ]);
-            $this->create_section_element($section1, $element2, 2);
+            $section1 = $this->include_elements_in_subject_instance($data, $activity);
 
             $participant_instances = [$subjects_participant_instance, $other_participant_instance, $third_participant_instance];
             foreach ($participant_instances as $participant_instance) {
@@ -1456,5 +1426,55 @@ class mod_perform_generator extends component_generator_base {
      */
     public function create_element_identifier(string $identifier): element_identifier_model{
         return element_identifier_model::create($identifier);
+    }
+
+    /**
+     * @param array $data
+     * @param activity $activity
+     * @return section
+     */
+    private function include_elements_in_subject_instance(array $data, activity $activity): section {
+        $required_question = $data['include_required_questions'] ?? false;
+
+        $include_reporting_ids = $data['include_reporting_ids'] ?? false;
+        $reporting_id1 = null;
+        $reporting_id2 = null;
+
+        if ($include_reporting_ids) {
+            $reporting_id1 = $activity->name . '-id-1';
+            $reporting_id2 = $activity->name . '-id-2';
+        }
+
+        // String conversion for behat, defaulting to false.
+        if (is_string($required_question) && $required_question !== 'true') {
+            $required_question = false;
+        }
+        $section1 = $this->create_section($activity, ['title' => 'Part one']);
+
+        $element = $this->create_element([
+            'title' => 'Question one',
+            'is_required' => (bool) $required_question,
+            'identifier' => $reporting_id1,
+        ]);
+        $this->create_section_element($section1, $element);
+
+        $element2 = $this->create_element([
+            'title' => 'Question two',
+            'is_required' => (bool) $required_question,
+            'identifier' => $reporting_id2
+        ]);
+        $this->create_section_element($section1, $element2, 2);
+
+        if ($data['include_static_content'] ?? false) {
+            $element3 = $this->create_element([
+                'title' => 'Static content title',
+                'plugin_name' => 'static_content',
+                'data' => json_encode(['textValue' => 'This content is static'])
+            ]);
+
+            $this->create_section_element($section1, $element3, 3);
+        }
+
+        return $section1;
     }
 }

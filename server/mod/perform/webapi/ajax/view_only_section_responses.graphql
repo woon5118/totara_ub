@@ -1,0 +1,43 @@
+query mod_perform_view_only_section_responses(
+  $section_id: core_id
+  $subject_instance_id: core_id!
+) {
+  mod_perform_view_only_section_responses(
+    section_id: $section_id
+    subject_instance_id: $subject_instance_id
+  ) {
+    section {
+      display_title
+    }
+    siblings {
+      id
+      display_title
+    }
+    section_element_responses {
+      section_element_id
+      element {
+        element_plugin {
+          participant_form_component
+          participant_response_component
+        }
+        title
+        data
+        is_required
+        is_respondable
+      }
+      sort_order
+      other_responder_groups {
+        relationship_name
+        responses {
+          participant_instance {
+            participant {
+              fullname
+              profileimageurlsmall
+            }
+          }
+          response_data
+        }
+      }
+    }
+  }
+}

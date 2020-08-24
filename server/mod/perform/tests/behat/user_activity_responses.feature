@@ -8,16 +8,18 @@ Feature: Viewing other responses
       | david    | David     | Two      | david.two@example.com   |
       | harry    | Harry     | Three    | harry.three@example.com |
     And the following "subject instances" exist in "mod_perform" plugin:
-      | activity_name                 | subject_username | subject_is_participating | other_participant_username | include_required_questions | activity_status |
-      | John is participating subject | john             | true                     | david                      | true                       | Draft           |
-      | David is subject              | david            | false                    | admin                      | true                       | Draft           |
-      | John is not participating     | harry            | true                     | david                      | false                      | Draft           |
+      | activity_name                 | subject_username | subject_is_participating | other_participant_username | include_required_questions | include_static_content | activity_status |
+      | John is participating subject | john             | true                     | david                      | true                       | true                   | Draft           |
+      | David is subject              | david            | false                    | admin                      | true                       | true                   | Draft           |
+      | John is not participating     | harry            | true                     | david                      | false                      | true                   | Draft           |
 
   Scenario: I can respond to my activities and view other non-respond activities
     When I log in as "john"
     And I navigate to the outstanding perform activities list page
     And I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
+    And I should see "Static content title"
+    And I should see "This content is static"
     And I should see that show others responses is toggled "off"
     And I should see perform activity relationship to user "Self"
     And I should see perform "short text" question "Question one" is unanswered
@@ -38,6 +40,34 @@ Feature: Viewing other responses
     Then I should see that show others responses is toggled "on"
     And I should see "Manager response"
     And I should see "No response submitted"
+    And I should see "Static content title"
+    And I should see "This content is static"
+
+    # Check the view-only report view
+    When I log out
+    And I log in as "admin"
+    And I navigate to the view only report view of performance activity "John is participating subject" where "john" is the subject
+    Then I should see perform "short text" question "Question one" is answered by "Subject" with "John Answer one"
+    And I should see perform "short text" question "Question one" is unanswered by "Manager"
+    And I should see perform "short text" question "Question two" is answered by "Subject" with "John Answer two"
+    And I should see perform "short text" question "Question two" is unanswered by "Manager"
+    And I should see "Static content title"
+    And I should see "This content is static"
+    And I should see the "Responses by relationship" tui select filter has the following options "All, Subject, Manager"
+
+    When I choose "Subject" in the "Responses by relationship" tui select filter
+    Then I should not see "Manager response"
+    And I should see perform "short text" question "Question one" is answered by "Subject" with "John Answer one"
+    And I should see perform "short text" question "Question two" is answered by "Subject" with "John Answer two"
+    And I should see "Static content title"
+    And I should see "This content is static"
+
+    When I choose "Manager" in the "Responses by relationship" tui select filter
+    Then I should not see "Subject response"
+    And I should see perform "short text" question "Question one" is unanswered by "Manager"
+    And I should see perform "short text" question "Question two" is unanswered by "Manager"
+    And I should see "Static content title"
+    And I should see "This content is static"
 
   Scenario: Manager can respond to other activities and I can view manager responses
     When I log in as "david"

@@ -141,18 +141,17 @@ class participant_section_with_responses {
     }
 
     /**
-     * Fetch the already entered responses for every question for both the main participant ($participant_id)
-     * and other responder groups/participants.
+     * Fetch the already entered responses for every question for all participants.
      *
      * @param int[] $participant_instance_ids
      * @param int[] $section_element_ids
      * @return collection
      */
     private function fetch_existing_responses(array $participant_instance_ids, array $section_element_ids): collection {
-        return element_response_entity::repository()
-            ->where_in('section_element_id', $section_element_ids)
-            ->where_in('participant_instance_id', $participant_instance_ids)
-            ->get();
+        return element_response_entity::repository()->find_for_participants_and_section_elements(
+            $participant_instance_ids,
+            $section_element_ids
+        );
     }
 
     /**

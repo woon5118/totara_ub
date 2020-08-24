@@ -92,6 +92,8 @@ class behat_totara_tui extends behat_base {
     private const TAGLIST_DROPDOWN_LIST_LOCATOR = '.tui-dropdown__content';
     private const TAGLIST_DROPDOWN_LIST_ITEM_LOCATOR = '.tui-dropdownItem';
 
+    private const TUI_SELECT_FILTER_LOCATOR = '.tui-selectFilter';
+
     /**
      * @param string $locator CSS locator
      * @param string $element_name Human understandable name of the element - e.g. 'modal', 'popover', 'picker' etc
@@ -1268,6 +1270,49 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
+     * @Given /^I should see the "([^"]*)" tui select filter has the following options "([^"]*)"$/
+     * @param string $label_text
+     * @param string $expected_options_list
+     */
+    public function i_should_see_the_tui_select_filter_has_the_following_options(
+        string $label_text,
+        string $expected_options_list
+    ): void {
+        $select_filter = $this->find_select_filter_by_label($label_text);
+
+        $expected_options = $this->expand_csv($expected_options_list);
+        $options = $select_filter->findAll('css', 'option');
+
+        foreach ($expected_options as $i => $expected_option) {
+            $actual_option = trim($options[$i]->getText());
+
+            if ($actual_option !== $expected_option) {
+                $this->fail("Expected option {$expected_option} at position {$i} instead found {$actual_option}");
+            }
+        }
+    }
+
+    /**
+     * @When /^I choose "([^"]*)" in the "([^"]*)" tui select filter$/
+     */
+    public function i_choose_in_the_tui_select_filter(string $choice, string $label_text): void {
+        $select_filter = $this->find_select_filter_by_label($label_text);
+
+        $select_filter->find('css', 'select')->selectOption($choice);
+    }
+
+    private function find_select_filter_by_label(string $label_text): NodeElement {
+        $select_filters = $this->find_all('css', self::TUI_SELECT_FILTER_LOCATOR);
+
+        $with_label = array_filter($select_filters, function (NodeElement $select_filter) use ($label_text) {
+            return $label_text === trim($select_filter->find('css', 'label')->getText());
+        });
+
+        return reset($with_label);
+    }
+
+
+    /**
      * @param string $table_selector_type
      * @param string $table_locator
      * @param NodeElement|false $node
@@ -1606,6 +1651,16 @@ class behat_totara_tui extends behat_base {
         }
 
         $this->fail("Could not find the '{$label}' {$tui_selector}");
+    }
+
+    /**
+     * @param string $csv
+     * @return string[]
+     */
+    private function expand_csv(string $csv): array {
+        $values = explode(',', $csv);
+
+        return array_map('trim', $values);
     }
 
 }

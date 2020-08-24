@@ -26,10 +26,10 @@ Feature: Test viewing Performance activity response data
       | mod/perform:report_on_subject_responses      | Allow      | staffmanager | System       |           |
       | mod/perform:report_on_all_subjects_responses | Allow      | manager      | System       |           |
     And the following "subject instances" exist in "mod_perform" plugin:
-      | activity_name                      | subject_username | subject_is_participating | include_questions | include_required_questions | include_reporting_ids | activity_status |
-      | Simple optional questions activity | user1            | true                     | true              |                            |                       | Active          |
-      | Simple required questions activity | user1            | true                     | true              | true                       |                       | Active          |
-      | With reporting ids                 | user5            | true                     | true              |                            | true                  | Active          |
+      | activity_name                      | subject_username | subject_is_participating | include_questions | include_required_questions | include_static_content | include_reporting_ids | activity_status |
+      | Simple optional questions activity | user1            | true                     | true              |                            | true                   |                       | Active          |
+      | Simple required questions activity | user1            | true                     | true              | true                       | true                   |                       | Active          |
+      | With reporting ids                 | user5            | true                     | true              |                            | true                   | true                  | Active          |
 
   Scenario: A user with the global capability can access the performance activity response data from the admin menu
     Given I log in as "sitemanager"
@@ -88,6 +88,27 @@ Feature: Test viewing Performance activity response data
     Then I should see "Their current and historical performance records are available for you to view or export"
     When I click on "view or export" "link"
     Then I should see "Performance activity response data"
+
+  Scenario: I can view a read only version of a users activity
+    Given I log in as "admin"
+    And I toggle open the admin quick access menu
+    And I should see "Performance activity response data" in the admin quick access menu
+    And I navigate to "Performance activities > Performance activity response data" in site administration
+    And I switch to "Browse records by user" tab
+
+    When I click on "User1 Last1" "link"
+    Then I should see "Performance data for User1 Last1: 2 records shown"
+
+    When I click on "Simple optional questions activity" "link"
+    Then I should see "Simple optional questions activity"
+    And I should see perform "short text" question "Question one" is unanswered by "Subject"
+    And I should see perform "short text" question "Question two" is unanswered by "Subject"
+    And I should see "Static content title"
+    And I should see "This content is static"
+
+    # No idea why "Close" "link" is not working
+    When I click on ".tui-participantContent__navigation-buttons .tui-actionLink" "css_element"
+    Then I should see "Performance data for User1 Last1: 2 records shown"
 
   Scenario: I can browse records by reporting ID
     Given I log in as "sitemanager"

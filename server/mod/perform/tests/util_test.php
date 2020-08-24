@@ -287,8 +287,6 @@ class mod_perform_util_testcase extends advanced_testcase {
      * @param string $cap
      * @param stdClass $reporter
      * @param stdClass $subject
-     * @throws coding_exception
-     * @throws dml_exception
      */
     private function assign_reporter_cap_over_subject(string $cap, stdClass $reporter, stdClass $subject): void {
         $reporter_role_id = create_role(

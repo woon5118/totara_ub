@@ -207,6 +207,9 @@ class require_activity implements middleware {
         $retriever = function (payload $payload) use ($payload_keys): activity {
             $subject_instance_ids = self::get_payload_value($payload_keys, $payload);
 
+            // Wrap single values in an array.
+            $subject_instance_ids = (array) $subject_instance_ids;
+
             /** @var subject_instance[] $subject_instances */
             $subject_instances = subject_instance::repository()
                 ->where('id', $subject_instance_ids)

@@ -128,3 +128,21 @@ export function imageUrl(name, component) {
     });
   }
 }
+
+/**
+ * Get a query string params value from the current url.
+ *
+ * @param {string} name
+ * @return {string}
+ */
+export function getQueryStringParam(name) {
+  const params = window.location.search.substring(1).split('&');
+  const parsedParams = {};
+
+  params.forEach(param => {
+    const split = param.split('=');
+    parsedParams[split[0]] = split[1];
+  });
+
+  return parsedParams[name];
+}

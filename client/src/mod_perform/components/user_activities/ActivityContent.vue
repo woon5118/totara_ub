@@ -49,12 +49,22 @@
           size="small"
           class="tui-participantContent__user-info"
         />
-        <div class="tui-participantContent__user-relationship">
+        <div
+          v-if="!viewOnlyReportMode"
+          class="tui-participantContent__user-relationship"
+        >
           {{ $str('user_activities_your_relationship_to_user', 'mod_perform') }}
           <h4 class="tui-participantContent__user-relationshipValue">
             {{ relationshipToUser }}
           </h4>
         </div>
+
+        <ResponseRelationshipSelector
+          v-else
+          v-model="selectedRelationshipFilter"
+          :anonymous-responses="activity.anonymous_responses"
+          :subject-instance-id="subjectInstanceId"
+        />
       </div>
 
       <h2
@@ -66,7 +76,7 @@
 
       <Grid :class="showSidePanel ? 'tui-participantContent__layout' : ''">
         <GridItem
-          v-show="showSidePanel"
+          v-if="showSidePanel"
           :units="2"
           class="tui-participantContent__sidePanel"
         >
@@ -77,11 +87,19 @@
             :sticky="false"
           >
             <SidePanelNav
-              v-model="selectedParticipantSectionId"
+              v-model="navModel"
               :aria-label="false"
-              @change="navChange($event)"
+              @change="navChange"
             >
-              <SidePanelNavGroup>
+              <SidePanelNavGroup v-if="viewOnlyReportMode">
+                <SidePanelNavButtonItem
+                  v-for="siblingSection in siblingSections"
+                  :id="siblingSection.id"
+                  :key="siblingSection.id"
+                  :text="siblingSection.display_title"
+                />
+              </SidePanelNavGroup>
+              <SidePanelNavGroup v-else>
                 <SidePanelNavButtonItem
                   v-for="participantSection in participantSections"
                   :id="participantSection.id"
@@ -109,9 +127,9 @@
                 >
                   {{ section.display_title }}
                 </h3>
-
                 <div
-                  class="tui-participantContent__sectionHeadingOtherResponsesBar"
+                  v-if="!viewOnlyReportMode"
+                  class="tui-participantContent__infoBar"
                 >
                   <ResponsesAreVisibleToDescription
                     class="tui-participantContent__sectionHeadingOtherResponsesDescription"
@@ -120,7 +138,7 @@
                     :activity="activity"
                   />
                   <div
-                    class="tui-participantContent__sectionHeading-other-response-switch"
+                    class="tui-participantContent__sectionHeading-otherResponseSwitch"
                   >
                     <ToggleSwitch
                       v-if="hasOtherResponse"
@@ -135,58 +153,78 @@
                   </div>
                 </div>
               </div>
-              <div class="tui-participantContent__section-required-container">
-                <span
-                  class="tui-participantContent__section-response-required"
-                  v-text="'*'"
-                />
-                {{ $str('section_element_response_required', 'mod_perform') }}
-              </div>
-
               <div
-                v-for="sectionElement in sectionElements"
-                :key="sectionElement.id"
-                class="tui-participantContent__sectionItem"
+                v-if="noParticipantForRelationshipFilter"
+                class="tui-participantContent__infoBar"
               >
-                <h3
-                  v-if="sectionElement.element.title"
-                  :id="$id('title')"
-                  class="tui-participantContent__sectionItem-contentHeader"
+                <em>
+                  {{
+                    $str('selected_relationship_not_in_section', 'mod_perform')
+                  }}
+                </em>
+              </div>
+              <template v-else>
+                <div class="tui-participantContent__section-requiredContainer">
+                  <span
+                    class="tui-participantContent__section-responseRequired"
+                    v-text="'*'"
+                  />
+                  {{ $str('section_element_response_required', 'mod_perform') }}
+                </div>
+
+                <div
+                  v-for="sectionElement in cleanedSectionElements"
+                  :key="sectionElement.id"
+                  class="tui-participantContent__sectionItem"
                 >
-                  {{ sectionElement.element.title }}
-                </h3>
+                  <h3
+                    v-if="sectionElement.element.title"
+                    :id="$id('title')"
+                    class="tui-participantContent__sectionItem-contentHeader"
+                  >
+                    {{ sectionElement.element.title }}
+                  </h3>
 
-                <RequiredOptionalIndicator
-                  v-if="sectionElement.is_respondable"
-                  :is-required="sectionElement.element.is_required"
-                />
+                  <RequiredOptionalIndicator
+                    v-if="sectionElement.is_respondable"
+                    :is-required="sectionElement.element.is_required"
+                  />
 
-                <div class="tui-participantContent__sectionItem-content">
-                  <ElementParticipantForm v-if="sectionElement.is_respondable">
-                    <template v-slot:content>
+                  <div class="tui-participantContent__sectionItem-content">
+                    <ElementParticipantForm
+                      v-if="
+                        sectionElement.is_respondable && !viewOnlyReportMode
+                      "
+                    >
+                      <template v-slot:content>
+                        <component
+                          :is="sectionElement.component"
+                          v-bind="loadUserSectionElementProps(sectionElement)"
+                        />
+                      </template>
+                    </ElementParticipantForm>
+                    <div
+                      v-else-if="!sectionElement.is_respondable"
+                      class="tui-participantContent__staticElement"
+                    >
                       <component
                         :is="sectionElement.component"
                         v-bind="loadUserSectionElementProps(sectionElement)"
                       />
-                    </template>
-                  </ElementParticipantForm>
-                  <div v-else class="tui-participantContent__staticElement">
-                    <component
-                      :is="sectionElement.component"
-                      v-bind="loadUserSectionElementProps(sectionElement)"
+                    </div>
+                    <OtherParticipantResponses
+                      v-show="showOtherResponse"
+                      :view-only="viewOnlyReportMode"
+                      :section-element="sectionElement"
+                      :anonymous-responses="activity.anonymous_responses"
                     />
                   </div>
-                  <OtherParticipantResponses
-                    v-show="showOtherResponse"
-                    :section-element="sectionElement"
-                    :anonymous-responses="activity.anonymous_responses"
-                  />
                 </div>
-              </div>
+              </template>
             </div>
 
             <ButtonGroup
-              v-if="!activeSectionIsClosed"
+              v-if="!activeSectionIsClosed && !viewOnlyReportMode"
               class="tui-participantContent__buttons"
             >
               <ButtonSubmit @click="fullSubmit(getSubmitting)" />
@@ -203,26 +241,31 @@
             </ButtonGroup>
 
             <div class="tui-participantContent__navigation">
-              <Grid v-if="activeSectionIsClosed">
+              <Grid v-if="activeSectionIsClosed || viewOnlyReportMode">
                 <GridItem :units="6">
                   <Button
-                    v-if="hasPreviousSection"
+                    v-if="previousNavSectionModel"
                     :text="$str('previous_section', 'mod_perform')"
-                    @click="loadPreviousParticipantSection"
+                    @click="loadPreviousSection"
                   />
                 </GridItem>
                 <GridItem :units="6">
                   <div class="tui-participantContent__navigation-buttons">
                     <Button
-                      v-if="hasNextSection"
+                      v-if="nextNavSectionModel"
                       :styleclass="{ primary: 'true' }"
                       :text="$str('next_section', 'mod_perform')"
-                      @click="loadNextParticipantSection"
+                      @click="loadNextSection"
                     />
                     <Button
-                      v-if="!isExternalParticipant"
+                      v-if="!isExternalParticipant && !viewOnlyReportMode"
                       :text="$str('button_close', 'mod_perform')"
                       @click="goBackToListCancel"
+                    />
+                    <ActionLink
+                      v-if="viewOnlyReportMode"
+                      :text="$str('button_close', 'mod_perform')"
+                      :href="backToUserReportHref"
                     />
                   </div>
                 </GridItem>
@@ -246,6 +289,7 @@ import { redirectWithPost } from 'mod_perform/redirect';
 import { notify } from 'tui/notifications';
 import { config } from 'tui/config';
 // Components
+import ActionLink from 'tui/components/links/ActionLink';
 import Button from 'tui/components/buttons/Button';
 import ButtonCancel from 'tui/components/buttons/Cancel';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
@@ -260,6 +304,7 @@ import OtherParticipantResponses from 'mod_perform/components/user_activities/pa
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
 import RequiredOptionalIndicator from 'mod_perform/components/user_activities/RequiredOptionalIndicator';
 import ResponsesAreVisibleToDescription from 'mod_perform/components/user_activities/participant/ResponsesAreVisibleToDescription';
+import ResponseRelationshipSelector from 'mod_perform/components/user_activities/ResponseRelationshipSelector';
 import SidePanel from 'tui/components/sidepanel/SidePanel';
 import SidePanelNav from 'tui/components/sidepanel/SidePanelNav';
 import SidePanelNavButtonItem from 'tui/components/sidepanel/SidePanelNavButtonItem';
@@ -268,14 +313,17 @@ import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 import { Uniform } from 'tui/components/uniform';
 // graphQL
 import SectionResponsesQuery from 'mod_perform/graphql/participant_section';
+import viewOnlyReportModeSectionResponsesQuery from 'mod_perform/graphql/view_only_section_responses';
 import SectionResponsesQueryExternal from 'mod_perform/graphql/participant_section_external_participant_nosession';
 import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_responses';
 import UpdateSectionResponsesMutationExternalParticipant from 'mod_perform/graphql/update_section_responses_external_participant_nosession';
+import { formatParams, getQueryStringParam } from 'tui/util';
 
 const PARTICIPANT_SECTION_STATUS_COMPLETE = 'COMPLETE';
 
 export default {
   components: {
+    ActionLink,
     RequiredOptionalIndicator,
     Button,
     ButtonCancel,
@@ -290,6 +338,7 @@ export default {
     OtherParticipantResponses,
     ParticipantUserHeader,
     ResponsesAreVisibleToDescription,
+    ResponseRelationshipSelector,
     SidePanel,
     SidePanelNav,
     SidePanelNavButtonItem,
@@ -308,6 +357,19 @@ export default {
     },
 
     /**
+     * The user this activity is about.
+     */
+    subjectUser: {
+      required: true,
+      type: Object,
+      validator(value) {
+        return ['id', 'profileimageurlsmall', 'fullname'].every(
+          Object.prototype.hasOwnProperty.bind(value)
+        );
+      },
+    },
+
+    /**
      * The id of the logged in user.
      */
     currentUserId: {
@@ -315,42 +377,41 @@ export default {
     },
 
     /**
-     * A participant instance id, to look the section up with.
-     * This will change when we introduce multiple sections.
+     * A participant instance id, to look the section up with (used by participant mode).
      */
     participantInstanceId: {
       type: Number,
     },
 
     /**
-     * participant section id
+     * participant section id (used by participant mode).
      */
     participantSectionId: {
       type: Number,
     },
 
     /**
-     * The user this activity is about.
+     * subject instance id (used by view-only mode).
      */
-    subjectUser: {
-      required: true,
-      type: Object,
-      validator(value) {
-        return ['profileimageurlsmall', 'fullname'].every(
-          Object.prototype.hasOwnProperty.bind(value)
-        );
-      },
+    subjectInstanceId: {
+      type: Number,
     },
 
     /**
-     * Optional token if this is an external participant
+     * section id (used by view-only mode).
+     */
+    sectionId: {
+      type: Number,
+    },
+
+    /**
+     * Optional token if this is an external participant (used by participant mode).
      */
     token: {
       required: false,
       type: String,
     },
   },
-
   data() {
     return {
       answerableParticipantInstances: null,
@@ -372,97 +433,118 @@ export default {
       modalOpen: false,
       formValues: {},
       participantSections: [],
+      siblingSections: [],
       hasChanges: false,
       responsesAreVisibleTo: [],
+      selectedRelationshipFilter: null,
       selectedParticipantSectionId: this.participantSectionId,
+      selectedSectionId: this.selectedSectionId || null,
       isDraft: false,
     };
   },
+  computed: {
+    /**
+     * Are we showing view-only (report) version,
+     * this is the form not from perspective of any one participant, but as someone reviewing all other responses.
+     *
+     * View only mode requires the subjectInstanceId prop (sectionId is optional)
+     * Participant mode requires the participantInstanceId prop (participantSectionId is optional)
+     */
+    viewOnlyReportMode() {
+      return Boolean(this.subjectInstanceId);
+    },
 
-  apollo: {
-    section: {
-      query() {
-        return this.isExternalParticipant
-          ? SectionResponsesQueryExternal
-          : SectionResponsesQuery;
-      },
-      variables() {
-        return {
-          participant_instance_id: this.answeringAsParticipantId,
-          participant_section_id: this.participantSectionId,
-          token: this.token,
-        };
-      },
-      update(data) {
-        return this.isExternalParticipant
-          ? data.mod_perform_participant_section_external_participant.section
-          : data.mod_perform_participant_section.section;
-      },
-      result({ data }) {
-        let result = this.isExternalParticipant
-          ? data.mod_perform_participant_section_external_participant
-          : data.mod_perform_participant_section;
+    /**
+     * Checks draft savings is available
+     *
+     * @return {Boolean}
+     */
+    hasSaveDraft() {
+      return this.progressStatus !== PARTICIPANT_SECTION_STATUS_COMPLETE;
+    },
 
-        this.selectedParticipantSectionId = result.id;
-        this.answerableParticipantInstances =
-          result.answerable_participant_instances;
-        this.activeParticipantSection = result;
-        this.progressStatus = result.progress_status;
-        this.participantSections =
-          result.participant_instance.participant_sections;
-        this.responsesAreVisibleTo = result.responses_are_visible_to;
-        this.formValues = {};
-        this.initialValues = {
-          sectionElements: {},
-        };
-        this.sectionElements = result.section_element_responses.map(item => {
-          let component = this.activeSectionIsClosed
-            ? item.element.element_plugin.participant_response_component
-            : item.element.element_plugin.participant_form_component;
-          return {
-            id: item.section_element_id,
-            clientId: uniqueId(),
-            component: tui.asyncComponent(component),
-            element: {
-              type: item.element.element_plugin,
-              title: item.element.title,
-              identifier: item.element.identifier,
-              data: JSON.parse(item.element.data),
-              is_required: item.element.is_required,
-              responseData: null,
-            },
-            sort_order: item.sort_order,
-            is_respondable: item.element.is_respondable,
-            response_data: item.response_data,
-            other_responder_groups: item.other_responder_groups,
-          };
-        });
+    /**
+     * Get and set the section navigation model,
+     * for the view-only (report) version this is a section_id,
+     * for participant mode this is a participant_section_id.
+     */
+    navModel: {
+      get() {
+        if (this.viewOnlyReportMode) {
+          const firstSiblingSection = this.siblingSections[0] || {};
 
-        result.section_element_responses
-          .filter(item => item.element.is_respondable)
-          .forEach(item => {
-            this.initialValues.sectionElements[
-              item.section_element_id
-            ] = JSON.parse(item.response_data);
-            this.hasOtherResponse = item.other_responder_groups.length > 0;
-            item.other_responder_groups.forEach(group => {
-              if (group.responses.length > 0 && item.response_data) {
-                this.showOtherResponse = true;
-              }
-            });
-          });
+          return this.selectedSectionId
+            ? this.selectedSectionId
+            : firstSiblingSection.id;
+        }
+
+        return this.selectedParticipantSectionId;
+      },
+      set(value) {
+        if (this.viewOnlyReportMode) {
+          this.selectedSectionId = value;
+        } else {
+          this.selectedParticipantSectionId = value;
+        }
       },
     },
-  },
 
-  computed: {
     /**
      * Returns true if the current user is an external participant,
      * means the token is set
      * @return {Boolean}
      */
     isExternalParticipant() {
+      if (this.viewOnlyReportMode) {
+        return false;
+      }
+
       return this.token !== null && this.token.length > 0;
+    },
+
+    /**
+     * Apply dynamic filtering and sorting to section elements.
+     */
+    cleanedSectionElements() {
+      return this.sectionElements.map(sectionElement => {
+        const cleanSectionElement = Object.assign({}, sectionElement);
+
+        if (
+          this.activity.anonymous_responses &&
+          cleanSectionElement.other_responder_groups.length > 0
+        ) {
+          // Push all missing responses to the end.
+          const sortedAnonGroup = this.sortMissingAnswersToEnd(
+            cleanSectionElement.other_responder_groups[0]
+          );
+
+          cleanSectionElement.other_responder_groups = [sortedAnonGroup];
+        } else if (this.selectedRelationshipFilter) {
+          // Apply relationship filter.
+          cleanSectionElement.other_responder_groups = cleanSectionElement.other_responder_groups.filter(
+            group => group.relationship_name === this.selectedRelationshipFilter
+          );
+        }
+
+        return cleanSectionElement;
+      });
+    },
+
+    /**
+     * Has a relationship filter been applied, but the selected
+     * relationship is not a participant in the current section
+     */
+    noParticipantForRelationshipFilter() {
+      if (this.selectedRelationshipFilter === null) {
+        return false;
+      }
+
+      // Check that any element has "other responders".
+      // The reason we need to check them all is that "other responders"
+      //  are stripped off non-respondable elements in the back end.
+      return !this.cleanedSectionElements.some(
+        sectionElement => sectionElement.other_responder_groups.length !== 0
+      );
     },
 
     relationshipToUser() {
@@ -505,54 +587,42 @@ export default {
       );
     },
 
-    /**
-     * Checks if there's a next section to load for the navigation.
-     *
-     * @return {Boolean}
-     */
-    hasNextSection() {
-      let nextSectionId = this.getNextParticipantSection(
-        this.activeParticipantSection.id
-      );
-
-      return nextSectionId !== null;
+    nextNavSectionModel() {
+      const next = this.navModelSections[this.navModelIndex + 1];
+      return next ? next.id : null;
     },
 
-    /**
-     * Checks if there's a previous section to load for the navigation.
-     *
-     * @return {Boolean}
-     */
-    hasPreviousSection() {
-      let previousSectionId = this.getPreviousParticipantSection(
-        this.activeParticipantSection.id
-      );
-
-      return previousSectionId !== null;
+    previousNavSectionModel() {
+      const previous = this.navModelSections[this.navModelIndex - 1];
+      return previous ? previous.id : null;
     },
 
-    /**
-     * Checks draft savings is available
-     *
-     * @return {Boolean}
-     */
-    hasSaveDraft() {
-      return this.progressStatus !== PARTICIPANT_SECTION_STATUS_COMPLETE;
+    navModelIndex() {
+      const sections = this.navModelSections;
+
+      return sections.findIndex(section => section.id == this.navModel);
+    },
+
+    navModelSections() {
+      return this.viewOnlyReportMode
+        ? this.siblingSections
+        : this.participantSections;
     },
 
     /*
      * Get the participant instance we are currently answering as.
      */
-    answeringAs: {
-      get() {
-        if (this.answerableParticipantInstances === null) {
-          return null;
-        }
+    answeringAs() {
+      if (
+        this.viewOnlyReportMode ||
+        this.answerableParticipantInstances === null
+      ) {
+        return null;
+      }
 
-        return this.answerableParticipantInstances.find(
-          pi => Number(pi.id) === Number(this.answeringAsParticipantId)
-        );
-      },
+      return this.answerableParticipantInstances.find(
+        pi => Number(pi.id) === Number(this.answeringAsParticipantId)
+      );
     },
 
     /**
@@ -561,14 +631,138 @@ export default {
     showSidePanel() {
       return this.activity.settings.multisection;
     },
-  },
 
+    /**
+     * The url back to the subject user reporting page, for view-only report users.
+     */
+    backToUserReportHref() {
+      return this.$url('/mod/perform/reporting/performance/user.php', {
+        subject_user_id: this.subjectUser.id,
+      });
+    },
+  },
   mounted() {
     // Confirm navigation away if user is currently editing.
     window.addEventListener('beforeunload', this.unloadHandler);
+    window.addEventListener('popstate', this.popstateHandler);
   },
+  apollo: {
+    section: {
+      query() {
+        if (this.viewOnlyReportMode) {
+          return viewOnlyReportModeSectionResponsesQuery;
+        }
 
+        return this.isExternalParticipant
+          ? SectionResponsesQueryExternal
+          : SectionResponsesQuery;
+      },
+      variables() {
+        if (this.viewOnlyReportMode) {
+          return {
+            subject_instance_id: this.subjectInstanceId,
+            section_id: this.selectedSectionId,
+          };
+        }
+
+        return {
+          participant_instance_id: this.answeringAsParticipantId,
+          participant_section_id: this.selectedParticipantSectionId,
+          token: this.token,
+        };
+      },
+      update(data) {
+        if (this.viewOnlyReportMode) {
+          return data.mod_perform_view_only_section_responses.section;
+        }
+
+        return this.isExternalParticipant
+          ? data.mod_perform_participant_section_external_participant.section
+          : data.mod_perform_participant_section.section;
+      },
+      result({ data }) {
+        let result;
+
+        if (this.viewOnlyReportMode) {
+          result = data.mod_perform_view_only_section_responses;
+          this.siblingSections = result.siblings;
+        } else {
+          result = this.isExternalParticipant
+            ? data.mod_perform_participant_section_external_participant
+            : data.mod_perform_participant_section;
+
+          this.selectedParticipantSectionId = result.id;
+          this.answerableParticipantInstances =
+            result.answerable_participant_instances;
+          this.activeParticipantSection = result;
+          this.participantSections =
+            result.participant_instance.participant_sections;
+          this.progressStatus = result.progress_status;
+        }
+
+        this.responsesAreVisibleTo = result.responses_are_visible_to;
+        this.formValues = {};
+        this.initialValues = {
+          sectionElements: {},
+        };
+        this.sectionElements = result.section_element_responses.map(item => {
+          let component = this.activeSectionIsClosed
+            ? item.element.element_plugin.participant_response_component
+            : item.element.element_plugin.participant_form_component;
+          return {
+            id: item.section_element_id,
+            clientId: uniqueId(),
+            component: tui.asyncComponent(component),
+            element: {
+              type: item.element.element_plugin,
+              title: item.element.title,
+              identifier: item.element.identifier,
+              data: JSON.parse(item.element.data),
+              is_required: item.element.is_required,
+              responseData: null,
+            },
+            sort_order: item.sort_order,
+            is_respondable: item.element.is_respondable,
+            response_data: item.response_data,
+            other_responder_groups: item.other_responder_groups,
+          };
+        });
+
+        if (this.viewOnlyReportMode) {
+          this.showOtherResponse = true;
+          return;
+        }
+
+        result.section_element_responses
+          .filter(item => item.element.is_respondable)
+          .forEach(item => {
+            this.initialValues.sectionElements[
+              item.section_element_id
+            ] = JSON.parse(item.response_data);
+            this.hasOtherResponse = item.other_responder_groups.length > 0;
+            item.other_responder_groups.forEach(group => {
+              if (group.responses.length > 0 && item.response_data) {
+                this.showOtherResponse = true;
+              }
+            });
+          });
+      },
+    },
+  },
   methods: {
+    /**
+     * Sort all missing responses to the end in a responder group.
+     */
+    sortMissingAnswersToEnd(responderGroup) {
+      const groupClone = Object.assign({}, responderGroup);
+
+      groupClone.responses = groupClone.responses
+        .slice()
+        .sort(response => (response.response_data === null ? 1 : -1));
+
+      return groupClone;
+    },
+
     /**
      * Creates user section element component props
      *
@@ -682,26 +876,19 @@ export default {
             });
             return acc;
           }, null);
-        let nextParticipantSectionId = this.getNextParticipantSection(
-          submittedParticipantSection.id
-        );
 
         //show validation if no errors
         if (!this.errors) {
           if (this.isDraft) {
             //stay same page and show notification
             this.showSuccessNotification();
+          } else if (this.nextNavSectionModel) {
+            // Redirect to next section.
+            this.showSuccessNotification();
+            this.loadNextSection();
           } else {
-            if (nextParticipantSectionId) {
-              // Redirect to next section.
-              this.showSuccessNotification();
-              await this.loadParticipantSection(nextParticipantSectionId);
-              this.selectedParticipantSectionId = nextParticipantSectionId;
-              this.updateUrlParam(nextParticipantSectionId);
-            } else {
-              // Go back to activity list
-              this.goBackToListCompletionSuccess();
-            }
+            // Go back to activity list
+            this.goBackToListCompletionSuccess();
           }
         }
       } catch (e) {
@@ -747,89 +934,24 @@ export default {
     },
 
     /**
-     * Loads the next participant section.
+     * Loads the next (participant) section.
      */
-    loadNextParticipantSection() {
-      let nextSection = this.getNextParticipantSection(
-        this.activeParticipantSection.id
-      );
-      if (nextSection) {
-        this.loadParticipantSection(nextSection);
-      }
+    loadNextSection() {
+      this.changeSection(this.nextNavSectionModel);
     },
 
     /**
-     * Loads the previous participant section.
+     * Loads the previous (participant) section.
      */
-    loadPreviousParticipantSection() {
-      let previousSection = this.getPreviousParticipantSection(
-        this.activeParticipantSection.id
-      );
-      if (previousSection) {
-        this.loadParticipantSection(previousSection);
-      }
+    loadPreviousSection() {
+      this.changeSection(this.previousNavSectionModel);
     },
 
     /**
-     * Loads the participant section as active participant section.
-     *
-     * @param {Number} participantSectionId
-     * @return {NULL}
+     * Loads the view-only section as active section.
      */
-    async loadParticipantSection(participantSectionId) {
-      await this.$apollo.queries.section.refetch({
-        participant_section_id: participantSectionId,
-        token: this.token,
-      });
-    },
-
-    /**
-     * Get the next available participant section to fill.
-     *
-     * @param {Number} participantSectionId Completed participant section id
-     * @return {Number|NULL} next participant section id
-     */
-    getNextParticipantSection(participantSectionId) {
-      let indexOfCurrent = this.getIndexOfParticipantSection(
-        participantSectionId
-      );
-      let nextParticipantSectionIndex = indexOfCurrent + 1;
-
-      return nextParticipantSectionIndex < this.participantSections.length
-        ? this.participantSections[nextParticipantSectionIndex].id
-        : null;
-    },
-
-    /**
-     * Get the previous participant section in reference to the provided participant section id.
-     *
-     * @param {Number} participantSectionId
-     * @return {Number|NULL}
-     */
-    getPreviousParticipantSection(participantSectionId) {
-      let indexOfCurrent = this.getIndexOfParticipantSection(
-        participantSectionId
-      );
-      let previousParticipantSectionIndex = indexOfCurrent - 1;
-
-      return previousParticipantSectionIndex >= 0
-        ? this.participantSections[previousParticipantSectionIndex].id
-        : null;
-    },
-
-    /**
-     * Get the nexy participant section in reference to the provided participant section id.
-     *
-     * @param {Number} participantSectionId
-     * @return {Number|NULL}
-     */
-    getIndexOfParticipantSection(participantSectionId) {
-      return this.participantSections.findIndex(
-        function(participantSection) {
-          return participantSection.id === participantSectionId;
-        },
-        { participantSectionId }
-      );
+    async reloadData() {
+      await this.$apollo.queries.section.refetch();
     },
 
     /**
@@ -900,39 +1022,89 @@ export default {
     /**
      * navigate to a different participant section
      *
-     * @param selectedParticipantSection
+     * @param id {Number} A participant section in participant mode,
+     * or a section_id for view-only mode.
      */
-    navChange(selectedParticipantSection) {
-      //check unsaved changes
-      if (this.hasUnsavedChanges) {
-        let message = this.$str('unsaved_changes_warning', 'mod_perform');
-        let answer = window.confirm(message);
-        if (!answer) {
-          this.selectedParticipantSectionId = this.activeParticipantSection.id;
-          return;
-        }
-        this.hasUnsavedChanges = false;
-      }
-
-      this.updateUrlParam(selectedParticipantSection.id);
-      this.loadParticipantSection(selectedParticipantSection.id);
+    navChange({ id }) {
+      this.changeSection(id);
     },
 
     /**
-     * Update the URL param
-     *
-     * @param participantSectionId
+     * Change the url and data to a new (participant) section.
+     * @param newNavModel {Number}
      */
-    updateUrlParam(participantSectionId) {
-      let url = new URL(window.location.href);
-      let search_params = url.searchParams;
-      search_params.delete('participant_instance_id');
-      search_params.set('participant_section_id', participantSectionId);
-      url.search = search_params.toString();
-      let new_url = url.toString();
-      window.history.replaceState({}, '', new_url);
+    changeSection(newNavModel) {
+      const shouldChange = this.checkForUnsavedChanges();
+
+      if (shouldChange) {
+        this.navModel = newNavModel;
+        this.updateUrl();
+        this.reloadData();
+      }
     },
 
+    /**
+     * Check for unsaved changes before nav change.
+     */
+    checkForUnsavedChanges() {
+      if (this.viewOnlyReportMode || !this.hasUnsavedChanges) {
+        return true;
+      }
+
+      const message = this.$str('unsaved_changes_warning', 'mod_perform');
+      const confirmNav = window.confirm(message);
+
+      if (!confirmNav) {
+        this.selectedParticipantSectionId = this.activeParticipantSection.id;
+        return false;
+      }
+
+      this.hasUnsavedChanges = false;
+      return true;
+    },
+
+    /**
+     * Push url params based of current state.
+     */
+    updateUrl() {
+      const params = {};
+      if (this.viewOnlyReportMode) {
+        params.subject_instance_id = this.subjectInstanceId;
+
+        if (this.selectedSectionId) {
+          params.section_id = this.selectedSectionId;
+        }
+      } else {
+        params.participant_section_id = this.selectedParticipantSectionId;
+      }
+
+      const formattedParams = formatParams(params);
+      const url = window.location.pathname + '?' + formattedParams;
+
+      // Note we push state by default (a new history entry) not replace it on section change.
+      window.history.pushState(null, null, url);
+    },
+    popstateHandler() {
+      const urlNavModelKey = this.viewOnlyReportMode
+        ? 'section_id'
+        : 'participant_section_id';
+
+      let newNavModel = getQueryStringParam(urlNavModelKey);
+
+      // If section_id is not in the url, assume the first section.
+      if (this.viewOnlyReportMode && !newNavModel) {
+        newNavModel = this.siblingSections[0].id;
+      }
+
+      if (newNavModel) {
+        this.navModel = newNavModel;
+        this.reloadData();
+      } else {
+        // Force reload if we didn't find the query string param we
+        // were looking for.
+        window.location.reload();
+      }
+    },
     /**
      * Displays a warning message if the user tries to navigate away without saving.
      * @param {Event} e
@@ -986,6 +1158,7 @@ export default {
       "relation_to_subject_self",
       "section_element_response_optional",
       "section_element_response_required",
+      "selected_relationship_not_in_section",
       "toast_error_save_response",
       "toast_success_save_close_on_completion_response",
       "toast_success_save_response",
