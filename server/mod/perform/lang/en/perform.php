@@ -488,6 +488,7 @@ $string['section_sort_order'] = 'Section sort order';
 $string['section_title'] = 'Section title';
 $string['sections_one'] = '1 section';
 $string['sections'] = '{$a} sections';
+$string['sections_header'] = 'Sections';
 $string['selected_reporting_ids'] = 'selected reporting IDs';
 $string['selected_relationship_not_in_section'] = 'Selected relationship is not a responding participant in this section';
 $string['select_relationship_to_respond_as_explanation'] = 'You have multiple relationships to {$a}. Please select one to access the activity.';

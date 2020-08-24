@@ -74,206 +74,234 @@
         {{ activity.name }}
       </h2>
 
-      <Grid :class="showSidePanel ? 'tui-participantContent__layout' : ''">
-        <GridItem
-          v-if="showSidePanel"
-          :units="2"
-          class="tui-participantContent__sidePanel"
+      <Responsive
+        :breakpoints="[
+          { name: 'small', boundaries: [0, 764] },
+          { name: 'medium', boundaries: [765, 1192] },
+          { name: 'large', boundaries: [1193, 1672] },
+        ]"
+        @responsive-resize="resize"
+      >
+        <Grid
+          :class="showSidePanel ? 'tui-participantContent__layout' : ''"
+          :direction="gridDirection"
+          :stack-at="764"
         >
-          <SidePanel
-            :initially-open="true"
-            :limit-height="false"
-            :show-button-control="false"
-            :sticky="false"
+          <GridItem
+            v-if="showSidePanel"
+            :units="gridUnitsLeft"
+            class="tui-participantContent__sidePanel"
           >
-            <SidePanelNav
-              v-model="navModel"
-              :aria-label="false"
-              @change="navChange"
+            <SidePanel
+              :initially-open="true"
+              :limit-height="false"
+              :show-button-control="false"
+              :sticky="false"
             >
-              <SidePanelNavGroup v-if="viewOnlyReportMode">
-                <SidePanelNavButtonItem
-                  v-for="siblingSection in siblingSections"
-                  :id="siblingSection.id"
-                  :key="siblingSection.id"
-                  :text="siblingSection.display_title"
-                />
-              </SidePanelNavGroup>
-              <SidePanelNavGroup v-else>
-                <SidePanelNavButtonItem
-                  v-for="participantSection in participantSections"
-                  :id="participantSection.id"
-                  :key="participantSection.id"
-                  :text="participantSection.section.display_title"
-                />
-              </SidePanelNavGroup>
-            </SidePanelNav>
-          </SidePanel>
-        </GridItem>
-        <GridItem :units="showSidePanel ? 10 : 12">
-          <Uniform
-            v-if="initialValues"
-            :key="activeParticipantSection.id"
-            v-slot="{ getSubmitting }"
-            :initial-values="initialValues"
-            @submit="handleSubmit"
-            @change="handleChange"
-          >
-            <div class="tui-participantContent__section">
-              <div class="tui-participantContent__sectionHeading">
-                <h3
-                  v-if="activity.settings.multisection"
-                  class="tui-participantContent__sectionHeading-title"
+              <SidePanelNav
+                v-model="navModel"
+                :aria-label="false"
+                @change="navChange"
+              >
+                <SidePanelNavGroup
+                  v-if="viewOnlyReportMode"
+                  :title="$str('sections_header', 'mod_perform')"
                 >
-                  {{ section.display_title }}
-                </h3>
-                <div
-                  v-if="!viewOnlyReportMode"
-                  class="tui-participantContent__infoBar"
-                >
-                  <ResponsesAreVisibleToDescription
-                    class="tui-participantContent__sectionHeadingOtherResponsesDescription"
-                    :current-user-is-subject="currentUserIsSubject"
-                    :visible-to-relationships="responsesAreVisibleTo"
-                    :activity="activity"
+                  <SidePanelNavButtonItem
+                    v-for="siblingSection in siblingSections"
+                    :id="siblingSection.id"
+                    :key="siblingSection.id"
+                    :text="siblingSection.display_title"
                   />
-                  <div
-                    class="tui-participantContent__sectionHeading-otherResponseSwitch"
+                </SidePanelNavGroup>
+                <SidePanelNavGroup
+                  v-else
+                  :title="$str('sections_header', 'mod_perform')"
+                >
+                  <SidePanelNavButtonItem
+                    v-for="participantSection in participantSections"
+                    :id="participantSection.id"
+                    :key="participantSection.id"
+                    :text="participantSection.section.display_title"
+                  />
+                </SidePanelNavGroup>
+              </SidePanelNav>
+            </SidePanel>
+          </GridItem>
+          <GridItem :units="gridUnitsRight">
+            <Uniform
+              v-if="initialValues"
+              :key="activeParticipantSection.id"
+              v-slot="{ getSubmitting }"
+              :initial-values="initialValues"
+              @submit="handleSubmit"
+              @change="handleChange"
+            >
+              <div class="tui-participantContent__section">
+                <div class="tui-participantContent__sectionHeading">
+                  <h3
+                    v-if="activity.settings.multisection"
+                    class="tui-participantContent__sectionHeading-title"
                   >
-                    <ToggleSwitch
-                      v-if="hasOtherResponse"
-                      v-model="showOtherResponse"
-                      :text="
-                        $str(
-                          'user_activities_other_response_show',
-                          'mod_perform'
-                        )
-                      "
+                    {{ section.display_title }}
+                  </h3>
+                  <div
+                    v-if="!viewOnlyReportMode"
+                    class="tui-participantContent__infoBar"
+                  >
+                    <ResponsesAreVisibleToDescription
+                      class="tui-participantContent__sectionHeadingOtherResponsesDescription"
+                      :current-user-is-subject="currentUserIsSubject"
+                      :visible-to-relationships="responsesAreVisibleTo"
+                      :activity="activity"
                     />
+                    <div
+                      class="tui-participantContent__sectionHeading-otherResponseSwitch"
+                    >
+                      <ToggleSwitch
+                        v-if="hasOtherResponse"
+                        v-model="showOtherResponse"
+                        :text="
+                          $str(
+                            'user_activities_other_response_show',
+                            'mod_perform'
+                          )
+                        "
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div
-                v-if="noParticipantForRelationshipFilter"
-                class="tui-participantContent__infoBar"
-              >
-                <em>
-                  {{
-                    $str('selected_relationship_not_in_section', 'mod_perform')
-                  }}
-                </em>
-              </div>
-              <template v-else>
-                <div class="tui-participantContent__section-requiredContainer">
-                  <span
-                    class="tui-participantContent__section-responseRequired"
-                    v-text="'*'"
-                  />
-                  {{ $str('section_element_response_required', 'mod_perform') }}
-                </div>
-
                 <div
-                  v-for="sectionElement in cleanedSectionElements"
-                  :key="sectionElement.id"
-                  class="tui-participantContent__sectionItem"
+                  v-if="noParticipantForRelationshipFilter"
+                  class="tui-participantContent__infoBar"
                 >
-                  <h3
-                    v-if="sectionElement.element.title"
-                    :id="$id('title')"
-                    class="tui-participantContent__sectionItem-contentHeader"
+                  <em>
+                    {{
+                      $str(
+                        'selected_relationship_not_in_section',
+                        'mod_perform'
+                      )
+                    }}
+                  </em>
+                </div>
+                <template v-else>
+                  <div
+                    class="tui-participantContent__section-requiredContainer"
                   >
-                    {{ sectionElement.element.title }}
-                  </h3>
+                    <span
+                      class="tui-participantContent__section-responseRequired"
+                      v-text="'*'"
+                    />
+                    {{
+                      $str('section_element_response_required', 'mod_perform')
+                    }}
+                  </div>
 
-                  <RequiredOptionalIndicator
-                    v-if="sectionElement.is_respondable"
-                    :is-required="sectionElement.element.is_required"
-                  />
-
-                  <div class="tui-participantContent__sectionItem-content">
-                    <ElementParticipantForm
-                      v-if="
-                        sectionElement.is_respondable && !viewOnlyReportMode
-                      "
+                  <div
+                    v-for="sectionElement in cleanedSectionElements"
+                    :key="sectionElement.id"
+                    class="tui-participantContent__sectionItem"
+                  >
+                    <h3
+                      v-if="sectionElement.element.title"
+                      :id="$id('title')"
+                      class="tui-participantContent__sectionItem-contentHeader"
                     >
-                      <template v-slot:content>
+                      {{ sectionElement.element.title }}
+                    </h3>
+
+                    <RequiredOptionalIndicator
+                      v-if="sectionElement.is_respondable"
+                      :is-required="sectionElement.element.is_required"
+                    />
+
+                    <div class="tui-participantContent__sectionItem-content">
+                      <ElementParticipantForm
+                        v-if="
+                          sectionElement.is_respondable && !viewOnlyReportMode
+                        "
+                      >
+                        <template v-slot:content>
+                          <component
+                            :is="sectionElement.component"
+                            v-bind="loadUserSectionElementProps(sectionElement)"
+                          />
+                        </template>
+                      </ElementParticipantForm>
+                      <div
+                        v-else-if="!sectionElement.is_respondable"
+                        class="tui-participantContent__staticElement"
+                      >
                         <component
                           :is="sectionElement.component"
                           v-bind="loadUserSectionElementProps(sectionElement)"
                         />
-                      </template>
-                    </ElementParticipantForm>
-                    <div
-                      v-else-if="!sectionElement.is_respondable"
-                      class="tui-participantContent__staticElement"
-                    >
-                      <component
-                        :is="sectionElement.component"
-                        v-bind="loadUserSectionElementProps(sectionElement)"
+                      </div>
+                      <OtherParticipantResponses
+                        v-show="showOtherResponse"
+                        :view-only="viewOnlyReportMode"
+                        :section-element="sectionElement"
+                        :anonymous-responses="activity.anonymous_responses"
                       />
                     </div>
-                    <OtherParticipantResponses
-                      v-show="showOtherResponse"
-                      :view-only="viewOnlyReportMode"
-                      :section-element="sectionElement"
-                      :anonymous-responses="activity.anonymous_responses"
-                    />
                   </div>
-                </div>
-              </template>
-            </div>
+                </template>
+              </div>
 
-            <ButtonGroup
-              v-if="!activeSectionIsClosed && !viewOnlyReportMode"
-              class="tui-participantContent__buttons"
-            >
-              <ButtonSubmit @click="fullSubmit(getSubmitting)" />
-              <Button
-                v-if="hasSaveDraft"
-                :text="$str('participant_section_button_draft', 'mod_perform')"
-                type="submit"
-                @click="draftSubmit(getSubmitting)"
-              />
-              <ButtonCancel
-                v-if="!isExternalParticipant"
-                @click="goBackToListCancel"
-              />
-            </ButtonGroup>
+              <ButtonGroup
+                v-if="!activeSectionIsClosed && !viewOnlyReportMode"
+                class="tui-participantContent__buttons"
+              >
+                <ButtonSubmit @click="fullSubmit(getSubmitting)" />
+                <Button
+                  v-if="hasSaveDraft"
+                  :text="
+                    $str('participant_section_button_draft', 'mod_perform')
+                  "
+                  type="submit"
+                  @click="draftSubmit(getSubmitting)"
+                />
+                <ButtonCancel
+                  v-if="!isExternalParticipant"
+                  @click="goBackToListCancel"
+                />
+              </ButtonGroup>
 
-            <div class="tui-participantContent__navigation">
-              <Grid v-if="activeSectionIsClosed || viewOnlyReportMode">
-                <GridItem :units="6">
-                  <Button
-                    v-if="previousNavSectionModel"
-                    :text="$str('previous_section', 'mod_perform')"
-                    @click="loadPreviousSection"
-                  />
-                </GridItem>
-                <GridItem :units="6">
-                  <div class="tui-participantContent__navigation-buttons">
+              <div class="tui-participantContent__navigation">
+                <Grid v-if="activeSectionIsClosed || viewOnlyReportMode">
+                  <GridItem :units="6">
                     <Button
-                      v-if="nextNavSectionModel"
-                      :styleclass="{ primary: 'true' }"
-                      :text="$str('next_section', 'mod_perform')"
-                      @click="loadNextSection"
+                      v-if="previousNavSectionModel"
+                      :text="$str('previous_section', 'mod_perform')"
+                      @click="loadPreviousSection"
                     />
-                    <Button
-                      v-if="!isExternalParticipant && !viewOnlyReportMode"
-                      :text="$str('button_close', 'mod_perform')"
-                      @click="goBackToListCancel"
-                    />
-                    <ActionLink
-                      v-if="viewOnlyReportMode"
-                      :text="$str('button_close', 'mod_perform')"
-                      :href="backToUserReportHref"
-                    />
-                  </div>
-                </GridItem>
-              </Grid>
-            </div>
-          </Uniform>
-        </GridItem>
-      </Grid>
+                  </GridItem>
+                  <GridItem :units="6">
+                    <div class="tui-participantContent__navigation-buttons">
+                      <Button
+                        v-if="nextNavSectionModel"
+                        :styleclass="{ primary: 'true' }"
+                        :text="$str('next_section', 'mod_perform')"
+                        @click="loadNextSection"
+                      />
+                      <Button
+                        v-if="!isExternalParticipant && !viewOnlyReportMode"
+                        :text="$str('button_close', 'mod_perform')"
+                        @click="goBackToListCancel"
+                      />
+                      <ActionLink
+                        v-if="viewOnlyReportMode"
+                        :text="$str('button_close', 'mod_perform')"
+                        :href="backToUserReportHref"
+                      />
+                    </div>
+                  </GridItem>
+                </Grid>
+              </div>
+            </Uniform>
+          </GridItem>
+        </Grid>
+      </Responsive>
     </div>
   </Loader>
 </template>
@@ -305,6 +333,7 @@ import ParticipantUserHeader from 'mod_perform/components/user_activities/partic
 import RequiredOptionalIndicator from 'mod_perform/components/user_activities/RequiredOptionalIndicator';
 import ResponsesAreVisibleToDescription from 'mod_perform/components/user_activities/participant/ResponsesAreVisibleToDescription';
 import ResponseRelationshipSelector from 'mod_perform/components/user_activities/ResponseRelationshipSelector';
+import Responsive from 'tui/components/responsive/Responsive';
 import SidePanel from 'tui/components/sidepanel/SidePanel';
 import SidePanelNav from 'tui/components/sidepanel/SidePanelNav';
 import SidePanelNavButtonItem from 'tui/components/sidepanel/SidePanelNavButtonItem';
@@ -339,6 +368,7 @@ export default {
     ParticipantUserHeader,
     ResponsesAreVisibleToDescription,
     ResponseRelationshipSelector,
+    Responsive,
     SidePanel,
     SidePanelNav,
     SidePanelNavButtonItem,
@@ -412,12 +442,31 @@ export default {
       type: String,
     },
   },
+
   data() {
     return {
       answerableParticipantInstances: null,
       answeringAsParticipantId: this.participantInstanceId,
       activeParticipantSection: {},
+      boundaryDefaults: {
+        small: {
+          gridDirection: 'vertical',
+          gridUnitsLeft: 12,
+          gridUnitsRight: 12,
+        },
+        medium: {
+          gridDirection: 'horizontal',
+          gridUnitsLeft: 3,
+          gridUnitsRight: 9,
+        },
+        large: {
+          gridDirection: 'horizontal',
+          gridUnitsLeft: 2,
+          gridUnitsRight: 10,
+        },
+      },
       completionSaveSuccess: false,
+      currentBoundaryName: null,
       errors: null,
       hasOtherResponse: false,
       hasUnsavedChanges: false,
@@ -443,6 +492,46 @@ export default {
     };
   },
   computed: {
+    /**
+     * Return the grid direction
+     *
+     * @return {Number}
+     */
+    gridDirection() {
+      if (!this.currentBoundaryName) {
+        return;
+      }
+      return this.boundaryDefaults[this.currentBoundaryName].gridDirection;
+    },
+
+    /**
+     * Return the number of grid units for side panel
+     *
+     * @return {Number}
+     */
+    gridUnitsLeft() {
+      if (!this.currentBoundaryName || !this.showSidePanel) {
+        return;
+      }
+
+      return this.boundaryDefaults[this.currentBoundaryName].gridUnitsLeft;
+    },
+
+    /**
+     * Return the number of grid units for main content
+     *
+     * @return {Number}
+     */
+    gridUnitsRight() {
+      if (!this.currentBoundaryName) {
+        return;
+      } else if (!this.showSidePanel) {
+        return 12;
+      }
+
+      return this.boundaryDefaults[this.currentBoundaryName].gridUnitsRight;
+    },
+
     /**
      * Are we showing view-only (report) version,
      * this is the form not from perspective of any one participant, but as someone reviewing all other responses.
@@ -750,6 +839,15 @@ export default {
     },
   },
   methods: {
+    /**
+     * Handles responsive resizing which wraps the grid layout for this page
+     *
+     * @param {String} boundaryName
+     */
+    resize(boundaryName) {
+      this.currentBoundaryName = boundaryName;
+    },
+
     /**
      * Sort all missing responses to the end in a responder group.
      */
@@ -1158,6 +1256,7 @@ export default {
       "relation_to_subject_self",
       "section_element_response_optional",
       "section_element_response_required",
+      "sections_header",
       "selected_relationship_not_in_section",
       "toast_error_save_response",
       "toast_success_save_close_on_completion_response",
