@@ -95,7 +95,15 @@ final class relationship extends model {
     public function get_name(): string {
         // In the future, relationships can be user (admin) specified, including their names. (Stored in the DB)
         // But until then, the name of a relationship will just be the name of their first resolver.
-        return $this->get_resolvers()[0]::get_name();
+        $resolvers = $this->get_resolvers();
+        if (!isset($resolvers[0])) {
+            $relationships = \totara_core\entities\relationship::repository()->get()->to_array();
+            error_log("Relationships:\n" . json_encode($relationships));
+            $resolvers = \totara_core\entities\relationship_resolver::repository()->get()->to_array();
+            error_log("Resolvers:\n" . json_encode($resolvers));
+            throw new coding_exception("Could not find resolvers for relationship '{$this->entity->idnumber}' (id: {$this->entity->id})");
+        }
+        return $resolvers[0]::get_name();
     }
 
     /**
@@ -106,7 +114,15 @@ final class relationship extends model {
     public function get_name_plural(): string {
         // In the future, relationships can be user (admin) specified, including their names. (Stored in the DB)
         // But until then, the name of a relationship will just be the name of their first resolver.
-        return $this->get_resolvers()[0]::get_name_plural();
+        $resolvers = $this->get_resolvers();
+        if (!isset($resolvers[0])) {
+            $relationships = \totara_core\entities\relationship::repository()->get()->to_array();
+            error_log("Relationships:\n" . json_encode($relationships));
+            $resolvers = \totara_core\entities\relationship_resolver::repository()->get()->to_array();
+            error_log("Resolvers:\n" . json_encode($resolvers));
+            throw new coding_exception("Could not find resolvers for relationship '{$this->entity->idnumber}' (id: {$this->entity->id})");
+        }
+        return $resolvers[0]::get_name_plural();
     }
 
     /**
