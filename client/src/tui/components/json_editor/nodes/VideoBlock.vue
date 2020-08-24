@@ -60,6 +60,7 @@ export default {
         controlBar: {
           fullscreenToggle: true,
         },
+        fluid: true,
       };
     },
   },

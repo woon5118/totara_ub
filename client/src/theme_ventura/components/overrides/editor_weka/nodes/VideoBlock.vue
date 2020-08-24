@@ -30,7 +30,6 @@
   }
 
   &__inner {
-    display: inline-block;
     max-width: 100%;
 
     .tui-videoBlock {
