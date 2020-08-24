@@ -35,8 +35,14 @@ define("LABEL_MAX_NAME_LENGTH", 50);
  */
 function get_label_name($label) {
     // Totara: format_string() is not suitable for general HTML markup, also shortening with substr would be wrong.
-    $format = isset($label->introformat) ? $label->introformat : FORMAT_MOODLE;
-    $name = format_text($label->intro, $format);
+
+    if (!empty($label->instance)) {
+        $cm = get_coursemodule_from_instance('label', $label->instance);
+        $name = format_module_intro('label', $label, $cm->id, false); // rewrite pluginfile + format text + trim.
+    } else {
+        $format = isset($label->introformat) ? $label->introformat : FORMAT_MOODLE;
+        $name = format_text($label->intro, $format); // we can't rewrite pluginfiles before it exists, handled later.
+    }
 
     $name = html_to_text($name, LABEL_MAX_NAME_LENGTH * 2, false);
     $name = trim($name);
