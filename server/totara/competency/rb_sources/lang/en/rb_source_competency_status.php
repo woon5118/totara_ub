@@ -22,7 +22,7 @@
  * @package totara_criteria
  */
 
-$string['sourcelabel'] = 'Competency Status (Perform)';
+$string['sourcelabel'] = 'Competencies';
 $string['sourcesummary'] = 'Learners progress on their assigned competencies.';
 $string['sourcetitle'] = 'Competency Status (Perform)';
 

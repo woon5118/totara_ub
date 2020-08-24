@@ -21,7 +21,7 @@
  * @package: mod_perform
  */
 
-$string['sourcelabel'] = 'Participant Instance Manage Participation (Perform)';
+$string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Version of participant instance report source restricted to participants where the viewing user can manage participation';
 $string['sourcetitle'] = 'Participant Instance Manage Participation (Perform)';
 

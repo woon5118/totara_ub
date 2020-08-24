@@ -24,7 +24,7 @@
  */
 
 $string['response_data'] = 'Response data';
-$string['sourcelabel'] = 'Performance Responses (Perform)';
+$string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Response data from performance activities.';
 $string['sourcetitle'] = 'Performance Responses (Perform)';
 $string['type_activity'] = 'Performance activity';

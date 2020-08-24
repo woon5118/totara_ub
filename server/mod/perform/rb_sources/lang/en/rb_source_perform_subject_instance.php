@@ -21,7 +21,7 @@
  * @package: mod_perform
  */
 
-$string['sourcelabel'] = 'Performance Subject Instance (Perform)';
+$string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Subject progress in performance activities';
 $string['sourcetitle'] = 'Performance Subject Instance (Perform)';
 

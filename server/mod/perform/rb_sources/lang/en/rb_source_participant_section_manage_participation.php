@@ -21,7 +21,7 @@
  * @package: mod_perform
  */
 
-$string['sourcelabel'] = 'Participant Section Manage Participation (Perform)';
+$string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Version of participant section report source restricted to participant sections where the viewing user can manage participation';
 $string['sourcetitle'] = 'Participant Section Manage Participation (Perform)';
 

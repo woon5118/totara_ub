@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-$string['sourcelabel'] = 'Performance Activity Questions with columns for reporting embedded reports (Perform)';
+$string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Questions from performance activities, with additional columns for reporting embedded reports.';
 $string['sourcetitle'] = 'Performance Questions Reporting (Perform)';
 $string['type_activity'] = 'Performance activity';

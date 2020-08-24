@@ -23,7 +23,7 @@
  *
  */
 
-$string['sourcelabel'] = 'Performance Activity Questions (Perform)';
+$string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Questions from performance activities.';
 $string['sourcetitle'] = 'Performance Questions (Perform)';
 $string['type_activity'] = 'Performance activity';

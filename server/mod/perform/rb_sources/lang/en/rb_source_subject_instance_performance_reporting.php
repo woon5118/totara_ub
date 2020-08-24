@@ -26,7 +26,7 @@ $string['participants'] = 'Participants';
 $string['participant_count'] = 'Participants';
 $string['created_at'] = 'Creation date';
 
-$string['sourcelabel'] = 'Performance Subject Instance Performance Reporting (Perform)';
+$string['sourcelabel'] = 'Performance Activity';
 $string['sourcesummary'] = 'Version of subject instances report source restricted to records where the viewing user can manage performance data for the subjects.';
 $string['sourcetitle'] = 'Performance Subject Instance Performance Reporting (Perform)';
 
