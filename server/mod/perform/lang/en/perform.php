@@ -181,6 +181,7 @@ $string['event_participant_instance_availability_opened'] = 'Performance activit
 $string['event_participant_instance_manually_added'] = 'Performance activity participant instance manually added';
 $string['event_participant_section_availability_closed_name'] = 'Performance participant section availability closed';
 $string['event_participant_section_availability_opened_name'] = 'Performance participant section availability opened';
+$string['event_participant_section_saved_as_draft'] = 'Performance participant section saved as draft';
 $string['event_subject_instance_activated'] = 'Performance activity subject instance activated';
 $string['event_subject_instance_availability_closed'] = 'Performance activity subject instance closed';
 $string['event_subject_instance_availability_opened'] = 'Performance activity subject instance opened';

@@ -26,10 +26,10 @@ use mod_perform\constants;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\event\participant_section_saved_as_draft;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\participant_source;
-use mod_perform\models\activity\subject_instance;
 use mod_perform\models\response\participant_section;
 use mod_perform\state\subject_instance\closed;
 use totara_core\advanced_feature;
@@ -186,7 +186,11 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_external_par
             ],
         ];
 
-        participant_section::load_by_entity($external_section)->get_progress_state()->on_participant_access();
+        $sink = $this->redirectEvents();
+
+        $participant_section = participant_section::load_by_entity($external_section);
+        $participant_section->get_progress_state()->on_participant_access();
+
         $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $this->assertArrayHasKey('participant_section', $result);
         $result = $result['participant_section'];
@@ -203,6 +207,27 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_external_par
             ->get()
             ->pluck('response_data');
         $this->assertEqualsCanonicalizing($expected_responses, $actual_responses);
+
+        $events = array_filter(
+            $sink->get_events(),
+            function ($event): bool {
+                return $event instanceof participant_section_saved_as_draft;
+            }
+        );
+        $this->assertCount(1, $events);
+
+        $event = reset($events);
+        $participant_instance = $participant_section->participant_instance;
+        $this->assertEquals($external_section->id, $event->objectid, 'wrong object id');
+        $this->assertEquals($participant_instance->participant_id, $event->relateduserid, 'wrong relateduserid');
+        $this->assertFalse($event->other['anonymous'], 'wrong anonymous');
+        $this->assertEquals(
+            $participant_instance->participant_source,
+            $event->other['participant_source'],
+            'wrong participant source'
+        );
+
+        $sink->close();
     }
 
     /**

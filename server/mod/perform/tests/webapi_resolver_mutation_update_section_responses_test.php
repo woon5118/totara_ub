@@ -28,6 +28,7 @@ use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section_element;
 use mod_perform\event\participant_section_progress_updated;
+use mod_perform\event\participant_section_saved_as_draft;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
@@ -513,11 +514,33 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
 
 
         // Initial save of responses.
+        $sink = $this->redirectEvents();
         /** @var participant_section $initial_save_result */
         $initial_save_result = $this->resolve_graphql_mutation(self::MUTATION, $args)['participant_section'];
 
         self::assertEquals('IN_PROGRESS', $initial_save_result->get_progress_status());
         self::assertCount(2, $initial_save_result->get_section_element_responses());
+
+        $events = array_filter(
+            $sink->get_events(),
+            function ($event): bool {
+                return $event instanceof participant_section_saved_as_draft;
+            }
+        );
+        $this->assertCount(1, $events);
+
+        $event = reset($events);
+        $participant_instance = $participant_section->participant_instance;
+        $this->assertEquals($participant_section->id, $event->objectid, 'wrong object id');
+        $this->assertEquals($participant_instance->participant_id, $event->relateduserid, 'wrong relateduserid');
+        $this->assertFalse($event->other['anonymous'], 'wrong anonymous');
+        $this->assertEquals(
+            $participant_instance->participant_source,
+            $event->other['participant_source'],
+            'wrong participant source'
+        );
+
+        $sink->close();
     }
 
     public function test_can_not_save_responses_for_section_elements_that_belong_to_a_different_section(): void {

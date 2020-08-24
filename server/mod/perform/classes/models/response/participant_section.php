@@ -32,6 +32,7 @@ use mod_perform\controllers\activity\view_external_participant_activity;
 use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section_relationship;
+use mod_perform\event\participant_section_saved_as_draft;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\section;
@@ -314,6 +315,9 @@ class participant_section extends model implements section_response_interface {
             }
         });
         $this->refresh();
+
+        participant_section_saved_as_draft::create_from_participant_section($this)
+            ->trigger();
 
         return true;
     }
