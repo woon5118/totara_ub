@@ -28,7 +28,7 @@
 
   &__overlay {
     &::after {
-      background: var(--tui-color-neutral-1);
+      background: var(--legacy-color-neutral-1);
       content: '';
       display: block;
       height: 100%;
@@ -42,7 +42,7 @@
 
     .tw-loader__loading {
       bottom: 50%;
-      color: var(--tui-color-neutral-7);
+      color: var(--legacy-color-neutral-7);
       display: block;
       position: absolute;
       position: sticky;

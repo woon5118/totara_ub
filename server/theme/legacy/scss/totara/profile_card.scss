@@ -24,16 +24,16 @@
 .tw-profileCard {
   display: flex;
   align-items: center;
-  margin-bottom: var(--tui-gap-4);
+  margin-bottom: var(--legacy-gap-4);
 
   &__avatar {
-    margin-right: var(--tui-gap-4);
+    margin-right: var(--legacy-gap-4);
     &__img {
       width: 105px;
       height: 105px;
       border-radius: 50%;
-      border: 2px solid var(--tui-color-primary);
-      padding: var(--tui-gap-1);
+      border: 2px solid var(--legacy-color-primary);
+      padding: var(--legacy-gap-1);
     }
   }
 
@@ -44,9 +44,9 @@
     &__text {
       // We cannot use tui_typography, so here we are - look alike copied/pasted
       // css rules.
-      color: var(--tui-color-text);
+      color: var(--legacy-color-text);
       font-weight: normal;
-      font-size: var(--tui-font-size-15);
+      font-size: var(--legacy-font-size-15);
       line-height: 1.33;
       margin: 0;
     }
@@ -54,37 +54,37 @@
     &__link {
       // We cannot use tui_typography, so here we are - look alike copied/pasted
       // css rules.
-      color: var(--tui-color-state);
-      font-size: var(--tui-font-size-15);
+      color: var(--legacy-color-state);
+      font-size: var(--legacy-font-size-15);
       line-height: 1.33;
       cursor: pointer;
       margin: 0;
 
       &:hover,
       &:focus {
-        color: var(--tui-color-state-hover);
+        color: var(--legacy-color-state-hover);
       }
 
       &:active,
       &:active:hover,
       &:active:focus {
-        color: var(--tui-color-state-active);
+        color: var(--legacy-color-state-active);
       }
 
       &__header {
         font-weight: bold;
-        font-size: var(--tui-font-size-30);
+        font-size: var(--legacy-font-size-30);
         line-height: 1;
         margin: 0;
-        margin-bottom: var(--tui-gap-2);
+        margin-bottom: var(--legacy-gap-2);
       }
     }
 
     &__header {
       font-weight: bold;
-      font-size: var(--tui-font-size-30);
+      font-size: var(--legacy-font-size-30);
       line-height: 1;
-      margin-bottom: var(--tui-gap-2);
+      margin-bottom: var(--legacy-gap-2);
     }
   }
 }

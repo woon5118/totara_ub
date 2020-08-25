@@ -24,16 +24,16 @@
 .tw-editAchievementPaths {
   &__aggregation {
     display: flex;
-    margin-top: var(--tui-gap-4);
+    margin-top: var(--legacy-gap-4);
 
     & > * {
-      margin-right: var(--tui-gap-8);
+      margin-right: var(--legacy-gap-8);
     }
   }
 
   &__transparentBtn {
     @include tui-font-heading-label-small();
-    color: var(--tui-color-state);
+    color: var(--legacy-color-state);
     background: transparent;
     border: none;
     cursor: pointer;
@@ -50,7 +50,7 @@
     &:focus,
     &:hover:active,
     &:hover {
-      color: var(--tui-color-state-hover);
+      color: var(--legacy-color-state-hover);
       text-decoration: none;
       background: transparent;
       border: none;
@@ -59,7 +59,7 @@
   }
 
   &__buttons {
-    margin-top: var(--tui-gap-6);
+    margin-top: var(--legacy-gap-6);
 
     &-submit.tw-editAchievementPaths__buttons-submit {
       @include bs-btn-primary();
@@ -76,29 +76,29 @@
     .tw-editAchievementPaths__btn {
       @extend .btn;
       @include bs-btn-default();
-      color: var(--tui-btn-toggle-text-color);
-      background: var(--tui-btn-toggle-bg-color);
-      border-color: var(--tui-btn-toggle-border-color);
+      color: var(--legacy-btn-text-color);
+      background: var(--legacy-btn-bg-color);
+      border-color: var(--legacy-btn-border-color);
 
       &:hover,
       &:focus {
-        color: var(--tui-btn-toggle-text-color-focus);
-        background: var(--tui-btn-toggle-bg-color-focus);
-        border-color: var(--tui-btn-toggle-border-color-focus);
+        color: var(--legacy-btn-text-color-focus);
+        background: var(--legacy-btn-bg-color-focus);
+        border-color: var(--legacy-btn-border-color-focus);
       }
 
       &-active {
-        color: var(--tui-btn-toggle-text-color-selected);
-        background: var(--tui-btn-toggle-bg-color-selected);
-        border-color: var(--tui-btn-toggle-border-color-selected);
+        color: var(--legacy-btn-prim-text-color);
+        background: var(--legacy-btn-prim-bg-color);
+        border-color: var(--legacy-btn-prim-border-color);
         cursor: default;
 
         &:active:hover,
         &:hover,
         &:focus {
-          color: var(--tui-btn-toggle-text-color-selected);
-          background: var(--tui-btn-toggle-bg-color-selected);
-          border-color: var(--tui-btn-toggle-border-color-selected);
+          color: var(--legacy-btn-prim-text-color-focus);
+          background: var(--legacy-btn-prim-bg-color-focus);
+          border-color: var(--legacy-btn-prim-border-color-focus);
           box-shadow: none;
         }
       }
@@ -112,23 +112,23 @@
   }
 
   &__dropPlaceholder {
-    padding: var(--tui-gap-4);
-    background-color: var(--tui-color-neutral-4);
-    border: 1px solid var(--tui-color-neutral-4);
-    border-radius: var(--tui-border-radius-normal);
+    padding: var(--legacy-gap-4);
+    background-color: var(--legacy-color-neutral-4);
+    border: 1px solid var(--legacy-color-neutral-4);
+    border-radius: var(--legacy-border-radius-normal);
   }
 
   &__empty {
     @include tui-font-hint();
-    border-top: 1px solid var(--tui-color-neutral-5);
-    border-bottom: 1px solid var(--tui-color-neutral-5);
-    margin-top: var(--tui-gap-4);
-    padding: var(--tui-gap-4) 0;
+    border-top: 1px solid var(--legacy-color-neutral-5);
+    border-bottom: 1px solid var(--legacy-color-neutral-5);
+    margin-top: var(--legacy-gap-4);
+    padding: var(--legacy-gap-4) 0;
   }
 
   &__groups {
     & > * {
-      margin-top: var(--tui-gap-4);
+      margin-top: var(--legacy-gap-4);
     }
 
     &-item {
@@ -138,26 +138,26 @@
 
   &__group {
     & > * + * {
-      margin-top: var(--tui-gap-4);
+      margin-top: var(--legacy-gap-4);
     }
 
     &-actions {
       margin-left: auto;
 
       &Button {
-        color: var(--tui-color-state);
+        color: var(--legacy-color-state);
         background: transparent;
         border: none;
         cursor: pointer;
         white-space: normal;
         text-align: left;
-        padding: 0 var(--tui-gap-1);
+        padding: 0 var(--legacy-gap-1);
 
         &:active,
         &:focus,
         &:hover:active,
         &:hover {
-          color: var(--tui-color-state-hover);
+          color: var(--legacy-color-state-hover);
           text-decoration: none;
           background: transparent;
           border: none;
@@ -173,10 +173,10 @@
 
     &-item {
       display: flex;
-      padding: var(--tui-gap-4);
-      border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
-      border-radius: var(--tui-border-radius-normal);
-      box-shadow: var(--tui-shadow-2);
+      padding: var(--legacy-gap-4);
+      border: var(--legacy-border-width-thin) solid var(--legacy-color-neutral-5);
+      border-radius: var(--legacy-border-radius-normal);
+      box-shadow: var(--legacy-shadow-2);
 
       &Details {
         display: flex;
@@ -210,13 +210,13 @@
 
   &__andSeparator {
     position: relative;
-    margin: var(--tui-gap-4) var(--tui-gap-6) 0;
+    margin: var(--legacy-gap-4) var(--legacy-gap-6) 0;
 
     &-label {
       position: relative;
-      background: var(--tui-color-neutral-1);
-      margin-left: var(--tui-gap-10);
-      padding: 0 var(--tui-gap-4);
+      background: var(--legacy-color-neutral-1);
+      margin-left: var(--legacy-gap-10);
+      padding: 0 var(--legacy-gap-4);
       text-transform: uppercase;
     }
 
@@ -224,12 +224,12 @@
       position: absolute;
       width: 100%;
       top: 50%;
-      border-top: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+      border-top: var(--legacy-border-width-thin) solid var(--legacy-color-neutral-5);
     }
   }
 
   &--deleted {
-    color: var(--tui-color-neutral-5);
+    color: var(--legacy-color-neutral-5);
     text-decoration: line-through;
 
     label,
@@ -240,17 +240,17 @@
 
   &__criterionForm {
     display: flex;
-    margin: var(--tui-gap-3) var(--tui-gap-6) 0;
+    margin: var(--legacy-gap-3) var(--legacy-gap-6) 0;
 
     &-title {
       width: 12rem;
-      margin: var(--tui-gap-1) var(--tui-gap-4) 0 0;
+      margin: var(--legacy-gap-1) var(--legacy-gap-4) 0 0;
       @include tui-font-heading-label-small();
     }
 
     &-items {
       & > * + * {
-        margin-top: var(--tui-gap-1);
+        margin-top: var(--legacy-gap-1);
       }
     }
 
@@ -271,17 +271,17 @@
       list-style: none;
 
       & > * {
-        margin-top: var(--tui-gap-1);
+        margin-top: var(--legacy-gap-1);
       }
     }
 
     &-warning {
-      color: var(--tui-color-prompt-warning);
+      color: var(--legacy-color-prompt-warning);
     }
   }
 }
 
 .tw-editAchievementPaths__activeDropZone.tw-editAchievementPaths__group {
-    border: var(--tui-border-width-thin) dashed var(--tui-color-neutral-6);
-    background-color: var(--tui-color-background);
+    border: var(--legacy-border-width-thin) dashed var(--legacy-color-neutral-6);
+    background-color: var(--legacy-color-background);
 }

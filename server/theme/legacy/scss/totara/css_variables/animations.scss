@@ -18,37 +18,10 @@
 //
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
-// @package   theme_roots
+// @author    Simon Chester <simon.chester@totaralearning.com>
+// @package   theme_legacy
 
-.tw-editLinkedCourses {
-  position: relative;
-
-  &__btn {
-    @include bs-btn-default();
-    margin: auto 0 auto auto;
-  }
-
-  &__list {
-    margin-bottom: var(--legacy-gap-4);
-
-    &_removed {
-      color: var(--legacy-color-neutral-3);
-      text-decoration: line-through;
-
-      input {
-        display: none;
-      }
-    }
-  }
-
-  &__title {
-    @include tui-font-heading-small();
-    margin: auto 0;
-  }
-
-  &__top_bar {
-    display: flex;
-    margin-bottom: var(--legacy-gap-4);
-  }
+:root {
+  --legacy-transition-form-function: linear;
+  --legacy-transition-form-duration: 0s;
 }

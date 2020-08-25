@@ -26,10 +26,10 @@
     align-items: center;
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: var(--tui-gap-2);
+    margin-bottom: var(--legacy-gap-2);
 
     > * {
-      padding-top: var(--tui-gap-4);
+      padding-top: var(--legacy-gap-4);
     }
   }
 
@@ -39,39 +39,39 @@
 
   &__btnGroup {
     @include bs-btn-group();
-    margin-right: var(--tui-gap-2);
+    margin-right: var(--legacy-gap-2);
 
     .tw-list__btn {
       @extend .btn;
       @include bs-btn-default();
-      color: var(--tui-btn-toggle-text-color);
-      background: var(--tui-btn-toggle-bg-color);
-      border-color: var(--tui-btn-toggle-border-color);
+      color: var(--legacy-btn-text-color);
+      background: var(--legacy-btn-bg-color);
+      border-color: var(--legacy-btn-border-color);
 
       &:hover,
       &:focus {
-        color: var(--tui-btn-toggle-text-color-focus);
-        background: var(--tui-btn-toggle-bg-color-focus);
-        border-color: var(--tui-btn-toggle-border-color-focus);
+        color: var(--legacy-btn-text-color-focus);
+        background: var(--legacy-btn-bg-color-focus);
+        border-color: var(--legacy-btn-border-color-focus);
       }
 
       &_small {
         font-size: 1.3rem;
-        padding: var(--tui-gap-1) var(--tui-gap-2);
+        padding: var(--legacy-gap-1) var(--legacy-gap-2);
         line-height: 1.31;
       }
 
       &_active {
-        color: var(--tui-btn-toggle-text-color-selected);
-        background: var(--tui-btn-toggle-bg-color-selected);
-        border-color: var(--tui-btn-toggle-border-color-selected);
+        color: var(--legacy-btn-prim-text-color);
+        background: var(--legacy-btn-prim-bg-color);
+        border-color: var(--legacy-btn-prim-border-color);
         cursor: default;
 
         &:hover,
         &:focus {
-          color: var(--tui-btn-toggle-text-color-selected);
-          background: var(--tui-btn-toggle-bg-color-selected);
-          border-color: var(--tui-btn-toggle-border-color-selected);
+          color: var(--legacy-btn-prim-text-color-focus);
+          background: var(--legacy-btn-prim-bg-color-focus);
+          border-color: var(--legacy-btn-prim-border-color-focus);
           box-shadow: none;
         }
       }
@@ -79,9 +79,9 @@
 
     &.tw-list__btn_disabled {
       .tw-list__btn {
-        color: var(--tui-btn-toggle-text-color-disabled);
-        background: var(--tui-btn-toggle-bg-color-disabled);
-        border-color: var(--tui-btn-toggle-border-color-disabled);
+        color: var(--legacy-btn-text-color-disabled);
+        background: var(--legacy-btn-bg-color-disabled);
+        border-color: var(--legacy-btn-border-color-disabled);
         box-shadow: none;
       }
     }
@@ -90,46 +90,46 @@
   &__count {
     align-items: center;
     display: flex;
-    font-size: var(--tui-font-size-15);
+    font-size: var(--legacy-font-size-15);
     font-weight: bold;
     margin-left: auto;
     order: 1;
 
     &_num {
-      padding: 0 var(--tui-gap-1);
+      padding: 0 var(--legacy-gap-1);
     }
 
     &_text {
-      margin-right: var(--tui-gap-2);
+      margin-right: var(--legacy-gap-2);
     }
   }
 
   &__empty {
-    border-bottom: 1px solid var(--tui-color-neutral-5);
-    border-top: 1px solid var(--tui-color-neutral-5);
+    border-bottom: 1px solid var(--legacy-color-neutral-5);
+    border-top: 1px solid var(--legacy-color-neutral-5);
     font-style: italic;
-    margin: var(--tui-gap-2) 0;
-    padding: var(--tui-gap-4) var(--tui-gap-2);
+    margin: var(--legacy-gap-2) 0;
+    padding: var(--legacy-gap-4) var(--legacy-gap-2);
   }
 
   &__cell {
     height: 100%;
-    margin: auto var(--tui-gap-2);
-    padding: 0 var(--tui-gap-12) 0 var(--tui-gap-8);
+    margin: auto var(--legacy-gap-2);
+    padding: 0 var(--legacy-gap-12) 0 var(--legacy-gap-8);
 
     &_hierarchy {
       margin: auto 0;
       padding: 0;
       position: absolute;
       right: 0;
-      top: var(--tui-gap-1);
+      top: var(--legacy-gap-1);
       text-align: right;
 
       &_btn {
         display: inline-block;
-        font-size: var(--tui-font-size-16);
-        margin-top: var(--tui-gap-2);
-        padding: 0 var(--tui-gap-2);
+        font-size: var(--legacy-font-size-16);
+        margin-top: var(--legacy-gap-2);
+        padding: 0 var(--legacy-gap-2);
       }
     }
 
@@ -137,15 +137,15 @@
       &_btn {
         display: inline-block;
         line-height: 2;
-        margin-right: var(--tui-gap-4);
-        margin-top: var(--tui-gap-2);
+        margin-right: var(--legacy-gap-4);
+        margin-top: var(--legacy-gap-2);
 
         &_disabled {
-          color: var(--tui-color-neutral-4);
+          color: var(--legacy-color-neutral-4);
           cursor: default;
 
           .flex-icon {
-            color: var(--tui-color-neutral-4);
+            color: var(--legacy-color-neutral-4);
           }
         }
 
@@ -156,17 +156,17 @@
     }
 
     &_label {
-      color: var(--tui-color-neutral-6);
+      color: var(--legacy-color-neutral-6);
       display: inline-block;
-      font-size: var(--tui-font-size-11);
+      font-size: var(--legacy-font-size-11);
       font-weight: bold;
-      margin-right: var(--tui-gap-2);
-      padding-top: var(--tui-gap-2);
+      margin-right: var(--legacy-gap-2);
+      padding-top: var(--legacy-gap-2);
     }
 
     &_primary {
       font-weight: bold;
-      padding-top: var(--tui-gap-2);
+      padding-top: var(--legacy-gap-2);
     }
 
     &_select {
@@ -176,7 +176,7 @@
 
       &_label {
         margin-bottom: 0;
-        padding: 0.1rem var(--tui-gap-4) var(--tui-gap-1) 0;
+        padding: 0.1rem var(--legacy-gap-4) var(--legacy-gap-1) 0;
       }
 
       &_checkbox {
@@ -191,7 +191,7 @@
     &_close {
       font-size: 2rem;
       position: absolute;
-      right: var(--tui-gap-2);
+      right: var(--legacy-gap-2);
       top: 0.4rem;
       z-index: 2;
 
@@ -201,13 +201,13 @@
     }
 
     &_content {
-      background: var(--tui-color-neutral-1);
-      border: 1px solid var(--tui-color-neutral-5);
-      box-shadow: var(--tui-shadow-2);
+      background: var(--legacy-color-neutral-1);
+      border: 1px solid var(--legacy-color-neutral-5);
+      box-shadow: var(--legacy-shadow-2);
       height: 100vh;
       overflow-x: hidden;
       overflow-y: scroll;
-      padding: var(--tui-gap-4);
+      padding: var(--legacy-gap-4);
       position: relative;
     }
 
@@ -248,38 +248,38 @@
   &__row {
     display: flex;
     flex-direction: column;
-    padding: var(--tui-gap-4) 0 var(--tui-gap-2);
+    padding: var(--legacy-gap-4) 0 var(--legacy-gap-2);
     position: relative;
 
     &:not(:first-child) {
-      border-top: 1px solid var(--tui-color-neutral-5);
+      border-top: 1px solid var(--legacy-color-neutral-5);
     }
 
     &:hover:not(:first-child) {
-      background: var(--tui-color-state-highlight);
+      background: var(--legacy-color-state-highlight);
     }
 
     &:last-child {
-      border-bottom: 1px solid var(--tui-color-neutral-5);
+      border-bottom: 1px solid var(--legacy-color-neutral-5);
     }
 
     &_active {
-      background: var(--tui-color-neutral-2);
+      background: var(--legacy-color-neutral-2);
 
       &:hover {
-        background: var(--tui-color-neutral-2);
+        background: var(--legacy-color-neutral-2);
       }
     }
 
     &_hover {
-      background: var(--tui-color-state-highlight);
+      background: var(--legacy-color-state-highlight);
     }
 
     &_disabled {
-      color: var(--tui-color-neutral-5);
+      color: var(--legacy-color-neutral-5);
 
       .tw-list__row_trigger {
-        color: var(--tui-color-neutral-5);
+        color: var(--legacy-color-neutral-5);
       }
     }
 
@@ -291,15 +291,15 @@
 
     &_header {
       font-weight: bold;
-      padding: var(--tui-gap-1) 0;
+      padding: var(--legacy-gap-1) 0;
 
       .tw-list__cell {
         display: none;
 
         &_label {
-          color: var(--tui-color-neutral-7);
+          color: var(--legacy-color-neutral-7);
           display: inline-block;
-          padding-left: var(--tui-gap-1);
+          padding-left: var(--legacy-gap-1);
         }
 
         &_select {
@@ -310,7 +310,7 @@
     }
 
     .tw-list__hover_warning {
-      color: var(--tui-color-prompt-alert);
+      color: var(--legacy-color-prompt-alert);
     }
   }
 
@@ -333,7 +333,7 @@
 @media (min-width: 550px) {
   .tw-list {
     &__empty {
-      border-color: var(--tui-color-neutral-4);
+      border-color: var(--legacy-color-neutral-4);
     }
 
     &__cell {
@@ -342,7 +342,7 @@
       margin: auto 0;
       overflow: hidden;
       overflow-wrap: break-word;
-      padding: 0 var(--tui-gap-4) 0 0;
+      padding: 0 var(--legacy-gap-4) 0 0;
 
       &_hierarchy {
         width: 3rem;
@@ -353,14 +353,14 @@
       &_hierarchy {
         flex-basis: auto;
         margin-left: auto;
-        padding-right: var(--tui-gap-1);
+        padding-right: var(--legacy-gap-1);
         position: relative;
         right: 0;
         text-align: right;
         top: 0;
 
         &_btn {
-          margin: 0 var(--tui-gap-2);
+          margin: 0 var(--legacy-gap-2);
           padding: 0;
 
           .flex-icon {
@@ -377,15 +377,15 @@
         flex-basis: auto;
         flex-grow: 0;
         flex-shrink: 0;
-        margin-right: var(--tui-gap-2);
+        margin-right: var(--legacy-gap-2);
         padding: 0;
         position: relative;
         width: 3rem;
 
         &_label {
           cursor: pointer;
-          padding: var(--tui-gap-1) var(--tui-gap-2) var(--tui-gap-1)
-            var(--tui-gap-1);
+          padding: var(--legacy-gap-1) var(--legacy-gap-2) var(--legacy-gap-1)
+            var(--legacy-gap-1);
 
           &_disabled {
             cursor: default;
@@ -400,11 +400,11 @@
     }
 
     &__expanded {
-      margin: var(--tui-gap-4) 0;
+      margin: var(--legacy-gap-4) 0;
 
       &_arrow {
         bottom: -1.5px;
-        margin: var(--tui-gap-4) auto 0;
+        margin: var(--legacy-gap-4) auto 0;
         position: relative;
         z-index: 4;
 
@@ -414,19 +414,19 @@
           bottom: 0.5px;
           content: '';
           height: 0;
-          left: var(--tui-gap-10);
+          left: var(--legacy-gap-10);
           position: absolute;
           width: 0;
         }
 
         &::before {
-          border-bottom-color: var(--tui-color-neutral-5);
+          border-bottom-color: var(--legacy-color-neutral-5);
           border-width: 16px;
           margin-left: -16px;
         }
 
         &::after {
-          border-bottom-color: var(--tui-color-neutral-1);
+          border-bottom-color: var(--legacy-color-neutral-1);
           border-width: 15px;
           margin-left: -15px;
         }
@@ -449,7 +449,7 @@
 
     &__row {
       flex-direction: row;
-      padding: var(--tui-gap-2) 0;
+      padding: var(--legacy-gap-2) 0;
 
       &_header {
         .tw-list__cell {
@@ -462,12 +462,12 @@
       }
 
       .tw-list__hover_warning {
-        color: var(--tui-color-neutral-6);
+        color: var(--legacy-color-neutral-6);
       }
 
       .tw-list__cell_hierarchy_btn,
       .tw-list__cell_action_btn {
-        color: var(--tui-color-neutral-6);
+        color: var(--legacy-color-neutral-6);
         display: inline-block;
         position: relative;
         top: 0;
@@ -479,7 +479,7 @@
       &:hover {
         .tw-list__cell_hierarchy_btn,
         .tw-list__cell_action_btn {
-          color: var(--tui-color-state);
+          color: var(--legacy-color-state);
 
           &:focus,
           &:hover {
@@ -488,7 +488,7 @@
         }
 
         .tw-list__hover_warning {
-          color: var(--tui-color-prompt-alert);
+          color: var(--legacy-color-prompt-alert);
         }
       }
     }
@@ -496,7 +496,7 @@
   .tw-list--viewer {
     .tw-list {
       &__row {
-        padding-left: var(--tui-gap-1);
+        padding-left: var(--legacy-gap-1);
       }
     }
   }
@@ -506,12 +506,12 @@
   .tw-list {
     &__bar {
       > * {
-        padding-top: var(--tui-gap-2);
+        padding-top: var(--legacy-gap-2);
       }
     }
 
     &__count {
-      margin-left: var(--tui-gap-1);
+      margin-left: var(--legacy-gap-1);
     }
 
     &__orderBy {
