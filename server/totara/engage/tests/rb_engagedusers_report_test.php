@@ -244,21 +244,8 @@ class totara_engage_rb_engagedusers_report_testcase extends advanced_testcase {
         }
 
         // Create report.
-        $rid = $this->create_report('engagedusers', 'Test User Engagement report');
-        $config = (new rb_config())->set_nocache(true);
-        $report = reportbuilder::create($rid, $config);
-        $this->add_column($report, 'engagedusers', 'creator', null, null, null, 0);
-        $this->add_column($report, 'engagedusers', 'created_resource', null, null, null, 0);
-        $this->add_column($report, 'engagedusers', 'public_resource', null, null, null, 0);
-        $this->add_column($report, 'engagedusers', 'private_resource', null, null, null, 0);
-        $this->add_column($report, 'engagedusers', 'restricted_resource', null, null, null, 0);
-        $this->add_column($report, 'engagedusers', 'created_comment', null, null, null, 0);
-        $this->add_column($report, 'engagedusers', 'created_playlist', null, null, null, 0);
-        $this->add_column($report, 'engagedusers', 'resource_in_workspace', null, null, null, 0);
-        $this->add_column($report, 'engagedusers', 'created_workspace', null, null, null, 0);
-        $this->add_column($report, 'engagedusers', 'memberofworkspace', null, null, null, 0);
-
-        $report = reportbuilder::create($rid); // Recreate after adding column.
+        $rid = $this->get_report_id();
+        $report = reportbuilder::create($rid);
         list($sql, $params) = $report->build_query();
         $records = $DB->get_records_sql($sql, $params);
 
@@ -413,5 +400,117 @@ class totara_engage_rb_engagedusers_report_testcase extends advanced_testcase {
             $list[] = $generator->create_workspace();
         }
         return $list;
+    }
+
+    /**
+     *  @return void
+     */
+    public function test_engagedusers_report_for_multitenancy(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+        $generator->create_user();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $tenant_one = $tenant_generator->create_tenant();
+        $tenant_two = $tenant_generator->create_tenant();
+
+        $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_two->id);
+
+        /** @var engage_article_generator $articlegen */
+        $articlegen = $generator->get_plugin_generator('engage_article');
+
+        // Create articles for user_one.
+        $this->create_reources(
+            'article',
+            3,
+            $user_one->id,
+            $articlegen,
+            access::PUBLIC
+        );
+
+        // Create articles for user_two.
+        $this->create_reources(
+            'article',
+            2,
+            $user_two->id,
+            $articlegen,
+            access::PUBLIC
+        );
+
+        // Login as admin.
+        $this->setAdminUser();
+        $rid = $this->get_report_id();
+        $report = reportbuilder::create($rid);
+        list($sql, $params) = $report->build_query();
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(4, $records);
+
+        // Login as user_two.
+        $this->setUser($user_two);
+        $rid = $this->get_report_id();
+        $this->enable_setting($rid);
+        $report = reportbuilder::create($rid);
+        list($sql, $params) = $report->build_query();
+        $records = $DB->get_records_sql($sql, $params);
+
+        // User_one has to be excluded.
+        $this->assertCount(3, $records);
+        foreach ($records as $record) {
+            $this->assertNotEquals($user_one->id, $record->engagedusers_creator);
+        }
+
+        // Login as user_two.
+        $this->setUser($user_one);
+        $rid = $this->get_report_id();
+        $this->enable_setting($rid);
+        $report = reportbuilder::create($rid);
+        list($sql, $params) = $report->build_query();
+        $records = $DB->get_records_sql($sql, $params);
+
+        // User_two has to be excluded.
+        $this->assertCount(3, $records);
+        foreach ($records as $record) {
+            $this->assertNotEquals($user_two->id, $record->engagedusers_creator);
+        }
+    }
+
+    /**
+     * @return int
+     */
+    private function get_report_id(): int {
+        $rid = $this->create_report('engagedusers', 'Test User Engagement report');
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
+        $this->add_column($report, 'engagedusers', 'creator', null, null, null, 0);
+        $this->add_column($report, 'engagedusers', 'created_resource', null, null, null, 0);
+        $this->add_column($report, 'engagedusers', 'public_resource', null, null, null, 0);
+        $this->add_column($report, 'engagedusers', 'private_resource', null, null, null, 0);
+        $this->add_column($report, 'engagedusers', 'restricted_resource', null, null, null, 0);
+        $this->add_column($report, 'engagedusers', 'created_comment', null, null, null, 0);
+        $this->add_column($report, 'engagedusers', 'created_playlist', null, null, null, 0);
+        $this->add_column($report, 'engagedusers', 'resource_in_workspace', null, null, null, 0);
+        $this->add_column($report, 'engagedusers', 'created_workspace', null, null, null, 0);
+        $this->add_column($report, 'engagedusers', 'memberofworkspace', null, null, null, 0);
+
+        return $rid;
+    }
+
+    /**
+     * @param int $rid
+     */
+    private function enable_setting(int $rid): void {
+        global $DB;
+
+        // Enable the content restriction.
+        reportbuilder::update_setting($rid, 'user_visibility_content', 'enable', 1);
+        $DB->set_field('report_builder', 'contentmode', REPORT_BUILDER_CONTENT_MODE_ALL);
+        set_config('tenantsisolated', '1');
     }
 }

@@ -216,20 +216,8 @@ class totara_engage_rb_engagecontent_report_testcase extends advanced_testcase {
         $article1->add_topics_by_ids($topics);
         $survey2->add_topics_by_ids($topics);
 
-        $rid = $this->create_report('engagecontent', 'Test engagecontnt report');
-        $config = (new rb_config())->set_nocache(true);
-        $report = reportbuilder::create($rid, $config);
-        $this->add_column($report, 'engagecontent', 'resource_name', null, null, null, 0);
-        $this->add_column($report, 'engagecontent', 'playlists', null, null, null, 0);
-        $this->add_column($report, 'engagecontent', 'likes', null, null, null, 0);
-        $this->add_column($report, 'engagecontent', 'comments', null, null, null, 0);
-        $this->add_column($report, 'engagecontent', 'shares', null, null, null, 0);
-        $this->add_column($report, 'engagecontent', 'workspaces', null, null, null, 0);
-        $this->add_column($report, 'engagecontent', 'visibility', null, null, null, 0);
-        $this->add_column($report, 'engagecontent', 'create_date', null, null, null, 0);
-        $this->add_column($report, 'engagecontent', 'topics', null, null, null, 0);
-
-        $report = reportbuilder::create($rid); // Recreate after adding column.
+        $rid = $this->get_report_id();
+        $report = reportbuilder::create($rid);
         list($sql, $params) = $report->build_query();
         $records = $DB->get_records_sql($sql, $params);
         //  There must be 3 artcles and 4 surveys.
@@ -307,5 +295,111 @@ class totara_engage_rb_engagecontent_report_testcase extends advanced_testcase {
                 $this->assertEmpty($record->engagecontent_topics);
             }
         }
+    }
+
+    /**
+     *  @return void
+     */
+    public function test_engagecontent_report_for_multitenancy(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $tenant_one = $tenant_generator->create_tenant();
+        $tenant_two = $tenant_generator->create_tenant();
+        $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_two->id);
+
+        /** @var engage_article_generator $articlegen */
+        $articlegen = $generator->get_plugin_generator('engage_article');
+
+        // Create articles for user_one.
+        $this->setUser($user_one);
+        $article1 = $articlegen->create_article();
+        $article2 = $articlegen->create_article();
+        $article3 = $articlegen->create_article();
+
+        // Create articles for user_two.
+        $this->setUser($user_two);
+        $article4 = $articlegen->create_article();
+        $article5 = $articlegen->create_article();
+
+        $this->setAdminUser();
+        $articlegen->create_article();
+
+        $rid = $this->get_report_id();
+        $report = reportbuilder::create($rid);
+        list($sql, $params) = $report->build_query();
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(6, $records);
+
+        // Login as user_one.
+        $this->setUser($user_one);
+        $rid = $this->get_report_id();
+        $this->enable_setting($rid);
+        $report = reportbuilder::create($rid);
+        list($sql, $params) = $report->build_query();
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(4, $records);
+
+        // User_two'articles have to be excluded.
+        foreach ($records as $record) {
+            $this->assertNotEquals($article4->get_name(), $record->engagecontent_resource_name);
+            $this->assertNotEquals($article5->get_name(), $record->engagecontent_resource_name);
+        }
+
+        // Login as user_two.
+        $this->setUser($user_two);
+        $rid = $this->get_report_id();
+        $this->enable_setting($rid);
+        $report = reportbuilder::create($rid);
+        list($sql, $params) = $report->build_query();
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(3, $records);
+
+        // User_one'articles have to be excluded.
+        foreach ($records as $record) {
+            $this->assertNotEquals($article1->get_name(), $record->engagecontent_resource_name);
+            $this->assertNotEquals($article2->get_name(), $record->engagecontent_resource_name);
+            $this->assertNotEquals($article3->get_name(), $record->engagecontent_resource_name);
+        }
+    }
+
+    /**
+     * @return int
+     */
+    private function get_report_id(): int {
+        $rid = $this->create_report('engagecontent', 'Test engagecontnt report');
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create($rid, $config);
+        $this->add_column($report, 'engagecontent', 'resource_name', null, null, null, 0);
+        $this->add_column($report, 'engagecontent', 'playlists', null, null, null, 0);
+        $this->add_column($report, 'engagecontent', 'likes', null, null, null, 0);
+        $this->add_column($report, 'engagecontent', 'comments', null, null, null, 0);
+        $this->add_column($report, 'engagecontent', 'shares', null, null, null, 0);
+        $this->add_column($report, 'engagecontent', 'workspaces', null, null, null, 0);
+        $this->add_column($report, 'engagecontent', 'visibility', null, null, null, 0);
+        $this->add_column($report, 'engagecontent', 'create_date', null, null, null, 0);
+        $this->add_column($report, 'engagecontent', 'topics', null, null, null, 0);
+
+        return $rid;
+    }
+
+    /**
+     * @param int $rid
+     */
+    private function enable_setting(int $rid): void {
+        global $DB;
+
+        // Enable the content restriction.
+        reportbuilder::update_setting($rid, 'user_visibility_content', 'enable', 1);
+        $DB->set_field('report_builder', 'contentmode', REPORT_BUILDER_CONTENT_MODE_ALL);
+        set_config('tenantsisolated', '1');
     }
 }

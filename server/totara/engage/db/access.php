@@ -27,19 +27,19 @@ $capabilities = [
     // View resource content
     'totara/engage:view_resource_reporting' => [
         'captype' => 'read',
-        'contextlevel' => CONTEXT_SYSTEM,
+        'contextlevel' => CONTEXT_USER,
         'archetypes' => [
             'manager' => CAP_ALLOW,
-            'tenantdomainmanager' => CAP_ALLOW,
+            'tenantusermanager' => CAP_ALLOW,
         ],
     ],
     // View engaged users content
     'totara/engage:view_engagedusers_reporting' => [
         'captype' => 'read',
-        'contextlevel' => CONTEXT_SYSTEM,
+        'contextlevel' => CONTEXT_USER,
         'archetypes' => [
             'manager' => CAP_ALLOW,
-            'tenantdomainmanager' => CAP_ALLOW,
+            'tenantusermanager' => CAP_ALLOW,
         ],
     ],
 
