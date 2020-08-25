@@ -6429,6 +6429,34 @@ abstract class context extends stdClass implements IteratorAggregate {
             }
         }
     }
+
+    /**
+     * Return an array containing full details of the context
+     *
+     * @return array
+     */
+    public function to_array(): array {
+        // Figure out parent context id from path
+        if (empty($this->_path) or $this->_id == SYSCONTEXTID) {
+            $parentcontextid = 0;
+        } else {
+            $parentcontexts = trim($this->_path, '/'); // kill leading slash
+            $parentcontexts = explode('/', $parentcontexts);
+            array_pop($parentcontexts);
+            $parentcontextid = array_pop($parentcontexts); // immediate parent
+        }
+
+        $return = [];
+        $return['id'] = $this->id;
+        $return['contextlevel'] = $this->contextlevel;
+        $return['instanceid'] = $this->instanceid;
+        $return['path'] = $this->path;
+        $return['depth'] = $this->depth;
+        $return['parentid'] = $parentcontextid;
+        $return['tenantid'] = $this->tenantid;
+
+        return $return;
+    }
 }
 
 

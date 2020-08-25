@@ -4342,6 +4342,86 @@ class core_accesslib_testcase extends advanced_testcase {
         );
         $this->assertSame($expected, $risks);;
     }
+
+    public function test_context_to_array() {
+        // System context
+        $systemcontext = context_system::instance();
+        $output = $systemcontext->to_array();
+        $system_expected = [
+            'id' => $systemcontext->id,
+            'contextlevel' => CONTEXT_SYSTEM,
+            'instanceid' => 0,
+            'path' => '/' . $systemcontext->id,
+            'depth' => 1,
+            'parentid' => 0,
+            'tenantid' => null
+        ];
+        $this->assertEquals($system_expected, $output);
+
+        // User context
+        $usercontext = context_user::instance(2);  // Admin user
+        $output = $usercontext->to_array();
+        $user_expected = [
+            'id' => $usercontext->id,
+            'contextlevel' => CONTEXT_USER,
+            'instanceid' => '2',
+            'path' => $usercontext->path,
+            'depth' => '2',
+            'parentid' => 1,
+            'tenantid' => null
+        ];
+        $this->assertEquals($user_expected, $output);
+
+        // Course context
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
+        $output = $coursecontext->to_array();
+        $course_expected = [
+            'id' => $coursecontext->id,
+            'contextlevel' => CONTEXT_COURSE,
+            'instanceid' => $course->id,
+            'path' => $coursecontext->path,
+            'depth' => '3',
+            'parentid' => $coursecontext->get_parent_context()->id,
+            'tenantid' => null
+        ];
+        $this->assertEquals($course_expected, $output);
+
+        // Tenant context
+        $tenantgenerator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
+        $tenantgenerator->enable_tenants();
+
+        $tenant = $tenantgenerator->create_tenant();
+        $tenantcontext = context_tenant::instance($tenant->id);
+        $output = $tenantcontext->to_array();
+        $tenant_expected = [
+            'id' => $tenantcontext->id,
+            'contextlevel' => CONTEXT_TENANT,
+            'instanceid' => $tenant->id,
+            'path' => $tenantcontext->path,
+            'depth' => '2',
+            'parentid' => $tenantcontext->get_parent_context()->id,
+            'tenantid' => $tenant->id
+        ];
+        $this->assertEquals($tenant_expected, $output);
+
+        // Program context
+        $programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
+        $program = $programgenerator->create_program();
+
+        $programcontext = context_program::instance($program->id);
+        $output = $programcontext->to_array();
+        $program_expected = [
+            'id' => $programcontext->id,
+            'contextlevel' => CONTEXT_PROGRAM,
+            'instanceid' => (int)$program->id,
+            'path' => $programcontext->path,
+            'depth' => '3',
+            'parentid' => $programcontext->get_parent_context()->id,
+            'tenantid' => null
+        ];
+        $this->assertEquals($program_expected, $output);
+    }
 }
 
 /**
