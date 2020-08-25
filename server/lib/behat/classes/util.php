@@ -157,13 +157,15 @@ class behat_util extends testing_util {
 
         // Need to enable all product features so they don't need to be turned on to test.
         // TL-26867 improvements to enforcing flavour defaults would avoid the need to specify every feature here.
-        set_config('enableperformance_activities', 1);
-        set_config('enablecompetency_assignments', 1);
-        set_config('enablegoals', 1);
-        set_config('enableengage_resources', 1);
-        set_config('enablecontainer_workspace', 1);
-        set_config('enabletotara_msteams', 1);
-        set_config('enableml_recommender', 1);
+        $disabled_features = [
+            'appraisals',  // Legacy - replaced by performance_activities.
+            'feedback360', // Legacy - replaced by performance_activities.
+        ];
+        foreach (\totara_core\advanced_feature::get_available() as $advanced_feature) {
+            if (!in_array($advanced_feature, $disabled_features)) {
+                \totara_core\advanced_feature::enable($advanced_feature);
+            }
+        }
 
         // Totara: purge log tables to speed up DB resets.
         $DB->delete_records('config_log');

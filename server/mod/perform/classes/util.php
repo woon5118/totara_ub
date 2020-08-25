@@ -365,7 +365,7 @@ class util {
         return ["{$user_id_field} {$sourcesql}", $sourceparams];
     }
 
-    public static function is_historic_activities_enabled() {
+    public static function is_historic_activities_enabled(): bool {
         if (get_config(null, 'showhistoricactivities') &&
             (advanced_feature::is_enabled('appraisals') || advanced_feature::is_enabled('feedback360'))
         ) {

@@ -38,12 +38,12 @@ Feature: Make sure user can see Appraisal in Historic activities under Performan
       | Appraisal1  | audience | AppAud1 |
 
     # Set necessary configuration.
-    When I log in as "admin"
-    And I set the following administration settings values:
+    And the following config values are set as admin:
       | totara_job_allowmultiplejobs | 0 |
       | showhistoricactivities       | 1 |
 
     # Activate appraisal.
+    When I log in as "admin"
     And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Activate" "link" in the "Appraisal1" "table_row"
     And I press "Activate"

@@ -14,9 +14,9 @@ Feature: Make sure user can see #60 feedback in Historic activities under Perfor
     And the following "cohort members" exist:
       | user  | cohort |
       | user1 | CH1    |
-    And I log in as "admin"
-    And I set the following administration settings values:
+    And the following config values are set as admin:
       | showhistoricactivities | 1 |
+    And I log in as "admin"
     And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     And I press "Create Feedback"
     And I set the following fields to these values:
