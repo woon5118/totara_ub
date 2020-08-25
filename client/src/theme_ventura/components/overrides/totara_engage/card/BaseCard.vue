@@ -21,6 +21,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
 
   &__link {
     color: var(--tui-color-neutral-7);
@@ -37,7 +38,9 @@
   &__card {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
     width: 100%;
+    height: 100%;
     cursor: default;
   }
 
@@ -48,7 +51,7 @@
   &__description {
     display: flex;
     flex-direction: column;
-    height: 181.31px;
+    flex-grow: 1;
     padding: 0 var(--tui-gap-4) var(--tui-gap-2) var(--tui-gap-4);
 
     & > :last-child {

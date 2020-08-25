@@ -17,17 +17,21 @@
 -->
 
 <style lang="scss">
+:root {
+  --tui-playlistResources-gridCard-max-height: 347px;
+}
+
 .tui-playlistResourcesGrid {
   &__row {
     margin-bottom: var(--tui-gap-5);
   }
 
   &__card {
-    // Maximum heigh of a single card.
-    height: 358px;
+    max-height: var(--tui-playlistResources-gridCard-max-height);
 
     &-item {
       position: relative;
+      height: 100%;
 
       &-moveIcon {
         position: absolute;

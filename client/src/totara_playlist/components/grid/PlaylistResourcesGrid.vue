@@ -44,17 +44,18 @@
             <GridItem
               v-for="(card, i) in row.items"
               :key="i"
+              :grows="true"
               :units="cardUnits"
               class="tui-playlistResourcesGrid__card"
             >
-              <template v-if="'AddNewPlaylistCard' == card.component">
+              <template v-if="card.component === 'AddNewPlaylistCard'">
                 <AddNewPlaylistCard
                   :playlist-id="playlistId"
                   :access="access"
                   @contribute="addResource"
                 />
               </template>
-              <template v-else>
+              <template v-else-if="card.component !== 'FillSlot'">
                 <Draggable
                   v-slot="{ dragging, anyDragging, attrs, events }"
                   :index="index * itemsPerRow + i"
@@ -88,6 +89,14 @@
                     </div>
                   </PropsProvider>
                 </Draggable>
+              </template>
+              <template v-else>
+                <AddNewPlaylistCard
+                  :style="{ visibility: 'hidden' }"
+                  :playlist-id="playlistId"
+                  :access="access"
+                  @contribute="addResource"
+                />
               </template>
             </GridItem>
           </CoreGrid>
@@ -192,7 +201,7 @@ export default {
     },
 
     rows() {
-      return calculateRow(this.allCards, this.itemsPerRow);
+      return calculateRow(this.allCards, this.itemsPerRow, true);
     },
 
     cardUnits() {

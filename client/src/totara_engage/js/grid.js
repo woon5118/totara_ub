@@ -21,24 +21,36 @@ const slice = Array.prototype.slice;
 /**
  * Returning an array of array.
  *
- * @param {Object[]} arrayData
+ * @param {Object[]} items
  * @param {Number} perRow
  *
  * @return {Array}
  */
-export function calculateRow(arrayData, perRow) {
-  if ('undefined' === typeof arrayData || 0 === arrayData.length) {
+export function calculateRow(items, perRow, padding = false) {
+  if (!Array.isArray(items) || !items.length) {
     return [];
   }
 
-  arrayData = slice.call(arrayData);
+  let value = items.slice();
   let rows = [];
 
-  for (let index = 0; index < arrayData.length; index += perRow) {
-    let row = slice.call(arrayData, index, index + perRow);
+  for (let index = 0; index < value.length; index += perRow) {
+    let row = slice.call(value, index, index + perRow);
     rows.push({ index: rows.length, items: row });
   }
 
+  if (!padding) return rows;
+
+  // Fill the empty slots
+  const remainder = items.length % perRow;
+  if (remainder <= 0) {
+    return rows;
+  }
+
+  const slotNum = perRow - remainder;
+  for (let index = 0; index < slotNum; index += 1) {
+    rows[rows.length - 1].items.push({ component: 'FillSlot' });
+  }
   return rows;
 }
 

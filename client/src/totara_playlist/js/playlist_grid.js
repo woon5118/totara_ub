@@ -50,7 +50,7 @@ export default {
     boundaries: [1193, 1396],
     gridDirection: 'horizontal',
     cardDirection: 'horizontal',
-    maxItemsPerRow: 5,
+    maxItemsPerRow: 4,
     cardUnits: 2,
   },
 

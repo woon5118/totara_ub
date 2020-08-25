@@ -18,6 +18,9 @@
 
 <style lang="scss">
 .tui-engageArticle-articleCard {
+  height: 100%;
+  min-height: var(--tui-totaraEngage-card-height);
+
   &__imageheader {
     padding: var(--tui-gap-4) var(--tui-gap-4) 0 var(--tui-gap-4);
   }
