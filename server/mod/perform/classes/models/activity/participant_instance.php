@@ -193,16 +193,16 @@ class participant_instance extends model {
      * @return bool
      */
     public function get_is_overdue(): bool {
-        return !$this->is_completed()
+        return !$this->is_complete()
             && $this->subject_instance->is_overdue;
     }
 
     /**
-     * Checks if participant instance is completed.
+     * Checks if participant instance is complete.
      *
      * @return bool
      */
-    public function is_completed(): bool {
+    public function is_complete(): bool {
         return $this->get_progress_state() instanceof complete;
     }
 

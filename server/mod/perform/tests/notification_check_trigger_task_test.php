@@ -27,15 +27,16 @@ use mod_perform\constants;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\notification as notification_entity;
 use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
+use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\notification as notification_model;
-use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\activity\section_element as section_element_model;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
+use mod_perform\models\response\participant_section;
 use mod_perform\models\response\section_element_response as section_element_response_model;
 use mod_perform\notification\broker;
 use mod_perform\notification\factory;
@@ -229,9 +230,42 @@ class mod_perform_notification_check_trigger_task_testcase extends mod_perform_n
                 'include_questions' => false,
             ]);
             $this->assertNotNull($subject_instance, $activity->name);
-            $this->perfgen->create_participant_instance($this->user, $subject_instance->id, constants::RELATIONSHIP_SUBJECT);
-            $this->perfgen->create_participant_instance($this->manager, $subject_instance->id, constants::RELATIONSHIP_MANAGER);
-            $this->perfgen->create_participant_instance($this->supervisor, $subject_instance->id, constants::RELATIONSHIP_MANAGERS_MANAGER);
+            $section = $activity->get_sections()->first();
+
+            $manager_section_relationship = $this->perfgen->create_section_relationship(
+                $section,
+                ['relationship' => constants::RELATIONSHIP_MANAGER]
+            );
+            $managers_manager_section_relationship = $this->perfgen->create_section_relationship(
+                $section,
+                ['relationship' => constants::RELATIONSHIP_MANAGERS_MANAGER]
+            );
+            $subject_section_relationship = $this->perfgen->create_section_relationship(
+                $section,
+                ['relationship' => constants::RELATIONSHIP_SUBJECT]
+            );
+
+            $this->perfgen->create_participant_instance_and_section(
+                $activity,
+                $this->user,
+                $subject_instance->id,
+                $section,
+                $subject_section_relationship->core_relationship_id
+            );
+            $this->perfgen->create_participant_instance_and_section(
+                $activity,
+                $this->manager,
+                $subject_instance->id,
+                $section,
+                $manager_section_relationship->core_relationship_id
+            );
+            $this->perfgen->create_participant_instance_and_section(
+                $activity,
+                $this->supervisor,
+                $subject_instance->id,
+                $section,
+                $managers_manager_section_relationship->core_relationship_id
+            );
         }
     }
 
@@ -246,6 +280,7 @@ class mod_perform_notification_check_trigger_task_testcase extends mod_perform_n
                 ->one(true);
             $subject_instance = subject_instance_model::load_by_entity($subject_instance);
             $participant_instances = $subject_instance->participant_instances;
+            /** @var section_element_entity $section_element */
             $section_element = section_element_entity::repository()
                 ->join([section_entity::TABLE, 's'], 'section_id', 'id')
                 ->join([activity_entity::TABLE, 'a'], 's.activity_id', 'id')
@@ -260,14 +295,22 @@ class mod_perform_notification_check_trigger_task_testcase extends mod_perform_n
                 } else if ($idnumber === constants::RELATIONSHIP_MANAGERS_MANAGER) {
                     $this->setUser($this->supervisor);
                 }
-                $short_text = element_plugin::load_by_plugin('short_text');
+
+                /** @var participant_section_entity $participant_section_entity */
+                $participant_section_entity = participant_section_entity::repository()
+                    ->where('participant_instance_id', $participant_instance->id)
+                    ->where('section_id', $section_element->section_id)
+                    ->one(true);
+                $participant_section = new participant_section($participant_section_entity);
+
                 $element_response = new section_element_response_model(
                     $participant_instance,
                     section_element_model::load_by_entity($section_element),
-                    null, new collection(), $short_text);
-                $element_response->save();
-                $subject_instance->update_progress_status();
-                $participant_instance->update_progress_status();
+                    null,
+                    new collection()
+                );
+                $participant_section->set_section_element_responses(new collection([$element_response]));
+                $participant_section->get_progress_state()->complete();
             }
         }
 
@@ -306,9 +349,9 @@ class mod_perform_notification_check_trigger_task_testcase extends mod_perform_n
         $this->assertEquals(1, subject_instance_entity::repository()->filter_by_activity_id($this->activity_completed->id)->count());
         $this->assertEquals(1, subject_instance_entity::repository()->filter_by_activity_id($this->activity_closed->id)->count());
 
-        $this->assertFalse(subject_instance_model::load_by_entity(subject_instance_entity::repository()->filter_by_activity_id($this->activity_open->id)->one(true))->is_completed());
-        $this->assertTrue(subject_instance_model::load_by_entity(subject_instance_entity::repository()->filter_by_activity_id($this->activity_completed->id)->one(true))->is_completed());
-        $this->assertTrue(subject_instance_model::load_by_entity(subject_instance_entity::repository()->filter_by_activity_id($this->activity_closed->id)->one(true))->is_completed());
+        $this->assertFalse(subject_instance_model::load_by_entity(subject_instance_entity::repository()->filter_by_activity_id($this->activity_open->id)->one(true))->is_complete());
+        $this->assertTrue(subject_instance_model::load_by_entity(subject_instance_entity::repository()->filter_by_activity_id($this->activity_completed->id)->one(true))->is_complete());
+        $this->assertTrue(subject_instance_model::load_by_entity(subject_instance_entity::repository()->filter_by_activity_id($this->activity_closed->id)->one(true))->is_complete());
 
         $this->assertInstanceOf(subject_instance_open::class, subject_instance_model::load_by_entity(subject_instance_entity::repository()->filter_by_activity_id($this->activity_completed->id)->one(true))->availability_state);
         $this->assertInstanceOf(subject_instance_closed::class, subject_instance_model::load_by_entity(subject_instance_entity::repository()->filter_by_activity_id($this->activity_closed->id)->one(true))->availability_state);

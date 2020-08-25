@@ -24,6 +24,7 @@
 namespace mod_perform\entities\activity;
 
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 
 /**
  * Section element response entity
@@ -33,6 +34,7 @@ use core\orm\entity\entity;
  * @property int section_element_id $context_id the section element this is a answer to
  * @property int participant_instance_id $plugin_name the participant instance for the person making this answer
  * @property string $response_data JSON encoded question response data
+ * @property-read section_element $section_element
  *
  * @method static element_response_repository repository()
  *
@@ -40,4 +42,13 @@ use core\orm\entity\entity;
  */
 class element_response extends entity {
     public const TABLE = 'perform_element_response';
+
+    /**
+     * Get the element_identifier
+     *
+     * @return belongs_to
+     */
+    public function section_element(): belongs_to {
+        return $this->belongs_to(section_element::class, 'section_element_id');
+    }
 }

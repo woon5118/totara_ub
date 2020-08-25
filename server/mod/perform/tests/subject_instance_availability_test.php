@@ -22,17 +22,21 @@
  * @category test
  */
 
+use mod_perform\constants;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\event\participant_instance_progress_updated;
+use mod_perform\event\participant_section_progress_updated;
 use mod_perform\event\subject_instance_availability_closed;
 use mod_perform\event\subject_instance_progress_updated;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
+use mod_perform\models\activity\participant_instance;
+use mod_perform\models\response\participant_section;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\observers\subject_instance_availability;
 use mod_perform\state\state;
 use mod_perform\state\subject_instance\closed;
 use mod_perform\state\subject_instance\complete;
-use mod_perform\state\subject_instance\in_progress;
 use mod_perform\state\subject_instance\not_started;
 use mod_perform\state\subject_instance\open;
 use mod_perform\state\subject_instance\subject_instance_availability as subject_instance_availability_state;
@@ -75,47 +79,67 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
     public function test_subject_instance_closed_upon_instance_completion(): void {
         /**
          * @var subject_instance $subject1
-         * @var subject_instance $subject2
          * @var subject_instance_entity $subject1_entity
+         * @var subject_instance_entity $subject2_entity
          */
-        [$subject1, $subject2, $subject1_entity] = $this->create_data();
+        [$subject1, $subject1_entity, $subject2_entity] = $this->create_data();
 
-        $subject1->update_progress_status();
+        /** @var participant_instance $participant1_instance */
+        $participant1_instance = $subject1->get_participant_instances()->first();
+        /** @var participant_section $participant1_section */
+        $participant1_section = $participant1_instance->get_participant_sections()->first();
+
+        $participant1_section->complete(); // Auto-aggregates completion of subject instance.
+
         $subject1_entity->refresh();
+        $subject2_entity->refresh();
 
-        $this->assertEquals(closed::get_code(), $subject1->availability_state::get_code());
-        $this->assertEquals(open::get_code(), $subject2->availability_state::get_code());
-        $this->assertEquals(closed::get_code(), $subject1->availability);
-        $this->assertEquals(open::get_code(), $subject2->availability);
+        $subject1_model = subject_instance::load_by_entity($subject1_entity);
+        $subject2_model = subject_instance::load_by_entity($subject2_entity);
+
+        $this->assertEquals(complete::get_code(), $subject1_model->progress_state::get_code());
+        $this->assertEquals(not_started::get_code(), $subject2_model->progress_state::get_code());
+
+        $this->assertEquals(closed::get_code(), $subject1_model->availability_state::get_code());
+        $this->assertEquals(open::get_code(), $subject2_model->availability_state::get_code());
     }
 
     public function test_subject_instance_not_closed_when_instance_not_complete(): void {
         /**
          * @var subject_instance $subject1
-         * @var subject_instance $subject2
          * @var subject_instance_entity $subject1_entity
+         * @var subject_instance_entity $subject2_entity
          */
-        [$subject1, $subject2, $subject1_entity] = $this->create_data();
+        [$subject1, $subject1_entity, $subject2_entity] = $this->create_data();
 
         $subject1_entity->progress = not_started::get_code();
         $subject1_entity->save();
 
-        subject_instance_availability::close_completed_subject_instance(
-            subject_instance_progress_updated::create_from_subject_instance($subject1)
-        );
-        $subject1_entity->refresh();
+        /** @var participant_instance $participant1_instance */
+        $participant1_instance = $subject1->get_participant_instances()->first();
+        /** @var participant_section $participant1_section */
+        $participant1_section = $participant1_instance->get_participant_sections()->first();
 
-        $this->assertEquals(open::get_code(), $subject1->availability);
-        $this->assertEquals(open::get_code(), $subject2->availability);
+        $participant1_section->draft(); // Auto-aggregates in-progress of subject instance.
+
+        $subject1_entity->refresh();
+        $subject2_entity->refresh();
+
+        $subject1_model = subject_instance::load_by_entity($subject1_entity);
+        $subject2_model = subject_instance::load_by_entity($subject2_entity);
+
+        $this->assertEquals(open::get_code(), $subject1_model->availability_state::get_code());
+        $this->assertEquals(open::get_code(), $subject2_model->availability_state::get_code());
     }
 
     public function test_subject_instance_closed_event(): void {
         /**
          * @var subject_instance $subject1
-         * @var subject_instance $subject2
          * @var subject_instance_entity $subject1_entity
+         * @var subject_instance_entity $subject2_entity
+         * @var activity $activity
          */
-        [$subject1, $subject2, $subject1_entity, $activity] = $this->create_data();
+        [$subject1, $subject1_entity, $subject2_entity, $activity] = $this->create_data();
 
         $subject1_entity->progress = complete::get_code();
         $subject1_entity->save();
@@ -125,7 +149,6 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
         );
         $event_sink->close();
         $events = $event_sink->get_events();
-        $subject1_entity->refresh();
 
         $this->assertCount(1, $events);
 
@@ -135,25 +158,56 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
         $this->assertEquals($activity->get_context()->id, $event->contextid);
         $this->assertEquals(get_admin()->id, $event->userid);
 
-        $this->assertEquals(closed::get_code(), $subject1->availability);
-        $this->assertEquals(open::get_code(), $subject2->availability);
+        $subject1_entity->refresh();
+        $subject2_entity->refresh();
+
+        $subject1_model = subject_instance::load_by_entity($subject1_entity);
+        $subject2_model = subject_instance::load_by_entity($subject2_entity);
+
+        $this->assertEquals(closed::get_code(), $subject1_model->availability_state::get_code());
+        $this->assertEquals(open::get_code(), $subject2_model->availability_state::get_code());
     }
 
     public function test_instance_is_not_closed_if_activity_close_on_completion_is_not_set(): void {
         /**
          * @var subject_instance $subject1
-         * @var subject_instance $subject2
          * @var subject_instance_entity $subject1_entity
+         * @var subject_instance_entity $subject2_entity
          * @var activity $activity
          */
-        [$subject1, $subject2, $subject1_entity, $activity] = $this->create_data();
+        [$subject1, $subject1_entity, $subject2_entity, $activity] = $this->create_data();
         $previous_subject_progress = $subject1->progress_status;
 
         $activity->settings->update([activity_setting::CLOSE_ON_COMPLETION => false]);
 
+        /** @var participant_instance $participant1_instance */
+        $participant1_instance = $subject1->get_participant_instances()->first();
+        /** @var participant_section $participant1_section */
+        $participant1_section = $participant1_instance->get_participant_sections()->first();
+
+        // Capture the participant section progress event.
+        $event_sink = $this->redirectEvents();
+        $participant1_section->complete();
+        $event_sink->close();
+        $events = $event_sink->get_events();
+
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $this->assertInstanceOf(participant_section_progress_updated::class, $event);
+
+        // Manually fire the update that should occur due to the first event, and capture the participant instance progress event.
+        $event_sink = $this->redirectEvents();
+        $participant1_instance->update_progress_status();
+        $event_sink->close();
+        $events = $event_sink->get_events();
+
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $this->assertInstanceOf(participant_instance_progress_updated::class, $event);
+
+        // Manually fire the update that should occur due to the second event, and capture the subject instance progress event.
         $event_sink = $this->redirectEvents();
         $subject1->update_progress_status();
-        $subject1_entity->refresh();
         $event_sink->close();
         $events = $event_sink->get_events();
         $this->assertCount(1, $events);
@@ -167,8 +221,14 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
         $this->assertEquals($subject1->progress_status, $event->other['progress']);
         $this->assertEquals($previous_subject_progress, $event->other['previous_progress']);
 
-        $this->assertEquals(open::get_code(), $subject1->availability);
-        $this->assertEquals(open::get_code(), $subject2->availability);
+        $subject1_entity->refresh();
+        $subject2_entity->refresh();
+
+        $subject1_model = subject_instance::load_by_entity($subject1_entity);
+        $subject2_model = subject_instance::load_by_entity($subject2_entity);
+
+        $this->assertEquals(open::get_code(), $subject1_model->availability_state::get_code());
+        $this->assertEquals(open::get_code(), $subject2_model->availability_state::get_code());
     }
 
     /**
@@ -184,6 +244,7 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
 
         $activity = $generator->create_activity_in_container();
         $activity->settings->update([activity_setting::CLOSE_ON_COMPLETION => true]);
+        $section = $activity->get_sections()->first();
 
         $user1 = self::getDataGenerator()->create_user();
         $user2 = self::getDataGenerator()->create_user();
@@ -197,7 +258,22 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
             'subject_user_id' => $user2->id,
         ]);
 
-        $section1 = $generator->create_section($activity);
+        $subject_relationship_id = $generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
+
+        $generator->create_participant_instance_and_section(
+            $activity,
+            $user1,
+            $subject1_entity->id,
+            $section,
+            $subject_relationship_id
+        );
+        $generator->create_participant_instance_and_section(
+            $activity,
+            $user2,
+            $subject2_entity->id,
+            $section,
+            $subject_relationship_id
+        );
 
         $subject1_model = subject_instance::load_by_entity($subject1_entity);
         $subject2_model = subject_instance::load_by_entity($subject2_entity);
@@ -205,12 +281,7 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
         $this->assertEquals(open::get_code(), $subject1_model->availability_state::get_code());
         $this->assertEquals(open::get_code(), $subject2_model->availability_state::get_code());
 
-        $subject1_entity->progress = in_progress::get_code();
-        $subject1_entity->save();
-        $subject2_entity->progress = in_progress::get_code();
-        $subject2_entity->save();
-
-        return [$subject1_model, $subject2_model, $subject1_entity, $activity];
+        return [$subject1_model, $subject1_entity, $subject2_entity, $activity];
     }
 
 }

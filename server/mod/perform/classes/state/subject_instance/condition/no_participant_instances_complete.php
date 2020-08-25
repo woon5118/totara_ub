@@ -26,6 +26,10 @@ namespace mod_perform\state\subject_instance\condition;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\state\condition;
 use mod_perform\state\participant_instance\complete;
+use mod_perform\state\participant_instance\in_progress;
+use mod_perform\state\participant_instance\not_started;
+use mod_perform\state\participant_instance\not_submitted;
+use mod_perform\state\participant_instance\progress_not_applicable;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,11 +41,24 @@ class no_participant_instances_complete extends condition {
     public function pass(): bool {
         /** @var participant_instance[] $participant_instances */
         $participant_instances = $this->object->participant_instances->all();
+
         foreach ($participant_instances as $participant_instance) {
-            if ((int)$participant_instance->progress === complete::get_code()) {
-                return false;
+            switch ($participant_instance->progress) {
+                case complete::get_code():
+                case not_submitted::get_code():
+                    // Note that not_submitted is treated as complete.
+                    return false;
+                case not_started::get_code():
+                case in_progress::get_code():
+                    break;
+                case progress_not_applicable::get_code():
+                    // The participant instance is view-only, so treated as if it doesn't exist.
+                    break;
+                default:
+                    throw new \coding_exception('Unexpected participant instance progress encountered');
             }
         }
+
         return true;
     }
 }

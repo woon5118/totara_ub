@@ -23,24 +23,16 @@
 
 namespace mod_perform\state\participant_section\condition;
 
-use mod_perform\models\response\section_element_response;
 use mod_perform\state\condition;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class all_answers_incomplete
+ * Class not_no_answers_provided
  */
-class all_answers_incomplete extends condition {
+class not_no_answers_provided extends condition {
 
     public function pass(): bool {
-        $section_element_responses = $this->object->section_element_responses;
-        /** @var section_element_response $section_element_response */
-        foreach ($section_element_responses as $section_element_response) {
-            if ($section_element_response->validate_response()) {
-                return false;
-            }
-        }
-        return true;
+        return !(new no_answers_provided($this->object))->pass();
     }
 }

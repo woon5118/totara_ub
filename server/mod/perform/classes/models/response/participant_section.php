@@ -30,16 +30,19 @@ use core\orm\entity\model;
 use core\orm\query\builder;
 use mod_perform\controllers\activity\view_external_participant_activity;
 use mod_perform\controllers\activity\view_user_activity;
+use mod_perform\entities\activity\element_response;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section_relationship;
 use mod_perform\event\participant_section_saved_as_draft;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\section;
+use mod_perform\models\activity\section_element;
 use mod_perform\state\participant_instance\closed as participant_instance_closed;
 use mod_perform\state\participant_section\in_progress;
 use mod_perform\state\participant_section\closed;
 use mod_perform\state\participant_section\complete;
+use mod_perform\state\participant_section\not_started;
 use mod_perform\state\participant_section\open;
 use mod_perform\state\participant_section\participant_section_availability;
 use mod_perform\state\participant_section\participant_section_progress;
@@ -56,8 +59,10 @@ use totara_core\relationship\relationship;
  * @property-read int $section_id
  * @property-read int $participant_instance_id
  * @property-read int $progress
+ * @property-read int $availability
  * @property-read int $created_at
  * @property-read int $updated_at
+ * @property-read string $availability_status
  * @property-read string $progress_status
  * @property-read participant_instance $participant_instance
  * @property-read section $section
@@ -77,9 +82,9 @@ class participant_section extends model implements section_response_interface {
     protected $entity;
 
     /**
-     * @var collection|section_element_response[]
+     * @var null|collection|section_element_response[]
      */
-    protected $element_responses;
+    protected $section_element_responses = null;
 
     protected $entity_attribute_whitelist = [
         'id',
@@ -109,12 +114,10 @@ class participant_section extends model implements section_response_interface {
      * participant_section constructor.
      *
      * @param participant_section_entity $entity
-     * @param collection $element_responses
      * @throws coding_exception
      */
-    public function __construct(participant_section_entity $entity, collection $element_responses = null) {
+    public function __construct(participant_section_entity $entity) {
         parent::__construct($entity);
-        $this->element_responses = $element_responses ?? new collection();
     }
 
     /**
@@ -197,19 +200,42 @@ class participant_section extends model implements section_response_interface {
     }
 
     /**
-     * @param collection|section_element_response[] $element_responses
+     * @param collection|section_element_response[] $section_element_responses
      * @return self
      */
-    public function set_element_responses(collection $element_responses): self {
-        $this->element_responses = $element_responses;
+    public function set_section_element_responses(collection $section_element_responses): self {
+        $this->section_element_responses = $section_element_responses;
         return $this;
     }
 
     /**
+     * Returns the collection of section element responses that have been set in this object, otherwise retrieves
+     * the current set of element responses from the DB and turns them into section element responses
+     *
      * @return collection|section_element_response[]
      */
     public function get_section_element_responses(): collection {
-        return $this->element_responses;
+        if (is_null($this->section_element_responses)) {
+            $element_responses = element_response::repository()
+                ->join('perform_section_element', 'section_element_id', 'id')
+                ->where('perform_section_element.section_id', $this->section_id)
+                ->where('perform_element_response.participant_instance_id', $this->participant_instance_id)
+                ->get();
+
+            $section_element_responses = [];
+            foreach ($element_responses as $element_response) {
+                $section_element_responses[] = new section_element_response(
+                    $this->participant_instance,
+                    section_element::load_by_entity($element_response->section_element),
+                    $element_response,
+                    new \core\orm\collection()
+                );
+            }
+
+            return new collection($section_element_responses);
+        } else {
+            return $this->section_element_responses;
+        }
     }
 
     /**
@@ -253,9 +279,9 @@ class participant_section extends model implements section_response_interface {
      * @return mixed|null
      */
     public function find_element_response(int $section_element_id): ?section_element_response {
-        return $this->element_responses->find(
-            function (section_element_response $element_response) use ($section_element_id) {
-                return (int) $element_response->section_element_id === $section_element_id;
+        return $this->get_section_element_responses()->find(
+            function (section_element_response $section_element_response) use ($section_element_id) {
+                return (int) $section_element_response->section_element_id === $section_element_id;
             }
         );
     }
@@ -269,12 +295,16 @@ class participant_section extends model implements section_response_interface {
      * @return bool true if no validation rules failed and the section was completed, false if any validation rules failed.
      * @see get_section_element_responses
      * @see section_element_response::get_validation_errors
-     * @see set_element_responses
+     * @see set_section_element_responses
      */
     public function complete(): bool {
+        if (!$this->can_complete()) {
+            throw new coding_exception('This participant section is not in a valid state to be completed');
+        }
+
         $has_validation_error = false;
 
-        foreach ($this->element_responses as $element_response) {
+        foreach ($this->get_section_element_responses() as $element_response) {
             $has_validation_error = !$element_response->validate_response();
         }
 
@@ -285,7 +315,7 @@ class participant_section extends model implements section_response_interface {
 
         // Validation has passed save all the responses, and ensure the progress status is set to complete.
         builder::get_db()->transaction(function () {
-            foreach ($this->element_responses as $element_response) {
+            foreach ($this->get_section_element_responses() as $element_response) {
                 $element_response->save();
             }
 
@@ -300,27 +330,53 @@ class participant_section extends model implements section_response_interface {
     }
 
     /**
+     * Indicates if it is valid for this participant section to be marked as complete
+     *
+     * @return bool
+     */
+    public function can_complete(): bool {
+        return $this->get_progress_state() instanceof not_started ||
+            $this->get_progress_state() instanceof in_progress ||
+            $this->get_progress_state() instanceof complete;
+    }
+
+    /**
      * Save participant section responses as a draft which ignore all validation rules
      * manually triggered progress updated event
      *
      * @return bool
      */
     public function draft(): bool {
-        if (!$this->get_progress_state() instanceof in_progress) {
-            throw new coding_exception('This function can only be called if the participant section is in in_progress status');
+        if (!$this->can_save_draft()) {
+            throw new coding_exception('This participant section is not in a valid state to be saved as draft');
         }
 
         builder::get_db()->transaction(function () {
-            foreach ($this->element_responses as $element_response) {
-                $element_response->save();
+            foreach ($this->get_section_element_responses() as $section_element_response) {
+                $section_element_response->save();
             }
+
+            /** @var participant_section_progress $state */
+            $state = $this->get_progress_state();
+            $state->on_participant_access();
         });
+
         $this->refresh();
 
         participant_section_saved_as_draft::create_from_participant_section($this)
             ->trigger();
 
         return true;
+    }
+
+    /**
+     * Indicates if it is valid for this participant section to be saved as draft
+     *
+     * @return bool
+     */
+    public function can_save_draft(): bool {
+        return $this->get_progress_state() instanceof not_started ||
+            $this->get_progress_state() instanceof in_progress;
     }
 
     /**
@@ -383,7 +439,7 @@ class participant_section extends model implements section_response_interface {
      * @return bool
      */
     public function get_is_overdue(): bool {
-        return !$this->is_completed()
+        return !$this->is_complete()
             && $this->participant_instance->is_overdue;
     }
 
@@ -414,12 +470,12 @@ class participant_section extends model implements section_response_interface {
     }
 
     /**
-     * Checks if participant section is completed.
+     * Checks if participant section is complete.
      * This means it is not in a "draft" state.
      *
      * @return bool
      */
-    public function is_completed(): bool {
+    public function is_complete(): bool {
         return $this->get_progress_state() instanceof complete;
     }
 

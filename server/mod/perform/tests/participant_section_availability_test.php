@@ -161,11 +161,12 @@ class mod_perform_participant_section_availability_testcase extends state_testca
      * @return void
      */
     public function test_availability_change_on_activity_settings(bool $close_on_completion): void {
+        /** @var participant_section $participant_section */
         $participant_section = participant_section::load_by_entity($this->create_participant_section());
 
         self::assertEquals(
             open::get_code(),
-            $participant_section->availability,
+            $participant_section->get_availability_state()::get_code(),
             'Participant section should start with the open availability status'
         );
 
@@ -181,9 +182,11 @@ class mod_perform_participant_section_availability_testcase extends state_testca
             ? closed::get_code()
             : open::get_code();
 
+        /** @var participant_section_entity $participant_section_entity */
+        $participant_section_entity = participant_section_entity::repository()->find($participant_section->get_id());
         self::assertEquals(
             $expected_availability,
-            participant_section_entity::repository()->find($participant_section->get_id())->availability,
+            $participant_section_entity->availability,
             'Participant section has the wrong availability status'
         );
     }
@@ -196,7 +199,7 @@ class mod_perform_participant_section_availability_testcase extends state_testca
             $responses->append($this->create_valid_element_response());
         }
 
-        $participant_section->set_element_responses($responses);
+        $participant_section->set_section_element_responses($responses);
     }
 
     /**

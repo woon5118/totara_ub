@@ -161,17 +161,17 @@ class subject_instance extends model {
      * @return bool
      */
     public function get_is_overdue(): bool {
-        return !$this->is_completed()
+        return !$this->is_complete()
             && !empty($this->entity->due_date)
             && time() >= (int)$this->entity->due_date;
     }
 
     /**
-     * Checks if subject instance is completed.
+     * Checks if subject instance is complete.
      *
      * @return bool
      */
-    public function is_completed(): bool {
+    public function is_complete(): bool {
         return $this->get_progress_state() instanceof complete;
     }
 

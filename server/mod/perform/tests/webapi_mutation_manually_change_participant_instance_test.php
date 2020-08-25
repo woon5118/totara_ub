@@ -35,6 +35,7 @@ use mod_perform\state\participant_section\not_started as participant_section_not
 use mod_perform\state\participant_section\not_submitted as participant_section_not_submitted;
 use mod_perform\state\subject_instance\open as subject_instance_open;
 use mod_perform\state\subject_instance\closed as subject_instance_closed;
+use mod_perform\state\subject_instance\complete as subject_instance_complete;
 use mod_perform\state\subject_instance\not_started as subject_instance_not_started;
 use mod_perform\state\subject_instance\not_submitted as subject_instance_not_submitted;
 use mod_perform\webapi\resolver\mutation\create_track;
@@ -92,8 +93,8 @@ class mod_perform_webapi_mutation_manually_change_participant_instance_testcase 
 
         // Verify the changes have been applied.
         $subject_instance = subject_instance::repository()->get()->first();
-        $this->assertEquals(subject_instance_not_started::get_code(), $subject_instance->progress); // Not affected.
-        $this->assertEquals(subject_instance_open::get_code(), $subject_instance->availability); // Not affected.
+        $this->assertEquals(subject_instance_complete::get_code(), $subject_instance->progress); // Auto-aggregated completion.
+        $this->assertEquals(subject_instance_open::get_code(), $subject_instance->availability); // Still open.
         $participant_instance = participant_instance::repository()->get()->first();
         $this->assertEquals(participant_instance_not_submitted::get_code(), $participant_instance->progress);
         $this->assertEquals(participant_instance_closed::get_code(), $participant_instance->availability);

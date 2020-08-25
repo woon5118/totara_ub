@@ -26,6 +26,10 @@ namespace mod_perform\state\participant_instance\condition;
 use mod_perform\entities\activity\participant_section;
 use mod_perform\state\condition;
 use mod_perform\state\participant_section\complete;
+use mod_perform\state\participant_section\in_progress;
+use mod_perform\state\participant_section\not_started;
+use mod_perform\state\participant_section\not_submitted;
+use mod_perform\state\participant_section\progress_not_applicable;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,11 +41,24 @@ class no_sections_complete extends condition {
     public function pass(): bool {
         /** @var participant_section[] $sections */
         $sections = $this->object->participant_sections->all();
+
         foreach ($sections as $section) {
-            if ((int)$section->progress === complete::get_code()) {
-                return false;
+            switch ($section->progress) {
+                case complete::get_code():
+                case not_submitted::get_code():
+                    // Note that not_submitted is treated as complete.
+                    return false;
+                case not_started::get_code():
+                case in_progress::get_code():
+                    break;
+                case progress_not_applicable::get_code():
+                    // The participant section is view-only, so treated as if it doesn't exist.
+                    break;
+                default:
+                    throw new \coding_exception('Unexpected participant section progress encountered');
             }
         }
+
         return true;
     }
 }

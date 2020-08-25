@@ -85,22 +85,6 @@ class participant_section extends entity {
     }
 
     /**
-     * Relationship with the element response entities.
-     *
-     * @return has_many_through
-     */
-    public function element_responses(): has_many_through {
-        return $this->has_many_through(
-            section_element::class,
-            element_response::class,
-            'section_id',
-            'section_id',
-            'id',
-            'section_element_id'
-        );
-    }
-
-    /**
      * Get all participant instances (same end user, different relationship),
      * that this section can be answered by the linked participant instance.
      *

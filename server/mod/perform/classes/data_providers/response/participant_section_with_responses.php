@@ -102,7 +102,7 @@ class participant_section_with_responses {
         );
 
         // Finally add section_element_responses collection to participant_section.
-        return $this->participant_section->set_element_responses($main_section_element_responses);
+        return $this->participant_section->set_section_element_responses($main_section_element_responses);
     }
 
     /**

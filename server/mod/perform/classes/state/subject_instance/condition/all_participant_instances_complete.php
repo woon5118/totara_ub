@@ -26,6 +26,10 @@ namespace mod_perform\state\subject_instance\condition;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\state\condition;
 use mod_perform\state\participant_instance\complete;
+use mod_perform\state\participant_instance\in_progress;
+use mod_perform\state\participant_instance\not_started;
+use mod_perform\state\participant_instance\not_submitted;
+use mod_perform\state\participant_instance\progress_not_applicable;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -37,11 +41,29 @@ class all_participant_instances_complete extends condition {
     public function pass(): bool {
         /** @var participant_instance[] $participant_instances */
         $participant_instances = $this->object->participant_instances->all();
+
+        // If no participant instance is found (e.g. no manager assigned, and only manager is involved) then
+        // we do NOT automatically mark the subject instance complete.
+        $instance_found = false;
+
         foreach ($participant_instances as $participant_instance) {
-            if ((int)$participant_instance->progress !== complete::get_code()) {
-                return false;
+            switch ($participant_instance->progress) {
+                case not_started::get_code():
+                case in_progress::get_code():
+                    // The participant instance is incomplete, so obviously the subject instance is incomplete.
+                    return false;
+                case complete::get_code():
+                case not_submitted::get_code():
+                    $instance_found = true;
+                    break;
+                case progress_not_applicable::get_code():
+                    // The participant instance is view-only, so treated as if it doesn't exist.
+                    break;
+                default:
+                    throw new \coding_exception('Unexpected participant instance progress encountered');
             }
         }
-        return true;
+
+        return $instance_found;
     }
 }

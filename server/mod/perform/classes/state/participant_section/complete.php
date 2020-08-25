@@ -23,6 +23,7 @@
 
 namespace mod_perform\state\participant_section;
 
+use mod_perform\state\participant_section\condition\all_answers_complete;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
@@ -55,7 +56,11 @@ class complete extends participant_section_progress {
         return [
             // The participant has saved a draft OR an admin has manually moved progress backwards.
             transition::to(new in_progress($this->object)),
-            transition::to(new self($this->object)),
+
+            // Re-complete (triggering events again).
+            transition::to(new complete($this->object))->with_conditions([
+                all_answers_complete::class
+            ]),
         ];
     }
 
@@ -90,8 +95,6 @@ class complete extends participant_section_progress {
     public function manually_uncomplete(): void {
         // The user must have done something for it to get into the "complete" state. We move back
         // to "in_progress" to force the user to submit the section again.
-        if ($this->can_switch(in_progress::class)) {
-            $this->object->switch_state(in_progress::class);
-        }
+        $this->object->switch_state(in_progress::class);
     }
 }

@@ -24,7 +24,6 @@
 namespace mod_perform\state\participant_section;
 
 use mod_perform\state\participant_section\condition\all_answers_complete;
-use mod_perform\state\participant_section\condition\not_all_answers_complete;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
@@ -52,9 +51,7 @@ class in_progress extends participant_section_progress {
             ]),
 
             // The participant has not completed a section, but it is "done".
-            transition::to(new not_submitted($this->object))->with_conditions([
-                not_all_answers_complete::class
-            ]),
+            transition::to(new not_submitted($this->object)),
         ];
     }
 
@@ -69,9 +66,7 @@ class in_progress extends participant_section_progress {
     }
 
     public function manually_complete(): void {
-        if ($this->can_switch(not_submitted::class)) {
-            $this->object->switch_state(not_submitted::class);
-        }
+        $this->object->switch_state(not_submitted::class);
     }
 
     public function manually_uncomplete(): void {

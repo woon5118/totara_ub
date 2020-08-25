@@ -231,7 +231,7 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
             $responses->append($this->create_valid_element_response());
         }
 
-        $participant_section->set_element_responses($responses);
+        $participant_section->set_section_element_responses($responses);
     }
 
     private function create_valid_element_response(): section_element_response {

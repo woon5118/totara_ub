@@ -322,7 +322,7 @@ class view_only_section_with_responses {
     ): ?element_response_entity {
         $participant_section_model = new participant_section($participant_section);
 
-        if (!$participant_section_model->is_completed()) {
+        if (!$participant_section_model->is_complete()) {
             return null;
         }
 

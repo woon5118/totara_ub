@@ -36,7 +36,7 @@ class notification {
     public static function send_completion_notification(base $event) {
         $entity = new subject_instance_entity($event->objectid);
         $inst = subject_instance_model::load_by_entity($entity);
-        if ($inst->is_completed()) {
+        if ($inst->is_complete()) {
             $dealer = factory::create_dealer_on_subject_instance($entity);
             $dealer->dispatch('completion');
         }

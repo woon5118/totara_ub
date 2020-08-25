@@ -23,6 +23,8 @@
 
 namespace mod_perform\state\participant_section\condition;
 
+use core\orm\collection;
+use mod_perform\entities\activity\element_response;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\response\participant_section;
 use mod_perform\models\response\section_element_response;
@@ -38,25 +40,25 @@ class all_answers_complete extends condition {
     public function pass(): bool {
         /** @var participant_section $participant_section */
         $participant_section = $this->object;
-        $section_elements = $participant_section->section->section_elements;
+
         $section_element_responses = $participant_section->section_element_responses;
-        $respondable_elements = $section_elements->filter(
-            function (section_element $section_element) {
-                return $section_element->element->is_respondable;
-            },
-            true
-        );
+
+        $section_elements = $participant_section->section->section_elements;
+        $respondable_elements = $section_elements->filter(function (section_element $section_element_entity) {
+            return $section_element_entity->element->is_respondable;
+        });
 
         if (count($respondable_elements) != count($section_element_responses)) {
             return false;
         }
 
-        /** @var section_element_response $section_element_response */
+        /** @var element_response $element_response */
         foreach ($section_element_responses as $section_element_response) {
             if (!$section_element_response->validate_response()) {
                 return false;
             }
         }
+
         return true;
     }
 }

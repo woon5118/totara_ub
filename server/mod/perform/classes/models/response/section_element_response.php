@@ -215,11 +215,13 @@ class section_element_response extends model implements section_element_response
      * @return bool
      */
     public function validate_response(): bool {
-        if (!$this->get_element()->get_element_plugin() instanceof respondable_element_plugin) {
+        $element_plugin = $this->get_element()->get_element_plugin();
+
+        if (!$element_plugin instanceof respondable_element_plugin) {
             return true;
         }
 
-        $this->validation_errors = $this->get_element()->get_element_plugin()->validate_response(
+        $this->validation_errors = $element_plugin->validate_response(
             $this->entity->response_data,
             $this->get_element()
         );

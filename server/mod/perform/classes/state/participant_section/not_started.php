@@ -53,15 +53,10 @@ class not_started extends participant_section_progress {
             ]),
 
             // The participant has saved a draft OR an admin has manually moved progress backwards.
-            transition::to(new in_progress($this->object))->with_conditions([
-                not_all_answers_complete::class,
-                // Could replace with "viewed".
-            ]),
+            transition::to(new in_progress($this->object)),
 
             // The participant has not completed a section, but it is "done".
-            transition::to(new not_submitted($this->object))->with_conditions([
-                all_answers_incomplete::class,
-            ]),
+            transition::to(new not_submitted($this->object)),
         ];
     }
 
@@ -72,15 +67,11 @@ class not_started extends participant_section_progress {
     }
 
     public function on_participant_access(): void {
-        if ($this->can_switch(in_progress::class)) {
-            $this->object->switch_state(in_progress::class);
-        }
+        $this->object->switch_state(in_progress::class);
     }
 
     public function manually_complete(): void {
-        if ($this->can_switch(not_submitted::class)) {
-            $this->object->switch_state(not_submitted::class);
-        }
+        $this->object->switch_state(not_submitted::class);
     }
 
     public function manually_uncomplete(): void {

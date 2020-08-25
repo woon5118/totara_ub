@@ -58,11 +58,14 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
     }
 
     public function state_transitions_data_provider(): array {
+        // Where the transition is false, the condition should indicate the state of data which you would
+        // expect would be required in order to enter the target state. For example, complete => not_started
+        // is not possible, and you would expect not_started to normally require condition NONE_COMPLETE.
         return [
             'Not started to not started' =>
                 [not_started::class, not_started::class, false, 'NONE_COMPLETE'],
             'Not started to in progress' =>
-                [not_started::class, in_progress::class, true, 'SOME_COMPLETE'],
+                [not_started::class, in_progress::class, true, 'SOME_INCOMPLETE'],
             'Not started to complete' =>
                 [not_started::class, complete::class, true, 'ALL_COMPLETE'],
             'Not started to not submitted' =>
@@ -71,13 +74,13 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
                 [not_started::class, progress_not_applicable::class, false, 'NONE_COMPLETE'],
 
             'In progress to in progress' =>
-                [in_progress::class, in_progress::class, false, 'SOME_COMPLETE'],
+                [in_progress::class, in_progress::class, false, 'SOME_INCOMPLETE'],
             'In progress to not started' =>
                 [in_progress::class, not_started::class, false, 'NONE_COMPLETE'],
             'In progress to complete' =>
                 [in_progress::class, complete::class, true, 'ALL_COMPLETE'],
             'In progress to not submitted' =>
-                [in_progress::class, not_submitted::class, true, 'SOME_COMPLETE'],
+                [in_progress::class, not_submitted::class, true, 'NONE_COMPLETE'],
             'In progress to not applicable' =>
                 [in_progress::class, progress_not_applicable::class, false, 'NONE_COMPLETE'],
 
@@ -86,29 +89,29 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
             'Complete to not started' =>
                 [complete::class, not_started::class, false, 'NONE_COMPLETE'],
             'Complete to in progress' =>
-                [complete::class, in_progress::class, true, 'SOME_COMPLETE'],
+                [complete::class, in_progress::class, true, 'SOME_INCOMPLETE'],
             'Complete to not submitted' =>
-                [complete::class, not_submitted::class, false, 'ALL_COMPLETE'],
+                [complete::class, not_submitted::class, false, 'NONE_COMPLETE'],
             'Complete to not applicable' =>
                 [complete::class, progress_not_applicable::class, false, 'NONE_COMPLETE'],
 
             'Not submitted to not submitted' =>
-                [not_submitted::class, not_submitted::class, false, 'SOME_COMPLETE'],
+                [not_submitted::class, not_submitted::class, false, 'NONE_COMPLETE'],
             'Not submitted to not started' =>
                 [not_submitted::class, not_started::class, true, 'NONE_COMPLETE'],
             'Not submitted to in progress' =>
-                [not_submitted::class, in_progress::class, true, 'SOME_COMPLETE'],
+                [not_submitted::class, in_progress::class, true, 'SOME_INCOMPLETE'],
             'Not submitted to complete' =>
-                [not_submitted::class, complete::class, true, 'ALL_COMPLETE'],
+                [not_submitted::class, complete::class, false, 'ALL_COMPLETE'],
             'Not submitted to not applicable' =>
                 [not_submitted::class, progress_not_applicable::class, false, 'NONE_COMPLETE'],
 
             'Not applicable to not started' =>
                 [progress_not_applicable::class, not_started::class, false, 'NONE_COMPLETE'],
             'Not applicable to in progress' =>
-                [progress_not_applicable::class, in_progress::class, false, 'NONE_COMPLETE'],
+                [progress_not_applicable::class, in_progress::class, false, 'SOME_INCOMPLETE'],
             'Not applicable to complete' =>
-                [progress_not_applicable::class, complete::class, false, 'NONE_COMPLETE'],
+                [progress_not_applicable::class, complete::class, false, 'ALL_COMPLETE'],
             'Not applicable to not submitted' =>
                 [progress_not_applicable::class, not_submitted::class, false, 'NONE_COMPLETE'],
             'Not applicable to not applicable' =>
@@ -146,11 +149,9 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
         switch ($condition) {
             case 'NONE_COMPLETE':
                 $responses = new collection([
-                    $this->create_element_response_with_validation_errors(),
-                    $this->create_element_response_with_validation_errors(),
                 ]);
                 break;
-            case 'SOME_COMPLETE':
+            case 'SOME_INCOMPLETE':
                 $responses = new collection([
                     $this->create_element_response_with_validation_errors(),
                     $this->create_valid_element_response(),
@@ -165,7 +166,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
             default:
                 throw new coding_exception('Unexpected condition');
         }
-        $participant_section->set_element_responses($responses);
+        $participant_section->set_section_element_responses($responses);
 
         $this->setUser($subject_user);
         $sink = $this->redirectEvents();
@@ -254,7 +255,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
             'Participant section should start with the in_progress status'
         );
 
-        $participant_section->set_element_responses($responses);
+        $participant_section->set_section_element_responses($responses);
         $completion_success = $participant_section->complete();
 
         self::assertTrue($completion_success);
@@ -283,7 +284,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
             'Participant section should start with the in_progress status'
         );
 
-        $participant_section->set_element_responses(new collection($element_responses));
+        $participant_section->set_section_element_responses(new collection($element_responses));
         $completion_success = $participant_section->complete();
 
         self::assertFalse($completion_success);
@@ -418,7 +419,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
 
         $responses = new collection([$response1, $response2]);
 
-        return new participant_section($participant_section_entity, $responses);
+        return (new participant_section($participant_section_entity))->set_section_element_responses($responses);
     }
 
     /**

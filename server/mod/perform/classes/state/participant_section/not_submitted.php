@@ -23,9 +23,8 @@
 
 namespace mod_perform\state\participant_section;
 
-use mod_perform\state\participant_section\condition\all_answers_complete;
-use mod_perform\state\participant_section\condition\all_answers_incomplete;
-use mod_perform\state\participant_section\condition\not_all_answers_incomplete;
+use mod_perform\state\participant_section\condition\no_answers_provided;
+use mod_perform\state\participant_section\condition\not_no_answers_provided;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
@@ -49,28 +48,21 @@ class not_submitted extends participant_section_progress {
 
     public function get_transitions(): array {
         return [
-            // The participant has completed a section.
-            transition::to(new complete($this->object))->with_conditions([
-                all_answers_complete::class,
-            ]),
-
             // An admin has manually moved progress backwards.
             transition::to(new in_progress($this->object))->with_conditions([
-                not_all_answers_incomplete::class,
+                not_no_answers_provided::class,
                 // Could replace with "viewed".
             ]),
 
             // An admin has manually moved progress backwards.
             transition::to(new not_started($this->object))->with_conditions([
-                all_answers_incomplete::class,
+                no_answers_provided::class,
             ]),
         ];
     }
 
     public function complete(): void {
-        if ($this->can_switch(complete::class)) {
-            $this->object->switch_state(complete::class);
-        }
+        // Must be moved out of not submitted state before being marked complete.
     }
 
     public function on_participant_access(): void {
