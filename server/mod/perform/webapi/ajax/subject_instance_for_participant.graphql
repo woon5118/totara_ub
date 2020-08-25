@@ -16,6 +16,7 @@ query mod_perform_subject_instance_for_participant(
         multisection
         visibility_condition {
           participant_description
+          view_only_participant_description
         }
       }
       anonymous_responses

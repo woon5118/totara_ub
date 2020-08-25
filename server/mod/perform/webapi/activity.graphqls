@@ -23,6 +23,7 @@ type mod_perform_visibility_condition_option {
   name: String!
   value: Int!
   participant_description: String
+  view_only_participant_description: String!
 }
 
 """

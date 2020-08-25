@@ -11,6 +11,7 @@ query mod_perform_participant_section_external_participant_nosession(
     id
     progress_status
     availability_status
+    can_answer
     section {
       display_title
     }

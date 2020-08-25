@@ -57,6 +57,17 @@ class responder_group {
     }
 
     /**
+     * Create a group for anonymous responses
+     *
+     * @return static
+     */
+    public static function create_anonymous_group(): self {
+        // Technically this name will be overwritten by the front end, this is just for safety.
+        $anonymous_name = get_string('anonymous_group_relationship_name', 'mod_perform');
+        return new responder_group($anonymous_name, new collection());
+    }
+
+    /**
      * @return string
      */
     public function get_relationship_name(): string {
@@ -78,6 +89,20 @@ class responder_group {
      */
     public function append_response(section_element_response $response): self {
         $this->responses->append($response);
+
+        return $this;
+    }
+
+    /**
+     * Add many responses.
+     *
+     * @param section_element_response[] $responses
+     * @return $this
+     */
+    public function append_responses(iterable $responses): self {
+        foreach ($responses as $response) {
+            $this->responses->append($response);
+        }
 
         return $this;
     }

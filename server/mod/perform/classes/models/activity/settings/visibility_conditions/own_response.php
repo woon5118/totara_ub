@@ -25,6 +25,7 @@ namespace mod_perform\models\activity\settings\visibility_conditions;
 
 use core\collection;
 use mod_perform\models\activity\participant_instance;
+use mod_perform\state\participant_instance\availability_not_applicable;
 use mod_perform\state\participant_instance\open;
 
 class own_response extends visibility_option {
@@ -35,6 +36,7 @@ class own_response extends visibility_option {
      * @inheritDoc
      */
     public function show_responses(participant_instance $participant_instance, collection $other_participant_instances): bool {
+        // Note this is NOT open rather than closed, so we also exclude not_applicable states too.
         return !$participant_instance->get_availability_state() instanceof open;
     }
 
@@ -58,4 +60,12 @@ class own_response extends visibility_option {
     public function get_participant_description(): ?string {
         return get_string('visibility_condition_viewer_closed_description', 'mod_perform');
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_view_only_participant_description(): ?string {
+        return get_string('visibility_condition_none_view_only_description', 'mod_perform');
+    }
+
 }

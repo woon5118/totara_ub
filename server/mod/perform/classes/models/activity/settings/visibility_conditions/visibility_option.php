@@ -66,6 +66,14 @@ abstract class visibility_option {
     abstract public function get_participant_description(): ?string;
 
     /**
+     * Get a description of when responses are made visible
+     * in the end user form where the reader is a view-only participant.
+     *
+     * @return string
+     */
+    abstract public function get_view_only_participant_description(): ?string;
+
+    /**
      * Default visibility option when anonymous responses are enabled.
      *
      * @return bool

@@ -57,4 +57,12 @@ class none extends visibility_option {
     public function get_participant_description(): ?string {
         return null;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_view_only_participant_description(): ?string {
+        return get_string('visibility_condition_none_view_only_description', 'mod_perform');
+    }
+
 }

@@ -252,7 +252,7 @@ class view_only_section_with_responses {
         section_element_entity $section_element
     ): collection {
         $responder_groups = $this->build_relationship_id_to_responder_group_map();
-        $anonymous_group = $this->build_anonymous_responder_group();
+        $anonymous_group = responder_group::create_anonymous_group();
 
         foreach ($this->responding_participant_sections as $participant_section) {
             $core_relationship_id = $participant_section->participant_instance->core_relationship_id;
@@ -332,13 +332,6 @@ class view_only_section_with_responses {
                     && (int) $response->participant_instance_id === (int) $participant_section->participant_instance_id;
             }
         );
-    }
-
-    protected function build_anonymous_responder_group(): responder_group {
-        // Technically this name will be overwritten by the front end, this is just for safety.
-        $anonymous_name = get_string('activity_general_anonymous_responses_label', 'mod_perform');
-
-        return new responder_group($anonymous_name, new collection());
     }
 
 }

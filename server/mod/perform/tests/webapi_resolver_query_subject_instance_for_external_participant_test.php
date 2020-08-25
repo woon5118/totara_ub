@@ -213,7 +213,8 @@ class mod_perform_webapi_resolver_query_subject_instance_for_external_participan
                     'close_on_completion' => false,
                     'multisection' => false,
                     'visibility_condition' => [
-                        'participant_description' => ''
+                        'participant_description' => null,
+                        'view_only_participant_description' => 'Responses are displayed as soon as a participant has submitted.'
                     ],
                 ],
                 'anonymous_responses' => false,

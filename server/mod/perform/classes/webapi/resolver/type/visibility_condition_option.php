@@ -49,6 +49,8 @@ class visibility_condition_option implements type_resolver {
                 return $source->get_value();
             case 'participant_description':
                 return $source->get_participant_description();
+            case 'view_only_participant_description':
+                return $source->get_view_only_participant_description();
             default:
                 $err = "Unknown field '$field' requested in visibility option type resolver";
                 throw new coding_exception($err);

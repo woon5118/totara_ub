@@ -23,7 +23,6 @@
 
 namespace mod_perform\data_providers\response;
 
-use coding_exception;
 use core\collection;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance;
@@ -39,6 +38,7 @@ use mod_perform\models\response\participant_section;
 use mod_perform\models\response\responder_group;
 use mod_perform\models\response\section_element_response;
 use mod_perform\state\participant_section\complete as participant_section_complete;
+use totara_core\relationship\relationship;
 
 class participant_section_with_responses {
 
@@ -50,6 +50,11 @@ class participant_section_with_responses {
 
     /** @var bool*/
     private $load_responses_for_submission = false;
+
+    /**
+     * @var collection|relationship[]
+     */
+    private $other_participant_core_relationships;
 
     /**
      * responses_for_participant_section constructor.
@@ -78,6 +83,8 @@ class participant_section_with_responses {
      * @return participant_section
      */
     public function build(): participant_section {
+        $this->other_participant_core_relationships = $this->get_other_participants_core_relationships();
+
         $action_data = $this->analyze_response_visibility_and_other_participants();
 
         // Build the the responses from other participants.
@@ -179,16 +186,16 @@ class participant_section_with_responses {
     }
 
     /**
-     * @param participant_instance_model $participant_instance
-     * @param collection $section_elements
-     * @param collection $existing_responses
-     * @param bool $include_other_responder_groups
-     * @param bool $include_draft
+     * @param participant_instance_model $target_participant_instance
+     * @param collection                 $section_elements
+     * @param collection                 $existing_responses
+     * @param bool                       $include_other_responder_groups
+     * @param bool                       $include_draft
      *
      * @return collection|section_element_response[]
      */
     private function create_section_element_responses(
-        participant_instance_model $participant_instance,
+        participant_instance_model $target_participant_instance,
         collection $section_elements,
         collection $existing_responses,
         bool $include_other_responder_groups = false,
@@ -203,18 +210,28 @@ class participant_section_with_responses {
 
         return $section_elements->map(
             function (section_element $section_element) use (
-                $participant_instance,
+                $target_participant_instance,
                 $existing_responses,
                 $include_other_responder_groups,
                 $include_draft
             ) {
+
+                //get target participant section
+                $target_participant_section = $target_participant_instance->get_participant_sections()->filter(
+                    function (participant_section $participant_section) use ($section_element) {
+                        return $participant_section->section_id == $section_element->section_id;
+                    }
+                )->first();
+
                 // The element response model will accept missing entities
                 // in the case where a question has not yet been answered.
-                if ($include_draft || $this->participant_section->get_progress_state() instanceof participant_section_complete) {
+                if ($include_draft ||
+                    ($target_participant_section->get_progress_state() instanceof participant_section_complete)
+                ) {
                     $element_response_entity = $this->find_existing_response_entity(
                         $existing_responses,
                         $section_element->id,
-                        $participant_instance->id
+                        $target_participant_instance->id
                     );
                 } else {
                     $element_response_entity = null;
@@ -227,7 +244,7 @@ class participant_section_with_responses {
                 }
 
                 return new section_element_response(
-                    $participant_instance,
+                    $target_participant_instance,
                     $section_element,
                     $element_response_entity,
                     $other_responder_groups
@@ -305,11 +322,9 @@ class participant_section_with_responses {
     private function create_other_responder_groups(int $section_element_id): collection {
         // Always create a group for the other participants relationship types.
         $grouped_by_relationship = [];
-        $anonymous_responses = $this->participant_section->section->activity->anonymous_responses;
-        if (!$anonymous_responses) {
-            foreach ($this->get_other_participants_relationship_type_names() as $relationship_type_name) {
-                $grouped_by_relationship[$relationship_type_name] = [];
-            }
+
+        foreach ($this->other_participant_core_relationships as $core_relationship) {
+            $grouped_by_relationship[$core_relationship->get_name()] = [];
         }
 
         /** @var collection|section_element_response[] $others_responses */
@@ -327,65 +342,85 @@ class participant_section_with_responses {
             // If we are fetching for one of the many manager/appraisers their relationship type name
             // will not have a group, as the relationship type name of the $participant_id
             // is excluded from the $this->other_participant_relationship_type_names array.
-            if (!$anonymous_responses) {
-                if (!array_key_exists($relationship_name, $grouped_by_relationship)) {
-                    $grouped_by_relationship[$relationship_name] = [];
-                }
-                $grouped_by_relationship[$relationship_name][] = $other_response;
-            } else {
-                $grouped_by_relationship['anonymous'][] = $other_response;
+            if (!array_key_exists($relationship_name, $grouped_by_relationship)) {
+                $grouped_by_relationship[$relationship_name] = [];
             }
+
+            $grouped_by_relationship[$relationship_name][] = $other_response;
+        }
+
+
+        if ($this->is_anonymous_responses()) {
+            $anonymous_group = $this->build_anonymous_responder_group($grouped_by_relationship);
+            return new collection([$anonymous_group]);
         }
 
         $other_responder_groups = new collection();
         foreach ($grouped_by_relationship as $relationship_name => $responses) {
+            if (!$this->relationship_group_can_answer($relationship_name)) {
+                continue;
+            }
+
             $other_responder_groups->append(new responder_group($relationship_name, new collection($responses)));
         }
 
         return $other_responder_groups;
     }
 
+    private function relationship_group_can_answer(string $relationship_name): bool {
+        /** @var section_relationship $section_relationship */
+        $section_relationship =  $this->participant_section
+            ->section
+            ->section_relationships
+            ->find(function (section_relationship $section_relationship) use ($relationship_name) {
+                return $section_relationship->core_relationship->get_name() === $relationship_name;
+            });
+
+        if ($section_relationship === null) {
+            throw new \coding_exception("${relationship_name} not found in section relationships");
+        }
+
+        return $section_relationship->can_answer;
+    }
+
     /**
      * Lazily fetch all the relationship type names of the other participants.
      * Any double ups are removed.
      *
-     * @return string[]
+     * @return collection|relationship[]
      */
-    private function get_other_participants_relationship_type_names(): array {
+    private function get_other_participants_core_relationships(): collection {
         $section_relationships = $this->participant_section->section->section_relationships;
 
-        $names = $section_relationships->map(
+        $core_relationships = $section_relationships->map(
             function (section_relationship $section_relationship) {
-                return $section_relationship->core_relationship->get_name();
+                return $section_relationship->core_relationship;
             }
         );
 
-        $main_participant_relationship_name = $this->fetch_main_participant_relationship_name();
-        $without_main_participant_relationship = $names->filter(
-            function (string $relationship_type_name) use ($main_participant_relationship_name) {
-                return $relationship_type_name !== $main_participant_relationship_name;
+        $main_participant_relationship = $this->fetch_main_participant_core_relationship();
+
+        return $core_relationships->filter(
+            function (relationship $core_relationship) use ($main_participant_relationship) {
+                return $core_relationship->get_id() !== $main_participant_relationship->get_id();
             }
         );
-
-        return array_unique($without_main_participant_relationship->to_array());
     }
 
     /**
      * Fetch the relationship to the subject for the main participant ($participant_id).
      *
-     * @return string
-     * @throws coding_exception
+     * @return relationship
      */
-    private function fetch_main_participant_relationship_name(): string {
+    private function fetch_main_participant_core_relationship(): relationship {
         return $this->participant_section
             ->participant_instance
-            ->core_relationship->get_name();
+            ->core_relationship;
     }
 
     /**
      * Checks if section relationship for the participant has can_view permissions.
      * @return bool
-     * @throws coding_exception
      */
     private function participant_section_relationship_can_view(): bool {
         return $this->participant_section->can_view_others_responses();
@@ -395,10 +430,9 @@ class participant_section_with_responses {
      * Checks if section relationship for the participant has can_answer permissions.
      *
      * @return bool
-     * @throws coding_exception
      */
     private function participant_section_relationship_can_answer(): bool {
-        return $this->participant_section->can_answer();
+        return $this->participant_section->get_can_answer();
     }
 
     /**
@@ -423,5 +457,27 @@ class participant_section_with_responses {
         $visibility_value = $activity_settings->lookup(activity_setting::VISIBILITY_CONDITION) ?? 0;
 
         return (new visibility_manager())->get_option_with_value($visibility_value);
+    }
+
+    private function is_anonymous_responses(): bool {
+        return $this->participant_section->section->activity->anonymous_responses;
+    }
+
+    /**
+     * @param array $relationship_name_to_responses_map
+     * @return responder_group
+     */
+    private function build_anonymous_responder_group(array $relationship_name_to_responses_map): responder_group {
+        $anonymous_group = responder_group::create_anonymous_group();
+
+        foreach ($relationship_name_to_responses_map as $relationship_name => $responses) {
+            if (!$this->relationship_group_can_answer($relationship_name)) {
+                continue;
+            }
+
+            $anonymous_group->append_responses($responses);
+        }
+
+        return $anonymous_group;
     }
 }

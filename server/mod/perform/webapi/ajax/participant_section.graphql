@@ -9,6 +9,7 @@ query mod_perform_participant_section(
     id
     progress_status
     availability_status
+    can_answer
     section {
       display_title
     }

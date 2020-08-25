@@ -652,7 +652,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
     private function get_anonymous_responder_group($responder_groups): ?responder_group {
         return $responder_groups->find(
             function (responder_group $group) {
-                return $group->get_relationship_name() === get_string('activity_general_anonymous_responses_label', 'mod_perform');
+                return $group->get_relationship_name() === get_string('anonymous_group_relationship_name', 'mod_perform');
             }
         );
     }

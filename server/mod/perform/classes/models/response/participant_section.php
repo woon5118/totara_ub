@@ -100,6 +100,7 @@ class participant_section extends model implements section_response_interface {
         'section',
         'section_id',
         'section_element_responses',
+        'can_answer',
         'progress_status',
         'participant_instance',
         'availability_status',
@@ -184,7 +185,7 @@ class participant_section extends model implements section_response_interface {
      *
      * @return bool
      */
-    public function can_answer(): bool {
+    public function get_can_answer(): bool {
         $core_relationship_id = (int) $this->entity->participant_instance->core_relationship_id;
 
         return $this->entity->section->section_relationships->has(
@@ -442,16 +443,6 @@ class participant_section extends model implements section_response_interface {
         return !$this->is_complete()
             && $this->participant_instance->is_overdue;
     }
-
-    /**
-     * Get value for can_answer
-     *
-     * @return bool
-     */
-    public function get_can_answer(): bool {
-        return $this->can_answer();
-    }
-
 
     /**
      * Get url for a user to participate in this section

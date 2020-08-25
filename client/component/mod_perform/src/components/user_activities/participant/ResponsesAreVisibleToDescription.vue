@@ -17,8 +17,24 @@
 -->
 
 <template>
-  <div>
-    <p>
+  <div class="tui-responsesAreVisibleToDescription">
+    <div
+      v-if="isViewOnlyParticipant"
+      class="tui-responsesAreVisibleToDescription__viewOnly"
+    >
+      <Lozenge
+        class="tui-responsesAreVisibleToDescription__viewOnly-lozenge"
+        :text="$str('response_visibility_view_only_lozenge', 'mod_perform')"
+        type="info"
+      />
+      <p class="tui-responsesAreVisibleToDescription__text">
+        {{
+          activity.settings.visibility_condition
+            .view_only_participant_description
+        }}
+      </p>
+    </div>
+    <p v-else class="tui-responsesAreVisibleToDescription__text">
       <template v-if="notVisibleToAnyone">
         {{ $str('response_visibility_not_visible_to_anyone', 'mod_perform') }}
       </template>
@@ -41,16 +57,30 @@
       </template>
     </p>
 
-    <p v-if="activity.settings.visibility_condition.participant_description">
+    <p
+      v-if="
+        !isViewOnlyParticipant &&
+          activity.settings.visibility_condition.participant_description
+      "
+      class="tui-responsesAreVisibleToDescription__text"
+    >
       {{ activity.settings.visibility_condition.participant_description }}
     </p>
   </div>
 </template>
 
 <script>
-import { RELATIONSHIP_SUBJECT } from 'mod_perform/constants';
+import {
+  RELATIONSHIP_SUBJECT,
+  PROGRESS_NOT_APPLICABLE,
+} from 'mod_perform/constants';
+
+import Lozenge from 'tui/components/lozenge/Lozenge';
 
 export default {
+  components: {
+    Lozenge,
+  },
   props: {
     currentUserIsSubject: {
       type: Boolean,
@@ -63,6 +93,13 @@ export default {
     activity: {
       type: Object,
       required: true,
+    },
+    participantSection: {
+      type: Object,
+      required: true,
+      validator(value) {
+        return value === null || value.progress_status;
+      },
     },
   },
   computed: {
@@ -125,6 +162,12 @@ export default {
     anonymousResponses() {
       return this.activity.anonymous_responses;
     },
+    isViewOnlyParticipant() {
+      return (
+        this.participantSection !== null &&
+        this.participantSection.progress_status === PROGRESS_NOT_APPLICABLE
+      );
+    },
   },
 };
 </script>
@@ -133,6 +176,7 @@ export default {
   {
     "mod_perform": [
       "response_visibility_label",
+      "response_visibility_view_only_lozenge",
       "response_visibility_label_anonymous",
       "response_visibility_not_visible_to_anyone",
       "response_visibility_the_employee",
@@ -141,3 +185,42 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-responsesAreVisibleToDescription {
+  & > * + * {
+    margin-top: var(--tui-gap-1);
+  }
+
+  &__viewOnly {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    & > * + * {
+      margin-top: var(--tui-gap-2);
+    }
+
+    &-lozenge {
+      flex-shrink: 0;
+    }
+  }
+
+  &__text {
+    margin-bottom: 0;
+  }
+
+  @media (min-width: $tui-screen-xs) {
+    &__viewOnly {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      & > * + * {
+        margin-top: 0;
+        margin-left: var(--tui-gap-2);
+      }
+    }
+  }
+}
+</style>

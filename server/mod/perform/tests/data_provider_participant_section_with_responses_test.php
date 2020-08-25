@@ -414,8 +414,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         ];
     }
 
-
-    public function test_non_respondable_section_element_is_included() {
+    public function test_non_respondable_section_element_is_included(): void {
         $participant_section = $this->create_participant_section_with_respondable_and_non_respondable_elements();
         $elements_in_section = $participant_section->section->get_section_elements();
 
@@ -428,7 +427,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         );
     }
 
-    public function test_non_respondable_element_is_hidden_when_built_for_submitting_response() {
+    public function test_non_respondable_element_is_hidden_when_built_for_submitting_response(): void {
         $participant_section = $this->create_participant_section_with_respondable_and_non_respondable_elements();
 
         $elements_in_section = $participant_section->section->get_section_elements();
@@ -515,12 +514,21 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
                 'relationship' => constants::RELATIONSHIP_SUBJECT
             ]
         );
+        $view_only_peer_section_relationship = $generator->create_section_relationship(
+            $section,
+            [
+                'relationship' => constants::RELATIONSHIP_PEER
+            ],
+            true,
+            false
+        );
 
         $element = $generator->create_element(['title' => 'Question one']);
         $generator->create_section_element($section, $element);
 
         $manager_user = self::getDataGenerator()->create_user();
         $appraiser_user = self::getDataGenerator()->create_user();
+        $view_only_peer_user = self::getDataGenerator()->create_user();
 
         $manager_section = $generator->create_participant_instance_and_section(
             $activity,
@@ -538,6 +546,14 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $appraiser_section_relationship->core_relationship_id
         );
 
+        $view_only_peer_section = $generator->create_participant_instance_and_section(
+            $activity,
+            $view_only_peer_user,
+            $subject_instance->id,
+            $section,
+            $view_only_peer_section_relationship->core_relationship_id
+        );
+
         $generator->create_participant_instance_and_section(
             $activity,
             $subject_user->get_record(),
@@ -546,7 +562,19 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $subject_section_relationship->core_relationship_id
         );
 
-        $participant_section_id = $fetching_as === 'Manager' ? $manager_section->id : $appraiser_section->id;
+        switch ($fetching_as) {
+            case 'Manager':
+                $participant_section_id = $manager_section->id;
+                break;
+            case 'Appraiser':
+                $participant_section_id = $appraiser_section->id;
+                break;
+            case 'Peer':
+                $participant_section_id = $view_only_peer_section->id;
+                break;
+            default:
+                throw new coding_exception('Invalid $fetching_as argument:' . $fetching_as);
+        }
 
         $data_provider = new participant_section_with_responses(participant_section::load_by_id($participant_section_id));
 
@@ -570,11 +598,24 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             return $group->get_relationship_name() === 'Subject';
         });
 
-        // There should always be two groups, the subject and another for either appraiser/manager group.
-        self::assertCount(2, $element_response->get_other_responder_groups());
+        /** @var responder_group|null $view_only_peer_responder_group */
+        $view_only_peer_responder_group = $element_response->get_other_responder_groups()->find(function (responder_group $group) {
+            return $group->get_relationship_name() === 'Peer';
+        });
+
+        if ($fetching_as === 'Peer') {
+            // There should always be three groups, the subject, manager and appraiser group (no peer group).
+            self::assertCount(3, $element_response->get_other_responder_groups());
+        } else {
+            // There should always be two groups, the subject and another for either appraiser/manager group.
+            // There should be bo peer group though.
+            self::assertCount(2, $element_response->get_other_responder_groups());
+        }
 
         // Note these are all empty responses.
         self::assertCount(1, $subject_responder_group->get_responses());
+
+        self::assertNull($view_only_peer_responder_group, 'Peer (view-only) responder group should never be present');
 
         if ($fetching_as === 'Manager') {
             self::assertNull(
@@ -586,7 +627,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
                 $appraiser_responder_group->get_responses(),
                 'When fetching as manager there should be an empty appraiser response'
             );
-        } else {
+        } else if ($fetching_as === 'Appraiser') {
             self::assertNull(
                 $appraiser_responder_group,
                 'When fetching as appraiser there should not be a appraiser other responder group'
@@ -596,6 +637,16 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
                 $manager_responder_group->get_responses(),
                 'When fetching as appraiser there should be an empty manager response'
             );
+        } else {
+            self::assertCount(1,
+                $appraiser_responder_group->get_responses(),
+                'When fetching as peer there should be an empty appraiser response'
+            );
+
+            self::assertCount(1,
+                $manager_responder_group->get_responses(),
+                'When fetching as peer there should be an empty manager response'
+            );
         }
     }
 
@@ -603,6 +654,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         return [
             'Fetching for Manager' => ['Manager'],
             'Fetching for Appraiser' => ['Appraiser'],
+            'Fetching for view-only peer' => ['Peer'],
         ];
     }
 
@@ -784,6 +836,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         $subject_user = user::logged_in();
         $manager_appraiser_user = self::getDataGenerator()->create_user();
+        $view_only_peer_user = self::getDataGenerator()->create_user();
 
         $subject_instance = $generator->create_subject_instance(
             [
@@ -813,6 +866,12 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $section,
             ['relationship' => constants::RELATIONSHIP_SUBJECT]
         );
+        $view_only_peer_section_relationship = $generator->create_section_relationship(
+            $section,
+            ['relationship' => constants::RELATIONSHIP_PEER],
+            true,
+            false
+        );
 
         $element = $generator->create_element(['title' => 'Question one']);
         $generator->create_section_element($section, $element);
@@ -833,6 +892,14 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $appraiser_section_relationship->core_relationship_id
         );
 
+        $generator->create_participant_instance_and_section(
+            $activity,
+            $view_only_peer_user,
+            $subject_instance->id,
+            $section,
+            $view_only_peer_section_relationship->core_relationship_id
+        );
+
         $subject_section = $generator->create_participant_instance_and_section(
             $activity,
             $subject_user,
@@ -848,26 +915,14 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         static::assertEquals('Subject', $element_response->get_relationship_name());
 
-        /** @var responder_group $manager_responder_group */
-        $manager_responder_group = $element_response->get_other_responder_groups()->find(function (responder_group $group) {
-            return $group->get_relationship_name() === 'Manager';
-        });
+        /** @var responder_group $anonymous_responder_group */
+        $anonymous_responder_group = $element_response->get_other_responder_groups()->first();
 
-        /** @var responder_group $appraiser_responder_group */
-        $appraiser_responder_group = $element_response->get_other_responder_groups()->find(function (responder_group $group) {
-            return $group->get_relationship_name() === 'Appraiser';
-        });
-
-        $anonymous_responder_group = $element_response->get_other_responder_groups()->find(function (responder_group $group) {
-            return $group->get_relationship_name() === 'anonymous';
-        });
+        // This is swapped out in the front end, but regardless it should not accidentally identify anyone.
+        self::assertEquals('Anonymous', $anonymous_responder_group->get_relationship_name());
 
         // There should always one group
         self::assertCount(1, $element_response->get_other_responder_groups());
-
-        // Note these are all empty responses.
-        self::assertEmpty($manager_responder_group);
-        self::assertEmpty($appraiser_responder_group);
 
         // anonymous group contains all data
         self::assertCount(2, $anonymous_responder_group->get_responses());
@@ -1048,7 +1103,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
      * @param participant_section $participant_section
      * @return void
      */
-    private function assert_responder_groups_are_not_empty(participant_section $participant_section) {
+    private function assert_responder_groups_are_not_empty(participant_section $participant_section): void {
         $selected_participant_section = participant_section::load_by_id($participant_section->id);
         $data_provider = new participant_section_with_responses($selected_participant_section);
         foreach ($data_provider->build()->get_section_element_responses() as $section_element_response) {

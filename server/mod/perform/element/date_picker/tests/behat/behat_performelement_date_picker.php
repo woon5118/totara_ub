@@ -46,4 +46,5 @@ class behat_performelement_date_picker extends behat_base {
         $done_button = $this->find('css', self::DONE_BUTTON_LOCATOR);
         $done_button->click();
     }
+
 }

@@ -38,6 +38,7 @@ class all_responses extends visibility_option {
      * @inheritDoc
     */
     public function show_responses(participant_instance $participant_instance, collection $other_participant_instances): bool {
+        // Note this is NOT open rather than closed, so we also exclude not_applicable states too.
         $participant_instance_open = $participant_instance->get_availability_state() instanceof open;
         $other_participant_instances_open = $other_participant_instances->has('availability', open::get_code());
 
@@ -63,5 +64,12 @@ class all_responses extends visibility_option {
      */
     public function get_participant_description(): ?string {
         return get_string('visibility_condition_all_participants_closed_description', 'mod_perform');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_view_only_participant_description(): ?string {
+        return get_string('visibility_condition_all_participants_closed_view_only_description', 'mod_perform');
     }
 }

@@ -31,6 +31,8 @@ use mod_perform\models\activity\settings\visibility_conditions\visibility_manage
 use mod_perform\models\activity\settings\visibility_conditions\visibility_option;
 use mod_perform\state\participant_instance\closed;
 use mod_perform\state\participant_instance\open;
+use mod_perform\state\participant_instance\progress_not_applicable;
+use mod_perform\state\participant_section\availability_not_applicable;
 
 /**
  * @covers visibility_manager
@@ -39,7 +41,7 @@ use mod_perform\state\participant_instance\open;
 */
 class mod_perform_visibility_conditions_test extends advanced_testcase {
 
-    public function test_get_all_options() {
+    public function test_get_all_options(): void {
         $options = (new visibility_manager())->get_options();
         $this->assertCount(3, $options);
 
@@ -48,7 +50,7 @@ class mod_perform_visibility_conditions_test extends advanced_testcase {
         }
     }
 
-    public function test_has_option_with_value() {
+    public function test_has_option_with_value(): void {
         $visibility_manager = new visibility_manager();
         $this->assertTrue($visibility_manager->has_option_with_value(0));
         $this->assertTrue($visibility_manager->has_option_with_value(1));
@@ -56,7 +58,7 @@ class mod_perform_visibility_conditions_test extends advanced_testcase {
         $this->assertFalse($visibility_manager->has_option_with_value(100));
     }
 
-    public function test_all_responses_is_default_anonymous_option() {
+    public function test_all_responses_is_default_anonymous_option(): void {
         $options = (new visibility_manager())->get_options();
 
         foreach ($options as $option) {
@@ -70,12 +72,13 @@ class mod_perform_visibility_conditions_test extends advanced_testcase {
      *
      * @param participant_instance_model $participant_instance
      * @param collection $other_participant_sections
+     * @param array $expected_result
      */
     public function test_none_visibility_condition_shows_responses(
         participant_instance_model $participant_instance,
         collection $other_participant_sections,
         array $expected_result
-    ) {
+    ): void {
         $none_condition = new none();
         $this->assertEquals($expected_result['none'], $none_condition->show_responses($participant_instance, $other_participant_sections));
     }
@@ -85,29 +88,30 @@ class mod_perform_visibility_conditions_test extends advanced_testcase {
      *
      * @param participant_instance_model $participant_instance
      * @param collection $other_participant_sections
+     * @param array $expected_result
      */
     public function test_own_response_visibility_condition_shows_responses(
         participant_instance_model $participant_instance,
         collection $other_participant_sections,
         array $expected_result
-    ) {
+    ): void {
         $own_response_condition = new own_response();
 
         $this->assertEquals($expected_result['own_response'], $own_response_condition->show_responses($participant_instance, $other_participant_sections));
     }
-
 
     /**
      * @dataProvider participant_sections_provider
      *
      * @param participant_instance_model $participant_instance
      * @param collection $other_participant_sections
+     * @param array $expected_result
      */
     public function test_all_response_visibility_condition_shows_responses(
         participant_instance_model $participant_instance,
         collection $other_participant_sections,
         array $expected_result
-    ) {
+    ): void {
         $all_response_condition = new all_responses();
         $this->assertEquals(
             $expected_result['all_responses'],
@@ -124,6 +128,7 @@ class mod_perform_visibility_conditions_test extends advanced_testcase {
         $participant_instance = [
             'open' => $this->create_mock_participant_instance_with_availability(open::class),
             'closed' => $this->create_mock_participant_instance_with_availability(closed::class),
+            'not_applicable' => $this->create_mock_participant_instance_with_availability(progress_not_applicable::class),
         ];
         $other_participant_instances = $this->create_other_participant_instances();
 
@@ -137,6 +142,15 @@ class mod_perform_visibility_conditions_test extends advanced_testcase {
                     'all_responses' => false,
                 ],
             ],
+            'participant section not applicable and other participant sections open' => [
+                $participant_instance['not_applicable'],
+                $other_participant_instances['3_open'],
+                [
+                    'none' => true,
+                    'own_response' => true,
+                    'all_responses' => false,
+                ],
+            ],
             'participant section open and other participant sections closed' => [
                 $participant_instance['open'],
                 $other_participant_instances['3_closed'],
@@ -144,6 +158,15 @@ class mod_perform_visibility_conditions_test extends advanced_testcase {
                     'none' => true,
                     'own_response' => false,
                     'all_responses' => false,
+                ]
+            ],
+            'participant section not applicable and other participant sections closed' => [
+                $participant_instance['not_applicable'],
+                $other_participant_instances['3_closed'],
+                [
+                    'none' => true,
+                    'own_response' => true,
+                    'all_responses' => true,
                 ]
             ],
             'participant section open and other participant sections open with one closed' => [
@@ -217,19 +240,28 @@ class mod_perform_visibility_conditions_test extends advanced_testcase {
             'closed' => new participant_instance([
                 'availability' => closed::get_code(),
             ]),
+            'not_applicable' => new participant_instance([
+                'availability' => availability_not_applicable::get_code(),
+            ]),
         ];
         $other_participant_instances_3_closed_1_open = array_fill(0,3, $other_participant_instance_entity['closed']);
         $other_participant_instances_3_closed_1_open[] = $other_participant_instance_entity['open'];
+        $other_participant_instances_3_closed_1_open[] = $other_participant_instance_entity['not_applicable'];
+
         $other_participant_instances_3_open_1_closed = array_fill(0,3, $other_participant_instance_entity['open']);
         $other_participant_instances_3_open_1_closed[] = $other_participant_instance_entity['closed'];
+        $other_participant_instances_3_open_1_closed[] = $other_participant_instance_entity['not_applicable'];
+
+        $other_participant_instances_3_open = array_fill(0,3, $other_participant_instance_entity['open']);
+        $other_participant_instances_3_open[] = $other_participant_instance_entity['not_applicable'];
+
+
+        $other_participant_instances_3_closed = array_fill(0,3, $other_participant_instance_entity['closed']);
+        $other_participant_instances_3_closed[] = $other_participant_instance_entity['not_applicable'];
 
         return [
-            '3_open' => new collection(
-                array_fill(0,3, $other_participant_instance_entity['open'])
-            ),
-            '3_closed' => new collection(
-                array_fill(0,3, $other_participant_instance_entity['closed'])
-            ),
+            '3_open' => new collection($other_participant_instances_3_open),
+            '3_closed' => new collection($other_participant_instances_3_closed),
             '3_open_1_closed' => new collection($other_participant_instances_3_open_1_closed),
             '3_closed_1_open' => new collection($other_participant_instances_3_closed_1_open),
         ];

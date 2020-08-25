@@ -154,12 +154,13 @@
                       :current-user-is-subject="currentUserIsSubject"
                       :visible-to-relationships="responsesAreVisibleTo"
                       :activity="activity"
+                      :participant-section="activeParticipantSection"
                     />
                     <div
                       class="tui-participantContent__sectionHeading-otherResponseSwitch"
                     >
                       <ToggleSwitch
-                        v-if="hasOtherResponse"
+                        v-if="hasOtherResponse && participantCanAnswer"
                         v-model="showOtherResponse"
                         :text="
                           $str(
@@ -218,7 +219,9 @@
                     <div class="tui-participantContent__sectionItem-content">
                       <ElementParticipantForm
                         v-if="
-                          sectionElement.is_respondable && !viewOnlyReportMode
+                          sectionElement.is_respondable &&
+                            participantCanAnswer &&
+                            !viewOnlyReportMode
                         "
                       >
                         <template v-slot:content>
@@ -249,7 +252,11 @@
               </div>
 
               <ButtonGroup
-                v-if="!activeSectionIsClosed && !viewOnlyReportMode"
+                v-if="
+                  !activeSectionIsClosed &&
+                    participantCanAnswer &&
+                    !viewOnlyReportMode
+                "
                 class="tui-participantContent__buttons"
               >
                 <ButtonSubmit @click="fullSubmit(getSubmitting)" />
@@ -268,7 +275,13 @@
               </ButtonGroup>
 
               <div class="tui-participantContent__navigation">
-                <Grid v-if="activeSectionIsClosed || viewOnlyReportMode">
+                <Grid
+                  v-if="
+                    activeSectionIsClosed ||
+                      !participantCanAnswer ||
+                      viewOnlyReportMode
+                  "
+                >
                   <GridItem :units="6">
                     <Button
                       v-if="previousNavSectionModel"
@@ -538,6 +551,10 @@ export default {
      */
     viewOnlyReportMode() {
       return Boolean(this.subjectInstanceId);
+    },
+
+    participantCanAnswer() {
+      return this.activeParticipantSection.can_answer;
     },
 
     /**
@@ -814,7 +831,7 @@ export default {
           };
         });
 
-        if (this.viewOnlyReportMode) {
+        if (this.viewOnlyReportMode || !this.participantCanAnswer) {
           this.showOtherResponse = true;
           return;
         }

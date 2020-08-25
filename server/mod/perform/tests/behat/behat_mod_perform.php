@@ -52,6 +52,7 @@ class behat_mod_perform extends behat_base {
     public const MULTI_CHOICE_RESPONSE_LOCATOR = 'radio';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses .tui-formLabel';
+    public const TUI_OTHER_PARTICIPANT_RESPONSES_ANONYMOUS_RESPONSE_PARTICIPANT_LOCATOR = '.tui-otherParticipantResponses__anonymousResponse-participant';
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
     public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceSingleParticipantResponse__answer';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
@@ -602,6 +603,30 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @Given /^I should see "([^"]*)" as answer "([1-9])" in the anonymous responses group for question "([^"]*)"$/
+     * @param string $expected_answer
+     * @param int $response_number
+     * @param string $question_text
+     */
+    public function i_should_see_as_answer_in_the_anonymous_responses_group_for_question(
+        string $expected_answer,
+        int $response_number,
+        string $question_text
+    ): void {
+        $question = $this->find_question_from_text($question_text);
+
+        $anonymous_responses = $question->findAll('css', self::TUI_OTHER_PARTICIPANT_RESPONSES_ANONYMOUS_RESPONSE_PARTICIPANT_LOCATOR);
+
+        $actual_response = $anonymous_responses[$response_number - 1];
+
+        $actual_answer_text = trim($actual_response->getText());
+
+        if ($actual_answer_text !== $expected_answer) {
+            $this->fail("Expected response {$response_number} to be {$expected_answer}, but found {$actual_answer_text}");
+        }
+    }
+
+    /**
      * @When /^I answer "([^"]*)" question "([^"]*)" with "([^"]*)" characters$/
      * @param string $element_type
      * @param string $question_text
@@ -1087,8 +1112,11 @@ class behat_mod_perform extends behat_base {
 
         $this->fail("{$participant_to_remove} participant not found");
     }
+
     /**
      * @Given /^I should see "([^"]*)" in the perform activity response visibility description$/
+     * @param string $expected_text
+     * @throws ExpectationException
      */
     public function i_should_see_in_the_perform_activity_response_visibility_description(string $expected_text): void {
         if ($expected_text === '') {

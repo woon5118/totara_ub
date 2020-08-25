@@ -8,11 +8,12 @@ Feature: Viewing other responses
       | david    | David     | Two      | david.two@example.com   |
       | harry    | Harry     | Three    | harry.three@example.com |
     And the following "subject instances" exist in "mod_perform" plugin:
-      | activity_name                 | subject_username | subject_is_participating | other_participant_username | include_required_questions | include_static_content | activity_status | update_participant_sections_status |
-      | John is participating subject | john             | true                     | david                      | true                       | true                   | Draft           | complete                           |
-      | David is subject              | david            | false                    | admin                      | true                       | true                   | Draft           | complete                           |
-      | John is not participating     | harry            | true                     | david                      | false                      | true                   | Draft           | complete                           |
-      | John draft                    | john             | true                     | david                      | true                       | true                   | Draft           | draft                              |
+      | activity_name                 | subject_username | subject_is_participating | other_participant_username | include_required_questions | include_static_content | activity_status | relationships_can_answer    | update_participant_sections_status |
+      | John is participating subject | john             | true                     | david                      | true                       | true                   | Draft           | subject, manager, appraiser | complete                           |
+      | John is view-only subject     | john             | true                     | david                      | true                       | true                   | Draft           | manager, appraiser          | complete                           |
+      | David is subject              | david            | false                    | admin                      | true                       | true                   | Draft           | subject, manager, appraiser | complete                           |
+      | John is not participating     | harry            | true                     | david                      | false                      | true                   | Draft           | subject, manager, appraiser | complete                           |
+      | John draft                    | john             | true                     | david                      | true                       | true                   | Draft           | subject, manager, appraiser | draft                              |
 
   Scenario: I can respond to my activities and view other non-respond activities
     When I log in as "john"
@@ -102,6 +103,35 @@ Feature: Viewing other responses
     And I wait until ".tui-otherParticipantResponses" "css_element" exists
     Then I should see perform "short text" question "Question one" is answered by "Manager" with "Manager Answer one"
     And I should see perform "short text" question "Question two" is answered by "Manager" with "Manager Answer two"
+
+  Scenario: Manager can respond to other activities and view-only participant can view manager's responses
+    When I log in as "david"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Activities about others" "link"
+    Then I should see "John is view-only subject" in the ".tui-performUserActivities" "css_element"
+
+    When I click on "John is view-only subject" "link"
+    Then I should see perform activity relationship to user "Manager"
+    And I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
+    And I answer "short text" question "Question one" with "Manager Answer one"
+    And I answer "short text" question "Question two" with "Manager Answer two"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+
+    Then I should see "Performance activities"
+    And I should see "Section submitted." in the tui success notification toast and close it
+    And the "Activities about others" tui tab should be active
+
+    When I log out
+    And I log in as "john"
+    And I navigate to the outstanding perform activities list page
+    And I click on "John is view-only subject" "link"
+    Then I should not see the show others responses toggle
+
+    When I wait until ".tui-otherParticipantResponses" "css_element" exists
+    Then I should see perform "short text" question "Question one" is answered by "Manager" with "Manager Answer one"
+    And I should see perform "short text" question "Question two" is answered by "Manager" with "Manager Answer two"
+    And I should not see "Subject response"
 
   Scenario: I can see required questions
     When I log in as "john"
