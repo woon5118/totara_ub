@@ -29,6 +29,7 @@ use mod_perform\rb\traits\activity_trait;
 use mod_perform\rb\traits\element_trait;
 use mod_perform\rb\traits\section_element_trait;
 use mod_perform\rb\traits\section_trait;
+use mod_perform\rb\util;
 use totara_core\advanced_feature;
 use totara_core\entities\relationship;
 use totara_core\relationship\relationship as relationship_model;
@@ -306,6 +307,11 @@ class rb_source_perform_element extends rb_base_source {
     public function global_restrictions_supported() {
         // Not relevant as elements aren't user data.
         return false;
+    }
+
+    public function post_config(reportbuilder $report) {
+        $restrictions = util::get_report_on_subjects_activities_sql($report->reportfor, "perform.id");
+        $report->set_post_config_restrictions($restrictions);
     }
 
     /**

@@ -118,6 +118,16 @@ class mod_perform_activity_generator_configuration {
     private $create_manual_participants = false;
 
     /**
+     * @var int
+     */
+    private $tenant_id;
+
+    /**
+     * @var int
+     */
+    private $category_id;
+
+    /**
      * shortcut function to get new object
      *
      * @return static
@@ -381,5 +391,44 @@ class mod_perform_activity_generator_configuration {
     public function should_create_manual_participants(): bool {
         return $this->create_manual_participants;
     }
+
+    /**
+     * Set the tenant id the activities should be created in
+     *
+     * @param int $tenant_id
+     * @return $this
+     */
+    public function set_tenant_id(int $tenant_id): self {
+        $this->tenant_id = $tenant_id;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function get_tenant_id(): ?int {
+        return $this->tenant_id;
+    }
+
+    /**
+     * Set the category id the activities should be created in
+     *
+     * @param int $category_id
+     * @return $this
+     */
+    public function set_category_id(int $category_id): self {
+        $this->category_id = $category_id;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function get_category_id(): ?int {
+        return $this->category_id;
+    }
+
 
 }

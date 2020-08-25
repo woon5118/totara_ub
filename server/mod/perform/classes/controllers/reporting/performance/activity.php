@@ -24,9 +24,9 @@
 namespace mod_perform\controllers\reporting\performance;
 
 use context;
-use context_coursecat;
 use core\output\notification;
 use mod_perform\controllers\perform_controller;
+use mod_perform\data_providers\activity\reportable_activities;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\util;
 use mod_perform\views\embedded_report_view;
@@ -35,7 +35,6 @@ use moodle_exception;
 use moodle_url;
 use totara_mvc\has_report;
 use totara_mvc\view;
-use mod_perform\data_providers\activity\reportable_activities;
 
 class activity extends perform_controller {
 
@@ -49,12 +48,11 @@ class activity extends perform_controller {
     private $activity;
 
     public function setup_context(): context {
-        if ($this->get_optional_param('activity_id', null, PARAM_INT)) {
-            return $this->get_activity()->get_context();
-        }
-
-        $category_id = util::get_default_category_id();
-        return context_coursecat::instance($category_id);
+        // Whether the user can access this page is based on
+        // whether there are any activities the user can report on
+        // and not based on the context. The checks for this are based
+        // on the users and not on the activiy.
+        return util::get_default_context();
     }
 
     public function action() {

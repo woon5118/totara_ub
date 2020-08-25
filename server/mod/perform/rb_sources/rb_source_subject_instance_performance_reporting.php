@@ -21,7 +21,7 @@
  * @package: mod_perform
  */
 
-use mod_perform\util;
+use mod_perform\rb\util;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -26,6 +26,7 @@ namespace mod_perform;
 use container_perform\perform as perform_container;
 use context_user;
 use core\collection;
+use core\entities\tenant;
 use core\orm\query\builder;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\activity_type;
@@ -38,6 +39,7 @@ use mod_perform\models\activity\activity;
 use required_capability_exception;
 use totara_core\access;
 use totara_core\advanced_feature;
+use totara_tenant\local\util as tenant_util;
 
 class util {
 
@@ -271,12 +273,24 @@ class util {
         return access::has_capability('mod/perform:manage_subject_user_participation', $subject_user_context, $manager_id);
     }
 
+    /**
+     * Has the user the capability to report on all subjects?
+     *
+     * @param int $user_id
+     * @return bool
+     */
     public static function has_report_on_all_subjects_capability(int $user_id): bool {
         $user_context = context_user::instance($user_id);
 
         return has_capability('mod/perform:report_on_all_subjects_responses', $user_context, $user_id);
     }
 
+    /**
+     * Has the user the capability to report on subject responses in any context?
+     *
+     * @param int $user_id
+     * @return bool
+     */
     public static function can_potentially_report_on_subjects(int $user_id): bool {
         if (static::has_report_on_all_subjects_capability($user_id)) {
             return true;
@@ -321,50 +335,48 @@ class util {
      * @return bool
      */
     public static function can_report_on_user(int $subject_user_id, int $viewing_user_id): bool {
+        global $CFG;
+
         if (empty($subject_user_id) || empty($viewing_user_id)) {
             return false;
         }
 
-        if (static::has_report_on_all_subjects_capability($viewing_user_id)) {
+        $subject_user_context = context_user::instance($subject_user_id);
+
+        if (has_capability('mod/perform:report_on_subject_responses', $subject_user_context, $viewing_user_id)) {
             return true;
         }
 
-        $subject_user_context = \context_user::instance($subject_user_id);
-        return has_capability('mod/perform:report_on_subject_responses', $subject_user_context, $viewing_user_id);
+        $viewing_user_context = context_user::instance($viewing_user_id);
+
+        if (static::has_report_on_all_subjects_capability($viewing_user_id)) {
+            if (!empty($CFG->tenantsenabled)) {
+                if ($viewing_user_context->tenantid) {
+                    $current_tenant_ids = tenant_util::get_user_participation($viewing_user_id);
+
+                    // If the user is outside of a tenant (means the capability is assigned
+                    // in the system context) or both users are in the same tenant
+                    if (!$viewing_user_context->tenantid
+                        || in_array($subject_user_context->tenantid, $current_tenant_ids)
+                    ) {
+                        return true;
+                    }
+                } else if (!empty($CFG->tenantsisolated)) {
+                    return empty($subject_user_context->tenantid);
+                }
+            } else {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
-     * Return SQL and params to apply to an SQL query in order to filter to only users where the viewing
-     * user can see performance data belonging to the subject user.
+     * Returns true if historic activities are enabled
      *
-     * @param int $report_for User ID of user who is viewing
-     * @param string $user_id_field String referencing database column containing user ids to filter.
-     * @return array Array containing SQL string and array of params
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @return bool
      */
-    public static function get_report_on_subjects_sql(int $report_for, string $user_id_field) {
-        global $DB;
-
-        // If user can manage participation across all users don't do the per-row restriction at all.
-        $user_context = \context_user::instance($report_for);
-        if (has_capability('mod/perform:report_on_all_subjects_responses', $user_context, $report_for)) {
-            return ['1=1', []];
-        }
-
-        $capability = 'mod/perform:report_on_subject_responses';
-        $permitted_users = self::get_permitted_users($report_for, $capability);
-
-        if (empty($permitted_users)) {
-            // No access at all if not permitted to see any users.
-            return ['1=0', []];
-        }
-
-        // Restrict to specific subject users.
-        list($sourcesql, $sourceparams) = $DB->get_in_or_equal($permitted_users, SQL_PARAMS_NAMED);
-        return ["{$user_id_field} {$sourcesql}", $sourceparams];
-    }
-
     public static function is_historic_activities_enabled(): bool {
         if (get_config(null, 'showhistoricactivities') &&
             (advanced_feature::is_enabled('appraisals') || advanced_feature::is_enabled('feedback360'))

@@ -50,12 +50,9 @@ class export extends perform_controller {
     private $activity;
 
     public function setup_context(): context {
-        if ($this->get_optional_param('activity_id', null, PARAM_INT)) {
-            return $this->get_activity()->get_context();
-        }
-
-        $category_id = util::get_default_category_id();
-        return context_coursecat::instance($category_id);
+        // The reports have their own checks whether they can export
+        // therefore we are not checking the activity context here.
+        return util::get_default_context();
     }
 
     /**

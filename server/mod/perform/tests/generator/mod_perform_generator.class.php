@@ -49,6 +49,7 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\element;
+use mod_perform\models\activity\element_identifier as element_identifier_model;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\participant_source;
@@ -59,9 +60,6 @@ use mod_perform\models\activity\subject_instance;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\notification\factory;
-use mod_perform\notification\loader as notification_loader;
-use mod_perform\models\activity\element_identifier as element_identifier_model;
-use mod_perform\models\activity\subject_instance_manual_participant;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\activity_state;
 use mod_perform\state\activity\draft;
@@ -69,6 +67,8 @@ use mod_perform\state\participant_instance\availability_not_applicable as partic
 use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_instance\progress_not_applicable as participant_instance_progress_not_applicable;
 use mod_perform\state\participant_section\availability_not_applicable as participant_section_availability_not_applicable;
+use mod_perform\state\participant_section\complete as participant_section_complete;
+use mod_perform\state\participant_section\in_progress as participant_section_in_progress;
 use mod_perform\state\participant_section\not_started as participant_section_not_started;
 use mod_perform\state\participant_section\open as particiant_section_open;
 use mod_perform\state\participant_section\progress_not_applicable as partipant_section_progress_not_applicable;
@@ -76,8 +76,6 @@ use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\manual_participant_progress;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
-use mod_perform\state\participant_section\complete as participant_section_complete;
-use mod_perform\state\participant_section\in_progress as participant_section_in_progress;
 use mod_perform\util;
 use totara_core\entities\relationship;
 use totara_core\relationship\relationship as core_relationship;
@@ -561,6 +559,9 @@ class mod_perform_generator extends component_generator_base {
             $configuration = mod_perform_activity_generator_configuration::new();
         }
 
+        $tenant_id = $configuration->get_tenant_id();
+        $category_id = $configuration->get_category_id() ?? util::get_default_category_id();
+
         $previous_user = clone $USER;
 
         // For the activity generation we need to make sure the admin user is set
@@ -585,6 +586,10 @@ class mod_perform_generator extends component_generator_base {
                 'activity_status' => $configuration->get_activity_status(),
                 'anonymous_responses' => $configuration->get_anonymous_responses_setting(),
             ];
+
+            if (isset($category_id)) {
+                $data['category'] = $category_id;
+            }
 
             $activity = $this->create_activity_in_container($data);
 
@@ -632,17 +637,26 @@ class mod_perform_generator extends component_generator_base {
             $activities[] = $activity;
         }
 
+        $context = context_system::instance();
+        if (!empty($category_id)) {
+            $context = context_coursecat::instance($category_id);
+        }
+        $user_data = [];
+        if ($tenant_id) {
+            $user_data['tenantid'] = $tenant_id;
+        }
+
         foreach ($activities as $activity) {
             $cohorts = [];
             for ($i = 0; $i < $configuration->get_cohort_assignments_per_activity(); $i++) {
-                $cohort = $this->datagenerator->create_cohort();
+                $cohort = $this->datagenerator->create_cohort(['contextid' => $context->id]);
                 $cohorts[] = $cohort->id;
                 for ($k = 0; $k < $configuration->get_number_of_users_per_user_group_type(); $k++) {
-                    $user = $this->datagenerator->create_user();
+                    $user = $this->datagenerator->create_user($user_data);
                     cohort_add_member($cohort->id, $user->id);
 
                     if ($configuration->should_create_appraiser_for_each_subject_user()) {
-                        $appraiser = $this->datagenerator->create_user();
+                        $appraiser = $this->datagenerator->create_user($user_data);
                         job_assignment::create([
                             'userid' => $user->id,
                             'idnumber' => 'app/' . $cohort->id . '/' . $user->id,
@@ -650,7 +664,7 @@ class mod_perform_generator extends component_generator_base {
                         ]);
                     }
                     if ($configuration->should_create_manager_for_each_subject_user()) {
-                        $manager = $this->datagenerator->create_user();
+                        $manager = $this->datagenerator->create_user($user_data);
                         job_assignment::create([
                             'userid' => $user->id,
                             'idnumber' => 'man/' . $cohort->id . '/' . $user->id,
@@ -674,12 +688,14 @@ class mod_perform_generator extends component_generator_base {
             $this->generate_subject_instances();
         }
 
-        if (!empty($manual_relationships) && $configuration->should_create_manual_participants()) {
+        if (!empty($manual_relationships)) {
             // Make sure the progress records are there
             (new manual_participant_progress())->generate();
 
-            foreach ($activities as $activity) {
-                $this->create_manual_users_for_activity($activity, $manual_relationships);
+            if ($configuration->should_create_manual_participants()) {
+                foreach ($activities as $activity) {
+                    $this->create_manual_users_for_activity($activity, $manual_relationships);
+                }
             }
         }
 
@@ -825,7 +841,7 @@ class mod_perform_generator extends component_generator_base {
             $status = $this->elevate_activity_status_to_code($data['activity_status'] ?? 'Active');
 
             $anonymous_responses = $data['anonymous_responses'] ?? 'false';
-            $anonymous_responses = $anonymous_responses === 'true';
+            $anonymous_responses = $anonymous_responses === 'true' || $anonymous_responses === true;
 
             $activity = $this->find_or_make_perform_activity($name, $type, $status, $anonymous_responses);
         }
@@ -1101,6 +1117,7 @@ class mod_perform_generator extends component_generator_base {
     private function find_or_make_perform_activity($name, $type, $status = null, $anonymous_responses = false): activity {
         $data = [
             'activity_type' => $type,
+            'anonymous_responses' => $anonymous_responses,
         ];
         if (isset($status)) {
             $data['activity_status'] = $status;

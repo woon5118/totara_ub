@@ -23,11 +23,11 @@
  *
  */
 
+use mod_perform\rb\util;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../../../totara/reportbuilder/rb_sources/rb_source_user.php');
-
-use mod_perform\util;
 
 /**
  * Performance reporting user report.

@@ -23,11 +23,11 @@
  *
  */
 
+use mod_perform\rb\util;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/rb_source_perform_response.php');
-
-use mod_perform\util;
 
 /**
  * Performance reporting response report.

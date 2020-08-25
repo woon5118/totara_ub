@@ -58,7 +58,6 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
      * @param reportbuilder $report
      */
     public function post_config(reportbuilder $report) {
-        // TODO multi-tenancy support in here too?
         $restrictions = util::get_manage_participation_sql($report->reportfor, "subject_instance.subject_user_id");
         $report->set_post_config_restrictions($restrictions);
     }

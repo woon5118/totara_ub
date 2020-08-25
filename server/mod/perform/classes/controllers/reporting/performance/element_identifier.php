@@ -25,6 +25,7 @@ namespace mod_perform\controllers\reporting\performance;
 
 use context;
 use context_coursecat;
+use context_user;
 use core\output\notification;
 use mod_perform\controllers\perform_controller;
 use mod_perform\entities\activity\element_identifier as element_identifier_entity;
@@ -48,6 +49,8 @@ class element_identifier extends perform_controller {
     }
 
     public function action() {
+        global $USER;
+
         $element_identifier = $this->get_optional_param('element_identifier', null, PARAM_RAW);
         $element_identifier = preg_replace('/[^0-9,]/', '', $element_identifier);
 
@@ -63,7 +66,7 @@ class element_identifier extends perform_controller {
         }
 
         // Must be higher level admin to access this report.
-        $this->require_capability('mod/perform:report_on_all_subjects_responses', $this->get_context());
+        $this->require_capability('mod/perform:report_on_all_subjects_responses', context_user::instance($USER->id));
 
         $extra_data = [
             'element_identifier' => $element_identifier,

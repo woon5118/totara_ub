@@ -24,10 +24,12 @@
 namespace mod_perform\data_providers\activity;
 
 use core\collection;
+use core\orm\entity\repository;
+use core\orm\query\field;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\activity;
+use mod_perform\rb\util as rb_util;
 use mod_perform\state\activity\draft;
-use mod_perform\util;
 
 /**
  * Class element_identifier
@@ -70,22 +72,18 @@ class reportable_activities {
     private function get_reportable_activities() :collection {
         global $USER;
 
-        if (util::has_report_on_all_subjects_capability($USER->id)) {
-            return activity_entity::repository()
-                ->filter_by_visible()
-                ->where_not_in('status', [draft::get_code()])
-                ->order_by('id')
-                ->get()
-                ->map_to(activity::class);
-        }
+        return activity_entity::repository()
+            ->when(true, function (repository $repository) use ($USER) {
+                [$activities_sql, $activities_params] = rb_util::get_report_on_subjects_activities_sql(
+                    $USER->id,
+                    (new field('id', $repository->get_builder()))->sql()
+                );
 
-        // Early exit if they can not even potentially report on any subjects
-        if (!has_capability_in_any_context('mod/perform:report_on_subject_responses')) {
-            return new collection();
-        }
-
-        $reportable_users = util::get_permitted_users($USER->id, 'mod/perform:report_on_subject_responses');
-
-        return activity_entity::repository()->find_by_subject_user_id(...$reportable_users)->map_to(activity::class);
+                $repository->where_raw($activities_sql, $activities_params);
+            })
+            ->where('status', '<>', draft::get_code())
+            ->order_by('name')
+            ->get()
+            ->map_to(activity::class);
     }
 }

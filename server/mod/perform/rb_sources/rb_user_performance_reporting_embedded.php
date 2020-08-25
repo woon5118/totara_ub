@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_user_performance
 class rb_user_performance_reporting_embedded extends rb_base_embedded {
 
     public function __construct($data) {
-
         $this->url = '/mod/perform/reporting/performance/activity_responses_by_user.php';
         $this->source = 'user_performance_reporting';
         $this->shortname = 'user_performance_reporting';

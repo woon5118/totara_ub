@@ -21,6 +21,15 @@
  * @package mod_perform
  */
 
+use core\collection;
+use core\entities\tenant;
+use core\orm\query\builder;
+use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\track;
+use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\models\activity\activity;
+use mod_perform\state\activity\active;
+use mod_perform\state\activity\draft;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -55,27 +64,173 @@ class mod_perform_webapi_resolver_query_reportable_activities_testcase extends a
         $user_context = \context_user::instance($user->id);
         role_assign($roleid, $user->id, $user_context);
         self::setUser($user);
-        $data = $this->create_test_data();
+        // Creating full activities as whether you can report on
+        // depends on the actual subject users
+        $expected_activities = $this->create_test_data();
 
-        $activities = $this->resolve_graphql_query(self::QUERY, []);
+        $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
         $this->assertEqualsCanonicalizing(
-            [$data->activity1->name, $data->activity2->name],
-            [$activities->first()->name, $activities->last()->name]
+            $expected_activities->pluck('id'),
+            $actual_activities->pluck('id')
+        );
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        // Draft activites never should show up
+        $draft_activity = $perform_generator->create_activity_in_container(['activity_status' => draft::get_code()]);
+
+        $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
+        $this->assertNull($actual_activities->find('id', $draft_activity->id));
+
+        // Active ones without any users should also not show up
+        $active_activity = $perform_generator->create_activity_in_container(['activity_status' => active::get_code()]);
+
+        $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
+        $this->assertNull($actual_activities->find('id', $active_activity->id));
+    }
+
+    public function test_get_activities_for_report_admin_multi_tenancy_enabled(): void {
+        $generator = $this->getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $generator->get_plugin_generator('mod_perform');
+
+        $this->setAdminUser();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+
+        $system_user = $generator->create_user();
+
+        $tenant_generator->enable_tenants();
+
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        $tenant1 = new tenant($tenant1);
+        $tenant2 = new tenant($tenant2);
+
+        $tenant1_category_context = context_coursecat::instance($tenant1->categoryid);
+        $tenant2_category_context = context_coursecat::instance($tenant2->categoryid);
+
+        $role_dm = builder::table('role')->where('shortname', 'tenantdomainmanager')->one();
+        $role_um = builder::table('role')->where('shortname', 'tenantusermanager')->one();
+
+        $tenant1_manager = $generator->create_user(['tenantid' => $tenant1->id]);
+        role_assign($role_dm->id, $tenant1_manager->id, $tenant1_category_context->id);
+        role_assign($role_um->id, $tenant1_manager->id, context_tenant::instance($tenant1->id));
+
+        $tenant2_manager = $generator->create_user(['tenantid' => $tenant2->id]);
+        role_assign($role_dm->id, $tenant2_manager->id, $tenant2_category_context->id);
+        role_assign($role_um->id, $tenant2_manager->id, context_tenant::instance($tenant2->id));
+
+        $this->setUser($tenant1_manager);
+
+        $activities1 = $perform_generator->create_full_activities(
+            mod_perform_activity_generator_configuration::new()
+                ->set_number_of_activities(3)
+                ->set_tenant_id($tenant1->id)
+        );
+
+        $this->setUser($tenant2_manager);
+
+        $activities2 = $perform_generator->create_full_activities(
+            mod_perform_activity_generator_configuration::new()
+                ->set_number_of_activities(3)
+                ->set_tenant_id($tenant2->id)
+        );
+
+
+        $this->setUser($tenant1_manager);
+
+        // Let's pick one user
+        /** @var activity $activity1 */
+        $activity1 = $activities1->first();
+
+        $subject_instances = subject_instance::repository()
+            ->join([track_user_assignment::TABLE, 'tua'], 'track_user_assignment_id', 'id')
+            ->join([track::TABLE, 't'], 'tua.track_id', 'id')
+            ->where('t.activity_id', $activity1->id)
+            ->get();
+
+        /** @var subject_instance $subject_instance1 */
+        $subject_instance1 = $subject_instances->shift();
+        /** @var subject_instance $subject_instance2 */
+        $subject_instance2 = $subject_instances->shift();
+
+        // Make sure we have two separate users
+        $this->assertNotEquals($subject_instance1->subject_user_id, $subject_instance2->subject_user_id);
+
+        assign_capability(
+            'mod/perform:report_on_subject_responses',
+            CAP_ALLOW,
+            $role_um->id,
+            context_user::instance($subject_instance1->subject_user_id)
+        );
+
+        // Now this activity should show up as the user has the capability to report on an user involved
+        $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
+        $this->assertCount(1, $actual_activities);
+        $this->assertEquals(
+            [$activity1->id],
+            $actual_activities->pluck('id')
+        );
+
+        $this->setUser($tenant2_manager);
+
+        $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
+        $this->assertCount(0, $actual_activities);
+
+        // Now give this user the capability to report on all users in the tenant
+        assign_capability(
+            'mod/perform:report_on_all_subjects_responses',
+            CAP_ALLOW,
+            $role_um->id,
+            context_tenant::instance($tenant2->id)
+        );
+
+        $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
+        $this->assertCount(3, $actual_activities);
+        $this->assertEqualsCanonicalizing(
+            $activities2->pluck('id'),
+            $actual_activities->pluck('id')
+        );
+
+        $this->setUser($system_user);
+
+        $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
+        $this->assertCount(0, $actual_activities);
+
+        // Now give the system user the capability to report on all users on the whole site
+        // The capability is added to the role in the system context.
+        $sys_context = context_system::instance();
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('mod/perform:report_on_all_subjects_responses', CAP_ALLOW, $roleid, $sys_context);
+        // The role is granted in the user's own context.
+        role_assign($roleid, $system_user->id, context_user::instance($system_user->id));
+
+        $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
+        $this->assertCount(6, $actual_activities);
+        $this->assertEqualsCanonicalizing(
+            array_merge($activities1->pluck('id'), $activities2->pluck('id')),
+            $actual_activities->pluck('id')
         );
     }
 
     public function test_successful_ajax_call(): void {
         self::setAdminUser();
 
-        $data = $this->create_test_data();
+        $expected_activities = $this->create_test_data();
 
         $result = $this->parsed_graphql_operation(self::QUERY, []);
         $this->assert_webapi_operation_successful($result);
 
-        $activities = $this->resolve_graphql_query(self::QUERY, []);
+        $data = $this->get_webapi_operation_data($result);
+        $this->assertCount(3, $data);
+
         $this->assertEqualsCanonicalizing(
-            [$data->activity1->name, $data->activity2->name],
-            [$activities->first()->name, $activities->last()->name]
+            $expected_activities->pluck('id'),
+            array_column($data, 'id')
         );
     }
 
@@ -99,15 +254,15 @@ class mod_perform_webapi_resolver_query_reportable_activities_testcase extends a
         $this->assert_webapi_operation_failed($result, 'not logged in');
     }
 
-    private function create_test_data(): stdClass {
+    private function create_test_data(): collection {
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
 
-        $data = new stdClass();
+        $activities = $perform_generator->create_full_activities(
+            mod_perform_activity_generator_configuration::new()
+                ->set_number_of_activities(3)
+        );
 
-        $data->activity1 = $perform_generator->create_activity_in_container(['activity_name' => 'Mid year performance']);
-        $data->activity2 = $perform_generator->create_activity_in_container(['activity_name' => 'End year performance']);
-
-        return $data;
+        return $activities;
     }
 }
