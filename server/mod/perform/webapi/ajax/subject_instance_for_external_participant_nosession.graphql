@@ -29,6 +29,20 @@ query mod_perform_subject_instance_for_external_participant_nosession(
     }
     job_assignment {
       fullname
+      organisation {
+        id
+        fullname
+      }
+      position {
+        id
+        fullname
+      }
+      managerja {
+        user {
+          id
+          fullname
+        }
+      }
     }
   }
 }

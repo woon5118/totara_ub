@@ -596,6 +596,7 @@ class participant_instance_creation {
                 $section_data['activity_id'] = $participant_instance['activity_id'];
                 $section_data['core_relationship_id'] = $participant_instance['participant_data']['core_relationship_id'];
                 $section_data['id'] = $participant_instance_id;
+                $section_data['subject_instance_id'] = $participant_instance['participant_data']['subject_instance_id'];
 
                 if ($participant_instance['participant_data']['participant_source'] == participant_source::EXTERNAL) {
                     external_participant::create(

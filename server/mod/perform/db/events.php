@@ -43,6 +43,7 @@ use totara_cohort\event\members_updated;
 use totara_job\event\job_assignment_created;
 use totara_job\event\job_assignment_deleted;
 use totara_job\event\job_assignment_updated;
+use mod_perform\observers\subject_static_instance_hierarchy;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -110,5 +111,13 @@ $observers = [
     [
         'eventname' => user_tenant_membership_changed::class,
         'callback' => tenant_membership_changed::class.'::updated',
+    ],
+    [
+        'eventname' => position_deleted::class,
+        'callback' => subject_static_instance_hierarchy::class.'::position_deleted',
+    ],
+    [
+        'eventname' => organisation_deleted::class,
+        'callback' => subject_static_instance_hierarchy::class.'::organisation_deleted',
     ],
 ];

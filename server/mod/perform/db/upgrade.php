@@ -515,5 +515,36 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020082600, 'perform');
     }
 
+    if ($oldversion < 2020082601) {
+        // Define table perform_subject_static_instance to be created.
+        $table = new xmldb_table('perform_subject_static_instance');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('subject_instance_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('job_assignment_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('manager_job_assignment_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('position_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('organisation_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('appraiser_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table perform_subject_static_instance.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('subject_instance_fk', XMLDB_KEY_FOREIGN, ['subject_instance_id'], 'perform_subject_instance', ['id']);
+        $table->add_key('job_assignment_fk', XMLDB_KEY_FOREIGN, ['job_assignment_id'], 'job_assignment', ['id']);
+        $table->add_key('manager_job_assignment_fk', XMLDB_KEY_FOREIGN, ['manager_job_assignment_id'], 'job_assignment', ['id']);
+        $table->add_key('position_fk', XMLDB_KEY_FOREIGN, ['position_id'], 'pos', ['id']);
+        $table->add_key('organisation_fk', XMLDB_KEY_FOREIGN, ['organisation_id'], 'org', ['id']);
+        $table->add_key('appraiser_fk', XMLDB_KEY_FOREIGN, ['appraiser_id'], 'user', ['id']);
+
+        // Create table perform_subject_static_instance if it does not yet exist.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2020082601, 'perform');
+    }
+
     return true;
 }

@@ -29,9 +29,39 @@ query mod_perform_subject_instance_for_participant(
       id
       fullname
       profileimageurlsmall
+      card_display {
+        profile_picture_alt
+        profile_picture_url
+        profile_url
+        display_fields {
+          associate_url
+          value
+          label
+          is_custom
+        }
+      }
     }
     job_assignment {
       fullname
+    }
+    static_instances {
+      fullname
+      managerja {
+        id
+        fullname
+        user {
+          id
+          fullname
+        }
+      }
+      position {
+        id
+        fullname
+      }
+      organisation {
+        id
+        fullname
+      }
     }
   }
 }

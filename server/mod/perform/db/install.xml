@@ -253,6 +253,28 @@
         <INDEX NAME="due_date" UNIQUE="false" FIELDS="due_date"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="perform_subject_static_instance" COMMENT="Represents a single job assignment at the time of subject creation">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="subject_instance_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="job_assignment_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Job assignment id at time of creation"/>
+        <FIELD NAME="manager_job_assignment_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Manager job assignment id at time of creation"/>
+        <FIELD NAME="position_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Position id at time of creation"/>
+        <FIELD NAME="organisation_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Organisation id at time of creation"/>
+        <FIELD NAME="appraiser_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Appraiser id at time of creation"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="subject_instance_fk" TYPE="foreign" FIELDS="subject_instance_id" REFTABLE="perform_subject_instance" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="job_assignment_fk" TYPE="foreign" FIELDS="job_assignment_id" REFTABLE="job_assignment" REFFIELDS="id"/>
+        <KEY NAME="manager_job_assignment_fk" TYPE="foreign" FIELDS="manager_job_assignment_id" REFTABLE="job_assignment" REFFIELDS="id"/>
+        <KEY NAME="position_fk" TYPE="foreign" FIELDS="position_id" REFTABLE="pos" REFFIELDS="id"/>
+        <KEY NAME="organisation_fk" TYPE="foreign" FIELDS="organisation_id" REFTABLE="org" REFFIELDS="id"/>
+        <KEY NAME="appraiser_fk" TYPE="foreign" FIELDS="appraiser_id" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
     <TABLE NAME="perform_participant_instance" COMMENT="Each participant instance represents a form to be completed by a a single participant">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>

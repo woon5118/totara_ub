@@ -53,6 +53,7 @@ use totara_job\entities\job_assignment;
  * @property-read job_assignment|null $job_assignment
  * @property-read collection|participant_instance[] $participant_instances
  * @property-read collection|manual_relationship_selection_progress[] $manual_relationship_selection_progress
+ * @property-read collection|subject_static_instance[] $static_instances
  *
  * @method static subject_instance_repository repository()
  *
@@ -132,4 +133,12 @@ class subject_instance extends entity {
     public function manual_relationship_selection_progress(): has_many {
         return $this->has_many(manual_relationship_selection_progress::class, 'subject_instance_id');
     }
+
+    /**
+     * @return has_many
+     */
+    public function static_instances(): has_many {
+        return $this->has_many(subject_static_instance::class, 'subject_instance_id');
+    }
+
 }

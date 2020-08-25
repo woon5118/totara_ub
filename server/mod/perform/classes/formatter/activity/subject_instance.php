@@ -52,6 +52,7 @@ class subject_instance extends entity_model_formatter {
             'availability_status' => null,
             'participant_instances' => null,
             'job_assignment' => null,
+            'static_instances' => null,
         ];
     }
 

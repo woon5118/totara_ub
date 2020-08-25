@@ -27,6 +27,7 @@ use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\subject_static_instance as subject_static_instance_entity;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_user_assignment;
@@ -35,6 +36,7 @@ use mod_perform\hook\subject_instances_created;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
+use mod_perform\models\activity\subject_static_instance as subject_static_instance_model;
 use mod_perform\state\activity\draft;
 use mod_perform\state\subject_instance\active;
 use mod_perform\state\subject_instance\complete;
@@ -77,6 +79,12 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $this->assertEqualsCanonicalizing(
             array_column($data->users, 'id'),
             $created_instances->pluck('subject_user_id')
+        );
+
+        $created_static_instances = subject_static_instance_entity::repository()->get();
+        $this->assertEqualsCanonicalizing(
+            $user_assignments->pluck('job_assignment_id'),
+            $created_static_instances->pluck('job_assignment_id')
         );
 
         // All subject instances created are marked as active
@@ -351,6 +359,70 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
 
         // No participant instances were created
         $this->assertEquals(0, participant_instance::repository()->count());
+    }
+
+    public function test_static_content_does_not_change() {
+        // We will create job assignments separately.
+        $data = $this->create_data(false);
+
+        /** @var totara_hierarchy_generator $hierarchies */
+        $hierarchies = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $pos_fw_id = ['frameworkid' => $hierarchies->create_pos_frame([])->id];
+        $org_fw_id = ['frameworkid' => $hierarchies->create_org_frame([])->id];
+
+        $job_assignments = [];
+        foreach ($data->users as $user) {
+            $pos_id = $hierarchies->create_pos($pos_fw_id)->id;
+            $org_id = $hierarchies->create_org($org_fw_id)->id;
+            $job_assignments[] = job_assignment::create([
+                'userid' => $user->id,
+                'positionid' => $pos_id,
+                'organisationid' => $org_id,
+                'idnumber' => "for-user-{$user->id}"
+            ]);
+        }
+
+        $this->generate_instances(false);
+        $created_static_instances = subject_static_instance_entity::repository()->get();
+
+        // Confirm that all job assignments mapped correctly.
+        foreach ($job_assignments as $job_assignment) {
+            $found = false;
+            foreach($created_static_instances as $created_static_instance) {
+                if ($job_assignment->id === $created_static_instance->job_assignment_id) {
+                    $found = true;
+
+                    $old_pos_id = $job_assignment->positionid;
+                    $old_org_id = $job_assignment->organisationid;
+
+                    // Update job assignment.
+                    $job_assignment->update([
+                        'positionid' => $hierarchies->create_pos($pos_fw_id)->id,
+                        'organisationid' => $hierarchies->create_org($org_fw_id)->id,
+                    ]);
+
+                    $new_pos_id = $job_assignment->positionid;
+                    $new_org_id = $job_assignment->organisationid;
+
+                    // Refresh job assignment.
+                    $job_assignment = job_assignment::get_with_id($job_assignment->id);
+                    $this->assertEquals($new_pos_id, $job_assignment->positionid);
+                    $this->assertEquals($new_org_id, $job_assignment->organisationid);
+
+                    // Get static instances.
+                    $model = subject_static_instance_model::load_by_entity($created_static_instance);
+                    $static_job_assignment = $model->get_job_assignment();
+
+                    $this->assertEquals($job_assignment->id, $static_job_assignment->id);
+                    $this->assertEquals($old_pos_id, $static_job_assignment->positionid);
+                    $this->assertEquals($old_org_id, $static_job_assignment->organisationid);
+
+                    break;
+                }
+            }
+            $this->assertEquals(true, $found);
+        }
+
     }
 
     /**

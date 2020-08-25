@@ -25,6 +25,7 @@ use core_container\hook\module_supported_in_container;
 use core_user\hook\allow_view_profile;
 use mod_perform\watcher\activity;
 use mod_perform\hook\subject_instances_created;
+use mod_perform\watcher\subject_static_instances;
 use mod_perform\watcher\participant_instances;
 use mod_perform\watcher\participant_sections;
 use mod_perform\hook\participant_instances_created;
@@ -62,5 +63,9 @@ $watchers = [
     [
         'hookname' => userdata_normalise_label::class,
         'callback' => [userdata_label::class, 'normalise'],
+    ],
+    [
+        'hookname' => subject_instances_created::class,
+        'callback' => [subject_static_instances::class, 'create_subject_static_instances'],
     ],
 ];

@@ -46,6 +46,7 @@ use mod_perform\state\subject_instance\subject_instance_manual_status;
 use mod_perform\state\subject_instance\subject_instance_progress;
 use stdClass;
 use totara_core\relationship\relationship;
+use totara_job\entities\job_assignment as job_assignment_entity;
 use totara_job\job_assignment;
 
 /**
@@ -72,6 +73,7 @@ use totara_job\job_assignment;
  * @property-read subject_instance_manual_status|state $manual_state Current manual status state
  * @property-read bool $is_overdue
  * @property-read int $instance_count
+ * @property-read collection|subject_static_instance[] $static_instances
  *
  * @package mod_perform\models\activity
  */
@@ -103,6 +105,7 @@ class subject_instance extends model {
         'is_overdue',
         'subject_user',
         'instance_count',
+        'static_instances',
     ];
 
     /** @var subject_instance_entity */
@@ -220,6 +223,23 @@ class subject_instance extends model {
         }
 
         return job_assignment::from_entity($this->entity->job_assignment);
+    }
+
+    /**
+     * Get all the static instances this subject has.
+     *
+     * @return job_assignment[]
+     */
+    public function get_static_instances(): array {
+        $models = $this->entity->static_instances->map_to(subject_static_instance::class);
+
+        /** @var subject_static_instance $model */
+        $jobs = [];
+        foreach ($models as $model) {
+            $jobs[] = $model->get_job_assignment();
+        }
+
+        return $jobs;
     }
 
     /**

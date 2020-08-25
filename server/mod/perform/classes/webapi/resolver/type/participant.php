@@ -29,7 +29,6 @@ use core\webapi\execution_context;
 use core\webapi\resolver\type\user as user_type;
 use core\webapi\type_resolver;
 use mod_perform\formatter\activity\participant as participant_formatter;
-use mod_perform\models\activity\helpers\external_participant_token_validator;
 use mod_perform\models\activity\helpers\external_participation;
 use mod_perform\models\activity\participant as participant_model;
 
