@@ -57,12 +57,6 @@ export default {
     element: {
       type: Object,
       required: true,
-      validator: val => {
-        if (['data'].indexOf(val) !== -1) {
-          return ['lowValue', 'highValue'].indexOf(val.data) !== -1;
-        }
-        return false;
-      },
     },
   },
 
