@@ -68,6 +68,7 @@
               :aria-setsize="setSize"
               :aria-labelledby="$id(`item-${item.id}`)"
               :label-id="$id(`item-${item.id}`)"
+              :owner="item.workspace_interactor.own"
               @remove-member="removeMember"
             />
           </template>

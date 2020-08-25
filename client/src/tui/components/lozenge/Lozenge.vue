@@ -32,7 +32,8 @@ export default {
     type: {
       default: 'info',
       type: String,
-      validator: val => ['alert', 'info', 'success', 'warning'].includes(val),
+      validator: val =>
+        ['alert', 'info', 'success', 'warning', 'neutral'].includes(val),
     },
   },
 };

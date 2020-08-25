@@ -56,6 +56,16 @@
       />
     </ModalPresenter>
 
+    <ModalPresenter
+      :open="modal.transferOwner"
+      @request-close="modal.transferOwner = false"
+    >
+      <WorkspaceTransferOwnerModal
+        :workspace-id="workspaceId"
+        @transfered-owner="modal.transferOwner = false"
+      />
+    </ModalPresenter>
+
     <!-- We are only enable the user adder if the actor is either owner or a site admin -->
     <WorkspaceUserAdder
       v-if="interactor.own || interactor.workspaces_admin"
@@ -88,20 +98,29 @@
           />
         </template>
 
+        <DropdownItem v-if="interactor.can_join" @click="joinWorkspace">
+          {{ $str('join_workspace', 'container_workspace') }}
+        </DropdownItem>
+
+        <DropdownItem
+          v-if="interactor.can_leave"
+          @click="modal.leaveConfirm = true"
+        >
+          {{ $str('leave_workspace', 'container_workspace') }}
+        </DropdownItem>
+
         <DropdownItem @click="modal.adder = true">
           {{ $str('add_members', 'container_workspace') }}
         </DropdownItem>
+
         <DropdownItem v-if="interactor.can_update" @click="modal.edit = true">
           {{ $str('edit_space', 'container_workspace') }}
         </DropdownItem>
-        <DropdownItem
-          v-if="interactor.can_delete"
-          @click="modal.deleteConfirm = true"
-        >
-          {{ $str('delete_workspace', 'container_workspace') }}
-        </DropdownItem>
 
-        <DropdownItem @click="updateMuteStatus(!interactor.muted)">
+        <DropdownItem
+          v-if="interactor.joined"
+          @click="updateMuteStatus(!interactor.muted)"
+        >
           <!-- Drop down item to toggle the mute status -->
           <template v-if="!interactor.muted">
             {{ $str('mute_notifications', 'container_workspace') }}
@@ -109,6 +128,20 @@
           <template v-else>
             {{ $str('unmute_notifications', 'container_workspace') }}
           </template>
+        </DropdownItem>
+
+        <DropdownItem
+          v-if="interactor.can_transfer_ownership"
+          @click="modal.transferOwner = true"
+        >
+          {{ $str('transfer_ownership', 'container_workspace') }}
+        </DropdownItem>
+
+        <DropdownItem
+          v-if="interactor.can_delete"
+          @click="modal.deleteConfirm = true"
+        >
+          {{ $str('delete_workspace', 'container_workspace') }}
         </DropdownItem>
       </Dropdown>
       <!-- End of owner section -->
@@ -166,7 +199,10 @@
             />
           </template>
 
-          <DropdownItem @click="modal.leaveConfirm = true">
+          <DropdownItem
+            v-if="interactor.can_leave"
+            @click="modal.leaveConfirm = true"
+          >
             {{ $str('leave_workspace', 'container_workspace') }}
           </DropdownItem>
           <DropdownItem @click="updateMuteStatus(!interactor.muted)">
@@ -196,6 +232,7 @@ import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import WorkspaceEditModal from 'container_workspace/components/modal/WorkspaceEditModal';
 import WorkspaceUserAdder from 'container_workspace/components/adder/WorkspaceUserAdder';
+import WorkspaceTransferOwnerModal from 'container_workspace/components/modal/WorkspaceTransferOwnerModal';
 
 // GraphQL queries
 import getWorkspaceInteractor from 'container_workspace/graphql/workspace_interactor';
@@ -219,6 +256,7 @@ export default {
     Dropdown,
     WorkspaceEditModal,
     WorkspaceUserAdder,
+    WorkspaceTransferOwnerModal,
   },
 
   props: {
@@ -253,6 +291,7 @@ export default {
         deleteConfirm: false,
         edit: false,
         adder: false,
+        transferOwner: false,
       },
     };
   },
@@ -554,6 +593,7 @@ export default {
     "add_members",
     "mute_notifications",
     "unmute_notifications",
+    "transfer_ownership",
     "error:add_members"
   ],
   "moodle": [

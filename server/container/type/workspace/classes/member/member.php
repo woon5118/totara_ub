@@ -130,14 +130,13 @@ final class member {
         $owner_id = $workspace->get_user_id();
         $is_owner = ($actor_id == $owner_id);
 
-        if (!$workspace->is_public() && (!$is_owner && !is_siteadmin($actor_id))) {
-            // Note: do not try to convert this part into itneractor, because at this point, user creator
-            // might not be able to enrolled to the workspace yet.
+        $interactor = new interactor($workspace, $actor_id);
+
+        if (!$workspace->is_public() && (!$is_owner && !$interactor->can_join())) {
             throw new \coding_exception("Cannot join the non-public workspace");
         }
 
         if ($CFG->tenantsenabled) {
-            $interactor = new interactor($workspace, $actor_id);
             if (!$interactor->can_view_workspace_with_tenant_check()) {
                 throw new \coding_exception("Cannot join the workspace that is not in the same tenant");
             }
@@ -195,7 +194,7 @@ final class member {
         }
 
         $role = reset($roles);
-        $member = static::do_added_to_workspace($workspace, $user_id, $role->id, $actor_id);
+        $member = static::do_add_to_workspace($workspace, $user_id, $role->id, $actor_id);
 
         if ($trigger_notification) {
             // Queue adhoc task to send the message out to the target user.
@@ -214,7 +213,7 @@ final class member {
      *
      * @return member
      */
-    protected static function do_added_to_workspace(workspace $workspace, int $user_id,
+    private static function do_add_to_workspace(workspace $workspace, int $user_id,
                                                     int $role_id, int $actor_id): member {
         global $CFG;
         if ($CFG->tenantsenabled) {
@@ -384,6 +383,129 @@ final class member {
     }
 
     /**
+     * The function only changes the role assignment to user, from owner role to a learner role.
+     * It does not remove the user's enrolment.
+     *
+     * @param int|null $actor_id
+     * @return void
+     */
+    public function demote_from_owner(?int $actor_id = null): void {
+        global $USER;
+
+        if (empty($actor_id)) {
+            $actor_id = $USER->id;
+        }
+
+        $workspace_id = $this->get_workspace_id();
+        $actor_workspace_interactor = interactor::from_workspace_id($workspace_id, $actor_id);
+
+        if (!$actor_workspace_interactor->can_manage()) {
+            throw new \coding_exception("No capability to demote an owner");
+        }
+
+        $context = \context_course::instance($workspace_id);
+
+        // Workspace's owner role.
+        $owner_roles = get_archetype_roles('workspaceowner');
+        if (empty($owner_roles)) {
+            throw new \coding_exception("There are no workspace's owner roles");
+        }
+
+        $current_roles = get_user_roles($context, $this->user_enrolment->userid);
+        foreach ($current_roles as $current_role) {
+            if (!isset($owner_roles[$current_role->roleid])) {
+                continue;
+            }
+
+            // Unassign the user's role for workspace owner.
+            role_unassign(
+                $current_role->roleid,
+                $this->user_enrolment->userid,
+                $context->id,
+                'container_workspace'
+            );
+        }
+
+        // Then assign the workspace member role.
+        $learner_roles = get_archetype_roles('student');
+        if (empty($learner_roles)) {
+            throw new \coding_exception("There are no learner roles found");
+        }
+
+        $learner_role = reset($learner_roles);
+        role_assign(
+            $learner_role->id,
+            $this->user_enrolment->userid,
+            $context->id,
+            'container_workspace'
+        );
+    }
+
+    /**
+     * @param int|null $actor_id
+     * @return void
+     */
+    public function promote_to_owner(?int $actor_id = null): void {
+        global $USER;
+        if (empty($actor_id)) {
+            $actor_id = $USER->id;
+        }
+
+        $workspace_id = $this->get_workspace_id();
+        $actor_workspace_interactor = interactor::from_workspace_id($workspace_id, $actor_id);
+
+        if (!$actor_workspace_interactor->can_manage()) {
+            throw new \coding_exception("No capability to promote a member");
+        }
+
+        $context = \context_course::instance($workspace_id);
+
+        // Workspace learner role - we need to remove them first.
+        $learner_roles = get_archetype_roles('student');
+        if (empty($learner_roles)) {
+            throw new \coding_exception("There are no learner roles found");
+        }
+
+        $current_roles = get_user_roles($context, $this->user_enrolment->userid);
+        foreach ($current_roles as $current_role) {
+            if (isset($learner_roles[$current_role->roleid])) {
+                continue;
+            }
+
+            // Unassign the user's role for workspace member.
+            role_unassign(
+                $current_role->roleid,
+                $this->user_enrolment->userid,
+                $context->id,
+                'container_workspace'
+            );
+        }
+
+        $owner_roles = get_archetype_roles('workspaceowner');
+        if (empty($owner_roles)) {
+            throw new \coding_exception("There are no workspace's owner roles");
+        }
+
+        $owner_role = reset($owner_roles);
+        // Check if the user already had this role.
+        $has_role = user_has_role_assignment(
+            $this->user_enrolment->userid,
+            $owner_role->id,
+            $context->id
+        );
+
+        if (!$has_role) {
+            // Only assign owner role if user does not have it yet.
+            role_assign(
+                $owner_role->id,
+                $this->user_enrolment->userid,
+                $context->id,
+                'container_workspace'
+            );
+        }
+    }
+
+    /**
      * @return int
      */
     public function get_time_modified(): int {
@@ -468,5 +590,12 @@ final class member {
      */
     public function get_member_user_id(): int {
         return $this->user_enrolment->userid;
+    }
+
+    /**
+     * @return void
+     */
+    public function reload(): void {
+        $this->user_enrolment->refresh();
     }
 }

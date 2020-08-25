@@ -48,6 +48,10 @@ query container_workspace_find_members(
       __typename
       can_remove
     }
+    workspace_interactor {
+      __typename
+      own
+    }
     time_joined(format: DATELONG)
   }
 }

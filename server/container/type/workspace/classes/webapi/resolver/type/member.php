@@ -29,7 +29,6 @@ use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use container_workspace\member\member as workspace_member;
 use container_workspace\member\status;
-use totara_job\job_assignment;
 
 /**
  * Resolver for type member
@@ -79,27 +78,6 @@ final class member implements type_resolver {
                 }
 
                 return new member_interactor($member, $actor_id);
-
-            case 'job_assignments':
-                // Default to 1
-                $limit = 1;
-                if (isset($args['limit'])) {
-                    $limit = $args['limit'];
-                }
-
-                $job_assignments = [];
-                $user_id = $member->get_user_id();
-
-                if (1 == $limit) {
-                    $job_assignment = job_assignment::get_first($user_id, false);
-                    if (null !== $job_assignment) {
-                        $job_assignments[] = $job_assignment;
-                    }
-                } else {
-                    $job_assignments = job_assignment::get_all($user_id);
-                }
-
-                return $job_assignments;
 
             default:
                 $format = null;

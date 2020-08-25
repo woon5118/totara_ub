@@ -56,6 +56,10 @@ final class workspace implements type_resolver {
         }
 
         switch ($field) {
+            case 'owner':
+                $owner_id = $workspace->get_user_id();
+                return $owner_id ? \core_user::get_user($owner_id) : null;
+
             case 'interactor':
                 $actor_id = null;
                 if (isset($args['actor_id'])) {

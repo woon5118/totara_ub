@@ -28,8 +28,10 @@ use container_workspace\interactor\workspace\interactor;
 use container_workspace\loader\member\loader;
 use container_workspace\member\member;
 use container_workspace\query\member\query;
+use container_workspace\task\notify_new_workspace_owner_task;
 use container_workspace\tracker\tracker;
 use container_workspace\workspace;
+use core\task\manager;
 
 /**
  * Class workspace_helper
@@ -245,5 +247,75 @@ final class workspace_helper {
 
         $tracker = new tracker($actor_id);
         $tracker->visit_workspace($workspace, $time);
+    }
+
+    /**
+     * @param workspace $workspace
+     * @param int $new_user_id
+     * @param int|null $actor_id
+     *
+     * @return void
+     */
+    public static function update_workspace_primary_owner(workspace $workspace, int $new_user_id,
+                                                          ?int $actor_id = null): void {
+        global $USER, $CFG;
+        if (empty($actor_id)) {
+            $actor_id = $USER->id;
+        }
+
+        $actor_workspace_interactor = new interactor($workspace, $actor_id);
+        if (!$actor_workspace_interactor->can_manage()) {
+            throw new \coding_exception("Actor does not have ability to update workspace owner");
+        }
+
+        // Checking if the new user is a valid one.
+        $new_owner = \core_user::get_user($new_user_id, '*', MUST_EXIST);
+        if ($new_owner->deleted || $new_owner->suspended) {
+            throw new \coding_exception(
+                "Cannot update the workspace primary owner to user that had been suspended or deleted"
+            );
+        }
+
+        if ($CFG->tenantsenabled) {
+            // Check if the new owner is able to see this workspace or not.
+            $new_owner_interactor = new interactor($workspace, $new_user_id);
+            if (!$new_owner_interactor->can_view_workspace_with_tenant_check()) {
+                throw new \coding_exception("New owner does not have ability to access the workspace");
+            }
+        }
+
+        $workspace_id = $workspace->get_id();
+        $current_owner_id = $workspace->get_user_id();
+
+        if (null !== $current_owner_id && $new_user_id == $current_owner_id) {
+            // Same actor what so ever.
+            return;
+        }
+
+        // We have to promote/add new user to the workspace first, as this is because when the actor
+        // is an actual owner, the actor will not have any power to promote/added any other user to the workspace
+        // Check if user is already a member of a workspace or not.
+        $new_user_member = loader::get_for_user($new_user_id, $workspace_id);
+
+        if (null === $new_user_member || !$new_user_member->is_active()) {
+            // Note that we do not trigger any notification for adding user to the workspace.
+            $new_user_member = member::added_to_workspace($workspace, $new_user_id, false, $actor_id);
+        }
+
+        $new_user_member->promote_to_owner($actor_id);
+
+        if (null !== $current_owner_id) {
+            // There is current owner id, we will demote them.
+            $workspace->remove_user();
+            // Demote user as member.
+            $current_owner_member = member::from_user($current_owner_id, $workspace_id);
+            $current_owner_member->demote_from_owner($actor_id);
+        }
+
+        // Then update the workspace's record.
+        $workspace->update_user($new_user_id);
+
+        $task = notify_new_workspace_owner_task::from_workspace($workspace_id, $actor_id);
+        manager::queue_adhoc_task($task);
     }
 }

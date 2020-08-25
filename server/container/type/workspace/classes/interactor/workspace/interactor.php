@@ -188,6 +188,9 @@ final class interactor {
     }
 
     /**
+     * A capability and logic check whether the actor is able to join the workspace or not.
+     * It depends on different workspace type that perform different check.
+     *
      * @return bool
      */
     public function can_join(): bool {
@@ -201,33 +204,14 @@ final class interactor {
             return false;
         }
 
-        if (!$this->workspace->is_public()) {
-            return false;
-        }
-
-        // Anyone with the capability can join the workspace
         $context = $this->workspace->get_context();
-        return has_capability('container/workspace:joinpublic', $context, $this->user_id);
-    }
 
-    /**
-     * @return bool
-     */
-    public function can_join_private_workspace(): bool {
         if ($this->workspace->is_public()) {
-            debugging("The workspace is not a private workspace", DEBUG_DEVELOPER);
-            return false;
+            // Anyone with the capability can join the workspace
+            return has_capability('container/workspace:joinpublic', $context, $this->user_id);
         }
 
-        if ($this->is_joined()) {
-            return false;
-        }
-
-        if (!$this->can_view_workspace_with_tenant_check()) {
-            return false;
-        }
-
-        // Note that only admin user is able to join the workspace as admin.
+        // Admin can join anyworkspace.
         return $this->can_administrate();
     }
 
@@ -501,5 +485,27 @@ final class interactor {
         // had not yet visit this very workspace.
         $workspace_timestamp = $this->workspace->get_timestamp();
         return $last_check_time >= $workspace_timestamp;
+    }
+
+    /**
+     * @return bool
+     */
+    public function can_leave_workspace(): bool {
+        if ($this->is_owner()) {
+            // As long as this user is not an owner of the specific workspace
+            // then user is able to leave the workspace.
+            return false;
+        }
+
+        return $this->is_joined();
+    }
+
+    /**
+     * Referesh workspace cache.
+     *
+     * @return void
+     */
+    public function reload_workspace(): void {
+        $this->workspace->reload();
     }
 }

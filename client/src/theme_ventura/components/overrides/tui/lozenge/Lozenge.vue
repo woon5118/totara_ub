@@ -38,5 +38,9 @@
   &--warning {
     background: var(--tui-color-prompt-warning);
   }
+
+  &--neutral {
+    background: var(--tui-color-neutral-6);
+  }
 }
 </style>

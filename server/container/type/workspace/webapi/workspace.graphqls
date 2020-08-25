@@ -37,6 +37,10 @@ type container_workspace_workspace {
   Number of discussions within a workspace.
   """
   total_discussions: Int!
+  """
+  The workspace's owner. If it is empty, meaning that there is no current user.
+  """
+  owner: core_user
 }
 
 """
@@ -67,6 +71,10 @@ type container_workspace_workspace_interactor {
   Whether the user is able to join the workspace or not.
   """
   can_join: Boolean!
+  """
+  Whether the user is able to leave the workspace or not.
+  """
+  can_leave: Boolean!
   """
   Whether user owns the workspace or not.
   """
@@ -123,6 +131,14 @@ type container_workspace_workspace_interactor {
   Whether the current user had muted the workspace or not.
   """
   muted: Boolean!
+  """
+  Whether the user actor has already seen this workspace or not.
+  """
+  has_seen(last_check_time: param_integer): Boolean!
+  """
+  Whether the current user is able to transfer the ownership of workspace or not.
+  """
+  can_transfer_ownership: Boolean!
 }
 
 """
@@ -149,10 +165,6 @@ type container_workspace_workspace_category_interactor {
   Whether the user has the ability to create any style of workspace or not.
   """
   can_create: Boolean!
-  """
-  Whether the user actor has already seen this workspace or not.
-  """
-  has_seen(last_check_time: param_integer): Boolean!
 }
 
 extend type Query {

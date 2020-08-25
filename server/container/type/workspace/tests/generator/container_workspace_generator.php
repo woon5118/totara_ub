@@ -260,6 +260,7 @@ final class container_workspace_generator extends component_generator_base imple
      * Behat helper to add a user to a workspace
      *
      * @param array $parameters
+     * @return void
      */
     public function create_workspace_owners(array $parameters): void {
         global $DB;

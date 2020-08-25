@@ -63,7 +63,8 @@ final class loader {
         $source = $query->get_source();
         $user_id = $query->get_user_id();
 
-        if (source::is_member_and_owned($source)) {
+        $source_is_member = source::is_member($source);
+        if (source::is_member_and_owned($source) || $source_is_member) {
             // For member and owned, we can check on the enrollment here. as owner is also enrolled to the workspace
             // as well as the member.
             $builder->where('ue.userid', $user_id);
@@ -80,6 +81,11 @@ final class loader {
                 } else if (status::is_suspended($status)) {
                     $builder->where('ue.status', ENROL_USER_SUSPENDED);
                 }
+            }
+
+            // We want to keep all the ones we're a member of, but exclude the ones we own
+            if ($source_is_member) {
+                $builder->where('wo.user_id', '<>', $user_id);
             }
         } else if (source::is_other($source)) {
             // For getting other workspaces, we need to filter out those workspaces that this user

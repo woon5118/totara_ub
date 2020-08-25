@@ -30,50 +30,62 @@
     }"
   >
     <!-- Only displaying avatar picture if there are no urls -->
-    <a
-      v-if="hasAvatar"
-      :href="readOnly ? null : profileUrl"
-      class="tui-miniProfileCard__avatar"
-      :class="{ 'tui-miniProfileCard__avatar--readOnly': readOnly }"
-    >
+    <template v-if="hasAvatar">
+      <a
+        v-if="!readOnly && profileUrl"
+        :href="profileUrl"
+        class="tui-miniProfileCard__avatar"
+      >
+        <Avatar :src="avatarSrc" :alt="avatarAlt" size="xsmall" />
+      </a>
+
       <Avatar
-        v-if="hasAvatar"
+        v-else
         :src="avatarSrc"
         :alt="avatarAlt"
         size="xsmall"
+        class="tui-miniProfileCard__avatar"
       />
-    </a>
+    </template>
 
     <div class="tui-miniProfileCard__description">
       <template v-for="({ value, url }, index) in displayFields">
         <template v-if="!!value">
-          <p
-            v-if="!url"
+          <div
             :key="index"
-            class="tui-miniProfileCard__description__text"
+            class="tui-miniProfileCard__description__row"
             :class="{
-              'tui-miniProfileCard__description__text--position-zero':
-                0 === index,
-              'tui-miniProfileCard__description__text--with-gap': 1 === index,
+              'tui-miniProfileCard__description__row--withGap': index === 1,
             }"
           >
-            {{ value }}
-          </p>
+            <p
+              v-if="!url || readOnly"
+              class="tui-miniProfileCard__description__row__text"
+              :class="{
+                'tui-miniProfileCard__description__row__text--bold':
+                  index === 0,
+              }"
+            >
+              {{ value }}
+            </p>
 
-          <a
-            v-else
-            :key="index"
-            :href="readOnly ? null : url"
-            class="tui-miniProfileCard__description__link"
-            :class="{
-              'tui-miniProfileCard__description__link--position-zero':
-                0 === index,
-              'tui-miniProfileCard__description__text--with-gap': 1 === index,
-              'tui-miniProfileCard__description__link--readOnly': readOnly,
-            }"
-          >
-            {{ value }}
-          </a>
+            <a
+              v-else
+              :href="url"
+              class="tui-miniProfileCard__description__row__link"
+              :class="{
+                'tui-miniProfileCard__description__row__link--bold':
+                  index === 0,
+              }"
+            >
+              {{ value }}
+            </a>
+
+            <template v-if="index == 0">
+              <!-- Add support for tag on the first section. -->
+              <slot name="tag" />
+            </template>
+          </div>
         </template>
       </template>
     </div>

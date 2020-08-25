@@ -4,7 +4,7 @@
   Copyright (C) 2020 onwards Totara Learning Solutions LTD
 
   Totara Enterprise Extensions is provided only to Totara
-  Learning Solutions LTD's customers and partners, pursuant to
+  Learning Solutions LTD’s customers and partners, pursuant to
   the terms and conditions of a separate agreement with Totara
   Learning Solutions LTD or its affiliate.
 
@@ -16,15 +16,26 @@
   @module theme_ventura
 -->
 <style lang="scss">
-.tui-workspaceMemberCard {
-  &__profileCard {
-    &.tui-miniProfileCard {
-      width: 100%;
+.tui-workspaceTransferOwnerForm {
+  display: flex;
+  flex-direction: column;
+
+  &__content {
+    flex-grow: 1;
+
+    &__formRow {
+      margin-bottom: var(--tui-gap-4);
     }
 
-    &__tag {
-      margin-left: var(--tui-gap-1);
+    &__helpText {
+      @include tui-font-body-small();
+      margin: 0;
+      margin-bottom: var(--tui-gap-4);
     }
+  }
+
+  &__buttonGroup {
+    justify-content: flex-end;
   }
 }
 </style>

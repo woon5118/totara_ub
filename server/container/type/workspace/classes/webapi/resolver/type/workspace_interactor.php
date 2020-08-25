@@ -109,6 +109,12 @@ final class workspace_interactor implements type_resolver {
                 $last_check_time = $args['last_check_time'] ?? null;
                 return $source->has_seen($last_check_time);
 
+            case 'can_transfer_ownership':
+                return $source->can_manage();
+
+            case 'can_leave':
+                return $source->can_leave_workspace();
+
             default:
                 debugging("Invalid field '{$field}' that is not in supported yet", DEBUG_DEVELOPER);
                 return null;

@@ -22,10 +22,12 @@
  */
 namespace container_workspace\loader\member;
 
+use container_workspace\entity\workspace;
 use container_workspace\query\member\query;
 use container_workspace\query\member\sort;
 use core\orm\pagination\offset_cursor_paginator;
 use core\orm\query\builder;
+use core\orm\query\order;
 use core\orm\query\raw_field;
 use container_workspace\member\member;
 use container_workspace\member\status;
@@ -54,6 +56,13 @@ final class loader {
 
         $builder->join(['enrol', 'e'], 'ue.enrolid', 'e.id');
         $builder->join(['user', 'u'], 'ue.userid', 'u.id');
+        $builder->left_join(
+            [workspace::TABLE, 'w'],
+            function (builder $join): void {
+                $join->where_field('u.id', 'w.user_id');
+                $join->where_field('w.course_id', 'e.courseid');
+            }
+        );
 
         $builder->where('e.courseid', $workspace_id);
         $builder->map_to([member::class, 'from_record']);
@@ -88,12 +97,15 @@ final class loader {
             );
         }
 
+        // By default we always include the user owner on top.
+        $builder->order_by('w.user_id', order::DIRECTION_ASC);
+
         $sort = $query->get_sort();
         if (sort::is_name($sort)) {
             $builder->order_by('u.firstname');
             $builder->order_by('u.lastname');
         } else if (sort::is_recent_join($sort)) {
-            $builder->order_by('ue.timemodified', 'desc');
+            $builder->order_by('ue.timemodified', order::DIRECTION_DESC);
         }
 
         $cursor = $query->get_cursor();

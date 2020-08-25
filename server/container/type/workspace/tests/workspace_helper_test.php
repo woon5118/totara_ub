@@ -85,4 +85,52 @@ class container_workspace_workspace_helper_testcase extends advanced_testcase {
         $timestamp = $workspace->get_timestamp();
         $this->assertEquals(100, $timestamp);
     }
+
+    /**
+     * @return void
+     */
+    public function test_update_primary_owner_as_non_authority_user(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Log in as user two and check if user two is able to transfer the owner ship.
+        $user_two = $generator->create_user();
+        $this->setUser($user_two);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Actor does not have ability to update workspace owner");
+
+        workspace_helper::update_workspace_primary_owner($workspace, $user_two->id);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_update_primary_owner_to_deleted_user(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // delete user two and assign it to the workspace's owner.
+        delete_user($user_two);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage(
+            "Cannot update the workspace primary owner to user that had been suspended or deleted"
+        );
+
+        workspace_helper::update_workspace_primary_owner($workspace, $user_two->id);
+    }
 }

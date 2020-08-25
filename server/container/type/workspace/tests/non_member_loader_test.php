@@ -115,4 +115,48 @@ class container_workspace_non_member_loader_testcase extends advanced_testcase {
         $this->assertSame('One', $found_user->lastname);
         $this->assertSame('user.one@example.com', $found_user->email);
     }
+
+    /**
+     * @return void
+     */
+    public function test_load_non_members_of_a_workspace_that_had_already_a_member_of_other_workspace(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace_one = $workspace_generator->create_workspace();
+        $workspace_two = $workspace_generator->create_workspace();
+
+        $users = [];
+
+        // Adding 5 users to the system plus adding them to the workspaces.
+        for ($i = 0; $i < 5; $i++) {
+            $user = $generator->create_user();
+            $users[$user->id] = $user;
+
+            member::join_workspace($workspace_one, $user->id);
+        }
+
+        $site_admin = get_admin();
+        $users[$site_admin->id] = $site_admin;
+
+        // After adding the users, try to load workspace's two non member records.
+        $query = new non_member_query($workspace_two->id);
+        $result = non_member_loader::get_non_members($query);
+
+        // All 5 users in the system for now + site admin default user.
+        $this->assertEquals(6, $result->get_total());
+        $user_records = $result->get_items()->all();
+
+        foreach ($user_records as $user_record) {
+            $this->assertArrayHasKey(
+                $user_record->id,
+                $users,
+                "Expecting the non member users should exist of the list created user"
+            );
+        }
+    }
 }

@@ -542,16 +542,28 @@ final class workspace extends container implements category_name_provider {
     }
 
     /**
+     * Create a valid URL for workspace page.
+     *
+     * @param int $workspace_id
      * @param string|null $tab
+     *
      * @return \moodle_url
      */
-    public function get_workspace_url(?string $tab = null): \moodle_url {
-        $params = ['id' => $this->id];
+    public static function create_url(int $workspace_id, ?string $tab = null): \moodle_url {
+        $params = ['id' => $workspace_id];
         if (null !== $tab) {
             $params['tab'] = $tab;
         }
 
         return new \moodle_url("/container/type/workspace/workspace.php", $params);
+    }
+
+    /**
+     * @param string|null $tab
+     * @return \moodle_url
+     */
+    public function get_workspace_url(?string $tab = null): \moodle_url {
+        return static::create_url($this->id, $tab);
     }
 
     /**
@@ -603,6 +615,7 @@ final class workspace extends container implements category_name_provider {
 
     /**
      * Remove the primary owner.
+     * @return void
      */
     public function remove_user(): void {
         $this->entity->user_id = null;
@@ -629,5 +642,17 @@ final class workspace extends container implements category_name_provider {
      */
     public function get_timestamp(): int {
         return $this->entity->timestamp;
+    }
+
+    /**
+     * Updatee primary owner, note that this function does not check for any capabilities,
+     * as it should had been done prior to call this function.
+     *
+     * @param int $new_user_id
+     * @return void
+     */
+    public function update_user(int $new_user_id): void {
+        $this->entity->user_id = $new_user_id;
+        $this->entity->update();
     }
 }

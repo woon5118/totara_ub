@@ -107,6 +107,19 @@ final class source implements option {
      * @param int $value
      * @return bool
      */
+    public static function is_member(int $value): bool {
+        if (!static::is_valid($value)) {
+            debugging("Invalid value '{$value}'", DEBUG_DEVELOPER);
+            return false;
+        }
+
+        return static::MEMBER == $value;
+    }
+
+    /**
+     * @param int $value
+     * @return bool
+     */
     public static function is_owned_only(int $value): bool {
         if (!static::is_valid($value)) {
             debugging("Invalid value '{$value}'", DEBUG_DEVELOPER);

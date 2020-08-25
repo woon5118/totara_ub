@@ -38,6 +38,7 @@ query container_workspace_find_workspaces(
       can_update
       can_invite
       can_join
+      can_leave
       joined
       workspaces_admin
       own

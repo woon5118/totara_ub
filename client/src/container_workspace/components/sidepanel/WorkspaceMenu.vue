@@ -107,11 +107,6 @@ export default {
   data() {
     return {
       categoryInteractor: {},
-    };
-  },
-
-  data() {
-    return {
       innerSelectedWorkspaceId: this.selectedWorkspaceId,
     };
   },

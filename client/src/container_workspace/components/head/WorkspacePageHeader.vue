@@ -169,7 +169,12 @@ export default {
 
       try {
         let mutation = status ? muteWorkspace : unmuteWorkspace;
-        await this.$apollo.mutate({ mutation, variables });
+        await this.$apollo.mutate({
+          mutation: mutation,
+          variables: variables,
+          // Update workspace interactor just in case.
+          refetchQueries: ['container_workspace_workspace_interactor'],
+        });
 
         this.$emit('update-mute-status', status);
       } finally {

@@ -1,0 +1,217 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD’s customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Kian Nguyen <kian.nguyen@totaralearning.com>
+  @module container_workspace
+-->
+<template>
+  <Form
+    :vertical="true"
+    input-width="full"
+    class="tui-workspaceTransferOwnerForm"
+  >
+    <div class="tui-workspaceTransferOwnerForm__content">
+      <FormRow
+        v-if="displayCurrentOwner"
+        v-slot="{ id }"
+        :label="$str('current_owner', 'container_workspace')"
+        :aria-disabled="true"
+        class="tui-workspaceTransferOwnerForm__content__formRow"
+      >
+        <TagList
+          :id="id"
+          :disabled="true"
+          :tags="[{ text: currentOwnerFullname }]"
+          class="tui-workspaceTransferOwnerForm__content__formRow__tagList"
+        />
+      </FormRow>
+
+      <FormRow
+        v-slot="{ id }"
+        :label="$str('select_new_owner', 'container_workspace')"
+        class="tui-workspaceTransferOwnerForm__content__formRow"
+      >
+        <TagList
+          :id="id"
+          :tags="selectedUsers"
+          :items="users"
+          class="tui-workspaceTransferOwnerForm__content__formRow__tagList"
+          @filter="searchPattern = $event"
+          @select="selectedUser = $event"
+          @remove="selectedUser = null"
+        >
+          <template
+            v-if="!$apollo.loading"
+            v-slot:item="{ item: { card_display } }"
+          >
+            <MiniProfileCard
+              :no-border="true"
+              :display="card_display"
+              :read-only="true"
+            />
+          </template>
+        </TagList>
+      </FormRow>
+
+      <p class="tui-workspaceTransferOwnerForm__content__helpText">
+        <template v-if="displayCurrentOwner">
+          <!-- Somebody is trying to transfer the owner ship -->
+          {{ $str('transfer_ownership_help_text_two', 'container_workspace') }}
+        </template>
+
+        <template v-else>
+          <!-- Self transfering ownership -->
+          {{ $str('transfer_ownership_help_text_one', 'container_workspace') }}
+        </template>
+      </p>
+    </div>
+
+    <ButtonGroup class="tui-workspaceTransferOwnerForm__buttonGroup">
+      <LoadingButton
+        class="tui-workspaceTransferOwnerForm__buttonGroup__button"
+        :text="$str('confirm', 'moodle')"
+        :primary="true"
+        :small="true"
+        :loading="submitting"
+        :disabled="!selectedUser"
+        @click="submitForm"
+      />
+      <!-- Separator -->
+      <Button
+        class="tui-workspaceTransferOwnerForm__buttonGroup__button"
+        :text="$str('cancel', 'moodle')"
+        :styleclass="{ small: true }"
+        @click="$emit('cancel', $event)"
+      />
+    </ButtonGroup>
+  </Form>
+</template>
+
+<script>
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import TagList from 'tui/components/tag/TagList';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import Button from 'tui/components/buttons/Button';
+import LoadingButton from 'totara_engage/components/buttons/LoadingButton';
+import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
+
+// GraphQL queries
+import searchUsers from 'container_workspace/graphql/search_users';
+
+export default {
+  components: {
+    Form,
+    FormRow,
+    TagList,
+    ButtonGroup,
+    Button,
+    LoadingButton,
+    MiniProfileCard,
+  },
+
+  props: {
+    workspaceId: {
+      type: [String, Number],
+      required: true,
+    },
+    displayCurrentOwner: Boolean,
+    currentOwnerFullname: String,
+    submitting: Boolean,
+  },
+
+  apollo: {
+    availableUsers: {
+      query: searchUsers,
+      fetchPolicy: 'network-only',
+      variables() {
+        return {
+          pattern: this.searchPattern,
+          workspace_id: this.workspaceId,
+        };
+      },
+
+      update({ users }) {
+        return users;
+      },
+    },
+  },
+
+  data() {
+    return {
+      selectedUser: null,
+      searchPattern: '',
+      availableUsers: [],
+    };
+  },
+
+  computed: {
+    /**
+     * Returning a list of users that filtering out the selected user's id.
+     * @return {Array}
+     */
+    users() {
+      if (!this.selectedUser) {
+        return this.availableUsers;
+      }
+
+      return this.availableUsers.filter(({ id }) => id != this.selectedUser.id);
+    },
+
+    /**
+     * Returning a list of selected users.
+     * If the user are not selected, then empty array will be returned.
+     *
+     * @return {Array}
+     */
+    selectedUsers() {
+      if (!this.selectedUser) {
+        return [];
+      }
+
+      return [
+        {
+          id: this.selectedUser.id,
+          text: this.selectedUser.fullname,
+        },
+      ];
+    },
+  },
+
+  methods: {
+    submitForm() {
+      if (!this.selectedUser) {
+        return;
+      }
+
+      this.$emit('submit', { userId: this.selectedUser.id });
+    },
+  },
+};
+</script>
+
+<lang-strings>
+  {
+    "container_workspace": [
+      "current_owner",
+      "select_new_owner",
+      "transfer_ownership_help_text_one",
+      "transfer_ownership_help_text_two"
+    ],
+    "moodle": [
+      "cancel",
+      "confirm"
+    ]
+  }
+</lang-strings>

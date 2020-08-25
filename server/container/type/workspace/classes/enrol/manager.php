@@ -137,7 +137,7 @@ final class manager {
             AND e.courseid = :workspace_id
         ';
 
-        // There MUST only one user enrolment record at a time despite of there are two many enrol instances
+        // There MUST only one user enrolment record at a time despite of there are two enrol instances
         // enabled for the workspace.
         $user_enrolment = $DB->get_record_sql(
             $sql,

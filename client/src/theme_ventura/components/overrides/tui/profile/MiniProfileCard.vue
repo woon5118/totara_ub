@@ -49,10 +49,6 @@
 
   &__avatar {
     margin-right: var(--tui-gap-2);
-    &--readOnly:hover,
-    &--readOnly:focus {
-      text-decoration: none;
-    }
   }
 
   &__description {
@@ -61,40 +57,36 @@
     flex-direction: column;
     overflow: hidden;
 
-    &__text {
-      @include tui-font-body-small();
-      margin: 0;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+    &__row {
+      display: flex;
+      align-items: center;
 
-      &--position-zero {
-        @include tui-font-heavy();
+      &__text {
+        @include tui-font-body-small();
+        margin: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        &--bold {
+          @include tui-font-heavy();
+        }
       }
 
-      &--with-gap {
+      &__link {
+        @include tui-font-link-small();
+        margin: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        &--bold {
+          @include tui-font-heavy();
+        }
+      }
+
+      &--withGap {
         margin-bottom: var(--tui-gap-1);
-      }
-    }
-
-    &__link {
-      @include tui-font-link-small();
-      margin: 0;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-
-      &--position-zero {
-        @include tui-font-heavy();
-      }
-
-      &--with-gap {
-        margin-bottom: var(--tui-gap-1);
-      }
-
-      &--readOnly:hover,
-      &--readOnly:focus {
-        text-decoration: none;
       }
     }
   }

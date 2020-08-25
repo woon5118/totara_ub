@@ -16,7 +16,7 @@ type container_workspace_member {
   """
   workspace_id: Int!
   """
-  The interactor of this member against the workspace.
+  The interactor of this member user against the workspace.
   """
   workspace_interactor: container_workspace_workspace_interactor!
   """
@@ -28,8 +28,8 @@ type container_workspace_member {
   """
   time_joined(format: core_date_format!): String!
   """
-  The interactor of a user against this member. Whether the user can perform specific to a member or not.
-  If user_id is not set then the user in session will be used.
+  The interactor of an actor (user in session) against this member. Whether the user can perform specific actions
+  toward the member or not. If user_id is not set then the user in session will be used.
   """
   member_interactor(user_id: Int): container_workspace_member_interactor!
 }
@@ -233,4 +233,16 @@ extend type Mutation {
   container_workspace_cancel_member_request(
     workspace_id: param_integer!
   ): container_workspace_member_request!
+
+  """
+  Mutation to change the current primary owner of the workspace to someone else.
+  Then return a member record.
+  """
+  container_workspace_change_primary_owner(
+    workspace_id: param_integer!
+    """
+    New user that we want to change to.
+    """
+    user_id: param_integer!
+  ): container_workspace_member!
 }

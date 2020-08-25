@@ -25,6 +25,15 @@
       "
       class="tui-workspaceMemberCard__profileCard"
     >
+      <template v-slot:tag>
+        <Lozenge
+          v-if="owner"
+          :text="$str('admin', 'moodle')"
+          type="neutral"
+          class="tui-workspaceMemberCard__profileCard__tag"
+        />
+      </template>
+
       <template v-if="deleteAble" v-slot:drop-down-items>
         <DropdownItem @click="modal.confirm = true">
           {{ $str('remove', 'moodle') }}
@@ -53,6 +62,7 @@ import { notify } from 'tui/notifications';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import WorkspaceWarningModal from 'container_workspace/components/modal/WorkspaceWarningModal';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
+import Lozenge from 'tui/components/lozenge/Lozenge';
 
 //GraphQL
 import removeMemberFromWorkspace from 'container_workspace/graphql/remove_member_from_workspace';
@@ -64,6 +74,7 @@ export default {
     ModalPresenter,
     WorkspaceWarningModal,
     DropdownItem,
+    Lozenge,
   },
 
   props: {
@@ -99,6 +110,8 @@ export default {
       type: String,
       required: true,
     },
+
+    owner: Boolean,
   },
 
   data() {
@@ -145,7 +158,8 @@ export default {
 <lang-strings>
   {
     "moodle": [
-      "remove"
+      "remove",
+      "admin"
     ],
     "container_workspace": [
       "error:remove_user",

@@ -46,4 +46,17 @@ extend type Query {
     However - it will skip the the field fullname - as it is a default for workspace page.
     """
     container_workspace_user_table_fields: [container_workspace_user_table_field!]!
+
+    """
+    A query to search for users by pattern.
+    This query is temporary to search for the users. It can be superceeded by the query
+    that sits in core if desire.
+    """
+    container_workspace_search_users(
+        """
+        Where this search is happening. Ideally that it must be done within a workspace.
+        """
+        workspace_id: param_integer!
+        pattern: param_text
+    ): [core_user!]!
 }

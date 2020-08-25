@@ -45,29 +45,20 @@ final class non_member_loader {
     public static function get_non_members(non_member_query $query): offset_cursor_paginator {
         global $CFG, $DB;
 
-        $builder = builder::table('user', 'u');
-        $builder->select_raw('DISTINCT u.*');
-
         $workspace_id = $query->get_workspace_id();
 
-        $builder->left_join(
-            ['user_enrolments', 'ue'],
-            function (builder $join): void {
-                $join->where_field('ue.userid', 'u.id');
-                $join->where('status', status::get_active());
-            }
-        );
+        // Create a query of all enrollments in the workspace
+        $members_query = builder::table('user_enrolments', 'ue');
+        $members_query->select('ue.id');
+        $members_query->where_field('ue.userid', 'u.id');
+        $members_query->where('status', status::get_active());
+        $members_query->join(['enrol', 'e'], 'ue.enrolid', 'e.id');
+        $members_query->where('e.courseid', $workspace_id);
 
-        $builder->left_join(
-            ['enrol', 'e'],
-            function (builder $join) use ($workspace_id): void {
-                $join->where_field('e.id', 'ue.enrolid');
-                $join->where('e.courseid', $workspace_id);
-            }
-        );
-
-        // We are only fetching non member of a specific workspace.
-        $builder->where_null('ue.id');
+        // Select all users excluding those who have a membership
+        $builder = builder::table('user', 'u');
+        $builder->select_raw('DISTINCT u.*');
+        $builder->where_not_exists($members_query);
 
         $search_term = $query->get_search_term();
         if (null !== $search_term) {
@@ -93,12 +84,17 @@ final class non_member_loader {
         // ================= SQL =====================
         // SELECT u.*
         // FROM phpu_00user "u"
-        //      LEFT JOIN phpu_00user_enrolments "ue" ON ue.userid = u.id AND "ue".status = $1
-        //      LEFT JOIN phpu_00enrol "e" ON e.id = ue.enrolid AND e.courseid = $2
-        // WHERE ue.id IS NULL
-        // AND "u".id <> $3
-        // AND "u".id <> $4
-        // AND "u.id" <> $5
+        // WHERE NOT EXISTS(
+        //      SELECT ue.id
+        //      FROM phpu_00user_enrolments "ue"
+        //      INNER JOIN phpu_00enrol "e" ON e.id = ue.enrolid
+        //      WHERE ue.userid = u.id
+        //      AND "ue".status = $1
+        //      AND e.courseid = $2
+        // )
+        // AND u.id <> $3
+        // AND u.deleted = $4
+        // AND u.suspended = $5
         // LIMIT 20 OFFSET 0
         // =============== End Of SQL ================
 
