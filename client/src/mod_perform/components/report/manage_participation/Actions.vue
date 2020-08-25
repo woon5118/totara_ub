@@ -49,22 +49,24 @@
     >
       <ParticipantAddIcon />
     </a>
-    <ButtonIcon
-      v-if="isOpen"
-      :aria-label="$str('button_close', 'mod_perform')"
-      :styleclass="{ transparentNoPadding: true }"
-      @click="showModal()"
-    >
-      <LockIcon />
-    </ButtonIcon>
-    <ButtonIcon
-      v-else
-      :aria-label="$str('button_reopen', 'mod_perform')"
-      :styleclass="{ transparentNoPadding: true }"
-      @click="showModal()"
-    >
-      <UnlockIcon />
-    </ButtonIcon>
+    <template v-if="showActions">
+      <ButtonIcon
+        v-if="isOpen"
+        :aria-label="$str('button_close', 'mod_perform')"
+        :styleclass="{ transparentNoPadding: true }"
+        @click="showModal()"
+      >
+        <LockIcon />
+      </ButtonIcon>
+      <ButtonIcon
+        v-else
+        :aria-label="$str('button_reopen', 'mod_perform')"
+        :styleclass="{ transparentNoPadding: true }"
+        @click="showModal()"
+      >
+        <UnlockIcon />
+      </ButtonIcon>
+    </template>
   </div>
 </template>
 <script>
@@ -99,6 +101,11 @@ export default {
     },
     isOpen: {
       type: Boolean,
+    },
+    showActions: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {

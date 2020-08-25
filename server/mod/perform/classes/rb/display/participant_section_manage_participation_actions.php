@@ -23,6 +23,7 @@
 
 namespace mod_perform\rb\display;
 
+use mod_perform\state\participant_section\availability_not_applicable;
 use mod_perform\state\participant_section\closed;
 use rb_column;
 use rb_column_option;
@@ -53,15 +54,17 @@ class participant_section_manage_participation_actions extends base {
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
-        $is_open = $extrafields->participant_section_availability != closed::get_code();
+        $is_open = (int)$extrafields->participant_section_availability != closed::get_code();
+        $show_actions = (int)$extrafields->participant_section_availability != availability_not_applicable::get_code();
 
         return $OUTPUT->render(
             new component(
                 'mod_perform/components/report/manage_participation/Actions',
                 [
-                    'reportType' => self::PARTICIPANT_SECTION_REPORT_TYPE,
-                    'id'         => $extrafields->participant_section_id,
-                    'isOpen'     => $is_open,
+                    'reportType'    => self::PARTICIPANT_SECTION_REPORT_TYPE,
+                    'id'            => $extrafields->participant_section_id,
+                    'isOpen'        => $is_open,
+                    'showActions'   => $show_actions,
                 ]
             )
         );

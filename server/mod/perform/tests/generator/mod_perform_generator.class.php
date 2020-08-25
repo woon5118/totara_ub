@@ -63,9 +63,13 @@ use mod_perform\models\activity\element_identifier as element_identifier_model;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\activity_state;
 use mod_perform\state\activity\draft;
-use mod_perform\state\participant_instance\not_started as instance_not_started;
+use mod_perform\state\participant_instance\availability_not_applicable as participant_instance_availability_not_applicable;
 use mod_perform\state\participant_instance\open;
-use mod_perform\state\participant_section\not_started;
+use mod_perform\state\participant_instance\progress_not_applicable as participant_instance_progress_not_applicable;
+use mod_perform\state\participant_section\availability_not_applicable as participant_section_availability_not_applicable;
+use mod_perform\state\participant_section\not_started as participant_section_not_started;
+use mod_perform\state\participant_section\open as particiant_section_open;
+use mod_perform\state\participant_section\progress_not_applicable as partipant_section_progress_not_applicable;
 use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\manual_participant_progress;
 use mod_perform\task\service\subject_instance_creation;
@@ -288,7 +292,16 @@ class mod_perform_generator extends component_generator_base {
         $participant_section = new participant_section_entity();
         $participant_section->section_id = $section->id;
         $participant_section->participant_instance_id = $participant_instance->id;
-        $participant_section->progress = not_started::get_code();
+        if ($participant_instance->progress === participant_instance_progress_not_applicable::get_code()) {
+            $participant_section->progress = partipant_section_progress_not_applicable::get_code();
+        } else {
+            $participant_section->progress = participant_section_not_started::get_code();
+        }
+        if ($participant_instance->availability === participant_instance_availability_not_applicable::get_code()) {
+            $participant_section->availability = participant_section_availability_not_applicable::get_code();
+        } else {
+            $participant_section->availability = particiant_section_open::get_code();
+        }
         $participant_section->save();
 
         if ($add_elements) {
@@ -848,6 +861,18 @@ class mod_perform_generator extends component_generator_base {
                 ->first();
         }
 
+        $relationships_can_view = $data['relationships_can_view'] ?? 'subject, manager, appraiser';
+        $relationships_can_view = explode(', ', $relationships_can_view);
+        $subject_can_view = in_array('subject', $relationships_can_view, true);
+        $manager_can_view = in_array('manager', $relationships_can_view, true);
+        $appraiser_can_view = in_array('appraiser', $relationships_can_view, true);
+
+        $relationships_can_answer = $data['relationships_can_answer'] ?? '';
+        $relationships_can_answer = empty($relationships_can_answer) ? [] : explode(', ', $relationships_can_answer);
+        $subject_can_answer = empty($relationships_can_answer) || in_array('subject', $relationships_can_answer, true);
+        $manager_can_answer = empty($relationships_can_answer) || in_array('manager', $relationships_can_answer, true);
+        $appraiser_can_answer = empty($relationships_can_answer) || in_array('appraiser', $relationships_can_answer, true);
+
         $track = track::create($activity, "track for {$activity->name}");
 
         $user_assignment = new track_user_assignment();
@@ -884,7 +909,9 @@ class mod_perform_generator extends component_generator_base {
                 $subjects_participant_instance->participant_id = $subject->id; // Answering on activity about them self
                 $subjects_participant_instance->participant_source = participant_source::INTERNAL;
                 $subjects_participant_instance->subject_instance_id = $subject_instance->id;
-                $subjects_participant_instance->progress = instance_not_started::get_code();
+                $this->set_participant_instance_progress_and_availability($subjects_participant_instance,
+                    $subject_can_answer, $subject_can_view
+                );
                 $subjects_participant_instance->save();
             }
 
@@ -895,18 +922,22 @@ class mod_perform_generator extends component_generator_base {
                 $other_participant_instance->participant_id = $other_participant->id;
                 $other_participant_instance->participant_source = participant_source::INTERNAL;
                 $other_participant_instance->subject_instance_id = $subject_instance->id;
-                $other_participant_instance->progress = instance_not_started::get_code();
+                $this->set_participant_instance_progress_and_availability($other_participant_instance,
+                    $manager_can_answer, $manager_can_view
+                );
                 $other_participant_instance->save();
             }
 
             $third_participant_instance = null;
             if ($third_participant && $is_active) {
                 $third_participant_instance = new participant_instance_entity();
-                $third_participant_instance->core_relationship_id = core_relationship::load_by_idnumber('manager')->id;
+                $third_participant_instance->core_relationship_id = core_relationship::load_by_idnumber('appraiser')->id;
                 $third_participant_instance->participant_id = $third_participant->id;
                 $third_participant_instance->participant_source = participant_source::INTERNAL;
                 $third_participant_instance->subject_instance_id = $subject_instance->id;
-                $third_participant_instance->progress = instance_not_started::get_code();
+                $this->set_participant_instance_progress_and_availability($third_participant_instance,
+                    $appraiser_can_answer, $appraiser_can_view
+                );
                 $third_participant_instance->save();
             }
             $subject_instances[] = $subject_instance;
@@ -932,14 +963,12 @@ class mod_perform_generator extends component_generator_base {
                 $participant_sections[] = $this->create_participant_section($activity, $participant_instance, false, $section1);
             }
 
-            $relationships_can_view = $data['relationships_can_view'] ?? 'subject, manager, appraiser';
-            $relationships_can_view = explode(', ', $relationships_can_view);
-
             if ($subject_is_participating) {
                 $subject_relationship = $this->create_section_relationship(
                     $section1,
                     ['relationship' => constants::RELATIONSHIP_SUBJECT],
-                    in_array('subject', $relationships_can_view, true)
+                    $subject_can_view,
+                    $subject_can_answer
                 );
                 $subjects_participant_instance->core_relationship_id = $subject_relationship->core_relationship_id;
                 $subjects_participant_instance->save();
@@ -949,16 +978,8 @@ class mod_perform_generator extends component_generator_base {
                 $manager_relationship = $this->create_section_relationship(
                     $section1,
                     ['relationship' => constants::RELATIONSHIP_MANAGER],
-                    in_array('manager', $relationships_can_view, true)
-                );
-                $other_participant_instance->core_relationship_id = $manager_relationship->core_relationship_id;
-                $other_participant_instance->save();
-            }
-
-            if ($other_participant) {
-                $manager_relationship = $this->create_section_relationship(
-                    $section1, ['relationship' => constants::RELATIONSHIP_MANAGER],
-                    in_array('manager', $relationships_can_view, true)
+                    $manager_can_view,
+                    $manager_can_answer
                 );
                 $other_participant_instance->core_relationship_id = $manager_relationship->core_relationship_id;
                 $other_participant_instance->save();
@@ -968,7 +989,8 @@ class mod_perform_generator extends component_generator_base {
                 $appraiser_relationship = $this->create_section_relationship(
                     $section1,
                     ['relationship' => constants::RELATIONSHIP_APPRAISER],
-                    in_array('appraiser', $relationships_can_view, true)
+                    $appraiser_can_view,
+                    $appraiser_can_answer
                 );
                 $third_participant_instance->core_relationship_id = $appraiser_relationship->core_relationship_id;
                 $third_participant_instance->save();
@@ -1139,7 +1161,7 @@ class mod_perform_generator extends component_generator_base {
         $participant_instance->participant_source = participant_source::INTERNAL;
         $participant_instance->participant_id = $participant_user->id;
         $participant_instance->subject_instance_id = $subject_instance_id;
-        $participant_instance->progress = not_started::get_code();
+        $participant_instance->progress = participant_section_not_started::get_code();
         $participant_instance->availability = open::get_code();
         return $participant_instance->save();
     }
@@ -1482,5 +1504,22 @@ class mod_perform_generator extends component_generator_base {
         }
 
         return $section1;
+    }
+
+    private function set_participant_instance_progress_and_availability(participant_instance_entity $participant_instance,
+        bool $can_answer, bool $can_view
+    ) {
+        // Taken from mod_perform\task\service\participant_section_creation
+        if ($can_answer) {
+            $participant_instance->progress = participant_section_not_started::get_code();
+            $participant_instance->availability = open::get_code();
+        } else if ($can_view) {
+            $participant_instance->progress = participant_instance_progress_not_applicable::get_code();
+            $participant_instance->availability = participant_instance_availability_not_applicable::get_code();
+        } else {
+            throw new \coding_exception(
+                'Tried to create participant section for relationship which cannot view or answer'
+            );
+        }
     }
 }

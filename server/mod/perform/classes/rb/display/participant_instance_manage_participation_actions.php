@@ -23,6 +23,7 @@
 
 namespace mod_perform\rb\display;
 
+use mod_perform\state\participant_instance\availability_not_applicable;
 use mod_perform\state\participant_instance\closed;
 use rb_column;
 use rb_column_option;
@@ -53,15 +54,17 @@ class participant_instance_manage_participation_actions extends base {
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
-        $is_open = $extrafields->participant_instance_availability != closed::get_code();
+        $is_open = (int)$extrafields->participant_instance_availability != closed::get_code();
+        $show_actions = (int)$extrafields->participant_instance_availability != availability_not_applicable::get_code();
 
         return $OUTPUT->render(
             new component(
                 'mod_perform/components/report/manage_participation/Actions',
                 [
-                    'reportType' => self::PARTICIPANT_INSTANCE_REPORT_TYPE,
-                    'id'         => $extrafields->participant_instance_id,
-                    'isOpen'     => $is_open,
+                    'reportType'    => self::PARTICIPANT_INSTANCE_REPORT_TYPE,
+                    'id'            => $extrafields->participant_instance_id,
+                    'isOpen'        => $is_open,
+                    'showActions'   => $show_actions,
                 ]
             )
         );

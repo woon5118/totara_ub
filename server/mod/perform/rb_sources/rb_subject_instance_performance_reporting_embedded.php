@@ -150,6 +150,10 @@ class rb_subject_instance_performance_reporting_embedded extends rb_base_embedde
      */
     public function is_capable($reportfor, $report): bool {
         $subject_user_id = $report->get_param_value('subject_user_id');
-        return util::can_report_on_user($subject_user_id, $reportfor);
+        if ($subject_user_id === null) {
+            return util::can_potentially_report_on_subjects($reportfor);
+        } else {
+            return util::can_report_on_user($subject_user_id, $reportfor);
+        }
     }
 }

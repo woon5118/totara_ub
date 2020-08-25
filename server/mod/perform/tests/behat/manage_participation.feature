@@ -9,6 +9,7 @@ Feature: Test management of activity participation
       | user3     | User      | Three    | user.three@example.com |
       | user4     | User      | Four     | user.four@example.com  |
       | user5     | User      | Five     | user.five@example.com  |
+      | user6     | User      | Six      | user.six@example.com   |
       | manager1  | manager   | One      | manager1@example.com   |
       | manager2  | manager   | Two      | manager2@example.com   |
       | appraiser | appraiser | User     | appraiser@example.com  |
@@ -24,22 +25,24 @@ Feature: Test management of activity participation
       | user4    | job      | manager1 | manage1           | appraiser |
       | user5    | job      | manager1 | manage2           |           |
       | user5    | job      | manager2 | manage            |           |
+      | user6    | job      | manager1 | manage1           | appraiser |
 
     And the following "subject instances" exist in "mod_perform" plugin:
-      | activity_name          | activity_status | subject_username | subject_is_participating | other_participant_username | third_participant_username | number_repeated_instances |
-      | 3 participants         | 1               | user1            | true                     |                            |                            | 3                         |
-      | 3 participants         | 1               | user2            | true                     | manager1                   |                            | 3                         |
-      | 3 participants         | 1               | user3            | true                     | appraiser                  |                            | 3                         |
-      | 3 participants         | 1               | user4            | true                     | manager1                   | appraiser                  | 3                         |
-      | for manager1           | 1               | user2            | false                    | manager1                   |                            | 1                         |
-      | for manager1           | 1               | user3            | false                    | manager1                   |                            | 1                         |
-      | for manager1           | 1               | user4            | false                    | manager1                   |                            | 1                         |
-      | for manager1           | 1               | user5            | false                    | manager1                   |                            | 1                         |
-      | for manager2 appraiser | 1               | user1            | false                    | manager2                   | appraiser                  | 2                         |
-      | for manager2 appraiser | 1               | user2            | false                    | manager2                   | appraiser                  | 2                         |
-      | for manager2 appraiser | 1               | user3            | false                    | manager2                   | appraiser                  | 2                         |
-      | for manager2 appraiser | 1               | user4            | false                    | manager2                   | appraiser                  | 2                         |
-      | for manager2 appraiser | 1               | user5            | false                    | manager2                   | appraiser                  | 2                         |
+      | activity_name          | activity_status | subject_username | subject_is_participating | other_participant_username | third_participant_username | number_repeated_instances | relationships_can_answer |
+      | 3 participants         | 1               | user1            | true                     |                            |                            | 3                         |                          |
+      | 3 participants         | 1               | user2            | true                     | manager1                   |                            | 3                         |                          |
+      | 3 participants         | 1               | user3            | true                     | appraiser                  |                            | 3                         |                          |
+      | 3 participants         | 1               | user4            | true                     | manager1                   | appraiser                  | 3                         |                          |
+      | for manager1           | 1               | user2            | false                    | manager1                   |                            | 1                         |                          |
+      | for manager1           | 1               | user3            | false                    | manager1                   |                            | 1                         |                          |
+      | for manager1           | 1               | user4            | false                    | manager1                   |                            | 1                         |                          |
+      | for manager1           | 1               | user5            | false                    | manager1                   |                            | 1                         |                          |
+      | for manager2 appraiser | 1               | user1            | false                    | manager2                   | appraiser                  | 2                         |                          |
+      | for manager2 appraiser | 1               | user2            | false                    | manager2                   | appraiser                  | 2                         |                          |
+      | for manager2 appraiser | 1               | user3            | false                    | manager2                   | appraiser                  | 2                         |                          |
+      | for manager2 appraiser | 1               | user4            | false                    | manager2                   | appraiser                  | 2                         |                          |
+      | for manager2 appraiser | 1               | user5            | false                    | manager2                   | appraiser                  | 2                         |                          |
+      | view only appraiser    | 1               | user6            | true                     | manager1                   | appraiser                  | 1                         | subject, manager         |
 
   Scenario: Manage participant tables contain the correct rows
     Given I log in as "admin"
@@ -155,6 +158,34 @@ Feature: Test management of activity participation
     Then I should see "Reopen participant section" in the tui modal
     When I confirm the tui confirmation modal
     Then I should see "Participant section reopened"
+
+  Scenario: open/close action not shown for view-only participants in participant management reports
+    Given I log in as "admin"
+    And I navigate to the manage perform activities page
+    And I click on "Manage participation" "link" in the tui datatable row with "view only appraiser" "Name"
+    Then the following should exist in the "subject_instance_manage_participation" table:
+      | Subject's full name | Instance number | Participants |
+      | User Six            | 1               | 3 instances  |
+    And "Close" "button" should exist in the "User Six" "table_row"
+    And I switch to "Participant instances" tab
+    Then the following should exist in the "participant_instance_manage_participation" table:
+    | Participant's name | Subject name | Relationship name | Sections  | Progress       | Availability   |
+    | appraiser User     | User Six     | Appraiser         | 1 section | Not applicable | Not applicable |
+    | manager One        | User Six     | Manager           | 1 section | Not started    | Open           |
+    | User Six           | User Six     | Subject           | 1 section | Not started    | Open           |
+    And "Close" "button" should not exist in the "appraiser User" "table_row"
+    And "Close" "button" should exist in the "manager One" "table_row"
+    # Not possible to uniquely identify the subject row - so not testing the close button for the subject
+
+    When I switch to "Participant sections" tab
+    Then the following should exist in the "participant_section_manage_participation" table:
+    | Participant's name | Section title | Subject name | Relationship name | Progress       | Availability   |
+    | appraiser User     | Part one      | User Six     | Appraiser         | Not applicable | Not applicable |
+    | manager One        | Part one      | User Six     | Manager           | Not started    | Open           |
+    | User Six           | Part one      | User Six     | Subject           | Not started    | Open           |
+    And "Close" "button" should not exist in the "appraiser User" "table_row"
+    And "Close" "button" should exist in the "manager One" "table_row"
+    # Not possible to uniquely identify the subject row - so not testing the close button for the subject
 
 
   Scenario: Manage participants top level instance/section filtering

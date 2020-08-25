@@ -70,7 +70,8 @@ class subject_instance_manage_participation_actions extends base {
                     'reportType'        => self::SUBJECT_INSTANCE_REPORT_TYPE,
                     'activityId'        => $extrafields->activity_id,
                     'id'                => $extrafields->subject_instance_id,
-                    'isOpen'            => $is_open
+                    'isOpen'            => $is_open,
+                    'showActions'       => true,
                 ]
             )
 
