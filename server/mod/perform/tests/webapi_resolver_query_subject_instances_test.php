@@ -119,6 +119,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
             'subject_user' => [
                 'fullname' => $subject_instance->subject_user->fullname
             ],
+            'job_assignment' => null,
             'participant_instances' => [
                 [
                     'progress_status' => participant_instance_not_started::get_name(),
@@ -243,6 +244,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
             'subject_user' => [
                 'fullname' => $subject_instance->subject_user->fullname
             ],
+            'job_assignment' => null,
             'participant_instances' => [
                 [
                     'progress_status' => participant_instance_not_started::get_name(),
@@ -411,6 +413,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
             'subject_user' => [
                 'fullname' => $subject_instance->subject_user->fullname
             ],
+            'job_assignment' => null,
             'participant_instances' => [
                 [
                     'progress_status' => participant_instance_not_started::get_name(),
@@ -540,7 +543,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
 
         $user1 = $this->getDataGenerator()->create_user();
         // This user has user1 as the manager
-        [$user2, $job_assignment1] = $job_generator->create_user_and_job([], $user1->id);
+        [$user2,] = $job_generator->create_user_and_job([], $user1->id);
         $user3 = $this->getDataGenerator()->create_user();
 
         // Add two users to the cohort
@@ -674,6 +677,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                 'subject_user' => [
                     'fullname' => $subject_instance->subject_user->fullname
                 ],
+                'job_assignment' => null,
                 'participant_instances' => $expected_participant_instances
             ];
 

@@ -1328,6 +1328,17 @@ class mod_perform_generator extends component_generator_base {
                 $track->update();
             }
         }
+
+        if (!empty($data['subject_instance_generation'])) {
+            $generation_methods = track::get_subject_instance_generation_methods();
+            $value = array_search($data['subject_instance_generation'], $generation_methods);
+
+            if ($value === false) {
+                throw new coding_exception('unknown subject instance generation value');
+            }
+            $track->set_subject_instance_generation($value);
+            $track->update();
+        }
     }
 
     /**

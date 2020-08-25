@@ -9,6 +9,10 @@ query mod_perform_my_subject_instances(
       created_at
       due_date
       is_overdue
+      job_assignment {
+        idnumber
+        fullname
+      }
       activity {
         id
         name

@@ -34,6 +34,9 @@
         <HeaderCell v-if="isAboutOthers" size="2">
           {{ $str('user_activities_subject_header', 'mod_perform') }}
         </HeaderCell>
+        <HeaderCell v-if="hasSubjectInstanceWithJobAssignment" size="2">
+          {{ $str('user_activities_job_assignment_header', 'mod_perform') }}
+        </HeaderCell>
         <HeaderCell v-if="isAboutOthers" size="2">
           {{
             $str('user_activities_status_header_relationship', 'mod_perform')
@@ -83,6 +86,18 @@
           valign="center"
         >
           {{ subjectInstance.subject.subject_user.fullname }}
+        </Cell>
+        <Cell
+          v-if="hasSubjectInstanceWithJobAssignment"
+          size="2"
+          :column-header="
+            $str('user_activities_job_assignment_header', 'mod_perform')
+          "
+          valign="center"
+        >
+          {{
+            getJobAssignmentDescription(subjectInstance.subject.job_assignment)
+          }}
         </Cell>
         <Cell
           v-if="isAboutOthers"
@@ -273,6 +288,20 @@ export default {
     isAboutOthers() {
       return this.about === 'others';
     },
+    /**
+     * Checks if the list of subject instances has a subject with a specified job assignment.
+     *
+     * @return {boolean}
+     */
+    hasSubjectInstanceWithJobAssignment() {
+      return this.subjectInstances.some(subjectInstance => {
+        return (
+          subjectInstance.subject &&
+          subjectInstance.subject.job_assignment !== null &&
+          subjectInstance.subject.job_assignment.idnumber !== null
+        );
+      });
+    },
   },
 
   apollo: {
@@ -309,6 +338,31 @@ export default {
         });
       }
       return '';
+    },
+
+    /**
+     * Get text to describe the subject instance's job assignment.
+     *
+     * @param {Object|NULL} jobAssignment
+     * @return {string}
+     */
+    getJobAssignmentDescription(jobAssignment) {
+      if (!jobAssignment) {
+        return this.$str('all_job_assignments', 'mod_perform');
+      }
+      let fullname = jobAssignment.fullname;
+
+      if (fullname) {
+        fullname = fullname.trim();
+      }
+
+      return fullname && fullname.length > 0
+        ? fullname
+        : this.$str(
+            'unnamed_job_assignment',
+            'mod_perform',
+            jobAssignment.idnumber
+          );
     },
 
     /**
@@ -509,10 +563,13 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "all_job_assignments",
       "is_overdue",
+      "unnamed_job_assignment",
       "user_activities_closed",
       "user_activities_complete_before",
       "user_activities_created_at",
+      "user_activities_job_assignment_header",
       "user_activities_single_section_view_only_activity",
       "user_activities_status_complete",
       "user_activities_status_header_activity",
