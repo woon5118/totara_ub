@@ -37,7 +37,7 @@ Feature: Workspaces should not be mentioned on playlists when the feature is dis
 
   @javascript
   Scenario: Should not see workspaces when another user is sharing a resource
-    Given I log in as "admin"
+    Given I log in as "user2"
 
     When I view playlist "Test Playlist 1"
     And I press "Share"
