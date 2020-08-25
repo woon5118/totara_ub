@@ -38,6 +38,8 @@ use totara_tui\local\mediation\styles\resolver;
 define('NO_DEBUG_DISPLAY', true);
 // We need just the values from config.php and minlib.php if we have the CSS cached already.
 define('ABORT_AFTER_CONFIG', true);
+// We embed time resolution information in the headers.
+define('TUI_RESOLUTION_START', microtime(true));
 
 require('../../config.php'); // this stops immediately at the beginning of lib/setup.php
 

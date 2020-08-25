@@ -287,6 +287,9 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
         $etag = sha1('tui ' . $rev . ' tui d');
         $_SERVER['HTTP_IF_NONE_MATCH'] = $etag;
 
+        // Once to prime the cache
+        $this->get_resolver($rev, 'd');
+        // And a second to check we've got the expected outcome aftewards.
         [$js, $messages, $file] = $this->get_resolver($rev, 'd');
 
         self::assertSame('d', bundle::get_js_suffix_for_url());

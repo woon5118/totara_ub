@@ -277,46 +277,41 @@ abstract class resolver {
      */
     protected function deliver_dev_mode() {
         $cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'totara_tui', 'scss_cache');
-        $last_sha = $cache->get($this->get_etag());
+        $etag = $this->get_etag();
         $sha = false;
 
-        $cachefile_exists = $this->cache_file_exists();
+        $use_cache_file = false;
 
-        if ($cachefile_exists && $last_sha === false) {
-            // We have a cachefile but we don't know the last sha that was used.
-            // This shouldn't happen but... regenerate the file to ensure we have the correct content.
-            @unlink($this->get_cachefile());
-            $cachefile_exists = false;
-        }
-        if ($cachefile_exists) {
-            // The cache file exists, compare the SHA of the theme files to the SHA we have stored in the cache and if they
-            // match then we can use the cachefile, otherwise we'll need to generate.
+        if ($this->cache_file_exists()) {
+            $use_cache_file = true;
             $sha = $this->get_sha_for_etag_comparison();
-            if ($sha !== $last_sha) {
+            $last_sha = $cache->get($etag);
+            if ($last_sha === false) {
+                // We have a cachefile but we don't know the last sha that was used.
+                // This shouldn't happen but... regenerate the file to ensure we have the correct content.
+                $use_cache_file = false;
+            } else if ($sha !== $last_sha) {
+                // The cache file exists, compare the SHA of the theme files to the SHA we have stored in the cache and if they
+                // match then we can use the cachefile, otherwise we'll need to generate.
                 // The sha' have changed, we need to regenerate.
-                $this->unlink_cache_file();
-                $cachefile_exists = false;
+                $use_cache_file = false;
             }
         }
 
         $content = false;
-        if (!$cachefile_exists) {
+        if (!$use_cache_file) {
             // The cache file does not
             if ($sha === false) {
                 $sha = $this->get_sha_for_etag_comparison();
             }
             $content = $this->get_content_to_cache();
             $this->store_in_cache($this->get_cachefile(), $content);
-            $cache->set($this->get_etag(), $sha);
+            $cache->set($etag, $sha);
         }
 
-        // Regenerate the etag to include the sha now that we know what is it.
-        $this->mediator->update_etag($this->get_etag());
-
-        // Next we're going to check if the browser has an old version of the css file, but that is unchanged (even though
-        // it is expired). If that is the case then the sha will match the etag and we can tell the browser to use the
-        // stale but correct file that it has.
-        if ($this->mediator->compare_if_none_match_etag()) {
+        // Next, if the cache file is usable, we will check if the etags match, and if they do we will let the browser
+        // use what it has in its cache.
+        if ($use_cache_file && $this->mediator->compare_if_none_match_etag()) {
             // The client has an old version that should not be cached, but it is correct and accurate to what we are about
             // to server. This will be quicker.
             $this->mediator->send_unmodified_from_cache();

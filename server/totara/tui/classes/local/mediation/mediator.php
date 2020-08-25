@@ -112,6 +112,16 @@ abstract class mediator {
     }
 
     /**
+     * Adds standard headers to all deliveries.
+     */
+    protected function standard_headers() {
+        if (defined('TUI_RESOLUTION_START') && (!defined('PHPUNIUT_TEST') || !PHPUNIT_TEST)) {
+            // Don't prefix with X- see https://tools.ietf.org/html/rfc6648
+            self::header('Totara-Tui-resolution-time: ' . (microtime(true) - TUI_RESOLUTION_START));
+        }
+    }
+
+    /**
      * Returns the filename that should be used in the content disposition header.
      *
      * Defaults to the static class name, with .php appended.
@@ -167,6 +177,7 @@ abstract class mediator {
         $this->header_do_not_cache();
         $this->header_accept_types();
         $this->header_content_type();
+        $this->standard_headers();
         echo $content;
         self::exit();
     }
@@ -185,7 +196,7 @@ abstract class mediator {
             $this->header_content_length(strlen($content));
         }
         $this->header_vary_accept_encoding();
-
+        $this->standard_headers();
         echo $content;
         self::exit();
     }
@@ -210,18 +221,22 @@ abstract class mediator {
             $this->header_content_length(filesize($absolutefilepath));
         }
         $this->header_vary_accept_encoding();
-
+        $this->standard_headers();
         readfile($absolutefilepath);
         self::exit();
     }
 
     /**
      * Sends headers to inform the client that the content is unmodified.
+     *
+     * Please note that Firefox and Chrome will strip unexpected headers on 304 responses.
+     * If you get here looking for pragma, or Totara headers that is why.
      */
     final public function send_unmodified_from_cache() {
         self::header("HTTP/1.1 304 Not Modified");
         $this->header_etag();
         $this->header_do_not_cache();
+        $this->standard_headers();
         self::exit();
     }
 
