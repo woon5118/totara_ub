@@ -39,6 +39,12 @@ class relationship_name extends base {
      * @return string
      */
     public static function display($idnumber, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        $extrafields = self::get_extrafields_row($row, $column);
+
+        if ($extrafields->anonymous_responses) {
+            return get_string('hidden_anonymised', 'mod_perform');
+        }
+
         $relationship = relationship::load_by_idnumber($idnumber);
         return $relationship->get_name();
     }

@@ -73,12 +73,15 @@ trait participant_instance_trait {
     }
 
     /**
-     * Add participant instance info where participant_instance is a joined table.
+     * Add participant instance info.
+     * If a new join isn't specified then the existing join will be used.
      *
      * @param rb_join $join
      * @throws coding_exception
      */
-    protected function add_participant_instance(rb_join $join) {
+    protected function add_participant_instance(rb_join $join = null): void {
+        $join = $join ?? $this->get_join('participant_instance');
+
         /** @var participant_instance_trait|rb_base_source $this */
         if (isset($this->participant_instance_join)) {
             throw new coding_exception('Participant instance info can be added only once!');
@@ -102,7 +105,7 @@ trait participant_instance_trait {
     /**
      * Add joins required for participant instance column and filter options to report.
      */
-    protected function add_participant_instance_joins() {
+    protected function add_participant_instance_joins(): void {
         /** @var participant_instance_trait|rb_base_source $this */
         $join = $this->participant_instance_join;
 
@@ -115,28 +118,25 @@ trait participant_instance_trait {
             [$join]
         );
 
-        /*
-         * TODO we might need something like this to ensure subject_instance join is in joinlist
-         *      in cases where a source uses this trait without using the subject instance one.
-         *      BUT need to be careful this isn't similar but slightly different so it tries to
-         *      add it twice! See TODO below in columnoptions.
-        $subject_instance_join = new rb_join(
+        $this->joinlist[] = new rb_join(
             'subject_instance',
             'INNER',
             '{perform_subject_instance}',
             "{$join}.subject_instance_id = subject_instance.id",
-            REPORT_BUILDER_RELATION_MANY_TO_ONE
+            REPORT_BUILDER_RELATION_MANY_TO_ONE,
+            [$join]
         );
-        if (!in_array($subject_instance_join, $this->joinlist, true)) {
-            $this->joinlist[] = $subject_instance_join;
-        }
-        */
+
+        $this->add_activity_joins_for_participant_instance();
 
         $this->add_core_user_tables(
             $this->joinlist,
             $join,
-            "participant_id AND {$join}.participant_source = " . participant_source::INTERNAL,
-            'participant_user'
+            null, // Not necessary as we are specifying a custom condition.
+            'participant_user',
+            "participant_user.id = " . $this->get_anonymised_field_sql("$join.participant_id")
+            . " AND {$join}.participant_source = " . participant_source::INTERNAL,
+            ['perform']
         );
 
         $this->joinlist[] = new \rb_join(
@@ -145,14 +145,48 @@ trait participant_instance_trait {
             '{perform_participant_external}',
             "external_participant.id = $join.participant_id AND $join.participant_source = " . participant_source::EXTERNAL,
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            $join
+            [$join]
+        );
+    }
+
+    /**
+     * We need to join a few tables in order to get the anonymity status on the activity.
+     */
+    private function add_activity_joins_for_participant_instance(): void {
+        $join = $this->participant_instance_join;
+
+        $this->joinlist[] = new rb_join(
+            'track_user_assignment',
+            'INNER',
+            '{perform_track_user_assignment}',
+            "subject_instance.track_user_assignment_id = track_user_assignment.id",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            [$join, 'subject_instance']
+        );
+
+        $this->joinlist[] = new rb_join(
+            'track',
+            'INNER',
+            '{perform_track}',
+            "track_user_assignment.track_id = track.id",
+            REPORT_BUILDER_RELATION_MANY_TO_ONE,
+            [$join, 'subject_instance', 'track_user_assignment']
+        );
+
+        $this->joinlist[] = new rb_join(
+            'perform',
+            'INNER',
+            '{perform}',
+            "track.activity_id = perform.id",
+            REPORT_BUILDER_RELATION_MANY_TO_ONE,
+            [$join, 'subject_instance', 'track_user_assignment', 'track']
         );
     }
 
     /**
      * Add columnoptions for participant instances to report.
      */
-    protected function add_participant_instance_columns() {
+    protected function add_participant_instance_columns(): void {
         /** @var participant_instance_trait|rb_base_source $this */
         $join = $this->participant_instance_join;
 
@@ -212,9 +246,6 @@ trait participant_instance_trait {
             ]
         );
 
-        // TODO Check subject_instance join is added by this trait alone
-        //      Do we need to conditionally add it to joinlist?
-        //      See comment above in add_joins method.
         $this->columnoptions[] = new rb_column_option(
             'participant_instance',
             'overdue',
@@ -240,19 +271,22 @@ trait participant_instance_trait {
             'participant_instance',
             'relationship_name',
             get_string('relationship_name', 'mod_perform'),
-            "totara_core_relationship.idnumber",
+            $this->get_anonymised_field_sql('totara_core_relationship.idnumber'),
             [
-                'joins' => [$join, 'totara_core_relationship'],
-                'displayfunc' => 'relationship_name'
+                'joins' => [$join, 'totara_core_relationship', 'perform'],
+                'displayfunc' => 'relationship_name',
+                'extrafields' => [
+                    'anonymous_responses' => "perform.anonymous_responses",
+                ],
             ]
         );
         $this->columnoptions[] = new rb_column_option(
             'participant_instance',
             'relationship_id',
             get_string('relationship_id', 'mod_perform'),
-            "totara_core_relationship.id",
+            $this->get_anonymised_field_sql('totara_core_relationship.id'),
             [
-                'joins' => [$join, 'totara_core_relationship'],
+                'joins' => [$join, 'totara_core_relationship', 'perform'],
                 'displayfunc' => 'integer',
                 'selectable' => false,
             ]
@@ -261,9 +295,9 @@ trait participant_instance_trait {
             'participant_instance',
             'relationship_sort_order',
             get_string('relationship_sort_order', 'mod_perform'),
-            "totara_core_relationship.sort_order",
+            $this->get_anonymised_field_sql('totara_core_relationship.sort_order'),
             [
-                'joins' => [$join, 'totara_core_relationship'],
+                'joins' => [$join, 'totara_core_relationship', 'perform'],
                 'displayfunc' => 'integer',
             ]
         );
@@ -274,8 +308,8 @@ trait participant_instance_trait {
         $this->add_core_user_columns($this->columnoptions, 'participant_user', 'participant_user', true);
     }
 
-    private function add_participant_columns(string $join) {
-        global $DB;
+    private function add_participant_columns(string $join): void {
+        global $CFG, $DB;
 
         $this->columnoptions[] = new rb_column_option(
             'participant_instance',
@@ -296,21 +330,24 @@ trait participant_instance_trait {
             'participant_instance',
             'participant_name',
             get_string('participant_name', 'rb_source_perform_participant_instance'),
-            "CASE
+            $this->get_anonymised_field_sql(
+                "CASE
                     WHEN
                         {$join}.participant_source = " . participant_source::EXTERNAL . "
                     THEN external_participant.name
                     ELSE ".$DB->sql_concat_join("' '", $usednamefields)."
-                END",
+                END"
+            ),
             [
-                'joins' => [$join, 'external_participant', 'participant_user'],
+                'joins' => [$join, 'external_participant', 'participant_user', 'perform'],
                 'dbdatatype' => 'char',
                 'displayfunc' => 'participant_link',
                 'extrafields' => array_merge(
                     [
                         'participant_source' => "{$join}.participant_source",
                         'id' => "participant_user.id",
-                        'deleted' => "participant_user.deleted"
+                        'deleted' => "participant_user.deleted",
+                        'anonymous_responses' => "perform.anonymous_responses",
                     ],
                     $allnamefields
                 ),
@@ -323,19 +360,22 @@ trait participant_instance_trait {
             get_string('participant_email', 'rb_source_perform_participant_instance'),
             // use CASE to include/exclude email in SQL
             // so search won't reveal hidden results
-            "CASE
+            $this->get_anonymised_field_sql(
+                "CASE
                     WHEN
                         {$join}.participant_source = " . participant_source::EXTERNAL . "
                     THEN external_participant.email
                     ELSE CASE WHEN participant_user.maildisplay <> 1 THEN '-' ELSE participant_user.email END
-                END",
+                END"
+            ),
             [
-                'joins' => [$join, 'external_participant', 'participant_user'],
+                'joins' => [$join, 'external_participant', 'participant_user', 'perform'],
                 'displayfunc' => 'participant_email',
                 'extrafields' => [
                     'participant_source' => "{$join}.participant_source",
                     'emailstop' => "participant_user.emailstop",
                     'maildisplay' => "participant_user.maildisplay",
+                    'anonymous_responses' => "perform.anonymous_responses",
                 ],
                 'dbdatatype' => 'char',
                 'outputformat' => 'text',
@@ -351,17 +391,20 @@ trait participant_instance_trait {
                 'participant_instance',
                 'participant_email_unobscured',
                 get_string('participant_email_unobscured', 'rb_source_perform_participant_instance'),
-                "CASE
-                    WHEN
-                        {$join}.participant_source = " . participant_source::EXTERNAL . "
-                    THEN external_participant.email
-                    ELSE participant_user.email
-                END",
+                $this->get_anonymised_field_sql(
+                    "CASE
+                        WHEN
+                            {$join}.participant_source = " . participant_source::EXTERNAL . "
+                        THEN external_participant.email
+                        ELSE participant_user.email
+                    END"
+                ),
                 [
-                    'joins' => [$join, 'external_participant', 'participant_user'],
+                    'joins' => [$join, 'external_participant', 'participant_user', 'perform'],
                     'displayfunc' => 'participant_email_unobscured',
                     'extrafields' => [
                         'participant_source' => "{$join}.participant_source",
+                        'anonymous_responses' => "perform.anonymous_responses",
                     ],
                     // Users must have viewuseridentity to see the
                     // unobscured email address.
@@ -377,6 +420,8 @@ trait participant_instance_trait {
      * Add filteroptions for participant instances to report.
      */
     protected function add_participant_instance_filters() {
+        global $CFG;
+
         $this->filteroptions[] = new rb_filter_option(
             'participant_instance',
             'progress',
@@ -479,6 +524,21 @@ trait participant_instance_trait {
         }
 
         $this->add_core_user_filters($this->filteroptions, 'participant_user', true);
+    }
+
+    /**
+     * Wrap field SQL with a CASE clause in order to anonymise the participant's details.
+     * This is needed on the database level in order to prevent filtering by anonymised fields.
+     *
+     * @param string $field
+     * @return string
+     */
+    protected function get_anonymised_field_sql(string $field): string {
+        return "CASE
+            WHEN perform.anonymous_responses = 0
+            THEN $field
+            ELSE NULL
+        END";
     }
 
     private function get_relationship_type_options() {

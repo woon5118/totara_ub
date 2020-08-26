@@ -230,6 +230,7 @@ $string['general_info_participant_selection_description'] = 'Participants for ea
 $string['general_info_participant_selection_heading'] = 'Selection of participants';
 $string['general_info_select_activity_type'] = 'Select a type';
 $string['get_started'] = 'Get started';
+$string['hidden_anonymised'] = 'Hidden (anonymised)';
 $string['instance_info_card_creation_date'] = 'Creation date';
 $string['instance_info_card_show_all_button'] = 'Show all';
 $string['instance_info_card_subject_full_name'] = 'Subject full name';

@@ -41,6 +41,10 @@ class participant_email extends user_email {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         $extrafields = self::get_extrafields_row($row, $column);
 
+        if ($extrafields->anonymous_responses) {
+            return get_string('hidden_anonymised', 'mod_perform');
+        }
+
         if ($extrafields->participant_source == participant_source::EXTERNAL) {
             if ($format !== 'html') {
                 return $value;

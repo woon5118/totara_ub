@@ -98,6 +98,13 @@ trait participant_section_trait {
      * Add joins required for participant section column and filter options to report.
      */
     protected function add_participant_section_joins() {
+        $this->joinlist[] = new rb_join(
+            'participant_instance',
+            'INNER',
+            '{perform_participant_instance}',
+            'base.participant_instance_id = participant_instance.id',
+            REPORT_BUILDER_RELATION_MANY_TO_ONE
+        );
     }
 
     /**

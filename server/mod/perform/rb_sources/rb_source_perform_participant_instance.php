@@ -67,27 +67,8 @@ class rb_source_perform_participant_instance extends rb_base_source {
         $this->filteroptions = $this->define_filteroptions();
 
         $this->add_participant_instance_to_base();
-
-        $this->add_subject_instance(
-            new rb_join(
-                'subject_instance',
-                'INNER',
-                '{perform_subject_instance}',
-                'base.subject_instance_id = subject_instance.id',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            )
-        );
-
-        $this->add_activity(
-            new rb_join(
-                'perform',
-                'INNER',
-                '{perform}',
-                'track.activity_id = perform.id',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE,
-                'track'
-            )
-        );
+        $this->add_subject_instance();
+        $this->add_activity();
 
         $this->contentoptions = $this->define_contentoptions();
         $this->paramoptions = $this->define_paramoptions();
@@ -114,24 +95,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
      * @return array
      */
     protected function define_joinlist() {
-        $joinlist = array(
-            new rb_join(
-                'track_user_assignment',
-                'INNER',
-                '{perform_track_user_assignment}',
-                "track_user_assignment.id = subject_instance.track_user_assignment_id",
-                REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'subject_instance'
-            ),
-            new rb_join(
-                'track',
-                'INNER',
-                '{perform_track}',
-                'track.id = track_user_assignment.track_id',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'track_user_assignment'
-            ),
-        );
+        $joinlist = [];
 
         return $joinlist;
     }

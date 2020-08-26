@@ -67,12 +67,15 @@ trait activity_trait {
     }
 
     /**
-     * Add activity info where activity is a joined table.
+     * Add activity info.
+     * If a new join isn't specified then the existing join will be used.
      *
      * @param rb_join $join
      * @throws coding_exception
      */
-    protected function add_activity(rb_join $join) {
+    protected function add_activity(rb_join $join = null): void {
+        $join = $join ?? $this->get_join('perform');
+
         /** @var activity_trait|rb_base_source $this */
         if (isset($this->activity_join)) {
             throw new coding_exception('Activity info can be added only once!');

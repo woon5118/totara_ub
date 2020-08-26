@@ -130,17 +130,6 @@ class rb_source_perform_response extends rb_base_source {
             )
         );
 
-        $this->add_activity(
-            new rb_join(
-                'perform',
-                'INNER',
-                '{perform}',
-                'perform_section.activity_id = perform.id',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE,
-                'perform_section'
-            )
-        );
-
         $this->add_participant_instance(
             new rb_join(
                 'participant_instance',
@@ -151,16 +140,8 @@ class rb_source_perform_response extends rb_base_source {
             )
         );
 
-        $this->add_subject_instance(
-            new rb_join(
-                'subject_instance',
-                'INNER',
-                '{perform_subject_instance}',
-                'participant_instance.subject_instance_id = subject_instance.id',
-                REPORT_BUILDER_RELATION_MANY_TO_ONE,
-                'participant_instance'
-            )
-        );
+        $this->add_subject_instance();
+        $this->add_activity();
 
         $this->contentoptions = $this->define_contentoptions();
         $this->paramoptions = $this->define_paramoptions();

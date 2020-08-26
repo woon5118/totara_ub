@@ -71,12 +71,15 @@ trait subject_instance_trait {
     }
 
     /**
-     * Add subject instance info where subject_instance is a joined table.
+     * Add subject instance info.
+     * If a new join isn't specified then the existing join will be used.
      *
      * @param rb_join $join
      * @throws coding_exception
      */
-    protected function add_subject_instance(rb_join $join) {
+    protected function add_subject_instance(rb_join $join = null): void {
+        $join = $join ?? $this->get_join('subject_instance');
+
         /** @var subject_instance_trait|rb_base_source $this */
         if (isset($this->subject_instance_join)) {
             throw new coding_exception('Subject instance info can be added only once!');
