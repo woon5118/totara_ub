@@ -44,15 +44,15 @@
     .tw-list__btn {
       @extend .btn;
       @include bs-btn-default();
-      color: var(--legacy-btn-text-color);
-      background: var(--legacy-btn-bg-color);
-      border-color: var(--legacy-btn-border-color);
+      color: var(--legacy-btn-toggle-text-color);
+      background: var(--legacy-btn-toggle-bg-color);
+      border-color: var(--legacy-btn-toggle-border-color);
 
       &:hover,
       &:focus {
-        color: var(--legacy-btn-text-color-focus);
-        background: var(--legacy-btn-bg-color-focus);
-        border-color: var(--legacy-btn-border-color-focus);
+        color: var(--legacy-btn-toggle-text-color-focus);
+        background: var(--legacy-btn-toggle-bg-color-focus);
+        border-color: var(--legacy-btn-toggle-border-color-focus);
       }
 
       &_small {
@@ -62,16 +62,16 @@
       }
 
       &_active {
-        color: var(--legacy-btn-prim-text-color);
-        background: var(--legacy-btn-prim-bg-color);
-        border-color: var(--legacy-btn-prim-border-color);
+        color: var(--legacy-btn-toggle-text-color-selected);
+        background: var(--legacy-btn-toggle-bg-color-selected);
+        border-color: var(--legacy-btn-toggle-border-color-selected);
         cursor: default;
 
         &:hover,
         &:focus {
-          color: var(--legacy-btn-prim-text-color-focus);
-          background: var(--legacy-btn-prim-bg-color-focus);
-          border-color: var(--legacy-btn-prim-border-color-focus);
+          color: var(--legacy-btn-toggle-text-color-selected);
+          background: var(--legacy-btn-toggle-bg-color-selected);
+          border-color: var(--legacy-btn-toggle-border-color-selected);
           box-shadow: none;
         }
       }
@@ -79,9 +79,9 @@
 
     &.tw-list__btn_disabled {
       .tw-list__btn {
-        color: var(--legacy-btn-text-color-disabled);
-        background: var(--legacy-btn-bg-color-disabled);
-        border-color: var(--legacy-btn-border-color-disabled);
+        color: var(--legacy-btn-toggle-text-color-disabled);
+        background: var(--legacy-btn-toggle-bg-color-disabled);
+        border-color: var(--legacy-btn-toggle-border-color-disabled);
         box-shadow: none;
       }
     }

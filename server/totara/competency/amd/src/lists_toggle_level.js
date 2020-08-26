@@ -68,6 +68,11 @@ define([], function() {
                     return;
                 }
 
+                if (e.target.closest('.' + that.disabledClass)) {
+                    e.preventDefault();
+                    return;
+                }
+
                 if (e.target.closest('[data-tw-list-toggleLevel-type]')) {
                     var btn = e.target,
                         changeType = btn.getAttribute('data-tw-list-toggleLevel-type');

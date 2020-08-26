@@ -95,7 +95,7 @@
 
         {{#hasActionBtnList}}
         <div class="tw-selectionBasket__actions_group" data-tw-selectionBasket-group="">
-            <button class="tw-selectionBasket__transparentBtn tw-selectionBasket__btn tw-selectionBasket__btn_small tw-selectionBasket__btn_prim
+            <button class="tw-selectionBasket__btn tw-selectionBasket__btn_small tw-selectionBasket__btn_prim
             {{^count}}tw-selectionBasket__btn_disabled{{/count}}" data-tw-selectionBasket-group-trigger=""
             data-tw-selectionBasket-countReq="">
                 {{actionBtnListLabel}}{{^actionBtnListLabel}}{{#str}}actions, core{{/str}}{{/actionBtnListLabel}}
@@ -106,9 +106,9 @@
             <ul class="tw-selectionBasket__actions_group_list">
                 {{#actionBtnList}}
                 <li>
-                    <button class="tw-selectionBasket__transparentBtn tw-selectionBasket__actions_group_link" data-tw-selectionBasket-customAction="{{action}}">
+                    <a href="#" class="tw-selectionBasket__actions_group_link" data-tw-selectionBasket-customAction="{{action}}" role="button">
                         {{label}}
-                    </button>
+                    </a>
                 </li>
                 {{/actionBtnList}}
             </ul>

@@ -60,6 +60,7 @@ define([], function() {
                     }
 
                     if (e.target.closest('.' + that.disabledBtnsClass)) {
+                        e.preventDefault();
                         return;
                     }
 

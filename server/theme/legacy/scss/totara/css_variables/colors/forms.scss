@@ -60,4 +60,18 @@
   --legacy-btn-prim-text-color-active: var(--legacy-color-neutral-1);
   --legacy-btn-prim-text-color-disabled: var(--legacy-color-neutral-3);
   --legacy-btn-prim-text-color-focus: var(--legacy-color-neutral-1);
+
+  // toggle icon btn background, border & text
+  --legacy-btn-toggle-bg-color: var(--legacy-color-neutral-1);
+  --legacy-btn-toggle-bg-color-disabled: var(--legacy-color-neutral-3);
+  --legacy-btn-toggle-bg-color-focus: var(--legacy-color-neutral-2);
+  --legacy-btn-toggle-bg-color-selected: var(--legacy-color-neutral-4);
+  --legacy-btn-toggle-border-color: var(--legacy-color-neutral-5);
+  --legacy-btn-toggle-border-color-disabled: var(--legacy-color-state-disabled);
+  --legacy-btn-toggle-border-color-focus: var(--legacy-color-neutral-5);
+  --legacy-btn-toggle-border-color-selected: var(--legacy-color-neutral-5);
+  --legacy-btn-toggle-text-color: var(--legacy-color-state);
+  --legacy-btn-toggle-text-color-disabled: var(--legacy-color-state-disabled);
+  --legacy-btn-toggle-text-color-focus: var(--legacy-color-state);
+  --legacy-btn-toggle-text-color-selected: var(--legacy-color-state);
 }
