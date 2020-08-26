@@ -1177,49 +1177,49 @@ Feel free to browse, list of users is below, their password is 12345.
     // Then we need to create courses and enrol users to use for the competencies
     $courses = [
         'infosec' => [
-            'fullname' => multilang('Information security'),
+            'fullname' => 'Information security',
             'shortname' => 'Infosec',
         ],
         'recruit' => [
-            'fullname' => multilang('Recruitment basics'),
+            'fullname' => 'Recruitment basics',
             'shortname' => 'Basics',
         ],
         'health' => [
-            'fullname' => multilang('Health and safety for all'),
+            'fullname' => 'Health and safety for all',
             'shortname' => 'Health',
         ],
         'orientation' => [
-            'fullname' => multilang('New employee orientation'),
+            'fullname' => 'New employee orientation',
             'shortname' => 'Orientation',
         ],
         'conversations' => [
-            'fullname' => multilang('Having difficult conversations'),
+            'fullname' => 'Having difficult conversations',
             'shortname' => 'Conversations',
         ],
         'communication' => [
-            'fullname' => multilang('Communication skills'),
+            'fullname' => 'Communication skills',
             'shortname' => 'Communication',
         ],
         'waitangi' => [
-            'fullname' => multilang('Te Tiriti o Waitangi'),
+            'fullname' => 'Te Tiriti o Waitangi',
             'shortname' => 'Waitangi',
         ],
         'nursing' => [
-            'fullname' => multilang('Professional, ethical and legislated requirements for nursing'),
+            'fullname' => 'Professional, ethical and legislated requirements for nursing',
             'shortname' => 'Nursing',
         ],
         'management' => [
-            'fullname' => multilang('Management essentials'),
+            'fullname' => 'Management essentials',
             'shortname' => 'Management',
         ],
         'listening' => [
-            'fullname' => multilang('Introduction to active listening'),
+            'fullname' => 'Introduction to active listening',
             'shortname' => 'Listening',
         ],
     ];
 
     foreach ($courses as $key => $record) {
-        $data['courses'][$key] = create_course_($record, $data, $generator);
+        $data['courses'][$key] = create_course_($record, $data, $generator, $key);
     }
 
     // Then we need to create course completions for users enrolled in the courses
@@ -1303,8 +1303,19 @@ Feel free to browse, list of users is below, their password is 12345.
         [get_course_('listening', $data), get_user('gm', $data), COMPLETION_STATUS_INPROGRESS],
     ];
 
-    foreach ($course_completion as $completion) {
-        $competency_generator->create_course_enrollment_and_completion(...$completion);
+    foreach ($course_completion as [$course, $user, $completion_status]) {
+        if (is_array($course)) {
+            foreach ($course as $a_course) {
+                $course_context = context_course::instance($a_course->id);
+                $user_context = context_user::instance($user->id);
+                if ($course_context->tenantid != $user_context->tenantid) {
+                    continue;
+                }
+                $competency_generator->create_course_enrollment_and_completion($a_course, $user, $completion_status);
+            }
+        } else {
+            $competency_generator->create_course_enrollment_and_completion($course, $user, $completion_status);
+        }
     }
 
     // Then we need to link the courses to the competencies
@@ -3938,29 +3949,53 @@ function create_manual_job_assignments($user, $assignments, $data) {
  * @param array $record Course attributes
  * @param $data
  * @param testing_data_generator $generator
- * @return stdClass Course record
+ * @return stdClass|array|stdClass[] Course record
  */
 function create_course_($record, $data, $generator) {
-    $time = time();
-
-    $course = $generator->create_course(array_merge(['enablecompletion' => COMPLETION_ENABLED], $record));
-
-    foreach ($data['users'] as $user_key => $user) {
-        // Need to make sure the initial course completion record is created, otherwise there will be an error when enrolling
-        if (!db()->record_exists('course_completions', ['course' => $course->id, 'userid' => $user->id])) {
-            db()->insert_record('course_completions', [
-                'userid' => $user->id,
-                'course' => $course->id,
-                'timeenrolled' => $time,
-                'reaggregate' => $time,
-                'status' => COMPLETION_STATUS_NOTYETSTARTED,
-            ]);
+    $create_course = function ($data, $tenant = null, $key = null) use ($record, $generator) {
+        if ($tenant) {
+            $record['category'] = $tenant->categoryid;
+            $record['shortname'] .= $tenant->id;
+            $record['fullname'] .= " (Tenant {$key})";
+            $record['fullname'] = multilang($record['fullname']);
         }
 
-        $generator->enrol_user($user->id, $course->id);
-    }
+        $time = time();
+        $course = $generator->create_course(array_merge(['enablecompletion' => COMPLETION_ENABLED], $record));
 
-    return $course;
+        foreach ($data['users'] as $user_key => $user) {
+            if ($tenant && $user->tenantid != $tenant->id) {
+                continue;
+            }
+
+            // Need to make sure the initial course completion record is created, otherwise there will be an error when enrolling
+            if (!db()->record_exists('course_completions', ['course' => $course->id, 'userid' => $user->id])) {
+                db()->insert_record(
+                    'course_completions', [
+                    'userid' => $user->id,
+                    'course' => $course->id,
+                    'timeenrolled' => $time,
+                    'reaggregate' => $time,
+                    'status' => COMPLETION_STATUS_NOTYETSTARTED,
+                ]
+                );
+            }
+
+            $generator->enrol_user($user->id, $course->id);
+        }
+
+        return $course;
+    };
+
+    if (!empty($data['tenants'])) {
+        $courses = [];
+        foreach ($data['tenants'] as $key => $tenant) {
+            $courses[] = $create_course($data, $tenant, $key);
+        }
+        return $courses;
+    } else {
+        return $create_course($data);
+    }
 }
 
 /**
@@ -3975,10 +4010,20 @@ function create_course_links($records, $data) {
 
         $links = [];
         foreach ($linked_courses as $course_key => $link_type) {
-            $links[] = [
-                'id' => get_course_($course_key, $data)->id,
-                'linktype' => $link_type,
-            ];
+            $course = get_course_($course_key, $data);
+            if (is_array($course)) {
+                foreach ($course as $a_course) {
+                    $links[] = [
+                        'id' => $a_course->id,
+                        'linktype' => $link_type,
+                    ];
+                }
+            } else {
+                $links[] = [
+                    'id' => $course->id,
+                    'linktype' => $link_type,
+                ];
+            }
         }
         linked_courses::set_linked_courses($competency->id, $links);
     }
@@ -4029,9 +4074,18 @@ function create_criteria($criteria_group, $competency, $generator) {
 
         switch ($criterion['criterion']) {
             case coursecompletion::class:
-                $course_ids = array_map(function (stdClass $course) {
-                    return $course->id;
-                }, $criterion['courses']);
+                if (is_array($criterion['courses'][0])) {
+                    $course_ids = [];
+                    foreach ($criterion['courses'] as $courses) {
+                        foreach ($courses as $course) {
+                            $course_ids[] = $course->id;
+                        }
+                    }
+                } else {
+                    $course_ids = array_map(function (stdClass $course) {
+                        return $course->id;
+                    }, $criterion['courses']);
+                }
                 $criteria[] = $generator->$criterion_method(array_merge($criteria_data, [
                     'aggregation' => [
                         'method' => $criterion['aggregation'],
