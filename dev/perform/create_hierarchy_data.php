@@ -23,9 +23,12 @@
 
 define('CLI_SCRIPT', 1);
 
-require __DIR__.'/../../../config.php';
+require __DIR__ . '/../../server/config.php';
+
+/** @var core_config $CFG */
+
 require_once($CFG->libdir . '/phpunit/classes/util.php');
-require_once($CFG->dirroot.'/totara/plan/lib.php');
+require_once($CFG->dirroot . '/totara/plan/lib.php');
 
 global $DB;
 

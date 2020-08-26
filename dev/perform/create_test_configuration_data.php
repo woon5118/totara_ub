@@ -26,8 +26,11 @@ use totara_competency\linked_courses;
 
 define('CLI_SCRIPT', 1);
 
-require __DIR__.'/../../../config.php';
-require_once($CFG->libdir.'/clilib.php');
+require __DIR__ . '/../../server/config.php';
+
+/** @var core_config $CFG */
+
+require_once($CFG->libdir . '/clilib.php');
 require_once($CFG->libdir . '/phpunit/classes/util.php');
 
 global $DB;

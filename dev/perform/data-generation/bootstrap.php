@@ -42,18 +42,17 @@ spl_autoload_register(function ($class_name) {
     }
 });
 
-define('CLI_SCRIPT', 'yes');
+define('CLI_SCRIPT', 1);
 
-require_once(__DIR__ . '/../../../../config.php');
+require_once(__DIR__ . '/../../../server/config.php');
 require_once(App::config()->libdir . '/phpunit/classes/util.php');
 
-if (!file_exists(App::config()->dirroot . '/vendor/fzaninotto/faker/src/autoload.php')) {
-    echo "In order to execute this script you need to execute: 'composer require fzaninotto/faker'!" . PHP_EOL;
-    echo "Please don't commit changes to composer.json and composer.lock files." . PHP_EOL;
+if (!file_exists(__DIR__ . '/vendor/fzaninotto/faker/src/autoload.php')) {
+    echo "In order to execute this script you need to execute: 'composer install' from this directory!" . PHP_EOL;
     exit(1);
 }
 
-require_once App::config()->dirroot . '/vendor/fzaninotto/faker/src/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 class App {
 

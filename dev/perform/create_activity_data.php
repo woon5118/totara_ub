@@ -3,7 +3,10 @@
 // in mod_perform_generator_class.php (advanced_testcase::set...).
 
 define('CLI_SCRIPT', 1);
-require __DIR__ . '/../../../config.php';
+require __DIR__ . '/../../server/config.php';
+
+/** @var core_config $CFG */
+
 require_once($CFG->dirroot . '/lib/clilib.php');
 require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
 

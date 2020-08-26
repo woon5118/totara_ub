@@ -44,7 +44,7 @@ use totara_job\job_assignment;
 
 define('CLI_SCRIPT', 1);
 
-require __DIR__ . '/../../../config.php';
+require __DIR__ . '/../../server/config.php';
 
 /** @var core_config $CFG */
 

@@ -31,8 +31,11 @@ use totara_competency\user_groups;
 
 define('CLI_SCRIPT', 1);
 
-require __DIR__.'/../../../config.php';
-require_once($CFG->libdir.'/clilib.php');         // cli only functions
+require __DIR__ . '/../../server/config.php';
+
+/** @var core_config $CFG */
+
+require_once($CFG->libdir . '/clilib.php');         // cli only functions
 
 list($options, $unrecognized) = cli_get_params(
     [
