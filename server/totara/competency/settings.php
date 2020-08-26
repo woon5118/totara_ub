@@ -29,47 +29,47 @@ defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
+$ADMIN->add(
+    'modules',
+    new admin_category(
+        'totara_competency',
+        get_string('pluginname', 'totara_competency'),
+        !advanced_feature::is_enabled('competency_assignment')
+    )
+);
+
+$ADMIN->add(
+    'competencies',
+    new admin_externalpage(
+        'competency_assignment',
+        get_string('title_index', 'totara_competency'),
+        "{$CFG->wwwroot}/totara/competency/assignments/index.php",
+        "totara/competency:manage_assignments",
+        !advanced_feature::is_enabled('competency_assignment')
+    )
+);
+$ADMIN->add(
+    'competencies',
+    new admin_externalpage(
+        'competency_assignment_users',
+        get_string('title_users', 'totara_competency'),
+        "{$CFG->wwwroot}/totara/competency/assignments/users.php",
+        "totara/competency:manage_assignments",
+        !advanced_feature::is_enabled('competency_assignment')
+    )
+);
+$ADMIN->add(
+    'competencies',
+    new admin_externalpage(
+        'competency_assignment_create',
+        get_string('title_create', 'totara_competency'),
+        "{$CFG->wwwroot}/totara/competency/assignments/create.php",
+        "totara/competency:manage_assignments",
+        !advanced_feature::is_enabled('competency_assignment')
+    )
+);
+
 if ($hassiteconfig) {
-    $ADMIN->add(
-        'modules',
-        new admin_category(
-            'totara_competency',
-            get_string('pluginname', 'totara_competency'),
-            !advanced_feature::is_enabled('competency_assignment')
-        )
-    );
-
-    $ADMIN->add(
-        'competencies',
-        new admin_externalpage(
-            'competency_assignment',
-            get_string('title_index', 'totara_competency'),
-            "{$CFG->wwwroot}/totara/competency/assignments/index.php",
-            "totara/competency:manage_assignments",
-            !advanced_feature::is_enabled('competency_assignment')
-        )
-    );
-    $ADMIN->add(
-        'competencies',
-        new admin_externalpage(
-            'competency_assignment_users',
-            get_string('title_users', 'totara_competency'),
-            "{$CFG->wwwroot}/totara/competency/assignments/users.php",
-            "totara/competency:manage_assignments",
-            !advanced_feature::is_enabled('competency_assignment')
-        )
-    );
-    $ADMIN->add(
-        'competencies',
-        new admin_externalpage(
-            'competency_assignment_create',
-            get_string('title_create', 'totara_competency'),
-            "{$CFG->wwwroot}/totara/competency/assignments/create.php",
-            "totara/competency:manage_assignments",
-            !advanced_feature::is_enabled('competency_assignment')
-        )
-    );
-
     $settings_page = \hierarchy_competency\admin_settings::load_or_create_settings_page($ADMIN);
     if (!is_array($settings_page->req_capability)) {
         $settings_page->req_capability = [$settings_page->req_capability];
@@ -78,12 +78,7 @@ if ($hassiteconfig) {
     $settings_page->req_capability = array_unique($settings_page->req_capability);
 
     if ($ADMIN->fulltree) {
-        $hidden = false;
-        if (!advanced_feature::is_enabled('competencies')) {
-            $hidden = true;
-        } else if (!advanced_feature::is_enabled('competency_assignment')) {
-            $hidden = true;
-        }
+        $hidden = advanced_feature::is_disabled('competencies') || advanced_feature::is_disabled('competency_assignment');
 
         if (!$hidden) {
             // You can't hide headings, if you don't want them, you don't add them.

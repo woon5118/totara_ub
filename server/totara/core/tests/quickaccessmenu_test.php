@@ -225,6 +225,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
             group::PERFORM => [
                 'mod_perform_manage_activities' => 'Activity Management',
                 'goalmanage' => 'Goals',
+                'competency_assignment' => 'Competency assignments',
             ],
             group::CONFIGURATION => [
                 'totarasyncsettings' => 'HR Import',
