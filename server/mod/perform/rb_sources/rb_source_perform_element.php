@@ -26,6 +26,7 @@
 use core\entities\user;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\rb\traits\activity_trait;
+use mod_perform\rb\traits\course_visibility_trait;
 use mod_perform\rb\traits\element_trait;
 use mod_perform\rb\traits\section_element_trait;
 use mod_perform\rb\traits\section_trait;
@@ -46,6 +47,7 @@ class rb_source_perform_element extends rb_base_source {
     use element_trait;
     use section_trait;
     use activity_trait;
+    use course_visibility_trait;
 
     /**
      * Constructor.
@@ -100,6 +102,8 @@ class rb_source_perform_element extends rb_base_source {
                 'perform_section'
             )
         );
+
+        $this->add_course_visibility('perform');
 
         $this->contentoptions = $this->define_contentoptions();
         $this->paramoptions = $this->define_paramoptions();
@@ -311,6 +315,8 @@ class rb_source_perform_element extends rb_base_source {
 
     public function post_config(reportbuilder $report) {
         $restrictions = util::get_report_on_subjects_activities_sql($report->reportfor, "perform.id");
+        $restrictions = $this->create_course_visibility_restrictions($report, $restrictions);
+
         $report->set_post_config_restrictions($restrictions);
     }
 

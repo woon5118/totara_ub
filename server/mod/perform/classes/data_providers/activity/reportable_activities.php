@@ -81,6 +81,7 @@ class reportable_activities {
 
                 $repository->where_raw($activities_sql, $activities_params);
             })
+            ->filter_by_visible()
             ->where('status', '<>', draft::get_code())
             ->order_by('name')
             ->get()

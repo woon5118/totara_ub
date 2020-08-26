@@ -51,6 +51,10 @@ class util {
         $params = [];
 
         if (has_capability('mod/perform:report_on_all_subjects_responses', $user_context, $user_id)) {
+            // If multi tenancy is enabled and the current user is a tenant member then
+            // we make sure that the user can report on all other subjects which are in the same tenant.
+            // If the user is not in an tenant and isolation is enabled we make sure he can only report on users who are NOT in a tenant.
+            // If the user is not in an tenant and isolation is disabled than he can report on all users.
             if (!empty($CFG->tenantsenabled)) {
                 if ($user_context->tenantid) {
                     $tenant = tenant::repository()->find($user_context->tenantid);
@@ -58,11 +62,14 @@ class util {
                     $params = ['mt_tenant_id' => $tenant->cohortid];
                 } else if (!empty($CFG->tenantsisolated)) {
                     $sql .= " JOIN {user} tpu ON si.subject_user_id = tpu.id AND tpu.tenantid IS NULL";
+                } else {
+                    return ['1 = 1', []];
                 }
+
+                return ["{$activity_id_column} IN ({$sql})", $params];
             }
 
-            $sql = "{$activity_id_column} IN ({$sql})";
-            return [$sql, $params];
+            return ['1 = 1', []];
         }
 
         // Early exit if they can not even potentially manage any participants

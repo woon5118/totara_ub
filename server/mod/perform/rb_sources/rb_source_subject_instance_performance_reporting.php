@@ -21,6 +21,7 @@
  * @package: mod_perform
  */
 
+use mod_perform\rb\traits\course_visibility_trait;
 use mod_perform\rb\util;
 
 defined('MOODLE_INTERNAL') || die();
@@ -34,6 +35,8 @@ require_once(__DIR__ . '/rb_source_perform_subject_instance.php');
  * Class rb_source_subject_instance_performance_reporting
  */
 class rb_source_subject_instance_performance_reporting extends rb_source_perform_subject_instance {
+
+    use course_visibility_trait;
 
     /**
      * Constructor.
@@ -49,6 +52,8 @@ class rb_source_subject_instance_performance_reporting extends rb_source_perform
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_subject_instance_performance_reporting');
         $this->sourcelabel = get_string('sourcelabel', 'rb_source_subject_instance_performance_reporting');
 
+        $this->add_course_visibility('perform');
+
         // This source is not available for user selection - it is used by the embedded report only.
         $this->selectable = false;
     }
@@ -63,6 +68,8 @@ class rb_source_subject_instance_performance_reporting extends rb_source_perform
      */
     public function post_config(reportbuilder $report) {
         $restrictions = util::get_report_on_subjects_sql($report->reportfor, "base.subject_user_id");
+        $restrictions = $this->create_course_visibility_restrictions($report, $restrictions);
+
         $report->set_post_config_restrictions($restrictions);
     }
 

@@ -40,8 +40,7 @@ class user extends perform_controller {
     use renders_performance_reports;
 
     public function setup_context(): context {
-        $category_id = util::get_default_category_id();
-        return context_coursecat::instance($category_id);
+        return util::get_default_context();
     }
 
     public function action() {

@@ -23,6 +23,7 @@
  *
  */
 
+use mod_perform\rb\traits\course_visibility_trait;
 use mod_perform\rb\util;
 
 defined('MOODLE_INTERNAL') || die();
@@ -37,6 +38,8 @@ require_once(__DIR__ . '/rb_source_perform_response.php');
  * Class rb_source_response_performance_reporting
  */
 class rb_source_response_performance_reporting extends rb_source_perform_response {
+
+    use course_visibility_trait;
 
     /**
      * Constructor.
@@ -55,6 +58,8 @@ class rb_source_response_performance_reporting extends rb_source_perform_respons
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_response_performance_reporting');
         $this->sourcelabel = get_string('sourcelabel', 'rb_source_response_performance_reporting');
 
+        $this->add_course_visibility('perform');
+
         // NOTE: This is necessary here to support restrictions added in $this->post_config()
         // Not ideal but there isn't a way to force joins to be added in post_config
         if (!in_array('subject_instance', $this->sourcejoins)) {
@@ -63,9 +68,11 @@ class rb_source_response_performance_reporting extends rb_source_perform_respons
     }
 
     public function post_config(reportbuilder $report) {
-        // NOTE: For this to work, subject_instance must be included in the $this->>sourcejoins array defined in the constructor.
+        // NOTE: For this to work, subject_instance must be included in the $this->sourcejoins array defined in the constructor.
         // Not ideal but there isn't a way to force joins to be added in post_config
         $restrictions = util::get_report_on_subjects_sql($report->reportfor, "subject_instance.subject_user_id");
+        $restrictions = $this->create_course_visibility_restrictions($report, $restrictions);
+
         $report->set_post_config_restrictions($restrictions);
     }
 

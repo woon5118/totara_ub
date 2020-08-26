@@ -83,11 +83,11 @@ class mod_perform_webapi_resolver_query_reportable_activities_testcase extends a
         $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
         $this->assertNull($actual_activities->find('id', $draft_activity->id));
 
-        // Active ones without any users should also not show up
+        // As the user has the super capability an activity without responsed will also show up
         $active_activity = $perform_generator->create_activity_in_container(['activity_status' => active::get_code()]);
 
         $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
-        $this->assertNull($actual_activities->find('id', $active_activity->id));
+        $this->assertNotNull($actual_activities->find('id', $active_activity->id));
     }
 
     public function test_get_activities_for_report_admin_multi_tenancy_enabled(): void {
@@ -123,6 +123,14 @@ class mod_perform_webapi_resolver_query_reportable_activities_testcase extends a
         $tenant2_manager = $generator->create_user(['tenantid' => $tenant2->id]);
         role_assign($role_dm->id, $tenant2_manager->id, $tenant2_category_context->id);
         role_assign($role_um->id, $tenant2_manager->id, context_tenant::instance($tenant2->id));
+
+        $this->setAdminUser();
+
+        // Create a system activity
+        $activities0 = $perform_generator->create_full_activities(
+            mod_perform_activity_generator_configuration::new()
+                ->set_number_of_activities(3)
+        );
 
         $this->setUser($tenant1_manager);
 
@@ -210,9 +218,9 @@ class mod_perform_webapi_resolver_query_reportable_activities_testcase extends a
         role_assign($roleid, $system_user->id, context_user::instance($system_user->id));
 
         $actual_activities = $this->resolve_graphql_query(self::QUERY, []);
-        $this->assertCount(6, $actual_activities);
+        $this->assertCount(9, $actual_activities);
         $this->assertEqualsCanonicalizing(
-            array_merge($activities1->pluck('id'), $activities2->pluck('id')),
+            array_merge($activities0->pluck('id'), $activities1->pluck('id'), $activities2->pluck('id')),
             $actual_activities->pluck('id')
         );
     }

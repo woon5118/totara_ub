@@ -26,6 +26,7 @@ namespace mod_perform;
 use container_perform\perform as perform_container;
 use context_user;
 use core\collection;
+use core\entities\cohort;
 use core\entities\tenant;
 use core\orm\query\builder;
 use mod_perform\entities\activity\activity as activity_entity;
@@ -352,21 +353,17 @@ class util {
         if (static::has_report_on_all_subjects_capability($viewing_user_id)) {
             if (!empty($CFG->tenantsenabled)) {
                 if ($viewing_user_context->tenantid) {
-                    $current_tenant_ids = tenant_util::get_user_participation($viewing_user_id);
+                    $subject_tenant_ids = tenant_util::get_user_participation($subject_user_id);
 
-                    // If the user is outside of a tenant (means the capability is assigned
-                    // in the system context) or both users are in the same tenant
-                    if (!$viewing_user_context->tenantid
-                        || in_array($subject_user_context->tenantid, $current_tenant_ids)
-                    ) {
+                    // The current user and the subject users have to share a tenant
+                    if (in_array($viewing_user_context->tenantid, $subject_tenant_ids)) {
                         return true;
                     }
                 } else if (!empty($CFG->tenantsisolated)) {
                     return empty($subject_user_context->tenantid);
                 }
-            } else {
-                return true;
             }
+            return true;
         }
 
         return false;

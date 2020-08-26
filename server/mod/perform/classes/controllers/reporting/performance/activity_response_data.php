@@ -48,8 +48,7 @@ class activity_response_data extends perform_controller {
     private $current_tab;
 
     public function setup_context(): context {
-        $category_id = util::get_default_category_id();
-        return context_coursecat::instance($category_id);
+        return util::get_default_context();
     }
 
     public static function get_base_url(): string {
