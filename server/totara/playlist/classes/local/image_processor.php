@@ -42,10 +42,11 @@ final class image_processor {
 
     /**
      * RGB colour code of the default squares (no image)
+     * #99AC3A
      *
      * @var array
      */
-    const IMAGE_DEFAULT = [219, 226, 76];
+    const IMAGE_DEFAULT = [153, 172, 58];
 
     /**
      * Width x Height of the whole canvas
