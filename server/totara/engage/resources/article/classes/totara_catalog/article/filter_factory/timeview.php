@@ -99,11 +99,20 @@ class timeview extends filter_factory {
      */
     private static function get_tree_optionsloader(): callable {
         return function () {
-            $options = [
+            $items = [
                 time::LESS_THAN_FIVE => get_string('filter:timeviewlow', 'engage_article'),
                 time::FIVE_TO_TEN => get_string('filter:timeviewmed', 'engage_article'),
                 time::MORE_THAN_TEN => get_string('filter:timeviewhigh', 'engage_article')
             ];
+
+            $options = [];
+
+            foreach ($items as $key => $name) {
+                $option = new \stdClass();
+                $option->key = $key;
+                $option->name = $name;
+                $options[] = $option;
+            }
 
             return $options;
         };
