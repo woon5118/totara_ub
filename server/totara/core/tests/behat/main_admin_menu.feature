@@ -20,19 +20,25 @@ Feature: Totara admin main menu
       | capability                 | permission | role    | contextlevel | reference |
       | totara/plan:configureplans | Allow      | userman | System       |           |
 
+    # The following is required in order to show "Legacy features" - i.e appraisals & feedback 360 before Totara 13
+    And I enable the "appraisals" advanced feature
+    And I enable the "feedback360" advanced feature
+    And the following config values are set as admin:
+      | showhistoricactivities | 1 |
+
   Scenario: Check admin main menu is shown for admin but not for learner
     Given I log in as "admin"
     And "[aria-label='Show admin menu window']" "css_element" should exist
     When I click on "[aria-label='Show admin menu window']" "css_element"
     Then I should see "Core platform" in the "#quickaccess-popover-content" "css_element"
     And I should see "Learning" in the "#quickaccess-popover-content" "css_element"
-    And I should see "Performance (legacy)" in the "#quickaccess-popover-content" "css_element"
+    And I should see "Legacy features" in the "#quickaccess-popover-content" "css_element"
     And I should see "Configuration" in the "#quickaccess-popover-content" "css_element"
     When I click on "[aria-label='Hide admin menu window']" "css_element"
 
     Then I should not see "Core platform" in the "#quickaccess-popover-content" "css_element"
     And I should not see "Learning" in the "#quickaccess-popover-content" "css_element"
-    And I should not see "Performance (legacy)" in the "#quickaccess-popover-content" "css_element"
+    And I should not see "Legacy features" in the "#quickaccess-popover-content" "css_element"
     And I should not see "Configuration" in the "#quickaccess-popover-content" "css_element"
     And I log out
 
