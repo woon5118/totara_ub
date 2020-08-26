@@ -4766,13 +4766,28 @@ class reportbuilder {
 
         $tablecolumns = array();
         $tableheaders = array();
+
+        $aggregated_restricted_cf = false;
+
         foreach ($columns as $column) {
+
+            if ($this->grouped === true &&
+                (isset($column->extracontext['customprofilefield']) && $column->extracontext['customprofilefield'] === true) &&
+                (isset($column->extracontext['visible']) && (int)$column->extracontext['visible'] !== (int)PROFILE_VISIBLE_ALL)) {
+                $aggregated_restricted_cf = true;
+            }
+
             $type = $column->type;
             $value = $column->value;
             if ($column->display_column(false)) {
                 $tablecolumns[] = "{$type}_{$value}"; // used for sorting
                 $tableheaders[] = $this->format_column_heading($column, false);
             }
+        }
+
+        if ($aggregated_restricted_cf) {
+            // Add warning message about aggregated cf visiblity
+            echo $OUTPUT->notification(get_string('aggregatevisibilitycfnotice', 'totara_reportbuilder'), 'info');
         }
 
         // Arrgh, the crazy table outputs each row immediately...

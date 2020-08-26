@@ -901,6 +901,7 @@ trait report_trait {
             $column_options = array();
             $column_options['joins'] = array($joinname);
             $column_options['extracontext'] = (array)$record;
+            $column_options['extracontext']['customprofilefield'] = true;
             $column_options['addtypetoheading'] = $addtypetoheading;
             $column_options['displayfunc'] = 'userfield_' . $record->datatype;
 

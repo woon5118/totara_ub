@@ -48,6 +48,7 @@ $string['advanced'] = 'Advanced?';
 $string['advancedcolumnheading'] = 'Aggregation or grouping';
 $string['advancedgroupaggregate'] = "Aggregations";
 $string['advancedgrouptimedate'] = "Time and date (DB server time zone)";
+$string['aggregatevisibilitycfnotice'] = 'Using aggregation in a report with a restricted visibility custom field is unsupported and may cause unexpected results.';
 $string['aggregatetypeavg_heading'] = 'Average of {$a}';
 $string['aggregatetypeavg_name'] = 'Average';
 $string['aggregatetypecountany_heading'] = 'Count of {$a}';

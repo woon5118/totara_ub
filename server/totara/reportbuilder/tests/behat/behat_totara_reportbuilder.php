@@ -95,7 +95,7 @@ class behat_totara_reportbuilder extends behat_base {
         \behat_hooks::set_step_readonly(false);
         $columnname_xpath = behat_context_helper::escape($columnname);
         $aggregation_xpath = behat_context_helper::escape($aggregation);
-        $xpath = '//option[contains(., '.$columnname_xpath.') and @selected]/ancestor::tr//select//option[contains(., '.$aggregation_xpath.')]//ancestor::select';
+        $xpath = '//option[contains(., '.$columnname_xpath.') and @selected]/ancestor::tr//select[contains(@class, \'advanced_selector\')]//option[contains(., '.$aggregation_xpath.')]//ancestor::select';
         $select = $this->find(
             'xpath',
             $xpath,
