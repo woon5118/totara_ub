@@ -1,4 +1,4 @@
-@container @workspace @container_workspace @totara @totara_engage @engage
+@container @workspace @container_workspace @totara @totara_engage @engage @javascript
 Feature: Workspaces cannot be seen when the capability is disabled.
 
   Background:
@@ -12,7 +12,7 @@ Feature: Workspaces cannot be seen when the capability is disabled.
 
   Scenario: Can see the workspaces menu items when it's enabled
     When I set the following system permissions of "Authenticated user" role:
-      | container/workspace:view | Allow |
+      | container/workspace:workspacesview | Allow |
     And I log out
     And I log in as "user1"
     Then I should see "Collaborate" in the totara menu
@@ -21,7 +21,7 @@ Feature: Workspaces cannot be seen when the capability is disabled.
 
   Scenario: Cannot see the workspaces menu items when it's disabled
     When I set the following system permissions of "Authenticated user" role:
-      | container/workspace:view | Prohibit |
+      | container/workspace:workspacesview | Prohibit |
     And I log out
     And I log in as "user1"
     Then I should not see "Collaborate" in the totara menu

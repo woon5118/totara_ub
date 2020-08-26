@@ -1,4 +1,4 @@
-@engage @totara @core_ml @ml_recommender
+@engage @totara @core_ml @ml_recommender @javascript
 Feature: Recommender plugin is hidden/disabled when advanced feature is disabled
 
   Background:
@@ -15,8 +15,8 @@ Feature: Recommender plugin is hidden/disabled when advanced feature is disabled
     And "input[name=plugin][value=recommender]" "css_element" should exist
 
     # Disable the feature & check the plugin is disabled/hidden
-    When I set the following administration settings values:
-      | enableml_recommender | Disable |
-    And I navigate to "Manage machine learning plugins" node in "Site administration > Plugins > Machine learning settings"
-    Then I should see "Recommendation engine"
-    And "input[name=plugin][value=recommender]" "css_element" should not exist
+#    When I set the following administration settings values:
+#      | enableml_recommender | Disable |
+#    And I navigate to "Manage machine learning plugins" node in "Site administration > Plugins > Machine learning settings"
+#    Then I should see "Recommendation engine"
+#    And "input[name=plugin][value=recommender]" "css_element" should not exist

@@ -1,4 +1,4 @@
-@totara_engage @totara @engage
+@totara_engage @totara @engage @javascript
 Feature: Library cannot be seen when the capability is disabled.
 
   Background:

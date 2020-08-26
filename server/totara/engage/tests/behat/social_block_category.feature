@@ -28,9 +28,7 @@ Feature: Display social block in user's profile
   Scenario: Social block is not available when engage is off
     Given I am on a totara site
     And I log in as "admin"
-    And I navigate to "System information > Advanced features" in site administration
-    And I set the field "Library" to "Disable"
-    And I click on "Save changes" "button"
+    And I disable the "engage_resources" advanced feature
     When I navigate to "Users > Default profile page" in site administration
     Then I should not see "Admin User's library"
     And I click on "Blocks editing on" "button"
@@ -56,9 +54,7 @@ Feature: Display social block in user's profile
     # Second block is definitely a social block
     And I should see "Admin User's library"
     And I should see "Social"
-    And I navigate to "System information > Advanced features" in site administration
-    And I set the field "Library" to "Disable"
-    And I click on "Save changes" "button"
+    And I disable the "engage_resources" advanced feature
     When I navigate to "Users > Default profile page" in site administration
     Then I should not see "Admin User's library"
     And I should not see "Social"

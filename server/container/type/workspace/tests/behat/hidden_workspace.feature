@@ -39,7 +39,9 @@ Feature: Hidden workspace workflow
     Then I should see "Hidden one"
     And I should see "Hidden two"
     And I log out
-    And I log in as "user_two"
-    When I click on "Find Workspaces" in the totara menu
+
+    # User 2 should see their own hidden workspace but not the other
+    When I log in as "user_two"
+    And I click on "Find Workspaces" in the totara menu
     Then I should not see "Hidden one"
-    And I should not see "Hidden two"
+    And I should see "Hidden two"

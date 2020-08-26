@@ -25,7 +25,10 @@ defined('MOODLE_INTERNAL') || die();
 use totara_core\advanced_feature;
 
 function totara_engage_create_engage_profile_block(): void {
-    if (!advanced_feature::is_enabled('engage_resources')) {
+    // Must have either behat or the feature enabled
+    $behat = defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING;
+    $feature = advanced_feature::is_enabled('engage_resources');
+    if (!$behat && !$feature) {
         return;
     }
 

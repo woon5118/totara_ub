@@ -32,7 +32,7 @@ class container_workspace_role_testcase extends advanced_testcase {
      * @return void
      */
     public function test_role_creation(): void {
-        global $DB;
+        global $DB, $CFG;
 
         // Delete any roles if  they exist
         $shortnames = ['workspacecreator', 'workspaceowner'];
@@ -46,7 +46,8 @@ class container_workspace_role_testcase extends advanced_testcase {
         }
 
         // Create the roles
-        \container_workspace\util::add_missing_workspace_roles();
+        require_once $CFG->dirroot . '/container/type/workspace/db/upgradelib.php';
+        container_workspace_add_missing_roles();
 
         // Now assert they do exist
         foreach ($shortnames as $shortname) {
@@ -58,7 +59,7 @@ class container_workspace_role_testcase extends advanced_testcase {
         $this->assertFalse($DB->record_exists('role', ['shortname' => 'workspacecreator']));
 
         // Create the roles
-        \container_workspace\util::add_missing_workspace_roles();
+        container_workspace_add_missing_roles();
 
         // Now assert they do exist
         foreach ($shortnames as $shortname) {

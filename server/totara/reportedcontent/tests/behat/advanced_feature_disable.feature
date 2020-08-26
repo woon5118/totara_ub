@@ -1,4 +1,4 @@
-@totara_engage @totara @engage @totara_reportedcontent
+@totara_engage @totara @engage @totara_reportedcontent @javascript
 Feature: Inappropriate content report is not accessible without the correct advanced features
 
   Background:

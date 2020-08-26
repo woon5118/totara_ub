@@ -28,17 +28,17 @@ Feature: Microsoft Teams settings pages will not show if the feature is disabled
     And I should see "Totara app installation"
 
     # Feature off
-    When I set the following administration settings values:
-      | enabletotara_msteams | Disable |
-    And I open the notification popover
-    And I follow "Notification preferences"
-    Then I should not see "Microsoft Teams"
-
-    When I navigate to "Default message outputs" node in "Site administration > Plugins > Message outputs"
-    Then I should not see "Microsoft Teams"
-
-    When I toggle open the admin quick access menu
-    And I follow "Administration overview"
-    Then I should not see "Microsoft Teams"
-    And I should not see "Microsoft Teams integration"
-    And I should not see "Totara app installation"
+#    When I set the following administration settings values:
+#      | enabletotara_msteams | Disable |
+#    And I open the notification popover
+#    And I follow "Notification preferences"
+#    Then I should not see "Microsoft Teams"
+#
+#    When I navigate to "Default message outputs" node in "Site administration > Plugins > Message outputs"
+#    Then I should not see "Microsoft Teams"
+#
+#    When I toggle open the admin quick access menu
+#    And I follow "Administration overview"
+#    Then I should not see "Microsoft Teams"
+#    And I should not see "Microsoft Teams integration"
+#    And I should not see "Totara app installation"
