@@ -24,9 +24,11 @@
 
 namespace totara_competency;
 
+use container_course\course as container_course;
 use context_system;
 use core\format;
 use core\orm\query\builder;
+use coursecat;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_framework;
 use totara_competency\entities\course;
@@ -66,14 +68,22 @@ class external extends \external_api {
 
     public static function get_categories() {
         advanced_feature::require('competencies');
-        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
-        global $DB;
+        global $CFG;
+        require_once($CFG->libdir . '/coursecatlib.php');
 
-        // Todo: things like capability checks and format strings. Also on courses. Also, look for internal functions that get this stuff for us.
-        $categories = $DB->get_records('course_categories', null, '', 'id, name AS fullname');
+        $categories = coursecat::make_categories_list();
 
-        return ['items' => array_values($categories)];
+        $result = [];
+        foreach ($categories as $id => $name) {
+            $result[] = [
+                'id' => $id,
+                'fullname' => $name
+            ];
+        }
+
+        return ['items' => $result];
     }
 
     public static function get_categories_returns() {
@@ -115,7 +125,7 @@ class external extends \external_api {
      */
     public static function get_courses(array $filters, int $page, string $order, string $direction) {
         advanced_feature::require('competencies');
-        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
         global $CFG;
         require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
@@ -142,7 +152,7 @@ class external extends \external_api {
             ->filter_by_ids($filters['ids'] ?? null)
             ->where(function (builder $builder) {
                 $builder->where_null('containertype')
-                    ->or_where('containertype', \container_course\course::get_type());
+                    ->or_where('containertype', container_course::get_type());
             })
             ->where('id', '!=', SITEID)
             ->where('ctx.contextlevel', '=', CONTEXT_COURSE)
