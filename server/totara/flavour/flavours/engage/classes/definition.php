@@ -70,23 +70,23 @@ class definition extends \totara_flavour\definition {
                 'enablefeedback360' => advanced_feature::DISABLED,
                 // Disable Learn only features
                 // Non-legacy features
-                'enableoutcomes' => advanced_feature::DISABLED,
-                'enableportfolios' => advanced_feature::DISABLED,
-                'enablecompletion' => advanced_feature::DISABLED,
-                'completiondefault' => advanced_feature::DISABLED,
-                'enableavailability' => advanced_feature::DISABLED,
-                'enablecourserpl' => advanced_feature::DISABLED,
-                'enablemodulerpl' => advanced_feature::DISABLED,
-                'enableplagiarism' => advanced_feature::DISABLED,
-                'enablecontentmarketplaces' => advanced_feature::DISABLED,
-                'enableprogramextensionrequests' => advanced_feature::DISABLED,
+                'enableoutcomes' => 0,
+                'enableportfolios' => 0,
+                'enablecompletion' => 0,
+                'completiondefault' => 0,
+                'enableavailability' => 0,
+                'enablecourserpl' => 0,
+                'enablemodulerpl' => [],
+                'enableplagiarism' => 0,
+                'enablecontentmarketplaces' => 0,
+                'enableprogramextensionrequests' => 0,
                 'enablelearningplans' => advanced_feature::DISABLED,
                 'enableprograms' => advanced_feature::DISABLED,
                 'enablecertifications' => advanced_feature::DISABLED,
                 'enablerecordoflearning' => advanced_feature::DISABLED,
-                'enableprogramcompletioneditor' => advanced_feature::DISABLED,
+                'enableprogramcompletioneditor' => 0,
                 // Legacy features
-                'enablelegacyprogramassignments' => advanced_feature::DISABLED,
+                'enablelegacyprogramassignments' => 0,
             ]
         ];
     }

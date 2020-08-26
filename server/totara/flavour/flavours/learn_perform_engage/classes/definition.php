@@ -43,24 +43,26 @@ class definition extends \totara_flavour\definition {
      * @inheritDoc
      */
     protected function load_default_settings() {
+        global $DB;
+
         return [
             '' => [
                 // Enable non-legacy Learn features
-                'enableoutcomes' => advanced_feature::ENABLED,
-                'enableportfolios' => advanced_feature::ENABLED,
-                'enablecompletion' => advanced_feature::ENABLED,
-                'completiondefault' => advanced_feature::ENABLED,
-                'enableavailability' => advanced_feature::ENABLED,
-                'enablecourserpl' => advanced_feature::ENABLED,
-                'enablemodulerpl' => advanced_feature::ENABLED,
-                'enableplagiarism' => advanced_feature::ENABLED,
-                'enablecontentmarketplaces' => advanced_feature::ENABLED,
-                'enableprogramextensionrequests' => advanced_feature::ENABLED,
+                'enableoutcomes' => 1,
+                'enableportfolios' => 1,
+                'enablecompletion' => 1,
+                'completiondefault' => 1,
+                'enableavailability' => 1,
+                'enablecourserpl' => 1,
+                'enablemodulerpl' => array_fill_keys($DB->get_fieldset_select('modules', 'id', '1=1'), 1),
+                'enableplagiarism' => 1,
+                'enablecontentmarketplaces' => 1,
+                'enableprogramextensionrequests' => 1,
                 'enablelearningplans' => advanced_feature::ENABLED,
                 'enableprograms' => advanced_feature::ENABLED,
                 'enablecertifications' => advanced_feature::ENABLED,
                 'enablerecordoflearning' => advanced_feature::ENABLED,
-                'enableprogramcompletioneditor' => advanced_feature::ENABLED,
+                'enableprogramcompletioneditor' => 1,
                 // Enable non-legacy Perform features
                 'enablecompetency_assignment' => advanced_feature::ENABLED,
                 'enableperformance_activities' => advanced_feature::ENABLED,
