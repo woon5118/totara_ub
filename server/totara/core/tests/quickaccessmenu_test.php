@@ -224,14 +224,12 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
             ],
             group::PERFORM => [
                 'mod_perform_manage_activities' => 'Activity Management',
-                'mod_perform_activity_response_data' => 'Performance activity response data',
                 'goalmanage' => 'Goals',
             ],
             group::CONFIGURATION => [
                 'totarasyncsettings' => 'HR Import',
             ]
         ], $user);
-
     }
 
     public function test_default_menu_for_staff_manager() {

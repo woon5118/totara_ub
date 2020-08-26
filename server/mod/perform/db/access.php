@@ -34,7 +34,7 @@ $capabilities = [
             'performanceactivitycreator' => CAP_ALLOW,
         ]
     ],
-    // Create a performance activity. Additonally requires the capability to access the management page and create
+    // Create a performance activity. Additionally requires the capability to access the management page and create
     // a performance container.
     'mod/perform:create_activity' => [
         'captype' => 'write',
@@ -88,8 +88,7 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => [
-            'manager' => CAP_ALLOW,
-            'tenantdomainmanager' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
         ]
     ],
     // Report on answers given for a specific subject user. Checked against a specific user.
@@ -106,8 +105,5 @@ $capabilities = [
         'riskbitmask'   => RISK_PERSONAL,
         'captype' => 'read',
         'contextlevel' => CONTEXT_USER,
-        'archetypes' => [
-            'manager' => CAP_ALLOW,
-        ],
     ],
 ];
