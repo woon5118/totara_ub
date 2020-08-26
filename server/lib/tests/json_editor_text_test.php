@@ -170,4 +170,103 @@ class core_json_editor_text_testcase extends advanced_testcase {
             $result['text']
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_validate_schema_with_link(): void {
+        $this->assertTrue(
+            text::validate_schema([
+                'type' => text::get_type(),
+                'text' => 'This is the text',
+                'marks' => [
+                    [
+                        'type' => 'link',
+                        'attrs' => [
+                            'href' => 'http://example.com'
+                        ]
+                    ]
+                ]
+            ])
+        );
+
+        $this->assertFalse(
+            text::validate_schema([
+                'type' => text::get_type(),
+                'text' => 'This is the text',
+                'marks' => [
+                    [
+                        'type' => 'link',
+                        'attrs' => 'dde'
+                    ]
+                ]
+            ])
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_clean_valid_raw_node_with_link(): void {
+        $valid_text_node = [
+            'type' => text::get_type(),
+            'text' => 'This is the text',
+            'marks' => [
+                [
+                    'type' => 'link',
+                    'attrs' => [
+                        'href' => 'http://example.com'
+                    ]
+                ]
+            ]
+        ];
+
+        $cleaned_valid_text_node = text::clean_raw_node($valid_text_node);
+        $this->assertArrayHasKey('marks', $cleaned_valid_text_node);
+        $this->assertCount(1, $cleaned_valid_text_node['marks']);
+
+        $marks = $cleaned_valid_text_node['marks'];
+        $mark = reset($marks);
+
+        $this->assertArrayHasKey('type', $mark);
+        $this->assertEquals('link', $mark['type']);
+
+        $this->assertArrayHasKey('attrs', $mark);
+        $this->assertArrayHasKey('href', $mark['attrs']);
+
+        $this->assertEquals('http://example.com', $mark['attrs']['href']);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_clean_invalid_raw_node_with_link(): void {
+        $valid_text_node = [
+            'type' => text::get_type(),
+            'text' => 'This is the text',
+            'marks' => [
+                [
+                    'type' => 'link',
+                    'attrs' => [
+                        'href' => 'mailto://admin@example.com'
+                    ]
+                ]
+            ]
+        ];
+
+        $cleaned_valid_text_node = text::clean_raw_node($valid_text_node);
+        $this->assertArrayHasKey('marks', $cleaned_valid_text_node);
+        $this->assertCount(1, $cleaned_valid_text_node['marks']);
+
+        $marks = $cleaned_valid_text_node['marks'];
+        $mark = reset($marks);
+
+        $this->assertArrayHasKey('type', $mark);
+        $this->assertEquals('link', $mark['type']);
+
+        $this->assertArrayHasKey('attrs', $mark);
+        $this->assertArrayHasKey('href', $mark['attrs']);
+
+        $this->assertEmpty($mark['attrs']['href']);
+    }
 }

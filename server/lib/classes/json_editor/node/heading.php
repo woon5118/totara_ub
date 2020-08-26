@@ -186,7 +186,7 @@ final class heading extends node implements block_node {
         }
 
         // Reset array keys to numeric - just in case.
-        $cleaned_raw_node['content'] = array_values($cleaned_raw_node);
+        $cleaned_raw_node['content'] = array_values($cleaned_raw_node['content']);
 
         $contents = $cleaned_raw_node['content'];
         $schema = schema::instance();

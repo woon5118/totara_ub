@@ -160,4 +160,35 @@ class core_json_editor_heading_testcase extends advanced_testcase {
 
         $this->assertDebuggingCalledCount(2);
     }
+
+    /**
+     * @return void
+     */
+    public function test_clean_raw_node_reset_content(): void {
+        $raw_data = [
+            'type' => heading::get_type(),
+            'attrs' => [
+                'level' => heading::LEVEL_ONE
+            ],
+            'content' => [
+                'x_y_z' => [
+                    'type' => text::get_type(),
+                    'text' => 'This is something else '
+                ],
+                'z_y_x' => [
+                    'type' => text::get_type(),
+                    'text' => 'ddd ogogo'
+                ]
+            ]
+        ];
+
+        $cleaned_data = heading::clean_raw_node($raw_data);
+        $this->assertArrayHasKey('content', $cleaned_data);
+        $this->assertArrayNotHasKey('x_y_z', $cleaned_data['content']);
+        $this->assertArrayNotHasKey('z_y_x', $cleaned_data['content']);
+
+        $this->assertArrayHasKey(0, $cleaned_data['content']);
+        $this->assertArrayHasKey(1, $cleaned_data['content']);
+        $this->assertArrayNotHasKey(2, $cleaned_data['content']);
+    }
 }

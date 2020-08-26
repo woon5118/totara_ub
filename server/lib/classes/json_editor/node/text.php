@@ -86,8 +86,21 @@ final class text extends node implements inline_node {
                     return false;
                 }
 
-                if (!node_helper::check_keys_match_against_data($mark_item, ['type'], ['url'])) {
+                if (!node_helper::check_keys_match_against_data($mark_item, ['type'], ['attrs'])) {
                     return false;
+                }
+
+                $mark_type = $mark_item['type'];
+                if ('link' == $mark_type) {
+                    // It is a link - check for field `attrs`
+                    if (!array_key_exists('attrs', $mark_item) || !is_array($mark_item['attrs'])) {
+                        return false;
+                    }
+
+                    $attrs = $mark_item['attrs'];
+                    if (!array_key_exists('href', $attrs)) {
+                        return false;
+                    }
                 }
             }
         }
@@ -125,8 +138,10 @@ final class text extends node implements inline_node {
                 $cleaned_type = clean_param($mark['type'], PARAM_ALPHA);
                 $mark['type'] = $cleaned_type;
 
-                if (isset($mark['url'])) {
-                    $mark['url'] = clean_param($mark['url'], PARAM_URL);
+                if ('link' == $cleaned_type && isset($mark['attrs'])) {
+                    // This is an assumption that if the text mark is a link. As the href needs to have a value
+                    // in order to make the link works, otherwise it is just an invalid json node.
+                    $mark['attrs']['href'] = clean_param($mark['attrs']['href'], PARAM_URL);
                 }
 
                 $cleaned_marks[] = $mark;
