@@ -34,6 +34,7 @@
         :subject-instance-id="subjectInstanceId"
         :section-id="sectionId"
         :subject-user="subjectInstance.subject_user"
+        :job-assignments="subjectInstance.static_instances"
       />
     </Loader>
   </div>

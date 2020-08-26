@@ -50,6 +50,11 @@ class mod_perform_webapi_resolver_query_subject_instance_for_participant_testcas
             0
         ))->get_url($GLOBALS['PAGE'])->out(false);
 
+        $profile_image_url = (new user_picture(
+            self::$about_user_and_participating->subject_user->get_user()->get_record(),
+            1
+        ))->get_url($GLOBALS['PAGE'])->out(false);
+
         $expected = [
             'id' => (string) self::$about_user_and_participating->id,
             'progress_status' => self::$about_user_and_participating->get_progress_status(),
@@ -76,7 +81,39 @@ class mod_perform_webapi_resolver_query_subject_instance_for_participant_testcas
                 'id' => self::$about_user_and_participating->subject_user->id,
                 'fullname' => self::$about_user_and_participating->subject_user->fullname,
                 'profileimageurlsmall' => $profile_image_small_url,
+                'card_display' => [
+                    'profile_picture_alt' => null,
+                    'profile_url' => null,
+                    'profile_picture_url' => $profile_image_url,
+                    'display_fields' => [
+                        [
+                            'associate_url' => null,
+                            'value' => self::$about_user_and_participating->subject_user->fullname,
+                            'label' => 'Full name',
+                            'is_custom' => false,
+                        ],
+                        [
+                            'associate_url' => null,
+                            'value' => '',
+                            'label' => 'Department',
+                            'is_custom' => false,
+                        ],
+                        [
+                            'associate_url' => null,
+                            'value' => null,
+                            'label' => null,
+                            'is_custom' => false,
+                        ],
+                        [
+                            'associate_url' => null,
+                            'value' => null,
+                            'label' => null,
+                            'is_custom' => false,
+                        ],
+                    ],
+                ],
             ],
+            'static_instances' => [],
         ];
 
         self::assertEquals($expected, $this->strip_expected_dates($actual));

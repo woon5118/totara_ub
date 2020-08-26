@@ -3,21 +3,37 @@ Feature: Allow users to select manual (internal and external) participants for a
 
   Background:
     Given the following "users" exist:
-      | username  | firstname | lastname |
+      | username  | firstname | lastname  |
       | subject   | Subject   | User      |
       | manager   | Manager   | User      |
       | appraiser | Appraiser | User      |
       | colleague | Colleague | User      |
+
+    Given the following "organisation" frameworks exist:
+      | fullname                    | idnumber | description           |
+      | Test organisation framework | FW002    | Framework description |
+    And the following "organisation" hierarchy exists:
+      | framework | fullname           | idnumber | description             |
+      | FW002     | Test Organisation  | ORG001   | This is an organisation |
+
+    And the following "position" frameworks exist:
+      | fullname      | idnumber |
+      | PosHierarchy1 | FW001    |
+    And the following "position" hierarchy exists:
+      | framework | idnumber | fullname   |
+      | FW001     | POS001   | Position1  |
+
     And the following job assignments exist:
-      | user      | manager | appraiser |
-      | subject   | manager | appraiser |
-      | colleague | manager |           |
+      | user      | manager | appraiser | fullname     | organisation | position |
+      | subject   | manager | appraiser | Subject JA   | ORG001       | POS001   |
+      | colleague | manager |           |              | ORG001       |          |
     And the following "cohorts" exist:
       | name | idnumber | description | contextlevel | reference | cohorttype |
       | aud1 | aud1     | Audience 1  | System       | 0         | 1          |
     And the following "cohort members" exist:
-      | user    | cohort |
-      | subject | aud1   |
+      | user      | cohort |
+      | subject   | aud1   |
+      | colleague | aud1   |
     When I log in as "admin"
     And I navigate to the manage perform activities page
 
@@ -101,8 +117,8 @@ Feature: Allow users to select manual (internal and external) participants for a
     Then I should see "Select participants"
     And I should see "Note: None of these activities can start until participants are selected."
     And I should see "Act1 for Subject User"
-    And I should see "Created" in the ".tui-performActivityParticipantSelector-meta" "css_element"
-    And I should see the current date in format "j F Y" in the ".tui-performActivityParticipantSelector-meta" "css_element"
+    And I should see "Created" in the ".tui-performActivityParticipantSelector:nth-child(2) .tui-performActivityParticipantSelector-meta" "css_element"
+    And I should see the current date in format "j F Y" in the ".tui-performActivityParticipantSelector:nth-child(2) .tui-performActivityParticipantSelector-meta" "css_element"
     # Subject can select themselves
     And I should see the following options in the tui taglist in the ".tui-formRow" "css_element":
       | Admin User |
@@ -128,6 +144,17 @@ Feature: Allow users to select manual (internal and external) participants for a
     When I log in as "manager"
     And I navigate to the outstanding perform activities list page
     And I click on "Select participants" "link" in the ".tui-actionCard" "css_element"
+
+    # Named job assignment details at subject instance creation.
+    And I should see "Subject JA" in the ".tui-performActivityParticipantSelector:nth-child(2) .tui-jobAssignment .tui-jobAssignment__jobAssignmentDetails:nth-of-type(1)" "css_element"
+    And I should see "(Position1)" in the ".tui-performActivityParticipantSelector:nth-child(2) .tui-jobAssignment .tui-jobAssignment__jobAssignmentDetails:nth-of-type(1)" "css_element"
+    And I should see "Test Organisation" in the ".tui-performActivityParticipantSelector:nth-child(2) .tui-jobAssignment .tui-jobAssignment__jobAssignmentDetails:nth-of-type(1)" "css_element"
+
+    # Unnamed job assignment details at subject instance creation.
+    Then I should see "Unnamed job assignment" in the ".tui-performActivityParticipantSelector:nth-child(3) .tui-jobAssignment .tui-jobAssignment__jobAssignmentDetails:nth-of-type(1)" "css_element"
+    And I should see "(ID: 1)" in the ".tui-performActivityParticipantSelector:nth-child(3) .tui-jobAssignment .tui-jobAssignment__jobAssignmentDetails:nth-of-type(1)" "css_element"
+    And I should see "Test Organisation" in the ".tui-performActivityParticipantSelector:nth-child(3) .tui-jobAssignment .tui-jobAssignment__jobAssignmentDetails:nth-of-type(1)" "css_element"
+
     Then I should see "Mentor" in the ".tui-formRow:nth-child(1)" "css_element"
     And I should see "External respondent" in the ".tui-formRow:nth-child(2)" "css_element"
     And I should see the following options in the tui taglist in the ".tui-formRow:nth-child(1)" "css_element":
@@ -155,7 +182,7 @@ Feature: Allow users to select manual (internal and external) participants for a
 
     Then I should see "The participants have been successfully saved." in the tui success notification toast
     When I click on "Back to all performance activities" "link"
-    Then I should not see "Select participants"
+    Then I should see "Select participants"
     When I click on "Activities about others" "link"
     And I should see "No items to display"
     And I should not see "Act1"
@@ -202,7 +229,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I navigate to the outstanding perform activities list page
     And I should not see "No items to display"
     When I click on "Act1" "link"
-    Then I should see perform activity relationship to user "Self"
+    Then I should see perform activity relationship to user "yourself"
     And I log out
 
     # Colleague views activity
@@ -242,7 +269,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     Then I should not see "Home" in the ".totaraNav" "css_element"
     And I should not see "You are logged in as"
     And "Login" "button" should not exist
-    And I should see perform activity relationship to user "External respondent"
+    And I should see perform activity relationship to user "External respondent" as an "external" participant
     And I should see perform "short text" question "Question 1" is unanswered
     When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
     And I answer "short text" question "Question 1" with "External participant was here"
@@ -254,7 +281,7 @@ Feature: Allow users to select manual (internal and external) participants for a
 
     # Try to access the page again, it should still be accessible
     When I follow "Review your responses."
-    Then I should see perform activity relationship to user "External respondent"
+    Then I should see perform activity relationship to user "External respondent" as an "external" participant
 
     # Try to access invalid page
     When I navigate to the external participants form with the wrong token
@@ -324,7 +351,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I navigate to the outstanding perform activities list page
     And I should not see "No items to display"
     When I click on "Act1" "link"
-    Then I should see perform activity relationship to user "Self"
+    Then I should see perform activity relationship to user "yourself"
     When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
     And I answer "short text" question "Question 1" with "Subject was here"
     And I click on "Submit" "button"
@@ -377,7 +404,7 @@ Feature: Allow users to select manual (internal and external) participants for a
 
     # Complete as external respondent again
     When I navigate to the external participants form for user "Mark Metcalfe"
-    Then I should see perform activity relationship to user "External respondent"
+    Then I should see perform activity relationship to user "External respondent" as an "external" participant
     And I should see perform "short text" question "Question 1" is unanswered
     When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
     And I answer "short text" question "Question 1" with "External participant 1 was here"
@@ -389,7 +416,7 @@ Feature: Allow users to select manual (internal and external) participants for a
 
     # Alright that's the last participant, subject instance should be closed after that
     When I navigate to the external participants form for user "Steve Example"
-    Then I should see perform activity relationship to user "External respondent"
+    Then I should see perform activity relationship to user "External respondent" as an "external" participant
     And I should see perform "short text" question "Question 1" is unanswered
     When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
     And I answer "short text" question "Question 1" with "External participant 2 was here"

@@ -10,6 +10,15 @@ query mod_perform_manual_participant_selection_instances {
       activity {
         name
       }
+      static_instances {
+        fullname
+        position {
+          fullname
+        }
+        organisation {
+          fullname
+        }
+      }
     }
     manual_relationships {
       id

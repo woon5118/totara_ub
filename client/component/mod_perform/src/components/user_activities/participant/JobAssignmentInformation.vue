@@ -67,3 +67,24 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-jobAssignment {
+  @include tui-font-body();
+
+  &__jobAssignmentDetails {
+    @include tui-font-body-small();
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: var(--gap-1);
+
+    span {
+      margin-right: var(--gap-1);
+    }
+  }
+
+  &__spacing {
+    margin-right: var(--gap-1);
+  }
+}
+</style>

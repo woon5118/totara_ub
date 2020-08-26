@@ -46,6 +46,11 @@
         @submit="submit($event, selectionInstance.subject_instance.id)"
       >
         <template v-slot:meta>
+          <JobAssignmentInformation
+            :job-assignments="
+              selectionInstance.subject_instance.static_instances
+            "
+          />
           <p>
             {{
               $str(
@@ -71,10 +76,12 @@ import Loader from 'tui/components/loader/Loader';
 import ManualParticipantSelectionInstancesQuery from 'mod_perform/graphql/manual_participant_selection_instances';
 import SetManualParticipantsMutation from 'mod_perform/graphql/set_manual_participants';
 import { notify } from 'tui/notifications';
+import JobAssignmentInformation from 'mod_perform/components/user_activities/participant/JobAssignmentInformation';
 
 export default {
   components: {
     ActivityParticipants,
+    JobAssignmentInformation,
     Loader,
   },
 

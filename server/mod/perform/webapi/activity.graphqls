@@ -127,22 +127,6 @@ type mod_perform_other_historic_activity {
 }
 
 """
-Static details at time of subject creation about perform activity that a subject is involved with.
-"""
-type mod_perform_static_subject_result {
-  subject_instance: mod_perform_subject_instance!
-  job_assignments: [totara_job_assignment!]!
-}
-
-"""
-Wrapper for static profile information for the subject and participant.
-"""
-type mod_perform_static_profile_result {
-  subject: mod_perform_static_subject_result!
-  participant: mod_perform_participant_instance!
-}
-
-"""
 Details about a participant_instance
 """
 type mod_perform_participant_instance {
@@ -357,14 +341,6 @@ extend type Query {
   the ones the user is not the subject in but participating.
   """
   mod_perform_other_historic_activities: [mod_perform_other_historic_activity!]!
-
-  """
-  Static information for a specific performance activity (perform_subject_instance) a user is participating in
-  """
-  mod_perform_static_profile_information(
-    subject_instance_id: core_id!
-    participant_instance_id: core_id!
-  ): mod_perform_static_profile_result!
 }
 
 """

@@ -109,7 +109,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
     When I click on "Single section Activity" "link_or_button"
     Then I should see "Single section Activity" in the ".tui-participantContent__header" "css_element"
     And I should see "Question 4"
-    And I should see perform activity relationship to user "Self"
+    And I should see perform activity relationship to user "yourself"
     When I click on "Cancel" "button"
     Then I should see the tui datatable contains:
       | Activity title                                  | Type      | Overall progress | Your progress   |
@@ -125,7 +125,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
     When I click on "Single section Activity" "link_or_button"
     Then I should see "Single section Activity" in the ".tui-participantContent__header" "css_element"
     And I should see "Question 4"
-    And I should see perform activity relationship to user "Self"
+    And I should see perform activity relationship to user "yourself"
     When I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -175,7 +175,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
     Then I should see "Multiple section Activity" in the ".tui-participantContent__header" "css_element"
     Then I should see "Section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should see "Question 1"
-    And I should see perform activity relationship to user "Self"
+    And I should see perform activity relationship to user "yourself"
     When I click on "Cancel" "button"
     Then I should see the tui datatable contains:
       | Activity title                                  | Type      | Overall progress | Your progress   |
@@ -201,7 +201,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
     Then I should see "Multiple section Activity" in the ".tui-participantContent__header" "css_element"
     Then I should see "Section 3" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should see "Question 3"
-    And I should see perform activity relationship to user "Self"
+    And I should see perform activity relationship to user "yourself"
     When I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -256,7 +256,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
     Then I should see "Anonymous responses - Multiple section Activity" in the ".tui-participantContent__header" "css_element"
     Then I should see "Section anon 3" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should see "Question 3"
-    And I should see perform activity relationship to user "Self"
+    And I should see perform activity relationship to user "yourself"
 
   Scenario: List and complete sections as the manager-appraiser with multiple sections with anonymous answers
     Given I log in as "manager-appraiser"

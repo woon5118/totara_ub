@@ -119,3 +119,71 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-participantGeneralInformation {
+  @include tui-font-body();
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: var(--border-width-thin) solid var(--color-border);
+  border-radius: var(--border-radius-normal);
+
+  &__userDetails {
+    min-width: 30%;
+    height: 100%;
+    padding: var(--gap-2) var(--gap-4);
+    border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
+  }
+
+  &__relationship {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: var(--gap-2) var(--gap-4) var(--gap-1) var(--gap-4);
+    background: var(--color-neutral-2);
+    border-radius: var(--border-radius-normal);
+  }
+
+  &__relationship-heading {
+    @include tui-font-heading-small-regular();
+
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: var(--gap-1);
+
+    span {
+      @include tui-font-heading-small();
+      // margin-left: 4px;
+    }
+  }
+
+  &__relationshipHeadingDetails {
+    @include tui-font-heading-small();
+  }
+
+  &__relationship-toSubject {
+    @include tui-font-body-small();
+    margin-bottom: var(--gap-1);
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-participantGeneralInformation {
+    flex-direction: row;
+
+    &__userDetails {
+      border-right: var(--border-width-thin) solid
+        var(--color-neutral-5);
+      border-bottom: none;
+    }
+
+    &__relationship-heading {
+      span {
+        margin-left: var(--gap-1);
+      }
+    }
+  }
+}
+</style>

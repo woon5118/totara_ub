@@ -23,7 +23,7 @@ Feature: Viewing other responses
     And I should see "Static content title"
     And I should see "This content is static"
     And I should see that show others responses is toggled "off"
-    And I should see perform activity relationship to user "Self"
+    And I should see perform activity relationship to user "yourself"
     And I should see perform "short text" question "Question one" is unanswered
     And I should see perform "short text" question "Question two" is unanswered
     And I should not see "Manager response"

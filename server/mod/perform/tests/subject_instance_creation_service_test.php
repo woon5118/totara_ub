@@ -388,7 +388,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         // Confirm that all job assignments mapped correctly.
         foreach ($job_assignments as $job_assignment) {
             $found = false;
-            foreach($created_static_instances as $created_static_instance) {
+            foreach ($created_static_instances as $created_static_instance) {
                 if ($job_assignment->id === $created_static_instance->job_assignment_id) {
                     $found = true;
 
@@ -422,7 +422,6 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
             }
             $this->assertEquals(true, $found);
         }
-
     }
 
     /**

@@ -40,6 +40,8 @@ use mod_perform\entities\activity\external_participant;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\entities\activity\subject_instance;
+use mod_perform\notification\factory;
+use mod_perform\task\check_notification_trigger_task;
 
 class behat_mod_perform extends behat_base {
 
@@ -56,6 +58,7 @@ class behat_mod_perform extends behat_base {
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
     public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceSingleParticipantResponse__answer';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
+    public const PERFORM_ACTIVITY_GENERAL_INFORMATION_RELATIONSHIP_LOCATOR = '.tui-participantGeneralInformation__relationship-heading';
     public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR = '.tui-participantContent__sectionHeading-otherResponseSwitch button';
     public const MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR = '.tui-performActivitySectionRelationship__item-name';
     public const MANAGE_CONTENT_ADD_RESPONDING_PARTICIPANTS_BUTTON_LABEL = '.tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d) [aria-label=\'Add participants\']';
@@ -417,20 +420,20 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @Then /^I should see perform activity relationship to user "([^"]*)" as an "([(internal)|(external)]*)" participant$/
      * @Then /^I should see perform activity relationship to user "([^"]*)"$/
+     *
      * @param string $expected_relation
+     * @param string $participant_source
      * @throws ExpectationException
      */
-    public function i_should_see_perform_activity_relationship_to_user(string $expected_relation): void {
-        $your_relationship_element = $this->find('css', self::PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR);
+    public function i_should_see_perform_activity_relationship_to_user(string $expected_relation, string $participant_source = 'internal'): void {
+        $locator = $participant_source === 'internal'
+            ? self::PERFORM_ACTIVITY_GENERAL_INFORMATION_RELATIONSHIP_LOCATOR
+            : self::PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR;
 
-        if ($expected_relation === trim($your_relationship_element->getText())) {
-            return;
-        }
-
-        throw new ExpectationException(
-            "Could not find expected relationship to user {$expected_relation}",
-            $this->getSession()
+        $this->execute('behat_general::assert_element_contains_text',
+            [$expected_relation, $locator, 'css_element']
         );
     }
 
@@ -1243,8 +1246,8 @@ class behat_mod_perform extends behat_base {
             $this->fail('direction must be future or past');
         }
         // create_clock_with_time_offset stores $bias in the database for further tasks.
-        \mod_perform\notification\factory::create_clock_with_time_offset($bias);
-        $this->execute('behat_tool_task::i_run_the_scheduled_task', [\mod_perform\task\check_notification_trigger_task::class]);
+        factory::create_clock_with_time_offset($bias);
+        $this->execute('behat_tool_task::i_run_the_scheduled_task', [check_notification_trigger_task::class]);
     }
 
     /**

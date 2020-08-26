@@ -326,6 +326,22 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             ]
         );
 
+        $subject_static_instances = new backup_nested_element('subject_static_instances');
+        $subject_static_instance = new backup_nested_element(
+            'subject_static_instance',
+            ['id'],
+            [
+                'subject_instance_id',
+                'job_assignment_id',
+                'manager_job_assignment_id',
+                'position_id',
+                'organisation_id',
+                'appraiser_id',
+                'created_at',
+                'updated_at',
+            ]
+        );
+
         $notifications = new backup_nested_element('notifications');
         $notification = new backup_nested_element(
             'notification',
@@ -460,6 +476,9 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             $subject_instance->add_child($subject_instance_manual_participants);
             $subject_instance_manual_participants->add_child($subject_instance_manual_participant);
 
+            $subject_instance->add_child($subject_static_instances);
+            $subject_static_instances->add_child($subject_static_instance);
+
             $external_participant->set_source_table('perform_participant_external', []);
             $element_response->set_source_table(
                 'perform_element_response',
@@ -497,11 +516,17 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'perform_subject_instance_manual_participant',
                 ['subject_instance_id' => backup::VAR_PARENTID]
             );
+            $subject_static_instance->set_source_table(
+                'perform_subject_static_instance',
+                ['subject_instance_id' => backup::VAR_PARENTID]
+            );
 
             $track_user_assignment->annotate_ids('user', 'subject_user_id');
             $track_user_assignment->annotate_ids('job_assignment', 'job_assignment_id');
             $subject_instance->annotate_ids('user', 'subject_user_id');
             $subject_instance->annotate_ids('job_assignment', 'job_assignment_id');
+            $subject_static_instance->annotate_ids('job_assignment', 'job_assignment_id');
+            $subject_static_instance->annotate_ids('job_assignment', 'manager_job_assignment_id');
 
             $participant_instance->annotate_ids('user', 'participant_id');
 

@@ -515,7 +515,7 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020082600, 'perform');
     }
 
-    if ($oldversion < 2020082601) {
+    if ($oldversion < 2020082602) {
         // Define table perform_subject_static_instance to be created.
         $table = new xmldb_table('perform_subject_static_instance');
 
@@ -543,7 +543,7 @@ function xmldb_perform_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        upgrade_mod_savepoint(true, 2020082601, 'perform');
+        upgrade_mod_savepoint(true, 2020082602, 'perform');
     }
 
     return true;
