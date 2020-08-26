@@ -26,6 +26,7 @@ use mod_perform\formatter\activity\element_data_field_formatter;
 use mod_perform\models\activity\element_plugin;
 use performelement_static_content\formatter\data_field_formatter;
 use performelement_static_content\static_content;
+use core\json_editor\node\paragraph;
 
 /**
  * @group perform
@@ -48,9 +49,25 @@ class performelement_static_content_data_field_formatter_testcase extends advanc
 
         $formatter = new data_field_formatter($format, $context);
 
-        $data['textValue'] = 'I see trees of green, red roses too';
+        $data['wekaDoc'] = $this->get_weka_document();
+        $data['docFormat'] = 'FORMAT_JSON_EDITOR';
+        $data['format'] = 'HTML';
+        $data['element_id'] = 1;
         $data = json_encode($data);
+
         $result = $formatter->format($data);
-        $this->assertEquals($data, $result);
+        $result = json_decode($result, true);
+        $this->assertArrayHasKey('content', $result);
+        $this->assertEquals('<div class="tui-rendered"><p>This is a test</p></div>', $result['content']);
     }
+
+    private function get_weka_document(): string {
+        return json_encode(
+            [
+                'type' => 'doc',
+                'content' => [paragraph::create_json_node_from_text('This is a test')]
+            ]
+        );
+    }
+
 }

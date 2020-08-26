@@ -24,6 +24,8 @@
 namespace performelement_static_content;
 
 use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\element as element_model;
+use performelement_static_content\local\helper;
 
 class static_content extends element_plugin {
     /**
@@ -54,5 +56,67 @@ class static_content extends element_plugin {
      */
     public function get_sortorder(): int {
         return 80;
+    }
+
+    /**
+     * We need to check if the user uploaded some files and get those
+     * into permanent storage.
+     *
+     * @param element_model $element
+     */
+    public function post_create(element_model $element): void {
+        global $CFG;
+
+        $data = json_decode($element->data, true);
+
+        if (isset($data['draftId']) && defined($data['docFormat'])) {
+            $context = $element->get_context();
+            // Start processing the files within the content.
+            require_once("{$CFG->dirroot}/lib/filelib.php");
+            $options = helper::get_editor_options($context);
+
+            // Simulate the form data.
+            $editordata = new \stdClass();
+            $editordata->content_editor = [
+                'text' => $data['wekaDoc'],
+                'format' => (int) constant($data['docFormat']),
+                'itemid' => $data['draftId']
+            ];
+
+            // Prepare the content of the 'editor' form element
+            // with embedded media files to be saved in database
+            $editordata = file_postupdate_standard_editor(
+                $editordata,
+                'content',
+                $options,
+                $context,
+                'performelement_static_content',
+                'content',
+                $element->id
+            );
+
+            $data['wekaDoc'] = $editordata->content;
+            $data['element_id'] = $element->id;
+            $data = json_encode($data);
+
+            // Update the element data with the updated content.
+            $element->update_details(
+                $element->title,
+                $data,
+                $element->is_required,
+                $element->get_identifier() ?? ''
+            );
+        }
+    }
+
+    /**
+     * We need to check if the user uploaded some files and get those
+     * into permanent storage.
+     *
+     * @param element_model $element
+     */
+    public function post_update(element_model $element): void {
+        // Follow same process as post_create.
+        $this->post_create($element);
     }
 }

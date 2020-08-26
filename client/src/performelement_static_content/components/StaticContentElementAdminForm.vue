@@ -36,18 +36,26 @@
             <FormText name="rawTitle" :validations="v => [v.maxLength(1024)]" />
           </FormRow>
           <FormRow
+            v-slot="{ id }"
             :label="
               $str(
                 'static_content_placeholder',
                 'performelement_static_content'
               )
             "
-            required
+            :required="true"
           >
-            <FormTextarea
-              name="rawText"
-              :rows="6"
-              :validations="v => [v.required()]"
+            <Weka
+              v-if="draftId"
+              :id="id"
+              component="performelement_static_content"
+              area="content"
+              :doc="wekaDoc"
+              :file-item-id="draftId"
+              :placeholder="
+                $str('weka_enter_content', 'performelement_static_content')
+              "
+              @update="handleUpdate"
             />
           </FormRow>
           <FormRow>
@@ -66,22 +74,33 @@
 
 <script>
 import { Uniform, FormRow, FormText } from 'tui/components/uniform';
-import FormTextarea from 'tui/components/uniform/FormTextarea';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
+import Weka from 'editor_weka/components/Weka';
+
+// Utils
+import { debounce } from 'tui/util';
+
+// GraphQL queries
+import fileDraftId from 'core/graphql/file_unused_draft_item_id';
+import prepareDraftArea from 'performelement_static_content/graphql/prepare_draft_area';
 
 export default {
   components: {
     ElementAdminForm,
     Uniform,
-    FormTextarea,
     FormRow,
     FormText,
     FormActionButtons,
+    Weka,
   },
+
   mixins: [AdminFormMixin],
+
   props: {
+    sectionId: [Number, String],
+    elementId: [Number, String],
     type: Object,
     title: String,
     rawTitle: String,
@@ -93,28 +112,84 @@ export default {
       required: true,
     },
   },
+
   data() {
     const initialValues = {
       title: this.title,
       rawTitle: this.rawTitle,
       data: this.data,
     };
-    if (Object.keys(this.rawData).length == 0) {
-      initialValues.rawText = '';
-    } else {
-      initialValues.rawText = this.rawData.textValue;
-    }
     return {
       initialValues: initialValues,
+      wekaDoc: null,
+      draftId: null,
     };
   },
+
+  async mounted() {
+    if (this.rawData && this.rawData.wekaDoc) {
+      this.wekaDoc = JSON.parse(this.rawData.wekaDoc);
+    }
+    if (this.sectionId && this.elementId) {
+      await this.$_loadExistingDraftId();
+    } else {
+      await this.$_loadNewDraftId();
+    }
+  },
+
   methods: {
+    /**
+     *
+     * @param {Object} opt
+     */
+    handleUpdate(opt) {
+      this.$_readJson(opt);
+    },
+
+    async $_loadNewDraftId() {
+      const {
+        data: { item_id },
+      } = await this.$apollo.mutate({ mutation: fileDraftId });
+      this.draftId = item_id;
+    },
+
+    async $_loadExistingDraftId() {
+      const {
+        data: { draft_id },
+      } = await this.$apollo.mutate({
+        mutation: prepareDraftArea,
+        variables: {
+          section_id: parseInt(this.sectionId),
+          element_id: parseInt(this.elementId),
+        },
+      });
+      this.draftId = draft_id;
+    },
+
+    $_readJson: debounce(
+      /**
+       *
+       * @param {Object} opt
+       */
+      function(opt) {
+        this.wekaDoc = opt.getJSON();
+      },
+      250,
+      { perArgs: false }
+    ),
+
     handleSubmit(values) {
       this.$emit('update', {
         title: values.rawTitle,
-        data: { textValue: values.rawText.trim() },
+        data: {
+          wekaDoc: JSON.stringify(this.wekaDoc),
+          draftId: this.draftId,
+          format: 'HTML',
+          docFormat: 'FORMAT_JSON_EDITOR',
+        },
       });
     },
+
     cancel() {
       this.$emit('display');
     },
@@ -123,10 +198,11 @@ export default {
 </script>
 
 <lang-strings>
-  {
+{
   "performelement_static_content": [
-  "title",
-  "static_content_placeholder"
+    "title",
+    "static_content_placeholder",
+    "weka_enter_content"
   ]
-  }
+}
 </lang-strings>

@@ -95,6 +95,8 @@
                         :is="componentFor(sectionElement)"
                         ref="sectionElements"
                         :key="sectionElement.id"
+                        :section-id="sectionId"
+                        :element-id="sectionElement.element.id"
                         :data="sectionElement.element.data"
                         :raw-data="sectionElement.element.raw_data"
                         :title="sectionElement.element.title"

@@ -26,9 +26,11 @@
     @display-read="$emit('display-read')"
   >
     <template v-slot:content>
-      <div class="tui-staticContentElementAdminDisplay">
-        {{ data.textValue }}
-      </div>
+      <div
+        ref="content"
+        class="tui-staticContentElementAdminDisplay"
+        v-html="data.content"
+      />
     </template>
   </ElementAdminDisplay>
 </template>
@@ -36,10 +38,14 @@
 <script>
 import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
 
+// Utils
+import tui from 'tui/tui';
+
 export default {
   components: {
     ElementAdminDisplay,
   },
+
   props: {
     title: String,
     type: Object,
@@ -48,6 +54,27 @@ export default {
     activityState: {
       type: Object,
       required: true,
+    },
+  },
+
+  mounted() {
+    this.$_scan();
+  },
+
+  updated() {
+    this.$_scan();
+  },
+
+  methods: {
+    $_scan() {
+      this.$nextTick().then(() => {
+        let content = this.$refs.content;
+        if (!content) {
+          return;
+        }
+
+        tui.scan(content);
+      });
     },
   },
 };

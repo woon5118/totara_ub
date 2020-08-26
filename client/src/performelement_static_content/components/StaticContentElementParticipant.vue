@@ -17,14 +17,38 @@
 -->
 <template>
   <div class="tui-staticContentElementParticipantForm">
-    {{ element.data.textValue }}
+    <div ref="content" v-html="element.data.content" />
   </div>
 </template>
 
 <script>
+// Utils
+import tui from 'tui/tui';
+
 export default {
   props: {
     element: Object,
+  },
+
+  mounted() {
+    this.$_scan();
+  },
+
+  updated() {
+    this.$_scan();
+  },
+
+  methods: {
+    $_scan() {
+      this.$nextTick().then(() => {
+        let content = this.$refs.content;
+        if (!content) {
+          return;
+        }
+
+        tui.scan(content);
+      });
+    },
   },
 };
 </script>

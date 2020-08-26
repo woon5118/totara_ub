@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -19,14 +19,12 @@
  *
  * @author Angela Kuznetsova <angela.kuznetsova@totaralearning.com>
  * @package performelement_static_content
- *
  */
 
 namespace performelement_static_content\formatter;
 
 use core\webapi\formatter\field\base;
-use core\webapi\formatter\field\string_field_formatter;
-
+use core\webapi\formatter\field\text_field_formatter;
 
 /**
  * This formatter runs the input text through the string field formatter
@@ -42,17 +40,31 @@ class data_field_formatter extends base {
      * @return false|string
      */
     protected function get_default_format($data) {
+        $data = json_decode($data, true);
 
-        $formatter = new string_field_formatter($this->format, $this->context);
+        $text_format = $data['docFormat'];
+        if (!empty($text_format) && defined($text_format)) {
+            $formatter = new text_field_formatter($data['format'], $this->context);
+            $formatter->set_additional_options(['formatter' => 'totara_tui']);
+            $formatter->set_pluginfile_url_options(
+                $this->context,
+                'performelement_static_content',
+                'content',
+                /** Use injected element_id @see static_content */
+                $data['element_id']
+            );
 
-        $text = json_decode($data, true);
-        $text['textValue'] = $formatter->format($text['textValue']);
-        $text = json_encode($text);
-        if ($text === false) {
-            throw new \coding_exception('Error encoding the formatted options');
+            $text_format = (int) constant($text_format);
+            $formatter->set_text_format($text_format);
+            $data['content'] = $formatter->format($data['wekaDoc']);
+
+            $data = json_encode($data);
+            if ($data === false) {
+                throw new \coding_exception('Error encoding the formatted options');
+            }
         }
 
-        return $text;
+        return $data;
     }
 
 }

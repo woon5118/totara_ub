@@ -68,4 +68,13 @@ class element extends entity {
     public function element_identifier(): belongs_to {
         return $this->belongs_to(element_identifier::class, 'identifier_id');
     }
+
+    /**
+     * An element belongs to a section.
+     *
+     * @return belongs_to
+     */
+    public function section_element(): belongs_to {
+        return $this->belongs_to(section_element::class, 'id', 'element_id');
+    }
 }

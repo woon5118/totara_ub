@@ -26,6 +26,7 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use core\orm\entity\model;
 use mod_perform\entities\activity\element as element_entity;
+use mod_perform\entities\activity\section_element as section_element_entity;
 
 /**
  * Class element
@@ -56,7 +57,8 @@ class element extends model {
         'title',
         'identifier_id',
         'data',
-        'is_required'
+        'is_required',
+        'element_section',
     ];
 
     protected $model_accessor_whitelist = [
@@ -203,5 +205,40 @@ class element extends model {
     public static function validate(element_entity $entity): void {
         $element_plugin = element_plugin::load_by_plugin($entity->plugin_name);
         $element_plugin->validate_element($entity);
+    }
+
+    /**
+     * Sometimes an element needs to do some post creation stuff like cleanup or
+     * store some files, this is the place to do just that.
+     *
+     * @param element $element
+     */
+    public static function post_create(element $element): void {
+        $element_plugin = element_plugin::load_by_plugin($element->plugin_name);
+        if (method_exists($element_plugin, 'post_create')) {
+            $element_plugin->post_create($element);
+        }
+    }
+
+    /**
+     * Sometimes an element needs to do some post update stuff like cleanup or
+     * store some files, this is the place to do just that.
+     *
+     * @param element $element
+     */
+    public static function post_update(element $element): void {
+        $element_plugin = element_plugin::load_by_plugin($element->plugin_name);
+        if (method_exists($element_plugin, 'post_update')) {
+            $element_plugin->post_update($element);
+        }
+    }
+
+    /**
+     * @return section_element_entity
+     */
+    public function get_section_element(): section_element_entity {
+        /** @var section_element_entity $entity */
+        $entity = $this->entity->section_element()->get()->first();
+        return $entity;
     }
 }

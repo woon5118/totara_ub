@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -15,14 +15,27 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Angela Kuznetsova <angela.kuznetsova@totaralearning.com>
+ * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
  * @package performelement_static_content
  */
 
-$string['name'] = 'Static content';
-$string['pluginname'] = 'Static content element';
-$string['title'] = 'Title';
-$string['static_content_placeholder'] = 'Content';
-$string['weka_enter_content'] = "Enter static content";
+/**
+ * Declare extensions that should be available in the editor for
+ * the specific component area.
+ * @see \editor_weka\config\factory
+ */
+$editor = [
+    // Area key
+    'content' => [
+        // Extensions to include
+        'includeextensions' => [
+            '\editor_weka\extension\attachment',
+            '\editor_weka\extension\emoji',
+            '\editor_weka\extension\list_extension',
+            '\editor_weka\extension\mention',
+            '\editor_weka\extension\media'
+        ],
+    ],
+];

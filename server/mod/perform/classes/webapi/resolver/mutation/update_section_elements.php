@@ -74,6 +74,7 @@ class update_section_elements implements mutation_resolver, has_middleware {
                         $create_new_form_data['data'] ?? null,
                         $create_new_form_data['is_required'] ?? null
                     );
+                    element::post_create($element);
                     $sort_orders[$create_new_form_data['sort_order']] = $section->add_element($element);
                 }
             }
@@ -99,6 +100,7 @@ class update_section_elements implements mutation_resolver, has_middleware {
                     $update_form_data['is_required'] ?? null,
                     $update_form_data['identifier'] ?? ''
                 );
+                element::post_update($element);
             }
         });
 

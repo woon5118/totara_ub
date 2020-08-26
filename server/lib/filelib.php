@@ -4952,6 +4952,38 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $theme 
         // all core subsystems have to be specified above, no more guessing here!
         send_file_not_found();
 
+        // ========================================================================================================================
+    } else if (strpos($component, 'performelement_') === 0) {
+        $modname = substr($component, 15);
+        if (!file_exists("$CFG->dirroot/mod/perform/element/$modname/lib.php")) {
+            send_file_not_found();
+        }
+        require_once("$CFG->dirroot/mod/perform/element/$modname/lib.php");
+
+        if ($context->contextlevel == CONTEXT_MODULE) {
+            $element = [
+                'context_id' => $context->id,
+                'plugin_name' => $modname,
+            ];
+            if (!$DB->record_exists('perform_element', $element)) {
+                // somebody tries to gain illegal access!
+                send_file_not_found();
+            }
+        }
+
+        $filefunction = $component.'_pluginfile';
+        $filefunctionold = $modname.'_pluginfile';
+        if (function_exists($filefunction)) {
+            // if the function exists, it must send the file and terminate. Whatever it returns leads to "not found"
+            $filefunction($course, $cm, $context, $filearea, $args, $forcedownload, array('preview' => $preview, 'theme' => $theme));
+        } else if (function_exists($filefunctionold)) {
+            // if the function exists, it must send the file and terminate. Whatever it returns leads to "not found"
+            $filefunctionold($course, $cm, $context, $filearea, $args, $forcedownload, array('preview' => $preview, 'theme' => $theme));
+        }
+
+        send_file_not_found();
+
+        // ========================================================================================================================
     } else {
         // try to serve general plugin file in arbitrary context
         $dir = core_component::get_component_directory($component);

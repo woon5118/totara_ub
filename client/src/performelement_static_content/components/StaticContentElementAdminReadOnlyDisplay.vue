@@ -29,7 +29,7 @@
           $str('static_content_placeholder', 'performelement_static_content')
         "
       >
-        {{ data.textValue }}
+        <div ref="content" v-html="data.content" />
       </FormRow>
     </template>
   </ElementAdminReadOnlyDisplay>
@@ -38,6 +38,9 @@
 <script>
 import ElementAdminReadOnlyDisplay from 'mod_perform/components/element/ElementAdminReadOnlyDisplay';
 import FormRow from 'tui/components/form/FormRow';
+
+// Utils
+import tui from 'tui/tui';
 
 export default {
   components: {
@@ -56,6 +59,27 @@ export default {
       required: true,
     },
     error: String,
+  },
+
+  mounted() {
+    this.$_scan();
+  },
+
+  updated() {
+    this.$_scan();
+  },
+
+  methods: {
+    $_scan() {
+      this.$nextTick().then(() => {
+        let content = this.$refs.content;
+        if (!content) {
+          return;
+        }
+
+        tui.scan(content);
+      });
+    },
   },
 };
 </script>
