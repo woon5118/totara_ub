@@ -1090,7 +1090,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
         if ($DB->get_dbfamily() === 'mysql') {
             // There are way too many columns for MySQL to handle, delete jobs related stuff.
-            foreach (['user', 'manager', 'appraiser', 'tempmanager'] as $type) {
+            foreach (['user', 'manager', 'appraiser', 'tempmanager', 'subject_user', 'participant_user'] as $type) {
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'username'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'firstname'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'lastname'));
