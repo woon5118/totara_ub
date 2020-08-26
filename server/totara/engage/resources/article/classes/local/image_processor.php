@@ -131,10 +131,6 @@ final class image_processor {
             }
         );
 
-        if ($CFG->debugdeveloper && 1 !== count($files)) {
-            debugging("There is more than one file found for article image", DEBUG_DEVELOPER);
-        }
-
         return reset($files) ?: null;
     }
 
