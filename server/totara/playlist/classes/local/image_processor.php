@@ -140,10 +140,6 @@ final class image_processor {
                 return !$file->is_directory();
             }
         );
-        // We expect to see two, as we have two images
-        if ($CFG->debugdeveloper && count($files) > 2) {
-            debugging("There is more than two files found for playlist image", DEBUG_DEVELOPER);
-        }
 
         return $files;
     }
