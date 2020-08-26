@@ -22,6 +22,7 @@
  * @category test
  */
 
+use core\orm\query\builder;
 use mod_perform\constants;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
@@ -31,6 +32,7 @@ use mod_perform\notification\dealer;
 use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\notification\factory;
 use totara_job\job_assignment;
+use totara_tenant\local\util;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
@@ -166,4 +168,177 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         } catch (class_key_not_available $ex) {
         }
     }
+
+    public function test_post_multi_tenancy_enabled() {
+        $generator = $this->getDataGenerator();
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+
+        $tenant_generator->enable_tenants();
+
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        $tenant1_manager = $generator->create_user(['tenantid' => $tenant1->id]);
+        $tenant2_manager = $generator->create_user(['tenantid' => $tenant2->id]);
+
+        $tenant_dm_role = builder::table('role')->where('shortname', 'tenantdomainmanager')->one();
+
+        role_assign($tenant_dm_role->id, $tenant1_manager->id, context_coursecat::instance($tenant1->categoryid));
+        role_assign($tenant_dm_role->id, $tenant2_manager->id, context_coursecat::instance($tenant2->categoryid));
+
+        $user11 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $user12 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $manager1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $appraiser1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $user11ja = job_assignment::create_default($user11->id, ['appraiserid' => $appraiser1->id]);
+        job_assignment::create_default($manager1->id, ['managerjaid' => $user11ja->id]);
+        $user12ja = job_assignment::create_default($user12->id);
+        job_assignment::create_default($manager1->id, ['managerjaid' => $user12ja->id]);
+
+        $user21 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $user22 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $manager2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $appraiser2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $user21ja = job_assignment::create_default($user21->id, ['appraiserid' => $appraiser2->id]);
+        job_assignment::create_default($manager2->id, ['managerjaid' => $user21ja->id]);
+        $user22ja = job_assignment::create_default($user22->id);
+        job_assignment::create_default($manager2->id, ['managerjaid' => $user22ja->id]);
+
+        $this->setUser($tenant1_manager);
+
+        $activity1 = $this->create_activity();
+        $section1 = $this->create_section($activity1);
+        $this->create_section_relationships($section1);
+        $track1 = $this->create_single_activity_track_and_assignment($activity1, [$user11->id, $user12->id]);
+        $element1 = $this->perfgen->create_element(['title' => 'Question one', 'plugin_name' => 'short_text']);
+        $this->perfgen->create_section_element($section1, $element1);
+
+        (new expand_task())->expand_all();
+
+        $notif11 = $this->create_notification($activity1, 'mock_one', false);
+        $notif12 = $this->create_notification($activity1, 'mock_two', true);
+        $this->toggle_recipients($notif11, [constants::RELATIONSHIP_SUBJECT => true]);
+        $this->toggle_recipients($notif12, [constants::RELATIONSHIP_SUBJECT => true, constants::RELATIONSHIP_APPRAISER => true]);
+
+        $activity1->activate();
+        $this->assertTrue($activity1->is_active());
+
+        $entities1 = $this->create_participant_instances_on_track($track1);
+
+        $this->setUser($tenant2_manager);
+
+        $activity2 = $this->create_activity();
+        $section2 = $this->create_section($activity2);
+        $this->create_section_relationships($section2);
+        $track2 = $this->create_single_activity_track_and_assignment($activity2, [$user21->id, $user22->id]);
+        $element2 = $this->perfgen->create_element(['title' => 'Question two', 'plugin_name' => 'short_text']);
+        $this->perfgen->create_section_element($section2, $element2);
+
+        (new expand_task())->expand_all();
+
+        $notif21 = $this->create_notification($activity2, 'mock_one', false);
+        $notif22 = $this->create_notification($activity2, 'mock_two', true);
+        $this->toggle_recipients($notif21, [constants::RELATIONSHIP_SUBJECT => true]);
+        $this->toggle_recipients($notif22, [constants::RELATIONSHIP_SUBJECT => true, constants::RELATIONSHIP_APPRAISER => true]);
+
+        $activity2->activate();
+        $this->assertTrue($activity2->is_active());
+
+        $entities2 = $this->create_participant_instances_on_track($track2);
+
+        $this->setAdminUser();
+
+        $dealer1 = factory::create_dealer_on_participant_instances($entities1->all());
+
+        $sink = $this->redirectMessages();
+
+        $dealer1->dispatch('mock_one');
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+
+        $dealer1->dispatch('mock_two');
+        // The user does not receive a notification
+        $this->assertEqualsCanonicalizing(
+            [$user11->id, $user12->id, $appraiser1->id],
+            array_column($sink->get_messages(), 'useridto')
+        );
+        $sink->clear();
+
+        $dealer1->dispatch('mock_three');
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+
+        $dealer2 = factory::create_dealer_on_participant_instances($entities2->all());
+
+        $dealer2->dispatch('mock_one');
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+
+        $dealer2->dispatch('mock_two');
+        $this->assertEqualsCanonicalizing(
+            [$user21->id, $user22->id, $appraiser2->id],
+            array_column($sink->get_messages(), 'useridto')
+        );
+        $sink->clear();
+
+        $dealer2->dispatch('mock_three');
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+
+        // Now migrate user 1 to the other tenant
+        util::migrate_user_to_tenant($user11->id, $tenant2->id);
+
+        $dealer1->dispatch('mock_one');
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+
+        $dealer1->dispatch('mock_two');
+        // The user does not receive a notification
+        $this->assertEqualsCanonicalizing(
+            [$user12->id, $appraiser1->id],
+            array_column($sink->get_messages(), 'useridto')
+        );
+        $sink->clear();
+
+        $dealer1->dispatch('mock_three');
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+
+        // And the other one still sends the same messages
+        $dealer2->dispatch('mock_one');
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+
+        $dealer2->dispatch('mock_two');
+        $this->assertEqualsCanonicalizing(
+            [$user21->id, $user22->id, $appraiser2->id],
+            array_column($sink->get_messages(), 'useridto')
+        );
+        $sink->clear();
+
+        $dealer2->dispatch('mock_three');
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+
+        // Move the user out of the tenant but keep him as participant
+        util::set_user_participation($user12->id, [$tenant1->id, $tenant2->id]);
+
+        $dealer1->dispatch('mock_one');
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+
+        $dealer1->dispatch('mock_two');
+        // The user should still receive a notification as he's a participant
+        $this->assertEqualsCanonicalizing(
+            [$user12->id, $appraiser1->id],
+            array_column($sink->get_messages(), 'useridto')
+        );
+        $sink->clear();
+
+        $dealer1->dispatch('mock_three');
+        $this->assertCount(0, $sink->get_messages());
+        $sink->clear();
+    }
+
 }

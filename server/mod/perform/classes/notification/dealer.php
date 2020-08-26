@@ -61,8 +61,19 @@ class dealer {
         $mailer = null;
 
         foreach ($this->participant_instances as $instance) {
+            $user = $instance->get_participant();
+            $activity = $instance->get_subject_instance()->get_activity();
+
+            // Do not send any notification if the recipient is not a participant
+            // in the same tenant as the activity. They won't be able to access the activity anymore
+            if ($user->is_internal()
+                && $activity->get_context()->is_user_access_prevented($user->id)
+            ) {
+                continue;
+            }
+
             if ($instance->subject_instance_id !== $subject_instance_id) {
-                $notification = notification_model::load_by_activity_and_class_key($instance->get_subject_instance()->get_activity(), $class_key);
+                $notification = notification_model::load_by_activity_and_class_key($activity, $class_key);
                 $mailer = factory::create_mailer_on_notification($notification);
                 $subject_instance_id = $instance->subject_instance_id;
             }
@@ -70,7 +81,6 @@ class dealer {
                 // The notification is not active, recipients are not set, etc.
                 continue;
             }
-            $user = $instance->get_participant();
             $relationship = $instance->get_core_relationship();
             $placeholders = placeholder::from_participant_instance($instance);
             $mailer->post($user, $relationship, $placeholders);
