@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -17,28 +17,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
-
 
 namespace mod_perform\task;
 
 use core\task\scheduled_task;
 use mod_perform\expand_task;
+use mod_perform\task\service\track_schedule_sync;
 
 /**
- * Update perform user assignment table
+ * Expand all track assignments.
+ *
+ * This will go through all tracks of active activities and expand/re-expand the track_user_assignment records.
+ * Therefore, it should not be run often.
+ *
+ * This is for cases that are not covered by expand_assignments_task.
  */
-class expand_assignments_task extends scheduled_task {
+class expand_all_assignments_task extends scheduled_task {
 
     public function get_name() {
-        return get_string('expand_assignments_task', 'mod_perform');
+        return get_string('expand_all_assignments_task', 'mod_perform');
     }
 
     public function execute() {
         $expand_task = new expand_task();
-        $expand_task->expand_all();
+        $expand_task->expand_all(true);
     }
 
 }

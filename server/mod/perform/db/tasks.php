@@ -25,6 +25,7 @@ use mod_perform\task\check_notification_trigger_task;
 use mod_perform\task\cleanup_unused_element_identifiers_task;
 use mod_perform\task\create_manual_participant_progress_task;
 use mod_perform\task\create_subject_instance_task;
+use mod_perform\task\expand_all_assignments_task;
 use mod_perform\task\expand_assignments_task;
 use mod_perform\task\sync_all_track_schedules_task;
 use mod_perform\task\sync_track_schedule_changes_task;
@@ -32,6 +33,15 @@ use mod_perform\task\sync_track_schedule_changes_task;
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
+    [
+        'classname' => expand_all_assignments_task::class,
+        'blocking' => 0,
+        'minute' => 45,
+        'hour' => 1,
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ],
     [
         'classname' => sync_all_track_schedules_task::class,
         'blocking' => 0,

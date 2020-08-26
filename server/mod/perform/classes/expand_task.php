@@ -51,9 +51,11 @@ class expand_task {
 
     /**
      * Expand all active assignments
+     *
+     * @param bool $force_not_flagged Also expand assignments not flagged for expansion.
      */
-    public function expand_all() {
-        $assignments = $this->get_repository()->get();
+    public function expand_all(bool $force_not_flagged = false) {
+        $assignments = $this->get_repository($force_not_flagged)->get();
         foreach ($assignments as $assignment) {
             $this->expand_assignment($assignment);
         }
@@ -99,10 +101,14 @@ class expand_task {
         $this->delete_orphaned_user_assignments();
     }
 
-    private function get_repository(): track_assignment_repository {
-        return track_assignment::repository()
-            ->filter_by_expand()
-            ->filter_by_active_track_and_activity()
+    private function get_repository(bool $force_not_flagged = false): track_assignment_repository {
+        $repository = track_assignment::repository();
+
+        if (!$force_not_flagged) {
+            $repository->filter_by_expand();
+        }
+
+        return $repository->filter_by_active_track_and_activity()
             ->with('track');
     }
 
@@ -476,7 +482,7 @@ class expand_task {
                 ]);
 
             // Update the user assignment period according to track schedule settings.
-            $this->sync_schedule_for_user_assignments($possible_deleted_user_assignments, $user_ids);
+            $this->sync_schedule_for_user_assignments($possible_deleted_user_assignments);
 
             // Trigger an event with all just newly reactivated user assignments
             track_user_assigned_bulk::create_from_user_assignments(
@@ -489,9 +495,8 @@ class expand_task {
 
     /**
      * @param collection|track_user_assignment[] $user_assignments
-     * @param int[] $user_ids
      */
-    private function sync_schedule_for_user_assignments(collection $user_assignments, array $user_ids): void {
+    private function sync_schedule_for_user_assignments(collection $user_assignments): void {
         /** @var track_assignment $first_assignment */
         $first_assignment = $user_assignments->first();
         $track = new track($first_assignment->track);
