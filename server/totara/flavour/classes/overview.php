@@ -66,8 +66,8 @@ class overview implements \renderable {
             return $name;
         }, array_keys($flavours));
 
-        // By default show the enterprise flavour only.
-        $showflavours = isset($CFG->showflavours) ? $CFG->showflavours : implode(',', $flavour_shortnames);
+        // By default don't display non-active flavours. $CFG->showflavours can be used to display others if required.
+        $showflavours = isset($CFG->showflavours) ? $CFG->showflavours : '';
 
         // Hide the flavours that are not supposed to be visible.
         if (empty($showflavours)) {
