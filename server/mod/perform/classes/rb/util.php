@@ -66,7 +66,7 @@ class util {
         }
 
         // Early exit if they can not even potentially manage any participants
-        if (!has_capability_in_any_context('mod/perform:report_on_subject_responses')) {
+        if (!has_capability_in_any_context('mod/perform:report_on_subject_responses', null, $user_id)) {
             return ['1 = 0', []];
         }
 
@@ -132,7 +132,7 @@ class util {
         // If user can manage participation across all users don't do the per-row restriction at all.
         $user_context = context_user::instance($report_for);
         if (has_capability('mod/perform:report_on_all_subjects_responses', $user_context, $report_for)) {
-            return rb\util::get_tenant_user_sql($user_context, $user_id_field);
+            return self::get_tenant_user_sql($user_context, $user_id_field);
         }
 
         $capability = 'mod/perform:report_on_subject_responses';

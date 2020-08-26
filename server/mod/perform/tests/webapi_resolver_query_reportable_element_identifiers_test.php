@@ -108,7 +108,7 @@ class mod_perform_webapi_resolver_query_reportable_element_identifiers_testcase 
         $data->identifier2 = $perform_generator->create_element_identifier('test_identifier_2');
         $data->identifier3 = $perform_generator->create_element_identifier('test_identifier_3');
 
-        $data->activity1 = $perform_generator->create_activity_in_container(['activity_name' => 'Mid year performance']);
+        $data->activity1 = $perform_generator->create_full_activities()->first();
         $section = $data->activity1->sections->first();
 
         $element1 = $perform_generator->create_element(['identifier'=>'test_identifier_1' ]);

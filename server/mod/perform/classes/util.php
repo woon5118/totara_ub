@@ -182,7 +182,7 @@ class util {
             return true;
         }
 
-        return has_capability_in_any_context('mod/perform:manage_subject_user_participation');
+        return has_capability_in_any_context('mod/perform:manage_subject_user_participation', null, $user_id);
     }
 
     public static function get_participant_manageable_activities(int $user_id) {
@@ -195,7 +195,7 @@ class util {
         }
 
         // Early exit if they can not even potentially manage any participants
-        if (!has_capability_in_any_context('mod/perform:manage_subject_user_participation')) {
+        if (!has_capability_in_any_context('mod/perform:manage_subject_user_participation', null, $user_id)) {
             return new collection();
         }
 
@@ -296,7 +296,7 @@ class util {
             return true;
         }
 
-        return has_capability_in_any_context('mod/perform:report_on_subject_responses');
+        return has_capability_in_any_context('mod/perform:report_on_subject_responses', null, $user_id);
     }
 
     /**
@@ -313,7 +313,7 @@ class util {
         }
 
         // Early exit if they can not even potentially manage any participants
-        if (!has_capability_in_any_context('mod/perform:report_on_subject_responses')) {
+        if (!has_capability_in_any_context('mod/perform:report_on_subject_responses', null, $user_id)) {
             return false;
         }
 
