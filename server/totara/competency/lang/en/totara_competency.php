@@ -114,6 +114,7 @@ $string['activity_log_unassigned_organisation'] = 'Unassigned: {$a->organisation
 $string['activity_log_unassigned_other'] = 'Unassigned: {$a->assigner_name}';
 $string['activity_log_unassigned_position'] = 'Unassigned: {$a->position_name} (Position)';
 $string['activity_log_unassigned_self'] = 'Unassigned: Self-assigned';
+$string['add_criteria_group'] = 'Add criteria group';
 $string['add_linked_courses'] = 'Add linked courses';
 $string['aggregate_all_competencies_task'] = 'Aggregate competency achievements for all users with active competency assignments';
 $string['aggregate_queued_competencies_task'] = 'Aggregate competency achievements for queued aggregation only';

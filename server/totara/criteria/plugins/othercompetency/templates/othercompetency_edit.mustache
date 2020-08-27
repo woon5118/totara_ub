@@ -61,13 +61,18 @@ data-tw-loader-target="">
 
         <div>
             <ul class="tw-editAchievementPaths__criterionForm-list" data-tw-criterionOtherCompetency-competencies="">
+                <li class="tw-editAchievementPaths__criterionForm-warning tw-editAchievementPaths--hidden" data-tw-criterionOtherCompetency-error="notenoughothercompetency">
+                    {{#flex_icon}}notification-warning, error, criteria_othercompetency{{/flex_icon}}
+                    <span>{{#str}}error_not_enough_competencies, criteria_othercompetency{{/str}}</span>
+                </li>
+
                 {{#items}}{{> totara_criteria/partial_item}}{{/items}}
             </ul>
 
             <div>
-                <div class="tw-editAchievementPaths__criterionForm-warning tw-editAchievementPaths--hidden" data-tw-criterionOtherCompetency-error="notenoughothercompetency">
+                <div class="tw-editAchievementPaths__criterionForm-warning tw-editAchievementPaths--hidden" data-tw-criterionOtherCompetency-error="noothercompetency">
                     {{#flex_icon}}notification-warning, error, criteria_othercompetency{{/flex_icon}}
-                    <span>{{#str}}error_not_enough_other_competency, criteria_othercompetency{{/str}}</span>
+                    <span>{{#str}}error_no_competencies, criteria_othercompetency{{/str}}</span>
                 </div>
 
                 <button type="button" class="tw-editAchievementPaths__transparentBtn" data-tw-criterionOtherCompetency-addCompetencies="">

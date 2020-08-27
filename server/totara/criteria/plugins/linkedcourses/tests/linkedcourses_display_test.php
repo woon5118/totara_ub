@@ -88,7 +88,7 @@ class criteria_linkedcourses_display_testcase extends advanced_testcase {
             'items' => [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error_not_enough_courses', 'criteria_linkedcourses'),
+                    'error' => get_string('error_no_courses', 'criteria_linkedcourses'),
                 ]
             ],
         ];

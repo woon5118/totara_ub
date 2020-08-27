@@ -116,11 +116,30 @@ class childcompetency extends criterion {
      * @return string
      */
     public function export_configuration_error_description(): string {
+        global $DB;
+
         if ($this->is_valid()) {
             return '';
         }
 
-        return get_string('error_not_enough_children', 'criteria_childcompetency');
+        $competency_id = $this->get_competency_id();
+        if (is_null($competency_id)) {
+            throw new coding_exception('Competency id must be set before children are retrieved');
+        }
+
+        $child_competencies = $DB->get_fieldset_select('comp', 'id', 'parentid = :parentid',
+            ['parentid' => $competency_id]
+        );
+        if (empty($child_competencies)) {
+            return get_string('error_no_children', 'criteria_childcompetency');
+        }
+
+        $num_required = $this->get_aggregation_num_required();
+        if (count($child_competencies) < $num_required) {
+            return get_string('error_not_enough_children', 'criteria_childcompetency');
+        }
+
+        return get_string('error_cant_become_proficient', 'criteria_childcompetency');
     }
 
 

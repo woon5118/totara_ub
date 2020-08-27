@@ -28,6 +28,7 @@ use coding_exception;
 use core\orm\collection;
 use core\orm\query\builder;
 use \core\orm\entity\repository;
+use criteria_onactivate\onactivate;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
 use stdClass;
@@ -416,6 +417,10 @@ class criteria_group extends pathway {
      * @return array
      */
     public static function export_criteria_types(): array {
+        // TODO: Get a more generic way of ordering
+        // For now hardcoding the order or known plugins.
+        $display_order = array_flip(['onactivate', 'linkedcourses', 'coursecompletion', 'childcompetency', 'othercompetency']);
+
         $types = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');
         $types = array_map(function ($type) {
             $criterion = criterion_factory::create($type);
@@ -426,6 +431,13 @@ class criteria_group extends pathway {
                 'criterion_templatename' => $criterion->get_edit_template(),
             ];
         }, $types);
+
+        usort($types, function ($type1, $type2) use ($display_order) {
+            // If new plugin, add at back
+            $order1 = $display_order[$type1['type']] ?? 99;
+            $order2 = $display_order[$type2['type']] ?? 99;
+            return $order1 - $order2;
+        });
 
         return array_values($types);
     }

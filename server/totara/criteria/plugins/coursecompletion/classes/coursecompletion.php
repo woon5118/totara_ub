@@ -101,7 +101,17 @@ class coursecompletion extends criterion {
             return '';
         }
 
-        return get_string('error_not_enough_children', 'criteria_childcompetency');
+        if (empty($this->get_item_ids())) {
+            return get_string('error_no_courses', 'criteria_coursecompletion');
+        }
+
+        $num_required = $this->get_aggregation_num_required();
+        if ($num_required > count($this->get_item_ids())) {
+            return get_string('error_not_enough_courses', 'criteria_coursecompletion');
+        }
+
+        // Some courses can not be completed
+        return get_string('error_invalid_configuration', 'totara_criteria');
     }
 
 

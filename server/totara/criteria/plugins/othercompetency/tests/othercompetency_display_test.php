@@ -126,7 +126,7 @@ class criteria_othercompetency_display_testcase extends advanced_testcase {
             $expected->error = get_string('error_invalid_configuration', 'totara_criteria');
             $expected->items[] = (object)[
                 'description' => '',
-                'error' => get_string('error_not_enough_other_competency', 'criteria_othercompetency'),
+                'error' => get_string('error_no_competencies', 'criteria_othercompetency'),
             ];
         }
 

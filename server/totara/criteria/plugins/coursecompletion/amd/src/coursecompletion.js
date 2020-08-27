@@ -214,6 +214,8 @@ function(templates, notification, ajax, ModalList, Loader) {
                 // the count input
                 countInput.disabled = testCountInput ? false : true;
             }
+
+            this.showHideNotEnoughCourses();
         },
 
         /**
@@ -228,6 +230,8 @@ function(templates, notification, ajax, ModalList, Loader) {
             if (countInput) {
                 countInput.value = reqItems;
             }
+
+            this.showHideNotEnoughCourses();
         },
 
         /**
@@ -251,28 +255,6 @@ function(templates, notification, ajax, ModalList, Loader) {
             }
         },
 
-        /**
-         * Create an empty coursecompletion criterion instance with the key
-         *
-         * @param {int} key
-         * @return {Promise}
-         */
-        oldCcreateEmptyCriterion: function() {
-            // Ensure the basket is empty
-            return new Promise(function(resolve) {
-                resolve({
-                    results: {
-                        id: 0,
-                        items: [],
-                        aggregation: {
-                            method: 1,
-                            reqitems: 1
-                        }
-                    }
-                });
-            });
-        },
-
 
         /**
          * Initialise the course adder
@@ -283,7 +265,6 @@ function(templates, notification, ajax, ModalList, Loader) {
             var that = this;
 
             return new Promise(function(resolve) {
-
                 var adderData = {
                     key: 'courseAdder_' + that.criterionKey,
                     title: [{
@@ -315,7 +296,7 @@ function(templates, notification, ajax, ModalList, Loader) {
                     primarySearch: {
                         filterKey: 'name',
                         placeholderString: [{
-                            component:  'totara_competency',
+                            component: 'totara_competency',
                             key: 'search_courses'
                         }]
                     },
@@ -336,7 +317,6 @@ function(templates, notification, ajax, ModalList, Loader) {
                 });
             });
         },
-
 
         /**
          * Open the adder to add courses
@@ -421,19 +401,34 @@ function(templates, notification, ajax, ModalList, Loader) {
         },
 
         /**
-         * Show or hide the No Criteria warning depending on the number of items
+         * Show or hide the 'No Courses' or 'Not enough courses' warning depending on the number of items
          */
         showHideNotEnoughCourses: function() {
-            var target = this.widget.querySelector('[data-tw-criterionCourseCompletion-error="notenoughcourses"]');
-            if (!target) {
+            var targetNone = this.widget.querySelector('[data-tw-criterionCourseCompletion-error="nocourses"]'),
+                targetNotEnough = this.widget.querySelector('[data-tw-criterionCourseCompletion-error="notenoughcourses"]');
+            if (!targetNone || !targetNotEnough) {
                 return;
             }
 
             if (this.criterion.itemids.length > 0) {
-                // Hide the warning
-                target.classList.add(this.domClasses.hidden);
+                // Hide no courses warning
+                targetNone.classList.add(this.domClasses.hidden);
+
+                if (this.criterion.aggregation.method == 1) {
+                    // Hide not enough courses warning
+                    targetNotEnough.classList.add(this.domClasses.hidden);
+                } else {
+                    if (
+                        this.criterion.aggregation.reqitems > this.criterion.itemids.length
+                    ) {
+                        targetNotEnough.classList.remove(this.domClasses.hidden);
+                    } else {
+                        targetNotEnough.classList.add(this.domClasses.hidden);
+                    }
+                }
             } else {
-                target.classList.remove(this.domClasses.hidden);
+                targetNone.classList.remove(this.domClasses.hidden);
+                targetNotEnough.classList.add(this.domClasses.hidden);
             }
         },
 
@@ -453,7 +448,6 @@ function(templates, notification, ajax, ModalList, Loader) {
 
             this.widget.dispatchEvent(propagateEvent);
         },
-
     };
 
     /**
@@ -484,4 +478,4 @@ function(templates, notification, ajax, ModalList, Loader) {
     return {
         init: init
     };
- });
+});

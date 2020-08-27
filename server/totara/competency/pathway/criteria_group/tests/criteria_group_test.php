@@ -646,7 +646,6 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $this->assertFalse($instance->is_valid());
     }
 
-
     /**
      * Validate the number of rows in the specified tables
      *
@@ -680,6 +679,19 @@ class pathway_criteria_group_testcase extends \advanced_testcase {
         $this->assertSame(count($expected_criterion_ids), count($rows));
         while ($row = array_pop($rows)) {
             $this->assertTrue(in_array($row->criterion_id, $expected_criterion_ids));
+        }
+    }
+
+    /**
+     * Test export_criteria_types and ensure they are in the correct order
+     */
+    public function test_export_criteria_types() {
+        $expected_types = ['onactivate', 'linkedcourses', 'coursecompletion', 'childcompetency', 'othercompetency'];
+
+        $types = criteria_group::export_criteria_types();
+        $this->assertSame(count($expected_types), count($types));
+        foreach ($expected_types as $idx => $expected) {
+            $this->assertSame($expected, $types[$idx]['type']);
         }
     }
 

@@ -22,13 +22,13 @@ Feature: Manage Manual rating achievement paths
     When I add a "manual" pathway
     Then I should not see "No achievement paths added"
     And I should see "manual" pathway
-    And I should see "No raters selected" in "manual" pathway
+    And I should see "No raters added" in "manual" pathway
     And the "Apply changes" "button" should be enabled
 
     When I click on "Add raters" "button" in "manual" pathway
     And I toggle the legacy adder list entry "Manager" in "Select raters"
     And I save my legacy selections and close the "Select raters" adder
-    And I should not see "No raters selected" in "manual" pathway
+    And I should not see "No raters added" in "manual" pathway
     And I should see "Manager" in "manual" pathway
 
     When I click on "Apply changes" "button"

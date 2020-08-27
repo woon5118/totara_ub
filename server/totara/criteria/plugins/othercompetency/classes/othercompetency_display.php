@@ -56,12 +56,20 @@ class othercompetency_display extends criterion_display {
             return [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error_not_enough_other_competency', 'criteria_othercompetency'),
+                    'error' => get_string('error_no_competencies', 'criteria_othercompetency'),
                 ],
             ];
         }
 
         $items = [];
+        $num_required = $this->criterion->get_aggregation_num_required();
+        if ($num_required > count($competency_ids)) {
+            $items[] = (object)[
+                'description' => '',
+                'error' => get_string('error_not_enough_competencies', 'criteria_othercompetency'),
+            ];
+        }
+
         foreach ($competency_ids as $competency_id) {
             $item_detail = [];
             try {

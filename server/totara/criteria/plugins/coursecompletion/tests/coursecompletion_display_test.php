@@ -115,7 +115,7 @@ class criteria_coursecompletion_display_testcase extends advanced_testcase {
             $expected->error = get_string('error_invalid_configuration', 'totara_criteria');
             $expected->items[] = (object)[
                 'description' => '',
-                'error' => get_string('error_not_enough_courses', 'criteria_coursecompletion'),
+                'error' => get_string('error_no_courses', 'criteria_coursecompletion'),
             ];
         }
 

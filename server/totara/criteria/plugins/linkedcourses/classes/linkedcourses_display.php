@@ -23,6 +23,7 @@
 
 namespace criteria_linkedcourses;
 
+use totara_competency\linked_courses;
 use totara_criteria\criterion_display;
 
 /**
@@ -52,10 +53,27 @@ class linkedcourses_display extends criterion_display {
             return [];
         }
 
+        $competency_id = $this->criterion->get_competency_id();
+        if (is_null($competency_id)) {
+            throw new coding_exception('Competency id must be set before linked courses are retrieved');
+        }
+        $linked_courses = linked_courses::get_linked_course_ids($competency_id);
+
+        if (empty($linked_courses)) {
+            $error =  get_string('error_no_courses', 'criteria_linkedcourses');
+        } else {
+            $num_required = $this->criterion->get_aggregation_num_required();
+            if ($num_required > count($linked_courses)) {
+                $error = get_string('error_not_enough_courses', 'criteria_linkedcourses');
+            } else {
+                $error = get_string('error_no_course_completion', 'criteria_linkedcourses');
+            }
+        }
+
         return [
             (object)[
                 'description' => '',
-                'error' => get_string('error_not_enough_courses', 'criteria_linkedcourses'),
+                'error' => $error,
             ],
         ];
     }

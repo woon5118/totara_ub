@@ -53,7 +53,7 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
             },
             singleuse: false,
             expandable: true
-            };
+        };
 
         // Saving items from the basket - therefore not stored in criterion
         this.criterionKey = ''; // Unique key to use in bubbled events
@@ -213,6 +213,8 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
                 // the count input
                 countInput.disabled = testCountInput ? false : true;
             }
+
+            this.showHideNotEnoughCompetency();
         },
 
         /**
@@ -227,6 +229,8 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
             if (countInput) {
                 countInput.value = reqItems;
             }
+
+            this.showHideNotEnoughCompetency();
         },
 
         /**
@@ -386,7 +390,6 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
          */
         addCompetencies: function() {
             var that = this;
-
             if (!this.competencyAdder) {
                 this.initCompetencyAdder().then(function() {
                     that.competencyAdder.show(that.criterion.itemids);
@@ -442,7 +445,6 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
             }
         },
 
-
         removeCompetency: function(id) {
             id = parseInt(id);
 
@@ -469,16 +471,29 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
          * Show or hide the No Criteria warning depending on the number of items
          */
         showHideNotEnoughCompetency: function() {
-            var target = this.widget.querySelector('[data-tw-criterionOtherCompetency-error="notenoughothercompetency"]');
-            if (!target) {
+            var targetNone = this.widget.querySelector('[data-tw-criterionOtherCompetency-error="noothercompetency"]'),
+                targetNotEnough = this.widget.querySelector('[data-tw-criterionOtherCompetency-error="notenoughothercompetency"]');
+
+            if (!targetNone || !targetNotEnough) {
                 return;
             }
 
             if (this.criterion.itemids.length > 0) {
-                // Hide the warning
-                target.classList.add(this.domClasses.hidden);
+                // Hide no courses warning
+                targetNone.classList.add(this.domClasses.hidden);
+                if (this.criterion.aggregation.method == 1) {
+                    // Hide not enough courses warning
+                    targetNotEnough.classList.add(this.domClasses.hidden);
+                } else {
+                    if (this.criterion.aggregation.reqitems > this.criterion.itemids.length) {
+                        targetNotEnough.classList.remove(this.domClasses.hidden);
+                    } else {
+                        targetNotEnough.classList.add(this.domClasses.hidden);
+                    }
+                }
             } else {
-                target.classList.remove(this.domClasses.hidden);
+                targetNone.classList.remove(this.domClasses.hidden);
+                targetNotEnough.classList.add(this.domClasses.hidden);
             }
         },
 
@@ -498,7 +513,6 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
 
             this.widget.dispatchEvent(propagateEvent);
         },
-
     };
 
     /**

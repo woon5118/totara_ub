@@ -55,12 +55,20 @@ class coursecompletion_display extends criterion_display {
             return [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error_not_enough_courses', 'criteria_coursecompletion'),
+                    'error' => get_string('error_no_courses', 'criteria_coursecompletion'),
                 ],
             ];
         }
 
         $items = [];
+        $num_required = $this->criterion->get_aggregation_num_required();
+        if ($num_required > count($course_ids)) {
+            $items[] = (object)[
+                'description' => '',
+                'error' => get_string('error_not_enough_courses', 'criteria_coursecompletion'),
+            ];
+        }
+
         foreach ($course_ids as $course_id) {
             $item_detail = [];
             $course = $DB->get_record('course', ['id' => $course_id]);

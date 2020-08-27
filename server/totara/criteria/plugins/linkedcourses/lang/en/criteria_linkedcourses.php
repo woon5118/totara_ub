@@ -24,5 +24,7 @@
 $string['pluginname'] = 'Course completion: Linked courses';
 
 $string['achievement_via'] = 'Course completion';
-$string['error_not_enough_courses'] = 'Not enough linked courses with completion tracking enabled';
+$string['error_no_courses'] = 'No courses linked to the competency';
+$string['error_no_course_completion'] = 'Course completion not possible in one or more linked courses (completion not tracked, or completion settings not valid)';
+$string['error_not_enough_courses'] = 'Not enough linked courses – link more courses, or reduce the number required';
 $string['linked_courses'] = 'Linked courses';

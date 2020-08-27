@@ -29,7 +29,7 @@
 
         Data attributes required for JS:
         * data-tw-editScaleValuePaths-scale-id
-        * 
+        *
 
         Context variables required for this template:
         * scalevalues
@@ -65,13 +65,14 @@
                     {{#proficient}}{{#flex_icon}}check-circle-o-success, single_value_proficient_mark, totara_competency{{/flex_icon}}{{/proficient}}
                     {{name}}
                 </h4>
-                
+
                 <div class="tw-editScaleValuePaths__scaleHeader-add">
                     <button aria-expanded="false" class="tw-editScaleValuePaths__addButton" aria-label="Add" type="button" data-tw-editScaleValuePaths-add="">
                         <span>
                             <span aria-hidden="true" class="">
                                 {{#flex_icon}}plus{{/flex_icon}}
                             </span>
+                            <span>{{#str}}add_criteria_group, totara_competency{{/str}}</span>
                         </span>
                     </button>
 

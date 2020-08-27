@@ -23,6 +23,7 @@
 
 $string['pluginname'] = 'Criteria fulfillment';
 
+$string['and'] = 'And';
 $string['criteria_add'] = 'Add criteria';
 $string['criteria_remove'] = 'Remove criteria';
 $string['criteria_remove_undo'] = 'Undo remove criteria';

@@ -48,7 +48,7 @@ abstract class criterion {
     /** @var int $id */
     private $id;
 
-    /** @var string $type Type of criterion*/
+    /** @var string $type Type of criterion */
     private $plugin_type;
 
     /** @var string $idnumber */

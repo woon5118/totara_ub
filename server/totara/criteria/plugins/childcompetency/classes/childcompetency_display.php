@@ -47,14 +47,35 @@ class childcompetency_display extends criterion_display {
      * @return string[]
      */
     protected function get_display_configuration_items(): array {
+        global $DB;
+
         if ($this->criterion->is_valid()) {
             return [];
+        }
+
+        $competency_id = $this->criterion->get_competency_id();
+        if (is_null($competency_id)) {
+            throw new coding_exception('Competency id must be set before children are retrieved');
+        }
+
+        $child_competencies = $DB->get_fieldset_select('comp', 'id', 'parentid = :parentid',
+            ['parentid' => $competency_id]
+        );
+        if (empty($child_competencies)) {
+            $error = get_string('error_no_children', 'criteria_childcompetency');
+        } else {
+            $num_required = $this->criterion->get_aggregation_num_required();
+            if (count($child_competencies) < $num_required) {
+                $error = get_string('error_not_enough_children', 'criteria_childcompetency');
+            } else {
+                $error = get_string('error_cant_become_proficient', 'criteria_childcompetency');
+            }
         }
 
         return [
             (object)[
                 'description' => '',
-                'error' => get_string('error_not_enough_children', 'criteria_childcompetency'),
+                'error' => $error,
             ],
         ];
     }

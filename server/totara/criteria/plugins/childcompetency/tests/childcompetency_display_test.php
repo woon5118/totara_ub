@@ -51,7 +51,7 @@ class criteria_childcompetency_display_testcase extends advanced_testcase {
             'items' => [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error_not_enough_children', 'criteria_childcompetency'),
+                    'error' => get_string('error_no_children', 'criteria_childcompetency'),
                 ]
             ],
         ];
@@ -85,7 +85,7 @@ class criteria_childcompetency_display_testcase extends advanced_testcase {
             'items' => [
                 (object)[
                     'description' => '',
-                    'error' => get_string('error_not_enough_children', 'criteria_childcompetency'),
+                    'error' => get_string('error_no_children', 'criteria_childcompetency'),
                 ]
             ],
         ];
