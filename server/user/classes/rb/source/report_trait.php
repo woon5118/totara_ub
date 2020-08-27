@@ -57,9 +57,18 @@ trait report_trait {
      *                     'user id' field
      * @param string $field Name of user id field to join on
      * @param string $alias Use custom user table alias
+     * @param string $custom_condition Override the standard join condition to allow for more complex queries.
+     * @param array $additional_joins Specify any additional aliases that are required for a complex custom condition.
      * @return boolean True
      */
-    protected function add_core_user_tables(&$joinlist, $join, $field, $alias = 'auser') {
+    protected function add_core_user_tables(
+        &$joinlist,
+        $join,
+        $field,
+        $alias = 'auser',
+        string $custom_condition = null,
+        array $additional_joins = []
+    ) {
         if (isset($this->addeduserjoins[$alias])) {
             debugging("User join '{$alias}' was already added to the source", DEBUG_DEVELOPER);
         } else {
@@ -73,9 +82,9 @@ trait report_trait {
                 $alias,
                 'LEFT',
                 '{user}',
-                "{$alias}.id = $join.$field",
+                $custom_condition ?? "{$alias}.id = $join.$field",
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                $join
+                array_merge([$join], $additional_joins)
             );
         }
 

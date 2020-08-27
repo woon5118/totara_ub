@@ -888,7 +888,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
             '{user}',
             'auser.id = base.userid',
             1,
-            'base'
+            ['base']
         );
         // the strings should have the correct format
         $this->assertEquals($userjoin, current($joins));
@@ -933,7 +933,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
             '{user}',
             'auser.id = base.userid',
             1,
-            'base'
+            ['base']
         );
         // the strings should have the correct format
         $this->assertEquals($userjoin, current($columns));
@@ -958,7 +958,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
             '{user}',
             'auser.id = base.userid',
             1,
-            'base'
+            ['base']
         );
         // the strings should have the correct format
         $this->assertEquals($userjoin, current($joins));
