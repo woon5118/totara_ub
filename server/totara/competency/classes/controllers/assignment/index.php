@@ -30,8 +30,6 @@ class index extends base {
     protected $admin_external_page_name = 'competency_assignment';
 
     public function action() {
-        $this->require_capability('totara/competency:manage_assignments', context_system::instance());
-
         return new \totara_competency\views\index();
     }
 

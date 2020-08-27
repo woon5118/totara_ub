@@ -23,6 +23,7 @@
 
 namespace totara_competency\services;
 
+use context_system;
 use core\format;
 use core\orm\collection;
 use core\output\notification;
@@ -91,8 +92,11 @@ class assignment extends \external_api {
      */
     public static function index(array $filters, int $page, string $order_by, string $order_dir) {
         advanced_feature::require('competency_assignment');
+        if (!has_capability('totara/competency:view_assignments', context_system::instance())) {
+            require_capability('totara/competency:manage_assignments', context_system::instance());
+        }
+        require_capability('moodle/user:viewdetails', context_system::instance());
 
-        require_capability('totara/competency:view_assignments', \context_system::instance());
 
         $order_dir = (strtolower($order_dir) == 'asc') ? 'ASC' : 'DESC';
 
@@ -166,8 +170,8 @@ class assignment extends \external_api {
      */
     public static function create(string $basket_id, array $user_groups, int $status) {
         advanced_feature::require('competency_assignment');
-
-        require_capability('totara/competency:manage_assignments', \context_system::instance());
+        require_capability('totara/competency:manage_assignments', context_system::instance());
+        require_capability('moodle/user:viewdetails', context_system::instance());
 
         try {
             $basket = new competency_basket($basket_id);
@@ -235,8 +239,8 @@ class assignment extends \external_api {
      */
     public static function create_from_baskets(string $basket_id, array $user_groups, int $status) {
         advanced_feature::require('competency_assignment');
-
-        require_capability('totara/competency:manage_assignments', \context_system::instance());
+        require_capability('totara/competency:manage_assignments', context_system::instance());
+        require_capability('moodle/user:viewdetails', context_system::instance());
 
         try {
             $basket = new competency_basket($basket_id);
@@ -388,8 +392,8 @@ class assignment extends \external_api {
      */
     public static function action(string $action, ?string $basket_key, ?int $assignment_id, array $extra) {
         advanced_feature::require('competency_assignment');
-
-        require_capability('totara/competency:manage_assignments', \context_system::instance());
+        require_capability('totara/competency:manage_assignments', context_system::instance());
+        require_capability('moodle/user:viewdetails', context_system::instance());
 
         if (is_null($basket_key) && is_null($assignment_id) || !is_null($basket_key) && !is_null($assignment_id)) {
             throw new \coding_exception('You must supply either basket_id or assignment_id, not both of them');
@@ -446,7 +450,7 @@ class assignment extends \external_api {
     protected static function prepare_assignment_response(models\assignment $assignment): array {
         global $PAGE;
         // As we use format_string make sure we have the page context set
-        $PAGE->set_context(\context_system::instance());
+        $PAGE->set_context(context_system::instance());
 
         $response = [
             'id' => $assignment->get_field('id'),
@@ -459,7 +463,7 @@ class assignment extends \external_api {
             'user_group_id' => $assignment->get_field('user_group_id'),
         ];
 
-        $formatter = new string_field_formatter(format::FORMAT_HTML, \context_system::instance());
+        $formatter = new string_field_formatter(format::FORMAT_HTML, context_system::instance());
 
         // TODO Previously we showed the competency name only in certain conditions, this will likely be replaced by GrpahQL
         $response['competency_name'] = $formatter->format($assignment->get_competency()->display_name);

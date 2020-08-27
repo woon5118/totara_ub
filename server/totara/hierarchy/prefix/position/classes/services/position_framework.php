@@ -23,9 +23,13 @@
 
 namespace hierarchy_position\services;
 
+use context_system;
+use core\orm\paginator;
+use core\orm\query\builder;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use hierarchy_position\entities\position_framework as position_framework_entity;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -62,17 +66,19 @@ class position_framework extends \external_api {
      * @return array
      */
     public static function index(array $filters, int $page, string $order, string $direction) {
-        require_capability('totara/hierarchy:viewpositionframeworks', \context_system::instance());
+        if (!has_capability('totara/hierarchy:viewpositionframeworks', context_system::instance())) {
+            return paginator::new(builder::table(position_framework_entity::TABLE)->where_raw('1 = 0'))->to_array();
+        }
 
         if (!array_key_exists('visible', $filters)) {
             $filters['visible'] = true;
         }
 
-        return \hierarchy_position\entities\position_framework::repository()
+        return position_framework_entity::repository()
             ->set_filters($filters)
             ->order_by($order, $direction)
             ->paginate($page)
-            ->transform(function (\hierarchy_position\entities\position_framework $item) {
+            ->transform(function (position_framework_entity $item) {
                 $fullname = format_string($item->fullname);
                 return [
                     'id' => $item->id,

@@ -24,15 +24,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 function xmldb_totara_competency_install() {
-    global $CFG;
-    require_once($CFG->dirroot . '/totara/competency/db/upgradelib.php');
-
     $task = new \totara_competency\task\default_criteria_on_install();
     \core\task\manager::queue_adhoc_task($task);
 
     $task = new \totara_competency\task\migrate_competency_achievements_task();
     \core\task\manager::queue_adhoc_task($task);
-
-    // This is to facilitate the creation of extra-web services we added to core if they don't exists
-    totara_competency_install_core_services();
 }

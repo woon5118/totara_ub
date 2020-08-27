@@ -35,7 +35,10 @@ class users extends base {
     protected $admin_external_page_name = 'competency_assignment_users';
 
     public function action() {
-        $this->require_capability('totara/competency:view_assignments', context_system::instance());
+        if (!has_capability('totara/competency:view_assignments', context_system::instance())) {
+            require_capability('totara/competency:manage_assignments', context_system::instance());
+        }
+        require_capability('moodle/user:viewdetails', context_system::instance());
 
         $debug = $this->get_optional_param('debug', false, PARAM_BOOL);
 

@@ -36,12 +36,6 @@ use totara_core\advanced_feature;
 
 class totara_competency_default_criteria_on_install_testcase extends advanced_testcase {
 
-    public function setUp(): void {
-        parent::setUp();
-        global $CFG;
-        require_once($CFG->dirroot . '/totara/competency/db/upgradelib.php');
-    }
-
     /**
      * Test the task can handle there being no competencies.
      */

@@ -21,19 +21,26 @@
  * @package core
  */
 
-namespace core\external;
+namespace totara_competency\services;
 
+use context_system;
+use context_user;
+use core\entities\user as user_entity;
+use core\orm\entity\repository;
+use core\orm\query\field;
+use core\tenant_orm_helper;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
 
-class cohort extends \external_api {
+class user extends \external_api {
 
     /**
      * @return external_function_parameters
@@ -43,9 +50,8 @@ class cohort extends \external_api {
             [
                 'filters' => new external_single_structure(
                     [
-                        'text' => new external_value(PARAM_TEXT, 'Search by audience name', VALUE_OPTIONAL, null),
-                        'visible' => new external_value(PARAM_BOOL, 'Visibility of the items', VALUE_OPTIONAL, true),
-                        'basket' => new external_value(PARAM_ALPHANUMEXT, 'selection in the basket', VALUE_OPTIONAL, null),
+                        'text' => new external_value(PARAM_TEXT, 'Search by username, full name ', VALUE_OPTIONAL, null),
+                        'basket' => new external_value(PARAM_ALPHANUMEXT, 'Search by basket key', VALUE_OPTIONAL, null),
                         'ids' => new external_multiple_structure(
                             new external_value(PARAM_INT, 'ids', VALUE_OPTIONAL),
                             'ids to filter by',
@@ -55,13 +61,15 @@ class cohort extends \external_api {
                     VALUE_REQUIRED
                 ),
                 'page' => new external_value(PARAM_INT, 'pagination: page to load', VALUE_REQUIRED),
-                'order' => new external_value(PARAM_ALPHANUMEXT, 'name of column to order by', VALUE_REQUIRED),
-                'direction' => new external_value(PARAM_ALPHA, 'direction of ordering (either ASC or DESC)', VALUE_REQUIRED),
+                'order' => new external_value(PARAM_ALPHANUMEXT, 'Name of column to order by - not used currently', VALUE_REQUIRED),
+                'direction' => new external_value(PARAM_ALPHA, 'either ASC or DESC - not used currently', VALUE_REQUIRED),
             ]
         );
     }
 
     /**
+     * List user for the picker
+     *
      * @param array $filters
      * @param int $page
      * @param string $order
@@ -69,34 +77,39 @@ class cohort extends \external_api {
      * @return array
      */
     public static function index(array $filters, int $page, string $order, string $direction) {
-        // TODO TL-20285 - Decide on how we deal with system vs. category audiences
-        require_capability('moodle/cohort:view', \context_system::instance());
+        advanced_feature::require('competency_assignment');
+        require_capability('totara/competency:manage_assignments', context_system::instance());
+        require_capability('moodle/user:viewdetails', context_system::instance());
 
-        if (!array_key_exists('visible', $filters)) {
-            $filters['visible'] = true;
+        global $PAGE;
+        $context = context_system::instance();
+        $PAGE->set_context($context);
+
+        if (!in_array(strtolower($direction), ['asc', 'desc'])) {
+            $direction = 'desc';
         }
 
-        $allowed_order_columns = [
-            'id',
-            'name',
-            'idnumber',
-            'timecreated',
-            'timemodified',
-        ];
-        if (!in_array($order, $allowed_order_columns)) {
-            $order = 'id';
-        }
+        // Force ordering by name at this stage. Attribute reserved for uniformity and future use
+        $name_order = totara_get_all_user_name_fields(true, '', null, null, true);
+        $order = "{$name_order} {$direction}, id asc";
 
-        return \core\entities\cohort::repository()
-            ->select_only_fields_for_picker()
+        return user_entity::repository()
+            ->select_full_name_fields()
+            ->filter_by_not_deleted()
+            ->filter_by_not_guest()
             ->set_filters($filters)
-            ->order_by($order, $direction)
+            ->order_by_raw($order)
             ->paginate($page)
-            ->transform(function (\core\entities\cohort $item) {
+            ->transform(function (user_entity $item) {
+                $user_name_fields = totara_get_all_user_name_fields();
+                $user = new \stdClass();
+                foreach ($user_name_fields as $field) {
+                    $user->$field = isset($item->$field) ? $item->$field : '';
+                }
+
                 return [
                     'id' => $item->id,
-                    'display_name' => format_string($item->name),
-                    'idnumber' => $item->idnumber,
+                    'display_name' => format_string(fullname($user))
                 ];
             })->to_array();
     }

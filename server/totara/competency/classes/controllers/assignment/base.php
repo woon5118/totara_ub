@@ -24,6 +24,7 @@
 namespace totara_competency\controllers\assignment;
 
 use context;
+use context_system;
 use totara_core\advanced_feature;
 use totara_mvc\admin_controller;
 
@@ -39,6 +40,9 @@ class base extends admin_controller {
      */
     protected function setup_context(): context {
         advanced_feature::require('competency_assignment');
+
+        $this->require_capability('totara/competency:manage_assignments', context_system::instance());
+        $this->require_capability('moodle/user:viewdetails', context_system::instance());
 
         return \context_system::instance();
     }

@@ -25,10 +25,13 @@ namespace hierarchy_position\services;
 
 use context_system;
 use core\format;
+use core\orm\paginator;
+use core\orm\query\builder;
 use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use hierarchy_position\entities\position as position_entity;
 use totara_core\advanced_feature;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;
@@ -84,20 +87,24 @@ class position extends \external_api {
     public static function index(array $filters, int $page, string $order, string $direction) {
         advanced_feature::require('positions');
 
-        require_capability('totara/hierarchy:viewposition', \context_system::instance());
+        if (!has_capability('totara/hierarchy:viewpositionframeworks', context_system::instance())
+            || !has_capability('totara/hierarchy:viewposition', context_system::instance())
+        ) {
+            return paginator::new(builder::table(position_entity::TABLE)->where_raw('1 = 0'))->to_array();
+        }
 
         if (!array_key_exists('visible', $filters)) {
             $filters['visible'] = true;
         }
 
-        return \hierarchy_position\entities\position::repository()
+        return position_entity::repository()
             ->reset_select()
             ->select_only_fields_for_picker()
             ->with_children_count()
             ->set_filters($filters)
             ->order_by($order, $direction)
             ->paginate($page)
-            ->transform(function (\hierarchy_position\entities\position $item) {
+            ->transform(function (position_entity $item) {
                 $name = format_string($item->fullname);
                 return [
                     'id' => $item->id,
@@ -144,8 +151,8 @@ class position extends \external_api {
         $context = context_system::instance();
         require_capability('totara/hierarchy:viewposition', $context);
 
-        /** @var \hierarchy_position\entities\position $item */
-        $item = \hierarchy_position\entities\position::repository()->find($id);
+        /** @var position_entity $item */
+        $item = position_entity::repository()->find($id);
         if (empty($item)) {
             return [];
         }

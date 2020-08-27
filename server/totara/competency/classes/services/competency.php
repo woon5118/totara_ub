@@ -31,6 +31,8 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use moodle_exception;
+use required_capability_exception;
 use totara_competency\entities;
 use totara_competency\entities\competency_repository;
 use totara_core\advanced_feature;
@@ -101,9 +103,16 @@ class competency extends external_api {
      */
     public static function index(array $filters = [], int $page = 0, string $order_by = '', string $order_dir = '') {
         advanced_feature::require('competency_assignment');
-        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
-
-        require_capability('totara/competency:view_assignments', context_system::instance());
+        if (!has_any_capability(
+            [
+                'totara/competency:view_assignments',
+                'totara/competency:manage_assignments',
+                'totara/hierarchy:viewcompetency'
+            ],
+            context_system::instance()
+        )) {
+            throw new moodle_exception('accessdenied', 'admin');
+        }
 
         if (!array_key_exists('visible', $filters)) {
             $filters['visible'] = true;
@@ -170,9 +179,16 @@ class competency extends external_api {
      */
     public static function show(int $id, array $options) {
         advanced_feature::require('competency_assignment');
-        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
-
-        require_capability('totara/competency:view_assignments', context_system::instance());
+        if (!has_any_capability(
+            [
+                'totara/competency:view_assignments',
+                'totara/competency:manage_assignments',
+                'totara/hierarchy:viewcompetency'
+            ],
+            context_system::instance()
+        )) {
+            throw new moodle_exception('accessdenied', 'admin');
+        }
 
         /** @var entities\competency $competency */
         $competency = entities\competency::repository()->find($id);

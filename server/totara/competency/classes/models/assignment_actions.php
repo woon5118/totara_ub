@@ -23,15 +23,17 @@
 
 namespace totara_competency\models;
 
+use coding_exception;
+use context_system;
 use core\event\base;
 use core\orm\collection;
+use core\orm\entity\filter\hierarchy_item_visible;
 use core\orm\query\builder;
 use totara_competency\assignment_create_exception;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\settings;
-use core\orm\entity\filter\hierarchy_item_visible;
 use totara_competency\task\expand_assignment_task;
 use totara_competency\user_groups;
 
@@ -198,18 +200,23 @@ class assignment_actions {
      * @param string $type type of assignment, admin, system, etc.
      * @param int $status Assignment activation status 0 - draft, 1 - active
      * @return collection|assignment_model[]
-     * @throws \coding_exception
+     * @throws coding_exception
      * @throws assignment_create_exception
      */
-    public function create_from_competencies(array $competency_ids, array $user_groups, string $type, int $status = assignment::STATUS_DRAFT) {
+    public function create_from_competencies(
+        array $competency_ids,
+        array $user_groups,
+        string $type,
+        int $status = assignment::STATUS_DRAFT
+    ) {
         // Validate assignment status
         if (!in_array($status, [assignment::STATUS_DRAFT, assignment::STATUS_ACTIVE], true)) {
-            throw new \coding_exception('Invalid assignment status supplied');
+            throw new coding_exception('Invalid assignment status supplied');
         }
 
         // Validate assignment type
         if (!in_array($type, assignment::get_available_types(), true)) {
-            throw new \coding_exception('Invalid assignment type supplied');
+            throw new coding_exception('Invalid assignment type supplied');
         }
 
         $competencies = competency::repository()
@@ -231,10 +238,21 @@ class assignment_actions {
         /*** @var competency $competency */
         foreach ($competencies as $competency) {
             foreach ($user_groups as $user_group_type => $ug_ids) {
-                foreach ($ug_ids as $user_group_id) {
-                    $assignment = assignment_model::create($competency->id, $type, $user_group_type, $user_group_id, $status, false);
-                    if ($assignment) {
-                        $assignments->append($assignment);
+                if (!empty($ug_ids)) {
+                    $this->validate_user_group_access($user_group_type);
+
+                    foreach ($ug_ids as $user_group_id) {
+                        $assignment = assignment_model::create(
+                            $competency->id,
+                            $type,
+                            $user_group_type,
+                            $user_group_id,
+                            $status,
+                            false
+                        );
+                        if ($assignment) {
+                            $assignments->append($assignment);
+                        }
                     }
                 }
             }
@@ -246,6 +264,33 @@ class assignment_actions {
         }
 
         return $assignments;
+    }
+
+    /**
+     * Validate whether the current user has the correct capabilities. The groups
+     * shouldn't be in here in the first place if the users hasn't. So this is the last
+     * resort to make sure no one sneaks something in.
+     *
+     * @param string $user_group_type
+     */
+    private function validate_user_group_access(string $user_group_type): void {
+        $can_access = true;
+
+        switch ($user_group_type) {
+            case 'cohort':
+                $can_access = has_any_capability(['moodle/cohort:manage', 'moodle/cohort:view'], context_system::instance());
+                break;
+            case 'position':
+                $can_access = has_capability('totara/hierarchy:viewposition', context_system::instance());
+                break;
+            case 'organisation':
+                $can_access = has_capability('totara/hierarchy:vieworganisation', context_system::instance());
+                break;
+        }
+
+        if (!$can_access) {
+            throw new coding_exception('No access rights for user group type '.$user_group_type);
+        }
     }
 
     /**
@@ -297,7 +342,7 @@ class assignment_actions {
     public function mark_for_expansion(array $user_group_type_ids) {
         foreach ($user_group_type_ids as [$user_group_type, $user_group_id]) {
             if (!in_array($user_group_type, user_groups::get_available_types())) {
-                throw new \coding_exception('Invalid user group type given!');
+                throw new coding_exception('Invalid user group type given!');
             }
 
             assignment::repository()

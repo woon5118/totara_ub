@@ -148,11 +148,37 @@ $assignments = [
         'loginrequired' => true,
         'ajax'          => true,
         'capabilities'  => implode(',', [
-            'moodle/user:viewdetails',
             'moodle/cohort:view',
+            'moodle/cohort:manage',
             'totara/hierarchy:viewposition',
             'totara/hierarchy:vieworganisation',
         ]),
+    ],
+
+    // List users
+    'totara_competency_user_index' => [
+        'classname'     => \totara_competency\services\user::class,
+        'methodname'    => 'index',
+        'description'   => 'List or search for users',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => 'totara/competency:manage_assignments',
+    ],
+
+    // List audiences
+    'totara_competency_cohort_index' => [
+        'classname'     => \totara_competency\services\cohort::class,
+        'methodname'    => 'index',
+        'description'   => 'List or search for audiences',
+        'type'          => 'read',
+        'loginrequired' => true,
+        'ajax'          => true,
+        'capabilities'  => [
+            'totara/competency:manage_assignments',
+            'moodle/cohort:view',
+            'moodle/cohort:manage'
+        ],
     ],
 ];
 

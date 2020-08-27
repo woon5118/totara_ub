@@ -155,6 +155,9 @@ class rb_competency_assignment_users_embedded extends rb_base_embedded {
 
     public function is_capable($reportfor, $report) {
         $context = context_system::instance();
-        return has_capability('totara/competency:view_assignments', $context, $reportfor);
+        return (
+            has_any_capability(['totara/competency:view_assignments', 'totara/competency:manage_assignments'], $context, $reportfor)
+            && has_capability('moodle/user:viewdetails', $context, $reportfor)
+        );
     }
 }

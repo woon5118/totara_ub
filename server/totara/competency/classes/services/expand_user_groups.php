@@ -24,6 +24,7 @@
 namespace totara_competency\services;
 
 
+use context_system;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
@@ -78,30 +79,39 @@ class expand_user_groups extends \external_api {
      */
     public static function index(array $baskets, array $filters, int $page, string $order, string $direction) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/competency:manage_assignments', context_system::instance());
+        require_capability('moodle/user:viewdetails', context_system::instance());
 
-        require_capability('moodle/cohort:view', \context_system::instance());
-        require_capability('totara/hierarchy:viewposition', \context_system::instance());
-        require_capability('totara/hierarchy:vieworganisation', \context_system::instance());
-        // TODO TL-20285 - Decide on how we deal with users in system context and user context
-        require_capability('moodle/user:viewdetails', \context_system::instance());
-
-        $user_ids = [
-            'cohort' => [],
-            'user' => [],
-            'organisation' => [],
-            'position' => [],
-        ];
+        $user_ids = [];
         if (!empty($baskets)) {
             foreach ($baskets as $type => $key) {
-                $user_ids[$type] = session_basket::fetch($key);
+                $can_view = false;
+
+                switch ($type) {
+                    case 'cohort':
+                        $can_view = has_any_capability(['moodle/cohort:manage', 'moodle/cohort:view'], context_system::instance());
+                        break;
+                    case 'user':
+                        // Viewing user details is essential for this already
+                        $can_view = true;
+                        break;
+                    case 'organisation':
+                        $can_view = has_capability('totara/hierarchy:vieworganisation', context_system::instance());
+                        break;
+                    case 'position':
+                        $can_view = has_capability('totara/hierarchy:viewposition', context_system::instance());
+                        break;
+                }
+
+                $user_ids[$type] = $can_view ? session_basket::fetch($key) : [];
             }
         }
 
         return (new expanded_users())
-            ->set_audience_ids($user_ids['cohort'])
-            ->set_user_ids($user_ids['user'])
-            ->set_organisation_ids($user_ids['organisation'])
-            ->set_position_ids($user_ids['position'])
+            ->set_audience_ids($user_ids['cohort'] ?? [])
+            ->set_user_ids($user_ids['user'] ?? [])
+            ->set_organisation_ids($user_ids['organisation'] ?? [])
+            ->set_position_ids($user_ids['position'] ?? [])
             ->filter_by_name($filters['name'] ?? '')
             ->fetch_paginated($page)
             ->transform(function (array $item) {

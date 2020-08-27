@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package core
+ * @package totara_competency
  * @category test
  */
 
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once __DIR__.'/expanded_users_testcase.php';
 
-class core_expanded_users_service_testcase extends expanded_users_testcase {
+class totara_competency_expanded_users_service_testcase extends expanded_users_testcase {
 
     use webservice_utils;
 

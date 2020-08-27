@@ -68,8 +68,8 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
         this.services = {
             updateBasket: 'totara_core_basket_update',
             createAssignments: 'totara_competency_assignment_create_from_baskets',
-            users: 'core_user_index',
-            audiences: 'core_cohort_index',
+            users: 'totara_competency_user_index',
+            audiences: 'totara_competency_cohort_index',
             organisations: 'hierarchy_organisation_index',
             positions: 'hierarchy_position_index'
         };
@@ -392,7 +392,7 @@ function(str, TemplatesManager, ModalList, HierarchyEvents, ajax, notification, 
                             },
                         }],
                     },
-                    service: 'core_user_index',
+                    service: 'totara_competency_user_index',
                 },
                 onClosed: function() {
                     that.resetTreeList();

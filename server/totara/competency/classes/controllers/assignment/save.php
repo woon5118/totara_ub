@@ -24,13 +24,13 @@
 namespace totara_competency\controllers\assignment;
 
 use core\output\notification;
-use moodle_url;
-use totara_competency\baskets\competency_basket;
-use totara_competency\views;
-use core\external\cohort;
 use hierarchy_organisation\services\organisation;
 use hierarchy_position\services\position;
-use core\external\user;
+use moodle_url;
+use totara_competency\baskets\competency_basket;
+use totara_competency\services\cohort;
+use totara_competency\services\user;
+use totara_competency\views;
 use totara_core\basket\session_basket;
 use totara_core\output\select_tree;
 
@@ -48,8 +48,8 @@ class save extends base {
     ];
 
     protected $services = [
-        'service_users' => 'core_user_index',
-        'service_audiences' => 'core_cohort_index',
+        'service_users' => 'totara_competency_user_index',
+        'service_audiences' => 'totara_competency_cohort_index',
         'service_positions' => 'hierarchy_position_index',
         'service_organisations' => 'hierarchy_organisation_index',
         'service_create_assignments' => 'totara_competency_assignment_create_from_baskets',
@@ -57,8 +57,6 @@ class save extends base {
     ];
 
     public function action() {
-        $this->require_capability('totara/competency:manage_assignments', $this->context);
-
         // Get competencies count
         $basket = new competency_basket($this->basket_key);
         $items = $basket->load();

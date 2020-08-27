@@ -232,10 +232,10 @@ function xmldb_totara_competency_upgrade($oldversion) {
 
             // This will refresh external services from core without an explicit version bumps
             external_update_descriptions('moodle');
-
-            // Competency savepoint reached.
-            upgrade_plugin_savepoint(true, 2019110803, 'totara', 'competency');
         }
+
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2019110803, 'totara', 'competency');
     }
 
     // Add more foreign keys
@@ -449,6 +449,22 @@ function xmldb_totara_competency_upgrade($oldversion) {
 
         // Competency savepoint reached.
         upgrade_plugin_savepoint(true, 2020021800, 'totara', 'competency');
+    }
+
+    if ($oldversion < 2020082700) {
+        // Let's check whether we need to do anything at all
+        global $DB, $CFG;
+
+        // If it's already been created, no point to waste resources on running descriptions upgrade
+        if (!$DB->record_exists('external_functions', ['name' => 'totara_competency_user_index'])
+            || !$DB->record_exists('external_functions', ['name' => 'totara_competency_cohort_index'])
+        ) {
+            require_once $CFG->libdir . '/db/upgradelib.php';
+            // This will refresh external services from core without an explicit version bumps
+            external_update_descriptions('moodle');
+        }
+        // Competency savepoint reached.
+        upgrade_plugin_savepoint(true, 2020082700, 'totara', 'competency');
     }
 
     return true;

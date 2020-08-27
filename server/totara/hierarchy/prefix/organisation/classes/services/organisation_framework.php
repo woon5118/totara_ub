@@ -23,9 +23,13 @@
 
 namespace hierarchy_organisation\services;
 
+use context_system;
+use core\orm\paginator;
+use core\orm\query\builder;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
+use hierarchy_organisation\entities\organisation_framework as organisation_framework_entity;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -62,17 +66,19 @@ class organisation_framework extends \external_api {
      * @return array
      */
     public static function index(array $filters, int $page, string $order, string $direction) {
-        require_capability('totara/hierarchy:vieworganisationframeworks', \context_system::instance());
+        if (!has_capability('totara/hierarchy:vieworganisationframeworks', context_system::instance())) {
+            return paginator::new(builder::table(organisation_framework_entity::TABLE)->where_raw('1 = 0'))->to_array();
+        }
 
         if (!array_key_exists('visible', $filters)) {
             $filters['visible'] = true;
         }
 
-        return \hierarchy_organisation\entities\organisation_framework::repository()
+        return organisation_framework_entity::repository()
             ->set_filters($filters)
             ->order_by($order, $direction)
             ->paginate($page)
-            ->transform(function (\hierarchy_organisation\entities\organisation_framework $item) {
+            ->transform(function (organisation_framework_entity $item) {
                 $fullname = format_string($item->fullname);
                 return [
                     'id' => $item->id,
