@@ -30,7 +30,6 @@ use block_totara_featured_links\form\element\colorpicker;
 use block_totara_featured_links\form\validator\alt_text_required;
 use block_totara_featured_links\form\validator\is_color;
 use block_totara_featured_links\form\validator\is_valid_url;
-use totara_form\form\element\action_button;
 use totara_form\form\element\checkbox;
 use totara_form\form\element\filemanager;
 use totara_form\form\element\radios;
@@ -127,10 +126,6 @@ class default_form_content extends base_form_content{
                 $iconsizeoptions
             )
         );
-
-        $actionbutton = new \totara_form\form\element\action_button('test', 'TESTING BUTTON', action_button::TYPE_SUBMIT);
-        $actionbutton->set_primarybutton(true);
-        $group->add($actionbutton);
 
         $alt_text = $backgroundgroup->add(new text('alt_text', get_string('tile_alt_text', 'block_totara_featured_links'), PARAM_TEXT));
         $alt_text->add_validator(new alt_text_required(null, 'background_img'));
