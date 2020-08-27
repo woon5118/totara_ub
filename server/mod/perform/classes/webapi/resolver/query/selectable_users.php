@@ -28,7 +28,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\activity\selectable_users as selectable_users_provider;
-use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\subject_instance;
 use mod_perform\webapi\middleware\require_activity;
 
 /**
@@ -42,10 +42,10 @@ class selectable_users implements query_resolver, has_middleware {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        /** @var activity_model $activity */
-        $activity = $args['activity'];
+        $subject_instance_id = $args['subject_instance_id'];
+        $subject_instance = subject_instance::load_by_id($subject_instance_id);
 
-        return (new selectable_users_provider($activity))
+        return (new selectable_users_provider($subject_instance))
             ->add_filters($args['filters'] ?? [])
             ->get();
     }

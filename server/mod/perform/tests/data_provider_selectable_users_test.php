@@ -25,7 +25,11 @@ use core\entities\tenant;
 use core\entities\user;
 use core\orm\collection;
 use mod_perform\data_providers\activity\selectable_users;
+use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\track;
+use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\util;
 
 /**
@@ -60,7 +64,9 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
         /** @var activity_model $activity2 */
         $activity2 = $activities2->first();
 
-        $provider = new selectable_users($activity1);
+        $subject_instance1 = $this->get_subject_instance($activity1);
+
+        $provider = new selectable_users($subject_instance1);
         $selectable_users = $provider->get();
 
         // The result should contain all users (except the guest, deleted and suspended)
@@ -74,7 +80,9 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
         $this->assertNotContains($deleted_user->id, $actual_user_ids);
         $this->assertNotContains($suspended_user->id, $actual_user_ids);
 
-        $provider = new selectable_users($activity2);
+        $subject_instance2 = $this->get_subject_instance($activity2);
+
+        $provider = new selectable_users($subject_instance2);
         $selectable_users = $provider->get();
 
         $this->assertCount(13, $selectable_users);
@@ -88,7 +96,7 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
         $this->assertNotContains($suspended_user->id, $actual_user_ids);
 
         // Now filter the data
-        $provider = new selectable_users($activity1);
+        $provider = new selectable_users($subject_instance1);
         $selectable_users = $provider
             ->add_filters(['exclude_users' => [get_admin()->id, $user1->id]])
             ->get();
@@ -98,7 +106,7 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
         $this->assertNotContains($user1->id, $actual_user_ids);
         $this->assertNotContains(get_admin()->id, $actual_user_ids);
 
-        $provider = new selectable_users($activity1);
+        $provider = new selectable_users($subject_instance1);
         $selectable_users = $provider
             ->add_filters(['fullname' => 'Qwertz'])
             ->get();
@@ -108,7 +116,7 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
         // The result is ordered by fullname, so user2 should come before user1
         $this->assertEquals([$user2->id, $user1->id], $actual_user_ids);
 
-        $provider = new selectable_users($activity1);
+        $provider = new selectable_users($subject_instance1);
         $selectable_users = $provider
             ->add_filters(['fullname' => 'asdfgh'])
             ->get();
@@ -119,7 +127,7 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
         $this->assertContains($user2->id, $actual_user_ids);
 
         // Test combination of filters
-        $provider = new selectable_users($activity1);
+        $provider = new selectable_users($subject_instance1);
         $selectable_users = $provider
             ->add_filters(['fullname' => 'Qwertz'])
             ->add_filters(['exclude_users' => [$user1->id]])
@@ -130,7 +138,7 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
         $this->assertEquals([$user2->id], $actual_user_ids);
 
         // Test filter returns empty result
-        $provider = new selectable_users($activity1);
+        $provider = new selectable_users($subject_instance1);
         $selectable_users = $provider
             ->add_filters(['fullname' => 'idontexist'])
             ->get();
@@ -139,7 +147,7 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
         $this->assertCount(0, $selectable_users);
 
         // Test non-existing user id in filter
-        $provider = new selectable_users($activity1);
+        $provider = new selectable_users($subject_instance1);
         $selectable_users = $provider
             ->add_filters(['fullname' => 'Qwertz'])
             ->add_filters(['exclude_users' => [999]])
@@ -196,7 +204,9 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
         /** @var activity_model $activity2 */
         $activity2 = $activities2->first();
 
-        $provider = new selectable_users($activity1);
+        $subject_instance1 = $this->get_subject_instance($activity1);
+
+        $provider = new selectable_users($subject_instance1);
         $selectable_users = $provider->get();
 
         // The result should contain all users from tenant 1
@@ -208,7 +218,9 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
 
         $this->assertEqualsCanonicalizing($expected_ids, $selectable_users->pluck('id'));
 
-        $provider = new selectable_users($activity2);
+        $subject_instance2 = $this->get_subject_instance($activity2);
+
+        $provider = new selectable_users($subject_instance2);
         $selectable_users = $provider->get();
 
         // The result should contain all users from tenant 2
@@ -220,6 +232,17 @@ class mod_perform_data_provider_selectable_users_testcase extends advanced_testc
             ->pluck('id');
 
         $this->assertEqualsCanonicalizing($expected_ids, $selectable_users->pluck('id'));
+    }
+
+    private function get_subject_instance(activity_model $activity): subject_instance_model {
+        $subject_instance = subject_instance::repository()
+            ->join([track_user_assignment::TABLE, 'tua'], 'track_user_assignment_id', 'id')
+            ->join([track::TABLE, 't'], 'tua.track_id', 'id')
+            ->where('t.activity_id', $activity->id)
+            ->order_by('id')
+            ->first();
+
+        return subject_instance_model::load_by_entity($subject_instance);
     }
 
 }

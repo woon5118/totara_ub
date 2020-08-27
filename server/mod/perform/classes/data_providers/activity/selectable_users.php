@@ -24,6 +24,7 @@
 
 namespace mod_perform\data_providers\activity;
 
+use context_user;
 use core\entities\user;
 use core\entities\user_repository;
 use core\orm\entity\repository;
@@ -31,6 +32,7 @@ use core\orm\query\field;
 use core\tenant_orm_helper;
 use mod_perform\data_providers\provider;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\subject_instance;
 
 /**
  * Class selectable_users
@@ -44,10 +46,10 @@ class selectable_users extends provider {
     /**
      * @var activity_model
      */
-    protected $activity;
+    protected $subject_instance;
 
-    public function __construct(activity_model $activity) {
-        $this->activity = $activity;
+    public function __construct(subject_instance $subject_instance) {
+        $this->subject_instance = $subject_instance;
     }
 
     /**
@@ -62,7 +64,7 @@ class selectable_users extends provider {
                 tenant_orm_helper::restrict_users(
                     $repository,
                     new field('id', $repository->get_builder()),
-                    $this->activity->get_context()
+                    context_user::instance($this->subject_instance->subject_user_id)
                 );
             })
             ->order_by_full_name();
