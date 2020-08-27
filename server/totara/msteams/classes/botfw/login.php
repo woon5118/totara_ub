@@ -25,6 +25,9 @@ use totara_msteams\botfw\auth\default_authoriser;
 use totara_msteams\botfw\mini_output;
 
 global $CFG;
+if (empty($CFG)) {
+    require_once(__DIR__ . '/../../../../config.php');
+}
 
 if (isset($USER) && isset($PAGE)) {
     // Turn off editing.
