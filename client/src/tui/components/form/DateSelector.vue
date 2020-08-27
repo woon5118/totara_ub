@@ -221,13 +221,14 @@ export default {
     let initialDate = '';
     if (this.value) {
       initialDate = getValuesFromIso(this.value.iso);
+      this.setInitialDate(initialDate);
     } else if (this.initialCustomDate) {
       initialDate = getValuesFromIso(this.initialCustomDate);
+      this.setDate(initialDate);
     } else if (this.initialCurrentDate) {
       initialDate = getCurrentDateValues();
+      this.setDate(initialDate);
     }
-
-    this.setDate(initialDate);
   },
 
   methods: {
@@ -316,6 +317,18 @@ export default {
           this.year = '';
           this.update();
         }
+      }
+    },
+
+    /**
+     * Set initial values to date
+     *
+     */
+    setInitialDate(initialDate) {
+      if (initialDate) {
+        this.day = initialDate.day;
+        this.month = initialDate.month;
+        this.year = initialDate.year;
       }
     },
 

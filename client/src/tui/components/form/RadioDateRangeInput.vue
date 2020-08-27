@@ -104,12 +104,19 @@ export default {
         }
         this.update();
       },
-      immediate: true,
     },
   },
 
   mounted() {
-    this.update();
+    // If no value emit the default
+    if (this.value === undefined) {
+      this.rangeType = 'DAY';
+      this.rangeValue = 1;
+      this.update();
+    } else {
+      this.rangeType = this.value.range;
+      this.rangeValue = this.value.value;
+    }
   },
 
   methods: {

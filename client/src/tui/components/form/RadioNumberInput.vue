@@ -64,12 +64,17 @@ export default {
         this.numberValue = this.value !== undefined ? this.value : 1;
         this.update();
       },
-      immediate: true,
     },
   },
 
   mounted() {
-    this.update();
+    // If no value emit the default
+    if (this.value === undefined) {
+      this.numberValue = 1;
+      this.update();
+    } else {
+      this.numberValue = this.value;
+    }
   },
 
   methods: {
