@@ -28,7 +28,11 @@ use totara_core\basket\storage\session_adapter;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * DEPRECATED
+ *
  * Decorator for the basket with session storage and limiter
+ *
+ * @deprecated since Totara 13
  */
 class session_basket implements basket_interface {
 
@@ -73,6 +77,8 @@ class session_basket implements basket_interface {
      *
      * @param array $items
      * @return basket_interface
+     *
+     * @deprecated since Totara 13
      */
     public function replace(array $items): basket_interface {
         // if we don't delete the items before validation
@@ -89,6 +95,8 @@ class session_basket implements basket_interface {
      *
      * @param array $items
      * @return basket_interface
+     *
+     * @deprecated since Totara 13
      */
     public function add(array $items): basket_interface {
         $this->validate($items);
@@ -112,6 +120,8 @@ class session_basket implements basket_interface {
      * Get the limit for this basket
      *
      * @return int
+     *
+     * @deprecated since Totara 13
      */
     public function get_limit(): int {
         return $this->limiter->get_limit();
@@ -122,6 +132,8 @@ class session_basket implements basket_interface {
      *
      * @param array $items
      * @return basket_interface
+     *
+     * @deprecated since Totara 13
      */
     public function remove(array $items): basket_interface {
         $this->basket->remove($items);
@@ -132,6 +144,8 @@ class session_basket implements basket_interface {
      * this removes the basket completely, essentially clearing it
      *
      * @return basket_interface
+     *
+     * @deprecated since Totara 13
      */
     public function delete(): basket_interface {
         $this->basket->delete();
@@ -142,6 +156,8 @@ class session_basket implements basket_interface {
      * returns all items contained in the basket
      *
      * @return array
+     *
+     * @deprecated since Totara 13
      */
     public function load(): array {
         return $this->basket->load();
@@ -152,6 +168,8 @@ class session_basket implements basket_interface {
      *
      * @param string $basket_key id of the basket to load
      * @return array
+     *
+     * @deprecated since Totara 13
      */
     public static function fetch($basket_key): array {
         return (new static($basket_key))->load();
@@ -159,6 +177,8 @@ class session_basket implements basket_interface {
 
     /**
      * @return string
+     *
+     * @deprecated since Totara 13
      */
     public function get_key(): string {
         return $this->basket->get_key();

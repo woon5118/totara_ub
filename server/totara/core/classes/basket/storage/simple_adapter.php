@@ -26,16 +26,26 @@ namespace totara_core\basket\storage;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * DEPRECATED
+ *
  * This storage adapter stores the data locally within the class.
+ *
+ * @deprecated since Totara 13
  */
 class simple_adapter implements adapter {
 
     private $data;
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function save($id, $data) {
         $this->data[$id] = $data;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function load($id) {
         if (isset($this->data[$id])) {
             return $this->data[$id];
@@ -43,6 +53,9 @@ class simple_adapter implements adapter {
         return null;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function delete($id) {
         unset($this->data[$id]);
     }

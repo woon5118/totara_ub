@@ -27,12 +27,18 @@ use totara_core\basket\basket_interface;
 use totara_core\basket\session_basket;
 
 /**
+ * DEPRECATED
+ *
  * Filters for all ids in the given basket, used for showing selected items in the interface
  *
  * @package totara_competency\entities\filters
+ *
+ * @deprecated since Totara 13
  */
 class basket extends filter {
-
+    /**
+     * @deprecated since Totara 13
+     */
     public function apply() {
         $val = $this->value;
         if ($val instanceof basket_interface) {

@@ -26,7 +26,11 @@ namespace totara_core\basket\storage;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * DEPRECATED
+ *
  * generic storage adapter to store data linked ot an id.
+ *
+ * @deprecated since Totara 13
  */
 interface adapter {
 
@@ -37,6 +41,8 @@ interface adapter {
      * @param mixed string $id
      * @param mixed $data
      * @return mixed
+     *
+     * @deprecated since Totara 13
      */
     public function save($id, $data);
 
@@ -45,6 +51,8 @@ interface adapter {
      *
      * @param $id
      * @return mixed
+     *
+     * @deprecated since Totara 13
      */
     public function load($id);
 
@@ -53,6 +61,8 @@ interface adapter {
      *
      * @param $id
      * @return mixed
+     *
+     * @deprecated since Totara 13
      */
     public function delete($id);
 

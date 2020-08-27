@@ -66,6 +66,10 @@ information provided here is intended especially for developers.
 * Updated totara_core/select_search_text template, changing remove text string
 * Changed class totara_dialog_content_plan_evidence and file totara/core/dialogs/search.php to use the new totara evidence tables
     and totara/core/dialogs/search.php now searches the text and text area content of evidence in addition to just the name.
+* The basket code in Totara core is deprecated; it is currently only used in the totara competency module and will be
+  replaced with vue/tui basket in the future. Affected files/classes are:
+  - All the files/classes in server/totara/core/classes/basket
+  - The basket class in server/lib/classes/orm/entity/filter/basket.php
 
 === 12.0 ===
 

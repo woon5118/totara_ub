@@ -23,6 +23,11 @@
 
 namespace totara_core\basket;
 
+/**
+ * DEPRECATED
+ *
+ * @deprecated since Totara 13
+ */
 class basket_limit_exception extends \moodle_exception {
 
 }

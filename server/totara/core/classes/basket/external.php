@@ -32,10 +32,17 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
 
+/**
+ * DEPRECATED
+ *
+ * @deprecated since Totara 13
+ */
 class external extends \external_api {
 
     /**
      * @return external_function_parameters
+     *
+     * @deprecated since Totara 13
      */
     public static function show_parameters(): external_function_parameters {
         return new external_function_parameters(
@@ -48,6 +55,8 @@ class external extends \external_api {
     /**
      * @param string $basket_key
      * @return array
+     *
+     * @deprecated since Totara 13
      */
     public static function show(string $basket_key) {
         $basket = new session_basket($basket_key);
@@ -59,6 +68,8 @@ class external extends \external_api {
 
     /**
      * @return null
+     *
+     * @deprecated since Totara 13
      */
     public static function show_returns() {
         return null;
@@ -66,6 +77,8 @@ class external extends \external_api {
 
     /**
      * @return external_function_parameters
+     *
+     * @deprecated since Totara 13
      */
     public static function update_parameters(): external_function_parameters {
         return new external_function_parameters(
@@ -82,6 +95,8 @@ class external extends \external_api {
      * @param string $action
      * @param array $ids
      * @return array
+     *
+     * @deprecated since Totara 13
      */
     public static function update(string $basket_key, string $action, array $ids) {
         $basket = new session_basket($basket_key);
@@ -107,6 +122,8 @@ class external extends \external_api {
 
     /**
      * @return null
+     *
+     * @deprecated since Totara 13
      */
     public static function update_returns() {
         return null;
@@ -114,6 +131,8 @@ class external extends \external_api {
 
     /**
      * @return external_function_parameters
+     *
+     * @deprecated since Totara 13
      */
     public static function delete_parameters(): external_function_parameters {
         return new external_function_parameters(
@@ -126,6 +145,8 @@ class external extends \external_api {
     /**
      * @param string $basket_key
      * @return array
+     *
+     * @deprecated since Totara 13
      */
     public static function delete(string $basket_key) {
         $basket = new session_basket($basket_key);
@@ -138,6 +159,8 @@ class external extends \external_api {
 
     /**
      * @return null
+     *
+     * @deprecated since Totara 13
      */
     public static function delete_returns() {
         return null;
@@ -145,6 +168,8 @@ class external extends \external_api {
 
     /**
      * @return external_function_parameters
+     *
+     * @deprecated since Totara 13
      */
     public static function copy_parameters(): external_function_parameters {
         return new external_function_parameters(
@@ -168,6 +193,8 @@ class external extends \external_api {
      * @param string $target_basket_key
      * @param array $options
      * @return array
+     *
+     * @deprecated since Totara 13
      */
     public static function copy(string $source_basket_key, string $target_basket_key, array $options) {
         $source_basket = new session_basket($source_basket_key);
@@ -190,6 +217,8 @@ class external extends \external_api {
 
     /**
      * @return null
+     *
+     * @deprecated since Totara 13
      */
     public static function copy_returns() {
         return null;

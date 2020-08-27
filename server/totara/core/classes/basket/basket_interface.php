@@ -25,6 +25,11 @@ namespace totara_core\basket;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * DEPRECATED
+ *
+ * @deprecated since Totara 13
+ */
 interface basket_interface {
 
     /**
@@ -32,6 +37,8 @@ interface basket_interface {
      *
      * @param array $items
      * @return basket_interface
+     *
+     * @deprecated since Totara 13
      */
     public function replace(array $items): basket_interface;
 
@@ -41,6 +48,8 @@ interface basket_interface {
      *
      * @param array $items
      * @return basket_interface
+     *
+     * @deprecated since Totara 13
      */
     public function add(array $items): basket_interface;
 
@@ -49,6 +58,8 @@ interface basket_interface {
      *
      * @param array $items
      * @return basket_interface
+     *
+     * @deprecated since Totara 13
      */
     public function remove(array $items): basket_interface;
 
@@ -56,6 +67,8 @@ interface basket_interface {
      * this removes the basket completely, essentially clearing it
      *
      * @return basket_interface
+     *
+     * @deprecated since Totara 13
      */
     public function delete(): basket_interface;
 
@@ -63,11 +76,15 @@ interface basket_interface {
      * returns all items contained in the basket
      *
      * @return array
+     *
+     * @deprecated since Totara 13
      */
     public function load(): array;
 
     /**
      * @return string
+     *
+     * @deprecated since Totara 13
      */
     public function get_key(): string;
 

@@ -26,8 +26,12 @@ namespace totara_core\basket\storage;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * DEPRECATED
+ *
  * This adapter stores the data in the session, the parent key for the entries
  * can be specified on instantiation.
+ *
+ * @deprecated since Totara 13
  */
 class session_adapter implements adapter {
 
@@ -37,15 +41,21 @@ class session_adapter implements adapter {
         $this->key = $key;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function save($id, $data) {
         global $SESSION;
-        
+
         if (!isset($SESSION->{$this->key})) {
             $SESSION->{$this->key} = [];
         }
         $SESSION->{$this->key}[$id] = $data;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function load($id) {
         global $SESSION;
 
@@ -55,6 +65,9 @@ class session_adapter implements adapter {
         return null;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function delete($id) {
         global $SESSION;
 

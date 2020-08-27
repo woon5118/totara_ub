@@ -26,9 +26,13 @@ namespace totara_core\basket;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * DEPRECATED
+ *
  * Class which contains the logic to determine if a basket has hit a given limit.
  *
  * System wide default is set by constant DEFAULT_LIMIT, but can be overriden by passing a limit to the constructor.
+ *
+ * @deprecated since Totara 13
  */
 class basket_limiter {
 
@@ -52,6 +56,8 @@ class basket_limiter {
 
     /**
      * @return int
+     *
+     * @deprecated since Totara 13
      */
     public function get_limit(): int {
         return $this->limit;
@@ -62,6 +68,8 @@ class basket_limiter {
      *
      * @param array $items_to_add
      * @return bool
+     *
+     * @deprecated since Totara 13
      */
     public function is_limit_reached(array $items_to_add = []): bool {
         if ($this->limit === 0) {

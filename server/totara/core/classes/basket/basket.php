@@ -29,9 +29,13 @@ use totara_core\basket\storage\adapter;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * DEPRECATED
+ *
  * The basket is essential a data holder storing a number of items for later use.
  * This basic implementation stores the data within the class, it is not persistant
  * outside of the instance
+ *
+ * @deprecated since Totara 13
  */
 class basket implements basket_interface {
 
@@ -56,12 +60,18 @@ class basket implements basket_interface {
         $this->storage = $storage ?? new simple_adapter();
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function replace(array $items): basket_interface {
         $this->delete();
         $this->add($items);
         return $this;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function add(array $items): basket_interface {
         $stored_items = $this->load();
         $items = array_merge($stored_items, $items);
@@ -72,6 +82,9 @@ class basket implements basket_interface {
         return $this;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function remove(array $items): basket_interface {
         $items = array_values(
             array_filter(
@@ -89,15 +102,24 @@ class basket implements basket_interface {
         return $this;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function delete(): basket_interface {
         $this->storage->delete($this->key);
         return $this;
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function load(): array {
         return $this->storage->load($this->key) ?? [];
     }
 
+    /**
+     * @deprecated since Totara 13
+     */
     public function get_key(): string {
         return $this->key;
     }
