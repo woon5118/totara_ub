@@ -61,4 +61,13 @@ $capabilities = [
             'user' => CAP_ALLOW,
         ],
     ],
+    // Manage engage. Ability to access and do many things
+    'totara/engage:manage' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'tenantusermanager' => CAP_ALLOW,
+        ],
+    ],
 ];

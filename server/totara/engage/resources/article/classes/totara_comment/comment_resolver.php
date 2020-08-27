@@ -64,7 +64,7 @@ final class comment_resolver extends resolver {
      */
     public function is_allow_to_update(comment $comment, int $actorid): bool {
         $owner_id = $comment->get_userid();
-        return (is_siteadmin($actorid) || $actorid == $owner_id);
+        return (access_manager::can_manage_engage($actorid) || $actorid == $owner_id);
     }
 
     /**
@@ -87,6 +87,6 @@ final class comment_resolver extends resolver {
      */
     public function is_allow_to_delete(comment $comment, int $actorid): bool {
         $owner_id = $comment->get_userid();
-        return (is_siteadmin($actorid) || $actorid == $owner_id);
+        return (access_manager::can_manage_engage($actorid) || $actorid == $owner_id);
     }
 }

@@ -25,6 +25,7 @@ namespace totara_playlist\totara_engage\card;
 use core\orm\pagination\offset_cursor_paginator;
 use core\orm\query\builder;
 use core\orm\query\order;
+use totara_engage\access\access_manager;
 use totara_engage\card\card_loader;
 use totara_engage\card\card_resolver;
 use totara_engage\entity\engage_resource;
@@ -72,7 +73,7 @@ class loader extends card_loader {
         );
 
         $user_id = $this->query->get_userid();
-        if (!empty($CFG->tenantsenabled) && !is_siteadmin($user_id)) {
+        if (!empty($CFG->tenantsenabled) && !access_manager::can_manage_tenant_participants($user_id)) {
             // Multi tenancy is on, and user is not a site admin.
             $tenant_id = $DB->get_field('user', 'tenantid', ['id' => $user_id]);
             if (null !== $tenant_id) {
@@ -183,7 +184,7 @@ class loader extends card_loader {
         );
 
         $user_id = $this->query->get_userid();
-        if (!empty($CFG->tenantsenabled) && !is_siteadmin($user_id)) {
+        if (!empty($CFG->tenantsenabled) && !access_manager::can_manage_tenant_participants($user_id)) {
             // Multi tenancy is on, and user is not a site admin
             $tenant_id = $DB->get_field('user', 'tenantid', ['id' => $user_id], MUST_EXIST);
 

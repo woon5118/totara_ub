@@ -25,6 +25,7 @@ namespace totara_playlist\webapi\resolver\mutation;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use totara_core\advanced_feature;
+use totara_engage\access\access_manager;
 use totara_playlist\local\helper;
 use totara_playlist\playlist;
 
@@ -50,10 +51,8 @@ final class update_order implements mutation_resolver {
         $actor = (int)$USER->id;
 
         // If current user is not owner of playlist and not admin, exception has to be fired.
-        if ($actor !== $playlist->get_userid()) {
-            if (!is_siteadmin($actor)) {
-                throw new \coding_exception('Current user can not order cards in the playlist');
-            }
+        if ($actor !== $playlist->get_userid() && access_manager::can_manage_engage($actor)) {
+            throw new \coding_exception('Current user can not order cards in the playlist');
         }
 
         // As sortorder starts from 1, order needs to plus 1.

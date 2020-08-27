@@ -22,6 +22,7 @@
  */
 namespace totara_engage\question;
 
+use totara_engage\access\access_manager;
 use totara_engage\answer\answer;
 use totara_engage\answer\answer_factory;
 use totara_engage\entity\answer_option;
@@ -260,8 +261,8 @@ final class question {
 
         $creator = $this->question->userid;
 
-        // Site admin can do anything.
-        if (is_siteadmin($userid)) {
+        // Engage manager can do anything.
+        if (access_manager::can_manage_engage($userid)) {
             return true;
         }
 

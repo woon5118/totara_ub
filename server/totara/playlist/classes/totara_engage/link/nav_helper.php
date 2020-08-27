@@ -25,6 +25,7 @@ namespace totara_playlist\totara_engage\link;
 
 use core\orm\query\builder;
 use stdClass;
+use totara_engage\access\access_manager;
 use totara_engage\entity\engage_resource;
 use totara_playlist\entity\playlist_resource;
 
@@ -158,7 +159,7 @@ final class nav_helper {
         global $USER, $CFG, $DB;
         $user_id = $USER->id;
 
-        if (!empty($CFG->tenantsenabled) && !is_siteadmin($user_id)) {
+        if (!empty($CFG->tenantsenabled) && !access_manager::can_manage_tenant_participants($user_id)) {
             // Multi-tenancy is on, and user is not a site admin one.
             $tenant_id = $DB->get_field('user', 'tenantid', ['id' => $user_id], MUST_EXIST);
 

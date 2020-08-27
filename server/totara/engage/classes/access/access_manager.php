@@ -22,7 +22,6 @@
  */
 namespace totara_engage\access;
 
-use totara_core\advanced_feature;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\share\recipient\recipient;
 use totara_engage\share\shareable;
@@ -33,6 +32,40 @@ final class access_manager {
      * access_manager constructor.
      */
     private function __construct() {
+    }
+
+    /**
+     * Check the super admin capability to see if this
+     * user is able to do admin thing in engage.
+     *
+     * @param int|null $user_id
+     * @return bool
+     */
+    public static function can_manage_engage(int $user_id = null): bool {
+        global $USER;
+        if (empty($user_id)) {
+            $user_id = $USER->id;
+        }
+
+        $context = \context_user::instance($user_id);
+        return has_capability('totara/engage:manage', $context, $user_id);
+    }
+
+    /**
+     * Check against the totara/tenant:manageparticipants capability
+     * to see if the user is a tenancy admin.
+     *
+     * @param int $user_id
+     * @return bool
+     */
+    public static function can_manage_tenant_participants(int $user_id): bool {
+        global $USER;
+        if (empty($user_id)) {
+            $user_id = $USER->id;
+        }
+
+        $context = \context_system::instance();
+        return has_capability('totara/tenant:manageparticipants', $context, $user_id);
     }
 
     /**
@@ -56,12 +89,12 @@ final class access_manager {
             return false;
         }
 
-        if (is_siteadmin($user_id)) {
+        if ($user_id == $ownerid) {
+            // Same owner, so he/she can access to this very item.
             return true;
         }
 
-        if ($user_id == $ownerid) {
-            // Same owner, so he/she can access to this very item.
+        if (self::can_manage_engage($user_id)) {
             return true;
         }
 

@@ -29,6 +29,7 @@ use totara_catalog\provider;
 use totara_core\advanced_feature;
 use totara_engage\access\access;
 use core\orm\query\builder;
+use totara_engage\access\access_manager;
 use totara_playlist\playlist as model_playlist;
 use totara_engage\link\builder as link_builder;
 
@@ -86,7 +87,7 @@ final class playlist extends provider {
 
         $results = [];
 
-        if (is_siteadmin($USER->id)) {
+        if (access_manager::can_manage_engage($USER->id)) {
             // The admin can see everything.
             foreach ($objects as $object) {
                 $results[$object->objectid] = true;
@@ -140,11 +141,6 @@ final class playlist extends provider {
      */
     public function prime_provider_cache(): void {
         global $DB, $USER, $CFG;
-
-        if (is_siteadmin($USER->id)) {
-            // Make it faster for site admin. No point to make the fetch.
-            return;
-        }
 
         if (advanced_feature::is_disabled('engage_resources')) {
             return;

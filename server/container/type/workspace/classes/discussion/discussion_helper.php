@@ -64,7 +64,7 @@ final class discussion_helper {
         }
 
         $interactor = new workspace_interactor($workspace, $actor_id);
-        if (!$interactor->is_joined()) {
+        if (!$interactor->can_create_discussions()) {
             throw discussion_exception::on_create($workspace->get_name());
         }
 

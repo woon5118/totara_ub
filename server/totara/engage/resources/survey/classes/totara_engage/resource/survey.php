@@ -28,6 +28,7 @@ use engage_survey\event\survey_reshared;
 use engage_survey\event\survey_shared;
 use engage_survey\repository\survey_question_repository;
 use engage_survey\result\vote_result;
+use totara_engage\access\access_manager;
 use totara_engage\answer\answer_factory;
 use engage_survey\totara_engage\resource\input\question_validator;
 use totara_engage\link\builder;
@@ -328,6 +329,10 @@ final class survey extends resource_item {
             return true;
         }
 
+        if (access_manager::can_manage_engage($userid)) {
+            return true;
+        }
+
         $context = \context_user::instance($owner);
         return has_capability('engage/survey:delete', $context, $userid);
     }
@@ -362,6 +367,10 @@ final class survey extends resource_item {
     public function can_update(int $userid): bool {
         $owner = $this->get_userid();
         if ($owner == $userid) {
+            return true;
+        }
+
+        if (access_manager::can_manage_engage($userid)) {
             return true;
         }
 
@@ -432,6 +441,9 @@ final class survey extends resource_item {
      * @inheritDoc
      */
     public function can_share(int $userid): bool {
+        if (access_manager::can_manage_engage($userid)) {
+            return true;
+        }
         // Check if user is allowed to share surveys.
         $context = \context_user::instance($userid);
         if (!has_capability('engage/survey:share', $context, $userid)) {

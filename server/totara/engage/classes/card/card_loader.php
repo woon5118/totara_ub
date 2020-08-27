@@ -26,6 +26,7 @@ use core\orm\pagination\offset_cursor_paginator;
 use core\orm\query\builder;
 use core\orm\query\table;
 use totara_engage\access\access;
+use totara_engage\access\access_manager;
 use totara_engage\entity\share;
 use totara_engage\entity\share_recipient;
 use totara_engage\query\option\section;
@@ -71,7 +72,7 @@ class card_loader {
 
         $user_id = $this->query->get_userid();
 
-        if (!empty($CFG->tenantsenabled) && !is_siteadmin($user_id)) {
+        if (!empty($CFG->tenantsenabled) && !access_manager::can_manage_tenant_participants($user_id)) {
             // Multi-tenancy is on, and user is not a site admin one.
             $tenant_id = $DB->get_field('user', 'tenantid', ['id' => $user_id], MUST_EXIST);
 
@@ -299,7 +300,7 @@ class card_loader {
         $items = $this->get_items_builder();
         $items->select(['items.*']);
 
-        if (!empty($CFG->tenantsenabled) && !is_siteadmin($USER->id)) {
+        if (!empty($CFG->tenantsenabled) && !access_manager::can_manage_tenant_participants($USER->id)) {
             // Only happening if the multi tenancy is enabled and user is not a site admin.
             $tenant_id = $DB->get_field('user', 'tenantid', ['id' => $USER->id]);
 

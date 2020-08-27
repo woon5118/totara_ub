@@ -33,6 +33,7 @@ use engage_article\local\image_processor;
 use totara_comment\comment_helper;
 use engage_article\totara_engage\resource\input\name_validator;
 use totara_engage\access\access;
+use totara_engage\access\access_manager;
 use totara_engage\entity\engage_resource;
 use totara_engage\link\builder;
 use totara_engage\resource\input\access_validator;
@@ -141,7 +142,7 @@ final class article extends resource_item implements time_viewable {
             return true;
         }
 
-        return is_siteadmin($userid);
+        return access_manager::can_manage_engage($userid);
     }
 
     /**
@@ -307,7 +308,7 @@ final class article extends resource_item implements time_viewable {
             return true;
         }
 
-        return is_siteadmin($userid);
+        return access_manager::can_manage_engage($userid);
     }
 
     /**

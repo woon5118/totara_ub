@@ -30,6 +30,7 @@ use totara_engage\access\access;
 use core\orm\query\builder;
 use engage_article\totara_engage\resource\article as model_article;
 use core\orm\query\raw_field;
+use totara_engage\access\access_manager;
 use totara_engage\link\builder as link_builder;
 
 final class article extends provider {
@@ -88,7 +89,7 @@ final class article extends provider {
 
         $results = [];
 
-        if (is_siteadmin($USER->id)) {
+        if (access_manager::can_manage_engage($USER->id)) {
             // The admin can see everything.
             foreach ($objects as $object) {
                 $results[$object->objectid] = true;
@@ -137,11 +138,6 @@ final class article extends provider {
      */
     public function prime_provider_cache(): void {
         global $DB, $USER, $CFG;
-
-        if (is_siteadmin($USER->id)) {
-            // No point to cache the site admin.
-            return;
-        }
 
         $builder = builder::table('engage_resource', 'er');
         $builder->left_join(
