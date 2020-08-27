@@ -947,11 +947,15 @@ class behat_totara_competency extends behat_base {
         );
 
         try {
-            $toggle = $this->find('css', 'button[aria-expanded]', false, $criterion_node);
+            $toggle = $this->find('css', 'button[aria-expanded] span', false, $criterion_node);
             $toggle->click();
         } catch (Exception $e) {
-            $msg = $criterion_type . '" criterion " has no detail';
-            throw new ExpectationException($msg, $this->getSession());
+            if (strpos($e->getMessage(), 'element not interactable: element has zero size') !== false) {
+                $toggle->findById('criterion_title--coursecompletion_1')->click();
+            } else {
+                $msg = $criterion_type . '" criterion " has no detail';
+                throw new ExpectationException($msg, $this->getSession());
+            }
         }
     }
 
