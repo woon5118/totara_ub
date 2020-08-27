@@ -69,7 +69,7 @@ define('FORMAT_MARKDOWN', '4');
  *
  * @see /core/formats/json_editor/json_editor
  */
-define('FORMAT_JSON_EDITOR', '42');
+define('FORMAT_JSON_EDITOR', '5');
 
 /**
  * A moodle_url comparison using this flag will return true if the base URLs match, params are ignored.

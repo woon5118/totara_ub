@@ -16,4 +16,4 @@
  * @module totara_core
  */
 
-export const FORMAT_JSON_EDITOR = '42';
+export const FORMAT_JSON_EDITOR = '5';
