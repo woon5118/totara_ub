@@ -370,7 +370,7 @@ final class util {
             'siteMaintenance' => $CFG->maintenance_enabled,
             'theme' => [
                 'urlLogo' => self::get_mobile_logo_url(),
-                'colorPrimary' => !empty($primarycolour) ? $primarycolour : "#8CA83D",
+                'colorPrimary' => !empty($primarycolour) ? $primarycolour : "#99AC3A",
                 'colorText' => !empty($textcolour) ? $textcolour : "#FFFFFF",
             ],
             'version' => self::get_api_version(),

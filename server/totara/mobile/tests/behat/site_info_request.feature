@@ -46,7 +46,7 @@ Feature: Confirm site info request functionality
   Scenario: Check that the mobile primary colour theme setting works as expected
     # Default setting
     When I am using the mobile emulator
-    Then I should see "\"colorPrimary\": \"#8CA83D\"," in the "#site_info_response" "css_element"
+    Then I should see "\"colorPrimary\": \"#99AC3A\"," in the "#site_info_response" "css_element"
     # Custom setting - Pending an admin colour selector behat step
 
   Scenario: Check that the mobile text colour theme setting works as expected
