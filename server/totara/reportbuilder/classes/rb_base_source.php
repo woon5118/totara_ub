@@ -1015,6 +1015,22 @@ abstract class rb_base_source {
     }
 
     /**
+     * Get the join with the specified name if it exists.
+     * This is useful for accessing joins defined in one trait from another trait.
+     *
+     * @param string $name
+     * @return rb_join
+     */
+    protected function get_join(string $name): ?rb_join {
+        foreach ($this->joinlist as $join) {
+            if ($join->name === $name) {
+                return $join;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Inject column_test data into database.
      *
      * @codeCoverageIgnore
