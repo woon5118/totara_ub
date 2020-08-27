@@ -70,33 +70,45 @@ if ($hassiteconfig) {
         )
     );
 
-    if (advanced_feature::is_enabled('competency_assignment')) {
-        $settings_page = \hierarchy_competency\admin_settings::load_or_create_settings_page($ADMIN);
-        if (!is_array($settings_page->req_capability)) {
-            $settings_page->req_capability = [$settings_page->req_capability];
-        }
-        $settings_page->req_capability[] = 'totara/competency:manage_assignments';
-        $settings_page->req_capability = array_unique($settings_page->req_capability);
+    $settings_page = \hierarchy_competency\admin_settings::load_or_create_settings_page($ADMIN);
+    if (!is_array($settings_page->req_capability)) {
+        $settings_page->req_capability = [$settings_page->req_capability];
+    }
+    $settings_page->req_capability[] = 'totara/competency:manage_assignments';
+    $settings_page->req_capability = array_unique($settings_page->req_capability);
 
-        if ($ADMIN->fulltree) {
+    if ($ADMIN->fulltree) {
+        $hidden = false;
+        if (!advanced_feature::is_enabled('competencies')) {
+            $hidden = true;
+        } else if (!advanced_feature::is_enabled('competency_assignment')) {
+            $hidden = true;
+        }
+
+        if (!$hidden) {
+            // You can't hide headings, if you don't want them, you don't add them.
             $settings_page->add(new admin_setting_heading(
                 'totara_competency/heading',
                 new lang_string('settings_unassignment_header', 'totara_competency'),
                 new lang_string('settings_unassignment_text', 'totara_competency')
             ));
-
-            $settings_page->add(new admin_setting_unassign_behaviour(
-                admin_setting_unassign_behaviour::NAME,
-                new lang_string('settings_unassign_behaviour', 'totara_competency'),
-                new lang_string('settings_unassign_behaviour_description', 'totara_competency')
-            ));
-
-            $settings_page->add(new admin_setting_continuous_tracking(
-                'totara_competency/continuous_tracking',
-                new lang_string('settings_continuous_tracking', 'totara_competency'),
-                new lang_string('settings_continuous_tracking_description', 'totara_competency')
-            ));
         }
+
+        $setting = new admin_setting_unassign_behaviour(
+            admin_setting_unassign_behaviour::NAME,
+            new lang_string('settings_unassign_behaviour', 'totara_competency'),
+            new lang_string('settings_unassign_behaviour_description', 'totara_competency')
+        );
+        $settings->hidden = $hidden;
+        $settings_page->add($setting);
+
+        $setting = new admin_setting_continuous_tracking(
+            'totara_competency/continuous_tracking',
+            new lang_string('settings_continuous_tracking', 'totara_competency'),
+            new lang_string('settings_continuous_tracking_description', 'totara_competency')
+        );
+        $settings->hidden = $hidden;
+        $settings_page->add($setting);
     }
 }
 

@@ -23,9 +23,5 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-if (\totara_core\advanced_feature::is_disabled('totara_msteams')) {
-    return;
-}
-
 global $CFG;
 totara_msteams\settings_helper::load_settings($ADMIN);

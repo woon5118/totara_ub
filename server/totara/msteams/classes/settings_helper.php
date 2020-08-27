@@ -91,15 +91,13 @@ final class settings_helper {
     public static function load_settings(admin_root $admin): void {
         global $CFG;
 
-        $enableteams = self::get_enable_msteams();
-        if (!$enableteams) {
-            return;
-        }
+        $hideteams = !self::get_enable_msteams();
 
-        $admin->add('root', new admin_category(self::NS, new lang_string('pluginname', 'totara_msteams')));
+        $admin->add('root', new admin_category(self::NS, new lang_string('pluginname', 'totara_msteams'), $hideteams));
 
         $pages = self::load_msteams_settings_pages($admin->fulltree);
         foreach ($pages as $page) {
+            $page->hidden = $page->hidden || $hideteams;
             $admin->add('msteams', $page);
         }
     }
@@ -108,7 +106,7 @@ final class settings_helper {
      * Return an array of all admin settings pages for the MS Teams app.
      *
      * @param boolean $withsetting
-     * @return (admin_settingpage|admin_externalpage)[]
+     * @return admin_settingpage[]|admin_externalpage[]
      */
     private static function load_msteams_settings_pages(bool $withsetting): array {
         return [
