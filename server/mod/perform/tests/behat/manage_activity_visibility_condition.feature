@@ -6,7 +6,7 @@ Feature: As an activity administrator, I need to be able to update visibility co
     Given I am on a totara site
     And the following "activities" exist in "mod_perform" plugin:
       | activity_name     | description                  | activity_type | create_track | create_section | activity_status |
-      | My Test Activity  | My Test Activity description | check-in      | true         | true           | Draft           |
+      | My Test Activity  | My Test Activity description | check-in      | true         | false          | Draft           |
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | user      | 1        | user1@example.com |
@@ -38,7 +38,7 @@ Feature: As an activity administrator, I need to be able to update visibility co
     And the "Anonymise responses" tui form row toggle switch should be "off"
     # visibility condition should be read only and set to 'all participants' when anonymous response is enabled
     When I toggle the "Anonymise responses" tui form row toggle switch
-    Then ".tui-radioGroup" "css_element" should not exist
+    Then ".tui-radioGroup" "css_element" should not be visible
     And I should see "All responding participants' responses must be marked closed"
     # If toggled back, the visibility condition selected will be “All responding participants”
     # regardless of what was selected before anonymise had been toggled on.
@@ -61,7 +61,7 @@ Feature: As an activity administrator, I need to be able to update visibility co
     And I click on "Save changes" "button"
     And I should see "This condition cannot be met by participants without manual intervention, because automatic closure is currently disabled. Enable it as a workflow setting on the \"Content\" tab." in the tui warning notification banner
     When I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
-    And I should see "Closure is set as a condition for response visibility, but this cannot be met by participants without manual intervention while automatic closure is disabled. Enable it, or change the visibility condition on the \"General\" tab to \"None\"." in the tui warning notification banner
+    And I should see "Closure is set as a condition for response visibility, but this cannot be met by participants without manual intervention while automatic closure is disabled. Enable it, or change the visibility condition on the \"General\" tab to \"None\"." in the ".tui-performActivityWorkflowSettings__warning" "css_element"
     # Situation: automatic closure enabled & visibility condition is not none
     When I toggle the "Automatic closure" tui form row toggle switch
     Then I should not see "Closure is set as a condition for response visibility, but this cannot be met by participants without manual intervention while automatic closure is disabled. Enable it, or change the visibility condition on the \"General\" tab to \"None\"."
@@ -111,5 +111,5 @@ Feature: As an activity administrator, I need to be able to update visibility co
     Then I should see "was successfully activated." in the tui success notification toast
 
     When I click on "General" "link"
-    Then ".tui-radioGroup" "css_element" should not exist
+    Then ".tui-radioGroup" "css_element" should not be visible
     And I should see "All responding participants' responses must be marked closed"
