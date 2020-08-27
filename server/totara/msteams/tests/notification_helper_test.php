@@ -36,7 +36,7 @@ use totara_msteams\botfw\notification\default_notification;
 use totara_msteams\botfw\router\null_router;
 use totara_msteams\my\helpers\notification_helper;
 
-require_once(__DIR__.'/../classes/botfw/tests/fixtures/lib.php');
+require_once(__DIR__.'/fixtures/lib.php');
 
 class totara_msteams_notification_helper_testcase extends botfw_bot_base_testcase {
     /** @var null_router */

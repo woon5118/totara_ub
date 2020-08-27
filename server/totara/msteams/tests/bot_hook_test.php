@@ -26,7 +26,7 @@ use totara_msteams\my\bot_hook;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__.'/../classes/botfw/tests/fixtures/lib.php');
+require_once(__DIR__.'/fixtures/lib.php');
 
 class totara_msteams_bot_hook_testcase extends advanced_testcase {
     /** @var integer */

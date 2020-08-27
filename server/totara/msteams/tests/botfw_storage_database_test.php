@@ -30,8 +30,7 @@ class totara_msteams_botfw_storage_database_testcase extends advanced_testcase {
     private $storage;
 
     public function setUp(): void {
-        global $CFG;
-        require_once("{$CFG->dirroot}/totara/msteams/classes/botfw/tests/fixtures/lib.php");
+        require_once(__DIR__.'/fixtures/lib.php');
 
         $bot_app_id = '31622776-6016-8379-3319-988935444327';
         $bot_app_secret = 's33krit';

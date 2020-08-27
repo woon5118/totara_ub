@@ -47,7 +47,7 @@ use totara_msteams\my\dispatcher\signin_request;
 use totara_msteams\my\dispatcher\signout_request;
 use totara_msteams\my\router as my_router;
 
-require_once(__DIR__.'/../classes/botfw/tests/fixtures/lib.php');
+require_once(__DIR__.'/fixtures/lib.php');
 
 class totara_msteams_my_router_testcase extends botfw_jwks_base_testcase {
     /** @var stdClass */
