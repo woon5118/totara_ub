@@ -117,7 +117,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
 
             for (var date = 0; date < cntdates; date++) {
                 if (document.querySelector('input[name="datedelete[' + date + ']"]').value > 0) {
-                    return;
+                    continue;
                 }
                 var input = document.querySelector('input[name="' + this.type + 'ids[' + date + ']"]');
 
