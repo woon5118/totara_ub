@@ -139,14 +139,14 @@ Feature: Competency profile landing page - an overview of their progress towards
     And I should see "proficient 100%" in the ".tui-competencyProfileCurrentProgress li:nth-child(4)" "css_element"
 
     # View the competency charts
-    Then I should see "Position" in the "li:nth-child(1) .tui-competencyCharts__chart" "css_element"
-    And I should see "Organisation" in the "li:nth-child(2) .tui-competencyCharts__chart" "css_element"
-    And I should see "Cohort" in the "li:nth-child(3) .tui-competencyCharts__chart" "css_element"
-    And I should see "Directly assigned" in the "li:nth-child(4) .tui-competencyCharts__chart" "css_element"
+    Then I should see "Position" in the ".tui-grid-item:nth-child(1) .tui-competencyCharts__chart" "css_element"
+    And I should see "Organisation" in the ".tui-grid-item:nth-child(2) .tui-competencyCharts__chart" "css_element"
+    And I should see "Cohort" in the ".tui-grid-item:nth-child(3) .tui-competencyCharts__chart" "css_element"
+    And I should see "Directly assigned" in the ".tui-grid-item:nth-child(4) .tui-competencyCharts__chart" "css_element"
 
     # Filter the competency charts, only Position should be listed
     When I set the field "Viewing by assignment" to "Position"
-    Then I should see "Position" in the ".tui-competencyProfile__filtersBar + div li:nth-child(1) .tui-competencyCharts__chart" "css_element"
+    Then I should see "Position" in the ".tui-grid-item:nth-child(1) .tui-competencyCharts__chart" "css_element"
     And I should not see "Organisation" in the ".tui-competencyProfile__filtersBar + div" "css_element"
     And I should not see "Cohort" in the ".tui-competencyProfile__filtersBar + div" "css_element"
     And I should not see "Directly assigned" in the ".tui-competencyProfile__filtersBar + div" "css_element"
@@ -287,4 +287,4 @@ Feature: Competency profile landing page - an overview of their progress towards
     And all assignments for the "cohort" assignment type are archived
     And all assignments for the "user" assignment type are archived
     When I reload the page
-    Then I should see "This user has no current assignments" in the ".tui-competencyProfileCurrentProgress li:nth-child(1)" "css_element"
+    Then I should see "This user has no current assignments" in the ".tui-grid-item:nth-child(1)" "css_element"
