@@ -28,6 +28,7 @@ Feature: Configure seminar settings
       | configurator | configurator | System       |           |
     And I log out
 
+  @mod_facetoface_notification
   Scenario: Access all seminar activity settings with modconfig capability
     Given I log in as "configurator"
 

@@ -928,12 +928,12 @@ class facetoface_notification extends data_object {
      *
      * @access  public
      * @param   object  $user       User object
-     * @param   int     $sessionid
+     * @param   int|seminar_event $sessionidorevent
      * @param   int     $sessiondate The specific sessiondate which this message is for.
      * @param   object  $fromuser User object describing who the email is from.
      * @return  object
      */
-    public function set_newevent($user, $sessionid, $sessiondate = null, $fromuser = null) {
+    public function set_newevent($user, $sessionidorevent, $sessiondate = null, $fromuser = null) {
         global $CFG, $USER, $DB;
 
         // Load facetoface object
@@ -948,9 +948,16 @@ class facetoface_notification extends data_object {
             $this->_facetoface->coursename = $course->fullname;
         }
 
+        if ($sessionidorevent instanceof seminar_event) {
+            $sessionid = $sessionidorevent->get_id();
+            $seminarevent = $sessionidorevent;
+        } else {
+            $sessionid = (int)$sessionidorevent;
+            $seminarevent = null;
+        }
         // Load session object
         if (empty($this->_sessions[$sessionid])) {
-            $seminarevent = new \mod_facetoface\seminar_event($sessionid);
+            $seminarevent = $seminarevent ?? new \mod_facetoface\seminar_event($sessionid);
             $session = $seminarevent->to_record();
             $session->sessiondates = $seminarevent->get_sessions()->sort('timestart')->to_records(false);
             $this->_sessions[$sessionid] = $session;

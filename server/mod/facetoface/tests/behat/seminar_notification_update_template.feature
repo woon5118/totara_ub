@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript
+@mod @mod_facetoface @mod_facetoface_notification @totara @javascript
 Feature: User is able to see the template used when editting a seminar notification
   Background:
     Given the following "courses" exist:

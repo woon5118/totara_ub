@@ -262,9 +262,9 @@ class mod_facetoface_seminar_hook_testcase extends advanced_testcase {
         seminar_event_helper::merge_sessions($seminarevent, $dates);
         $hook = $this->get_one_hook(resources_are_being_updated::class);
         /** @var resources_are_being_updated $hook */
-        $assetids = self::get_sorted_ids($hook->session->get_asset_list());
-        $roomids = self::get_sorted_ids($hook->session->get_room_list());
-        $facilitatorids = self::get_sorted_ids($hook->session->get_facilitator_list(false));
+        $assetids = self::get_sorted_ids($hook->sessions[0]->get_asset_list());
+        $roomids = self::get_sorted_ids($hook->sessions[0]->get_room_list());
+        $facilitatorids = self::get_sorted_ids($hook->sessions[0]->get_facilitator_list(false));
         $this->assertEquals([$ass1->get_id(), $ass2->get_id()], $assetids);
         $this->assertEquals([$roo1->get_id(), $roo2->get_id()], $roomids);
         $this->assertEquals([$fac1->get_id(), $fac2->get_id(), $fac3->get_id()], $facilitatorids);
@@ -278,9 +278,9 @@ class mod_facetoface_seminar_hook_testcase extends advanced_testcase {
         seminar_event_helper::merge_sessions($seminarevent, $dates);
         $hook = $this->get_one_hook(resources_are_being_updated::class);
         /** @var resources_are_being_updated $hook */
-        $this->assertTrue($hook->session->get_asset_list()->is_empty());
-        $this->assertTrue($hook->session->get_room_list()->is_empty());
-        $this->assertTrue($hook->session->get_facilitator_list(false)->is_empty());
+        $this->assertTrue($hook->sessions[0]->get_asset_list()->is_empty());
+        $this->assertTrue($hook->sessions[0]->get_room_list()->is_empty());
+        $this->assertTrue($hook->sessions[0]->get_facilitator_list(false)->is_empty());
     }
 
     public function test_event_is_being_cancelled() {

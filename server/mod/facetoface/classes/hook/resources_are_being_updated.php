@@ -24,6 +24,7 @@
 namespace mod_facetoface\hook;
 
 use mod_facetoface\hook\service\seminar_session_resource;
+use mod_facetoface\seminar_event;
 use stdClass;
 
 /**
@@ -33,17 +34,30 @@ use stdClass;
  */
 class resources_are_being_updated extends \totara_core\hook\base {
     /**
-     * A seminar session associated to the hook. **Do not modify the instance!!**
-     * @var seminar_session_resource
+     * A seminar event associated to the hook. **Do not modify the instance!!**
+     *
+     * @var seminar_event
      */
-    public $session;
+    public $seminarevent;
+
+    /**
+     * Seminar sessions associated to the hook. **Do not modify the instance!!**
+     * @var seminar_session_resource[]
+     */
+    public $sessions;
 
     /**
      * The constructor.
      *
-     * @param stdClass $sessiondate a facetoface_sessions_dates record optionally containing assetids, roomids and facilitatorids
+     * @param seminar_event $seminarevent
+     * @param stdClass[] $sessiondates a facetoface_sessions_dates record optionally containing assetids, roomids and facilitatorids
      */
-    public function __construct(stdClass $sessiondate) {
-        $this->session = seminar_session_resource::from_record($sessiondate);
+    public function __construct(seminar_event $seminarevent, array $sessiondates) {
+        // Make a shallow copy of the seminar event instance.
+        $this->seminarevent = new seminar_event();
+        $this->seminarevent->from_record($seminarevent->to_record());
+        $this->sessions = array_map(function ($sessiondate) {
+            return seminar_session_resource::from_record($sessiondate);
+        }, $sessiondates);
     }
 }

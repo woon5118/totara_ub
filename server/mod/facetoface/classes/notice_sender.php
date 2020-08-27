@@ -477,7 +477,7 @@ class notice_sender {
 
         $notice = new \facetoface_notification($params);
         $notice->facetofaceid = $seminarevent->get_facetoface();
-        $notice->set_newevent($user, $seminareventid, null, $fromuser);
+        $notice->set_newevent($user, $seminarevent, null, $fromuser);
 
         if ($notifyuser) {
             $icaldata = [];

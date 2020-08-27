@@ -53,6 +53,7 @@ foreach($itemids as $itemid) {
     $res = (object)[
         'id' => $asset->get_id(),
         'name' => $asset->get_name(),
+        'name_only' => $asset->get_name(),
         'hidden' => $asset->get_hidden(),
         'custom' => $asset->get_custom()
     ];

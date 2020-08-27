@@ -2049,8 +2049,8 @@ $string['setting:defaultadminrequestsubjectdefault'] = 'Seminar booking admin re
 $string['setting:defaultfacilitatorassignedmessagedefault'] = 'This is to confirm that you are now assigned to deliver training on the following seminar session(s):
 
 Facilitator: [firstname] [lastname]
-Course: [coursename](link)
-Seminar: [seminarname](link)
+Course: [coursenamelink]
+Seminar: [seminarnamelink]
 
 Date(s) and location(s):
 [#sessions]
@@ -2069,8 +2069,8 @@ $string['setting:defaultfacilitatorcancelmessagedefault'] = 'This is to advise t
 ***SESSION CANCELLED***
 
 Facilitator: [firstname] [lastname]
-Course: ([coursename]link)
-Seminar: ([seminarname]link)
+Course: [coursenamelink]
+Seminar: [seminarnamelink]
 
 Date(s) and location(s):
 [#sessions]
@@ -2085,8 +2085,8 @@ $string['setting:defaultfacilitatorcancelsubjectdefault'] = 'Seminar session fac
 $string['setting:defaultfacilitatortimechangemessagedefault'] = 'The seminar session(s) you are assigned to facilitate have been changed:
 
 Facilitator: [firstname] [lastname]
-Course: [coursename](link)
-Seminar: [seminarname] (link)
+Course: [coursenamelink]
+Seminar: [seminarnamelink]
 
 The updated information is:
 Date(s) and location(s):
@@ -2104,8 +2104,8 @@ $string['setting:defaultfacilitatorunassignedmessagedefault'] = 'This is to advi
 ***SESSION UNASSIGNED***
 
 Facilitator: [firstname] [lastname]
-Course: [coursename] (link)
-Seminar: [seminarname] (link)
+Course: [coursenamelink]
+Seminar: [seminarnamelink]
 
 Date(s) and location(s):
 [#sessions]

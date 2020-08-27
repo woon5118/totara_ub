@@ -172,7 +172,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
             return this.getResource(id)
                 .then(function(resource) {
                     var edit = Promise.resolve('');
-                    var remove = strLib.get_string('remove' + that.type + 'x', 'mod_facetoface', resource.name)
+                    var remove = strLib.get_string('remove' + that.type + 'x', 'mod_facetoface', resource.name_only)
                         .then(function(name) {
                             return templatesLib.renderIcon('delete', name);
                         }).then(function(deleteIcon) {
@@ -180,7 +180,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
                         });
 
                     if (that.manageCustom && resource.custom) {
-                        edit = strLib.get_string('editcustom' + that.type + 'x', 'mod_facetoface', resource.name)
+                        edit = strLib.get_string('editcustom' + that.type + 'x', 'mod_facetoface', resource.name_only)
                         .then(function(name) {
                             return templatesLib.renderIcon('edit', name);
                         }).then(function(editIcon) {

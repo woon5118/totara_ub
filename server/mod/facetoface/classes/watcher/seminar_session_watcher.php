@@ -23,22 +23,25 @@
 
 namespace mod_facetoface\watcher;
 
-use mod_facetoface\facilitator_list;
 use mod_facetoface\facilitator_user;
 use mod_facetoface\hook\event_is_being_cancelled;
 use mod_facetoface\hook\resources_are_being_updated;
 use mod_facetoface\hook\service\seminar_session_resource;
+use mod_facetoface\hook\service\seminar_session_resource_dynamic;
 use mod_facetoface\hook\sessions_are_being_updated;
 use mod_facetoface\notice_sender;
+use mod_facetoface\seminar_event;
 
 final class seminar_session_watcher {
     /**
      * Get an array of facilitators attached to the sessions.
      *
+     * @param seminar_event $seminarevent
      * @param seminar_session_resource[] $sessions
-     * @return integer[]
+     * @return seminar_event[] facilitator_userid => seminar_event_with_filtered_sessions
      */
-    private static function get_recipients(array $sessions): array {
+    private static function get_recipients(seminar_event $seminarevent, array $sessions): array {
+        $f2fevent = $seminarevent->to_record();
         $time = time();
         $recipients = [];
         foreach ($sessions as $sess) {
@@ -46,14 +49,52 @@ final class seminar_session_watcher {
                 continue;
             }
             if ($sess->has_facilitators()) {
+                $date = $sess->get_session()->to_record();
                 $facs = $sess->get_facilitator_list(true);
                 foreach ($facs as $fac) {
                     /** @var facilitator_user $fac */
-                    $recipients[] = $fac->get_userid();
+                    if (!isset($recipients[$fac->get_userid()])) {
+                        $recipients[$fac->get_userid()] = [];
+                    }
+                    $recipients[$fac->get_userid()][] = $date;
                 }
             }
         }
-        return array_unique($recipients);
+        return array_map(function ($dates) use ($f2fevent) {
+            $f2fevent->sessiondates = $dates;
+            $event = new seminar_event();
+            $event->from_record_with_dates($f2fevent);
+            return $event;
+        }, $recipients);
+    }
+
+    /**
+     * Compute the difference of sessions in each seminar event.
+     *
+     * @param seminar_event[] $source array of userid => seminar_event
+     * @param seminar_event[] $destination array of userid => seminar_event
+     * @return seminar_event[] array of userid => seminar_event_with_different_sessions
+     */
+    private static function diff_recipients(array $source, array $destination): array {
+        $result = [];
+        foreach ($source as $userid => $src_event) {
+            $dst_event = $destination[$userid] ?? null;
+            if ($dst_event) {
+                $src_sessiondates = $src_event->get_sessions()->to_records();
+                $dst_sessiondates = $dst_event->get_sessions()->to_records();
+                $record = $src_event->to_record();
+                // Two elements of each array with the same key are identical.
+                $record->sessiondates = array_diff_key($src_sessiondates, $dst_sessiondates);
+                if (!empty($record->sessiondates)) {
+                    $diff_event = new seminar_event();
+                    $diff_event->from_record_with_dates($record);
+                    $result[$userid] = $diff_event;
+                }
+            } else {
+                $result[$userid] = $src_event;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -62,15 +103,15 @@ final class seminar_session_watcher {
     public static function sessions_updated(sessions_are_being_updated $hook) {
         // Notify time updated.
         $olddates = $hook->seminarevent->get_sessions()->to_records();
-        $recipients = self::get_recipients($hook->sessionstobeupdated);
-        foreach ($recipients as $recipient) {
-            notice_sender::session_facilitator_datetime_changed($recipient, $hook->seminarevent, $olddates);
+        $recipients = self::get_recipients($hook->seminarevent, $hook->sessionstobeupdated);
+        foreach ($recipients as $recipient => $seminareventfiltered) {
+            notice_sender::session_facilitator_datetime_changed($recipient, $seminareventfiltered, $olddates);
         }
 
         // Notify cancellation.
-        $recipients = self::get_recipients($hook->sessionstobedeleted);
-        foreach ($recipients as $recipient) {
-            notice_sender::session_facilitator_cancellation($recipient, $hook->seminarevent);
+        $recipients = self::get_recipients($hook->seminarevent, $hook->sessionstobedeleted);
+        foreach ($recipients as $recipient => $seminareventfiltered) {
+            notice_sender::session_facilitator_cancellation($recipient, $seminareventfiltered);
         }
     }
 
@@ -82,14 +123,12 @@ final class seminar_session_watcher {
             return;
         }
         $recipients = [];
-        $facs = facilitator_list::from_seminarevent($hook->seminarevent->get_id(), true);
-        foreach ($facs as $fac) {
-            /** @var facilitator_user $fac */
-            $recipients[] = $fac->get_userid();
-        }
-        $recipients = array_unique($recipients);
-        foreach ($recipients as $recipient) {
-            notice_sender::session_facilitator_cancellation($recipient, $hook->seminarevent);
+        $dates = array_map(function ($sess) {
+            return seminar_session_resource_dynamic::from_session($sess);
+        }, iterator_to_array($hook->seminarevent->get_sessions()));
+        $recipients = self::get_recipients($hook->seminarevent, $dates);
+        foreach ($recipients as $recipient => $seminareventfiltered) {
+            notice_sender::session_facilitator_cancellation($recipient, $seminareventfiltered);
         }
     }
 
@@ -97,25 +136,50 @@ final class seminar_session_watcher {
      * @param resources_are_being_updated $hook
      */
     public static function resources_updated(resources_are_being_updated $hook) {
-        if ($hook->session->get_session()->is_over(time())) {
+        $seminarevent = $hook->seminarevent;
+        if ($seminarevent->is_over()) {
             return;
         }
-        $seminarevent = $hook->session->get_event();
-        $old_facilitators = array_unique(array_map(function (facilitator_user $fac) {
-            return $fac->get_userid();
-        }, iterator_to_array(facilitator_list::from_session($hook->session->get_session_id(), true), false)));
-        $new_facilitators = self::get_recipients([$hook->session]);
+        $old_facilitators = self::get_recipients($seminarevent, array_map(function (seminar_session_resource $session) {
+            return seminar_session_resource_dynamic::from_session($session->get_session());
+        }, $hook->sessions));
+        $new_facilitators = self::get_recipients($seminarevent, $hook->sessions);
 
         // Send an assignment notification.
-        $assigned_recipients = array_diff($new_facilitators, $old_facilitators);
-        foreach ($assigned_recipients as $recipient) {
-            notice_sender::session_facilitator_assigned($recipient, $seminarevent);
+        $assigned_recipients = self::diff_recipients($new_facilitators, $old_facilitators);
+        foreach ($assigned_recipients as $recipient => $seminareventfiltered) {
+            notice_sender::session_facilitator_assigned($recipient, $seminareventfiltered);
         }
 
         // Send an unassignment notification.
-        $unassigned_recipients = array_diff($old_facilitators, $new_facilitators);
-        foreach ($unassigned_recipients as $recipient) {
-            notice_sender::session_facilitator_unassigned($recipient, $seminarevent);
+        $unassigned_recipients = self::diff_recipients($old_facilitators, $new_facilitators);
+        foreach ($unassigned_recipients as $recipient => $seminareventfiltered) {
+            notice_sender::session_facilitator_unassigned($recipient, $seminareventfiltered);
         }
+    }
+
+    /**
+     * @param seminar_event[] $events
+     * @return array
+     */
+    private static function format_event_recipients(array $events): array {
+        $result = [];
+        foreach ($events as $userid => $event) {
+            /** @var \mod_facetoface\seminar_event $event */
+            $username = \core_user::get_user($userid)->username;
+            $sessions = [];
+            foreach ($event->get_sessions() as $s) {
+                /** @var \mod_facetoface\seminar_session $s */
+                $sessions[$s->get_id()] = [
+                    'start' => userdate($s->get_timestart(), '%d %B %Y %I:%M:%S %p'),
+                    'finish' => userdate($s->get_timefinish(), '%d %B %Y %I:%M:%S %p'),
+                ];
+            }
+            $result[$username] = [
+                'name' => $event->get_details(),
+                'sessions' => $sessions,
+            ];
+        }
+        return $result;
     }
 }

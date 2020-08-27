@@ -61,9 +61,13 @@ final class mod_facetoface_generator_util {
         $sql = "SELECT id FROM {facetoface_sessions} WHERE {$DB->sql_compare_text('details')} = '{$details}'";
 
         // This seems to be a bad idea, but presumably that the test environment does only have one record
-        // per test suite, then it is okay to do so. Just pass MUST_EXIST here, so that it can fail the test straight
-        // away when record is not found.
-        return (int) $DB->get_record_sql($sql, null, MUST_EXIST)->id;
+        // per test suite, then it is okay to do so. Just pass IGNORE_MISSING here, so that it can return false
+        // when record is not found.
+        $record = $DB->get_record_sql($sql, null, IGNORE_MISSING);
+        if (!$record) {
+            throw new coding_exception("event '{$details}' does not exist");
+        }
+        return (int)$record->id;
     }
 
     /**
@@ -104,56 +108,57 @@ final class mod_facetoface_generator_util {
         $rc->id = $DB->insert_record('facetoface_sessions_dates', $rc);
 
         if (isset($record['room']) && !isset($record['rooms'])) {
-            throw new coding_exception('The room field is no longer supported. Please replace it with rooms.');
+            if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || (defined('BEHAT_UTIL') || defined('BEHAT_TEST') || defined('BEHAT_SITE_RUNNING'))) {
+                throw new coding_exception('The room field is no longer supported. Please replace it with rooms.');
+            } else {
+                debugging('The room field is no longer supported. Please replace it with rooms.', DEBUG_DEVELOPER);
+                $record['rooms'] = $record['room'];
+                unset($record['room']);
+            }
         }
 
         if (isset($record['rooms'])) {
             // Start processing on rooms if there are any provided.
-            $rooms = explode(",", $record['rooms']);
+            $rooms = array_filter(explode(",", $record['rooms']));
             foreach ($rooms as $room) {
                 $room = trim($room);
                 $frd = new \stdClass();
                 $frd->sessionsdateid = $rc->id;
                 // Expecting room to be existing in the storage, with the given name from the step.
-                $frd->roomid = $DB->get_field('facetoface_room', 'id', ['name' => $room], MUST_EXIST);
+                if (!($frd->roomid = $DB->get_field('facetoface_room', 'id', ['name' => $room]))) {
+                    throw new coding_exception("room '{$room}' does not exist");
+                }
                 $DB->insert_record('facetoface_room_dates', $frd);
             }
         }
 
         if (isset($record['facilitators'])) {
             // Start processing on facilitators if there are any provided.
-            $facilitators = explode(",", $record['facilitators']);
-            array_walk(
-                $facilitators,
-                function (string &$facilitator): void {
-                    trim($facilitator);
-                }
-            );
-
+            $facilitators = array_filter(explode(",", $record['facilitators']));
             foreach ($facilitators as $facilitator) {
+                $facilitator = trim($facilitator);
                 $o = new \stdClass();
                 $o->sessionsdateid = $rc->id;
 
                 // Expecting facilitator to be existing in the storage, with the given name from the step.
-                $o->facilitatorid = $DB->get_field('facetoface_facilitator', 'id', ['name' => $facilitator], MUST_EXIST);
+                if (!($o->facilitatorid = $DB->get_field('facetoface_facilitator', 'id', ['name' => $facilitator]))) {
+                    throw new coding_exception("facilitator '{$facilitator}' does not exist");
+                }
                 $DB->insert_record('facetoface_facilitator_dates', $o);
             }
         }
 
         if (isset($record['assets'])) {
             // Start processing on assets if there are any provided.
-            $assets = explode(",", $record['assets']);
-            array_walk(
-                $assets,
-                function (string &$asset): void {
-                    trim($asset);
-                }
-            );
+            $assets = array_filter(explode(",", $record['assets']));
             foreach ($assets as $asset) {
+                $asset = trim($asset);
                 $o = new \stdClass();
                 $o->sessionsdateid = $rc->id;
                 // Expecting asset to be existing in the storage, with the given name from the step.
-                $o->assetid = $DB->get_field('facetoface_asset', 'id', ['name' => $asset], MUST_EXIST);
+                if (!($o->assetid = $DB->get_field('facetoface_asset', 'id', ['name' => $asset]))) {
+                    throw new coding_exception("asset '{$asset}' does not exist");
+                }
                 $DB->insert_record('facetoface_asset_dates', $o);
             }
         }

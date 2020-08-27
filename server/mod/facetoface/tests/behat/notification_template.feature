@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara
+@mod @mod_facetoface @mod_facetoface_notification @totara
 Feature: Edit seminar notification templates
   In order to update seminar notifications across the site
   As admin

@@ -1,4 +1,4 @@
-@javascript @mod @mod_facetoface @totara
+@javascript @mod @mod_facetoface @mod_facetoface_notification @totara
 Feature: Check seminar notification duplicates recovery functionality
   In order to fix problem with duplicated seminar notifications
   As an admin

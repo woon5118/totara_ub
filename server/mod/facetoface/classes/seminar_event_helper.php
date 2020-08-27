@@ -65,7 +65,7 @@ final class seminar_event_helper {
         }, $dates);
 
         // Get a list of sessions that should be updated/inserted.
-        $dates = self::filter_sessions($dates, $sessionstobedeleted);
+        $dates = self::filter_sessions($seminarevent, $dates, $sessionstobedeleted);
 
         // Notify watchers only if sessions are being inserted or deleted, or session time is updated.
         $datesinserted = array_filter($dates, function ($date) {
@@ -120,6 +120,7 @@ final class seminar_event_helper {
         $sessionstobedeleted->delete();
 
         // Update or create sessions with their associated assets.
+        $datesupdated = [];
         foreach ($dates as $date) {
             $assets = isset($date->assetids) ? $date->assetids : [];
             unset($date->assetids);
@@ -142,11 +143,18 @@ final class seminar_event_helper {
             $datecloned->assetids = $assets;
             $datecloned->roomids = $rooms;
             $datecloned->facilitatorids = $facilitators;
-            (new resources_are_being_updated($datecloned))->execute();
+            $datesupdated[] = $datecloned;
+        }
 
-            room_helper::sync($date->id, array_unique($rooms));
-            asset_helper::sync($date->id, array_unique($assets));
-            facilitator_helper::sync($date->id, array_unique($facilitators));
+        // Notify watchers.
+        if (!empty($datesupdated)) {
+            (new resources_are_being_updated($seminarevent, $datesupdated))->execute();
+        }
+
+        foreach ($datesupdated as $date) {
+            room_helper::sync($date->id, array_unique($date->roomids));
+            asset_helper::sync($date->id, array_unique($date->assetids));
+            facilitator_helper::sync($date->id, array_unique($date->facilitatorids));
         }
     }
 
@@ -159,12 +167,16 @@ final class seminar_event_helper {
      * and != 0 (not a new date) to prevent users from messing with the input
      * and other seminar dates since we rely on the date id came from a form.
      *
+     * @param seminar_event $seminarevent
      * @param array $dates
      * @param seminar_session_list $sessions
      * @return array $dates
      */
-    private static function filter_sessions(array $dates, seminar_session_list $sessions): array {
-        return array_filter($dates, function ($date) use (&$sessions) {
+    private static function filter_sessions(seminar_event $seminarevent, array $dates, seminar_session_list $sessions): array {
+        $datesincluded = [];
+        $datesexcluded = [];
+        $datesexcluded_but_sync = [];
+        foreach ($dates as $date) {
             $date->id = isset($date->id) ? $date->id : 0;
             if ($sessions->contains($date->id)) {
                 /** @var seminar_session $session */
@@ -174,25 +186,30 @@ final class seminar_event_helper {
                     && $session->get_timestart() == $date->timestart
                     && $session->get_timefinish() == $date->timefinish)
                 {
-                    // Notify watchers.
-                    (new resources_are_being_updated($date))->execute();
-
                     $date->roomids = (isset($date->roomids) && is_array($date->roomids)) ? $date->roomids : [];
-                    room_helper::sync($date->id, array_unique($date->roomids));
-
                     $date->assetids = (isset($date->assetids) && is_array($date->assetids)) ? $date->assetids : [];
-                    asset_helper::sync($date->id, array_unique($date->assetids));
-
                     $date->facilitatorids = (isset($date->facilitatorids) && is_array($date->facilitatorids)) ? $date->facilitatorids : [];
-                    facilitator_helper::sync($date->id, array_unique($date->facilitatorids));
-
-                    return false;
+                    $datesexcluded_but_sync[] = $date;
+                    continue;
                 }
             } else if ($date->id != 0) {
-                return false;
+                $datesexcluded[] = $date;
+                continue;
             }
-            return true;
-        });
+            $datesincluded[] = $date;
+        }
+
+        // Notify watchers.
+        if (!empty($datesexcluded) || !empty($datesexcluded_but_sync)) {
+            (new resources_are_being_updated($seminarevent, array_merge($datesexcluded, $datesexcluded_but_sync)))->execute();
+        }
+
+        foreach ($datesexcluded_but_sync as $date) {
+            room_helper::sync($date->id, array_unique($date->roomids));
+            asset_helper::sync($date->id, array_unique($date->assetids));
+            facilitator_helper::sync($date->id, array_unique($date->facilitatorids));
+        }
+        return $datesincluded;
     }
 
     /**

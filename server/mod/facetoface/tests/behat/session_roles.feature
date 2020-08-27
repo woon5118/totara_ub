@@ -67,6 +67,7 @@ Feature: Use facetoface session roles
     And I should see "Student1 Midsam1 Sam1" in the "Test facetoface name" "table_row"
     And I should not see "Student2" in the "Test facetoface name" "table_row"
 
+  @mod_facetoface_notification
   Scenario: Add and remove facetoface session roles, including overlapping roles (Learner + Trainer)
     Given I am on a totara site
     And the following "users" exist:

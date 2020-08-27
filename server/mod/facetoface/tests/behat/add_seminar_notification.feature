@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara
+@mod @mod_facetoface @mod_facetoface_notification @totara
 Feature: Adding a new seminar's notification
   with selected seminar's notification template
   then it should populate the text boxes

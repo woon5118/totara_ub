@@ -56,6 +56,7 @@ foreach($itemids as $itemid) {
     $res = (object)[
         'id' => $facilitator->get_id(),
         'name' => $fullname !== '' ? get_string('facilitatordisplayname', 'mod_facetoface', (object)['name' => $facilitator->get_name(), 'fullname' => $fullname]) : $facilitator->get_name(),
+        'name_only' => $facilitator->get_name(),
         'hidden' => $facilitator->get_hidden(),
         'custom' => $facilitator->get_custom()
     ];

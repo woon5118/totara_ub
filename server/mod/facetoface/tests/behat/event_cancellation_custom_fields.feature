@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript @totara_customfield
+@mod @mod_facetoface @mod_facetoface_notification @totara @javascript @totara_customfield
 Feature: Seminar event cancellation custom fields
   After seminar events have been created
   As an admin

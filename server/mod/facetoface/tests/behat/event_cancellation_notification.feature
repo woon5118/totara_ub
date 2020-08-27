@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript
+@mod @mod_facetoface @mod_facetoface_notification @totara @javascript
 Feature: Seminar event cancellation notifications
   After seminar events have been cancelled
   As an learner

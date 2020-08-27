@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript
+@mod @mod_facetoface @mod_facetoface_notification @totara @javascript
 Feature: Test notification templates update with none trust content
   In order to test notification templates
   I use unsafe chars in notification body

@@ -1,4 +1,4 @@
-@totara @mod_facetoface @javascript
+@totara @mod_facetoface @mod_facetoface_notification @javascript
 Feature: User is not able to create a notification with a booked recipients checked but not booked type set.
   Background:
     Given the following "courses" exist:

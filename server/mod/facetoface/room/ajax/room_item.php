@@ -53,6 +53,7 @@ foreach($itemids as $itemid) {
     $res = (object)[
         'id' => $room->get_id(),
         'name' => $room->get_name(),
+        'name_only' => $room->get_name(),
         'hidden' => $room->get_hidden(),
         'custom' => $room->get_custom(),
         'capacity' => $room->get_capacity()

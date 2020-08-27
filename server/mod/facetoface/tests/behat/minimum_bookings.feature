@@ -56,6 +56,7 @@ Feature: Minimum Seminar bookings
     And I click on the seminar event action "Edit event" in row "29 December"
     Then the field "Minimum bookings" matches value "2"
 
+  @mod_facetoface_notification
   Scenario Outline: Confirm notifications are sent out once cutoff has been reached
     Given the following "seminar events" exist in "mod_facetoface" plugin:
       | facetoface    | details | mincapacity | sendcapacityemail | cutoff |

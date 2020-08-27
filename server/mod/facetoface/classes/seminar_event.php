@@ -404,9 +404,12 @@ final class seminar_event implements seminar_iterator_item {
      * @return seminar_event
      */
     public function from_record_with_dates(\stdClass $object, bool $strict = true): seminar_event {
+        $object = clone $object;
+        $sessiondates = $object->sessiondates ?? null;
+        unset($object->sessiondates);
         $this->from_record($object, $strict);
-        if (isset($object->sessiondates)) {
-            $this->sessions = seminar_session_list::from_records($object->sessiondates, $strict);
+        if (!empty($sessiondates)) {
+            $this->sessions = seminar_session_list::from_records($sessiondates, $strict);
         }
         return $this;
     }

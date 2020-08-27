@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara
+@mod @mod_facetoface @mod_facetoface_notification @totara
 Feature: Test notification templates according TL-10404
   In order to test notification templates for all activities
   I use Manager copy checkbox and Update all activities checkbox to activate or deactivate the changes

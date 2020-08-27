@@ -340,9 +340,10 @@ class mod_facetoface_generator extends testing_module_generator {
      * Resolve record fields for behat.
      *
      * @param array $record
+     * @param boolean $usernametouserid
      * @return void
      */
-    private function translate_record_for_behat(array &$record) {
+    private function translate_record_for_behat(array &$record, bool $usernametouserid = false) {
         foreach (['usercreated', 'usermodified'] as $fieldname) {
             if (isset($record[$fieldname])) {
                 $user = core_user::get_user_by_username($record[$fieldname], 'id');
@@ -353,6 +354,11 @@ class mod_facetoface_generator extends testing_module_generator {
                     unset($record[$fieldname]);
                 }
             }
+        }
+        if ($usernametouserid && isset($record['username']) && (string)$record['username'] !== '') {
+            $user = core_user::get_user_by_username($record['username'], 'id', null, MUST_EXIST);
+            $record['userid'] = $user->id;
+            unset($record['username']);
         }
         // Add any adjustments here if necessary.
     }
@@ -776,8 +782,8 @@ class mod_facetoface_generator extends testing_module_generator {
      * @return stdClass
      */
     public function create_global_facilitator_for_behat(array $record): stdClass {
-        $this->validate_record_for_behat($record, [], ['custom']);
-        $this->translate_record_for_behat($record);
+        $this->validate_record_for_behat($record, [], ['custom', 'userid']);
+        $this->translate_record_for_behat($record, true);
         return $this->add_site_wide_facilitator($record);
     }
 
@@ -787,7 +793,7 @@ class mod_facetoface_generator extends testing_module_generator {
      * @return stdClass
      */
     public function create_custom_facilitator_for_behat(array $record): stdClass {
-        $this->validate_record_for_behat($record, [], ['custom']);
+        $this->validate_record_for_behat($record, [], ['custom', 'userid', 'username']);
         $this->translate_record_for_behat($record);
         return $this->add_custom_facilitator($record);
     }

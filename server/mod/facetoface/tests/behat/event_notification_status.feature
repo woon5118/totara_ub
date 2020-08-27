@@ -1,4 +1,4 @@
-@mod @mod_facetoface @totara @javascript
+@mod @mod_facetoface @mod_facetoface_notification @totara @javascript
 Feature: Seminar event notification must not be available for user after it has been disabled locally or globally
   After seminar events have been created
   As a user I should not be prompted to receive notifications if notifications have been disabled
