@@ -523,10 +523,9 @@ final class bundle {
      * @param string $path_absolute
      */
     private function add_bundle_scss_file_to_map(string $bundle, string $suffix, string $path_relative, string $path_absolute) {
-        $relative = (new path($path_relative))->get_relative('styles', true);
+        $relative = (new path($path_relative))->get_relative('global_styles', true);
         if ($relative !== null) {
-            $path_relative = $relative->out();
-            $this->map_scss_imports[$bundle][$suffix][$path_relative] = $path_absolute;
+            $this->map_scss_imports[$bundle][$suffix][$relative->out()] = $path_absolute;
         } else if ($path_relative === 'tui_bundle.scss') {
             $this->map_bundle_scss[$bundle][$suffix] = $path_absolute;
         } else {

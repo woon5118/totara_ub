@@ -295,16 +295,16 @@ function scssToScssConfig({ mode, watch }) {
   ).map(x => path.dirname(x));
 
   const scssEntry = tuiDirs.reduce((acc, dir) => {
-    if (fs.existsSync(path.join(rootDir, dir, 'styles'))) {
-      globSync('styles/**/*.scss', { cwd: dir }).forEach(x => {
-        if (x == 'styles/static.scss') {
+    if (fs.existsSync(path.join(rootDir, dir, 'global_styles'))) {
+      globSync('global_styles/**/*.scss', { cwd: dir }).forEach(x => {
+        if (x == 'global_styles/static.scss') {
           // already included in bundle (see tui_json_loader)
           return;
         }
         const out = path.join(
           dir.replace(/^\.[\/\\]client[\/\\]component[\/\\]([^\/\\]+)[\/\\]src/, './client/component/$1/build'),
-          'styles',
-          x.slice('styles/'.length).replace(/\.scss$/, '')
+          'global_styles',
+          x.slice('global_styles/'.length).replace(/\.scss$/, '')
         );
         const modeSuffix = mode == 'production' ? '' : '.' + mode;
         acc[out + modeSuffix] = './' + path.join(dir, x);

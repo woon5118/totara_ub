@@ -182,6 +182,7 @@ class scss {
          *
          *   if not compiling theme:
          *     add component scss vars
+         *   add core scss vars
          *   for each theme:
          *     add theme scss vars
          *   if compiling theme:
@@ -213,6 +214,7 @@ class scss {
          */
 
         $component_files = $this->get_component_tui_scss_files($component);
+        $tui_core_files = $this->get_component_tui_scss_files('tui');
         $themes_files = $this->get_themes_tui_scss();
 
         $imports = [];
@@ -220,7 +222,7 @@ class scss {
         $is_theme = strpos($component, 'theme_') === 0;
 
         // SCSS vars
-        $def_file_sets = array_merge([$component_files], $themes_files);
+        $def_file_sets = array_merge([$component_files, $tui_core_files], $themes_files);
 
         foreach ($def_file_sets as $def_files) {
             foreach ($def_files['variables'] as $def_file) {
