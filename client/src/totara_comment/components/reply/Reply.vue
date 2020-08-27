@@ -327,13 +327,11 @@ export default {
 
         if (response.success) {
           await notify({
-            duration: 2000,
             message: this.$str('reported', 'totara_reportedcontent'),
             type: 'success',
           });
         } else {
           await notify({
-            duration: 2000,
             message: this.$str('reported_failed', 'totara_reportedcontent'),
             type: 'error',
           });

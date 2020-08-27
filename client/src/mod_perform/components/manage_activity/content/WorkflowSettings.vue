@@ -93,7 +93,6 @@ import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 import { notify } from 'tui/notifications';
 import {
   ACTIVITY_STATUS_DRAFT,
-  NOTIFICATION_DURATION,
   VISIBILITY_CONDITION_NONE,
 } from 'mod_perform/constants';
 // Queries
@@ -182,7 +181,6 @@ export default {
         })
         .then(() => {
           notify({
-            duration: NOTIFICATION_DURATION,
             message: this.$str('toast_success_activity_update', 'mod_perform'),
             type: 'success',
           });
@@ -199,7 +197,6 @@ export default {
         .catch(() => {
           this.value = this.activity.settings.close_on_completion;
           notify({
-            duration: NOTIFICATION_DURATION,
             message: this.$str('toast_error_generic_update', 'mod_perform'),
             type: 'error',
           });

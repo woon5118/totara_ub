@@ -22,7 +22,6 @@
 
 <script>
 import { notify } from 'tui/notifications';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {
   props: {
@@ -32,7 +31,6 @@ export default {
     if (this.message) {
       notify({
         message: this.message,
-        duration: NOTIFICATION_DURATION,
         type: 'success',
       });
     }

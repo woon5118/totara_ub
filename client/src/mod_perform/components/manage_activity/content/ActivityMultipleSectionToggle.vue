@@ -53,7 +53,6 @@
 
 <script>
 import { notify } from 'tui/notifications';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
@@ -140,13 +139,11 @@ export default {
         this.$emit('change', newSetting);
 
         notify({
-          duration: NOTIFICATION_DURATION,
           message: this.$str('toast_success_activity_update', 'mod_perform'),
           type: 'success',
         });
       } catch (e) {
         notify({
-          duration: NOTIFICATION_DURATION,
           message: this.$str('toast_error_generic_update', 'mod_perform'),
           type: 'error',
         });

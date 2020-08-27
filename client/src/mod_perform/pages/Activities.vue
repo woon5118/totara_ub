@@ -93,7 +93,6 @@ import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import performActivitiesQuery from 'mod_perform/graphql/activities';
 import Table from 'tui/components/datatable/Table';
 import { notify } from 'tui/notifications';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {
   components: {
@@ -131,7 +130,6 @@ export default {
      */
     creationError() {
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_error_create_activity', 'mod_perform'),
         type: 'error',
       });

@@ -69,7 +69,6 @@ import ChangeParticipantSectionMutation from 'mod_perform/graphql/manually_chang
 import { notify } from 'tui/notifications';
 import { redirectWithPost } from 'mod_perform/redirect';
 import {
-  NOTIFICATION_DURATION,
   INSTANCE_AVAILABILITY_STATUS_OPEN,
   INSTANCE_AVAILABILITY_STATUS_CLOSED,
 } from 'mod_perform/constants';
@@ -105,7 +104,6 @@ export default {
      */
     showErrorNotification() {
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_error_generic_update', 'mod_perform'),
         type: 'error',
       });

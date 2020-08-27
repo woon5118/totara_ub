@@ -111,10 +111,7 @@ import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import MoreButton from 'tui/components/buttons/MoreIcon';
 import ParticipationReportingIcon from 'mod_perform/components/icons/ParticipationReporting';
 import { notify } from 'tui/notifications';
-import {
-  ACTIVITY_STATUS_DRAFT,
-  NOTIFICATION_DURATION,
-} from 'mod_perform/constants';
+import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
 
 // Queries
 import activateCloneMutation from 'mod_perform/graphql/clone_activity';
@@ -250,7 +247,6 @@ export default {
 
     showCloneSuccessNotification() {
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str(
           'toast_success_activity_cloned',
           'mod_perform',
@@ -278,7 +274,6 @@ export default {
       }
 
       notify({
-        duration: NOTIFICATION_DURATION,
         message,
         type: 'success',
       });
@@ -289,7 +284,6 @@ export default {
      */
     showErrorNotification() {
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str(
           'toast_error_generic_update',
           'mod_perform',

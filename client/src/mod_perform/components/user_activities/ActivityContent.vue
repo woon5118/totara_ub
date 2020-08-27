@@ -309,10 +309,7 @@
 <script>
 // Util
 import { uniqueId } from 'tui/util';
-import {
-  NOTIFICATION_DURATION,
-  RELATIONSHIP_SUBJECT,
-} from 'mod_perform/constants';
+import { RELATIONSHIP_SUBJECT } from 'mod_perform/constants';
 import { redirectWithPost } from 'mod_perform/redirect';
 import { notify } from 'tui/notifications';
 import { config } from 'tui/config';
@@ -888,7 +885,6 @@ export default {
      */
     showErrorNotification() {
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_error_save_response', 'mod_perform'),
         type: 'error',
       });
@@ -905,7 +901,6 @@ export default {
         message = 'participant_section_draft_saved';
       }
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str(message, 'mod_perform'),
         type: 'success',
       });

@@ -39,7 +39,6 @@
 
 <script>
 import { notify } from 'tui/notifications';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import NotificationSection from 'mod_perform/components/manage_activity/notification/NotificationSection';
 import notificationsQuery from 'mod_perform/graphql/notifications';
 import createNotificationMutation from 'mod_perform/graphql/create_notification';
@@ -98,13 +97,11 @@ export default {
             refetchAll: false,
           });
           notify({
-            duration: NOTIFICATION_DURATION,
             message: this.$str('toast_success_activity_update', 'mod_perform'),
             type: 'success',
           });
         } catch (ex) {
           notify({
-            duration: NOTIFICATION_DURATION,
             message: this.$str('toast_error_generic_update', 'mod_perform'),
             type: 'error',
           });

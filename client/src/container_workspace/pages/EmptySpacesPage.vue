@@ -94,7 +94,6 @@ export default {
           notify({
             message: message,
             type: type,
-            duration: 5000,
           });
         });
       },

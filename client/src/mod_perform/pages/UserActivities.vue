@@ -88,7 +88,6 @@ import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
 import UserActivityList from 'mod_perform/components/user_activities/list/Activities';
 import UserHistoricActivityList from 'mod_perform/components/user_activities/list/HistoricActivities';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import { notify } from 'tui/notifications';
 
 export default {
@@ -167,7 +166,6 @@ export default {
      */
     showSuccessNotification(message, component) {
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str(message, component),
         type: 'success',
       });

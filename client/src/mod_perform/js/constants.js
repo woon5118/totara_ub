@@ -19,8 +19,6 @@
 // We need to define the constants that we want to use across multiple components here
 // because the theme overrides don't support having more than one export per vue file.
 
-export const NOTIFICATION_DURATION = 10 * 1000; // 10 seconds (in milliseconds)
-
 // The idnumber for the core subject relationship will ALWAYS be 'subject'.
 // This also corresponds to \mod_perform\constants::RELATIONSHIP_SUBJECT in the back end.
 export const RELATIONSHIP_SUBJECT = 'subject';

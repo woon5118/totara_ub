@@ -66,7 +66,6 @@ import activateActivityMutation from 'mod_perform/graphql/activate_activity';
 import activityUsersToAssignCountQuery from 'mod_perform/graphql/activity_users_to_assign_count';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import InformationModal from 'tui/components/modal/InformationModal';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import { notify } from 'tui/notifications';
 
 export default {
@@ -193,7 +192,6 @@ export default {
      */
     showSuccessNotification() {
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str(
           'toast_success_activity_activated',
           'mod_perform',
@@ -208,7 +206,6 @@ export default {
      */
     showErrorNotification() {
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str(
           'toast_error_generic_update',
           'mod_perform',

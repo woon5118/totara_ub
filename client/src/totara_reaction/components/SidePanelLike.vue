@@ -248,7 +248,6 @@ export default {
         await notify({
           message: this.$str('error:create_like', 'totara_reaction'),
           type: 'error',
-          duration: 5000,
         });
       } finally {
         this.submitting = false;
@@ -289,7 +288,6 @@ export default {
         await notify({
           message: this.$str('error:remove_like', 'totara_reaction'),
           type: 'error',
-          duration: 5000,
         });
       } finally {
         this.submitting = false;

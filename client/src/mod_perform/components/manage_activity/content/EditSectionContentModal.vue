@@ -199,10 +199,7 @@ import sectionDetailQuery from 'mod_perform/graphql/section_admin';
 import updateSectionElementMutation from 'mod_perform/graphql/update_section_elements';
 import { notify } from 'tui/notifications';
 import { pull, uniqueId } from 'tui/util';
-import {
-  ACTIVITY_STATUS_DRAFT,
-  NOTIFICATION_DURATION,
-} from 'mod_perform/constants';
+import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
 
 export default {
   components: {
@@ -713,7 +710,6 @@ export default {
      */
     showSuccessNotification(messageString) {
       notify({
-        duration: NOTIFICATION_DURATION,
         message:
           messageString ||
           this.$str('toast_success_save_element', 'mod_perform'),
@@ -726,7 +722,6 @@ export default {
      */
     showErrorNotification() {
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_error_generic_update', 'mod_perform'),
         type: 'error',
       });

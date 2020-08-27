@@ -70,7 +70,6 @@ import ActivityParticipants from 'mod_perform/components/user_activities/partici
 import Loader from 'tui/components/loader/Loader';
 import ManualParticipantSelectionInstancesQuery from 'mod_perform/graphql/manual_participant_selection_instances';
 import SetManualParticipantsMutation from 'mod_perform/graphql/set_manual_participants';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import { notify } from 'tui/notifications';
 
 export default {
@@ -135,13 +134,11 @@ export default {
         });
 
         notify({
-          duration: NOTIFICATION_DURATION,
           message: this.$str('toast_success_participants_saved', 'mod_perform'),
           type: 'success',
         });
       } catch (e) {
         notify({
-          duration: NOTIFICATION_DURATION,
           message: this.$str('toast_error_generic_update', 'mod_perform'),
           type: 'error',
         });
