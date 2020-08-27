@@ -208,7 +208,7 @@ Feature: Navigate a learning item in a static tab
     And ".totara_msteams__navigation" "css_element" should not exist
 
     When I click on "10 apps to boost your productivity" "link"
-    And I click on "Library" "link" in the ".totara_msteams__navigation" "css_element"
+    And I click on "Your resources" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Your resources" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 

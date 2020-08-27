@@ -125,12 +125,25 @@ html.theme_msteams__iframe #page-header,
 html.theme_msteams__iframe #page-footer,
 html.theme_msteams__iframe #maincontent,
 html.theme_msteams__iframe #region-main > .skiplinks,
+html.theme_msteams__iframe .tui-resourceNavigationBar__backLink,
+html.theme_msteams__iframe .tui-contributionBaseContent__navButtons,
 html.theme_msteams__iframe .theme_msteams--continue--back-to-index {
     display: none;
 }
 
+/* Adjust the navigation bar */
+html.theme_msteams__iframe .tui-resourceNavigationBar {
+    -webkit-box-pack: end;
+    justify-content: end;
+}
+
 html.theme_msteams__iframe .totara_msteams__navigation ~ #page {
     margin-top: calc(var(--theme_msteams__nav_link-size) + var(--theme_msteams__nav_link-gap) + var(--gap-5));
+}
+
+html.theme_msteams__iframe > .path-totara-engage-resources .totara_msteams__navigation ~ #page,
+html.theme_msteams__iframe > .path-totara-playlist .totara_msteams__navigation ~ #page {
+    margin-top: calc(var(--theme_msteams__nav_link-size) + var(--theme_msteams__nav_link-gap));
 }
 
 html.theme_msteams__iframe .totara_msteams__navigation ~ .totara_msteams__alert {
