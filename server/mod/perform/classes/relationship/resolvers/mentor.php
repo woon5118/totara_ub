@@ -25,17 +25,4 @@ namespace mod_perform\relationship\resolvers;
 
 class mentor extends manual {
 
-    /**
-     * @inheritDoc
-     */
-    public static function get_name(): string {
-        return get_string('relationship_mentor', 'mod_perform');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function get_name_plural(): string {
-        return get_string('relationship_mentor_plural', 'mod_perform');
-    }
 }

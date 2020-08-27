@@ -93,7 +93,7 @@ class mod_perform_webapi_resolver_mutation_toggle_notification_recipient_testcas
         $this->assertCount(1, $notification->recipients);
         $recipient = $notification->recipients->shift();
         $this->assertNotEmpty($recipient->relationship_id);
-        $this->assertSame(subject::get_name(), $recipient->name);
+        $this->assertSame(get_string('relationship_name_subject', 'totara_core'), $recipient->name);
         $this->assertEquals($active, $recipient->active);
     }
 
@@ -254,7 +254,7 @@ class mod_perform_webapi_resolver_mutation_toggle_notification_recipient_testcas
         $this->assertNotEmpty($notification['id']);
         $this->assertCount(1, $notification['recipients']);
         $this->assertNotEmpty($notification['recipients'][0]['relationship_id']);
-        $this->assertSame(subject::get_name(), $notification['recipients'][0]['name']);
+        $this->assertSame(get_string('relationship_name_subject', 'totara_core'), $notification['recipients'][0]['name']);
         $this->assertEquals($active, $notification['recipients'][0]['active']);
 
         // Check your work.

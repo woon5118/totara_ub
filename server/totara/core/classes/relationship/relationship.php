@@ -95,16 +95,13 @@ final class relationship extends model {
      */
     public function get_name(): string {
         // In the future, relationships can be user (admin) specified, including their names. (Stored in the DB)
-        // But until then, the name of a relationship will just be the name of their first resolver.
-        $resolvers = $this->get_resolvers();
-        if (!isset($resolvers[0])) {
-            $relationships = \totara_core\entities\relationship::repository()->get()->to_array();
-            error_log("Relationships:\n" . json_encode($relationships));
-            $resolvers = \totara_core\entities\relationship_resolver::repository()->get()->to_array();
-            error_log("Resolvers:\n" . json_encode($resolvers));
-            throw new coding_exception("Could not find resolvers for relationship '{$this->entity->idnumber}' (id: {$this->entity->id})");
+        // But until then, the name of a relationship will be provided by a lang string.
+        $component = $this->entity->component ?? 'totara_core';
+        $string_name = 'relationship_name_' . $this->entity->idnumber;
+        if (get_string_manager()->string_exists($string_name, $component)) {
+            return get_string($string_name, $component);
         }
-        return $resolvers[0]::get_name();
+        return get_string('unknown_relationship_name', 'totara_core');
     }
 
     /**
@@ -114,16 +111,13 @@ final class relationship extends model {
      */
     public function get_name_plural(): string {
         // In the future, relationships can be user (admin) specified, including their names. (Stored in the DB)
-        // But until then, the name of a relationship will just be the name of their first resolver.
-        $resolvers = $this->get_resolvers();
-        if (!isset($resolvers[0])) {
-            $relationships = \totara_core\entities\relationship::repository()->get()->to_array();
-            error_log("Relationships:\n" . json_encode($relationships));
-            $resolvers = \totara_core\entities\relationship_resolver::repository()->get()->to_array();
-            error_log("Resolvers:\n" . json_encode($resolvers));
-            throw new coding_exception("Could not find resolvers for relationship '{$this->entity->idnumber}' (id: {$this->entity->id})");
+        // But until then, the name of a relationship will be provided by a lang string.
+        $component = $this->entity->component ?? 'totara_core';
+        $string_name = 'relationship_name_plural_' . $this->entity->idnumber;
+        if (get_string_manager()->string_exists($string_name, $component)) {
+            return get_string($string_name, $component);
         }
-        return $resolvers[0]::get_name_plural();
+        return get_string('unknown_relationship_name', 'totara_core');
     }
 
     /**

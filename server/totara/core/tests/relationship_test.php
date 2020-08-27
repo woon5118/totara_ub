@@ -54,25 +54,17 @@ class totara_core_relationship_testcase extends advanced_testcase {
     }
 
     public function test_get_name(): void {
-        // For now, get_name() simply just gets the name of the first resolver that is associated with the relationship in the DB.
-        $relationship_one = relationship::create([test_resolver_one::class], 'one', 1);
-        $relationship_two = relationship::create([test_resolver_two::class], 'two', 2);
-        $this->assertEquals(test_resolver_one::get_name(), $relationship_one->get_name());
-        $this->assertEquals(test_resolver_two::get_name(), $relationship_two->get_name());
-
-        $subject = relationship::create([subject::class], 'subject2', 3);
-        $this->assertEquals('Subject', $subject->get_name());
+        $relationship_one = relationship::create([test_resolver_one::class], 'subject', 1);
+        $relationship_two = relationship::create([test_resolver_two::class], 'unknown', 2);
+        $this->assertEquals('Subject', $relationship_one->get_name());
+        $this->assertEquals('Unknown relationship name', $relationship_two->get_name());
     }
 
     public function test_get_name_plural(): void {
-        // For now, get_name() simply just gets the name of the first resolver that is associated with the relationship in the DB.
-        $relationship_one = relationship::create([test_resolver_one::class], 'one', 1);
-        $relationship_two = relationship::create([test_resolver_two::class], 'two', 2);
-        $this->assertEquals(test_resolver_one::get_name_plural(), $relationship_one->get_name_plural());
-        $this->assertEquals(test_resolver_two::get_name_plural(), $relationship_two->get_name_plural());
-
-        $subject = relationship::create([subject::class], 'subject2', 3);
-        $this->assertEquals('Subjects', $subject->get_name_plural());
+        $relationship_one = relationship::create([test_resolver_one::class], 'subject', 1);
+        $relationship_two = relationship::create([test_resolver_two::class], 'unknown', 2);
+        $this->assertEquals('Subjects', $relationship_one->get_name_plural());
+        $this->assertEquals('Unknown relationship name', $relationship_two->get_name_plural());
     }
 
     public function test_idnumber(): void {

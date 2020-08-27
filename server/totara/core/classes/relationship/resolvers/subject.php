@@ -36,22 +36,6 @@ use totara_core\relationship\relationship_resolver_dto;
 class subject extends relationship_resolver {
 
     /**
-     * The name of this relationship resolver to display to the user.
-     *
-     * @return string
-     */
-    public static function get_name(): string {
-        return get_string('relationship_subject', 'totara_core');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function get_name_plural(): string {
-        return get_string('relationship_subject_plural', 'totara_core');
-    }
-
-    /**
      * Get a list of fields that can be provided to {@see get_users}
      *
      * @return string[][]

@@ -33,22 +33,6 @@ use totara_job\entities\job_assignment;
 class managers_manager extends relationship_resolver {
 
     /**
-     * The name of this relationship resolver to display to the user.
-     *
-     * @return string
-     */
-    public static function get_name(): string {
-        return get_string('managers_manager', 'totara_job');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function get_name_plural(): string {
-        return get_string('managers_manager_plural', 'totara_job');
-    }
-
-    /**
      * Get a list of fields that can be provided to {@see get_users}
      *
      * @return string[][]

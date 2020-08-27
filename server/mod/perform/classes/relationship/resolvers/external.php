@@ -40,20 +40,6 @@ class external extends relationship_resolver {
     /**
      * @inheritDoc
      */
-    public static function get_name(): string {
-        return get_string('relationship_external', 'mod_perform');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function get_name_plural(): string {
-        return get_string('relationship_external_plural', 'mod_perform');
-    }
-
-    /**
-     * @inheritDoc
-     */
     public static function get_accepted_fields(): array {
         return [
             ['subject_instance_id'],

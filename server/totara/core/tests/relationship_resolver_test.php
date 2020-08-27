@@ -30,28 +30,6 @@ use totara_core\relationship\relationship_resolver_dto;
  */
 class totara_core_relationship_resolver_testcase extends \advanced_testcase {
 
-    public function test_get_name(): void {
-        $resolvers = $this->get_all_resolvers();
-
-        // Resolver names must not be empty.
-        foreach ($resolvers as $resolver) {
-            $this->assertGreaterThan(0, strlen(trim($resolver::get_name())),
-                $resolver . '::get_name() must return a non-empty string'
-            );
-        }
-    }
-
-    public function test_get_name_plural(): void {
-        $resolvers = $this->get_all_resolvers();
-
-        // Resolver names must not be empty.
-        foreach ($resolvers as $resolver) {
-            $this->assertGreaterThan(0, strlen(trim($resolver::get_name_plural())),
-                $resolver . '::get_name() must return a non-empty string'
-            );
-        }
-    }
-
     public function test_accepted_fields(): void {
         $resolvers = $this->get_all_resolvers();
 

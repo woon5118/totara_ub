@@ -62,14 +62,14 @@ class mod_perform_webapi_resolver_query_relationships_testcase extends advanced_
         $this->assertCount(8, $results);
 
         // make sure the order of relationships is correct
-        $this->assertEquals(get_string('relationship_subject', 'totara_core'), $results[0]->get_name());
-        $this->assertEquals(get_string('manager', 'totara_job'), $results[1]->get_name());
-        $this->assertEquals(get_string('managers_manager', 'totara_job'), $results[2]->get_name());
-        $this->assertEquals(get_string('appraiser', 'totara_job'), $results[3]->get_name());
-        $this->assertEquals(get_string('relationship_peer', 'mod_perform'), $results[4]->get_name());
-        $this->assertEquals(get_string('relationship_mentor', 'mod_perform'), $results[5]->get_name());
-        $this->assertEquals(get_string('relationship_reviewer', 'mod_perform'), $results[6]->get_name());
-        $this->assertEquals(get_string('relationship_external', 'mod_perform'), $results[7]->get_name());
+        $this->assertEquals(get_string('relationship_name_subject', 'totara_core'), $results[0]->get_name());
+        $this->assertEquals(get_string('relationship_name_manager', 'totara_core'), $results[1]->get_name());
+        $this->assertEquals(get_string('relationship_name_managers_manager', 'totara_core'), $results[2]->get_name());
+        $this->assertEquals(get_string('relationship_name_appraiser', 'totara_core'), $results[3]->get_name());
+        $this->assertEquals(get_string('relationship_name_perform_peer', 'mod_perform'), $results[4]->get_name());
+        $this->assertEquals(get_string('relationship_name_perform_mentor', 'mod_perform'), $results[5]->get_name());
+        $this->assertEquals(get_string('relationship_name_perform_reviewer', 'mod_perform'), $results[6]->get_name());
+        $this->assertEquals(get_string('relationship_name_perform_external', 'mod_perform'), $results[7]->get_name());
     }
 
     public function test_require_manage_performance_activities_capability(): void {
