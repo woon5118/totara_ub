@@ -263,7 +263,8 @@ class util {
      */
     public static function can_manage_participation(int $manager_id, int $subject_user_id): bool {
         if (static::has_manage_all_participants_capability($manager_id)) {
-            return true;
+            $subject_user_context = context_user::instance($subject_user_id);
+            return !$subject_user_context->is_user_access_prevented($manager_id);
         }
 
         // Allow for deleted subject user.
@@ -336,8 +337,6 @@ class util {
      * @return bool
      */
     public static function can_report_on_user(int $subject_user_id, int $viewing_user_id): bool {
-        global $CFG;
-
         if (empty($subject_user_id) || empty($viewing_user_id)) {
             return false;
         }
@@ -348,22 +347,8 @@ class util {
             return true;
         }
 
-        $viewing_user_context = context_user::instance($viewing_user_id);
-
         if (static::has_report_on_all_subjects_capability($viewing_user_id)) {
-            if (!empty($CFG->tenantsenabled)) {
-                if ($viewing_user_context->tenantid) {
-                    $subject_tenant_ids = tenant_util::get_user_participation($subject_user_id);
-
-                    // The current user and the subject users have to share a tenant
-                    if (in_array($viewing_user_context->tenantid, $subject_tenant_ids)) {
-                        return true;
-                    }
-                } else if (!empty($CFG->tenantsisolated)) {
-                    return empty($subject_user_context->tenantid);
-                }
-            }
-            return true;
+            return !$subject_user_context->is_user_access_prevented($viewing_user_id);
         }
 
         return false;
