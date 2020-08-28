@@ -29,7 +29,7 @@ use engage_article\totara_engage\resource\article;
 use totara_comment\event\comment_updated;
 use totara_comment\event\reply_created;
 use totara_core\content\content_handler;
-use totara_engage\task\comment_content_task;
+use totara_engage\task\comment_notify_task;
 
 /**
  * Observer for comment component
@@ -112,11 +112,14 @@ final class comment_observer {
     protected static function create_owner_notification_task(comment $comment, article $article, ?bool $is_comment = true): void {
         // If commenter is not owner, task will be initialized.
         if ($comment->get_userid() !== $article->get_userid()) {
-            $task = new comment_content_task();
+            $task = new comment_notify_task();
             $task->set_custom_data([
                 'url' => $article->get_url(),
                 'owner' => $article->get_userid(),
-                'resourcetype' => 'resource',
+                // As article is part of engage resource, adhoc task will be triggered in the engage and we do not want
+                // to set message setting for engage_article.
+                'component' => 'totara_engage',
+                'resourcetype' => get_string('message_resource', 'totara_engage'),
                 'commenter' =>   $comment->get_userid(),
                 'name' => $article->get_name(),
                 'is_comment' => $is_comment

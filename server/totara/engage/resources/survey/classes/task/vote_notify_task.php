@@ -18,15 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Qingyang Liu <qingyang.liu@totaralearning.com>
- * @package container_workspace
+ * @package engage_survey
  */
-namespace totara_engage\task;
+namespace engage_survey\task;
 
 use core\message\message;
 use core\task\adhoc_task;
 use core_user;
+use engage_survey\output\vote_message;
 
-final class comment_content_task extends adhoc_task {
+final class vote_notify_task extends adhoc_task {
     /**
      * Constructor.
      */
@@ -38,8 +39,10 @@ final class comment_content_task extends adhoc_task {
      * @return void
      */
     public function execute() {
+        global $OUTPUT;
+
         $data = $this->get_custom_data();
-        $keys = ['owner', 'resourcetype', 'commenter', 'name', 'url', 'is_comment'];
+        $keys = ['owner', 'voter', 'name', 'url'];
 
         foreach ($keys as $key) {
             if (!property_exists($data, $key)) {
@@ -49,47 +52,25 @@ final class comment_content_task extends adhoc_task {
         }
 
         $owner = core_user::get_user($data->owner, '*', MUST_EXIST);
-        $commenter = core_user::get_user($data->commenter, '*', MUST_EXIST);
+        $voter = core_user::get_user($data->voter, '*', MUST_EXIST);
 
-        cron_setup_user($commenter);
+        cron_setup_user($voter);
 
         $url = new \moodle_url($data->url);
-        $html_url = \html_writer::tag('a', $url, ['href' => $url]);
-
-        $message_content = null;
-        $subject_content = null;
-
-        // Initailize message body.
-        $message_body = new \stdClass();
-        $message_body->fullname = fullname($commenter);
-        $message_body->name = $data->name;
-        $message_body->url = $html_url;
-
-        // Initailize message subject.
-        $subject = new \stdClass();
-        $subject->fullname = fullname($commenter);
-
-        if ($data->is_comment) {
-            $message_content = get_string('commentcontent', 'totara_engage', $message_body);
-            $subject->resourcetype = $data->resourcetype;
-            $subject_content = get_string('commentcontentsubject', 'totara_engage', $subject);
-
-        } else {
-            $message_content = get_string('replycontent', 'totara_engage', $message_body);
-            $subject_content = get_string('replycontentsubject', 'totara_engage', $subject);
-        }
+        $template = vote_message::create($data->name ,$url);
+        $message_body = $OUTPUT->render($template);
 
         $message = new message();
         $message->courseid = SITEID;
-        $message->component = 'totara_engage';
-        $message->name = $data->is_comment? 'comment_notification' : 'reply_notification';
-        $message->userfrom = $commenter;
+        $message->component = 'engage_survey';
+        $message->name = 'voting_survey_notification';
+        $message->userfrom = $voter;
         $message->userto = $owner;
         $message->notification = 1;
-        $message->subject = $subject_content;
-        $message->fullmessage = strip_tags($message_content);
+        $message->subject = get_string('vote_message_subject', 'engage_survey', fullname($voter));
+        $message->fullmessage = html_to_text($message_body);
         $message->fullmessageformat = FORMAT_HTML;
-        $message->fullmessagehtml = $message_content;
+        $message->fullmessagehtml = $message_body;
 
         message_send($message);
     }

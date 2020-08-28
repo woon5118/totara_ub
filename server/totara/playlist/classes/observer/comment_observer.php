@@ -28,7 +28,7 @@ use totara_comment\event\comment_created;
 use totara_comment\event\comment_updated;
 use totara_comment\event\reply_created;
 use totara_core\content\content_handler;
-use totara_engage\task\comment_content_task;
+use totara_engage\task\comment_notify_task;
 use totara_playlist\playlist;
 
 /**
@@ -111,11 +111,12 @@ final class comment_observer {
      */
     protected static function create_owner_notification_task(comment $comment, playlist $playlist, ?bool $is_comment = true): void {
         if ($comment->get_userid() !== $playlist->get_userid()) {
-            $task = new comment_content_task();
+            $task = new comment_notify_task();
             $task->set_custom_data([
                 'url' => $playlist->get_url(),
                 'owner' => $playlist->get_userid(),
-                'resourcetype' => 'playlist',
+                'component' => $playlist::get_resource_type(),
+                'resourcetype' => get_string('message_playlist', 'totara_playlist'),
                 'commenter' =>   $comment->get_userid(),
                 'name' => $playlist->get_name(),
                 'is_comment' => $is_comment

@@ -27,9 +27,9 @@ use core\webapi\mutation_resolver;
 use totara_core\advanced_feature;
 use totara_engage\event\rating_created;
 use totara_engage\rating\rating_manager;
-use totara_engage\task\rate_playlist_task;
 use totara_playlist\playlist;
 use core\task\manager;
+use totara_playlist\task\rate_notify_task;
 
 /**
  * Mutation resolver for totara_playlist_add_rating.
@@ -60,7 +60,7 @@ final class add_rating implements mutation_resolver {
 
         $rating_record = $rating->add($args['rating'], $USER->id);
 
-        $task = new rate_playlist_task();
+        $task = new rate_notify_task();
         $task->set_custom_data([
             'url' => $playlist->get_url(),
             'owner' => $playlist->get_userid(),

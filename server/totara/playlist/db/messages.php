@@ -18,16 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Qingyang Liu <qingyang.liu@totaralearning.com>
- * @package totara_engage
+ * @package totara_playlist
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 $messageproviders = [
-    'share_notification' => [
+    'rating_playlist_notification' => [
         'defaults' => [
             'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
+            'email' => MESSAGE_PERMITTED,
             'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN
         ]
     ],
@@ -35,13 +34,6 @@ $messageproviders = [
         'defaults' => [
             'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
             'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN
-        ]
-    ],
-    'like_notification' => [
-        'defaults' => [
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'email' => MESSAGE_PERMITTED,
             'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN
         ]
     ],

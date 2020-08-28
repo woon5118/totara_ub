@@ -24,7 +24,7 @@ namespace engage_article\observer;
 
 use core\task\manager;
 use engage_article\totara_engage\resource\article;
-use totara_engage\task\like_content_task;
+use totara_engage\task\like_notify_task;
 use totara_reaction\event\reaction_created;
 
 /**
@@ -49,13 +49,13 @@ final class reaction_observer {
             $article = article::from_resource_id($others['instanceid']);
 
             if ($liker_id !== $article->get_userid()) {
-                $task = new like_content_task();
+                $task = new like_notify_task();
                 $task->set_custom_data([
                     'url' => $article->get_url(),
                     'liker' => $liker_id,
                     'owner' => $article->get_userid(),
                     'name' => $article->get_name(),
-                    'resourcetype' => 'resource'
+                    'resourcetype' => get_string('message_resource', 'totara_engage')
                 ]);
 
                 manager::queue_adhoc_task($task);

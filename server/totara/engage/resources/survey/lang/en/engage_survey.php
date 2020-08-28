@@ -34,6 +34,7 @@ $string['expiredat'] = 'Survey ends {$a}';
 $string['formtitle'] = 'Enter survey question';
 $string['formtypetitle'] = 'How many answers can people select?';
 $string['likesurvey'] = 'Like survey "{$a}"';
+$string['message_survey'] = 'survey';
 $string['noresult'] = 'No results yet';
 $string['option'] = 'Option';
 $string['optionmultiple'] = 'Multiple answers';
@@ -58,6 +59,9 @@ $string['user_data_item_survey'] = 'Survey';
 $string['user_data_item_survey_completion'] = 'Survey Vote';
 $string['viewresult'] = "View all results";
 $string['vote'] = "Vote";
+$string['vote_message'] = 'You have a new vote on your survey \'{$a}\'';
+$string['vote_message_subject'] = '{$a} has voted on your survey';
+$string['vote_message_view'] = 'View survey results: ';
 $string['votemessage'] = 'Showing {$a->options} of {$a->questions} results';
 $string['votenow'] = "Vote";
 
@@ -75,3 +79,6 @@ $string['error:shareprivate'] = 'This survey is viewable by only you. Change who
 $string['error:sharerestricted'] = 'This survey is not viewable by everyone and only the owner is allowed to share it.';
 $string['error:reportsurvey'] = "Cannot report the survey";
 $string['error:update'] = "Cannot update the survey";
+
+// Strings for message component
+$string['messageprovider:voting_survey_notification'] = "Survey votes";

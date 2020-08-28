@@ -30,7 +30,7 @@ use totara_engage\repository\share_recipient_repository;
 use totara_engage\repository\share_repository;
 use totara_engage\share\recipient\manager as recipient_manager;
 use totara_engage\share\recipient\recipient;
-use totara_engage\task\share_item_task;
+use totara_engage\task\share_notify_task;
 use core\task\manager as task_manager;
 use totara_engage\local\helper as engage_helper;
 
@@ -106,7 +106,7 @@ final class manager {
 
         foreach ($shares as $share) {
             if ($share->get_recipient_component() === 'core_user' && $share->get_recipient_area() === 'USER') {
-                $task = new share_item_task();
+                $task = new share_notify_task();
                 $task->set_component('totara_engage');
                 $task->set_custom_data(
                     [

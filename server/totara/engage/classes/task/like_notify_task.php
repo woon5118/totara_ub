@@ -25,9 +25,10 @@ namespace totara_engage\task;
 use core\message\message;
 use core\task\adhoc_task;
 use core_user;
-use totara_engage\local\helper;
+use totara_engage\output\like_message;
 
-final class share_item_task extends adhoc_task {
+
+final class like_notify_task extends adhoc_task {
     /**
      * Constructor.
      */
@@ -39,9 +40,11 @@ final class share_item_task extends adhoc_task {
      * @return void
      */
     public function execute() {
+        global $OUTPUT;
+
         $data = $this->get_custom_data();
-        $keys = ['component', 'recipient_id', 'sharer_id', 'item_name'];
-    
+        $keys = ['owner', 'liker', 'name', 'url', 'resourcetype'];
+
         foreach ($keys as $key) {
             if (!property_exists($data, $key)) {
                 debugging("The custom data for the task does not have key '{$key}'");
@@ -49,31 +52,39 @@ final class share_item_task extends adhoc_task {
             }
         }
 
-        $sharer = core_user::get_user($data->sharer_id, '*', MUST_EXIST);
-        $recipient = core_user::get_user($data->recipient_id, '*', MUST_EXIST);
+        $owner = core_user::get_user($data->owner, '*', MUST_EXIST);
+        $liker = core_user::get_user($data->liker, '*', MUST_EXIST);
 
-        cron_setup_user($sharer);
+        cron_setup_user($liker);
 
-        $url = new \moodle_url('/totara/engage/shared_with_you.php');
-        $html_url = \html_writer::tag('a', $url->out(true), ['href' => $url->out(true)]);
+        $url = new \moodle_url($data->url);
+
+        // Initailize message body.
+        $message_body = new \stdClass();
+        $message_body->fullname = fullname($liker);
+        $message_body->name = $data->name;
+        $message_body->url = $url;
+        $message_body->type = $data->resourcetype;
+
+        $template = like_message::create($message_body);
+        $message_body = $OUTPUT->render($template);
+
+        // Initailize message subject.
+        $subject = new \stdClass();
+        $subject->fullname = fullname($liker);
+        $subject->name = $data->resourcetype;
 
         $message = new message();
-        $message_data= new \stdClass();
-        $message_data->fullname = fullname($sharer);
-        $message_data->name = $data->item_name;
-        $message_data->url = $html_url;
-        $message_content = get_string('messagecontentshared', 'totara_engage', $message_data);
-
         $message->courseid = SITEID;
         $message->component = 'totara_engage';
-        $message->name = 'notification';
-        $message->userfrom = $sharer;
-        $message->userto = $recipient;
+        $message->name = 'like_notification';
+        $message->userfrom = $liker;
+        $message->userto = $owner;
         $message->notification = 1;
-        $message->subject = get_string('messagecontentsharedsubject', 'totara_engage', $data->component);
-        $message->fullmessage = strip_tags($message_content);
+        $message->subject = get_string('like_message_subject', 'totara_engage', $subject);
+        $message->fullmessage = html_to_text($message_body);
         $message->fullmessageformat = FORMAT_HTML;
-        $message->fullmessagehtml = $message_content;
+        $message->fullmessagehtml = $message_body;
 
         message_send($message);
     }

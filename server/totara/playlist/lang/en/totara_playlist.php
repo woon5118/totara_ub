@@ -39,6 +39,7 @@ $string['deletewarningmsg'] = 'This action is permanent. People with access to t
 $string['deletewarningtitle'] = 'Are you sure you want to delete the playlist?';
 $string['edit_playlist_title'] = 'Edit playlist title';
 $string['entertitle'] = "Enter playlist title";
+$string['message_playlist'] = "playlist";
 $string['mentionbody:comment'] = '<strong>{$a->fullname}</strong> has commented on the playlist {$a->title}.';
 $string['mentionbody:playlist'] = '<strong>{$a->fullname}</strong> has mentioned you in the playlist {$a->title}.';
 $string['mentiontitle:playlist'] = '{$a} has mentioned you in a playlist';
@@ -54,6 +55,9 @@ $string['playlisttitle'] = 'Playlist title';
 $string['pluginname'] = "Playlist";
 $string['rating'] = 'rating';
 $string['ratings'] = 'ratings';
+$string['rating_message'] = 'You have a new rating on your playlist {$a}.';
+$string['rating_message_view'] = 'View playlist: ';
+$string['rating_message_subject'] = 'Someone has rated your playlist';
 $string['restricted'] = "Limited people";
 $string['savedplaylists'] = "Saved playlists";
 $string['selectcontent'] = "Select content to add into playlist";
@@ -86,3 +90,8 @@ $string['playlist:create'] = 'Create playlist';
 $string['playlist:delete'] = 'Remove playlist';
 $string['playlist:share'] = 'Share playlist';
 $string['playlist:view_playlist_report'] = 'View playlists engagement report';
+
+// Strings for message component
+$string['messageprovider:comment_notification'] = "Comments on your playlists";
+$string['messageprovider:rating_playlist_notification'] = "Playlist ratings";
+$string['messageprovider:reply_notification'] = "Replies on your playlists";

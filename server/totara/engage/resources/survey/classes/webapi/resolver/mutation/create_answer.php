@@ -26,9 +26,9 @@ use core\task\manager;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use engage_survey\event\vote_created;
+use engage_survey\task\vote_notify_task;
 use engage_survey\totara_engage\resource\survey;
 use totara_core\advanced_feature;
-use totara_engage\task\vote_survey_task;
 
 /**
  * Mutation resolver for creating answers.
@@ -55,7 +55,7 @@ final class create_answer implements mutation_resolver {
             vote_created::from_survey($survey)->trigger();
 
             if ($USER->id !== $survey->get_userid()) {
-                $task =  new vote_survey_task();
+                $task =  new vote_notify_task();
                 $task->set_custom_data([
                     'url' => $survey->get_url(),
                     'owner' => $survey->get_userid(),
