@@ -63,3 +63,11 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-elementEditMultiChoiceMultiParticipantResponse {
+  &__noResponse {
+    @include tui-font-hint();
+  }
+}
+</style>

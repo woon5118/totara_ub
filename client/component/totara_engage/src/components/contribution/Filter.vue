@@ -309,3 +309,19 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-contributionFilter {
+  .tui-formLabel {
+    @include tui-font-heading-label-small;
+  }
+
+  &__sort {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: var(--gap-4);
+    margin-right: 0;
+  }
+}
+</style>

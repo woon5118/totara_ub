@@ -467,3 +467,13 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-comment {
+  margin-top: var(--gap-4);
+
+  &__replyBox {
+    padding-left: var(--gap-8);
+  }
+}
+</style>

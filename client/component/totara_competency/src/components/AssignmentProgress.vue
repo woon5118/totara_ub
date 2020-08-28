@@ -53,9 +53,9 @@ export default {
   },
 
   computed: {
-    color: () => theme.getVar('--tui-color-secondary'),
-    backgroundColor: () => theme.getVar('--tui-color-neutral-4'),
-    labelColor: () => theme.getVar('--tui-color-text'),
+    color: () => theme.getVar('--color-secondary'),
+    backgroundColor: () => theme.getVar('--color-neutral-4'),
+    labelColor: () => theme.getVar('--color-text'),
   },
 };
 </script>
@@ -67,3 +67,22 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-assignmentProgress {
+  width: 180px;
+  padding: var(--gap-3);
+
+  &__header {
+    overflow: hidden;
+    font-size: var(--font-size-16);
+    white-space: nowrap;
+    text-align: center;
+    text-overflow: ellipsis;
+  }
+
+  &__progress-card {
+    padding: var(--gap-3) var(--gap-4);
+  }
+}
+</style>

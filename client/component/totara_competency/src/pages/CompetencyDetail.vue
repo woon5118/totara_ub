@@ -396,3 +396,60 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyDetail {
+  &__backLink {
+    padding-bottom: var(--gap-2);
+  }
+
+  &__body {
+    margin-top: var(--gap-6);
+    border-top: 1px solid var(--color-neutral-5);
+
+    &-title {
+      @include tui-font-heading-small();
+    }
+
+    &-empty {
+      @include tui-font-hint();
+    }
+  }
+
+  &__buttons {
+    text-align: right;
+
+    .dir-rtl & {
+      text-align: left;
+    }
+
+    & > * + * {
+      margin-top: var(--gap-4);
+      margin-left: var(--gap-2);
+
+      .dir-rtl & {
+        margin: 0 var(--gap-2) 0 0;
+      }
+    }
+  }
+
+  &__title {
+    margin-top: 0;
+    @include tui-font-heading-medium();
+  }
+
+  &__description {
+    @include tui-font-body();
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-competencyDetail {
+    &__buttons {
+      > * {
+        margin-top: 0;
+      }
+    }
+  }
+}
+</style>

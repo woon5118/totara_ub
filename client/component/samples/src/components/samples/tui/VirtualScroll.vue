@@ -277,19 +277,19 @@ export default {
   }
 
   &__row {
-    margin-bottom: var(--tui-gap-4);
-    padding: var(--tui-gap-4);
+    margin-bottom: var(--gap-4);
+    padding: var(--gap-4);
     background-color: #ddd;
   }
 
   // add margin between grid rows (except last)
   &__grid-row:not(:last-child) {
-    margin-bottom: var(--tui-grid-gutter);
+    margin-bottom: var(--grid-gutter);
   }
 
   &__grid-card {
     height: 20rem;
-    padding: var(--tui-gap-4);
+    padding: var(--gap-4);
     background-color: #ddd;
   }
 

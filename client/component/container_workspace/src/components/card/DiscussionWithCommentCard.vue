@@ -216,3 +216,21 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-discussionWithCommentCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &__comments {
+    width: 100%;
+    &.tui-commentBox {
+      &--withBorder {
+        // Remove the border-top of the comment box.
+        border-top: none;
+      }
+    }
+  }
+}
+</style>

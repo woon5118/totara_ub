@@ -60,3 +60,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-imageBlock {
+  display: flex;
+  justify-content: flex-start;
+  margin: var(--gap-8) 0;
+}
+</style>

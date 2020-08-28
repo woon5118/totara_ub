@@ -280,3 +280,34 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceDiscussionPage {
+  &__column {
+    margin-top: var(--gap-4);
+    &__content {
+      &__backButton {
+        @include tui-font-link();
+        &:hover,
+        &:focus {
+          text-decoration: none;
+        }
+      }
+
+      &__discussion {
+        margin: var(--gap-8) 0;
+      }
+
+      &__title {
+        @include tui-font-heading-x-small();
+        margin: 0;
+        margin-bottom: var(--gap-4);
+      }
+
+      &__commentBox {
+        position: relative;
+      }
+    }
+  }
+}
+</style>

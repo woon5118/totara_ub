@@ -161,3 +161,52 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-engage__components__modal__namelistmodal {
+  &-title {
+    @include tui-font-heading-x-small();
+
+    margin: 0;
+    padding: var(--gap-8) var(--gap-8) var(--gap-2);
+    border-bottom: var(--border-width-thin) solid var(--color-primary);
+  }
+
+  &-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: var(--gap-3);
+  }
+
+  &-content {
+    max-height: 50vh;
+    overflow-y: auto;
+
+    &-list {
+      @include tui-font-body-small();
+      margin: 0;
+      color: var(--color-state);
+      list-style-type: none;
+
+      li {
+        padding: var(--gap-2) var(--gap-8);
+
+        + li {
+          border-top: var(--border-width-thin) solid
+            var(--color-neutral-5);
+        }
+
+        & > :first-child {
+          margin-right: var(--gap-1);
+        }
+      }
+    }
+
+    &-loadmore {
+      padding: var(--gap-2) var(--gap-8);
+      border-top: var(--border-width-thin) solid var(--color-neutral-5);
+    }
+  }
+}
+</style>

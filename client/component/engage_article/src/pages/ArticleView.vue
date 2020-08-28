@@ -144,3 +144,15 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --engageArticle-min-height: 78vh;
+}
+
+.tui-articleView {
+  .tui-grid-item {
+    min-height: var(--engageArticle-min-height);
+  }
+}
+</style>

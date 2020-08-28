@@ -275,3 +275,20 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performManageActivity {
+  @include tui-font-body();
+
+  &__content {
+    & > * + * {
+      margin-top: var(--gap-8);
+    }
+  }
+
+  &__title {
+    @include tui-font-heading-medium;
+    margin: var(--gap-2) 0 0;
+  }
+}
+</style>

@@ -154,3 +154,30 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceMemberRequestList {
+  padding: var(--gap-2);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+
+  &__title {
+    @include tui-font-heading-x-small();
+    margin: 0;
+    padding-bottom: var(--gap-2);
+    border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
+  }
+
+  &__cards {
+    display: flex;
+    flex-direction: column;
+
+    &__card {
+      padding: var(--gap-2) 0;
+      &:not(:last-child) {
+        border-bottom: var(--border-width-thin) solid
+          var(--color-neutral-5);
+      }
+    }
+  }
+}
+</style>

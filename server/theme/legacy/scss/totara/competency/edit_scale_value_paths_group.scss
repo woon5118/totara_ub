@@ -22,16 +22,16 @@
 // @package   theme_legacy
 
 .tw-editScaleValuePathsGroup {
-  margin-top: var(--legacy-gap-2);
-  padding: var(--legacy-gap-2);
-  border: var(--legacy-border-width-thin) solid var(--legacy-color-neutral-5);
-  border-radius: var(--legacy-border-radius-normal);
+  margin-top: var(--gap-2);
+  padding: var(--gap-2);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+  border-radius: var(--border-radius-normal);
 }
 
 .tw-editScaleValuePathGroup {
   &__scaleHeader {
     &-add {
-      margin-top: var(--legacy-gap-2);
+      margin-top: var(--gap-2);
     }
   }
 }
@@ -39,10 +39,10 @@
 .tw-editScaleValuePathGroupCriterion {
   display: flex;
   margin-left: 6em;
-  margin-top: var(--legacy-gap-4);
+  margin-top: var(--gap-4);
 
   &--deleted {
-    color: var(--legacy-color-neutral-6);
+    color: var(--color-neutral-6);
     text-decoration: line-through;
   }
 

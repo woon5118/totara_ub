@@ -115,3 +115,46 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-summaryPlaylistCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  &__top {
+    display: flex;
+    width: 100%;
+
+    &__title {
+      @include tui-font-link-small();
+      @include tui-font-heavy();
+      flex: 1;
+      margin: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    // Overriding the star rating
+    .tui-totaraEngage-star {
+      width: var(--font-size-15);
+      height: var(--font-size-14);
+
+      &__filled {
+        stop-color: var(--color-chart-background-2);
+      }
+
+      &__unfilled {
+        stop-color: var(--color-neutral-1);
+      }
+    }
+  }
+
+  &__author {
+    @include tui-font-body-x-small();
+    margin: 0;
+    margin-top: var(--gap-1);
+  }
+}
+</style>

@@ -46,3 +46,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-form {
+  @include tui-stack-vertical(var(--gap-4));
+}
+</style>

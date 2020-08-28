@@ -51,3 +51,62 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+// override <button> styles
+.tui-dropdownButton {
+  color: var(--dropdown-item-text-color);
+  text-align: left;
+  border: none;
+  border-radius: 0;
+  &:hover,
+  &:focus,
+  &:active,
+  &:focus:active {
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+
+// tui-dropdownButton styles
+.tui-dropdownButton {
+  @include tui-font-body();
+  padding: var(--gap-2) var(--gap-4);
+  overflow: hidden;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+
+  &:hover,
+  &:focus,
+  &:active,
+  &:focus:active {
+    color: var(--dropdown-item-text-color-hover);
+    text-decoration: none;
+    background-color: var(--dropdown-item-bg-color-hover);
+    outline: 0;
+  }
+
+  &:focus,
+  &:active,
+  &:focus:active {
+    color: var(--dropdown-item-text-color-focus);
+    background-color: var(--dropdown-item-bg-color-focus);
+  }
+
+  &--disabled,
+  &--disabled:hover,
+  &--disabled:focus {
+    color: var(--dropdown-item-text-color-disabled);
+    background-color: transparent;
+    cursor: not-allowed;
+  }
+
+  &--disabled:active {
+    pointer-events: none;
+  }
+
+  &--noPadding {
+    padding: 0;
+  }
+}
+</style>

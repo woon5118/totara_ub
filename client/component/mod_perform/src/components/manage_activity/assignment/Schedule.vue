@@ -871,3 +871,39 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performAssignmentSchedule {
+  & > * + * {
+    margin-top: var(--gap-8);
+  }
+
+  &__heading {
+    margin: var(--gap-12) 0 0;
+    @include tui-font-heading-small;
+  }
+
+  &__form {
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+
+    &-section {
+      padding: var(--gap-8);
+      background: var(--color-neutral-3);
+    }
+  }
+
+  .tui-performAssignmentSchedule__form {
+    &-additional {
+      margin-top: var(--gap-12);
+      margin-left: var(--gap-8);
+    }
+
+    &-buttons {
+      margin-top: var(--gap-8);
+      margin-left: var(--gap-8);
+    }
+  }
+}
+</style>

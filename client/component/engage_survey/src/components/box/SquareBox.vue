@@ -117,3 +117,22 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-engageSurvey-squareBox {
+  &__checkbox {
+    font-size: var(--font-size-15);
+  }
+  .tui-checkbox {
+    height: 100%;
+    min-height: var(--gap-4);
+    overflow: auto;
+    -ms-word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: none;
+  }
+  .tui-checkboxGroup > * + * {
+    margin-top: 0;
+  }
+}
+</style>

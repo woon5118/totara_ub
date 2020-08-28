@@ -288,7 +288,7 @@ export default {
 <style lang="scss">
 .tui-samples {
   .formHeader {
-    margin-top: var(--tui-gap-6);
+    margin-top: var(--gap-6);
   }
 
   &__filter {
@@ -311,30 +311,30 @@ export default {
 
   &__result {
     display: block;
-    padding: var(--tui-gap-1) var(--tui-gap-2);
-    color: var(--tui-color-state);
+    padding: var(--gap-1) var(--gap-2);
+    color: var(--color-state);
 
     &:hover,
     &:focus {
-      color: var(--tui-color-state-focus);
+      color: var(--color-state-focus);
       text-decoration: none;
-      background-color: var(--tui-color-state-highlight);
+      background-color: var(--color-state-highlight);
     }
 
     &--selected,
     &--selected:hover,
     &--selected:focus {
-      color: var(--tui-color-state);
-      background-color: var(--tui-color-neutral-3);
+      color: var(--color-state);
+      background-color: var(--color-neutral-3);
       border-radius: 3px;
     }
   }
 
   &__resultGroupHeader {
-    margin-top: var(--tui-gap-1);
-    color: var(--tui-color-neutral-6);
+    margin-top: var(--gap-1);
+    color: var(--color-neutral-6);
     font-weight: bold;
-    font-size: var(--tui-font-size-11);
+    font-size: var(--font-size-11);
     text-transform: uppercase;
   }
 

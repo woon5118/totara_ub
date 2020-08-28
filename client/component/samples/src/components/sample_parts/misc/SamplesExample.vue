@@ -44,10 +44,10 @@ export default {
 
 <style lang="scss">
 .tui-samplesExample {
-  margin-top: var(--tui-gap-4);
+  margin-top: var(--gap-4);
 
   &__box {
-    padding: var(--tui-gap-4);
+    padding: var(--gap-4);
   }
 }
 </style>

@@ -52,3 +52,43 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+:root {
+  --card-border-radius: var(--border-radius-normal);
+}
+
+.tui-card {
+  display: flex;
+  border: 1px solid var(--card-border-color);
+  border-radius: var(--card-border-radius);
+  outline: none;
+
+  &--noBorder {
+    border: none;
+    &:focus,
+    &:hover {
+      border: none;
+    }
+  }
+
+  &--hasShadow {
+    box-shadow: var(--shadow-2);
+  }
+
+  &--clickable {
+    transition: box-shadow var(--transition-form-function)
+      var(--transition-form-duration);
+
+    &.tui-focusWithin {
+      box-shadow: var(--shadow-2);
+    }
+  }
+
+  &--clickable:hover,
+  &--clickable:focus {
+    box-shadow: var(--shadow-2);
+    cursor: pointer;
+  }
+}
+</style>

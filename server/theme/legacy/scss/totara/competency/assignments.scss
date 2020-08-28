@@ -25,10 +25,10 @@
   &__archiveActionModal {
     &_confirm {
       display: flex;
-      margin: var(--legacy-gap-6) 0;
+      margin: var(--gap-6) 0;
 
       input {
-        margin: var(--legacy-gap-1) var(--legacy-gap-4) 0 0;
+        margin: var(--gap-1) var(--gap-4) 0 0;
       }
 
       label {
@@ -39,7 +39,7 @@
 
   &__backLink {
     display: block;
-    padding-bottom: var(--legacy-gap-1);
+    padding-bottom: var(--gap-1);
   }
 
   &__btn {
@@ -54,29 +54,29 @@
     }
 
     &_block {
-      margin: var(--legacy-gap-4) 0;
+      margin: var(--gap-4) 0;
 
       &_title {
         @include tui-font-heading-small();
-        margin: 0 0 var(--legacy-gap-2);
+        margin: 0 0 var(--gap-2);
       }
     }
 
     &_title {
       @include tui-font-heading-medium();
-      margin: var(--legacy-gap-1) var(--legacy-gap-1) var(--legacy-gap-4) 0;
+      margin: var(--gap-1) var(--gap-1) var(--gap-4) 0;
     }
   }
 }
 
 .tw-assignCompSave {
   &__activate {
-    margin-bottom: var(--legacy-gap-2);
+    margin-bottom: var(--gap-2);
   }
 
   &__assign {
     display: flex;
-    margin-bottom: var(--legacy-gap-4);
+    margin-bottom: var(--gap-4);
 
     &_header {
       height: 100%;
@@ -86,18 +86,18 @@
     &_selector {
       margin-left: auto;
       .tw-selectTree__current {
-        border-radius: var(--legacy-gap-1);
-        color: var(--legacy-color-state);
+        border-radius: var(--gap-1);
+        color: var(--color-state);
         font-weight: normal;
       }
     }
   }
 
   &__basket {
-    border: 1px solid var(--legacy-color-neutral-3);
+    border: 1px solid var(--color-neutral-3);
     display: flex;
-    margin: var(--legacy-gap-4) 0;
-    padding: var(--legacy-gap-4);
+    margin: var(--gap-4) 0;
+    padding: var(--gap-4);
 
     &_link {
       display: block;
@@ -106,9 +106,9 @@
   }
 
   &__overview {
-    background: var(--legacy-color-neutral-2);
+    background: var(--color-neutral-2);
     display: flex;
-    padding: var(--legacy-gap-2) var(--legacy-gap-4);
+    padding: var(--gap-2) var(--gap-4);
 
     &_btn {
       margin-left: auto;
@@ -118,7 +118,7 @@
       @include tui-font-heading-x-small();
       height: 100%;
       margin: auto 0;
-      padding-right: var(--legacy-gap-4);
+      padding-right: var(--gap-4);
     }
 
     &_users {
@@ -128,40 +128,40 @@
   }
 
   &__selected {
-    margin-bottom: var(--legacy-gap-6);
+    margin-bottom: var(--gap-6);
     position: relative;
 
     &_empty {
-      border-bottom: 1px solid var(--legacy-color-neutral-4);
-      border-top: 1px solid var(--legacy-color-neutral-4);
+      border-bottom: 1px solid var(--color-neutral-4);
+      border-top: 1px solid var(--color-neutral-4);
       font-style: italic;
-      padding: var(--legacy-gap-6) var(--legacy-gap-4);
+      padding: var(--gap-6) var(--gap-4);
     }
 
     &_group {
-      border: 1px solid var(--legacy-color-neutral-3);
-      border-radius: var(--legacy-gap-2);
+      border: 1px solid var(--color-neutral-3);
+      border-radius: var(--gap-2);
       display: flex;
       flex-direction: column;
-      margin: 0 0 var(--legacy-gap-2);
-      padding: var(--legacy-gap-4);
+      margin: 0 0 var(--gap-2);
+      padding: var(--gap-4);
 
       &_heading {
         @include tui-font-heading-label-small();
         flex-basis: 15%;
         flex-shrink: 0;
-        margin: 0 0 var(--legacy-gap-4);
+        margin: 0 0 var(--gap-4);
         min-width: 150px;
         word-break: break-all;
       }
 
       &_row {
         display: flex;
-        padding: 0 0 var(--legacy-gap-2);
+        padding: 0 0 var(--gap-2);
 
         &_name {
           font-weight: bold;
-          margin-right: var(--legacy-gap-2);
+          margin-right: var(--gap-2);
           word-break: break-all;
         }
 
@@ -173,18 +173,18 @@
             text-decoration: none;
 
             .flex-icon {
-              color: var(--legacy-color-prompt-alert);
+              color: var(--color-prompt-alert);
               top: -1px;
             }
           }
         }
 
         &:last-child {
-          padding-bottom: var(--legacy-gap-1);
+          padding-bottom: var(--gap-1);
         }
 
         .flex-icon {
-          color: var(--legacy-color-neutral-4);
+          color: var(--color-neutral-4);
           display: block;
           font-weight: normal;
           position: relative;
@@ -195,7 +195,7 @@
 
         &:hover {
           .flex-icon {
-            color: var(--legacy-color-prompt-alert);
+            color: var(--color-prompt-alert);
           }
         }
       }
@@ -203,12 +203,12 @@
   }
 
   &__disabled {
-    color: var(--legacy-color-neutral-3);
+    color: var(--color-neutral-3);
 
     &:active,
     &:focus,
     &:hover {
-      color: var(--legacy-color-neutral-3);
+      color: var(--color-neutral-3);
       cursor: default;
       text-decoration: none;
     }
@@ -222,13 +222,13 @@
 @media (min-width: $tui-screen-sm) {
   .tw-assignComp {
     &__pageBtns {
-      margin-bottom: var(--legacy-gap-2);
+      margin-bottom: var(--gap-2);
       text-align: right;
     }
 
     &__title {
       float: left;
-      margin-bottom: var(--legacy-gap-8);
+      margin-bottom: var(--gap-8);
     }
   }
 
@@ -236,10 +236,10 @@
     &__selected {
       &_group {
         flex-direction: row;
-        padding: var(--legacy-gap-4) 0;
+        padding: var(--gap-4) 0;
 
         &_heading {
-          margin: 0 var(--legacy-gap-4);
+          margin: 0 var(--gap-4);
         }
       }
     }

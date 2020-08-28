@@ -71,16 +71,16 @@ export default {
       colours: [
         {
           class: 'tui-colourSamplesBox--primary',
-          name: 'var(--tui-color-primary);',
+          name: 'var(--color-primary);',
           note: 'No contrast dependency (No text on top)',
         },
         {
           class: 'tui-colourSamplesBox--secondary',
-          name: 'var(--tui-color-secondary);',
+          name: 'var(--color-secondary);',
         },
         {
           class: 'tui-colourSamplesBox--tertiary',
-          name: 'var(--tui-color-tertiary);',
+          name: 'var(--color-tertiary);',
         },
         {
           class: '',
@@ -88,27 +88,27 @@ export default {
         },
         {
           class: 'tui-colourSamplesBox--state',
-          name: 'var(--tui-color-state);',
+          name: 'var(--color-state);',
         },
         {
           class: 'tui-colourSamplesBox--stateHover',
-          name: 'var(--tui-color-state-hover);',
+          name: 'var(--color-state-hover);',
         },
         {
           class: 'tui-colourSamplesBox--stateFocus',
-          name: 'var(--tui-color-state-focus);',
+          name: 'var(--color-state-focus);',
         },
         {
           class: 'tui-colourSamplesBox--stateActive',
-          name: 'var(--tui-color-state-active);',
+          name: 'var(--color-state-active);',
         },
         {
           class: 'tui-colourSamplesBox--stateHighlight',
-          name: 'var(--tui-color-state-highlight);',
+          name: 'var(--color-state-highlight);',
         },
         {
           class: 'tui-colourSamplesBox--stateDisabled',
-          name: 'var(--tui-color-state-disabled);',
+          name: 'var(--color-state-disabled);',
         },
         {
           class: '',
@@ -116,35 +116,35 @@ export default {
         },
         {
           class: 'tui-colourSamplesBox--promptInfo',
-          name: 'var(--tui-color-prompt-info);',
+          name: 'var(--color-prompt-info);',
         },
         {
           class: 'tui-colourSamplesBox--promptInfoBg',
-          name: 'var(--tui-color-prompt-info-bg);',
+          name: 'var(--color-prompt-info-bg);',
         },
         {
           class: 'tui-colourSamplesBox--promptAlert',
-          name: 'var(--tui-color-prompt-alert);',
+          name: 'var(--color-prompt-alert);',
         },
         {
           class: 'tui-colourSamplesBox--promptAlertBg',
-          name: 'var(--tui-color-prompt-alert-bg);',
+          name: 'var(--color-prompt-alert-bg);',
         },
         {
           class: 'tui-colourSamplesBox--promptWarning',
-          name: 'var(--tui-color-prompt-warning);',
+          name: 'var(--color-prompt-warning);',
         },
         {
           class: 'tui-colourSamplesBox--promptWarningBg',
-          name: 'var(--tui-color-prompt-warning-bg);',
+          name: 'var(--color-prompt-warning-bg);',
         },
         {
           class: 'tui-colourSamplesBox--promptSuccess',
-          name: 'var(--tui-color-prompt-success);',
+          name: 'var(--color-prompt-success);',
         },
         {
           class: 'tui-colourSamplesBox--promptSuccessBg',
-          name: 'var(--tui-color-prompt-Success-bg);',
+          name: 'var(--color-prompt-Success-bg);',
         },
         {
           class: '',
@@ -152,31 +152,31 @@ export default {
         },
         {
           class: 'tui-colourSamplesBox--neutralOne',
-          name: 'var(--tui-color-neutral-1);',
+          name: 'var(--color-neutral-1);',
         },
         {
           class: 'tui-colourSamplesBox--neutralTwo',
-          name: 'var(--tui-color-neutral-2);',
+          name: 'var(--color-neutral-2);',
         },
         {
           class: 'tui-colourSamplesBox--neutralThree',
-          name: 'var(--tui-color-neutral-3);',
+          name: 'var(--color-neutral-3);',
         },
         {
           class: 'tui-colourSamplesBox--neutralFour',
-          name: 'var(--tui-color-neutral-4);',
+          name: 'var(--color-neutral-4);',
         },
         {
           class: 'tui-colourSamplesBox--neutralFive',
-          name: 'var(--tui-color-neutral-5);',
+          name: 'var(--color-neutral-5);',
         },
         {
           class: 'tui-colourSamplesBox--neutralSix',
-          name: 'var(--tui-color-neutral-6);',
+          name: 'var(--color-neutral-6);',
         },
         {
           class: 'tui-colourSamplesBox--neutralSeven',
-          name: 'var(--tui-color-neutral-7);',
+          name: 'var(--color-neutral-7);',
         },
         {
           class: '',
@@ -184,65 +184,65 @@ export default {
         },
         {
           class: 'tui-colourSamplesBox--chartOne',
-          name: 'var(--tui-color-chart-background-1);',
+          name: 'var(--color-chart-background-1);',
         },
         {
           class: 'tui-colourSamplesBox--chartOneLight',
-          name: 'var(--tui-color-chart-transparent-1);',
+          name: 'var(--color-chart-transparent-1);',
         },
         {
           class: 'tui-colourSamplesBox--chartTwo',
-          name: 'var(--tui-color-chart-background-2);',
+          name: 'var(--color-chart-background-2);',
         },
         {
           class: 'tui-colourSamplesBox--chartTwoLight',
-          name: 'var(--tui-color-chart-transparent-2);',
+          name: 'var(--color-chart-transparent-2);',
         },
         {
           class: 'tui-colourSamplesBox--chartThree',
-          name: 'var(--tui-color-chart-background-3);',
+          name: 'var(--color-chart-background-3);',
         },
         {
           class: 'tui-colourSamplesBox--chartThreeLight',
-          name: 'var(--tui-color-chart-transparent-3);',
+          name: 'var(--color-chart-transparent-3);',
         },
         {
           class: 'tui-colourSamplesBox--chartFour',
-          name: 'var(--tui-color-chart-background-4);',
+          name: 'var(--color-chart-background-4);',
         },
         {
           class: 'tui-colourSamplesBox--chartFourLight',
-          name: 'var(--tui-color-chart-transparent-4);',
+          name: 'var(--color-chart-transparent-4);',
         },
         {
           class: 'tui-colourSamplesBox--chartFive',
-          name: 'var(--tui-color-chart-background-5);',
+          name: 'var(--color-chart-background-5);',
         },
         {
           class: 'tui-colourSamplesBox--chartFiveLight',
-          name: 'var(--tui-color-chart-transparent-5);',
+          name: 'var(--color-chart-transparent-5);',
         },
         {
           class: 'tui-colourSamplesBox--chartSix',
-          name: 'var(--tui-color-chart-background-6);',
+          name: 'var(--color-chart-background-6);',
         },
         {
           class: 'tui-colourSamplesBox--chartSixLight',
-          name: 'var(--tui-color-chart-transparent-6);',
+          name: 'var(--color-chart-transparent-6);',
         },
         {
           class: 'tui-colourSamplesBox--chartSeven',
-          name: 'var(--tui-color-chart-background-7);',
+          name: 'var(--color-chart-background-7);',
         },
         {
           class: 'tui-colourSamplesBox--chartSevenLight',
-          name: 'var(--tui-color-chart-transparent-7);',
+          name: 'var(--color-chart-transparent-7);',
         },
       ],
       codeTemplate: `<div class="tui-example__box">Hello</div>`,
       codeScript: `<style lang="scss">
   .tui-example__box {
-    background: var(--tui-color-primary);
+    background: var(--color-primary);
   }
 </style>`,
     };
@@ -257,154 +257,154 @@ export default {
 }
 
 .tui-colourSamplesBox--primary {
-  background: var(--tui-color-primary);
+  background: var(--color-primary);
 }
 
 .tui-colourSamplesBox--secondary {
-  background: var(--tui-color-secondary);
+  background: var(--color-secondary);
 }
 
 .tui-colourSamplesBox--tertiary {
-  background: var(--tui-color-tertiary);
+  background: var(--color-tertiary);
 }
 
 .tui-colourSamplesBox--state {
-  background: var(--tui-color-state);
+  background: var(--color-state);
 }
 
 .tui-colourSamplesBox--stateHover {
-  background: var(--tui-color-state-hover);
+  background: var(--color-state-hover);
 }
 
 .tui-colourSamplesBox--stateFocus {
-  background: var(--tui-color-state-focus);
+  background: var(--color-state-focus);
 }
 
 .tui-colourSamplesBox--stateActive {
-  background: var(--tui-color-state-active);
+  background: var(--color-state-active);
 }
 
 .tui-colourSamplesBox--stateHighlight {
-  background: var(--tui-color-state-highlight);
+  background: var(--color-state-highlight);
 }
 
 .tui-colourSamplesBox--stateDisabled {
-  background: var(--tui-color-state-disabled);
+  background: var(--color-state-disabled);
 }
 
 .tui-colourSamplesBox--promptInfo {
-  background: var(--tui-color-prompt-info);
+  background: var(--color-prompt-info);
 }
 
 .tui-colourSamplesBox--promptInfoBg {
-  background: var(--tui-color-prompt-info-bg);
+  background: var(--color-prompt-info-bg);
 }
 
 .tui-colourSamplesBox--promptAlert {
-  background: var(--tui-color-prompt-alert);
+  background: var(--color-prompt-alert);
 }
 
 .tui-colourSamplesBox--promptAlertBg {
-  background: var(--tui-color-prompt-alert-bg);
+  background: var(--color-prompt-alert-bg);
 }
 
 .tui-colourSamplesBox--promptWarning {
-  background: var(--tui-color-prompt-warning);
+  background: var(--color-prompt-warning);
 }
 
 .tui-colourSamplesBox--promptWarningBg {
-  background: var(--tui-color-prompt-warning-bg);
+  background: var(--color-prompt-warning-bg);
 }
 
 .tui-colourSamplesBox--promptSuccess {
-  background: var(--tui-color-prompt-success);
+  background: var(--color-prompt-success);
 }
 
 .tui-colourSamplesBox--promptSuccessBg {
-  background: var(--tui-color-prompt-success-bg);
+  background: var(--color-prompt-success-bg);
 }
 
 .tui-colourSamplesBox--neutralOne {
-  background: var(--tui-color-neutral-1);
+  background: var(--color-neutral-1);
 }
 
 .tui-colourSamplesBox--neutralTwo {
-  background: var(--tui-color-neutral-2);
+  background: var(--color-neutral-2);
 }
 
 .tui-colourSamplesBox--neutralThree {
-  background: var(--tui-color-neutral-3);
+  background: var(--color-neutral-3);
 }
 
 .tui-colourSamplesBox--neutralFour {
-  background: var(--tui-color-neutral-4);
+  background: var(--color-neutral-4);
 }
 
 .tui-colourSamplesBox--neutralFive {
-  background: var(--tui-color-neutral-5);
+  background: var(--color-neutral-5);
 }
 
 .tui-colourSamplesBox--neutralSix {
-  background: var(--tui-color-neutral-6);
+  background: var(--color-neutral-6);
 }
 
 .tui-colourSamplesBox--neutralSeven {
-  background: var(--tui-color-neutral-7);
+  background: var(--color-neutral-7);
 }
 
 .tui-colourSamplesBox--chartOne {
-  background: var(--tui-color-chart-background-1);
+  background: var(--color-chart-background-1);
 }
 
 .tui-colourSamplesBox--chartOneLight {
-  background: var(--tui-color-chart-transparent-1);
+  background: var(--color-chart-transparent-1);
 }
 
 .tui-colourSamplesBox--chartTwo {
-  background: var(--tui-color-chart-background-2);
+  background: var(--color-chart-background-2);
 }
 
 .tui-colourSamplesBox--chartTwoLight {
-  background: var(--tui-color-chart-transparent-2);
+  background: var(--color-chart-transparent-2);
 }
 
 .tui-colourSamplesBox--chartThree {
-  background: var(--tui-color-chart-background-3);
+  background: var(--color-chart-background-3);
 }
 
 .tui-colourSamplesBox--chartThreeLight {
-  background: var(--tui-color-chart-transparent-3);
+  background: var(--color-chart-transparent-3);
 }
 
 .tui-colourSamplesBox--chartFour {
-  background: var(--tui-color-chart-background-4);
+  background: var(--color-chart-background-4);
 }
 
 .tui-colourSamplesBox--chartFourLight {
-  background: var(--tui-color-chart-transparent-4);
+  background: var(--color-chart-transparent-4);
 }
 
 .tui-colourSamplesBox--chartFive {
-  background: var(--tui-color-chart-background-5);
+  background: var(--color-chart-background-5);
 }
 
 .tui-colourSamplesBox--chartFiveLight {
-  background: var(--tui-color-chart-transparent-5);
+  background: var(--color-chart-transparent-5);
 }
 
 .tui-colourSamplesBox--chartSix {
-  background: var(--tui-color-chart-background-6);
+  background: var(--color-chart-background-6);
 }
 
 .tui-colourSamplesBox--chartSixLight {
-  background: var(--tui-color-chart-transparent-6);
+  background: var(--color-chart-transparent-6);
 }
 
 .tui-colourSamplesBox--chartSeven {
-  background: var(--tui-color-chart-background-7);
+  background: var(--color-chart-background-7);
 }
 
 .tui-colourSamplesBox--chartSevenLight {
-  background: var(--tui-color-chart-transparent-7);
+  background: var(--color-chart-transparent-7);
 }
 </style>

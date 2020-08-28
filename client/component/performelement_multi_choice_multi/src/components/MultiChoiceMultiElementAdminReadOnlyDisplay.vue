@@ -75,3 +75,14 @@ export default {
   ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-multiChoiceMultiElementAdminReadOnlyDisplay__options {
+  display: flex;
+  flex-direction: column;
+
+  &-item {
+    margin-top: var(--gap-2);
+  }
+}
+</style>

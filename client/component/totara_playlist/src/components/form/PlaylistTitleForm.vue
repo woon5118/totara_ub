@@ -101,3 +101,23 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-playlistTitleForm {
+  @include tui-font-body();
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  // Override form row
+  .tui-formRow {
+    &__desc {
+      display: none;
+    }
+
+    &__action {
+      margin: 0;
+    }
+  }
+}
+</style>

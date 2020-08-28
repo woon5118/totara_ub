@@ -24,16 +24,16 @@
 .tw-editAchievementPaths {
   &__aggregation {
     display: flex;
-    margin-top: var(--legacy-gap-4);
+    margin-top: var(--gap-4);
 
     & > * {
-      margin-right: var(--legacy-gap-8);
+      margin-right: var(--gap-8);
     }
   }
 
   &__transparentBtn {
     @include tui-font-heading-label-small();
-    color: var(--legacy-color-state);
+    color: var(--color-state);
     background: transparent;
     border: none;
     cursor: pointer;
@@ -50,7 +50,7 @@
     &:focus,
     &:hover:active,
     &:hover {
-      color: var(--legacy-color-state-hover);
+      color: var(--color-state-hover);
       text-decoration: none;
       background: transparent;
       border: none;
@@ -59,7 +59,7 @@
   }
 
   &__buttons {
-    margin-top: var(--legacy-gap-6);
+    margin-top: var(--gap-6);
 
     &-submit.tw-editAchievementPaths__buttons-submit {
       @include bs-btn-primary();
@@ -76,29 +76,29 @@
     .tw-editAchievementPaths__btn {
       @extend .btn;
       @include bs-btn-default();
-      color: var(--legacy-btn-toggle-text-color);
-      background: var(--legacy-btn-toggle-bg-color);
-      border-color: var(--legacy-btn-toggle-border-color);
+      color: var(--btn-toggle-text-color);
+      background: var(--btn-toggle-bg-color);
+      border-color: var(--btn-toggle-border-color);
 
       &:hover,
       &:focus {
-        color: var(--legacy-btn-toggle-text-color-focus);
-        background: var(--legacy-btn-toggle-bg-color-focus);
-        border-color: var(--legacy-btn-toggle-border-color-focus);
+        color: var(--btn-toggle-text-color-focus);
+        background: var(--btn-toggle-bg-color-focus);
+        border-color: var(--btn-toggle-border-color-focus);
       }
 
       &-active {
-        color: var(--legacy-btn-toggle-text-color-selected);
-        background: var(--legacy-btn-toggle-bg-color-selected);
-        border-color: var(--legacy-btn-toggle-border-color-selected);
+        color: var(--btn-toggle-text-color-selected);
+        background: var(--btn-toggle-bg-color-selected);
+        border-color: var(--btn-toggle-border-color-selected);
         cursor: default;
 
         &:active:hover,
         &:hover,
         &:focus {
-          color: var(--legacy-btn-toggle-text-color-selected);
-          background: var(--legacy-btn-toggle-bg-color-selected);
-          border-color: var(--legacy-btn-toggle-border-color-selected);
+          color: var(--btn-toggle-text-color-selected);
+          background: var(--btn-toggle-bg-color-selected);
+          border-color: var(--btn-toggle-border-color-selected);
           box-shadow: none;
         }
       }
@@ -112,23 +112,23 @@
   }
 
   &__dropPlaceholder {
-    padding: var(--legacy-gap-4);
-    background-color: var(--legacy-color-neutral-4);
-    border: 1px solid var(--legacy-color-neutral-4);
-    border-radius: var(--legacy-border-radius-normal);
+    padding: var(--gap-4);
+    background-color: var(--color-neutral-4);
+    border: 1px solid var(--color-neutral-4);
+    border-radius: var(--border-radius-normal);
   }
 
   &__empty {
     @include tui-font-hint();
-    border-top: 1px solid var(--legacy-color-neutral-5);
-    border-bottom: 1px solid var(--legacy-color-neutral-5);
-    margin-top: var(--legacy-gap-4);
-    padding: var(--legacy-gap-4) 0;
+    border-top: 1px solid var(--color-neutral-5);
+    border-bottom: 1px solid var(--color-neutral-5);
+    margin-top: var(--gap-4);
+    padding: var(--gap-4) 0;
   }
 
   &__groups {
     & > * {
-      margin-top: var(--legacy-gap-4);
+      margin-top: var(--gap-4);
     }
 
     &-item {
@@ -138,26 +138,26 @@
 
   &__group {
     & > * + * {
-      margin-top: var(--legacy-gap-4);
+      margin-top: var(--gap-4);
     }
 
     &-actions {
       margin-left: auto;
 
       &Button {
-        color: var(--legacy-color-state);
+        color: var(--color-state);
         background: transparent;
         border: none;
         cursor: pointer;
         white-space: normal;
         text-align: left;
-        padding: 0 var(--legacy-gap-1);
+        padding: 0 var(--gap-1);
 
         &:active,
         &:focus,
         &:hover:active,
         &:hover {
-          color: var(--legacy-color-state-hover);
+          color: var(--color-state-hover);
           text-decoration: none;
           background: transparent;
           border: none;
@@ -173,11 +173,11 @@
 
     &-item {
       display: flex;
-      padding: var(--legacy-gap-4);
-      border: var(--legacy-border-width-thin) solid
-        var(--legacy-color-neutral-5);
-      border-radius: var(--legacy-border-radius-normal);
-      box-shadow: var(--legacy-shadow-2);
+      padding: var(--gap-4);
+      border: var(--border-width-thin) solid
+        var(--color-neutral-5);
+      border-radius: var(--border-radius-normal);
+      box-shadow: var(--shadow-2);
 
       &Details {
         display: flex;
@@ -211,13 +211,13 @@
 
   &__andSeparator {
     position: relative;
-    margin: var(--legacy-gap-4) var(--legacy-gap-6) 0;
+    margin: var(--gap-4) var(--gap-6) 0;
 
     &-label {
       position: relative;
-      background: var(--legacy-color-neutral-1);
-      margin-left: var(--legacy-gap-10);
-      padding: 0 var(--legacy-gap-4);
+      background: var(--color-neutral-1);
+      margin-left: var(--gap-10);
+      padding: 0 var(--gap-4);
       text-transform: uppercase;
     }
 
@@ -225,13 +225,13 @@
       position: absolute;
       width: 100%;
       top: 50%;
-      border-top: var(--legacy-border-width-thin) solid
-        var(--legacy-color-neutral-5);
+      border-top: var(--border-width-thin) solid
+        var(--color-neutral-5);
     }
   }
 
   &--deleted {
-    color: var(--legacy-color-neutral-5);
+    color: var(--color-neutral-5);
     text-decoration: line-through;
 
     label,
@@ -242,17 +242,17 @@
 
   &__criterionForm {
     display: flex;
-    margin: var(--legacy-gap-3) var(--legacy-gap-6) 0;
+    margin: var(--gap-3) var(--gap-6) 0;
 
     &-title {
       width: 12rem;
-      margin: var(--legacy-gap-1) var(--legacy-gap-4) 0 0;
+      margin: var(--gap-1) var(--gap-4) 0 0;
       @include tui-font-heading-label-small();
     }
 
     &-items {
       & > * + * {
-        margin-top: var(--legacy-gap-1);
+        margin-top: var(--gap-1);
       }
     }
 
@@ -273,17 +273,17 @@
       list-style: none;
 
       & > * {
-        margin-top: var(--legacy-gap-1);
+        margin-top: var(--gap-1);
       }
     }
 
     &-warning {
-      color: var(--legacy-color-prompt-warning);
+      color: var(--color-prompt-warning);
     }
   }
 }
 
 .tw-editAchievementPaths__activeDropZone.tw-editAchievementPaths__group {
-  border: var(--legacy-border-width-thin) dashed var(--legacy-color-neutral-6);
-  background-color: var(--legacy-color-background);
+  border: var(--border-width-thin) dashed var(--color-neutral-6);
+  background-color: var(--color-background);
 }

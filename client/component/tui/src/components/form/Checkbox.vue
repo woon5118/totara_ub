@@ -88,3 +88,147 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+:root {
+  // Size of checkbox
+  --form-checkbox-size: var(--form-input-font-size);
+  --form-checkbox-size-large: calc(var(--form-input-font-size) * 1.333);
+  --checkbox-check-width: 0.2rem;
+}
+
+.tui-checkbox {
+  position: relative;
+  display: flex;
+  height: calc(var(--form-checkbox-size) + 2px);
+
+  &--large {
+    height: calc(var(--form-checkbox-size-large) + 2px);
+  }
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  &__label {
+    position: relative;
+    margin: 0;
+    padding-left: calc(var(--form-checkbox-size) * 1.5);
+    font-weight: normal;
+    font-size: var(--form-input-font-size);
+    line-height: 1;
+
+    .tui-checkbox--large & {
+      padding-left: calc(var(--form-checkbox-size-large) * 1.5);
+    }
+
+    &--noOffset {
+      padding-left: var(--form-checkbox-size);
+      .tui-checkbox--large & {
+        padding-left: var(--form-checkbox-size-large);
+      }
+    }
+
+    &::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      width: var(--form-checkbox-size);
+      height: var(--form-checkbox-size);
+      margin-top: 1px;
+      background: var(--form-checkbox-bg-color);
+      border: var(--form-input-border-size) solid;
+      border-color: var(--form-checkbox-border-color);
+      transition: border var(--transition-form-function)
+          var(--transition-form-duration),
+        box-shadow var(--transition-form-function)
+          var(--transition-form-duration);
+      content: '';
+      pointer-events: none;
+
+      .tui-checkbox--large & {
+        width: var(--form-checkbox-size-large);
+        height: var(--form-checkbox-size-large);
+      }
+
+      .tui-contextInvalid & {
+        border-color: var(--form-input-border-color-invalid);
+        box-shadow: var(--shadow-none), var(--form-input-shadow-invalid);
+      }
+    }
+  }
+
+  &__input:disabled ~ &__label {
+    color: var(--form-input-text-color-disabled);
+  }
+
+  &__input:checked:hover ~ &__label::before,
+  &__input:hover ~ &__label::before,
+  &__input:focus ~ &__label::before {
+    border: var(--form-input-border-size) solid;
+    border-color: var(--form-checkbox-border-color-focus);
+    box-shadow: var(--form-input-shadow-focus);
+
+    .tui-contextInvalid & {
+      border-color: var(--form-input-border-color-invalid);
+      box-shadow: var(--shadow-none),
+        var(--form-input-shadow-invalid-focus);
+    }
+  }
+
+  &__input:focus ~ &__label::before {
+    background: var(--form-checkbox-bg-color-focus);
+  }
+
+  &__input:disabled:checked ~ &__label::before,
+  &__input:disabled ~ &__label::before {
+    background: var(--form-checkbox-bg-color-disabled);
+    border: var(--form-input-border-size) solid;
+    border-color: var(--form-checkbox-border-color-disabled);
+    box-shadow: none;
+  }
+
+  &__input ~ &__label::after {
+    // construct a check mark out of two sides of a rotated box
+    position: absolute;
+    top: calc(0.267 * var(--form-checkbox-size));
+    left: calc(0.133 * var(--form-checkbox-size));
+    display: block;
+    width: calc(0.733 * var(--form-checkbox-size));
+    height: calc(0.4 * var(--form-checkbox-size));
+    border-color: var(--form-checkbox-check-color);
+    border-style: solid;
+    /*rtl:ignore*/
+    border-width: 0 0 var(--checkbox-check-width)
+      var(--checkbox-check-width);
+    transform: rotate(-45deg);
+    opacity: 0;
+    transition: opacity var(--transition-form-function)
+      var(--transition-form-duration);
+    content: '';
+    pointer-events: none;
+
+    .tui-checkbox--large & {
+      top: calc(0.267 * var(--form-checkbox-size-large));
+      left: calc(0.133 * var(--form-checkbox-size-large));
+      width: calc(0.733 * var(--form-checkbox-size-large));
+      height: calc(0.4 * var(--form-checkbox-size-large));
+    }
+  }
+
+  &__input:disabled:checked ~ &__label::after,
+  &__input:disabled ~ &__label::after {
+    border-color: var(--form-checkbox-check-color-disabled);
+  }
+
+  &__input:checked ~ &__label::before {
+    background: var(--form-checkbox-bg-color-active);
+  }
+
+  &__input:checked ~ &__label::after {
+    opacity: 1;
+  }
+}
+</style>

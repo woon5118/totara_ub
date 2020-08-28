@@ -218,3 +218,20 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-replyForm {
+  margin-top: var(--gap-4);
+  padding-right: var(--gap-2);
+
+  &__form {
+    flex: 1;
+    max-width: 100%;
+
+    &__editor {
+      flex: 1;
+      max-width: 100%;
+    }
+  }
+}
+</style>

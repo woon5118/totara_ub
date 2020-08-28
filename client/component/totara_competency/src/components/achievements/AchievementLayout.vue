@@ -51,3 +51,32 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-achievementLayout {
+  &__left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding-right: var(--gap-4);
+  }
+
+  &--borderless &__left {
+    border-right: none;
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-achievementLayout {
+    &__left {
+      border-right: var(--border-width-normal) solid
+        var(--color-neutral-5);
+
+      .tui-grid--stacked & {
+        border-right: none;
+      }
+    }
+  }
+}
+</style>

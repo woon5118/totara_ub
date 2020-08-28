@@ -289,3 +289,34 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-dropdown {
+  &__menu {
+    z-index: var(--zindex-dropdown-menu);
+    min-width: 15rem;
+    max-width: 35rem;
+    max-height: 40vh;
+    overflow-y: auto;
+    background-color: var(--dropdown-menu-bg-color);
+    background-clip: padding-box;
+    border: 1px solid var(--dropdown-menu-border-color);
+    box-shadow: var(--shadow-2);
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    &--separator > * + * {
+      border-top: 1px solid var(--dropdown-menu-border-color);
+    }
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+    .tui-dropdown__trigger {
+      pointer-events: none;
+    }
+  }
+}
+</style>

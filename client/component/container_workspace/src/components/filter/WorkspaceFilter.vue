@@ -187,3 +187,13 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceFilter {
+  &__sortFilter {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--gap-8);
+  }
+}
+</style>

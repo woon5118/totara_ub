@@ -79,7 +79,7 @@ export default {
   }
 
   &__sidepanel {
-    padding: var(--tui-gap-8);
+    padding: var(--gap-8);
   }
 }
 </style>

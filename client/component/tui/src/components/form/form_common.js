@@ -18,7 +18,7 @@
 
 import theme from 'tui/theme';
 
-const scaleString = theme.getVar('tui-char-length-scale');
+const scaleString = theme.getVar('char-length-scale');
 
 /**
  * Entries in char length scale.

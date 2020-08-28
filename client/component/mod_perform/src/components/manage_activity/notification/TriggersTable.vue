@@ -163,3 +163,38 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-activityNotificationsTriggersTable {
+  width: 100%;
+  &__banner {
+    margin-top: var(--gap-2);
+  }
+}
+.tui-activityNotificationsTriggers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tui-activityNotificationsTrigger {
+  $value-width: 6em;
+  width: 100%;
+  margin: 0 0 var(--gap-2) 0;
+  padding: 0;
+  &__field {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+  }
+  &__value {
+    width: $value-width;
+  }
+  &__format {
+    width: calc(100% - #{$value-width} - var(--gap-4));
+    margin: 0 var(--gap-2);
+  }
+  &__error {
+    margin-top: var(--gap-1);
+  }
+}
+</style>

@@ -146,3 +146,11 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-pathwayManualAchievement {
+  & > * + * {
+    margin-top: var(--gap-6);
+  }
+}
+</style>

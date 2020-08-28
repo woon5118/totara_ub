@@ -362,7 +362,7 @@ export default {
   height: 100%;
 
   & .tui-sidePanelExample__content {
-    padding: var(--tui-gap-8);
+    padding: var(--gap-8);
   }
 
   .tui-grid--animated > .tui-grid-item {

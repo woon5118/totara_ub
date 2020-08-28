@@ -59,3 +59,14 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyDetailProficientStatus {
+  @media screen and (min-width: $tui-screen-xs) {
+    font-weight: bold;
+    &-srOnly {
+      @include sr-only();
+    }
+  }
+}
+</style>

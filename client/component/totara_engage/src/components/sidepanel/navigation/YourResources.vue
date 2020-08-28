@@ -73,3 +73,15 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-navigationYourResources {
+  display: flex;
+  justify-content: space-between;
+
+  .tui-iconBtn--small {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+</style>

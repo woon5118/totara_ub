@@ -362,7 +362,7 @@ export default {
         options.scale = {
           pointLabels: {
             fontSize: 12,
-            fontColor: theme.getVar('tui-color-state'),
+            fontColor: theme.getVar('color-state'),
           },
           ticks: {
             beginAtZero: true,
@@ -407,7 +407,7 @@ export default {
                 min,
                 max,
                 fontSize: 12,
-                fontColor: theme.getVar('tui-color-state'),
+                fontColor: theme.getVar('color-state'),
               },
             },
           ],
@@ -448,8 +448,8 @@ export default {
         datasets: [
           {
             label: this.$str('achievement_level', 'totara_competency'),
-            backgroundColor: theme.getVar('tui-color-chart-transparent-1'),
-            borderColor: theme.getVar('tui-color-chart-background-1'),
+            backgroundColor: theme.getVar('color-chart-transparent-1'),
+            borderColor: theme.getVar('color-chart-background-1'),
             borderWidth: 2,
             rawData: [],
             data: [],
@@ -462,10 +462,10 @@ export default {
             backgroundColor:
               this.type === 'bar'
                 ? 'transparent'
-                : theme.getVar('tui-color-chart-transparent-4'),
-            borderColor: theme.getVar('tui-color-chart-background-4'),
-            pointBorderColor: theme.getVar('tui-color-chart-background-4'),
-            pointBackgroundColor: theme.getVar('tui-color-chart-background-4'),
+                : theme.getVar('color-chart-transparent-4'),
+            borderColor: theme.getVar('color-chart-background-4'),
+            pointBorderColor: theme.getVar('color-chart-background-4'),
+            pointBackgroundColor: theme.getVar('color-chart-background-4'),
             borderWidth: 2,
             steppedLine: 'middle',
             rawData: [],

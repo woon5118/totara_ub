@@ -102,3 +102,52 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-baseCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+
+  &__link {
+    color: var(--color-neutral-7);
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      color: var(--color-neutral-7);
+      text-decoration: none;
+      outline: none;
+    }
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    cursor: default;
+  }
+
+  &__headerImage {
+    overflow: hidden;
+  }
+
+  &__description {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 0 var(--gap-4) var(--gap-2) var(--gap-4);
+
+    & > :last-child {
+      margin-top: auto;
+    }
+
+    &__infoContent {
+      margin-top: var(--gap-2);
+    }
+  }
+}
+</style>

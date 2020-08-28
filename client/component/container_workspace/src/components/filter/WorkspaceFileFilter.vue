@@ -146,3 +146,28 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceFileFilter {
+  display: flex;
+  flex-direction: column;
+  &__sortFilter {
+    align-self: flex-end;
+    margin-top: var(--gap-8);
+    padding-bottom: var(--gap-2);
+    .tui-formLabel {
+      @include tui-font-heading-label-small();
+    }
+
+    @media (max-width: 765px) {
+      padding: var(--gap-4);
+    }
+  }
+
+  &__label {
+    .tui-formLabel {
+      @include tui-font-heading-label-small();
+    }
+  }
+}
+</style>

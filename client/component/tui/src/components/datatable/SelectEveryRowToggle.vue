@@ -55,3 +55,10 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-dataTableSelectEveryRowToggle {
+  padding: var(--gap-2);
+  background-color: var(--datatable-select-everything-prompt-bg);
+}
+</style>

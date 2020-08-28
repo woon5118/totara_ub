@@ -19,3 +19,17 @@
 <template>
   <div class="tui-articleSeparator" />
 </template>
+
+<style lang="scss">
+:root {
+  --engage-article-separator-width: 40px;
+}
+.tui-articleSeparator {
+  display: block;
+  width: var(--engage-article-separator-width);
+
+  margin-top: var(--gap-4);
+  margin-bottom: var(--gap-8);
+  border-bottom: solid var(--border-width-thick) var(--color-primary);
+}
+</style>

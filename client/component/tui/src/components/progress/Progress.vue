@@ -166,3 +166,49 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-progress {
+  @include tui-font-body-xx-small();
+
+  display: flex;
+  height: 14px;
+  background-color: var(--progress-container-bg-color);
+  border: 1px solid var(--progress-border-color);
+  border-radius: var(--gap-2);
+
+  &--small {
+    height: 12px;
+    line-height: 10px;
+  }
+
+  &--hideBackground {
+    background: none;
+  }
+
+  &__bar {
+    display: flex;
+    justify-content: flex-end;
+    background-color: var(--progress-value-bg-color);
+    border-radius: var(--gap-2);
+    transition: width var(--transition-progress-function)
+      var(--transition-progress-duration);
+  }
+
+  &__label {
+    padding: 0 var(--gap-1);
+    opacity: 0;
+
+    &--inside {
+      color: var(--progress-value-text-color);
+      opacity: 1;
+      transition: opacity var(--transition-progress-function)
+        var(--transition-progress-duration);
+    }
+    &--outside {
+      color: var(--progress-container-text-color);
+      opacity: 1;
+    }
+  }
+}
+</style>

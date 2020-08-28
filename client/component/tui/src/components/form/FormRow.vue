@@ -104,3 +104,53 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-formRow {
+  display: flex;
+  flex-direction: column;
+
+  // __inner is needed as setting margin on the root element is the
+  // responsibility of the containing element (outside-in spacing).
+  // (see below for margin setting)
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-wrap: wrap;
+  }
+
+  &__inner > &__desc {
+    min-width: 0;
+    margin-bottom: var(--gap-1);
+    padding-top: var(--gap-1);
+    padding-right: var(--gap-2);
+    text-align: left;
+    overflow-wrap: break-word;
+  }
+
+  &__inner > &__action {
+    display: flex;
+
+    &--isStacked {
+      flex-direction: column;
+
+      @include tui-stack-vertical(var(--gap-1));
+    }
+  }
+}
+
+.tui-form--horizontal .tui-formRow:not(.tui-formRow--vertical) > {
+  .tui-formRow {
+    &__inner {
+      @include tui-layout-sidebar(
+        $side-width: 22rem,
+        $content-min-width: 60%,
+        $gutter: var(--gap-1),
+        $sidebar-selector: '.tui-formRow__desc',
+        $content-selector: '.tui-formRow__action'
+      );
+    }
+  }
+}
+</style>

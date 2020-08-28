@@ -78,3 +78,9 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-editArticleTitleForm {
+  width: 100%;
+}
+</style>

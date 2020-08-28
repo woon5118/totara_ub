@@ -251,3 +251,68 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-articleForm {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-top: var(--gap-4);
+
+  &__title {
+    &.tui-formRow {
+      // Reset form row margin.
+      margin-bottom: 0;
+    }
+    // Reset the margin of label section when it is hidden. So that it does not give us any extra spaces.
+    .tui-formRow {
+      &__desc {
+        margin: 0;
+      }
+    }
+  }
+
+  &__description {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-top: var(--gap-8);
+
+    &__formRow {
+      flex-grow: 1;
+      // Reset margin of itself.
+      &.tui-formRow {
+        margin-bottom: 0;
+      }
+
+      .tui-formRow {
+        // Reset the margin of label section when it is hidden. So that it does not give us any extra spaces.
+        &__desc {
+          margin: 0;
+        }
+
+        &__action {
+          // Expand the box.
+          flex-grow: 1;
+        }
+      }
+    }
+
+    &__tip {
+      position: relative;
+      display: flex;
+      margin-top: var(--gap-2);
+
+      &__content {
+        margin: 0;
+      }
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--gap-8);
+  }
+}
+</style>

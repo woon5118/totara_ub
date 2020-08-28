@@ -67,3 +67,9 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-audioBlock {
+  margin: var(--gap-8) 0;
+}
+</style>

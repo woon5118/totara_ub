@@ -56,3 +56,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-totaraEngage-public {
+  &--color {
+    color: var(--color-prompt-success);
+  }
+}
+</style>

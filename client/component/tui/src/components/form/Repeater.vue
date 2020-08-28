@@ -126,3 +126,36 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-repeater {
+  display: block;
+  flex-grow: 1;
+  width: 100%;
+  min-width: 0;
+
+  & > * + * {
+    margin-top: var(--gap-3);
+  }
+
+  &__row,
+  &__headerRow {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  &__headerRow + &__row {
+    margin-top: var(--gap-2);
+  }
+
+  &--noSpacing > * {
+    margin: 0;
+  }
+
+  &__headerRow &__delete {
+    height: 1px;
+    min-height: 1px;
+    overflow: hidden;
+  }
+}
+</style>

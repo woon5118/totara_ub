@@ -45,3 +45,19 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-dataTableHeaderCell {
+  @include tui-font-heading-label();
+  display: none;
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-dataTableHeaderCell {
+    @extend .tui-dataTableCell;
+    display: flex;
+    color: var(--datatable-cell-header-text-color);
+    font-weight: bold;
+  }
+}
+</style>

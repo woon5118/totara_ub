@@ -65,3 +65,19 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-mention {
+  display: inline-block;
+  white-space: normal;
+
+  &__displayName {
+    color: var(--color-state);
+
+    &:hover {
+      // Hover state, for now we keep the same color.
+      color: var(--color-state);
+    }
+  }
+}
+</style>

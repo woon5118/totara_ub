@@ -164,3 +164,27 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-otherParticipantResponses {
+  &__response {
+    width: 100%;
+    margin-top: var(--gap-1);
+
+    & > * + * {
+      margin-top: var(--gap-6);
+    }
+
+    &-participant {
+      & > * + * {
+        margin-top: var(--gap-2);
+      }
+    }
+  }
+
+  &__noParticipant {
+    margin-top: var(--gap-1);
+    @include tui-font-hint();
+  }
+}
+</style>

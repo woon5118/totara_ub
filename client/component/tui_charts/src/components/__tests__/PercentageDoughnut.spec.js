@@ -29,11 +29,11 @@ jest.mock('tui/theme', () => {
   return {
     getVar(name) {
       let vars = {
-        'tui-color-chart-background-1': '#3869B1',
-        'tui-font-size-chart-doughnut-label': '24',
-        'tui-font-size-chart-doughnut-percentage-label': '40',
-        'tui-color-chart-doughnut-label': '#000',
-        'tui-color-neutral-4': '#e6e4e4',
+        'color-chart-background-1': '#3869B1',
+        'font-size-chart-doughnut-label': '24',
+        'font-size-chart-doughnut-percentage-label': '40',
+        'color-chart-doughnut-label': '#000',
+        'color-neutral-4': '#e6e4e4',
       };
       return vars[name];
     },

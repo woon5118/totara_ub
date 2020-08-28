@@ -482,3 +482,22 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-layoutOneColumnWithMultiSidePanel,
+> .tui-responsive,
+> .tui-grid,
+> .tui-grid-item {
+  transition: flex-basis ease-in 0.3s;
+}
+
+.tui-layoutOneColumnWithMultiSidePanel {
+  &__outerRight {
+    position: relative;
+  }
+
+  &__rightSidePanelContainer {
+    height: 100%;
+  }
+}
+</style>

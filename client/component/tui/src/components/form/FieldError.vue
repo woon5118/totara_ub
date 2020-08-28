@@ -59,3 +59,41 @@ export default {
   "moodle": ["closebuttontitle"]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-formFieldError {
+  // offset the extra red shadow on invalid elements + we want the error
+  // message to be spaced 1px away
+  margin-top: calc(var(--form-input-invalid-shadow-size) + 1px);
+
+  &__inner {
+    @include tui-font-body-small();
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 0.8rem;
+    color: var(--form-error-text-color);
+    background: var(--form-error-bg-color);
+  }
+
+  &__dismiss {
+    margin-left: var(--gap-1);
+    padding: 0;
+    color: inherit;
+    opacity: 0.7;
+
+    &:hover:active,
+    &:active,
+    &:hover,
+    &:focus {
+      color: inherit;
+      opacity: 1;
+    }
+
+    &-icon {
+      position: relative;
+      top: -1px;
+      @include tui-font-body-small();
+    }
+  }
+}
+</style>

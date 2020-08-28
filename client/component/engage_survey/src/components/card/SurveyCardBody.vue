@@ -132,3 +132,48 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-surveyCardBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--gap-2) var(--gap-4) var(--gap-2) var(--gap-4);
+
+  &__title {
+    @include tui-font-heading-small-regular();
+    flex-basis: 72%;
+    height: 100%;
+    overflow: hidden;
+    -ms-word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: none;
+  }
+
+  &__footer {
+    display: flex;
+    flex-basis: 28%;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  &__text {
+    @include tui-font-heading-label-small();
+    margin-top: 0;
+    margin-bottom: var(--gap-4);
+  }
+
+  &__container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  &__icon {
+    align-self: flex-end;
+    margin-right: -14px;
+  }
+}
+</style>

@@ -198,3 +198,106 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --workspace-header-small-height: 55px;
+  --workspace-header-medium-height: 88px;
+
+  // Large screen width and height
+  --workspace-header-large-height: 135px;
+  --workspace-header-large-width: 135px;
+}
+.tui-workspacePageHeader {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  @media (min-width: $tui-screen-sm) {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  &__img {
+    width: 100%;
+    height: var(--workspace-header-small-height);
+    margin-bottom: var(--gap-2);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+
+    @media (min-width: $tui-screen-xs) {
+      height: var(--workspace-header-medium-height);
+      margin-bottom: var(--gap-6);
+    }
+
+    @media (min-width: $tui-screen-sm) {
+      width: 50%;
+      max-width: var(--workspace-header-large-width);
+      height: var(--workspace-header-large-height);
+      margin-right: var(--gap-4);
+      margin-bottom: 0;
+      border-radius: var(--border-radius-normal);
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    &__head {
+      padding: 0;
+      padding-left: var(--gap-4);
+
+      @media (min-width: $tui-screen-sm) {
+        padding: 0;
+      }
+
+      &__title {
+        display: flex;
+        align-items: center;
+
+        &__text {
+          width: 100%;
+          margin: 0;
+          -ms-word-break: break-all;
+          word-break: break-word;
+          hyphens: none;
+
+          @include tui-font-heading-small();
+
+          @media (min-width: $tui-screen-lg) {
+            @include tui-font-heading-medium();
+          }
+        }
+
+        &__buttonIcon {
+          margin-left: var(--gap-2);
+        }
+      }
+
+      &__subTitle {
+        display: flex;
+        align-items: center;
+
+        &__text {
+          @include tui-font-body();
+          margin-top: var(--gap-2);
+          color: var(--color-neutral-6);
+        }
+
+        &__button {
+          margin-left: var(--gap-4);
+        }
+      }
+    }
+
+    &__menu {
+      padding: var(--gap-8) 0;
+      background-color: var(--color-neutral-3);
+      border: var(--border-width-thin) solid var(--color-neutral-5);
+    }
+  }
+}
+</style>

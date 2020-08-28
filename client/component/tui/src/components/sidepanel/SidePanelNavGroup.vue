@@ -74,3 +74,33 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-sidePanelNavGroup {
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+
+  &__heading {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--gap-4);
+    padding-left: var(--sidepanel-navigation-item-padding-left);
+
+    &-title {
+      margin: 0;
+      @include tui-font-heading-label();
+    }
+
+    &-side {
+      margin-left: auto;
+      padding-left: var(--gap-2);
+    }
+  }
+
+  &__items {
+    margin-left: 0;
+    list-style: none;
+  }
+}
+</style>

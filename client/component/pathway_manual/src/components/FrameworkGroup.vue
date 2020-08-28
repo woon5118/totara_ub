@@ -209,3 +209,16 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-bulkManualRatingFrameworkGroup {
+  &:not(:last-child) {
+    margin-bottom: var(--gap-7);
+  }
+
+  &__headerWithHelp {
+    display: flex;
+    flex-direction: row;
+  }
+}
+</style>

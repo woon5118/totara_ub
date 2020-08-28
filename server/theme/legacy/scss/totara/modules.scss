@@ -192,12 +192,12 @@ select {
 
 .breadcrumb-button .singlebutton {
   float: left;
-  margin-left: var(--legacy-gap-1);
+  margin-left: var(--gap-1);
 }
 
 .breadcrumb-button .singleselect {
   float: left;
-  margin-left: var(--legacy-gap-1);
+  margin-left: var(--gap-1);
 
   .addtomenu option:last-child {
     font-style: italic;
@@ -261,7 +261,7 @@ div#dock {
   }
 
   .mod_choice__remove-choice-link {
-    padding-left: var(--legacy-gap-4);
+    padding-left: var(--gap-4);
   }
 }
 
@@ -387,7 +387,7 @@ div#dock {
 }
 
 .mod_lesson__student-response {
-  margin-bottom: var(--legacy-gap-4);
+  margin-bottom: var(--gap-4);
 }
 
 // Wiki
@@ -483,5 +483,5 @@ div#dock {
 
 // override '.label a' when viewing a label activity in a course
 .modtype_label a {
-  color: var(--legacy-link-color);
+  color: var(--link-color);
 }

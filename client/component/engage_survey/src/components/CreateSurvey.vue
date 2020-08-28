@@ -153,3 +153,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-engageSurvey-createSurvey {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+</style>

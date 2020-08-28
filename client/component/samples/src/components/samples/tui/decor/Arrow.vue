@@ -104,8 +104,8 @@ export default {
     position: relative;
     width: 50%;
     height: 100px;
-    background: var(--tui-color-neutral-1);
-    border: 1px solid var(--tui-color-neutral-5);
+    background: var(--color-neutral-1);
+    border: 1px solid var(--color-neutral-5);
   }
 }
 </style>

@@ -81,3 +81,20 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-formHelpIcon {
+  display: inline-block;
+
+  &__icon {
+    padding: 0;
+    color: var(--color-state);
+  }
+
+  &__desc {
+    // aria-describedby still works even if the target element is display: none
+    // https://developer.paciellogroup.com/blog/2015/05/short-note-on-aria-labelledby-and-aria-describedby/
+    display: none;
+  }
+}
+</style>

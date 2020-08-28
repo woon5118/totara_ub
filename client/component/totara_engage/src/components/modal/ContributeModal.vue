@@ -259,3 +259,76 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-contributeModal {
+  position: relative;
+
+  &__adderContainer {
+    margin-bottom: var(--gap-2);
+    padding: 0 var(--gap-8);
+    &__title {
+      @include tui-font-heading-small();
+      margin-top: 0;
+    }
+  }
+
+  &__resize.tui-iconBtn {
+    position: absolute;
+    top: var(--gap-5);
+    right: var(--gap-5);
+  }
+
+  &__tabs {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+
+    .tui-tabs {
+      &__tabs {
+        padding-right: var(--gap-8);
+        padding-left: var(--gap-8);
+      }
+
+      &__panels {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+
+  &__componentContent {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 510px;
+    padding: 0 var(--gap-8);
+  }
+
+  .tui-modalContent__title {
+    display: none;
+  }
+
+  .tui-modalContent__content {
+    display: flex;
+    flex-direction: column;
+    min-height: 510px;
+    margin-top: 0;
+    padding: 0;
+  }
+
+  .tui-tabContent {
+    position: relative;
+    flex: 1;
+    min-height: 400px;
+    padding: var(--gap-8) 0;
+  }
+
+  .tui-modalContent__header-title {
+    margin-bottom: var(--gap-2);
+  }
+}
+</style>

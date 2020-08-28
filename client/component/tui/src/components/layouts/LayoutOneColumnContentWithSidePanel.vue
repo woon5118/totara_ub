@@ -198,3 +198,25 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-layoutOneColumnContentWithSidepanel
+  > .tui-responsive
+  > .tui-grid
+  > .tui-grid-item {
+  transition: flex-basis var(--transition-sidepanel-content-function)
+    var(--transition-sidepanel-content-duration);
+
+  .tui-sidePanel {
+    overflow: visible;
+  }
+}
+
+.tui-layoutOneColumnContentWithSidepanel {
+  &-fullSidePanel {
+    > .tui-responsive > .tui-grid > .tui-grid-item {
+      border-left: none;
+    }
+  }
+}
+</style>

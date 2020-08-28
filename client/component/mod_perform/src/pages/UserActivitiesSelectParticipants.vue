@@ -165,3 +165,12 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performUserActivitiesSelectParticipants {
+  &__title {
+    @include tui-font-heading-medium;
+    padding-top: var(--gap-2);
+  }
+}
+</style>

@@ -109,3 +109,37 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-commentReplyContent {
+  margin: 0;
+
+  &__content {
+    max-width: 100%;
+
+    .tui-rendered {
+      p {
+        @include tui-font-body();
+        // Reset margin of paragraph in tui-rendered content.
+        margin: 0;
+      }
+    }
+
+    &--deleted {
+      // Deleted comment should not have any .tui-rendered element
+      @include tui-font-body-small();
+      font-style: italic;
+    }
+
+    &--reply {
+      @include tui-font-body-small();
+
+      .tui-rendered {
+        p {
+          @include tui-font-body-small();
+        }
+      }
+    }
+  }
+}
+</style>

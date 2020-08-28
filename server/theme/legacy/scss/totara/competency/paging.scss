@@ -22,19 +22,19 @@
 // @package   theme_legacy
 
 .tw-paging {
-  margin: var(--legacy-gap-6) var(--legacy-gap-1);
+  margin: var(--gap-6) var(--gap-1);
   text-align: center;
 
   &__btn {
     @extend .btn;
     @include bs-btn-default();
-    padding-left: var(--legacy-gap-8);
-    padding-right: var(--legacy-gap-8);
+    padding-left: var(--gap-8);
+    padding-right: var(--gap-8);
   }
 }
 
 @media (min-width: $tui-screen-sm) {
   .tw-paging {
-    margin: var(--legacy-gap-6) 0 var(--legacy-gap-1);
+    margin: var(--gap-6) 0 var(--gap-1);
   }
 }

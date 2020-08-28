@@ -99,3 +99,27 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-engageSurvey-radioBox {
+  .tui-radioGroup {
+    padding: 0;
+    overflow: auto;
+  }
+
+  .tui-radioGroup > * + * {
+    margin-top: 0;
+  }
+
+  &__radio {
+    margin-bottom: var(--gap-4);
+
+    .tui-radio__label {
+      font-size: var(--font-size-15);
+      -ms-word-break: break-all;
+      overflow-wrap: break-word;
+      hyphens: none;
+    }
+  }
+}
+</style>

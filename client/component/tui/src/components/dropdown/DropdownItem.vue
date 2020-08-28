@@ -64,3 +64,50 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-dropdownItem {
+  @include tui-font-body();
+  width: 100%;
+  padding: var(--gap-2) var(--gap-4);
+  overflow: hidden;
+  color: var(--dropdown-item-text-color);
+  line-height: 1.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    color: var(--dropdown-item-text-color-hover);
+    text-decoration: none;
+    background-color: var(--dropdown-item-bg-color-hover);
+    outline: 0;
+  }
+
+  &:focus {
+    color: var(--dropdown-item-text-color-focus);
+    background-color: var(--dropdown-item-bg-color-focus);
+  }
+
+  &--disabled,
+  &--disabled:hover,
+  &--disabled:focus {
+    color: var(--dropdown-item-text-color-disabled);
+    background-color: transparent;
+    cursor: not-allowed;
+  }
+
+  &--disabled:focus {
+    background-color: var(--dropdown-item-bg-color-disabled-focus);
+  }
+
+  &--disabled:active {
+    pointer-events: none;
+  }
+
+  &--noPadding {
+    padding: 0;
+  }
+}
+</style>

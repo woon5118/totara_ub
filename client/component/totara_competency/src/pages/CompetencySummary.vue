@@ -96,3 +96,37 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencySummary {
+  @include tui-font-body();
+
+  & > * + * {
+    margin-top: var(--gap-4);
+  }
+
+  &__header {
+    &-title {
+      @include tui-font-heading-medium();
+      margin: var(--gap-2) 0 0;
+    }
+  }
+
+  &__sectionHeader {
+    display: flex;
+    align-items: center;
+    padding-bottom: var(--gap-1);
+    border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
+
+    &-title {
+      margin: 0;
+      @include tui-font-heading-small();
+    }
+
+    &-edit {
+      margin-left: auto;
+      padding-left: var(--gap-2);
+    }
+  }
+}
+</style>

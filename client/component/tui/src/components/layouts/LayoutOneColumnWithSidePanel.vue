@@ -166,3 +166,27 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-layoutOneColumnContentWithSidepanel {
+  &--fullSidePanel {
+    > .tui-responsive > .tui-grid > .tui-grid-item {
+      border-left: none;
+    }
+  }
+
+  // Prevents the button edges from being hidden which would prevent the user from selecting the button again
+  &--onSmallScreen {
+    > .tui-responsive > .tui-grid > .tui-grid-item {
+      .tui-sidepanel {
+        overflow: visible;
+        &--closed {
+          .tui-sidepanel__inner {
+            overflow: hidden;
+          }
+        }
+      }
+    }
+  }
+}
+</style>

@@ -91,3 +91,35 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-competencySummaryAchievementCriteria {
+  width: 100%;
+
+  &--multi {
+    padding: var(--gap-4);
+  }
+
+  &__and {
+    width: 50%;
+    margin: 0;
+  }
+
+  &__criterion {
+    &-header {
+      display: inline-block;
+      width: 40%;
+      margin: 0;
+      @include tui-font-heading-label();
+    }
+
+    &-aggregation {
+      @include tui-font-hint();
+    }
+
+    &-items {
+      margin-top: var(--gap-1);
+    }
+  }
+}
+</style>

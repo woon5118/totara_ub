@@ -144,3 +144,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-topicsSelector {
+  width: 100%;
+}
+</style>

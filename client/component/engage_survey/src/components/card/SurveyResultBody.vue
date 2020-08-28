@@ -112,3 +112,49 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-surveyResultBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--gap-2) var(--gap-4);
+
+  &__title.tui-formLabel {
+    @include tui-font-heading-label;
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: var(--gap-6);
+    -ms-word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: none;
+  }
+
+  &__progress {
+    flex-basis: 90%;
+  }
+
+  &__footer {
+    display: flex;
+    flex-basis: 10%;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  &__container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  &__text {
+    @include tui-font-body-small();
+  }
+
+  &__icon {
+    align-self: flex-end;
+    margin-right: -5px;
+  }
+}
+</style>

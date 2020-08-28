@@ -355,3 +355,23 @@ export default {
     "totara_core": ["noitems"]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-dataTable {
+  &--archived {
+    background: var(--datatable-bg-archived);
+  }
+
+  &__row-move-cell {
+    flex-basis: var(--gap-5);
+    flex-grow: 0;
+  }
+
+  &__row-move-menu {
+    position: absolute;
+    top: 0;
+    left: var(--gap-8);
+    background: var(--color-background);
+  }
+}
+</style>

@@ -102,3 +102,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-multiSelectFilter {
+  & > * + * {
+    margin-top: var(--gap-1);
+  }
+}
+</style>

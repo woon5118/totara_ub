@@ -178,3 +178,28 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-editorWeka-videoBlock {
+  margin: var(--gap-8) 0;
+  white-space: normal;
+
+  &.ProseMirror-selectednode {
+    outline: none;
+  }
+
+  &.ProseMirror-selectednode > &__inner > .tui-videoBlock {
+    outline: var(--border-width-normal) solid var(--weka-select-color);
+  }
+
+  &__inner {
+    max-width: 100%;
+
+    .tui-videoBlock {
+      // Reset margin
+      margin: 0;
+      white-space: normal;
+    }
+  }
+}
+</style>

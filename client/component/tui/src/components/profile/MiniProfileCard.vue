@@ -237,3 +237,83 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-miniProfileCard {
+  // The parent who uses this card decides the width/height.
+  display: flex;
+  align-items: flex-start;
+  padding: var(--gap-2);
+  outline: none;
+
+  &--no-avatar {
+    padding-left: var(--gap-4);
+  }
+
+  &--no-dropDown {
+    padding-right: var(--gap-4);
+  }
+
+  &--no-padding {
+    // Reset padding to zero.
+    padding: 0;
+  }
+
+  &--border {
+    border: var(--border-width-thin) solid var(--color-neutral-5);
+    border-radius: var(--border-radius-normal);
+  }
+
+  &--hasShadow {
+    box-shadow: var(--shadow-2);
+  }
+
+  &__avatar {
+    margin-right: var(--gap-2);
+  }
+
+  &__description {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+
+    &__row {
+      display: flex;
+      align-items: center;
+
+      &__text {
+        @include tui-font-body-small();
+        margin: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        &--bold {
+          @include tui-font-heavy();
+        }
+      }
+
+      &__link {
+        @include tui-font-link-small();
+        margin: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        &--bold {
+          @include tui-font-heavy();
+        }
+      }
+
+      &--withGap {
+        margin-bottom: var(--gap-1);
+      }
+    }
+  }
+
+  &__dropDown {
+    margin-left: var(--gap-4);
+  }
+}
+</style>

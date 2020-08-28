@@ -110,7 +110,7 @@ body {
     padding: ($grid-gutter-width / 2 - 8);
     position: relative;
     &::after {
-      border: 2px dotted var(--legacy-color-neutral-5);
+      border: 2px dotted var(--color-neutral-5);
       content: '';
       height: 100%;
       left: 0;
@@ -212,7 +212,7 @@ body {
 @media (max-width: $screen-md) {
   .has-region-side-pre #region-main,
   .has-region-side-post #region-main {
-    border-bottom: 1px solid var(--legacy-color-neutral-5);
+    border-bottom: 1px solid var(--color-neutral-5);
     margin-bottom: 1em;
     padding-bottom: 4em;
 
@@ -264,14 +264,14 @@ a.dimmed,
   &:link,
   &:visited {
     .ft {
-      color: var(--legacy-link-color);
+      color: var(--link-color);
     }
   }
   &:hover,
   &:active,
   &:focus {
     .ft {
-      color: var(--legacy-link-color-hover);
+      color: var(--link-color-hover);
     }
   }
 }
@@ -372,7 +372,7 @@ a.autolink.glossary:hover {
     background-color: #ffee69;
     border: 1px solid #a6982b;
     border-top-color: #d4c237;
-    color: var(--legacy-color-neutral-7);
+    color: var(--color-neutral-7);
     left: 0;
     padding: 2px 5px;
     position: relative;
@@ -764,7 +764,7 @@ a.skip:active {
 }
 
 .comment-paging .curpage {
-  border: 1px solid var(--legacy-color-neutral-5);
+  border: 1px solid var(--color-neutral-5);
 }
 
 .comment-message .picture {
@@ -790,7 +790,7 @@ a.skip:active {
 }
 
 .comment-delete-confirm {
-  background: var(--legacy-color-neutral-4);
+  background: var(--color-neutral-4);
   padding: 2px;
   width: 5em;
   text-align: center;
@@ -851,7 +851,7 @@ a.skip:active {
 */
 #webservice-doc-generator td {
   text-align: left;
-  border: 0 solid var(--legacy-color-neutral-5);
+  border: 0 solid var(--color-neutral-5);
 }
 
 /**
@@ -862,7 +862,7 @@ a.skip:active {
 }
 
 .smartselect .smartselect_mask {
-  background-color: var(--legacy-color-neutral-1);
+  background-color: var(--color-neutral-1);
 }
 
 .smartselect ul {
@@ -884,8 +884,8 @@ a.skip:active {
 
 .smartselect .smartselect_menu,
 .smartselect .smartselect_submenu {
-  border: 1px solid var(--legacy-color-neutral-5);
-  background-color: var(--legacy-color-neutral-1);
+  border: 1px solid var(--color-neutral-5);
+  background-color: var(--color-neutral-1);
   display: none;
 }
 
@@ -900,7 +900,7 @@ a.skip:active {
 }
 
 .smartselect .smartselect_menu_content ul li a {
-  color: var(--legacy-color-neutral-7);
+  color: var(--color-neutral-7);
   text-decoration: none;
 }
 
@@ -960,7 +960,7 @@ a.skip:active {
 }
 
 .corelightbox {
-  background-color: var(--legacy-color-neutral-4);
+  background-color: var(--color-neutral-4);
   position: absolute;
   top: 0;
   left: 0;
@@ -1110,7 +1110,7 @@ audio.mediaplugin_html5audio {
 
 /* Moodle Dialogue Settings (moodle-core-dialogue)  */
 .moodle-dialogue-base .moodle-dialogue-lightbox {
-  background-color: var(--legacy-color-neutral-5);
+  background-color: var(--color-neutral-5);
 }
 
 .moodle-dialogue-base .hidden,
@@ -1146,16 +1146,16 @@ audio.mediaplugin_html5audio {
   background: none;
   border: none;
   z-index: 600;
-  outline: var(--legacy-color-neutral-7) dotted 0;
+  outline: var(--color-neutral-7) dotted 0;
 }
 
 .moodle-dialogue-base .moodle-dialogue-wrap {
   margin-top: -3px;
   margin-left: -3px;
-  background-color: var(--legacy-color-neutral-1);
-  border: 1px solid var(--legacy-color-neutral-5);
+  background-color: var(--color-neutral-1);
+  border: 1px solid var(--color-neutral-5);
   border-radius: 10px;
-  box-shadow: 5px 5px 20px 0 var(--legacy-color-neutral-6);
+  box-shadow: 5px 5px 20px 0 var(--color-neutral-6);
 }
 
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd,
@@ -1165,14 +1165,14 @@ audio.mediaplugin_html5audio {
   font-size: 12px;
   font-weight: normal;
   letter-spacing: 1px;
-  color: var(--legacy-color-neutral-7);
+  color: var(--color-neutral-7);
   text-align: center;
-  text-shadow: 1px 1px 1px var(--legacy-color-neutral-1);
+  text-shadow: 1px 1px 1px var(--color-neutral-1);
   border-radius: 10px 10px 0 0;
-  border-bottom: 1px solid var(--legacy-color-neutral-5);
-  background: var(--legacy-color-neutral-4);
+  border-bottom: 1px solid var(--color-neutral-5);
+  background: var(--color-neutral-4);
   min-height: 22px;
-  background-image: linear-gradient(to bottom, var(--legacy-color-neutral-1) 0%, var(--legacy-color-neutral-5) 100%);
+  background-image: linear-gradient(to bottom, var(--color-neutral-1) 0%, var(--color-neutral-5) 100%);
   filter: none;
 }
 
@@ -1208,13 +1208,13 @@ audio.mediaplugin_html5audio {
 .moodle-dialogue-base .moodle-dialogue .moodle-dialogue-bd {
   padding: 1em;
   line-height: 2em;
-  color: var(--legacy-color-neutral-6);
+  color: var(--color-neutral-6);
   font-size: 12px;
 }
 
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-content {
   padding: 0;
-  background: var(--legacy-color-neutral-1);
+  background: var(--color-neutral-1);
 }
 
 .moodle-dialogue-base .moodle-dialogue-fullscreen .moodle-dialogue-hd {
@@ -1262,14 +1262,14 @@ audio.mediaplugin_html5audio {
 }
 
 .moodle-dialogue-exception .param-stacktrace label {
-  background-color: var(--legacy-color-neutral-3);
-  border: 1px solid var(--legacy-color-neutral-5);
+  background-color: var(--color-neutral-3);
+  border: 1px solid var(--color-neutral-5);
   border-bottom-width: 0;
 }
 
 .moodle-dialogue-exception .param-stacktrace pre {
-  border: 1px solid var(--legacy-color-neutral-5);
-  background-color: var(--legacy-color-neutral-1);
+  border: 1px solid var(--color-neutral-5);
+  background-color: var(--color-neutral-1);
 }
 
 .moodle-dialogue-exception .param-stacktrace .stacktrace-file {
@@ -1283,9 +1283,9 @@ audio.mediaplugin_html5audio {
 }
 
 .moodle-dialogue-exception .param-stacktrace .stacktrace-call {
-  color: var(--legacy-color-neutral-7);
+  color: var(--color-neutral-7);
   font-size: 90%;
-  border-bottom: 1px solid var(--legacy-color-neutral-3);
+  border-bottom: 1px solid var(--color-neutral-3);
 }
 
 .moodle-dialogue-base
@@ -1295,7 +1295,7 @@ audio.mediaplugin_html5audio {
   padding: 0;
   margin: 0.7em 1em;
   text-align: right;
-  background-color: var(--legacy-color-neutral-1);
+  background-color: var(--color-neutral-1);
   font-size: 12px;
 }
 
@@ -1354,7 +1354,7 @@ audio.mediaplugin_html5audio {
   height: 100%;
   top: 0;
   left: 0;
-  background-color: var(--legacy-color-neutral-1);
+  background-color: var(--color-neutral-1);
   text-align: center;
   padding: 10% 0;
 }
@@ -1390,7 +1390,7 @@ audio.mediaplugin_html5audio {
 
 .chooserdialogue .moodle-dialogue-wrap .moodle-dialogue-bd {
   padding: 0;
-  background: var(--legacy-color-neutral-2);
+  background: var(--color-neutral-2);
   @include border-bottom-radius(10px);
 }
 
@@ -1408,7 +1408,7 @@ audio.mediaplugin_html5audio {
 /* Various settings for the options area */
 .choosercontainer #chooseform .options {
   position: relative;
-  border-bottom: 1px solid var(--legacy-color-neutral-5);
+  border-bottom: 1px solid var(--color-neutral-5);
 }
 
 /* Only set these options if we're showing the js container */
@@ -1416,7 +1416,7 @@ audio.mediaplugin_html5audio {
   overflow-x: hidden;
   overflow-y: auto;
   max-width: 20.3em;
-  box-shadow: inset 0 0 30px 0 var(--legacy-color-neutral-5);
+  box-shadow: inset 0 0 30px 0 var(--color-neutral-5);
 }
 
 /* Settings for option rows and option subtypes */
@@ -1452,7 +1452,7 @@ audio.mediaplugin_html5audio {
 .choosercontainer #chooseform .option label {
   display: block;
   padding: 0.3em 0 0.1em 0;
-  border-bottom: 1px solid var(--legacy-color-neutral-1);
+  border-bottom: 1px solid var(--color-neutral-1);
 }
 
 .choosercontainer #chooseform .nonoption {
@@ -1495,7 +1495,7 @@ audio.mediaplugin_html5audio {
 
 .choosercontainer #chooseform .selected {
   background-color: $body-bg;
-  box-shadow: 0 0 10px 0 var(--legacy-color-neutral-5);
+  box-shadow: 0 0 10px 0 var(--color-neutral-5);
 }
 
 .section-modchooser-link img.smallicon {
@@ -1520,8 +1520,8 @@ audio.mediaplugin_html5audio {
   position: relative;
   margin: 15px 0;
   padding: 1px 19px 14px;
-  background-color: var(--legacy-color-neutral-1);
-  border: 1px solid var(--legacy-color-neutral-5);
+  background-color: var(--color-neutral-1);
+  border: 1px solid var(--color-neutral-5);
   border-radius: 4px;
 }
 
@@ -1533,9 +1533,9 @@ audio.mediaplugin_html5audio {
   padding: 3px 7px;
   font-size: 12px;
   font-weight: bold;
-  background-color: var(--legacy-color-neutral-1);
-  border: 1px solid var(--legacy-color-neutral-5);
-  color: var(--legacy-color-neutral-6);
+  background-color: var(--color-neutral-1);
+  border: 1px solid var(--color-neutral-5);
+  color: var(--color-neutral-6);
   border-radius: 4px 0 4px 0;
 }
 
@@ -1548,10 +1548,10 @@ audio.mediaplugin_html5audio {
 .formlistingrow {
   cursor: pointer;
   border-bottom: 1px solid;
-  border-color: var(--legacy-color-neutral-5);
-  border-left: 1px solid var(--legacy-color-neutral-5);
-  border-right: 1px solid var(--legacy-color-neutral-5);
-  background-color: var(--legacy-color-neutral-3);
+  border-color: var(--color-neutral-5);
+  border-left: 1px solid var(--color-neutral-5);
+  border-right: 1px solid var(--color-neutral-5);
+  background-color: var(--color-neutral-3);
   border-radius: 0 0 4px 4px;
   padding: 6px;
   top: 50%;
@@ -1814,7 +1814,7 @@ ul.dragdrop-keyboard-drag li {
 }
 
 .moodle-core-dragdrop-draghandle {
-  color: var(--legacy-link-color);
+  color: var(--link-color);
 }
 
 .navbar-header {
@@ -1850,13 +1850,13 @@ a.btn.disabled:hover,
 a.btn.disabled {
   font-style: normal;
   &.btn-default {
-    color: var(--legacy-btn-text-color);
+    color: var(--btn-text-color);
   }
   &.btn-primary {
-    color: var(--legacy-btn-prim-text-color);
+    color: var(--btn-prim-text-color);
   }
   &.btn-secondary {
-    color: var(--legacy-btn-text-color);
+    color: var(--btn-text-color);
   }
   &.btn-success {
     color: $btn-success-color;
@@ -1953,7 +1953,7 @@ body.behat-site {
       color: $state-info-text;
       text-decoration: none;
       z-index: 9999;
-      box-shadow: 2px 2px 5px 1px var(--legacy-color-neutral-5);
+      box-shadow: 2px 2px 5px 1px var(--color-neutral-5);
       border: 1px solid $state-info-border;
     }
   }
@@ -2136,7 +2136,7 @@ a.comments-icon-none {
 }
 
 .comment-paging .curpage {
-  border: 1px solid var(--legacy-color-neutral-5);
+  border: 1px solid var(--color-neutral-5);
 }
 
 .comment-userpicture {

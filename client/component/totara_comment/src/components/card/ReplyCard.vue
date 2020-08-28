@@ -36,3 +36,30 @@
     </div>
   </div>
 </template>
+
+<style lang="scss">
+.tui-replyCard {
+  display: flex;
+  align-items: flex-start;
+
+  &__profilePicture {
+    margin-right: var(--gap-2);
+  }
+
+  &__body {
+    flex: 1 1 auto;
+
+    &__header {
+      margin-bottom: var(--gap-2);
+    }
+
+    &__content {
+      margin-bottom: var(--gap-2);
+      padding-right: var(--gap-2);
+      -ms-word-break: break-all;
+      overflow-wrap: break-word;
+      hyphens: none;
+    }
+  }
+}
+</style>

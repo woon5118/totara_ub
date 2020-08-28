@@ -61,3 +61,18 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-dataTableSelectVisibleRowsCell {
+  display: flex;
+
+  &--hidden {
+    visibility: hidden;
+  }
+
+  .tui-dataTableCell__label {
+    margin: auto 0;
+    padding-left: var(--gap-2);
+  }
+}
+</style>

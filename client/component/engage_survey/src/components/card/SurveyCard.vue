@@ -197,3 +197,73 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-surveyCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .tui-card {
+    // A hack to set the cursor back to normal cursor instead of pointer.
+    cursor: default;
+  }
+
+  &__cardContent {
+    width: 100%;
+
+    &__calcHeight {
+      height: calc(var(--totaraEngage-card-height) - 22px);
+    }
+
+    &__height {
+      height: var(--totaraEngage-card-height);
+    }
+
+    &:hover {
+      box-shadow: var(--shadow-2);
+    }
+
+    &__inner {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      border: var(--border-width-normal) solid var(--color-primary);
+      border-radius: calc(var(--card-border-radius) - 1px);
+
+      &__header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        &__image {
+          display: flex;
+          flex-direction: row;
+          padding-top: var(--gap-2);
+          padding-left: var(--gap-4);
+
+          img:first-child {
+            width: 40px;
+            height: 40px;
+            margin-top: var(--gap-1);
+          }
+        }
+
+        &__title {
+          @include tui-font-heading-label-small();
+          margin-left: var(--gap-2);
+          color: var(--color-neutral-6);
+          line-height: inherit;
+        }
+
+        &__bookmark {
+          align-self: flex-start;
+          // Negative margin here to neutralise the default redundant edges of icon.
+          margin-top: -2px;
+        }
+      }
+    }
+  }
+}
+</style>

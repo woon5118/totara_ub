@@ -241,3 +241,16 @@ export default {
   ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performReportPerformanceResponseByContent {
+  display: flex;
+  flex-direction: column;
+  &__heading {
+    @include tui-font-heading-small();
+  }
+  &__divider {
+    max-width: 250px;
+  }
+}
+</style>

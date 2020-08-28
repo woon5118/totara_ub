@@ -147,3 +147,34 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-emptySpacesPage {
+  display: flex;
+  flex-direction: column;
+
+  // Overriding the height here.
+  .tui-responsive {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__content {
+    padding-right: var(--gap-8);
+
+    &__header {
+      margin-top: calc(var(--gap-12) * 2);
+      margin-bottom: var(--gap-12);
+    }
+
+    &__horizontalLine {
+      margin: 0;
+    }
+
+    &__recommendedSpaces {
+      margin-top: var(--gap-8);
+    }
+  }
+}
+</style>

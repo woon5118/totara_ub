@@ -162,7 +162,7 @@ export default {
 }
 .tui-customTag {
   padding: 0.4rem;
-  border: 1px solid var(--tui-btn-text-color);
+  border: 1px solid var(--btn-text-color);
   border-radius: 6px;
 }
 </style>

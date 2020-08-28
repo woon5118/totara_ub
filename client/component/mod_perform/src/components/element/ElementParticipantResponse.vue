@@ -28,3 +28,13 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-performElementParticipantResponse {
+  display: flex;
+  &__name {
+    @include tui-font-body();
+    margin-left: var(--gap-3);
+  }
+}
+</style>

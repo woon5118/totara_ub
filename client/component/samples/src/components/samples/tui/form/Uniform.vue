@@ -195,7 +195,7 @@ export default {
     return {
       initialValues: {
         answers: ['first value', '', 'third value'],
-        color: theme.getVar('tui-color-primary'),
+        color: theme.getVar('color-primary'),
         pineapple: true,
       },
       errors: null,

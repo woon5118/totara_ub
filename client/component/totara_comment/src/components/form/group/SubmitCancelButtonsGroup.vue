@@ -89,3 +89,11 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-submitCancelButtonGroup {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--gap-4);
+}
+</style>

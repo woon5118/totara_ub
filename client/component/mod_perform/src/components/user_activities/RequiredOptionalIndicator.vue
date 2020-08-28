@@ -54,3 +54,16 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-performRequiredOptionalIndicator {
+  &--required {
+    @include tui-font-heading-label();
+    color: var(--color-prompt-alert);
+  }
+  &--optional {
+    @include tui-font-body();
+    @include tui-font-hint();
+  }
+}
+</style>

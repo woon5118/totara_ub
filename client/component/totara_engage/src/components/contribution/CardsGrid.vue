@@ -88,7 +88,7 @@ export default {
       type: [String, Number],
       validator: units => units > 0,
       default() {
-        return theme.getVar('tui-grid-maxunits');
+        return theme.getVar('grid-maxunits');
       },
     },
     cards: {
@@ -163,3 +163,19 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --totaraEngage-card-height: 340px;
+}
+
+.tui-totaraEngage-cardsGrid {
+  &__row.tui-grid {
+    margin-bottom: var(--gap-8);
+  }
+
+  &__card {
+    display: flex;
+  }
+}
+</style>

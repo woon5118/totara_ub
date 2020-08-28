@@ -62,3 +62,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-editorWeka-emojis {
+  display: flex;
+  flex-wrap: wrap;
+
+  &__emoji {
+    font-size: var(--font-size-22);
+  }
+}
+</style>

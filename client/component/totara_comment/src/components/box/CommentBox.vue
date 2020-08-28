@@ -294,3 +294,35 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-commentBox {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  // The parent that using this box should be able to override its padding.
+  padding: 0;
+
+  &--withBorder {
+    background-color: var(--color-neutral-3);
+    border: var(--border-width-thin) solid var(--color-neutral-5);
+
+    &.tui-commentBox--noForm {
+      // When the form is not available for the comment box, it will leave us a trailing border. Therefore, this
+      // modifier is in place in order to prevent that traing border.
+      border-bottom: none;
+    }
+  }
+
+  &__commentForm {
+    flex-basis: 20%;
+    margin-top: var(--gap-4);
+
+    &--withBorder {
+      padding: var(--gap-4);
+      padding-top: 0;
+    }
+  }
+}
+</style>

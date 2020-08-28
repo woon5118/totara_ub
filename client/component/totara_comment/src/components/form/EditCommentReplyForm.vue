@@ -180,3 +180,15 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-editCommentReplyForm {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+
+  &__editor {
+    max-width: 100%;
+  }
+}
+</style>

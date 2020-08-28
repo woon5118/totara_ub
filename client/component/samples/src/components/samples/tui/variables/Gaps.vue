@@ -66,57 +66,57 @@ export default {
       gaps: [
         {
           class: 'tui-gapSamplesBox--one',
-          name: 'var(--tui-gap-1);',
+          name: 'var(--gap-1);',
         },
         {
           class: 'tui-gapSamplesBox--two',
-          name: 'var(--tui-gap-2);',
+          name: 'var(--gap-2);',
         },
         {
           class: 'tui-gapSamplesBox--three',
-          name: 'var(--tui-gap-3);',
+          name: 'var(--gap-3);',
         },
         {
           class: 'tui-gapSamplesBox--four',
-          name: 'var(--tui-gap-4);',
+          name: 'var(--gap-4);',
         },
         {
           class: 'tui-gapSamplesBox--five',
-          name: 'var(--tui-gap-5);',
+          name: 'var(--gap-5);',
         },
         {
           class: 'tui-gapSamplesBox--six',
-          name: 'var(--tui-gap-6);',
+          name: 'var(--gap-6);',
         },
         {
           class: 'tui-gapSamplesBox--seven',
-          name: 'var(--tui-gap-7);',
+          name: 'var(--gap-7);',
         },
         {
           class: 'tui-gapSamplesBox--eight',
-          name: 'var(--tui-gap-8);',
+          name: 'var(--gap-8);',
         },
         {
           class: 'tui-gapSamplesBox--nine',
-          name: 'var(--tui-gap-9);',
+          name: 'var(--gap-9);',
         },
         {
           class: 'tui-gapSamplesBox--ten',
-          name: 'var(--tui-gap-10);',
+          name: 'var(--gap-10);',
         },
         {
           class: 'tui-gapSamplesBox--eleven',
-          name: 'var(--tui-gap-11);',
+          name: 'var(--gap-11);',
         },
         {
           class: 'tui-gapSamplesBox--twelve',
-          name: 'var(--tui-gap-12);',
+          name: 'var(--gap-12);',
         },
       ],
       codeTemplate: `<div class="tui-example__box">...</div>`,
       codeScript: `<style lang="scss">
   .tui-example__box {
-    margin-left: var(--tui-gap-4);
+    margin-left: var(--gap-4);
   }
 </style>`,
     };
@@ -127,54 +127,54 @@ export default {
 <style lang="scss">
 .tui-gapSamplesBox {
   height: 30px;
-  background: var(--tui-color-state);
+  background: var(--color-state);
 
   &--one {
-    width: var(--tui-gap-1);
+    width: var(--gap-1);
   }
 
   &--two {
-    width: var(--tui-gap-2);
+    width: var(--gap-2);
   }
 
   &--three {
-    width: var(--tui-gap-3);
+    width: var(--gap-3);
   }
 
   &--four {
-    width: var(--tui-gap-4);
+    width: var(--gap-4);
   }
 
   &--five {
-    width: var(--tui-gap-5);
+    width: var(--gap-5);
   }
 
   &--six {
-    width: var(--tui-gap-6);
+    width: var(--gap-6);
   }
 
   &--seven {
-    width: var(--tui-gap-7);
+    width: var(--gap-7);
   }
 
   &--eight {
-    width: var(--tui-gap-8);
+    width: var(--gap-8);
   }
 
   &--nine {
-    width: var(--tui-gap-9);
+    width: var(--gap-9);
   }
 
   &--ten {
-    width: var(--tui-gap-10);
+    width: var(--gap-10);
   }
 
   &--eleven {
-    width: var(--tui-gap-11);
+    width: var(--gap-11);
   }
 
   &--twelve {
-    width: var(--tui-gap-12);
+    width: var(--gap-12);
   }
 }
 </style>

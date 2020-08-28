@@ -107,3 +107,46 @@ export default {
   "totara_core": ["selected"]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-basket {
+  @include tui-font-body();
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  background-color: var(--color-neutral-3);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+
+  @media (min-width: $tui-screen-sm) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__status,
+  &__actions {
+    display: flex;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: var(--gap-2) var(--gap-3);
+
+    > .tui-formBtn--transparent {
+      padding: var(--gap-1);
+    }
+
+    > * + * {
+      margin-left: var(--gap-2);
+    }
+  }
+
+  &__selected {
+    font-weight: bold;
+  }
+
+  &__selectedCount {
+    font-size: var(--font-size-18);
+  }
+}
+</style>

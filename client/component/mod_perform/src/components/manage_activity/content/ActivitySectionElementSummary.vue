@@ -73,3 +73,11 @@ export default {
   ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performActivitySectionElementSummary {
+  &__count {
+    @include tui-font-heavy;
+  }
+}
+</style>

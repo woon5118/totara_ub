@@ -294,3 +294,37 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --playlistResources-gridCard-max-height: 347px;
+}
+
+.tui-playlistResourcesGrid {
+  &__row {
+    margin-bottom: var(--gap-5);
+  }
+
+  &__card {
+    max-height: var(--playlistResources-gridCard-max-height);
+
+    &-item {
+      position: relative;
+      height: 100%;
+
+      &-moveIcon {
+        position: absolute;
+        top: var(--gap-2);
+        left: var(--gap-2);
+        display: none;
+      }
+
+      &:hover &-moveIcon,
+      &--dragging &-moveIcon {
+        z-index: 1;
+        display: block;
+      }
+    }
+  }
+}
+</style>

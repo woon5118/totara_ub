@@ -63,3 +63,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-postDiscussionForm {
+  display: flex;
+  &__form {
+    flex-grow: 1;
+    width: 100%;
+    padding-left: var(--gap-2);
+  }
+}
+</style>

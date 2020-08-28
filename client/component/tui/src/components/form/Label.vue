@@ -68,3 +68,36 @@ export default {
   "moodle": ["required"]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-formLabel {
+  @include tui-font-heading-label();
+  min-width: 0;
+  margin: 0;
+  padding: 0 var(--gap-1) 0 0;
+
+  legend& {
+    width: auto;
+    margin: 0;
+    padding: 0 var(--gap-1) 0 0;
+    color: inherit;
+    border: none;
+  }
+
+  &--inline {
+    display: inline;
+  }
+
+  &--hidden {
+    @include sr-only();
+  }
+
+  &--subfield {
+    @include tui-font-body();
+  }
+
+  &__required {
+    color: var(--color-prompt-alert);
+  }
+}
+</style>

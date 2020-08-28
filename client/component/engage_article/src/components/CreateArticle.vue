@@ -166,3 +166,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-engageArticle-createArticle {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+}
+</style>

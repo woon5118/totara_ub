@@ -465,20 +465,20 @@ input[type='checkbox'] {
     padding: 0.2em;
     margin: 0;
     cursor: pointer;
-    color: var(--legacy-color-text);
+    color: var(--color-text);
   }
   li:hover {
     background-color: $dropdown-link-active-bg;
     color: $dropdown-link-active-color;
   }
   li[aria-selected='true'] {
-    background-color: var(--legacy-color-neutral-2);
+    background-color: var(--color-neutral-2);
     color: $gray;
   }
 }
 
 .form-autocomplete-downarrow {
-  color: var(--legacy-color-text);
+  color: var(--color-text);
   position: relative;
   left: -1.5em;
   cursor: pointer;
@@ -577,10 +577,10 @@ div#dateselector-calendar-panel {
 
 .mform .helptooltip {
   a {
-    color: var(--legacy-link-color);
+    color: var(--link-color);
 
     &:hover {
-      color: var(--legacy-link-color-hover);
+      color: var(--link-color-hover);
     }
   }
 }
@@ -761,7 +761,7 @@ textarea#id_approval_termsandconds {
       position: inherit;
 
       &[readonly] {
-        background-color: var(--legacy-form-input-bg-color-disabled);
+        background-color: var(--form-input-bg-color-disabled);
         opacity: 1; // iOS fix for unreadable disabled content; see https://github.com/twbs/bootstrap/issues/11655
       }
     }

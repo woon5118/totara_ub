@@ -144,3 +144,76 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --workspaceFileViewModal-minHeight: 240px;
+  --workspaceFileViewModal-maxHeight: 500px;
+}
+.tui-workspaceFileViewModal {
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: var(--gap-4);
+  }
+
+  &__title {
+    @include tui-font-heading-label();
+    width: 60%;
+    padding-right: var(--gap-4);
+  }
+
+  &__links {
+    @include tui-font-body();
+    display: flex;
+    justify-content: space-between;
+    width: 40%;
+  }
+
+  &__link {
+    padding-right: var(--gap-2);
+  }
+
+  &__area {
+    @include tui-font-body();
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: var(--workspaceFileViewModal-minHeight);
+    border: 1px solid var(--filter-bar-border-color);
+
+    &__icon {
+      margin-bottom: var(--gap-8);
+      color: var(--color-neutral-6);
+      font-size: 60px;
+    }
+  }
+
+  &__media {
+    display: inline-block;
+    width: 100%;
+    height: auto;
+    min-height: var(--workspaceFileViewModal-minHeight);
+    max-height: var(--workspaceFileViewModal-maxHeight);
+  }
+
+  &__media.tui-videoBlock {
+    margin: 0;
+  }
+
+  &__audio {
+    display: inline-block;
+    width: 100%;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+</style>

@@ -41,3 +41,38 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-dataTableRowGroup {
+  padding: 0 var(--gap-2);
+  border-top: 2px solid var(--datatable-row-first-border-color);
+
+  & + & {
+    border-top: 1px solid var(--datatable-row-border-color);
+  }
+
+  &:last-child {
+    border-bottom: 1px solid var(--datatable-row-border-color);
+  }
+
+  &.tui-focusWithin,
+  &:active,
+  &:hover {
+    background: var(--datatable-row-bg-color-focus);
+  }
+
+  &--selected {
+    background: var(--datatable-row-bg-color-active);
+
+    &:hover {
+      background: var(--datatable-row-bg-color-focus);
+    }
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-dataTableRowGroup {
+    padding: 0;
+  }
+}
+</style>

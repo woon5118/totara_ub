@@ -104,3 +104,32 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-confirmDeleteCommentReplyModal {
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__textBox {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    &__text {
+      @include tui-font-body();
+      margin: 0;
+      margin-left: var(--gap-4);
+    }
+  }
+
+  &__content {
+    .tui-modalContent {
+      &__title {
+        padding: 0;
+      }
+    }
+  }
+}
+</style>

@@ -301,3 +301,241 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --tab-border-width: 1px;
+  // Tab inner horizontal padding
+  --tab-h-padding: var(--gap-6);
+  // Tab inner vertical padding
+  --tab-v-padding: var(--gap-3);
+  // Size of Highlight
+  --tab-highlight-height: var(--gap-1);
+  // Add extra spacing for drop shadow to be displayed
+  --tab-shadow-offset: var(--gap-3);
+  // Tab small version inner horizontal padding
+  --tab-small-h-padding: var(--gap-4);
+  // Tab small version inner vertical padding
+  --tab-small-v-padding: var(--gap-3);
+}
+
+.tui-tabs {
+  $mod-horizontal: #{&}--horizontal;
+  $mod-vertical: #{&}--vertical;
+
+  &--vertical {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__selector {
+    list-style: none;
+  }
+
+  &__tabs {
+    display: flex;
+    align-items: flex-end;
+    margin: 0;
+    padding: 0;
+
+    #{$mod-horizontal} & {
+      border-bottom: var(--tab-border-width) solid;
+      border-bottom-color: var(--tabs-border-color);
+    }
+
+    #{$mod-vertical} & {
+      border-right: var(--tab-border-width) solid;
+      border-right-color: var(--tabs-border-color);
+    }
+  }
+
+  #{$mod-vertical} &__tabs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  &__tab {
+    display: block;
+    overflow: hidden;
+    pointer-events: none;
+
+    #{$mod-horizontal} & {
+      margin: calc(var(--tab-shadow-offset) * -1);
+      margin-bottom: calc(var(--tab-border-width) * -1);
+      padding: var(--tab-shadow-offset);
+      padding-bottom: var(--tab-border-width);
+    }
+
+    #{$mod-vertical} & {
+      max-width: 220px;
+      margin-right: calc(var(--tab-border-width) * -1);
+      margin-bottom: calc(var(--tab-shadow-offset) * -1);
+      padding-right: var(--tab-border-width);
+      padding-bottom: var(--tab-shadow-offset);
+    }
+
+    &--hidden {
+      display: none;
+    }
+  }
+
+  a&__link {
+    @include tui-font-link-large();
+    display: flex;
+    padding: var(--tab-v-padding) var(--tab-h-padding);
+    color: var(--tabs-text-color);
+    text-decoration: none;
+
+    border: var(--tab-border-width) solid;
+    border-color: transparent;
+
+    pointer-events: auto;
+
+    &:hover {
+      color: var(--tabs-text-color-focus);
+      background: var(--tabs-bg-color-focus);
+    }
+
+    &:focus {
+      color: var(--tabs-text-color-focus);
+      background: var(--tabs-bg-color-focus);
+      outline: dashed 1px var(--color-state-focus);
+      outline-offset: -0.75rem;
+    }
+
+    &:active,
+    &:active:focus,
+    &:active:hover {
+      color: var(--tabs-text-color-active);
+      outline: none;
+    }
+
+    #{$mod-horizontal} & {
+      margin-top: var(--tab-highlight-height);
+      // overlap edges to avoid double border
+      margin-right: calc(var(--tab-border-width) * -1);
+      border-bottom: none;
+    }
+
+    #{$mod-vertical} & {
+      // overlap edges to avoid double border
+      margin-bottom: calc(var(--tab-border-width) * -1);
+      margin-left: var(--tab-highlight-height);
+      border-right: none;
+    }
+  }
+
+  &__tab--disabled a&__link {
+    color: var(--tabs-text-color-disabled);
+    cursor: default;
+    pointer-events: none;
+  }
+
+  &__tab--active a&__link {
+    position: relative;
+    color: var(--tabs-text-color-selected);
+    background: var(--tabs-bg-color-selected);
+
+    #{$mod-horizontal} & {
+      top: var(--tab-border-width);
+      padding-top: calc(var(--tab-v-padding) - var(--tab-border-width));
+      padding-bottom: calc(
+        var(--tab-v-padding) + var(--tab-border-width)
+      );
+      border-color: var(--tabs-border-color);
+      box-shadow: var(--shadow-3);
+    }
+
+    #{$mod-vertical} & {
+      left: var(--tab-border-width);
+      padding-right: calc(
+        var(--tab-v-padding) + var(--tab-border-width)
+      );
+      padding-left: calc(
+        var(--tab-h-padding) - var(--tab-border-width)
+      );
+      border-color: var(--tabs-border-color);
+      box-shadow: var(--shadow-2);
+    }
+
+    &::after {
+      position: absolute;
+      background: var(--tabs-selected-bar-color);
+      content: '';
+
+      #{$mod-horizontal} & {
+        top: calc(var(--tab-highlight-height) * -1);
+        right: 0;
+        left: -1px;
+        width: calc(100% + 2px);
+        height: var(--tab-highlight-height);
+      }
+
+      #{$mod-vertical} & {
+        top: 0;
+        bottom: 0;
+        left: calc(var(--tab-border-width) * -2);
+        width: var(--tab-highlight-height);
+        height: calc(100% + 1px);
+      }
+    }
+  }
+
+  &__tabLabel {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.tui-tabs {
+  $mod-horizontal: #{&}--horizontal;
+  $block: #{&};
+
+  // Small tab
+  &__tab--small {
+    #{$mod-horizontal} & {
+      #{$block}__link {
+        @include tui-font-body-small;
+        padding: var(--tab-small-v-padding) var(--tab-small-h-padding);
+      }
+    }
+  }
+
+  // Active small tab
+  &__tab--active&__tab--small {
+    #{$mod-horizontal} & {
+      #{$block}__link {
+        padding-top: calc(
+          var(--tab-small-v-padding) - var(--tab-border-width)
+        );
+        padding-bottom: calc(
+          var(--tab-small-v-padding) + var(--tab-border-width)
+        );
+        color: var(--tabs-text-color-selected);
+      }
+    }
+  }
+
+  // Disabled small tab
+  &__tab--disabled&__tab--small {
+    #{$mod-horizontal} & {
+      #{$block}__link {
+        color: var(--tabs-text-color-disabled);
+        cursor: default;
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+.tui-tabContent {
+  .tui-tabs--horizontal & {
+    padding-top: var(--gap-4);
+  }
+
+  .tui-tabs--vertical & {
+    padding-left: var(--gap-4);
+  }
+}
+</style>

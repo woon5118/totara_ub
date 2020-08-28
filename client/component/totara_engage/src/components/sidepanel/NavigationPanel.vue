@@ -162,3 +162,121 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-navigationPanel {
+  &__selected {
+    margin-top: var(--gap-6);
+    margin-bottom: var(--gap-2);
+  }
+
+  &__menu {
+    height: 100%;
+    overflow: auto;
+  }
+
+  &__search {
+    margin: var(--gap-4);
+    margin-right: var(--gap-1);
+    margin-bottom: var(--gap-6);
+  }
+
+  &__category {
+    @include tui-font-heading-label;
+    display: flex;
+    align-items: center;
+    margin: var(--gap-8) var(--gap-4);
+    margin-bottom: var(--gap-3);
+
+    & > span {
+      padding-right: var(--gap-2);
+    }
+  }
+
+  &__header {
+    margin-top: 0;
+    margin-bottom: 0;
+    @include tui-font-heading-label();
+    & .tui-navigationPanel__btn {
+      @include tui-font-heading-small;
+      color: var(--color-text);
+      .tui-caret {
+        color: var(--color-state);
+      }
+    }
+  }
+
+  &__contribute {
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    padding: var(--gap-1) var(--gap-4);
+
+    a {
+      text-decoration: none;
+    }
+
+    &--inactive {
+      .tui-navigationPanel__link__text {
+        @include tui-font-link;
+        color: var(--color-state-focus);
+      }
+
+      &:hover,
+      &:focus {
+        background-color: var(--color-state-highlight);
+      }
+    }
+
+    &--active {
+      background-color: var(--color-state-active);
+
+      .tui-navigationPanel__link__text {
+        @include tui-font-link;
+        color: var(--color-neutral-1);
+
+        &:hover,
+        &:focus {
+          color: var(--color-neutral-1);
+        }
+      }
+    }
+  }
+
+  /* Vertical grid styles */
+  &__vertical {
+    border-bottom: 1px solid var(--color-neutral-5);
+
+    .tui-navigationPanel {
+      &__selected {
+        padding: 0 var(--gap-4);
+      }
+
+      &__search {
+        margin-bottom: var(--gap-8);
+      }
+
+      &__link {
+        padding: var(--gap-2) var(--gap-4);
+        border-bottom: 1px solid var(--color-neutral-4);
+
+        &__first {
+          border-top: 1px solid var(--color-neutral-4);
+        }
+      }
+
+      &__menu {
+        z-index: var(--zindex-dropdown-menu);
+        width: 100%;
+        margin-bottom: var(--gap-4);
+        background-color: var(--color-neutral-3);
+        border: 1px solid var(--color-neutral-5);
+      }
+    }
+  }
+}
+</style>

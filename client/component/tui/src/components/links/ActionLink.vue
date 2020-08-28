@@ -67,3 +67,40 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-actionLink {
+  @extend .tui-formBtn;
+  display: inline-block;
+
+  &--prim {
+    @extend .tui-formBtn--prim;
+  }
+
+  &--small {
+    @extend .tui-formBtn--small;
+  }
+
+  &--srOnly {
+    @extend .tui-formBtn--srOnly;
+  }
+
+  &:not([href]) {
+    color: var(--btn-text-color-disabled);
+    background-color: var(--btn-bg-color-disabled);
+    border-color: var(--btn-border-color-disabled);
+    cursor: default;
+    opacity: 1;
+    &:active,
+    &:focus,
+    &:active:focus,
+    &:active:hover,
+    &:hover {
+      color: var(--btn-text-color-disabled);
+      background-color: var(--btn-bg-color-disabled);
+      border-color: var(--btn-border-color-disabled);
+      box-shadow: none;
+    }
+  }
+}
+</style>

@@ -625,3 +625,28 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performManageActivityGeneralInfo {
+  &__heading {
+    @include tui-font-heading-small();
+
+    & > * + * {
+      margin-top: var(--gap-12);
+    }
+  }
+  &__warning {
+    max-width: 712px;
+  }
+}
+
+.tui-performManageActivityManualRelationships {
+  margin-top: var(--gap-6);
+  & > * + * {
+    margin-top: var(--gap-6);
+  }
+  &__heading {
+    @include tui-font-heading-small();
+  }
+}
+</style>

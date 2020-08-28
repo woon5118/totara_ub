@@ -33,3 +33,29 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-editorWeka-attachments {
+  margin: 0 0 10px;
+
+  &__content {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    white-space: normal;
+
+    > .tui-editorWeka-attachment {
+      // Doing the margin for the single attachment.
+      margin-top: var(--gap-1);
+      margin-right: var(--gap-1);
+      margin-bottom: var(--gap-1);
+
+      @media (min-width: 720px) {
+        margin-right: var(--gap-4);
+      }
+    }
+  }
+}
+</style>

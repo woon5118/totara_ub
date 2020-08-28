@@ -117,3 +117,12 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-playlistNavigation {
+  .tui-iconBtn--small {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+</style>

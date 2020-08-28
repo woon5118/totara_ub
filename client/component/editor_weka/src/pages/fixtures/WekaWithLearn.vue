@@ -177,3 +177,36 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-wekaWithLearn {
+  display: flex;
+  flex-direction: column;
+
+  &__title {
+    @include tui-font-heading-small();
+    margin-bottom: var(--gap-8);
+  }
+
+  &__form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    &__row {
+      flex: 1;
+    }
+
+    &__buttonGroup {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: var(--gap-2);
+    }
+  }
+
+  &__code {
+    display: flex;
+    padding-left: var(--gap-2);
+  }
+}
+</style>

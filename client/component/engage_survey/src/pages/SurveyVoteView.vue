@@ -76,3 +76,35 @@ export default {
   mixins: [surveyPageMixin],
 };
 </script>
+
+<style lang="scss">
+.tui-surveyVoteView {
+  .tui-grid-item {
+    min-height: var(--engageSurvey-min-height);
+  }
+
+  &__navBar {
+    margin-top: var(--gap-4);
+    margin-left: var(--gap-4);
+  }
+
+  &__layout {
+    display: flex;
+    &__content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 0 var(--gap-12) 0;
+      @media (max-width: $tui-screen-sm) {
+        width: 70vw;
+        margin-left: var(--gap-8);
+      }
+      &__title {
+        margin-bottom: var(--gap-4);
+      }
+    }
+  }
+}
+</style>

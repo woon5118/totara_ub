@@ -265,3 +265,62 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-engageArticle-articleCard {
+  height: 100%;
+  min-height: var(--totaraEngage-card-height);
+
+  &__imageheader {
+    padding: var(--gap-4) var(--gap-4) 0 var(--gap-4);
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+  }
+
+  &__icons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    & > * + * {
+      margin-left: var(--gap-4);
+    }
+  }
+
+  &__bookmark {
+    // Negative margin here to neutralise the default redundant edges of icon.
+    margin-top: -2px;
+    margin-right: calc(var(--gap-3) * -1);
+  }
+
+  &__title {
+    @include tui-font-heading-x-small();
+    overflow-wrap: break-word;
+  }
+
+  &__subTitle {
+    display: inline-flex;
+    align-items: center;
+    margin-top: var(--gap-2);
+    padding-right: var(--gap-1);
+    border: var(--border-width-thin) solid var(--color-neutral-5);
+    border-radius: 50px;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: flex-end;
+
+    & > * + * {
+      margin-left: var(--gap-1);
+    }
+
+    & > :last-child {
+      margin: 0 -5px 0 auto;
+    }
+  }
+}
+</style>

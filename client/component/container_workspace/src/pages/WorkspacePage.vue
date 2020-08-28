@@ -348,3 +348,57 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspacePage {
+  .tui-layoutTwoColumn {
+    &__heading {
+      display: none;
+    }
+  }
+
+  &__mainContent {
+    margin: 0;
+
+    @media (min-width: $tui-screen-sm) {
+      margin-top: var(--gap-8);
+    }
+
+    &__primaryAction {
+      display: flex;
+      width: 100%;
+      margin-top: var(--gap-4);
+
+      @media (min-width: $tui-screen-sm) {
+        justify-content: flex-end;
+      }
+
+      &__action {
+        width: 100%;
+
+        @media (min-width: $tui-screen-sm) {
+          width: inherit;
+        }
+      }
+    }
+
+    &__tabs {
+      margin-top: var(--gap-4);
+      .tui-tabs__tabs {
+        padding-left: var(--gap-4);
+        @media (min-width: $tui-screen-sm) {
+          padding: 0;
+        }
+      }
+
+      &__text {
+        @include tui-font-body();
+      }
+
+      &__discussionTab {
+        margin-top: var(--gap-4);
+      }
+    }
+  }
+}
+</style>

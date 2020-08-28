@@ -67,3 +67,31 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-dataTableExpandCell {
+  display: flex;
+  order: 1;
+  margin: var(--gap-2) 0;
+
+  .tui-iconBtn {
+    margin: 0 auto;
+  }
+
+  &.tui-dataTableExpandCell--header {
+    margin-left: 0;
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-dataTableExpandCell {
+    order: 0;
+    width: var(--gap-9);
+    margin: 0;
+
+    .tui-iconBtn__text {
+      display: none;
+    }
+  }
+}
+</style>

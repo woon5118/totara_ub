@@ -62,3 +62,18 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-bulkManualRatingPageHeader {
+  display: flex;
+  align-items: center;
+
+  &__title {
+    margin: 0;
+
+    &-withPhoto {
+      padding-left: var(--gap-3);
+    }
+  }
+}
+</style>

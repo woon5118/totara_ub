@@ -105,3 +105,70 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyProfileCurrentProgress {
+  margin-bottom: var(--gap-8);
+
+  &__progress {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 0 var(--gap-4) 0;
+    padding: 0;
+    list-style: none;
+
+    @media (min-width: $tui-screen-xs) {
+      justify-content: flex-start;
+    }
+  }
+
+  &__userDetails {
+    display: flex;
+    flex-direction: column;
+
+    & > :not(:last-child) {
+      margin-bottom: var(--gap-4);
+    }
+  }
+
+  &__latestAchievement {
+    $header-v-padding: var(--gap-2);
+    $header-height: calc(
+      var(--font-size-13) * 1.15 + var(--border-width-normal) + #{$header-v-padding} *
+        2
+    );
+
+    display: flex;
+    flex-direction: column;
+    margin-top: var(--gap-10);
+    padding: 0 var(--gap-1);
+    background: var(--color-background);
+    border: var(--border-width-normal) solid var(--color-primary);
+    border-radius: 6px;
+
+    &-header {
+      max-width: 100%;
+      height: $header-height;
+      margin: calc(
+          -1 * var(--border-width-normal) - (#{$header-height} / 2)
+        )
+        auto calc(-1 * var(--gap-2)) auto;
+      padding: $header-v-padding var(--gap-4);
+      overflow: hidden;
+      font-weight: bold;
+      font-size: var(--font-size-13);
+      line-height: 1.15;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      background: var(--color-background);
+      border: var(--border-width-normal) solid var(--color-primary);
+      border-radius: 6px;
+    }
+
+    &-content {
+      padding: var(--gap-4) var(--gap-6);
+    }
+  }
+}
+</style>

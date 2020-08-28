@@ -299,3 +299,43 @@ export default {
   "editor_weka": ["format_as_blocktype_status", "label_toolbar"]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-editorWeka-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0 var(--gap-2);
+  border-bottom: 1px solid var(--color-neutral-4);
+
+  &__group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0 var(--gap-2);
+
+    > * + * {
+      margin-left: 1px;
+    }
+  }
+
+  &__currentBlock.tui-iconBtn {
+    min-width: 8em;
+    padding: 0 var(--gap-1);
+
+    .tui-iconBtn__label {
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .tui-iconBtn__text {
+      padding: 0;
+      color: var(--color-text);
+    }
+
+    &:disabled .tui-iconBtn__text {
+      color: var(--color-state-disabled);
+    }
+  }
+}
+</style>

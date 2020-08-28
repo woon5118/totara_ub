@@ -69,3 +69,10 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-engage__sidepanel__media_lazylist-list {
+  margin: 0;
+  list-style-type: none;
+}
+</style>

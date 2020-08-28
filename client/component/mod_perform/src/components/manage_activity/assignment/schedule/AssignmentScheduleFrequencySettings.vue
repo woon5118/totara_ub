@@ -331,3 +331,20 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-assignmentScheduleFrequencySettings {
+  &__title {
+    margin: 0;
+    @include tui-font-heading-x-small();
+  }
+
+  &__description {
+    margin-top: var(--gap-4);
+  }
+
+  &__form {
+    margin-top: var(--gap-8);
+  }
+}
+</style>

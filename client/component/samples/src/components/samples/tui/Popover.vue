@@ -324,13 +324,13 @@ export default {
 <style lang="scss">
 .tui-samplePopover {
   &__collection {
-    margin-bottom: var(--tui-gap-8);
+    margin-bottom: var(--gap-8);
   }
 
   &__buttonrow {
     display: flex;
     > * + * {
-      margin-left: var(--tui-gap-1);
+      margin-left: var(--gap-1);
     }
   }
 }

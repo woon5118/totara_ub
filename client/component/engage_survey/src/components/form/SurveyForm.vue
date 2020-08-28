@@ -274,3 +274,73 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-totaraEngage-surveyForm {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-top: var(--gap-8);
+
+  &__title {
+    display: flex;
+    padding-bottom: var(--gap-4);
+  }
+
+  &__optionType {
+    width: 200px;
+  }
+
+  &__options {
+    margin-top: var(--gap-8);
+
+    &__input {
+      display: flex;
+    }
+  }
+
+  // Overiding css.
+  .tui-formRow__desc {
+    margin-bottom: 0;
+  }
+
+  &__answerTitle {
+    // Overiding css.
+    .tui-formRow {
+      .tui-formRow__desc {
+        margin-bottom: var(--gap-2);
+      }
+    }
+  }
+
+  &__repeater {
+    .tui-repeater__row {
+      .tui-totaraEngage-surveyForm__repeater__input {
+        width: 80%;
+        .tui-formField {
+          width: 100%;
+          input[type='text'].tui-formInput {
+            width: 100%;
+            max-width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  &__buttons {
+    flex: 1;
+    align-items: flex-end;
+    margin-top: var(--gap-2);
+    button.tui-totaraEngage-surveyForm__cancelButton {
+      margin-bottom: 0;
+    }
+    &--left {
+      justify-content: flex-start;
+    }
+    &--right {
+      justify-content: flex-end;
+    }
+  }
+}
+</style>

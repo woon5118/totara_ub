@@ -235,7 +235,7 @@ export default {
   display: flex;
 
   & > * + * {
-    margin-left: var(--tui-gap-1);
+    margin-left: var(--gap-1);
   }
 }
 </style>

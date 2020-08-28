@@ -170,3 +170,70 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-accessDisplay {
+  &__accessIcon {
+    display: flex;
+    // neutralize the defalut flexicon padding
+    margin-left: -7px;
+    &__icons {
+      display: flex;
+      align-items: center;
+    }
+    &__shareButton {
+      margin-left: var(--gap-4);
+
+      @media (max-width: $tui-screen-md) {
+        margin-left: var(--gap-2);
+      }
+    }
+  }
+
+  &__timeView {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: var(--gap-2);
+    margin-left: -3px;
+    > :first-child {
+      margin-left: calc(var(--gap-1) * -1);
+    }
+  }
+
+  &__topics {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: var(--gap-1);
+    margin-left: -2px;
+    line-height: normal;
+
+    &__topic {
+      @include tui-font-body-small();
+      margin-top: var(--gap-1);
+      margin-right: var(--gap-1);
+    }
+
+    > :first-child {
+      margin-right: var(--gap-1);
+      color: var(--color-neutral-6);
+    }
+  }
+
+  &__editSettings {
+    margin-top: var(--gap-2);
+
+    &__text {
+      @include tui-font-body-small();
+      color: var(--color-state);
+
+      &:focus,
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+  }
+}
+</style>

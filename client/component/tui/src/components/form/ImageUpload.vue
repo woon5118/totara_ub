@@ -165,3 +165,45 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-formImageUpload {
+  color: var(--form-input-text-color);
+  font-size: var(--form-input-font-size);
+  line-height: 1;
+  background: var(--form-input-bg-color);
+
+  &__actions {
+    display: flex;
+    padding: var(--form-input-v-padding) var(--gap-2);
+    background: var(--color-neutral-3);
+    border-color: var(--form-input-border-color);
+    border-top: var(--form-input-border-size) solid;
+    border-right: var(--form-input-border-size) solid;
+    border-left: var(--form-input-border-size) solid;
+  }
+  &__deleteButton {
+    margin-left: auto;
+  }
+  &__filearea {
+    padding: var(--form-input-v-padding) var(--gap-2);
+    border: var(--form-input-border-size) solid;
+    border-color: var(--form-input-border-color);
+
+    .tui-formImageUpload--highlight & {
+      background: var(--form-input-bg-color-focus);
+      border-color: var(--form-input-border-color-focus);
+      outline: none;
+      box-shadow: var(--form-input-shadow-focus);
+    }
+  }
+  &__display {
+    .tui-responsiveImage {
+      max-height: 25rem;
+    }
+  }
+  &__progress {
+    padding: var(--form-input-v-padding) var(--gap-2);
+  }
+}
+</style>

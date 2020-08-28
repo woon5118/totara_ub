@@ -99,3 +99,24 @@ export default {
   "moodle": ["edit", "remove"]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-editorWeka-linkBlock {
+  max-width: 28.6rem;
+  margin-bottom: var(--paragraph-gap);
+  white-space: normal;
+
+  .tui-dropdown__menu {
+    width: auto;
+  }
+
+  &__btn:not(:focus) {
+    @include sr-only();
+  }
+
+  &__btn-wrapper {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+</style>

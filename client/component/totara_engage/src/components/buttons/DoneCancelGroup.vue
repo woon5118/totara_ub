@@ -64,3 +64,12 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-doneCancelGroup {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: var(--gap-2);
+}
+</style>

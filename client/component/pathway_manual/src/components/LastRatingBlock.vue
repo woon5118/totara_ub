@@ -106,3 +106,19 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-bulkManualRatingLastRatingBlock {
+  @media (min-width: $tui-screen-xs) {
+    &__blocks {
+      & > span {
+        display: block;
+      }
+    }
+
+    &__neverRated {
+      display: none;
+    }
+  }
+}
+</style>

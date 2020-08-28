@@ -309,3 +309,50 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --playlistView-min-height: 78vh;
+}
+
+.tui-playlistView {
+  display: flex;
+  flex-direction: column;
+
+  .tui-responsive > .tui-grid > .tui-grid-item--first {
+    min-height: var(--playlistView-min-height);
+  }
+
+  // Getting rid of the title
+  .tui-layoutOneColumnWithSidepanel__heading {
+    display: none;
+  }
+
+  &__bookmark {
+    align-self: flex-start;
+  }
+
+  &__loadMoreContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  &__viewedResources {
+    display: flex;
+    align-self: center;
+    margin-bottom: var(--gap-1);
+  }
+
+  &__loadMore {
+    display: flex;
+    align-self: center;
+  }
+
+  .tui-contributionBaseContent__counterContainer__counter {
+    position: relative;
+    top: 0;
+    padding-bottom: var(--gap-2);
+  }
+}
+</style>

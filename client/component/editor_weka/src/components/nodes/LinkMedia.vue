@@ -143,3 +143,31 @@ export default {
   "moodle": ["edit", "remove"]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-editorWeka-linkMedia {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--paragraph-gap);
+  white-space: normal;
+
+  &--intrinsic-width {
+    align-items: flex-start;
+  }
+
+  &.ProseMirror-selectednode {
+    outline: none;
+  }
+  &.ProseMirror-selectednode > &__inner {
+    outline: var(--border-width-normal) solid var(--weka-select-color);
+  }
+
+  &__inner {
+    max-width: 700px;
+
+    & > .tui-editorWeka-nodeBar {
+      margin-top: var(--gap-2);
+    }
+  }
+}
+</style>

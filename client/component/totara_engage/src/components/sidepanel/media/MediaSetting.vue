@@ -94,3 +94,13 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-mediaSetting {
+  display: inline-flex;
+  margin-top: var(--gap-8);
+  > * {
+    margin-right: var(--gap-3);
+  }
+}
+</style>

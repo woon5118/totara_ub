@@ -208,3 +208,47 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-contributionPlaylistResources {
+  display: flex;
+  width: 100%;
+  height: 100%;
+
+  .tui-loader {
+    flex-grow: 1;
+  }
+
+  &__loadMoreContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  &__viewedResources {
+    display: flex;
+    align-self: center;
+    margin-bottom: var(--gap-1);
+  }
+
+  &__loadMore {
+    display: flex;
+    align-self: center;
+  }
+
+  .tui-contributionBaseContent {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    &__counterContainer {
+      margin-bottom: var(--gap-4);
+
+      &__counter {
+        position: relative;
+        top: 0;
+      }
+    }
+  }
+}
+</style>

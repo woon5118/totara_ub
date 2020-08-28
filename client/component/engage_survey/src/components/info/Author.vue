@@ -60,3 +60,15 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-engageSurvey-author {
+  display: flex;
+  align-items: center;
+
+  &__userLink {
+    margin-left: var(--gap-2);
+    font-size: var(--font-size-13);
+  }
+}
+</style>

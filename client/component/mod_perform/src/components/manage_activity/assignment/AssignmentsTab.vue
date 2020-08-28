@@ -574,3 +574,25 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performManageActivityAssignmentsForm {
+  &__heading {
+    @include tui-font-heading-small();
+    margin: var(--gap-4) 0 0;
+  }
+
+  &__add {
+    display: flex;
+    margin-top: var(--gap-2);
+
+    &-dropdown {
+      margin-left: auto;
+    }
+  }
+
+  &__table {
+    margin-top: var(--gap-4);
+  }
+}
+</style>

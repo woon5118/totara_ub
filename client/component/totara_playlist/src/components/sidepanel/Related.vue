@@ -118,3 +118,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-playlistRelated {
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+}
+</style>

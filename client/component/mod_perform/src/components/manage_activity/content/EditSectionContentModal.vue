@@ -799,3 +799,46 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-performEditSectionContentModal {
+  &__title {
+    margin: 0;
+    @include tui-font-heading-medium;
+  }
+
+  &__required {
+    color: var(--color-prompt-alert);
+  }
+
+  &__form {
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+  }
+
+  &__dragList {
+    > [data-tui-draggable-placeholder] {
+      margin-top: var(--gap-3);
+    }
+  }
+
+  &__draggableItem {
+    position: relative;
+    margin-top: var(--gap-3);
+    user-select: none;
+
+    &-moveIcon {
+      position: absolute;
+      top: var(--gap-1);
+      left: var(--gap-2);
+      display: none;
+    }
+
+    &:hover &-moveIcon,
+    &--dragging &-moveIcon {
+      display: block;
+    }
+  }
+}
+</style>

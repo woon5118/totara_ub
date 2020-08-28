@@ -67,3 +67,15 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-totaraEngage-statIcon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__statNumber {
+    font-size: var(--font-size-12);
+  }
+}
+</style>

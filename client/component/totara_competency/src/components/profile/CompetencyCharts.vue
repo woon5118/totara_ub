@@ -78,3 +78,19 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-competencyCharts {
+  &__chart {
+    padding: var(--gap-7) var(--gap-5);
+    border: 1px var(--color-neutral-5) solid;
+    border-radius: 4px;
+
+    &--center {
+      max-width: 800px;
+      margin-right: auto;
+      margin-left: auto;
+    }
+  }
+}
+</style>

@@ -302,7 +302,7 @@ export default {
 <style lang="scss">
 .tui-grid-example .tui-grid-item {
   position: relative; /* parental control of popover trigger position */
-  background-color: var(--tui-color-neutral-4);
+  background-color: var(--color-neutral-4);
 
   > div > .tui-iconBtn {
     position: absolute;

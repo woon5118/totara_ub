@@ -118,3 +118,18 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyDetailArchivedAssignments {
+  margin: var(--gap-2) var(--gap-4);
+
+  &__title {
+    @include tui-font-heading-small();
+    padding-top: var(--gap-2);
+  }
+
+  &__achievement {
+    display: flex;
+  }
+}
+</style>

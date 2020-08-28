@@ -57,3 +57,18 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performElementAdminForm {
+  padding: var(--gap-2) var(--gap-3);
+  background: var(--color-neutral-2);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+  border-radius: var(--border-radius-normal);
+  cursor: pointer;
+
+  &__type {
+    margin-bottom: var(--gap-2);
+    font-weight: bold;
+  }
+}
+</style>

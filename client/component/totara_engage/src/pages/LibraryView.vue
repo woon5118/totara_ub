@@ -204,3 +204,26 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-libraryView {
+  .tui-sidePanel__inner {
+    width: 100%;
+    padding: 0;
+    border-top: none;
+  }
+
+  /* Vertical grid styles */
+  .tui-grid--vertical {
+    .tui-layoutOneColumnWithMultiSidePanel__leftSidePanel {
+      .tui-sidePanel__inner {
+        background-color: unset;
+        border: unset;
+      }
+    }
+    .tui-grid-item--wrapped {
+      margin: 0;
+    }
+  }
+}
+</style>

@@ -54,3 +54,15 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-hasChildrenCell {
+  &__forwardArrow {
+    text-align: start;
+
+    @media screen and (min-width: $tui-screen-xs) {
+      text-align: center;
+    }
+  }
+}
+</style>

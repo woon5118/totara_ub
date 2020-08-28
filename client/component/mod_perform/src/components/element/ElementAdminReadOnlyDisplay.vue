@@ -107,3 +107,33 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performElementReadOnlyDisplay {
+  padding: var(--gap-2) var(--gap-3);
+  background: var(--color-neutral-2);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+  border-radius: var(--border-radius-normal);
+
+  &__title {
+    display: flex;
+    flex-direction: row;
+  }
+  &__content {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: row;
+  }
+  &__action {
+    display: flex;
+    align-items: end;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
+</style>

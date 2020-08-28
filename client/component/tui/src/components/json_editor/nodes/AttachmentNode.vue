@@ -146,3 +146,76 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-attachmentNode {
+  @media (max-width: 490px) {
+    // From 490px downward
+    width: 100%;
+    overflow: hidden;
+  }
+
+  @media (min-width: 491px) {
+    // From 490px onward
+    flex-basis: 20%;
+    min-width: 235px;
+  }
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--gap-2);
+  white-space: normal;
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+  border-radius: var(--card-border-radius);
+
+  &__info {
+    width: 72%;
+
+    @media (max-width: 490px) {
+      width: 65%;
+    }
+
+    @media (max-width: 350px) {
+      width: 50%;
+    }
+
+    &__fileSize {
+      margin: 0;
+      font-size: var(--font-size-3);
+      white-space: nowrap;
+    }
+
+    &__filename {
+      position: relative;
+
+      p {
+        margin: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      &--truncate {
+        &:after {
+          position: absolute;
+          top: 0;
+          left: 100%;
+          width: 100%;
+          content: attr(data-file-extension);
+        }
+      }
+    }
+  }
+
+  &__icon {
+    flex-basis: 9%;
+    margin-right: var(--gap-2);
+    color: var(--color-state);
+  }
+
+  &--withDownloadUrl {
+    cursor: pointer;
+  }
+}
+</style>

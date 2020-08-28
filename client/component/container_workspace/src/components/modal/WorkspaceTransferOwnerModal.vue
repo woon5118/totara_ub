@@ -154,3 +154,17 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceTransferOwnerModal {
+  &__modalContent {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    &__form {
+      flex-grow: 1;
+    }
+  }
+}
+</style>

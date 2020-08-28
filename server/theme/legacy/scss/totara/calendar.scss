@@ -197,7 +197,7 @@
         }
         .topic {
           .name {
-            font-size: var(--legacy-font-size-18);
+            font-size: var(--font-size-18);
             font-weight: 200;
             line-height: 24px;
             /*rtl:ignore*/
@@ -329,10 +329,10 @@
       color: $calendar-month-today-text-color;
     }
     .calendar-event-panel {
-      color: var(--legacy-color-text);
+      color: var(--color-text);
     }
     .popover-content a {
-      color: var(--legacy-color-state);
+      color: var(--color-state);
     }
   }
   td {

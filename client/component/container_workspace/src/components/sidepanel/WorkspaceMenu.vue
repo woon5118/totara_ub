@@ -159,3 +159,16 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceMenu {
+  width: 100%;
+  max-height: 100%;
+
+  &__separator {
+    width: 18%;
+    margin-left: var(--gap-4);
+    border: var(--border-width-thin) dashed var(--color-neutral-5);
+  }
+}
+</style>

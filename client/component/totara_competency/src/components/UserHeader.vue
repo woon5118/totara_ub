@@ -44,3 +44,28 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-competencyUserHeader {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 19px; // half of xsmall avatar (which is specified in px)
+    border-bottom: var(--border-width-normal) solid var(--color-primary);
+    content: '';
+  }
+
+  &__name {
+    @include tui-font-body();
+    // offset name by the border width so it doesn't look weird
+    margin-bottom: var(--border-width-normal);
+    margin-left: var(--gap-2);
+    font-weight: bold;
+  }
+}
+</style>

@@ -288,3 +288,22 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceUserAdder {
+  &__table {
+    &__name {
+      display: flex;
+      // IE support
+      flex-grow: 1;
+      align-items: center;
+
+      &__text {
+        @include tui-font-body();
+        margin: 0;
+        margin-left: var(--gap-2);
+      }
+    }
+  }
+}
+</style>

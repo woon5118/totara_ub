@@ -153,7 +153,7 @@ export default {
 <style lang="scss">
 .tui-testActionLink {
   h4 {
-    margin-top: var(--tui-gap-6);
+    margin-top: var(--gap-6);
   }
 }
 </style>

@@ -33,3 +33,23 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+@media (min-width: $tui-screen-xs) {
+  .tui-dataTableRowHeader {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: var(--gap-3) var(--gap-1);
+
+    &--empty {
+      display: none;
+    }
+
+    & > * + * {
+      margin-left: var(--gap-4);
+    }
+  }
+}
+</style>

@@ -59,3 +59,13 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-InfoIconButton {
+  &.tui-iconBtn {
+    width: auto;
+    height: auto;
+    padding: 0;
+  }
+}
+</style>

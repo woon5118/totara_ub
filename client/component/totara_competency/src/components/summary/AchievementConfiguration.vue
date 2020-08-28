@@ -235,3 +235,50 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencySummaryAchievementConfiguration {
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+
+  &__aggregation {
+    margin-top: var(--gap-4);
+    &-label {
+      @include tui-font-heavy();
+      margin-right: var(--gap-2);
+    }
+  }
+
+  &__noPaths {
+    padding: var(--font-size-8);
+    font-style: italic;
+  }
+
+  &__pathGroup {
+    flex-grow: 1;
+    padding: var(--gap-4);
+
+    & > * + * {
+      &.tui-grid {
+        margin-top: var(--gap-4);
+        padding-top: var(--gap-4);
+        border-top: var(--border-width-thin) solid
+          var(--card-border-color);
+      }
+    }
+  }
+
+  &__scaleValue {
+    &-header {
+      margin: 0;
+      @include tui-font-heading-x-small();
+    }
+
+    &-or {
+      width: 50%;
+      margin: 0;
+    }
+  }
+}
+</style>

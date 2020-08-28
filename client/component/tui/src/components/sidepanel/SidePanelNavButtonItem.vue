@@ -102,3 +102,66 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-sidePanelNavButtonItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: var(--side-panel-nav-item-text-color);
+  background: var(--side-panel-nav-item-bg-color);
+  border-color: var(--side-panel-nav-item-border-color);
+
+  // Item li
+  &.tui-focusWithin,
+  &:hover {
+    color: var(--side-panel-nav-item-text-color-focus);
+    background: var(--side-panel-nav-item-bg-color-focus);
+    border-color: var(--side-panel-nav-item-border-color-focus);
+  }
+
+  &__side {
+    margin-left: auto;
+    padding-right: var(--gap-4);
+  }
+
+  &__notification {
+    position: absolute;
+    // The same as padding left of actioin plus another tui-gap-4 to make sure there is a padding between
+    // the action link and the dot.
+    width: var(--sidepanel-navigation-item-padding-left);
+    color: var(--color-prompt-alert);
+    pointer-events: none;
+  }
+
+  // Item link
+  &__action {
+    flex-grow: 1;
+    padding: var(--gap-2) var(--gap-4);
+    padding-left: var(--sidepanel-navigation-item-padding-left);
+    color: inherit;
+    text-align: left;
+    -ms-word-break: break-all;
+    word-break: break-word;
+
+    &:hover,
+    &:focus,
+    &:focus:hover {
+      color: inherit;
+    }
+  }
+
+  &--active {
+    color: var(--side-panel-nav-item-text-color-selected);
+    background: var(--side-panel-nav-item-bg-color-selected);
+    border-color: var(--side-panel-nav-item-border-color-selected);
+
+    &.tui-focusWithin,
+    &:hover {
+      color: var(--side-panel-nav-item-text-color-selected);
+      background: var(--side-panel-nav-item-bg-color-selected);
+      border-color: var(--side-panel-nav-item-border-color-selected);
+    }
+  }
+}
+</style>

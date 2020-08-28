@@ -143,3 +143,25 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-articleTitle {
+  display: flex;
+  flex-direction: column;
+
+  &__head {
+    display: flex;
+    align-items: flex-start;
+
+    &__title {
+      @include tui-font-heading-large;
+      width: 93%;
+      margin: 0;
+      margin-top: calc(var(--gap-2) / -1);
+      -ms-word-break: break-all;
+      overflow-wrap: break-word;
+      hyphens: none;
+    }
+  }
+}
+</style>

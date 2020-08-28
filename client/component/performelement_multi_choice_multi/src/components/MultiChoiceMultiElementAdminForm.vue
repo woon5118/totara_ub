@@ -325,3 +325,15 @@ export default {
   ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-elementEditMultiChoiceMulti {
+  &__action-buttons {
+    display: flex;
+    align-items: end;
+    width: 100%;
+    margin-top: var(--gap-4);
+    margin-bottom: 0;
+  }
+}
+</style>

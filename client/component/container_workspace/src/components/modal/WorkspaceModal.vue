@@ -168,3 +168,14 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceModal {
+  &__content {
+    &__form {
+      flex-grow: 1;
+      height: 100%;
+    }
+  }
+}
+</style>

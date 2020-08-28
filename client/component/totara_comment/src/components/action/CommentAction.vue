@@ -132,3 +132,21 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-commentAction {
+  display: flex;
+  justify-content: flex-start;
+
+  &__replyBox {
+    display: flex;
+    margin-left: var(--gap-4);
+
+    &__text {
+      &--small {
+        @include tui-font-body-small();
+      }
+    }
+  }
+}
+</style>

@@ -1268,3 +1268,166 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-participantContent {
+  @include tui-font-body();
+
+  &__layout.tui-grid {
+    margin-top: var(--gap-6);
+  }
+
+  &__header {
+    margin: var(--gap-6) 0 0;
+    @include tui-font-heading-medium();
+  }
+
+  &__buttons {
+    margin-top: var(--gap-4);
+  }
+
+  &__user {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--gap-2) var(--gap-4);
+    border: var(--border-width-thin) solid var(--color-border);
+    border-radius: var(--border-radius-normal);
+
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+
+    &-relationship {
+      display: flex;
+      padding-top: var(--gap-3);
+    }
+
+    &-relationshipValue {
+      display: inline;
+      margin: auto 0 auto var(--gap-1);
+      @include tui-font-heading-x-small();
+    }
+  }
+
+  &__navigation {
+    margin-top: var(--gap-4);
+
+    &-buttons {
+      text-align: right;
+
+      :not(:first-child) {
+        margin-left: var(--gap-4);
+      }
+    }
+  }
+
+  &__sectionHeading {
+    justify-content: flex-end;
+    margin-top: var(--gap-6);
+
+    &-title {
+      flex: 1;
+      margin: auto 0;
+      @include tui-font-heading-small();
+    }
+  }
+
+  &__infoBar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-top: var(--gap-6);
+    padding-bottom: var(--gap-6);
+    border-top: solid var(--color-neutral-5) var(--border-width-thin);
+    border-bottom: solid var(--color-neutral-5) var(--border-width-thin);
+  }
+
+  &__sectionHeadingOtherResponsesDescription {
+    margin: 0;
+  }
+
+  &__sectionHeading-otherResponseSwitch {
+    margin-top: var(--gap-4);
+    margin-left: 0;
+  }
+
+  &__section {
+    &-requiredContainer {
+      margin-top: var(--gap-2);
+    }
+
+    &-responseRequired {
+      display: inline-flex;
+      @include tui-font-heading-label();
+      color: var(--color-prompt-alert);
+    }
+  }
+
+  &__sectionItem {
+    margin-top: var(--gap-4);
+
+    &-content {
+      & > * {
+        margin-top: var(--gap-4);
+      }
+    }
+    &-contentHeader {
+      display: inline-flex;
+      @include tui-font-heading-x-small();
+      margin-left: 0;
+    }
+  }
+
+  &__staticElement {
+    display: flex;
+    &__name {
+      @include tui-font-body();
+      margin-left: var(--gap-3);
+    }
+  }
+
+  &__readonly {
+    padding-top: var(--gap-1);
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-participantContent {
+    // Spit the avatar and relationship blurb on tablet an larger.
+    &__user {
+      flex-direction: row;
+      align-items: center;
+
+      & > * + * {
+        margin-top: 0;
+      }
+
+      &-info {
+        padding-right: var(--gap-4);
+      }
+
+      &-relationship {
+        display: block;
+        padding-top: 0;
+      }
+
+      &-relationshipValue {
+        display: block;
+        margin: var(--gap-1) 0 0;
+      }
+    }
+
+    &__infoBar {
+      flex-wrap: nowrap;
+      margin-top: var(--gap-6);
+    }
+
+    &__sectionHeading-otherResponseSwitch {
+      flex-shrink: 0;
+      margin-top: 0;
+      margin-left: var(--gap-6);
+    }
+  }
+}
+</style>

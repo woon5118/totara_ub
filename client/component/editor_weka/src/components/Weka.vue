@@ -315,3 +315,120 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+:root {
+  --weka-select-color: #8cf;
+}
+
+.tui-weka {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: var(--color-neutral-1);
+  border: var(--border-width-thin) solid var(--form-input-border-color);
+
+  &__placeholder {
+    // Styling for the place holder.
+    &:before {
+      color: var(--color-neutral-6);
+      content: attr(data-placeholder);
+    }
+  }
+
+  &__editorHost {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    > .tui-weka-editor {
+      flex-grow: 1;
+    }
+  }
+
+  .ProseMirror-focused {
+    .tui-weka {
+      &__placeholder {
+        &:before {
+          content: '';
+        }
+      }
+    }
+  }
+
+  .ProseMirror {
+    position: relative;
+    padding: var(--gap-4);
+    white-space: pre-wrap;
+    white-space: break-spaces;
+    word-wrap: break-word;
+    -webkit-font-variant-ligatures: none;
+    font-variant-ligatures: none;
+    font-feature-settings: 'liga' 0; /* the above doesn't seem to work in Edge */
+
+    &:focus {
+      outline: none;
+    }
+
+    hr {
+      margin: 0 0 var(--gap-2) 0;
+    }
+
+    pre {
+      white-space: pre-wrap;
+    }
+
+    ol,
+    ul {
+      margin: 0;
+      padding-left: var(--gap-4);
+    }
+
+    ul ul {
+      list-style-type: circle;
+    }
+    ul ul ul {
+      list-style-type: square;
+    }
+
+    li {
+      position: relative;
+    }
+  }
+
+  .ProseMirror-hideselection *::selection,
+  .ProseMirror-hideselection *::-moz-selection {
+    background: transparent;
+  }
+
+  .ProseMirror-hideselection {
+    caret-color: transparent;
+  }
+
+  .ProseMirror-selectednode {
+    outline: var(--border-width-normal) solid var(--weka-select-color);
+  }
+
+  /* Make sure li selections wrap around markers */
+
+  li.ProseMirror-selectednode {
+    outline: none;
+  }
+
+  li.ProseMirror-selectednode:after {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -32px;
+    border: var(--border-width-normal) solid var(--weka-select-color);
+    content: '';
+    pointer-events: none;
+  }
+
+  .ProseMirror-gapcursor:before {
+    // insert an nbsp to make gapcursor expand to full line height
+    content: '\00a0';
+  }
+}
+</style>

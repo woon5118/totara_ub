@@ -21,3 +21,17 @@
     <slot />
   </div>
 </template>
+
+<style lang="scss">
+.tui-formBtnGroup {
+  display: flex;
+
+  .tui-formBtn {
+    min-width: 80px;
+  }
+
+  > :not(:first-child) {
+    margin: auto 0 auto var(--gap-4);
+  }
+}
+</style>

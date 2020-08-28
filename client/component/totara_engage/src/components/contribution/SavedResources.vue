@@ -100,3 +100,13 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-contributionSavedResources {
+  .tui-contributionBaseContent__counterContainer__counter {
+    position: relative;
+    top: 0;
+    padding-bottom: var(--gap-2);
+  }
+}
+</style>

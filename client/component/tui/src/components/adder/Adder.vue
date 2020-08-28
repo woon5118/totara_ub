@@ -260,3 +260,56 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-adder {
+  margin-top: calc(var(--gap-6) - var(--modal-content-separation));
+
+  &__list {
+    height: 316px;
+    overflow-y: auto;
+
+    &-loadMore {
+      margin: var(--gap-1) 0 0;
+      text-align: center;
+    }
+
+    &::before {
+      display: block;
+      height: var(--gap-4);
+      content: '';
+    }
+  }
+
+  &__footer {
+    display: flex;
+    padding-top: var(--gap-6);
+    border-top: var(--border-width-normal) solid var(--color-neutral-5);
+  }
+
+  &__summary {
+    display: flex;
+    align-items: center;
+    width: 50%;
+    @include tui-font-heading-label();
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    width: 50%;
+  }
+}
+
+@media screen and (min-width: $tui-screen-sm) {
+  .tui-adder {
+    .tui-tabContent {
+      min-height: 380px;
+    }
+
+    &__listBasket {
+      min-height: 350px;
+    }
+  }
+}
+</style>

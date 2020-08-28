@@ -91,3 +91,20 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-radioWithInput {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  & > * + * {
+    // Use same indentation as radio for nicer wrapping
+    margin-left: var(--radio-label-offset);
+  }
+
+  &__radio {
+    margin: var(--gap-1) 0;
+  }
+}
+</style>

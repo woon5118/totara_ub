@@ -194,3 +194,23 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-activityNotifications {
+  &__header {
+    display: flex;
+    align-items: baseline;
+    margin-top: var(--gap-2); // Check the content tab before changing this.
+  }
+
+  &__title {
+    @include tui-font-heading-small();
+    flex-basis: 100%;
+  }
+
+  &__active {
+    @include tui-font-heading-label-small();
+    margin-right: var(--gap-4);
+  }
+}
+</style>

@@ -82,3 +82,34 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-engageSidePanel {
+  padding: var(--gap-8);
+
+  &__tabs {
+    padding-top: var(--gap-8);
+    // Overriding the fallback select list when there isn't enough space
+    .tui-formRow__action {
+      width: 200px;
+    }
+  }
+
+  &__commentBox {
+    // Since the tab is already having a padding which it is '--gap-4'.
+    // Therefore we just need another '--gap-4'.
+    margin-top: var(--gap-4);
+  }
+
+  &__overviewBox {
+    // Since the tab is already having a padding which it is '--gap-4'.
+    // Therefore we just need another '--gap-4'.
+    margin-top: var(--gap-4);
+  }
+
+  &__related {
+    max-height: 71vh;
+    overflow-y: auto;
+  }
+}
+</style>

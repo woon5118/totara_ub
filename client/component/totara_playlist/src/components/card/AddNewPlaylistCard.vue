@@ -101,3 +101,28 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-totaraPlaylist-addNewPlaylistCard {
+  width: 100%;
+  height: calc(var(--totaraEngage-card-height) + 11px);
+
+  .tui-card {
+    // Overiding cards border
+    border: 2px dashed var(--color-primary);
+  }
+
+  &__card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__icon {
+    color: var(--color-primary);
+    cursor: pointer;
+  }
+}
+</style>

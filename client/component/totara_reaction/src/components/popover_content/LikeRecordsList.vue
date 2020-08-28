@@ -129,3 +129,12 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-likeRecordsList {
+  &__list {
+    margin: 0;
+    list-style-type: none;
+  }
+}
+</style>

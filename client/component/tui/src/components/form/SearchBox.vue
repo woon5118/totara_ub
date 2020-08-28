@@ -106,3 +106,32 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-searchBox {
+  display: flex;
+
+  .tui-formLabel {
+    margin-right: var(--gap-2);
+  }
+
+  // So that the search button matches the format of the input that is next to it
+  &__button {
+    border-color: var(--form-input-border-color);
+    border-style: solid;
+    border-width: var(--form-input-border-size)
+      var(--form-input-border-size) var(--form-input-border-size) 0;
+
+    &:hover,
+    &:active,
+    &:focus {
+      background-color: var(--btn-bg-color-focus);
+      border-color: var(--form-input-border-color);
+      border-style: solid;
+      border-width: var(--form-input-border-size)
+        var(--form-input-border-size) var(--form-input-border-size) 0;
+      box-shadow: var(--btn-shadow-focus);
+    }
+  }
+}
+</style>

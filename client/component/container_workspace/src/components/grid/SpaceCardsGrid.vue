@@ -96,3 +96,18 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-spaceCardsGrid {
+  &__row {
+    // Override the margin.
+    &.tui-grid {
+      margin-bottom: var(--gap-4);
+    }
+
+    &__card {
+      height: var(--totaraEngage-card-height);
+    }
+  }
+}
+</style>

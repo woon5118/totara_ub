@@ -129,3 +129,31 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-collapsible {
+  &__header {
+    display: flex;
+    padding: var(--gap-2) var(--gap-2) var(--gap-2) 0;
+    background: var(--collapsible-header-bg-color);
+    border: var(--border-width-thin) solid
+      var(--collapsible-header-border-color);
+
+    &_icons {
+      padding-right: var(--gap-4);
+      padding-left: var(--gap-4);
+    }
+
+    &-text {
+      @include tui-font-heading-x-small();
+      margin: 0;
+    }
+
+    &-sideContent {
+      display: flex;
+      flex-shrink: 0;
+      margin: auto 0 auto auto;
+    }
+  }
+}
+</style>

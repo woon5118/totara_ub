@@ -52,3 +52,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-formFieldGroup {
+  flex-grow: 1;
+  width: 100%;
+  min-width: 0;
+}
+</style>

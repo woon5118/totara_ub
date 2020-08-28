@@ -321,3 +321,25 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performActivityActions {
+  display: flex;
+  justify-content: flex-start;
+
+  &__item {
+    margin-right: var(--gap-2);
+    padding: 0 var(--gap-1);
+  }
+}
+
+@media screen and (min-width: $tui-screen-xs) {
+  .tui-performActivityActions {
+    justify-content: flex-end;
+
+    &__item {
+      margin-right: 0;
+    }
+  }
+}
+</style>

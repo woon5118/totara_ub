@@ -76,3 +76,20 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-playlistPopover {
+  .tui-popoverFrame {
+    width: 190px;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__yes {
+    margin-right: var(--gap-2);
+  }
+}
+</style>

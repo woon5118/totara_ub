@@ -269,3 +269,96 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyDetailAssignment {
+  &__bar {
+    padding: var(--gap-4);
+    background: var(--color-neutral-3);
+
+    &-filter.tui-selectFilter {
+      .tui-select {
+        max-width: initial;
+      }
+    }
+  }
+
+  &__actions {
+    padding: var(--gap-4) var(--gap-2);
+    text-align: right;
+  }
+
+  .tui-grid--stacked {
+    & > * + * {
+      justify-content: flex-start;
+      padding-top: var(--gap-4);
+    }
+  }
+
+  &__level {
+    display: flex;
+    align-items: center;
+
+    &-header {
+      display: flex;
+      margin: 0;
+      @include tui-font-body-small();
+    }
+
+    &-infoBtn {
+      padding-left: var(--gap-1);
+    }
+
+    &-text {
+      @include tui-font-heading-label-small();
+    }
+
+    &-wrap {
+      @include tui-font-body-small();
+      padding-left: var(--gap-2);
+      border-style: solid;
+      border-width: 0 0 0 var(--border-width-thick);
+
+      .dir-rtl & {
+        padding-right: var(--gap-2);
+        border-width: 0 var(--border-width-thick) 0 0;
+      }
+
+      &-pending {
+        border-color: var(--progresstracker-color-pending);
+      }
+
+      &-complete {
+        border-color: var(--progresstracker-color-complete);
+      }
+
+      &-achieved {
+        border-color: var(--progresstracker-color-achieved);
+      }
+    }
+  }
+
+  &__status {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    &-text {
+      margin-left: var(--gap-2);
+      @include tui-font-heading-small();
+
+      .dir-rtl & {
+        margin: 0 var(--gap-2) 0 0;
+      }
+
+      &-complete {
+        margin-left: var(--gap-1);
+
+        .dir-rtl & {
+          margin: 0 var(--gap-1) 0 0;
+        }
+      }
+    }
+  }
+}
+</style>

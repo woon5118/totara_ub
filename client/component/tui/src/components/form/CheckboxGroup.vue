@@ -87,3 +87,37 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+:root {
+  --form-checkbox-group-padding: var(--gap-2);
+  --form-checkbox-group-spacing-v: var(--gap-4);
+  --form-checkbox-group-spacing-h: var(--gap-4);
+}
+
+.tui-checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  padding: var(--form-checkbox-group-padding) 0;
+
+  @include tui-stack-vertical(var(--form-checkbox-group-spacing-v));
+}
+
+@media screen and (min-width: $tui-screen-sm) {
+  .tui-checkboxGroup--horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+    // stylelint-disable length-zero-no-unit
+    margin-top: calc(
+      0px - var(--form-checkbox-group-spacing-v) +
+        var(--form-checkbox-group-padding)
+    );
+    padding-top: 0;
+
+    & > * {
+      margin-top: var(--form-checkbox-group-spacing-v);
+      margin-right: var(--form-checkbox-group-spacing-h);
+    }
+  }
+}
+</style>

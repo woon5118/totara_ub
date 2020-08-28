@@ -87,3 +87,12 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-videoBlock {
+  display: flex;
+  width: 100%;
+
+  margin: var(--gap-8) 0;
+}
+</style>

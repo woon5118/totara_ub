@@ -371,3 +371,9 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-reply {
+  margin-top: var(--gap-4);
+}
+</style>

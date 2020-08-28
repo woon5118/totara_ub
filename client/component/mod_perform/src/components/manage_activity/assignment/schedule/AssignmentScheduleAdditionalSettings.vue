@@ -142,3 +142,11 @@ export default {
   }
 
 </lang-strings>
+
+<style lang="scss">
+.tui-assignmentScheduleAdditionalSettings {
+  &__description {
+    @include tui-font-body-placeholder();
+  }
+}
+</style>

@@ -94,3 +94,24 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-commentActionLink {
+  &__link {
+    &--small {
+      @include tui-font-link-small();
+    }
+
+    &--disabled {
+      color: var(--color-neutral-5);
+      cursor: not-allowed;
+
+      &:hover,
+      &:focus {
+        color: var(--color-neutral-5);
+        text-decoration: none;
+      }
+    }
+  }
+}
+</style>

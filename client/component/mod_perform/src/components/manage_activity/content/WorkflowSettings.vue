@@ -228,3 +228,22 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performActivityWorkflowSettings {
+  &__heading {
+    @include tui-font-heading-small();
+  }
+  &__warning {
+    max-width: 712px;
+  }
+}
+
+@media (min-width: $tui-screen-sm) {
+  .tui-performActivityWorkflowSettings {
+    & > * + * {
+      padding-top: var(--gap-4);
+    }
+  }
+}
+</style>

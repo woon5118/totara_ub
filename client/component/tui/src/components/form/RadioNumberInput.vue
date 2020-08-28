@@ -97,3 +97,16 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-radioNumberInput {
+  display: flex;
+  // Use same indentation as radio for nicer wrapping
+  margin-left: var(--radio-label-offset);
+
+  &__number {
+    display: flex;
+    width: 6rem;
+  }
+}
+</style>

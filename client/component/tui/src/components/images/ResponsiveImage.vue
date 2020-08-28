@@ -34,3 +34,10 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-responsiveImage {
+  max-width: 100%;
+  height: auto;
+}
+</style>

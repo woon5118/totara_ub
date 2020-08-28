@@ -186,3 +186,26 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-toggleSet {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 1px;
+  background: var(--toggle-bg-color);
+  border-radius: var(--btn-radius);
+
+  &--disabled {
+    opacity: 0.4;
+  }
+
+  &--select {
+    width: 100%;
+    background: transparent;
+  }
+
+  &--large {
+    padding: 2px;
+  }
+}
+</style>

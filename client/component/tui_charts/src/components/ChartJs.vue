@@ -46,47 +46,47 @@ import 'chartjs-plugin-doughnutlabel';
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 Chart.defaults.global.defaultColor = theme.getVar(
-  'tui-color-chart-background-1'
+  'color-chart-background-1'
 );
 Chart.defaults.global.defaultFontSize = parseInt(
-  theme.getVar('tui-font-size-chart-default')
+  theme.getVar('font-size-chart-default')
 );
 
 let defaultColors = [
   {
     // 01
-    baseColor: theme.getVar('tui-color-chart-background-1'),
-    transparentColor: theme.getVar('tui-color-chart-transparent-1'),
+    baseColor: theme.getVar('color-chart-background-1'),
+    transparentColor: theme.getVar('color-chart-transparent-1'),
   },
   {
     // 02
-    baseColor: theme.getVar('tui-color-chart-background-2'),
-    transparentColor: theme.getVar('tui-color-chart-transparent-2'),
+    baseColor: theme.getVar('color-chart-background-2'),
+    transparentColor: theme.getVar('color-chart-transparent-2'),
   },
   {
     // 03
-    baseColor: theme.getVar('tui-color-chart-background-3'),
-    transparentColor: theme.getVar('tui-color-chart-transparent-3'),
+    baseColor: theme.getVar('color-chart-background-3'),
+    transparentColor: theme.getVar('color-chart-transparent-3'),
   },
   {
     // 04
-    baseColor: theme.getVar('tui-color-chart-background-4'),
-    transparentColor: theme.getVar('tui-color-chart-transparent-4'),
+    baseColor: theme.getVar('color-chart-background-4'),
+    transparentColor: theme.getVar('color-chart-transparent-4'),
   },
   {
     // 05
-    baseColor: theme.getVar('tui-color-chart-background-5'),
-    transparentColor: theme.getVar('tui-color-chart-transparent-5'),
+    baseColor: theme.getVar('color-chart-background-5'),
+    transparentColor: theme.getVar('color-chart-transparent-5'),
   },
   {
     // 06
-    baseColor: theme.getVar('tui-color-chart-background-6'),
-    transparentColor: theme.getVar('tui-color-chart-transparent-6'),
+    baseColor: theme.getVar('color-chart-background-6'),
+    transparentColor: theme.getVar('color-chart-transparent-6'),
   },
   {
     // 07
-    baseColor: theme.getVar('tui-color-chart-background-7'),
-    transparentColor: theme.getVar('tui-color-chart-transparent-7'),
+    baseColor: theme.getVar('color-chart-background-7'),
+    transparentColor: theme.getVar('color-chart-transparent-7'),
   },
 ];
 
@@ -316,3 +316,21 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+:root {
+  // Chart default font size
+  --font-size-chart-default: 14; // It has to be without units
+  --font-size-chart-doughnut-label: 16; // It has to be without units
+  --font-size-chart-doughnut-percentage-label: 30; // It has to be without units
+}
+
+.tui-chartJs__header {
+  @include tui-font-heading-small();
+  padding-bottom: var(--gap-7);
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+</style>

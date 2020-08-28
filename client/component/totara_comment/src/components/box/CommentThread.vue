@@ -346,3 +346,28 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-commentThread {
+  &__actionLink {
+    &--withBorder {
+      margin-top: var(--gap-4);
+      margin-left: var(--gap-4);
+    }
+  }
+
+  &__comments {
+    &__comment {
+      &--large {
+        padding: 0 var(--gap-4);
+        padding-bottom: var(--gap-4);
+      }
+
+      &--withBorderBottom {
+        border-bottom: var(--border-width-thin) solid
+          var(--color-neutral-5);
+      }
+    }
+  }
+}
+</style>

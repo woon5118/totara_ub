@@ -307,3 +307,27 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-bulkManualUserCompetenciesFilters {
+  &__singleCompetencyMessage {
+    &-text {
+      margin-right: var(--gap-2);
+      @include tui-font-hint;
+    }
+
+    @media (max-width: $tui-screen-sm) {
+      display: flex;
+      align-content: space-between;
+
+      &-text {
+        margin-right: var(--gap-4);
+      }
+
+      &-button {
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+</style>

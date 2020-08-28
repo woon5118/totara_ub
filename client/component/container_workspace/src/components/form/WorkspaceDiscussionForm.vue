@@ -215,3 +215,15 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceDiscussionForm {
+  display: flex;
+  flex-direction: column;
+
+  &__buttonGroup {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+</style>

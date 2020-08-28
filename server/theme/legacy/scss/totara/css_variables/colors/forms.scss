@@ -26,52 +26,52 @@
   // Form colours
   //
 
-  --legacy-form-text-color: var(--legacy-color-neutral-7);
-  --legacy-form-input-bg-color-disabled: var(--legacy-color-neutral-3);
-  --legacy-form-input-border-color: var(--legacy-color-neutral-6);
-  --legacy-form-input-text-placeholder-color: var(--legacy-color-neutral-6);
-  --legacy-form-error-text-color: var(--legacy-color-prompt-alert);
-  --legacy-form-error-bg-color: var(--legacy-color-prompt-alert-bg);
+  --form-text-color: var(--color-neutral-7);
+  --form-input-bg-color-disabled: var(--color-neutral-3);
+  --form-input-border-color: var(--color-neutral-6);
+  --form-input-text-placeholder-color: var(--color-neutral-6);
+  --form-error-text-color: var(--color-prompt-alert);
+  --form-error-bg-color: var(--color-prompt-alert-bg);
 
   // Standard btn background, border & text
-  --legacy-btn-bg-color: var(--legacy-color-neutral-1);
-  --legacy-btn-bg-color-active: var(--legacy-color-neutral-1);
-  --legacy-btn-bg-color-disabled: var(--legacy-color-neutral-3);
-  --legacy-btn-bg-color-focus: var(--legacy-color-neutral-3);
-  --legacy-btn-border-color: var(--legacy-color-state);
-  --legacy-btn-border-color-active: var(--legacy-color-state-active);
-  --legacy-btn-border-color-disabled: var(--legacy-color-state-disabled);
-  --legacy-btn-border-color-focus: var(--legacy-color-state-focus);
-  --legacy-btn-text-color: var(--legacy-color-state);
-  --legacy-btn-text-color-active: var(--legacy-color-state-active);
-  --legacy-btn-text-color-disabled: var(--legacy-color-state-disabled);
-  --legacy-btn-text-color-focus: var(--legacy-color-state-focus);
+  --btn-bg-color: var(--color-neutral-1);
+  --btn-bg-color-active: var(--color-neutral-1);
+  --btn-bg-color-disabled: var(--color-neutral-3);
+  --btn-bg-color-focus: var(--color-neutral-3);
+  --btn-border-color: var(--color-state);
+  --btn-border-color-active: var(--color-state-active);
+  --btn-border-color-disabled: var(--color-state-disabled);
+  --btn-border-color-focus: var(--color-state-focus);
+  --btn-text-color: var(--color-state);
+  --btn-text-color-active: var(--color-state-active);
+  --btn-text-color-disabled: var(--color-state-disabled);
+  --btn-text-color-focus: var(--color-state-focus);
 
   // Primary btn background, text & border
-  --legacy-btn-prim-bg-color: var(--legacy-color-state);
-  --legacy-btn-prim-bg-color-active: var(--legacy-color-state-active);
-  --legacy-btn-prim-bg-color-disabled: var(--legacy-color-state-disabled);
-  --legacy-btn-prim-bg-color-focus: var(--legacy-color-state-focus);
-  --legacy-btn-prim-border-color: var(--legacy-color-state);
-  --legacy-btn-prim-border-color-active: var(--legacy-color-state-active);
-  --legacy-btn-prim-border-color-disabled: var(--legacy-color-state-disabled);
-  --legacy-btn-prim-border-color-focus: var(--legacy-color-state-focus);
-  --legacy-btn-prim-text-color: var(--legacy-color-neutral-1);
-  --legacy-btn-prim-text-color-active: var(--legacy-color-neutral-1);
-  --legacy-btn-prim-text-color-disabled: var(--legacy-color-neutral-3);
-  --legacy-btn-prim-text-color-focus: var(--legacy-color-neutral-1);
+  --btn-prim-bg-color: var(--color-state);
+  --btn-prim-bg-color-active: var(--color-state-active);
+  --btn-prim-bg-color-disabled: var(--color-state-disabled);
+  --btn-prim-bg-color-focus: var(--color-state-focus);
+  --btn-prim-border-color: var(--color-state);
+  --btn-prim-border-color-active: var(--color-state-active);
+  --btn-prim-border-color-disabled: var(--color-state-disabled);
+  --btn-prim-border-color-focus: var(--color-state-focus);
+  --btn-prim-text-color: var(--color-neutral-1);
+  --btn-prim-text-color-active: var(--color-neutral-1);
+  --btn-prim-text-color-disabled: var(--color-neutral-3);
+  --btn-prim-text-color-focus: var(--color-neutral-1);
 
   // toggle icon btn background, border & text
-  --legacy-btn-toggle-bg-color: var(--legacy-color-neutral-1);
-  --legacy-btn-toggle-bg-color-disabled: var(--legacy-color-neutral-3);
-  --legacy-btn-toggle-bg-color-focus: var(--legacy-color-neutral-2);
-  --legacy-btn-toggle-bg-color-selected: var(--legacy-color-neutral-4);
-  --legacy-btn-toggle-border-color: var(--legacy-color-neutral-5);
-  --legacy-btn-toggle-border-color-disabled: var(--legacy-color-state-disabled);
-  --legacy-btn-toggle-border-color-focus: var(--legacy-color-neutral-5);
-  --legacy-btn-toggle-border-color-selected: var(--legacy-color-neutral-5);
-  --legacy-btn-toggle-text-color: var(--legacy-color-state);
-  --legacy-btn-toggle-text-color-disabled: var(--legacy-color-state-disabled);
-  --legacy-btn-toggle-text-color-focus: var(--legacy-color-state);
-  --legacy-btn-toggle-text-color-selected: var(--legacy-color-state);
+  --btn-toggle-bg-color: var(--color-neutral-1);
+  --btn-toggle-bg-color-disabled: var(--color-neutral-3);
+  --btn-toggle-bg-color-focus: var(--color-neutral-2);
+  --btn-toggle-bg-color-selected: var(--color-neutral-4);
+  --btn-toggle-border-color: var(--color-neutral-5);
+  --btn-toggle-border-color-disabled: var(--color-state-disabled);
+  --btn-toggle-border-color-focus: var(--color-neutral-5);
+  --btn-toggle-border-color-selected: var(--color-neutral-5);
+  --btn-toggle-text-color: var(--color-state);
+  --btn-toggle-text-color-disabled: var(--color-state-disabled);
+  --btn-toggle-text-color-focus: var(--color-state);
+  --btn-toggle-text-color-selected: var(--color-state);
 }

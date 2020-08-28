@@ -434,3 +434,110 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &__container {
+    display: flex;
+    align-items: stretch;
+
+    &__inputs {
+      display: flex;
+      flex-direction: column;
+      width: 66%;
+
+      &__formRow {
+        // Overriding the margin
+        &.tui-formRow {
+          margin-bottom: 0;
+
+          &:not(:first-child) {
+            margin-top: var(--gap-8);
+          }
+        }
+
+        .tui-formRow__desc {
+          margin-bottom: var(--gap-2);
+        }
+
+        &__editor {
+          display: flex;
+          flex-direction: column;
+          flex-grow: 1;
+          width: 100%;
+
+          &__tip {
+            display: flex;
+            margin-top: var(--gap-2);
+
+            &__text {
+              @include tui-font-body-small();
+            }
+          }
+        }
+      }
+
+      &__unhiddenRow {
+        margin-top: var(--gap-8);
+        &__box {
+          display: flex;
+          flex-direction: column;
+          flex-grow: 1;
+          width: 100%;
+
+          &__helpText {
+            @include tui-font-body-small();
+            margin: 0;
+            margin-top: var(--gap-2);
+          }
+        }
+      }
+    }
+
+    &__imagePicker {
+      // This will let us to have our custom FORM input :)
+      width: calc(100% - (66% + var(--gap-4)));
+
+      &.tui-formRow {
+        // Reset margin
+        margin: 0;
+        margin-left: var(--gap-4);
+
+        .tui-formRow {
+          &__desc {
+            // Hiding description part.
+            display: none;
+          }
+
+          &__action {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  &__buttonGroup {
+    display: flex;
+    justify-content: flex-end;
+
+    // This button group need to have the same width as the inputs div
+    width: 66%;
+    margin-top: var(--gap-8);
+
+    &.tui-formBtnGroup {
+      // Overriding the margin
+      & > :not(:first-child) {
+        margin: 0;
+        margin-left: var(--gap-4);
+      }
+    }
+  }
+}
+</style>

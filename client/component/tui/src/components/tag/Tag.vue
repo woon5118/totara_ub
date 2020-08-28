@@ -41,3 +41,41 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+:root {
+  --tag-height: 24px;
+  --tag-border-radius: 12px; // --tag-height / 2 - for some reason IE calc wasn't working correctly here
+}
+
+.tui-tag {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: var(--tag-height);
+  white-space: nowrap;
+  background-color: var(--tag-bg-color);
+  border: var(--border-width-thin) solid var(--tag-border-color);
+  border-radius: var(--tag-border-radius);
+
+  &__content {
+    padding: 0 var(--gap-2);
+    color: var(--tag-active-color);
+    font-size: var(--font-size-13);
+
+    &--withButton {
+      padding-right: 0;
+      color: var(--tag-button-color);
+    }
+  }
+
+  &--primary {
+    text-transform: uppercase;
+    background-color: var(--color-state);
+  }
+
+  &--primary &__content {
+    color: var(--color-neutral-1);
+  }
+}
+</style>

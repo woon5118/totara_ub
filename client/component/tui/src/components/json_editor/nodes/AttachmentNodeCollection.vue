@@ -81,3 +81,27 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-attachmentNodeCollection {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: var(--gap-1) 0;
+  white-space: normal;
+  border-top: var(--border-width-thin) solid var(--color-neutral-5);
+  border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
+
+  > .tui-attachmentNode {
+    // Doing the margin for the single attachment.
+    margin-top: var(--gap-1);
+    margin-right: var(--gap-1);
+    margin-bottom: var(--gap-1);
+
+    @media (min-width: 720px) {
+      margin-right: var(--gap-4);
+    }
+  }
+}
+</style>

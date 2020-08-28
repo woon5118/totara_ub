@@ -180,3 +180,19 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceLibraryTab {
+  .tui-contributionBaseContent__horizontal {
+    padding: 0;
+  }
+
+  .tui-contributionFilter__sort {
+    margin-top: var(--gap-8);
+  }
+
+  &__filter {
+    padding-top: var(--gap-4);
+  }
+}
+</style>

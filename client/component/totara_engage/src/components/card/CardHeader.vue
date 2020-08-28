@@ -29,3 +29,18 @@
     </div>
   </div>
 </template>
+
+<style lang="scss">
+.tui-totaraEngage-cardHeader {
+  &__first {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__second {
+    * {
+      margin: 0;
+    }
+  }
+}
+</style>

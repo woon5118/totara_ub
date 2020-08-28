@@ -238,3 +238,21 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-bulkManualRatingPopover {
+  &__scaleValues {
+    margin-bottom: var(--gap-4);
+  }
+
+  &__comment,
+  &__textarea,
+  &__divider {
+    width: 100%;
+  }
+
+  &__divider {
+    border-top: 1px solid var(--color-neutral-5);
+  }
+}
+</style>

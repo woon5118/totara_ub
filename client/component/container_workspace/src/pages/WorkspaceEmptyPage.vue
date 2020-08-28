@@ -31,3 +31,16 @@
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceEmptyPage {
+  display: flex;
+  width: 100%;
+  margin-top: var(--gap-6);
+  padding: 0 var(--gap-6);
+
+  &__text {
+    @include tui-font-body();
+  }
+}
+</style>

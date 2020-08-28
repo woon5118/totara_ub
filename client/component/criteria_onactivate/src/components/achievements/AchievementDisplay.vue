@@ -73,3 +73,16 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-criteriaOnActiveAchievement {
+  &__title {
+    @extend .tui-criteriaCourseAchievement__title;
+    max-width: 100%;
+  }
+
+  &__goal {
+    @extend .tui-criteriaCourseAchievement__goal;
+  }
+}
+</style>

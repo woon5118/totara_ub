@@ -55,3 +55,26 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceFileHeader {
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 764px) {
+    padding: var(--gap-4);
+  }
+
+  &__back {
+    .tui-iconBtn {
+      padding: 0;
+    }
+  }
+
+  &__title {
+    @include tui-font-heading-large();
+    margin-top: var(--gap-10);
+    margin-bottom: var(--gap-12);
+  }
+}
+</style>

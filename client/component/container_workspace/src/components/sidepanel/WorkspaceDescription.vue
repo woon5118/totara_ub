@@ -68,3 +68,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-workspaceDescription {
+  &__body {
+    &__time {
+      @include tui-font-body-small();
+      margin-bottom: var(--gap-4);
+    }
+  }
+}
+</style>

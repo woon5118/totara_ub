@@ -60,3 +60,34 @@
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --engageSurvey-badge-height: 40px;
+  --engageSurvey-badge-width: 105px;
+}
+
+.tui-surveyBadge {
+  width: var(--engageSurvey-badge-width);
+  height: var(--engageSurvey-badge-height);
+
+  &__text {
+    font-weight: bold;
+    font-size: 13px;
+    fill: #262626;
+  }
+
+  &__shapeParent {
+    fill: none;
+    fill-rule: evenodd;
+    stroke: none;
+    stroke-width: 1;
+  }
+
+  &__shape {
+    fill: var(--color-neutral-1);
+    stroke: var(--color-primary);
+    stroke-width: 3;
+  }
+}
+</style>

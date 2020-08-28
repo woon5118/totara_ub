@@ -98,3 +98,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-layoutThreeColumn__heading {
+  @include tui-font-heading-medium();
+}
+</style>

@@ -619,3 +619,26 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-droppable {
+  &__dropLine {
+    z-index: var(--zindex-draggable);
+    background: var(--color-secondary);
+    pointer-events: none;
+
+    &--vertical {
+      height: var(--border-width-normal);
+      margin-top: calc(var(--border-width-normal) * -0.5);
+    }
+
+    &--horizontal {
+      width: var(--border-width-normal);
+      margin-left: calc(var(--border-width-normal) * -0.5);
+    }
+  }
+}
+[data-tui-droppable-location-indicator] {
+  background-color: var(--color-neutral-5);
+}
+</style>

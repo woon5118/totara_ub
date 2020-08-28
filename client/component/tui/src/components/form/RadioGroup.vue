@@ -77,3 +77,41 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+:root {
+  --form-radio-group-padding: var(--gap-2);
+  // note: should not be more than twice padding
+  --form-radio-group-spacing-v: var(--gap-4);
+  --form-radio-group-spacing-h: var(--gap-4);
+}
+
+.tui-radioGroup {
+  display: flex;
+  flex-direction: column;
+  padding: var(--form-radio-group-padding) 0;
+
+  @include tui-stack-vertical(var(--form-radio-group-spacing-v));
+
+  &--inputSizedOptions {
+    & > * {
+      align-items: center;
+      min-height: var(--form-input-height);
+    }
+  }
+}
+
+@media screen and (min-width: $tui-screen-sm) {
+  .tui-radioGroup--horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+    // prettier-ignore
+    padding: calc(var(--form-radio-group-padding) - var(--form-radio-group-spacing-v) / 2) 0;
+
+    & > * {
+      margin: calc(var(--form-radio-group-spacing-v) / 2) 0;
+      margin-right: var(--form-radio-group-spacing-h);
+    }
+  }
+}
+</style>

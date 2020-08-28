@@ -159,3 +159,11 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencySelfAssignment__table-reasons {
+  margin-left: 0;
+  padding-left: 0;
+  list-style: none;
+}
+</style>

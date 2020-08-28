@@ -217,3 +217,32 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-memberRequestCard {
+  display: flex;
+  align-items: center;
+
+  &__info {
+    display: flex;
+    flex: 1;
+    align-items: center;
+
+    &__userProfile {
+      @include tui-font-link-small();
+      @include tui-font-heavy();
+
+      margin-left: var(--gap-2);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+
+    > :not(:first-child) {
+      margin-left: var(--gap-4);
+    }
+  }
+}
+</style>

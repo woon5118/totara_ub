@@ -167,3 +167,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-totaraEngage-star {
+  display: block;
+  margin-right: var(--gap-1);
+
+  &__polygon {
+    stroke: var(--color-neutral-6);
+  }
+}
+</style>

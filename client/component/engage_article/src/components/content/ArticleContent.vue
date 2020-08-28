@@ -145,3 +145,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-articleContent {
+  &__content {
+    flex-grow: 1;
+  }
+}
+</style>

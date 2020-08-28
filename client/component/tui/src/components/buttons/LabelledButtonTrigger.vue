@@ -90,3 +90,19 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-labelledButtonTrigger {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__label {
+    color: var(--color-state);
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+}
+</style>

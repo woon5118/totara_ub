@@ -95,3 +95,46 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-inlineEditing {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: calc(-1 * var(--gap-1));
+  padding: var(--gap-1);
+  border: 2px solid transparent;
+
+  &:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    content: '';
+  }
+
+  &--fullWidth {
+    width: 100%;
+  }
+
+  &--updateAble {
+    &:hover,
+    &:focus-within,
+    &.tui-focusWithin {
+      border: 2px solid var(--color-secondary);
+      cursor: pointer;
+      & .tui-inlineEditing__btn {
+        outline: none;
+      }
+    }
+  }
+
+  &:not(:hover) {
+    .tui-inlineEditing__btn:not(:focus) {
+      @include sr-only();
+    }
+  }
+}
+</style>

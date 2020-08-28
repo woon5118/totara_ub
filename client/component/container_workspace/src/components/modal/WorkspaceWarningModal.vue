@@ -126,3 +126,30 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceWarningModal {
+  .tui-modalContent {
+    // Overriding the spacing of modal content.
+    margin-top: 0;
+  }
+
+  &__container {
+    display: flex;
+
+    &__box {
+      margin-left: var(--gap-4);
+
+      &__title {
+        @include tui-font-heading-x-small();
+        margin-top: 0;
+        margin-bottom: var(--gap-2);
+      }
+
+      &__content {
+        @include tui-font-body();
+      }
+    }
+  }
+}
+</style>

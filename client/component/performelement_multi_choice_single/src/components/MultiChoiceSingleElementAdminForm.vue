@@ -224,3 +224,17 @@ export default {
      ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-elementEditMultiChoiceSingle {
+  &__action-buttons {
+    display: flex;
+    align-items: end;
+    width: 100%;
+    margin-bottom: 0;
+  }
+  &__option {
+    max-width: 200px;
+  }
+}
+</style>

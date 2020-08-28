@@ -88,3 +88,49 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-toastContainer {
+  position: fixed;
+  top: var(--gap-6);
+  right: 0;
+  left: 0;
+  z-index: var(--zindex-toast);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+
+  &__inner {
+    position: relative;
+    flex-basis: 300px;
+    pointer-events: auto;
+  }
+
+  &__item-transition {
+    &-enter-active,
+    &-leave-active {
+      transition: all 0.15s ease-out;
+    }
+
+    &-enter,
+    &-leave-to {
+      opacity: 0;
+    }
+
+    &-leave-active {
+      position: absolute;
+      right: 0;
+      left: 0;
+      opacity: 0;
+    }
+  }
+}
+
+@media screen and (min-width: $tui-screen-sm) {
+  .tui-toastContainer {
+    &__inner {
+      flex-basis: 500px;
+    }
+  }
+}
+</style>

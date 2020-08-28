@@ -223,3 +223,23 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-commentForm {
+  &__form {
+    flex: 1;
+    max-width: 100%;
+
+    &__editor {
+      flex: 1;
+      max-width: 100%;
+    }
+
+    &__buttonGroup {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: var(--gap-4);
+    }
+  }
+}
+</style>

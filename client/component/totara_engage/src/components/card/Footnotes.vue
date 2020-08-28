@@ -68,3 +68,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-cardFootnotes {
+  margin: var(--gap-2) 0;
+}
+</style>

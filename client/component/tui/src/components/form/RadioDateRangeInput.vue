@@ -145,3 +145,23 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-radioDateRangeInput {
+  display: flex;
+
+  & > * + * {
+    margin-left: var(--gap-2);
+  }
+
+  &__number {
+    display: flex;
+    width: 6rem;
+  }
+
+  &__type {
+    display: flex;
+    width: 12rem;
+  }
+}
+</style>

@@ -71,3 +71,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-elementDisplayNumericRatingScale {
+  &__range {
+    margin-top: var(--gap-4);
+  }
+}
+</style>

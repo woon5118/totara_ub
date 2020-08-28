@@ -153,91 +153,91 @@ export default {
 <style lang="scss">
 .tui-typographySamples__heading-large {
   @include tui-font-heading-large();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__heading-medium {
   @include tui-font-heading-medium();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__heading-small {
   @include tui-font-heading-small();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__heading-smallRegular {
   @include tui-font-heading-small-regular();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__heading-xSmall {
   @include tui-font-heading-x-small();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__heading-label {
   @include tui-font-heading-label();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__heading-labelSmall {
   @include tui-font-heading-label-small();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__body {
   @include tui-font-body();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__body-small {
   @include tui-font-body-small();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__body-xSmall {
   @include tui-font-body-x-small();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__body-xxSmall {
   @include tui-font-body-xx-small();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__body-disabled {
   @include tui-font-body-disabled();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__body-placeholder {
   @include tui-font-body-placeholder();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__body-heavy {
   @include tui-font-heavy();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__body-hint {
   @include tui-font-hint();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__link {
   @include tui-font-link();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__link-large {
   @include tui-font-link-large();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 
 .tui-typographySamples__link-small {
   @include tui-font-link-small();
-  margin: var(--tui-gap-1) 0;
+  margin: var(--gap-1) 0;
 }
 </style>

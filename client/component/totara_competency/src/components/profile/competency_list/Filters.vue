@@ -174,3 +174,9 @@ export default {
   "admin": ["filters"]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyProfileListFilters {
+  margin-bottom: var(--gap-4);
+}
+</style>

@@ -29,3 +29,10 @@
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-formRow__defaults {
+  color: var(--form-defaults-text-color);
+  @include tui-font-body-x-small;
+}
+</style>

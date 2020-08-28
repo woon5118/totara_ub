@@ -87,3 +87,14 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performUserHistoricActivities {
+  &__heading {
+    margin: var(--gap-8) 0 var(--gap-6) 0;
+    padding-right: var(--gap-8);
+  }
+
+  @include tui-font-body();
+}
+</style>

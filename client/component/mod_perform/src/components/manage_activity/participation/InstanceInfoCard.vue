@@ -84,3 +84,32 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-instanceInfoCard {
+  &__title {
+    @include tui-font-heading-x-small();
+    margin-top: 0;
+  }
+
+  &__info-section {
+    @include tui-font-body();
+    display: table;
+  }
+
+  &__info-row {
+    display: table-row;
+  }
+
+  &__info-label {
+    display: table-cell;
+    padding-right: var(--gap-8);
+    padding-bottom: var(--gap-3);
+  }
+
+  &__info-value {
+    display: table-cell;
+    padding-bottom: var(--gap-3);
+  }
+}
+</style>

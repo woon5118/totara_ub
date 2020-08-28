@@ -228,3 +228,19 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-bulkManualRatingRoleSelector {
+  display: flex;
+  align-items: center;
+  margin-top: var(--gap-4);
+
+  &__ratingAs {
+    @include tui-font-heading-x-small;
+  }
+
+  &__selectRole {
+    margin-left: var(--gap-2);
+  }
+}
+</style>

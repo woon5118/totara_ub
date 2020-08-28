@@ -140,3 +140,83 @@ export default {
   "moodle": ["info", "success", "warning", "error"]
 }
 </lang-strings>
+
+<style lang="scss">
+@mixin tui-notification-banner-color($name, $color) {
+  .tui-notificationBanner {
+    &--#{$name} {
+      border-color: $color;
+    }
+
+    &--#{$name} &__icon {
+      background: $color;
+    }
+  }
+}
+
+.tui-notificationBanner {
+  @include tui-font-body-small();
+
+  display: flex;
+  background-color: var(--color-background);
+  border: var(--border-width-thin) solid var(--color-prompt-info);
+  border-radius: var(--border-radius-small);
+
+  &__icon {
+    display: flex;
+    padding: var(--gap-4);
+    color: var(--color-neutral-1);
+    background: var(--color-prompt-info);
+    // -1px to avoid isue with razor thin white line between icon container and notification border
+    border-top-left-radius: calc(
+      var(--border-radius-small) - var(--border-width-thin) - 1px
+    );
+    border-bottom-left-radius: calc(
+      var(--border-radius-small) - var(--border-width-thin) - 1px
+    );
+  }
+
+  &__message {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    padding: var(--gap-4) var(--gap-3);
+  }
+
+  &__dismiss {
+    display: flex;
+
+    &_button {
+      color: var(--color-neutral-6);
+    }
+  }
+}
+
+@include tui-notification-banner-color(
+  'success',
+  var(--color-prompt-success)
+);
+@include tui-notification-banner-color(
+  'warning',
+  var(--color-prompt-warning)
+);
+@include tui-notification-banner-color('error', var(--color-prompt-alert));
+
+@media screen and (min-width: $tui-screen-sm) {
+  .tui-notificationBanner {
+    @include tui-font-body();
+
+    border-radius: var(--border-radius-normal);
+
+    &__icon {
+      // -1px to avoid isue with razor thin white line between icon container and notification border
+      border-top-left-radius: calc(
+        var(--border-radius-normal) - var(--border-width-thin) - 1px
+      );
+      border-bottom-left-radius: calc(
+        var(--border-radius-normal) - var(--border-width-thin) - 1px
+      );
+    }
+  }
+}
+</style>

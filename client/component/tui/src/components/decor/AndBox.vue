@@ -31,3 +31,13 @@
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-andBox {
+  @extend .tui-orBox;
+
+  &__text {
+    @extend .tui-orBox__text;
+  }
+}
+</style>

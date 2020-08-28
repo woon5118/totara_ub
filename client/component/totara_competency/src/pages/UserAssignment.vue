@@ -487,3 +487,41 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencySelfAssignment {
+  &__table {
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
+  }
+
+  &__tableExpand {
+    & > * + * {
+      margin: var(--gap-2) 0 0;
+    }
+
+    &-header {
+      @include tui-font-heading-small();
+    }
+
+    &-subHeader {
+      @include tui-font-heading-x-small();
+    }
+  }
+
+  &__actions {
+    justify-content: space-between;
+    margin-bottom: var(--gap-5);
+  }
+
+  &__header {
+    margin: 0;
+    @include tui-font-heading-small();
+  }
+
+  &__table {
+    margin-bottom: var(--gap-5);
+  }
+}
+</style>

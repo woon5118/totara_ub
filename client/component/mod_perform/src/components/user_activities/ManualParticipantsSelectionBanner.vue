@@ -72,3 +72,10 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performManualParticipantSelectionBanner {
+  margin-top: var(--gap-5);
+  margin-bottom: var(--gap-5);
+}
+</style>

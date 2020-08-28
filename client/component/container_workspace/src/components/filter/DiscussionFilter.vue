@@ -143,3 +143,26 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-discussionFilter {
+  &__search {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--gap-8);
+
+    &__searchBox {
+      flex-basis: 40%;
+    }
+
+    &__link {
+      margin-left: var(--gap-8);
+    }
+  }
+
+  &__sortBox {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+</style>

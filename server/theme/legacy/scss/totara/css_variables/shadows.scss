@@ -27,10 +27,10 @@
   //
 
   // Often used for form element focus
-  --legacy-shadow-1: 0 0 3px 0 var(--legacy-color-state);
-  --legacy-shadow-2: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
-  --legacy-shadow-3: 0 6px 6px 0 rgba(0, 0, 0, 0.15);
+  --shadow-1: 0 0 3px 0 var(--color-state);
+  --shadow-2: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  --shadow-3: 0 6px 6px 0 rgba(0, 0, 0, 0.15);
 
-  --legacy-btn-shadow-focus: var(--legacy-shadow-2);
-  --legacy-btn-shadow-active: var(--legacy-shadow-3);
+  --btn-shadow-focus: var(--shadow-2);
+  --btn-shadow-active: var(--shadow-3);
 }

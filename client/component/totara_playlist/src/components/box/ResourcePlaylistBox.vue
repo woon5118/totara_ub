@@ -142,3 +142,19 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-resourcePlaylistBox {
+  display: flex;
+  flex-direction: column;
+
+  &__card {
+    padding: var(--gap-2) 0;
+
+    &:not(:last-child) {
+      border-bottom: var(--border-width-thin) solid
+        var(--color-neutral-5);
+    }
+  }
+}
+</style>

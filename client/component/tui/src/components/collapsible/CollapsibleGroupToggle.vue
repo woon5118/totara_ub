@@ -105,3 +105,12 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-collapsibleGroupToggle {
+  display: flex;
+  &__button {
+    margin-left: auto;
+  }
+}
+</style>

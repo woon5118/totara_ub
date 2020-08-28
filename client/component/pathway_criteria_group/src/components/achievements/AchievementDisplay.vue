@@ -166,3 +166,15 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-pathwayCriteriaGroupAchievement {
+  padding: var(--gap-4);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+  border-radius: 6px;
+
+  & > * + * {
+    margin-top: var(--gap-8);
+  }
+}
+</style>

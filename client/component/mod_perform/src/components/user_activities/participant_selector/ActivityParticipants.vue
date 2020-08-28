@@ -319,3 +319,24 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performActivityParticipantSelector {
+  margin-top: var(--gap-4);
+  padding: var(--gap-4);
+  border: var(--border-width-thin) solid var(--card-border-color);
+
+  &-title {
+    @include tui-font-heading-small;
+    margin: 0;
+  }
+
+  &-meta {
+    margin-top: var(--gap-2);
+  }
+
+  &-form {
+    margin-top: var(--gap-4);
+  }
+}
+</style>

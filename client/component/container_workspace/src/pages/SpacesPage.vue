@@ -292,3 +292,18 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-spacesPage {
+  padding: 0 var(--gap-8);
+
+  &__header {
+    @include tui-font-heading-large();
+    margin: calc(var(--gap-8) * 2) 0;
+  }
+
+  &__filter {
+    margin-bottom: var(--gap-4);
+  }
+}
+</style>

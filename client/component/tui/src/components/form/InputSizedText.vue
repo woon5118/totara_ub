@@ -21,3 +21,11 @@
     <slot />
   </div>
 </template>
+
+<style lang="scss">
+.tui-formInputSizedText {
+  // prettier-ignore
+  padding: calc((var(--form-input-height) - (1em * var(--font-body-line-height))) / 2) 0;
+  line-height: var(--font-body-line-height);
+}
+</style>

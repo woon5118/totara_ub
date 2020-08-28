@@ -87,3 +87,40 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-errorDisplay {
+  padding: var(--gap-8);
+  background: var(--color-neutral-3);
+  border-radius: 4px;
+
+  &__title {
+    margin-top: 0;
+  }
+
+  &__buttons {
+    margin-bottom: var(--gap-4);
+  }
+
+  &__buttons:last-child {
+    margin-bottom: 0;
+  }
+
+  &__detailsToggle {
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+    }
+  }
+
+  &__detailsPre {
+    margin-top: var(--gap-2);
+    margin-bottom: 0;
+    padding: var(--gap-4);
+    background-color: var(--color-neutral-1);
+    border-radius: 4px;
+  }
+}
+</style>

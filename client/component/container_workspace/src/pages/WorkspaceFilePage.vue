@@ -233,3 +233,41 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceFilePage {
+  display: flex;
+  flex-direction: column;
+
+  // Overriding the css here.
+  .tui-responsive {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+
+    .tui-grid--vertical {
+      display: flex;
+      flex-direction: column-reverse;
+
+      .tui-grid-item {
+        border-top: 0;
+      }
+    }
+
+    .tui-layoutTwoColumn__heading {
+      margin: 0;
+    }
+  }
+
+  &__content {
+    @media (min-width: $tui-screen-sm) {
+      padding: var(--gap-8);
+    }
+
+    &__message {
+      @include tui-font-body();
+      margin: var(--gap-8) 0;
+    }
+  }
+}
+</style>

@@ -87,3 +87,63 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+:root {
+  --modal-content-separation: var(--gap-2);
+  --modal-content-separation-large: var(--gap-8);
+  --modal-content-outer-padding: var(--gap-8);
+}
+
+.tui-modalContent {
+  @include tui-font-body();
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+  padding: var(--modal-content-outer-padding) 0;
+
+  &__header {
+    display: flex;
+    flex-shrink: 0;
+    padding: 0 var(--modal-content-outer-padding);
+
+    &-title {
+      @include tui-font-heading-small();
+      flex-grow: 1;
+      overflow: hidden;
+
+      &--sronly {
+        @include sr-only();
+      }
+    }
+
+    &-close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: var(--gap-3);
+    }
+  }
+
+  &__content {
+    flex-grow: 1;
+    min-height: 0;
+    margin-top: var(--modal-content-separation);
+    padding: 0 var(--modal-content-outer-padding) 2px;
+    overflow-y: auto;
+  }
+
+  &__footer {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    margin-top: var(--modal-content-separation-large);
+    padding: 0 var(--modal-content-outer-padding);
+
+    &-buttons {
+      margin-left: auto;
+    }
+  }
+}
+</style>

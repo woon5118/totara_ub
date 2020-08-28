@@ -117,3 +117,38 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --totaraReaction-modalMaxHeight: 50vh;
+}
+.tui-likeRecordsModal {
+  &__title {
+    @include tui-font-heading-x-small();
+    margin: 0;
+    padding-bottom: var(--gap-2);
+    border-bottom: var(--border-width-thin) solid var(--color-primary);
+  }
+
+  &__content {
+    max-height: var(--totaraReaction-modalMaxHeight);
+    overflow-y: auto;
+
+    &__records {
+      @include tui-font-body-small();
+      margin: 0;
+      color: var(--color-state);
+      list-style-type: none;
+
+      li {
+        padding: var(--gap-2) 0;
+
+        + li {
+          border-top: var(--border-width-thin) solid
+            var(--color-neutral-5);
+        }
+      }
+    }
+  }
+}
+</style>

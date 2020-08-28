@@ -40,3 +40,15 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-emoji {
+  display: inline-block;
+  font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', Times, Symbola, Aegyptus, Code2000, Code2001, Code2002,
+    Musica, serif, LastResort;
+  white-space: normal;
+  text-decoration: none;
+  font-variant-emoji: emoji;
+}
+</style>

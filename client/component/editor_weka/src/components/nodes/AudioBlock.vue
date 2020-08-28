@@ -173,3 +173,32 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-editorWeka-audioBlock {
+  margin: var(--gap-8) 0;
+  white-space: normal;
+
+  &.ProseMirror-selectednode {
+    outline: none;
+  }
+
+  &.ProseMirror-selectednode > &__inner > .tui-audioBlock {
+    outline: var(--border-width-normal) solid var(--weka-select-color);
+  }
+
+  &__inner {
+    display: inline-block;
+
+    .tui-audioBlock {
+      margin: 0;
+      white-space: normal;
+
+      audio:focus {
+        // Removing self outlininga
+        outline: none;
+      }
+    }
+  }
+}
+</style>

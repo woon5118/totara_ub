@@ -601,3 +601,46 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspacePrimaryAction {
+  display: flex;
+  width: 100%;
+
+  @media (min-width: $tui-screen-sm) {
+    justify-content: flex-end;
+  }
+
+  &--initialise {
+    justify-content: center;
+    padding: var(--gap-2);
+  }
+
+  &__dropDown {
+    width: 100%;
+
+    @media (min-width: $tui-screen-sm) {
+      // IE support - :(
+      width: auto;
+    }
+
+    &__button {
+      width: 100%;
+
+      @media (min-width: $tui-screen-sm) {
+        // IE support - :(
+        width: auto;
+      }
+    }
+  }
+
+  &__button {
+    width: 100%;
+
+    @media (min-width: $tui-screen-sm) {
+      // IE Support - :(
+      width: auto;
+    }
+  }
+}
+</style>

@@ -121,3 +121,20 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-engageWarningModal {
+  &__container {
+    display: flex;
+  }
+
+  &__title {
+    @include tui-font-heading-x-small();
+    margin-bottom: var(--gap-2);
+  }
+
+  &__box {
+    padding-left: var(--gap-4);
+  }
+}
+</style>

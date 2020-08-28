@@ -80,3 +80,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-elementEditNumericRatingScaleParticipantForm {
+  display: flex;
+  flex-direction: column-reverse;
+
+  &__input {
+    margin-top: var(--gap-2);
+  }
+}
+</style>

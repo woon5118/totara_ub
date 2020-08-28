@@ -81,3 +81,15 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-totaraEngage-icon {
+  display: flex;
+  align-items: center;
+  outline: none;
+  cursor: default;
+  &--clickable {
+    cursor: pointer;
+  }
+}
+</style>

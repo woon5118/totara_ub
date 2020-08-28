@@ -169,3 +169,17 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceMemberCard {
+  &__profileCard {
+    &.tui-miniProfileCard {
+      width: 100%;
+    }
+
+    &__tag {
+      margin-left: var(--gap-1);
+    }
+  }
+}
+</style>

@@ -403,3 +403,21 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performManageActivityContent {
+  & > * + * {
+    margin: var(--gap-8) 0 0;
+  }
+
+  &__items {
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+  }
+
+  &__heading {
+    @include tui-font-heading-small();
+  }
+}
+</style>

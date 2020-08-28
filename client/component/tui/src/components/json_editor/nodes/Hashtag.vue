@@ -45,3 +45,19 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-hashtag {
+  display: inline-block;
+  white-space: normal;
+
+  &__text {
+    color: var(--color-state);
+
+    &:hover {
+      // Hover state, for now we keep the same color.
+      color: var(--color-state);
+    }
+  }
+}
+</style>

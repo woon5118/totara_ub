@@ -386,3 +386,53 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-criteriaCompetencyAchievement {
+  &__title {
+    margin: 0;
+    text-align: center;
+    hyphens: manual;
+    @include tui-font-heading-x-small();
+  }
+
+  &__goal {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    max-width: 100%;
+  }
+
+  &__summary {
+    padding: var(--gap-2) var(--gap-2) 0;
+
+    &-header {
+      margin: 0;
+      @include tui-font-heading-x-small();
+    }
+
+    &-body {
+      margin-top: var(--gap-4);
+    }
+
+    &-button {
+      margin-top: var(--gap-4);
+    }
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-criteriaCompetencyAchievement {
+    &__completion {
+      &-notComplete {
+        @include sr-only();
+      }
+    }
+    &__level {
+      &-notAvailable {
+        @include sr-only();
+      }
+    }
+  }
+}
+</style>

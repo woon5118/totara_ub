@@ -282,3 +282,23 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-pathwayManualAchievementRater {
+  margin-top: var(--gap-2);
+  padding: var(--gap-4);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+  border-radius: 6px;
+
+  &__overview {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    align-items: center;
+
+    &-role {
+      @include tui-font-heavy();
+    }
+  }
+}
+</style>

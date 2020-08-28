@@ -22,26 +22,26 @@
 // @package   theme_roots
 
 .tw-selectRegionPanelToggle {
-  background: var(--legacy-color-neutral-1);
-  padding: var(--legacy-gap-2) 0;
+  background: var(--color-neutral-1);
+  padding: var(--gap-2) 0;
   position: sticky;
   top: 0;
   z-index: 2;
 
   &__trigger {
-    border: 1px solid var(--legacy-color-neutral-3);
-    color: var(--legacy-color-state);
+    border: 1px solid var(--color-neutral-3);
+    color: var(--color-state);
     margin: 0 auto;
     text-align: center;
 
     &_hide {
       display: none;
-      padding: var(--legacy-gap-2);
+      padding: var(--gap-2);
     }
 
     &_show {
       display: block;
-      padding: var(--legacy-gap-2);
+      padding: var(--gap-2);
     }
   }
 }

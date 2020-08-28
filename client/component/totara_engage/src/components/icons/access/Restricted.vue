@@ -56,3 +56,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-totaraEngage-restricted {
+  &--color {
+    color: var(--color-secondary);
+  }
+}
+</style>

@@ -54,10 +54,10 @@ export default {
 <style lang="scss">
 .tui-samplesCode {
   &__box {
-    margin: var(--tui-gap-4) 0;
-    padding: var(--tui-gap-4);
-    background-color: var(--tui-color-neutral-3);
-    border: 1px solid var(--tui-color-neutral-5);
+    margin: var(--gap-4) 0;
+    padding: var(--gap-4);
+    background-color: var(--color-neutral-3);
+    border: 1px solid var(--color-neutral-5);
   }
 }
 </style>

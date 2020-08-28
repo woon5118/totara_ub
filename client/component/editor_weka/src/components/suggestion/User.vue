@@ -139,3 +139,10 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-editorWeka-user {
+  position: absolute;
+  width: 32.6rem;
+}
+</style>

@@ -123,3 +123,16 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-playlistPageHeaderBox {
+  &__titleBox {
+    width: 100%;
+
+    &__title {
+      @include tui-font-heading-medium;
+      margin: 0;
+    }
+  }
+}
+</style>

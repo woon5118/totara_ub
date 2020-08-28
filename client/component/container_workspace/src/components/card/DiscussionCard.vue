@@ -529,3 +529,76 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-discussionCard {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--gap-4);
+  color: var(--color-neutral-7);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+
+  &__pinBox {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: var(--gap-2);
+  }
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+
+  &__card {
+    display: flex;
+    padding: var(--gap-4);
+    padding-top: 0;
+
+    &__avatar {
+      margin-right: var(--gap-2);
+    }
+
+    &__content {
+      flex-grow: 1;
+      width: 100%;
+
+      &__head {
+        display: flex;
+        flex: 1;
+        align-items: flex-end;
+        margin-bottom: var(--gap-4);
+        padding-top: 2px;
+
+        a {
+          @include tui-font-body();
+          color: var(--color-state);
+          font-weight: bold;
+        }
+
+        p {
+          @include tui-font-body-x-small();
+          margin: 0;
+          margin-left: var(--gap-2);
+          color: var(--color-neutral-7);
+        }
+      }
+
+      &__body {
+        &--deleted {
+          @include tui-font-body-small();
+          font-style: italic;
+        }
+      }
+
+      &__buttons {
+        display: flex;
+
+        &__comment {
+          display: flex;
+          margin-left: var(--gap-4);
+        }
+      }
+    }
+  }
+}
+</style>

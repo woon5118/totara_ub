@@ -84,3 +84,13 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-engageTopicsSelector {
+  margin-bottom: var(--gap-9);
+  &__label.tui-formLabel {
+    @include tui-font-heading-label();
+    margin-bottom: var(--gap-2);
+  }
+}
+</style>

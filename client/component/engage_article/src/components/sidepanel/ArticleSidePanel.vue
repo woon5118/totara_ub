@@ -358,3 +358,15 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-articleSidePanel {
+  &__timeDescription {
+    @include tui-font-body-small();
+  }
+
+  &__playlistBox {
+    margin-top: var(--gap-8);
+  }
+}
+</style>

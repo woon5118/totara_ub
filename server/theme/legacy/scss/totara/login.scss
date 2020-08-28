@@ -27,7 +27,7 @@
 
 .path-login {
   #page {
-    background-color: var(--legacy-color-neutral-2);
+    background-color: var(--color-neutral-2);
   }
 
   #page-footer {
@@ -39,11 +39,11 @@
   }
 
   hr {
-    border: 1px solid var(--legacy-color-primary);
+    border: 1px solid var(--color-primary);
     width: 50px;
-    margin: var(--legacy-gap-2)
+    margin: var(--gap-2)
         calc(100% - 50px)
-        var(--legacy-gap-4)
+        var(--gap-4)
         0;
 
     display: block;
@@ -84,14 +84,14 @@
     padding: 0 8.88%;
     
     @media screen and (max-width: calc(#{$tui-screen-sm} - 1px)) {
-      padding-bottom: var(--legacy-gap-4);
-      border-bottom: var(--legacy-border-width-thin) solid var(--legacy-color-neutral-5);
+      padding-bottom: var(--gap-4);
+      border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
     }
 
     @media screen and (min-width: $tui-screen-sm) {
       width: 50%;
       float: left;
-      border-right: var(--legacy-border-width-thin) solid var(--legacy-color-neutral-5);
+      border-right: var(--border-width-thin) solid var(--color-neutral-5);
     }
   }
 
@@ -109,13 +109,13 @@
       text-align: left;
 
       label {
-        margin-bottom: var(--legacy-gap-2);
+        margin-bottom: var(--gap-2);
       }
     }
 
     .form-input {
       width: 100%;
-      margin-bottom: var(--legacy-gap-4);
+      margin-bottom: var(--gap-4);
 
       input[type='text'],
       input[type='password'] {
@@ -132,7 +132,7 @@
   }
 
   input[type='submit'] {
-    margin: var(--legacy-gap-8) 0 0;
+    margin: var(--gap-8) 0 0;
   }
 
   .loginerrors {
@@ -141,9 +141,9 @@
 
   .desc {
     line-height: $totara-style-font-line-height-large;
-    color: var(--legacy-color-text);
+    color: var(--color-text);
     clear: both;
-    margin-top: var(--legacy-gap-8);
+    margin-top: var(--gap-8);
   }
 
   .subcontent {
@@ -154,7 +154,7 @@
   #loginbtn {
     @include bs-btn-primary();
     font-weight: bold;
-    margin: var(--legacy-gap-8) 0 var(--legacy-gap-4);
+    margin: var(--gap-8) 0 var(--gap-4);
   }
 
   .potentialidplist {
@@ -179,11 +179,11 @@
     }
 
     fieldset + fieldset {
-      border-top: var(--legacy-border-width-thin) solid var(--legacy-color-neutral-5);
+      border-top: var(--border-width-thin) solid var(--color-neutral-5);
     }
 
     .fcontainer {
-      margin: var(--legacy-gap-4) 0;
+      margin: var(--gap-4) 0;
 
       div.fitemtile,
       div.felement {
@@ -197,7 +197,7 @@
       }
 
       .fitemtitle {
-        margin-bottom: var(--legacy-gap-2);
+        margin-bottom: var(--gap-2);
       }
     }
 
@@ -212,7 +212,7 @@
     .boxwidthnormal,
     #notice {
       width: 100%;
-      padding-bottom: var(--legacy-gap-4);
+      padding-bottom: var(--gap-4);
     }
   }
 }

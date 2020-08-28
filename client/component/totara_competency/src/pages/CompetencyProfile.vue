@@ -388,3 +388,51 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyProfile {
+  // disable scroll anchoring as it is problematic when switching between chart/list views
+  overflow-anchor: none;
+
+  &__split {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__titleSection {
+    margin: var(--gap-6) 0 var(--gap-4) 0;
+  }
+
+  &__title {
+    @include tui-font-heading-medium();
+    margin: 0;
+  }
+
+  &__buttons {
+    > * {
+      margin-top: var(--gap-4);
+    }
+  }
+
+  &__sectionTitle {
+    @include tui-font-heading-small();
+    margin: var(--gap-4) 0 var(--gap-2) 0;
+  }
+
+  &__filtersBar {
+    margin: var(--gap-6) 0;
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-competencyProfile {
+    &__buttons {
+      > * {
+        margin-top: 0;
+      }
+    }
+  }
+}
+</style>

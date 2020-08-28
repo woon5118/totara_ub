@@ -21,3 +21,9 @@
     <slot />
   </div>
 </template>
+
+<style lang="scss">
+.tui-formRowStack {
+  @include tui-stack-vertical(var(--gap-4));
+}
+</style>

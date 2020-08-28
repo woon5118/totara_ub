@@ -22,7 +22,7 @@
 // @package   theme_roots
 
 .tw-crumbWithTitle {
-  margin-top: var(--legacy-gap-2);
+  margin-top: var(--gap-2);
   width: 100%;
 
   &__heading {
@@ -38,10 +38,10 @@
   }
 
   &__list {
-    margin: var(--legacy-gap-1) 0 0;
+    margin: var(--gap-1) 0 0;
 
     &_chev {
-      padding: 0 var(--legacy-gap-2);
+      padding: 0 var(--gap-2);
     }
 
     &_item {
@@ -49,9 +49,9 @@
     }
 
     &_framework {
-      padding: 0 var(--legacy-gap-4) 0 0;
+      padding: 0 var(--gap-4) 0 0;
       font-weight: bold;
-      font-size: var(--legacy-font-size-14);
+      font-size: var(--font-size-14);
     }
   }
 }

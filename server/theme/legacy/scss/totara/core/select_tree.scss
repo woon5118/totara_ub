@@ -83,14 +83,14 @@
     }
 
     &_showBox {
-      border-color: var(--legacy-color-neutral-5);
+      border-color: var(--color-neutral-5);
     }
   }
 
   &__option {
     background: $selectTree-options-bg-color;
     border: 1px solid $selectTree-options-border-color;
-    box-shadow: var(--legacy-shadow-2);
+    box-shadow: var(--shadow-2);
     font-size: $selectTree-options-text-size;
     max-height: 350px;
     max-width: 300px;

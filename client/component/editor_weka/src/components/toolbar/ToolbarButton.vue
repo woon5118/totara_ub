@@ -63,3 +63,18 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-editorWeka-toolbarButton {
+  width: var(--gap-6);
+  height: var(--gap-6);
+  padding: 0 var(--gap-1);
+
+  .tui-iconBtn__icon {
+    font-size: var(--font-size-14);
+    .flex-icon {
+      width: auto;
+    }
+  }
+}
+</style>

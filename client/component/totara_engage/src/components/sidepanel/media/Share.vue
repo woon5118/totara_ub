@@ -329,3 +329,17 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --shareSetting-min-height: 250px;
+}
+
+.tui-shareSetting {
+  &__recipient {
+    display: flex;
+    flex-direction: column;
+    min-height: var(--shareSetting-min-height);
+  }
+}
+</style>

@@ -63,15 +63,15 @@ ol {
     line-height: 14px;
   }
   .msg-sender {
-    color: var(--legacy-color-secondary);
+    color: var(--color-secondary);
   }
   .msg-time {
-    color: var(--legacy-color-neutral-6);
+    color: var(--color-neutral-6);
     display: block;
     font-size: 11px;
   }
   [title='new'] {
-    background-color: var(--legacy-color-neutral-2);
+    background-color: var(--color-neutral-2);
   }
 }
 

@@ -72,3 +72,131 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+:root {
+  // Size of radio circle
+  --form-radio-size: var(--font-size-16);
+  // Size of radio inner dot
+  --form-radio-dot-size: calc(var(--form-radio-size) / 2);
+  // Offset to center dot
+  --radio-dot-offset: calc(var(--form-radio-size) / 4);
+  // Offset for radio label
+  --radio-label-offset: calc(var(--form-radio-size) * 1.35);
+}
+
+.tui-radio {
+  position: relative;
+  display: inline-flex;
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  &__label {
+    position: relative;
+    margin: 0;
+    padding-left: var(--radio-label-offset);
+    font-weight: normal;
+    font-size: var(--form-input-font-size);
+    line-height: 1;
+
+    &::before {
+      position: absolute;
+      top: calc(50% - var(--form-radio-size) / 2);
+      left: 0;
+      display: block;
+      width: var(--form-radio-size);
+      height: var(--form-radio-size);
+      background: var(--form-radio-bg-color);
+      border: var(--form-input-border-size) solid;
+      border-color: var(--form-radio-border-color);
+      border-radius: 50%;
+      transition: border var(--transition-form-function)
+          var(--transition-form-duration),
+        box-shadow var(--transition-form-function)
+          var(--transition-form-duration);
+      content: '';
+      pointer-events: none;
+
+      .tui-contextInvalid & {
+        border-color: var(--form-input-border-color-invalid);
+        box-shadow: var(--shadow-none), var(--form-input-shadow-invalid);
+      }
+    }
+  }
+
+  &__input:disabled ~ &__label {
+    color: var(--form-input-text-color-disabled);
+  }
+
+  &__input:hover ~ &__label::before {
+    background: var(--form-radio-bg-color-hover);
+  }
+
+  &__input:focus ~ &__label::before {
+    background: var(--form-radio-bg-color-focus);
+  }
+
+  &__input:hover ~ &__label::before,
+  &__input:focus ~ &__label::before {
+    border: var(--form-input-border-size) solid;
+    border-color: var(--form-radio-border-color-focus);
+    box-shadow: var(--form-input-shadow-focus);
+
+    .tui-contextInvalid & {
+      border-color: var(--form-input-border-color-invalid);
+      box-shadow: var(--shadow-none),
+        var(--form-input-shadow-invalid-focus);
+    }
+  }
+
+  &__input:active:focus ~ &__label::before,
+  &__input:active:hover ~ &__label::before,
+  &__input:active ~ &__label::before {
+    background: var(--form-radio-bg-color-active);
+    border: var(--form-input-border-size) solid;
+    border-color: var(--form-radio-border-color-active);
+    box-shadow: var(--form-input-shadow-focus);
+
+    .tui-contextInvalid & {
+      border-color: var(--form-input-border-color-invalid);
+      box-shadow: var(--shadow-none),
+        var(--form-input-shadow-invalid-focus);
+    }
+  }
+
+  &__input:disabled:active ~ &__label::before,
+  &__input:disabled ~ &__label::before {
+    background: var(--form-radio-bg-color-disabled);
+    border: var(--form-input-border-size) solid;
+    border-color: var(--form-radio-border-color-disabled);
+    box-shadow: none;
+  }
+
+  &__input ~ &__label::after {
+    position: absolute;
+    top: calc(50% - var(--form-radio-dot-size) / 2);
+    left: var(--radio-dot-offset);
+    display: block;
+    width: var(--form-radio-dot-size);
+    height: var(--form-radio-dot-size);
+    background-color: var(--form-radio-dot-color);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity var(--transition-form-function)
+      var(--transition-form-duration);
+    content: '';
+    pointer-events: none;
+  }
+
+  &__input:disabled ~ &__label::after {
+    background-color: var(--form-input-text-color-disabled);
+  }
+
+  &__input:checked ~ &__label::after {
+    opacity: 1;
+  }
+}
+</style>

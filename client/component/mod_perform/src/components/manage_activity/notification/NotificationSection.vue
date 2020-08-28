@@ -106,3 +106,16 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-activityNotificationSettings {
+  margin-bottom: var(--gap-4);
+
+  &__toggle {
+    margin-right: var(--gap-1);
+  }
+}
+.tui-activityNotificationsRecipients {
+  margin: var(--gap-4) 0;
+}
+</style>

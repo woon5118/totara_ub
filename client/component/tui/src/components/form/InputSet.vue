@@ -82,3 +82,76 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+@mixin tui-input-set-stack-below($name, $size) {
+  &--stackBelow-#{$name} > *,
+  // need to specify .tui-formInput here too for specificity reasons
+  &--stackBelow-#{$name} > .tui-formInput {
+    // This triggers the children to switch to being vertically stacked below a
+    // certain width.
+    // It works like this:
+    // Above the specified width, (width - 100%) evaluates to a large
+    // negative flex basis, and is therefore ignored.
+    // Below the specified width, (width - 100%) evaluates to a large
+    // positve flex basis, and forces each item to take up its own line.
+    // Magic!
+    flex-basis: calc(
+      (#{tui-char-length($size)} - (100% - var(--input-set-spacing))) * 999
+    );
+  }
+}
+.tui-inputSet {
+  display: flex;
+  flex-grow: 1;
+
+  @include tui-char-length-classes();
+
+  // can't set margin on inputSet itself, so it is just a wrapper for this
+  // the variants are on inner to ensure the & > * selectors retain low specificity (0-1-0)
+  & > &__inner {
+    display: flex;
+    flex-basis: 0; // required for things to look correct in IE 11
+    flex-grow: 1;
+    margin: calc((var(--input-set-spacing) / 2) * -1);
+
+    &--vertical {
+      flex-direction: column;
+    }
+
+    &--horizontal {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    & > *,
+    & > .tui-formInput {
+      margin: calc(var(--input-set-spacing) / 2);
+    }
+
+    & > .tui-formLabel {
+      padding: 0;
+    }
+
+    & > {
+      // replaced input elements have their width set to 100% normally as
+      // `width: auto` doesn't fill the container like it does on divs
+      #{$tui-input-replaced-selectors} {
+        width: auto;
+      }
+    }
+
+    &--split {
+      & > * {
+        flex-basis: 0;
+        flex-grow: 1;
+        width: auto;
+      }
+    }
+
+    @each $size in $tui-char-length-scale {
+      @include tui-input-set-stack-below($size, $size);
+    }
+  }
+}
+</style>

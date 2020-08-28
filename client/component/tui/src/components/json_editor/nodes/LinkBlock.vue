@@ -69,3 +69,86 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-linkBlock {
+  position: relative;
+  display: flex;
+  max-width: 28.6rem;
+  height: calc(7.6rem + 2px);
+  font-size: var(--font-size-13);
+  line-height: 1.15;
+  white-space: normal;
+  border: 1px solid var(--card-border-color);
+  border-radius: 4px;
+  transition: box-shadow var(--transition-form-function)
+    var(--transition-form-duration);
+
+  &:hover,
+  &:focus {
+    box-shadow: var(--shadow-2);
+  }
+
+  &__image {
+    flex-shrink: 0;
+    order: 2;
+    width: 6rem;
+    height: 6rem;
+    margin: var(--gap-2);
+    background-position: center;
+    background-size: cover;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+
+    > img {
+      width: 100%;
+    }
+  }
+
+  &__summary {
+    flex-grow: 1;
+    order: 1;
+    padding: var(--gap-2);
+    overflow: hidden;
+  }
+
+  &__site {
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+    font-size: var(--font-size-12);
+    line-height: 1.15;
+  }
+
+  &__title {
+    margin-bottom: 0.3rem;
+    color: var(--color-state);
+    font-weight: bold;
+  }
+
+  &__description {
+    // show a max of 2 lines
+    height: calc(var(--font-size-13) * 2 * 1.15);
+    overflow: hidden;
+  }
+
+  &__linkOnly {
+    // show a max of 4 lines
+    height: calc(var(--font-size-13) * 4 * 1.12);
+    margin-top: 0.2rem;
+    overflow: hidden;
+    color: var(--color-state);
+    font-weight: bold;
+    font-size: var(--font-size-13);
+    line-height: 1.15;
+  }
+
+  &__overlayLink {
+    position: absolute;
+    // -1px to account for border
+    top: -1px;
+    right: -1px;
+    bottom: -1px;
+    left: -1px;
+  }
+}
+</style>

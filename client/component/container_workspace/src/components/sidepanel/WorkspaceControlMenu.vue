@@ -99,3 +99,37 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceControlMenu {
+  display: flex;
+  width: 100%;
+
+  &__head {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    &__control {
+      display: flex;
+      align-items: center;
+      padding: var(--gap-4) var(--gap-4) 0 var(--gap-4);
+
+      &__title {
+        @include tui-font-heading-small();
+        margin: 0;
+      }
+
+      &__buttonIcon {
+        margin-left: var(--gap-2);
+      }
+    }
+
+    &__menu {
+      padding: var(--gap-8) 0;
+      background-color: var(--color-neutral-3);
+      border: var(--border-width-thin) solid var(--color-neutral-5);
+    }
+  }
+}
+</style>

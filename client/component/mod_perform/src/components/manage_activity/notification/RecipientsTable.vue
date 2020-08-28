@@ -73,3 +73,17 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-activityNotificationsRecipientsTable {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__row {
+    margin: 0 0 var(--gap-4);
+    padding: 0;
+  }
+}
+</style>

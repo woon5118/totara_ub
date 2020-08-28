@@ -49,16 +49,16 @@ export default {
 <style lang="scss">
 .tui-samplesCtl {
   &__box {
-    margin: var(--tui-gap-4) 0;
-    padding: var(--tui-gap-4);
-    background-color: var(--tui-color-neutral-3);
-    border: 1px solid var(--tui-color-neutral-5);
+    margin: var(--gap-4) 0;
+    padding: var(--gap-4);
+    background-color: var(--color-neutral-3);
+    border: 1px solid var(--color-neutral-5);
   }
 
   &__optional {
-    margin: var(--tui-gap-4) 0;
-    padding-bottom: var(--tui-gap-1);
-    border-bottom: 1px solid var(--tui-color-neutral-5);
+    margin: var(--gap-4) 0;
+    padding-bottom: var(--gap-1);
+    border-bottom: 1px solid var(--color-neutral-5);
   }
 }
 </style>

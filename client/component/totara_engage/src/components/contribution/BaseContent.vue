@@ -184,3 +184,90 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-contributionBaseContent {
+  &__horizontal {
+    padding: var(--gap-8);
+  }
+
+  &__vertical {
+    .tui-filterBar__filters,
+    .tui-contributionBaseContent__cards {
+      padding: var(--gap-4);
+    }
+
+    .tui-contributionBaseContent__counterContainer {
+      padding: 0 var(--gap-2);
+    }
+    .tui-contributionFilter__sort {
+      padding-right: var(--gap-4);
+    }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--gap-8);
+    margin-bottom: calc(var(--gap-8) * 2);
+
+    &__title {
+      @include tui-font-heading-large;
+      flex: 1;
+    }
+
+    :not(:first-child) {
+      margin-left: var(--gap-8);
+    }
+  }
+
+  &__filter {
+    display: flex;
+    flex-direction: column;
+    margin-top: var(--gap-4);
+    margin-bottom: var(--gap-4);
+  }
+
+  &__cards {
+    margin-top: var(--gap-1);
+    padding: var(--gap-1);
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
+  }
+
+  &__loadMoreContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  &__viewedResources {
+    display: flex;
+    align-self: center;
+    margin-bottom: var(--gap-1);
+  }
+
+  &__loadMore {
+    display: flex;
+    align-self: center;
+  }
+
+  &__counterContainer {
+    position: relative;
+
+    &__counter {
+      @include tui-font-heading-x-small;
+      position: absolute;
+      top: calc(var(--gap-6) * -2);
+      padding: var(--gap-2);
+      padding-bottom: 0;
+    }
+  }
+
+  &__emptyText {
+    @include tui-font-body;
+    margin-top: var(--gap-2);
+  }
+}
+</style>

@@ -141,3 +141,11 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-cardSharedByFootnote {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+</style>

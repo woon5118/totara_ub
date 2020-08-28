@@ -359,7 +359,7 @@ export default {
   }
 
   &__table-toggle {
-    margin-top: var(--tui-gap-2);
+    margin-top: var(--gap-2);
   }
 
   &__dragLists {
@@ -370,8 +370,8 @@ export default {
   &__dragList {
     width: 200px;
     margin-right: 50px;
-    padding: var(--tui-gap-2);
-    background: var(--tui-color-neutral-4);
+    padding: var(--gap-2);
+    background: var(--color-neutral-4);
     transition: background-color 0.15s;
 
     &--valid {
@@ -379,20 +379,20 @@ export default {
     }
 
     > [data-tui-draggable-placeholder] {
-      margin-bottom: var(--tui-gap-2);
+      margin-bottom: var(--gap-2);
     }
   }
 
   &__draggableItem {
-    margin-bottom: var(--tui-gap-2);
-    padding: var(--tui-gap-4);
+    margin-bottom: var(--gap-2);
+    padding: var(--gap-4);
     background: white;
     border: 1px solid black;
     transition: box-shadow 0.15s;
     user-select: none;
 
     &--dragging {
-      box-shadow: var(--tui-shadow-3);
+      box-shadow: var(--shadow-3);
     }
   }
 
@@ -410,8 +410,8 @@ export default {
       justify-content: center;
       width: 150px;
       height: 180px;
-      margin: var(--tui-gap-2);
-      padding: var(--tui-gap-4);
+      margin: var(--gap-2);
+      padding: var(--gap-4);
       background: white;
       border: 1px solid black;
       transition: box-shadow 0.15s;
@@ -419,8 +419,8 @@ export default {
 
       &-moveIcon {
         position: absolute;
-        top: var(--tui-gap-2);
-        left: var(--tui-gap-2);
+        top: var(--gap-2);
+        left: var(--gap-2);
         display: none;
       }
 

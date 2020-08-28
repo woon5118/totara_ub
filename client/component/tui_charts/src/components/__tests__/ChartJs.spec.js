@@ -67,7 +67,7 @@ jest.mock('tui/theme', () => {
   return {
     getVar(name) {
       let vars = {
-        'tui-font-size-chart-default': '14',
+        'font-size-chart-default': '14',
       };
 
       // This must be a local variable
@@ -110,8 +110,8 @@ jest.mock('tui/theme', () => {
       ];
 
       mockDefaultColors.forEach((value, i) => {
-        vars[`tui-color-chart-background-${i + 1}`] = value.baseColor;
-        vars[`tui-color-chart-transparent-${i + 1}`] = value.transparentColor
+        vars[`color-chart-background-${i + 1}`] = value.baseColor;
+        vars[`color-chart-transparent-${i + 1}`] = value.transparentColor
           ? value.transparentColor
           : value.baseColor;
       });

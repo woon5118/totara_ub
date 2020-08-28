@@ -335,3 +335,13 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-elementEditNumericRatingScale {
+  &__values {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+</style>

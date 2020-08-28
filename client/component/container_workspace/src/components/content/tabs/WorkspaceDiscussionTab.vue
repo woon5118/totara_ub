@@ -482,3 +482,36 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceDiscussionTab {
+  display: flex;
+  flex-direction: column;
+
+  &__filter {
+    margin-bottom: var(--gap-4);
+  }
+
+  &__card {
+    margin-bottom: var(--gap-8);
+  }
+
+  &__loadMoreContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: var(--gap-8);
+  }
+
+  &__viewedDiscussions {
+    display: flex;
+    align-self: center;
+    margin-bottom: var(--gap-1);
+  }
+
+  &__loadMore {
+    display: flex;
+    align-self: center;
+  }
+}
+</style>

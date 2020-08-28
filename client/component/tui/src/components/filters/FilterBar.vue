@@ -208,3 +208,95 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-filterBar {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--gap-3);
+
+  &--hasTop {
+    padding-top: var(--gap-4);
+    border-top: var(--border-width-thin) solid
+      var(--filter-bar-border-color);
+  }
+
+  &--hasBottom {
+    padding-bottom: var(--gap-4);
+    border-bottom: var(--border-width-thin) solid
+      var(--filter-bar-border-color);
+  }
+
+  &__heading {
+    @include sr-only();
+  }
+
+  &__toggle {
+    display: flex;
+    justify-content: center;
+
+    &-btn {
+      margin: var(--gap-2) 0;
+    }
+  }
+
+  &__filters {
+    $stacked: #{&}--stacked;
+    display: flex;
+    flex-grow: 1;
+
+    &-left,
+    &-right {
+      display: flex;
+      flex-shrink: 0;
+
+      > * {
+        flex-shrink: 0;
+      }
+
+      > * + * {
+        margin-left: var(--gap-4);
+      }
+
+      // make slider icon closer to next filter item
+      > .tui-filterBar__filters-icon + * {
+        margin-left: var(--gap-2);
+      }
+
+      #{$stacked} & {
+        flex-direction: column;
+        margin-left: 0;
+
+        .tui-formLabel {
+          @include tui-font-heading-label-small();
+        }
+
+        > * {
+          margin-top: var(--gap-2);
+          margin-left: 0;
+        }
+      }
+    }
+
+    &-right {
+      flex-grow: 1;
+      justify-content: flex-end;
+      margin-left: var(--gap-4);
+    }
+
+    &-icon {
+      display: flex;
+      align-items: center;
+    }
+
+    &-iconSlider {
+      display: flex;
+      margin: auto 0;
+    }
+
+    &--stacked {
+      flex-direction: column;
+    }
+  }
+}
+</style>

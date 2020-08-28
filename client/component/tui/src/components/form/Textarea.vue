@@ -81,3 +81,59 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-formTextarea {
+  display: block;
+  flex-grow: 1;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: var(--gap-1) var(--gap-2);
+  overflow: auto;
+  color: var(--form-input-text-color);
+  font-size: var(--form-input-font-size);
+  font-family: inherit;
+  line-height: inherit;
+  border: var(--form-input-border-size) solid
+    var(--form-input-border-color);
+  resize: none;
+
+  @include tui-char-length-classes();
+
+  &::placeholder {
+    color: var(--form-input-text-placeholder-color);
+  }
+
+  .tui-contextInvalid & {
+    border-color: var(--form-input-border-color-invalid);
+    box-shadow: var(--form-input-shadow-invalid);
+  }
+
+  &:focus {
+    background: var(--form-input-bg-color-focus);
+    border: var(--form-input-border-size) solid
+      var(--form-input-border-color-focus);
+    outline: none;
+    box-shadow: var(--form-input-shadow-focus);
+
+    .tui-contextInvalid & {
+      background: var(--form-input-bg-color-invalid-focus);
+      border-color: var(--form-input-border-color-invalid);
+      box-shadow: var(--form-input-shadow-invalid-focus);
+    }
+  }
+
+  &[disabled] {
+    color: var(--form-input-text-color-disabled);
+    background: var(--form-input-bg-color-disabled);
+    border-color: var(--form-input-border-color-disabled);
+
+    &::placeholder {
+      color: var(--form-input-text-color-disabled);
+    }
+  }
+}
+</style>

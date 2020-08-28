@@ -222,3 +222,27 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyAchievementsScale {
+  & > * + * {
+    margin-top: var(--gap-3);
+  }
+
+  &__title {
+    margin-left: var(--gap-2);
+    @include tui-font-heading-small();
+  }
+
+  &__item {
+    margin-top: var(--gap-4);
+    &:first-of-type {
+      margin-top: var(--gap-2);
+    }
+  }
+
+  &__separator {
+    margin: var(--gap-4) var(--gap-4) 0;
+  }
+}
+</style>

@@ -142,3 +142,43 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-inputColor {
+  position: relative;
+
+  @include tui-char-length-classes();
+
+  // visually hide the colour Input control
+  &__picker[type='color'] {
+    position: absolute;
+    width: calc(var(--gap-8) + var(--gap-2));
+    opacity: 0;
+
+    &[disabled='disabled'] {
+      cursor: not-allowed;
+    }
+  }
+
+  // quite acute box model and positioning values to make sure they scale with
+  // associated text Input values
+  &__colorBlock {
+    position: absolute;
+    // prettier-ignore
+    top: calc( var(--form-input-v-padding) / 2 + var(--form-input-border-size) );
+    left: calc(var(--gap-2) / 2);
+    width: var(--gap-8);
+    // prettier-ignore
+    height: calc(100% - var(--form-input-v-padding) - var(--form-input-border-size) * 2);
+    border-radius: var(--border-radius-small);
+
+    &--disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  & &__input[type='text'] {
+    padding-left: calc(var(--gap-8) + var(--gap-2));
+  }
+}
+</style>

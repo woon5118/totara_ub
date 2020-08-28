@@ -195,3 +195,9 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-elementResponseReportingActionCard {
+  margin-bottom: var(--gap-10);
+}
+</style>

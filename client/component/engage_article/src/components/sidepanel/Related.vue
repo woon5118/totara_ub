@@ -121,3 +121,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-articleRelated {
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+}
+</style>

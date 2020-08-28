@@ -103,3 +103,35 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-selectFilter {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .tui-formLabel {
+    margin: auto var(--gap-3) auto 0;
+  }
+
+  .tui-select {
+    width: auto;
+    max-width: 250px;
+  }
+
+  &--stacked {
+    flex-direction: column;
+    align-items: stretch;
+
+    .tui-formLabel {
+      margin: var(--gap-1) 0 0;
+    }
+
+    .tui-select {
+      max-width: initial;
+      margin-top: var(--gap-1);
+    }
+  }
+}
+</style>

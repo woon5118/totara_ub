@@ -62,3 +62,59 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-loader {
+  $loading-fullpage: #{&}--fullpage;
+
+  position: relative;
+
+  // Don't show nested loaders
+  &--active > * .tui-loader__overlay {
+    display: none;
+  }
+
+  // If no slot content (e.g. initial load)
+  &__empty {
+    min-height: var(--gap-8);
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    /*rtl:ignore*/
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    #{$loading-fullpage} & {
+      position: fixed;
+      z-index: var(--zindex-loading-page);
+    }
+
+    &-positioner {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      background: var(--color-background);
+      opacity: 0.85;
+      content: '';
+    }
+  }
+
+  &__display {
+    position: sticky;
+    top: var(--gap-6);
+    bottom: var(--gap-6);
+    font-size: var(--font-size-18);
+
+    .fa-spinner {
+      position: relative;
+      top: -1px;
+    }
+  }
+}
+</style>

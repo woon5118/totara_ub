@@ -117,3 +117,21 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-surveyResultContent {
+  &__participant {
+    @include tui-font-body();
+    @include tui-font-heavy();
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--gap-2);
+  }
+
+  &__participantnumber {
+    @include tui-font-body();
+    @include tui-font-heavy();
+    padding-right: var(--gap-1);
+  }
+}
+</style>

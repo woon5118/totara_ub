@@ -184,3 +184,30 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-bulkManualRatingRateUsersList {
+  display: block;
+
+  &__avatar {
+    margin-right: var(--gap-1);
+  }
+
+  &__flexRow {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__search {
+    @media (min-width: $tui-screen-sm) {
+      width: 50%;
+    }
+    margin-top: var(--gap-4);
+    margin-bottom: var(--gap-4);
+  }
+
+  &__noUsers {
+    @include tui-font-hint;
+  }
+}
+</style>

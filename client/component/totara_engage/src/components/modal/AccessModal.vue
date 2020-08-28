@@ -141,3 +141,17 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-totaraEngage-accessModal {
+  &__content {
+    .tui-modalContent__content {
+      position: relative;
+      display: flex;
+      flex-basis: 100%;
+      flex-direction: column;
+      min-height: 450px;
+    }
+  }
+}
+</style>

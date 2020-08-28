@@ -109,3 +109,11 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-contributionSearchResults {
+  .tui-contributionBaseContent__header__title {
+    @include tui-font-heading-medium;
+  }
+}
+</style>

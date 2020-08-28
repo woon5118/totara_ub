@@ -165,3 +165,9 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-editorWeka-suggestion__hashtag {
+  position: absolute;
+}
+</style>

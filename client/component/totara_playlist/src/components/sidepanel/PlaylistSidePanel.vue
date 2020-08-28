@@ -318,3 +318,23 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-playlistSidePanel {
+  padding: var(--gap-8);
+
+  &__overview__timeDescription {
+    @include tui-font-body-small();
+  }
+
+  &__overview__setting {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__overview__media {
+    margin-top: 0;
+    margin-left: var(--gap-6);
+  }
+}
+</style>

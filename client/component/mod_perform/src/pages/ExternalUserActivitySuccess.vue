@@ -65,3 +65,19 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performUserActivitySuccess {
+  @include tui-font-body();
+
+  margin: var(--gap-8) 0 0;
+
+  & > * + * {
+    margin-top: var(--gap-6);
+  }
+
+  &__header {
+    @include tui-font-heading-medium();
+  }
+}
+</style>

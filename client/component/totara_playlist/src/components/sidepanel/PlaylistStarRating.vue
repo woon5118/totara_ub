@@ -133,3 +133,35 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-playlistStarRating {
+  &:after {
+    display: flex;
+    margin-top: calc(var(--gap-10) * 4);
+    border-bottom: 1px solid var(--color-neutral-4);
+    content: '';
+  }
+
+  .tui-totaraEngage-star {
+    width: var(--font-size-15);
+    height: var(--font-size-15);
+
+    &__filled {
+      stop-color: var(--color-chart-background-2);
+    }
+
+    &__unfilled {
+      stop-color: var(--color-neutral-1);
+    }
+  }
+
+  &__rates {
+    padding-right: var(--gap-1);
+  }
+
+  &__icon {
+    margin-bottom: var(--gap-1);
+  }
+}
+</style>

@@ -193,3 +193,29 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-totaraEngage-rating {
+  display: flex;
+
+  &__rtl {
+    direction: rtl;
+  }
+
+  &__inline {
+    display: inline-flex;
+  }
+
+  &__pointer {
+    cursor: pointer;
+  }
+
+  &__srOnly {
+    @include sr-only();
+  }
+}
+
+.tui-totaraEngage-ratingStar {
+  display: inline-block;
+}
+</style>

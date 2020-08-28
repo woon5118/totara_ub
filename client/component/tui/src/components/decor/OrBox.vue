@@ -31,3 +31,19 @@
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-orBox {
+  display: inline-flex;
+  margin: 0 auto;
+  border: var(--border-width-thin) solid var(--color-neutral-6);
+  border-radius: 6px;
+
+  &__text {
+    margin: 0;
+    padding: var(--gap-2) var(--gap-4);
+    text-transform: uppercase;
+    @include tui-font-heading-label();
+  }
+}
+</style>

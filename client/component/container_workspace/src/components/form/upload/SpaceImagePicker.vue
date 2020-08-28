@@ -205,3 +205,51 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-spaceImagePicker {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+
+  padding: var(--gap-2);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+
+  &--loading {
+    align-items: center;
+    justify-content: center;
+    border: none;
+  }
+
+  &__image {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: var(--border-radius-normal);
+
+    &--progressing {
+      align-items: stretch;
+    }
+
+    &__loader {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    &__button,
+    &__progress {
+      margin-bottom: var(--gap-4);
+    }
+  }
+}
+</style>

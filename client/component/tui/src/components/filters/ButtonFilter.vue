@@ -34,3 +34,14 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-buttonFilter.tui-buttonFilter {
+  &--stacked {
+    text-align: right;
+    > * {
+      margin-top: var(--gap-4);
+    }
+  }
+}
+</style>

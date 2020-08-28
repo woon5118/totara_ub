@@ -50,3 +50,63 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-dataTableExpandableRow {
+  position: relative;
+  color: var(--datatable-expanded-text-color);
+  border: 1px solid var(--datatable-expanded-border-color);
+  box-shadow: var(--shadow-2);
+
+  &__close {
+    position: absolute;
+    top: var(--gap-2);
+    right: 0;
+    z-index: 2;
+    font-size: var(--font-size-20);
+
+    .flex_icon {
+      vertical-align: text-top;
+    }
+  }
+
+  &__content {
+    position: relative;
+    height: 100vh;
+    padding: var(--gap-3);
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background: var(--datatable-expanded-bg-color);
+  }
+
+  &__placement {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100vw;
+    height: 0;
+    padding: 0;
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-dataTableExpandableRow {
+    margin: var(--gap-2) 0;
+
+    &__content {
+      height: inherit;
+      overflow-y: hidden;
+    }
+
+    &__placement {
+      position: relative;
+      top: inherit;
+      left: 0;
+      z-index: initial;
+      width: 100%;
+      height: inherit;
+    }
+  }
+}
+</style>

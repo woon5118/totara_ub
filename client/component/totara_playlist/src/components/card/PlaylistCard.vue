@@ -252,3 +252,120 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-totaraPlaylist-playlistCard {
+  min-height: var(--totaraEngage-card-height);
+
+  &__imageHeader {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__imageContainer {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-between;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-top-left-radius: calc(var(--card-border-radius) - 1px);
+    border-top-right-radius: calc(var(--card-border-radius) - 1px);
+  }
+
+  &__numberOfResourcesContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__numberOfResources {
+    width: 60px;
+    height: 60px;
+    background-color: var(--color-neutral-1);
+    border-radius: 50%;
+
+    p {
+      margin: 0 auto;
+      padding: 0;
+      font-weight: 700;
+      font-size: var(--font-size-16);
+      line-height: 60px;
+      text-align: center;
+    }
+  }
+
+  &__icons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    & > * + * {
+      margin-left: var(--gap-4);
+    }
+  }
+
+  &__bookmark {
+    // Negative margin here to neutralise the default redundant edges of icon.
+    margin-top: -2px;
+    margin-right: calc(var(--gap-3) * -1);
+  }
+
+  &__title {
+    @include tui-font-heading-x-small();
+  }
+
+  &__bookmarkIcon {
+    margin: -1px -5px 0 0;
+    &--hidden {
+      visibility: hidden;
+    }
+  }
+
+  &__rating {
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding-bottom: 10px;
+
+    .tui-totaraEngage-star {
+      width: var(--font-size-14);
+      height: var(--font-size-14);
+
+      &__filled {
+        stop-color: var(--color-chart-background-2);
+      }
+
+      &__unfilled {
+        stop-color: var(--color-neutral-1);
+      }
+    }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: flex-end;
+
+    & > * + * {
+      margin-left: var(--gap-1);
+    }
+
+    & > :last-child {
+      margin: 0 -5px 0 auto;
+    }
+  }
+}
+</style>

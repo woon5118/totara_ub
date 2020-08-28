@@ -215,3 +215,28 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceTransferOwnerForm {
+  display: flex;
+  flex-direction: column;
+
+  &__content {
+    flex-grow: 1;
+
+    &__formRow {
+      margin-bottom: var(--gap-4);
+    }
+
+    &__helpText {
+      @include tui-font-body-small();
+      margin: 0;
+      margin-bottom: var(--gap-4);
+    }
+  }
+
+  &__buttonGroup {
+    justify-content: flex-end;
+  }
+}
+</style>

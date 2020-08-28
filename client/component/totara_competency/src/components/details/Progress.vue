@@ -138,3 +138,25 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyDetailProgress {
+  min-height: 65px;
+  margin-top: var(--gap-7);
+
+  &__popover {
+    &-header {
+      margin-top: 0;
+      @include tui-font-heading-label();
+    }
+
+    &-body {
+      color: var(--color-neutral-6);
+    }
+
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
+  }
+}
+</style>

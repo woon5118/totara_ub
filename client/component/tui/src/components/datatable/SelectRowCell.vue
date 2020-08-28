@@ -66,3 +66,37 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-dataTableSelectRowCell {
+  display: flex;
+  flex-direction: column;
+
+  &--hidden {
+    height: 0;
+    visibility: hidden;
+  }
+
+  &--valign {
+    &-start {
+      justify-content: flex-start;
+    }
+
+    &-center {
+      justify-content: center;
+    }
+
+    &-end {
+      justify-content: flex-end;
+    }
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-dataTableSelectRowCell {
+    &--hidden {
+      height: auto;
+    }
+  }
+}
+</style>

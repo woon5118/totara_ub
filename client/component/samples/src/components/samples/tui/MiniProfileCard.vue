@@ -212,7 +212,7 @@ export default {
   flex-direction: column;
 
   &__card {
-    margin-bottom: var(--tui-gap-3);
+    margin-bottom: var(--gap-3);
   }
 
   &__smallerBox {

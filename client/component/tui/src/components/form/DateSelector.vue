@@ -374,3 +374,38 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-dateSelector {
+  display: flex;
+  flex-wrap: wrap;
+
+  &__date {
+    display: flex;
+    margin: 0 var(--gap-4) var(--gap-2) 0;
+
+    & > * {
+      display: flex;
+    }
+
+    @include tui-stack-horizontal(var(--gap-2));
+
+    &-day {
+      width: 5rem;
+    }
+
+    &-month {
+      width: 12rem;
+    }
+
+    &-year {
+      width: 7rem;
+    }
+  }
+
+  &__time {
+    display: flex;
+    width: calc((var(--gap-2) * 2) + 24rem);
+  }
+}
+</style>

@@ -326,3 +326,9 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-simpleLike {
+  display: inline-flex;
+}
+</style>

@@ -63,3 +63,16 @@ export default {
   "editor_weka": ["more_items"]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-editorWeka-nodeBar {
+  display: flex;
+  justify-content: flex-end;
+  visibility: hidden;
+}
+
+.tui-weka:hover .tui-editorWeka-nodeBar,
+.ProseMirror-focused .tui-editorWeka-nodeBar {
+  visibility: visible;
+}
+</style>

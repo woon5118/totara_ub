@@ -72,3 +72,17 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-commentUserLink {
+  font-weight: bold;
+
+  &--small {
+    @include tui-font-link-small();
+  }
+
+  &--large {
+    @include tui-font-link();
+  }
+}
+</style>

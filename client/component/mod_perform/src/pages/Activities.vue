@@ -192,3 +192,19 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performManageActivityList {
+  &__table {
+    padding-top: var(--gap-4);
+  }
+}
+
+@media (min-width: $tui-screen-sm) {
+  .tui-performManageActivityList {
+    &__table {
+      padding-top: var(--gap-2);
+    }
+  }
+}
+</style>

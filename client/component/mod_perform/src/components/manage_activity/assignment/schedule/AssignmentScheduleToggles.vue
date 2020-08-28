@@ -237,3 +237,52 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-assignmentScheduleToggles {
+  display: flex;
+  flex-wrap: wrap;
+
+  &__group {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: var(--gap-4);
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  &__item {
+    margin-right: var(--gap-4);
+
+    &-header {
+      margin: var(--gap-4) 0 0;
+      @include tui-font-heading-label;
+    }
+
+    &-toggle {
+      margin-top: var(--gap-4);
+    }
+  }
+}
+
+@media (min-width: $tui-screen-sm) {
+  .tui-assignmentScheduleToggles {
+    &__group {
+      border-right: var(--border-width-thin) solid
+        var(--color-neutral-6);
+
+      &:last-child {
+        border-right: none;
+      }
+    }
+
+    &__item {
+      &-header {
+        margin: 0;
+      }
+    }
+  }
+}
+</style>

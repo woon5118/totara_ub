@@ -56,3 +56,11 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-longTextElementParticipantResponse {
+  &__noResponse {
+    @include tui-font-hint();
+  }
+}
+</style>

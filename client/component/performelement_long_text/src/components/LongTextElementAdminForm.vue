@@ -148,3 +148,14 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-elementEditLongText {
+  &__action-buttons {
+    display: flex;
+    align-items: end;
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
+</style>

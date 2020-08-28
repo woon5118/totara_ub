@@ -533,3 +533,55 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-replyBox {
+  display: flex;
+  flex-direction: column;
+
+  &__replyLinkBox {
+    display: flex;
+    margin-top: var(--gap-2);
+    padding-top: var(--gap-2);
+
+    &--withSeparator {
+      border-top: var(--border-width-thin) solid var(--color-neutral-4);
+    }
+
+    &--withoutSeparator {
+      // Hide the line, but keep the position as same.
+      border-top: var(--border-width-thin) solid transparent;
+    }
+
+    &__link {
+      @include tui-font-link-small();
+
+      &--disabled {
+        color: var(--color-neutral-5);
+        cursor: not-allowed;
+        &:hover,
+        &:focus {
+          color: var(--color-neutral-5);
+          text-decoration: none;
+        }
+      }
+    }
+  }
+
+  &__reply {
+    padding-top: var(--gap-4);
+    border-top: var(--border-width-thin) solid var(--color-neutral-5);
+
+    &--large {
+      // Override the margin-top for the reply card.
+      &.tui-reply {
+        margin-top: var(--gap-6);
+      }
+    }
+  }
+
+  &__replyForm {
+    width: 100%;
+  }
+}
+</style>

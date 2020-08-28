@@ -205,3 +205,60 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-surveyQuestionResult {
+  &__progressBar {
+    margin-bottom: var(--gap-2);
+  }
+
+  &__progress {
+    display: flex;
+    align-items: center;
+    margin-top: var(--gap-4);
+  }
+
+  &__cardProgress {
+    display: flex;
+    align-items: center;
+  }
+
+  &__bar {
+    width: 100%;
+  }
+
+  &__count {
+    @include tui-font-body();
+    margin-left: var(--gap-2);
+    text-align: end;
+  }
+
+  &__percent {
+    @include tui-font-body();
+    margin-right: var(--gap-2);
+    color: var(--color-secondary);
+    font-weight: bold;
+  }
+
+  &__answer {
+    @include tui-font-body();
+    -ms-word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: none;
+  }
+
+  &__votes {
+    @include tui-font-heading-label();
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--gap-4);
+  }
+
+  &__participant {
+    @include tui-font-heavy();
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--gap-2);
+  }
+}
+</style>

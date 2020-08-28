@@ -46,3 +46,19 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-participantUserHeader {
+  display: flex;
+  align-items: center;
+
+  &__avatar {
+    flex-shrink: 0;
+  }
+
+  &__name {
+    @include tui-font-heading-x-small();
+    margin-left: var(--gap-2);
+  }
+}
+</style>

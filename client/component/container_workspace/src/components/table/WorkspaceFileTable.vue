@@ -228,3 +228,35 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceFileTable {
+  @media (max-width: 764px) {
+    padding: var(--gap-4);
+  }
+
+  &__action {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  &__loadMoreContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--gap-8);
+  }
+
+  &__viewedFiles {
+    display: flex;
+    align-self: center;
+    margin-bottom: var(--gap-1);
+  }
+
+  &__loadMore {
+    display: flex;
+    align-self: center;
+  }
+}
+</style>

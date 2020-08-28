@@ -263,3 +263,80 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-originalSpaceCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+  border-radius: var(--border-radius-normal);
+  transition: box-shadow var(--transition-form-function)
+    var(--transition-form-duration);
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:hover,
+  &:focus {
+    box-shadow: var(--shadow-2);
+  }
+
+  &:focus-within,
+  &.tui-focusWithin {
+    box-shadow: var(--shadow-2);
+  }
+
+  &__titleBox {
+    display: flex;
+    flex-basis: 50%;
+    flex-direction: column;
+    width: 100%;
+    padding: var(--gap-4) var(--gap-2);
+    padding-bottom: 0;
+    background-image: linear-gradient(
+      to top,
+      transparent 0%,
+      var(--color-backdrop-heavy) 78%,
+      var(--color-backdrop-heavy)
+    );
+
+    border-top-left-radius: var(--border-radius-normal);
+    border-top-right-radius: var(--border-radius-normal);
+
+    &__title {
+      @include tui-font-heading-x-small();
+      margin: 0;
+    }
+  }
+
+  &__link {
+    color: var(--color-neutral-1);
+    &:hover,
+    &:focus {
+      color: var(--color-neutral-1);
+      text-decoration: none;
+      outline: none;
+    }
+  }
+
+  &__actionBox {
+    display: flex;
+    flex-basis: 50%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+
+    &__button,
+    &__dropDown {
+      margin-bottom: var(--gap-4);
+    }
+  }
+}
+</style>

@@ -80,3 +80,54 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+:root {
+  --totaraComment-sidePanel-commentBox-height: 40vh;
+}
+
+.tui-sidePanelCommentBox {
+  // Overriding the comment box to make it fit with the sidepanel.
+  &__header {
+    margin: 0;
+    margin-bottom: var(--gap-4);
+    padding: 0;
+    padding-bottom: var(--gap-2);
+    font-size: var(--font-size-14);
+    border-bottom: var(--border-width-thin) solid var(--color-primary);
+  }
+
+  &__box {
+    .tui-commentBox {
+      // Overriding the comment thread to make it fit with the sidepanel
+      &__comments {
+        // This is needed for scrolling
+        position: relative;
+
+        height: var(--totaraComment-sidePanel-commentBox-height);
+        overflow: auto;
+
+        // This is not support by IE or Edge.
+        scroll-behavior: smooth;
+
+        .tui-commentThread {
+          &__comments {
+            &__comment {
+              &:not(:first-child) {
+                padding-top: var(--gap-4);
+                border-top: var(--border-width-thin) solid
+                  var(--color-neutral-5);
+              }
+            }
+          }
+        }
+      }
+
+      &__commentForm {
+        padding-top: var(--gap-4);
+        border-top: var(--border-width-thin) solid var(--color-primary);
+      }
+    }
+  }
+}
+</style>

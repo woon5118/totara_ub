@@ -406,3 +406,55 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-sharedRecipientsSelector {
+  &__label.tui-formLabel {
+    @include tui-font-heading-label();
+    margin-right: 0;
+    margin-bottom: var(--gap-2);
+  }
+
+  &__icon {
+    display: inline-flex;
+  }
+
+  &__recipient {
+    display: flex;
+    > :first-child {
+      margin-right: var(--gap-2);
+    }
+
+    &__summary {
+      margin: 0;
+      list-style-type: none;
+      > :first-child {
+        @include tui-font-heading-label();
+      }
+      > :last-child {
+        @include tui-font-body-small();
+      }
+    }
+
+    &__badge {
+      align-self: flex-end;
+      margin-left: auto;
+      > :last-child {
+        @include tui-font-body-small();
+      }
+    }
+  }
+
+  &__profileContainer {
+    position: relative;
+    &-badge {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      > :last-child {
+        @include tui-font-body-small();
+      }
+    }
+  }
+}
+</style>

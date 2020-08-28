@@ -95,7 +95,7 @@ a.btn {
 // Make a button look and behave like a link
 .btn-link {
   font-weight: 400;
-  color: var(--legacy-link-color);
+  color: var(--link-color);
   border-radius: 0;
 
   &,
@@ -114,7 +114,7 @@ a.btn {
   }
   &:hover,
   &:focus {
-    color: var(--legacy-link-color-hover);
+    color: var(--link-color-hover);
     text-decoration: $link-hover-decoration;
     background-color: transparent;
   }

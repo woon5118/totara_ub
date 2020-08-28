@@ -44,3 +44,39 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-actionCard {
+  flex-direction: column;
+  padding: var(--gap-4);
+
+  &__body {
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  &__action {
+    display: flex;
+    flex-shrink: 0;
+    align-items: normal;
+    padding: var(--gap-4) 0 0;
+  }
+}
+
+@media screen and (min-width: $tui-screen-sm) {
+  .tui-actionCard {
+    flex-direction: row;
+    &--stacked {
+      flex-direction: column;
+    }
+
+    &:not(&--stacked) &__action {
+      align-items: center;
+      padding: 0 0 0 var(--gap-4);
+    }
+  }
+}
+</style>

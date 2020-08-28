@@ -201,3 +201,17 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-playlistSummary {
+  margin: var(--gap-8) 0;
+
+  > p {
+    margin: 0;
+  }
+
+  &__placeholder {
+    color: var(--color-state);
+  }
+}
+</style>

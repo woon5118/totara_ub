@@ -31,15 +31,15 @@
 import ChartJs from 'tui_charts/components/ChartJs';
 import theme from 'tui/theme';
 
-let defaultColor = theme.getVar('tui-color-chart-background-1');
+let defaultColor = theme.getVar('color-chart-background-1');
 let defaultLabelFontSize = parseInt(
-  theme.getVar('tui-font-size-chart-doughnut-label')
+  theme.getVar('font-size-chart-doughnut-label')
 );
 let defaultPercentageFontSize = parseInt(
-  theme.getVar('tui-font-size-chart-doughnut-percentage-label')
+  theme.getVar('font-size-chart-doughnut-percentage-label')
 );
-let defaultLabelColor = theme.getVar('tui-color-chart-doughnut-label');
-let defaultBackgroundColor = theme.getVar('tui-color-neutral-4');
+let defaultLabelColor = theme.getVar('color-chart-doughnut-label');
+let defaultBackgroundColor = theme.getVar('color-neutral-4');
 
 export default {
   components: { ChartJs },

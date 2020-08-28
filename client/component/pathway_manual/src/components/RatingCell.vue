@@ -195,3 +195,32 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-bulkManualRatingCell {
+  &__newRating {
+    @media (min-width: $tui-screen-sm) {
+      display: flex;
+      flex-direction: row-reverse;
+    }
+  }
+
+  &__rating {
+    display: flex;
+    align-items: center;
+    margin-right: var(--gap-2);
+
+    &-hasComment {
+      margin-left: var(--gap-1);
+    }
+
+    &-noValue {
+      @include tui-font-hint;
+    }
+
+    &-valueName {
+      @include tui-font-heading-label;
+    }
+  }
+}
+</style>

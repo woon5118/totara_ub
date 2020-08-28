@@ -95,3 +95,11 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-playlistFootnote {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+</style>

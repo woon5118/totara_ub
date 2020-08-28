@@ -92,3 +92,9 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-performMyHistoricActivityList {
+  @include tui-font-body();
+}
+</style>

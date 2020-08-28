@@ -66,3 +66,27 @@ export default {
   }
 
 </lang-strings>
+
+<style lang="scss">
+.tui-progressCircle {
+  &__circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    margin: var(--gap-6) auto 0;
+    background: var(--color-neutral-4);
+    border-radius: 100%;
+  }
+
+  &__label {
+    margin-top: var(--gap-1);
+    text-align: center;
+  }
+
+  &--complete &__circle {
+    background: var(--color-primary);
+  }
+}
+</style>

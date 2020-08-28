@@ -228,3 +228,20 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-workspaceEditModal {
+  display: flex;
+  flex-direction: column;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+
+    &__form {
+      flex: 1;
+      height: 100%;
+    }
+  }
+}
+</style>

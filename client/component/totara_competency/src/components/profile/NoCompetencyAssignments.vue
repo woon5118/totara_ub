@@ -71,3 +71,13 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-noCompetencyAssignments {
+  &__search-competencies {
+    display: flex;
+    flex-direction: row-reverse;
+    margin-top: 35px;
+  }
+}
+</style>

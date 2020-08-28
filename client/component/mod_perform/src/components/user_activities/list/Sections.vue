@@ -436,3 +436,35 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performUserActivityListSections {
+  padding: var(--gap-4);
+
+  & > * + * {
+    margin-top: var(--gap-12);
+  }
+}
+
+.tui-performUserActivityDateSummary {
+  padding: var(--gap-6) var(--gap-4) 0;
+  color: var(--color-neutral-6);
+}
+
+.tui-performUserActivityListSection {
+  max-width: 800px;
+
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+
+  &__header {
+    margin: 0;
+    @include tui-font-body();
+  }
+
+  &__header button {
+    @include tui-font-link();
+  }
+}
+</style>

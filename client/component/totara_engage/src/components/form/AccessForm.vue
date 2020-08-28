@@ -369,3 +369,55 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-accessForm {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+
+  &__heading {
+    @include tui-font-heading-small();
+    margin-bottom: var(--gap-4);
+  }
+
+  &__options {
+    &--withTagList {
+      flex-basis: 35%;
+    }
+
+    &--withoutTagLists {
+      flex-basis: 90%;
+      flex-grow: 1;
+    }
+  }
+
+  &__time {
+    margin-top: var(--gap-4);
+  }
+
+  &__tagLists {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-top: var(--gap-4);
+  }
+
+  &__tagList {
+    margin-bottom: var(--gap-1);
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--gap-2);
+
+    &__back {
+      margin-right: auto;
+    }
+  }
+}
+</style>

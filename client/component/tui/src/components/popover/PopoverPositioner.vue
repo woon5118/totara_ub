@@ -254,3 +254,52 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-popoverPositioner {
+  // note: position: absolute + z-index triggers a new stacking context
+  // this allows us to escape from overflow: hidden.
+  // because stacking contexts can be nested, this will still work correctly
+  // even inside modals, which have a higher z-index
+  position: absolute;
+  top: 0;
+  /*rtl:ignore*/
+  left: 0;
+  z-index: var(--zindex-popover);
+  width: auto;
+  @include tui-font-body();
+
+  &--fixed {
+    position: fixed;
+  }
+
+  &--transition-default {
+    transition: opacity 0.2s;
+  }
+
+  &--transition-default-enter,
+  &--transition-default-leave-to {
+    opacity: 0;
+  }
+
+  &--transition-dropdown {
+    transition: opacity 0s;
+  }
+
+  &--transition-dropdown-enter,
+  &--transition-dropdown-leave-to {
+    opacity: 0;
+  }
+
+  &--transition-dropdown-leave-to {
+    transition: opacity 0.15s;
+  }
+}
+
+.tui-modal--animated .tui-popoverPositioner {
+  display: none;
+}
+.tui-modal--animated.tui-modal--in .tui-popoverPositioner {
+  display: block;
+}
+</style>

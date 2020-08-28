@@ -56,3 +56,51 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-popoverFrame {
+  @include tui-font-body();
+  position: relative;
+  max-width: 300px;
+  // margin must be equal on all 4 sides, and must not change with position
+  margin: 10px;
+  padding: var(--gap-4);
+  background: var(--color-background);
+  background-clip: padding-box;
+  border: 1px solid var(--color-neutral-5);
+  box-shadow: var(--shadow-3);
+
+  &__close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    padding: calc(1.4rem - 0.1em) calc(1.4rem - 0.3em);
+  }
+
+  &__title {
+    @include tui-font-heading-x-small();
+    padding-top: var(--gap-2);
+    padding-right: var(--gap-4);
+  }
+
+  &__content {
+    padding: var(--gap-2) var(--gap-4) var(--gap-2) 0;
+  }
+
+  &__title + &__content {
+    padding-right: 0;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--gap-3);
+    padding-bottom: var(--gap-3);
+
+    > * + * {
+      margin-left: var(--gap-4);
+    }
+  }
+}
+</style>

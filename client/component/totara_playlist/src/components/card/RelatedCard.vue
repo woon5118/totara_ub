@@ -120,3 +120,85 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-playlistRelatedCard {
+  display: flex;
+  min-width: 120px;
+  height: 82px;
+  background-color: var(--color-neutral-1);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    margin-right: var(--gap-2);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-top-left-radius: var(--border-radius-normal);
+    border-bottom-left-radius: var(--border-radius-normal);
+
+    > :first-child {
+      @include tui-font-heading-label-small();
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background-color: var(--color-neutral-1);
+      border-radius: 50%;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: var(--gap-4) 0 var(--gap-2) 0;
+    overflow: hidden;
+
+    & > * {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    > :first-child {
+      @include tui-font-heading-label-small();
+      color: inherit;
+      text-decoration: none;
+    }
+
+    > :nth-child(2) {
+      @include tui-font-body-x-small();
+    }
+
+    > :last-child {
+      margin-top: auto;
+      margin-bottom: 0;
+
+      .tui-totaraEngage-star {
+        width: var(--font-size-14);
+        height: var(--font-size-14);
+
+        &__filled {
+          stop-color: var(--color-chart-background-2);
+        }
+
+        &__unfilled {
+          stop-color: var(--color-neutral-1);
+        }
+      }
+    }
+  }
+
+  &__bookmark {
+    align-self: flex-start;
+    // neutralize the default icon padding
+    margin-top: -2px;
+  }
+}
+</style>

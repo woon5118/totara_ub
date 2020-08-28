@@ -48,3 +48,17 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-performReportPerformanceReportingIdBanner {
+  margin-bottom: var(--gap-8);
+  padding: var(--gap-2) var(--gap-3);
+  background: var(--color-neutral-3);
+  border: none;
+  border-radius: var(--border-radius-normal);
+
+  &__tag {
+    margin-left: var(--gap-2);
+  }
+}
+</style>

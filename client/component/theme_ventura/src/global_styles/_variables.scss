@@ -1,0 +1,54 @@
+// This file is part of Totara Enterprise Extensions.
+//
+// Copyright (C) 2020 onwards Totara Learning Solutions LTD
+//
+// Totara Enterprise Extensions is provided only to Totara
+// Learning Solutions LTD's customers and partners, pursuant to
+// the terms and conditions of a separate agreement with Totara
+// Learning Solutions LTD or its affiliate.
+//
+// If you do not have an agreement with Totara Learning Solutions
+// LTD, you may not access, use, modify, or distribute this software.
+// Please contact [licensing@totaralearning.com] for more information.
+//
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @module tuickage   tui
+
+:root {
+  //
+  // Theme colours
+  //
+
+  // Primary colour
+  // Often used for default image, backgrounds, line separators & visual indicators
+  --color-primary: #99ac3a;
+
+  // Secondary colour
+  // Often used for visual components such as progress bars & charts
+  --color-secondary: #007ab8;
+
+  // Tertiary colour
+  // Often used for visual components, must have high contrast to background
+  --color-tertiary: #1ea4a9;
+
+  //
+  // Interactive state colours
+  //
+
+  // Default state colour, shows an element is interactive
+  --color-state: #4b7e2b;
+
+  // Hover state colour, shown when cursor is over interactive element
+  --color-state-hover: #3c6721;
+  // Focus state colour, shown when element has focus (keyboard tabbing)
+  --color-state-focus: #3c6721;
+  // Active state colour, shown when element is active (clicked)
+  --color-state-active: #30541a;
+  // Highlight, visual clue for things that need to be highlighted more
+  // prominently than highlight-neutral.
+  --color-state-highlight: #f6f9d7;
+  // Neutral highlight, visual clue for hover/focus on components such as a list row
+  --color-state-highlight-neutral: var(--color-neutral-3);
+  // Disabled colour of interactive elements
+  --color-state-disabled: var(--color-neutral-5);
+}

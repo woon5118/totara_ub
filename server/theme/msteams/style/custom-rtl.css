@@ -21,8 +21,8 @@
  */
 
 :root {
-    --theme_msteams__nav_link-size: var(--legacy-font-size-14);
-    --theme_msteams__nav_link-gap: var(--legacy-gap-3);
+    --theme_msteams__nav_link-size: var(--font-size-14);
+    --theme_msteams__nav_link-gap: var(--gap-3);
     --theme_msteams__transition: .4s;
     --theme_msteams__input-border-radius: .3rem;
 }
@@ -126,16 +126,16 @@ html.theme_msteams__iframe .theme_msteams--continue--back-to-index {
 }
 
 html.theme_msteams__iframe .totara_msteams__navigation ~ #page {
-    margin-top: calc(var(--theme_msteams__nav_link-size) + var(--theme_msteams__nav_link-gap) + var(--legacy-gap-5));
+    margin-top: calc(var(--theme_msteams__nav_link-size) + var(--theme_msteams__nav_link-gap) + var(--gap-5));
 }
 
 html.theme_msteams__iframe .totara_msteams__navigation ~ .totara_msteams__alert {
     margin-top: calc(var(--theme_msteams__nav_link-size) + var(--theme_msteams__nav_link-gap));
-    padding: var(--legacy-gap-3);
+    padding: var(--gap-3);
 }
 
 html.theme_msteams__iframe .totara_msteams__alert ~ #page {
-    margin-top: var(--legacy-gap-5);
+    margin-top: var(--gap-5);
 }
 
 body#page-totara-msteams-tabs-config {
@@ -183,8 +183,8 @@ html.theme_msteams__iframe .totara_msteams__navigation {
 }
 
 .totara_msteams__navigation__link__label {
-    padding-right: var(--legacy-gap-1);
-    padding-left: var(--legacy-gap-3);
+    padding-right: var(--gap-1);
+    padding-left: var(--gap-3);
 }
 
 /* Mobile layout */
@@ -216,7 +216,7 @@ html.theme_msteams__iframe .totara_msteams__alert {
     -webkit-box-direction: normal;
     flex-direction: column;
     font-family: "Segoe UI", system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
-    font-size: var(--legacy-font-size-14);
+    font-size: var(--font-size-14);
     font-style: normal;
     font-weight: normal;
 }

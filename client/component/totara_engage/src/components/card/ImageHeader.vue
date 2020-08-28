@@ -37,3 +37,38 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-totaraEngage-imageHeader {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-top-left-radius: var(--card-border-radius);
+  border-top-right-radius: var(--card-border-radius);
+
+  &__actionContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border-top-left-radius: var(--card-border-radius);
+    border-top-right-radius: var(--card-border-radius);
+  }
+
+  &__imageBox {
+    &--covered,
+    &--noCovered {
+      width: 100%;
+      height: 100%;
+      border-top-left-radius: var(--card-border-radius);
+      border-top-right-radius: var(--card-border-radius);
+    }
+  }
+}
+</style>

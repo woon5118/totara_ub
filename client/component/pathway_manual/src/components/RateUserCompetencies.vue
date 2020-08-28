@@ -388,3 +388,26 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-bulkManualRatingRateUserCompetencies {
+  margin-top: var(--gap-4);
+
+  &__filters {
+    margin-bottom: var(--gap-5);
+  }
+
+  &__frameworkGroup {
+    margin-bottom: var(--gap-5);
+  }
+
+  &__noCompetencies {
+    @include tui-font-hint;
+  }
+
+  &__submitButtons {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+}
+</style>

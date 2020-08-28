@@ -98,7 +98,7 @@
   padding: 3px;
   margin: 3px;
   > *:hover {
-    border-bottom: 1px solid var(--legacy-color-neutral-6);
+    border-bottom: 1px solid var(--color-neutral-6);
   }
 }
 
@@ -124,7 +124,7 @@
   .header {
     @extend .popover-title;
     .close {
-      color: var(--legacy-link-color);
+      color: var(--link-color);
       background: inherit;
       font-size: 20px;
       margin-bottom: 10px;
@@ -144,7 +144,7 @@
   .content {
     @extend .popover-content;
     margin-top: 5px;
-    background-color: var(--legacy-color-neutral-2);
+    background-color: var(--color-neutral-2);
   }
 }
 

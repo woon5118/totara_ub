@@ -55,3 +55,21 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-responseBox {
+  display: flex;
+  align-content: flex-start;
+
+  &__profilePicture {
+    margin-right: var(--gap-2);
+  }
+
+  &__formBox {
+    flex: 1 1 auto;
+    -ms-word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: none;
+  }
+}
+</style>

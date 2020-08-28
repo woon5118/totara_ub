@@ -134,3 +134,41 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-filterSidePanel {
+  display: block;
+  padding: var(--gap-4);
+
+  &__header {
+    @include tui-font-heading-x-small();
+    min-width: 0;
+    margin: 0 var(--gap-2) 0 0;
+  }
+
+  &__heading {
+    display: flex;
+  }
+
+  &__instructions,
+  &__status {
+    @include sr-only();
+  }
+
+  .tui-filterSidePanel__clearBtn {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+}
+
+.tui-filterSidePanel.tui-filterSidePanel {
+  & > * + * {
+    margin-top: var(--gap-4);
+  }
+
+  .tui-fieldset__legend,
+  .tui-formLabel {
+    @include tui-font-heading-label-small();
+  }
+}
+</style>

@@ -34,3 +34,23 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  &__legend {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    color: var(--form-text-color);
+    font-size: var(--font-size-18);
+    line-height: inherit;
+    border: none;
+  }
+}
+</style>

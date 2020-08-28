@@ -58,3 +58,23 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-hierarchicalParentButton {
+  display: flex;
+  align-items: center;
+  padding: var(--gap-4) 0 0;
+
+  &__backArrow {
+    text-align: start;
+
+    @media screen and (min-width: $tui-screen-xs) {
+      text-align: center;
+    }
+  }
+
+  &__label {
+    margin-left: var(--gap-2);
+  }
+}
+</style>

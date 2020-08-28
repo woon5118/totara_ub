@@ -154,3 +154,66 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-articleRelatedCard {
+  display: flex;
+  min-width: 120px;
+  height: 82px;
+  background-color: var(--color-neutral-1);
+
+  &__img {
+    width: 80px;
+    height: 80px;
+    padding: var(--gap-2);
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+    padding: var(--gap-4) 0 var(--gap-2) 0;
+    overflow: hidden;
+
+    & > * {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    > :first-child {
+      @include tui-font-heading-label-small();
+      @include tui-font-heavy();
+      color: inherit;
+      text-decoration: none;
+    }
+
+    > :last-child {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      @include tui-font-body-x-small();
+    }
+  }
+
+  &__bookmark {
+    align-self: flex-start;
+    // neutralize the default icon padding
+    margin-top: -2px;
+  }
+
+  &__timeview {
+    display: flex;
+    margin-right: var(--gap-4);
+    padding: 2px;
+    padding-right: var(--gap-1);
+    border: var(--border-width-thin) solid var(--color-neutral-5);
+    border-radius: 15px;
+  }
+
+  &--dimmed {
+    color: var(--color-neutral-6);
+  }
+}
+</style>

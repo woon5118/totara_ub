@@ -221,3 +221,50 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-tagList {
+  display: flex;
+  align-items: flex-start;
+  min-width: 230px;
+  padding: var(--gap-2);
+  border: var(--border-width-thin) solid var(--form-input-border-color);
+
+  &__tags {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    min-height: calc(
+      var(--tag-height) + (2 * var(--border-width-thin))
+    );
+  }
+
+  &__tagItems {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+
+    &--open {
+      flex-wrap: wrap;
+    }
+
+    & > * {
+      margin-right: var(--gap-1);
+      margin-bottom: 0.2rem;
+    }
+  }
+
+  &__suffix {
+    @include tui-font-body-small();
+    flex-shrink: 0;
+    padding-right: var(--gap-2);
+    padding-left: var(--gap-1);
+    white-space: nowrap;
+  }
+
+  &__input {
+    margin: -2px 0;
+  }
+}
+</style>

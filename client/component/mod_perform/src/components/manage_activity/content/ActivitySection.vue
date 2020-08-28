@@ -687,3 +687,106 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performActivitySection {
+  &--editing {
+    padding: var(--gap-4);
+    border: solid var(--color-secondary) var(--border-width-normal);
+  }
+
+  &__title {
+    margin: 0;
+  }
+
+  &__multiple {
+    padding: var(--gap-4);
+    & > * + * {
+      margin-top: var(--gap-6);
+    }
+  }
+
+  &.tui-card {
+    display: block;
+  }
+
+  &__action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    .tui-iconBtn {
+      min-width: auto;
+    }
+  }
+  &__saveButtons {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__action-edit {
+    min-width: auto;
+  }
+
+  &__divider {
+    margin-top: var(--gap-8);
+    margin-bottom: 0;
+  }
+
+  &__content {
+    margin-top: var(--gap-4);
+
+    &--autoSave {
+      margin-top: var(--gap-4);
+      border-bottom: var(--border-width-thin) solid
+        var(--card-border-color);
+    }
+  }
+
+  &__can-view-others-legend {
+    display: block;
+  }
+
+  &__participant-heading {
+    margin-top: var(--gap-2);
+  }
+
+  &__participant-items {
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
+  }
+
+  &__participant-groups {
+    margin-top: var(--gap-2);
+  }
+
+  &__participant-group {
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+  }
+
+  &__participant-info {
+    font-style: italic;
+  }
+
+  &__participant-heading {
+    display: inline-block;
+    margin-top: var(--gap-4);
+    margin-bottom: 0;
+    @include tui-font-heading-label();
+  }
+}
+
+@media (min-width: $tui-screen-sm) {
+  .tui-performActivitySection {
+    &__can-view-others-legend {
+      display: inline;
+    }
+
+    &__content-buttons {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}
+</style>

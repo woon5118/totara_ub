@@ -165,3 +165,31 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-surveyEditView {
+  .tui-grid-item {
+    min-height: var(--engageSurvey-min-height);
+  }
+
+  &__navBar {
+    margin-top: var(--gap-4);
+    margin-left: var(--gap-4);
+  }
+
+  &__layout {
+    display: flex;
+    &__content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 0 auto;
+      padding: 0 0 var(--gap-12) 0;
+      @media (max-width: $tui-screen-sm) {
+        max-width: 80vw;
+        margin-left: var(--gap-8);
+      }
+    }
+  }
+}
+</style>

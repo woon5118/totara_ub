@@ -42,3 +42,91 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-progressTrackerCircle {
+  $pending: #{&}--pending;
+  $complete: #{&}--complete;
+  $achieved: #{&}--achieved;
+  $target: #{&}--target;
+
+  &__outer {
+    z-index: 2;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--gap-7) + 1px);
+    height: calc(var(--gap-7) + 1px);
+    border: var(--border-width-normal) transparent dotted;
+    border-radius: 50%;
+
+    // Pending target
+    &#{$pending}&#{$target} {
+      border-color: var(--progresstracker-color-pending);
+    }
+
+    // Achieved target
+    &#{$target}&#{$achieved} {
+      background: var(--progresstracker-container-bg-color);
+      border-color: var(--progresstracker-color-achieved);
+      border-style: solid;
+    }
+  }
+
+  &__middle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--gap-4) + 1px);
+    height: calc(var(--gap-4) + 1px);
+    background: transparent;
+    border: var(--border-width-thin) solid transparent;
+    border-radius: 50%;
+
+    // Pending
+    #{$pending} & {
+      background: var(--progresstracker-color-pending);
+    }
+
+    // Pending target
+    #{$pending}#{$target} & {
+      background: transparent;
+    }
+
+    // Complete
+    #{$complete} & {
+      background: var(--progresstracker-color-complete);
+    }
+
+    // Achieved
+    #{$achieved} & {
+      background: var(--progresstracker-color-achieved);
+    }
+  }
+
+  &__inner {
+    width: calc(var(--gap-2) + 1px);
+    height: calc(var(--gap-2) + 1px);
+    background: var(--progresstracker-container-bg-color);
+    border: var(--border-width-thin) solid
+      var(--progresstracker-container-bg-color);
+    border-radius: 50%;
+
+    // Pending
+    #{$pending} & {
+      border-color: var(--progresstracker-container-bg-color);
+    }
+
+    // Pending target
+    #{$pending}#{$target} & {
+      border-color: var(--progresstracker-color-pending);
+    }
+
+    // Achieved
+    #{$achieved} & {
+      border-color: var(--progresstracker-container-bg-color);
+    }
+  }
+}
+</style>

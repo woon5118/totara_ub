@@ -26,42 +26,42 @@
   // Catalog
   //
 
-  --legacy-catalog-item-bg-color: var(--legacy-color-neutral-1);
-  --legacy-catalog-item-border-color: var(--legacy-color-neutral-5);
-  --legacy-catalog-item-text-color: var(--legacy-color-neutral-7);
+  --catalog-item-bg-color: var(--color-neutral-1);
+  --catalog-item-border-color: var(--color-neutral-5);
+  --catalog-item-text-color: var(--color-neutral-7);
 
   // Catalog primary filter
-  --legacy-catalog-primfilter-border-color: var(--legacy-color-neutral-5);
+  --catalog-primfilter-border-color: var(--color-neutral-5);
 
   // Catalog expanded details
-  --legacy-catalog-details-bg-color: var(--legacy-color-neutral-1);
-  --legacy-catalog-details-border-color: var(--legacy-color-neutral-5);
+  --catalog-details-bg-color: var(--color-neutral-1);
+  --catalog-details-border-color: var(--color-neutral-5);
 
   // Catalog expanded details goto link box
-  --legacy-catalog-details-goto-bg-color: var(--legacy-color-neutral-2);
-  --legacy-catalog-details-goto-border-color: var(--legacy-color-neutral-5);
+  --catalog-details-goto-bg-color: var(--color-neutral-2);
+  --catalog-details-goto-border-color: var(--color-neutral-5);
 
   // Catalog manage button group
-  --legacy-catalog-managebtn-group-bg-color: var(--legacy-color-neutral-1);
-  --legacy-catalog-managebtn-group-bg-color-focus: var(
-    --legacy-color-state-highlight
+  --catalog-managebtn-group-bg-color: var(--color-neutral-1);
+  --catalog-managebtn-group-bg-color-focus: var(
+    --color-state-highlight
   );
-  --legacy-catalog-managebtn-group-border-color: var(--legacy-color-neutral-5);
+  --catalog-managebtn-group-border-color: var(--color-neutral-5);
 
   // Catalog share menu
-  --legacy-catalog-share-bg-color: var(--legacy-color-neutral-1);
-  --legacy-catalog-share-border-color: var(--legacy-color-neutral-5);
+  --catalog-share-bg-color: var(--color-neutral-1);
+  --catalog-share-border-color: var(--color-neutral-5);
 
   // Catalog grid item additional text (metadata)
-  --legacy-catalog-details-additional-text-color: var(--legacy-color-neutral-6);
+  --catalog-details-additional-text-color: var(--color-neutral-6);
 
   // Catalog grid item hero
-  --legacy-catalog-item-hero-bg-color: var(--legacy-color-neutral-7);
-  --legacy-catalog-item-hero-icon-bg-color: var(--legacy-color-neutral-1);
-  --legacy-catalog-item-hero-text-color: var(--legacy-color-neutral-1);
+  --catalog-item-hero-bg-color: var(--color-neutral-7);
+  --catalog-item-hero-icon-bg-color: var(--color-neutral-1);
+  --catalog-item-hero-text-color: var(--color-neutral-1);
   // Catalog grid item featured
-  --legacy-catalog-item-featured-bg-color: var(--legacy-color-secondary);
-  --legacy-catalog-item-featured-text-color: var(--legacy-color-neutral-1);
+  --catalog-item-featured-bg-color: var(--color-secondary);
+  --catalog-item-featured-text-color: var(--color-neutral-1);
   // Catalog grid item additional text (metadata)
-  --legacy-catalog-item-additional-text-color: var(--legacy-color-neutral-6);
+  --catalog-item-additional-text-color: var(--color-neutral-6);
 }

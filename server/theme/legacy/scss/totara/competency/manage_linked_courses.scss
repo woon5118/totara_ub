@@ -30,10 +30,10 @@
   }
 
   &__list {
-    margin-bottom: var(--legacy-gap-4);
+    margin-bottom: var(--gap-4);
 
     &_removed {
-      color: var(--legacy-color-neutral-3);
+      color: var(--color-neutral-3);
       text-decoration: line-through;
 
       input {
@@ -49,6 +49,6 @@
 
   &__top_bar {
     display: flex;
-    margin-bottom: var(--legacy-gap-4);
+    margin-bottom: var(--gap-4);
   }
 }

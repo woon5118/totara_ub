@@ -116,3 +116,47 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyRatingScaleOverview {
+  &__title {
+    margin: 0;
+    @include tui-font-heading-x-small;
+  }
+
+  &__list {
+    margin: var(--gap-4) 0 0;
+
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
+
+    &-item {
+      display: flex;
+    }
+  }
+
+  &__proficientStatus {
+    min-width: var(--gap-8);
+
+    .flex-icon {
+      position: relative;
+      top: -1px;
+    }
+  }
+
+  &__scaleValue {
+    display: flex;
+    flex-direction: column;
+
+    &-name {
+      @include tui-font-heading-label;
+      margin: 0;
+    }
+
+    &-description {
+      margin: var(--gap-1) 0 0 var(--gap-3);
+    }
+  }
+}
+</style>

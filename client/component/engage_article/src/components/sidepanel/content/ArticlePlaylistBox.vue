@@ -77,3 +77,20 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-articlePlaylistBox {
+  &__playlistsBox {
+    max-height: 300px;
+    overflow-y: auto;
+    border-top: var(--border-width-thin) solid var(--color-neutral-5);
+    border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
+  }
+
+  &__label {
+    @include tui-font-heading-label-small();
+    margin: 0;
+    margin-bottom: var(--gap-2);
+  }
+}
+</style>

@@ -55,3 +55,10 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-editorWeka-mention {
+  display: inline-block;
+  white-space: normal;
+}
+</style>

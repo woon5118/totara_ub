@@ -105,3 +105,54 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-searchFilter {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  input.tui-formInput {
+    flex-grow: 0;
+  }
+
+  .tui-formLabel {
+    margin: auto var(--gap-3) auto 0;
+  }
+
+  &__group {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    margin-top: 0;
+    margin-bottom: auto;
+
+    &--stacked {
+      margin-top: var(--gap-1);
+    }
+
+    &-icon {
+      position: absolute;
+      left: var(--gap-1);
+      display: flex;
+      align-items: center;
+      height: 100%;
+      color: var(--filter-search-icon-color);
+
+      .fa-search {
+        margin: auto 0;
+      }
+    }
+  }
+
+  &--stacked {
+    flex-direction: column;
+    align-items: stretch;
+
+    .tui-formLabel {
+      margin: var(--gap-1) 0;
+    }
+  }
+}
+</style>

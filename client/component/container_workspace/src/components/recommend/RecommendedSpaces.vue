@@ -95,3 +95,28 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-recommendedSpaces {
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--gap-4);
+
+    &__title {
+      @include tui-font-heading-small();
+      margin: 0;
+    }
+
+    &__link {
+      @include tui-font-link();
+    }
+  }
+
+  &__grid {
+    &__card {
+      height: var(--totaraEngage-card-height);
+    }
+  }
+}
+</style>

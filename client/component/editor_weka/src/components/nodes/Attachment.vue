@@ -282,3 +282,16 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-editorWeka-attachment {
+  @media (min-width: 491px) {
+    flex-basis: 20%;
+    min-width: 235px;
+  }
+
+  @media (max-width: 490px) {
+    width: 100%;
+  }
+}
+</style>

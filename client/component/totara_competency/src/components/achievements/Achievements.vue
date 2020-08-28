@@ -199,3 +199,22 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyAchievements {
+  margin-top: var(--gap-7);
+
+  &__empty {
+    font-size: var(--font-size-16);
+    @include tui-font-hint();
+  }
+
+  &__tabs {
+    margin-top: var(--gap-5);
+  }
+
+  &__title {
+    @include tui-font-heading-small();
+  }
+}
+</style>

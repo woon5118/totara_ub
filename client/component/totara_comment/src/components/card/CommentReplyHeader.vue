@@ -151,3 +151,41 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-commentReplyHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  &__content {
+    flex-basis: 94%;
+
+    &--inline {
+      display: flex;
+      align-items: flex-end;
+    }
+
+    &__link {
+      margin-bottom: var(--gap-2);
+
+      &--inline {
+        margin: 0;
+      }
+    }
+
+    &__timeDescription {
+      margin: 0;
+      @include tui-font-body-x-small();
+
+      &--inline {
+        margin-left: var(--gap-4);
+      }
+
+      span:not(:first-child) {
+        margin-left: var(--gap-4);
+      }
+    }
+  }
+}
+</style>

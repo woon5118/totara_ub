@@ -93,3 +93,37 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-emptySpacesHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__title {
+    @include tui-font-heading-medium();
+    margin: 0;
+    margin-bottom: var(--gap-12);
+  }
+
+  &__actionBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &__actionLink {
+      margin-bottom: var(--gap-4);
+    }
+
+    p {
+      @include tui-font-body();
+      margin: 0;
+      margin-bottom: var(--gap-8);
+
+      a {
+        @include tui-font-link();
+      }
+    }
+  }
+}
+</style>

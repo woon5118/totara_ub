@@ -315,3 +315,21 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-surveySidePanel {
+  padding: var(--gap-8);
+
+  &__profile {
+    margin-bottom: var(--gap-8);
+  }
+
+  &__tabs {
+    &__overview {
+      &__timeDescription {
+        @include tui-font-body-small();
+      }
+    }
+  }
+}
+</style>

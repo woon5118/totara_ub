@@ -129,3 +129,37 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-sharedBoard {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-bottom: var(--gap-2);
+
+  &__label {
+    display: inline-flex;
+    margin-top: var(--gap-2);
+    @include tui-font-body-small();
+  }
+  &__content {
+    flex-basis: 1px;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 60px;
+    padding: var(--gap-1);
+    padding-left: 0;
+    overflow-y: auto;
+
+    &__container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    &__tags {
+      margin: 0 0 var(--gap-1) var(--gap-1);
+      list-style-type: none;
+    }
+  }
+}
+</style>

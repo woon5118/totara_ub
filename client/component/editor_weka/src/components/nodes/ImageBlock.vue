@@ -235,3 +235,31 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-editorWeka-imageBlock {
+  display: flex;
+  min-width: 250px;
+  margin: var(--gap-8) 0;
+  white-space: normal;
+
+  &.ProseMirror-selectednode {
+    outline: none;
+  }
+
+  &.ProseMirror-selectednode > &__inner > .tui-imageBlock {
+    // Set the outline for the picture only.
+    outline: var(--border-width-normal) solid var(--weka-select-color);
+  }
+
+  &__inner {
+    display: inline-block;
+    max-width: 100%;
+    white-space: normal;
+
+    .tui-imageBlock {
+      margin: 0;
+    }
+  }
+}
+</style>

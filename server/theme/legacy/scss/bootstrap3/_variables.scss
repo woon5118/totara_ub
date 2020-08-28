@@ -454,11 +454,11 @@ $nav-pills-active-link-hover-color: $component-active-color !default;
 //
 //##
 
-$pagination-color: var(--legacy-link-color) !default;
+$pagination-color: var(--link-color) !default;
 $pagination-bg: #fff !default;
 $pagination-border: #ddd !default;
 
-$pagination-hover-color: var(--legacy-link-color) !default;
+$pagination-hover-color: var(--link-color) !default;
 $pagination-hover-bg: $gray-lighter !default;
 $pagination-hover-border: #ddd !default;
 

@@ -144,3 +144,11 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-otherUserLibrary {
+  &__header {
+    padding-left: 0;
+  }
+}
+</style>

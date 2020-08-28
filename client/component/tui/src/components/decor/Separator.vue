@@ -66,3 +66,55 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-separator {
+  margin: var(--gap-4) 0;
+
+  &--spread {
+    margin: var(--gap-8) 0;
+  }
+
+  // simple implementation using a horizontal rule element
+  &-rule {
+    height: var(--border-width-thin);
+    line-height: var(--border-width-thin);
+    background-color: var(--color-primary);
+    border: none;
+
+    &.tui-separator--thick {
+      height: var(--border-width-thick);
+      line-height: var(--border-width-thick);
+    }
+  }
+
+  // alternative implementation with wrapper markup to center slotted content
+  // horizontal rule visible only to screen readers, the visual lines added with
+  // pseudo selectors
+  &--wrapped {
+    display: flex;
+    align-items: center;
+
+    .tui-separator-content {
+      margin: 0 var(--gap-4);
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    &:before,
+    &:after {
+      width: 50%;
+      height: var(--border-width-thin);
+      line-height: var(--border-width-thin);
+      background-color: var(--color-primary);
+      content: '';
+    }
+
+    &.tui-separator--thick:before,
+    &.tui-separator--thick:after {
+      height: var(--border-width-thick);
+      line-height: var(--border-width-thick);
+    }
+  }
+}
+</style>

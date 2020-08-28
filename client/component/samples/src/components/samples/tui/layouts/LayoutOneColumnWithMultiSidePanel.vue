@@ -218,10 +218,10 @@ export default {
 
 <style lang="scss">
 .tui-sampleLayoutOneColumnWithMultiSidePanel {
-  margin-bottom: var(--tui-gap-8);
+  margin-bottom: var(--gap-8);
 
   .tui-layoutOneColumnWithMultiSidePanel {
-    border: var(--tui-border-width-thin) solid var(--tui-color-neutral-4);
+    border: var(--border-width-thin) solid var(--color-neutral-4);
     .tui-sidePanel__inner {
       width: 100%;
     }
