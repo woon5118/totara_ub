@@ -12,5 +12,5 @@ Feature: Confirm mathjax filter is working
     And I navigate to "Edit settings" node in "Front page settings"
     And I set the field "Front page summary" to "\( \alpha \beta \Delta \)"
     And I press "Save changes"
-    And I click on "Home" in the totara menu
+    And I am on site homepage
     Then I should see "αβΔ"
