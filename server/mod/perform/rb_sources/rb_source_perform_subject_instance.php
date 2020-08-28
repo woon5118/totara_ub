@@ -310,7 +310,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
         $contentoptions = [];
 
         // Add the manager/position/organisation content options.
-        $this->add_basic_user_content_options($contentoptions);
+        $this->add_basic_user_content_options($contentoptions, 'subject_user');
 
         return $contentoptions;
     }

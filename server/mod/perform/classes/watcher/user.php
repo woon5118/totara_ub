@@ -26,6 +26,7 @@ namespace mod_perform\watcher;
 use container_perform\perform;
 use core_user\hook\allow_view_profile_field;
 use mod_perform\entities\activity\participant_instance;
+use mod_perform\util;
 
 class user {
 
@@ -61,6 +62,10 @@ class user {
         }
 
         if (participant_instance::repository()->user_can_view_other_users_profile($hook->viewing_user_id, $hook->target_user_id)) {
+            $hook->give_permission();
+        }
+
+        if (util::can_report_on_user($hook->target_user_id, $hook->viewing_user_id)) {
             $hook->give_permission();
         }
     }
