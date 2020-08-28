@@ -27,8 +27,8 @@
           <HeaderCell size="3">Name</HeaderCell>
           <HeaderCell size="10">Description</HeaderCell>
         </template>
-        <template v-slot:row="{ row, expand }">
-          <Cell size="3">
+        <template v-slot:row="{ row }">
+          <Cell size="3" valign="center">
             <component :is="row.icon" :size="size" />
           </Cell>
 
@@ -53,6 +53,7 @@
           <Radio value="500">500</Radio>
           <Radio value="600">600</Radio>
           <Radio value="700">700</Radio>
+          <Radio :value="null"><code>null</code> (font size)</Radio>
         </RadioGroup>
       </FormRow>
     </SamplesPropCtl>
@@ -65,38 +66,7 @@
 </template>
 
 <script>
-import Add from 'tui/components/icons/common/Add';
-import AddUser from 'tui/components/icons/common/AddUser';
-import Archive from 'tui/components/icons/common/Archive';
-import BackArrow from 'tui/components/icons/common/BackArrow';
-import ForwardArrow from 'tui/components/icons/common/ForwardArrow';
-import CheckSuccess from 'tui/components/icons/common/CheckSuccess';
-import Close from 'tui/components/icons/common/Close';
-import Comment from 'tui/components/icons/common/Comment';
-import Delete from 'tui/components/icons/common/Delete';
-import Edit from 'tui/components/icons/common/Edit';
-import Error from 'tui/components/icons/common/Error';
-import Collapse from 'tui/components/icons/common/Collapse';
-import Expand from 'tui/components/icons/common/Expand';
-import More from 'tui/components/icons/common/More';
-import RemoveUser from 'tui/components/icons/common/RemoveUser';
-import Remove from 'tui/components/icons/common/Remove';
-import Search from 'tui/components/icons/common/Search';
-import Slider from 'tui/components/icons/common/Slider';
-import Success from 'tui/components/icons/common/Success';
-import Show from 'tui/components/icons/common/Show';
-import Hide from 'tui/components/icons/common/Hide';
-import List from 'tui/components/icons/common/List';
-import Grid from 'tui/components/icons/common/Grid';
-import Info from 'tui/components/icons/common/Info';
-import Loading from 'tui/components/icons/common/Loading';
-import Preview from 'tui/components/icons/common/Preview';
-import Warning from 'tui/components/icons/common/Warning';
-import Bookmark from 'tui/components/icons/common/Bookmark';
-import BookmarkActive from 'tui/components/icons/common/BookmarkActive';
-import Notification from 'tui/components/icons/common/Notification';
-import NotificationDisabled from 'tui/components/icons/common/NotificationDisabled';
-import Dot from 'tui/components/icons/common/Dot';
+import tui from 'tui/tui';
 
 import Cell from 'tui/components/datatable/Cell';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
@@ -108,12 +78,28 @@ import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample'
 import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 import Table from 'tui/components/datatable/Table';
 
+const prefix = 'tui/components/icons';
+const excludedPrefixes = [
+  'tui/components/icons/implementation',
+  'tui/components/icons/internal',
+  'tui/components/icons/Flex',
+  'tui/components/icons/flex',
+];
+
+const descriptions = {
+  BackArrow: 'Used for going back to previous page or place',
+  Collapse: 'Used for collapsing additional content',
+  Expand: 'Used for expanding additional content',
+  ForwardArrow: 'Used for going forward to next page or place',
+  Hide: 'Used for collasping form like elements',
+  Show: 'Used for expanding form like elements',
+};
+
 export default {
   components: {
     Cell,
     HeaderCell,
     FormRow,
-    ForwardArrow,
     Radio,
     RadioGroup,
     SamplesCode,
@@ -124,171 +110,26 @@ export default {
 
   data() {
     return {
-      iconData: [
-        {
-          icon: Add,
-          name: 'Add',
-          desc: '...',
-        },
-        {
-          icon: AddUser,
-          name: 'AddUser',
-          desc: '...',
-        },
-        {
-          icon: Archive,
-          name: 'Archive',
-          desc: '...',
-        },
-        {
-          icon: BackArrow,
-          name: 'GoBack',
-          desc: 'Used for going back to previous page or place',
-        },
-        {
-          icon: ForwardArrow,
-          name: 'GoForward',
-          desc: 'Used for going forward to next page or place',
-        },
-        {
-          icon: CheckSuccess,
-          name: 'CheckSuccess',
-          desc: '...',
-        },
-        {
-          icon: Close,
-          name: 'Close',
-          desc: '...',
-        },
-        {
-          icon: Collapse,
-          name: 'Collapse',
-          desc: 'Used for collapsing additional content',
-        },
-        {
-          icon: Comment,
-          name: 'Comment',
-          desc: '...',
-        },
-        {
-          icon: Delete,
-          name: 'Delete',
-          desc: '...',
-        },
-        {
-          icon: Edit,
-          name: 'Edit',
-          desc: '...',
-        },
-        {
-          icon: Error,
-          name: 'Error',
-          desc: '...',
-        },
-        {
-          icon: Expand,
-          name: 'Expand',
-          desc: 'Used for expanding additional content',
-        },
-        {
-          icon: Grid,
-          name: 'Grid',
-          desc: '...',
-        },
-        {
-          icon: Hide,
-          name: 'Hide',
-          desc: 'Used for collasping form like elements',
-        },
-        {
-          icon: Info,
-          name: 'Info',
-          desc: '...',
-        },
-        {
-          icon: List,
-          name: 'List',
-          desc: '...',
-        },
-        {
-          icon: More,
-          name: 'More',
-          desc: '...',
-        },
-        {
-          icon: Remove,
-          name: 'Remove',
-          desc: '...',
-        },
-        {
-          icon: RemoveUser,
-          name: 'RemoveUser',
-          desc: '...',
-        },
-        {
-          icon: Search,
-          name: 'Search',
-          desc: '...',
-        },
-        {
-          icon: Show,
-          name: 'Show',
-          desc: 'Used for expanding form like elements',
-        },
-        {
-          icon: Slider,
-          name: 'Slider',
-          desc: '...',
-        },
-        {
-          icon: Loading,
-          name: 'Loading',
-          desc: '...',
-        },
-        {
-          icon: Success,
-          name: 'Success',
-          desc: '...',
-        },
-        {
-          icon: Preview,
-          name: 'Preview',
-          desc: '...',
-        },
-        {
-          icon: Warning,
-          name: 'Warning',
-          desc: '...',
-        },
-        {
-          icon: Bookmark,
-          name: 'Bookmark',
-          desc: '...',
-        },
-        {
-          icon: BookmarkActive,
-          name: 'BookmarkActive',
-          desc: '...',
-        },
-        {
-          icon: Notification,
-          name: 'Notification',
-          desc: '...',
-        },
-        {
-          icon: NotificationDisabled,
-          name: 'Notification disabled',
-          desc: '...',
-        },
-        {
-          icon: Dot,
-          name: 'Dot',
-          desc: '...',
-        },
-      ],
+      iconData: tui
+        // eslint-disable-next-line tui/no-tui-internal
+        ._getLoadedComponentModules('tui')
+        .filter(
+          x =>
+            x.startsWith(prefix) &&
+            excludedPrefixes.every(p => !x.startsWith(p)) &&
+            !x.includes('compute')
+        )
+        .map(x => {
+          const name = x.slice(prefix.length + 1);
+          return {
+            icon: tui.defaultExport(tui.require(x)),
+            name,
+            desc: descriptions[name] ? descriptions[name] : '...',
+          };
+        }),
       size: '200',
       codeTemplate: `<Close :size="size"/>`,
-      codeScript: `import Close from 'tui/components/icons/common/Close';
+      codeScript: `import Close from 'tui/components/icons/Close';
 
 export default {
   components: {

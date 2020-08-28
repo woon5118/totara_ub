@@ -23,6 +23,7 @@ module.exports = {
   transform: {
     '^.+\\.vue$': 'vue-jest',
     '^.+\\.graphql': path.resolve(__dirname, '../jest/transform_graphql.js'),
+    '^.+\\.svg': path.resolve(__dirname, '../jest/transform_svg.js'),
     '.+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$':
       'jest-transform-stub',
     '^.+\\.js$': 'babel-jest',
