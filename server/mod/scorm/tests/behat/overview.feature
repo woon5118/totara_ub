@@ -1,8 +1,8 @@
 @mod @mod_scorm @_file_upload @_switch_frame @javascript @totara
-Feature: Scorm my learning overview
+Feature: Scorm Course overview block overview
   In order to let students know what to do
   As a student
-  I need to be able to see overview in My Learning
+  I need to be able to see overview in Course overview block
 
   Background:
     Given I am on a totara site
@@ -32,17 +32,17 @@ Feature: Scorm my learning overview
       | Description | Description |
     And I upload "mod/scorm/tests/packages/overview_test.zip" file to "Package file" filemanager
 
-  Scenario: Scorm my learning overview - no completion tracking
+  Scenario: Scorm Course overview block and entry page - no completion tracking
     Given I set the following fields to these values:
-      | Completion tracking    | Do not indicate activity completion |
-      | Display attempt status | My learning and entry page          |
+      | Completion tracking    | Do not indicate activity completion   |
+      | Display attempt status | Course overview block and entry page  |
     And I click on "Save and display" "button"
     And I log out
     And I log in as "student1"
     When I am on "Dashboard" page
     Then I should not see "You have SCORM packages that need attention"
 
-  Scenario: Scorm my learning overview - no display attempt status
+  Scenario: Scorm Course overview block and entry page - no display attempt status
     Given I set the following fields to these values:
       | Completion tracking        | Show activity as complete when conditions are met |
       | Display attempt status     | No                                                |
@@ -55,10 +55,10 @@ Feature: Scorm my learning overview
     When I am on "Dashboard" page
     Then I should not see "You have SCORM packages that need attention"
 
-  Scenario: Scorm my learning overview - activity availability specified in future
+  Scenario: Scorm Course overview block and entry page - activity availability specified in future
     Given I set the following fields to these values:
       | Completion tracking        | Show activity as complete when conditions are met |
-      | Display attempt status     | My learning and entry page                        |
+      | Display attempt status     | Course overview block and entry page              |
       | timeopen[enabled]          | 1                                                 |
       | timeopen[year]             | 2035                                              |
       | Require view               | 1                                                 |
@@ -70,10 +70,10 @@ Feature: Scorm my learning overview
     When I am on "Dashboard" page
     Then I should not see "You have SCORM packages that need attention"
 
-  Scenario: Scorm my learning overview - activity availability specified in past
+  Scenario: Scorm Course overview block and entry page - activity availability specified in past
     Given I set the following fields to these values:
       | Completion tracking        | Show activity as complete when conditions are met |
-      | Display attempt status     | My learning and entry page                        |
+      | Display attempt status     | Course overview block and entry page              |
       | timeopen[enabled]          | 1                                                 |
       | timeopen[year]             | 2015                                              |
       | Require view               | 1                                                 |
@@ -85,10 +85,10 @@ Feature: Scorm my learning overview
     When I am on "Dashboard" page
     Then I should see "You have SCORM packages that need attention"
 
-  Scenario: Scorm my learning overview - display attempt status
+  Scenario: Scorm Course overview block and entry page - display attempt status
     Given I set the following fields to these values:
       | Completion tracking        | Show activity as complete when conditions are met |
-      | Display attempt status     | My learning and entry page                        |
+      | Display attempt status     | Course overview block and entry page              |
       | Require view               | 1                                                 |
       | id_completionscoredisabled | 0                                                 |
       | completionscorerequired    | 80                                                |
