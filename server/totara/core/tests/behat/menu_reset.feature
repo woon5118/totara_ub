@@ -75,7 +75,7 @@ Feature: Main menu advanced reset tests
     And "Test sub item" row "Visibility" column of "totaramenutable" table should contain "Show"
     And "Test hidden item" row "Visibility" column of "totaramenutable" table should contain "Hide"
     And "Test unused item" row "Visibility" column of "totaramenutable" table should contain "Unused"
-    And "Vykonnost" row "Visibility" column of "totaramenutable" table should contain "Show"
+    And "Vykonnost" row "Visibility" column of "totaramenutable" table should contain "Unused"
     And "Reports" row "Visibility" column of "totaramenutable" table should contain "Unused"
 
   Scenario: Reset advanced Main menu to default with full delete
@@ -92,7 +92,7 @@ Feature: Main menu advanced reset tests
     And I should not see "Test hidden item"
     And I should not see "Test unused item"
     And I should not see "Vykonnost"
-    And "Performance (legacy)" row "Visibility" column of "totaramenutable" table should contain "Show"
+    And "Performance (legacy)" row "Visibility" column of "totaramenutable" table should contain "Unused"
     And "Reports" row "Visibility" column of "totaramenutable" table should contain "Show"
 
   Scenario: Reset advanced Main menu to default with custom backup
@@ -109,5 +109,5 @@ Feature: Main menu advanced reset tests
     And "Test hidden item" row "Visibility" column of "totaramenutable" table should contain "Unused"
     And "Test unused item" row "Visibility" column of "totaramenutable" table should contain "Unused"
     And I should not see "Vykonnost"
-    And "Performance (legacy)" row "Visibility" column of "totaramenutable" table should contain "Show"
+    And "Performance (legacy)" row "Visibility" column of "totaramenutable" table should contain "Unused"
     And "Reports" row "Visibility" column of "totaramenutable" table should contain "Show"
