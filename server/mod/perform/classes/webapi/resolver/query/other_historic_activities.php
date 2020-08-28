@@ -116,7 +116,7 @@ class other_historic_activities implements query_resolver, has_middleware {
         }
 
         $usernamefields = get_all_user_name_fields(true, 'u');
-        $what = explode(',', "re.*,fb.name,ua.userid,{$usernamefields}");
+        $what = explode(',', "re.*,fb.name,ua.timedue,ua.userid,{$usernamefields}");
         $builder = builder::table('feedback360_resp_assignment', 're')
             ->join((new table('feedback360_user_assignment'))->as('ua'), 'ua.id', '=', 're.feedback360userassignmentid')
             ->join((new table('feedback360'))->as('fb'), 'fb.id', '=', 'ua.feedback360id')
@@ -134,9 +134,34 @@ class other_historic_activities implements query_resolver, has_middleware {
                 'type' => get_string('feedback360:utf8', 'totara_feedback360'),
                 'subject_user' => fullname($resp_assignment),
                 'relationship_to' => get_string('manager', 'totara_feedback360'),
-                'status' => \feedback360::display_status($resp_assignment->status)
+                'status' => self::get_feedback_status($resp_assignment)
             ];
         }
         return $data;
+    }
+
+    /**
+     * Get user feedback360 status depending from timecompleted or timedue
+     *
+     * @param $resp_assignment
+     * @return string
+     */
+    private static function get_feedback_status($resp_assignment): string {
+        if (!empty($resp_assignment->timecompleted)) {
+            // Completed
+            $status = get_string('completed', 'totara_feedback360');
+        } else {
+            if (empty($resp_assignment->timedue)) {
+                // Infinite time.
+                $status = '';
+            } else if ($resp_assignment->timedue < time()) {
+                // Overdue.
+                $status = get_string('overdue', 'totara_feedback360');
+            } else {
+                // Pending.
+                $status = get_string('pending', 'totara_feedback360');
+            }
+        }
+        return $status;
     }
 }
