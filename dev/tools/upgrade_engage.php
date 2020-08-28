@@ -68,9 +68,10 @@ if (!$db_manager->field_exists("engage_resource", "contextid")) {
 
     $records = $DB->get_records('engage_resource');
     foreach ($records as $record) {
-        $context = context_user::instance($record['userid']);
+        $context = context_user::instance($record->userid);
         $obj = new \stdClass();
         $obj->contextid = $context->id;
+        $obj->id = $record->id;
         $DB->update_record('engage_resource', $obj);
     }
 
@@ -85,6 +86,13 @@ if ($db_manager->table_exists('engage_resource_completion')) {
     if ($db_manager->key_exists($table, $key)) {
         $db_manager->drop_key($table, $key);
     }
+}
+
+// Add the workspace roles if they don't exist
+require_once $CFG->dirroot . '/container/type/workspace/db/upgradelib.php';
+if (function_exists('container_workspace_add_missing_roles')) {
+    // Will do the check internally
+    container_workspace_add_missing_roles();
 }
 
 return 0;
