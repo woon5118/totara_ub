@@ -92,7 +92,7 @@ class totara_tui_requirement_local_scss_testcase extends advanced_testcase {
         global $CFG;
 
         $requirement = new scss('tui');
-        if (file_exists($CFG->srcroot . '/client/build/tui/tui_bundle.scss')) {
+        if (file_exists($CFG->srcroot . '/client/component/tui/build/tui_bundle.scss')) {
             self::assertTrue($requirement->has_resources_to_load());
         } else {
             self::assertFalse($requirement->has_resources_to_load());

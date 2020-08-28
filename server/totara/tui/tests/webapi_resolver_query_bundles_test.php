@@ -67,13 +67,19 @@ class totara_tui_webapi_resolver_query_bundles_testcase extends advanced_testcas
         }
         $result = $this->resolve_graphql_query('totara_tui_bundles', ['components' => ['tui', 'tui_charts'], 'theme' => 'ventura']);
         self::assertIsArray($result);
-        self::assertCount(4, $result);
-        $expected = ['tui/vendors.js', 'tui/tui_bundle.js', 'tui/tui_bundle.scss', 'tui_charts/tui_bundle.js'];
+        $expected = [
+            'tui/vendors.js',
+            'tui/tui_bundle.js',
+            'tui/tui_bundle.scss',
+            'tui_charts/tui_bundle.js',
+            'tui_charts/tui_bundle.scss'
+        ];
         $actual = [];
         foreach ($result as $requirement_description) {
             $actual[] = $requirement_description->component . '/' . $requirement_description->name;
         }
         self::assertSame($expected, $actual);
+        self::assertCount(5, $result);
     }
 
     /**
@@ -117,6 +123,13 @@ class totara_tui_webapi_resolver_query_bundles_testcase extends advanced_testcas
                         'name' => 'tui_bundle.js',
                         'type' => 'js',
                         'url' => 'https://www.example.com/moodle/totara/tui/javascript.php/1/p/tui_charts',
+                    ],
+                    [
+                        'id' => 'tui_charts:tui_bundle.scss',
+                        'component' => 'tui_charts',
+                        'name' => 'tui_bundle.scss',
+                        'type' => 'css',
+                        'url' => 'https://www.example.com/moodle/totara/tui/styles.php/ventura/1/p/ltr/tui_charts',
                     ],
                 ],
             ],

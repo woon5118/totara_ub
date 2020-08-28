@@ -60,9 +60,9 @@ class totara_tui_local_mediation_mediator_testcase extends advanced_testcase {
         $expected = [
             'Header: HTTP/1.1 304 Not Modified',
             'Header: Etag: "etag_test"',
-            'Header: Date: ' . gmdate('D, d M Y', time()),
-            'Header: Last-Modified: ' . gmdate('D, d M Y', time()),
-            'Header: Expires: ' . gmdate('D, d M Y', time()),
+            'Header: Date: ' . gmdate('M Y', time()),
+            'Header: Last-Modified: ' . gmdate('M Y', time()),
+            'Header: Expires: ' . gmdate('M Y', time()),
             'Header: Cache-Control: no-cache',
             'Header: Pragma: no-cache',
             'Exiting'
@@ -83,9 +83,9 @@ class totara_tui_local_mediation_mediator_testcase extends advanced_testcase {
         $expected = [
             'Header: Etag: "etag_test"',
             'Header: Content-Disposition: inline; filename="'.get_class($instance).'.php"',
-            'Header: Date: ' . gmdate('D, d M Y', time()),
-            'Header: Last-Modified: ' . gmdate('D, d M Y', time()),
-            'Header: Expires: ' . gmdate('D, d M Y', time()),
+            'Header: Date: ' . gmdate('M Y', time()),
+            'Header: Last-Modified: ' . gmdate('M Y', time()),
+            'Header: Expires: ' . gmdate('M Y', time()),
             'Header: Cache-Control: no-cache',
             'Header: Pragma: no-cache',
             'Header: Accept-Ranges: none',
@@ -111,9 +111,9 @@ class totara_tui_local_mediation_mediator_testcase extends advanced_testcase {
         $expected = [
             'Header: Etag: "etag_test"',
             'Header: Content-Disposition: inline; filename="'.get_class($instance).'.php"',
-            'Header: Date: ' . gmdate('D, d M Y', time()),
-            'Header: Last-Modified: ' . gmdate('D, d M Y', filemtime(__FILE__)),
-            'Header: Expires: ' . gmdate('D, d M Y', $this->get_lifetimestamp()),
+            'Header: Date: ' . gmdate('M Y', time()),
+            'Header: Last-Modified: ' . gmdate('M Y', filemtime(__FILE__)),
+            'Header: Expires: ' . gmdate('M Y', $this->get_lifetimestamp()),
             'Header: Pragma: ',
             'Header: Cache-Control: public, max-age=604800, immutable',
             'Header: Accept-Ranges: none',
@@ -139,9 +139,9 @@ class totara_tui_local_mediation_mediator_testcase extends advanced_testcase {
         $expected = [
             'Header: Etag: "etag_test"',
             'Header: Content-Disposition: inline; filename="'.get_class($instance).'.php"',
-            'Header: Date: ' . gmdate('D, d M Y', time()),
-            'Header: Last-Modified: ' . gmdate('D, d M Y', filemtime(__FILE__)),
-            'Header: Expires: ' . gmdate('D, d M Y', $this->get_lifetimestamp()),
+            'Header: Date: ' . gmdate('M Y', time()),
+            'Header: Last-Modified: ' . gmdate('M Y', filemtime(__FILE__)),
+            'Header: Expires: ' . gmdate('M Y', $this->get_lifetimestamp()),
             'Header: Pragma: ',
             'Header: Cache-Control: public, max-age=604800, immutable',
             'Header: Accept-Ranges: none',
@@ -193,7 +193,7 @@ class totara_tui_local_mediation_mediator_testcase extends advanced_testcase {
         foreach ($messages as $message) {
             $text = $message->message;
             // Get rid of the time from: Fri, 21 Aug 2020 03:26:20 => Fri, 21 Aug 2020
-            $text = preg_replace('/(\w{3,4}, \d{1,2} \w{3,4} 20\d{2}) \d{1,2}:\d{1,2}:\d{1,2} GMT/', '$1', $text);
+            $text = preg_replace('/\w{3,4}, \d{1,2} (\w{3,4} 20\d{2}) \d{1,2}:\d{1,2}:\d{1,2} GMT/', '$1', $text);
             $return[] = $text;
         }
         return $return;

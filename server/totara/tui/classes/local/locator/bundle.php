@@ -196,7 +196,7 @@ final class bundle {
         if ($bundle !== framework::clean_bundle_name($bundle)) {
             throw new coding_exception('Invalid bundle name provided.');
         }
-        return new path($CFG->srcroot, self::DIR_BUNDLE, $bundle);
+        return new path($CFG->srcroot, self::DIR_BUNDLE, $bundle, 'build');
     }
 
     /**
