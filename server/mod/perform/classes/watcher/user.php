@@ -46,6 +46,7 @@ class user {
         'fullname',
         'profileimageurl',
         'profileimageurlsmall',
+        'profileimagealt'
     ];
 
     /**
@@ -115,6 +116,13 @@ class user {
         }
 
         if (util::can_report_on_user($hook->target_user_id, $hook->viewing_user_id)) {
+            $hook->give_permission();
+            return;
+        }
+
+        // This is just a small safety check. The query should have taken care of the checks
+        // whether the user can be shown
+        if (util::can_potentially_manage_participants($hook->viewing_user_id)) {
             $hook->give_permission();
             return;
         }
