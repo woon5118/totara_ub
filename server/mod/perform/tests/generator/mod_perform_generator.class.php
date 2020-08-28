@@ -1508,7 +1508,7 @@ class mod_perform_generator extends component_generator_base {
             $element3 = $this->create_element([
                 'title' => 'Static content title',
                 'plugin_name' => 'static_content',
-                'data' => json_encode(['textValue' => 'This content is static'])
+                'data' => '{"wekaDoc":"{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"This content is static\"}]}]}","format":"HTML","docFormat":"FORMAT_JSON_EDITOR","element_id":1}'
             ]);
 
             $this->create_section_element($section1, $element3, 3);

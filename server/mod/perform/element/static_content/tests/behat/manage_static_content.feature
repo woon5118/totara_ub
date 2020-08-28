@@ -1,4 +1,4 @@
-@totara @perform @mod_perform @javascript @vuejs
+@totara @perform @mod_perform @javascript @vuejs @editor_weka @weka
 Feature: Manage performance activity static content
 
   Background:
@@ -16,7 +16,8 @@ Feature: Manage performance activity static content
     And I click on "Static content" "link"
     And I set the following fields to these values:
       | rawTitle | Static content 1 |
-      | rawText  | I see trees of green, red roses too. I see them bloom for me and you. And I think to myself what a wonderful world. |
+    And I activate the weka editor with css ".tui-weka"
+    And I type "I see trees of green, red roses too. I see them bloom for me and you. And I think to myself what a wonderful world." in the weka editor
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     Then I should see "Element saved."
     And I should see "I see them bloom for me and you."
@@ -27,8 +28,8 @@ Feature: Manage performance activity static content
     # Edit a static content element
     When I click on "Edit content" "button"
     And I click on "Edit element" "button"
-    And I set the following fields to these values:
-      | rawText  | Changed static content |
+    And I activate the weka editor with css ".tui-weka"
+    And I type "Changed static content" in the weka editor
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     Then I should see "Element saved."
     And I should see "Changed static content"
