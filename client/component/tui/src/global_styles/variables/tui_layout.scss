@@ -38,7 +38,7 @@
       @if $side-width != 'content' {
         flex-basis: $side-width;
       }
-      flex-grow: 1;
+      flex-grow: 0;
       margin: calc(#{$gutter} / 2);
     }
 

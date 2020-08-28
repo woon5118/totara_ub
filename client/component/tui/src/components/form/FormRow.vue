@@ -131,9 +131,11 @@ export default {
 
   &__inner > &__action {
     display: flex;
+    max-width: 71.2rem;
 
     &--isStacked {
       flex-direction: column;
+      display: block;
 
       @include tui-stack-vertical(var(--gap-1));
     }
