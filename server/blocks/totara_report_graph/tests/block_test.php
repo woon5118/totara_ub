@@ -32,11 +32,11 @@ class block_totara_report_graph_block_testcase extends advanced_testcase {
     use \block_totara_report_graph\phpunit\block_testing;
 
     public function test_get_content() {
-        $this->resetAfterTest();
         $this->setAdminUser();
 
         $rid = $this->create_user_report_with_graph();
-        $blockinstance = $this->create_report_graph_block_instance($rid, ['graphimage_maxwidth' => 777]);
+        $block = $this->create_report_graph_block_instance($rid, ['graph_height' => 777]);
+        $blockinstance = block_instance('totara_report_graph', $block);
 
         $content = $blockinstance->get_content();
         $this->assertInstanceOf('stdClass', $content);

@@ -25,16 +25,13 @@ namespace totara_reportbuilder\local\graph;
 
 /**
  * Class to draw Graphs based on reporting data
- *
- * Class graph_base
- * @package totara_reportbuilder\local\graph
  */
 abstract class base {
     const GRAPH_CATEGORY_SIMPLE = -1;
     const GRAPH_CATEGORY_COLUMN = -2;
 
     /** @var \stdClass record from report_builder_graph table */
-    protected $record;
+    protected $graphrecord;
     /** @var \reportbuilder the relevant reportbuilder instance */
     protected $report;
     /** @var array category and data series */
@@ -77,16 +74,16 @@ abstract class base {
         $this->values = [];
         $this->series = [];
 
-        $this->record = $DB->get_record('report_builder_graph', ['reportid' => $this->report->_id]);
-        if (!$this->record) {
-            $this->record = new \stdClass();
-            $this->record->type = '';
+        $this->graphrecord = $DB->get_record('report_builder_graph', ['reportid' => $this->report->_id]);
+        if (!$this->graphrecord) {
+            $this->graphrecord = new \stdClass();
+            $this->graphrecord->type = '';
             return;
         }
 
         // Load user settings.
-        if (isset($this->record->settings)) {
-            $this->usersettings = fix_utf8(json_decode($this->record->settings, true));
+        if (isset($this->graphrecord->settings)) {
+            $this->usersettings = fix_utf8(json_decode($this->graphrecord->settings, true));
         } else {
             $this->usersettings = [];
         }
@@ -101,16 +98,16 @@ abstract class base {
             $columns[$colkey] = $column;
             $columnsmap[$colkey] = $i++;
         }
-        $rawseries = fix_utf8(json_decode($this->record->series, true));
+        $rawseries = fix_utf8(json_decode($this->graphrecord->series, true));
         $series = [];
         foreach ($rawseries as $colkey) {
             $series[$colkey] = $colkey;
         }
 
-        if ($this->record->category === 'columnheadings') {
+        if ($this->graphrecord->category === 'columnheadings') {
             $this->category = base::GRAPH_CATEGORY_COLUMN;
 
-            $legendcolumn = $this->record->legend;
+            $legendcolumn = $this->graphrecord->legend;
             if ($legendcolumn and isset($columns[$legendcolumn])) {
                 $this->legendcolumn = $columnsmap[$legendcolumn];
             }
@@ -123,9 +120,9 @@ abstract class base {
                 $this->values[$i][base::GRAPH_CATEGORY_COLUMN] = $this->report->format_column_heading($this->report->columns[$colkey], true);
             }
         } else {
-            if (isset($columns[$this->record->category])) {
-                $this->category = $columnsmap[$this->record->category];
-                unset($series[$this->record->category]);
+            if (isset($columns[$this->graphrecord->category])) {
+                $this->category = $columnsmap[$this->graphrecord->category];
+                unset($series[$this->graphrecord->category]);
             } else { // Category value 'none' or problem detected.
                 $this->category = base::GRAPH_CATEGORY_SIMPLE;
             }
@@ -158,6 +155,11 @@ abstract class base {
         }
     }
 
+    /**
+     * Add record to chart.
+     *
+     * @param $record
+     */
     public function add_record($record): void {
         $recorddata = $this->report->src->process_data_row($record, 'graph', $this->report);
         $this->process_data($recorddata);
@@ -173,19 +175,38 @@ abstract class base {
     abstract protected function process_data(array $data): void;
 
     /**
-     * Returns the rendered graph markup
-     * @param int $width width of the graph
-     * @param int $height height of the graph
-     * @return string
+     * Render chart.
+     *
+     * @param int|null $width
+     * @param int|null $height
+     * @return string HTML markup
      */
     abstract public function render(?int $width = null, ?int $height = null): string;
+
+    /**
+     * Returns data for future rendering,
+     * the result can be cached later.
+     *
+     * @param int|null $width width of the graph
+     * @param int|null $height height of the graph
+     * @return array data for rendering, must be compatible with json_encode
+     */
+    abstract public function get_render_data(?int $width, ?int $height): array;
+
+    /**
+     * Returns the rendered graph markup.
+     *
+     * @param array data from get_render_data()
+     * @return string
+     */
+    abstract public static function render_data(array $data): string;
 
     public function count_records(): int {
         return $this->processedcount;
     }
 
     public function get_max_records(): int {
-        return $this->record->maxrecords;
+        return $this->graphrecord->maxrecords;
     }
 
     /**
@@ -193,33 +214,11 @@ abstract class base {
      * @return bool
      */
     public function is_valid(): bool {
-        if (empty($this->record->type)) {
+        if (empty($this->graphrecord->type)) {
             return false;
         }
 
         return (bool)$this->series;
-    }
-
-    /**
-     * Save the data in this report to store in a cache
-     *
-     * @return string
-     */
-    public function save_for_cache(): string {
-        // Method stub -- override in subclass
-        return '';
-    }
-
-    /**
-     * Load data into this report from cached data.
-     *
-     * This function must be implemented if allow_caching() returns true
-     *
-     * @param string $cached
-     * @return bool
-     */
-    public function load_from_cache(string $cached): bool {
-        throw new \coding_exception("The class ".get_called_class()." has not overridden the method load_from_cache. This issue must be fixed by a developer");
     }
 
     /**
@@ -265,33 +264,5 @@ abstract class base {
 
         // fallback to chartjs
         return new chartjs($report, $autoload);
-    }
-
-    /**
-     * Create an instance of a graph using data previously saved in a cache
-     *
-     * @param \reportbuilder $report
-     * @param string $cached
-     * @return base|null
-     */
-    final public static function create_from_cache(\reportbuilder $report, string $cached): ?base {
-        $class = get_config('totara_reportbuilder', 'graphlibclass');
-        if (!class_exists($class) || !$class::allow_caching()) {
-            return null;
-        }
-
-        $chart = new $class($report, false);
-        $chart->load_from_cache($cached);
-
-        return $chart;
-    }
-
-    /**
-     * Whether this report allows caching of results
-     * @return bool
-     */
-    public static function allow_caching(): bool {
-        // To allow caching, set set this to true in subclass
-        return false;
     }
 }

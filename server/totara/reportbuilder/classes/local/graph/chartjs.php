@@ -25,8 +25,6 @@ namespace totara_reportbuilder\local\graph;
 
 /**
  * Abstraction for ChartJS library for use with reports.
- *
- * @package totara_reportbuilder\local\graph
  */
 final class chartjs extends base {
     /** @var array ChartJS settings */
@@ -56,7 +54,7 @@ final class chartjs extends base {
             'responsive' => true,
             'maintainAspectRatio' => false,
             'legend' => [
-                'display' => $this->record->type !== 'progress',
+                'display' => $this->graphrecord->type !== 'progress',
             ]
         ];
 
@@ -64,29 +62,29 @@ final class chartjs extends base {
             $this->chartsettings['scales'] = [
                 'xAxes' => [
                     [
-                        'stacked' => !empty($this->record->stacked),
+                        'stacked' => !empty($this->graphrecord->stacked),
                         'ticks' => [
                             'beginAtZero' => true,
                         ],
                         'gridLines' => [
-                            'display' => $this->record->type === 'bar',
+                            'display' => $this->graphrecord->type === 'bar',
                         ],
                     ]
                 ],
                 'yAxes' => [
                     [
-                        'stacked' => !empty($this->record->stacked),
+                        'stacked' => !empty($this->graphrecord->stacked),
                         'ticks' => [
                             'beginAtZero' => true,
                         ],
                         'gridLines' => [
-                            'display' => $this->record->type !== 'bar',
+                            'display' => $this->graphrecord->type !== 'bar',
                         ],
                     ]
                 ]
             ];
         } else {
-            $this->chartsettings['cutoutPercentage'] = chartjs::convert_type($this->record->type) === 'doughnut' ? 66 : 0;
+            $this->chartsettings['cutoutPercentage'] = chartjs::convert_type($this->graphrecord->type) === 'doughnut' ? 66 : 0;
         }
 
         $this->labels = [];
@@ -108,8 +106,8 @@ final class chartjs extends base {
 
             $this->values[] = [
                 'label' => $this->report->format_column_heading($this->report->columns[$item], true),
-                'fill' => $this->record->type === 'area',
-                'showLine' => $this->record->type !== 'scatter',
+                'fill' => $this->graphrecord->type === 'area',
+                'showLine' => $this->graphrecord->type !== 'scatter',
                 'data' => [],
                 'backgroundColor' => [], //for pie charts -- will be overridden further down
             ];
@@ -119,7 +117,7 @@ final class chartjs extends base {
             foreach ($this->values as $k => $val) {
                 $this->values[$k]['backgroundColor'] = $this->colors[$k % count($this->colors)];
 
-                if ($this->record->type === 'line') {
+                if ($this->graphrecord->type === 'line') {
                     $this->values[$k]['borderColor'] = $this->colors[$k % count($this->colors)];
                 }
             }
@@ -161,7 +159,7 @@ final class chartjs extends base {
 
             $this->values[$k]['total'] = isset($this->values[$k]['total']) ? $this->values[$k]['total'] + $val : $val;
 
-            if ($this->record->type === 'scatter') {
+            if ($this->graphrecord->type === 'scatter') {
                 $this->values[$k]['data'][] = ['x' => $label, 'y' => $val];
             } else {
                 $this->values[$k]['data'][] = $val;
@@ -171,7 +169,7 @@ final class chartjs extends base {
                 $this->values[$k]['backgroundColor'][] = $this->colors[$this->processedcount % count($this->colors)];
             }
 
-            if (empty($this->record->stacked)) {
+            if (empty($this->graphrecord->stacked)) {
                 $this->values[$k]['stack'] = $k;
             }
         }
@@ -179,11 +177,28 @@ final class chartjs extends base {
         $this->processedcount++;
     }
 
+    /**
+     * Render chart.
+     *
+     * @param int|null $width
+     * @param int|null $height
+     * @return string HTML markup
+     */
     public function render(int $width = null, int $height = null): string {
-        global $OUTPUT;
+        $data = $this->get_render_data($width, $height);
+        return self::render_data($data);
+    }
 
-        //Progress charts need to draw multiple charts, so they have to be handled separately
-        if ($this->record->type === 'progress') {
+    /**
+     * Returns cache data for future rendering.
+     *
+     * @param int|null $width width of the graph
+     * @param int|null $height height of the graph
+     * @return array data for rendering, must be compatible with json_encode
+     */
+    public function get_render_data(?int $width, ?int $height): array {
+        // Progress charts need to draw multiple charts, so they have to be handled separately.
+        if ($this->graphrecord->type === 'progress') {
             $context = $this->get_progress_chart_data($width, $height);
         } else {
             if ($this->is_pie_chart()) {
@@ -192,10 +207,11 @@ final class chartjs extends base {
 
             // Since we're using the ChartJS responsive setting, we ignore $width so it will grow correctly
             $context = [
-                'height' => $height,
+                'width' => (empty($width) ? null : $width),
+                'height' => (empty($height) ? null : $height),
                 'chart' => [
                     'settings' => json_encode([
-                        'type' => chartjs::convert_type($this->record->type),
+                        'type' => chartjs::convert_type($this->graphrecord->type),
                         'data' => [
                             'labels' => $this->labels,
                             'datasets' => $this->values,
@@ -206,14 +222,25 @@ final class chartjs extends base {
             ];
         }
 
-        return $OUTPUT->render_from_template('totara_reportbuilder/chartjs', $context);
+        return $context;
+    }
+
+    /**
+     * Returns the rendered graph markup.
+     *
+     * @param array data from get_render_data()
+     * @return string
+     */
+    public static function render_data(array $data): string {
+        global $OUTPUT;
+        return $OUTPUT->render_from_template('totara_reportbuilder/chartjs', $data);
     }
 
     /**
      * Generate the context data for the progress donut chart type.
      *
-     * @param int|null $width
-     * @param int|null $height
+     * @param int|null $width Minimal width
+     * @param int|null $height Minimal height
      * @return array context data for a progress donut chart
      */
     private function get_progress_chart_data(int $width = null, int $height = null): array {
@@ -258,7 +285,7 @@ final class chartjs extends base {
                 $charts[] = [
                     'settings' => json_encode([
                         'aspectRatio' => 1,
-                        'type' => chartjs::convert_type($this->record->type),
+                        'type' => chartjs::convert_type($this->graphrecord->type),
                         'data' => [
                             'labels' => [$this->labels[$k], ''],
                             'datasets' => [$chart],
@@ -270,8 +297,9 @@ final class chartjs extends base {
         }
 
         $context = [
-            'type' => $this->record->type,
-            'height' => $height,
+            'width' => (empty($width) ? null : $width),
+            'height' => (empty($height) ? null : $height),
+            'type' => $this->graphrecord->type,
             'chart' => $charts,
         ];
 
@@ -310,9 +338,9 @@ final class chartjs extends base {
      * @return bool
      */
     private function is_pie_chart() {
-        return $this->record->type === 'pie'
-            || $this->record->type === 'doughnut'
-            || $this->record->type === 'progress';
+        return $this->graphrecord->type === 'pie'
+            || $this->graphrecord->type === 'doughnut'
+            || $this->graphrecord->type === 'progress';
     }
 
     public static function get_name(): string {

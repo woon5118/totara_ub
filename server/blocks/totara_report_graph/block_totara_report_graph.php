@@ -33,18 +33,6 @@ class block_totara_report_graph extends block_base {
      */
     protected $rawreport;
 
-    /**
-     * The maximum width for the graph image.
-     * @var string|null
-     */
-    protected $graphimage_maxwidth = null;
-
-    /**
-     * The maximum height for the graph image.
-     * @var string|null
-     */
-    protected $graphimage_maxheight = null;
-
     public function init() {
         $this->title = get_string('pluginname', 'block_totara_report_graph');
     }
@@ -68,12 +56,6 @@ class block_totara_report_graph extends block_base {
                 $this->title = format_string($this->rawreport->fullname);
             }
         }
-        if (!empty($this->config->graphimage_maxwidth)) {
-            $this->graphimage_maxwidth = \block_totara_report_graph\util::normalise_size_and_user_input($this->config->graphimage_maxwidth);
-        }
-        if (!empty($this->config->graphimage_maxheight)) {
-            $this->graphimage_maxheight = \block_totara_report_graph\util::normalise_size_and_user_input($this->config->graphimage_maxheight);
-        }
     }
 
     public function applicable_formats() {
@@ -94,7 +76,7 @@ class block_totara_report_graph extends block_base {
 
 
     public function get_content() {
-        global $USER, $CFG, $SESSION;
+        global $CFG, $OUTPUT, $USER;
 
         if (advanced_feature::is_disabled('reportgraphs')) {
             return '';
@@ -143,6 +125,22 @@ class block_totara_report_graph extends block_base {
         $this->content = new stdClass();
         $this->content->footer = '';
 
+        $data = \block_totara_report_graph\util::get_cached_chart_data($this->instance, $this->config);
+
+        if ($data === null || $data === []) {
+            // Hide block if userfor cannot see the graph.
+            $reportfor = ($this->config->reportfor ? $this->config->reportfor : $USER->id);
+            if (!reportbuilder::is_capable($this->rawreport->id, $reportfor)) {
+                $this->content = '';
+                return $this->content;
+            }
+        }
+
+        if ($data === []) {
+            $this->content->text = '<div>'.get_string('errorrendergraph', 'block_totara_report_graph').'</div>';
+            return $this->content;
+        }
+
         if (reportbuilder::is_capable($this->rawreport->id, $USER->id)) {
             $url = new moodle_url('/totara/reportbuilder/report.php', array('id' => $this->rawreport->id));
             if (!empty($this->rawreport->savedid)) {
@@ -152,8 +150,16 @@ class block_totara_report_graph extends block_base {
             $this->content->footer = html_writer::link($url, get_string('viewfullreport', 'block_totara_report_graph'), $attrs);
         }
 
-        $chart = \totara_reportbuilder\local\graph\base::create_graph(reportbuilder::create($this->rawreport->id));
-        $this->content->text = $chart->render(400,400);
+        $templatecontext = ['data' => $data, 'blockid' => $this->instance->id];
+        if ($data === null) {
+            if (!empty($this->config->graph_height)) {
+                $templatecontext['height'] = $this->config->graph_height;
+            } else {
+                $templatecontext['height'] = 400;
+            }
+        }
+
+        $this->content->text = $OUTPUT->render_from_template('block_totara_report_graph/graph_loader', $templatecontext);
 
         return $this->content;
     }

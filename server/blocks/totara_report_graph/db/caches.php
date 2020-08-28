@@ -23,6 +23,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2020082500;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;       // Requires this Moodle version.
-$plugin->component = 'block_totara_report_graph'; // To check on upgrade, that module sits in correct place
+$definitions = array(
+    'graph' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => false,
+        'staticacceleration' => false,
+        'ttl' => 60 * 60 * 24, // This should correspond with maximum lifetime in block configuration.
+        'canuselocalstore' => true,
+    ),
+);

@@ -113,9 +113,10 @@ trait block_testing {
 
     /**
      * Create a report graph block instance
+     *
      * @param int $rid
      * @param array $config
-     * @return \block_totara_report_graph
+     * @return \stdClass block record
      */
     protected function create_report_graph_block_instance($rid, array $config = []) {
         global $DB;
@@ -124,8 +125,7 @@ trait block_testing {
             'title' => 'My report block',
             'reportorsavedid' => $rid,
             'reportfor' => 1,
-            'graphimage_maxwidth' => '789px',
-            'graphimage_maxheight' => '327px'
+            'graph_height' => '327px'
         ];
         foreach ($config as $key => $value) {
             if (isset($realconfig->{$key})) {
@@ -144,6 +144,6 @@ trait block_testing {
         $DB->set_field('block_instances', 'configdata', $configdata, ['id' => $block->id]);
         $block->configdata = $configdata;
 
-        return block_instance('totara_report_graph', $block);
+        return $block;
     }
 }

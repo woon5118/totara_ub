@@ -172,7 +172,7 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $this->assertStringContainsString($user2->username, $data);
 
         $graph = $this->init_graph($rid);
-        $data = $graph->render(400, 400, false);
+        $data = $graph->render(400, 400);
         $this->assertStringNotContainsString('Zero length axis', $data);
         $this->assertStringContainsString($user1->username, $data);
         $this->assertStringContainsString($user2->username, $data);

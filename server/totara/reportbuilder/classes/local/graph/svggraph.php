@@ -25,8 +25,6 @@ namespace totara_reportbuilder\local\graph;
 
 /**
  * Abstraction for SVGGraph library for use with reports.
- *
- * @package totara_reportbuilder\local\graph
  */
 final class svggraph extends base {
     /** @var array SVGGraph settings */
@@ -45,9 +43,6 @@ final class svggraph extends base {
         'area',
         'doughnut',
     ];
-
-    /** @var string rendered SVG from cache */
-    private $rendered;
 
     protected function init(): void {
         $this->svggraphsettings = [
@@ -117,16 +112,31 @@ final class svggraph extends base {
         $this->processedcount++;
     }
 
-    public function render(?int $width = null, ?int $height = null, $fix_rtl = true): string {
-        // If we already have a rendered version of this graph, return that instead
-        if (isset($this->rendered)) {
-            return $this->rendered;
-        }
+    /**
+     * Render chart.
+     *
+     * @param int|null $width
+     * @param int|null $height
+     * @return string HTML markup
+     */
+    public function render(?int $width = null, ?int $height = null): string {
+        $data = $this->get_render_data($width, $height);
+        return self::render_data($data);
+    }
 
+    /**
+     * Returns data for future rendering,
+     * the result can be cached later.
+     *
+     * @param int|null $width width of the graph
+     * @param int|null $height height of the graph
+     * @return array data for rendering, must be compatible with json_encode
+     */
+    public function get_render_data(?int $width, ?int $height): array {
         $this->init_svggraph();
         if (!$this->svggraphtype) {
             // Nothing to do.
-            return '';
+            return ['svg' => ''];
         }
         $settings = $this->get_final_settings();
 
@@ -136,14 +146,17 @@ final class svggraph extends base {
         $svggraph = new \SVGGraph($renderwidth, $renderheight, $settings);
         $svggraph->Colours($this->svggraphcolours);
         $svggraph->Values($this->shorten_labels($this->values, $settings));
-        $data = $svggraph->Fetch($this->svggraphtype, false, false);
+        $svg = $svggraph->Fetch($this->svggraphtype, false, false);
 
-        if (strpos($data, 'Zero length axis (min >= max)') === false) {
-            return !empty($data) ? \html_writer::div($data, 'rb-report-svggraph') : '';
+        if (empty($svg)) {
+            return ['svg' => ''];
+        }
+        if (strpos($svg, 'Zero length axis (min >= max)') === false) {
+            return ['svg' => $svg];
         }
 
         // Use a workaround to prevent axis problems caused by zero only values.
-        $dir = ($this->record->type === 'bar') ? 'h' : 'v';
+        $dir = ($this->graphrecord->type === 'bar') ? 'h' : 'v';
         if (!isset($settings['axis_min_' . $dir])) {
             $settings['axis_min_' . $dir] = 0;
         }
@@ -154,13 +167,23 @@ final class svggraph extends base {
         $svggraph->Colours($this->svggraphcolours);
         $svggraph->Values($this->shorten_labels($this->values, $settings));
 
-        $data = $svggraph->Fetch($this->svggraphtype, false, false);
+        $svg = $svggraph->Fetch($this->svggraphtype, false, false);
+        $svg = self::fix_svg_rtl($svg);
 
-        if ($fix_rtl) {
-            $data = self::fix_svg_rtl($data);
+        return ['svg' => $svg];
+    }
+
+    /**
+     * Returns the rendered graph markup.
+     *
+     * @param array data from get_render_data()
+     * @return string
+     */
+    public static function render_data(array $data): string {
+        if (empty($data['svg'])) {
+            return '';
         }
-
-        return !empty($data) ? \html_writer::div($data, 'rb-report-svggraph') : '';
+        return \html_writer::div($data['svg'], 'rb-report-svggraph');
     }
 
     protected function init_svggraph() {
@@ -235,14 +258,14 @@ final class svggraph extends base {
 
         if ($this->category == base::GRAPH_CATEGORY_SIMPLE) {
             // Row number as category - start with 1 instead of automatic 0.
-            if ($this->record->type === 'bar') {
+            if ($this->graphrecord->type === 'bar') {
                 $this->svggraphsettings['axis_min_v'] = 1;
             } else {
                 $this->svggraphsettings['axis_min_h'] = 1;
             }
         }
 
-        if ($this->record->type === 'bar') {
+        if ($this->graphrecord->type === 'bar') {
             if ($seriescount <= 2) {
                 $this->svggraphsettings['bar_space'] = 40;
             } else if ($seriescount <= 4) {
@@ -253,40 +276,40 @@ final class svggraph extends base {
             if ($singleseries) {
                 $this->svggraphtype = 'HorizontalBarGraph';
             } else {
-                $this->svggraphtype = $this->record->stacked ? 'HorizontalStackedBarGraph' : 'HorizontalGroupedBarGraph';
+                $this->svggraphtype = $this->graphrecord->stacked ? 'HorizontalStackedBarGraph' : 'HorizontalGroupedBarGraph';
             }
 
-        } else if ($this->record->type === 'line') {
+        } else if ($this->graphrecord->type === 'line') {
             if ($singleseries) {
                 $this->svggraphtype = 'MultiLineGraph';
             } else {
-                $this->svggraphtype = $this->record->stacked ? 'StackedLineGraph' : 'MultiLineGraph';
+                $this->svggraphtype = $this->graphrecord->stacked ? 'StackedLineGraph' : 'MultiLineGraph';
             }
 
-        } else if ($this->record->type === 'scatter') {
+        } else if ($this->graphrecord->type === 'scatter') {
             if ($singleseries) {
                 $this->svggraphtype = 'ScatterGraph';
             } else {
                 $this->svggraphtype = 'MultiScatterGraph';
             }
 
-        } else if ($this->record->type === 'area') {
+        } else if ($this->graphrecord->type === 'area') {
             $this->svggraphsettings['fill_under'] = true;
             $this->svggraphsettings['marker_size'] = 2;
 
             if ($singleseries) {
                 $this->svggraphtype = 'MultiLineGraph';
             } else {
-                $this->svggraphtype = $this->record->stacked ? 'StackedLineGraph' : 'MultiLineGraph';
+                $this->svggraphtype = $this->graphrecord->stacked ? 'StackedLineGraph' : 'MultiLineGraph';
             }
 
-        } else if ($this->record->type === 'pie') {
+        } else if ($this->graphrecord->type === 'pie') {
             $this->svggraphtype = 'PieGraph';
 
-        } else if ($this->record->type === 'doughnut') {
+        } else if ($this->graphrecord->type === 'doughnut') {
             $this->svggraphtype = 'DonutGraph';
         } else { // Type 'column' or unknown.
-            $this->record->type = 'column';
+            $this->graphrecord->type = 'column';
             if ($seriescount <= 2) {
                 $this->svggraphsettings['bar_space'] = 80;
             } else if ($seriescount <= 5) {
@@ -299,7 +322,7 @@ final class svggraph extends base {
             if ($singleseries) {
                 $this->svggraphtype = 'BarGraph';
             } else {
-                $this->svggraphtype = $this->record->stacked ? 'StackedBarGraph' : 'GroupedBarGraph';
+                $this->svggraphtype = $this->graphrecord->stacked ? 'StackedBarGraph' : 'GroupedBarGraph';
             }
         }
 
@@ -532,22 +555,8 @@ final class svggraph extends base {
      * @return bool
      */
     private function is_pie_chart(): bool {
-        return $this->record->type === 'pie'
-            || $this->record->type === 'doughnut';
-    }
-
-    public function save_for_cache(): string {
-        return $this->render(400, 400, false);
-    }
-
-    public function load_from_cache(string $cached): bool {
-        $this->rendered = self::fix_svg_rtl($cached);
-        return true;
-    }
-
-    public static function allow_caching(): bool {
-        // To allow caching, set set this to true in subclass
-        return true;
+        return $this->graphrecord->type === 'pie'
+            || $this->graphrecord->type === 'doughnut';
     }
 
     public static function get_name(): string {

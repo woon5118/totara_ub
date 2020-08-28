@@ -785,6 +785,7 @@ class block_manager {
                     COALESCE(bp.visible, bs.visible, 1) AS visible,
                     COALESCE(bp.region, bs.region, bi.defaultregion) AS region,
                     COALESCE(bp.weight, bs.weight, bi.defaultweight) AS weight,
+                    bi.timemodified,
                     bi.configdata,
                     bi.common_config
                     $ccselect

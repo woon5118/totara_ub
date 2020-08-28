@@ -356,7 +356,7 @@ class rb_global_restriction_set implements Iterator {
      *
      * @param int $userid user to restrict id, 0 means not logged in, null means use $USER->id
      * @param bool $nocache Do not use cache (cache is static variable)
-     * @return stdClass[]|null  List of available restrictions ids as (id, id, id) or null if user has no restrictions.
+     * @return int[]|null  List of available restrictions ids as (id, id, id) or null if user has no restrictions.
      */
     public static function get_user_all_restrictions_ids($userid, $nocache = false) {
         $restrs = self::get_user_all_restrictions($userid, $nocache);

@@ -30,42 +30,63 @@ namespace block_totara_report_graph;
  * @package block_totara_report_graph
  */
 class util {
+    /**
+     * Default height for graphs in blocks.
+     */
+    const DEFAULT_HEIGHT = 400;
 
     /**
-     * Get the graph
-     * @param \reportbuilder $report
-     * @return string HTML for graph
+     * Cache key helper.
+     *
+     * @param int $blockid
+     * @param \stdClass $config
+     * @return string|null key
      */
-    public static function get_graph(\reportbuilder $report) {
-        $graph = \totara_reportbuilder\local\graph\base::create_graph($report);
-        return $graph->render(400,400);
+    protected static function get_cache_key(int $blockid, \stdClass $config): ?string {
+        global $USER;
+
+        if (!isset($config->reportfor) || empty($config->reportorsavedid)) {
+            // No chart means no caching.
+            return null;
+        }
+
+        $reportfor = ($config->reportfor ? $config->reportfor : $USER->id);
+
+        if (!empty($config->graph_height) && $config->graph_height > 0) {
+            $height = (int)$config->graph_height;
+        } else {
+            $height = self::DEFAULT_HEIGHT;
+        }
+
+        return 'b' . $blockid . 'f' . $reportfor . 'h' . $height . 'l' . current_language();
     }
 
     /**
      * Get raw report record from database.
-     * @param int $reportorsavedid
-     * @return \stdClass
+     *
+     * @param int $reportorsavedid positive number means real record id, negative number means save id.
+     * @return \stdClass|false
      */
-    public static function get_report($reportorsavedid) {
+    public static function get_report(int $reportorsavedid) {
         global $DB;
 
         // Fetch report even if type not set - users may fiddle with the setting in reportbuilder.
 
         if ($reportorsavedid > 0) {
-            $sql = "SELECT r.id, r.fullname, r.timemodified AS rtimemodified, g.type,
+            $sql = 'SELECT r.id, r.fullname, r.timemodified AS rtimemodified, g.type,
                            NULL AS savedid, NULL AS userid, 0 AS gtimemodified, r.globalrestriction, r.contentmode
-                     FROM {report_builder} r
-                     JOIN {report_builder_graph} g ON g.reportid = r.id
-                    WHERE r.id = :reportid";
+                     FROM "ttr_report_builder" r
+                     JOIN "ttr_report_builder_graph" g ON g.reportid = r.id
+                    WHERE r.id = :reportid';
             $report = $DB->get_record_sql($sql, array('reportid' => $reportorsavedid), IGNORE_MISSING);
 
         } else if ($reportorsavedid < 0) {
-            $sql = "SELECT r.id, s.name AS fullname, r.timemodified AS rtimemodified, g.type,
+            $sql = 'SELECT r.id, s.name AS fullname, r.timemodified AS rtimemodified, g.type,
                            s.id AS savedid, s.userid, g.timemodified AS gtimemodified, r.globalrestriction, r.contentmode
-                      FROM {report_builder} r
-                      JOIN {report_builder_graph} g ON g.reportid = r.id
-                      JOIN {report_builder_saved} s ON s.reportid = r.id
-                     WHERE s.id = :savedid AND s.ispublic <> 0";
+                      FROM "ttr_report_builder" r
+                      JOIN "ttr_report_builder_graph" g ON g.reportid = r.id
+                      JOIN "ttr_report_builder_saved" s ON s.reportid = r.id
+                     WHERE s.id = :savedid AND s.ispublic <> 0';
             $report = $DB->get_record_sql($sql, array('savedid' => - $reportorsavedid), IGNORE_MISSING);
 
         } else {
@@ -76,30 +97,165 @@ class util {
     }
 
     /**
-     * Cleans user input of max width and max height.
+     * Get chart rendering data.
      *
-     * @param string $input
-     * @return null|string
+     * NOTE: Session must be already closed and session language set to required value!
+     *
+     * @param \stdClass $block
+     * @param \stdClass $config
+     * @return array|null null means error
      */
-    public static function normalise_size_and_user_input($input) {
-        if (trim($input) === '') {
-            // Its empty, that is fine.
-            return '';
-        }
-        $regex = '#^ *(?<size>\-?\d+(\.\d+)?|\-?\.\d+) *(?<unit>%|px|cm|em|em|in|mm|pc|pe|pt|px)? *$#i';
-        if (preg_match($regex, $input, $matches)) {
-            $size = (float)$matches['size'];
-            if (empty($size)) {
-                return '';
-            }
-            $unit = 'px';
-            if (!empty($matches['unit'])) {
-                $unit = \core_text::strtolower($matches['unit']);
-            }
-            return $size.$unit;
+    public static function get_chart_data(\stdClass $block, \stdClass $config): ?array {
+        global $SESSION, $USER, $DB;
+
+        if (\core\session\manager::is_session_active()) {
+            throw new \coding_exception('Session must not be active when rendering chart block data!');
         }
 
-        // Its not valid.
-        return null;
+        $blockid = $block->id;
+
+        if (!isset($config->reportfor) || empty($config->reportorsavedid)) {
+            error_log($blockid . ': not configured');
+            return null;
+        }
+
+        $rawreport = self::get_report($config->reportorsavedid);
+
+        if (empty($rawreport->type)) {
+            error_log($blockid . ': no graph type');
+            return null;
+        }
+
+        $key = self::get_cache_key($blockid, $config);
+        $cache = null;
+        if ($key) {
+            $cache = \cache::make('block_totara_report_graph', 'graph');
+        }
+
+        try {
+            unset($SESSION->reportbuilder[$rawreport->id]); // Not persistent - we closed session already.
+            $reportfor = $config->reportfor ? $config->reportfor : null;
+
+            // Switch user if necessary.
+            if ($reportfor && $reportfor != $USER->id) {
+                $user = $DB->get_record('user', ['id' => $reportfor, 'deleted' => 0]);
+                if (!$user) {
+                    error_log($blockid . ': invalid reportfor user');
+                    return null;
+                }
+                $USER = $user; // Not persistent - we closed session already.
+            }
+
+            $allrestr = \rb_global_restriction_set::create_from_ids(
+                $rawreport,
+                \rb_global_restriction_set::get_user_all_restrictions_ids($reportfor, true)
+            );
+
+            $cfg = new \rb_config();
+            $cfg->set_sid($rawreport->savedid);
+            $cfg->set_reportfor($reportfor);
+            $cfg->set_global_restriction_set($allrestr);
+            $report = \reportbuilder::create($rawreport->id, $cfg, true);
+
+            $graph = new \totara_reportbuilder\local\graph\chartjs($report, true);
+            // Width is automatic based on column size, height can be customised.
+            if (!empty($config->graph_height) && $config->graph_height > 0) {
+                $height = (int)$config->graph_height;
+            } else {
+                $height = self::DEFAULT_HEIGHT;
+            }
+            $data = $graph->get_render_data(null, $height);
+
+            // If we go this far than make sure we save the result to the cache no matter what the user does.
+            if ($key) {
+                ignore_user_abort(true);
+                $cacheddata = new \stdClass();
+                $cacheddata->data = $data;
+                $cacheddata->reportorsavedid = $config->reportorsavedid;
+                $cacheddata->reportfor = $config->reportfor;
+                $cacheddata->timecreated = time();
+                $cacheddata->btimemodified = $block->timemodified;
+                $cacheddata->rtimemodified = $rawreport->rtimemodified;
+                $cacheddata->gtimemodified = $rawreport->gtimemodified;
+                $cache->set($key, $cacheddata);
+                if (connection_aborted()) {
+                    return null;
+                }
+                ignore_user_abort(false);
+            }
+
+            // Finally return the render data.
+            return $data;
+        } catch (\Exception $e) {
+            error_log($blockid . ': report error: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Fetch graph data from cache.
+     *
+     * @param \stdClass $block
+     * @param \stdClass $config
+     * @return array|null empty array means error, null means not cached yet
+     */
+    public static function get_cached_chart_data(\stdClass $block, \stdClass $config): ?array {
+        if (!$block->id || !isset($config->reportfor) || empty($config->reportorsavedid)) {
+            // Error.
+            return [];
+        }
+        $blockid = $block->id;
+
+        $rawreport = self::get_report($config->reportorsavedid);
+        if (empty($rawreport->type)) {
+            // Error.
+            return [];
+        }
+
+        $key = self::get_cache_key($blockid, $config);
+        if (!$key) {
+            // No caching.
+            return null;
+        }
+
+        $cache = \cache::make('block_totara_report_graph', 'graph');
+
+        if (empty($config->cachettl)) {
+            $config->cachettl = 3600;
+        }
+
+        $cacheddata = $cache->get($key);
+
+        if (empty($cacheddata->data)) {
+            // No cache yet.
+            return null;
+        }
+        if ($cacheddata->reportorsavedid != $config->reportorsavedid) {
+            // Block setting was changed.
+            return null;
+        }
+        if ($cacheddata->reportfor != $config->reportfor) {
+            // Block setting was changed.
+            return null;
+        }
+        if ($cacheddata->btimemodified != $block->timemodified) {
+            // Force cache purge after block config save even if nothing changed.
+            return null;
+        }
+        if ($cacheddata->timecreated < time() - $config->cachettl) {
+            // The cache is too old.
+            return null;
+        }
+        if ($cacheddata->rtimemodified != $rawreport->rtimemodified) {
+            // The report settings were changed.
+            return null;
+        }
+        if ($cacheddata->gtimemodified != $rawreport->gtimemodified) {
+            // The graph setting was changed.
+            return null;
+        }
+
+        // Yay - we can use the cached data!
+        return $cacheddata->data;
     }
 }

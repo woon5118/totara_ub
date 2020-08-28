@@ -125,18 +125,29 @@ class block_totara_report_graph_edit_form extends block_edit_form {
 
         $mform->addElement('select', 'config_reportfor', get_string('reportfor', 'block_totara_report_graph'), $options);
         $mform->addHelpButton('config_reportfor', 'reportfor', 'block_totara_report_graph');
+        // The reasoning to use identity of the user that added block is that others likely do not have access to the report selected.
         $mform->setDefault('config_reportfor', $USER->id);
+
+        // Cache lifetime.
+
+        $options = array(
+            60 * 1 => '1 ' . get_string('minute'),
+            60 * 10 => '10 ' . get_string('minutes'),
+            60 * 30 => '30 ' . get_string('minutes'),
+            60 * 60 * 1 => '1 ' . get_string('hour'),
+            60 * 60 * 3 => '3 ' . get_string('hours'),
+            60 * 60 * 6 => '6 ' . get_string('hours'),
+            60 * 60 * 12 => '12 ' . get_string('hours'),
+            60 * 60 * 24 => '1 ' . get_string('day'),
+        );
+        $mform->addElement('select', 'config_cachettl', get_string('cachettl', 'block_totara_report_graph'), $options);
+        $mform->setDefault('config_cachettl', 60 * 60 * 1);
 
         $mform->addElement('header', 'graphappearance', get_string('graphappearance', 'block_totara_report_graph'));
 
-        $mform->addElement('text', 'config_graphimage_maxheight', get_string('maxheight', 'block_totara_report_graph'));
-        $mform->setType('config_graphimage_maxheight', PARAM_TEXT);
-        $mform->addHelpButton('config_graphimage_maxheight', 'maxheight', 'block_totara_report_graph');
-
-        $mform->addElement('text', 'config_graphimage_maxwidth', get_string('maxwidth', 'block_totara_report_graph'));
-        $mform->setType('config_graphimage_maxwidth', PARAM_TEXT);
-        $mform->addHelpButton('config_graphimage_maxwidth', 'maxwidth', 'block_totara_report_graph');
-
+        $mform->addElement('text', 'config_graph_height', get_string('height', 'block_totara_report_graph'));
+        $mform->setType('config_graph_height', PARAM_INT);
+        $mform->addHelpButton('config_graph_height', 'height', 'block_totara_report_graph');
     }
 
     function validation($data, $files) {
@@ -154,6 +165,8 @@ class block_totara_report_graph_edit_form extends block_edit_form {
             $prevreportfor = -1; // Intentionally invalid value - this is used for new value detection.
         }
         $reportfor = $data['config_reportfor'];
+
+        // Do not purge caches here, instead we now rely on timemodified timestamps and TTL.
 
         // Validate the data.
 
@@ -232,21 +245,10 @@ class block_totara_report_graph_edit_form extends block_edit_form {
             }
         }
 
-        // Validate maxwidth and maxheight are in an acceptable format.
-        if (!empty($data['config_graphimage_maxwidth'])) {
-            $result = \block_totara_report_graph\util::normalise_size_and_user_input($data['config_graphimage_maxwidth']);
-            if ($result === null) {
-                // Its not a valid max width.
-                $errors['config_graphimage_maxwidth'] = get_string('errormaxwidthinvalid', 'block_totara_report_graph');
-            }
-        }
-
-        // Validate maxwidth and maxheight are in an acceptable format.
-        if (!empty($data['config_graphimage_maxheight'])) {
-            $result = \block_totara_report_graph\util::normalise_size_and_user_input($data['config_graphimage_maxheight']);
-            if ($result === null) {
-                // Its not a valid max width.
-                $errors['config_graphimage_maxheight'] = get_string('errormaxheightinvalid', 'block_totara_report_graph');
+        // Validate height is valid value.
+        if (!empty($data['config_graph_height'])) {
+            if ($data['config_graph_height'] < 0) {
+                $errors['config_graph_height'] = get_string('error');
             }
         }
 

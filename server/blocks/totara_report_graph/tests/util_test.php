@@ -21,6 +21,8 @@
  * @package block_totara_report_graph
  */
 
+use \block_totara_report_graph\util;
+
 /**
  * Test the util class for report graph block.
  *
@@ -31,75 +33,79 @@ class block_totara_report_graph_util_testcase extends advanced_testcase {
 
     use \block_totara_report_graph\phpunit\block_testing;
 
-    /**
-     * Test the util normalise_size_and_user_input method.
-     */
-    public function test_normalise_size_and_user_input() {
+    public function test_get_report() {
+        global $DB, $USER;
 
-        // First up test valid values:
-        $this->assertSame('64px', \block_totara_report_graph\util::normalise_size_and_user_input('64'));
-        $this->assertSame('64px', \block_totara_report_graph\util::normalise_size_and_user_input('64px'));
-        $this->assertSame('64em', \block_totara_report_graph\util::normalise_size_and_user_input('64em'));
-        $this->assertSame('64%', \block_totara_report_graph\util::normalise_size_and_user_input('64%'));
-        $this->assertSame('64.32px', \block_totara_report_graph\util::normalise_size_and_user_input('64.32'));
-        $this->assertSame('64.32px', \block_totara_report_graph\util::normalise_size_and_user_input('64.32px'));
-        $this->assertSame('64.32em', \block_totara_report_graph\util::normalise_size_and_user_input('64.32em'));
-        $this->assertSame('64.32%', \block_totara_report_graph\util::normalise_size_and_user_input('64.32%'));
-        $this->assertSame('0.32px', \block_totara_report_graph\util::normalise_size_and_user_input('0.32'));
-        $this->assertSame('0.32px', \block_totara_report_graph\util::normalise_size_and_user_input('0.32 px'));
-        $this->assertSame('0.32px', \block_totara_report_graph\util::normalise_size_and_user_input('.32 PX'));
-        $this->assertSame('64px', \block_totara_report_graph\util::normalise_size_and_user_input('64PX'));
-        $this->assertSame('64px', \block_totara_report_graph\util::normalise_size_and_user_input('64pX'));
-        $this->assertSame('64px', \block_totara_report_graph\util::normalise_size_and_user_input('64 PX'));
-        $this->assertSame('64px', \block_totara_report_graph\util::normalise_size_and_user_input('64  px'));
-        $this->assertSame('64px', \block_totara_report_graph\util::normalise_size_and_user_input(' 64PX'));
-        $this->assertSame('64px', \block_totara_report_graph\util::normalise_size_and_user_input('64px '));
-        $this->assertSame('64px', \block_totara_report_graph\util::normalise_size_and_user_input('  64  PX  '));
-        $this->assertSame('64px', \block_totara_report_graph\util::normalise_size_and_user_input('  64  '));
-        $this->assertSame('', \block_totara_report_graph\util::normalise_size_and_user_input('0'));
-        $this->assertSame('', \block_totara_report_graph\util::normalise_size_and_user_input('0px'));
-        $this->assertSame('', \block_totara_report_graph\util::normalise_size_and_user_input('0em'));
-        $this->assertSame('', \block_totara_report_graph\util::normalise_size_and_user_input('0 px'));
-        $this->assertSame('', \block_totara_report_graph\util::normalise_size_and_user_input('-0%'));
-        $this->assertSame('', \block_totara_report_graph\util::normalise_size_and_user_input('0000px'));
-        $this->assertSame('-75px', \block_totara_report_graph\util::normalise_size_and_user_input('-75px'));
-        $this->assertSame('-75px', \block_totara_report_graph\util::normalise_size_and_user_input('-0075px'));
-        $this->assertSame('75px', \block_totara_report_graph\util::normalise_size_and_user_input('0075px'));
-        $this->assertSame('0.0075px', \block_totara_report_graph\util::normalise_size_and_user_input('.0075px'));
-        $this->assertSame('0.75px', \block_totara_report_graph\util::normalise_size_and_user_input('00.75px'));
-        $this->assertSame('', \block_totara_report_graph\util::normalise_size_and_user_input('00.00'));
-        $this->assertSame('', \block_totara_report_graph\util::normalise_size_and_user_input(''));
-        $this->assertSame('', \block_totara_report_graph\util::normalise_size_and_user_input('   '));
+        $this->setAdminUser();
 
-        // Now test invalid values:
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('px'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('em'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('%'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64px;'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64em;'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64%;'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('0;'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64pxpx'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64pxem'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64emem'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64%%'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64%64%'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('%%64'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64fu'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64.'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64.px'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('.64.'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('..64'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64..32'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64.32.'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64.3.2'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('.64.32'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('--64'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('64-'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('6-4'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('-'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('.'));
-        $this->assertSame(null, \block_totara_report_graph\util::normalise_size_and_user_input('sixty four pixels'));
+        $rid = $this->create_user_report_with_graph();
+
+        $rbsaved = new stdClass();
+        $rbsaved->reportid = $rid;
+        $rbsaved->userid = $USER->id;
+        $rbsaved->name = 'Saved Search';
+        $rbsaved->search = 'a:1:{s:13:"user-fullname";a:2:{s:8:"operator";i:0;s:5:"value";s:5:"Admin";}}'; // Invalid data will do here.
+        $rbsaved->ispublic = 1;
+        $rbsaved->id = $DB->insert_record('report_builder_saved', $rbsaved);
+
+        $report = util::get_report($rid);
+        $this->assertInstanceOf('stdClass', $report);
+        $this->assertSame((string)$rid, $report->id);
+
+        $report = util::get_report(0);
+        $this->assertFalse($report);
+
+        $report = util::get_report(-1 * $rbsaved->id);
+        $this->assertInstanceOf('stdClass', $report);
+        $this->assertSame((string)$rid, $report->id);
+
+        $report = util::get_report($rid + 1);
+        $this->assertFalse($report);
     }
 
+    public function test_get_chart_data() {
+        global $CFG, $USER;
+
+        $oldlog = ini_get('error_log');
+        ini_set('error_log', "$CFG->dataroot/testlog.log"); // Prevent standard logging.
+
+        $this->setAdminUser();
+
+        $rid = $this->create_user_report_with_graph();
+        $block = $this->create_report_graph_block_instance($rid, ['graph_height' => 777, 'reportfor' => $USER->id]);
+        $config = unserialize(base64_decode($block->configdata));
+
+        $data = util::get_chart_data($block, $config);
+        $this->assertIsArray($data);
+        $this->assertSame(null, $data['width']);
+        $this->assertSame(777, $data['height']);
+        $this->assertArrayHasKey('chart', $data);
+
+        ini_set('error_log', $oldlog);
+    }
+
+    public function test_get_get_cached_chart_data() {
+        global $CFG, $USER;
+
+        $oldlog = ini_get('error_log');
+        ini_set('error_log', "$CFG->dataroot/testlog.log"); // Prevent standard logging.
+
+        $this->setAdminUser();
+
+        $rid = $this->create_user_report_with_graph();
+        $block = $this->create_report_graph_block_instance($rid, ['graph_height' => 777, 'reportfor' => $USER->id]);
+        $config = unserialize(base64_decode($block->configdata));
+
+        $cacheddata = util::get_cached_chart_data($block, $config);
+        $this->assertSame(null, $cacheddata);
+
+        $data = util::get_chart_data($block, $config);
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('chart', $data);
+
+        $cacheddata = util::get_cached_chart_data($block, $config);
+        $this->assertSame($data, $cacheddata);
+
+        ini_set('error_log', $oldlog);
+    }
 }
