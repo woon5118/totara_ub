@@ -23,6 +23,8 @@
 
 namespace totara_flavour;
 
+use xmldb_table;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -226,5 +228,23 @@ abstract class definition {
             }
         }
         return $prohibited;
+    }
+
+    /**
+     * Return the set of all modules available to enable, or an empty array if none.
+     *
+     * Checking in this way ensures this doesn't fail if executed before installation has occurred.
+     *
+     * @return array
+     * @throws \ddl_exception
+     * @throws \dml_exception
+     */
+    protected function get_default_module_settings(): array {
+        global $DB;
+
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('modules');
+        return ($dbman->table_exists($table)) ?
+            array_fill_keys($DB->get_fieldset_select('modules', 'id', '1=1'), 1) : [];
     }
 }

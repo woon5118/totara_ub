@@ -43,8 +43,6 @@ class definition extends \totara_flavour\definition {
      * @inheritDoc
      */
     protected function load_default_settings() {
-        global $DB;
-
         return [
             '' => [
                 // Enable non-legacy Learn features
@@ -54,7 +52,7 @@ class definition extends \totara_flavour\definition {
                 'completiondefault' => 1,
                 'enableavailability' => 1,
                 'enablecourserpl' => 1,
-                'enablemodulerpl' => array_fill_keys($DB->get_fieldset_select('modules', 'id', '1=1'), 1),
+                'enablemodulerpl' => $this->get_default_module_settings(),
                 'enableplagiarism' => 1,
                 'enablecontentmarketplaces' => 1,
                 'enableprogramextensionrequests' => 1,
