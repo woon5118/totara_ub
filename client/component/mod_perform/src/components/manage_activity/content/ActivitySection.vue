@@ -591,6 +591,9 @@ export default {
         this.updateSection(savedSection);
         this.$emit('mutation-success');
       } catch (e) {
+        this.displayedParticipants = this.getParticipantsFromSection(
+          this.section
+        );
         this.$emit('mutation-error', e);
       }
       this.isSaving = false;

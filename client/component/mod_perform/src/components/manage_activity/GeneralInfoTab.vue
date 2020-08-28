@@ -87,6 +87,12 @@
               v-else
               v-model="form.anonymousResponse"
               toggle-first
+              :aria-label="
+                $str(
+                  'activity_general_anonymous_responses_label',
+                  'mod_perform'
+                )
+              "
               @input="anonymityValueChanged"
             />
           </div>
