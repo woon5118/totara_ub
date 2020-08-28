@@ -56,9 +56,9 @@
 import ButtonIconWithLabel from 'tui/components/buttons/LabelledButtonTrigger';
 import LikeRecordsList from 'totara_reaction/components/popover_content/LikeRecordsList';
 import LikeRecordsModal from 'totara_reaction/components/modal/LikeRecordsModal';
-import Like from 'tui/components/icons/common/Like';
-import LikeActive from 'tui/components/icons/common/LikeActive';
-import Loading from 'totara_engage/components/icons/Loading';
+import Like from 'tui/components/icons/Like';
+import LikeActive from 'tui/components/icons/LikeActive';
+import Loading from 'tui/components/icons/Loading';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 
 // GraphQL queries

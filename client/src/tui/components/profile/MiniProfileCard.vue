@@ -115,7 +115,7 @@
 import Avatar from 'tui/components/avatar/Avatar';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import More from 'tui/components/icons/common/More';
+import More from 'tui/components/icons/More';
 
 export default {
   components: {

@@ -77,10 +77,10 @@ av<!--
 
 <script>
 import Upload from 'tui/components/form/Upload';
-import AddIcon from 'tui/components/icons/common/Add';
+import AddIcon from 'tui/components/icons/Add';
 import ResponsiveImage from 'tui/components/images/ResponsiveImage';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import DeleteIcon from 'tui/components/icons/common/Delete';
+import DeleteIcon from 'tui/components/icons/Delete';
 import Progress from 'tui/components/progress/Progress';
 import { notify } from 'tui/notifications';
 

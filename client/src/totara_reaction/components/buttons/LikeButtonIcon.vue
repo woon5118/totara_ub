@@ -33,9 +33,9 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import LikeIcon from 'tui/components/icons/common/Like';
-import LikedIcon from 'tui/components/icons/common/LikeActive';
-import Loading from 'tui/components/icons/common/Loading';
+import LikeIcon from 'tui/components/icons/Like';
+import LikedIcon from 'tui/components/icons/LikeActive';
+import Loading from 'tui/components/icons/Loading';
 
 export default {
   components: {

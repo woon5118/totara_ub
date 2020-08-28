@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import ProficientIcon from 'tui/components/icons/common/CheckSuccess';
+import ProficientIcon from 'tui/components/icons/CheckSuccess';
 
 export default {
   components: {

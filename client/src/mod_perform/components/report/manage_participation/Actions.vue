@@ -71,12 +71,12 @@
 </template>
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import LockIcon from 'tui/components/icons/common/Lock';
+import LockIcon from 'tui/components/icons/Lock';
 import ParticipantOpenCloseActionModal from 'mod_perform/components/report/manage_participation/ParticipantOpenCloseActionModal';
 import SectionOpenCloseActionModal from 'mod_perform/components/report/manage_participation/SectionOpenCloseActionModal';
 import SubjectOpenCloseActionModal from 'mod_perform/components/report/manage_participation/SubjectInstanceOpenCloseActionModal';
-import ParticipantAddIcon from 'tui/components/icons/common/AddUser';
-import UnlockIcon from 'tui/components/icons/common/Unlock';
+import ParticipantAddIcon from 'tui/components/icons/AddUser';
+import UnlockIcon from 'tui/components/icons/Unlock';
 
 const REPORT_TYPE_SUBJECT_INSTANCE = 'SUBJECT_INSTANCE';
 const REPORT_TYPE_PARTICIPANT_INSTANCE = 'PARTICIPANT_INSTANCE';

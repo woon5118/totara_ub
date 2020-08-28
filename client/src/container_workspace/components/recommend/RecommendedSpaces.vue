@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 import SpaceCardsGrid from 'container_workspace/components/grid/SpaceCardsGrid';
 
 // GraphQL Queries

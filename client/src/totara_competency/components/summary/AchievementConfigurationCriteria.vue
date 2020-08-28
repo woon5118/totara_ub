@@ -74,7 +74,7 @@
 import AndBox from 'tui/components/decor/AndBox';
 import Card from 'tui/components/card/Card';
 import Separator from 'tui/components/decor/Separator';
-import WarningIcon from 'tui/components/icons/common/Warning';
+import WarningIcon from 'tui/components/icons/Warning';
 
 export default {
   components: {

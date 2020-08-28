@@ -58,7 +58,7 @@
 <script>
 import tui from 'tui/tui';
 import Button from 'tui/components/buttons/Button';
-import Show from 'tui/components/icons/common/Show';
+import Show from 'tui/components/icons/Show';
 import EngageSection from 'totara_engage/components/sidepanel/navigation/EngageSection';
 
 // Mixins

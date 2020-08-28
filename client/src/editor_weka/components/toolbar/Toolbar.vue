@@ -71,7 +71,7 @@
               @focus.native="handleButtonFocus"
             >
               <template slot="icon">
-                <FlexIcon :icon="item.icon" />
+                <component :is="item.iconComponent" />
               </template>
             </ToolbarButton>
           </template>
@@ -81,7 +81,7 @@
             :disabled="!child.enabled"
             @click="itemClick(child)"
           >
-            <FlexIcon :icon="child.icon" />
+            <component :is="child.iconComponent" />
             {{ child.label.toString() }}
           </DropdownItem>
         </Dropdown>
@@ -105,7 +105,7 @@
               @focus.native="handleButtonFocus"
             >
               <template slot="icon">
-                <FlexIcon :icon="item.icon" />
+                <component :is="item.iconComponent" />
               </template>
             </ToolbarButton>
           </template>
@@ -126,7 +126,7 @@
           @focus.native="handleButtonFocus"
         >
           <template slot="icon">
-            <FlexIcon :icon="item.icon" />
+            <component :is="item.iconComponent" />
           </template>
         </ToolbarButton>
       </template>

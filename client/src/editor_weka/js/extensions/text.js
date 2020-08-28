@@ -25,6 +25,8 @@ import {
   textblockTypeInputRule,
   ellipsis,
 } from 'ext_prosemirror/inputrules';
+import TextBoldIcon from 'tui/components/icons/TextBold';
+import TextItalicIcon from 'tui/components/icons/TextItalic';
 
 const blockquotedom = ['blockquote', 0],
   emdom = ['em', 0],
@@ -167,12 +169,12 @@ class TextExtension extends BaseExtension {
       markItem(strong, {
         group: 'marks',
         label: langString('bold', 'editor'),
-        icon: 'editor_weka|bold',
+        iconComponent: TextBoldIcon,
       }),
       markItem(em, {
         group: 'marks',
         label: langString('italic', 'editor'),
-        icon: 'editor_weka|italic',
+        iconComponent: TextItalicIcon,
       }),
     ];
   }

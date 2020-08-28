@@ -24,34 +24,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $icons = [
-    'totara_engage|actions' => [
-        'data' => [
-            'classes' => 'fa-ellipsis-h'
-        ]
-    ],
-
     'totara_engage|add-to-playlist' => [
         'data' => [
             'classes' => 'ft-add-to-list'
         ]
-    ],
-
-    'totara_engage|bookmark-success' => [
-        'data' => [
-            'classes' => 'fa-bookmark-o ft-state-success'
-        ]
-    ],
-
-    'totara_engage|grid' => [
-        'data' => [
-            'classes' => 'fa-th'
-        ],
-    ],
-
-    'totara_engage|list' => [
-        'data' => [
-            'classes' => 'fa-th-list'
-        ],
     ],
 
     'totara_engage|public' => [
@@ -59,34 +35,9 @@ $icons = [
             'classes' => 'fa-globe'
         ]
     ],
-
-    'totara_engage|sliders' => [
-        'data' => [
-            'classes' => 'fa-sliders'
-        ]
-    ],
-
-    'totara_engage|dot-circle-o' => [
-        'data' => [
-            'classes' => 'fa-dot-circle-o'
-        ]
-    ],
-
-    'totara_engage|plus-circle' => [
-        'data' => [
-            'classes' => 'fa-plus-circle'
-        ]
-    ],
-
-    'totara_engage|tags' => [
-        'data' => [
-            'classes' => 'fa-tags'
-        ]
-    ]
 ];
 
 $aliases = [
-    'totara_engage|bookmark' => 'bookmark',
     'totara_engage|comment' => 'comment',
     'totara_engage|share' => 'share-link',
     'totara_engage|restricted' => 'users',

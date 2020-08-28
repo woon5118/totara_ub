@@ -41,7 +41,7 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import Close from 'tui/components/icons/common/Close';
+import Close from 'tui/components/icons/Close';
 import Tag from 'tui/components/tag/Tag';
 
 export default {

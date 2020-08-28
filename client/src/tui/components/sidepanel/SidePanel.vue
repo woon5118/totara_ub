@@ -75,8 +75,8 @@
 
 <script>
 import { waitForTransitionEnd } from 'tui/dom/transitions';
-import CollapseIcon from 'tui/components/icons/common/Collapse';
-import ExpandIcon from 'tui/components/icons/common/Expand';
+import CollapseIcon from 'tui/components/icons/Collapse';
+import ExpandIcon from 'tui/components/icons/Expand';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import { throttle } from 'tui/util';
 

@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 
 // GraphQL queries
 import getLikes from 'totara_reaction/graphql/get_likes';

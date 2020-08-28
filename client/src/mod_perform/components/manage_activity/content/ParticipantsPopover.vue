@@ -62,7 +62,7 @@
   </Popover>
 </template>
 <script>
-import AddIcon from 'tui/components/icons/common/Add';
+import AddIcon from 'tui/components/icons/Add';
 import Button from 'tui/components/buttons/Button';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Checkbox from 'tui/components/form/Checkbox';

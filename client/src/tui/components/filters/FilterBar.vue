@@ -110,7 +110,7 @@
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import OverflowDetector from 'tui/components/util/OverflowDetector';
-import SliderIcon from 'tui/components/icons/common/Slider';
+import SliderIcon from 'tui/components/icons/Slider';
 
 export default {
   components: {

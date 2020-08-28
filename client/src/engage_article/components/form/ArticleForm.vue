@@ -108,7 +108,7 @@ import { debounce } from 'tui/util';
 import Weka from 'editor_weka/components/Weka';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
-import InfoIcon from 'tui/components/icons/common/Info';
+import InfoIcon from 'tui/components/icons/Info';
 
 // GraphQL queries
 import fileDraftId from 'core/graphql/file_unused_draft_item_id';

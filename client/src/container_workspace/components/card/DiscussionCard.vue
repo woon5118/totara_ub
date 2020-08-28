@@ -160,10 +160,10 @@ import DiscussionAvatar from 'container_workspace/components/profile/DiscussionA
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import MoreIcon from 'tui/components/icons/common/More';
+import MoreIcon from 'tui/components/icons/More';
 import SimpleLike from 'totara_reaction/components/SimpleLike';
 import EditPostDiscussionForm from 'container_workspace/components/form/EditPostDiscussionForm';
-import CommentIcon from 'tui/components/icons/common/Comment';
+import CommentIcon from 'tui/components/icons/Comment';
 import { notify } from 'tui/notifications';
 import Lozenge from 'tui/components/lozenge/Lozenge';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';

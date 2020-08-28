@@ -149,14 +149,14 @@
 import ToggleButton from 'tui/components/toggle/ToggleButton';
 import ToggleSet from 'tui/components/toggle/ToggleSet';
 // Icons
-import CalendarIcon from 'tui/components/icons/common/Calendar';
-import DateDisabledIcon from 'tui/components/icons/common/DateDisabled';
-import DateEnabledIcon from 'tui/components/icons/common/DateEnabled';
-import DateFrequencyOnceIcon from 'tui/components/icons/common/DateFrequencyOnce';
-import DateFrequencyRepeatingIcon from 'tui/components/icons/common/DateFrequencyRepeating';
-import DateLimitedIcon from 'tui/components/icons/common/DateLimited';
-import DateOpenIcon from 'tui/components/icons/common/DateOpen';
-import DateRelativeIcon from 'tui/components/icons/common/DateRelative';
+import CalendarIcon from 'tui/components/icons/Calendar';
+import DateDisabledIcon from 'tui/components/icons/DateDisabled';
+import DateEnabledIcon from 'tui/components/icons/DateEnabled';
+import DateFrequencyOnceIcon from 'tui/components/icons/DateFrequencyOnce';
+import DateFrequencyRepeatingIcon from 'tui/components/icons/DateFrequencyRepeating';
+import DateLimitedIcon from 'tui/components/icons/DateLimited';
+import DateOpenIcon from 'tui/components/icons/DateOpen';
+import DateRelativeIcon from 'tui/components/icons/DateRelative';
 
 // Util
 

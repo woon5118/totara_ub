@@ -28,7 +28,7 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import EditIcon from 'tui/components/icons/common/Edit';
+import EditIcon from 'tui/components/icons/Edit';
 
 export default {
   components: {

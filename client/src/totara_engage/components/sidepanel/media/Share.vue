@@ -83,7 +83,7 @@
 
 <script>
 import ButtonLabel from 'totara_engage/components/buttons/ButtonLabel';
-import Share from 'tui/components/icons/common/Share';
+import Share from 'tui/components/icons/Share';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';

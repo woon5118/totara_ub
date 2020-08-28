@@ -28,7 +28,7 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import MoreIcon from 'tui/components/icons/common/More';
+import MoreIcon from 'tui/components/icons/More';
 
 export default {
   components: {

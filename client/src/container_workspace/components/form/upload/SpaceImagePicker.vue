@@ -66,7 +66,7 @@
 <script>
 import Upload from 'tui/components/form/Upload';
 import Button from 'tui/components/buttons/Button';
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 import PageLoader from 'tui/components/loader/Loader';
 
 // GraphQL queries

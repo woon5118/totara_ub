@@ -32,9 +32,15 @@ exports[`totara_playlist/components/sidepanel/PlaylistSummary Checks snapshot 1`
             aria-hidden="true"
             class="tui-iconBtn__icon"
           >
-            <img
-              class="icon"
-              src="http://foo/theme/image.php/ventura/core/1001/edit"
+            <svg
+              class="tui-svgIcon tui-svgIcon--size-200"
+              fill="currentColor"
+              focusable="false"
+              height="1em"
+              role="presentation"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
             />
           </span>
            

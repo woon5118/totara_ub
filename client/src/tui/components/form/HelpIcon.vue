@@ -42,7 +42,7 @@
 
 <script>
 // Components
-import Info from 'tui/components/icons/common/Info';
+import Info from 'tui/components/icons/Info';
 import Popover from 'tui/components/popover/Popover';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 

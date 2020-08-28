@@ -64,7 +64,7 @@
 import Modal from 'tui/components/modal/Modal';
 import Avatar from 'tui/components/avatar/Avatar';
 import CloseButton from 'tui/components/buttons/CloseIcon';
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 
 export default {
   components: {

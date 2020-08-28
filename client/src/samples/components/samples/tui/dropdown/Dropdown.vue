@@ -162,7 +162,7 @@ import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import DropdownButton from 'tui/components/dropdown/DropdownButton';
 import { Uniform, FormRow, FormRadioGroup } from 'tui/components/uniform';
 import Radio from 'tui/components/form/Radio';
-import AddIcon from 'tui/components/icons/common/Add';
+import AddIcon from 'tui/components/icons/Add';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';

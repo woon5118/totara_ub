@@ -46,7 +46,7 @@
 <script>
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
-import MoreIcon from 'tui/components/icons/common/More';
+import MoreIcon from 'tui/components/icons/More';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 
 export default {

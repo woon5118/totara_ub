@@ -61,7 +61,7 @@
 <script>
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
-import Warning from 'tui/components/icons/common/Warning';
+import Warning from 'tui/components/icons/Warning';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import Button from 'tui/components/buttons/Button';
 

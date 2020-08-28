@@ -67,7 +67,7 @@
 <script>
 import Upload from 'tui/components/form/Upload';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import DeleteIcon from 'tui/components/icons/common/Delete';
+import DeleteIcon from 'tui/components/icons/Delete';
 
 export default {
   components: {

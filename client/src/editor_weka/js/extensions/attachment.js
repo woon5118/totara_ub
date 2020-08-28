@@ -19,6 +19,7 @@
 import BaseExtension from './Base';
 import Attachment from 'editor_weka/components/nodes/Attachment';
 import Attachments from 'editor_weka/components/nodes/Attachments';
+import AttachmentIcon from 'tui/components/icons/Attachment';
 import { ToolbarItem } from '../toolbar';
 import { langString, loadLangStrings } from 'tui/i18n';
 import { attachment } from '../plugins/attachment';
@@ -122,7 +123,7 @@ class AttachmentExtension extends BaseExtension {
       new ToolbarItem({
         group: 'upload',
         label: langString('attachment', 'editor_weka'),
-        icon: 'editor_weka|attachment',
+        iconComponent: AttachmentIcon,
         execute: editor => {
           pickFiles(editor).then(files => {
             this.startUploadingFiles(files);

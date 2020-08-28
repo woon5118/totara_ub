@@ -164,7 +164,7 @@ import ActionLink from 'tui/components/links/ActionLink';
 import Avatar from 'tui/components/avatar/Avatar';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Cell from 'tui/components/datatable/Cell';
-import CommentIcon from 'tui/components/icons/common/Comment';
+import CommentIcon from 'tui/components/icons/Comment';
 import Popover from 'tui/components/popover/Popover';
 import Table from 'tui/components/datatable/Table';
 

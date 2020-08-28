@@ -22,6 +22,7 @@ import LinkBlock from 'editor_weka/components/nodes/LinkBlock';
 import LinkMedia from 'editor_weka/components/nodes/LinkMedia';
 import LinkView from 'editor_weka/components/marks/Link';
 import EditLinkModal from 'editor_weka/components/editing/EditLinkModal';
+import LinkIcon from 'tui/components/icons/Link';
 import { Plugin } from 'ext_prosemirror/state';
 import { Slice, Fragment, Node, Mark } from 'ext_prosemirror/model';
 import { langString, loadLangStrings } from 'tui/i18n';
@@ -192,7 +193,7 @@ class LinkExtension extends BaseExtension {
       new ToolbarItem({
         group: 'embeds',
         label: langString('link', 'editor_weka'),
-        icon: 'editor_weka|link',
+        iconComponent: LinkIcon,
         execute: () => {
           this.editLink();
         },

@@ -111,7 +111,7 @@ export default {
   :size="size"
   @click="clicked()"
 />`,
-      codeScript: `import CloseButton from 'tui/components/icons/common/CloseButton';
+      codeScript: `import CloseButton from 'tui/components/icons/CloseButton';
 
 export default {
   components: {

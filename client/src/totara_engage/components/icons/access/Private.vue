@@ -17,23 +17,16 @@
 -->
 
 <script>
-import FlexIcon from 'tui/components/icons/FlexIcon';
+import AccessPrivate from 'tui/components/icons/AccessPrivate';
 
 export default {
   functional: true,
   components: {
-    FlexIcon,
+    AccessPrivate,
   },
 
   props: {
     alt: String,
-    customClass: {
-      type: [String, Object, Array],
-      default() {
-        return [];
-      },
-    },
-    styleClass: Object,
     size: [String, Number],
     title: String,
     coloring: {
@@ -44,16 +37,6 @@ export default {
 
   render(h, { props }) {
     let customClasses = [];
-    if ('string' === typeof props.customClass) {
-      // Split by the space.
-      customClasses = props.customClass.split(' ');
-    } else if (Array.isArray(props.customClass)) {
-      customClasses = props.customClass;
-    } else {
-      Object.keys(props.customClass).map(function(key) {
-        customClasses.push(props.customClass[key]);
-      });
-    }
 
     // Pushing the default icon.
     customClasses.push('tui-totaraEngage-private');
@@ -65,13 +48,11 @@ export default {
     let items = {
       alt: props.alt,
       customClass: customClasses,
-      styleClass: props.styleClass,
       size: props.size,
       title: props.title,
-      icon: 'totara_engage|private',
     };
 
-    return h(FlexIcon, { props: items });
+    return h(AccessPrivate, { props: items });
   },
 };
 </script>

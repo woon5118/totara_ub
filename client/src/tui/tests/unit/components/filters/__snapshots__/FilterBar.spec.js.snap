@@ -72,6 +72,7 @@ exports[`FilterBar.vue matches snapshot 1`] = `
         style=""
       >
         <slidericon-stub
+          custom-class="tui-filterBar__filters-iconSlider"
           customclass="tui-filterBar__filters-iconSlider"
           size="300"
           title="title text"

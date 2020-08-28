@@ -45,7 +45,7 @@
 <script>
 import WorkspaceMenu from 'container_workspace/components/sidepanel/WorkspaceMenu';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import ShowIcon from 'tui/components/icons/common/Show';
+import ShowIcon from 'tui/components/icons/Show';
 
 export default {
   components: {

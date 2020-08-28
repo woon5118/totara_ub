@@ -181,7 +181,7 @@ import AchievementLayout from 'totara_competency/components/achievements/Achieve
 import ActionLink from 'tui/components/links/ActionLink';
 import Button from 'tui/components/buttons/Button';
 import Cell from 'tui/components/datatable/Cell';
-import CheckIcon from 'tui/components/icons/common/CheckSuccess';
+import CheckIcon from 'tui/components/icons/CheckSuccess';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ExpandCell from 'tui/components/datatable/ExpandCell';
 import ProgressCircle from 'totara_competency/components/achievements/ProgressCircle';

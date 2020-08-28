@@ -47,7 +47,7 @@
 // Components
 import InputSearch from 'tui/components/form/InputSearch';
 import Label from 'tui/components/form/Label';
-import SearchIcon from 'tui/components/icons/common/Search';
+import SearchIcon from 'tui/components/icons/Search';
 
 export default {
   components: {

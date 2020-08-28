@@ -176,7 +176,7 @@
 
 <script>
 // Components
-import AddIcon from 'tui/components/icons/common/Add';
+import AddIcon from 'tui/components/icons/Add';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';

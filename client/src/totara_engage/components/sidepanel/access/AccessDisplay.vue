@@ -33,9 +33,9 @@
     </div>
 
     <div v-if="timeView" class="tui-accessDisplay__timeView">
-      <Clock
+      <TimeIcon
         size="300"
-        :alt="$str('clock', 'totara_engage')"
+        :alt="$str('time', 'totara_engage')"
         custom-class="tui-icon--dimmed"
       />
       {{ getTimeView }}
@@ -70,9 +70,9 @@
 </template>
 
 <script>
-import TagIcon from 'tui/components/icons/common/Tags';
+import TagIcon from 'tui/components/icons/Tags';
 import Tag from 'tui/components/tag/Tag';
-import Clock from 'tui/components/icons/common/Clock';
+import TimeIcon from 'tui/components/icons/Time';
 import { AccessManager, TimeViewType } from 'totara_engage/index';
 import AccessIcon from 'totara_engage/components/icons/access/computed/AccessIcon';
 import Button from 'tui/components/buttons/Button';
@@ -81,7 +81,7 @@ export default {
   components: {
     AccessIcon,
     TagIcon,
-    Clock,
+    TimeIcon,
     Tag,
     Button,
   },

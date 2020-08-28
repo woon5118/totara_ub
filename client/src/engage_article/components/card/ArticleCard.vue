@@ -77,9 +77,9 @@
         slot="third"
         class="tui-engageArticle-articleCard__subTitle"
       >
-        <Clock
+        <TimeIcon
           size="200"
-          :alt="$str('clock', 'totara_engage')"
+          :alt="$str('time', 'totara_engage')"
           custom-class="tui-icon--dimmed"
         />
         <span>{{ getTimeView }}</span>
@@ -110,12 +110,12 @@ import ImageHeader from 'totara_engage/components/card/ImageHeader';
 import StatIcon from 'totara_engage/components/icons/StatIcon';
 import CardHeader from 'totara_engage/components/card/CardHeader';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import ShareIcon from 'totara_engage/components/icons/Share';
-import AddToPlaylistIcon from 'totara_engage/components/icons/AddToPlaylist';
-import MoreIcon from 'totara_engage/components/icons/More';
+import ShareIcon from 'tui/components/icons/Share';
+import AddToListIcon from 'tui/components/icons/AddToList';
+import MoreIcon from 'tui/components/icons/More';
 import { cardMixin, AccessManager, TimeViewType } from 'totara_engage/index';
 import AccessIcon from 'totara_engage/components/icons/access/computed/AccessIcon';
-import Clock from 'tui/components/icons/common/Clock';
+import TimeIcon from 'tui/components/icons/Time';
 import BookmarkButton from 'totara_engage/components/buttons/BookmarkButton';
 
 // GraphQL
@@ -129,10 +129,10 @@ export default {
     StatIcon,
     CardHeader,
     ShareIcon,
-    AddToPlaylistIcon,
+    AddToListIcon,
     MoreIcon,
     AccessIcon,
-    Clock,
+    TimeIcon,
     BookmarkButton,
   },
 
@@ -168,7 +168,7 @@ export default {
       actions: [
         {
           alt: this.$str('addtoplaylist', 'engage_article'),
-          component: 'AddToPlaylistIcon',
+          component: 'AddToListIcon',
         },
         {
           alt: this.$str('share', 'totara_engage'),

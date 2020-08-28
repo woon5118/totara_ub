@@ -74,7 +74,7 @@
 <script>
 import WorkspaceMenu from 'container_workspace/components/sidepanel/WorkspaceMenu';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import ShowIcon from 'tui/components/icons/common/Show';
+import ShowIcon from 'tui/components/icons/Show';
 import { PUBLIC, PRIVATE, HIDDEN } from 'container_workspace/access';
 import WorkspaceMuteButton from 'container_workspace/components/action/WorkspaceMuteButton';
 

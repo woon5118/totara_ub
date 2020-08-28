@@ -66,7 +66,7 @@
 <script>
 // Components
 import Cell from 'tui/components/datatable/Cell';
-import EditIcon from 'tui/components/icons/common/Edit';
+import EditIcon from 'tui/components/icons/Edit';
 import Table from 'tui/components/datatable/Table';
 // Queries
 import competencyQuery from 'totara_competency/graphql/competency';

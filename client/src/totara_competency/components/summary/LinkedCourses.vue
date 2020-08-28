@@ -63,7 +63,7 @@
 <script>
 // Components
 import Cell from 'tui/components/datatable/Cell';
-import EditIcon from 'tui/components/icons/common/Edit';
+import EditIcon from 'tui/components/icons/Edit';
 import Table from 'tui/components/datatable/Table';
 // Query
 import linkedCoursesQuery from 'totara_competency/graphql/linked_courses';

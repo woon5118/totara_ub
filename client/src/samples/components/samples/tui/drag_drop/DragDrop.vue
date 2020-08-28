@@ -257,7 +257,7 @@ import HeaderCell from 'tui/components/datatable/HeaderCell';
 import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 import InputText from 'tui/components/form/InputText';
 import PropsProvider from 'tui/components/util/PropsProvider';
-import DragHandleIcon from 'tui/components/icons/common/DragHandle';
+import DragHandleIcon from 'tui/components/icons/DragHandle';
 
 export default {
   components: {

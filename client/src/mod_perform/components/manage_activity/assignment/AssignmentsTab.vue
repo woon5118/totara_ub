@@ -191,7 +191,7 @@ import Button from 'tui/components/buttons/Button';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Cell from 'tui/components/datatable/Cell';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
-import DeleteIcon from 'tui/components/icons/common/Delete';
+import DeleteIcon from 'tui/components/icons/Delete';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import HeaderCell from 'tui/components/datatable/HeaderCell';

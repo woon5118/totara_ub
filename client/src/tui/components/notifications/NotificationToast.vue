@@ -44,10 +44,10 @@
 <script>
 // Components
 import CloseButton from 'tui/components/buttons/CloseIcon';
-import ErrorIcon from 'tui/components/icons/common/Error';
-import InfoIcon from 'tui/components/icons/common/Info';
-import SuccessIcon from 'tui/components/icons/common/Success';
-import WarningIcon from 'tui/components/icons/common/Warning';
+import ErrorIcon from 'tui/components/icons/Error';
+import InfoIcon from 'tui/components/icons/Info';
+import SuccessIcon from 'tui/components/icons/Success';
+import WarningIcon from 'tui/components/icons/Warning';
 
 const icons = {
   error: ErrorIcon,

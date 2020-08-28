@@ -59,7 +59,7 @@ import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownButton from 'tui/components/dropdown/DropdownButton';
 import LinkBlockInner from 'tui/components/json_editor/nodes/LinkBlock';
-import More from 'tui/components/icons/common/More';
+import More from 'tui/components/icons/More';
 
 export default {
   components: {

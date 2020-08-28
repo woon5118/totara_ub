@@ -109,9 +109,9 @@
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import InputText from 'tui/components/form/InputText';
-import Expand from 'tui/components/icons/common/Show';
+import Expand from 'tui/components/icons/Show';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import Close from 'tui/components/icons/common/Close';
+import Close from 'tui/components/icons/Close';
 import Tag from 'tui/components/tag/Tag';
 import OverflowDetector from 'tui/components/util/OverflowDetector';
 

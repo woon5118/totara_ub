@@ -112,7 +112,7 @@
 
 <script>
 // Components
-import ArchiveIcon from 'tui/components/icons/common/Archive';
+import ArchiveIcon from 'tui/components/icons/Archive';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import Grid from 'tui/components/grid/Grid';

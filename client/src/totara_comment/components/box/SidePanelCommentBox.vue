@@ -38,7 +38,7 @@
 <script>
 import CommentBox from 'totara_comment/components/box/CommentBox';
 import { SIZE_SMALL } from 'totara_comment/size';
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 
 export default {
   components: {

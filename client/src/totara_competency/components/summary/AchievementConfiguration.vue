@@ -88,7 +88,7 @@
 // Components
 import Card from 'tui/components/card/Card';
 import Criteria from 'totara_competency/components/summary/AchievementConfigurationCriteria';
-import EditIcon from 'tui/components/icons/common/Edit';
+import EditIcon from 'tui/components/icons/Edit';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import OrBox from 'tui/components/decor/OrBox';

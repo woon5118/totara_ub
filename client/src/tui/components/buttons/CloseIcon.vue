@@ -28,7 +28,7 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import CloseIcon from 'tui/components/icons/common/Close';
+import CloseIcon from 'tui/components/icons/Close';
 
 export default {
   components: {

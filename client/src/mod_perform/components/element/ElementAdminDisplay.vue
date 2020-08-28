@@ -36,7 +36,7 @@
             :styleclass="{ transparentNoPadding: true }"
           >
             <template>
-              <ReportingIdentifierIcon
+              <ReportsIcon
                 :alt="$str('reporting_identifier', 'mod_perform')"
                 :title="$str('reporting_identifier', 'mod_perform')"
                 size="200"
@@ -83,9 +83,9 @@
 <script>
 import EditIcon from 'tui/components/buttons/EditIcon';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import SettingsIcon from 'tui/components/icons/common/Settings';
+import SettingsIcon from 'tui/components/icons/Settings';
 import Popover from 'tui/components/popover/Popover';
-import ReportingIdentifierIcon from 'mod_perform/components/icons/ReportingIdentifier';
+import ReportsIcon from 'tui/components/icons/Reports';
 import DeleteIcon from 'tui/components/buttons/DeleteIcon';
 export default {
   components: {
@@ -94,7 +94,7 @@ export default {
     EditIcon,
     SettingsIcon,
     Popover,
-    ReportingIdentifierIcon,
+    ReportsIcon,
   },
 
   props: {

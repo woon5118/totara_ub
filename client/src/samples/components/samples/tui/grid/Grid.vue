@@ -176,7 +176,7 @@ import Radio from 'tui/components/form/Radio';
 import RadioGroup from 'tui/components/form/RadioGroup';
 import Button from 'tui/components/buttons/Button';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import EditIcon from 'tui/components/icons/common/Edit';
+import EditIcon from 'tui/components/icons/Edit';
 import Popover from 'tui/components/popover/Popover';
 
 export default {

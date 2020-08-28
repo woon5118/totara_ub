@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import AddIcon from 'tui/components/icons/common/Add';
+import AddIcon from 'tui/components/icons/Add';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Checkbox from 'tui/components/form/Checkbox';

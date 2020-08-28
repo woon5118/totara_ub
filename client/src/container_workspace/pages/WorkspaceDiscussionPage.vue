@@ -115,10 +115,10 @@
 import Layout from 'tui/components/layouts/LayoutTwoColumn';
 import WorkspaceMenu from 'container_workspace/components/sidepanel/WorkspaceMenu';
 import DiscussionCard from 'container_workspace/components/card/DiscussionCard';
-import BackArrow from 'tui/components/icons/common/BackArrow';
+import BackArrow from 'tui/components/icons/BackArrow';
 import CommentBox from 'totara_comment/components/box/CommentBox';
 import apolloClient from 'tui/apollo_client';
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 import { SIZE_LARGE } from 'totara_comment/size';
 import SidePanel from 'tui/components/sidepanel/SidePanel';
 import WorkspaceContentLayout from 'container_workspace/components/content/WorkspaceContentLayout';

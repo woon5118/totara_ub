@@ -19,6 +19,7 @@
 import BaseExtension from './Base';
 import { ToolbarItem } from '../toolbar';
 import { langString } from 'tui/i18n';
+import HorizontalRuleIcon from 'tui/components/icons/HorizontalRule';
 
 class RulerExtension extends BaseExtension {
   nodes() {
@@ -40,7 +41,7 @@ class RulerExtension extends BaseExtension {
       new ToolbarItem({
         group: 'embeds',
         label: langString('horizontalrule', 'editor'),
-        icon: 'editor_weka|arrows',
+        iconComponent: HorizontalRuleIcon,
         execute: editor => {
           editor.execute((state, dispatch) => {
             let hr = state.schema.nodes.ruler;

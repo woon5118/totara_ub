@@ -71,7 +71,7 @@
 <script>
 import ActivityMultipleSectionToggle from 'mod_perform/components/manage_activity/content/ActivityMultipleSectionToggle';
 import ActivitySection from 'mod_perform/components/manage_activity/content/ActivitySection';
-import AddIcon from 'tui/components/icons/common/Add';
+import AddIcon from 'tui/components/icons/Add';
 import AddSectionMutation from 'mod_perform/graphql/add_section';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import RelationshipsQuery from 'mod_perform/graphql/relationships';

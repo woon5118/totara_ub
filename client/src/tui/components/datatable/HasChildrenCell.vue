@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import ForwardArrow from 'tui/components/icons/common/ForwardArrow';
+import ForwardArrow from 'tui/components/icons/ForwardArrow';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 
 export default {

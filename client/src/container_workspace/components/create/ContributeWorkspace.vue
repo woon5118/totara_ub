@@ -35,7 +35,7 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import AddIcon from 'tui/components/icons/common/Add';
+import AddIcon from 'tui/components/icons/Add';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import WorkspaceModal from 'container_workspace/components/modal/WorkspaceModal';
 

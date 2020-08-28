@@ -26,6 +26,8 @@ import {
   sinkListItem,
 } from '../lib/prosemirror_schema_list/schema_list';
 import { wrappingInputRule } from 'ext_prosemirror/inputrules';
+import ListOrdered from 'tui/components/icons/ListOrdered';
+import ListUnordered from 'tui/components/icons/ListUnordered';
 
 const olDOM = ['ol', 0];
 const ulDOM = ['ul', 0];
@@ -90,13 +92,13 @@ class ListExtension extends BaseExtension {
       cmdItem(toggleList(bullet_list, list_item, listTypes), {
         group: 'node',
         label: langString('bulletlist', 'editor'),
-        icon: 'editor_weka|bulletlist',
+        iconComponent: ListUnordered,
         active: editor => isListActive(editor.state, bullet_list),
       }),
       cmdItem(toggleList(ordered_list, list_item, listTypes), {
         group: 'node',
         label: langString('numberedlist', 'editor'),
-        icon: 'editor_weka|numberedlist',
+        iconComponent: ListOrdered,
         active: editor => isListActive(editor.state, ordered_list),
       }),
     ];

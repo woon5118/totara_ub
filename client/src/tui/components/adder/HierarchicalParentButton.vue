@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import BackArrow from 'tui/components/icons/common/BackArrow';
+import BackArrow from 'tui/components/icons/BackArrow';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 
 export default {

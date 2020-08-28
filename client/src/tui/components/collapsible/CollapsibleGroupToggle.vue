@@ -36,8 +36,8 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import CollapseIcon from 'tui/components/icons/common/Collapse';
-import ExpandIcon from 'tui/components/icons/common/Expand';
+import CollapseIcon from 'tui/components/icons/Collapse';
+import ExpandIcon from 'tui/components/icons/Expand';
 
 export default {
   components: {

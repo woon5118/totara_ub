@@ -85,7 +85,7 @@ import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 
 import Avatar from 'tui/components/avatar/Avatar';
 import InfoIconButton from 'tui/components/buttons/InfoIconButton';
-import CheckSuccess from 'tui/components/icons/common/CheckSuccess';
+import CheckSuccess from 'tui/components/icons/CheckSuccess';
 import Label from 'tui/components/form/Label';
 import TagList from 'tui/components/tag/TagList';
 import { AccessManager } from 'totara_engage/index';

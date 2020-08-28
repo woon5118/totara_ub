@@ -105,7 +105,7 @@
 <script>
 import ReplyForm from 'totara_comment/components/form/ReplyForm';
 import { isValid, SIZE_SMALL, SIZE_LARGE } from 'totara_comment/size';
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 import Reply from 'totara_comment/components/reply/Reply';
 import apolloClient from 'tui/apollo_client';
 

@@ -50,7 +50,7 @@
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
 import Avatar from 'tui/components/avatar/Avatar';
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 
 // GraphQL
 import getLikes from 'totara_reaction/graphql/get_likes';

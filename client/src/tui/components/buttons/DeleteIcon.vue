@@ -28,7 +28,7 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import DeleteIcon from 'tui/components/icons/common/Delete';
+import DeleteIcon from 'tui/components/icons/Delete';
 
 export default {
   components: {

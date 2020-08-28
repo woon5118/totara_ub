@@ -21,6 +21,7 @@ import { ToolbarItem } from '../toolbar';
 import { langString } from 'tui/i18n';
 import Emojis from 'editor_weka/components/editing/Emojis';
 import Emoji from 'editor_weka/components/nodes/Emoji';
+import EmojiIcon from 'tui/components/icons/Emoji';
 import Vue from 'vue';
 import emoji from '../plugins/emoji';
 import { getJsonAttrs } from './util';
@@ -95,7 +96,7 @@ class EmojiExtension extends BaseExtension {
           component: this.getEmojiPopover(),
         },
         label: langString('insertemoji', 'editor'),
-        icon: 'editor_weka|emoji',
+        iconComponent: EmojiIcon,
         enabled: editor => {
           return editor.view.state.selection.$head.pos > 0;
         },

@@ -31,7 +31,7 @@
           transparent: true,
         }"
       >
-        <InfoIcon />
+        <InfoIcon size="100" />
       </ButtonIcon>
     </template>
     <slot />
@@ -40,7 +40,7 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import InfoIcon from 'tui/components/icons/common/Info';
+import InfoIcon from 'tui/components/icons/Info';
 import Popover from 'tui/components/popover/Popover';
 
 export default {

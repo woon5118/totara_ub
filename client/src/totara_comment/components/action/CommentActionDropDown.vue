@@ -48,7 +48,7 @@
 
 <script>
 import Dropdown from 'tui/components/dropdown/Dropdown';
-import More from 'tui/components/icons/common/More';
+import More from 'tui/components/icons/More';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 

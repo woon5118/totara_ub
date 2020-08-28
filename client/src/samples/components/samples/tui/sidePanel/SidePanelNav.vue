@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import AddIcon from 'tui/components/icons/common/Add';
+import AddIcon from 'tui/components/icons/Add';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';

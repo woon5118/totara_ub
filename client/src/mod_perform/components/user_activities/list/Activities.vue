@@ -227,7 +227,7 @@ import Cell from 'tui/components/datatable/Cell';
 import ExpandCell from 'tui/components/datatable/ExpandCell';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
 import Loader from 'tui/components/loader/Loader';
-import Lock from 'tui/components/icons/common/Lock';
+import Lock from 'tui/components/icons/Lock';
 import Lozenge from 'tui/components/lozenge/Lozenge';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import SectionsList from 'mod_perform/components/user_activities/list/Sections';

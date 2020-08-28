@@ -115,9 +115,9 @@
 
 <script>
 // Components
-import ListIcon from 'tui/components/icons/common/List';
-import GridIcon from 'tui/components/icons/common/Grid';
-import SliderIcon from 'tui/components/icons/common/Slider';
+import ListIcon from 'tui/components/icons/List';
+import GridIcon from 'tui/components/icons/Grid';
+import SliderIcon from 'tui/components/icons/Slider';
 import ToggleSet from 'tui/components/toggle/ToggleSet';
 import ToggleButton from 'tui/components/toggle/ToggleButton';
 import FormRow from 'tui/components/form/FormRow';

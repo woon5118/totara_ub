@@ -40,7 +40,7 @@
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import ExportRowAction from 'mod_perform/components/report/element_response/ExportRowAction';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
-import PreviewIcon from 'tui/components/icons/common/Preview';
+import PreviewIcon from 'tui/components/icons/Preview';
 import QuestionElementPreviewModal from 'mod_perform/components/report/element_response/QuestionElementPreviewModal';
 
 export default {

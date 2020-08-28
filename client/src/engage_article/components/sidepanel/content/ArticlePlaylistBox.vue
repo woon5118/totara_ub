@@ -39,7 +39,7 @@
 
 <script>
 import ResourcePlaylistBox from 'totara_playlist/components/box/ResourcePlaylistBox';
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 import { UrlSourceType } from 'totara_engage/index';
 
 export default {

@@ -91,7 +91,7 @@
 <script>
 import Button from 'tui/components/buttons/Button';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import DeleteIcon from 'tui/components/icons/common/Delete';
+import DeleteIcon from 'tui/components/icons/Delete';
 import Popover from 'tui/components/popover/Popover';
 import Radio from 'tui/components/form/Radio';
 import RadioGroup from 'tui/components/form/RadioGroup';

@@ -30,9 +30,9 @@
 
       <p>
         <span v-if="timeviewString" class="tui-articleRelatedCard__timeview">
-          <Clock
+          <TimeIcon
             size="200"
-            :alt="$str('clock', 'totara_engage')"
+            :alt="$str('time', 'totara_engage')"
             custom-class="tui-articleRelatedCard--dimmed"
           />
           {{ timeviewString }}
@@ -60,8 +60,8 @@
 
 <script>
 import Card from 'tui/components/card/Card';
-import Clock from 'tui/components/icons/common/Clock';
-import Like from 'tui/components/icons/common/Like';
+import TimeIcon from 'tui/components/icons/Time';
+import Like from 'tui/components/icons/Like';
 
 import { TimeViewType } from 'totara_engage/index';
 import BookmarkButton from 'totara_engage/components/buttons/BookmarkButton';
@@ -70,7 +70,7 @@ export default {
   components: {
     BookmarkButton,
     Card,
-    Clock,
+    TimeIcon,
     Like,
   },
 

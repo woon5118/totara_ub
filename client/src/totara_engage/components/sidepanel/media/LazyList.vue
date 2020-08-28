@@ -34,7 +34,7 @@
   </div>
 </template>
 <script>
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 
 export default {
   components: {

@@ -127,8 +127,8 @@
   </div>
 </template>
 <script>
-import BarChartIcon from 'tui/components/icons/common/BarChart';
-import ListIcon from 'tui/components/icons/common/List';
+import BarChartIcon from 'tui/components/icons/BarChart';
+import ListIcon from 'tui/components/icons/List';
 import Responsive from 'tui/components/responsive/Responsive';
 import Loader from 'tui/components/loader/Loader';
 import ActionLink from 'tui/components/links/ActionLink';

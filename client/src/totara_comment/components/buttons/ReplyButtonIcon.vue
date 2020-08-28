@@ -30,7 +30,7 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import ReplyIcon from 'tui/components/icons/common/Reply';
+import ReplyIcon from 'tui/components/icons/Reply';
 
 export default {
   components: {

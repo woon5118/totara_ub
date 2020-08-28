@@ -29,8 +29,8 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import Bookmark from 'tui/components/icons/common/Bookmark';
-import BookmarkActive from 'tui/components/icons/common/BookmarkActive';
+import Bookmark from 'tui/components/icons/Bookmark';
+import BookmarkActive from 'tui/components/icons/BookmarkActive';
 
 export default {
   components: {

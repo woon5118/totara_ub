@@ -21,9 +21,8 @@
     :is="icon"
     :coloring="coloring"
     :alt="alt"
-    :custom-class="customClass"
+    :class="customClass"
     :size="size"
-    :style-class="styleClass"
     :title="title"
   />
 </template>
@@ -43,7 +42,6 @@ export default {
   props: {
     alt: String,
     customClass: [String, Object, Array],
-    styleClass: Object,
     size: [String, Number],
     title: String,
 

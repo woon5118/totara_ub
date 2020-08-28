@@ -46,7 +46,7 @@
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import ContributeModal from 'totara_engage/components/modal/ContributeModal';
-import Add from 'tui/components/icons/common/Add';
+import Add from 'tui/components/icons/Add';
 
 // Mixins
 import ContainerMixin from 'totara_engage/mixins/container_mixin';

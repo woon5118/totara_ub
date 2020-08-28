@@ -39,7 +39,7 @@
 <script>
 import ActionDropdown from 'editor_weka/components/editing/ActionDropdown';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import More from 'tui/components/icons/common/More';
+import More from 'tui/components/icons/More';
 
 export default {
   components: {

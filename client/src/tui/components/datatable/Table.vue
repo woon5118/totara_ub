@@ -150,7 +150,7 @@ import Draggable from 'tui/components/drag_drop/Draggable';
 import PropsProvider from 'tui/components/util/PropsProvider';
 import Cell from 'tui/components/datatable/Cell';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
-import DragHandleIcon from 'tui/components/icons/common/DragHandle';
+import DragHandleIcon from 'tui/components/icons/DragHandle';
 
 export default {
   components: {

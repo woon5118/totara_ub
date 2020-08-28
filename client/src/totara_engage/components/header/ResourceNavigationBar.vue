@@ -69,8 +69,8 @@
 </template>
 
 <script>
-import ForwardArrow from 'tui/components/icons/common/ForwardArrow';
-import BackArrow from 'tui/components/icons/common/BackArrow';
+import ForwardArrow from 'tui/components/icons/ForwardArrow';
+import BackArrow from 'tui/components/icons/BackArrow';
 
 export default {
   components: {

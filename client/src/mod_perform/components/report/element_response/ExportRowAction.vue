@@ -35,7 +35,7 @@
 </template>
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import DownloadIcon from 'tui/components/icons/common/Download';
+import DownloadIcon from 'tui/components/icons/Download';
 import ExportConfirmModal from 'mod_perform/components/report/element_response/ExportConfirmModal';
 
 export default {

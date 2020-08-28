@@ -23,6 +23,7 @@ import { pickFiles, UploadError } from '../utils/upload';
 import ImageBlock from 'editor_weka/components/nodes/ImageBlock';
 import VideoBlock from 'editor_weka/components/nodes/VideoBlock';
 import AudioBlock from 'editor_weka/components/nodes/AudioBlock';
+import ImageIcon from 'tui/components/icons/Image';
 import { getMediaType } from '../api';
 import { IMAGE, VIDEO } from '../helpers/media';
 import { getJsonAttrs } from './util';
@@ -197,7 +198,7 @@ class MediaExtension extends BaseExtension {
       new ToolbarItem({
         group: 'upload',
         label: langString('embedded_media', 'editor_weka'),
-        icon: 'editor_weka|image',
+        iconComponent: ImageIcon,
         execute: editor => {
           pickFiles(editor).then(
             /**

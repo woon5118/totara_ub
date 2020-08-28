@@ -110,7 +110,7 @@
 <script>
 import CoreGrid from 'tui/components/grid/Grid';
 import Draggable from 'tui/components/drag_drop/Draggable';
-import DragHandleIcon from 'tui/components/icons/common/DragHandle';
+import DragHandleIcon from 'tui/components/icons/DragHandle';
 import Droppable from 'tui/components/drag_drop/Droppable';
 import GridItem from 'tui/components/grid/GridItem';
 import PropsProvider from 'tui/components/util/PropsProvider';

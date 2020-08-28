@@ -29,7 +29,7 @@ export class ToolbarItem {
     this._def = {
       group: opts.group,
       label: opts.label,
-      icon: opts.icon,
+      iconComponent: opts.iconComponent,
       enabled: true,
       active: null,
       children: opts.children && opts.children.map(x => x.getDef()),

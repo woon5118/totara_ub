@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import CheckSuccess from 'tui/components/icons/common/CheckSuccess';
+import CheckSuccess from 'tui/components/icons/CheckSuccess';
 
 export default {
   components: { CheckSuccess },

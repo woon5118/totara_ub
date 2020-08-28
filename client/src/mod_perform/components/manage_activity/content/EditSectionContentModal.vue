@@ -190,7 +190,7 @@ import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ContentAddElementButton from 'mod_perform/components/manage_activity/content/ContentAddElementButton';
 import Draggable from 'tui/components/drag_drop/Draggable';
 import Droppable from 'tui/components/drag_drop/Droppable';
-import DragHandleIcon from 'tui/components/icons/common/DragHandle';
+import DragHandleIcon from 'tui/components/icons/DragHandle';
 import Loader from 'tui/components/loader/Loader';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';

@@ -104,7 +104,7 @@ import CancelButton from 'tui/components/buttons/Cancel';
 import Popover from 'tui/components/popover/Popover';
 import FormRow from 'tui/components/form/FormRow';
 import Form from 'tui/components/form/Form';
-import InfoIcon from 'tui/components/icons/common/Info';
+import InfoIcon from 'tui/components/icons/Info';
 import Weka from 'editor_weka/components/Weka';
 import { debounce } from 'tui/util';
 import { FORMAT_JSON_EDITOR } from 'tui/format';

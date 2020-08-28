@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import EditIcon from 'tui/components/icons/common/Edit';
+import EditIcon from 'tui/components/icons/Edit';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 
 export default {

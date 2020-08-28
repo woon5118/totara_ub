@@ -36,7 +36,7 @@
       :title="$str('participation_reporting', 'mod_perform')"
       class="tui-performActivityActions__item"
     >
-      <ParticipationReportingIcon
+      <TasksIcon
         :alt="$str('participation_reporting', 'mod_perform')"
         :title="$str('participation_reporting', 'mod_perform')"
         size="200"
@@ -104,12 +104,12 @@
 
 <script>
 import ActivateActivityModal from 'mod_perform/components/manage_activity/ActivateActivityModal';
-import Users from 'tui/components/icons/common/Users';
+import Users from 'tui/components/icons/Users';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import MoreButton from 'tui/components/buttons/MoreIcon';
-import ParticipationReportingIcon from 'mod_perform/components/icons/ParticipationReporting';
+import TasksIcon from 'tui/components/icons/Tasks';
 import { notify } from 'tui/notifications';
 import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
 
@@ -125,7 +125,7 @@ export default {
     Dropdown,
     DropdownItem,
     MoreButton,
-    ParticipationReportingIcon,
+    TasksIcon,
   },
 
   props: {

@@ -71,9 +71,9 @@
 </template>
 
 <script>
-import AddIcon from 'tui/components/icons/common/Add';
+import AddIcon from 'tui/components/icons/Add';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import DeleteIcon from 'tui/components/icons/common/Delete';
+import DeleteIcon from 'tui/components/icons/Delete';
 
 export default {
   components: {
