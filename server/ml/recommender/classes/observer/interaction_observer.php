@@ -82,8 +82,13 @@ final class interaction_observer {
         $item_id = $event->objectid;
 
         if ($event instanceof course_viewed) {
-            $component = 'container_course';
             $item_id = $event->courseid;
+            if (SITEID == $item_id) {
+                // Skip for SITE course.
+                return;
+            }
+
+            $component = 'container_course';
         }
 
         $entity = new interaction();
