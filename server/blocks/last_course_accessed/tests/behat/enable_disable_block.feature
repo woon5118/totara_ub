@@ -26,7 +26,6 @@ Feature: Site Administrator can enable and disable the LCA block.
     And I click on "Hide" "link" in the "Last Course Accessed" "table_row"
     # Use css_element to ensure exact match (as there is another link with the text "Show ...")
     And I click on "[title='Show']" "css_element" in the "Last Course Accessed" "table_row"
-    And I follow "Find Learning"
-    And I click on "Course 1" "text"
+    And I am on "Course 1" course homepage
     Then I should see "Last Course Accessed"
     And I log out
