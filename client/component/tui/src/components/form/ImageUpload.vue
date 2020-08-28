@@ -42,7 +42,11 @@ av<!--
       <div class="tui-formImageUpload__actions">
         <ButtonIcon
           :text="$str('add', 'totara_core')"
-          :aria-label="$str('add', 'totara_core')"
+          :aria-label="
+            ariaLabelExtension
+              ? $str('addextended', 'totara_core', ariaLabelExtension)
+              : $str('add', 'totara_core')
+          "
           @click="pickFile"
         >
           <AddIcon size="200" />
@@ -51,7 +55,12 @@ av<!--
           v-if="files && files[0]"
           class="tui-formImageUpload__deleteButton"
           :styleclass="{ stealth: true }"
-          :aria-label="$str('delete', 'totara_core')"
+          :aria-label="
+            ariaLabelExtension
+              ? $str('deleteextended', 'totara_core', ariaLabelExtension)
+              : $str('delete', 'totara_core')
+          "
+          :aria-describedby="ariaDescribedby"
           @click="clearUpload(deleteDraft, files && files[0])"
         >
           <DeleteIcon />
@@ -110,6 +119,8 @@ export default {
     currentUrl: String,
     defaultUrl: String,
     acceptedTypes: Array,
+    ariaDescribedby: String,
+    ariaLabelExtension: String,
   },
 
   data() {
@@ -160,7 +171,9 @@ export default {
 {
   "totara_core": [
     "add",
+    "addextended",
     "delete",
+    "deleteextended",
     "error:upload_failed"
   ]
 }
