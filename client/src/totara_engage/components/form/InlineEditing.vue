@@ -30,6 +30,7 @@
 
     <ButtonIcon
       v-show="updateAble"
+      ref="inlineEditingBtn"
       :aria-label="buttonAriaLabel"
       :styleclass="{ transparent: true, small: true }"
       class="tui-inlineEditing__btn"
@@ -71,8 +72,12 @@ export default {
       }
 
       if (this.restrictedMode) {
-        // No event triggering when click inside elements of InlineEditing
-        if (event.target !== event.currentTarget) {
+        // No event triggering when click inside elements of InlineEditing, unless it's the edit button
+
+        if (
+          event.target !== event.currentTarget &&
+          event.target !== this.$refs['inlineEditingBtn'].$el
+        ) {
           return;
         }
       }

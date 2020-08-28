@@ -26,6 +26,15 @@
   padding: var(--tui-gap-1);
   border: 2px solid transparent;
 
+  &:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    content: '';
+  }
+
   &--fullWidth {
     width: 100%;
   }
