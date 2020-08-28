@@ -95,4 +95,14 @@ if (function_exists('container_workspace_add_missing_roles')) {
     container_workspace_add_missing_roles();
 }
 
+$discussion_table = new xmldb_table('workspace_discussion');
+$time_deleted = new xmldb_field('time_deleted', XMLDB_TYPE_INTEGER, '10');
+if (!$db_manager->field_exists($discussion_table, $time_deleted)) {
+    $db_manager->add_field($discussion_table, $time_deleted);
+}
+$reason_deleted = new xmldb_field('reason_deleted', XMLDB_TYPE_INTEGER, '1');
+if (!$db_manager->field_exists($discussion_table, $reason_deleted)) {
+    $db_manager->add_field($discussion_table, $reason_deleted);
+}
+
 return 0;
