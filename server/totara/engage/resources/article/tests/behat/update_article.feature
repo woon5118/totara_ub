@@ -30,12 +30,12 @@ Feature: Update article
   Scenario: Update resource by owner
     Given I log in as "user1"
     And I view article "Test Article 1"
-    And I click on "Test Article 1" "text" in the ".tui-articleTitle" "css_element"
+    And I click on "//h3[contains(text(),'Test Article 1')]/parent::*[button[@title='Edit']]" "xpath_element"
     And I set the field "Enter resource title" to "Updated test article 1"
     And I should see "Done"
     And I press "Done"
     And I should see "Updated test article 1"
-    And I click on "Test Article" "text" in the ".tui-articleContent" "css_element"
+    And I click on "//div[contains(text(),'Test Article')]/parent::*[button[@title='Edit']]" "xpath_element"
     And I wait for the next second
     And I activate the weka editor with css ".tui-editArticleContentForm__editor"
     And I type "Edit article" in the weka editor
@@ -50,14 +50,14 @@ Feature: Update article
     And I log out
     And I log in as "user2"
     And I view article "Test Article 1"
-    And I click on "Test Article 1" "text" in the ".tui-articleTitle" "css_element"
+    And I click on "//h3[contains(text(),'Test Article 1')]/parent::*[button[@title='Edit']]" "xpath_element"
     And I should not see "Done"
-    And I click on "Test Article" "text" in the ".tui-articleContent" "css_element"
+    And I click on "//div[contains(text(),'Test Article')]/parent::*[button[@title='Edit']]" "xpath_element"
     And I should not see "Done"
     And I view article "Test Article 2"
     And I should see "Test Article 2"
-    And I click on "Test Article 2" "text" in the ".tui-articleTitle" "css_element"
+    And I click on "//h3[contains(text(),'Test Article 2')]/parent::*[button[@title='Edit']]" "xpath_element"
     And I should not see "Done"
     And I should see "Test Article"
-    And I click on "Test Article" "text" in the ".tui-articleContent" "css_element"
+    And I click on "//div[contains(text(),'Test Article')]/parent::*[button[@title='Edit']]" "xpath_element"
     And I should not see "Done"
