@@ -76,6 +76,7 @@ export default {
           innerHTML: props.htmlContent,
         },
       }),
+      props.alt && h('span', { class: 'sr-only' }, props.alt),
     ];
   },
 };

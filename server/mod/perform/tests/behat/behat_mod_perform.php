@@ -628,7 +628,7 @@ class behat_mod_perform extends behat_base {
         behat_hooks::set_step_readonly(false);
 
         $question = $this->find_edit_display_question_from_text($question_text);
-        $question->find('css', 'span[data-flex-icon=trash]')->click();
+        $question->find('xpath', "//button[@title='Delete element']/*")->click();
     }
 
     /**
@@ -639,7 +639,7 @@ class behat_mod_perform extends behat_base {
         behat_hooks::set_step_readonly(false);
 
         $question = $this->find_edit_display_question_from_text($question_text);
-        $question->find('css', 'span[data-flex-icon=edit]')->click();
+        $question->find('xpath', "//button[@title='Edit element']/*")->click();
     }
 
     /**
@@ -651,7 +651,7 @@ class behat_mod_perform extends behat_base {
 
         $this->close_all_popovers();
         $question = $this->find_edit_display_question_from_text($question_text);
-        $question->find('css', "span[data-flex-icon='mod_perform|reporting']")->click();
+        $question->find('xpath', "//button[@title='Reporting ID']/*")->click();
     }
 
     /**
@@ -660,7 +660,7 @@ class behat_mod_perform extends behat_base {
      */
     public function i_should_not_see_identifier_icon_for_question(string $question_text) {
         $question = $this->find_edit_display_question_from_text($question_text);
-        $element_found = $question->find('css', "span[data-flex-icon='mod_perform|reporting']");
+        $element_found = $question->find('xpath', "//button[@title='Reporting ID']/*");
         if ($element_found !== null) {
             throw new ExpectationException(
                 "Identifier icon for question '{$question_text}' should not exist but was found.",

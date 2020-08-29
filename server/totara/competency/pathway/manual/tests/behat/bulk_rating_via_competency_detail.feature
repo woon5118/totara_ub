@@ -51,7 +51,7 @@ Feature: Test rating a single competency via the competency detail page.
 
     # Add rating
     When I click on "Rate" "button"
-    And I click on "//div[@class='tui-radioGroup']/div[@class='tui-radio'][1]/label[@class='tui-radio__label']" "xpath_element"
+    And I click on "//*[contains(text(), 'Select scale value')]/parent::*//label[contains(text(), 'Competent')]" "xpath_element"
     And I click on "Done" "button"
 
     When I click on "View all" "button"

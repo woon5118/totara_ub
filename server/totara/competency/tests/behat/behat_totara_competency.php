@@ -35,7 +35,7 @@ use totara_criteria\criterion_factory;
 
 class behat_totara_competency extends behat_base {
 
-    private const COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR = '.tui-toggleBtn__icon .fa-th-list.flex-icon.ft.ft-fw';
+    private const COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR = '//*[@aria-label="Display formats"]//*[@aria-label="Show tables"]/*';
     private const TOTARA_COMPETENCY_PROFILE_PATH = 'totara/competency/profile/index.php';
     private const TOTARA_COMPETENCY_PROFILE_DETAIL_PATH = 'totara/competency/profile/details/index.php';
     private const TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH = 'totara/competency/profile/assign/index.php';
@@ -122,7 +122,7 @@ class behat_totara_competency extends behat_base {
     public function i_change_the_competency_profile_to_list_view(): void {
         behat_hooks::set_step_readonly(false);
 
-        $this->find('css', self::COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR)->click();
+        $this->find('xpath', self::COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR)->click();
     }
 
     /**

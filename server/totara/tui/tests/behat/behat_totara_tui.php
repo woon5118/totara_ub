@@ -426,7 +426,7 @@ class behat_totara_tui extends behat_base {
         $cell_text = $cell->getText();
 
         if ($cell_text !== $expected_text) {
-            $exception_message = "Expected cell to contain text \"{$expected_text}\" instead found \"{$cell_text}\"";
+            $exception_message = "Expected cell ({$column_heading_text}, {$row_number}) to contain text \"{$expected_text}\" instead found \"{$cell_text}\"";
             throw new ExpectationException($exception_message, $this->getSession());
         }
     }
