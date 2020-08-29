@@ -87,7 +87,7 @@ Feature: Totara form number element tests
     When I press "Save changes"
     Then I should see "The form has been submit"
     And "number_basic" row "Value" column of "form_results" table should contain "«»"
-    And "number_required" row "Value" column of "form_results" table should contain "«42»"
+    And "number_required" row "Value" column of "form_results" table should contain "«5»"
 
     When I press "Reset"
     Then I should see "Form: Basic number element"
@@ -98,7 +98,7 @@ Feature: Totara form number element tests
     When I press "Save changes"
     Then I should see "The form has been submit"
     And "number_basic" row "Value" column of "form_results" table should contain "«»"
-    And "number_required" row "Value" column of "form_results" table should contain "«42»"
+    And "number_required" row "Value" column of "form_results" table should contain "«5»"
 
     When I press "Reset"
     Then I should see "Form: Basic number element"
@@ -109,7 +109,7 @@ Feature: Totara form number element tests
     When I press "Save changes"
     Then I should see "The form has been submit"
     And "number_basic" row "Value" column of "form_results" table should contain "«»"
-    And "number_required" row "Value" column of "form_results" table should contain "«42»"
+    And "number_required" row "Value" column of "form_results" table should contain "«5»"
 
     When I press "Reset"
     Then I should see "Form: Basic number element"

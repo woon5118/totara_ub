@@ -54,6 +54,6 @@ Feature: Totara form weka editor test
     And I press "Save changes"
     Then I should see "The form has been submit"
     And "userpreferrededitor" row "Value" column of "form_results" table should contain '«{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Test"}]}]}»'
-    And "userpreferrededitorformat" row "Value" column of "form_results" table should contain "«42»"
+    And "userpreferrededitorformat" row "Value" column of "form_results" table should contain "«5»"
     And "form_select" row "Value" column of "form_results" table should contain "«totara_form\form\testform\element_editor_user_preferred»"
     And "submitbutton" row "Value" column of "form_results" table should contain "«1»"
