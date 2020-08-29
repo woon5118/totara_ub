@@ -159,7 +159,7 @@ export default {
       "viewpublic",
       "viewrestricted",
       "tags",
-      "clock",
+      "time",
       "share",
       "editsettings"
     ],

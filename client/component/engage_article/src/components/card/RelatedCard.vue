@@ -144,7 +144,7 @@ export default {
 <lang-strings>
   {
     "totara_engage": [
-      "clock",
+      "time",
       "like"
     ],
     "engage_article": [

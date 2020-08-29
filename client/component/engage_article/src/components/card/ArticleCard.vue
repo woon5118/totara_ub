@@ -261,7 +261,7 @@ export default {
       "numberofcomments",
       "numberoflikes",
       "numberofshares",
-      "clock"
+      "time"
     ]
   }
 </lang-strings>
