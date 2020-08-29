@@ -766,6 +766,21 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
+     * @When /^I click on the "([^"]*)" button in the "([^"]*)" tui modal$/
+     */
+    public function i_click_on_x_button_in_the_y_tui_modal(string $button_text, string $modal_heading) {
+        \behat_hooks::set_step_readonly(false);
+
+        $heading_literal = behat_context_helper::escape($modal_heading);
+        $button_literal = behat_context_helper::escape($button_text);
+        $button = $this->find('xpath', "//*[contains(text(), {$heading_literal})]//ancestor::*[contains(@class, 'tui-modal__inner')]//button[contains(text(), {$button_literal})]");
+        if (!$button) {
+            throw new ExpectationException('Unable to find requested '.$button_literal.' button in modal with heading '.$heading_literal, $this->getSession());
+        }
+        $button->click();
+    }
+
+    /**
      * @When /^I click on the tui form help icon in the "([^"]*)" "([^"]*)"$/
      * @param string $element_locator
      * @param string $element_selector

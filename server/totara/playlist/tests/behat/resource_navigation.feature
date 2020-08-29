@@ -39,7 +39,7 @@ Feature: Users can navigate between resources/surveys inside a playlist.
     And I press "select an existing resource"
     And I wait for the next second
     And I click the select all checkbox in the tui datatable
-    And I press "Add"
+    And I click on the "Add" button in the "Select content to add into playlist" tui modal
     And I log out
 
   Scenario: Users can navigate through resources on a playlist
