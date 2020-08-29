@@ -169,7 +169,7 @@ class behat_blocks extends behat_base {
      * @param string $title
      */
     public function i_should_see_the_block_in_region($title, $region) {
-        $xpath = '//aside[@id="block-region-' . $region . '"]' . $this->get_block_xpath($title);
+        $xpath = '//*[@id="block-region-' . $region . '"]' . $this->get_block_xpath($title);
         $this->execute('behat_general::should_exist', [ $xpath, 'xpath_element' ]);
     }
 
