@@ -77,6 +77,10 @@ class settings {
     }
 
     private static function add_manage_activities_link(\admin_root $admin_root) {
+        global $USER;
+        // Save $USER->access as the subsequent has_capability() trashes it.
+        // This is necessary for the guest enrolment plugin that loads a temp role to $USER->access.
+        $user_access = $USER->access ?? null;
         $context = null;
         $system_context = \context_system::instance();
         // If the user has the capability on the system level he should be able to access the pages
@@ -109,6 +113,10 @@ class settings {
                     $context
                 )
             );
+        }
+        // Restore $USER->access.
+        if ($user_access) {
+            $USER->access = $user_access;
         }
     }
 }
