@@ -67,12 +67,21 @@ final class totara_playlist_generator extends component_generator_base implement
             $userid = $parameters['userid'];
         }
 
+        $summary_format = $parameters['summaryformat'] ?? null;
+
         $summary = null;
         if (isset($parameters['summary'])) {
-            $summary = $parameters['summary'];
+            if ($summary_format === null || $summary_format === FORMAT_JSON_EDITOR) {
+                $summary_format = FORMAT_JSON_EDITOR;
+                $summary = json_encode([
+                    'type' => 'doc',
+                    'content' => [\core\json_editor\node\paragraph::create_json_node_from_text($parameters['summary'])]
+                ]);
+            } else {
+                $summary = $parameters['summary'];
+            }
         }
 
-        $summary_format = $parameters['summaryformat'] ?? null;
         $playlist = playlist::create($name, $access, $contextid, $userid, $summary, $summary_format);
 
         if (isset($parameters['topics']) && !empty($parameters['topics'])) {
