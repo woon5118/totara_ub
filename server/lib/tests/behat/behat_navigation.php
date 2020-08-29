@@ -296,6 +296,8 @@ class behat_navigation extends behat_base {
 
                 $this->js_trigger_click($pnode);
 
+                $this->wait_for_pending_js();
+
                 // Wait for node to load, if not loaded before.
                 if ($pnode->hasAttribute('data-loaded') && $pnode->getAttribute('data-loaded') == "false") {
                     $jscondition = '(document.evaluate("' . $pnode->getXpath() . '", document, null, '.

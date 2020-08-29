@@ -107,12 +107,10 @@ Feature: Add badges to the system
 
   @javascript @_file_upload
   Scenario: Add a badge from Site badges section
-    Given I click on "Home" in the totara menu
-    And I click on "Site badges" "link" in the "Front page" "block"
-    Then I should see "Manage badges" in the "#region-main" "css_element"
-    And I should see "Add a new badge"
+    Given I navigate to "Manage badges" node in "Site administration > Badges"
+    And I should see "Site badges: Manage badges"
     # Add a badge.
-    When I follow "Add a new badge"
+    When I press "Add a new badge"
     And I set the following fields to these values:
       | Name          | Test badge with 'apostrophe' and other friends (<>&@#) 2 |
       | Version       | v1                                                       |
@@ -131,11 +129,9 @@ Feature: Add badges to the system
     And I should see "Number of badges available: 1"
     And I should not see "There are no badges available."
     # See buttons from the "Site badges" page.
-    And I am on homepage
-    And I click on "Home" in the totara menu
-    When I click on "Site badges" "link" in the "Front page" "block"
-    Then I should see "Manage badges" in the "#region-main" "css_element"
-    And I should see "Add a new badge"
+    When I am on homepage
+    And I navigate to "Manage badges" node in "Site administration > Badges"
+    Then I should see "Number of badges available: 1"
 
   @javascript @_file_upload
   Scenario: Edit a badge

@@ -250,6 +250,15 @@ define(['jquery'], function($) {
      */
     Tree.prototype.expandGroup = function(item) {
         var promise = $.Deferred();
+        var pendingkey = 'Tree-expandGroup-'+item.attr('id');
+
+        M.util.js_pending(pendingkey);
+
+        promise.then(
+            function() {
+                M.util.js_complete(pendingkey);
+            }
+        );
 
         require(['core/templates'], function (templates) {
             templates.renderIcon('loading').done(function (html) {

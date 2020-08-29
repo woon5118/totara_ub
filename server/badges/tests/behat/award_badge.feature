@@ -131,6 +131,7 @@ Feature: Award badges
     # Teacher 1 should NOT have access to manage/create site badges in the Site badges section.
     When I am on homepage
     And I click on "Home" in the totara menu
+    And I follow "Go to calendar"
     And I click on "Site badges" "link" in the "Front page" "block"
     Then I should see "There are no badges available."
     And I should not see "Manage badges" in the "#region-main" "css_element"

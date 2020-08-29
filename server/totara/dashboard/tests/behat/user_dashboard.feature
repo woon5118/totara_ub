@@ -110,8 +110,6 @@ Feature: Perform basic dashboard user changes
     And I should not see "Dashboard locked published"
     And I should not see "Dashboard unlocked published"
     And I should see "Front page" in the "#block-region-side-pre" "css_element"
-    And I follow "Dashboard"
-    Then I should see "Guest Dashboard"
     And I log in as "admin"
     And I set the following administration settings values:
       | Home page for guests | Totara dashboard |
