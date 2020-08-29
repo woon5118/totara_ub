@@ -37,7 +37,7 @@ module.exports = {
   ],
   snapshotSerializers: ['jest-serializer-vue'],
   testMatch: [
-    '<rootDir>/client/**/src/*/tests/unit/**/*.spec.(js|jsx|ts|tsx)',
+    '<rootDir>/client/**/src/tests/unit/**/*.spec.(js|jsx|ts|tsx)',
     '<rootDir>/client/**/__tests__/**/*.(js|jsx|ts|tsx)',
   ],
   testPathIgnorePatterns: [
