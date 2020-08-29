@@ -17,7 +17,7 @@ Feature: Edit playlist instance
     And I click on "Your Library" in the totara menu
     When I follow "Playlist 101"
     Then I should see "Playlist 101"
-    And I click on "Edit playlist title" "button"
+    And I click on "//button[@title='Edit playlist title']/parent::*" "xpath_element"
     And I set the field "playlist title" to "Playlist 102"
     When I click on "Done" "button" in the ".tui-playlistTitleForm" "css_element"
     Then I should not see "Playlist 101"
@@ -30,7 +30,7 @@ Feature: Edit playlist instance
     When I follow "Playlist 101"
     Then I should see "Playlist 101"
     And I click on "Expand" "button"
-    And I click on "Add a description (optional)" "button"
+    And I click on "//button[@title='Add a description (optional)']/parent::*" "xpath_element"
     And I activate the weka editor with css ".tui-playlistSummary__editor"
     And I type "Best playlist ever" in the weka editor
     And I wait for the next second
