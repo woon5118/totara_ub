@@ -78,7 +78,7 @@ Feature: Guest users enrol themselves in courses where seminar direct enrolment 
     And I log out
 
     When I log in as "user1"
-    And I am on "Course 1" course homepage
+    And I am on "Wananga Whakamatautau" seminar homepage
     Then I should see "Wananga Whakamatautau"
     When I click on "Go to event" "link" in the "1 September" "table_row"
     And I press "Sign-up"
