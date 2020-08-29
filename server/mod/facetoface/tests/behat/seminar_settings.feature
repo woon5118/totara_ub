@@ -28,7 +28,7 @@ Feature: Disabling approval options in global settings would
       | Training | 1 |
     And I click on "Save changes" "button"
     And I set the following fields to these values:
-      | id_s__facetoface_approvaloptions_approval_role_12 | 1 |
+      | id_s__facetoface_approvaloptions_approval_role_14 | 1 |
     And I click on "Save changes" "button"
     And I am on "Course101" course homepage
     And I turn editing mode on
@@ -37,7 +37,7 @@ Feature: Disabling approval options in global settings would
       | Training    | 1                   |
     And I navigate to "Seminars > Global settings" in site administration
     And I set the following fields to these values:
-      | id_s__facetoface_approvaloptions_approval_role_12 | 0 |
+      | id_s__facetoface_approvaloptions_approval_role_14 | 0 |
     And I click on "Save changes" "button"
     And I am on "Course101" course homepage
     And I follow "Seminar 1"
