@@ -50,7 +50,7 @@
     >
       <template v-slot:trigger="{ toggle }">
         <MoreButton
-          no-padding="true"
+          :no-padding="true"
           :aria-label="$str('activity_action_options', 'mod_perform')"
           @click="toggle"
         />
