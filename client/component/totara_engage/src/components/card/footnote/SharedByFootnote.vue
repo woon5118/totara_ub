@@ -50,9 +50,9 @@
 </template>
 
 <script>
-import Delete from 'tui/components/icons/common/Delete';
+import Delete from 'tui/components/icons/Delete';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import Loading from 'tui/components/icons/common/Loading';
+import Loading from 'tui/components/icons/Loading';
 
 //graphQL
 import unShare from 'totara_engage/graphql/unshare';
