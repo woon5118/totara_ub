@@ -355,9 +355,7 @@ class util {
                     $subject_tenant_ids = tenant_util::get_user_participation($subject_user_id);
 
                     // The current user and the subject users have to share a tenant
-                    if (in_array($viewing_user_context->tenantid, $subject_tenant_ids)) {
-                        return true;
-                    }
+                    return in_array($viewing_user_context->tenantid, $subject_tenant_ids);
                 } else if (!empty($CFG->tenantsisolated)) {
                     return empty($subject_user_context->tenantid);
                 }
