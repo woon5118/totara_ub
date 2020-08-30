@@ -189,6 +189,13 @@
             }}
           </span>
         </p>
+
+        <Button
+          class="tui-performUserActivityList__button"
+          :text="$str('print_activity', 'mod_perform')"
+          @click="printActivity(subjectInstance)"
+        />
+
         <SectionsList
           :activity-id="subjectInstance.subject.activity.id"
           :subject-sections="subjectInstance.sections"
@@ -557,6 +564,21 @@ export default {
     isSingleSectionViewOnly(activityId) {
       return this.singleSectionViewOnlyActivities.includes(activityId);
     },
+    /**
+     * Open print-friendly page with activity.
+     *
+     * @param subjectInstance
+     * @returns {boolean}
+     */
+    printActivity(subjectInstance) {
+      const participantSection = this.getFirstSectionToParticipate(
+        subjectInstance.sections
+      );
+      const url = this.$url('/mod/perform/activity/print.php', {
+        participant_section_id: participantSection.id
+      });
+      window.open(url);
+    },
   },
 };
 </script>
@@ -565,6 +587,7 @@ export default {
     "mod_perform": [
       "all_job_assignments",
       "is_overdue",
+      "print_activity",
       "unnamed_job_assignment",
       "user_activities_closed",
       "user_activities_complete_before",

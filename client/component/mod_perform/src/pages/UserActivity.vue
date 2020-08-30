@@ -28,8 +28,19 @@
         "
         type="error"
       />
+      <ActivityContentPrint
+        v-else-if="print && subjectInstance"
+        :current-user-id="currentUserId"
+        :activity="subjectInstance.activity"
+        :participant-instance-id="participantInstanceId"
+        :participant-section-id="participantSectionId"
+        :subject-user="subjectInstance.subject_user"
+        :created-at="subjectInstance.created_at"
+        :due-date="subjectInstance.due_date"
+        :token="token"
+      />
       <ActivityContent
-        v-else-if="subjectInstance"
+        v-else-if="!print && subjectInstance"
         :current-user-id="currentUserId"
         :activity="subjectInstance.activity"
         :participant-instance-id="participantInstanceId"
@@ -47,12 +58,14 @@ import subjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_parti
 import Loader from 'tui/components/loader/Loader';
 import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import ActivityContent from 'mod_perform/components/user_activities/ActivityContent';
+import ActivityContentPrint from 'mod_perform/components/user_activities/ActivityContentPrint';
 
 export default {
   components: {
     Loader,
     NotificationBanner,
     ActivityContent,
+    ActivityContentPrint,
   },
   props: {
     /**
@@ -79,6 +92,10 @@ export default {
       required: false,
       type: String,
       default: '',
+    },
+    print: {
+      required: true,
+      type: Boolean,
     },
   },
 

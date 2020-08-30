@@ -8,9 +8,13 @@ query mod_perform_subject_instance_for_participant(
     progress_status
     created_at
     instance_count
+    due_date
     activity {
       id
       name
+      type {
+        display_name
+      }
       settings {
         close_on_completion
         multisection

@@ -55,9 +55,13 @@ class mod_perform_webapi_resolver_query_subject_instance_for_participant_testcas
             'progress_status' => self::$about_user_and_participating->get_progress_status(),
             'instance_count' => 1,
             'job_assignment' => null,
+            'due_date' => null,
             'activity' => [
                 'id' => self::$about_user_and_participating->get_activity()->id,
                 'name' => self::$about_user_and_participating->get_activity()->name,
+                'type' => [
+                    'display_name' => self::$about_user_and_participating->get_activity()->type->display_name,
+                ],
                 'settings' => [
                     'close_on_completion' => false,
                     'multisection' => false,
