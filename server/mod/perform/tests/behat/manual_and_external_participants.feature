@@ -41,9 +41,9 @@ Feature: Allow users to select manual (internal and external) participants for a
     # Setup the activity so it can be activated
     When I click on "Add activity" "button"
     And I set the following fields to these values:
-      | Activity title | Act1      |
-      | Activity type  | Appraisal |
-    And I click on "Get started" "button"
+      | Title | Act1      |
+      | Type  | Appraisal |
+    And I click on "Create" "button"
     And I click the add responding participant button
     And I click on the "Subject" tui checkbox
     And I click on the "Manager" tui checkbox

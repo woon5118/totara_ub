@@ -112,6 +112,9 @@ $string['configshowhistoricactivities'] = 'Use this setting to make any historic
 
 Note: Legacy Appraisals and Legacy 360 Feedback features must also be enabled in order to make historic activities visible.';
 $string['create_activity'] = 'Add activity';
+$string['create_activity_select_placeholder'] = 'Select...';
+$string['create_activity_title'] = 'Title';
+$string['create_activity_type'] = 'Type';
 $string['create_manual_participant_progress_task'] = 'Create progress records for selecting manual participants in performance activities';
 $string['create_subject_instance_task'] = 'Create subject instance for performance activities';
 $string['created_at'] = 'Created at';
@@ -1287,4 +1290,5 @@ $string['workflow_automatic_closure_on_completion_help'] = 'Sections and instanc
 $string['workflow_settings'] = 'Workflow settings';
 $string['x_record_selected'] = '<strong>{$a}</strong> record selected';
 $string['x_records_selected'] = '<strong>{$a}</strong> records selected';
+$string['you_can_add_this_later'] = 'You can add this later.';
 $string['your_response'] = 'Your response';

@@ -16,11 +16,11 @@ Feature: Activity general information supports multi-lang filters
     Given I navigate to the manage perform activities page
     And I click on "Add activity" "button"
     And I set the following fields to these values:
-      | Activity title | <span lang="en" class="multilang">it's an English title</span><span lang="de" class="multilang">deutscher Titel</span>              |
+      | Title | <span lang="en" class="multilang">it's an English title</span><span lang="de" class="multilang">deutscher Titel</span>              |
       | Description    | <span lang="en" class="multilang">it's an English description </span><span lang="de" class="multilang">deutsche Beschreibung</span> |
-      | Activity type  | Feedback                                                                                                                            |
+      | Type  | Feedback                                                                                                                            |
 
-    When I press "Get started"
+    When I press "Create"
     Then I should see "it's an English title"
     And I should not see "deutscher Titel"
 

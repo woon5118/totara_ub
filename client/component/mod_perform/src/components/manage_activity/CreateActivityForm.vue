@@ -17,66 +17,84 @@
 -->
 
 <template>
-  <Form>
-    <FormRow
-      v-slot="{ id }"
-      :label="$str('general_info_label_activity_title', 'mod_perform')"
-      required
+  <Modal :aria-labelledby="$id('title')">
+    <ModalContent
+      :title="$str('add_activity', 'mod_perform')"
+      :title-id="$id('title')"
+      :close-button="false"
+      @dismiss="$emit('cancel')"
     >
-      <InputText
-        :id="id"
-        v-model="form.name"
-        :maxlength="ACTIVITY_NAME_MAX_LENGTH"
-      />
-    </FormRow>
+      <Form>
+        <FormRow
+          v-slot="{ id }"
+          :label="$str('create_activity_title', 'mod_perform')"
+          required
+        >
+          <InputText
+            :id="id"
+            v-model="form.name"
+            :maxlength="ACTIVITY_NAME_MAX_LENGTH"
+            char-length="full"
+          />
+        </FormRow>
 
-    <FormRow
-      v-slot="{ id }"
-      :label="$str('general_info_label_activity_description', 'mod_perform')"
-    >
-      <Textarea :id="id" v-model="form.description" />
-    </FormRow>
+        <FormRow
+          v-slot="{ id }"
+          :label="
+            $str('general_info_label_activity_description', 'mod_perform')
+          "
+        >
+          <Textarea :id="id" v-model="form.description" char-length="full" />
+          <FormRowDetails :id="$id('aria-describedby')">
+            {{ $str('you_can_add_this_later', 'mod_perform') }}
+          </FormRowDetails>
+        </FormRow>
 
-    <FormRow
-      v-slot="{ id }"
-      :label="$str('general_info_label_activity_type', 'mod_perform')"
-      :required="true"
-    >
-      <div>
-        <Select
-          :id="id"
-          v-model="form.type"
-          :aria-labelledby="id"
-          :aria-describedby="$id('aria-describedby')"
-          :options="activityTypes"
-        />
-        <FormRowDetails :id="$id('aria-describedby')">
-          {{ $str('activity_type_help_text', 'mod_perform') }}
-        </FormRowDetails>
-      </div>
-    </FormRow>
+        <FormRow
+          v-slot="{ id }"
+          :label="$str('create_activity_type', 'mod_perform')"
+          :required="true"
+        >
+          <div>
+            <Select
+              :id="id"
+              v-model="form.type"
+              :aria-labelledby="id"
+              :aria-describedby="$id('aria-describedby')"
+              :options="activityTypes"
+              char-length="10"
+            />
+            <FormRowDetails :id="$id('aria-describedby')">
+              {{ $str('activity_type_help_text', 'mod_perform') }}
+            </FormRowDetails>
+          </div>
+        </FormRow>
+      </Form>
 
-    <FormRow>
-      <ButtonGroup>
+      <template v-slot:buttons>
         <Button
           :styleclass="{ primary: true }"
-          :text="$str('get_started', 'mod_perform')"
+          :text="$str('button_create', 'mod_perform')"
           :disabled="isSaving || hasNoTitle || hasNoType"
           type="submit"
           @click.prevent="trySave"
         />
-      </ButtonGroup>
-    </FormRow>
-  </Form>
+
+        <CancelButton :disabled="isSaving" @click="$emit('request-close')" />
+      </template>
+    </ModalContent>
+  </Modal>
 </template>
 
 <script>
 import Button from 'tui/components/buttons/Button';
-import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import CancelButton from 'tui/components/buttons/Cancel';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
 import InputText from 'tui/components/form/InputText';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
 import Select from 'tui/components/form/Select';
 import Textarea from 'tui/components/form/Textarea';
 import { ACTIVITY_NAME_MAX_LENGTH } from 'mod_perform/constants';
@@ -88,11 +106,13 @@ import createActivityMutation from 'mod_perform/graphql/create_activity';
 export default {
   components: {
     Button,
-    ButtonGroup,
+    CancelButton,
     Form,
     FormRow,
     FormRowDetails,
     InputText,
+    Modal,
+    ModalContent,
     Select,
     Textarea,
   },
@@ -107,7 +127,7 @@ export default {
       activityTypes: [
         {
           id: 0,
-          label: this.$str('general_info_select_activity_type', 'mod_perform'),
+          label: this.$str('create_activity_select_placeholder', 'mod_perform'),
         },
       ],
       isSaving: false,
@@ -155,7 +175,7 @@ export default {
         //show 'select type'
         options.unshift({
           id: 0,
-          label: this.$str('general_info_select_activity_type', 'mod_perform'),
+          label: this.$str('create_activity_select_placeholder', 'mod_perform'),
         });
         return options;
       },
@@ -203,11 +223,13 @@ export default {
   {
     "mod_perform": [
       "activity_type_help_text",
+      "add_activity",
+      "button_create",
+      "create_activity_select_placeholder",
+      "create_activity_title",
+      "create_activity_type",
       "general_info_label_activity_description",
-      "general_info_label_activity_title",
-      "general_info_label_activity_type",
-      "general_info_select_activity_type",
-      "get_started"
+      "you_can_add_this_later"
     ]
   }
 </lang-strings>

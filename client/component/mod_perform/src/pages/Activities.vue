@@ -19,25 +19,20 @@
 <template>
   <div class="tui-performManageActivityList">
     <h2 v-text="$str('perform:manage_activity', 'mod_perform')" />
-    <Button
-      v-if="canAdd"
-      :disabled="$apollo.loading"
-      :text="$str('add_activity', 'mod_perform')"
-      @click="showCreateModal()"
-    />
+    <div class="tui-performManageActivityList__add">
+      <Button
+        v-if="canAdd"
+        :styleclass="{ primary: true }"
+        :disabled="$apollo.loading"
+        :text="$str('add_activity', 'mod_perform')"
+        @click="showCreateModal()"
+      />
+    </div>
     <ModalPresenter :open="modalOpen" @request-close="modalRequestClose">
-      <Modal :aria-labelledby="$id('title')">
-        <ModalContent
-          :title="$str('add_activity', 'mod_perform')"
-          :title-id="$id('title')"
-          :close-button="true"
-        >
-          <CreateActivityForm
-            @mutation-success="redirectToManageActivity"
-            @mutation-error="creationError"
-          />
-        </ModalContent>
-      </Modal>
+      <CreateActivityForm
+        @mutation-success="redirectToManageActivity"
+        @mutation-error="creationError"
+      />
     </ModalPresenter>
 
     <loader :loading="$apollo.loading">
@@ -87,8 +82,6 @@ import Cell from 'tui/components/datatable/Cell';
 import CreateActivityForm from 'mod_perform/components/manage_activity/CreateActivityForm';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
 import Loader from 'tui/components/loader/Loader';
-import Modal from 'tui/components/modal/Modal';
-import ModalContent from 'tui/components/modal/ModalContent';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import performActivitiesQuery from 'mod_perform/graphql/activities';
 import Table from 'tui/components/datatable/Table';
@@ -102,8 +95,6 @@ export default {
     CreateActivityForm,
     HeaderCell,
     Loader,
-    Modal,
-    ModalContent,
     ModalPresenter,
     Table,
   },
@@ -182,7 +173,6 @@ export default {
   {
     "mod_perform": [
       "add_activity",
-      "get_started",
       "perform:manage_activity",
       "toast_error_create_activity",
       "view_actions",
@@ -195,6 +185,10 @@ export default {
 
 <style lang="scss">
 .tui-performManageActivityList {
+  &__add {
+    text-align: right;
+  }
+
   &__table {
     padding-top: var(--gap-4);
   }

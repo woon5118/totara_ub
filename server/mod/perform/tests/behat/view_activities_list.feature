@@ -55,10 +55,10 @@ Feature: Manage performance activity page
 
     When I click on "Add activity" "button"
     Given I set the following fields to these values:
-      | Activity title | My Test Activity             |
+      | Title | My Test Activity             |
       | Description    | My Test Activity description |
-      | Activity type  | Feedback                     |
-    When I click on "Get started" "button"
+      | Type  | Feedback                     |
+    When I click on "Create" "button"
     And I navigate to the manage perform activities page
     Then I should see the tui datatable contains:
       | Name             | Type     | Status |

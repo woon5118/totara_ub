@@ -42,10 +42,10 @@ Feature: Checking access to performance activities in different situations
     And I should see "Add activity"
     When I click on "Add activity" "button"
     And I set the following fields to these values:
-      | Activity title | My Test Activity             |
+      | Title | My Test Activity             |
       | Description    | My Test Activity description |
-      | Activity type  | Feedback                     |
-    When I click on "Get started" "button"
+      | Type  | Feedback                     |
+    When I click on "Create" "button"
     Then the "Content" tui tab should be active
     And I should see "My Test Activity"
     When I click on "Back to all performance activities" "link"

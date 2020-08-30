@@ -15,11 +15,11 @@ Feature: Create and update activity general info fields
     And I navigate to the manage perform activities page
     And I click on "Add activity" "button"
     And I set the following fields to these values:
-      | Activity title | My Test Activity #3             |
+      | Title | My Test Activity #3             |
       | Description    | My Test Activity #3 description |
-      | Activity type  | Feedback                        |
+      | Type  | Feedback                        |
 
-    When I click on "Get started" "button"
+    When I click on "Create" "button"
     Then the "Content" tui tab should be active
 
     When I click on "General" "link"
@@ -40,9 +40,9 @@ Feature: Create and update activity general info fields
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "Add activity" "button"
-    And I set the field "Activity title" to "  "
-    And I set the field "Activity type" to "Feedback"
-    Then the "Get started" "button" should be disabled
+    And I set the field "Title" to "  "
+    And I set the field "Type" to "Feedback"
+    Then the "Create" "button" should be disabled
 
   Scenario: Edit the general info fields for an existing activity
     Given I log in as "admin"
@@ -120,11 +120,11 @@ Feature: Create and update activity general info fields
     And I navigate to the manage perform activities page
     And I click on "Add activity" "button"
     And I set the following fields to these values:
-      | Activity title | My Test Activity #3             |
+      | Title | My Test Activity #3             |
       | Description    | My Test Activity #3 description |
-      | Activity type  | Feedback                        |
+      | Type  | Feedback                        |
 
-    When I click on "Get started" "button"
+    When I click on "Create" "button"
     Then the "Content" tui tab should be active
 
     When I click on "General" "link"
