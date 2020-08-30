@@ -127,6 +127,97 @@ function js_write_cache_file_content($file, $content) {
 }
 
 /**
+ * Tell the browser that the JSON file they have in the cache is unmodified.
+ *
+ * @param int $lastmodified
+ * @param string $etag
+ */
+function json_send_unmodified(int $lastmodified, string $etag) {
+    // 7 days only, you should use etags and if-none-modified to serve stale caches to optimise longer.
+    $lifetime = 60 * 60 * 24 * 7;
+
+    header('HTTP/1.1 304 Not Modified');
+    header('Expires: '. gmdate('D, d M Y H:i:s', time() + $lifetime) .' GMT');
+    header('Cache-Control: public, max-age='.$lifetime);
+    header('Content-Type: application/json; charset=utf-8');
+    header('Etag: "'.$etag.'"');
+    header('Last-Modified: '. gmdate('D, d M Y H:i:s', $lastmodified) .' GMT');
+
+    die;
+}
+
+/**
+ * Sends JSON directly without caching it.
+ *
+ * @param string $content
+ * @param string $etag Optional etag to set when serving this uncached CSS.
+ */
+function json_send_uncached_content(string $content, string $etag) {
+    header('Etag: "'.$etag.'"');
+    header('Content-Disposition: inline; filename="json_debug.php"');
+    header('Last-Modified: '. gmdate('D, d M Y H:i:s', time()) .' GMT');
+    header('Expires: '. gmdate('D, d M Y H:i:s', time() + 10) .' GMT');
+    header('Pragma: ');
+    header('Accept-Ranges: none');
+    header('Content-Type: application/json; charset=utf-8');
+
+    echo $content;
+    die;
+}
+
+/**
+ * Sends the cached JSON file.
+ *
+ * @param string $absolute_path The path to the JSON file we want to serve.
+ * @param string|null $etag Etag to set when serving this uncached CSS.
+ */
+function json_send_cached(string $absolute_path, string $etag) {
+    // 7 days only, you should use etags and if-none-modified to serve stale caches to optimise longer.
+    $lifetime = 60 * 60 * 24 * 7;
+
+    header('Etag: "'.$etag.'"');
+    header('Content-Disposition: inline; filename="json.php"');
+    header('Last-Modified: '. gmdate('D, d M Y H:i:s', filemtime($absolute_path)) .' GMT');
+    header('Expires: '. gmdate('D, d M Y H:i:s', time() + $lifetime) .' GMT');
+    header('Pragma: ');
+    header('Cache-Control: public, max-age='.$lifetime.', immutable');
+    header('Accept-Ranges: none');
+    header('Content-Type: application/json; charset=utf-8');
+    if (!min_enable_zlib_compression()) {
+        header('Content-Length: '.filesize($absolute_path));
+    }
+
+    readfile($absolute_path);
+    die;
+}
+
+/**
+ * Sends cached JSON content.
+ *
+ * @param string $content The actual json to serve
+ * @param string $etag The revision to make sure we utilise any caches.
+ */
+function json_send_cached_content(string $content, string $etag) {
+    // 7 days only, you should use etags and if-none-modified to serve stale caches to optimise longer.
+    $lifetime = 60 * 60 * 24 * 7;
+
+    header('Etag: "'.$etag.'"');
+    header('Content-Disposition: inline; filename="json.php"');
+    header('Last-Modified: '. gmdate('D, d M Y H:i:s', time()) .' GMT');
+    header('Expires: '. gmdate('D, d M Y H:i:s', time() + $lifetime) .' GMT');
+    header('Pragma: ');
+    header('Cache-Control: public, max-age='.$lifetime.', immutable');
+    header('Accept-Ranges: none');
+    header('Content-Type: application/json; charset=utf-8');
+    if (!min_enable_zlib_compression()) {
+        header('Content-Length: '.strlen($content));
+    }
+
+    echo $content;
+    die;
+}
+
+/**
  * Create cache file for JS file in a path.
  * @param string $file full file path to cache file
  * @param string $absolute_path JS code

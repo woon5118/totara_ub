@@ -64,6 +64,7 @@ class totara_tui_requirement_local_scss_testcase extends advanced_testcase {
             'type' => 'totara_tui',
             'suffix' => bundle::get_css_suffix_for_url(),
             'direction' => $direction,
+            'tenant' => 'notenant',
         ];
         $options = ['theme' => $theme];
 
@@ -76,7 +77,7 @@ class totara_tui_requirement_local_scss_testcase extends advanced_testcase {
         $CFG->slasharguments = true;
 
         $url = new \moodle_url('/totara/tui/styles.php');
-        $url->set_slashargument('/' . $theme . '/' . bundle::get_css_rev() . '/' . bundle::get_css_suffix_for_url() . '/' . $direction . '/totara_tui');
+        $url->set_slashargument('/' . $theme . '/' . bundle::get_css_rev() . '/' . bundle::get_css_suffix_for_url() . '/' . $direction . '/totara_tui/notenant');
         $expected = $url->out(false);
         $actual = $requirement->get_url($options)->out(false);
         self::assertSame($expected, $actual);

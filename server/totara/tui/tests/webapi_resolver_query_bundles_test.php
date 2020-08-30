@@ -115,7 +115,7 @@ class totara_tui_webapi_resolver_query_bundles_testcase extends advanced_testcas
                         'component' => 'tui',
                         'name' => 'tui_bundle.scss',
                         'type' => 'css',
-                        'url' => 'https://www.example.com/moodle/totara/tui/styles.php/ventura/1/p/ltr/tui',
+                        'url' => 'https://www.example.com/moodle/totara/tui/styles.php/ventura/1/p/ltr/tui/notenant',
                     ],
                     [
                         'id' => 'tui_charts:tui_bundle.js',
@@ -129,7 +129,7 @@ class totara_tui_webapi_resolver_query_bundles_testcase extends advanced_testcas
                         'component' => 'tui_charts',
                         'name' => 'tui_bundle.scss',
                         'type' => 'css',
-                        'url' => 'https://www.example.com/moodle/totara/tui/styles.php/ventura/1/p/ltr/tui_charts',
+                        'url' => 'https://www.example.com/moodle/totara/tui/styles.php/ventura/1/p/ltr/tui_charts/notenant',
                     ],
                 ],
             ],

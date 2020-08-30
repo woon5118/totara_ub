@@ -64,8 +64,8 @@ class totara_tui_output_framework_test extends advanced_testcase {
             self::assertIsArray($urls);
             self::assertCount(2, $urls);
             /** @var moodle_url[] $urls */
-            self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/tui', $urls[0]->out_as_local_url());
-            self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/theme_ventura', $urls[1]->out_as_local_url());
+            self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/tui/notenant', $urls[0]->out_as_local_url());
+            self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/theme_ventura/notenant', $urls[1]->out_as_local_url());
         }
     }
 
@@ -98,8 +98,8 @@ class totara_tui_output_framework_test extends advanced_testcase {
             self::assertIsArray($urls);
             self::assertCount(2, $urls);
             /** @var moodle_url[] $urls */
-            self::assertSame('/totara/tui/styles.php/bananas/1/p/ltr/tui', $urls[0]->out_as_local_url());
-            self::assertSame('/totara/tui/styles.php/bananas/1/p/ltr/theme_bananas', $urls[1]->out_as_local_url());
+            self::assertSame('/totara/tui/styles.php/bananas/1/p/ltr/tui/notenant', $urls[0]->out_as_local_url());
+            self::assertSame('/totara/tui/styles.php/bananas/1/p/ltr/theme_bananas/notenant', $urls[1]->out_as_local_url());
         }
     }
 
@@ -119,8 +119,8 @@ class totara_tui_output_framework_test extends advanced_testcase {
 
         self::assertCount(5, $a);
         self::assertSame('a', $a[0]);
-        self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/tui', $a[1]->out_as_local_url());
-        self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/theme_ventura', $a[2]->out_as_local_url());
+        self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/tui/notenant', $a[1]->out_as_local_url());
+        self::assertSame('/totara/tui/styles.php/ventura/1/p/ltr/theme_ventura/notenant', $a[2]->out_as_local_url());
         self::assertSame('b/tui_scss', $a[3]);
         self::assertSame('c', $a[4]);
     }

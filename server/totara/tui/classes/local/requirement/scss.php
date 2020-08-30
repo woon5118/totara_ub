@@ -70,11 +70,13 @@ final class scss extends requirement {
      * @return moodle_url
      */
     private function make_tui_scss_url(string $component, string $theme): moodle_url {
-        global $CFG;
+        global $CFG, $USER;
 
         $rev = bundle::get_css_rev();
         $suffix = bundle::get_css_suffix_for_url();
         $direction = right_to_left() ? 'rtl' : 'ltr';
+        $tenant = (!isloggedin() || empty($USER->tenantid)) ? 0 : $USER->tenantid;
+        $tenant = ($tenant === 0) ? 'notenant' : 'tenant_' . $tenant;
 
         $arguments = [
             'theme' => $theme,
@@ -82,12 +84,13 @@ final class scss extends requirement {
             'type' => $component,
             'suffix' => $suffix,
             'direction' => $direction,
+            'tenant' => $tenant,
         ];
         if (empty($CFG->slasharguments)) {
             $url = new moodle_url('/totara/tui/styles.php', $arguments);
         } else {
             $url = new moodle_url('/totara/tui/styles.php');
-            $url->set_slashargument("/{$theme}/{$rev}/{$suffix}/{$direction}/{$component}", 'noparam', true);
+            $url->set_slashargument("/{$theme}/{$rev}/{$suffix}/{$direction}/{$component}/{$tenant}", 'noparam', true);
         }
         return $url;
     }

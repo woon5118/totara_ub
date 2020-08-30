@@ -93,6 +93,12 @@ final class bundle {
     private $map_bundle_dependencies = [];
 
     /**
+     * An array of bundle CSS variables json files. The key is the number name, the value is the absolute path to the file
+     * @var string[]
+     */
+    private $map_bundle_css_variables_json = [];
+
+    /**
      * A map of file suffixes to URL parameters used for the suffix, for caching.
      * @var string[]
      */
@@ -131,6 +137,16 @@ final class bundle {
      */
     public static function get_bundle_css_variables_file(string $bundle) {
         return self::instance()->resolve_style_import($bundle, '_variables.scss');
+    }
+
+    /**
+     * Given a bundle name return the json file that describes the CSS variables used by the bundle.
+     * If the bundle does not exist, or the bundle has no CSS variables then null is returned.
+     * @param string $bundle
+     * @return string|null
+     */
+    public static function get_bundle_css_json_variables_file(string $bundle): ?string {
+        return self::instance()->resolve_bundle_css_variables_json($bundle);
     }
 
     /**
@@ -256,6 +272,19 @@ final class bundle {
             if (isset($this->map_scss_imports[$bundle][$suffix][$importpath])) {
                 return $this->map_scss_imports[$bundle][$suffix][$importpath];
             }
+        }
+        return null;
+    }
+
+    /**
+     * Resolves the css_variables json file.
+     * @param string $bundle
+     * @return string|null The path to the variables JSON file, or null if the component does not have one.
+     */
+    private function resolve_bundle_css_variables_json(string $bundle): ?string {
+        $this->ensure_map_generated();
+        if (isset($this->map_bundle_css_variables_json[$bundle])) {
+            return $this->map_bundle_css_variables_json[$bundle];
         }
         return null;
     }
@@ -441,6 +470,7 @@ final class bundle {
             $this->map_bundle_js[$bundle] = $suffixes;
             $this->map_bundle_scss[$bundle] = $suffixes;
             $this->map_scss_imports[$bundle] = $suffixes_imports;
+            $this->map_bundle_css_variables_json[$bundle] = $directory->join($bundle, 'build', "css_variables.json")->out();
             $this->map_bundle_dependencies[$bundle] = [];
             $this->map_bundle($bundle);
         }

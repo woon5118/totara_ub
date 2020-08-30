@@ -50,6 +50,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'theme_ventura',
             $mode,
             ($rtl) ? 'rtl' : 'ltr',
+            0
         ]));
         return $etag;
     }
@@ -329,7 +330,8 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             $rev,
             'ventura',
             'theme_ventura',
-            $mode
+            $mode,
+            0
         );
 
         ob_start();
