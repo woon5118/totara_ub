@@ -344,6 +344,9 @@ class rb_source_perform_response extends rb_base_source {
     protected function define_contentoptions() {
         $contentoptions = [];
 
+        // Add the manager/position/organisation content options.
+        $this->add_basic_user_content_options($contentoptions, 'subject_user');
+
         return $contentoptions;
     }
 
