@@ -1596,6 +1596,7 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
          */
         init: function (formData) {
 
+            M.util.js_pending('totara-form-init');
             MODULE.debug('Initialising form #' + formData.id, Form, MODULE.LOGLEVEL.info);
 
             var formNode = $('#' + formData.id);
@@ -1657,6 +1658,8 @@ define(['jquery', 'core/config', 'core/templates', 'core/notification'], functio
                 working.resolve();
 
                 MODULE.debug('Initialised form #' + formData.id + '.', Form, MODULE.LOGLEVEL.success);
+
+                M.util.js_complete('totara-form-init');
             });
 
         },
