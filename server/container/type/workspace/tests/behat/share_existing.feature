@@ -115,6 +115,7 @@ Feature: Share existing items with workspace
 
     When I click the select all checkbox in the tui datatable
     And I confirm the tui confirmation modal
+    And I click on "Continue" "button"
     And I wait for the next second
 
     Then I should see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
