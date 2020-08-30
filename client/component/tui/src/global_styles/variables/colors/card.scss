@@ -14,7 +14,9 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-//
-// Card
-//
---card-border-color: var(--color-neutral-5);
+:root {
+  //
+  // Card
+  //
+  --card-border-color: var(--color-neutral-5);
+}

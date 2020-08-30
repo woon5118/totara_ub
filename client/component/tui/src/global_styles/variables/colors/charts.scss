@@ -14,7 +14,9 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-//
-// Charts
-//
---color-chart-doughnut-label: var(--color-neutral-7);
+:root {
+  //
+  // Charts
+  //
+  --color-chart-doughnut-label: var(--color-neutral-7);
+}

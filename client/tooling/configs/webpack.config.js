@@ -13,7 +13,7 @@
  * Please contact [licensing@totaralearning.com] for more information.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @module totara_core
+ * @module tui
  */
 
 require('../lib/environment_patch');
@@ -29,14 +29,15 @@ const tuiExternals = require('../webpack/tui_externals');
 const TuiAliasPlugin = require('../webpack/TuiAliasPlugin');
 const babelConfigs = require('./babel');
 const globSync = require('tiny-glob/sync');
+const cssVarExtract = require('./webpack/css_var_extract');
 
 let entryCache = null;
 const getEntry = () =>
   entryCache ? entryCache : (entryCache = scanEntry({ rootDir }));
 
-const isCoreBundleChunk = function (x) {
+const isCoreBundleChunk = function(x) {
   return x.name === 'tui' || x.name.startsWith('tui.');
-}
+};
 
 const separateNameAndSuffix = function(name) {
   let suffix = '';
@@ -47,9 +48,17 @@ const separateNameAndSuffix = function(name) {
   }
   return {
     name: name,
-    suffix: suffix
+    suffix: suffix,
   };
-}
+};
+
+const getTuiDirs = () => {
+  let entry = getEntry();
+  const tuiDirs = arrayUnique(
+    ...Object.values(entry).map(x => (Array.isArray(x) ? x : [x]))
+  ).map(x => path.dirname(x));
+  return tuiDirs;
+};
 
 /**
  * Create a webpack config with the specified options.
@@ -89,7 +98,7 @@ function createConfig({
   const plugins = [
     new VueLoaderPlugin(),
     new MiniCssExtractPlugin({
-      moduleFilename: function({name}) {
+      moduleFilename: function({ name }) {
         let bits = separateNameAndSuffix(name);
         name = bits.name + '/build/tui_bundle' + bits.suffix + '.scss';
         return name;
@@ -201,7 +210,9 @@ function createConfig({
         if (bundleChunk.name !== 'tui') {
           // '' or '.legacy' or '.development' or '.legacy.development'
           const index = bundleChunk.name.indexOf('.');
-          if (index === -1) throw new Error('Unexpected chunk name ' + bundleChunk.name);
+          if (index === -1) {
+            throw new Error('Unexpected chunk name ' + bundleChunk.name);
+          }
           vendorName = 'tui/build/vendors' + bundleChunk.name.slice(index);
         }
         return vendorName;
@@ -226,12 +237,12 @@ function createConfig({
 
     output: {
       path: path.resolve(rootDir, 'client/component'),
-      filename: (pathData) => {
+      filename: pathData => {
         let bits = separateNameAndSuffix(pathData.chunk.name);
         name = bits.name + '/build/tui_bundle' + bits.suffix + '.js';
         return name;
       },
-      chunkFilename: '[name].js'
+      chunkFilename: '[name].js',
     },
 
     resolve: {
@@ -289,10 +300,7 @@ function legacyConfig(opts) {
  * @return {object}
  */
 function scssToScssConfig({ mode, watch }) {
-  let entry = getEntry();
-  const tuiDirs = arrayUnique(
-    ...Object.values(entry).map(x => (Array.isArray(x) ? x : [x]))
-  ).map(x => path.dirname(x));
+  const tuiDirs = getTuiDirs();
 
   const scssEntry = tuiDirs.reduce((acc, dir) => {
     if (fs.existsSync(path.join(rootDir, dir, 'global_styles'))) {
@@ -302,7 +310,10 @@ function scssToScssConfig({ mode, watch }) {
           return;
         }
         const out = path.join(
-          dir.replace(/^\.[\/\\]client[\/\\]component[\/\\]([^\/\\]+)[\/\\]src/, './client/component/$1/build'),
+          dir.replace(
+            /^\.[\/\\]client[\/\\]component[\/\\]([^\/\\]+)[\/\\]src/,
+            './client/component/$1/build'
+          ),
           'global_styles',
           x.slice('global_styles/'.length).replace(/\.scss$/, '')
         );
@@ -374,6 +385,7 @@ module.exports = function(opts) {
     modernConfig(opts),
     legacyConfig(opts),
     scssToScssConfig(opts),
+    cssVarExtract(opts, { getTuiDirs }),
   ];
   return configs.filter(Boolean);
 };

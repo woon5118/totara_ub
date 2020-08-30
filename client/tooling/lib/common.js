@@ -21,9 +21,14 @@ const minimatch = require('minimatch');
 const execFileSync = require('child_process').execFileSync;
 
 /**
- * @var {string} rootDir Root directory of Totara installation.
+ * @var {string} rootDir Root directory of Totara repository.
  */
 const rootDir = path.join(__dirname, '../../../');
+
+/**
+ * @var {string} clientDir "client" directory.
+ */
+const clientDir = path.join(__dirname, '../../');
 
 /**
  * Execute a command.
@@ -122,6 +127,7 @@ function escapeRegExp(s) {
 
 module.exports = {
   rootDir,
+  clientDir,
   listChangedFiles,
   filterByGlobs,
   arrayUnique,

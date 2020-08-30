@@ -14,5 +14,7 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-// Avatar
---avatar-border-color: var(--color-primary);
+:root {
+  // Avatar
+  --avatar-border-color: var(--color-primary);
+}

@@ -111,42 +111,50 @@
   --color-text: var(--color-neutral-7);
   --color-text-disabled: var(--color-neutral-5);
   --color-text-hint: var(--color-neutral-6);
+  --link-color: var(--color-state);
+  --link-color-hover: var(--color-state-hover);
 
   // Backdrops
   --color-backdrop-standard: rgba(0, 0, 0, 0.4);
   --color-backdrop-heavy: rgba(0, 0, 0, 0.8);
   --color-backdrop-contrast: var(--color-neutral-1);
 
-  // Arrows
-  @import 'tui/variables/colors/arrow';
-  // Forms
-  @import 'tui/variables/colors/forms';
-  // Avatar
-  @import 'tui/variables/colors/avatar';
-  // Drop down
-  @import 'tui/variables/colors/dropdown';
-  // Data table
-  @import 'tui/variables/colors/datatable';
-  // Tabs
-  @import 'tui/variables/colors/tabs';
-  // Card
-  @import 'tui/variables/colors/card';
-  // Charts
-  @import 'tui/variables/colors/charts';
-  // Filters
-  @import 'tui/variables/colors/filters';
-  // Tags
-  @import 'tui/variables/colors/tags';
-  // Tags
-  @import 'tui/variables/colors/progressbar';
-  // collapsible
-  @import 'tui/variables/colors/collapsible';
-  // progress tracker
-  @import 'tui/variables/colors/progresstracker';
-  // Side panel navigation
-  @import 'tui/variables/colors/side_panel_nav';
-  // Toggle buttons
-  @import 'tui/variables/colors/toggle';
-  // Notification toast
-  @import 'tui/variables/colors/notificationtoast';
+  //
+  // Header colors
+  //
+  --nav-bg-color: #fff;
+  --nav-text-color: var(--color-text);
 }
+
+// Arrows
+@import 'tui/variables/colors/arrow';
+// Forms
+@import 'tui/variables/colors/forms';
+// Avatar
+@import 'tui/variables/colors/avatar';
+// Drop down
+@import 'tui/variables/colors/dropdown';
+// Data table
+@import 'tui/variables/colors/datatable';
+// Tabs
+@import 'tui/variables/colors/tabs';
+// Card
+@import 'tui/variables/colors/card';
+// Charts
+@import 'tui/variables/colors/charts';
+// Filters
+@import 'tui/variables/colors/filters';
+// Tags
+@import 'tui/variables/colors/tags';
+// Tags
+@import 'tui/variables/colors/progressbar';
+// collapsible
+@import 'tui/variables/colors/collapsible';
+// progress tracker
+@import 'tui/variables/colors/progresstracker';
+// Side panel navigation
+@import 'tui/variables/colors/side_panel_nav';
+// Toggle buttons
+@import 'tui/variables/colors/toggle';
+// Notification toast
+@import 'tui/variables/colors/notificationtoast';

@@ -14,6 +14,8 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-// CSS collapsable
---collapsible-header-bg-color: var(--color-neutral-3);
---collapsible-header-border-color: var(--color-neutral-3);
+:root {
+  // CSS collapsable
+  --collapsible-header-bg-color: var(--color-neutral-3);
+  --collapsible-header-border-color: var(--color-neutral-3);
+}

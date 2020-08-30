@@ -14,13 +14,15 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-// Drop down
---dropdown-item-bg-color-hover: var(--color-neutral-3);
---dropdown-item-bg-color-focus: var(--color-neutral-4);
---dropdown-item-bg-color-disabled-focus: var(--color-neutral-2);
---dropdown-item-text-color: var(--color-text);
---dropdown-item-text-color-hover: var(--color-text);
---dropdown-item-text-color-focus: var(--color-text);
---dropdown-item-text-color-disabled: var(--color-text-disabled);
---dropdown-menu-bg-color: var(--color-background);
---dropdown-menu-border-color: var(--color-neutral-5);
+:root {
+  // Drop down
+  --dropdown-item-bg-color-hover: var(--color-neutral-3);
+  --dropdown-item-bg-color-focus: var(--color-neutral-4);
+  --dropdown-item-bg-color-disabled-focus: var(--color-neutral-2);
+  --dropdown-item-text-color: var(--color-text);
+  --dropdown-item-text-color-hover: var(--color-text);
+  --dropdown-item-text-color-focus: var(--color-text);
+  --dropdown-item-text-color-disabled: var(--color-text-disabled);
+  --dropdown-menu-bg-color: var(--color-background);
+  --dropdown-menu-border-color: var(--color-neutral-5);
+}

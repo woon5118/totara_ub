@@ -14,8 +14,10 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-// CSS arrows
---progresstracker-color-achieved: var(--color-tertiary);
---progresstracker-color-complete: var(--color-prompt-warning);
---progresstracker-color-pending: var(--color-neutral-6);
---progresstracker-container-bg-color: var(--color-neutral-1);
+:root {
+  // CSS arrows
+  --progresstracker-color-achieved: var(--color-tertiary);
+  --progresstracker-color-complete: var(--color-prompt-warning);
+  --progresstracker-color-pending: var(--color-neutral-6);
+  --progresstracker-container-bg-color: var(--color-neutral-1);
+}

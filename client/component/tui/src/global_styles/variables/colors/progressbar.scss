@@ -14,11 +14,13 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-//
-// Progress
-//
---progress-value-bg-color: var(--color-secondary);
---progress-container-bg-color: var(--color-neutral-4);
---progress-border-color: var(--color-neutral-1);
---progress-container-text-color: var(--color-neutral-7);
---progress-value-text-color: var(--color-neutral-1);
+:root {
+  //
+  // Progress
+  //
+  --progress-value-bg-color: var(--color-secondary);
+  --progress-container-bg-color: var(--color-neutral-4);
+  --progress-border-color: var(--color-neutral-1);
+  --progress-container-text-color: var(--color-neutral-7);
+  --progress-value-text-color: var(--color-neutral-1);
+}

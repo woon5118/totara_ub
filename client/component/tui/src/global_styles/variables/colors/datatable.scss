@@ -14,21 +14,23 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-//
-// Data table
-//
---datatable-bg-archived: var(--color-neutral-2);
---datatable-cell-header-text-color: var(--color-neutral-7);
-// Expanded styles
---datatable-expanded-bg-color: var(--color-neutral-1);
---datatable-expanded-border-color: var(--color-neutral-5);
---datatable-expanded-text-color: var(--color-neutral-7);
-// Row styles
---datatable-row-bg-color: transparent;
---datatable-row-bg-color-active: var(--color-neutral-3);
---datatable-row-bg-color-focus: var(--color-state-highlight);
---datatable-row-bg-color-odd: var(--color-neutral-2);
---datatable-row-border-color: var(--color-neutral-5);
---datatable-row-first-border-color: var(--color-neutral-7);
-// Select all prompt
---datatable-select-everything-prompt-bg: var(--color-neutral-2);
+:root {
+  //
+  // Data table
+  //
+  --datatable-bg-archived: var(--color-neutral-2);
+  --datatable-cell-header-text-color: var(--color-neutral-7);
+  // Expanded styles
+  --datatable-expanded-bg-color: var(--color-neutral-1);
+  --datatable-expanded-border-color: var(--color-neutral-5);
+  --datatable-expanded-text-color: var(--color-neutral-7);
+  // Row styles
+  --datatable-row-bg-color: transparent;
+  --datatable-row-bg-color-active: var(--color-neutral-3);
+  --datatable-row-bg-color-focus: var(--color-state-highlight);
+  --datatable-row-bg-color-odd: var(--color-neutral-2);
+  --datatable-row-border-color: var(--color-neutral-5);
+  --datatable-row-first-border-color: var(--color-neutral-7);
+  // Select all prompt
+  --datatable-select-everything-prompt-bg: var(--color-neutral-2);
+}

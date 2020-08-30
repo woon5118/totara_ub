@@ -14,10 +14,12 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-//
-// Tag
-//
---tag-bg-color: var(--color-neutral-2);
---tag-border-color: var(--color-neutral-5);
---tag-active-color: var(--color-state);
---tag-button-color: var(--color-neutral-7);
+:root {
+  //
+  // Tag
+  //
+  --tag-bg-color: var(--color-neutral-2);
+  --tag-border-color: var(--color-neutral-5);
+  --tag-active-color: var(--color-state);
+  --tag-button-color: var(--color-neutral-7);
+}

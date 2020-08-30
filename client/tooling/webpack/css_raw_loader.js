@@ -75,6 +75,7 @@ module.exports = function(content) {
     null,
     `module.exports = [[module.id, ${JSON.stringify(
       content
-    )}, "", ${JSON.stringify(map)}]];`
+    )}, "", ${JSON.stringify(map)}]];
+module.exports.toString = function() { return module.exports[0][1]; }`
   );
 };

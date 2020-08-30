@@ -14,6 +14,8 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-// CSS arrows
---arrow-bg-color: var(--color-background);
---arrow-border-color: var(--color-neutral-5);
+:root {
+  // CSS arrows
+  --arrow-bg-color: var(--color-background);
+  --arrow-border-color: var(--color-neutral-5);
+}

@@ -14,8 +14,10 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-//
-// Filters
-//
---filter-bar-border-color: var(--color-neutral-5);
---filter-search-icon-color: var(--color-neutral-6);
+:root {
+  //
+  // Filters
+  //
+  --filter-bar-border-color: var(--color-neutral-5);
+  --filter-search-icon-color: var(--color-neutral-6);
+}

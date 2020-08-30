@@ -14,21 +14,23 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   tui
 
-//
-// Tabs
-//
---tabs-bg-color: var(--color-neutral-3);
---tabs-bg-color-selected: var(--color-neutral-1);
---tabs-bg-color-disabled: var(--color-neutral-3);
---tabs-bg-color-focus: var(--color-neutral-3);
---tabs-selected-bar-color: var(--color-primary);
+:root {
+  //
+  // Tabs
+  //
+  --tabs-bg-color: var(--color-neutral-3);
+  --tabs-bg-color-selected: var(--color-neutral-1);
+  --tabs-bg-color-disabled: var(--color-neutral-3);
+  --tabs-bg-color-focus: var(--color-neutral-3);
+  --tabs-selected-bar-color: var(--color-primary);
 
---tabs-text-color: var(--color-state);
---tabs-text-color-active: var(--color-state-active);
---tabs-text-color-disabled: var(--color-state-disabled);
---tabs-text-color-focus: var(--color-state-focus);
---tabs-text-color-selected: var(--color-neutral-7);
+  --tabs-text-color: var(--color-state);
+  --tabs-text-color-active: var(--color-state-active);
+  --tabs-text-color-disabled: var(--color-state-disabled);
+  --tabs-text-color-focus: var(--color-state-focus);
+  --tabs-text-color-selected: var(--color-neutral-7);
 
---tabs-border-color: var(--color-neutral-5);
---tabs-border-color-selected: var(--color-neutral-1);
---tabs-border-color-disabled: var(--color-neutral-4);
+  --tabs-border-color: var(--color-neutral-5);
+  --tabs-border-color-selected: var(--color-neutral-1);
+  --tabs-border-color-disabled: var(--color-neutral-4);
+}
