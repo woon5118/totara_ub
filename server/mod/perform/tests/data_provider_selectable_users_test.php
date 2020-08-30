@@ -38,6 +38,8 @@ use mod_perform\util;
 class mod_perform_data_provider_selectable_users_testcase extends advanced_testcase {
 
     public function test_get_users() {
+        $this->setAdminUser();
+
         $generator = $this->getDataGenerator();
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $generator->get_plugin_generator('mod_perform');

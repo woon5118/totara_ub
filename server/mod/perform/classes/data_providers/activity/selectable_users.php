@@ -56,15 +56,35 @@ class selectable_users extends provider {
      * @inheritDoc
      */
     protected function build_query(): repository {
+        global $USER;
+
+        $reference_context = null;
+        $activity_context = $this->subject_instance->get_context();
+        $viewing_user_context = context_user::instance($USER->id);
+        $subject_user_context = context_user::instance($this->subject_instance->subject_user_id);
+        if ($activity_context->tenantid) {
+            // We only show users to the selector who are participants of the tenant the activity is in,
+            // regardless whether the selector or the subject are participants of the tenant of the activity.
+            $reference_context = $activity_context;
+        } else if ($subject_user_context->tenantid) {
+            // We base the user list on the tenant the subject is in, means the selector only sees
+            // users who are in the same tenant as the subject, regardless whether they are a participant of the tenant or not.
+            $reference_context = $subject_user_context;
+        } else if ($viewing_user_context->tenantid) {
+            // We base the user list on the tenant the selector is in, means the selector only sees users
+            // who are participants in the same tenant as themselves
+            $reference_context = $viewing_user_context;
+        }
+
         $repository = user::repository()
             ->filter_by_not_guest()
             ->filter_by_not_deleted()
             ->filter_by_not_suspended()
-            ->when(true, function (repository $repository) {
+            ->when(!empty($reference_context), function (repository $repository) use ($reference_context) {
                 tenant_orm_helper::restrict_users(
                     $repository,
                     new field('id', $repository->get_builder()),
-                    context_user::instance($this->subject_instance->subject_user_id)
+                    $reference_context
                 );
             })
             ->order_by_full_name();
