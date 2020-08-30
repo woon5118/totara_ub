@@ -37,6 +37,7 @@ $string['edit_link'] = 'Edit link';
 $string['embedded_media'] = 'Embedded media';
 $string['error_failed_to_execute'] = 'Failed to execute editor command.';
 $string['error_failed_to_initialise'] = 'Failed to initialise Weka editor.';
+$string['error_mobile_friendly_conversion'] = 'Please check mobile-friendly content and save when ready';
 $string['error_textarea_not_found'] = 'Failed to initialise Weka editor. The textarea was not found.';
 $string['error_no_url_info'] = 'This URL does not have enough information available.';
 $string['error_upload_failed'] = 'Upload failed.';

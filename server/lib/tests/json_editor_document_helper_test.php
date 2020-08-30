@@ -313,4 +313,21 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
             $text['text']
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_looks_like_json(): void {
+        $tests = [
+            '<div><p>HTML is your<br>friend!</p></div>' => false,
+            'I wonder <a href="#doc">what I am</a>?' => false,
+            'Too many cooks spoils the broth.' => false,
+            '{}' => true,
+            ' {"space": "is hard"} ' => true,
+            '' => false
+        ];
+        foreach ($tests as $test => $expected) {
+            $this->assertEquals($expected, document_helper::looks_like_json($test));
+        }
+    }
 }

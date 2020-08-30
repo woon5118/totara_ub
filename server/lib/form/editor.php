@@ -335,6 +335,14 @@ class MoodleQuickForm_editor extends HTML_QuickForm_element implements templatab
             $formats[$fid] = $strformats[$fid];
         }
 
+        // Totara: allow conversion to JSON if Weka is enabled
+        if ($format == FORMAT_HTML && in_array('weka', array_keys(editors_get_enabled()))) {
+            $formats[FORMAT_JSON_EDITOR] = get_string('mobile_friendly_format', 'core_editor');
+        } else if ($format == FORMAT_JSON_EDITOR && !\core\json_editor\helper\document_helper::looks_like_json($text) && in_array('weka', array_keys(editors_get_enabled()))) {
+            $formats[FORMAT_JSON_EDITOR] = get_string('mobile_friendly_format', 'core_editor');
+            $formats[FORMAT_HTML] = get_string('formathtml');
+        }
+
         // get filepicker info
         //
         $fpoptions = array();
@@ -485,7 +493,11 @@ class MoodleQuickForm_editor extends HTML_QuickForm_element implements templatab
             case FORMAT_JSON_EDITOR:
                 // Check if we have valid json.
                 if (!\core\json_editor\helper\document_helper::is_valid_json_document($value['text'])) {
-                    return get_string('err_json_editor', 'form');
+                    if (\core\json_editor\helper\document_helper::looks_like_json($value['text'])) {
+                        return get_string('err_json_editor', 'form');
+                    } else {
+                        return get_string('error_mobile_friendly_conversion', 'core_editor');
+                    }
                 }
                 break;
         }
@@ -518,7 +530,9 @@ class MoodleQuickForm_editor extends HTML_QuickForm_element implements templatab
         $format = $this->getFormat();
         switch ($format) {
             case FORMAT_JSON_EDITOR:
-                $text = \core\json_editor\helper\document_helper::clean_json_document($text);
+                if (\core\json_editor\helper\document_helper::looks_like_json($text)) {
+                    $text = \core\json_editor\helper\document_helper::clean_json_document($text);
+                }
                 break;
         }
         return $text;

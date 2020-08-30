@@ -223,10 +223,20 @@ final class weka_texteditor extends texteditor {
             $options = [];
         }
 
-        // Cleaning text on the way out - this is only happening for json_editor content.
-        // If your content is not a json_editor compatible - empty string will be given.
-        if (!empty($options['noclean']) && !empty($this->text)) {
+        // Cleaning text on the way out.
+        // If your content is JSON but not a json_editor compatible - empty string will be given.
+        // Any other content is probably HTML for conversion by the editor.
+        if (!empty($options['noclean']) && !empty($this->text) && document_helper::looks_like_json($this->text)) {
             $this->text = document_helper::sanitize_json_document($this->text);
+        }
+        if (!empty($options['noclean']) && !empty($this->text)) {
+            if (document_helper::looks_like_json($this->text)) {
+                $this->text = document_helper::sanitize_json_document($this->text);
+            } else {
+                // Strip out anything dodgy before passing to the editor.
+                // This doesn't need to be fancy; markup for conversion should be simple and XSS-free.
+                $this->text = clean_text($this->text);
+            }
         }
 
         // Start finding the draft_item_id within file picker options.

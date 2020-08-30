@@ -97,6 +97,10 @@ final class document_helper {
             return false;
         }
 
+        if (!self::looks_like_json($json_document)) {
+            return false;
+        }
+
         $document = self::parse_document($json_document);
         if (empty($document)) {
             debugging("Cannot decode the json document as it is invalid json", DEBUG_DEVELOPER);
@@ -332,5 +336,16 @@ final class document_helper {
         $document['content'] = node_helper::sanitize_raw_nodes($block_nodes);
 
         return $document;
+    }
+
+    /**
+     * Detect whether a document is likely to be JSON
+     *
+     * @param string $document
+     * @return bool
+     */
+    public static function looks_like_json(string $document): bool {
+        $document = trim($document);
+        return (substr($document, 0, 1) == '{' && substr($document, -1) == '}');
     }
 }
