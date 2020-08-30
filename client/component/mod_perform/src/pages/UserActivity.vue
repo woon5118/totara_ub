@@ -47,6 +47,7 @@
         :participant-section-id="participantSectionId"
         :subject-user="subjectInstance.subject_user"
         :token="token"
+        :job-assignments="subjectInstance.static_instances"
       />
     </Loader>
   </div>
@@ -101,7 +102,6 @@ export default {
 
   data() {
     return {
-      hasLoaded: false,
       userActivity: null,
       subjectInstance: null,
     };
@@ -124,8 +124,6 @@ export default {
         };
       },
       update(data) {
-        this.hasLoaded = true;
-
         return this.isExternalParticipant
           ? data['mod_perform_subject_instance_for_external_participant']
           : data['mod_perform_subject_instance_for_participant'];

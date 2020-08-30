@@ -163,13 +163,12 @@
                       :current-user-is-subject="currentUserIsSubject"
                       :visible-to-relationships="responsesAreVisibleTo"
                       :activity="activity"
-                      :participant-section="activeParticipantSection"
                     />
                     <div
                       class="tui-participantContent__sectionHeading-otherResponseSwitch"
                     >
                       <ToggleSwitch
-                        v-if="hasOtherResponse && participantCanAnswer"
+                        v-if="hasOtherResponse"
                         v-model="showOtherResponse"
                         :text="
                           $str(
@@ -228,9 +227,7 @@
                     <div class="tui-participantContent__sectionItem-content">
                       <ElementParticipantForm
                         v-if="
-                          sectionElement.is_respondable &&
-                            participantCanAnswer &&
-                            !viewOnlyReportMode
+                          sectionElement.is_respondable && !viewOnlyReportMode
                         "
                       >
                         <template v-slot:content>
@@ -261,11 +258,7 @@
               </div>
 
               <ButtonGroup
-                v-if="
-                  !activeSectionIsClosed &&
-                    participantCanAnswer &&
-                    !viewOnlyReportMode
-                "
+                v-if="!activeSectionIsClosed && !viewOnlyReportMode"
                 class="tui-participantContent__buttons"
               >
                 <ButtonSubmit @click="fullSubmit(getSubmitting)" />
@@ -284,13 +277,7 @@
               </ButtonGroup>
 
               <div class="tui-participantContent__navigation">
-                <Grid
-                  v-if="
-                    activeSectionIsClosed ||
-                      !participantCanAnswer ||
-                      viewOnlyReportMode
-                  "
-                >
+                <Grid v-if="activeSectionIsClosed || viewOnlyReportMode">
                   <GridItem :units="6">
                     <Button
                       v-if="previousNavSectionModel"
@@ -572,10 +559,6 @@ export default {
       return Boolean(this.subjectInstanceId);
     },
 
-    participantCanAnswer() {
-      return this.activeParticipantSection.can_answer;
-    },
-
     /**
      * Checks draft savings is available
      *
@@ -854,7 +837,7 @@ export default {
           };
         });
 
-        if (this.viewOnlyReportMode || !this.participantCanAnswer) {
+        if (this.viewOnlyReportMode) {
           this.showOtherResponse = true;
           return;
         }
@@ -1138,8 +1121,7 @@ export default {
         // handle initValue is null, but formValue is empty string or array
         // convert empty formValue to null, then we can compare the difference
         let isEmptyForm =
-          formValue === null || !Object.values(formValue)[0] || Object.values(formValue)[0].length === 0;
-
+          formValue === null || Object.values(formValue)[0].length === 0;
         if (isEmptyForm) {
           formValue = null;
         }
