@@ -14,10 +14,8 @@ Feature: Test Goals menu item
   Scenario: Make sure Goals is available in totara menu even if everything else is disabled in Appraisals
     Given I am on a totara site
     And I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Legacy Appraisals" to "Disable"
-    And I set the field "Enable Legacy 360 Feedback" to "Disable"
-    And I press "Save changes"
+    And I disable the "appraisals" advanced feature
+    And I disable the "feedback360" advanced feature
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Goals" in the "#totaramenutable" "css_element"
     And I should see "Goals" in the totara menu
@@ -25,9 +23,7 @@ Feature: Test Goals menu item
   Scenario: Make sure Goals is not in totara menu if feature disabled
     Given I am on a totara site
     And I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Goals" to "Disable"
-    And I press "Save changes"
+    And I disable the "goals" advanced feature
     And I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Goals" in the "#totaramenutable" "css_element"
     And I should see "Feature disabled" in the "Goals" "table_row"
