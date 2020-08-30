@@ -45,9 +45,7 @@ import 'chartjs-plugin-doughnutlabel';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-Chart.defaults.global.defaultColor = theme.getVar(
-  'color-chart-background-1'
-);
+Chart.defaults.global.defaultColor = theme.getVar('color-chart-background-1');
 Chart.defaults.global.defaultFontSize = parseInt(
   theme.getVar('font-size-chart-default')
 );

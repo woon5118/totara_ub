@@ -26,11 +26,9 @@
 
   // Input box-shadows
   --form-input-shadow-focus: 0 0 3px 0 var(--color-state);
-  --form-input-shadow-invalid: 0 0 0
-    var(--form-input-invalid-shadow-size)
+  --form-input-shadow-invalid: 0 0 0 var(--form-input-invalid-shadow-size)
     var(--form-input-border-color-invalid);
-  --form-input-shadow-invalid-focus: 0 0 0
-      var(--form-input-invalid-shadow-size)
+  --form-input-shadow-invalid-focus: 0 0 0 var(--form-input-invalid-shadow-size)
       var(--form-input-border-color-invalid),
     0 0 3px var(--form-input-invalid-shadow-size)
       var(--form-input-border-color-invalid);

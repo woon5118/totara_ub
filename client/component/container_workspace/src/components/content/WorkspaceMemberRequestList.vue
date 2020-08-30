@@ -174,8 +174,7 @@ export default {
     &__card {
       padding: var(--gap-2) 0;
       &:not(:last-child) {
-        border-bottom: var(--border-width-thin) solid
-          var(--color-neutral-5);
+        border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
       }
     }
   }
