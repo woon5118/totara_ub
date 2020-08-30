@@ -3980,11 +3980,18 @@ EOD;
      * @return string
      */
     public function render_login(\core_auth\output\login $form) {
+        global $PAGE;
         $context = $form->export_for_template($this);
+        $image = new \core\theme\file\login_image($PAGE->theme);
+        $image->set_context(\context_system::instance());
 
         // Override because rendering is not supported in template yet.
         $context->cookieshelpiconformatted = $this->help_icon('cookiesenabled');
         $context->errorformatted = $this->error_text($context->error);
+        if ($image->show_image()) {
+            $context->hero_image = $image->get_current_or_default_url();
+            $context->hero_alt = $image->get_alt_text();
+        }
 
         return $this->render_from_template('core/login', $context);
     }
