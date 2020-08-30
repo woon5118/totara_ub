@@ -22,6 +22,7 @@
  */
 namespace engage_article\totara_engage\card;
 
+use engage_article\theme\file\article_image;
 use engage_article\totara_engage\resource\article;
 use totara_comment\loader\comment_loader;
 use totara_engage\card\card;
@@ -42,10 +43,14 @@ final class article_card extends card {
      * @return array
      */
     public function get_extra_data(): array {
-        global $OUTPUT, $PAGE;
+        global $PAGE;
+
+        // Get default image.
+        $article_image = new article_image();
+        $default_image = $article_image->get_default_url()->out();
 
         $extra_data = [
-            'image' => $OUTPUT->image_url("default", 'engage_article')->out(),
+            'image' => $default_image,
             'usage' => article::get_resource_usage($this->instanceid),
             'timeview'=> null,
         ];
@@ -60,7 +65,7 @@ final class article_card extends card {
             $image = new \moodle_url($extra['image'], ['preview' => 'engage_article_resource', 'theme' => $PAGE->theme->name]);
             $extra_data['image'] = $image->out(false);
         } else {
-            $extra_data['image'] = $OUTPUT->image_url("default", 'engage_article')->out();
+            $extra_data['image'] = $default_image;
         }
 
         return $extra_data;

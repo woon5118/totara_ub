@@ -2173,7 +2173,7 @@ class core_renderer extends renderer_base {
             if (!empty($user->imagealt)) {
                 $alt = $user->imagealt;
             } else if (!$userpicture->visibletoscreenreaders) {
-                $alt = '';    
+                $alt = '';
             } else {
                 $alt = fullname($user);
             }
@@ -2185,7 +2185,7 @@ class core_renderer extends renderer_base {
             if (!empty($user->imagetitle)) {
                 $title = $user->imagetitle;
             } else if (!$userpicture->visibletoscreenreaders) {
-                $title = '';   
+                $title = '';
             } else {
                 $title = fullname($user);
             }

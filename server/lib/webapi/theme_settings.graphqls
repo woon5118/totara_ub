@@ -1,0 +1,105 @@
+"""
+Totara product flavours enabled.
+"""
+type core_theme_flavours {
+    engage: Boolean!
+    learn: Boolean!
+    perform: Boolean!
+}
+
+"""
+Enum defining the valid property types.
+"""
+enum core_theme_property_type {
+    boolean
+    file
+    image
+    text
+    value
+}
+
+"""
+CSS property.
+"""
+type core_theme_property {
+    name: String!
+    type: core_theme_property_type!
+    value: String!
+}
+
+"""
+Category representing a bunch of properties.
+"""
+type core_theme_category {
+    name: String!
+    properties: [core_theme_property!]!
+}
+
+"""
+File that can be set in theme settings.
+"""
+type core_theme_file {
+    ui_key: String!
+    type: core_file_type!
+    default_url: String
+    current_url: String
+    file_area: core_file_area!
+}
+
+"""
+Qeury result object for theme settings.
+"""
+type core_theme_settings_result {
+    theme_chain: [String!]!
+    categories: [core_theme_category!]!
+    files: [core_theme_file!]!
+    flavours: core_theme_flavours!
+}
+
+extend type Query {
+    """
+    Query to get settings for specific theme.
+    """
+    core_get_theme_settings(
+        theme: param_component!
+        tenant_id: core_id
+        draft_id: Int
+    ): core_theme_settings_result!
+}
+
+"""
+Input type for properties.
+"""
+input core_theme_property_input {
+    name: param_alphanumext!
+    type: core_theme_property_type!
+    value: String!
+}
+
+"""
+Input type for categories.
+"""
+input core_theme_category_input {
+    name: param_alphanumext!
+    properties: [core_theme_property_input!]!
+}
+
+"""
+File input type.
+"""
+input core_theme_file_input {
+    ui_key: param_alphanumext!
+    draft_id: Int!
+}
+
+extend type Mutation {
+    """
+    Update settings for specific theme.
+    """
+    core_update_theme_settings(
+        theme: param_component!
+        tenant_id: core_id
+        categories: [core_theme_category_input!]!
+        files: [core_theme_file_input!]!
+    ): core_theme_settings_result!
+}

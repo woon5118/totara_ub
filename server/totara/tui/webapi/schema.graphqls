@@ -17,4 +17,9 @@ extend type Query {
     components: [String!]!
     theme: param_theme!
   ): [totara_tui_bundle!]!
+
+  """
+  Query to retrieve all themes that defines css variables.
+  """
+  totara_tui_themes_with_variables(theme: param_alphaext!): [String!]!
 }

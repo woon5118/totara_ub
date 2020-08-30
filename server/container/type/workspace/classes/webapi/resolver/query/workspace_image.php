@@ -22,10 +22,12 @@
  */
 namespace container_workspace\webapi\resolver\query;
 
+use core\files\file_helper;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use core_container\factory;
 use container_workspace\workspace;
+use container_workspace\theme\file\workspace_image as workspace_image_file;
 use totara_core\advanced_feature;
 
 /**
@@ -40,52 +42,25 @@ final class workspace_image implements query_resolver {
      * @return string
      */
     public static function resolve(array $args, execution_context $ec): string {
-        global $CFG, $OUTPUT;
         require_login();
         advanced_feature::require('container_workspace');
 
         if (empty($args['workspace_id'])) {
-            return $OUTPUT->image_url("default_space", 'container_workspace')->out();
-        }
-
-        require_once("{$CFG->dirroot}/lib/filelib.php");
-        $workspace = factory::from_id($args['workspace_id']);
-
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Cannot fetch image of a container that is not a workspace");
-        }
-
-        $context = $workspace->get_context();
-        $fs = get_file_storage();
-
-        $files = $fs->get_area_files(
-            $context->id,
-            'container_workspace',
-            workspace::IMAGE_AREA,
-            0
-        );
-
-        $files = array_filter(
-            $files,
-            function (\stored_file $file): bool {
-                return !$file->is_directory() && $file->is_valid_image();
+            $workspace_image = new workspace_image_file();
+            $url = $workspace_image->get_current_or_default_url();
+        } else {
+            $workspace = factory::from_id($args['workspace_id']);
+            if (!$workspace->is_typeof(workspace::get_type())) {
+                throw new \coding_exception("Cannot fetch image of a container that is not a workspace");
             }
-        );
 
-        if (empty($files)) {
-            return $OUTPUT->image_url("default_space", 'container_workspace')->out();
+            $file_helper = new file_helper(
+                workspace::get_type(),
+                workspace::IMAGE_AREA,
+                $workspace->get_context()
+            );
+            $url = $file_helper->get_file_url();
         }
-
-        /** @var \stored_file $file */
-        $file = reset($files);
-        $url = \moodle_url::make_pluginfile_url(
-            $context->id,
-            'container_workspace',
-            workspace::IMAGE_AREA,
-            0,
-            '/',
-            $file->get_filename()
-        );
 
         return $url->out();
     }

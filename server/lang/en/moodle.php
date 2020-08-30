@@ -77,6 +77,7 @@ $string['addstudent'] = 'Add learner';
 $string['addsubcategory'] = 'Add a subcategory';
 $string['addteacher'] = 'Add trainer';
 $string['admin'] = 'Admin';
+$string['adminaccessrequired'] = 'Administrator access required';
 $string['adminhelpaddnewuser'] = 'To manually create a new user account';
 $string['adminhelpassignadmins'] = 'Admins can do anything and go anywhere in the site';
 $string['adminhelpassigncreators'] = 'Course creators can create new courses';

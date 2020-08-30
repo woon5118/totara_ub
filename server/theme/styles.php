@@ -45,14 +45,18 @@ if ($slashargument = min_get_slash_argument()) {
     }
 
     // Totara: Removed chunking support as it's not used by currently supported browsers
-
     // Totara: Rewrote slash argument handling to be more robust
+    // Totara: themename/rev/type/tenant(/rtl)?(/legacy)?
     $slashargument_parts = explode('/', $slashargument);
     $themename = min_clean_param(array_shift($slashargument_parts), 'SAFEDIR');
     $rev = min_clean_param(array_shift($slashargument_parts), 'INT');
     $type = min_clean_param(array_shift($slashargument_parts), 'SAFEDIR');
+    $tenant = min_clean_param(array_shift($slashargument_parts), 'SAFEDIR');
     $rtl = in_array('rtl', $slashargument_parts);
     $legacy = in_array('legacy', $slashargument_parts);
+
+    // Totara: add tenant.
+    $tenant = (preg_match('#^tenant_(\d+)$#', $tenant, $matches)) ? (int)$matches[1] : 0;
 } else {
     $themename = min_optional_param('theme', 'standard', 'SAFEDIR');
     $rev       = min_optional_param('rev', 0, 'INT');
@@ -60,6 +64,9 @@ if ($slashargument = min_get_slash_argument()) {
     $usesvg    = (bool)min_optional_param('svg', '1', 'INT');
     $rtl       = (bool)min_optional_param('rtl', 0, 'INT');
     $legacy    = (bool)min_optional_param('legacy', 0, 'INT');
+
+    // Totara: add tenant.
+    $tenant    = min_optional_param('tenant', 0, 'INT');
 }
 
 // Totara: Removed chunking support as it's not used by currently supported browsers
@@ -76,8 +83,8 @@ if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
     die('Theme was not found, sorry.');
 }
 
-$candidatedir = "$CFG->localcachedir/theme/$rev/$themename/css";
-$etag = "$rev/$themename/$type";
+$candidatedir = "$CFG->localcachedir/theme/{$rev}/{$themename}/tenant{$tenant}/css";
+$etag = "{$rev}/{$themename}/{$type}/{$tenant}";
 $candidatename = $type;
 if (!$usesvg) {
     // Add to the sheet name, one day we'll be able to just drop this.
@@ -130,8 +137,8 @@ if ($themerev <= 0 or $themerev != $rev) {
     $rev = $themerev;
     $cache = false;
 
-    $candidatedir = "$CFG->localcachedir/theme/$rev/$themename/css";
-    $etag = "$rev/$themename/$type";
+    $candidatedir = "$CFG->localcachedir/theme/$rev/$themename/{$tenant}/css";
+    $etag = "$rev/$themename/$type/{$tenant}";
     $candidatename = $type;
     if (!$usesvg) {
         // Add to the sheet name, one day we'll be able to just drop this.
@@ -179,6 +186,12 @@ if ($type === 'editor') {
     }
 
     $csscontent = $theme->get_css_content_by($type);
+
+    // Include any content that might have been changed by theme settings.
+    if (!during_initial_install() && $type === $themename) {
+        $theme_settings = new \core\theme\settings($theme, $tenant);
+        $csscontent .= $theme_settings->get_css_variables();
+    }
 
     // Totara: Removed chunking support as it's not used by currently supported browsers
 

@@ -26,6 +26,8 @@ use container_workspace\enrol\manager;
 use container_workspace\event\workspace_created;
 use container_workspace\event\workspace_updated;
 use container_workspace\exception\workspace_exception;
+use container_workspace\theme\file\workspace_image;
+use core\files\file_helper;
 use core_container\container;
 use core_container\container_helper;
 use core_container\facade\category_name_provider;
@@ -430,108 +432,25 @@ final class workspace extends container implements category_name_provider {
      * @return void
      */
     public function save_image(int $draft_id, ?int $user_id = null): void {
-        global $CFG, $USER;
-        require_once("{$CFG->dirroot}/lib/filelib.php");
-
+        global $USER;
         if (null === $user_id || 0 === $user_id) {
             $user_id = $USER->id;
         }
-
-        $user_context = \context_user::instance($user_id);
-        $fs = get_file_storage();
-
-        // We need to purge all the draft files that are not latest, then leave the latest one for saving it.
-        // Otherwise the process will pick up the first one in the draft file lists to save it instead of the other.
-        $draft_files = $fs->get_area_files(
-            $user_context->id,
-            'user',
-            'draft',
-            $draft_id,
-            'timemodified'
-        );
-
-        // Filtering the directory out of the list, then we will be sure that the files will be sorted for us.
-        // Then we can just pop the last one out of the list and delete the rest.
-        $draft_files = array_filter(
-            $draft_files,
-            function (\stored_file $file): bool {
-                return !$file->is_directory();
-            }
-        );
-
-        if (empty($draft_files)) {
-            // No draft files - hence no point to do the rest of the code.
-            return;
-        }
-
-        if (1 !== count($draft_files)) {
-            // There are more than one draft files. Which we can guess the last file with latest time modified
-            // to be the exact file that user want to use. However, need to debug what happened.
-            debugging("There are more than just one draft files", DEBUG_DEVELOPER);
-
-            // Pop the last item, which is the file that we want.
-            array_pop($draft_files);
-            foreach ($draft_files as $draft_file) {
-                $draft_file->delete();
-            }
-        }
-
-        $context = $this->get_context();
-        file_save_draft_area_files(
-            $draft_id,
-            $context->id,
-            static::get_type(),
-            static::IMAGE_AREA,
-            0,
-            ['maxfiles' => 1]
-        );
+        $file_helper = new file_helper(self::get_type(), self::IMAGE_AREA, $this->get_context());
+        $file_helper->save_files($draft_id, $user_id, ['maxfiles' => 1]);
     }
 
     /**
      * @return \moodle_url
      */
     public function get_image(): \moodle_url {
-        global $CFG, $OUTPUT;
-
-        require_once("{$CFG->dirroot}/lib/filelib.php");
-        $fs = get_file_storage();
-
-        $component = workspace::get_type();
-        $context = $this->get_context();
-
-        $files = $fs->get_area_files(
-            $context->id,
-            $component,
-            workspace::IMAGE_AREA,
-            0
-        );
-
-        // Remove any directory.
-        $files = array_filter(
-            $files,
-            function (\stored_file $file): bool {
-                return !$file->is_directory();
-            }
-        );
-
-        if (empty($files)) {
-            return $OUTPUT->image_url('default_space', $component);
+        $file_helper = new file_helper(self::get_type(), self::IMAGE_AREA, $this->get_context());
+        $url = $file_helper->get_file_url();
+        if (empty($url)) {
+            $workspace_image = new workspace_image();
+            $url = $workspace_image->get_current_or_default_url();
         }
-
-        if (1 !== count($files)) {
-            debugging("There are more than one default image file", DEBUG_DEVELOPER);
-        }
-
-        /** @var \stored_file $file */
-        $file = reset($files);
-        return \moodle_url::make_pluginfile_url(
-            $context->id,
-            $component,
-            workspace::IMAGE_AREA,
-            0,
-            '/',
-            $file->get_filename()
-        );
+        return $url;
     }
 
     /**

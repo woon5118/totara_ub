@@ -851,7 +851,7 @@ class theme_config {
      * @return moodle_url[]
      */
     public function css_urls(moodle_page $page) {
-        global $CFG;
+        global $CFG, $USER;
 
         $rev = theme_get_revision();
 
@@ -867,6 +867,10 @@ class theme_config {
         // Totara: RTL stylesheet.
         $rtl = (get_string('thisdirection', 'langconfig') === 'rtl');
 
+        // Totara: TenantID in requests to styles files.
+        $tenant = (!isloggedin() || empty($USER->tenantid)) ? 0 : $USER->tenantid;
+        $tenant = ($tenant === 0) ? 'notenant' : 'tenant_' . $tenant;
+
         if ($rev > -1) {
             $filename = right_to_left() ? 'all-rtl' : 'all';
             $url = new moodle_url("/theme/styles.php");
@@ -878,7 +882,8 @@ class theme_config {
                     $slashargs .= '/_s'.$slashargs;
                 }
 
-                $slashargs .= '/'.$this->name.'/'.$rev.'/'.$filename;
+                // Totara: add tenant to slahsargs
+                $slashargs .= '/'.$this->name.'/'.$rev.'/'.$filename.'/'.$tenant;
 
                 // Totara: Legacy CSS
                 if ($legacy) {
@@ -887,7 +892,8 @@ class theme_config {
 
                 $url->set_slashargument($slashargs, 'noparam', true);
             } else {
-                $params = array('theme' => $this->name, 'rev' => $rev, 'type' => $filename);
+                // Totara: add tenant to arguments.
+                $params = array('theme' => $this->name, 'rev' => $rev, 'type' => $filename, 'tenant' => $tenant);
                 if (!$svg) {
                     // We add an SVG param so that we know not to serve SVG images.
                     // We do this because all modern browsers support SVG and this param will one day be removed.
@@ -925,6 +931,10 @@ class theme_config {
             if ($legacy) {
                 $baseurl->param('legacy', '1');
             }
+
+            // Totara: add tenant to arguments.
+            $baseurl->param('tenant', $tenant);
+
             // Totara: Removed special handling to support IE 9
             foreach ($css['plugins'] as $plugin => $unused) {
                 $urls[] = new moodle_url($baseurl, array('theme' => $this->name, 'type' => 'plugin', 'subtype' => $plugin));
@@ -949,6 +959,8 @@ class theme_config {
                     $urls[] = new moodle_url($baseurl, array('sheet' => $sheet, 'theme' => $this->name, 'type' => 'theme'));
                 }
             }
+
+            $urls[] = new moodle_url($baseurl, ['theme' => $this->name, 'type' => 'css_variables', 'tenant' => $tenant]);
         }
 
         return $urls;
@@ -1809,16 +1821,28 @@ class theme_config {
      * @return moodle_url
      */
     public function image_url($imagename, $component) {
-        global $CFG;
+        global $CFG, $USER;
 
         $params = array('theme'=>$this->name);
-        $svg = $this->use_svg_icons();
-
         if (empty($component) or $component === 'moodle' or $component === 'core') {
             $params['component'] = 'core';
         } else {
             $params['component'] = $component;
         }
+
+        // If this is a theme file then see if an overwrite exists.
+        $theme_file = \core\theme\file\helper::get_class_for_component($this, $params['component'], $imagename);
+        if (!empty($theme_file)) {
+            $theme_file->set_tenant_id(!empty($USER->tenantid) ? $USER->tenantid : 0);
+            if ($theme_file->is_available()) {
+                $url = $theme_file->get_current_url();
+                if (!empty($url)) {
+                    return $url;
+                }
+            }
+        }
+
+        $svg = $this->use_svg_icons();
 
         $rev = theme_get_revision();
         if ($rev != -1) {

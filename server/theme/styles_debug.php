@@ -38,6 +38,8 @@ $sheet     = optional_param('sheet', '', PARAM_SAFEDIR);
 $usesvg    = optional_param('svg', 1, PARAM_BOOL);
 $rtl       = optional_param('rtl', false, PARAM_BOOL);
 $legacy    = optional_param('legacy', false, PARAM_BOOL);
+// Totara: add tenant.
+$tenant    = optional_param('tenant', 0, PARAM_INT);
 
 if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
     // The theme exists in standard location - ok.
@@ -61,7 +63,7 @@ if ($type === 'editor') {
 
 // We need some kind of caching here because otherwise the page navigation becomes
 // way too slow in theme designer mode.
-$key = "$type $subtype $sheet $usesvg $rtl $legacy";
+$key = "$type $subtype $sheet $usesvg $rtl $legacy $tenant";
 // Totara: updated to use cache definition
 $cache = cache::make('core', 'themedesigner', array('theme' => $themename));
 if ($content = $cache->get($key)) {
@@ -74,7 +76,12 @@ if ($content = $cache->get($key)) {
     }
 }
 
-$csscontent = $theme->get_css_content_debug($type, $subtype, $sheet);
+if (!during_initial_install() && $type === 'css_variables') {
+    $theme_settings = new \core\theme\settings($theme, $tenant);
+    $csscontent .= $theme_settings->get_css_variables();
+} else {
+    $csscontent = $theme->get_css_content_debug($type, $subtype, $sheet);
+}
 $cache->set($key, array('data' => $csscontent, 'created' => time()));
 
 // Totara: Removed chunking support as it's not used by currently supported browsers

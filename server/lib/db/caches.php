@@ -364,4 +364,10 @@ $definitions = array(
         'simplekeys' => true,
         'simpledata' => true,
     ),
+
+    // Used to store theme file classes.
+    'themefileclasses' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+    ),
 );

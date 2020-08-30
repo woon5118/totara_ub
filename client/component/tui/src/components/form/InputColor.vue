@@ -150,7 +150,7 @@ export default {
   @include tui-char-length-classes();
 
   // visually hide the colour Input control
-  &__picker[type='color'] {
+  & &__picker[type='color'] {
     position: absolute;
     width: calc(var(--gap-8) + var(--gap-2));
     opacity: 0;

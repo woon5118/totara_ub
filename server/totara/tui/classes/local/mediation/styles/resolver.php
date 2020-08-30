@@ -63,20 +63,35 @@ final class resolver extends \totara_tui\local\mediation\resolver {
     private $theme;
 
     /**
+     * @var int Tenant ID if user belongs to a tenant.
+     */
+    private $tenant;
+
+    /**
      * Styles constructor.
      * @param string $mediator The class name of the mediator to use to deliver content.
      * @param string $rev The revision number for this resource request.
      * @param string $themename The theme name the CSS was requested for
      * @param string $component The component that was requested.
      * @param string $suffix The suffix that was requested (production|development)
+     * @param int $tenant The tenant id if the user belongs to a tenant
      * @param bool $option_rtl True if the css should be flipped for rtl
      * @throws \coding_exception If mediator is not available or of the correct type.
      */
-    public function __construct(string $mediator, string $rev, string $themename, string $component, string $suffix, bool $option_rtl = false) {
+    public function __construct(
+        string $mediator,
+        string $rev,
+        string $themename,
+        string $component,
+        string $suffix,
+        int $tenant,
+        bool $option_rtl = false
+    ) {
         $this->themename = $themename;
         $this->component = $component;
         $this->suffix = $suffix;
-        $this->option_rtl;
+        $this->tenant = $tenant;
+        $this->option_rtl = $option_rtl;
         parent::__construct($mediator, $rev);
     }
 
@@ -92,6 +107,7 @@ final class resolver extends \totara_tui\local\mediation\resolver {
             $this->component,
             $this->suffix,
             ($this->option_rtl) ? 'rtl' : 'ltr',
+            $this->tenant,
         ]));
         return $etag;
     }
@@ -108,6 +124,7 @@ final class resolver extends \totara_tui\local\mediation\resolver {
             $this->get_rev(),
             $this->themename,
             ($this->option_rtl) ? 'rtl' : 'ltr',
+            $this->tenant,
             "{$this->component}-{$this->suffix}.css"
         ]);
         return $cachefile;
@@ -148,6 +165,14 @@ final class resolver extends \totara_tui\local\mediation\resolver {
      */
     protected function get_content_to_cache() {
         $theme = $this->get_theme();
-        return $theme->get_css_content_by($this->component);
+        $content = $theme->get_css_content_by($this->component);
+
+        // Include any content that might have been changed by theme settings.
+        if (!during_initial_install()) {
+            $theme_settings = new \core\theme\settings($this->theme, $this->tenant);
+            $content .= $theme_settings->get_css_variables();
+        }
+
+        return $content;
     }
 }

@@ -26,9 +26,9 @@ namespace engage_article\totara_catalog\article\dataformatter;
 
 defined('MOODLE_INTERNAL') || die();
 
+use engage_article\theme\file\article_image;
 use totara_catalog\dataformatter\formatter;
 use engage_article\local\image_processor;
-use engage_article\totara_engage\resource\article;
 
 class image extends formatter {
 
@@ -57,7 +57,7 @@ class image extends formatter {
      * @return \stdClass
      */
     public function get_formatted_value(array $data, \context $context): \stdClass {
-        global $OUTPUT, $PAGE;
+        global $PAGE;
 
         if (!array_key_exists('resourceid', $data)) {
             throw new \coding_exception("article image data formatter expects 'resourceid'");
@@ -93,7 +93,8 @@ class image extends formatter {
                 ]
             );
         } else {
-            $image->url = $OUTPUT->image_url("default", 'engage_article')->out();
+            $article_image = new article_image();
+            $image->url = $article_image->get_default_url();
         }
 
         $image->alt = format_string($data['alt'], true, ['context' => $context]);

@@ -27,9 +27,10 @@ echo $OUTPUT->container_start();
 echo html_writer::tag('p', 'You can build images manually using image_url() to get the image path, but you have to specify all the info manually (including width, height and alt attributes):');
 echo html_writer::tag('p', html_writer::tag('strong', 'NOTE:') . 'This should not be used for icons (use pix_icon or flex_icon instead)');
 
+$logo_image = new \core\theme\file\logo_image($PAGE->theme);
 $attr = array(
-    'src' => $OUTPUT->image_url('logo', 'totara_core'),
-    'alt' => 'Totara logo',
+    'src' => $logo_image->get_current_or_default_url(),
+    'alt' => $logo_image->get_alt_text(),
     'width' => 253,
     'height' => 177,
 );

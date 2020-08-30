@@ -131,7 +131,7 @@ final class theme_config extends \theme_config {
      *
      * @return string[]
      */
-    private function get_tui_theme_chain(): array {
+    public function get_tui_theme_chain(): array {
         $themes = [];
 
         // Find out wanted parent sheets.
