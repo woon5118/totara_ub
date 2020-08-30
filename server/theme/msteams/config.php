@@ -23,6 +23,7 @@
 
 defined('MOODLE_INTERNAL' || die());
 
+/** @var theme_config $THEME */
 $THEME->doctype = 'html5';
 $THEME->name = 'msteams';
 $THEME->sheets = ['custom'];
@@ -30,7 +31,7 @@ $THEME->editor_sheets = [];
 $THEME->parents = ['ventura', 'legacy', 'base'];
 $THEME->enable_dock = true;
 $THEME->enable_hide = true;
-$THEME->tui = true;
+$THEME->minify_css = false;
 $THEME->hidefromselector = true;
 
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
