@@ -30,6 +30,7 @@ use admin_externalpage;
 use admin_root;
 use admin_setting_configcheckbox;
 use admin_setting_configcolourpicker;
+use admin_setting_configpasswordunmask;
 use admin_setting_configstoredfile;
 use admin_setting_configtext;
 use admin_setting_configtext_with_maxlength;
@@ -195,7 +196,7 @@ final class settings_helper {
                 manifest_helper::GUID_NULL, PARAM_TEXT));
 
             // Client secret.
-            $page->add(new admin_setting_configtext('totara_msteams/bot_app_secret',
+            $page->add(new admin_setting_configpasswordunmask('totara_msteams/bot_app_secret',
                 new lang_string('settings:bot_app_secret', 'totara_msteams'),
                 new lang_string('settings:bot_app_secret_help', 'totara_msteams'),
                 ''));
