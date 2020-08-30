@@ -356,8 +356,6 @@ class util {
 
                     // The current user and the subject users have to share a tenant
                     return in_array($viewing_user_context->tenantid, $subject_tenant_ids);
-                } else if (!empty($CFG->tenantsisolated)) {
-                    return empty($subject_user_context->tenantid);
                 }
             }
             return true;

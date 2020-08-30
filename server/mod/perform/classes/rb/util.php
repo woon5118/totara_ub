@@ -177,17 +177,6 @@ class util {
                 $params['tp_cohort_id'] = $tenant->cohortid;
 
                 return ["{$user_id_field} IN ({$tenant_sql})", $params];
-            } else if (!empty($CFG->tenantsisolated)) {
-                $tenant_sql = "
-                        EXISTS (
-                            SELECT id
-                            FROM {user} tpu
-                            WHERE tpu.id = {$user_id_field}
-                                AND tpu.tenantid IS NULL
-                        )
-                    ";
-
-                return [$tenant_sql, []];
             }
         }
         return ['1=1', []];
