@@ -91,6 +91,7 @@ class totara_tui_local_scss_testcase extends basic_testcase {
                 'definitions_only!internal_absolute:'.$CFG->srcroot.'/client/component/tui/build/global_styles/_variables.scss',
                 'definitions_only!internal_absolute:'.$CFG->srcroot.'/client/component/tui/build/global_styles/_variables.scss',
                 'definitions_only!internal_absolute:'.$CFG->srcroot.'/client/component/theme_ventura/build/global_styles/_variables.scss',
+                'output_only!internal_absolute:'.$CFG->srcroot.'/client/component/tui/build/global_styles/_variables.scss',
                 'output_only!internal_absolute:'.$CFG->srcroot.'/client/component/theme_ventura/build/global_styles/_variables.scss',
             ];
         }
@@ -128,6 +129,7 @@ class totara_tui_local_scss_testcase extends basic_testcase {
                 'definitions_only!internal_absolute:'.$CFG->srcroot.'/client/component/theme_ventura/build/global_styles/_variables.scss',
                 'definitions_only!internal_absolute:'.$CFG->srcroot.'/client/component/tui/build/global_styles/_variables.scss',
                 'definitions_only!internal_absolute:'.$CFG->srcroot.'/client/component/theme_ventura/build/global_styles/_variables.scss',
+                'output_only!internal_absolute:'.$CFG->srcroot.'/client/component/tui/build/global_styles/_variables.scss',
                 'output_only!internal_absolute:'.$CFG->srcroot.'/client/component/theme_ventura/build/global_styles/_variables.scss',
             ];
         }
