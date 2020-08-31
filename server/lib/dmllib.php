@@ -297,7 +297,7 @@ class dml_transaction_exception extends dml_exception {
  *
  * @global stdClass $CFG The global configuration instance.
  * @see config.php
- * @see config-dist.php
+ * @see config.example.php
  * @global stdClass $DB The global moodle_database instance.
  * @return void|bool Returns true when finished setting up $DB. Returns void when $DB has already been set.
  */

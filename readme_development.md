@@ -1,7 +1,9 @@
 # Developing for Totara
 
 This document provides a quick developer overview. 
-For detailed information and more extensive options please see our (developer documentation)[https://help.totaralearning.com/display/DEV/]
+For detailed information and more extensive options please see our [developer documentation](https://help.totaralearning.com/display/DEV/).
+
+There is a docker setup designed for development with Totara available [on github](https://github.com/totara/totara-docker-dev).
 
 ## General setup
 
@@ -29,6 +31,9 @@ $CFG->allowuserthemes = 1;
 $CFG->allowcoursethemes = 1;
 $CFG->allowthemechangeonurl = 1;
 $CFG->noemailever = 1;
+// Support developer GraphQL access and prevent schema caching
+define('GRAPHQL_DEVELOPMENT_MODE', true);
+$CFG->cache_graphql_schema = false;
 ```
 
 ## Build processes
@@ -57,7 +62,7 @@ npm install
 ./node_modules/grunt/bin/grunt
 ```
 
-For more information on the AMD and less themes build process see our (developer documentation)[https://help.totaralearning.com/display/DEV/Working+With+LESS+in+Themes]
+For more information on the AMD and LESS themes build process see our [developer documentation](https://help.totaralearning.com/display/DEV/Working+With+LESS+in+Themes)
 
 ## Automated testing
 
@@ -65,7 +70,7 @@ Totara uses PHPUnit for unit and integration testing (predominantly integration 
 
 ### Running PHPUnit
 
-The following is a quick overview. For further information see our (Unit testing developer documentation)[https://help.totaralearning.com/display/DEV/Unit+testing].
+The following is a quick overview. For further information see our [Unit testing developer documentation](https://help.totaralearning.com/display/DEV/Unit+testing).
 
 - Quick overview of required config.php settings
 ```php
@@ -76,6 +81,16 @@ $CFG->phpunit_dboptions = array_merge($CFG->dboptions, array(
 ));
 ```
 - Quick copy + paste commands
+
+```
+# All commands run from the same folder as this readme.md file
+# Initialise PHPUnit (run once before use):
+php test/phpunit/phpunit.php init
+# Run all tests
+php test/phpunit/phpunit.php run
+# Drop database ready to re-initialise:
+php test/phpunit/phpunit.php util --drop
+```
 
 ### Running Behat
 
@@ -91,3 +106,13 @@ $CFG->behat_dboptions = array_merge($CFG->dboptions, array(
 ));
 ```
 - Quick copy paste commands
+
+```php
+# All commands run from the same folder as this readme.md file
+# Initialise Behat (run once before use):
+php test/behat/behat.php init
+# Run all tests
+php test/behat/behat.php run
+# Drop database ready to re-initialise:
+php test/behat/behat.php util --drop
+```

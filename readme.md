@@ -118,7 +118,7 @@ For information on product licensing please see the [licensing readme](readme_li
 - Your database user must have permission to alter server settings  
   `ALTER SETTINGS(SERVER)`
 - Full text search must be enabled; see [Full text search in MSSQL Server](https://help.totaralearning.com/display/latest/Full+Text+Search+in+MS+SQL+Server)
-- For security we recommend you use a dedicated database user who has access just to the Totara database.
+- For security, we recommend you use a dedicated database user who has access just to the Totara database.
 
 ### Required server configuration
 
@@ -136,7 +136,7 @@ The following settings should be adjusted in your php.ini file:
 - *upload_tmp_dir* - Some customers may wish to enable this setting and specifically set a directory where files are temporarily stored during the upload process. Note the web server user must have permissions to write files in this directory, or all file uploads will fail.
 - *opcache.enable=1* If the opcache extension is installed then enabling opcache is recommended for performance reasons. This is enabled by default in modern versions of PHP.
 
-For more information on changing these settings see [PHP documentation](http://php.net/manual/en/ini.core.php)
+For more information on changing these settings see [PHP documentation](http://php.net/manual/en/ini.core.php).
 After changing any settings in php.ini you will need to restart your web server, and/or PHP-FPM if you are using that.
 
 <a name="browser-requirements" />
@@ -173,7 +173,7 @@ The following is a quick installation overview.
    up a dedicated user for Totara to use.
    
 2. Create a directory in which Totara will store files.  
-   User files, cache files, and temporary files fill be stored in this directory. If you are horizontally scaling your
+   User files, cache files, and temporary files will be stored in this directory. If you are horizontally scaling your
    web architecture then it is important to note that this directory MUST be shared between all nodes.
    The data directory must be writable by the web server user.
    The data directory must not be web accessible.
@@ -209,7 +209,7 @@ For a set of complete instructions please see the help documentation on [install
 ## Upgrading
 
 The following steps should be followed when upgrading any Totara site, to any newer release.
-For detailed instructions see [upgrading from Totara](https://help.totaralearning.com/display/latest/Upgrading+from+Totara)
+For detailed instructions see [upgrading to Totara](https://help.totaralearning.com/display/latest/Upgrading+to+Totara)
 
 1.  Check the live logs to check if any users are currently using the site.
     The site will be offline while the upgrades are performed.
@@ -238,7 +238,7 @@ For detailed instructions see [upgrading from Totara](https://help.totaralearnin
 
 10. Disable server maintenance mode.
 
-11. Congratulations, your site is now upgraded. Read CHANGELOG.php for details on what is new.
+11. Congratulations, your site is now upgraded. Read changelog.md for details on what is new.
 
 ### Totara 13
 
@@ -261,7 +261,7 @@ The following are valid flavours:
 * perform
 * engage
 
-This should be set between steps 5 and 6 above.
+This should be set between steps 6 and 7 above.
 
 <a name="development" />
 

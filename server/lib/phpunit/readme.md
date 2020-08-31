@@ -21,7 +21,7 @@ It installs PHP libraries into /vendor/ subdirectory inside your srcroot.
 Configure your server
 ---------------------
 You need to create a new dataroot directory and specify a separate database prefix for the test environment,
-see config-dist.php for more information.
+see config.example.php for more information.
 
 * add `$CFG->phpunit_prefix = 'phpu_';` to your config.php file
 * and `$CFG->phpunit_dataroot = '/path/to/phpunitdataroot';` to your config.php file

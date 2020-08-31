@@ -30,7 +30,7 @@ Getting started
 Totara Registration
 ***********************************************************************************************************************/
 //
-// When installing or upgrading Totara you will be asked to resgiter your site if you have not already.
+// When installing or upgrading Totara you will be asked to register your site if you have not already.
 // To save having to provide the information through the web interface you can set the following configuration variables.
 // Site type can be one of: production, trial, qa, demo, or development.
 // $CFG->sitetype = 'production';
@@ -141,7 +141,7 @@ $CFG->dboptions = array(
 // The context_map table is exceptionally large, and changes to a single context record can lead to
 // a significant number of updates for the context_map table.
 // The following setting controls how often table statistics are updated when updating the context_map table.
-// By default it will update context_map table statistics when more than 1000 updates have occured.
+// By default it will update context_map table statistics when more than 1000 updates have occurred.
 // If set to a positive integer, it will update statistics after the number of updates is more than the value.
 // Setting it to 0 will cause it to update statistics after every update.
 // Note: table statistics will not be updated if $CFG->analyze_context_table_after_build has been set to false.
@@ -558,6 +558,15 @@ Themes
 // much easier when working with older technologies.
 // $CFG->themedesignermode = true;
 //
+// Enable TUI designer mode
+// TUI designer mode operates similarly to theme designer mode but only impacts code using the new TUI framework.
+// Enabling TUI designer mode but not theme designer mode should be sufficient to develop with the new framework,
+// but will be significantly faster than enabling the full theme designer mode.
+// $CFG->tuidesignermode = true;
+//
+// Disable all caching for TUI development
+// Again this should only be used when developing for TUI, but can help prevent caching of changes during development.
+// $CFG->forced_plugin_settings['totara_tui'] = ['cache_js' => false, 'cache_scss' => false, 'development_mode' => true];
 //
 
 /***********************************************************************************************************************
@@ -624,7 +633,7 @@ Grid catalog settings
 // low value content will include high, medium and low value content.
 // In databases that apply implicit "AND" behaviour across columns during a full text search this will ensure that if
 // the user searches for two words, which only appear across two buckets, that results will still be returned.
-// At the time of writing this, this settin is applicable to PgSQL and MSSQL only.
+// At the time of writing this, this setting is applicable to PgSQL and MSSQL only.
 // After changing this setting you will need to run:
 // php server/totara/catalog/cli/populate_catalog_data.php --purge_catalog_first
 // $CFG->catalog_use_and_compatible_buckets = true;
@@ -675,7 +684,7 @@ General settings
 // $CFG->forceflavour = 'flavourname';
 //
 // Configure which flavours get shown on the feature overview screen
-// $CFG->showflavours = 'flavourname,enterprise';
+// $CFG->showflavours = 'flavourname,learn,learn_perform';
 //
 
 /***********************************************************************************************************************
@@ -943,6 +952,10 @@ Developer settings
 // When enabled a new action appears on the scheduled task interface to override the schedule of a scheduled task
 // causing it to run when cron next runs.
 // $CFG->debugallowscheduledtaskoverride = true;
+//
+// Enable GraphQL development mode
+// This enables a development GraphQL endpoint which can be used to run arbitrary GraphQL queries from development tools.
+// define('GRAPHQL_DEVELOPMENT_MODE', true);
 //
 // Capture performance information and display it in the page footer of every page (theme must support this)
 // $CFG->perfdebug = 15;

@@ -2596,7 +2596,7 @@ function blocks_find_block($blockid, $blocksarray) {
 // Functions for programatically adding default blocks to pages ================
 
  /**
-  * Parse a list of default blocks. See config-dist for a description of the format.
+  * Parse a list of default blocks. See config.example.php for a description of the format.
   *
   * @param string $blocksstr Determines the starting point that the blocks are added in the region.
   * @return array the parsed list of default blocks

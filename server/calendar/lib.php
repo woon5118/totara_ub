@@ -3148,7 +3148,7 @@ class calendar_information {
                 // This setting is not available via the interface and must be set via config.php.
                 // Higher limits may impact performance, while lower limits may mean some events aren't
                 // shown to admins when they view all courses in the calendar.
-                // See config-dist.php for more information.
+                // See config.example.php for more information.
                 $limit = $CFG->calendar_adminallcourseslimit;
             } else {
                 // We need to limit the number of records fetched here in some way, as there's potential

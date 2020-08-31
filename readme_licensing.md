@@ -1,13 +1,13 @@
 # Licensing
 
-This distribution of Totara consists of two independently licensed solutions.
+This distribution of Totara consists of two independently licensed code bases.
 
 1. Totara Core
 2. Totara Enterprise Extensions
 
 ## Totara Core
 
-The Totara Core code base is contained within the *server* directory adjacent to this file, with the majority licensed under GPLv3 or later, and MIT.
+The Totara Core code base is contained within the *server* directory which is in the same directory as this file, with the majority licensed under GPLv3 or later, and MIT.
 A copy of the GPLv3 license can be found at *server/COPYING.txt*, and all files using the GPLv3 license include a notice to this extent at the start.
 The MIT license can be found at the start of all files using it.
 

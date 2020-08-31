@@ -667,7 +667,7 @@ EXISTS (
 
     /**
      * Get the configutation values of $CFG->analyze_context_table_xxx.
-     * Refer to config-dist.php for more information.
+     * Refer to config.example.php for more information.
      *
      * @return array consisting of [ after_build, inserted_count_threshold ]
      */
