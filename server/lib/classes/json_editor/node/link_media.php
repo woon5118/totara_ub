@@ -117,7 +117,14 @@ final class link_media extends base_link implements block_node {
         }
 
         $input_keys = array_keys($attrs);
-        return node_helper::check_keys_match($input_keys, ['url'], ['title', 'description', 'resolution', 'image']);
+        return node_helper::check_keys_match(
+            $input_keys,
+            ['url'],
+            [
+                // `Loading` is only needed for the front-end. when rendering
+                'title', 'description', 'resolution', 'image', 'loading'
+            ]
+        );
     }
 
     /**
@@ -152,6 +159,11 @@ final class link_media extends base_link implements block_node {
                 $attrs['resolution']['width'] = clean_param($attrs['resolution']['width'], PARAM_INT);
                 $attrs['resolution']['height'] = clean_param($attrs['resolution']['height'], PARAM_INT);
             }
+        }
+
+        if (isset($attrs['loading'])) {
+            // We don't really need this key in our json data.
+            unset($attrs['loading']);
         }
 
         $cleaned_raw_node['attrs'] = $attrs;
