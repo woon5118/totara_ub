@@ -543,7 +543,32 @@ function xmldb_perform_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
+        // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020082602, 'perform');
+    }
+
+    if ($oldversion < 2020082603) {
+
+        // Define index sort_order to be dropped form perform_section_element.
+        $table = new xmldb_table('perform_section_element');
+        $index = new xmldb_index('sort_order', XMLDB_INDEX_NOTUNIQUE, array('sort_order'));
+
+        // Conditionally launch drop index sort_order.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define index section_sort_order (unique) to be added to perform_section_element.
+        $table = new xmldb_table('perform_section_element');
+        $index = new xmldb_index('section_sort_order', XMLDB_INDEX_UNIQUE, array('section_id', 'sort_order'));
+
+        // Conditionally launch add index section_sort_order.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020082603, 'perform');
     }
 
     return true;

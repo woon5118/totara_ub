@@ -177,6 +177,9 @@ class section extends model {
         $section_element_models = [];
 
         foreach ($this->entity->section_elements as $section_element_entity) {
+            if (isset($section_element_models[$section_element_entity->sort_order])) {
+                throw new coding_exception('Section elements have invalid sort orders');
+            }
             $section_element_models[$section_element_entity->sort_order] =
                 section_element::load_by_entity($section_element_entity);
         }
@@ -429,10 +432,19 @@ class section extends model {
         }
 
         $DB->transaction(function () use ($move_section_elements) {
+            global $DB;
+
             foreach ($move_section_elements as $sort_order => $section_element) {
                 if ($section_element->section_id != $this->id) {
                     throw new coding_exception('Cannot move a section element that does not belong to this section');
                 }
+                // Sort order has a unique key. The destination sort order might still be in use by a following
+                // element, so we temporarily set the sort order to the negative of its final position.
+                $section_element->update_sort_order(-$sort_order);
+            }
+
+            foreach ($move_section_elements as $sort_order => $section_element) {
+                // We move the section element back into the correct position, which must currently be vacant.
                 $section_element->update_sort_order($sort_order);
             }
 

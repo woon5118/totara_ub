@@ -129,7 +129,7 @@
         <KEY NAME="element_id" TYPE="foreign" FIELDS="element_id" REFTABLE="perform_element" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="sort_order" UNIQUE="false" FIELDS="sort_order"/>
+        <INDEX NAME="section_sort_order" UNIQUE="true" FIELDS="section_id, sort_order"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="perform_track" COMMENT="Each performance activity can have multiple tracks, each with their own independent assignments and config">

@@ -393,8 +393,13 @@ class mod_perform_activity_multisection_toggler_testcase extends advanced_testca
             $element_sort_order = 1;
             $reversed_elements = $section->section_elements->sort('sort_order', 'desc');
 
+            /** @var section_element $element */
             foreach ($reversed_elements as $element) {
-                $element->update_sort_order($element_sort_order++);
+                $element->update_sort_order(-$element_sort_order++);
+            }
+
+            foreach ($reversed_elements as $element) {
+                $element->update_sort_order(-$element->sort_order);
             }
         }
 

@@ -71,7 +71,7 @@ class section_element extends model {
      *
      * @param section $section
      * @param element $element
-     * @param int $sort_order
+     * @param int $sort_order must be unique for the section, index starting at 1
      *
      * @return static
      */
@@ -109,10 +109,12 @@ class section_element extends model {
      * Update this section element to the specified location in the section
      *
      * Note that the section should be responsible for making sure that sort orders are managed correctly.
+     * There is a unique index on the sort order, so make sure that the target position is vacant.
      *
-     * @param int $sort_order
+     * @param int $sort_order must be unique for the section, index starting at 1
      */
     public function update_sort_order(int $sort_order) {
+        // Dev note: We do not validate that sort order > 0 here - that is managed by the section.
         $this->entity->sort_order = $sort_order;
         $this->entity->save();
     }
