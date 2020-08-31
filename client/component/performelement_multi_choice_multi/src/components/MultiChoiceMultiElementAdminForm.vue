@@ -28,9 +28,10 @@
         v-slot="{ getSubmitting }"
         :initial-values="initialValues"
         class="tui-elementEditMultiChoiceMulti"
-        input-width="full"
         validation-mode="submit"
         :validate="validator"
+        input-width="full"
+        vertical
         @submit="handleSubmit"
       >
         <FormRow
@@ -97,27 +98,31 @@
             )
           "
         >
-          <FormNumber name="min" />
-          <FormRowDetails :id="$id('aria-describedby')">
-            {{
-              $str(
-                'restriction_minimum_label',
-                'performelement_multi_choice_multi'
-              )
-            }}
-          </FormRowDetails>
+          <InputSet char-length="full">
+            <FormNumber name="min" char-length="4" />
+            <InputSizedText :id="$id('aria-describedby')">
+              {{
+                $str(
+                  'restriction_minimum_label',
+                  'performelement_multi_choice_multi'
+                )
+              }}
+            </InputSizedText>
+          </InputSet>
         </FormRow>
 
         <FormRow>
-          <FormNumber name="max" />
-          <FormRowDetails>
-            {{
-              $str(
-                'restriction_maximum_label',
-                'performelement_multi_choice_multi'
-              )
-            }}
-          </FormRowDetails>
+          <InputSet char-length="full">
+            <FormNumber name="max" char-length="4" />
+            <InputSizedText>
+              {{
+                $str(
+                  'restriction_maximum_label',
+                  'performelement_multi_choice_multi'
+                )
+              }}
+            </InputSizedText>
+          </InputSet>
         </FormRow>
 
         <IdentifierInput />
@@ -152,7 +157,8 @@ import {
   FormNumber,
   FormText,
 } from 'tui/components/uniform';
-import FormRowDetails from 'tui/components/form/FormRowDetails';
+import InputSet from 'tui/components/form/InputSet';
+import InputSizedText from 'tui/components/form/InputSizedText';
 
 const MIN_OPTIONS = 2;
 const OPTION_PREFIX = 'option_';
@@ -166,12 +172,13 @@ export default {
     FieldArray,
     FormActionButtons,
     FormRow,
-    FormRowDetails,
     FormNumber,
     FormText,
     IdentifierInput,
     Repeater,
     Uniform,
+    InputSet,
+    InputSizedText,
   },
   mixins: [AdminFormMixin],
   props: {

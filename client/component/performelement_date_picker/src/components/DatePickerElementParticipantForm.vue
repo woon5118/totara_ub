@@ -26,9 +26,6 @@
         :years-after-midrange="midrangeYearAfter"
         :validate="answerValidator"
       />
-      <FormRowDetails>{{
-        $str('date_picker_placeholder', 'performelement_date_picker')
-      }}</FormRowDetails>
     </div>
   </FormScope>
 </template>
@@ -36,13 +33,11 @@
 <script>
 import FormScope from 'tui/components/reform/FormScope';
 import { FormDateSelector } from 'tui/components/uniform';
-import FormRowDetails from 'tui/components/form/FormRowDetails';
 
 export default {
   components: {
     FormScope,
     FormDateSelector,
-    FormRowDetails,
   },
 
   props: {
@@ -97,8 +92,7 @@ export default {
   {
     "performelement_date_picker": [
         "error_invalid_date",
-        "error_you_must_answer_this_question",
-        "date_picker_placeholder"
+        "error_you_must_answer_this_question"
     ]
   }
 </lang-strings>

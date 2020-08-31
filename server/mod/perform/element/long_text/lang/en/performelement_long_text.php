@@ -22,7 +22,7 @@
  */
 
 $string['error_question_required'] = 'Question is required';
-$string['error_you_must_answer_this_question'] = 'You must answer this question';
+$string['error_you_must_answer_this_question'] = 'Required';
 $string['name'] = 'Long text';
 $string['pluginname'] = 'Long text element';
 $string['response_no_response_submitted'] = 'No response submitted';

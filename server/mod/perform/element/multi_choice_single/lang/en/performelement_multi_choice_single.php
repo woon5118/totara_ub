@@ -23,7 +23,7 @@
 
 $string['answer_text'] = 'Answer text {$a}';
 $string['error_answer_required'] = 'Answer is required';
-$string['error_you_must_answer_this_question'] = 'You must answer this question';
+$string['error_you_must_answer_this_question'] = 'Required';
 $string['error_question_required'] = 'Question is required';
 $string['name'] = 'Multiple choice: single-select';
 $string['no_response_submitted'] = 'No response submitted';
