@@ -274,11 +274,7 @@ final class playlist extends provider {
 
         // We are caching the list of items per user.
         $cache = \cache::make('totara_playlist', 'catalog_visibility');
-        $cached_access_items = $cache->get($USER->id);
-
-        if (!$cached_access_items) {
-            $cached_access_items = [];
-        }
+        $cached_access_items = [];
 
         if (empty($access_items)) {
             $cached_access_items = [];

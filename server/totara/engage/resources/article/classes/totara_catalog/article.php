@@ -244,11 +244,7 @@ final class article extends provider {
         // We are caching per user's bucket. As this should only live within a request anyway - and for every request,
         // there will be a required actor.
         $cache = \cache::make('engage_article', 'catalog_visibility');
-        $cached_access_items = $cache->get($USER->id);
-
-        if (!is_array($cached_access_items)) {
-            $cached_access_items = [];
-        }
+        $cached_access_items = [];
 
         $access_items = $builder->fetch();
         if (empty($access_items)) {
