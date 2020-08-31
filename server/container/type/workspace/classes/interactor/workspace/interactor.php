@@ -301,7 +301,20 @@ final class interactor {
      * @return bool
      */
     public function can_view_workspace(): bool {
-        if ($this->can_manage() || $this->is_joined()) {
+        global $USER;
+
+        if ($this->can_administrate()) {
+            return true;
+        }
+
+        // Context check first of all, handles any mismatched tenancy checks.
+        // You may be a member, but it's possible shifting tenancies has blocked your access
+        $context = $this->workspace->get_context();
+        if ($context->is_user_access_prevented($USER)) {
+            return false;
+        }
+
+        if ($this->is_joined()) {
             return true;
         }
 
@@ -314,7 +327,6 @@ final class interactor {
         }
 
         if ($this->workspace->is_hidden()) {
-            $context = $this->workspace->get_context();
             return has_capability('moodle/course:viewhiddencourses', $context, $this->user_id);
         }
 

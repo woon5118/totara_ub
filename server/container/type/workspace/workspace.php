@@ -119,6 +119,9 @@ if ($interactor->can_view_workspace()) {
         $parameters
     );
 
+    // We only want to count views if access is allowed.
+    $workspace_viewed = workspace_viewed::from_workspace($workspace);
+    $workspace_viewed->trigger();
 }
 
 $tui->register($PAGE);
@@ -126,9 +129,6 @@ $notifications = [];
 if ($hold_notification) {
     $notifications = notification::fetch();
 }
-
-$workspace_viewed = workspace_viewed::from_workspace($workspace);
-$workspace_viewed->trigger();
 
 echo $OUTPUT->header();
 echo $OUTPUT->render($tui);
