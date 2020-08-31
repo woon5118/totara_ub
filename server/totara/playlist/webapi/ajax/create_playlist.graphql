@@ -17,17 +17,34 @@ mutation totara_playlist_create_playlist(
     shares: $shares
   ) {
     __typename
+    user {
+      __typename
+      id
+      card_display {
+        __typename
+        profile_picture_alt
+        profile_picture_url
+        profile_url
+        display_fields {
+          __typename
+          is_custom
+          associate_url
+          label
+          value
+        }
+      }
+    }
     id
-    name(format: PLAIN)
-    summary(format: PLAIN)
-    access
-    owned
+    contextid
     timedescription
     topics {
       __typename
       id
       value(format: PLAIN)
     }
+    name(format: PLAIN)
+    access
+    summary(format: HTML)
     rating {
       itemid
       rating
@@ -36,7 +53,11 @@ mutation totara_playlist_create_playlist(
     }
     updateable
     contributable
+    totalresources
     sharedbycount
+    owned
+    bookmarked
     manageable
+    hasnonpublicresources
   }
 }

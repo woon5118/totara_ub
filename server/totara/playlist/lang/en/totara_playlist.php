@@ -44,6 +44,9 @@ $string['mentionbody:comment'] = '<strong>{$a->fullname}</strong> has commented 
 $string['mentionbody:playlist'] = '<strong>{$a->fullname}</strong> has mentioned you in the playlist {$a->title}.';
 $string['mentiontitle:playlist'] = '{$a} has mentioned you in a playlist';
 $string['mentionview:playlist'] = 'View playlist';
+$string['privacywarningtitle'] = 'This will result in a change';
+$string['privacychangeprivatetorestrictedorpublic'] = 'Some of the resources in this playlist are only visible to you. If you share this playlist, the resources will become visible to all people and workspaces you share it with.';
+$string['privacychangerestrictedtopublic'] = 'Some of the resources in this playlist are only visible to limited people and workspaces. If you change the visibility to everyone, all resources in this playlist will become visible.';
 $string['playlistcreated'] = "Playlist created";
 $string['playlistdescription'] = "Playlist description";
 $string['playlistdeleted'] = "Playlist deleted";
@@ -72,6 +75,8 @@ $string['playlist_unavailable'] = 'This playlist is no longer available';
 $string['toaddplaylist'] = 'to add in this playlist';
 $string['yourplaylists'] = 'Your playlists';
 $string['resourceplaylistposition'] = '{$a->current} of {$a->total} resources';
+$string['warning_change_to_public'] = 'Some of this content is only visible to you, or limited people. If you add it with a public playlist, it will become visible for all users.';
+$string['warning_change_to_restricted'] = 'Some of this content is only visible to you. If you share it with this playlist, it will become visible for all users that have access playlist.';
 
 // Error strings
 $string['error:access'] = "Cannot access to the playlist";

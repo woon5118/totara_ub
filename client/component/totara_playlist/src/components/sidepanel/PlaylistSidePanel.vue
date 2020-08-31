@@ -55,6 +55,7 @@
         <AccessSetting
           v-if="canManage"
           :item-id="playlistId"
+          :has-non-public-resources="playlist.hasnonpublicresources"
           component="totara_playlist"
           :access-value="playlist.access"
           :topics="playlist.topics"

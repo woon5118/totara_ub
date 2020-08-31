@@ -17,6 +17,10 @@ type totara_playlist_playlist {
   sharedbycount: Int!
   bookmarked: Boolean!
   manageable: Boolean!
+  """
+  A flag to tell whether this playlist is containing a miss matched resources
+  """
+  hasnonpublicresources: Boolean!
 }
 
 """

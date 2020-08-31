@@ -24,6 +24,7 @@ namespace totara_playlist\webapi\resolver\type;
 
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
+use totara_engage\access\access;
 use totara_engage\entity\engage_bookmark;
 use totara_engage\link\builder;
 use totara_engage\rating\rating_manager;
@@ -35,6 +36,7 @@ use totara_engage\repository\share_repository;
 use totara_playlist\playlist as model;
 use totara_playlist\repository\playlist_resource_repository;
 use totara_topic\provider\topic_provider;
+use core\orm\query\builder as query_builder;
 
 /**
  * Resolver for type totara_playlist_playlist
@@ -111,6 +113,9 @@ final class playlist implements type_resolver {
                 }
 
                 return $url->out(false);
+
+            case 'hasnonpublicresources':
+                return $source->has_non_public_resources();
 
             default:
                 $format = null;

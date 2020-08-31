@@ -42,7 +42,7 @@
         :selected-time-view="selectedTimeView"
         :enable-time-view="enableTimeView"
         @back="$emit('back')"
-        @done="$emit('done', $event)"
+        @done="$emit(done, $event)"
         @cancel="$emit('request-close')"
       />
     </ModalContent>
@@ -129,6 +129,21 @@ export default {
     showBack: {
       type: Boolean,
       default: false,
+    },
+
+    hasNonPublicResources: Boolean,
+
+    isPrivate: Boolean,
+    isRestricted: Boolean,
+  },
+
+  computed: {
+    done() {
+      if (this.isPrivate && this.hasNonPublicResources)
+        return 'warning-privatetorestrictedorpublic';
+      if (this.isRestricted && this.hasNonPublicResources)
+        return 'warning-restrictedtopublic';
+      return 'done';
     },
   },
 };

@@ -60,7 +60,7 @@
             :update-able="canUpdate"
             :is-loading="$apollo.loading"
             @refetch="refetchCards"
-            @resource-added="refetchCards"
+            @resource-added="refetchCardsAndPlaylist"
             @resource-reordered="resourceReordered"
           />
 
@@ -210,6 +210,11 @@ export default {
 
     refetchCards() {
       this.$apollo.queries.contribution.refetch();
+    },
+
+    refetchCardsAndPlaylist() {
+      this.$apollo.queries.contribution.refetch();
+      this.$apollo.queries.playlist.refetch();
     },
 
     resourceReordered(obj) {

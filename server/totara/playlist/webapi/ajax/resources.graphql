@@ -52,10 +52,21 @@ query totara_playlist_resources(
       extra
       owned
       user {
+        __typename
         id
-        fullname
-        profileimageurl
-        profileimagealt
+        card_display {
+          __typename
+          profile_picture_alt
+          profile_picture_url
+          profile_url
+          display_fields {
+            __typename
+            is_custom
+            associate_url
+            label
+            value
+          }
+        }
       }
       topics {
         id

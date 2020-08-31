@@ -4,7 +4,6 @@ mutation totara_playlist_update_playlist_name(
 ) {
   playlist: totara_playlist_update(id: $id, name: $name) {
     __typename
-    name(format: PLAIN)
     user {
       __typename
       id
@@ -23,27 +22,29 @@ mutation totara_playlist_update_playlist_name(
       }
     }
     id
-    bookmarked
-    summary(format: HTML)
-    access
-    timedescription
     contextid
-    updateable
-    contributable
+    timedescription
     topics {
       __typename
-      value(format: PLAIN)
       id
+      value(format: PLAIN)
     }
+    name(format: PLAIN)
+    access
+    summary(format: HTML)
     rating {
       itemid
       rating
       count
       rated
     }
+    updateable
+    contributable
     totalresources
-    owned
     sharedbycount
+    owned
+    bookmarked
     manageable
+    hasnonpublicresources
   }
 }

@@ -25,6 +25,7 @@ namespace totara_playlist\repository;
 use core\orm\entity\entity;
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use totara_engage\access\access;
 use totara_engage\access\access_manager;
 use totara_engage\entity\engage_resource;
 use totara_playlist\entity\playlist_resource;
@@ -168,7 +169,7 @@ final class playlist_resource_repository extends repository {
     }
 
     /**
-     * @param int $resouceid
+     * @param int $resourceid
      * @return void
      */
     public function delete_resource_by_resourceid(int $resourceid): void {
@@ -198,7 +199,7 @@ final class playlist_resource_repository extends repository {
 
     /**
      * @param int $sort_order
-     * @param int $playlistid
+     * @param int $playlist_id
      * @return playlist_resource|null
      */
     public function find_resource_by_sortorder(int $sort_order, int $playlist_id): ?playlist_resource {
@@ -240,5 +241,21 @@ final class playlist_resource_repository extends repository {
             ->where('resourceid', $resource_id)
             ->where('playlistid', $playlist_id)
             ->delete();
+    }
+
+    /**
+     * Checking whether the given playlist has any non public resources or not.
+     *
+     * @param int $playlist_id
+     * @return bool
+     */
+    public function has_non_public_resources(int $playlist_id): bool {
+        $builder = builder::table(static::get_table(), 'pr');
+        $builder->join(['engage_resource', 'er'], 'pr.resourceid', 'er.id');
+
+        $builder->where('pr.playlistid', $playlist_id);
+        $builder->where('er.access', '<>', access::PUBLIC);
+
+        return $builder->exists();
     }
 }

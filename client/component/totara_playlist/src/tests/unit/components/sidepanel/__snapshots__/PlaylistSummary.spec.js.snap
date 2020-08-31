@@ -8,11 +8,9 @@ exports[`totara_playlist/components/sidepanel/PlaylistSummary Checks snapshot 1`
     class="tui-inlineEditing tui-inlineEditing--fullWidth"
   >
     <div
-      class="tui-playlistSummary__placeholder"
+      class="tui-playlistSummary__content"
     >
-      
-      [[adddescription, totara_playlist]]
-    
+      Hello world
     </div>
      
     <button

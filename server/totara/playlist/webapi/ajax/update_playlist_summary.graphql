@@ -9,7 +9,6 @@ mutation totara_playlist_update_playlist_summary(
         summary_format: $summary_format
     ) {
         __typename
-        name(format: PLAIN)
         user {
             __typename
             id
@@ -28,27 +27,29 @@ mutation totara_playlist_update_playlist_summary(
             }
         }
         id
-        bookmarked
-        summary(format: HTML)
-        access
-        timedescription
         contextid
-        updateable
-        contributable
+        timedescription
         topics {
             __typename
-            value(format: PLAIN)
             id
+            value(format: PLAIN)
         }
+        name(format: PLAIN)
+        access
+        summary(format: HTML)
         rating {
             itemid
             rating
             count
             rated
         }
+        updateable
+        contributable
         totalresources
-        owned
         sharedbycount
+        owned
+        bookmarked
         manageable
+        hasnonpublicresources
     }
 }

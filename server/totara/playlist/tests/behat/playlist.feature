@@ -61,7 +61,8 @@ Feature: Manipulate playlist instance
     # View public playlist
     When I follow "Playlist 103"
     Then I should see "Playlist 103"
-    And I click on "Share" "button" in the ".tui-shareSetting" "css_element"
+    And I click on "Expand" "button"
+    And I click on "Share" "button" in the ".tui-accessSetting" "css_element"
     Then I should see "Settings" in the ".tui-modalContent__header-title" "css_element"
 
   @javascript

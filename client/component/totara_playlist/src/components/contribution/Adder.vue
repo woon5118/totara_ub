@@ -17,27 +17,44 @@
 -->
 
 <template>
-  <EngageAdderModal
-    :title="$str('selectcontent', 'totara_playlist')"
-    :open="showAdder"
-    :cards="contribution.cards"
-    :filter-value="filterValue"
-    filter-component="totara_playlist"
-    filter-area="adder"
-    @added="adderUpdate"
-    @cancel="$emit('close', $event)"
-    @topic="filterTopic"
-    @search="filterSearch"
-    @section="filterSection"
-  />
+  <div>
+    <ModalPresenter
+      :open="showWarningModal"
+      @request-close="showWarningModal = false"
+    >
+      <EngagePrivacyWarningModal
+        :title="$str('privacywarningtitle', 'totara_playlist')"
+        :message-content="privacyWarningMessage"
+        @cancel="cancelPrivacyChange"
+        @confirm="adderUpdate(privacyWarningSelection)"
+      />
+    </ModalPresenter>
+
+    <EngageAdderModal
+      :title="$str('selectcontent', 'totara_playlist')"
+      :open="showAdder"
+      :cards="contribution.cards"
+      :filter-value="filterValue"
+      filter-component="totara_playlist"
+      filter-area="adder"
+      @added="processAddToPlaylist"
+      @cancel="$emit('close', $event)"
+      @topic="filterTopic"
+      @search="filterSearch"
+      @section="filterSection"
+    />
+  </div>
 </template>
 
 <script>
 import EngageAdderModal from 'totara_engage/components/modal/EngageAdderModal';
+import EngagePrivacyWarningModal from 'totara_engage/components/modal/EngagePrivacyWarningModal';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
 
 // GraphQL
 import resources from 'totara_playlist/graphql/resources';
 import addResources from 'totara_playlist/graphql/add_resources';
+import checkItemsAccess from 'totara_playlist/graphql/check_items_access';
 
 // Mixins
 import ContributionMixin from 'totara_engage/mixins/contribution_mixin';
@@ -45,6 +62,8 @@ import ContributionMixin from 'totara_engage/mixins/contribution_mixin';
 export default {
   components: {
     EngageAdderModal,
+    EngagePrivacyWarningModal,
+    ModalPresenter,
   },
 
   mixins: [ContributionMixin],
@@ -57,9 +76,21 @@ export default {
     showAdder: Boolean,
   },
 
+  data() {
+    return {
+      showWarningModal: this.openWarningModal,
+      privacyWarningMessage: null,
+      privacyWarningSelection: null,
+    };
+  },
+
   watch: {
     showAdder(value) {
       this.skipCardsQuery = !value;
+    },
+
+    openWarningModal(value) {
+      this.showWarningModal = value;
     },
   },
 
@@ -92,12 +123,64 @@ export default {
   },
 
   methods: {
-    adderUpdate(selection) {
-      this.$apollo
-        .mutate({
+    /**
+     * @param {String[]} selection
+     */
+    async processAddToPlaylist(selection) {
+      let items = selection.map(item => JSON.parse(item));
+      let { warning, message } = await this.checkAccessSetting(items);
+
+      if (warning) {
+        this.showAdder = false;
+
+        // open warningmodal with the selection data
+        this.privacyWarningMessage = message;
+        this.privacyWarningSelection = selection;
+        this.showWarningModal = true;
+
+        return;
+      }
+
+      await this.adderUpdate(selection);
+    },
+
+    /**
+     * Check the access settings of the items
+     * @param {Object} items
+     * @return {{warning: String, message: String}}
+     */
+    async checkAccessSetting(items) {
+      const {
+        data: {
+          result: { warning, message },
+        },
+      } = await this.$apollo.query({
+        refetchQueries: [
+          'totara_playlist_cards',
+          'totara_playlist_get_playlist',
+        ],
+        query: checkItemsAccess,
+        variables: {
+          items: items,
+          playlist_id: this.playlistId,
+        },
+      });
+
+      return {
+        warning: warning,
+        message: message,
+      };
+    },
+
+    async adderUpdate(selection) {
+      try {
+        await this.$apollo.mutate({
           mutation: addResources,
           refetchAll: false,
-          refetchQueries: ['totara_playlist_cards'],
+          refetchQueries: [
+            'totara_playlist_cards',
+            'totara_playlist_get_playlist',
+          ],
           variables: {
             playlistid: this.playlistId,
             resources: selection.map(item => {
@@ -105,10 +188,17 @@ export default {
               return resource.itemid;
             }),
           },
-        })
-        .finally(() => {
-          this.$emit('close');
         });
+
+        this.showWarningModal = false;
+      } finally {
+        this.$emit('close');
+      }
+    },
+
+    cancelPrivacyChange() {
+      this.showWarningModal = false;
+      this.showAdder = true;
     },
   },
 };

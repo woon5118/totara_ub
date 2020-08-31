@@ -75,7 +75,10 @@ export default {
       try {
         await this.$apollo.mutate({
           mutation: removeResource,
-          refetchQueries: ['totara_playlist_cards'],
+          refetchQueries: [
+            'totara_playlist_cards',
+            'totara_playlist_get_playlist',
+          ],
           variables: {
             id: this.playlistId,
             instanceid: this.instanceId,

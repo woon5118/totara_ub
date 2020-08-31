@@ -15,6 +15,14 @@ exports[`totara_engage/components/sidepanel/access/AccessSeting.vue Checks snaps
     />
   </modalpresenter-stub>
    
+  <modalpresenter-stub>
+    <engageprivacywarningmodal-stub
+      closebutton="true"
+      size="normal"
+      title="privacywarningtitle-totara_playlist"
+    />
+  </modalpresenter-stub>
+   
   <accessdisplay-stub
     accessvalue="PUBLIC"
     showbutton="true"

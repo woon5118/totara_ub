@@ -22,6 +22,14 @@ import { mount } from '@vue/test-utils';
 
 Vue.directive('focus-within', {});
 
+jest.mock('tui/tui', function() {
+  return {
+    scan() {
+      return 'content';
+    },
+  };
+});
+
 describe('totara_playlist/components/sidepanel/PlaylistSummary', () => {
   let wrapper;
 

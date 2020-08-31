@@ -27,7 +27,7 @@
       @click="editing = true"
     >
       <div
-        v-if="!content.isEmpty"
+        v-if="summary"
         slot="content"
         ref="content"
         class="tui-playlistSummary__content"
@@ -109,7 +109,9 @@ export default {
     playlist: {
       query: getPlaylist,
       fetchPolicy: 'network-only',
-
+      skip() {
+        return !this.editing;
+      },
       variables() {
         return {
           id: this.instanceId,

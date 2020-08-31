@@ -42,5 +42,6 @@ query totara_playlist_get_playlist($id: param_integer!) {
     owned
     bookmarked
     manageable
+    hasnonpublicresources
   }
 }

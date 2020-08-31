@@ -26,10 +26,24 @@ query totara_playlist_cards(
       name(format: PLAIN)
       instanceid
       user {
+        __typename
         id
         fullname
-        profileimageurl
         profileimagealt
+        profileimageurl
+        card_display {
+          __typename
+          profile_picture_alt
+          profile_picture_url
+          profile_url
+          display_fields {
+            __typename
+            is_custom
+            associate_url
+            label
+            value
+          }
+        }
       }
       comments
       tuicomponent

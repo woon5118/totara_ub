@@ -883,4 +883,13 @@ final class playlist implements accessible, shareable {
         $owner_id = $this->playlist->userid;
         return $DB->record_exists_sql($valid_owner_sql, ['owner_id' => $owner_id]);
     }
+
+    /**
+     * @return bool
+     */
+    public function has_non_public_resources(): bool {
+        /** @var playlist_resource_repository $repository */
+        $repository = playlist_resource::repository();
+        return $repository->has_non_public_resources($this->playlist->id);
+    }
 }

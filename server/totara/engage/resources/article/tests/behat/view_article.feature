@@ -31,5 +31,5 @@ Feature: View article
     And I view article "Test Article 2"
     Then I should not see "Reshare"
     And I view article "Test Article 3"
-    And I click on "Share" "button" in the ".tui-shareSetting" "css_element"
+    And I click on "Share" "button" in the ".tui-accessSetting" "css_element"
     Then I should see "Settings" in the ".tui-modalContent__header-title" "css_element"

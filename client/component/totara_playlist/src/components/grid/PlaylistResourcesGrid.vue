@@ -251,7 +251,10 @@ export default {
         .mutate({
           mutation: addResources,
           refetchAll: false,
-          refetchQueries: ['totara_playlist_cards'],
+          refetchQueries: [
+            'totara_playlist_cards',
+            'totara_playlist_get_playlist',
+          ],
           variables: {
             playlistid: this.playlistId,
             resources: [resourceId],
