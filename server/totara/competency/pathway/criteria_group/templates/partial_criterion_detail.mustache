@@ -43,7 +43,7 @@ data-tw-editScaleValuePaths-criterion-deleted="">
 </div>
 
 {{#expandable}}
-<div class="tw-editScaleValuePathGroupCriterion__item" data-tw-editScaleValuePaths-criterion-active="" data-tw-editAchievementPaths-on-ordering="hide">
+<div class="tw-editScaleValuePathGroupCriterion__item" data-tw-editScaleValuePaths-criterion-active="">
     <div class="criterion_title"
     data-tw-editScaleValuePaths-criterion-action="toggle-detail"
     {{#expanded}}data-tw-editScaleValuePaths-criterion-detail-expanded="1"{{/expanded}}>
@@ -69,13 +69,6 @@ data-tw-editScaleValuePaths-criterion-deleted="">
     <div data-tw-editScaleValuePaths-criterion-detail="{{key}}" {{^expanded}}class="tw-editAchievementPaths--hidden"{{/expanded}}>
         {{#criterion_templatename}}{{> &&criterion_templatename}}{{/criterion_templatename}}
     </div>
-</div>
-
-<div class="tw-editScaleValuePathGroupCriterion__item tw-editAchievementPaths--hidden" data-tw-editAchievementPaths-on-ordering="show">
-    <span data-tw-editScaleValuePaths-criterion-detail-icon="collapsed" {{#expanded}}class="tw-editAchievementPaths--hidden"{{/expanded}}>
-        {{#flex_icon}}collapsed{{/flex_icon}}
-    </span>
-    {{title}}
 </div>
 {{/expandable}}
 

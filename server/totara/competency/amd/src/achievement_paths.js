@@ -47,6 +47,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         this.nPaths = 0;
         this.pathways = [];
         this.singlevalShown = false;
+        this.busyAddPathway = '';
         this.dropPlaceholder = document.createElement('div');
         this.dropPlaceholder.className = 'tw-editAchievementPaths__dropPlaceholder';
         this.dropPlaceholder.innerText = '\xa0'; // nbsp
@@ -250,6 +251,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 delete pw.singleuse;
 
                 that.pathways[key].detail = pw;
+
+                // Reset busyAddPw to allow adding of another pw
+                // TODO: May want to check the current value against the update value. Just make sure it works during init
+                that.busyAddPathway = '';
             });
 
             this.widget.addEventListener(pwEvents + 'remove', function(e) {
@@ -400,6 +405,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 pathTitle = selectedOption.text,
                 pathTemplate = '';
 
+            if (this.busyAddPathway !== '') {
+                return;
+            }
+
             if (selectedOption.hasAttribute('data-tw-editAchievementPaths-path-template')) {
                 pathTemplate = selectedOption.getAttribute('data-tw-editAchievementPaths-path-template');
             }
@@ -415,6 +424,8 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 this.showHideNoPaths();
                 return;
             }
+
+            this.busyAddPathway = pathType;
 
             var that = this,
                 target,
@@ -518,6 +529,11 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 criterionKey,
                 criterion,
                 scaleValueId = svWgt.getAttribute('data-tw-editScaleValuePaths-scale-id');
+
+            if (this.busyAddPathway !== '') {
+                return;
+            }
+            this.busyAddPathway = 'criteria_group';
 
             key = this.getNextKey();
             criterionKey = key + '_criterion_1';
