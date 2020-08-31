@@ -31,7 +31,6 @@
 
 namespace totara_tui\local;
 
-use core_minify;
 use totara_tui\local\scss\scss;
 use totara_tui\local\scss\scss_options;
 
@@ -40,6 +39,12 @@ use totara_tui\local\scss\scss_options;
  * This is local, and should only be used by mediation scripts belonging to totara_tui.
  */
 final class theme_config extends \theme_config {
+
+    /**
+     * Totara Tui is not compatible with minify.
+     * @var bool
+     */
+    public $minify_css = false;
 
     /**
      * If set to true, when resolving SCSS it will not be compiled
@@ -56,7 +61,6 @@ final class theme_config extends \theme_config {
     public function get_css_content_by($type) {
         $csscontent = $this->get_tui_css_content($type);
         $csscontent = $this->post_process($csscontent);
-        $csscontent = core_minify::css($csscontent);
         return $csscontent;
     }
 

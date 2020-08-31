@@ -79,7 +79,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Exiting',
         ], self::strip_debugging_messages($messages));
 
-        self::assertStringStartsWith('@import "definitions_only!internal_absolute:/', $css);
+        self::assertStringStartsWith('@import \'definitions_only!internal_absolute:/', $css);
     }
 
     public function test_production_legacy_mode_cached() {
@@ -109,7 +109,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Exiting',
         ], self::strip_debugging_messages($messages));
 
-        self::assertStringStartsWith('@import "definitions_only!internal_absolute:/', $css);
+        self::assertStringStartsWith('@import \'definitions_only!internal_absolute:/', $css);
     }
 
     public function test_development_mode_cached() {
@@ -140,7 +140,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Exiting',
         ], self::strip_debugging_messages($messages));
 
-        self::assertStringStartsWith('@import "definitions_only!internal_absolute:/', $css);
+        self::assertStringStartsWith('@import \'definitions_only!internal_absolute:/', $css);
     }
 
     public function test_development_legacy_mode_cached() {
@@ -174,7 +174,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Exiting',
         ], self::strip_debugging_messages($messages));
 
-        self::assertStringStartsWith('@import "definitions_only!internal_absolute:/', $css);
+        self::assertStringStartsWith('@import \'definitions_only!internal_absolute:/', $css);
     }
 
     public function test_production_mode_uncached() {
@@ -200,7 +200,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Exiting',
         ], self::strip_debugging_messages($messages));
 
-        self::assertStringStartsWith('@import "definitions_only!internal_absolute:/', $css);
+        self::assertStringStartsWith('@import \'definitions_only!internal_absolute:/', $css);
     }
 
     public function test_production_legacy_mode_uncached() {
@@ -228,7 +228,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Exiting',
         ], self::strip_debugging_messages($messages));
 
-        self::assertStringStartsWith('@import "definitions_only!internal_absolute:/', $css);
+        self::assertStringStartsWith('@import \'definitions_only!internal_absolute:/', $css);
     }
 
     public function test_development_mode_uncached() {
@@ -257,7 +257,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Exiting',
         ], self::strip_debugging_messages($messages));
 
-        self::assertStringStartsWith('@import "definitions_only!internal_absolute:/', $css);
+        self::assertStringStartsWith('@import \'definitions_only!internal_absolute:/', $css);
     }
 
     public function test_development_legacy_mode_uncached() {
@@ -289,7 +289,7 @@ class totara_tui_local_mediation_styles_resolver_testcase extends advanced_testc
             'Exiting',
         ], self::strip_debugging_messages($messages));
 
-        self::assertStringStartsWith('@import "definitions_only!internal_absolute:/', $css);
+        self::assertStringStartsWith('@import \'definitions_only!internal_absolute:/', $css);
     }
 
     public function test_development_mode_uncached_stale_in_cache() {
