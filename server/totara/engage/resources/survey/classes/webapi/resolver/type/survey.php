@@ -84,6 +84,9 @@ final class survey implements type_resolver {
                 $repo = share::repository();
                 return $repo->get_total_sharers($source->get_id(), $source::get_resource_type());
 
+            case 'updateable':
+                return $source->can_update($USER->id);
+
             case 'bookmarked':
                 /** @var bookmark_repository $repo */
                 $repo = engage_bookmark::repository();

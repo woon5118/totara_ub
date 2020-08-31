@@ -52,4 +52,25 @@ class behat_engage_survey extends behat_base {
         return survey::from_instance($survey->id, survey::get_resource_type());
     }
 
+    /**
+     * Goes to the survey view page.
+     *
+     * @Given I view survey :name
+     * @param string $name
+     */
+    public function i_view_survey(string $name): void {
+        global $DB;
+
+        \behat_hooks::set_step_readonly(false);
+
+        $resource_id = $DB->get_field('engage_resource', 'id', [
+            'name' => $name,
+            'resourcetype' => 'engage_survey'
+        ]);
+
+        // Go directly to URL, we are testing functionality of page, not how to get there.
+        $url = new moodle_url("/totara/engage/resources/survey/survey_edit.php?id={$resource_id}");
+        $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+        $this->wait_for_pending_js();
+    }
 }

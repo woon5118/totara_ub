@@ -14,9 +14,11 @@ Feature: Update article
       | user2    | User      | Two      | user2@example.com |
 
     And the following "articles" exist in "engage_article" plugin:
-      | name           | username | content       | format        | access | topics  |
-      | Test Article 1 | user1    | Test Article  | FORMAT_PLAIN  | PUBLIC | Topic 1 |
-      | Test Article 2 | user1    | Test Article2 | FORMAT_PLAIN  | PUBLIC | Topic 1 |
+      | name           | username | content       | format        | access     | topics  |
+      | Test Article 1 | user1    | Test Article  | FORMAT_PLAIN  | PUBLIC     | Topic 1 |
+      | Test Article 2 | user1    | Test Article2 | FORMAT_PLAIN  | PUBLIC     | Topic 1 |
+      | Test Article 3 | user1    | Test Article3 | FORMAT_PLAIN  | PRIVATE    | Topic 1 |
+      | Test Article 4 | user2    | Test Article3 | FORMAT_PLAIN  | RESTRICTED | Topic 1 |
 
     And "engage_article" "Test Article 1" is shared with the following users:
       | sharer | recipient |
@@ -61,3 +63,46 @@ Feature: Update article
     And I should see "Test Article"
     And I click on "//div[contains(text(),'Test Article')]/parent::*[button[@title='Edit']]" "xpath_element"
     And I should not see "Done"
+
+  @javascript
+  Scenario: Admin can update/delete user's resource
+
+    #View public resource
+    Given I log in as "admin"
+    And I view article "Test Article 1"
+    And I should see "Share"
+    When I click on "Actions" "button"
+    Then I should see "Delete"
+    And I click on "Delete" "link"
+    And I press "No"
+    When I click on "Share" "button"
+    Then I should see "Only you"
+    And I should see "Limited people"
+    And I should see "Everyone"
+    And I click on "Cancel" "button"
+
+    # View private resource
+    And I view article "Test Article 3"
+    And I should see "Share"
+    When I click on "Actions" "button"
+    Then I should see "Delete"
+    And I click on "Delete" "link"
+    And I press "No"
+    When I click on "Share" "button"
+    Then I should see "Only you"
+    And I should see "Limited people"
+    And I should see "Everyone"
+    And I click on "Cancel" "button"
+
+    # View restrict resource
+    And I view article "Test Article 4"
+    And I should see "Share"
+    When I click on "Actions" "button"
+    Then I should see "Delete"
+    And I click on "Delete" "link"
+    And I press "No"
+    When I click on "Share" "button"
+    Then I should see "Only you"
+    And I should see "Limited people"
+    And I should see "Everyone"
+    And I click on "Cancel" "button"

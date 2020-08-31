@@ -12,6 +12,7 @@ type engage_survey_survey {
   owned: Boolean!
   voted: Boolean!
   reacted: Boolean!
+  updateable: Boolean!
 }
 
 type engage_survey_answer_option {

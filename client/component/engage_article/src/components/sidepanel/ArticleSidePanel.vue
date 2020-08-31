@@ -24,10 +24,10 @@
       :no-border="true"
     >
       <template v-slot:drop-down-items>
-        <DropdownItem v-if="article.owned" @click="openModalFromAction = true">
+        <DropdownItem v-if="article.owned || article.updateable" @click="openModalFromAction = true">
           {{ $str('delete', 'moodle') }}
         </DropdownItem>
-        <DropdownItem v-else @click="reportResource">
+        <DropdownItem v-if="!article.owned" @click="reportResource">
           {{ $str('reportresource', 'engage_article') }}
         </DropdownItem>
       </template>
@@ -52,7 +52,7 @@
         {{ article.timedescription }}
       </p>
       <AccessSetting
-        v-if="article.owned"
+        v-if="article.owned || article.updateable"
         :item-id="resourceId"
         component="engage_article"
         :access-value="article.resource.access"

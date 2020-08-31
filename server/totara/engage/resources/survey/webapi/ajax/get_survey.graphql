@@ -63,5 +63,6 @@ query engage_survey_get_survey($resourceid: param_integer!) {
     voted
     sharedbycount
     reacted
+    updateable
   }
 }
