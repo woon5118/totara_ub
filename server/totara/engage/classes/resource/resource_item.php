@@ -29,7 +29,6 @@ use totara_engage\entity\engage_resource;
 use core\orm\query\builder;
 use totara_engage\access\accessible;
 use totara_engage\local\helper as local_helper;
-use totara_engage\repository\resource_repository;
 use totara_engage\resource\input\access_validator;
 use totara_engage\resource\input\definition;
 use totara_engage\resource\input\topic_validator;
@@ -79,10 +78,17 @@ abstract class resource_item implements accessible, shareable {
      * @return resource_item
      */
     public static function from_instance(int $instanceid, string $resourcetype): resource_item {
-        /** @var resource_repository $repo */
-        $repo = engage_resource::repository();
-        $entity = $repo->get_from_instance($instanceid, $resourcetype);
-        return new static($entity);
+        global $DB;
+        $resource_id = $DB->get_field(
+            engage_resource::TABLE,
+            'id',
+            [
+                'instanceid' => $instanceid,
+                'resourcetype' => $resourcetype
+            ]
+        );
+
+        return static::from_resource_id($resource_id);
     }
 
     /**

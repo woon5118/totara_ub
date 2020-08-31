@@ -234,6 +234,7 @@ final class totara_playlist_generator extends component_generator_base implement
                 }
 
                 $data['topics'][] = $topic->get_id();
+                $data['topics'][] = $topic->get_id();
             }
         }
 
@@ -262,5 +263,45 @@ final class totara_playlist_generator extends component_generator_base implement
         }
 
         $manager->add($rating, $user_id);
+    }
+
+    /**
+     * Behat step for creating playlist resources.
+     *
+     * @param array $parameters
+     * @return void
+     */
+    public function create_playlist_resouce_from_params(array $parameters): void {
+        global $CFG, $USER;
+        require_once("{$CFG->dirroot}/totara/playlist/tests/behat/behat_totara_playlist.php");
+
+        $playlist = behat_totara_playlist::get_item_by_name($parameters['playlist']);
+
+        [$plugin_type, $plugin_name] = \core_component::normalize_component($parameters['component']);
+        $directory = \core_component::get_plugin_directory($plugin_type, $plugin_name);
+
+        $behat_class = "behat_{$parameters['component']}";
+        $file = "{$directory}/tests/behat/{$behat_class}.php";
+
+        if (!file_exists($file)) {
+            throw new \coding_exception("Unable to located behat file '{$file}'");
+        }
+
+        require_once($file);
+        if (!method_exists($behat_class, "get_item_by_name")) {
+            throw new \coding_exception("Function '{$behat_class}::get_item_by_name' does not exist");
+        }
+
+        $resource = call_user_func([$behat_class, 'get_item_by_name'], $parameters['name']);
+
+        if (isset($parameters['user'])) {
+            $user = core_user::get_user_by_username($parameters['user'], '*', null, MUST_EXIST);
+            $actor_id = $user->id;
+        } else {
+            // Not all the times $USER is being set.
+            $actor_id = $USER->id;
+        }
+
+        $playlist->add_resource($resource, $actor_id);
     }
 }

@@ -23,6 +23,7 @@
 
 use totara_playlist\entity\playlist as playlist_entity;
 use totara_playlist\playlist;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * Behat steps to generate playlist related data.

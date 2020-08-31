@@ -23,7 +23,6 @@
 namespace totara_engage\entity;
 
 use core\orm\entity\entity;
-use totara_engage\repository\resource_repository;
 use totara_engage\access\access;
 
 /**
@@ -147,12 +146,5 @@ final class engage_resource extends entity {
         }
 
         $this->set_attribute_raw('extra', $extra);
-    }
-
-    /**
-     * @return string
-     */
-    public static function repository_class_name(): string {
-        return resource_repository::class;
     }
 }

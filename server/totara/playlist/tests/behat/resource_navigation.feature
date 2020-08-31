@@ -27,19 +27,16 @@ Feature: Users can navigate between resources/surveys inside a playlist.
       | question | username | access  | topics |
       | Survey 3 | user1    | PRIVATE | Topic1 |
       | Survey 4 | user1    | PRIVATE | Topic1 |
+    # Share the articles/surveys with the playlist
+    And the following "playlist resources" exist in "totara_playlist" plugin:
+      | component      | name      | playlist        | user  |
+      | engage_article | Article 1 | Test Playlist 1 | user1 |
+      | engage_article | Article 2 | Test Playlist 1 | user1 |
+      | engage_survey  | Survey 3  | Test Playlist 1 | user1 |
+      | engage_survey  | Survey 4  | Test Playlist 1 | user1 |
     And I log in as "admin"
     And I set the following system permissions of "Authenticated user" role:
       | moodle/user:viewalldetails | Allow |
-    And I log out
-    # Share the articles/surveys with the playlist
-    And I log in as "user1"
-    And I view playlist "Test Playlist 1"
-    And I press "Contribute"
-    And I wait for the next second
-    And I press "select an existing resource"
-    And I wait for the next second
-    And I click the select all checkbox in the tui datatable
-    And I click on the "Add" button in the "Select content to add into playlist" tui modal
     And I log out
 
   Scenario: Users can navigate through resources on a playlist

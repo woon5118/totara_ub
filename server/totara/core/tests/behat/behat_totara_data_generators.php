@@ -479,6 +479,12 @@ class behat_totara_data_generators extends behat_base {
             'playlists' => array(
                 'datagenerator' => 'playlist_from_params',
                 'required' => array('name', 'username', 'access')
+            ),
+            'playlist resources' => array(
+                'datagenerator' => 'playlist_resouce_from_params',
+                // `user` is the actor that we set for whoever going to add the resources
+                // to the playlist.
+                'required' => array('component', 'name', 'playlist', 'user')
             )
         ),
         'engage_article' => array(
