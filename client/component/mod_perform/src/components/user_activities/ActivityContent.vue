@@ -256,28 +256,31 @@
                 </template>
               </div>
 
-              <ButtonGroup
-                v-if="
+              <FormRow>
+                <ButtonGroup
+                  v-if="
                   !activeSectionIsClosed &&
                     participantCanAnswer &&
                     !viewOnlyReportMode
                 "
-                class="tui-participantContent__buttons"
-              >
-                <ButtonSubmit @click="fullSubmit(getSubmitting)" />
-                <Button
-                  v-if="hasSaveDraft"
-                  :text="
+                  class="tui-participantContent__buttons"
+                >
+                  <ButtonSubmit @click="fullSubmit(getSubmitting)" />
+                  <Button
+                    v-if="hasSaveDraft"
+                    :text="
                     $str('participant_section_button_draft', 'mod_perform')
                   "
-                  type="submit"
-                  @click="draftSubmit(getSubmitting)"
-                />
-                <ButtonCancel
-                  v-if="!isExternalParticipant"
-                  @click="goBackToListCancel"
-                />
-              </ButtonGroup>
+                    type="submit"
+                    @click="draftSubmit(getSubmitting)"
+                  />
+                  <ButtonCancel
+                    v-if="!isExternalParticipant"
+                    @click="goBackToListCancel"
+                  />
+                </ButtonGroup>
+              </FormRow>
+
 
               <div class="tui-participantContent__navigation">
                 <Grid
@@ -340,6 +343,7 @@ import ButtonSubmit from 'tui/components/buttons/Submit';
 import Collapsible from 'tui/components/collapsible/Collapsible';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
+import FormRow from 'tui/components/form/FormRow';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import Loader from 'tui/components/loader/Loader';
@@ -379,6 +383,7 @@ export default {
     Collapsible,
     ConfirmationModal,
     ElementParticipantForm,
+    FormRow,
     Grid,
     GridItem,
     Loader,
