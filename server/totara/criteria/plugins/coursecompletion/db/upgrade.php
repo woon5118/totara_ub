@@ -32,20 +32,5 @@ function xmldb_criteria_coursecompletion_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // Totara 13 branching line.
-
-    if ($oldversion < 2018120700) {
-        // Drop old tables
-        foreach (['criteria_coursecompletion', 'criteria_coursecompletion_course'] as $tablename) {
-            $table = new xmldb_table($tablename);
-            if ($dbman->table_exists($table)) {
-                $dbman->drop_table($table);
-            }
-        }
-
-        // Assign savepoint reached.
-        upgrade_plugin_savepoint(true, 2018120700, 'criteria', 'coursecompletion');
-    }
-
     return true;
 }

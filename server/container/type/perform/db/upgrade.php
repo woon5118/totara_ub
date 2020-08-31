@@ -32,15 +32,5 @@ function xmldb_container_perform_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2020070600) {
-        $record = $DB->get_record('course_categories', ['name' => 'performance-activities', 'idnumber' => null]);
-
-        $record->issystem = 1;
-
-        $DB->update_record('course_categories', $record);
-
-        upgrade_plugin_savepoint(true, 2020070600, 'container', 'perform');
-    }
-
     return true;
 }
