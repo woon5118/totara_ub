@@ -226,9 +226,6 @@ final class weka_texteditor extends texteditor {
         // Cleaning text on the way out.
         // If your content is JSON but not a json_editor compatible - empty string will be given.
         // Any other content is probably HTML for conversion by the editor.
-        if (!empty($options['noclean']) && !empty($this->text) && document_helper::looks_like_json($this->text)) {
-            $this->text = document_helper::sanitize_json_document($this->text);
-        }
         if (!empty($options['noclean']) && !empty($this->text)) {
             if (document_helper::looks_like_json($this->text)) {
                 $this->text = document_helper::sanitize_json_document($this->text);

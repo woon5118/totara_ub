@@ -20,8 +20,6 @@
 import { EditorState } from 'ext_prosemirror/state';
 import { getDefaultDocument } from './helpers/editor';
 
-// needs to be able to be attached to a different editor
-
 export default class WekaValue {
   /**
    * @private
@@ -30,11 +28,18 @@ export default class WekaValue {
     this._editor = null;
     this._state = null;
     this._doc = null;
+    this._html = null;
     this._map = null;
     // prevent this (and state) from becoming reactive
     Object.preventExtensions(this);
   }
 
+  /**
+   * Create a WekaValue from editor state.
+   *
+   * @param {EditorState} editorState
+   * @param {Editor} editor
+   */
   static fromState(editorState, editor) {
     const ws = new WekaValue();
     ws._editor = editor;
@@ -42,9 +47,29 @@ export default class WekaValue {
     return ws;
   }
 
+  /**
+   * Create a WekaValue from a serialized document.
+   *
+   * @param {string} doc
+   */
   static fromDoc(doc) {
     const ws = new WekaValue();
     ws._doc = doc;
+    return ws;
+  }
+
+  /**
+   * Create a WekaValue containing HTML.
+   *
+   * (used to initialise Weka from HTML source)
+   *
+   * WekaValues created from HTML cannot be converted to docs or have their state retrieved.
+   *
+   * @param {string} html
+   */
+  static fromHtml(html) {
+    const ws = new WekaValue();
+    ws._html = html;
     return ws;
   }
 
@@ -113,6 +138,24 @@ export default class WekaValue {
     }
     this._doc = this._state.toJSON().doc;
     return this._doc;
+  }
+
+  /**
+   * Does this WekaValue have HTML content?
+   *
+   * (used to initialise Weka from HTML source)
+   */
+  hasHtml() {
+    return !!this._html;
+  }
+
+  /**
+   * Get the HTML content of this WekaValue.
+   *
+   * (used to initialise Weka from HTML source)
+   */
+  getHtml() {
+    return this._html;
   }
 
   /**

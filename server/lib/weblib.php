@@ -1387,6 +1387,7 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
             // For filtering html text, json_editor will tell whether we would want to go futher with
             // filtering text or not. Ideally, only if the formatter is a default one.
             $filtertext = ($options['filter'] && $editor->use_legacy_filter_text());
+
             break;
 
         default:  // Anything else.

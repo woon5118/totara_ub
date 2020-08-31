@@ -24,6 +24,7 @@ import { baseKeymap } from 'ext_prosemirror/commands';
 import { dropCursor } from 'ext_prosemirror/dropcursor';
 import { gapCursor } from 'ext_prosemirror/gapcursor';
 import { inputRules } from 'ext_prosemirror/inputrules';
+import { DOMParser } from 'ext_prosemirror/model';
 import { buildKeymap } from './keymap';
 import { createSchema } from './schema';
 import ComponentView from './ComponentView';
@@ -153,11 +154,22 @@ export default class Editor {
    */
   setValue(value) {
     if (!value.inflated(this)) {
-      const state = EditorState.fromJSON(this._editorConfig(), {
-        doc: value.getDoc(),
-        selection: { anchor: 0, head: 0, type: 'text' },
-      });
-      value.inflate(this, state);
+      if (value.hasHtml()) {
+        const element = document.createElement('div');
+        element.innerHTML = value.getHtml();
+        const state = EditorState.create(
+          Object.assign({}, this._editorConfig(), {
+            doc: DOMParser.fromSchema(this.schema).parse(element),
+          })
+        );
+        value.inflate(this, state);
+      } else {
+        const state = EditorState.fromJSON(this._editorConfig(), {
+          doc: value.getDoc(),
+          selection: { anchor: 0, head: 0, type: 'text' },
+        });
+        value.inflate(this, state);
+      }
     }
 
     this._value = value;
