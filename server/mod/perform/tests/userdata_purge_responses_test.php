@@ -186,8 +186,13 @@ class mod_perform_userdata_purge_responses_testcase  extends advanced_testcase {
         // Purged user's subject instance is not removed.
         $subject_instances = (subject_instance::repository())->get();
         $this->assertEquals(2, $subject_instances->count());
-        $subject_instance = $subject_instances->first();
-        $this->assertEquals($subject->id, $subject_instance->subject_user_id);
+
+        $target_subject_instance_count = $subject_instances->filter(
+            function (subject_instance $subject_instance) use ($subject): bool {
+                return (int)$subject_instance->subject_user_id === (int)$subject->id;
+            }
+        )->count();
+        $this->assertEquals(1, $target_subject_instance_count);
 
         // Purged user's participant instances removed from both subject instances, but not other participant's.
         $participant_instances = (participant_instance::repository())->order_by('id')->get();
