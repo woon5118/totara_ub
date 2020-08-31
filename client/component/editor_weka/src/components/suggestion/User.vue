@@ -18,27 +18,25 @@
 
 <template>
   <div class="tui-editorWeka-user" :style="positionStyle">
-    <Dropdown :separator="true" :open="true" @dismiss="$emit('dismiss')">
+    <Dropdown :separator="true" :open="$apollo.loading || users.length" @dismiss="$emit('dismiss')">
       <span class="sr-only">
         {{ $str('matching_users', 'editor_weka') }}:
       </span>
 
-      <template v-if="!$apollo.loading">
-        <DropdownItem
-          v-for="(user, index) in users"
-          :key="index"
-          :no-padding="true"
-          @click="pickUser(user)"
-        >
-          <MiniProfileCard :no-border="true" :display="user.card_display" />
-        </DropdownItem>
-      </template>
-
-      <template v-else>
+      <template v-if="$apollo.loading">
         <DropdownItem :disabled="true">
           {{ $str('loadinghelp', 'moodle') }}
         </DropdownItem>
       </template>
+
+      <DropdownItem
+        v-for="(user, index) in users"
+        :key="index"
+        :no-padding="true"
+        @click="pickUser(user)"
+      >
+        <MiniProfileCard :no-border="true" :display="user.card_display" />
+      </DropdownItem>
     </Dropdown>
   </div>
 </template>
@@ -90,6 +88,7 @@ export default {
   apollo: {
     users: {
       query: findUsers,
+      fetchPolicy: 'network-only',
       variables() {
         return {
           pattern: this.pattern,

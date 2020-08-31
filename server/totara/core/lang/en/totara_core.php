@@ -340,6 +340,7 @@ $string['fontdefault'] = 'Appropriate default';
 $string['formfield_defaults'] = 'Default:';
 $string['framework'] = 'Framework';
 $string['gobacktoall'] = 'Go back to all';
+$string['hashtag'] = 'Hashtag';
 $string['heading'] = 'Heading';
 $string['headingcolumnsdescription'] = 'The fields below define which data appear in the Report Heading Block. This block contains information about a specific user, and can appear in many locations throughout the site.';
 $string['headingmissingvalue'] = 'Value to display if no data found';

@@ -17,38 +17,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package core
  */
-namespace core\webapi\resolver\query;
+namespace core\webapi\resolver\type;
 
 use core\webapi\execution_context;
-use core\webapi\middleware\require_login;
-use core\webapi\query_resolver;
-use core\webapi\resolver\has_middleware;
-use totara_core\hashtag\hashtag;
-use totara_core\hashtag\hashtag_loader;
+use core\webapi\type_resolver;
+use totara_core\hashtag\hashtag as model;
 
 /**
- * Query resolver for 'core_hashtags_by_pattern'
+ * Hashtag type resolver
  */
-final class hashtags_by_pattern implements query_resolver, has_middleware {
+final class hashtag implements type_resolver {
     /**
-     * @param array             $args
+     * @param string $field
+     * @param model $source
+     * @param array $args
      * @param execution_context $ec
      *
-     * @return hashtag[]
+     * @return mixed
      */
-    public static function resolve(array $args, execution_context $ec): array {
-        return hashtag_loader::find_hashtags_by_pattern($args['pattern']);
-    }
+    public static function resolve(string $field, $source, array $args, execution_context $ec) {
+        if (!($source instanceof model)) {
+            throw new \coding_exception("Expecting the instance of " . model::class);
+        }
 
-    /**
-     * @return require_login[]
-     */
-    public static function get_middleware(): array {
-        return [
-            new require_login()
-        ];
+        switch ($field) {
+            case 'id':
+                return $source->get_id();
+            case 'tag':
+                return $source->get_display_name();
+
+            default:
+                debugging("Field '{$field}' was not supported yet", DEBUG_DEVELOPER);
+                return null;
+        }
     }
 }

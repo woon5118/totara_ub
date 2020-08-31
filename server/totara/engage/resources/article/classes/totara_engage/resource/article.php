@@ -203,11 +203,12 @@ final class article extends resource_item implements time_viewable {
             $article->timeview = $data['timeview'];
         }
 
+        $article->save();
+
         // Download & save the image attached to the article
         $processor = image_processor::make($resourceid, $context->id);
         $processor->extract_image_from_content($article->content, $article->format);
 
-        $article->save();
         return $article->id;
     }
 

@@ -130,8 +130,8 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     );
 
     protected $tag_coll_data = array(
-        // 2 records by default now for tag collection
-        'id' => 3, 'sortorder' => 2
+        // 3 records by default now for tag collection
+        'id' => 4, 'sortorder' => 2
     );
 
     protected $tag_instance_data = array(

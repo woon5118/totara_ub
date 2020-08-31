@@ -249,7 +249,7 @@ export default {
     },
 
     $_useFixedPositioning() {
-      return !!this.$el.closest('.tui-modalContent');
+      return !!this.$el.closest('.tui-modalContent') && !this.$el.closest('.tui-weka');
     },
   },
 };

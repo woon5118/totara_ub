@@ -1370,3 +1370,32 @@ function totara_core_update_site_container_type(): void {
 
     $DB->update_record('course', $update_site_record);
 }
+
+/**
+ * Creating a tag collection record for hashtag. Then returning the id of the collection.
+ * This function will also try to set the config for `hashtag_collection_id` which is `$CFG->hashtag_collection_id`
+ *
+ * @return int
+ */
+function totara_core_add_hashtag_tag_collection(): int {
+    global $DB, $CFG;
+
+    if (!empty($CFG->hashtag_collection_id)) {
+        return $CFG->hashtag_collection_id;
+    }
+
+    $sql = 'SELECT MAX(sortorder) AS sortorder FROM "ttr_tag_coll"';
+    $current_sort_order = $DB->get_field_sql($sql);
+
+    $record = new stdClass();
+    $record->name = get_string('hashtag', 'totara_core');
+    $record->isdefault = 1;
+    $record->component = 'totara_core';
+    $record->sortorder = $current_sort_order + 1;
+    $record->searchable = 1;
+
+    $id = (int) $DB->insert_record('tag_coll', $record);
+
+    set_config('hashtag_collection_id', $id);
+    return $id;
+}

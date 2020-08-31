@@ -22,6 +22,7 @@
  */
 namespace totara_core\content;
 
+use totara_core\content\processor\hashtag_processor;
 use totara_core\content\processor\mention_processor;
 
 final class content_handler {
@@ -55,9 +56,10 @@ final class content_handler {
             return;
         }
 
-        // Default to have mention processor
+        // Default to have mention and hashtag processors
         $this->processors = [
-            new mention_processor()
+            new mention_processor(),
+            new hashtag_processor()
         ];
 
         $classes = \core_component::get_namespace_classes('totara_core\\content', processor::class);
@@ -123,8 +125,9 @@ final class content_handler {
      *
      * @return void
      */
-    public function handle_with_params(string $title, string $content, int $contentformat, int $instanceid, string $component, string $area,
-                                       ?int $contextid = null, $contexturl = null): void {
+    public function handle_with_params(string $title, string $content, int $contentformat, int $instanceid,
+                                       string $component, string $area, ?int $contextid = null,
+                                       $contexturl = null): void {
         $item = content::create($title, $content, $contentformat, $instanceid, $component, $area, $contextid);
 
         if (null !== $contexturl) {

@@ -523,11 +523,18 @@ class core_tag_collection {
             return false;
         }
 
-        if (!property_exists($CFG, 'topic_collection_id')) {
+        if (property_exists($CFG, 'topic_collection_id') && $CFG->topic_collection_id == $tagcollectionid) {
+            // As long as the tag collection id is not a topic collection id then it is able to be deleted.
             return false;
         }
 
-        // As long as the tag collection id is not a topic collection id then it is able to be deleted.
-        return $CFG->topic_collection_id != $tagcollectionid;
+        if (property_exists($CFG, 'hashtag_collection_id') && $CFG->hashtag_collection_id == $tagcollectionid) {
+            // As long as the tag collection id is not a hashtag collection id then it is able to be deleted.
+            return false;
+        }
+
+        // Other than 'hashtag_collection_id' and 'topic_collection_id' all the
+        // other collections can be deleted.
+        return true;
     }
 }

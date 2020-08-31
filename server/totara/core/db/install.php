@@ -655,5 +655,8 @@ function xmldb_totara_core_install() {
     require_once("{$CFG->dirroot}/totara/topic/db/upgradelib.php");
     totara_topic_add_tag_collection();
 
+
+    // Installing default hashtag collection.
+    totara_core_add_hashtag_tag_collection();
     return true;
 }

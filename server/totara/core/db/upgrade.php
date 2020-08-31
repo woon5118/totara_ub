@@ -1383,5 +1383,10 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020072902, 'totara', 'core');
     }
 
+    if ($oldversion < 2020081701) {
+        totara_core_add_hashtag_tag_collection();
+        upgrade_plugin_savepoint(true, 2020081701, 'totara', 'core');
+    }
+
     return true;
 }

@@ -25,21 +25,19 @@
         </span>
       </template>
 
-      <template v-if="!$apollo.loading">
-        <DropdownItem
-          v-for="(hashtag, index) in hashtags"
-          :key="index"
-          @click="pickTag(hashtag)"
-        >
-          {{ hashtag.tag }}
-        </DropdownItem>
-      </template>
-
-      <template v-else>
+      <template v-if="$apollo.loading">
         <DropdownItem :disabled="true">
           {{ $str('loadinghelp', 'moodle') }}
         </DropdownItem>
       </template>
+
+      <DropdownItem
+        v-for="(hashtag, index) in hashtags"
+        :key="index"
+        @click="pickTag(hashtag)"
+      >
+        {{ hashtag.tag }}
+      </DropdownItem>
     </Dropdown>
   </div>
 </template>
@@ -95,6 +93,7 @@ export default {
   apollo: {
     hashtags: {
       query: findHashtags,
+      fetchPolicy: 'network-only',
       variables() {
         return {
           pattern: this.pattern,
