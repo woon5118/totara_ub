@@ -66,20 +66,20 @@ final class interaction_repository {
         $builder = builder::table('ml_recommender_interactions', 'mri');
         $builder->join(['ml_recommender_components', 'mrc'], 'mrc.id', 'mri.component_id');
         $builder->join(['ml_recommender_interaction_types', 'mrit'], 'mrit.id', 'mri.interaction_type_id');
-        $unique = builder::concat('component', 'item_id');
+        $unique = builder::concat('mrc.component', 'item_id');
         $builder->select([
             new raw_field("{$unique} AS unique_id"),
-            'item_id',
-            'component',
-            'area',
-            new raw_field('MAX(time_created) AS max_time_created'),
+            'mri.item_id',
+            'mrc.component',
+            'mrc.area',
+            new raw_field('MAX(mri.time_created) AS max_time_created'),
         ]);
 
-        $builder->where('interaction', 'view');
-        $builder->where('user_id', $user_id);
-        $builder->where_in('component', $valid_components);
+        $builder->where('mrit.interaction', 'view');
+        $builder->where('mri.user_id', $user_id);
+        $builder->where_in('mrc.component', $valid_components);
 
-        $builder->group_by_raw("{$unique}, item_id, component, area");
+        $builder->group_by_raw("{$unique}, item_id, mrc.component, mrc.area");
 
         $builder->order_by_raw('max_time_created DESC');
         $builder->limit($max_count);
