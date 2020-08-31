@@ -246,6 +246,10 @@ namespace core\internal\phpunit {
                 'dbpass',
                 'dboptions',
             ];
+            // dbuser and dbpass are optional on SQL Server.
+            if (isset($cfg->dbtype) && $cfg->dbtype === 'sqlsrv') {
+                $required = array_diff($required, ['dbuser', 'dbpass']);
+            }
             array_walk($required, function ($property) use ($cfg, $mainconfig) {
                 if (!isset($cfg->{$property})) {
                     if ($mainconfig) {
