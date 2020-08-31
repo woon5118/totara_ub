@@ -50,6 +50,11 @@ final class non_member_users implements query_resolver, has_middleware {
             throw new \coding_exception("Cannot find workspace by id '{$args['workspace_id']}'");
         }
 
+        if (!$ec->has_relevant_context()) {
+            $context = $workspace->get_context();
+            $ec->set_relevant_context($context);
+        }
+
         $query = new non_member_query($workspace->get_id());
         if (isset($args['search_term'])) {
             $query->set_search_term($args['search_term']);
