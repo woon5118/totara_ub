@@ -18,8 +18,10 @@ Feature: Manage performance activity static content
       | rawTitle | Static content 1 |
     And I activate the weka editor with css ".tui-weka"
     And I type "I see trees of green, red roses too. I see them bloom for me and you. And I think to myself what a wonderful world." in the weka editor
+    And I wait for the next second
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     Then I should see "Element saved."
+    And I wait for pending js
     And I should see "I see them bloom for me and you."
     When I close the tui modal
     And I close the tui notification toast
@@ -30,6 +32,7 @@ Feature: Manage performance activity static content
     And I click on "Edit element" "button"
     And I activate the weka editor with css ".tui-weka"
     And I type "Changed static content" in the weka editor
+    And I wait for the next second
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     Then I should see "Element saved."
     And I should see "Changed static content"
