@@ -101,6 +101,8 @@ class user_interactions extends export {
         $sql = "
             SELECT user_id, item_id, component, MAX(time_created) AS mytimestamp, SUM(rating) AS myrating
             FROM {ml_recommender_interactions} ri
+            INNER JOIN {ml_recommender_components} mrc ON (mrc.id = ri.component_id)
+            INNER JOIN {ml_recommender_interaction_types} mrit ON (mrit.id = ri.interaction_type_id)
             $tenant_join_sql
             WHERE component $components_in_sql
               AND time_created >= :mintimestamp

@@ -120,7 +120,8 @@ final class totara_recommendations_trending_repository extends repository {
                 component,
                 area,
                 COUNT(item_id) AS counter
-            FROM {ml_recommender_interactions}';
+            FROM {ml_recommender_interactions} mri
+            INNER JOIN {ml_recommender_components} mrc ON (mrc.id = mri.component_id)';
         $sql .= ' ' . $where . ' ';
         $sql .= '
             GROUP BY

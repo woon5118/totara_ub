@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * @group block_totara_recommendations
  */
-class totara_recommendations_courses_testcase extends advanced_testcase {
+class block_totara_recommendations_courses_testcase extends advanced_testcase {
     /**
      * Test that the correct type of records are returned for micro_learning
      */

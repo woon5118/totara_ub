@@ -25,7 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 use core\webapi\execution_context;
 use engage_article\totara_engage\resource\article;
 use engage_survey\totara_engage\resource\survey;
-use ml_recommender\entity\interaction;
 use totara_core\advanced_feature;
 use totara_engage\access\access;
 use totara_playlist\playlist;
@@ -55,7 +54,13 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
         $this->assertNotNull($result->data);
 
         // Check the record exists
-        $record = $DB->get_record(interaction::TABLE, [
+        $record = $DB->get_record_sql('
+            SELECT *
+            FROM {ml_recommender_interactions} mri
+            INNER JOIN  {ml_recommender_components} mrc ON (mrc.id = mri.component_id)
+            INNER JOIN  {ml_recommender_interaction_types} mrit ON (mrit.id = mri.interaction_type_id)
+            WHERE component = :component AND area = :area AND interaction = :interaction AND item_id = :item_id AND user_id = :user_id
+            ', [
             'component' => 'totara_playlist',
             'area' => 'playlist',
             'interaction' => 'rate',
@@ -81,7 +86,13 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
         $this->assertNotNull($result->data);
 
         // Check the record exists
-        $record = $DB->get_record(interaction::TABLE, [
+        $record = $DB->get_record_sql('
+            SELECT *
+            FROM {ml_recommender_interactions} mri
+            INNER JOIN  {ml_recommender_components} mrc ON (mrc.id = mri.component_id)
+            INNER JOIN  {ml_recommender_interaction_types} mrit ON (mrit.id = mri.interaction_type_id)
+            WHERE component = :component AND area = :area AND interaction = :interaction AND item_id = :item_id AND user_id = :user_id
+            ', [
             'component' => 'totara_playlist',
             'area' => 'playlist',
             'interaction' => 'rate',
@@ -124,7 +135,13 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
 
-        $record = $DB->get_record(interaction::TABLE, [
+        $record = $DB->get_record_sql('
+            SELECT *
+            FROM {ml_recommender_interactions} mri
+            INNER JOIN  {ml_recommender_components} mrc ON (mrc.id = mri.component_id)
+            INNER JOIN  {ml_recommender_interaction_types} mrit ON (mrit.id = mri.interaction_type_id)
+            WHERE component = :component AND area = :area AND interaction = :interaction AND item_id = :item_id AND user_id = :user_id
+            ', [
             'component' => 'engage_article',
             'area' => 'media',
             'interaction' => 'like',
@@ -146,7 +163,13 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
 
-        $record = $DB->get_record(interaction::TABLE, [
+        $record = $DB->get_record_sql('
+            SELECT *
+            FROM {ml_recommender_interactions} mri
+            INNER JOIN  {ml_recommender_components} mrc ON (mrc.id = mri.component_id)
+            INNER JOIN  {ml_recommender_interaction_types} mrit ON (mrit.id = mri.interaction_type_id)
+            WHERE component = :component AND area = :area AND interaction = :interaction AND item_id = :item_id AND user_id = :user_id
+            ', [
             'component' => 'engage_article',
             'area' => 'media',
             'interaction' => 'like',
@@ -167,7 +190,13 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
 
-        $record = $DB->get_record(interaction::TABLE, [
+        $record = $DB->get_record_sql('
+            SELECT *
+            FROM {ml_recommender_interactions} mri
+            INNER JOIN  {ml_recommender_components} mrc ON (mrc.id = mri.component_id)
+            INNER JOIN  {ml_recommender_interaction_types} mrit ON (mrit.id = mri.interaction_type_id)
+            WHERE component = :component AND area = :area AND interaction = :interaction AND item_id = :item_id AND user_id = :user_id
+            ', [
             'component' => 'engage_article',
             'area' => 'media',
             'interaction' => 'unlike',
@@ -189,7 +218,13 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
 
-        $record = $DB->get_record(interaction::TABLE, [
+        $record = $DB->get_record_sql('
+            SELECT *
+            FROM {ml_recommender_interactions} mri
+            INNER JOIN  {ml_recommender_components} mrc ON (mrc.id = mri.component_id)
+            INNER JOIN  {ml_recommender_interaction_types} mrit ON (mrit.id = mri.interaction_type_id)
+            WHERE component = :component AND area = :area AND interaction = :interaction AND item_id = :item_id AND user_id = :user_id
+            ', [
             'component' => 'engage_article',
             'area' => 'media',
             'interaction' => 'unlike',
@@ -255,7 +290,13 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
             $result = graphql::execute_operation($ec, $parameters);
             $this->assertNotNull($result->data);
 
-            $record = $DB->get_record(interaction::TABLE, [
+            $record = $DB->get_record_sql('
+            SELECT *
+            FROM {ml_recommender_interactions} mri
+            INNER JOIN  {ml_recommender_components} mrc ON (mrc.id = mri.component_id)
+            INNER JOIN  {ml_recommender_interaction_types} mrit ON (mrit.id = mri.interaction_type_id)
+            WHERE component = :component AND area = :area AND interaction = :interaction AND item_id = :item_id AND user_id = :user_id
+            ', [
                 'component' => $component::get_resource_type(),
                 'area' => 'comment',
                 'interaction' => 'comment',
@@ -350,7 +391,13 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
             $result = graphql::execute_operation($ec, $parameters);
             $this->assertNotNull($result->data);
 
-            $record = $DB->get_record(interaction::TABLE, [
+            $record = $DB->get_record_sql('
+            SELECT *
+            FROM {ml_recommender_interactions} mri
+            INNER JOIN  {ml_recommender_components} mrc ON (mrc.id = mri.component_id)
+            INNER JOIN  {ml_recommender_interaction_types} mrit ON (mrit.id = mri.interaction_type_id)
+            WHERE component = :component AND interaction = :interaction AND item_id = :item_id AND user_id = :user_id
+            ', [
                 'component' => $component::get_resource_type(),
                 'interaction' => 'reshare',
                 'item_id' => $component->get_id(),

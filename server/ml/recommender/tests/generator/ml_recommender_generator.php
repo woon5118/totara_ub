@@ -21,6 +21,9 @@
  * @package ml_recommender
  */
 
+use ml_recommender\repository\interaction_type_repository;
+use ml_recommender\repository\component_repository;
+
 /**
  * Generator for ml_recommenders. Allows mocking of the recommender engine.
  */
@@ -107,12 +110,14 @@ final class ml_recommender_generator extends component_generator_base {
     ):int {
         global $DB;
 
+        $component_repo = \ml_recommender\entity\component::repository();
+        $type_repo = \ml_recommender\entity\interaction_type::repository();
+
         return $DB->insert_record('ml_recommender_interactions', [
             'user_id' => $user_id,
             'item_id' => $item_id,
-            'component' => $component,
-            'area' => $area,
-            'interaction' => $interation,
+            'component_id' => $component_repo->ensure_id($component, $area),
+            'interaction_type_id' => $type_repo->ensure_id($interation),
             'rating' => $rating,
             'time_created' => time()
         ]);

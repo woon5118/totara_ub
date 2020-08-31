@@ -27,7 +27,9 @@ use core\event\base;
 use core\event\course_deleted;
 use core\event\course_viewed;
 use core_ml\event\interaction_event;
+use ml_recommender\entity\component;
 use ml_recommender\entity\interaction;
+use ml_recommender\entity\interaction_type;
 use ml_recommender\repository\interaction_repository;
 use totara_core\advanced_feature;
 
@@ -51,18 +53,19 @@ final class interaction_observer {
             return;
         }
 
-        $entity = new interaction();
-        $entity->user_id = $event->get_user_id();
-        $entity->area = $event->get_area();
-        $entity->component = $event->get_component();
-        $entity->rating = $event->get_rating();
-        $entity->interaction = $event->get_interaction_type();
-        $entity->item_id = $event->get_item_id();
-
         // Record the event, but if it fails, let it fail silently.
         // It's possible for multiple of the same event to occur at the same
         // time and we don't want them crashing the page.
         try {
+            $component_repo = component::repository();
+            $type_repo = interaction_type::repository();
+
+            $entity = new interaction();
+            $entity->user_id = $event->get_user_id();
+            $entity->component_id = $component_repo->ensure_id($event->get_component(), $event->get_area());
+            $entity->rating = $event->get_rating();
+            $entity->interaction_type_id = $type_repo->ensure_id($event->get_interaction_type());
+            $entity->item_id = $event->get_item_id();
             $entity->save();
         } catch (\dml_exception $exception) {
             // Do nothing
@@ -91,18 +94,20 @@ final class interaction_observer {
             $component = 'container_course';
         }
 
-        $entity = new interaction();
-        $entity->user_id = $event->userid;
-        $entity->area = null;
-        $entity->component = $component;
-        $entity->rating = 1;
-        $entity->interaction = 'view';
-        $entity->item_id = $item_id;
-
         // Record the event, but if it fails, let it fail silently.
         // It's possible for multiple of the same event to occur at the same
         // time and we don't want them crashing the page.
         try {
+            $component_repo = component::repository();
+            $type_repo = interaction_type::repository();
+
+            $entity = new interaction();
+            $entity->user_id = $event->userid;
+            $entity->component_id = $component_repo->ensure_id($component);
+            $entity->rating = 1;
+            $entity->interaction_type_id = $type_repo->ensure_id('view');
+            $entity->item_id = $item_id;
+
             $entity->save();
         } catch (\dml_exception $exception) {
             // Do nothing

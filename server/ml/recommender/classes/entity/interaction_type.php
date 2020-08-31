@@ -17,38 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Valerii Kuznetsov <valerii.kuznetsov@totaralearning.com>
  * @package ml_recommender
  */
 namespace ml_recommender\entity;
 
 use core\orm\entity\entity;
-use ml_recommender\repository\interaction_repository;
+use ml_recommender\repository\interaction_type_repository;
 
 /**
- * @property int            $user_id
- * @property int            $item_id
- * @property int            $component_id
- * @property string|null    $area
- * @property int            $interaction_type_id
- * @property int            $rating
- * @property int            $time_created
+ * @property string $interaction
  */
-final class interaction extends entity {
+final class interaction_type extends entity {
     /**
      * @var string
      */
-    public const TABLE = 'ml_recommender_interactions';
-
-    /**
-     * @var string
-     */
-    public const CREATED_TIMESTAMP = 'time_created';
+    public const TABLE = 'ml_recommender_interaction_types';
 
     /**
      * @return string
      */
     public static function repository_class_name(): string {
-        return interaction_repository::class;
+        return interaction_type_repository::class;
     }
 }

@@ -63,7 +63,9 @@ final class interaction_repository {
 
         // We need to select the first X, distinctively.
         // The ORM doesn't support distinct so we're instead grouping against the time created
-        $builder = builder::table('ml_recommender_interactions');
+        $builder = builder::table('ml_recommender_interactions', 'mri');
+        $builder->join(['ml_recommender_components', 'mrc'], 'mrc.id', 'mri.component_id');
+        $builder->join(['ml_recommender_interaction_types', 'mrit'], 'mrit.id', 'mri.interaction_type_id');
         $unique = builder::concat('component', 'item_id');
         $builder->select([
             new raw_field("{$unique} AS unique_id"),

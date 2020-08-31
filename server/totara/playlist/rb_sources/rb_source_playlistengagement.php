@@ -252,21 +252,29 @@ class rb_source_playlistengagement extends rb_base_source {
             ]
         );
 
-        $interaction = 'view';
-        $columnoptions[] = new rb_column_option(
-            'playlistengagement',
-            'views',
-            get_string('views', 'rb_source_playlistengagement'),
-            "(SELECT COUNT(*) FROM {ml_recommender_interactions} rt WHERE
-            rt.item_id = base.id
-            AND rt.user_id <> base.userid
-            AND rt.interaction = '{$interaction}')",
-            [
-                'displayfunc' => 'plaintext',
-                'dbdatatype' => 'text',
-                'iscompound' => true,
-            ]
-        );
+        if (advanced_feature::is_enabled('ml_recommender')) {
+            $component = totara_playlist\playlist::get_resource_type();
+            $columnoptions[] = new rb_column_option(
+                'playlistengagement',
+                'views',
+                get_string('views', 'rb_source_playlistengagement'),
+                "(
+                SELECT COUNT(*) FROM {ml_recommender_interactions} mrt
+                INNER JOIN {ml_recommender_components} mrc ON (mrc.id = mrt.component_id)
+                INNER JOIN {ml_recommender_interaction_types} mrit ON (mrit.id = mrt.interaction_type_id) 
+                WHERE mrt.item_id = base.id
+                AND mrt.user_id <> base.userid
+                AND mrc.component = '{$component}'
+                AND mrc.area IS NULL
+                AND mrit.interaction = 'view'
+                )",
+                [
+                    'displayfunc' => 'plaintext',
+                    'dbdatatype' => 'text',
+                    'iscompound' => true,
+                ]
+            );
+        }
 
         $columnoptions[] = new rb_column_option(
             'playlistengagement',
