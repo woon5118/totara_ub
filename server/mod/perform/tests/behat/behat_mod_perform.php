@@ -1397,7 +1397,7 @@ class behat_mod_perform extends behat_base {
         return subject_instance::repository()
             ->as('si')
             ->join([track_user_assignment::TABLE, 'tua'], 'tua.id', 'si.track_user_assignment_id')
-            ->join([track::TABLE, 't'], 't.id', 'tua.id')
+            ->join([track::TABLE, 't'], 't.id', 'tua.track_id')
             ->join([activity::TABLE, 'a'], 'a.id', 't.activity_id')
             ->where('a.name', $activity_name)
             ->join([user::TABLE, 'u'], 'u.id', 'si.subject_user_id')
