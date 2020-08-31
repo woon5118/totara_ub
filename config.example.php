@@ -888,11 +888,6 @@ Dangerous advanced settings
 // authentication plugins working or if the deprecated alternative login URL setting is being used.
 // $CFG->allowlogincsrf = 1;
 //
-// Enable fast hashing of users passwords when importing users through HR Import.
-// When turned on password hashing for users is significantly faster. However this comes at the cost of security. We
-// strongly recommend not changing this setting.
-// $CFG->tool_totara_sync_enable_fasthash = true;
-//
 // Enable custom script replacement of existing Totara scripts.
 // If set, must be set to a directory that can be read by the web server. When set and a request is made to a script in
 // Totara that requires config.php, the code will check if a script exists within the configured directory, in the same
