@@ -251,7 +251,7 @@ export default class BundleLoader {
 
       // last tui_scss link should be the theme css, so insert directly before that.
       const tuiLinks = document.head.querySelectorAll(
-        'link[rel=stylesheet][href*=tui_scss]'
+        'link[rel=stylesheet][href*="tui/styles.php"]'
       );
       const lastTuiLink = tuiLinks[tuiLinks.length - 1];
       if (lastTuiLink) {
