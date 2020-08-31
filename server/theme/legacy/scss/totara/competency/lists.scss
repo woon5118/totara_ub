@@ -256,7 +256,7 @@
     }
 
     &:hover:not(:first-child) {
-      background: var(--color-state-highlight);
+      background: var(--color-state-highlight-neutral);
     }
 
     &:last-child {
@@ -272,7 +272,7 @@
     }
 
     &_hover {
-      background: var(--color-state-highlight);
+      background: var(--color-state-highlight-neutral);
     }
 
     &_disabled {

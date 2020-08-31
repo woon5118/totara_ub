@@ -23,7 +23,7 @@
   --form-radio-dot-color: var(--color-state);
   --form-radio-bg-color: var(--color-neutral-1);
   --form-radio-bg-color-disabled: var(--color-neutral-3);
-  --form-radio-bg-color-focus: var(--color-state-highlight);
+  --form-radio-bg-color-focus: var(--color-state-highlight-neutral);
   --form-radio-bg-color-hover: var(--color-neutral-1);
   --form-radio-bg-color-active: var(--color-neutral-1);
   --form-radio-border-color: var(--color-neutral-6);
@@ -36,7 +36,7 @@
   --form-checkbox-check-color-disabled: var(--color-neutral-5);
   --form-checkbox-bg-color: var(--color-neutral-1);
   --form-checkbox-bg-color-disabled: var(--color-neutral-3);
-  --form-checkbox-bg-color-focus: var(--color-state-highlight);
+  --form-checkbox-bg-color-focus: var(--color-state-highlight-neutral);
   --form-checkbox-bg-color-active: var(--color-state);
   --form-checkbox-border-color: var(--color-neutral-6);
   --form-checkbox-border-color-disabled: var(--color-state-disabled);
@@ -119,7 +119,7 @@
 
   // Checkbox btn background & text
   --btn-checkbox-bg-color-selected: var(--color-neutral-3);
-  --btn-checkbox-bg-color-hover: var(--color-state-highlight);
+  --btn-checkbox-bg-color-hover: var(--color-state-highlight-neutral);
   --btn-checkbox-text-color: var(--color-state);
   --btn-checkbox-text-color-active: var(--color-state-active);
   --btn-checkbox-text-color-focus: var(--color-state-focus);

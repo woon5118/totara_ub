@@ -228,7 +228,7 @@ export default {
 
       &:hover,
       &:focus {
-        background-color: var(--color-state-highlight);
+        background-color: var(--color-state-highlight-neutral);
       }
     }
 

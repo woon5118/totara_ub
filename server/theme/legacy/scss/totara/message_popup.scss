@@ -197,7 +197,7 @@
           &:hover {
             @include setSelectedContact();
             color: var(--color-state-hover);
-            background-color: var(--color-state-highlight);
+            background-color: var(--color-state-highlight-neutral);
           }
 
           &.selected {
@@ -1103,7 +1103,7 @@
               &:hover {
                 @include setSelectedContact();
                 color: var(--color-state-hover);
-                background-color: var(--color-state-highlight);
+                background-color: var(--color-state-highlight-neutral);
               }
 
               .picture {

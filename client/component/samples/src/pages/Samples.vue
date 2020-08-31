@@ -318,7 +318,7 @@ export default {
     &:focus {
       color: var(--color-state-focus);
       text-decoration: none;
-      background-color: var(--color-state-highlight);
+      background-color: var(--color-state-highlight-neutral);
     }
 
     &--selected,

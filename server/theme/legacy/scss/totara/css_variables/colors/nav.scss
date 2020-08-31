@@ -38,7 +38,7 @@
   --nav-tab-border-color-focus: var(--nav-tab-bg-color-focus);
   --nav-tab-border-inner-color-focus: var(--color-neutral-5);
   --nav-tab-text-color-focus: var(--color-neutral-7);
-  --nav-tab-mobile-bg-color-focus: var(--color-state-highlight);
+  --nav-tab-mobile-bg-color-focus: var(--color-state-highlight-neutral);
   // Primary tab selected
   --nav-tab-bg-color-selected: var(--color-neutral-1);
   --nav-tab-border-color-selected: var(--nav-tab-bg-color-selected);
@@ -50,7 +50,7 @@
   --nav-tab-expand-border-color: var(--color-neutral-5);
   --nav-tab-expand-text-color: var(--nav-tab-text-color);
   // Primary tab expanded menu hover/focus
-  --nav-tab-expand-bg-color-focus: var(--color-state-highlight);
+  --nav-tab-expand-bg-color-focus: var(--color-state-highlight-neutral);
   --nav-tab-expand-text-color-focus: var(--color-neutral-7);
   // Expanded menu selected expand item
   --nav-tab-expand-bg-color-selected: var(--color-neutral-3);
@@ -74,14 +74,14 @@
   --nav-sub-tab-border-color: var(--color-neutral-1);
   --nav-sub-tab-text-color: var(--color-neutral-7);
   // Sub tab hover/focus
-  --nav-sub-tab-bg-color-focus: var(--color-state-highlight);
-  --nav-sub-tab-border-color-focus: var(--color-state-highlight);
+  --nav-sub-tab-bg-color-focus: var(--color-state-highlight-neutral);
+  --nav-sub-tab-border-color-focus: var(--color-state-highlight-neutral);
   --nav-sub-tab-text-color-focus: var(--color-neutral-7);
   // Sub tab selected
   --nav-sub-tab-bg-color-selected: var(--color-neutral-1);
   --nav-sub-tab-border-color-selected: var(--color-primary);
   // Expanded menu selected expand item
-  --nav-sub-tab-expand-bg-color-selected: var(--color-state-highlight);
+  --nav-sub-tab-expand-bg-color-selected: var(--color-state-highlight-neutral);
 
   //
   // Navigation Quick access menu

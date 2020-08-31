@@ -104,7 +104,7 @@ export default {
         },
         {
           class: 'tui-colourSamplesBox--stateHighlight',
-          name: 'var(--color-state-highlight);',
+          name: 'var(--color-state-highlight-neutral);',
         },
         {
           class: 'tui-colourSamplesBox--stateDisabled',
@@ -285,7 +285,7 @@ export default {
 }
 
 .tui-colourSamplesBox--stateHighlight {
-  background: var(--color-state-highlight);
+  background: var(--color-state-highlight-neutral);
 }
 
 .tui-colourSamplesBox--stateDisabled {
