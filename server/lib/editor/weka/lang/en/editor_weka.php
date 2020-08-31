@@ -41,6 +41,7 @@ $string['error_textarea_not_found'] = 'Failed to initialise Weka editor. The tex
 $string['error_no_url_info'] = 'This URL does not have enough information available.';
 $string['error_upload_failed'] = 'Upload failed.';
 $string['file_with_size'] = '{$a->filename} ({$a->size})';
+$string['file_size_exceed'] = 'The maximum file size you can upload is {$a}MB.';
 $string['format_as_blocktype_status'] = 'Format as: {$a}';
 $string['go_to_link'] = 'Go to link';
 $string['hashtag'] = '#{$a}';

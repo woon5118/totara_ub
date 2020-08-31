@@ -19,8 +19,11 @@
 import { prepareDraftFileArea } from '../api';
 import { upload, parseFiles } from '../utils/upload';
 import { langString, loadLangStrings } from 'tui/i18n';
+import { notify } from 'tui/notifications';
 
 const has = Object.prototype.hasOwnProperty;
+const MaxFileSize = 60; // Max size of upload file is 60MB
+const MegaToByte = 1024 * 1024;
 
 /**
  * File manager for weka editor. This file storage should only support multiple extensions per editor only.
@@ -227,6 +230,14 @@ export default class FileStorage {
         return;
       }
 
+      if (this.checkFilesSizeExceed(files)) {
+        const str = langString('file_size_exceed', 'editor_weka', MaxFileSize);
+        loadLangStrings([str]).then(() =>
+          notify({ type: 'error', message: str.toString() })
+        );
+        return;
+      }
+
       Promise.all(files.map(rawFile => this.uploadFile(rawFile, acceptTypes)))
         .then(submitFiles => {
           resolve(submitFiles);
@@ -235,5 +246,10 @@ export default class FileStorage {
           reject(e);
         });
     });
+  }
+
+  checkFilesSizeExceed(files) {
+    const exceedBytes = MaxFileSize * MegaToByte;
+    return files.some(file => file.size > exceedBytes);
   }
 }
