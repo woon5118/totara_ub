@@ -21,9 +21,9 @@
  * @package mod_perform
  */
 
+use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
-use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use totara_core\relationship\relationship;
@@ -33,20 +33,33 @@ use totara_core\relationship\relationship;
  */
 class mod_perform_activity_model_testcase extends advanced_testcase {
 
+    /**
+     * @var mod_perform_generator|component_generator_base
+     */
+    protected $perform_generator;
+
+    protected function setUp(): void {
+        parent::setUp();
+        self::setAdminUser();
+        $this->perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+    }
+
+    protected function tearDown(): void {
+        $this->perform_generator = null;
+    }
+
     public function test_can_manage() {
         $data_generator = $this->getDataGenerator();
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
 
         $user1 = $data_generator->create_user();
         $user2 = $data_generator->create_user();
         $user3 = $data_generator->create_user();
 
         $this->setUser($user1);
-        $activity_user1 = $perform_generator->create_activity_in_container(['activity_name' => 'User1 One']);
+        $activity_user1 = $this->perform_generator->create_activity_in_container(['activity_name' => 'User1 One']);
 
         $this->setUser($user2);
-        $activity_user2 = $perform_generator->create_activity_in_container(['activity_name' => 'User2 One']);
+        $activity_user2 = $this->perform_generator->create_activity_in_container(['activity_name' => 'User2 One']);
 
         $this->setAdminUser();
 
@@ -64,15 +77,19 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
     }
 
     public function test_update_general_info(): void {
-        $original_data = new activity_entity();
-        $original_data->name = 'Existing activity name';
-        $original_data->description = 'Existing activity description';
-
+        $original_name = 'Existing activity name';
+        $original_description = 'Existing activity description';
         $activity_type = 'check-in';
-        $activity = $this->create_activity($original_data, $activity_type, draft::get_code());
 
-        $this->assertEquals($activity->name, $original_data->name);
-        $this->assertEquals($activity->description, $original_data->description);
+        $activity = $this->perform_generator->create_activity_in_container([
+            'activity_name' => $original_name,
+            'description' => $original_description,
+            'activity_type' => $activity_type,
+            'activity_status' => draft::get_code(),
+        ]);
+
+        $this->assertEquals($activity->name, $original_name);
+        $this->assertEquals($activity->description, $original_description);
         $this->assertEquals($activity->type->name, $activity_type);
 
         $new_type_id = activity_type::load_by_name('feedback')->id;
@@ -91,15 +108,19 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
     }
 
     public function test_update_general_info_accepts_null_description(): void {
-        $original_data = new activity_entity();
-        $original_data->name = 'Existing activity name';
-        $original_data->description = 'Existing activity description';
-
+        $original_name = 'Existing activity name';
+        $original_description = 'Existing activity description';
         $activity_type = 'feedback';
-        $activity = $this->create_activity($original_data, $activity_type);
 
-        $this->assertEquals($activity->name, $original_data->name);
-        $this->assertEquals($activity->description, $original_data->description);
+        $activity = $this->perform_generator->create_activity_in_container([
+            'activity_name' => $original_name,
+            'description' => $original_description,
+            'activity_type' => $activity_type,
+            'activity_status' => draft::get_code(),
+        ]);
+
+        $this->assertEquals($activity->name, $original_name);
+        $this->assertEquals($activity->description, $original_description);
         $this->assertEquals($activity->type->name, $activity_type);
 
         $activity->set_general_info('New name for existing activity', null, null)->update();
@@ -115,12 +136,12 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
     }
 
     public function test_update_attribution_settings(): void {
-        $original_data = new activity_entity();
-        $original_data->name = 'Existing activity name';
-        $original_data->description = 'Existing activity description';
-
-        $activity_type = 'check-in';
-        $activity = $this->create_activity($original_data, $activity_type, draft::get_code());
+        $activity = $this->perform_generator->create_activity_in_container([
+            'activity_name' => 'Existing activity name',
+            'description' => 'Existing activity description',
+            'activity_type' => 'check-in',
+            'activity_status' => draft::get_code(),
+        ]);
 
         $this->assertFalse($activity->anonymous_responses);
 
@@ -135,39 +156,37 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
     }
 
     public function test_cant_update_attribution_settings_when_active(): void {
-        $original_data = new activity_entity();
-        $original_data->name = 'Existing activity name';
-        $original_data->description = 'Existing activity description';
+        $activity_model = $this->perform_generator->create_activity_in_container([
+            'activity_name' => 'Existing activity name',
+            'description' => 'Existing activity description',
+            'activity_type' => 'check-in',
+            'activity_status' => draft::get_code(),
+        ]);
+        $activity_entity = new activity_entity($activity_model->id);
+        $activity_model = activity::load_by_entity($activity_entity);
 
-        $activity_type = 'check-in';
-        $activity = $this->create_activity($original_data, $activity_type, draft::get_code());
+        $activity_entity->status = active::get_code();
+        $activity_entity->save();
 
-        $original_data->refresh();
-        $original_data->status = active::get_code();
-        $original_data->save();
-
-        self::assertTrue($activity->is_active(), 'Failed precondition check, activity should be active.');
+        self::assertTrue($activity_model->is_active(), 'Failed precondition check, activity should be active.');
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Attribution settings can not be updated when an activity is active');
 
-        $activity->set_anonymous_setting(true);
+        $activity_model->set_anonymous_setting(true);
     }
 
     /**
      * Test updating an active activity manual relationship fails.
     */
     public function test_cant_update_manual_relationship_when_active(): void {
-        $original_data = new activity_entity(
-            [
-                'name' => 'Existing activity',
-                'description' => 'Existing activity description',
-            ],
-            false,
-            false
-        );
+        $activity = $this->perform_generator->create_activity_in_container([
+            'activity_name' => 'Existing activity name',
+            'description' => 'Existing activity description',
+            'activity_type' => 'check-in',
+            'activity_status' => active::get_code(),
+        ]);
 
-        $activity = $this->create_activity($original_data, 'check-in', active::get_code());
         $manager_relationship = relationship::load_by_idnumber('manager');
 
         $manual_relationships_args = [];
@@ -191,11 +210,10 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
      * @throws coding_exception
      */
     public function test_update_general_should_validate_new_attributes(string $new_name, string $expected_message): void {
-        $original_data = new activity_entity();
-        $original_data->name = 'Existing activity name';
-        $original_data->description = 'Existing activity description';
-
-        $activity = $this->create_activity($original_data);
+        $activity = $this->perform_generator->create_activity_in_container([
+            'activity_name' => 'Existing activity name',
+            'description' => 'Existing activity description',
+        ]);
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage($expected_message);
@@ -204,13 +222,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
     }
 
     public function test_update_general_should_not_update_type_for_active_activity() {
-        $this->setAdminUser();
-
-        $data_generator = $this->getDataGenerator();
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
-
-        $active_activity = $perform_generator->create_activity_in_container(
+        $active_activity = $this->perform_generator->create_activity_in_container(
             [
                 'activity_name' => 'User1 One',
                 'activity_status' => active::get_code(),
@@ -239,10 +251,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
     }
 
     public function test_update_general_should_fail_on_new_activity(): void {
-        $original_data = new activity_entity();
-        $original_data->name = 'Existing activity name';
-        $original_data->description = 'Existing activity description';
-
+        $activity = $this->perform_generator->create_activity_in_container();
         $new_entity = new class extends activity_entity {
             public $exists_now = true;
 
@@ -250,6 +259,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
                 return $this->exists_now;
             }
         };
+        $new_entity->course = $activity->course;
 
         /** @var activity $activity */
         $activity = activity::load_by_entity($new_entity);
@@ -262,13 +272,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
     }
 
     public function test_status() {
-        $this->setAdminUser();
-
-        $data_generator = $this->getDataGenerator();
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
-
-        $draft_activity = $perform_generator->create_activity_in_container(
+        $draft_activity = $this->perform_generator->create_activity_in_container(
             [
                 'activity_name' => 'User1 One',
                 'activity_status' => draft::get_code(),
@@ -277,10 +281,10 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
 
         $this->assertEquals(draft::get_code(), $draft_activity->status);
         $state = $draft_activity->get_status_state();
-        $this->assertEquals('DRAFT', $state->get_name());
-        $this->assertEquals('Draft', $state->get_display_name());
+        $this->assertEquals('DRAFT', $state::get_name());
+        $this->assertEquals('Draft', $state::get_display_name());
 
-        $active_activity = $perform_generator->create_activity_in_container(
+        $active_activity = $this->perform_generator->create_activity_in_container(
             [
                 'activity_name' => 'User1 One',
                 'activity_status' => active::get_code(),
@@ -289,20 +293,24 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
 
         $this->assertEquals(active::get_code(), $active_activity->status);
         $state = $active_activity->get_status_state();
-        $this->assertEquals('ACTIVE', $state->get_name());
-        $this->assertEquals('Active', $state->get_display_name());
+        $this->assertEquals('ACTIVE', $state::get_name());
+        $this->assertEquals('Active', $state::get_display_name());
     }
 
     public function test_update_general_info_not_accepts_title_only_with_spaces(): void {
-        $original_data = new activity_entity();
-        $original_data->name = 'Existing activity name';
-        $original_data->description = 'Existing activity description';
-
+        $original_name = 'Existing activity name';
+        $original_description = 'Existing activity description';
         $activity_type = 'feedback';
-        $activity = $this->create_activity($original_data, $activity_type);
 
-        $this->assertEquals($activity->name, $original_data->name);
-        $this->assertEquals($activity->description, $original_data->description);
+        $activity = $this->perform_generator->create_activity_in_container([
+            'activity_name' => $original_name,
+            'description' => $original_description,
+            'activity_type' => $activity_type,
+            'activity_status' => draft::get_code(),
+        ]);
+
+        $this->assertEquals($activity->name, $original_name);
+        $this->assertEquals($activity->description, $original_description);
         $this->assertEquals($activity->type->name, $activity_type);
 
         $this->expectException(coding_exception::class);
@@ -311,22 +319,24 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $activity->set_general_info('   ', null, null)->update();
     }
 
-    /**
-     * Create just the activity entity without any container.
-     *
-     * @param activity_entity $entity
-     * @param string $type activity type
-     * @param int $status
-     * @return activity
-     * @throws coding_exception
-     */
-    private function create_activity(activity_entity $entity, string $type = 'appraisal', int $status = 1): activity {
-        $entity->type_id = activity_type::load_by_name($type)->id;
-        $entity->status = $status;
+    public function test_update_general_info_updates_course_container_name(): void {
+        $original_name = 'Appraisal';
+        $updated_name = 'Feedback';
 
-        /** @var activity_entity $entity */
-        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-        $entity = activity_entity::repository()->create_entity($entity);
-        return activity::load_by_entity($entity);
+        $activity = $this->perform_generator->create_activity_in_container(['activity_name' => $original_name]);
+        $container = $activity->get_container();
+
+        $this->assertEquals($original_name, $activity->name);
+        $this->assertEquals($original_name, $container->fullname);
+        $this->assertNotEquals($updated_name, $activity->name);
+        $this->assertNotEquals($updated_name, $container->fullname);
+
+        $activity->set_general_info($updated_name, null, null)->update();
+        $container = $activity->get_container();
+
+        $this->assertEquals($updated_name, $activity->name);
+        $this->assertEquals($updated_name, $container->fullname);
+        $this->assertNotEquals($original_name, $activity->name);
+        $this->assertNotEquals($original_name, $container->fullname);
     }
 }

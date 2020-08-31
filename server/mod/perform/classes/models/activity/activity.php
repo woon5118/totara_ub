@@ -84,6 +84,7 @@ use totara_core\relationship\relationship_provider;
  * @property bool multisection_setting
  * @property-read bool $can_clone
  * @property-read int $context_id
+ * @property-read perform_container $container
  *
  * @package mod_perform\models\activity
  */
@@ -115,6 +116,7 @@ class activity extends model {
         'can_clone',
         'visibility_condition_options',
         'context_id',
+        'container',
     ];
 
     public const NAME_MAX_LENGTH = 1024;
@@ -155,6 +157,15 @@ class activity extends model {
             ->one(true);
 
         return self::load_by_entity($entity);
+    }
+
+    /**
+     * Get the course container for this activity.
+     *
+     * @return perform_container
+     */
+    public function get_container(): perform_container {
+        return perform_container::from_activity($this);
     }
 
     /**
@@ -382,11 +393,31 @@ class activity extends model {
     }
 
     public function update(): self {
-        $this->entity->update();
+        builder::get_db()->transaction(function () {
+            $this->update_container();
+            $this->entity->update();
+        });
 
         $this->entity->load_relation('type');
 
         return $this;
+    }
+
+    /**
+     * Update the container course record to be in sync with the activity.
+     */
+    protected function update_container(): void {
+        $to_update = [];
+
+        // Update the name if it has changed.
+        if (isset($this->entity->get_dirty()['name'])) {
+            $to_update['fullname'] = $this->entity->name;
+        }
+
+        if (!empty($to_update)) {
+            $container = $this->get_container();
+            $container->update((object) array_merge($to_update, ['id' => $container->id]));
+        }
     }
 
     /**
