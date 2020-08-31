@@ -29,7 +29,7 @@ if (file_exists(__DIR__.'/../../config.php')) {
     die('// Installation has been completed, install styles no longer served.');
 }
 
-$content = file_get_contents(__DIR__.'/../theme/ventura/style/totara.css');
+$content = file_get_contents(__DIR__.'/../theme/legacy/style/totara.css');
 
 $content .= <<<EOF
 
@@ -37,13 +37,19 @@ $content .= <<<EOF
     direction: ltr !important;
 }
 
+#header {
+    background-color: rgb(61, 68, 75);
+}
+
 .headermain {
-    margin: 15px;
+    padding: 15px;
+    color: #FFF;
 }
 .headermain img {
     height: 40px;
-    margin: 15px 15px 15px 0;
+    margin: 0 15px;
     display: inline;
+    vertical-align:top;
 }
 
 #installdiv {
@@ -97,6 +103,7 @@ label {
 
 .totara-navbar-container {
     height: 40px;
+    background-color:#FFF;
 }
 
 .breadcrumb {

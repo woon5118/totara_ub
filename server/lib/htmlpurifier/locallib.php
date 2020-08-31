@@ -24,6 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+if (during_initial_install() && !class_exists('HTMLPurifier_URIScheme')) {
+    // Class autoloading is not working here. We can however manually get it going.
+    require_once(__DIR__ . '/../../../libraries/required/autoload.php');
+}
+
 /**
  * Validates RTSP defined by RFC 2326
  */
