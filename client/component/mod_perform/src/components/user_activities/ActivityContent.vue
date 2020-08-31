@@ -1115,7 +1115,8 @@ export default {
         // handle initValue is null, but formValue is empty string or array
         // convert empty formValue to null, then we can compare the difference
         let isEmptyForm =
-          formValue === null || Object.values(formValue)[0].length === 0;
+          formValue === null || !Object.values(formValue)[0] || Object.values(formValue)[0].length === 0;
+
         if (isEmptyForm) {
           formValue = null;
         }
