@@ -143,6 +143,21 @@ class activity extends model {
     }
 
     /**
+     * Gets a model object based on the course module id.
+     *
+     * @param int $course_module_id
+     * @return static
+     */
+    public static function load_by_module_id(int $course_module_id): self {
+        $entity = activity_entity::repository()
+            ->join('course_modules', 'course', 'course')
+            ->where('course_modules.id', $course_module_id)
+            ->one(true);
+
+        return self::load_by_entity($entity);
+    }
+
+    /**
      * Checks whether the logged in (or given) user has the capability to create the activity.
      *
      * @param int|null $userid
