@@ -234,6 +234,9 @@ class scss {
         $cssvars_legacy_imports = [];
         if ($this->options->get_legacy()) {
             $cssvars_legacy_imports = $imports;
+            foreach ($tui_core_files['variables'] as $theme_file) {
+                $cssvars_legacy_imports[] = "output_only!internal_absolute:" . $theme_file;
+            }
             foreach ($themes_files as $theme_files) {
                 foreach ($theme_files['variables'] as $theme_file) {
                     $cssvars_legacy_imports[] = "output_only!internal_absolute:" . $theme_file;
