@@ -55,15 +55,15 @@ Feature: User activity anonymise responses
 
     Then I should see "All responses anonymised" in the ".tui-participantContent__user" "css_element"
     # The missing ("No response submitted") answers should be last.
-    And I should see "Manager Answer one" as answer "1" in the anonymous responses group for question "Question one"
+    And I should see "Manager Answer one" as answer "any" in the anonymous responses group for question "Question one"
     # No responses from the appraiser and subject, and missing ("No response submitted") answers should be last.
-    And I should see "My Answer one" as answer "2" in the anonymous responses group for question "Question one"
-    And I should see "No response submitted" as answer "3" in the anonymous responses group for question "Question one"
+    And I should see "My Answer one" as answer "any" in the anonymous responses group for question "Question one"
+    And I should see "No response submitted" as answer "any" in the anonymous responses group for question "Question one"
 
-    And I should see "Manager Answer two" as answer "1" in the anonymous responses group for question "Question two"
+    And I should see "Manager Answer two" as answer "any" in the anonymous responses group for question "Question two"
     # No responses from the appraiser and subject, and missing ("No response submitted") answers should be last.
-    And I should see "My Answer two" as answer "2" in the anonymous responses group for question "Question two"
-    And I should see "No response submitted" as answer "3" in the anonymous responses group for question "Question two"
+    And I should see "My Answer two" as answer "any" in the anonymous responses group for question "Question two"
+    And I should see "No response submitted" as answer "any" in the anonymous responses group for question "Question two"
 
   Scenario: manager can submit anonymise responses and view-only subject can view them
     Given I log in as "manager"
@@ -81,13 +81,13 @@ Feature: User activity anonymise responses
     And I navigate to the outstanding perform activities list page
     And I click on "Anonymise responses view-only subject" "link"
     And I should not see the show others responses toggle
-    And I should see "Manager Answer one" as answer "1" in the anonymous responses group for question "Question one"
+    And I should see "Manager Answer one" as answer "any" in the anonymous responses group for question "Question one"
     # No responses from the appraiser, and missing ("No response submitted") answers should be last.
-    And I should see "No response submitted" as answer "2" in the anonymous responses group for question "Question one"
+    And I should see "No response submitted" as answer "any" in the anonymous responses group for question "Question one"
 
-    And I should see "Manager Answer two" as answer "1" in the anonymous responses group for question "Question two"
+    And I should see "Manager Answer two" as answer "any" in the anonymous responses group for question "Question two"
     # No responses from the appraiser, and missing ("No response submitted") answers should be last.
-    And I should see "No response submitted" as answer "2" in the anonymous responses group for question "Question two"
+    And I should see "No response submitted" as answer "any" in the anonymous responses group for question "Question two"
 
     # Check view-only reporting view
     When I log out
@@ -95,10 +95,10 @@ Feature: User activity anonymise responses
     And I navigate to the view only report view of performance activity "Anonymise responses view-only subject" where "subject" is the subject
 
     Then I should see "All responses anonymised" in the ".tui-participantContent__user" "css_element"
-    And I should see "Manager Answer one" as answer "1" in the anonymous responses group for question "Question one"
+    And I should see "Manager Answer one" as answer "any" in the anonymous responses group for question "Question one"
     # No responses from the appraiser, and missing ("No response submitted") answers should be last.
-    And I should see "No response submitted" as answer "2" in the anonymous responses group for question "Question one"
+    And I should see "No response submitted" as answer "any" in the anonymous responses group for question "Question one"
 
-    And I should see "Manager Answer two" as answer "1" in the anonymous responses group for question "Question two"
+    And I should see "Manager Answer two" as answer "any" in the anonymous responses group for question "Question two"
     # No responses from the appraiser, and missing ("No response submitted") answers should be last.
-    And I should see "No response submitted" as answer "2" in the anonymous responses group for question "Question two"
+    And I should see "No response submitted" as answer "any" in the anonymous responses group for question "Question two"

@@ -603,26 +603,47 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I should see "([^"]*)" as answer "([1-9])" in the anonymous responses group for question "([^"]*)"$/
+     * @Given /^I should see "([^"]*)" as answer "([0-9]*|any)" in the anonymous responses group for question "([^"]*)"$/
      * @param string $expected_answer
-     * @param int $response_number
+     * @param string $response_number
      * @param string $question_text
      */
     public function i_should_see_as_answer_in_the_anonymous_responses_group_for_question(
         string $expected_answer,
-        int $response_number,
+        string $response_number,
         string $question_text
     ): void {
         $question = $this->find_question_from_text($question_text);
 
         $anonymous_responses = $question->findAll('css', self::TUI_OTHER_PARTICIPANT_RESPONSES_ANONYMOUS_RESPONSE_PARTICIPANT_LOCATOR);
 
-        $actual_response = $anonymous_responses[$response_number - 1];
+        if (is_number($response_number)) {
+            $response_number = (int)$response_number;
+            if ($response_number < 1) {
+                $this->fail("Invalid response number {$response_number}. Expected 1 or above");
+            }
 
-        $actual_answer_text = trim($actual_response->getText());
+            $actual_response = $anonymous_responses[(int)$response_number - 1];
+            $actual_answer_text = trim($actual_response->getText());
 
-        if ($actual_answer_text !== $expected_answer) {
-            $this->fail("Expected response {$response_number} to be {$expected_answer}, but found {$actual_answer_text}");
+            if ($actual_answer_text !== $expected_answer) {
+                $this->fail("Expected response \"{$response_number}\" to be \"{$expected_answer}\", but found \"{$actual_answer_text}\"");
+            }
+        } else if ($response_number === 'any') {
+            $fnd = false;
+            foreach ($anonymous_responses as $response) {
+                $actual_answer_text = trim($response->getText());
+                if ($expected_answer === $actual_answer_text) {
+                    $fnd = true;
+                    break;
+                }
+            }
+
+            if (!$fnd) {
+                $this->fail("Expected response \"{$expected_answer}\" not found in question \"{$question_text}\"");
+            }
+        } else {
+            $this->fail("Invalid response number \"{$response_number}\". Expected a number or \"any\"");
         }
     }
 
