@@ -321,14 +321,14 @@ class totara_engage_rb_engagecontent_report_testcase extends advanced_testcase {
 
         // Create articles for user_one.
         $this->setUser($user_one);
-        $article1 = $articlegen->create_article();
-        $article2 = $articlegen->create_article();
-        $article3 = $articlegen->create_article();
+        $article1 = $articlegen->create_article(['name' => 'article 1']);
+        $article2 = $articlegen->create_article(['name' => 'article 2']);
+        $article3 = $articlegen->create_article(['name' => 'article 3']);
 
         // Create articles for user_two.
         $this->setUser($user_two);
-        $article4 = $articlegen->create_article();
-        $article5 = $articlegen->create_article();
+        $article4 = $articlegen->create_article(['name' => 'article 4']);
+        $article5 = $articlegen->create_article(['name' => 'article 5']);
 
         $this->setAdminUser();
         $articlegen->create_article();
