@@ -34,8 +34,8 @@ Feature: Show only links to member information the manager has permission to see
 
   Scenario: Plans link is not available if learningplans feature is not visible
     Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Learning Plans" to "Disable"
+    And I navigate to "Learn settings" node in "Site administration > System information > Configure features"
+    And I set the field "Enable Learning Plans" to "0"
     And I press "Save changes"
     And I log out
     When I log in as "manager1"
@@ -61,8 +61,8 @@ Feature: Show only links to member information the manager has permission to see
 
   Scenario: Appraisals link is not available if appraisals feature is not visible
     Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Legacy Appraisals" to "Disable"
+    And I navigate to "Perform settings" node in "Site administration > System information > Configure features"
+    And I set the field "Enable legacy appraisals" to "0"
     And I press "Save changes"
     And I log out
     When I log in as "manager1"
@@ -86,8 +86,8 @@ Feature: Show only links to member information the manager has permission to see
 
   Scenario: 360 Feedback link is not available if feedback360 feature is not visible
     Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Legacy 360 Feedback" to "Disable"
+    And I navigate to "Perform settings" node in "Site administration > System information > Configure features"
+    And I set the field "Enable legacy 360 feedback" to "0"
     And I press "Save changes"
     And I log out
     When I log in as "manager1"
@@ -109,8 +109,8 @@ Feature: Show only links to member information the manager has permission to see
 
   Scenario: Goals link is not available if goals feature is not visible
     Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Goals" to "Disable"
+    And I navigate to "Perform settings" node in "Site administration > System information > Configure features"
+    And I set the field "Enable Goals" to "0"
     And I press "Save changes"
     And I log out
     When I log in as "manager1"
@@ -131,13 +131,9 @@ Feature: Show only links to member information the manager has permission to see
     And "Goals" "link" should not exist in the "User 1" "table_row"
 
   Scenario: Required link is not available if programs and certifications features are not visible
-    Given I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Programs" to "Disable"
-    And I set the field "Enable Certifications" to "Disable"
-    And I press "Save changes"
-    And I log out
-    When I log in as "manager1"
+    When I disable the "certifications" advanced feature
+    And I disable the "programs" advanced feature
+    And I log in as "manager1"
     And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Required" "link" should not exist in the "User 1" "table_row"

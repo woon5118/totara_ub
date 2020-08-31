@@ -34,7 +34,7 @@ Feature: See that audience based visibility doesn't effect a program showing in 
   Scenario: Audience based visibility where learner can't see program.
     Given the "mylearning" user profile block exists
     And I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration > System information"
+    When I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     And I navigate to "Manage programs" node in "Site administration > Programs"

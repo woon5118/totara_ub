@@ -140,7 +140,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
     # Switch the site setting, certification is now set to all users (default).
     When I log out
     And I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -169,7 +169,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
   @javascript
   Scenario: Audience visibility, all users (default).
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -197,7 +197,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
   @javascript
   Scenario: Audience visibility, enrolled users and auds.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -232,7 +232,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
   @javascript
   Scenario: Audience visibility, enrolled users.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -267,7 +267,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
   @javascript
   Scenario: Audience visibility, no users.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -296,7 +296,7 @@ Feature: See that certification visibility affects Record of Learning: Certifica
   @javascript
   Scenario: Audience visibility, no users, 2nd certification assigned.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -331,8 +331,10 @@ Feature: See that certification visibility affects Record of Learning: Certifica
   @javascript
   Scenario: Certification ROL: Audience visibility, no users, newly assigned in 1st certification and then unassigned.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
+    And I press "Save changes"
+    And I navigate to "Learn settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable program completion editor" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -374,8 +376,10 @@ Feature: See that certification visibility affects Record of Learning: Certifica
   @javascript
   Scenario: Certification ROL: Audience visibility, no users, certified, before window opens in 1st certification and then unassigned.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
+    And I press "Save changes"
+    And I navigate to "Learn settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable program completion editor" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -443,8 +447,10 @@ Feature: See that certification visibility affects Record of Learning: Certifica
   @javascript
   Scenario: Certification ROL: Audience visibility, no users, certified, window is open in 1st certification and then unassigned.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
+    And I press "Save changes"
+    And I navigate to "Learn settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable program completion editor" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -513,8 +519,10 @@ Feature: See that certification visibility affects Record of Learning: Certifica
   @javascript
   Scenario: Certification ROL: Audience visibility, no users, expired in 2nd certification and then unassigned.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
+    And I press "Save changes"
+    And I navigate to "Learn settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable program completion editor" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"

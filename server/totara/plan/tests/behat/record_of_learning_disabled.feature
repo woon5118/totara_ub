@@ -14,10 +14,8 @@ Feature: Check Record of Learning feature visibility
 
   Scenario: Verify Record of Learning does not appear in the Totara menu if disabled
     Given I am on a totara site
+    And I disable the "recordoflearning" advanced feature
     And I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Record of Learning" to "Disable"
-    And I press "Save changes"
 
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Record of Learning" in the "#totaramenutable" "css_element"

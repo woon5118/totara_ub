@@ -359,12 +359,8 @@ $string['competencyupdatedframework'] = 'The competency framework "{$a}" has bee
 $string['competencyupdatetype'] = 'The competency type "{$a}" has been updated';
 $string['competent'] = 'Competent';
 $string['competentwithsupervision'] = 'Competent with supervision';
-$string['configenablegoals'] = 'This option will let you: Enable/Disable Goal features from users on this site.
-
-* If Enable is selected, all links, menus, tabs and option related to goals will be accessible.
-* If Disable is selected, goals will disappear from any menu on the site and will not be accessible.
-';
-$string['configshowhierarchyshortnames'] = 'Toggles the use of shortnames in addition to fullnames in hierarchy forms. When enabled, hierarchies will include a shortname field in the framework, item and type forms';
+$string['configenablegoals'] = 'When enabled this will allow users to set goals. All links, menus, tabs, and options related to goals will be accessible.';
+$string['configshowhierarchyshortnames'] = 'When enabled, hierarchies will include a shortname field in the framework, item and type forms';
 $string['confirmmoveitems'] = 'Are you sure you want to move {$a->num} {$a->items} into "{$a->parentname}"?<br /><br />Any children of the {$a->items} being moved will also be relocated at the same time.';
 $string['confirmpersonaldelete'] = 'Are you sure you want to delete {$a->username}\'s personal goal {$a->goalname}';
 $string['confirmproceed'] = 'Are you sure you want to proceed?';
@@ -496,17 +492,10 @@ $string['editscalevalue'] = 'Edit scale value';
 $string['edittype'] = 'Edit type';
 $string['edittypelevel'] = 'Edit type';
 $string['enablecompetencies'] = 'Enable Competencies';
-$string['enablecompetencies_desc'] = 'This option will let you: Enable/Disable Competency feature on this site.
-
-* If Enable is selected, all links, menus, tabs and option related to competencies will be accessible.
-* If Disable is selected, competencies will disappear from any menu on the site and will not be accessible.
-';
+$string['enablecompetencies_desc'] = 'When enabled, this will allow users to view competencies. All links, menus, tabs and options related to competencies will be accessible.';
 $string['enablegoals'] = 'Enable Goals';
-$string['enablepositions'] = 'Enable positions hierarchies';
-$string['enablepositions_desc'] = 'This option will let you: enable or disable the position hierarchy feature on this site.
-
-* If Enable is selected, all features related to positions will be visible and accessible.
-* If Disable is selected, no position features will be visible or accessible.';
+$string['enablepositions'] = 'Enable position hierarchies';
+$string['enablepositions_desc'] = 'When enabled, all features related to position hierarchies will be visible and accessible.';
 $string['enternamesoneperline'] = 'Enter {$a} names (one per line)';
 $string['entervaliddate'] = 'Enter a valid date';
 $string['error:addcompetency'] = 'There was a problem adding the competency "{$a}"';

@@ -24,14 +24,6 @@
 defined('MOODLE_INTERNAL') || die();
 /* @var admin_root $ADMIN */
 
-if ($hassiteconfig) {
-    /** @var admin_settingpage $temp */
-    $temp = $ADMIN->locate('optionalsubsystems');
-    if ($temp) {
-        $temp->add(new totara_tenant_admin_setting_enable());
-    }
-}
-
 $tenantsdisabled = empty($CFG->tenantsenabled);
 $ADMIN->add('root', new admin_category('tenants', new lang_string('tenants', 'totara_tenant')));
 

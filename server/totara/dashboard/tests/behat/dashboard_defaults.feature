@@ -85,10 +85,7 @@ Feature: Test Dashboard defaults
     And "Make home page" "button" should not exist
 
   Scenario: Disable Totara Dashboard feature
-    Given I log in as "admin"
-    And I set the following administration settings values:
-      | enabletotaradashboard | Disable |
-    And I log out
+    Given I disable the "totaradashboard" advanced feature
 
     When I log in as "student1"
     Then I should see "Latest announcements"

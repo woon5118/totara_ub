@@ -110,7 +110,7 @@ Their input is needed by {$a->duedate}.
 ';
 $string['configshowhistoricactivities'] = 'Use this setting to make any historic activities from Legacy Appraisals and 360 Feedback visible to assigned users under their Performance Activities.
 
-Note: Legacy Appraisals and Legacy 360 Feedback features must also be enabled in order to make historic activities visible.';
+Note: Legacy appraisals and legacy 360 feedback features must also be enabled in order to make historic activities visible.';
 $string['create_activity'] = 'Add activity';
 $string['create_activity_select_placeholder'] = 'Select...';
 $string['create_activity_title'] = 'Title';
@@ -167,10 +167,7 @@ $string['embedded_perform_subject_instance'] = 'Performance Subject Instance';
 $string['embedded_response_export_performance_reporting'] = 'Performance Activity Response Export';
 $string['embedded_user_performance_reporting'] = 'Performance data reporting: List of users to report on';
 $string['enable_performance_activities'] = 'Enable Performance Activities';
-$string['enable_performance_activities_description'] = 'This option lets you enable or disable the performance activities feature on this site.
-
-* If \'Enable\' is selected, all functionality related to performance activities will be visible and accessible to users.
-* If \'Disable\' is selected, no performance activities functionality will be visible or accessible.';
+$string['enable_performance_activities_description'] = 'When enabled this will allow users to view performance activities. All functionality related to performance activities will be visible and accessible to users.';
 $string['error_activity_id_wrong'] = 'Wrong activity id';
 $string['error_activity_name_missing'] = 'You are not allowed to create an activity with an empty name';
 $string['error_activity_unavailable'] = 'You cannot report on this activity because you do not have permission on any of its subject users';
@@ -522,7 +519,7 @@ $string['setting_element'] = "Element setting";
 $string['short_text'] = 'Short text';
 $string['subject_availability'] = 'Availability';
 $string['subject_instance_status'] = 'Status of subject instance';
-$string['showhistoricactivities'] = 'Show Historic Activities';
+$string['showhistoricactivities'] = 'Show historic activities';
 $string['subject_instance_availability_closed'] = 'Closed';
 $string['subject_instance_availability_open'] = 'Open';
 $string['subject_instance_availability_reopen'] = 'Reopen';

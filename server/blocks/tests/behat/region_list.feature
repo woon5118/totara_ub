@@ -121,8 +121,8 @@ Feature: Ensure page layouts are listed correctly
     When I click on "Stop customising this page" "button"
     Then "#block-region-main.editing-region-border" "css_element" should not exist
 
-    # On "Advanced features" page only the left region should have the region border displayed.
-    When I navigate to "Advanced features" node in "Site administration > System information"
+    # On "Configure features" page only the left region should have the region border displayed.
+    When I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I click on "Blocks editing on" "button"
     Then "#block-region-side-pre.editing-region-border" "css_element" should exist
     And "#block-region-main.editing-region-border" "css_element" should not exist

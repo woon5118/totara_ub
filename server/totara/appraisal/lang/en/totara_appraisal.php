@@ -133,11 +133,7 @@ $string['completedbyxonbehalfofy'] = ' ({$a->completedby} on behalf of {$a->comp
 $string['completedbyx'] = ' ({$a})';
 $string['completedon'] = 'This appraisal was completed on {$a}';
 $string['completestage'] = 'Complete stage';
-$string['configenablelegacyappraisals'] = 'This option will let you: Enable/Disable legacy appraisal features from users on this site.
-
-* Disable: Legacy appraisals will disappear from any menu on the site and will not be accessible.
-* Enable: Legacy appraisals will be accessible, but will not appear under user’s Performance Activities.
-';
+$string['configenablelegacyappraisals'] = 'When enabled this allows legacy appraisals to be accessible, but they will not appear under the user\'s performance activities. When disabled, legacy appraisals will disappear from all menus.';
 $string['confirmactivateappraisal'] = 'Do you really want to activate this appraisal?';
 $string['confirmactivatewarning'] = 'You can activate the appraisal without fixing these warnings, but users may encounter some issues. Do you really want to activate this appraisal?';
 $string['confirmcloseappraisal'] = 'Do you really want to close this appraisal?';
@@ -181,7 +177,7 @@ $string['editpageheading'] = 'Edit page';
 $string['editstageheading'] = 'Edit stage';
 $string['empty'] = 'Empty';
 $string['emptyassignments'] = 'Due to be removed';
-$string['enablelegacyappraisals'] = 'Enable Legacy Appraisals';
+$string['enablelegacyappraisals'] = 'Enable legacy appraisals';
 $string['example:appraisalname'] = 'Example appraisal';
 $string['example:appraisaldescription'] = '<p>This is an example appraisal. You can use this as a starting point for building your own appraisal or just browse around to see how the functionality works.</p><p>If you don\'t need it, just delete it and create your own.</p>';
 $string['example:scaleyesnoname'] = 'Yes or no';

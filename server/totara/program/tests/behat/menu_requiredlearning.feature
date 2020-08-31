@@ -21,23 +21,17 @@ Feature: Test Required Learning Main menu item
     And I press "Save changes"
     And "Required Learning" row "Visibility" column of "totaramenutable" table should contain "Show when accessible"
 
-    When I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Programs" to "Disable"
-    And I set the field "Enable Certifications" to "Disable"
-    And I press "Save changes"
+    When I disable the "certifications" advanced feature
+    And I disable the "programs" advanced feature
     And I navigate to "Main menu" node in "Site administration > Navigation"
     Then "Required Learning" row "Visibility" column of "totaramenutable" table should contain "Feature disabled"
 
-    When I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Programs" to "Enable"
-    And I set the field "Enable Certifications" to "Disable"
-    And I press "Save changes"
+    When I disable the "certifications" advanced feature
+    And I enable the "programs" advanced feature
     And I navigate to "Main menu" node in "Site administration > Navigation"
     Then "Required Learning" row "Visibility" column of "totaramenutable" table should contain "Show when accessible"
 
-    When I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Programs" to "Disable"
-    And I set the field "Enable Certifications" to "Enable"
-    And I press "Save changes"
+    When I enable the "certifications" advanced feature
+    And I disable the "programs" advanced feature
     And I navigate to "Main menu" node in "Site administration > Navigation"
     Then "Required Learning" row "Visibility" column of "totaramenutable" table should contain "Show when accessible"

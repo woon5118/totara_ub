@@ -268,8 +268,8 @@ Feature: Assigning a manager to a user via the job assignment page
     Then I should see "Manager One - Testing Manager"
 
   Scenario: Disabling multiple job assignments removes the create empty job assignment option in the totara dialog
-    And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Allow multiple job assignments" to "Disable"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
+    And I set the field "Enable multiple job assignments" to "0"
     And I press "Save changes"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "User One" "link" in the "User One" "table_row"

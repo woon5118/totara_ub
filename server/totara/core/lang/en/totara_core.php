@@ -102,8 +102,8 @@ At this point you can choose to delete all completion records for users who have
 Alternatively you can choose to keep all existing completion records and accept that different users may have received their status for different accomplishments.';
 $string['completionexcludefailuresoff'] = 'Users may complete activities in any way, failures are acceptable.';
 $string['completionexcludefailureson'] = 'Users have to complete activities without failures.';
-$string['configdynamicappraisals'] = 'This setting allows you to specify whether appraisals lock on activation and no longer update assignments and roles or continue to update after activation';
-$string['configdynamicappraisalsautoprogress'] = 'When Dynamic Appraisals is enabled, this setting allows you to specify whether appraisals will automatically progress to the next stage if one or more roles are empty (assuming all filled roles are complete and there is at least one role filled). When Dynamic Appraisals is not enabled, appraisals will automatically progress.';
+$string['configdynamicappraisals'] = 'When enabled this allows you to specify whether appraisals lock on activation and no longer update assignments and roles or continue to update after activation';
+$string['configdynamicappraisalsautoprogress'] = 'When legacy dynamic appraisals is enabled, this setting allows you to specify whether appraisals will automatically progress to the next stage if one or more roles are empty (assuming all filled roles are complete and there is at least one role filled). When Dynamic Appraisals is not enabled, appraisals will automatically progress.';
 $string['configforcelogintotara'] = 'Normally, the entire site is only available to logged in users. If you would like to make the front page and the course listings (but not the course contents) available without logging in, then you should uncheck this setting.';
 $string['core:appearance'] = 'Configure site appearance settings';
 $string['core:coursemanagecustomfield'] = 'Manage a course custom field';
@@ -225,8 +225,8 @@ $string['dragdrop_announce_move_unknown'] = 'You have moved the item from positi
 $string['dragdrop_announce_no_drop'] = 'The item cannot be dropped here.';
 $string['dragdrop_draggable_description'] = 'Draggable item';
 $string['dragdrop_draggable_instructions'] = 'Press space bar to start a drag. When dragging you can use the arrow keys to move the item around, escape to cancel, and space bar again to drop.';
-$string['dynamicappraisals'] = 'Dynamic Appraisals';
-$string['dynamicappraisalsautoprogress'] = 'Dynamic Appraisals Automatic Progression';
+$string['dynamicappraisals'] = 'Legacy dynamic appraisals';
+$string['dynamicappraisalsautoprogress'] = 'Legacy dynamic appraisals automatic progression';
 $string['editheading'] = 'Edit the Report Heading Block';
 $string['edition'] = 'Edition';
 $string['edittheme'] = 'Edit {$a} theme';
@@ -237,10 +237,7 @@ $string['emptyassignments'] = 'No assignments';
 $string['enabled'] = 'Enabled';
 $string['enabledisabletotarasync'] = 'Select Enable or Disable and then click continue to update HR Import for {$a}';
 $string['enableteam'] = 'Enable Team';
-$string['enableteam_desc'] = 'This option will let you: Enable/Disable Team feature from users on this site.
-
-* If Enable is selected, all links, menus, tabs and option related to Team will be accessible.
-* If Disable is selected, Team will disappear from any menu on the site and will not be accessible.';
+$string['enableteam_desc'] = 'When enabled, all links, menus, tabs, and options related to Team will be accessible.';
 $string['enableprogramextensionrequests'] = 'Enable program extension requests';
 $string['enableprogramextensionrequests_help'] = 'When enabled extension requests can be turned on for individual programs. This allows the program assignee to request an extension to the due date for a program. This extension can then be accepted or denied by the assignees manager.';
 $string['enrolled'] = 'Enrolled';

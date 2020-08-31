@@ -74,7 +74,7 @@ class general implements \totara_core\quickaccessmenu\provider {
             item::from_provider(
                 'optionalsubsystems',
                 group::get(group::CONFIGURATION),
-                new \lang_string('advancedfeatures', 'admin'),
+                new \lang_string('configfeatures', 'admin'),
                 8000
             ),
             item::from_provider(

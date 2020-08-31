@@ -140,7 +140,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # Switch the site setting, program is now set to all users (default).
     When I log out
     And I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -169,7 +169,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
   @javascript
   Scenario: Audience visibility, all users (default).
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -197,7 +197,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
   @javascript
   Scenario: Audience visibility, enrolled users and auds.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -232,7 +232,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
   @javascript
   Scenario: Audience visibility, enrolled users.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -267,7 +267,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
   @javascript
   Scenario: Audience visibility, no users.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -296,7 +296,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
   @javascript
   Scenario: Audience visibility, no users, 2nd program assigned.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -331,8 +331,10 @@ Feature: See that program visibility affects Record of Learning: Programs conten
   @javascript
   Scenario: ROL Program: Audience visibility, no users, 1st program not completed then unassigned.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
+    And I press "Save changes"
+    And I navigate to "Learn settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable program completion editor" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -374,8 +376,10 @@ Feature: See that program visibility affects Record of Learning: Programs conten
   @javascript
   Scenario: ROL Program: Audience visibility, no users, 1st program completed then unassigned.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
+    And I press "Save changes"
+    And I navigate to "Learn settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable program completion editor" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"

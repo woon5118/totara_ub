@@ -82,8 +82,8 @@ Feature: Test exporting performance response data
     # Can't see own link when feature disabled
     Given I log out
     And I log in as "admin"
-    And I navigate to "System information > Advanced features" in site administration
-    And I set the field "Enable Performance Activities" to "Disable"
+    And I navigate to "System information > Configure features > Perform settings" in site administration
+    And I set the field "Enable Performance Activities" to "0"
     And I press "Save changes"
     And I log out
     And I log in as "sitemanager"

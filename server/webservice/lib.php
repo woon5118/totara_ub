@@ -60,7 +60,7 @@ class webservice {
 
         // web service must be enabled to use this script
         if (!$CFG->enablewebservices) {
-            throw new webservice_access_exception('Web services are not enabled in Advanced features.');
+            throw new webservice_access_exception('Web services are not enabled in Configure features.');
         }
 
         // Obtain token record

@@ -10,7 +10,7 @@ Lists of future ideas are not intended as a roadmap for future versions.
 ## How to start
 
 1. install or upgrade from Evergreen
-2. enable "Enable multitenancy support" in Advanced features page
+2. enable "Enable multitenancy support" in Configure features page
 3. optionally enable "Enable tenant isolation" in Experimental settings
 4. as admin go to "Tenants" via quick access menu (first Core Platform column)
 5. press "Add new tenant" and fill in tenant name and idnumber

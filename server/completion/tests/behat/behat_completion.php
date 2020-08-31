@@ -106,7 +106,8 @@ class behat_completion extends behat_base {
 
         $this->execute('behat_auth::i_log_in_as', 'admin');
         $this->execute("behat_general::i_am_on_homepage");
-        $this->execute("behat_general::i_click_on", array('Advanced features', 'link'));
+        $this->execute("behat_general::i_click_on", array('Configure features', 'link'));
+        $this->execute("behat_general::i_click_on", array('Learn settings', 'link'));
         $this->execute("behat_forms::i_set_the_field_to", array("Enable completion tracking", "{$toggle}"));
         $this->execute("behat_forms::press_button", "Save changes");
         $this->execute('behat_auth::i_log_out');

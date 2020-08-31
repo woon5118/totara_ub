@@ -182,7 +182,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'langsettings' => 'Localisation',
                 'environment' => 'Server',
                 'debugging' => 'Development',
-                'optionalsubsystems' => 'Advanced features',
+                'optionalsubsystems' => 'Configure features',
                 'adminnotifications' => 'System information',
                 'msteamssetup' => 'Microsoft Teams',
             ]

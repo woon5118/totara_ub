@@ -74,5 +74,5 @@ Feature: Totara admin main menu
     And I click on "[aria-label='Show admin menu window']" "css_element"
     And I click on ".totara_core__QuickAccess_menu_search-button" "css_element"
     Then I should see "Site administration"
-    And I should see "Search results - Advanced features"
+    And I should see "Search results - Shared services settings"
     And I should see "Enable audience-based visibility"

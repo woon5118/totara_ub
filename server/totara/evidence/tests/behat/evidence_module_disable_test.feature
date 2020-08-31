@@ -3,8 +3,8 @@ Feature: Disable evidence module at site-level
 
   Background:
     When I log in as "admin"
-    And I navigate to "System information > Advanced features" in site administration
-    And I set the field "Enable Evidence" to "Enable"
+    And I navigate to "System information > Configure features > Shared services settings" in site administration
+    And I set the field "Enable Evidence" to "1"
     And I press "Save changes"
 
   Scenario: Evidence link in the admin menu
@@ -12,8 +12,8 @@ Feature: Disable evidence module at site-level
     Then I should see "Evidence" in the admin quick access menu
 
     # Disable it
-    When I navigate to "System information > Advanced features" in site administration
-    And I set the field "Enable Evidence" to "Disable"
+    When I navigate to "System information > Configure features > Shared services settings" in site administration
+    And I set the field "Enable Evidence" to "0"
     And I press "Save changes"
 
     When I toggle open the admin quick access menu
@@ -25,8 +25,8 @@ Feature: Disable evidence module at site-level
     Then I should see "Evidence bank" in the ".block_totara_user_profile_category_mylearning" "css_element"
 
     # Disable it
-    When I navigate to "System information > Advanced features" in site administration
-    And I set the field "Enable Evidence" to "Disable"
+    When I navigate to "System information > Configure features > Shared services settings" in site administration
+    And I set the field "Enable Evidence" to "0"
     And I press "Save changes"
 
     When I am on profile page for user "admin"
@@ -39,8 +39,8 @@ Feature: Disable evidence module at site-level
     Then I should see "Evidence bank" in the page title
 
       # Disable it
-    When I navigate to "System information > Advanced features" in site administration
-    And I set the field "Enable Evidence" to "Disable"
+    When I navigate to "System information > Configure features > Shared services settings" in site administration
+    And I set the field "Enable Evidence" to "0"
     And I press "Save changes"
 
     When I click on "Record of Learning" in the totara menu

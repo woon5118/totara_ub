@@ -84,8 +84,8 @@ Feature: Verify the display of the shortname field on Hierarchy forms
     Then I should not see "Type short name"
 
     When I click on "Cancel" "button"
-    And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Display Hierarchy Shortnames" to "true"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
+    And I set the field "Display Hierarchy Shortnames" to "1"
     And I click on "Save changes" "button"
     Then I should see "Changes saved"
 

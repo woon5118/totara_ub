@@ -11,7 +11,7 @@ Feature: Tenant behat generator functionality
   Scenario: Tenant support is disabled by default
     Given I log in as "admin"
 
-    When I navigate to "System information > Advanced features" in site administration
+    When I navigate to "System information > Configure features > Shared services settings" in site administration
     Then the field "Enable multitenancy support" matches value "0"
 
     When I click on "[aria-label='Show admin menu window']" "css_element"

@@ -41,10 +41,7 @@ $string['edit_this_type'] = 'Edit this type';
 $string['edit_x'] = 'Edit {$a}';
 $string['edit_x_type'] = 'Edit {$a} type';
 $string['enable_evidence'] = 'Enable Evidence';
-$string['enable_evidence_description'] = 'This option will let you: enable (show) or disable the evidence feature on this site.
-
-* If Show is selected, all features related to evidence will be visible and accessible.
-* If Disable is selected, no evidence features will be visible or accessible.';
+$string['enable_evidence_description'] = 'When enabled, all features related to evidence will be visible and accessible.';
 $string['enter_form'] = 'Enter Form';
 $string['error_error_message_edit_item_in_use'] = 'You cannot delete this evidence because it is currently in use elsewhere';
 $string['error_message_delete_item_permissions'] = 'You cannot delete this evidence because you did not create it';

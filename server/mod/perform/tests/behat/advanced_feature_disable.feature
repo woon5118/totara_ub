@@ -8,8 +8,8 @@ Feature: Disable performance activities feature at site-level
     When I toggle open the admin quick access menu
     Then I should see "Activity Management" in the admin quick access menu
 
-    When I navigate to "System information > Advanced features" in site administration
-    And I set the field "Enable Performance Activities" to "Disable"
+    When I navigate to "Perform settings" node in "Site administration > System information > Configure features"
+    And I set the field "Enable Performance Activities" to "0"
     And I press "Save changes"
 
     When I toggle open the admin quick access menu
@@ -17,8 +17,8 @@ Feature: Disable performance activities feature at site-level
 
   Scenario: Hide performance activities link in top menu
     Given I should see "Activities" in the totara menu
-    When I navigate to "System information > Advanced features" in site administration
-    And I set the field "Enable Performance Activities" to "Disable"
+    When I navigate to "Perform settings" node in "Site administration > System information > Configure features"
+    And I set the field "Enable Performance Activities" to "0"
     And I press "Save changes"
     Then I should not see "Activities" in the totara menu
 

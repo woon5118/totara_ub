@@ -175,7 +175,7 @@ class core_blog_lib_testcase extends advanced_testcase {
         $iscurrentuser = true;
         $course = null;
 
-        // Enable blogs.
+        // Enable legacy blogs.
         set_config('enableblogs', true);
 
         // Check the node tree is correct.

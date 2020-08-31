@@ -63,7 +63,7 @@ Feature: See that program visibility affects Required Learning content correctly
   @javascript
   Scenario: Audience visibility, all users (default), RL should be shown and link to the program.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -77,7 +77,7 @@ Feature: See that program visibility affects Required Learning content correctly
   @javascript
   Scenario: Audience visibility, enrolled users and auds, RL should be shown and link to the program.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -98,7 +98,7 @@ Feature: See that program visibility affects Required Learning content correctly
   @javascript
   Scenario: Audience visibility, enrolled users, RL should be shown and link to the program.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -119,7 +119,7 @@ Feature: See that program visibility affects Required Learning content correctly
   @javascript
   Scenario: Audience visibility, enrolled users, 2nd program assigned, RL should be shown.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -141,7 +141,7 @@ Feature: See that program visibility affects Required Learning content correctly
   @javascript
   Scenario: Audience visibility, no users, RL should not be visible.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"
@@ -160,7 +160,7 @@ Feature: See that program visibility affects Required Learning content correctly
   @javascript
   Scenario: Audience visibility, no users, 2nd program assigned, RL should be visible and go straight to prog 2.
     When I log in as "admin"
-    And I navigate to "Advanced features" node in "Site administration > System information"
+    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
     And I set the field "Enable audience-based visibility" to "1"
     And I press "Save changes"
     Then I should see "Changes saved"

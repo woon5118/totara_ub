@@ -67,8 +67,8 @@ Feature: Check Evidence visibility in Record of Learning feature visibility
 
     When I log out
     And I log in as "admin"
-    And I navigate to "System information > Advanced features" in site administration
-    And I set the field "Enable Evidence" to "Disable"
+    And I navigate to "System information > Configure features > Shared services settings" in site administration
+    And I set the field "Enable Evidence" to "0"
     And I press "Save changes"
     And I log out
 
@@ -114,8 +114,8 @@ Feature: Check Evidence visibility in Record of Learning feature visibility
       | Evidence_One |
     When I log out
     And I log in as "admin"
-    And I navigate to "System information > Advanced features" in site administration
-    And I set the field "Enable Evidence" to "Disable"
+    And I navigate to "System information > Configure features > Shared services settings" in site administration
+    And I set the field "Enable Evidence" to "0"
     And I press "Save changes"
     And I log out
     And I log in as "user"

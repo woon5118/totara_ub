@@ -32,8 +32,14 @@ $ADMIN->add('systeminformation', new admin_externalpage('flavouroverview', new l
 $ADMIN->add('root', new admin_externalpage('upgradesettings', new lang_string('upgradesettings', 'admin'), "$CFG->wwwroot/$CFG->admin/upgradesettings.php", 'moodle/site:config', true));
 
 if ($hassiteconfig) {
-    $optionalsubsystems = new admin_settingpage('optionalsubsystems', new lang_string('advancedfeatures', 'admin'));
-    $ADMIN->add('systeminformation', $optionalsubsystems);
+    // This must be kept separate and named as is, so that any third party plugins injecting into this page continue to work.
+    $optionalsubsystems = new admin_settingpage('optionalsubsystems', new lang_string('configsharedservicesettings', 'admin'));
+
+    $ADMIN->add('systeminformation', new admin_category('advancedfeatures', new lang_string('configfeatures', 'admin')));
+    $ADMIN->add('advancedfeatures', $optionalsubsystems);
+    $ADMIN->add('advancedfeatures', new admin_settingpage('advancedfeatures_learn', new lang_string('configlearnsettings', 'admin')));
+    $ADMIN->add('advancedfeatures', new admin_settingpage('advancedfeatures_perform', new lang_string('configperformsettings', 'admin')));
+    $ADMIN->add('advancedfeatures', new admin_settingpage('advancedfeatures_engage', new lang_string('configengagesettings', 'admin')));
 }
 
 $ADMIN->add('root', new admin_category('users', new lang_string('users','admin')));

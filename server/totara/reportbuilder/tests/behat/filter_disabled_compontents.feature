@@ -33,16 +33,14 @@ Feature: Disabled components disappear from reportbuilder filter options
     And I click on "View" "link" in the "Alerts" "table_row"
     And I should see "Program"
     # Disable one
-    When I set the following administration settings values:
-      | Enable Programs   | Disable |
+    When I disable the "programs" advanced feature
     And I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I set the field "report-name" to "Alerts"
     And I press "id_submitgroupstandard_addfilter"
     And I click on "View" "link" in the "Alerts" "table_row"
     Then I should see "Program"
     # Disable both
-    When I set the following administration settings values:
-      | Enable Certifications   | Disable |
+    When I disable the "certifications" advanced feature
     And I navigate to "Manage embedded reports" node in "Site administration > Reports"
     And I set the field "report-name" to "Alerts"
     And I press "id_submitgroupstandard_addfilter"

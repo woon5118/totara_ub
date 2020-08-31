@@ -21,10 +21,8 @@ Feature: Test Learning Plans Main menu item
 
   Scenario: Make sure Learning Plans is not in totara menu if feature disabled
     Given I am on a totara site
+    And I disable the "learningplans" advanced feature
     And I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Learning Plans" to "Disable"
-    And I press "Save changes"
     And I navigate to "Main menu" node in "Site administration > Navigation"
     Then "Learning Plans" row "Visibility" column of "totaramenutable" table should contain "Unused"
     When I click on "Edit" "link" in the "Learning Plans" "table_row"

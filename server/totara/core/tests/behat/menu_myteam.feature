@@ -63,9 +63,7 @@ Feature: Test Team menu item
     Given I am on a totara site
     And I log in as "admin"
     And I should see "Team" in the ".totaraNav" "css_element"
-    And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Team" to "Disable"
-    And I press "Save changes"
+    And I disable the "myteam" advanced feature
 
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Team" in the "#totaramenutable" "css_element"

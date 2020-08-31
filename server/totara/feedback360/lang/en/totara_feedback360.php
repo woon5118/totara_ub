@@ -99,7 +99,7 @@ $string['emailrequeststr'] = '{$a->fullname} has requested you fill in their fee
 {$a->url}';
 $string['emailrequestsubject'] = 'Feedback request from {$a->fullname}';
 $string['emailrequesturlmask'] = 'here';
-$string['enablelegacyfeedback360'] = 'Enable Legacy 360 Feedback';
+$string['enablelegacyfeedback360'] = 'Enable legacy 360 feedback';
 $string['error:accessdenied'] = 'Access Denied, you do not have permission to view this page';
 $string['error:activationconfirmation'] = 'Feedback is not ready to be activated';
 $string['error:activationstatus'] = 'Cannot activate a Feedback that is neither draft or closed';

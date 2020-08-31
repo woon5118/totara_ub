@@ -43,8 +43,8 @@ Feature: The competencies can be disabled
     And I click on "Save" "button" in the "Add linked competencies" "totaradialogue"
 
   Scenario: Show competency feature. All links and options related to the feature should be in place.
-    Given I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Competencies" to "Enable"
+    Given I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
+    And I set the field "Enable Competencies" to "1"
     And I press "Save changes"
 
     # Check competency component is displayed in learning plans.
@@ -76,8 +76,8 @@ Feature: The competencies can be disabled
     And the "contenttype_ce" select box should contain "Competency"
 
   Scenario: Disable competency feature. All links and options related to the feature should not be in available anywhere.
-    Given I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Competencies" to "Disable"
+    Given I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
+    And I set the field "Enable Competencies" to "0"
     And I press "Save changes"
 
     # Check competency component is not displayed in learning plans.

@@ -8456,10 +8456,11 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
     $context->warning = $warning;
     $context->override = '';
     if ($setting->is_forced()) {
+        $context->override = new \stdClass;
         if (empty($CFG->cloudconfigoverride)) {
-            $context->override = get_string('configoverride', 'admin');
+            $context->override->message = get_string('configoverride', 'admin');
         } else {
-            $context->override = get_string('cloudconfigoverride', 'totara_core');
+            $context->override->message = get_string('cloudconfigoverride', 'totara_core');
         }
     }
 
@@ -8495,9 +8496,8 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
         $enforcedsettings = \totara_flavour\helper::get_enforced_settings();
         $plugin = is_null($setting->plugin) ? 'moodle' : $setting->plugin;
         if (isset($enforcedsettings[$plugin][$setting->name])) {
-            $context->override = get_string('settinglocked', 'totara_flavour');
-            $context->flavourclass = ' flavourlock';
-            $context->upgradeneeded = get_string('settinglocked', \totara_flavour\helper::get_active_flavour_component());
+            $context->upgradeneeded = new \stdClass;
+            $context->upgradeneeded->message = get_string('settinglocked', \totara_flavour\helper::get_active_flavour_component());
         }
     }
 

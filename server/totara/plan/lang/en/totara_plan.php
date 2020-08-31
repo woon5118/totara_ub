@@ -288,11 +288,7 @@ $string['componentupdatelongmanager'] = '{$a->component} in learning plan "{$a->
 $string['componentupdatelongmanagerhtml'] = '{$a->component} in learning plan "{$a->planhtml}" updated:<br /> {$a->updateshtml}';
 $string['componentupdateshortlearner'] = '{$a} updated';
 $string['componentupdateshortmanager'] = '{$a->user} updated {$a->component}';
-$string['configenablelearningplans'] = 'This option will let you: Enable/Disable Learning Plan features from users on this site.
-
-* If Enable is selected, all links, menus, tabs and option related to learning plans will be accessible.
-* If Disable is selected, learning plans will disappear from any menu on the site and will not be accessible.
-';
+$string['configenablelearningplans'] = 'When enabled, all links, menus, tabs and options related to learning plans will be accessible.';
 $string['confirm'] = 'Confirm';
 $string['confirmcreateplans'] = 'Confirm creation of plans';
 $string['confirmdeleteplantitle'] = 'Delete learning plan: {$a}';
@@ -389,10 +385,7 @@ $string['editpriority'] = 'Edit priority {$a}';
 $string['editpriorityvalue'] = 'Edit priority value';
 $string['enablelearningplans'] = 'Enable Learning Plans';
 $string['enablerecordoflearning'] = 'Enable Record of Learning';
-$string['enablerecordoflearninginfo'] = 'This option will let you: enable or disable Record of Learning features on this site.
-
-* If Enable is selected, all features related to Record of Learning will be visible and accessible.
-* If Disable is selected, no Record of Learning features will be visible or accessible.';
+$string['enablerecordoflearninginfo'] = 'When enabled, all features related to Record of Learning will be visible and accessible';
 $string['enddate'] = 'End date';
 $string['error:cannotaddscalevalue'] = 'You cannot add a scale value to a scale that is in use';
 $string['error:cannotupdatecompetencies'] = 'Cannot update competencies';

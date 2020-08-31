@@ -91,6 +91,9 @@ class behat_totara_core extends behat_base {
      */
     public function i_enable_the_advanced_feature(string $feature): void {
         \behat_hooks::set_step_readonly(false);
+        if (strpos($feature, 'enable') === 0) {
+            throw new ExpectationException('Disabling features requires that "enable" be removed from the start of the setting name');
+        }
         \totara_core\advanced_feature::enable($feature);
     }
 
@@ -102,6 +105,9 @@ class behat_totara_core extends behat_base {
      */
     public function i_disable_the_advanced_feature(string $feature): void {
         \behat_hooks::set_step_readonly(false);
+        if (strpos($feature, 'enable') === 0) {
+            throw new ExpectationException('Disabling features requires that "enable" be removed from the start of the setting name');
+        }
         \totara_core\advanced_feature::disable($feature);
     }
 

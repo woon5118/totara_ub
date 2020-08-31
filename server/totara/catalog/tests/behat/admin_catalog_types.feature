@@ -1,5 +1,5 @@
 @totara @totara_catalog @javascript @totara_core_menu
-Feature: Admin can set catalog type in Advanced features
+Feature: Admin can set catalog type in Configure features
   As an administrator
   I need to be able to set the catalog type
   In order to choose the catalog that best fits my needs

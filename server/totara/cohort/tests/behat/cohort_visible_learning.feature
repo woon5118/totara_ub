@@ -13,7 +13,7 @@ Feature: User is performing actions on audience learning visibility report
       | fullname            | shortname                  | source                      |
       | Audience Visibility | report_audience_visibility | cohort_associations_visible |
     And I log in as "admin"
-    And I navigate to "System information > Advanced features" in site administration
+    And I navigate to "System information > Configure features > Shared services settings" in site administration
     And I set the field "Enable audience-based visibility" to "1"
     And I click on "Save changes" "button"
     And I am on "c101" course homepage

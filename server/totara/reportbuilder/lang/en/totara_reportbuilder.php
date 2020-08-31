@@ -157,7 +157,7 @@ $string['columns'] = 'Columns';
 $string['columns_updated'] = 'Columns updated';
 $string['competency_evidence'] = 'Competency Evidence';
 $string['completedorgenable'] = 'Show records completed in the user\'s organisation';
-$string['configenablereportcaching'] = 'This will allow administrators to configure report caching';
+$string['configenablereportcaching'] = 'When enabled you can configure report caching per report. Note that not all reports support caching.';
 $string['confirmdeleterestrictionheader'] = 'Confirm deletion of "{$a}" restriction';
 $string['confirmdeleterestriction'] = 'Are you sure you want to delete this restriction? All restriction data will be lost.';
 $string['confirmcoldelete'] = 'Are you sure you want to delete this column?';
@@ -300,10 +300,7 @@ $string['enablereportcaching'] = 'Enable report caching';
 $string['enableglobalrestrictions'] = 'Enable report restrictions';
 $string['enableglobalrestrictions_desc'] = 'Global user report restrictions are designed to restrict the content visible in report builder reports. Turning this feature on allows for fine grained control over what records are visible to users viewing a report builder report but can have a significant impact on performance.';
 $string['enablereportgraphs'] = 'Enable report builder graphs';
-$string['enablereportgraphsinfo'] = 'This option will let you: enable or disable report builder graphs on this site.
-
-* If Enable is selected, all features related to report builder graphs will be visible and accessible.
-* If Disable is selected, no report builder graphs features will be visible or accessible.';
+$string['enablereportgraphsinfo'] = 'When enabled, all features related to report builder graphs will be visible and accessible.';
 $string['enrol'] = 'Enrol';
 $string['enrolledcoursecohortids'] = 'Enrolled course audience IDs';
 $string['enrolledcertificationcohortids'] = 'Enrolled certification audience IDs';
