@@ -26,21 +26,19 @@ Feature: Toggle activities groups mode from the course page
       | Force group mode | No |
     When I press "Save and display"
     Then "No groups (Click to change)" "link" should exist
-    And ".ft-stack .fa-users" "css_element" should exist
-    And ".ft-stack .ft-slash.ft-stack-main" "css_element" should exist
+    And "[data-flex-icon='core|i/groupn']" "css_element" should exist
     And I click on "No groups (Click to change)" "link" in the "Test forum name" activity
     And "Separate groups (Click to change)" "link" should exist
-    And ".ft-group-separate" "css_element" should exist
+    And "[data-flex-icon='groups-separate']" "css_element" should exist
     And I reload the page
     And "Separate groups (Click to change)" "link" should exist
-    And ".ft-group-separate" "css_element" should exist
+    And "[data-flex-icon='core|i/groups']" "css_element" should exist
     And I click on "Separate groups (Click to change)" "link" in the "Test forum name" activity
     And "Visible groups (Click to change)" "link" should exist
-    And ".fa-users" "css_element" should exist
+    And "[data-flex-icon='groups-visible']" "css_element" should exist
     And I reload the page
     And "Visible groups (Click to change)" "link" should exist
-    And ".fa-users" "css_element" should exist
+    And "[data-flex-icon='core|i/groupv']" "css_element" should exist
     And I click on "Visible groups (Click to change)" "link" in the "Test forum name" activity
     And "No groups (Click to change)" "link" should exist
-    And ".fa-users" "css_element" should exist
-    And ".ft-stack .ft-slash.ft-stack-main" "css_element" should exist
+    And "[data-flex-icon='groups-no']" "css_element" should exist

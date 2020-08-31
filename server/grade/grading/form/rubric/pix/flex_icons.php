@@ -23,7 +23,10 @@
  */
 
 /* Developer documentation is in /pix/flex_icons.php file. */
-
-$aliases = array(
-    'gradingform_rubric|icon' => 'grades',
-);
+$icons = [
+    'gradingform_rubric|icon' => [
+        'data' => [
+            'classes' => 'tfont-var-window_list'
+        ]
+    ]
+];

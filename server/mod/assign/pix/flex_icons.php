@@ -31,14 +31,9 @@ $aliases = array(
 $icons = array(
     'mod_assign|icon' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-file-text-o ft-stack-main',
-                            'fa-thumb-tack ft-stack-suffix ft-state-info',
-                        ),
+                    'classes' => 'tfont-var-file_earmark_pin'
                 ),
         ),
 );

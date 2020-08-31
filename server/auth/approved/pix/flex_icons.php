@@ -27,7 +27,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-thumbs-up',
+                    'classes' => 'tfont-var-hand-thumbs-up',
                 ),
         ),
     'auth_approved|reject' =>

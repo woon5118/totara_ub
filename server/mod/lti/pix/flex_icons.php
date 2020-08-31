@@ -29,7 +29,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-puzzle-piece',
+                    'classes' => 'tfont-var-puzzle-fill',
                 ),
         ),
 );

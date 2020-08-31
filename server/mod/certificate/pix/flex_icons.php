@@ -29,7 +29,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-certificate',
+                    'classes' => 'tfont-var-certificate1',
                 ),
         ),
 );

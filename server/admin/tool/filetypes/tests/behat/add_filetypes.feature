@@ -21,7 +21,8 @@ Feature: Add customised file types
     Then I should see "Froggy file" in the "application/x-frog" "table_row"
     And I should see "document" in the "application/x-frog" "table_row"
     And I should see "frog" in the "application/x-frog" "table_row"
-    And "//span[contains(@class, 'fa-file-archive-o')]" "xpath_element" should exist in the "application/x-frog" "table_row"
+    # Non browser tests can't find data attributes
+    And "span.tfont-var-file-earmark" "css_element" should exist in the "application/x-frog" "table_row"
 
   Scenario: Update an existing file type
     Given I log in as "admin"
@@ -103,7 +104,8 @@ Feature: Add customised file types
     And I press "Save changes"
     When I follow "Restore 7z to defaults"
     And I press "Yes"
-    Then "//span[contains(@class, 'fa-file-archive-o')]" "xpath_element" should exist in the "7z" "table_row"
+    # Non browser tests can't find data attributes
+    Then "span.tfont-var-file-earmark" "css_element" should exist in the "7z" "table_row"
 
   @javascript @_file_upload
   Scenario: Create a resource activity which contains a customised file type
@@ -131,4 +133,4 @@ Feature: Add customised file types
     And I set the field "Show type" to "1"
     And I press "Save and return to course"
     Then I should see "Froggy file"
-    And the "class" attribute of ".modtype_resource a span" "css_element" should contain "fa-file-archive-o"
+    And the "data-flex-icon" attribute of ".modtype_resource a span" "css_element" should contain "core|f/archive"

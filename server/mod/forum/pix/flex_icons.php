@@ -29,45 +29,35 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-comments-o',
+                    'classes' => 'tfont-var-chats',
                 ),
         ),
     'mod_forum|t/subscribed' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-envelope-o ft-stack-main',
-                            'fa-check ft-stack-suffix ft-state-success',
-                        ),
+                    'classes' => 'tfont-var-envelope_check'
                 ),
         ),
     'mod_forum|t/unsubscribed' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-envelope-o ft-stack-main',
-                            'fa-times ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-envelope_x'
                 ),
         ),
     'mod_forum|t/selected' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check',
+                    'classes' => 'tfont-var-check',
                 ),
         ),
     'mod_forum|i/pinned' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-map-pin',
+                    'classes' => 'tfont-var-geo',
                 ),
         ),
 

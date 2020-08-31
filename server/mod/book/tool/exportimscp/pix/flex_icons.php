@@ -27,14 +27,9 @@
 $icons = array(
     'booktool_exportimscp|generate' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'ft-package ft-stack-main',
-                            'fa-arrow-right ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-box_arrow_right'
                 ),
         ),
 );

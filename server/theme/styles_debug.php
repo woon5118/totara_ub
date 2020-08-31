@@ -53,7 +53,7 @@ $theme = theme_config::load($themename);
 $theme->force_svg_use($usesvg);
 $theme->set_rtl_mode($rtl);
 $theme->set_legacy_browser($legacy);
-
+$csscontent = '';
 if ($type === 'editor') {
     $csscontent = $theme->get_css_content_editor();
     css_send_uncached_css($csscontent);

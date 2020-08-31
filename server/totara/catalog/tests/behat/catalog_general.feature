@@ -148,7 +148,7 @@ Feature: Test file for catalog
     Then "Bilbo Baggin's Secret Agents" "text" should appear before "Bye Bye Park Shin Hye" "text"
     # Viewing from tile to list
     When I click on "List view" "link"
-    Then "span.fa-th-list" "css_element" should exist in the "a.tw-catalogItemStyleToggle__btn_active" "css_element"
+    Then "span[data-flex-icon='view-list']" "css_element" should exist in the "a.tw-catalogItemStyleToggle__btn_active" "css_element"
     And "span.fa-th-large" "css_element" should not exist in the "a.tw-catalogItemStyleToggle__btn_active" "css_element"
     And "div.tw-grid__item--single-column" "css_element" should exist
     And "div.tw-grid__item--multi-column" "css_element" should not exist
@@ -156,8 +156,8 @@ Feature: Test file for catalog
     When I click on "Tile view" "link"
     Then "div.tw-grid__item--single-column" "css_element" should not exist
     And "div.tw-grid__item--multi-column" "css_element" should exist
-    Then "span.fa-th-list" "css_element" should not exist in the "a.tw-catalogItemStyleToggle__btn_active" "css_element"
-    And "span.fa-th-large" "css_element" should exist in the "a.tw-catalogItemStyleToggle__btn_active" "css_element"
+    Then "span[data-flex-icon='view-list']" "css_element" should not exist in the "a.tw-catalogItemStyleToggle__btn_active" "css_element"
+    And "span[data-flex-icon='view-grid']" "css_element" should exist in the "a.tw-catalogItemStyleToggle__btn_active" "css_element"
 
   # Featured learning
   Scenario: Featured learning is not enabled by default, and user is not able to see it

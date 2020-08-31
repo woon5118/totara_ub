@@ -26,14 +26,14 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-chevron-left ft-flip-rtl',
+                    'classes' => 'tfont-var-chevron-left ft-flip-rtl',
                 ),
         ),
     'theme_msteams|open-externally' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-globe',
+                    'classes' => 'tfont-var-globe',
                 ),
         ),
 );

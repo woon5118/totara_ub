@@ -29,21 +29,21 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-seminar',
+                    'classes' => 'tfont-var-person_group',
                 ),
         ),
     'mod_facetoface|filters' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-sliders',
+                    'classes' => 'tfont-var-sliders',
                 ),
         ),
     'mod_facetoface|moreactions' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-ellipsis-h',
+                    'classes' => 'tfont-var-three-dots',
                 ),
         ),
 );

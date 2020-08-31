@@ -29,7 +29,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-folder-o',
+                    'classes' => 'tfont-var-folder',
                 ),
         ),
 );

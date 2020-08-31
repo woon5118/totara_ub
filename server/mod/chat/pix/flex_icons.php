@@ -29,7 +29,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-comments',
+                    'classes' => 'tfont-var-chats',
                 ),
         ),
 );

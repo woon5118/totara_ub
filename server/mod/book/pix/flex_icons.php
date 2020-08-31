@@ -32,42 +32,42 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-book',
+                    'classes' => 'tfont-var-book',
                 ),
         ),
     'mod_book|chapter' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-book-open',
+                    'classes' => 'tfont-var-chapter',
                 ),
         ),
     'mod_book|nav_exit' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-up',
+                    'classes' => 'tfont-var-caret-up-fill',
                 ),
         ),
     'mod_book|nav_next' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-right ft-flip-rtl',
+                    'classes' => 'tfont-var-caret-right-fill ft-flip-rtl',
                 ),
         ),
     'mod_book|nav_prev' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-left ft-flip-rtl',
+                    'classes' => 'tfont-var-caret-left-fill ft-flip-rtl',
                 ),
         ),
     'mod_book|nav_prev_dis' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-left ft-state-disabled ft-flip-rtl',
+                    'classes' => 'tfont-var-caret-left-fill ft-state-disabled ft-flip-rtl',
                 ),
         ),
 );

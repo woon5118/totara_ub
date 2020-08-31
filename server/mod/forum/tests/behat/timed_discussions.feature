@@ -37,7 +37,7 @@ Feature: Users can choose to set start and end time for display of their discuss
     And I follow "Test forum name"
     And I should see "Discussion 2 timed"
     And I should see "Discussion 3 timed"
-    And ".fa-calendar" "css_element" should exist
+    And "[data-flex-icon='core|i/calendar']" "css_element" should exist
     And I log out
     And I log in as "student1"
     When I follow "Course 1"

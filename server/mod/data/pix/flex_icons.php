@@ -29,49 +29,49 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-globe',
+                    'classes' => 'tfont-var-globe',
                 ),
         ),
     'mod_data|field/radiobutton' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-dot-circle-o',
+                    'classes' => 'tfont-var-radio_button',
                 ),
         ),
     'mod_data|field/menu' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bars',
+                    'classes' => 'tfont-var-menu-button-wide',
                 ),
         ),
     'mod_data|field/multimenu' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bars',
+                    'classes' => 'tfont-var-menu-button-wide',
                 ),
         ),
     'mod_data|field/number' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-hashtag',
+                    'classes' => 'tfont-var-hash',
                 ),
         ),
     'mod_data|field/textarea' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-font',
+                    'classes' => 'tfont-var-type',
                 ),
         ),
     'mod_data|field/text' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-i-cursor',
+                    'classes' => 'tfont-var-cursor-text',
                 ),
         ),
 );

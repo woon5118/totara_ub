@@ -26,33 +26,33 @@
 $icons = [
     'mod_perform|ellipsis' => [
         'data' => [
-            'classes' => 'fa-ellipsis-h',
+            'classes' => 'tfont-var-three-dots',
         ],
     ],
     'mod_perform|notification-slash' => [
         'data' => [
-            'classes' => 'fa-bell-slash',
+            'classes' => 'tfont-var-bell_slash',
         ],
     ],
 
     'mod_perform|icon' => [
         'data' => [
-            'classes' => 'fa-compass',
+            'classes' => 'tfont-var-compass',
         ]
     ],
     'mod_perform|once-off' => [
         'data' => [
-            'classes' => 'fa-sticky-note',
+            'classes' => 'tfont-var-file-earmark-fill',
         ],
     ],
     'mod_perform|repeat' => [
         'data' => [
-            'classes' => 'fa-repeat',
+            'classes' => 'tfont-var-arrow-repeat',
         ],
     ],
     'mod_perform|reporting' => [
         'data' => [
-            'classes' => 'fa-bar-chart',
+            'classes' => 'tfont-var-bar-chart-fill',
         ],
     ],
 ];

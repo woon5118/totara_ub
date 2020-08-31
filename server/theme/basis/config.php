@@ -39,8 +39,7 @@ $THEME->csspostprocess = 'theme_basis_process_css';
 
 // Use CSS preprocessing to facilitate style inheritance.
 $THEME->parents_exclude_sheets = array(
-    'roots' => array('totara', 'totara-rtl'),
-    'base' => array('flexible-icons'),
+    'roots' => array('totara', 'totara-rtl')
 );
 
 // Register our favicon resolver.

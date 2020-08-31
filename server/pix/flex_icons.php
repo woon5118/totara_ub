@@ -50,21 +50,16 @@ $icons = array(
     /* Do not use 'flex-icon-missing' directly, it indicates requested icon was not found */
     'flex-icon-missing' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-question ft-stack-main',
-                            'fa-exclamation ft-stack-suffix'
-                        ),
+                    'classes' => 'tfont-var-questionmark_exclamation'
                 ),
         ),
     'activate' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrow-circle-o-right',
+                    'classes' => 'tfont-var-arrow-right-circle',
                 ),
         ),
     'alarm' =>
@@ -76,131 +71,121 @@ $icons = array(
         ),
     'alarm-danger' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'ft-alarm ft-stack-main',
-                            'fa-bolt ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-alarm_lightning'
                 ),
         ),
     'alarm-warning' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'ft-alarm ft-stack-main',
-                            'fa-warning ft-stack-suffix ft-state-warning',
-                        ),
+                    'classes' => 'tfont-var-Alarm-warning'
                 ),
         ),
     'archive' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-archive',
+                    'classes' => 'tfont-var-archive',
                 ),
     ),
     'arrow-down' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrow-down',
+                    'classes' => 'tfont-var-arrow-down',
                 ),
         ),
     'arrow-left' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrow-left',
+                    'classes' => 'tfont-var-arrow-left ft-flip-rtl',
                 ),
         ),
     'arrow-right' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrow-right',
+                    'classes' => 'tfont-var-arrow-right ft-flip-rtl',
                 ),
         ),
     'arrow-up' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrow-up',
+                    'classes' => 'tfont-var-arrow-up1',
                 ),
         ),
     'arrows' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrows',
+                    'classes' => 'tfont-var-arrows-move',
                 ),
         ),
     'arrows-alt' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrows-alt',
+                    'classes' => 'tfont-var-arrows-fullscreen',
                 ),
         ),
     'arrows-h' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrows-h',
+                    'classes' => 'tfont-var-doublehead_arrow',
                 ),
         ),
     'arrows-v' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrows-v',
+                    'classes' => 'tfont-var-arrows-v',
                 ),
         ),
     'attachment' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-paperclip',
+                    'classes' => 'tfont-var-paperclip',
                 ),
         ),
     'back-arrow' =>
         array (
             'data' =>
                 array (
-                    'classes' => 'fa-chevron-left ft-flip-rtl'
+                    'classes' => 'tfont-var-chevron-left ft-flip-rtl'
                 )
         ),
     'backpack' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-backpack',
+                    'classes' => 'tfont-var-backpack1',
                 ),
         ),
     'badge' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-trophy',
+                    'classes' => 'tfont-var-trophy2',
                 ),
         ),
     'ban' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-ban',
+                    'classes' => 'tfont-var-slash-circle',
                 ),
         ),
     'bars' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bars',
+                    'classes' => 'tfont-var-list',
                 ),
         ),
     'bar-chart' =>
@@ -214,124 +199,119 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-blended',
+                    'classes' => 'tfont-var-computer_people',
                 ),
         ),
     'block-dock' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-square-o-left ft-flip-rtl',
+                    'classes' => 'tfont-var-caret-left-square ft-flip-rtl',
                 ),
         ),
     'block-hide' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-minus-square',
+                    'classes' => 'tfont-var-dash-square',
                 ),
         ),
     'block-show' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-plus-square',
+                    'classes' => 'tfont-var-plus-square',
                 ),
         ),
     'block-undock' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-square-o-right ft-flip-rtl',
+                    'classes' => 'tfont-var-caret-right-square ft-flip-rtl',
                 ),
         ),
     'bookmark' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bookmark-o',
+                    'classes' => 'tfont-var-bookmark',
                 ),
         ),
     'books' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-books',
+                    'classes' => 'tfont-var-books',
                 ),
         ),
     'cache' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bolt',
+                    'classes' => 'tfont-var-lightning',
                 ),
         ),
     'calculator' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-calculator',
+                    'classes' => 'tfont-var-calculator-fill',
                 ),
         ),
     'calculator-off' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-calculator ft-stack-main',
-                            'ft-slash ft-stack-over ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-calculator_slash_filled'
                 ),
         ),
     'calendar' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-calendar',
+                    'classes' => 'tfont-var-calendar3',
                 ),
         ),
     'caret-down' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-down',
+                    'classes' => 'tfont-var-caret-down-fill',
                 ),
         ),
     'caret-left' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-left',
+                    'classes' => 'tfont-var-caret-left-fill ft-flip-rtl',
                 ),
         ),
     'caret-left-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-left ft-state-disabled',
+                    'classes' => 'tfont-var-caret-left-fill ft-state-disabled',
                 ),
         ),
     'caret-left-info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-left ft-state-info',
+                    'classes' => 'tfont-var-caret-left-fill ft-state-info ft-flip-rtl',
                 ),
         ),
     'caret-right' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-right',
+                    'classes' => 'tfont-var-caret-down-fill ft-flip-rtl',
                 ),
         ),
     'caret-right-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-right ft-state-disabled',
+                    'classes' => 'tfont-var-caret-right-fill ft-flip-rtl ft-state-disabled',
                 ),
         ),
     'caret-right-info' =>
@@ -345,35 +325,35 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-up',
+                    'classes' => 'tfont-var-caret-up-fill',
                 ),
         ),
     'certification' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-certificate',
+                    'classes' => 'tfont-var-certificate1',
                 ),
         ),
     'check' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check',
+                    'classes' => 'tfont-var-check',
                 ),
         ),
     'check-circle' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check-circle',
+                    'classes' => 'tfont-var-check-circle-fill',
                 ),
         ),
     'check-circle-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check-circle-o',
+                    'classes' => 'tfont-var-check-circle',
                 ),
         ),
     'check-circle-o-success' =>
@@ -387,21 +367,21 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check-circle ft-state-success',
+                    'classes' => 'tfont-var-check-circle ft-state-success',
                 ),
         ),
     'check-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check ft-state-disabled',
+                    'classes' => 'tfont-var-check ft-state-disabled',
                 ),
         ),
     'check-square-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check-square-o',
+                    'classes' => 'tfont-var-check-square',
                 ),
         ),
     'check-success' =>
@@ -415,221 +395,196 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check ft-state-warning',
+                    'classes' => 'tfont-var-check ft-state-warning',
                 ),
         ),
     'checklist' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-checklist',
+                    'classes' => 'tfont-var-clipboard-check',
                 ),
         ),
     'chevron-down' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-chevron-down',
+                    'classes' => 'tfont-var-chevron-down',
                 ),
         ),
     'chevron-up' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-chevron-up',
+                    'classes' => 'tfont-var-chevron-up',
                 ),
         ),
     'circle-danger' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-circle ft-state-danger',
+                    'classes' => 'tfont-var-circle-fill ft-state-danger',
                 ),
         ),
     'circle-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-circle ft-state-disabled',
+                    'classes' => 'tfont-var-dash-circle-fill ft-state-disabled',
                 ),
         ),
     'circle-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-circle-o',
+                    'classes' => 'tfont-var-circle',
                 ),
         ),
     'circle-success' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-circle ft-state-success',
+                    'classes' => 'tfont-var-circle-fill ft-state-success',
                 ),
         ),
     'clock' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-clock-o',
+                    'classes' => 'tfont-var-clock',
                 ),
         ),
     'clock-locked' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-clock-o ft-stack-main',
-                            'fa-lock ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-Clock-lock'
                 ),
         ),
     'close' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times'
+                    'classes' => 'tfont-var-x'
                 ),
         ),
     'code' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-code',
+                    'classes' => 'tfont-var-code-slash',
                 ),
         ),
     'cohort' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-users',
+                    'classes' => 'tfont-var-people',
                 ),
         ),
     'collapsed' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-right ft-flip-rtl'
+                    'classes' => 'tfont-var-caret-right-fill ft-flip-rtl'
                 ),
         ),
     'collapsed-empty' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-right ft-flip-rtl ft-state-disabled'
+                    'classes' => 'tfont-var-caret-right-fill ft-flip-rtl ft-state-disabled'
                 ),
         ),
     'columns' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-columns',
+                    'classes' => 'tfont-var-layout-three-columns',
                 ),
         ),
     'column-hide' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-minus-square'
+                    'classes' => 'tfont-var-dash-square-fill'
                 ),
         ),
     'column-show' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-plus-square'
+                    'classes' => 'tfont-var-plus-square'
                 ),
         ),
     'comment' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-comment-o',
+                    'classes' => 'tfont-var-chat',
                 ),
         ),
     'comment-add' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-comment-o ft-stack-main',
-                            'fa-plus ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-chat'
                 ),
         ),
     'commenting-info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-commenting ft-state-info',
+                    'classes' => 'tfont-var-chat ft-state-info',
                 ),
         ),
     'comments' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-comments-o',
+                    'classes' => 'tfont-var-chat',
                 ),
         ),
     'comments-search' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-comments-o ft-stack-main',
-                            'fa-search ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-chat_text_search'
                 ),
         ),
     'competency' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-graduation-cap',
+                    'classes' => 'tfont-var-trophy2',
                 ),
         ),
     'competency-achieved' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-graduation-cap ft-stack-main',
-                            'fa-check ft-stack-suffix ft-state-success',
-                        ),
+                    'classes' => 'tfont-var-trophy_check'
                 ),
         ),
     'completion-auto-enabled' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-check-circle-o ft-stack-main',
-                            'fa-play ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-completion-auto-enabled'
                 ),
         ),
     'completion-auto-fail' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times-circle-o ft-state-danger',
+                    'classes' => 'tfont-var-x-circle ft-state-danger',
                 ),
         ),
     'completion-auto-n' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-circle-o',
+                    'classes' => 'tfont-var-circle',
                 ),
         ),
     'completion-auto-pass' =>
@@ -643,200 +598,175 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check-circle-o',
+                    'classes' => 'tfont-var-check-circle',
                 ),
         ),
     'completion-manual-enabled' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-check-square-o ft-stack-main',
-                            'fa-play ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-completion-manual-enabled'
                 ),
         ),
     'completion-manual-n' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-square-o',
+                    'classes' => 'tfont-var-square',
                 ),
         ),
     'completion-manual-y' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check-square-o',
+                    'classes' => 'tfont-var-check-square',
                 ),
         ),
     'completion-rpl-n' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-square-o',
+                    'classes' => 'tfont-var-square',
                 ),
         ),
     'completion-rpl-y' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check-square-o',
+                    'classes' => 'tfont-var-check-square',
                 ),
         ),
     'compress' =>
         array (
             'data' =>
                 array(
-                    'classes' => 'fa-compress',
+                    'classes' => 'tfont-var-arrows-angle-contract',
                 ),
         ),
     'contact-add' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'ft-address-book ft-stack-main',
-                            'fa-plus ft-stack-suffix ft-state-info',
-                        ),
+                    'classes' => 'tfont-var-journal_person_plus'
                 ),
         ),
     'contact-remove' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'ft-address-book ft-stack-main',
-                            'fa-minus ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-phonebook_minus'
                 ),
         ),
     'core|notification-error' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times-circle',
+                    'classes' => 'tfont-var-x-circle-fill',
                 ),
         ),
     'core|notification-info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-info-circle',
+                    'classes' => 'tfont-var-info_filled',
                 ),
         ),
     'core|notification-success' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check-circle',
+                    'classes' => 'tfont-var-check-circle-fill',
                 ),
         ),
     'core|notification-warning' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-warning',
+                    'classes' => 'tfont-var-exclamation-triangle-fill',
                 ),
         ),
     'course' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-cube',
+                    'classes' => 'tfont-var-box',
                 ),
         ),
     'course-completed' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-cube ft-stack-main',
-                            'fa-check ft-stack-suffix ft-state-success',
-                        ),
+                    'classes' => 'tfont-var-box_tick'
                 ),
         ),
     'course-started' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-cube ft-stack-main',
-                            'fa-play ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-box_play'
                 ),
         ),
     'database' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-database',
+                    'classes' => 'tfont-var-database',
                 ),
         ),
     'date-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-ban',
+                    'classes' => 'tfont-var-slash-circle',
                 ),
         ),
     'date-enabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-clock-o',
+                    'classes' => 'tfont-var-clock',
                 ),
         ),
     'date-frequency-once' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-calendar-check-o',
+                    'classes' => 'tfont-var-calendar-check',
                 ),
         ),
     'date-frequency-repeating' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-repeat',
+                    'classes' => 'tfont-var-arrow-clockwise',
                 ),
         ),
     'date-limited' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-sign-in',
+                    'classes' => 'tfont-var-box-arrow-in-right',
                 ),
         ),
     'date-open' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-sign-out',
+                    'classes' => 'tfont-var-box-arrow-right',
                 ),
         ),
     'date-relative' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-calendar-o',
+                    'classes' => 'tfont-var-calendar',
                 ),
         ),
     'deeper' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-right ft-flip-rtl'
+                    'classes' => 'tfont-var-caret-right-fill ft-flip-rtl'
                 ),
         ),
     /* General delete icon to be used for all delete actions */
@@ -844,7 +774,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times ft-state-danger',
+                    'classes' => 'tfont-var-x ft-state-danger',
                 ),
         ),
     // Non-standard / no state delete. For use with dark background colours.
@@ -852,227 +782,182 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times',
+                    'classes' => 'tfont-var-x',
                 ),
         ),
     'delete-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times ft-state-disabled',
+                    'classes' => 'tfont-var-x ft-state-disabled',
                 ),
         ),
     'document-edit' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-file-o ft-stack-main',
-                            'fa-pencil ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-pencil'
                 ),
         ),
     'document-new' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-file-o ft-stack-main',
-                            'fa-plus ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-file-earmark-plus'
                 ),
         ),
     'document-properties' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-file-o ft-stack-main',
-                            'fa-wrench ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-file_earmark_gear'
                 ),
         ),
     'dollar' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-dollar',
+                    'classes' => 'tfont-var-dollar',
                 ),
         ),
     'download' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-download',
+                    'classes' => 'tfont-var-download',
                 ),
         ),
     'duplicate' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-copy',
+                    'classes' => 'tfont-var-files_copy',
                 ),
         ),
     'edit' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-pencil',
+                    'classes' => 'tfont-var-pencil',
                 ),
         ),
     'email' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-envelope-o',
+                    'classes' => 'tfont-var-envelope',
                 ),
         ),
     'email-filled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-envelope',
+                    'classes' => 'tfont-var-envelope-fill',
                 ),
         ),
     'email-no' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-envelope-o ft-stack-main',
-                            'ft-slash ft-stack-over ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-email_slash'
                 ),
         ),
     'emoticon-frown' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-frown-o',
+                    'classes' => 'tfont-var-emoji-frown',
                 ),
         ),
     'emoticon-smile' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-smile-o',
+                    'classes' => 'tfont-var-emoji-smile',
                 ),
         ),
     'enrolment-suspended' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-user ft-stack-main',
-                            'fa-pause ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-person_noentry'
                 ),
         ),
     'error-circle' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times-circle',
+                    'classes' => 'tfont-var-dash-circle-fill',
                 ),
         ),
     'event-course' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-cube ft-stack-main',
-                            'fa-clock-o ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-box_clock'
                 ),
         ),
     'event-group' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-users ft-stack-main',
-                            'fa-clock-o ft-stack-suffix ft-state-info',
-                        ),
+                    'classes' => 'tfont-var-people_calendar1'
                 ),
         ),
     'event-user' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-user ft-stack-main',
-                            'fa-clock-o ft-stack-suffix ft-state-info',
-                        ),
+                    'classes' => 'tfont-var-person_calendar'
                 ),
         ),
     'exclamation-circle' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-exclamation-circle',
+                    'classes' => 'tfont-var-exclamation-circle-fill',
                 ),
         ),
     'expand' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-expand',
+                    'classes' => 'tfont-var-arrows-angle-expand',
                 ),
         ),
     'expandable' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-down'
+                    'classes' => 'tfont-var-caret-down-fill'
                 ),
         ),
     'expanded' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-caret-down'
+                    'classes' => 'tfont-var-caret-down-fill'
                 ),
         ),
     'explore' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-folder-o ft-stack-main',
-                            'fa-search ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-explore'
                 ),
         ),
     'export' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-share-square-o',
+                    'classes' => 'tfont-var-box-arrow-up',
                 ),
         ),
     'external-link' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-external-link',
+                    'classes' => 'tfont-var-box-arrow-up-right',
                 ),
         ),
     'external-link-square' =>
@@ -1086,152 +971,147 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-archive-o',
+                    'classes' => 'tfont-var-file-earmark',
                 ),
         ),
     'file-audio' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-volume-up',
+                    'classes' => 'tfont-var-file_audio',
                 ),
         ),
     'file-chart' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bar-chart',
+                    'classes' => 'tfont-var-file_chart',
                 ),
         ),
     'file-code' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-code-o',
+                    'classes' => 'tfont-var-file-earmark-code',
                 ),
         ),
     'file-database' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-database',
+                    'classes' => 'tfont-var-database',
                 ),
         ),
     'file-ebook' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-book',
+                    'classes' => 'tfont-var-journal-code',
                 ),
         ),
     'file-general' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-o',
+                    'classes' => 'tfont-var-file-earmark',
                 ),
         ),
     'file-image' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-image-o',
+                    'classes' => 'tfont-var-file_image',
                 ),
         ),
     'file-pdf' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-pdf-o',
+                    'classes' => 'tfont-var-file_pdf',
                 ),
         ),
     'file-powerpoint' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-powerpoint-o',
+                    'classes' => 'tfont-var-file_p',
                 ),
         ),
     'file-sound' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-sound-o',
+                    'classes' => 'tfont-var-file_audio',
                 ),
         ),
     'file-spreadsheet' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-excel-o',
+                    'classes' => 'tfont-var-file_x',
                 ),
         ),
     'file-text' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-text-o',
+                    'classes' => 'tfont-var-file-earmark-text',
                 ),
         ),
     'file-video' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-video-o',
+                    'classes' => 'tfont-var-file_camera',
                 ),
         ),
     'file-word' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-word-o',
+                    'classes' => 'tfont-var-file_w',
                 ),
         ),
     'filter' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-filter',
+                    'classes' => 'tfont-var-funnel',
                 ),
         ),
     'flag-off' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-flag-o',
+                    'classes' => 'tfont-var-flag',
                 ),
         ),
     'flag-on' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-flag',
+                    'classes' => 'tfont-var-flag-fill',
                 ),
         ),
     'folder-create' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-folder-o ft-stack-main',
-                            'fa-plus ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-folder-plus'
                 ),
         ),
     'folder' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-folder-o',
+                    'classes' => 'tfont-var-folder',
                 ),
         ),
     'folder-open' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-folder-open-o',
+                    'classes' => 'tfont-var-folder2-open',
                 ),
         ),
     'forward-arrow' =>
@@ -1245,40 +1125,35 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-grades',
+                    'classes' => 'tfont-var-file-earmark-spreadsheet',
                 ),
         ),
     'grid' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-th',
+                    'classes' => 'tfont-var-grid-3x3-gap-fill',
                 ),
         ),
     'groups-no' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-users ft-stack-main',
-                            'ft-slash ft-stack-main ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-groups_no'
                 ),
         ),
     'groups-separate' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-group-separate',
+                    'classes' => 'tfont-var-people_slash',
                 ),
         ),
     'groups-visible' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-users',
+                    'classes' => 'tfont-var-people',
                 ),
         ),
     /* For links to Totara help */
@@ -1286,7 +1161,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-info-circle',
+                    'classes' => 'tfont-var-info_filled',
                 ),
         ),
     /* For action links that result in hiding of something */
@@ -1294,159 +1169,154 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-eye',
+                    'classes' => 'tfont-var-eye',
                 ),
         ),
     'image' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-image',
+                    'classes' => 'tfont-var-card-image',
                 ),
         ),
     'indent' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-indent',
+                    'classes' => 'tfont-var-text-indent-left ft-flip-rtl',
                 ),
         ),
     'info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-info-circle ft-state-info',
+                    'classes' => 'tfont-var-info_filled ft-state-info',
                 ),
         ),
     'info-circle' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-info-circle',
+                    'classes' => 'tfont-var-info_filled',
                 ),
         ),
     'key' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-key',
+                    'classes' => 'tfont-var-key',
                 ),
         ),
     'key-no' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-key ft-stack-main',
-                            'ft-slash ft-stack-over ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-key_slash'
                 ),
         ),
     'laptop' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-laptop',
+                    'classes' => 'tfont-var-laptop',
                 ),
         ),
     'learningplan' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-briefcase',
+                    'classes' => 'tfont-var-briefcase',
                 ),
         ),
     'level-up' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-level-up',
+                    'classes' => 'tfont-var-arrow-90deg-up',
                 ),
         ),
     'link' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-link',
+                    'classes' => 'tfont-var-link-45deg',
                 ),
         ),
     'loading' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-spinner fa-pulse',
+                    'classes' => 'tfont-var-spinner tfont-pulse',
                 ),
         ),
     'lock' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-lock',
+                    'classes' => 'tfont-var-lock',
                 ),
         ),
     'log' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-log',
+                    'classes' => 'tfont-var-card-text',
                 ),
         ),
     'marker-on' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-lightbulb-o',
+                    'classes' => 'tfont-var-light_bulb',
                 ),
         ),
     'marker-off' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-lightbulb-o ft-state-disabled',
+                    'classes' => 'tfont-var-light_bulb',
                 ),
         ),
     'mean' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-mean',
+                    'classes' => 'tfont-var-mean1',
                 ),
         ),
     'message' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-comment',
+                    'classes' => 'tfont-var-chat-fill',
                 ),
         ),
     'messages' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-comments',
+                    'classes' => 'tfont-var-chats',
                 ),
         ),
     'minus' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-minus',
+                    'classes' => 'tfont-var-dash',
                 ),
         ),
     'minus-square' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-minus-square',
+                    'classes' => 'tfont-var-dash-square ',
                 ),
         ),
     'minus-square-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-minus-square-o',
+                    'classes' => 'tfont-var-dash-square',
                 ),
         ),
     'mnet-host' =>
@@ -1460,249 +1330,224 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-ellipsis-h'
+                    'classes' => 'tfont-var-three-dots'
                 ),
         ),
     'mouse-pointer' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-mouse-pointer',
+                    'classes' => 'tfont-var-mouse_pointer_filled',
                 ),
         ),
     'move-down' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrow-down'
+                    'classes' => 'tfont-var-arrow-down'
                 ),
         ),
     'move-up' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-arrow-up'
+                    'classes' => 'tfont-var-arrow-up1'
                 ),
         ),
     'nav-down' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-chevron-down',
+                    'classes' => 'tfont-var-chevron-down',
                 ),
         ),
     'nav-expand' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-chevron-right ft-flip-rtl',
+                    'classes' => 'tfont-var-chevron-right ft-flip-rtl',
                 ),
         ),
     'nav-expanded' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-chevron-down',
+                    'classes' => 'tfont-var-chevron-down',
                 ),
         ),
     'navitem' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-square-small',
+                    'classes' => 'tfont-var-stop-fill',
                 ),
         ),
     'new' => // Something recently added.
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-new',
+                    'classes' => 'tfont-var-star_10_points_filled',
                 ),
         ),
     'news' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-newspaper-o',
+                    'classes' => 'tfont-var-newspaper',
                 ),
         ),
     'notification' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bell',
+                    'classes' => 'tfont-var-bell-fill',
                 ),
         ),
     'objective' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bullseye',
+                    'classes' => 'tfont-var-bullseye',
                 ),
         ),
     'objective-achieved' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-bullseye ft-stack-main',
-                            'fa-check ft-stack-suffix ft-state-success',
-                        ),
+                    'classes' => 'tfont-var-bullseye_tick'
                 ),
         ),
     'outcomes' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-pie-chart',
+                    'classes' => 'tfont-var-pie-chart',
                 ),
         ),
     'outdent' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-outdent',
+                    'classes' => 'tfont-var-outdent',
                 ),
         ),
     'parent-node' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-sitemap',
+                    'classes' => 'tfont-var-diagram-3-fill',
                 ),
         ),
     'package' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-package',
+                    'classes' => 'tfont-var-box-seam',
                 ),
         ),
     'pencil' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-pencil',
+                    'classes' => 'tfont-var-pencil',
                 ),
         ),
     'pencil-square-info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-pencil-square ft-state-info',
+                    'classes' => 'tfont-var-pencil ft-state-info',
                 ),
         ),
     'pencil-square-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-pencil-square-o',
+                    'classes' => 'tfont-var-pencil-square',
                 ),
         ),
     'permission-lock' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-user ft-stack-main',
-                            'fa-lock ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-person_lock'
                 ),
         ),
     'permissions' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-user ft-stack-main',
-                            'fa-key ft-stack-suffix ft-state-info',
-                        ),
+                    'classes' => 'tfont-var-person_key'
                 ),
         ),
     'permissions-check' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-user ft-stack-main',
-                            'fa-warning ft-stack-suffix ft-state-warning',
-                        ),
+                    'classes' => 'tfont-var-person_check'
                 ),
         ),
     'plus' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-plus',
+                    'classes' => 'tfont-var-plus',
                 ),
         ),
     'plus-circle-info' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-plus-circle ft-state-info',
+                    'classes' => 'tfont-var-plus-circle-fill ft-state-info',
                 ),
         ),
     'plus-square' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-plus-square',
+                    'classes' => 'tfont-var-plus-square',
                 ),
         ),
     'plus-square-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-plus-square-o',
+                    'classes' => 'tfont-var-plus-square',
                 ),
         ),
     'portfolio' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-profile',
+                    'classes' => 'tfont-var-file-person',
                 ),
         ),
     'portfolio-add' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'ft-profile ft-stack-main',
-                            'fa-plus ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-briefcase_person_plus'
                 ),
         ),
     'preferences' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-sliders',
+                    'classes' => 'tfont-var-sliders',
                 ),
         ),
     'preview' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-eye',
+                    'classes' => 'tfont-var-eye',
                 ),
         ),
     'print' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-print',
+                    'classes' => 'tfont-var-printer ',
                 ),
         ),
     /* Totara program */
@@ -1710,40 +1555,35 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-cubes',
+                    'classes' => 'tfont-var-boxes',
                 ),
         ),
     'publish' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-globe ft-stack-main',
-                            'fa-play ft-stack-suffix ft-state-info',
-                        ),
+                    'classes' => 'tfont-var-globe_caret'
                 ),
         ),
     'question' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-question',
+                    'classes' => 'tfont-var-question',
                 ),
         ),
     'question-circle' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-question-circle',
+                    'classes' => 'tfont-var-question-circle',
                 ),
         ),
     'question-circle-warning' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-question-circle ft-state-warning',
+                    'classes' => 'tfont-var-question-circle-fill ft-state-warning',
                 ),
         ),
     'ranges' =>
@@ -1757,43 +1597,42 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-star-half-o',
+                    'classes' => 'tfont-var-star-half',
                 ),
         ),
     'recordoflearning' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-archive',
+                    'classes' => 'tfont-var-archive',
                 ),
         ),
     'recycle' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-recycle',
+                    'classes' => 'tfont-var-arrow-repeat',
                 ),
         ),
     'refresh' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-refresh',
+                    'classes' => 'tfont-var-arrow-repeat',
                 ),
         ),
     'remove' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-trash-o',
-
+                    'classes' => 'tfont-var-trash',
                 ),
             ),
     'repeat' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-repeat',
+                    'classes' => 'tfont-var-arrow-repeat',
                 ),
         ),
     /* Forms element required to be filled */
@@ -1801,126 +1640,91 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-asterisk ft-state-danger',
+                    'classes' => 'tfont-var-asterisk ft-state-danger',
                 ),
         ),
     'risk-allowxss' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-code ft-stack-main',
-                            'fa-warning ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-exclamation_code_slash'
                 ),
         ),
     'risk-config' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-cogs ft-stack-main',
-                            'fa-warning ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-exclamation_gear'
                 ),
         ),
     'risk-dataloss' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-database ft-stack-main',
-                            'fa-warning ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-risk-dataloss'
                 ),
         ),
     'risk-managetrust' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-shield ft-stack-main',
-                            'fa-warning ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-shield-exclamation'
                 ),
         ),
     'risk-personal' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-user ft-stack-main',
-                            'fa-warning ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-exclamation_person'
                 ),
         ),
     'risk-spam' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-envelope ft-stack-main',
-                            'fa-warning ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-exclamation_envelope'
                 ),
         ),
     'risk-xss' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-code ft-stack-main',
-                            'fa-warning ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-risk-xss'
                 ),
         ),
     'rows' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bars',
+                    'classes' => 'tfont-var-list',
                 ),
         ),
     'rss' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-rss',
+                    'classes' => 'tfont-var-rss',
                 ),
         ),
     'save' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-save',
+                    'classes' => 'tfont-var-floppy_disk',
                 ),
         ),
     'scales' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-stats-bars',
+                    'classes' => 'tfont-var-scales',
                 ),
         ),
     'search' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-search',
+                    'classes' => 'tfont-var-search',
                 ),
         ),
     /* Settings or editing of stuff that changes how Totara works */
@@ -1928,38 +1732,28 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-cog',
+                    'classes' => 'tfont-var-gear',
                 ),
         ),
     'settings-lock' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-cog ft-stack-main',
-                            'fa-lock ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-gear_lock'
                 ),
         ),
     'settings-menu' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-cog ft-stack-main',
-                            'fa-caret-down ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-gear'
                 ),
         ),
     'share-link' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-share-alt',
+                    'classes' => 'tfont-var-share-fill',
                 ),
         ),
     /* Use for action icons that unhide something */
@@ -1967,80 +1761,70 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-eye-slash',
+                    'classes' => 'tfont-var-eye-slash',
                 ),
         ),
     'sigma' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-sigma',
+                    'classes' => 'tfont-var-sigma1',
                 ),
         ),
     'sigma-plus' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'ft-sigma ft-stack-main',
-                            'fa-plus ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-sigma_plus'
                 ),
         ),
     'sign-out' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-sign-out',
+                    'classes' => 'tfont-var-box-arrow-right',
                 ),
         ),
     'site-lock' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-sitemap ft-stack-main',
-                            'fa-lock ft-stack-suffix ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-site_lock'
                 ),
         ),
     'slash' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-slash',
+                    'classes' => 'tfont-var-slash1',
                 ),
         ),
     'slider' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-sliders',
+                    'classes' => 'tfont-var-sliders',
                 ),
         ),
     'sort' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-sort',
+                    'classes' => 'tfont-var-chevron-expand',
                 ),
         ),
     'sort-asc' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-sort-asc',
+                    'classes' => 'tfont-var-caret-up-fill',
                 ),
         ),
     'sort-desc' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-sort-desc',
+                    'classes' => 'tfont-var-caret-down-fill',
                 ),
         ),
     'spacer' =>
@@ -2051,325 +1835,315 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-square-o',
+                    'classes' => 'tfont-var-square',
                 ),
         ),
     'star' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-star',
+                    'classes' => 'tfont-var-star-fill',
                 ),
         ),
     'star-off' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-star-o',
+                    'classes' => 'tfont-var-star',
                 ),
         ),
     'statistics' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-line-chart',
+                    'classes' => 'tfont-var-statistics',
                 ),
         ),
     'subcategory-no' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'ft-view-tree ft-stack-main',
-                            'ft-slash ft-stack-over ft-state-danger',
-                        ),
+                    'classes' => 'tfont-var-List_X'
                 ),
         ),
     'subitems' =>
        array(
            'data' =>
                array(
-                   'classes' => 'fa-chevron-right ft-flip-rtl',
+                   'classes' => 'tfont-var-chevron-right ft-flip-rtl',
                ),
        ),
     'table' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-table',
+                    'classes' => 'tfont-var-table',
                 ),
         ),
     'tags-searchable' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check-square-o'
+                    'classes' => 'tfont-var-check-square'
                 ),
         ),
     'tags-unsearchable' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-square-o',
+                    'classes' => 'tfont-var-plus-square',
                 ),
         ),
     'tasks' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-tasks',
+                    'classes' => 'tfont-var-progress_bars',
                 ),
         ),
     'thumbs-down-danger' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-thumbs-down ft-state-danger',
+                    'classes' => 'tfont-var-hand-thumbs-down ft-state-danger',
                 ),
         ),
     'thumbs-up-success' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-thumbs-up ft-state-success',
+                    'classes' => 'tfont-var-hand_thumbs_up_filled ft-state-success',
                 ),
         ),
     'times-circle-danger' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times-circle ft-state-danger',
+                    'classes' => 'tfont-var-x-circle-fill ft-state-danger',
                 ),
         ),
     'times-circle-o' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times-circle-o',
+                    'classes' => 'tfont-var-x-circle',
                 ),
         ),
     'times-circle-o-danger' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times-circle-o ft-state-danger',
+                    'classes' => 'tfont-var-x-circle ft-state-danger',
                 ),
         ),
     'times-danger' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times ft-state-danger',
+                    'classes' => 'tfont-var-x ft-state-danger',
                 ),
         ),
     'toggle-off' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-toggle-off',
+                    'classes' => 'tfont-var-toggle-off',
                 ),
         ),
     'toggle-on' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-toggle-on',
+                    'classes' => 'tfont-var-toggle-on',
                 ),
         ),
     'totara' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-totara',
+                    'classes' => 'tfont-var-totara_filled',
                 ),
         ),
     'trash' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-trash',
+                    'classes' => 'tfont-var-trash',
                 ),
         ),
     'tree-list-collapsed' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-angle-right',
+                    'classes' => 'tfont-var-chevron-right',
                 ),
         ),
     'tree-list-expanded' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-angle-down',
+                    'classes' => 'tfont-var-chevron-down',
                 ),
         ),
     'undo' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-undo',
+                    'classes' => 'tfont-var-arrow-counterclockwise',
                 ),
         ),
     'unlink' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-unlink',
+                    'classes' => 'tfont-var-unlink',
                 ),
         ),
     'unlock' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-unlock',
+                    'classes' => 'tfont-var-unlock',
                 ),
         ),
     'unlocked' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-unlock-alt',
+                    'classes' => 'tfont-var-unlock',
                 ),
         ),
     'upload' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-upload',
+                    'classes' => 'tfont-var-upload',
                 ),
         ),
     'user' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-user',
+                    'classes' => 'tfont-var-person',
                 ),
         ),
     'user-add' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-user-plus',
+                    'classes' => 'tfont-var-person-plus',
                 ),
         ),
     'user-delete' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-user-times',
+                    'classes' => 'tfont-var-person_x',
                 ),
         ),
     'user-disabled' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-user ft-state-disabled',
+                    'classes' => 'tfont-var-person ft-state-disabled',
                 ),
         ),
     'user-refresh' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-user ft-stack-main',
-                            'fa-refresh ft-stack-suffix ft-state-info',
-                        ),
+                    'classes' => 'tfont-var-person_arrow_clockwise'
                 ),
         ),
     'user-secret' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-user-secret',
+                    'classes' => 'tfont-var-user-secret',
                 ),
         ),
     'users' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-users',
+                    'classes' => 'tfont-var-people',
                 ),
         ),
     'view-grid' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-th-large',
+                    'classes' => 'tfont-var-grid-fill',
                 ),
         ),
     'view-large' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-th-large',
+                    'classes' => 'tfont-var-grid-fill',
                 ),
         ),
     'view-list' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-th-list',
+                    'classes' => 'tfont-var-grid_list_filled',
                 ),
         ),
     'view-tree' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-view-tree',
+                    'classes' => 'tfont-var-diagram_tree',
                 ),
         ),
     'warning' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-warning ft-state-warning',
+                    'classes' => 'tfont-var-exclamation-triangle-fill ft-state-warning',
                 ),
         ),
     'warning-sign' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-warning',
+                    'classes' => 'tfont-var-exclamation-triangle-fill',
                 ),
         ),
     'tags' =>
         array (
             'data' =>
                 array (
-                    'classes' => 'fa-tags'
+                    'classes' => 'tfont-var-tags'
                 )
         ),
     'tag' =>
         array (
             'data' =>
                 array (
-                    'classes' => 'fa-tag'
+                    'classes' => 'tfont-var-tag'
                 )
         ),
     'reply' =>
         array (
             'data' =>
                 array (
-                    'classes' => 'fa-reply'
+                    'classes' => 'tfont-var-reply-filled'
                 )
         ),
     'notification-non-filled' =>
         array (
             'data' =>
                 array (
-                    'classes' => 'fa-bell-o'
+                    'classes' => 'tfont-var-bell'
                 )
         ),
     'notification-slash-non-filled' =>
         array (
             'data' =>
                 array (
-                    'classes' => 'fa-bell-slash-o'
+                    'classes' => 'tfont-var-bell_slash'
                 )
         ),
     'circle' =>

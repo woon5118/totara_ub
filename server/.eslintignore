@@ -14,13 +14,14 @@ enrol/lti/ims-blti/
 filter/algebra/AlgParser.pm
 filter/tex/mimetex.*
 lib/editor/atto/yui/src/rangy/js/*.*
+lib/editor/weka/tui/js/lib/prosemirror_utils
+lib/editor/weka/tui/js/lib/prosemirror_schema_list
 lib/adodb/
 lib/bennu/
 lib/evalmath/
 lib/lessphp/
 lib/phpspreadsheet/
 lib/google/
-lib/htmlpurifier/
 lib/jabber/
 lib/minify/matthiasmullie-minify/
 lib/minify/matthiasmullie-pathconverter/
@@ -49,7 +50,6 @@ lib/graphlib.php
 lib/php-css-parser/
 lib/rtlcss/
 lib/scssphp/
-lib/spout/
 lib/amd/src/chartjs-lazy.js
 lib/amd/src/chartjs-plugin-doughnutlabel.js
 lib/maxmind/GeoIp2/
@@ -68,7 +68,7 @@ media/player/videojs/videojs/video-js.swf
 mod/assign/feedback/editpdf/fpdi/
 repository/s3/S3.php
 theme/base/fonts/
-theme/base/less/fa/
+theme/base/less/fa
 theme/base/fonts/totara_font.json.zip
 theme/legacy/tui/styles/bootstrap3
 theme/legacy/amd/src/bootstrap.js
@@ -84,6 +84,4 @@ totara/core/js/lib/src/jquery.placeholder.js
 totara/core/js/lib/src/jquery.treeview.js
 totara/core/js/lib/i18n/
 totara/core/amd/src/jquery.dataTables-lazy.js
-totara/core/tui/build
 totara/tui/tui/build
-totara/webapi/lib/graphql-php/

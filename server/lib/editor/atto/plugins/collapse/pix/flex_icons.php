@@ -27,7 +27,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-level-down',
+                    'classes' => 'tfont-var-arrow_90deg_down',
                 ),
         ),
 );

@@ -26,7 +26,7 @@
 $icons = [
     'pathway_manual|comment-filled' => [
         'data' => [
-            'classes' => 'fa-comment',
+            'classes' => 'tfont-var-chat-fill',
         ],
     ],
 ];

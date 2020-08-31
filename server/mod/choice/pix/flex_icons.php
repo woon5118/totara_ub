@@ -29,7 +29,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-question-circle',
+                    'classes' => 'tfont-var-question-circle-fill',
                 ),
         ),
 );

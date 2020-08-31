@@ -29,7 +29,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-stats-bars',
+                    'classes' => 'tfont-var-bar-chart-line-fill',
                 ),
         ),
 );

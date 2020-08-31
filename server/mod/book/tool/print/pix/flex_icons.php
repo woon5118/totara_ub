@@ -27,26 +27,16 @@
 $icons = array(
     'booktool_print|book' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-book ft-stack-main',
-                            'fa-print ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-book_print'
                 ),
         ),
     'booktool_print|chapter' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'ft-book-open ft-stack-main',
-                            'fa-print ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-chapter'
                 ),
         ),
 );

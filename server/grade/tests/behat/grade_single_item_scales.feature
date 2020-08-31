@@ -81,7 +81,7 @@ Feature: View gradebook when single item scales are used
     And I navigate to "Setup > Gradebook setup" in the course gradebook
     And the following should exist in the "grade_edit_tree_table" table:
       | Name                               | Max grade |
-      | Move AssignmentTest assignment one | 1.00      |
+      | MoveAssignmentTest assignment one | 1.00      |
       | NaturalSub category 1 total        | 1.00      |
       | NaturalCourse total                | 1.00      |
 
@@ -113,7 +113,7 @@ Feature: View gradebook when single item scales are used
     And I navigate to "Setup > Gradebook setup" in the course gradebook
     And the following should exist in the "grade_edit_tree_table" table:
       | Name                                                          | Max grade |
-      | Move AssignmentTest assignment one                            | Ace! (1)  |
+      | MoveAssignmentTest assignment one                            | Ace! (1)  |
       | <aggregation>Sub category (<aggregation>) total<aggregation>. | 100.00    |
       | <aggregation>Course total<aggregation>.                       | 100.00    |
 

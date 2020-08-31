@@ -29,19 +29,18 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-bullhorn',
+                    'classes' => 'tfont-var-loudspeaker',
                 ),
         ),
     'mod_feedback|notrequired' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-question-circle-o',
+                    'classes' => 'tfont-var-question-circle',
                 ),
         ),
 );
 
 $aliases = array(
     'mod_feeback|required' => 'required',
-    'mod_feeback|notrequired' => 'required',
 );

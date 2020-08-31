@@ -29,7 +29,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-plug',
+                    'classes' => 'tfont-var-plug',
                 ),
         ),
 

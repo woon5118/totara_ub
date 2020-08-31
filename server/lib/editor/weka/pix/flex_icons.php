@@ -22,13 +22,13 @@
  */
 
 $icons = [
-    'editor_weka|bold' => ['data' => ['classes' => 'fa-bold']],
-    'editor_weka|italic' => ['data' => ['classes' => 'fa-italic']],
-    'editor_weka|link' => ['data' => ['classes' => 'fa-link ft-flip']],
-    'editor_weka|arrows' => ['data' => ['classes' => 'fa-arrows-h']],
-    'editor_weka|bulletlist' => ['data' => ['classes' => 'fa-list-ul']],
-    'editor_weka|numberedlist' => ['data' => ['classes' => 'fa-list-ol']],
-    'editor_weka|emoji' => ['data' => ['classes' => 'fa-smile-o']],
+    'editor_weka|bold' => ['data' => ['classes' => 'tfont-var-type-bold']],
+    'editor_weka|italic' => ['data' => ['classes' => 'tfont-var-type-italic']],
+    'editor_weka|link' => ['data' => ['classes' => 'tfont-var-link-45deg ft-flip']],
+    'editor_weka|arrows' => ['data' => ['classes' => 'tfont-var-doublehead_arrow']],
+    'editor_weka|bulletlist' => ['data' => ['classes' => 'tfont-var-list_ul']],
+    'editor_weka|numberedlist' => ['data' => ['classes' => 'tfont-var-list_ol']],
+    'editor_weka|emoji' => ['data' => ['classes' => 'tfont-var-emoji-smile']],
 ];
 
 $aliases = [

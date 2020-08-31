@@ -26,13 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 $icons = [
     'totara_engage|add-to-playlist' => [
         'data' => [
-            'classes' => 'ft-add-to-list'
+            'classes' => 'tfont-var-list_plus'
         ]
     ],
 
     'totara_engage|public' => [
         'data' => [
-            'classes' => 'fa-globe'
+            'classes' => 'tfont-var-globe'
         ]
     ],
 ];

@@ -27,14 +27,9 @@
 $icons = array(
     'repository_areafiles|icon' =>
         array(
-            'template' => 'core/flex_icon_stack',
             'data' =>
                 array(
-                    'classes' =>
-                        array(
-                            'fa-file-text-o ft-stack-main',
-                            'fa-paperclip ft-stack-suffix',
-                        ),
+                    'classes' => 'tfont-var-file_earmark_paperclip'
                 ),
         )
 );

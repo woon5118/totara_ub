@@ -28,7 +28,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-laptop',
+                    'classes' => 'tfont-var-laptop',
                 ),
         ),
 );

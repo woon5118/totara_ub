@@ -36,33 +36,30 @@ Feature: Javascript template rendering
     And "#template_pix_alt_json img.muppet" "css_element" should exist
 
     # Pix replacement with no data
-    And "#template_flex_pix .flex-icon.fa-asterisk" "css_element" should exist
+    And "#template_flex_pix .flex-icon[data-flex-icon='core|req']" "css_element" should exist
     And "#template_flex_pix .sr-only" "css_element" should not exist
 
     # Pix replacement with text alt
-    And "#template_flex_pix_alt .flex-icon.fa-asterisk" "css_element" should exist
     And "#template_flex_pix_alt .flex-icon[data-flex-icon='core|req']" "css_element" should exist
     And I should see "test case" in the "#template_flex_pix_alt" "css_element"
 
     # Pix replacement with string alt
-    And "#template_flex_pix_alt_variable .flex-icon.fa-asterisk" "css_element" should exist
     And "#template_flex_pix_alt_variable .flex-icon[data-flex-icon='core|req']" "css_element" should exist
 
     # Pix replacement with data
-    And "#template_flex_pix_alt_variable .flex-icon.fa-asterisk" "css_element" should exist
     And "#template_flex_pix_alt_variable .flex-icon[data-flex-icon='core|req']" "css_element" should exist
     And "#template_flex_pix_alt_json .flex-icon.muppet" "css_element" should exist
 
     # Flex without alt
-    And "#template_flex .flex-icon.fa-caret-right" "css_element" should exist
+    And "#template_flex .flex-icon[data-flex-icon='collapsed']" "css_element" should exist
     And "#template_flex .sr-only" "css_element" should not exist
 
     # Flex with alt
-    And "#template_flex_alt .flex-icon.fa-cog" "css_element" should exist
+    And "#template_flex_alt .flex-icon[data-flex-icon='settings']" "css_element" should exist
     And I should see "test case" in the "#template_flex_alt .sr-only" "css_element"
 
     # Flex with alt string
-    And "#template_flex_alt .flex-icon.fa-cog" "css_element" should exist
+    And "#template_flex_string_alt .flex-icon[data-flex-icon='delete']" "css_element" should exist
     And "#template_flex_string_alt .sr-only" "css_element" should not exist
 
     # Flex with alt data

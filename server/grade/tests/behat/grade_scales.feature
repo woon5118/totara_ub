@@ -101,7 +101,7 @@ Feature: View gradebook when scales are used
     And I navigate to "Setup > Gradebook setup" in the course gradebook
     And the following should exist in the "grade_edit_tree_table" table:
       | Name                               | Max grade |
-      | Move AssignmentTest assignment one | 5.00      |
+      | MoveAssignmentTest assignment one  | 5.00      |
       | NaturalSub category 1 total        | 5.00      |
       | NaturalCourse total                | 5.00      |
     And I log out
@@ -147,7 +147,7 @@ Feature: View gradebook when scales are used
     And I navigate to "Setup > Gradebook setup" in the course gradebook
     And the following should exist in the "grade_edit_tree_table" table:
       | Name                                                          | Max grade |
-      | Move AssignmentTest assignment one                            | A (5)     |
+      | MoveAssignmentTest assignment one                             | A (5)     |
       | <aggregation>Sub category (<aggregation>) total<aggregation>. |           |
       | <aggregation>Course total<aggregation>.                       |           |
     And I log out

@@ -29,7 +29,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-seminar',
+                    'classes' => 'tfont-var-person_group',
                 ),
         ),
 );

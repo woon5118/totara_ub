@@ -27,14 +27,14 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-crosshairs',
+                    'classes' => 'tfont-var-crosshair',
                 ),
         ),
     'qtype_ddmarker|grid' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-th',
+                    'classes' => 'tfont-var-grid-3x3-gap-fill',
                 ),
         ),
 );

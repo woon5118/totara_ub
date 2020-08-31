@@ -27,14 +27,14 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-download',
+                    'classes' => 'tfont-var-download',
                 ),
         ),
     'tool_usertours|i/reload' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-refresh',
+                    'classes' => 'tfont-var-arrow-counterclockwise',
                 ),
         ),
 );

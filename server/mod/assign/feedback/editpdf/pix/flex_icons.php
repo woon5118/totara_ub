@@ -29,14 +29,14 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-stamp',
+                    'classes' => 'tfont-var-stamp',
                 ),
         ),
     'assignfeedback_editpdf|highlight' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-highlight',
+                    'classes' => 'tfont-var-highlighter',
                 ),
         ),
 );

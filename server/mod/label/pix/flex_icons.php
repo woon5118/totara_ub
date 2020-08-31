@@ -29,7 +29,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-tag',
+                    'classes' => 'tfont-var-tag-fill',
                 ),
         ),
 );

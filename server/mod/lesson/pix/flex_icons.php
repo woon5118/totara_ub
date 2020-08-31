@@ -29,14 +29,14 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-list-alt',
+                    'classes' => 'tfont-var-card-list',
                 ),
         ),
     'mod_lesson|e/copy' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-clone',
+                    'classes' => 'tfont-var-files',
                 ),
         ),
 );

@@ -29,7 +29,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-globe',
+                    'classes' => 'tfont-var-globe',
                 ),
         ),
 );

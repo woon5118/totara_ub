@@ -28,84 +28,84 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-chevron-down',
+                    'classes' => 'tfont-var-chevron-down',
                 ),
         ),
     'totara_core|accordion-collapsed' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-chevron-right ft-flip-rtl',
+                    'classes' => 'tfont-var-chevron-right ft-flip-rtl',
                 ),
         ),
     'totara_core|home' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-home',
+                    'classes' => 'tfont-var-house-door',
                 ),
         ),
     'totara_core|archive_file' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-archive-o'
+                    'classes' => 'tfont-var-file-earmark-zip'
                 )
         ),
     'totara_core|pdf_file' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-pdf-o'
+                    'classes' => 'tfont-var-file_pdf'
                 )
         ),
     'totara_core|image_file' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-image-o'
+                    'classes' => 'tfont-var-file_image'
                 )
         ),
     'totara_core|word_file' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-word-o'
+                    'classes' => 'tfont-var-file_w'
                 )
         ),
     'totara_core|excel_file' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-excel-o'
+                    'classes' => 'tfont-var-file_x'
                 )
         ),
     'totara_core|file' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-o'
+                    'classes' => 'tfont-var-file-earmark'
                 )
         ),
     'totara_core|video_file' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-video-o'
+                    'classes' => 'tfont-var-file_camera'
                 )
         ),
     'totara_core|powerpoint_file' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-powerpoint-o'
+                    'classes' => 'tfont-var-file_p'
                 )
         ),
     'totara_core|audio_file' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-audio-o',
+                    'classes' => 'tfont-var-file_audio',
                 )
         ),
 
@@ -113,7 +113,7 @@ $icons = array(
         array (
             'data' =>
                 array (
-                    'classes' => 'fa-bookmark'
+                    'classes' => 'tfont-var-bookmark-fill'
                 )
         ),
 
@@ -121,7 +121,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-thumbs-o-up'
+                    'classes' => 'tfont-var-hand-thumbs-up'
                 )
         ),
 
@@ -129,7 +129,7 @@ $icons = array(
         array(
             'data' =>
                 array (
-                    'classes' => 'fa-thumbs-up'
+                    'classes' => 'tfont-var-hand-thumbs-up-fill'
                 )
         ),
 );

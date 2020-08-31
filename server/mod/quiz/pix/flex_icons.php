@@ -24,15 +24,15 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 $icons = array(
-    'mod_feedback|navflagged' =>
+    'mod_quiz|icon' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-flag',
+                    'classes' => 'tfont-var-text_file_tick',
                 ),
         ),
 );
 
-$aliases = array(
-    'mod_quiz|icon' => 'checklist',
-);
+$deprecated = [
+    'mod_feedback|navflagged' => 'flag-on'
+];

@@ -29,70 +29,70 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'ft-archive',
+                    'classes' => 'tfont-var-collection_handle_fill',
                 ),
         ),
     'mod_scorm|suspend' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-moon-o',
+                    'classes' => 'tfont-var-moon',
                 ),
         ),
     'mod_scorm|assetc' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-archive-o',
+                    'classes' => 'tfont-var-file-earmark-zip',
                 ),
         ),
     'mod_scorm|asset' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-file-archive-o',
+                    'classes' => 'tfont-var-file-earmark-zip',
                 ),
         ),
     'mod_scorm|browsed' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-book',
+                    'classes' => 'tfont-var-book',
                 ),
         ),
     'mod_scorm|completed' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-check-square-o',
+                    'classes' => 'tfont-var-check-square',
                 ),
         ),
     'mod_scorm|failed' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-times',
+                    'classes' => 'tfont-var-x',
                 ),
         ),
     'mod_scorm|incomplete' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-pencil-square-o',
+                    'classes' => 'tfont-var-pencil-square',
                 ),
         ),
     'mod_scorm|popdown' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-window-close-o',
+                    'classes' => 'tfont-var-x-square',
                 ),
         ),
     'mod_scorm|popup' =>
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-window-restore',
+                    'classes' => 'tfont-var-popup',
                 ),
         ),
 );

@@ -24,10 +24,20 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+
+$icons = array(
+    'block_totara_stats|statlearnerhours' => [
+        'data' => [
+            'classes' => 'tfont-var-person_alarm',
+        ],
+    ],
+
+);
+
+
 $aliases = array(
     'block_totara_stats|statcompachieved' => 'competency-achieved',
     'block_totara_stats|statcoursescompleted' => 'course-completed',
     'block_totara_stats|statcoursesstarted' => 'course-started',
-    'block_totara_stats|statlearnerhours' => 'event-user',
     'block_totara_stats|statobjachieved' => 'objective-achieved',
 );
