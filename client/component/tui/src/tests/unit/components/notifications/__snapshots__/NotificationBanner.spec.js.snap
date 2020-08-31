@@ -7,7 +7,7 @@ exports[`NotificationBanner Checks snapshot 1`] = `
   <div
     class="tui-notificationBanner__icon"
   >
-    <anonymous-stub
+    <svgicongenerated-stub
       alt="tempstring: "
       size="200"
       title="tempstring"

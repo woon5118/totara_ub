@@ -25,7 +25,7 @@
       :title="backButton.label"
       @click.prevent.stop="backClick"
     >
-      <BackArrow size="300" />
+      <BackArrow class="tui-resourceNavigationBar__backIcon" size="200" />
       <span> {{ backButton.label }} </span>
     </a>
 
@@ -126,7 +126,9 @@ export default {
   }
 
   &__backLink {
+    display: flex;
     flex: 1;
+    align-items: center;
     padding-right: var(--gap-12);
     overflow: hidden;
     white-space: nowrap;
@@ -134,6 +136,10 @@ export default {
     &:hover {
       text-decoration: none;
     }
+  }
+
+  &__backIcon {
+    margin-right: var(--gap-2);
   }
 
   &--disabled {

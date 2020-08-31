@@ -34,7 +34,6 @@
       'tui-iconBtn--textFirst': styleclass.textFirst,
       'tui-iconBtn--toggle': styleclass.toggle,
       'tui-iconBtn--toolbar': styleclass.toolbar,
-      'tui-iconBtn--selected': styleclass.selected,
       'tui-iconBtn--xsmall': styleclass.xsmall,
       'tui-iconBtn--transparent-noPadding': styleclass.transparentNoPadding,
     }"
@@ -174,8 +173,6 @@ export default {
   }
 
   &__icon {
-    position: relative;
-    top: 1px;
     display: flex;
     flex-shrink: 0;
     font-size: var(--font-size-16);
@@ -269,18 +266,6 @@ export default {
     .tui-iconBtn__text {
       padding: 0 var(--gap-1);
     }
-  }
-
-  &--toolbar {
-    @extend .tui-formBtn--toolbar;
-  }
-
-  &--selected {
-    @extend .tui-formBtn--selected;
-  }
-
-  &--toolbar&--selected {
-    @extend .tui-formBtn--toolbar.tui-formBtn--selected;
   }
 }
 

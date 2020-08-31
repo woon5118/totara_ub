@@ -26,7 +26,7 @@
           :title="iconLabel || helpmsg"
           :styleclass="{ transparent: true }"
         >
-          <Info v-if="!hidden" />
+          <Info v-if="!hidden" size="100" />
         </ButtonIcon>
       </template>
       <slot v-if="$slots.default" />

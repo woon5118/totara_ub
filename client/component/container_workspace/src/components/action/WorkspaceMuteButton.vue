@@ -30,8 +30,8 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import Notification from 'tui/components/icons/common/Notification';
-import NotificationDisabled from 'tui/components/icons/common/NotificationDisabled';
+import Notification from 'tui/components/icons/Notification';
+import NotificationDisabled from 'tui/components/icons/NotificationDisabled';
 
 export default {
   components: {

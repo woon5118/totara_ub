@@ -20,6 +20,7 @@ exports[`Loader Checks snapshot 1`] = `
       >
         <loading-stub
           aria-hidden="true"
+          ariahidden="true"
         />
         
         loading

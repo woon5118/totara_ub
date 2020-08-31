@@ -196,7 +196,7 @@ class MediaExtension extends BaseExtension {
     if (!this.editor.fileStorage.enabled) return [];
     return [
       new ToolbarItem({
-        group: 'upload',
+        group: 'embeds',
         label: langString('embedded_media', 'editor_weka'),
         iconComponent: ImageIcon,
         execute: editor => {

@@ -17,26 +17,28 @@
 -->
 
 <template>
-  <Button
+  <ButtonIcon
     class="tui-editorWeka-toolbarButton"
     :class="{
       'tui-editorWeka-toolbarButton--selected': selected,
+      'tui-editorWeka-toolbarButton--iconOnly': iconOnly,
     }"
     :aria-label="text"
     :aria-pressed="ariaPressed"
-    :text="text"
-    :caret="caret"
+    :title="text"
     :disabled="disabled"
     @click="$emit('click', $event)"
-  />
+  >
+    <slot name="icon" />
+  </ButtonIcon>
 </template>
 
 <script>
-import Button from 'tui/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 
 export default {
   components: {
-    Button,
+    ButtonIcon,
   },
 
   props: {
@@ -51,7 +53,7 @@ export default {
       default: null,
     },
 
-    caret: Boolean,
+    iconOnly: Boolean,
 
     disabled: Boolean,
   },
@@ -59,7 +61,7 @@ export default {
   computed: {
     ariaPressed() {
       if (this.selected == null) {
-        return null; // unset - not pressable
+        return false; // unset - not pressable
       }
       return this.selected ? 'true' : 'false';
     },
@@ -68,58 +70,11 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-editorWeka-toolbarButton {
-  min-width: 0;
-  height: var(--gap-8);
-  min-height: var(--gap-6);
-  padding: 0 var(--gap-2);
-  color: var(--color-text);
-  font-size: var(--font-size-14);
-  line-height: 1;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  transition: none;
-
-  &:focus,
-  &:hover,
-  &:active,
-  &:active:hover,
-  &:active:focus {
-    color: var(--color-text);
-    background: var(--color-neutral-4);
-    border: none;
-    box-shadow: none;
-  }
-
-  &:disabled {
-    color: var(--color-state-disabled);
-    background: transparent;
-    opacity: 1;
-
-    &:active,
-    &:focus,
-    &:active:focus,
-    &:active:hover,
-    &:hover {
-      color: var(--color-state-disabled);
-      background: transparent;
-      box-shadow: none;
-    }
-  }
+.tui-editorWeka-toolbarButtonIcon {
+  @extend .tui-editorWeka-toolbarButton;
 
   &--selected {
-    color: var(--color-neutral-1);
-    background: var(--color-state-active);
-
-    &:focus,
-    &:hover,
-    &:active,
-    &:active:hover,
-    &:active:focus {
-      color: var(--color-neutral-1);
-      background: var(--color-state-active);
-    }
+    @extend .tui-editorWeka-toolbarButton--selected;
   }
 }
 </style>

@@ -140,6 +140,7 @@ export default {
 
   &__icon {
     display: flex;
+    align-items: center;
     padding: var(--gap-4) 0 var(--gap-4) var(--gap-4);
     color: var(--color-neutral-1);
     background: var(--color-prompt-success);

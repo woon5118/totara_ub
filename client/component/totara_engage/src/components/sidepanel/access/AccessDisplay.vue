@@ -175,11 +175,12 @@ export default {
 .tui-accessDisplay {
   &__accessIcon {
     display: flex;
-    // neutralize the defalut flexicon padding
-    margin-left: -7px;
     &__icons {
       display: flex;
       align-items: center;
+      > :first-child {
+        margin-right: var(--gap-2);
+      }
     }
     &__shareButton {
       margin-left: var(--gap-4);
@@ -195,9 +196,8 @@ export default {
     flex-wrap: wrap;
     align-items: center;
     margin-top: var(--gap-2);
-    margin-left: -3px;
     > :first-child {
-      margin-left: calc(var(--gap-1) * -1);
+      margin-right: var(--gap-2);
     }
   }
 
@@ -206,7 +206,6 @@ export default {
     flex-wrap: wrap;
     align-items: center;
     margin-top: var(--gap-1);
-    margin-left: -2px;
     line-height: normal;
 
     &__topic {

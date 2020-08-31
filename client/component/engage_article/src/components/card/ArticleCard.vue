@@ -82,7 +82,9 @@
           :alt="$str('time', 'totara_engage')"
           custom-class="tui-icon--dimmed"
         />
-        <span>{{ getTimeView }}</span>
+        <span class="tui-engageArticle-articleCard__subTitle-text">{{
+          getTimeView
+        }}</span>
       </div>
     </CardHeader>
 
@@ -90,10 +92,11 @@
       <StatIcon
         v-for="statIcon in statIcons"
         :key="statIcon.type"
-        :icon="statIcon.icon"
         :title="statIcon.title"
         :stat-number="statIcon.statNumber"
-      />
+      >
+        <component :is="statIcon.icon" :title="statIcon.title" />
+      </StatIcon>
 
       <AccessIcon
         :access="access"
@@ -112,6 +115,8 @@ import CardHeader from 'totara_engage/components/card/CardHeader';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import ShareIcon from 'tui/components/icons/Share';
 import AddToListIcon from 'tui/components/icons/AddToList';
+import LikeIcon from 'tui/components/icons/Like';
+import CommentIcon from 'tui/components/icons/Comment';
 import MoreIcon from 'tui/components/icons/More';
 import { cardMixin, AccessManager, TimeViewType } from 'totara_engage/index';
 import AccessIcon from 'totara_engage/components/icons/access/computed/AccessIcon';
@@ -151,7 +156,7 @@ export default {
             'totara_engage',
             this.totalReactions
           ),
-          icon: 'totara_core|like',
+          icon: LikeIcon,
           statNumber: this.totalReactions,
         },
         {
@@ -161,7 +166,7 @@ export default {
             'totara_engage',
             this.totalComments
           ),
-          icon: 'totara_engage|comment',
+          icon: CommentIcon,
           statNumber: this.totalComments,
         },
       ],
@@ -207,7 +212,7 @@ export default {
             'totara_engage',
             this.sharedbycount
           ),
-          icon: 'totara_engage|share',
+          icon: ShareIcon,
           statNumber: this.sharedbycount,
         },
         {
@@ -217,7 +222,7 @@ export default {
             'engage_article',
             this.extraData.usage
           ),
-          icon: 'totara_engage|add-to-playlist',
+          icon: AddToListIcon,
           statNumber: this.extraData.usage,
         },
       ]);
@@ -292,8 +297,8 @@ export default {
 
   &__bookmark {
     // Negative margin here to neutralise the default redundant edges of icon.
-    margin-top: -2px;
-    margin-right: calc(var(--gap-3) * -1);
+    margin-top: 1px;
+    margin-right: calc(var(--gap-2) * -1);
   }
 
   &__title {
@@ -305,9 +310,13 @@ export default {
     display: inline-flex;
     align-items: center;
     margin-top: var(--gap-2);
-    padding-right: var(--gap-1);
+    padding: 0 var(--gap-2) 0 var(--gap-1);
     border: var(--border-width-thin) solid var(--color-neutral-5);
     border-radius: 50px;
+
+    &-text {
+      margin-left: var(--gap-1);
+    }
   }
 
   &__footer {

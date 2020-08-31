@@ -32,7 +32,6 @@
       'tui-formBtn--reveal': styleclass.reveal,
       'tui-formBtn--stealth': styleclass.stealth,
       'tui-formBtn--toolbar': styleclass.toolbar,
-      'tui-formBtn--selected': styleclass.selected,
     }"
     :disabled="disabled"
     :formaction="formaction"
@@ -323,10 +322,8 @@ export default {
   &--small {
     min-height: var(--form-input-height);
     padding: calc(
-        (
-            var(--form-input-height) - var(--form-input-font-size-sm) *
-              1.2
-          ) / 2 - var(--form-input-border-size)
+        (var(--form-input-height) - var(--form-input-font-size-sm) * 1.2) / 2 -
+          var(--form-input-border-size)
       )
       var(--gap-3);
 
@@ -426,65 +423,6 @@ export default {
         border-bottom: 1px dashed var(--color-state);
       }
     }
-  }
-
-  &--toolbar {
-    min-width: 0;
-    height: var(--gap-6);
-    min-height: var(--gap-6);
-    padding: var(--gap-1);
-    color: var(--btn-toolbar-text-color);
-    font-size: var(--font-size-14);
-    line-height: 1;
-    background: var(--btn-toolbar-bg-color);
-    border: none;
-    border-radius: 0;
-    transition: none;
-
-    &:focus {
-      color: var(--btn-toolbar-text-color);
-      background: var(--btn-toolbar-bg-color-focus);
-      border: none;
-      box-shadow: none;
-    }
-
-    &:hover {
-      color: var(--btn-toolbar-text-color);
-      background: var(--btn-toolbar-bg-color-focus);
-      border: none;
-      box-shadow: none;
-    }
-
-    &:active,
-    &:active:hover,
-    &:active:focus {
-      color: var(--btn-toolbar-text-color);
-      text-decoration: none;
-      background: var(--btn-toolbar-bg-color-focus);
-      border: none;
-      box-shadow: none;
-    }
-
-    &:disabled {
-      color: var(--color-state-disabled);
-      background: transparent;
-      opacity: 1;
-
-      &:active,
-      &:focus,
-      &:active:focus,
-      &:active:hover,
-      &:hover {
-        color: var(--color-state-disabled);
-        background: transparent;
-        box-shadow: none;
-      }
-    }
-  }
-
-  &--toolbar&--selected {
-    color: var(--btn-toolbar-text-color-selected);
-    background: var(--btn-toolbar-bg-color-selected);
   }
 
   &--srOnly {

@@ -28,7 +28,7 @@
     >
       <div class="tui-engageWarningModal__container">
         <div class="tui-engageWarningModal__icon">
-          <warning size="700" :custom-class="'tui-icon--warning'" />
+          <Warning size="700" :custom-class="'tui-icon--warning'" />
         </div>
         <div class="tui-engageWarningModal__box">
           <p v-show="title" class="tui-engageWarningModal__title">

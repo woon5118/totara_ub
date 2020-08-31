@@ -22,10 +22,12 @@ export function createIconComponent([type, attrs, content], opts = {}) {
   // svgc (content string) is the only supported type
   if (type != 'svgc') throw new Error('Unsupported icon type');
   return {
+    name: 'SvgIconGenerated',
     functional: true,
     components: { SvgIconWrap },
     render(h, { props }) {
       return h(SvgIconWrap, {
+        class: opts.class,
         props: Object.assign(
           {
             htmlContent: content,

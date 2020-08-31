@@ -9,10 +9,8 @@ exports[`totara_engage/components/icons/StatIcon.vue Checks snapshot 1`] = `
     class="tui-totaraEngage-statIcon__iconContainer"
     role="img"
   >
-    <icon-stub
-      class="tui-totaraEngage-statIcon__icon"
-      icon="totara_core|like"
-      title="15 likes"
+    <span
+      class="tui-totaraEngage-statIcon__icon tui-totaraEngage-icon"
     />
   </span>
    

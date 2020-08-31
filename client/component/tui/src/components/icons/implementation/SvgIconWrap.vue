@@ -81,3 +81,57 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-svgIcon {
+  &--size {
+    &-100 {
+      font-size: 1.4rem;
+    }
+    &-200 {
+      font-size: 1.6rem;
+    }
+    &-300 {
+      font-size: 2rem;
+    }
+    &-400 {
+      font-size: 2.4rem;
+    }
+    &-500 {
+      font-size: 2.8rem;
+    }
+    &-600 {
+      font-size: 3.2rem;
+    }
+    &-700 {
+      font-size: 3.8rem;
+    }
+  }
+
+  &--state {
+    &-info {
+      color: var(--color-prompt-info);
+    }
+
+    &-alert {
+      color: var(--color-prompt-alert);
+    }
+
+    &-warning {
+      color: var(--color-prompt-warning);
+    }
+
+    &-success {
+      color: var(--color-prompt-success);
+    }
+
+    &-dimmed {
+      color: var(--color-neutral-6);
+    }
+  }
+}
+
+.dir-rtl .tui-svgIcon--flipRtl {
+  transform: scale(-1, 1);
+}
+</style>

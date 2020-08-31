@@ -23,6 +23,7 @@
       <template v-if="state === ACTIVITY_STATUS_DRAFT">
         <span v-html="$str('activity_status_banner_draft', 'mod_perform')" />
         <HelpIcon
+          class="tui-activityStatusBanner__helpIcon"
           :icon-label="$str('activity_status_banner_help_title', 'mod_perform')"
           :desc-id="$id('activation-help')"
         >
@@ -115,3 +116,9 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-activityStatusBanner__helpIcon {
+  margin-left: var(--gap-2);
+}
+</style>

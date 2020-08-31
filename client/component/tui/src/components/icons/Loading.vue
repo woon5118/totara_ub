@@ -12,34 +12,28 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @author Simon Chester <simon.chester@totaralearning.com>
   @module tui
 -->
 
 <script>
-import FlexIcon from 'tui/components/icons/FlexIcon';
+import icon from './internal/obj/totara/spinner.svg';
+import { createIconComponent } from 'tui/lib/svg_icon';
 
-export default {
-  functional: true,
-
-  components: {
-    FlexIcon,
-  },
-
-  props: {
-    alt: String,
-    customClass: [String, Object, Array],
-    styleClass: Object,
-    size: [String, Number],
-    title: String,
-  },
-
-  render(h, { props }) {
-    return h(FlexIcon, {
-      props: Object.assign({}, props, {
-        icon: 'loading',
-      }),
-    });
-  },
-};
+export default createIconComponent(icon, { class: 'tui-iconLoading' });
 </script>
+
+<style lang="scss">
+.tui-iconLoading {
+  animation: tui-iconLoading-spin 1s steps(12, end) infinite;
+}
+
+@keyframes tui-iconLoading-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>

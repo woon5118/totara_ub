@@ -25,7 +25,6 @@ describe('totara_engage/components/icons/StatIcon.vue', () => {
   beforeAll(() => {
     wrapper = shallowMount(StatIcon, {
       propsData: {
-        icon: 'totara_core|like',
         title: '15 likes',
         statNumber: 15,
       },

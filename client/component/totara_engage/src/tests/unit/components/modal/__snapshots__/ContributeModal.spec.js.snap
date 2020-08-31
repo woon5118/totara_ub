@@ -64,11 +64,7 @@ exports[`totara_engage/components/modal/ContributeModal.vue Checks snapshot 1`] 
       styleclass="[object Object]"
       type="button"
     >
-      <flexicon-stub
-        alt=""
-        customclass=""
-        icon="expand"
-      />
+      <sizeexpandicon-stub />
     </buttonicon-stub>
   </modalcontent-stub>
 </modal-stub>

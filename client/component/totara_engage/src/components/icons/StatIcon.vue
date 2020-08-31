@@ -23,12 +23,12 @@
       role="img"
       :aria-label="title"
     >
-      <Icon
-        class="tui-totaraEngage-statIcon__icon"
-        :icon="icon"
-        :title="title"
-        :icon-size="iconSize"
-      />
+      <span
+        class="tui-totaraEngage-statIcon__icon tui-totaraEngage-icon"
+        :class="iconCss"
+      >
+        <slot />
+      </span>
     </span>
 
     <span class="tui-totaraEngage-statIcon__statNumber" aria-hidden="true">
@@ -38,19 +38,8 @@
 </template>
 
 <script>
-import Icon from 'totara_engage/components/icons/Icon';
-
 export default {
-  components: {
-    Icon: Icon,
-  },
-
   props: {
-    icon: {
-      required: true,
-      type: String,
-    },
-
     title: {
       required: true,
       type: String,
@@ -65,6 +54,16 @@ export default {
       type: [String, Number],
     },
   },
+
+  computed: {
+    iconCss() {
+      if (this.clickable) {
+        return 'tui-totaraEngage-icon--clickable';
+      }
+
+      return '';
+    },
+  },
 };
 </script>
 
@@ -76,6 +75,16 @@ export default {
 
   &__statNumber {
     font-size: var(--font-size-12);
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    outline: none;
+    cursor: default;
+    &--clickable {
+      cursor: pointer;
+    }
   }
 }
 </style>

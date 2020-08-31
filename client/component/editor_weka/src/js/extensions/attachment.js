@@ -121,7 +121,7 @@ class AttachmentExtension extends BaseExtension {
     if (!this.editor.fileStorage.enabled) return [];
     return [
       new ToolbarItem({
-        group: 'upload',
+        group: 'embeds',
         label: langString('attachment', 'editor_weka'),
         iconComponent: AttachmentIcon,
         execute: editor => {

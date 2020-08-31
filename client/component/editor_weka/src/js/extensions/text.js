@@ -167,12 +167,12 @@ class TextExtension extends BaseExtension {
         }
       ),
       markItem(strong, {
-        group: 'marks',
+        group: 'text',
         label: langString('bold', 'editor'),
         iconComponent: TextBoldIcon,
       }),
       markItem(em, {
-        group: 'marks',
+        group: 'text',
         label: langString('italic', 'editor'),
         iconComponent: TextItalicIcon,
       }),

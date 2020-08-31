@@ -16,6 +16,7 @@
  * @module tui
  */
 
-export const load = jest.fn(() => Promise.resolve());
-export const loaded = () => true;
-export const getFlexData = () => null;
+import icon from './internal/obj/bootstrap-icons/arrows-angle-expand.svg';
+import { createIconComponent } from 'tui/lib/svg_icon';
+
+export default createIconComponent(icon);

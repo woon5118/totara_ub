@@ -16,24 +16,7 @@
  * @module tui
  */
 
-import { config } from '@vue/test-utils';
+import icon from './internal/obj/bootstrap-icons/chat-fill.svg';
+import { createIconComponent } from 'tui/lib/svg_icon';
 
-jest.mock('tui/internal/storage');
-jest.mock('tui/internal/lang_string_store');
-jest.mock('tui/config');
-jest.mock('tui/apollo_client', () => null);
-jest.mock('tui/tui');
-jest.mock('tui/pending');
-jest.mock('tui/i18n');
-
-jest.mock('tui/components/icons/implementation/SvgIconWrap', () => {
-  return {
-    render: h => h('span'),
-  };
-});
-
-config.mocks.$str = (key, comp, a) =>
-  a ? `[[${key}, ${comp}, ${JSON.stringify(a)}]]` : `[[${key}, ${comp}]]`;
-
-config.mocks.uid = 'id';
-config.mocks.$id = x => (x ? 'id-' + x : 'id');
+export default createIconComponent(icon);

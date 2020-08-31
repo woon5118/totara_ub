@@ -20,18 +20,6 @@ import CardsGrid from 'totara_engage/components/contribution/CardsGrid';
 import { mount } from '@vue/test-utils';
 import { AccessManager } from 'totara_engage/index';
 
-jest.mock('tui/components/icons/FlexIcon', () => {
-  return {
-    render(h) {
-      return h('span');
-    },
-  };
-});
-
-jest.mock('tui/apollo_client', function() {
-  return null;
-});
-
 // Mock tui.import
 jest.mock('tui/tui', function() {
   return {

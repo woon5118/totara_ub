@@ -82,7 +82,6 @@ import ActivateActivityModal from 'mod_perform/components/manage_activity/Activa
 import ActivityContentTab from 'mod_perform/components/manage_activity/content/ActivityContentTab';
 import ActivityStatusBanner from 'mod_perform/components/manage_activity/ActivityStatusBanner';
 import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/AssignmentsTab';
-import FlexIcon from 'tui/components/icons/FlexIcon';
 import GeneralInfoTab from 'mod_perform/components/manage_activity/GeneralInfoTab';
 import NotificationsTab from 'mod_perform/components/manage_activity/notification/NotificationsTab';
 import Loader from 'tui/components/loader/Loader';
@@ -100,7 +99,6 @@ export default {
     ActivityContentTab,
     ActivityStatusBanner,
     AssignmentsTab,
-    FlexIcon,
     Tab,
     Tabs,
     Loader,

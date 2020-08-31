@@ -79,7 +79,8 @@
         :styleclass="{ transparentNoPadding: true }"
         @click="resize"
       >
-        <FlexIcon custom-class="" :icon="resizeIcon" alt="" />
+        <SizeContractIcon v-if="expanded" />
+        <SizeExpandIcon v-else />
       </ButtonIcon>
     </ModalContent>
   </Modal>
@@ -90,7 +91,8 @@ import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
 import Tabs from 'tui/components/tabs/Tabs';
 import Tab from 'tui/components/tabs/Tab';
-import FlexIcon from 'tui/components/icons/FlexIcon';
+import SizeContractIcon from 'tui/components/icons/SizeContract';
+import SizeExpandIcon from 'tui/components/icons/SizeExpand';
 import tui from 'tui/tui';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Button from 'tui/components/buttons/Button';
@@ -109,7 +111,8 @@ export default {
     ModalContent,
     Tabs,
     Tab,
-    FlexIcon,
+    SizeContractIcon,
+    SizeExpandIcon,
     ButtonIcon,
     Button,
   },

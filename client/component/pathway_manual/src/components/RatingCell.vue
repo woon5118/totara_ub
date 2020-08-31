@@ -50,7 +50,7 @@
         {{ scaleValue.name }}
       </span>
       <span v-if="comment" class="tui-bulkManualRatingCell__rating-hasComment">
-        <FlexIcon icon="pathway_manual|comment-filled" size="200" />
+        <CommentActiveIcon size="200" />
       </span>
     </span>
     <span class="tui-bulkManualRatingCell__rating-editRating">
@@ -67,8 +67,7 @@
             :aria-label="$str('edit_rating', 'pathway_manual')"
             :styleclass="{ small: true }"
           >
-            <FlexIcon
-              icon="edit"
+            <EditIcon
               size="200"
               :title="$str('edit_rating', 'pathway_manual')"
             />
@@ -82,7 +81,8 @@
 <script>
 import Button from 'tui/components/buttons/Button';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import FlexIcon from 'tui/components/icons/FlexIcon';
+import CommentActiveIcon from 'tui/components/icons/CommentActive';
+import EditIcon from 'tui/components/icons/Edit';
 import RatingPopover from 'pathway_manual/components/RatingPopover';
 
 import { NONE_OPTION_VALUE } from 'pathway_manual/constants';
@@ -91,7 +91,8 @@ export default {
   components: {
     Button,
     ButtonIcon,
-    FlexIcon,
+    CommentActiveIcon,
+    EditIcon,
     RatingPopover,
   },
 

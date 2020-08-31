@@ -119,7 +119,9 @@ exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`]
           <div
             class="tui-loader__display"
           >
-            <span />
+            <span
+              class="tui-iconLoading"
+            />
             
         [[loading, moodle]]
       

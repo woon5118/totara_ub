@@ -68,15 +68,21 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
     class="tui-engageArticle-articleCard__footer"
   >
     <staticon-stub
-      icon="totara_core|like"
       statnumber="15"
       title="[numberoflikes, totara_engage - 15]"
-    />
+    >
+      <svgicongenerated-stub
+        title="[numberoflikes, totara_engage - 15]"
+      />
+    </staticon-stub>
     <staticon-stub
-      icon="totara_engage|comment"
       statnumber="1"
       title="[numberofcomments, totara_engage - 1]"
-    />
+    >
+      <svgicongenerated-stub
+        title="[numberofcomments, totara_engage - 1]"
+      />
+    </staticon-stub>
      
     <accessicon-stub
       access="PRIVATE"

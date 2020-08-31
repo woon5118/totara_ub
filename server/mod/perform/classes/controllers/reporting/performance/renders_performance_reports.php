@@ -93,7 +93,7 @@ trait renders_performance_reports {
     }
 
     private function get_back_to(string $uri): array {
-        $arrow =  $this->get_rendered_component('tui/components/icons/common/BackArrow', ['size' => 100]);
+        $arrow =  $this->get_rendered_component('tui/components/icons/BackArrow', ['size' => 100]);
         $back_text = get_string('all_performance_data_records', 'mod_perform');
         $back_url = new moodle_url($uri);
 

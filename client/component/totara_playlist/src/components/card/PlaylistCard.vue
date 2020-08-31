@@ -103,10 +103,11 @@
       <StatIcon
         v-for="statIcon in statIcons"
         :key="statIcon.type"
-        :icon="statIcon.icon"
         :title="statIcon.title"
         :stat-number="statIcon.statNumber"
-      />
+      >
+        <component :is="statIcon.icon" :title="statIcon.title" />
+      </StatIcon>
 
       <AccessIcon
         :access="access"
@@ -125,6 +126,7 @@ import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import StatIcon from 'totara_engage/components/icons/StatIcon';
 import StarRating from 'totara_engage/components/icons/StarRating';
 import ShareIcon from 'tui/components/icons/Share';
+import CommentIcon from 'tui/components/icons/Share';
 import MoreIcon from 'tui/components/icons/More';
 import { cardMixin, AccessManager } from 'totara_engage/index';
 import AccessIcon from 'totara_engage/components/icons/access/computed/AccessIcon';
@@ -142,6 +144,7 @@ export default {
     StatIcon,
     StarRating,
     ShareIcon,
+    CommentIcon,
     MoreIcon,
     AccessIcon,
     BookmarkButton,
@@ -158,7 +161,7 @@ export default {
       statIcons: [
         {
           type: 'comment',
-          icon: 'totara_engage|comment',
+          icon: CommentIcon,
           title: this.$str(
             'numberofcomments',
             'totara_engage',
@@ -196,7 +199,7 @@ export default {
       // Adding stat icon depending the visibility
       this.statIcons.push({
         type: 'share',
-        icon: 'totara_engage|share',
+        icon: ShareIcon,
         title: this.$str('numberofshares', 'totara_engage', this.sharedbycount),
         statNumber: this.sharedbycount,
       });

@@ -22,8 +22,11 @@
     class="tui-sidePanelNavButtonItem"
     :class="{ 'tui-sidePanelNavButtonItem--active': activeItem }"
   >
-    <span v-if="notification" class="tui-sidePanelNavButtonItem__notification">
-      <Dot :aria-hidden="true" />
+    <span
+      v-if="notification"
+      class="tui-sidePanelNavButtonItem__notificationDot"
+    >
+      <span class="tui-sidePanelNavButtonItem__notificationDot-inner" />
       <span :id="notificationTextId" class="sr-only">
         {{ notificationText }}
       </span>
@@ -48,12 +51,10 @@
 
 <script>
 import Button from 'tui/components/buttons/Button';
-import Dot from 'tui/components/icons/common/Dot';
 
 export default {
   components: {
     Button,
-    Dot,
   },
 
   props: {
@@ -125,13 +126,21 @@ export default {
     padding-right: var(--gap-4);
   }
 
-  &__notification {
+  &__notificationDot {
     position: absolute;
     // The same as padding left of actioin plus another tui-gap-4 to make sure there is a padding between
     // the action link and the dot.
     width: var(--sidepanel-navigation-item-padding-left);
-    color: var(--color-prompt-alert);
     pointer-events: none;
+
+    &-inner {
+      display: block;
+      width: 0.6rem;
+      height: 0.6rem;
+      margin-left: var(--gap-3);
+      background-color: var(--color-prompt-alert);
+      border-radius: 100%;
+    }
   }
 
   // Item link

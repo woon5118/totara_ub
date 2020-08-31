@@ -25,21 +25,19 @@
     <div class="tui-editorWeka-toolbar__group">
       <Dropdown :separator="false">
         <template v-slot:trigger="{ toggle, isOpen }">
-          <ButtonIcon
+          <ToolbarButton
             class="tui-editorWeka-toolbar__currentBlock tui-editorWeka-toolbar__button"
-            :styleclass="{ toolbar: true, textFirst: true }"
             :text="activeBlockName"
             :aria-expanded="isOpen ? 'true' : 'false'"
             :aria-label="
               $str('format_as_blocktype_status', 'editor_weka', activeBlockName)
             "
             :disabled="!blockSelectorEnabled"
+            caret
             @click="toggle()"
             @keydown.native="handleButtonKeydown"
             @focus.native="handleButtonFocus"
-          >
-            <FlexIcon icon="caret-down" size="100" />
-          </ButtonIcon>
+          />
         </template>
         <DropdownItem
           v-for="(item, i) in blockItems"
@@ -61,7 +59,7 @@
         <!-- dropdown toolbar item -->
         <Dropdown v-if="item.children" :key="i" :separator="false">
           <template v-slot:trigger="{ toggle }">
-            <ToolbarButton
+            <ToolbarButtonIcon
               class="tui-editorWeka-toolbar__button"
               :text="item.label.toString()"
               :active="item.active"
@@ -73,7 +71,7 @@
               <template slot="icon">
                 <component :is="item.iconComponent" />
               </template>
-            </ToolbarButton>
+            </ToolbarButtonIcon>
           </template>
           <DropdownItem
             v-for="(child, j) in item.children"
@@ -94,7 +92,7 @@
           @open-changed="openChanged(item, ...arguments)"
         >
           <template v-slot:trigger="{ isOpen }">
-            <ToolbarButton
+            <ToolbarButtonIcon
               class="tui-editorWeka-toolbar__button"
               :text="item.label.toString()"
               :selected="item.active"
@@ -107,14 +105,14 @@
               <template slot="icon">
                 <component :is="item.iconComponent" />
               </template>
-            </ToolbarButton>
+            </ToolbarButtonIcon>
           </template>
           <template v-slot:default="{ close }">
             <component :is="item.popover.component" @close="close" />
           </template>
         </Popover>
         <!-- regular toolbar button -->
-        <ToolbarButton
+        <ToolbarButtonIcon
           v-else
           :key="i"
           class="tui-editorWeka-toolbar__button"
@@ -128,29 +126,30 @@
           <template slot="icon">
             <component :is="item.iconComponent" />
           </template>
-        </ToolbarButton>
+        </ToolbarButtonIcon>
       </template>
     </div>
   </div>
 </template>
 
 <script>
-import { groupBy } from 'tui/util';
 import { getTabbableElements } from 'tui/dom/focus';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
-import FlexIcon from 'tui/components/icons/FlexIcon';
-import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import ShowIcon from 'tui/components/icons/Show';
+import Button from 'tui/components/buttons/Button';
 import ToolbarButton from 'editor_weka/components/toolbar/ToolbarButton';
+import ToolbarButtonIcon from 'editor_weka/components/toolbar/ToolbarButtonIcon';
 import Popover from 'tui/components/popover/Popover';
 
 export default {
   components: {
     Dropdown,
     DropdownItem,
-    FlexIcon,
-    ButtonIcon,
+    ShowIcon,
+    Button,
     ToolbarButton,
+    ToolbarButtonIcon,
     Popover,
   },
 
@@ -175,10 +174,18 @@ export default {
     },
 
     itemGroups() {
-      return groupBy(
-        this.items.filter(x => x.group != 'blocks'),
-        x => x.group
-      );
+      const items = this.items.filter(x => x.group != 'blocks');
+      const groups = {
+        text: [],
+        embeds: [],
+      };
+      items.forEach(x => {
+        if (!groups[x.group]) {
+          groups[x.group] = [];
+        }
+        groups[x.group].push(x);
+      });
+      return groups;
     },
   },
 
@@ -319,21 +326,14 @@ export default {
     }
   }
 
-  &__currentBlock.tui-iconBtn {
+  &__currentBlock.tui-formBtn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     min-width: 8em;
-    padding: 0 var(--gap-1);
+    padding: 0 var(--gap-2);
 
-    .tui-iconBtn__label {
-      flex: 1;
-      justify-content: space-between;
-    }
-
-    .tui-iconBtn__text {
-      padding: 0;
-      color: var(--color-text);
-    }
-
-    &:disabled .tui-iconBtn__text {
+    &:disabled {
       color: var(--color-state-disabled);
     }
   }

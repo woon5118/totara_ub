@@ -166,7 +166,7 @@ function createConfig({
       loader: require.resolve('../webpack/graphql_loader'),
     },
     {
-      test: /icons\/internal\/obj\/.*\.svg/,
+      test: /icons[/\\]internal[/\\]obj[/\\].*\.svg/,
       type: 'javascript/auto',
       loader: require.resolve('../webpack/icons_svg_loader'),
     },

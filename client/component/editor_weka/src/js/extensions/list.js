@@ -90,13 +90,13 @@ class ListExtension extends BaseExtension {
 
     return [
       cmdItem(toggleList(bullet_list, list_item, listTypes), {
-        group: 'node',
+        group: 'text',
         label: langString('bulletlist', 'editor'),
         iconComponent: ListUnordered,
         active: editor => isListActive(editor.state, bullet_list),
       }),
       cmdItem(toggleList(ordered_list, list_item, listTypes), {
-        group: 'node',
+        group: 'text',
         label: langString('numberedlist', 'editor'),
         iconComponent: ListOrdered,
         active: editor => isListActive(editor.state, ordered_list),
