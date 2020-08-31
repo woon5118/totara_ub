@@ -182,7 +182,7 @@ export default {
       this.$emit('update', {
         title: values.rawTitle,
         data: {
-          wekaDoc: JSON.stringify(this.wekaDoc),
+          wekaDoc: this.wekaDoc ? JSON.stringify(this.wekaDoc) : null,
           draftId: this.draftId,
           format: 'HTML',
           docFormat: 'FORMAT_JSON_EDITOR',
