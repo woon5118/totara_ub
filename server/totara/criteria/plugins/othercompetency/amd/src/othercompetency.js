@@ -59,6 +59,7 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
         this.criterionKey = ''; // Unique key to use in bubbled events
         this.competencies = []; // other competencies to complete
         this.competencyAdder = null; // Initialized Adder for other competencies
+        this.pwCompetencyId = 0; // Id of the competency this criterion belongs to
 
         this.endpoints = {
             detail: 'criteria_othercompetency_get_detail',
@@ -155,9 +156,14 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
         getDetail: function(wgt) {
             var that = this,
                 criterionNode = this.widget.closest('[data-tw-editScaleValuePaths-criterion-key]'),
-                aggregationNode = criterionNode.querySelector('[data-tw-criterionOtherCompetency-aggregation]');
+                aggregationNode = criterionNode.querySelector('[data-tw-criterionOtherCompetency-aggregation]'),
+                pathwayNode = document.querySelector('[data-tw-editAchievementPaths-competency]');
 
             return new Promise(function(resolve) {
+                if (pathwayNode) {
+                    that.pwCompetencyId = pathwayNode.getAttribute('data-tw-editAchievementPaths-competency');
+                }
+
                 if (criterionNode) {
                     that.criterionKey = criterionNode.hasAttribute('data-tw-editScaleValuePaths-criterion-key')
                         ? criterionNode.getAttribute('data-tw-editScaleValuePaths-criterion-key')
@@ -347,10 +353,6 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
                                 hasExpandedView: true,
                                 hasHierarchy: true,
                             },
-                            defaultFilters: {
-                                'excluded_competency_id': document.querySelector('[data-tw-editAchievementPaths-competency]')
-                                .getAttribute('data-tw-editAchievementPaths-competency')
-                            },
                             service: 'totara_competency_competency_index',
                         },
                         onSaved: function(modal, items, selectionData) {
@@ -389,17 +391,22 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
          * Open the adder to add competencies
          */
         addCompetencies: function() {
-            var that = this;
+            // We don't want to filter out the competency to which the criteria belong to allow for navigation to its child competencies
+            // We rather want this competency's id in the list as if it was selected previously to prevent selection
+            var that = this,
+                selectedIds = this.criterion.itemids.slice(0);
+
+            selectedIds.push(that.pwCompetencyId);
             if (!this.competencyAdder) {
                 this.initCompetencyAdder().then(function() {
-                    that.competencyAdder.show(that.criterion.itemids);
+                    that.competencyAdder.show(selectedIds);
                 }).catch(function(e) {
                     e.fileName = that.filename;
                     e.name = 'Error initialsing the competency adder';
                     notification.exception(e);
                 });
             } else {
-                this.competencyAdder.show(this.criterion.itemids);
+                this.competencyAdder.show(selectedIds);
             }
         },
 
@@ -419,15 +426,17 @@ function(templates, notification, ajax, ModalList, Loader, HierarchyEvents) {
 
             for (var a = 0; a < competencies.length; a++) {
                 id = competencies[a].id;
-                fullname = competencies[a].fullname;
+                if (id != that.pwCompetencyId) {
+                    fullname = competencies[a].fullname;
 
-                idIndex = this.criterion.itemids.indexOf(id);
+                    idIndex = this.criterion.itemids.indexOf(id);
 
-                if (idIndex < 0) {
-                    this.criterion.itemids.push(id);
+                    if (idIndex < 0) {
+                        this.criterion.itemids.push(id);
 
-                    templateData = {type: 'competency', value: id, text: fullname};
-                    competenciesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, competenciesTarget));
+                        templateData = {type: 'competency', value: id, text: fullname};
+                        competenciesPromiseArr.push(templates.renderAppend('totara_criteria/partial_item', templateData, competenciesTarget));
+                    }
                 }
             }
 
