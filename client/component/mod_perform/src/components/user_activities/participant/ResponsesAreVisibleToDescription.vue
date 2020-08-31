@@ -189,7 +189,7 @@ export default {
 <style lang="scss">
 .tui-responsesAreVisibleToDescription {
   & > * + * {
-    margin-top: var(--tui-gap-1);
+    margin-top: var(--gap-1);
   }
 
   &__viewOnly {
@@ -198,7 +198,7 @@ export default {
     align-items: flex-start;
 
     & > * + * {
-      margin-top: var(--tui-gap-2);
+      margin-top: var(--gap-2);
     }
 
     &-lozenge {
@@ -218,7 +218,7 @@ export default {
 
       & > * + * {
         margin-top: 0;
-        margin-left: var(--tui-gap-2);
+        margin-left: var(--gap-2);
       }
     }
   }
