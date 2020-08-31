@@ -325,7 +325,7 @@ export default {
   },
 
   methods: {
-    validate(values) {
+    validate() {
       const errors = {};
       return errors;
     },

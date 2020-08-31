@@ -333,7 +333,7 @@ export default {
       return;
     },
 
-    validate(values) {
+    validate() {
       const errors = {};
       return errors;
     },
@@ -448,9 +448,6 @@ export default {
           tenant_id: this.selectedTenantId,
         };
       },
-      result(ApolloQueryResult, key) {
-        // console.log(`Apollo queryData loaded (${key})`);
-      },
     },
     totara_tui_themes_with_variables: {
       query: tuiQueryThemesWithVariables,
@@ -458,9 +455,6 @@ export default {
         return {
           theme: this.theme,
         };
-      },
-      result(ApolloQueryResult, key) {
-        // console.log(`Apollo queryData loaded (${key})`);
       },
     },
   },

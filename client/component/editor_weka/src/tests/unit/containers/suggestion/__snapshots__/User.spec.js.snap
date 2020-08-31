@@ -9,7 +9,7 @@ exports[`editor_weka/components/suggestion/User.vue Checks snapshot 1`] = `
     animation="default"
     canclose="true"
     closeonclick="true"
-    open="true"
+    open="0"
     position="bottom-left"
     role="menu"
     separator="true"
@@ -21,6 +21,8 @@ exports[`editor_weka/components/suggestion/User.vue Checks snapshot 1`] = `
       [[matching_users, editor_weka]]:
     
     </span>
+     
+    <!---->
      
   </dropdown-stub>
 </div>

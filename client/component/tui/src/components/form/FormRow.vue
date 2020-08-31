@@ -134,8 +134,8 @@ export default {
     max-width: 71.2rem;
 
     &--isStacked {
-      flex-direction: column;
       display: block;
+      flex-direction: column;
 
       @include tui-stack-vertical(var(--gap-1));
     }
