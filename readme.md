@@ -10,7 +10,6 @@ Table of contents:
 * [Upgrading](#upgrading)
 * [Development](#development)
 * [Support](#support)
-* [Documentation](#documentation)
 
 <a name="introduction" />
 
@@ -210,7 +209,7 @@ For a set of complete instructions please see the help documentation on [install
 ## Upgrading
 
 The following steps should be followed when upgrading any Totara site, to any newer release.
-For detailed instructions see https://help.totaralearning.com/display/latest/Upgrading+from+Totara
+For detailed instructions see [upgrading from Totara](https://help.totaralearning.com/display/latest/Upgrading+from+Totara)
 
 1.  Check the live logs to check if any users are currently using the site.
     The site will be offline while the upgrades are performed.
@@ -249,7 +248,9 @@ Totara 13 brings with it a number of significant changes. For information on the
 Most notably, as a partner you will now need to set the flavour that the site is using to ensure that the correct
 functionality is available to the site.
 This can be done by defining the following in your config.php:
-`$CFG->forceflavour = 'learn';`
+```php
+$CFG->forceflavour = 'learn';
+```
 
 The following are valid flavours:
 * learn_perform_engage
@@ -266,17 +267,17 @@ This should be set between steps 5 and 6 above.
 
 ## Development
 
-For information on developing for Totara see (readme_development)[readme_development.md]
+For information on developing for Totara see [readme_development](readme_development.md)
 
 <a name="support" />
 
 ## Support
 
 For subscribers, please get in touch with your partner.
-If you are a direct subscriber, or a partner, and require support, please contact us through (totara.support)[http://totara.support]
+If you are a direct subscriber, or a partner, and require support, please contact us through [totara.support](http://totara.support)
 
 Further information and help can be found at the following:
-* (Help documentation)[https://help.totaralearning.com/display/latest/]
-* (Developer documentation)[https://help.totaralearning.com/display/DEV/]
-* (Community)[https://totara.community/]
-* (Academy)[https://totara.academy/]
+* [Help documentation](https://help.totaralearning.com/display/latest/)
+* [Developer documentation](https://help.totaralearning.com/display/DEV/)
+* [Community](https://totara.community/)
+* [Academy](https://totara.academy/)
