@@ -70,8 +70,8 @@ module.exports = function(jsonSource, map) {
 };
 `;
 
-  if (fs.existsSync(path.resolve(self.context, './styles/static.scss'))) {
-    source += 'require("./styles/static.scss");\n';
+  if (fs.existsSync(path.resolve(self.context, './global_styles/static.scss'))) {
+    source += 'require("./global_styles/static.scss");\n';
   }
 
   // execute pre-entry code
