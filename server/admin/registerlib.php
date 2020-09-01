@@ -137,9 +137,9 @@ function get_registration_data() {
     $data['issuedbadgesnumber'] = $DB->count_records('badge_issued');
     $data['debugstatus'] = (isset($CFG->debug) ? $CFG->debug : DEBUG_NONE); // Support needs to know what errors users see.
     $data['lastcron'] = $DB->get_field_sql('SELECT MAX(lastruntime) FROM {task_scheduled}'); // Support needs to know if cron is configured and running.
-    $data['tenantsenabled'] = $CFG->tenantsenabled ? get_string('settingenabled', 'admin'): get_string('settingdisabled', 'admin');
-    $data['tenantisolationmode'] = $CFG->tenantsisolated ? get_string('settingenabled', 'admin'): get_string('settingdisabled', 'admin');
-    if ($CFG->tenantsenabled) {
+    $data['tenantsenabled'] = !empty($CFG->tenantsenabled) ? 1 : 0;
+    $data['tenantisolationmode'] = !empty($CFG->tenantsisolated) ? 1 : 0;
+    if (!empty($CFG->tenantsenabled)) {
         $tenantmembers = $DB->count_records_sql("SELECT COUNT('x') FROM {user} WHERE tenantid IS NOT NULL AND deleted = 0");
         $tenantparticipants =  $DB->count_records_sql("
                                   SELECT COUNT('x') FROM {cohort_members} cm 
