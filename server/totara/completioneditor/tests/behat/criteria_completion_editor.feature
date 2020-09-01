@@ -48,13 +48,14 @@ Feature: Criteria completion records can be edited
     And "Criteria time completed" "field" should not exist
     And I should see "Copied from activity time completed"
     And the field "Activity status" matches value "Not completed"
-    And "Activity time completed" "field" should not exist
+    And Activity time completed field should not exist
     And the field "Viewed" matches value "0"
     And "RPL" "field" should not exist
 
     # Create course_modules_completion and course_completion_crit_compl records.
     When I set the field "Viewed" to "1"
     And I set the "Activity status" Totara form field to "Completed"
+    And I wait for Activity time completed form field to be ready
     And I set the "Activity time completed" Totara form field to "2011-02-03 04:56"
     And I set the field "RPL" to "This is an RPL reason"
     And I press "Save changes"
@@ -85,7 +86,7 @@ Feature: Criteria completion records can be edited
     # Update course_modules_completion and course_completion_crit_compl records.
     When I set the field "Viewed" to "0"
     And I set the "Activity status" Totara form field to "Not completed"
-    And "Activity time completed" "field" should not exist
+    And Activity time completed field should not exist
     And "RPL" "field" should not exist
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -104,7 +105,7 @@ Feature: Criteria completion records can be edited
     And "Criteria status" "field" should not exist
     And "Criteria time completed" "field" should not exist
     And the field "Activity status" matches value "Not completed"
-    And "Activity time completed" "field" should not exist
+    And Activity time completed field should not exist
     And the field "Viewed" matches value "0"
     And "RPL" "field" should not exist
 
@@ -116,7 +117,7 @@ Feature: Criteria completion records can be edited
     And I set the "Criteria time completed" Totara form field to "2011-02-03 04:56"
     And I set the field "RPL" to "This is another RPL reason"
     When I set the "Activity status" Totara form field to "Completed"
-    # The line below highlights a bug in Totara forms / behat interaction.
+    And I wait for Activity time completed form field to be ready
     And I set the "Activity time completed" Totara form field to "2027-07-08 16:34"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -144,7 +145,7 @@ Feature: Criteria completion records can be edited
     And the field "Criteria status" matches value "Completed"
     And the field "Criteria time completed" matches value "2011-02-03T04:56:00"
     And the field "Activity status" matches value "Not completed"
-    And "Activity time completed" "field" should not exist
+    And Activity time completed field should not exist
     And the field "Viewed" matches value "0"
     And the field "RPL" matches value "This is yet another RPL reason"
 
@@ -153,6 +154,7 @@ Feature: Criteria completion records can be edited
     And I set the "Criteria status" Totara form field to "Not completed"
     Then "RPL" "field" should not exist
     When I set the field "Viewed" to "1"
+    And I wait for Activity time completed form field to be ready
     And I set the "Activity time completed" Totara form field to "2011-11-11 11:11"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -219,13 +221,14 @@ Feature: Criteria completion records can be edited
     And "Criteria time completed" "field" should not exist
     And I should see "Copied from activity time completed"
     And the field "Activity status" matches value "Not completed"
-    And "Activity time completed" "field" should not exist
+    And Activity time completed field should not exist
     And the field "Viewed" matches value "0"
     And "RPL" "field" should not exist
 
     # Create course_modules_completion and course_completion_crit_compl records.
     When I set the field "Viewed" to "1"
     When I set the "Activity status" Totara form field to "Completed"
+    And I wait for Activity time completed form field to be ready
     And I set the "Activity time completed" Totara form field to "2011-02-03 04:56"
     And I set the field "RPL" to "This is an RPL reason"
     And I press "Save changes"
@@ -256,7 +259,7 @@ Feature: Criteria completion records can be edited
     # Update course_modules_completion and course_completion_crit_compl records.
     When I set the field "Viewed" to "0"
     And I set the "Activity status" Totara form field to "Not completed"
-    And "Activity time completed" "field" should not exist
+    And Activity time completed field should not exist
     And "RPL" "field" should not exist
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -275,7 +278,7 @@ Feature: Criteria completion records can be edited
     And "Criteria status" "field" should not exist
     And "Criteria time completed" "field" should not exist
     And the field "Activity status" matches value "Not completed"
-    And "Activity time completed" "field" should not exist
+    And Activity time completed field should not exist
     And the field "Viewed" matches value "0"
     And "RPL" "field" should not exist
 
@@ -287,6 +290,7 @@ Feature: Criteria completion records can be edited
     And I set the "Criteria time completed" Totara form field to "2011-02-03 04:56"
     And I set the field "RPL" to "This is another RPL reason"
     And I set the "Activity status" Totara form field to "Completed"
+    And I wait for Activity time completed form field to be ready
     And I set the "Activity time completed" Totara form field to "2027-07-08 16:34"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -314,7 +318,7 @@ Feature: Criteria completion records can be edited
     And the field "Criteria status" matches value "Completed"
     And the field "Criteria time completed" matches value "2011-02-03T04:56:00"
     And the field "Activity status" matches value "Not completed"
-    And "Activity time completed" "field" should not exist
+    And Activity time completed field should not exist
     And the field "Viewed" matches value "0"
     And the field "RPL" matches value "This is yet another RPL reason"
 
@@ -323,6 +327,7 @@ Feature: Criteria completion records can be edited
     And I set the "Criteria status" Totara form field to "Not completed"
     Then "RPL" "field" should not exist
     When I set the field "Viewed" to "1"
+    And I wait for Activity time completed form field to be ready
     And I set the "Activity time completed" Totara form field to "2011-11-11 11:11"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
