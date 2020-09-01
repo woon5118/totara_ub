@@ -53,8 +53,7 @@ class ml_recommender_userdata_interaction_testcase extends advanced_testcase {
         $recommendations_generator->create_recommender_interaction($target_user1->id, $article->get_id(), 'engage_article');
         $recommendations_generator->create_recommender_interaction($target_user1->id, $playlist1->get_id(), 'totara_playlist');
         $recommendations_generator->create_recommender_interaction($target_user->id, $article->get_id(), 'engage_article');
-        $recommendations_generator->create_recommender_interaction($target_user->id, $playlist->get_id(), 'engage_article');
-
+        $recommendations_generator->create_recommender_interaction($target_user->id, $playlist->get_id(), 'totara_playlist');
 
         // Recommender_interactions created
         $this->assertTrue(
