@@ -112,7 +112,7 @@ class totara_tui_local_mediation_mediator_testcase extends advanced_testcase {
             'Header: Etag: "etag_test"',
             'Header: Content-Disposition: inline; filename="'.get_class($instance).'.php"',
             'Header: Date: ' . gmdate('M Y', time()),
-            'Header: Last-Modified: ' . gmdate('M Y', filemtime(__FILE__)),
+            'Header: Last-Modified: ' . gmdate('M Y', time()),
             'Header: Expires: ' . gmdate('M Y', $this->get_lifetimestamp()),
             'Header: Pragma: ',
             'Header: Cache-Control: public, max-age=604800, immutable',
