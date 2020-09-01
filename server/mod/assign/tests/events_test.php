@@ -302,6 +302,8 @@ class assign_events_testcase extends advanced_testcase {
         global $PAGE;
         $this->resetAfterTest();
 
+        // Trigger the creation of the default perform category. Will be fixed by TL-27080
+        \mod_perform\util::get_default_category_id();
         $course = $this->getDataGenerator()->create_course();
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
 
