@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2020070800;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
+$plugin->version  = 2020090100;       // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2017111309;       // Requires this Moodle version.
 $plugin->component = 'performelement_numeric_rating_scale'; // To check on upgrade, that module sits in correct place
 $plugin->maturity  = MATURITY_STABLE;

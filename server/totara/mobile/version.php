@@ -24,6 +24,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Note that \totara_mobile\util::API_VERSION may also need to be changed.
-$plugin->version   = 2020072203;    // The current module version (Date: YYYYMMDDXX).
-$plugin->requires  = 2017051509;    // Requires this platform version.
+$plugin->version   = 2020090100;    // The current module version (Date: YYYYMMDDXX).
+$plugin->requires  = 2017111309;    // Requires this platform version.
 $plugin->component = 'totara_mobile'; // To check on upgrade, that module sits in correct place.

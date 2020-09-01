@@ -23,6 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2019102300;
+$plugin->version = 2020090100;
 $plugin->requires = 2017111309;
 $plugin->component = 'availability_language';

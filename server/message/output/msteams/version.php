@@ -23,6 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2019062400;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2017051509;        // Requires this Totara version
+$plugin->version   = 2020090100;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2017111309;        // Requires this Totara version
 $plugin->component = 'message_msteams';  // Full name of the plugin (used for diagnostics)

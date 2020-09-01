@@ -27,5 +27,5 @@ defined('MOODLE_INTERNAL') || die();
  * Site Policy Version
  */
 $plugin->component = 'tool_sitepolicy';
-$plugin->version = 2019102300;
+$plugin->version = 2020090100;
 $plugin->requires = 2017111309;
