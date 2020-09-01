@@ -1090,7 +1090,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
 
         if ($DB->get_dbfamily() === 'mysql') {
             // There are way too many columns for MySQL to handle, delete jobs related stuff.
-            foreach (['user', 'manager', 'appraiser', 'tempmanager', 'subject_user', 'participant_user'] as $type) {
+            foreach (['user', 'manager', 'appraiser', 'tempmanager', 'subject_user', 'participant_user', 'assignment_created_by', 'created_by', 'modified_by', 'auser'] as $type) {
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'username'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'firstname'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'lastname'));
@@ -1123,6 +1123,14 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                 $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'address'));
                 $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'city'));
                 $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'idnumber'));
+            }
+            foreach (['creator', 'modifier'] as $type) {
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'name'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'position_name'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'position_type'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'organisation_name'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'organisation_idnumber'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'organisation_type'));
             }
             foreach (['org', 'pos'] as $type) {
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'fullname'));
