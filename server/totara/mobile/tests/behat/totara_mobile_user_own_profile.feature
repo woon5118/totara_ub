@@ -35,4 +35,6 @@ Feature: Test the totara_mobile_user_own_profile query
     When I click on "link0" "link" in the "#response2" "css_element"
     Then I should see "26) File request HTTP ok."
     And I should see "27) File received image/jpeg"
-    And I should see "28) File response 6945 bytes"
+    # Response size may differ depending on server configuration, but should not be 0
+    And I should see "28) File response"
+    And I should not see "28) File response 0"
