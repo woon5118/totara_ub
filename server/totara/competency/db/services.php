@@ -174,11 +174,11 @@ $assignments = [
         'type'          => 'read',
         'loginrequired' => true,
         'ajax'          => true,
-        'capabilities'  => [
+        'capabilities'  => implode(',', [
             'totara/competency:manage_assignments',
             'moodle/cohort:view',
             'moodle/cohort:manage'
-        ],
+        ]),
     ],
 ];
 
