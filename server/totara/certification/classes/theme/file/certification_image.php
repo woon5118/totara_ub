@@ -28,6 +28,7 @@ use core\files\type\web_image;
 use core\theme\file\theme_file;
 use moodle_url;
 use theme_config;
+use totara_core\advanced_feature;
 
 /**
  * Class certification_image
@@ -67,8 +68,7 @@ class certification_image extends theme_file {
      * @return bool
      */
     public function is_enabled(): bool {
-        global $CFG;
-        return $CFG->enablecertifications;
+        return advanced_feature::is_enabled('certifications');
     }
 
     /**

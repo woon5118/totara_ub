@@ -64,14 +64,6 @@ class course_image extends theme_file {
     }
 
     /**
-     * @return bool
-     */
-    public function is_enabled(): bool {
-        global $CFG;
-        return $CFG->enablecourserpl;
-    }
-
-    /**
      * @inheritDoc
      */
     public function get_component(): string {

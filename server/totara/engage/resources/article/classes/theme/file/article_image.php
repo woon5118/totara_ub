@@ -27,6 +27,7 @@ use core\files\type\file_type;
 use core\files\type\web_image;
 use core\theme\file\theme_file;
 use theme_config;
+use totara_core\advanced_feature;
 
 /**
  * Class article_image
@@ -66,8 +67,7 @@ class article_image extends theme_file {
      * @return bool
      */
     public function is_enabled(): bool {
-        global $CFG;
-        return $CFG->enableengage_resources;
+        return advanced_feature::is_enabled('engage_resources');
     }
 
     /**
