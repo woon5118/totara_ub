@@ -24,6 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once("{$CFG->dirroot}/mod/facetoface/lib.php");
+require_once("{$CFG->dirroot}/mod/facetoface/renderer.php");
 
 use mod_facetoface\{seminar, signup, seminar_event, seminar_session, signup_list, render_event_info_option};
 use totara_job\job_assignment;
