@@ -49,3 +49,10 @@ if (!empty($CFG->totara_build) and $CFG->totara_build < '20181026.00') {
         unset_config('protectpackagedownloads', 'scorm');
     }
 }
+
+// Unset deleted Enterprise flavour, it will be unisstalled later.
+if ('flavour_enterprise' === get_config('totara_flavour', 'currentflavour')) {
+    if (!file_exists(__DIR__ . '/../../flavour/flavours/enterprise/version.php')) {
+        set_config('currentflavour', '', 'totara_flavour');
+    }
+}
