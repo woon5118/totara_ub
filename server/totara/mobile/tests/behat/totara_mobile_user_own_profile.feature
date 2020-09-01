@@ -17,7 +17,7 @@ Feature: Test the totara_mobile_user_own_profile query
       | Enable mobile app | 1 |
     And I click on "Save changes" "button"
 
-  Scenario: Test the query with a program that has an image
+  Scenario: Test the query with a user that has a profile image
     When I am using the mobile emulator
     Then I should see "Device emulator loading..."
     And I should see "Making login_setup request"
@@ -35,6 +35,4 @@ Feature: Test the totara_mobile_user_own_profile query
     When I click on "link0" "link" in the "#response2" "css_element"
     Then I should see "26) File request HTTP ok."
     And I should see "27) File received image/jpeg"
-    # Response size may differ depending on server configuration, but should not be 0
-    And I should see "28) File response"
-    And I should not see "28) File response 0"
+    And I should see the mobile file response on line "28"

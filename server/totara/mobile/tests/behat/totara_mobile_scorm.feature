@@ -42,7 +42,7 @@ Feature: Test various aspects of the totara_mobile_scorm query
     And I click on "link0" "link" in the "#response2" "css_element"
     Then I should see "26) File request HTTP ok."
     And I should see "27) File received application/x-forcedownload"
-    And I should see "28) File response 384787 bytes"
+    And I should see the mobile file response on line "28"
 
   Scenario: Test current status query after an attempt is made
     Given I log out

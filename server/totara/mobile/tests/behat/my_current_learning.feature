@@ -210,15 +210,15 @@ Feature: Confirm that the mobile my current learning query works as expected
     And I click on "link0" "link" in the "#response2" "css_element"
     Then I should see "26) File request HTTP ok."
     And I should see "27) File received image/png"
-    And I should see "28) File response 3335 bytes"
+    And I should see the mobile file response on line "28"
     And I click on "link1" "link" in the "#response2" "css_element"
     Then I should see "30) File request HTTP ok."
     And I should see "31) File received image/jpeg"
-    And I should see "32) File response 126472 bytes"
+    And I should see the mobile file response on line "32"
     And I click on "link2" "link" in the "#response2" "css_element"
     Then I should see "34) File request HTTP ok."
     And I should see "35) File received image/png"
-    And I should see "36) File response 3312 bytes"
+    And I should see the mobile file response on line "36"
 
   Scenario: Check totara_mobile_current_learning query works as expected with mobile native courses
     When I am on "Course 1" course homepage
