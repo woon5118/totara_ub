@@ -266,31 +266,3 @@ Feature: Assigning a manager to a user via the job assignment page
     And I click on "User Two" "link" in the "User Two" "table_row"
     And I click on "Tester" "link"
     Then I should see "Manager One - Testing Manager"
-
-  Scenario: Disabling multiple job assignments removes the create empty job assignment option in the totara dialog
-    And I navigate to "Shared services settings" node in "Site administration > System information > Configure features"
-    And I set the field "Enable multiple job assignments" to "0"
-    And I press "Save changes"
-    And I navigate to "Manage users" node in "Site administration > Users"
-    And I click on "User One" "link" in the "User One" "table_row"
-    And I click on "Add job assignment" "link"
-    And I set the following fields to these values:
-      | Full name | Developer |
-      | ID Number | 1         |
-    And I press "Choose manager"
-    Then I should see "Manager One (manager1@example.com) - create empty job assignment" in the "Choose manager" "totaradialogue"
-    And I should see "Manager Two (manager2@example.com) - create empty job assignment" in the "Choose manager" "totaradialogue"
-    When I click on "Manager One (manager1@example.com) - create empty job assignment" "link" in the "Choose manager" "totaradialogue"
-    And I click on "OK" "button" in the "Choose manager" "totaradialogue"
-    And I click on "Add job assignment" "button"
-    Then I should see "Job assignment saved"
-    When I navigate to "Manage users" node in "Site administration > Users"
-    And I click on "User One" "link" in the "User One" "table_row"
-    And I click on "Add job assignment" "link"
-    And I set the following fields to these values:
-      | Full name | Developer |
-      | ID Number | 1         |
-    And I press "Choose manager"
-    Then I should not see "Manager One (manager1@example.com) - create empty job assignment" in the "Choose manager" "totaradialogue"
-    And I should see "Manager One (manager1@example.com)" in the "Choose manager" "totaradialogue"
-    And I should see "Manager Two (manager2@example.com) - create empty job assignment" in the "Choose manager" "totaradialogue"
