@@ -21,7 +21,7 @@
  * @package container_workspace
  */
 define('CLI_SCRIPT', true);
-require_once(__DIR__ . "/../../../../config.php");
+require_once(__DIR__ . "/../../server/config.php");
 
 use totara_core\advanced_feature;
 use core_container\factory;
@@ -57,7 +57,7 @@ A script to add number of member requests into the workspace. It will create new
 within the system and create a request for those users to join the given workspace.
 
 Usage:
-    php container/type/workspace/cli/add_request_members.php --workspace_id=42
+    php dev/engage/add_request_members_to_workspace.php --workspace_id=42
 
 Options:
     -h, --help              Print out this help

@@ -22,7 +22,6 @@
  */
 
 use totara_engage\access\access;
-use totara_engage\generator\engage_generator;
 use engage_survey\totara_engage\resource\survey;
 use totara_engage\answer\answer_type;
 use core_user\totara_engage\share\recipient\user as user_recipient;
@@ -31,7 +30,7 @@ use totara_engage\share\share as share_model;
 use totara_engage\share\shareable;
 use totara_topic\provider\topic_provider;
 
-final class engage_survey_generator extends component_generator_base implements engage_generator {
+final class engage_survey_generator extends component_generator_base {
     /**
      * @var array
      */
@@ -104,13 +103,6 @@ final class engage_survey_generator extends component_generator_base implements 
                                          int $answer_type = answer_type::MULTI_CHOICE): survey {
         $parameters = ['access' => access::PUBLIC];
         return $this->create_survey($question, $options, $answer_type, $parameters);
-    }
-
-    /**
-     * @return void
-     */
-    public function generate_random(): void {
-        $this->create_survey();
     }
 
     /**

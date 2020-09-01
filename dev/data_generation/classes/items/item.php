@@ -154,5 +154,4 @@ abstract class item {
     public static function new() {
         return new static();
     }
-
 }

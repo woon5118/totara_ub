@@ -7,6 +7,11 @@
   "require": {
     "php": ">=7.2.10 <7.5"
   },
+  "autoload": {
+    "psr-4": {
+      "degeneration\\": "classes/"
+    }
+  },
   "require-dev": {
     "fzaninotto/faker": "^1.9"
   }

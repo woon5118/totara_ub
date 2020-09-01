@@ -21,7 +21,7 @@
  * @package container_workspace
  */
 define('CLI_SCRIPT', true);
-require_once(__DIR__ . "/../../../../config.php");
+require_once(__DIR__ . "/../../server/config.php");
 
 use container_workspace\loader\workspace\loader;
 use container_workspace\query\workspace\query;
@@ -53,7 +53,7 @@ This is a script to delete all the related workspace to a specified user. And th
 site only.
 
 Usage:
-    php container/type/workspace/cli/remove_all_workspace.php -u=\"2\"
+    php dev/engage/remove_all_workspace.php -u=\"2\"
     
 Options:
     -h, --help          Print out this help

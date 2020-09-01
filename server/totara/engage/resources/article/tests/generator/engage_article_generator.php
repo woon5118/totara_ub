@@ -20,9 +20,7 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package engage_article
  */
-
 use engage_article\totara_engage\resource\article;
-use totara_engage\generator\engage_generator;
 use totara_engage\share\shareable;
 use totara_engage\timeview\time_view;
 use core_user\totara_engage\share\recipient\user as user_recipient;
@@ -31,7 +29,7 @@ use totara_engage\share\share as share_model;
 use totara_engage\access\access;
 use totara_topic\provider\topic_provider;
 
-final class engage_article_generator extends component_generator_base implements engage_generator {
+final class engage_article_generator extends component_generator_base {
     /**
      * @var string[]
      */
@@ -81,13 +79,6 @@ final class engage_article_generator extends component_generator_base implements
         /** @var article $article */
         $article = article::create($parameters, $userid);
         return $article;
-    }
-
-    /**
-     * @return void
-     */
-    public function generate_random(): void {
-        $this->create_article();
     }
 
     /**

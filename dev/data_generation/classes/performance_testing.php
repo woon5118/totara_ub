@@ -28,6 +28,7 @@ use core\orm\query\builder;
 use degeneration\items\audience;
 use degeneration\items\competency;
 use degeneration\items\competency_scale;
+use degeneration\items\container_workspace\workspace;
 use degeneration\items\course;
 use degeneration\items\course_completion;
 use degeneration\items\course_completion_basic;
@@ -43,6 +44,10 @@ use degeneration\items\user;
 use hierarchy_organisation\entities\organisation_framework;
 use hierarchy_position\entities\position_framework;
 use totara_competency\linked_courses;
+use container_workspace\loader\member\loader as member_loader;
+use container_workspace\query\member\query as member_query;
+use container_workspace\loader\discussion\loader as discussion_loader;
+use container_workspace\query\discussion\query as discussion_query;
 
 class performance_testing extends App {
 
@@ -85,6 +90,11 @@ class performance_testing extends App {
     protected $assign_groups = true;
 
     /**
+     * @var array
+     */
+    protected $workspaces = [];
+
+    /**
      *
      */
     public function generate() {
@@ -104,6 +114,10 @@ class performance_testing extends App {
             ->create_course_completions_basic()
             ->add_linked_courses()
             ->create_criteria()
+            ->create_workspaces()
+            ->create_workspace_members()
+            ->create_workspace_discussions()
+            ->create_workspace_discussion_comments_replies()
             ;
         //->create_job_assignments();
     }
@@ -621,11 +635,203 @@ class performance_testing extends App {
         return $this;
     }
 
+    public function create_workspaces() {
+        $this->output('Creating workspaces ...');
+        $size = $this->get_item_size('workspaces');
+
+        if (!is_numeric($size)) {
+            return $this;
+        }
+
+        builder::get_db()->transaction(
+            function () use ($size) {
+                $workspaces = [];
+                for ($x = 0; $x <= $size; $x++) {
+                    $workspaces[] = (workspace::new())->create_workspace();
+                }
+
+                $this->workspaces = $workspaces;
+            }
+        );
+
+        return $this;
+    }
+
+    public function create_workspace_members() {
+        $this->output('Creating workspace members ...');
+        $size = $this->get_item_size('workspace_members');
+
+        if (empty($this->users)) {
+            throw new \coding_exception("Cannot create workspace member when users are empty");
+        }
+
+        builder::get_db()->transaction(
+            function () use ($size) {
+                $generator = App::generator();
+
+                /** @var \container_workspace_generator $workspace_generator */
+                $workspace_generator = $generator->get_plugin_generator('container_workspace');
+
+                foreach ($this->workspaces as $workspace) {
+                    $i = 0;
+                    foreach ($this->users as $user) {
+                        if (isguestuser($user->get_data()->id)) {
+                            continue;
+                        }
+
+                        $workspace_generator->create_self_join_member($workspace, $user->get_data()->id);
+                        $i++;
+
+                        if ($i == $size) {
+                            break;
+                        }
+                    }
+                }
+            }
+        );
+
+        return $this;
+    }
+
+    public function create_workspace_discussions() {
+        $this->output('Creating workspace discussions ...');
+        $size = $this->get_item_size('workspace_discussions');
+
+        builder::get_db()->transaction(
+            function () use($size) {
+                foreach ($this->workspaces as $workspace) {
+                    $workspace_id = $workspace->get_id();
+                    $query = new member_query($workspace_id);
+                    $paginator = member_loader::get_members($query);
+
+                    while (true) {
+                        $members = $paginator->get_items()->all();
+                        foreach ($members as $member) {
+                            $user_id = $member->get_user_id();
+                            for ($c = 0; $c <= $size; $c++) {
+                                $this->create_workspace_discussion($workspace->get_id(), $user_id);
+                            }
+                        }
+
+                        $next_cursor = $paginator->get_next_cursor();
+                        if (null === $next_cursor) {
+                            break;
+                        }
+
+                        $query->set_cursor($next_cursor);
+                        $paginator = member_loader::get_members($query);
+                    }
+                }
+            }
+        );
+
+        return $this;
+    }
+
+    public function create_workspace_discussion($workspace_id, $author_id) {
+        $generator = App::generator();
+        $faker = App::faker();
+
+        /** @var \container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $discussion = $workspace_generator->create_discussion(
+            $workspace_id,
+            $faker->text,
+            null,
+            FORMAT_JSON_EDITOR,
+            $author_id
+        );
+
+        return $this;
+    }
+
+    public function create_workspace_discussion_comments_replies() {
+        $this->output('Creating workspace discussion comments and replies...');
+        $comment_size = $this->get_item_size('workspace_discussion_comments');
+        $reply_size = $this->get_item_size('workspace_discussion_replies');
+
+        builder::get_db()->transaction(
+            function () use ($reply_size, $comment_size) {
+                $generator = App::generator();
+                $faker = App::faker();
+
+                /** @var \totara_comment_generator $comment_generator */
+                $comment_generator = $generator->get_plugin_generator('totara_comment');
+                foreach ($this->workspaces as $workspace) {
+                    $workspace_id = $workspace->get_id();
+
+                    $discussion_query = new discussion_query($workspace_id);
+                    $discussion_paginator = discussion_loader::get_discussions($discussion_query);
+
+                    while (true) {
+                        $discussions = $discussion_paginator->get_items()->all();
+
+                        foreach ($discussions as $discussion) {
+                            $member_query = new member_query($workspace_id);
+                            $member_paginator = member_loader::get_members($member_query);
+
+                            while (true) {
+                                $members = $member_paginator->get_items()->all();
+                                foreach ($members as $member) {
+                                    for ($i = 0; $i < $comment_size; $i++) {
+                                        $comment = $comment_generator->create_comment(
+                                            $discussion->get_id(),
+                                            'container_workspace',
+                                            $discussion::AREA,
+                                            $faker->text,
+                                            FORMAT_JSON_EDITOR,
+                                            $member->get_user_id()
+                                        );
+
+                                        foreach ($members as $inner_member) {
+                                            for ($x = 0; $x < $reply_size; $x++) {
+                                                $reply = $comment_generator->create_reply(
+                                                    $comment->get_id(),
+                                                    $faker->text,
+                                                    FORMAT_JSON_EDITOR,
+                                                    $inner_member->get_user_id()
+                                                );
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                                $member_next_cursor = $member_paginator->get_next_cursor();
+                                if (null === $member_next_cursor) {
+                                    break;
+                                }
+
+                                $member_query->set_cursor($member_next_cursor);
+                                $member_paginator = member_loader::get_members($member_query);
+                            }
+                        }
+
+                        $discussion_next_cursor = $discussion_paginator->get_next_cursor();
+                        if (null === $discussion_next_cursor) {
+                            break;
+                        }
+
+                        $discussion_query->set_cursor($discussion_next_cursor);
+                        $discussion_paginator = discussion_loader::get_discussions($discussion_query);
+                    }
+                }
+            }
+        );
+
+        return $this;
+    }
+
     //['xs', 's', 'm', 'l', 'xl', 'xxl', 'goliath'
     public function get_xs_size() {
         return [
             'users' => 10,
             'courses' => 10,
+            'workspaces' => 1,
+            'workspace_members' => 2,
+            'workspace_discussions' => 1,
+            'workspace_discussion_comments' => 1,
+            'workspace_discussion_replies' => 1,
             'audiences' => 10,
             'organisations' => [3, 3],
             'positions' => [3, 3],
@@ -643,6 +849,11 @@ class performance_testing extends App {
         return [
             'users' => 100,
             'courses' => 100,
+            'workspaces' => 10,
+            'workspace_members' => 5,
+            'workspace_discussions' => 5,
+            'workspace_discussion_comments' => 3,
+            'workspace_discussion_replies' => 2,
             'audiences' => 10,
             'organisations' => [4, 4],
             'positions' => [4, 4],
@@ -660,6 +871,11 @@ class performance_testing extends App {
         return [
             'users' => 1000,
             'courses' => 100,
+            'workspaces' => 100,
+            'workspace_members' => 100,
+            'workspace_discussions' => 100,
+            'workspace_discussion_comments' => 100,
+            'workspace_discussion_replies' => 100,
             'audiences' => 100,
             'organisations' => [4, 4],
             'positions' => [4, 4],
@@ -678,6 +894,11 @@ class performance_testing extends App {
             'users' => 1000,
             'courses' => 100,
             'audiences' => 100,
+            'workspaces' => 100,
+            'workspace_members' => 250,
+            'workspace_discussions' => 250,
+            'workspace_discussion_comments' => 250,
+            'workspace_discussion_replies' => 250,
             'organisations' => [4, 4],
             'positions' => [4, 4],
             'competencies' => [4, 4],
@@ -694,6 +915,11 @@ class performance_testing extends App {
         return [
             'users' => 1000,
             'courses' => 1000,
+            'workspaces' => 1000,
+            'workspace_members' => 500,
+            'workspace_discussions' => 750,
+            'workspace_discussion_comments' => 750,
+            'workspace_discussion_replies' => 750,
             'audiences' => 100,
             'organisations' => [5, 5],
             'positions' => [5, 5],
@@ -711,6 +937,11 @@ class performance_testing extends App {
         return [
             'users' => 10000,
             'courses' => 1000,
+            'workspaces' => 1000,
+            'workspace_members' => 1000,
+            'workspace_discussions' => 1000,
+            'workspace_discussion_comments' => 1000,
+            'workspace_discussion_replies' => 1000,
             'audiences' => 100,
             'organisations' => [5, 5],
             'positions' => [5, 5],
@@ -728,6 +959,11 @@ class performance_testing extends App {
         return [
             'users' => 100000,
             'courses' => 1000,
+            'workspaces' => 1000,
+            'workspace_members' => 1000,
+            'workspace_discussions' => 1000,
+            'workspace_discussion_comments' => 1000,
+            'workspace_discussion_replies' => 1000,
             'audiences' => 100,
             'organisations' => [5, 5],
             'positions' => [5, 5],

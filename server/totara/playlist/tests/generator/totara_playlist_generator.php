@@ -25,14 +25,13 @@ use totara_engage\rating\rating_manager;
 use totara_engage\share\shareable;
 use totara_playlist\playlist;
 use totara_engage\access\access;
-use totara_engage\generator\engage_generator;
 use totara_engage\share\manager as share_manager;
 use totara_engage\share\share as share_model;
 use totara_engage\share\recipient\recipient;
 use core_user\totara_engage\share\recipient\user as user_recipient;
 use totara_topic\provider\topic_provider;
 
-final class totara_playlist_generator extends component_generator_base implements engage_generator {
+final class totara_playlist_generator extends component_generator_base {
     /**
      * @param array|\stdClass $parameters
      * @return playlist
@@ -89,13 +88,6 @@ final class totara_playlist_generator extends component_generator_base implement
         }
 
         return $playlist;
-    }
-
-    /**
-     * @return void
-     */
-    public function generate_random(): void {
-        $this->create_playlist();
     }
 
     /**

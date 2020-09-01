@@ -23,7 +23,7 @@
 define('CLI_SCRIPT', true);
 global $CFG, $DB, $USER;
 
-require_once(__DIR__ . "/../../../config.php");
+require_once(__DIR__ . "/../../server/config.php");
 require_once("{$CFG->dirroot}/lib/clilib.php");
 require_once("{$CFG->dirroot}/lib/testing/classes/util.php");
 
@@ -61,7 +61,7 @@ Options:
     -h, --help              Print out this help.
 
 Example:
-    php totara/comment/cli/generate_comments
+    php dev/engage/generate_comments.php --component=\"container_workspace\" --area=\"discussion\" --instance_id=5
 ";
 
     return 0;

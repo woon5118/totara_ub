@@ -22,7 +22,6 @@
  */
 use container_workspace\workspace;
 use container_workspace\local\workspace_helper;
-use totara_engage\generator\engage_generator;
 use container_workspace\discussion\discussion;
 use core\json_editor\node\paragraph;
 use container_workspace\discussion\discussion_helper;
@@ -33,7 +32,7 @@ use container_workspace\totara_engage\share\recipient\library as library_recipie
 /**
  * Generator for container workspace
  */
-final class container_workspace_generator extends component_generator_base implements engage_generator {
+final class container_workspace_generator extends component_generator_base {
     /**
      * @var array
      */
@@ -43,13 +42,6 @@ final class container_workspace_generator extends component_generator_base imple
      * @var array
      */
     private static $discussions;
-
-    /**
-     * @return void
-     */
-    public function generate_random(): void {
-        $this->create_workspace();
-    }
 
     /**
      * @param string|null   $name
@@ -294,5 +286,14 @@ final class container_workspace_generator extends component_generator_base imple
             $user_context = context_user::instance($userid, MUST_EXIST);
             assign_capability('container/workspace:create', $permission, $role->id, $user_context, true);
         }
+    }
+
+    /**
+     * @param workspace $workspace
+     * @param int $user_id
+     * @return member
+     */
+    public function create_self_join_member(workspace $workspace, int $user_id): member {
+        return member::join_workspace($workspace, $user_id);
     }
 }

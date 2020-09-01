@@ -56,11 +56,14 @@ class totara_engage_query_cards_testcase extends advanced_testcase {
         $user = $gen->create_user();
         $this->setUser($user);
 
+        /** @var engage_article_generator $article_generator */
         $article_generator = $gen->get_plugin_generator('engage_article');
+
+        /** @var engage_survey_generator $survey_generator */
         $survey_generator = $gen->get_plugin_generator('engage_survey');
 
-        $article_generator->generate_random();
-        $survey_generator->generate_random();
+        $article_generator->create_article();
+        $survey_generator->create_survey();
 
         $query = new query();
         $loader = new card_loader($query);

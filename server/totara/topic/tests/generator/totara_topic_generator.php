@@ -20,14 +20,12 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package totara_topic
  */
-
-use totara_engage\generator\engage_generator;
 use totara_topic\topic;
 use totara_topic\provider\topic_provider;
 use core_tag\entity\tag_area;
 use core_tag\repository\tag_area_repository;
 
-class totara_topic_generator extends component_generator_base implements engage_generator {
+class totara_topic_generator extends component_generator_base {
     /**
      * @var string[]
      */
@@ -82,13 +80,6 @@ class totara_topic_generator extends component_generator_base implements engage_
         }
 
         return $area;
-    }
-
-    /**
-     * @return void
-     */
-    public function generate_random(): void {
-        $this->create_topic();
     }
 
     /**

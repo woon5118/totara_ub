@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,59 +18,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_competency
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  */
+define('CLI_SCRIPT', 1);
+use degeneration\App;
+use degeneration\performance_testing;
 
-namespace degeneration;
+if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
+    echo "In order to execute this script you need to execute: 'composer install' from this directory!" . PHP_EOL;
+    return 1;
+}
 
-use Faker\Factory;
-use Faker\Generator;
+require_once __DIR__ . '/vendor/autoload.php';
+require_once(__DIR__ . '/../../server/config.php');
+require_once(App::config()->libdir . '/phpunit/classes/util.php');
+require_once(App::config()->dirroot . "/lib/clilib.php");
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-require_once(App::config()->dirroot . '/cohort/lib.php');
 
-$USER = get_admin();
+[$options, $params] = cli_get_params(
+    [
+        'help' => false,
+        'size' => 's',
+        'transaction' => 0
+    ],
+    [
+        'h' => 'help',
+        's' => 'size',
+        't' => 'transaction'
+    ]
+);
 
-if (in_array($argv[1] ?? null, ['-h', '--help'])) {
-    help:
-    echo "This script is designed to generate a vast amount of testing data for perform features of the site.
+if ($options['help']) {
+    echo "
+This script is designed to generate a vast amount of testing data for perform features of the site.
 The script meant to be executed on a clean (freshly installed) site.
 
-php create-data.php [SIZE] [--transaction]
-
-The following options are available:
+Usage:
+    php dev/data_generation/generate_site.php --t=\"full_performance_testing\" --s=\"l\" -t=1
     
- - SIZE of the generated data, a predefined size of generated data.
-    XS - A tiny amount of data
-    S - A little data
-    M - A little more data
-    L - Large amount of data
-    XL - Extra large amount of data
-    XXL - Extra-extra large amount of data
-    GOLIATH - Unnecessary large amount of data
-    
- --transaction - specify after size if you want to run data generation in transaction.
-";
+Options:
+    -h, --help          Print out this help
+    -s, --size          XS - A tiny amount of data
+                        S - A little data
+                        M - A little more data
+                        L - Large amount of data
+                        XL - Extra large amount of data
+                        XXL - Extra-extra large amount of data
+                        GOLIATH - Unnecessary large amount of data
+    -t, --transaction   Specify if you want to run data generator in transaction.
+    ";
 
-    exit(0);
+    return 0;
 }
 
-if (!in_array(strtolower($size = $argv[1] ?? null), ['xs', 's', 'm', 'l', 'xl', 'xxl', 'goliath'])) {
-    echo 'You must specify size of data to create to run the script, available sizes:' . PHP_EOL . PHP_EOL;
-    goto help;
+if (!isset($options['size']) || !in_array(strtolower($options['size']), ['xs', 's', 'm', 'l', 'xl', 'xxl', 'goliath'])) {
+    echo 'You must specify size of data to create to run the script';
+    return 1;
 }
-
-$in_transaction = in_array(strtolower($argv[2] ?? false), ['--transaction', '-t']);
-
 
 // Ok we need to do something.
 // Need to instantiate the main app and create things
 
 $time = time();
+$size = $options['size'];
+$USER = get_admin();
 
 $generate = function() use ($size) {
-
     $pt = new performance_testing();
 
     $pt->set_size($size)
@@ -151,7 +165,7 @@ $generate = function() use ($size) {
     // $lpp->save();
 };
 
-if ($in_transaction) {
+if ($options['transaction']) {
     echo 'Running data generation inside a transaction it might take a long time...' . PHP_EOL;
     App::transaction($generate);
 } else {

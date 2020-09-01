@@ -24,17 +24,7 @@ use totara_topic\provider\topic_provider;
 use totara_topic\topic_helper;
 
 define('CLI_SCRIPT', true);
-$file = realpath(__DIR__ . "/../../../config.php");
-
-if (!$file) {
-    fwrite(STDERR, "config.php does not existing");
-    return 1;
-} else if (!file_exists($file)) {
-    fwrite(STDERR, "Config file '{$file}' does not existing");
-    return 1;
-}
-
-require_once($file);
+require_once(__DIR__ . "/../../server/config.php");
 global $CFG, $PAGE;
 
 $PAGE->set_context(context_system::instance());
@@ -43,10 +33,10 @@ require_once("{$CFG->dirroot}/lib/clilib.php");
 $help = "
 A cli script to assign all the current topics within the system into the specific instance of a component.
 Options:
---instance-id=NUMBER        The id of particular instance that you want to assign the topics to
---component=STRING          The component name of the particular instance
---item-type=STRING           The itemtype which match with the tag area
--h, --help                  Print out this help message
+    --instance-id=NUMBER        The id of particular instance that you want to assign the topics to
+    --component=STRING          The component name of the particular instance
+    --item-type=STRING          The itemtype which match with the tag area
+    -h, --help                  Print out this help message
 ";
 
 [$options, $unrecognized] = cli_get_params(
@@ -65,7 +55,7 @@ if ($options['help']) {
     echo $help;
     return 0;
 } else if (empty($options['instance-id']) || empty($options['component'])) {
-    fwrite(STDERR, "No parameter instance-id or component");
+    echo "No parameter instance-id or component";
     return 1;
 }
 
@@ -81,7 +71,7 @@ if (empty($topics)) {
 
 $component = clean_param($options['component'], PARAM_COMPONENT);
 if ('' == $component) {
-    fwrite(STDERR, "Invalid component being passed into");
+    echo "Invalid component being passed into";
     return 1;
 }
 

@@ -21,7 +21,7 @@
  * @package totara_playlist
  */
 define('CLI_SCRIPT', true);
-require_once(__DIR__ . "/../../../config.php");
+require_once(__DIR__ . "/../../server/config.php");
 
 use totara_engage\resource\resource_factory;
 use totara_engage\access\access_manager;
@@ -53,7 +53,7 @@ Note that this script will only look for the resource that the user is able to s
 and add it into multiple playlists that this user is able to control or own.
 
 Usage: 
-    php totara/playlist/cli/add_resource_to_playlists.php -u=2 - i=15
+    php dev/engage/add_resource_to_playlists.php -u=2 - i=15
 
 Options:
     -h, --help              Print out this help.

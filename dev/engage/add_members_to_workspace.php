@@ -21,7 +21,7 @@
  * @package container_workspace
  */
 define('CLI_SCRIPT', true);
-require_once(__DIR__ . "/../../../../config.php");
+require_once(__DIR__ . "/../../server/config.php");
 
 use core_container\factory;
 use container_workspace\workspace;
@@ -57,7 +57,7 @@ A script to add a number of members into the workspace. It will check for the to
 within the system against the number provided from parameter to determine whether to add new users or not.
 
 Usage:
-    php container/type/workspace/cli/add_member.php --workspace_id=15
+    php dev/engage/add_members_to_workspace.php --workspace_id=15
     
 Options:
     -h, --help              Print out this help

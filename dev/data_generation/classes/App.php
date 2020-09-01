@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,42 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @package totara_competency
+ * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  */
-
 namespace degeneration;
 
-use degeneration\items\item;
 use Faker\Factory;
 use Faker\Generator;
-
-/**
- * Auto-loading our pseudo PSR-4
- */
-spl_autoload_register(function ($class_name) {
-    if (strpos($class_name, 'degeneration') === 0) {
-        $class_name = substr($class_name, 13);
-        $class_name = str_replace('\\', DIRECTORY_SEPARATOR, $class_name);
-
-        if (file_exists($file = __DIR__ . DIRECTORY_SEPARATOR . $class_name . '.php')) {
-            include_once $file;
-        }
-
-    }
-});
-
-define('CLI_SCRIPT', 1);
-
-require_once(__DIR__ . '/../../../server/config.php');
-require_once(App::config()->libdir . '/phpunit/classes/util.php');
-
-if (!file_exists(__DIR__ . '/vendor/fzaninotto/faker/src/autoload.php')) {
-    echo "In order to execute this script you need to execute: 'composer install' from this directory!" . PHP_EOL;
-    exit(1);
-}
-
-require_once __DIR__ . '/vendor/autoload.php';
 
 class App {
 
@@ -185,74 +155,5 @@ class App {
      */
     public function get_percentage(int $count, int $percentage): int {
         return $count * $percentage / 100;
-    }
-}
-
-class Cache {
-
-    /**
-     * Cached items library
-     *
-     * @var array
-     */
-    protected $items = [];
-
-    /**
-     * Cache instance
-     *
-     * @var null|static
-     */
-    protected static $cache = null;
-
-    /**
-     * Cache constructor.
-     */
-    private function __construct() {
-        static::$cache = $this;
-    }
-
-    /**
-     * Get cache instance
-     *
-     * @return static
-     */
-    public static function get() {
-        if (!static::$cache) {
-            return new static();
-        }
-
-        return static::$cache;
-    }
-
-    /**
-     * Add created item to the cache
-     *
-     * @param item $item
-     * @return $this
-     */
-    public function add(item $item) {
-
-        if (!isset($this->items[$class = get_class($item)])) {
-            $this->items[$class] = [];
-        }
-
-        $this->items[$item->get_data('id')] = $item;
-
-        return $this;
-    }
-
-    /**
-     * Get an item (items) from cache
-     *
-     * @param string $class Item class to get
-     * @param int|null $id Item id
-     * @return array|mixed|null
-     */
-    public function fetch(string $class, ?int $id = null) {
-        if (is_null($id)) {
-            return $this->items[$class] ?? [];
-        }
-
-        return $this->items[$class][$id] ?? null;
     }
 }
