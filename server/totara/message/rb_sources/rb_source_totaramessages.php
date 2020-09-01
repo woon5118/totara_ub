@@ -511,6 +511,9 @@ class rb_source_totaramessages extends rb_base_source {
         if (advanced_feature::is_disabled('programs') && advanced_feature::is_disabled('certifications')) {
             unset($componentskeys['program']);
         }
+        if (advanced_feature::is_disabled('evidence')) {
+            unset($componentskeys['evidence']);
+        }
         $components = array_flip($componentskeys);
 
         foreach ($components as $type) {
