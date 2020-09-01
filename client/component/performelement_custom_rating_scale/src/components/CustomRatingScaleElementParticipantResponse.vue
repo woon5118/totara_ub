@@ -18,13 +18,13 @@
 <template>
   <div class="tui-elementEditCustomRatingScaleParticipantResponse">
     <div
-      v-if="answerOption"
+      v-if="Object.keys(answerOption).length > 0"
       class="tui-elementEditCustomRatingScaleParticipantResponse__answer"
     >
       {{ answerOption }}
     </div>
     <div
-      v-else
+      v-else-if="Object.keys(answerOption).length === 0"
       class="tui-elementEditCustomRatingScaleParticipantResponse__noResponse"
     >
       {{ $str('no_response_submitted', 'performelement_custom_rating_scale') }}
