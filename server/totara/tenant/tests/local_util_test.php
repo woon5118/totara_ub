@@ -558,13 +558,10 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
 
         $this->assertTrue(util::user_username_exists('User1'));
         $this->assertTrue(util::user_username_exists('uSER1'));
-        $this->assertFalse(util::user_username_exists('Úser1')); // Accent insensitive MySQL will fail here, that is to be expected.
 
-        if ($DB->get_dbfamily() != 'mssql') {
-            // Note that we do not want to do this kind of assertion in mssql because in mssql, it will ignores the
-            // trailing spaces in the comparisions.
-            // References here: https://stackoverflow.com/questions/52592109/spaces-in-where-clause-for-sql-server
-            $this->assertFalse(util::user_username_exists('User1 '));
+        if ($DB->get_dbfamily() != 'mysql') {
+            // Accent insensitive MySQL will fail here, that is to be expected.
+            $this->assertFalse(util::user_username_exists('Úser1'));
         }
 
         $this->assertFalse(util::user_username_exists('user2'));
@@ -601,13 +598,10 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
 
         $this->assertTrue(util::user_email_exists('User1@example.com'));
         $this->assertTrue(util::user_email_exists('uSER1@example.com'));
-        $this->assertFalse(util::user_email_exists('Úser1@example.com')); // Accent insensitive MySQL will fail here, that is to be expected.
 
-        if ($DB->get_dbfamily() != 'mssql') {
-            // Note that we do not want to do this kind of assertion in mssql because in mssql, it will ignores the
-            // trailing spaces in the comparisions.
-            // References here: https://stackoverflow.com/questions/52592109/spaces-in-where-clause-for-sql-server
-            $this->assertFalse(util::user_email_exists('User1@example.com '));
+        if ($DB->get_dbfamily() != 'mysql') {
+            // Accent insensitive MySQL will fail here, that is to be expected.
+            $this->assertFalse(util::user_email_exists('Úser1@example.com'));
         }
 
         $this->assertFalse(util::user_email_exists('user2@example.com'));
@@ -645,13 +639,10 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
 
         $this->assertTrue(util::user_idnumber_exists('User1'));
         $this->assertTrue(util::user_idnumber_exists('uSER1'));
-        $this->assertFalse(util::user_idnumber_exists('Úser1')); // Accent insensitive MySQL will fail here, that is to be expected.
 
-        if ($DB->get_dbfamily() != 'mssql') {
-            // Note that we do not want to do this kind of assertion in mssql because in mssql, it will ignores the
-            // trailing spaces in the comparisions.
-            // References here: https://stackoverflow.com/questions/52592109/spaces-in-where-clause-for-sql-server
-            $this->assertFalse(util::user_idnumber_exists('User1 '));
+        if ($DB->get_dbfamily() != 'mysql') {
+            // Accent insensitive MySQL will fail here, that is to be expected.
+            $this->assertFalse(util::user_idnumber_exists('Úser1'));
         }
 
         $this->assertFalse(util::user_idnumber_exists('user2'));

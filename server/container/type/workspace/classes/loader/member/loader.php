@@ -98,15 +98,16 @@ final class loader {
         }
 
         // By default we always include the user owner on top.
-        if ('mssql' == $DB->get_dbfamily()) {
+        if ($DB->get_dbfamily() == 'postgres') {
+            $builder->order_by('w.user_id', order::DIRECTION_ASC);
+        } else {
             // We treat mssql differently here, and it is a really UGLY hack because
             // we are at high level API and we still have to do this check.
             // However, based on https://www.sqlservertutorial.net/sql-server-basics/sql-server-order-by
             // NULL value is treated as the lowest value within MSSQL database, hence we will have to order by
             // descending so that we can have owner as top.
+            // Same stuff with mysql family.
             $builder->order_by('w.user_id', order::DIRECTION_DESC);
-        } else {
-            $builder->order_by('w.user_id', order::DIRECTION_ASC);
         }
 
         $sort = $query->get_sort();
