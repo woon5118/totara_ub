@@ -41,7 +41,7 @@ Feature: Job assignment column on user activities list.
       | All job assignments        | All job track         | ONE_PER_SUBJECT             |
       | Specific job assignments   | specific track        | ONE_PER_JOB                 |
       | Subject assignment         | subject track         | ONE_PER_SUBJECT             |
-      | Another Subject assignment | another subject track | ONE_PER_SUBJECT             |
+      | Another Subject assignment | another subject track | ONE_PER_JOB                 |
     And the following "track assignments" exist in "mod_perform" plugin:
       | track_description     | assignment_type | assignment_name |
       | All job track         | cohort          | aud1            |
@@ -53,11 +53,11 @@ Feature: Job assignment column on user activities list.
       | All job section         | manager      |
       | All job section         | subject      |
       | All job section         | appraiser    |
-      | specific section        | manager      |
       | specific section        | subject      |
       | specific section        | appraiser    |
       | subject section         | subject      |
       | another subject section | subject      |
+      | another subject section | manager      |
     And the following "section elements" exist in "mod_perform" plugin:
       | section_name            | element_name | title      |
       | All job section         | short_text   | Question 1 |
@@ -82,7 +82,7 @@ Feature: Job assignment column on user activities list.
 
     # Tests job assignment column is shown when any of the subject instances are created per job assignment
     Then I should see the tui datatable contains:
-      | Activity title           | Type      | User         | Job assignment                   | Relationship to user | Overall progress | Your progress   |
-      | Specific job assignments | Appraisal | Edward Eiger | Mark man                         | Manager              | Not yet started  | Not yet started |
-      | Specific job assignments | Appraisal | Edward Eiger | Unnamed job assignment (ID: Y2k) | Appraiser            | Not yet started  | Not yet started |
-      | All job assignments      | Appraisal | Edward Eiger | All                              | Manager, Appraiser   | Not yet started  | Not yet started |
+      | Activity title             | Type      | User         | Job assignment                   | Relationship to user | Overall progress | Your progress   |
+      | Another Subject assignment | Appraisal | Edward Eiger | Mark man                         | Manager              | Not yet started  | Not yet started |
+      | Specific job assignments   | Appraisal | Edward Eiger | Unnamed job assignment (ID: Y2k) | Appraiser            | Not yet started  | Not yet started |
+      | All job assignments        | Appraisal | Edward Eiger | All                              | Manager, Appraiser   | Not yet started  | Not yet started |
