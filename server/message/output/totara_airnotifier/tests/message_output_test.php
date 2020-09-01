@@ -62,9 +62,12 @@ class air_notifier_message_output_testcase extends advanced_testcase {
         // Mock some message data.
         $mockdata = new \stdClass();
         $mockdata->userto = $user;
+        $mockdata->userfrom = $user;
         $mockdata->subject = 'Test message';
         $mockdata->smallmessage = 'smallmessage';
         $mockdata->fullmessage = 'Big message with lots of words in it.';
+        $mockdata->courseid = 1;
+        $mockdata->component = 'test';
 
         $output = new message_output_totara_airnotifier();
         $result = $output->send_message($mockdata);
