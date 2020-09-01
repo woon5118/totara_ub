@@ -62,7 +62,7 @@ class mod_perform_notification_recipient_testcase extends advanced_testcase {
      */
     public function test_is_available() {
         [$idnumbers, $expects_list] = $this->get_data();
-        $relationships = relationship_entity::repository()->select_raw('idnumber, *')->get()->map_to(relationship_model::class)->all(true);
+        $relationships = relationship_entity::repository()->get()->map_to(relationship_model::class)->key_by('idnumber')->all(true);
         foreach ($expects_list as $what => [$recipients, $expects]) {
             foreach ($idnumbers as $i => $idnumber) {
                 $outcome = recipient::is_available($recipients, $relationships[$idnumber]);
@@ -83,16 +83,16 @@ class mod_perform_notification_recipient_testcase extends advanced_testcase {
     public function test_where_available() {
         [$idnumbers, $expects_list] = $this->get_data();
         foreach ($expects_list as $what => [$recipients, $expects]) {
-            $builder = builder::table(relationship_entity::TABLE, 'rel')->select_raw('idnumber, *')->map_to(relationship_entity::class);
+            $builder = builder::table(relationship_entity::TABLE, 'rel')->map_to(relationship_entity::class);
             recipient::where_available($recipients, $builder, 'rel');
-            $relationships = $builder->get()->map_to(relationship_model::class)->all(true);
+            $relationships = $builder->get()->key_by('idnumber')->map_to(relationship_model::class)->all(true);
             foreach ($idnumbers as $i => $idnumber) {
                 $outcome = isset($relationships[$idnumber]);
                 $this->assertEquals($expects[$i], $outcome, "$what: $idnumber");
             }
         }
         try {
-            $builder = builder::table(relationship_entity::TABLE, 'rel')->select_raw('idnumber, *')->map_to(relationship_entity::class);
+            $builder = builder::table(relationship_entity::TABLE, 'rel')->map_to(relationship_entity::class);
             recipient::where_available(0, $builder, 'rel');
             $this->fail('coding_exception expected');
         } catch (coding_exception $ex) {
