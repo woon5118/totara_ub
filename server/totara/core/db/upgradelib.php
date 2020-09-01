@@ -1259,13 +1259,17 @@ function totara_core_upgrade_create_relationship($resolver_classes, $idnumber = 
 
     // Checks if idnumber already exists, then updates the relationship.
     if ($idnumber) {
-        $relationship = $DB->get_record(
+        $sql = "idnumber = :idnumber OR idnumber = :resolver_class";
+        $params = ['idnumber' => $idnumber, 'resolver_class' => $resolver_classes[0]];
+        $relationship = $DB->get_record_select(
             'totara_core_relationship',
-            ['idnumber' => $idnumber]
+            $sql,
+            $params
         );
 
         // Update the sort order, type & component if the relationship already exists.
         if ($relationship) {
+            $relationship->idnumber = $idnumber;
             // Conditionally add properties if they exist as a db column.
             if (isset($relationship->sort_order)) {
                 $relationship->sort_order = $sort_order;
