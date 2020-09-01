@@ -52,6 +52,33 @@ Feature: Users visibility of programs can be toggled
       | Catalog type | Top navigation |
       | totara       | Find Learning  |
       | enhanced     | Programs       |
+
+  @javascript
+  Scenario Outline: A user can view programs on the catalog of moodle with old visibility (show).
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | catalogtype | <Catalog type> |
+    And I log out
+
+    When I log in as "user001"
+    And I click on "<Top navigation>" in the totara menu
+    And I click on "Miscellaneous" "link"
+    Then I should see "Visibility Program Tests"
+
+    When I log out
+    And I log in as "user002"
+    And I click on "<Top navigation>" in the totara menu
+    And I click on "Miscellaneous" "link"
+    Then I should see "Visibility Program Tests"
+
+    When I log out
+    And I log in as "user003"
+    And I click on "<Top navigation>" in the totara menu
+    And I click on "Miscellaneous" "link"
+    Then I should see "Visibility Program Tests"
+
+    Examples:
+      | Catalog type | Top navigation |
       | moodle       | Programs       |
 
   @javascript
@@ -114,6 +141,34 @@ Feature: Users visibility of programs can be toggled
       | Catalog type | Top navigation |
       | totara       | Find Learning  |
       | enhanced     | Programs       |
+
+  @javascript
+  Scenario Outline: A user can view programs on the catalog of moodle with audience visibility (all users).
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | Enable audience-based visibility | 1              |
+      | catalogtype                      | <Catalog type> |
+    And I log out
+
+    When I log in as "user001"
+    And I click on "<Top navigation>" in the totara menu
+    And I click on "Miscellaneous" "link"
+    Then I should see "Visibility Program Tests"
+
+    When I log out
+    And I log in as "user002"
+    And I click on "<Top navigation>" in the totara menu
+    And I click on "Miscellaneous" "link"
+    Then I should see "Visibility Program Tests"
+
+    When I log out
+    And I log in as "user003"
+    And I click on "<Top navigation>" in the totara menu
+    And I click on "Miscellaneous" "link"
+    Then I should see "Visibility Program Tests"
+
+    Examples:
+      | Catalog type | Top navigation |
       | moodle       | Programs       |
 
   @javascript
@@ -184,6 +239,39 @@ Feature: Users visibility of programs can be toggled
       | Catalog type | Top navigation |
       | totara       | Find Learning  |
       | enhanced     | Programs       |
+
+  @javascript
+  Scenario Outline: Only an enrolled user can view programs on the catalog of moodle with audience visibility (enrolled users).
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | Enable audience-based visibility | 1              |
+      | catalogtype                      | <Catalog type> |
+    And I navigate to "Manage programs" node in "Site administration > Programs"
+    And I click on "Miscellaneous" "link"
+    And I click on "Visibility Program Tests" "link"
+    And I click on "Edit program details" "button"
+    And I click on "Details" "link"
+    And I set the field "audiencevisible" to "Enrolled users only"
+    And I press "Save changes"
+    And I log out
+
+    When I log in as "user001"
+    And I click on "<Top navigation>" in the totara menu
+    And I click on "Miscellaneous" "link"
+    Then I should see "Visibility Program Tests"
+
+    When I log out
+    And I log in as "user002"
+    And I click on "<Top navigation>" in the totara menu
+    Then I should not see "Visibility Program Tests"
+
+    When I log out
+    And I log in as "user003"
+    And I click on "<Top navigation>" in the totara menu
+    Then I should not see "Visibility Program Tests"
+
+    Examples:
+      | Catalog type | Top navigation |
       | moodle       | Programs       |
 
   @javascript
@@ -223,6 +311,44 @@ Feature: Users visibility of programs can be toggled
       | Catalog type | Top navigation |
       | totara       | Find Learning  |
       | enhanced     | Programs       |
+
+  @javascript
+  Scenario Outline: Only an enrolled user or audience member can view programs on the catalog of moodle with audience visibility (audience members).
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | Enable audience-based visibility | 1              |
+      | catalogtype                      | <Catalog type> |
+    And I navigate to "Manage programs" node in "Site administration > Programs"
+    And I click on "Miscellaneous" "link"
+    And I click on "Visibility Program Tests" "link"
+    And I click on "Edit program details" "button"
+    And I click on "Details" "link"
+    And I set the field "audiencevisible" to "Enrolled users and members of the selected audiences"
+    And I click on "Add visible audiences" "button"
+    And I click on "Audience1" "link" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I click on "OK" "button" in the "course-cohorts-visible-dialog" "totaradialogue"
+    And I wait "1" seconds
+    And I press "Save changes"
+    And I log out
+
+    When I log in as "user001"
+    And I click on "<Top navigation>" in the totara menu
+    And I click on "Miscellaneous" "link"
+    Then I should see "Visibility Program Tests"
+
+    When I log out
+    And I log in as "user002"
+    And I click on "<Top navigation>" in the totara menu
+    And I click on "Miscellaneous" "link"
+    Then I should see "Visibility Program Tests"
+
+    When I log out
+    And I log in as "user003"
+    And I click on "<Top navigation>" in the totara menu
+    Then I should not see "Visibility Program Tests"
+
+    Examples:
+      | Catalog type | Top navigation |
       | moodle       | Programs       |
 
     # TODO - programs availability.
