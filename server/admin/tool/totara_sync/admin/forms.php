@@ -269,6 +269,17 @@ class totara_sync_element_settings_form extends moodleform {
 
         /** @var totara_sync_element $element */
         $element = $this->_customdata['element'];
+
+        if ($sources = $element->get_sources()) {
+            $sourceselection = 'source_' . $element->get_name();
+            if (empty($data[$sourceselection])) {
+                $errors['source_type_group'] = get_string('required');
+                // No point validating anything else.
+                return $errors;
+            }
+        }
+
+        // Continue with other validation
         $errors = array_merge($errors, $element->validation($data, $files));
 
         if ($data['fileaccess'] == FILE_ACCESS_DIRECTORY && isset($data['filesdir'])) {
