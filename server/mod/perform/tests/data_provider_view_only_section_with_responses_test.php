@@ -26,15 +26,14 @@ use core\collection;
 use core\entities\user;
 use mod_perform\constants;
 use mod_perform\data_providers\response\view_only_section_with_responses;
-use mod_perform\entities\activity\element;
 use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\section;
+use mod_perform\models\activity\section as section_model;
 use mod_perform\entities\activity\section_element;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\models\response\participant_section as participant_section_model;
 use mod_perform\models\response\responder_group;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\view_only_element_response;
@@ -61,7 +60,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
         ]);
 
         /** @var section $section */
-        $section = section::repository()->get()->last();
+        $section = section::repository()->one(true);
 
         $data_provider = new view_only_section_with_responses($section, $subject_instance);
 
@@ -116,7 +115,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
         ]);
 
         /** @var section $section */
-        $section = section::repository()->get()->last();
+        $section = section::repository()->one(true);
 
         $data_provider = new view_only_section_with_responses($section, $subject_instance);
 
@@ -180,7 +179,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
         ]);
 
         /** @var section $section */
-        $section = section::repository()->get()->last();
+        $section = section::repository()->one(true);
 
         $static_element = $generator->create_element(['title' => 'Static element', 'plugin_name' => 'static_content']);
         $generator->create_section_element(new \mod_perform\models\activity\section($section), $static_element, 3);
@@ -222,7 +221,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
         ]);
 
         /** @var section $section */
-        $section = section::repository()->get()->last();
+        $section = section::repository()->one(true);
 
         $data_provider = new view_only_section_with_responses($section, $subject_instance);
 
@@ -363,7 +362,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
 
         $activity = new activity($subject_instance->activity());
 
-        $section = $generator->create_section($activity, ['title' => 'Part one']);
+        $section = new section_model(section::repository()->one(true));
 
         // Always create both the manager and appraiser section_relationships
         $manager_section_relationship = $generator->create_section_relationship(
@@ -410,7 +409,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
         );
 
         /** @var section $section */
-        $section = section::repository()->get()->last();
+        $section = section::repository()->one(true);
 
         $data_provider = new view_only_section_with_responses($section, $subject_instance);
 
@@ -471,7 +470,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
         )[0];
 
         /** @var section $section */
-        $section = section::repository()->get()->last();
+        $section = section::repository()->one(true);
 
         $data_provider = new view_only_section_with_responses(
             $section,
@@ -571,7 +570,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
         );
 
         /** @var section $section */
-        $section = section::repository()->get()->last();
+        $section = section::repository()->one(true);
 
         $data_provider = new view_only_section_with_responses($section, $subject_instance);
 

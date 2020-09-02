@@ -34,6 +34,7 @@ use hierarchy_position\entities\position;
 use mod_perform\constants;
 use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\element as element_entity;
 use mod_perform\entities\activity\element_response;
 use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\manual_relationship_selection_progress;
@@ -145,9 +146,7 @@ class mod_perform_generator extends component_generator_base {
                 track::create($activity);
             }
 
-            if (!isset($data['create_section']) ||
-                (isset($data['create_section']) && $data['create_section'] == 'true')
-            ) {
+            if (!array_key_exists('create_section', $data) || $data['create_section'] == 'true') {
                 section::create($activity);
             }
 
@@ -214,6 +213,24 @@ class mod_perform_generator extends component_generator_base {
     public function create_section(activity $activity, $data = []): section {
         $title = $data['title'] ?? "test Section";
         return section::create($activity, $title);
+    }
+
+    public function find_or_create_section(activity $activity, $data = []): section {
+        /** @var section_entity $section_entity */
+        $section_entity = section_entity::repository()
+            ->where('activity_id', $activity->id)
+            ->order_by('id')
+            ->first();
+
+        if ($section_entity === null) {
+            return $this->create_section($activity, $data);
+        }
+
+        $title = $data['title'] ?? "test Section";
+        $section_entity->title = $title;
+        $section_entity->save();
+
+        return new section($section_entity);
     }
 
     /**
@@ -1141,22 +1158,21 @@ class mod_perform_generator extends component_generator_base {
                     ]
                 );
             }
-            else {
-                $activity = $this->create_activity_in_container(
-                    [
-                        'activity_name'   => $name,
-                        'activity_type'   => $type,
-                        'create_section'  => false,
-                        'activity_status' => 'DRAFT',
-                    ]
-                );
-                $activity->set_anonymous_setting(true)->update();
 
-                if ($status !== draft::get_code()) {
-                    $activity->activate();
-                }
-                return $activity;
+            $activity = $this->create_activity_in_container(
+                [
+                    'activity_name'   => $name,
+                    'activity_type'   => $type,
+                    'create_section'  => false,
+                    'activity_status' => 'DRAFT',
+                ]
+            );
+            $activity->set_anonymous_setting(true)->update();
+
+            if ($status !== draft::get_code()) {
+                $activity->activate();
             }
+            return $activity;
         }
 
         if ($anonymous_responses) {
@@ -1327,7 +1343,7 @@ class mod_perform_generator extends component_generator_base {
 
         $activity = new activity($subject_instance->activity());
 
-        $section = $this->create_section($activity, ['title' => 'Part one']);
+        $section = $this->find_or_create_section($activity, ['title' => 'Part one']);
 
         $manager_section_relationship = $this->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_MANAGER]);
         $appraiser_section_relationship = $this->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_APPRAISER]);
@@ -1506,7 +1522,23 @@ class mod_perform_generator extends component_generator_base {
         if (is_string($required_question) && $required_question !== 'true') {
             $required_question = false;
         }
-        $section1 = $this->create_section($activity, ['title' => 'Part one']);
+
+
+
+        $section1 = $this->find_or_create_section($activity, ['title' => 'Part one']);
+
+        $existing_section_element_count = section_element_entity::repository()
+            ->as('se')
+            ->join([element_entity::TABLE, 'e'], 'se.element_id', 'e.id')
+            ->where('e.title', 'Question one')
+            ->where('e.is_required', (bool) $required_question)
+            ->where('se.section_id', $section1->id)
+            ->count();
+
+        // Section elements already exists for this activity.
+        if ($existing_section_element_count !== 0) {
+            return $section1;
+        }
 
         $element = $this->create_element([
             'title' => 'Question one',

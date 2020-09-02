@@ -252,10 +252,13 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
         $subject1_entity = $generator->create_subject_instance([
             'activity_id' => $activity->id,
             'subject_user_id' => $user1->id,
+            'include_questions' => false,
         ]);
+        
         $subject2_entity = $generator->create_subject_instance([
             'activity_id' => $activity->id,
             'subject_user_id' => $user2->id,
+            'include_questions' => false,
         ]);
 
         $subject_relationship_id = $generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;

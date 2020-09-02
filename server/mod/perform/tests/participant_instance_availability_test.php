@@ -257,6 +257,7 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
         $subject_instance = $generator->create_subject_instance([
             'activity_id' => $activity->id,
             'subject_user_id' => $user1->id,
+            'include_questions' => false,
         ]);
 
         $subject_relationship_id = $generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;

@@ -75,7 +75,7 @@ class mod_perform_userdata_purge_responses_testcase  extends advanced_testcase {
 
         $this->assertEquals(2, (activity::repository())->count());
         $this->assertEquals(2, (track::repository())->count());
-        $this->assertEquals(4, (section::repository())->count());
+        $this->assertEquals(2, (section::repository())->count());
         $this->assertEquals(4, (section_element::repository())->count());
         $this->assertEquals(4, (element::repository())->count());
         $this->assertEquals(2, (subject_instance::repository())->count());
@@ -90,7 +90,7 @@ class mod_perform_userdata_purge_responses_testcase  extends advanced_testcase {
         // Activity, track, section, section_elements and elements left alone
         $this->assertEquals(2, (activity::repository())->count());
         $this->assertEquals(2, (track::repository())->count());
-        $this->assertEquals(4, (section::repository())->count());
+        $this->assertEquals(2, (section::repository())->count());
         $this->assertEquals(4, (section_element::repository())->count());
         $this->assertEquals(4, (element::repository())->count());
 
@@ -163,7 +163,7 @@ class mod_perform_userdata_purge_responses_testcase  extends advanced_testcase {
 
         $this->assertEquals(2, (activity::repository())->count());
         $this->assertEquals(2, (track::repository())->count());
-        $this->assertEquals(4, (section::repository())->count());
+        $this->assertEquals(2, (section::repository())->count());
         $this->assertEquals(4, (section_element::repository())->count());
         $this->assertEquals(4, (element::repository())->count());
         $this->assertEquals(2, (subject_instance::repository())->count());
@@ -179,7 +179,7 @@ class mod_perform_userdata_purge_responses_testcase  extends advanced_testcase {
         // Activity, track, section, section_elements and elements left alone
         $this->assertEquals(2, (activity::repository())->count());
         $this->assertEquals(2, (track::repository())->count());
-        $this->assertEquals(4, (section::repository())->count());
+        $this->assertEquals(2, (section::repository())->count());
         $this->assertEquals(4, (section_element::repository())->count());
         $this->assertEquals(4, (element::repository())->count());
 
