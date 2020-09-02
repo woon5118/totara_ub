@@ -480,8 +480,8 @@ switch ($searchtype) {
             $allfields = $fields;
         }
 
-        $search_info->id = 'COALESCE((' . $DB->sql_concat_join('\'-\'', array('u.id', 'managerja.id')) . '), '
-            . $DB->sql_concat('u.id', '\'-\'') . ')';
+        $search_info->id = 'DISTINCT(COALESCE((' . $DB->sql_concat_join('\'-\'', array('u.id', 'managerja.id')) . '), '
+            . $DB->sql_concat('u.id', '\'-\'') . '))';
         $search_info->fullnamefields = 'managerja.fullname, managerja.idnumber, u.id AS userid, managerja.id AS jaid, ' . implode(',', $allfields);
 
         $keywords = totara_search_parse_keywords($query);
