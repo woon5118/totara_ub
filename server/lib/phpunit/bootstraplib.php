@@ -291,7 +291,7 @@ namespace core\internal\phpunit {
             }
 
             // Add the PHPUnit instance token to dataroot and prefix to create separation.
-            $cfg->dataroot = $cfg->dataroot . '/' . PHPUNIT_INSTANCE;
+            $cfg->dataroot = $cfg->dataroot . DIRECTORY_SEPARATOR . PHPUNIT_INSTANCE;
             $cfg->prefix = $cfg->prefix . PHPUNIT_INSTANCE;
 
             // Set up dataroot at this point.

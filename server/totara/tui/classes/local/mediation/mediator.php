@@ -30,6 +30,8 @@
 
 namespace totara_tui\local\mediation;
 
+use totara_core\path;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -203,9 +205,10 @@ abstract class mediator {
 
     /**
      * Sends the given file, and ensures that it is cached.
-     * @param string $absolutefilepath
+     * @param path $absolutefilepath
      */
-    final public function send_cached_file(string $absolutefilepath) {
+    final public function send_cached_file(path $absolutefilepath) {
+        $absolutefilepath = $absolutefilepath->out(true);
         $this->header_etag();
         $this->header_content_disposition_inline();
         $this->header_cache(filemtime($absolutefilepath));

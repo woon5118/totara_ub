@@ -31,6 +31,7 @@
 
 namespace totara_tui\local\requirement;
 
+use totara_core\path;
 use totara_tui\local\locator\bundle;
 use totara_tui\local\requirement;
 use totara_tui\output\framework;
@@ -72,7 +73,7 @@ final class vendors_js extends requirement {
     /**
      * {@inheritdoc}
      */
-    public function get_required_resource(): ?string {
+    public function get_required_resource(): ?path {
         return bundle::get_vendors_file();
     }
 }

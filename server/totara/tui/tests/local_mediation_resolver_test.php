@@ -28,6 +28,7 @@
  * @package totara_tui
  */
 
+use totara_core\path;
 use totara_tui\local\mediation\helper;
 use totara_tui\local\mediation\resolver;
 
@@ -38,7 +39,7 @@ class totara_tui_local_mediation_resolver_testcase extends advanced_testcase {
     private function get_mock_resolver_instance($rev = 1234) {
         $class = $this->getMockForAbstractClass(resolver::class, [\totara_tui\local\mediation\styles\mediator::class, $rev]);
         $class->expects($this->any())->method('calculate_etag')->willReturn('etag_test');
-        $class->expects($this->any())->method('calculate_cachefile')->willReturn('test_path');
+        $class->expects($this->any())->method('calculate_cachefile')->willReturn(new path('test_path'));
         return $class;
     }
 

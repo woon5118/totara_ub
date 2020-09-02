@@ -43,24 +43,24 @@ class totara_tui_local_locator_bundle_test extends advanced_testcase {
     public function test_get_bundle_js_file() {
         global $CFG;
         if ($this->build_files_exist()) {
-            self::assertSame($CFG->srcroot . '/client/component/tui/build/tui_bundle.js', bundle::get_bundle_js_file('tui'));
+            self::assertSamePath($CFG->srcroot . '/client/component/tui/build/tui_bundle.js', bundle::get_bundle_js_file('tui'));
         }
-        self::assertSame(null, bundle::get_bundle_js_file('space_monkeys'));
+        self::assertNull(bundle::get_bundle_js_file('space_monkeys'));
     }
 
     public function test_get_bundle_css_file() {
         global $CFG;
         if ($this->build_files_exist()) {
-            self::assertSame($CFG->srcroot . '/client/component/tui/build/tui_bundle.scss', bundle::get_bundle_css_file('tui'));
+            self::assertSamePath($CFG->srcroot . '/client/component/tui/build/tui_bundle.scss', bundle::get_bundle_css_file('tui'));
         }
-        self::assertSame(null, bundle::get_bundle_css_file('theme_ventura'));
-        self::assertSame(null, bundle::get_bundle_js_file('space_monkeys'));
+        self::assertNull(bundle::get_bundle_css_file('theme_ventura'));
+        self::assertNull(bundle::get_bundle_js_file('space_monkeys'));
     }
 
     public function test_get_vendors_file() {
         global $CFG;
         if ($this->build_files_exist()) {
-            self::assertSame($CFG->srcroot . '/client/component/tui/build/vendors.js', bundle::get_vendors_file());
+            self::assertSamePath($CFG->srcroot . '/client/component/tui/build/vendors.js', bundle::get_vendors_file());
         }
     }
 
@@ -68,7 +68,7 @@ class totara_tui_local_locator_bundle_test extends advanced_testcase {
         global $CFG;
         if ($this->build_files_exist()) {
             $actual = bundle::get_style_import('theme_ventura', '_variables.scss');
-            self::assertSame($CFG->srcroot . '/client/component/theme_ventura/build/global_styles/_variables.scss', $actual);
+            self::assertSamePath($CFG->srcroot . '/client/component/theme_ventura/build/global_styles/_variables.scss', $actual);
         }
 
         $actual = bundle::get_style_import('theme_ventura', 'space_monkeys.scss');
@@ -108,7 +108,7 @@ class totara_tui_local_locator_bundle_test extends advanced_testcase {
         $method = new ReflectionMethod(bundle::class, 'anticipated_bundle_location');
         $method->setAccessible(true);
         $actual = $method->invoke(null, 'test');
-        self::assertTrue((new path($CFG->srcroot, 'client/component/test/build'))->equals($actual));
+        self::assertSamePath("$CFG->srcroot/client/component/test/build", $actual);
     }
 
     public function test_get_js_suffix_for_url() {

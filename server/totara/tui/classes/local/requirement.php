@@ -31,6 +31,8 @@
 
 namespace totara_tui\local;
 
+use totara_core\path;
+
 /**
  * Represents a TUI bundle file for a Totara component
  */
@@ -93,9 +95,9 @@ abstract class requirement {
 
     /**
      * Returns true if this requirement is required.
-     * @return string|null The path to the resource, or null if it does not have one.
+     * @return path|null The path to the resource, or null if it does not have one.
      */
-    abstract public function get_required_resource(): ?string;
+    abstract public function get_required_resource(): ?path;
 
     /**
      * Forces the requirement to load even if it does not have a resource file.

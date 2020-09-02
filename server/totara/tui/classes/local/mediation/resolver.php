@@ -32,6 +32,10 @@ namespace totara_tui\local\mediation;
 
 use core\lock\lock;
 use core\lock\lock_config;
+use totara_core\path;
+
+global $CFG;
+require_once($CFG->dirroot . '/totara/core/classes/path.php');
 
 /**
  * Resolver class
@@ -57,7 +61,7 @@ abstract class resolver {
 
     /**
      * The path to the cachefile for the mediated resource.
-     * @var string
+     * @var path|null
      */
     private $cachefile;
 
@@ -87,9 +91,9 @@ abstract class resolver {
 
     /**
      * Returns the path to the cachefile for this resource.
-     * @return string
+     * @return path
      */
-    abstract protected function calculate_cachefile(): string;
+    abstract protected function calculate_cachefile(): path;
 
     /**
      * Returns the etag to use for this resource.
@@ -148,9 +152,9 @@ abstract class resolver {
 
     /**
      * Returns the path to the cachefile for this resource.
-     * @return string
+     * @return path
      */
-    final protected function get_cachefile(): string {
+    final protected function get_cachefile(): path {
         if ($this->cachefile === null) {
             $this->cachefile = $this->calculate_cachefile();
         }
@@ -162,7 +166,7 @@ abstract class resolver {
      * @return string
      */
     final protected function get_cachefile_contents(): string {
-        return file_get_contents($this->get_cachefile());
+        return file_get_contents($this->get_cachefile()->out(true));
     }
 
     /**
@@ -170,14 +174,14 @@ abstract class resolver {
      * @return bool
      */
     final protected function cache_file_exists(): bool {
-        return file_exists($this->get_cachefile());
+        return $this->get_cachefile()->exists();
     }
 
     /**
      * Unlinks the cachefile.
      */
     final protected function unlink_cache_file() {
-        @unlink($this->get_cachefile());
+        @unlink($this->get_cachefile()->out(true));
     }
 
     /**
@@ -193,17 +197,18 @@ abstract class resolver {
 
     /**
      * Stores the given contents in the cachefile.
-     * @param string $absolutepath
+     * @param path $absolutepath
      * @param string|file $content
      * @return bool
      */
-    final protected function store_in_cache(string $absolutepath, $content): bool {
+    final protected function store_in_cache(path $absolutepath, $content): bool {
         global $CFG;
 
         clearstatcache();
-        if (!file_exists(dirname($absolutepath))) {
+        $parent = $absolutepath->get_parent();
+        if (!$parent->exists()) {
             make_localcache_directory('totara_tui', false);
-            @mkdir(dirname($absolutepath), $CFG->directorypermissions, true);
+            @mkdir($parent->out(true), $CFG->directorypermissions, true);
         }
 
         // Prevent serving of incomplete file from concurrent request,
@@ -212,23 +217,25 @@ abstract class resolver {
 
         // The strategy is to create a temp file that is the cached content, and then to move it into place.
         // This will avoid race conditions, and partial file serve problems.
-        $temp_file = $absolutepath . '-' . bin2hex(random_bytes(6)) . '.tmp';
+        $absolutepath_str = $absolutepath->out(true);
+        $temp_file = $absolutepath_str . '-' . bin2hex(random_bytes(6)) . '.tmp';
 
         if ($content instanceof file) {
-            $content_file = (string)$content;
-            if (strpos($content_file, '..') !== false) {
+            $content_file = $content->get_path();
+            $content_file_str = $content_file->out(true);
+            if (strpos($content_file_str, '..') !== false) {
                 // This should never happen, don't entertain it, just quit.
                 debugging('Safety check: path traversal is not allowed', DEBUG_DEVELOPER);
                 return $this->store_in_cache($absolutepath, 'Invalid file path provided for copying.');
             }
-            if (substr($content_file, 0, strlen($CFG->srcroot)) !== $CFG->srcroot) {
+            if (!$content_file->get_relative($CFG->srcroot, true)) {
                 debugging('Safety check: attempted to cache file from outside of srcroot directory.', DEBUG_DEVELOPER);
                 return $this->store_in_cache($absolutepath, 'Invalid file path provided for copying.');
             }
 
             // Prevent serving of incomplete file from concurrent request,
             // Rename should be more atomic the copy if the file is large.
-            copy($content_file, $temp_file);
+            copy($content_file_str, $temp_file);
         } else {
             // Write out the single file for all those using decent browsers.
             $fp = fopen($temp_file, 'xb');
@@ -241,8 +248,8 @@ abstract class resolver {
         }
 
         // Tidy things up.
-        rename($temp_file, $absolutepath);
-        @chmod($absolutepath, $CFG->filepermissions);
+        rename($temp_file, $absolutepath_str);
+        @chmod($absolutepath_str, $CFG->filepermissions);
         @unlink($temp_file); // Just in case anything fails.
 
         ignore_user_abort(false);
@@ -262,7 +269,7 @@ abstract class resolver {
      */
     final protected function delivery_from_cache() {
         $cachefile = $this->get_cachefile();
-        if (file_exists($cachefile)) {
+        if ($cachefile->exists()) {
             if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) || !empty($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
                 // We do not actually need to verify the etag value because our files
                 // never change in cache because we increment the rev counter.

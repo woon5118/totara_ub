@@ -129,6 +129,71 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
     }
 
     /**
+     * Asserts that two file paths are identical.
+     *
+     * @param string|totara_core\path $expected
+     * @param string|totara_core\path $actual
+     * @return void
+     */
+    public static function assertSamePath($expected, $actual, string $message = ''): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/core/classes/path.php');
+        $check = function ($index, $param, $message) {
+            if (!(is_string($param) || $param instanceof totara_core\path)) {
+                if ($message !== '') {
+                    $message .= "\n";
+                }
+                $message = "Argument {$index} must be string or path.";
+                static::fail($message);
+            }
+        };
+        $check(1, $expected, $message);
+        $check(2, $actual, $message);
+        static::assertThat($actual, new class($expected) extends PHPUnit\Framework\Constraint\Constraint {
+            /** @var totara_core\path */
+            private $path;
+
+            public function __construct($path) {
+                $this->path = new totara_core\path($path);
+            }
+
+            /**
+             * {@inheritdoc}
+             */
+            public function toString(): string {
+                return "is identical to '{$this->path->out()}'";
+            }
+
+            /**
+             * {@inheritdoc}
+             */
+            public function evaluate($other, string $description = '', bool $returnResult = false) {
+                $success = $this->path->equals($other);
+                if ($returnResult) {
+                    return $success;
+                }
+                if (!$success) {
+                    $path = $this->path->out(true);
+                    if ($other instanceof totara_core\path) {
+                        $other = $other->out(true);
+                    } else {
+                        $other = str_replace('/', totara_core\path::SEPARATOR, $other);
+                    }
+                    $failure = new SebastianBergmann\Comparator\ComparisonFailure($path, $other, "'{$path}'", "'{$other}'");
+                    $this->fail($other, $description, $failure);
+                }
+            }
+
+            /**
+             * {@inheritdoc}
+             */
+            protected function failureDescription($other): string {
+                return 'two file paths are identical';
+            }
+        }, $message);
+    }
+
+    /**
      * Parse out the options from the tag using DOM object tree.
      *
      * @param DOMDocument $dom

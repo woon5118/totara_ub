@@ -28,14 +28,17 @@
  * @package totara_tui
  */
 
+use totara_core\path;
+
 defined('MOODLE_INTERNAL') || die();
 
 class totara_tui_local_mediation_file_testcase extends base_testcase {
 
     public function test_operation() {
         $file = new \totara_tui\local\mediation\file(__FILE__);
-        self::assertSame(__FILE__, (string)$file);
-        self::assertSame(__FILE__, $file->__toString());
+        self::assertSame(str_replace(path::SEPARATOR, '/', __FILE__), (string)$file);
+        self::assertSame(str_replace(path::SEPARATOR, '/', __FILE__), $file->__toString());
+        self::assertSamePath(new path(__FILE__), $file->get_path());
         self::assertTrue($file->exists());
     }
 

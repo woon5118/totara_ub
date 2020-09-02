@@ -30,26 +30,36 @@
 
 namespace totara_tui\local\mediation;
 
+use totara_core\path;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Mediation file class
  *
- * Used to make ie easier to mediate files without any modification.
+ * Used to make it easier to mediate files without any modification.
  */
 final class file {
 
     /**
-     * @var string The path tot he file.
+     * @var path The path to the file.
      */
     private $path;
 
     /**
      * File constructor.
-     * @param string $absolute_path Absolute path to the file.
+     * @param string|path $absolute_path Absolute path to the file.
      */
-    public function __construct(string $absolute_path) {
-        $this->path = $absolute_path;
+    public function __construct($absolute_path) {
+        $this->path = new path($absolute_path);
+    }
+
+    /**
+     * Returns the file path.
+     * @return path
+     */
+    public function get_path(): path {
+        return new path($this->path);
     }
 
     /**
@@ -57,7 +67,7 @@ final class file {
      * @return string
      */
     public function __toString() {
-        return $this->path;
+        return $this->path->to_string();
     }
 
     /**
@@ -65,7 +75,7 @@ final class file {
      * @return bool
      */
     public function exists() {
-        return file_exists($this->path);
+        return $this->path->exists();
     }
 
 }

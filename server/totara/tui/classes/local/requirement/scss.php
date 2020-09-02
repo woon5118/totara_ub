@@ -33,6 +33,7 @@ namespace totara_tui\local\requirement;
 
 use coding_exception;
 use moodle_url;
+use totara_core\path;
 use totara_tui\local\locator\bundle;
 use totara_tui\local\requirement;
 
@@ -98,7 +99,7 @@ final class scss extends requirement {
     /**
      * {@inheritdoc}
      */
-    public function get_required_resource(): ?string {
+    public function get_required_resource(): ?path {
         return bundle::get_bundle_css_file($this->component);
     }
 }

@@ -30,6 +30,7 @@
 
 namespace totara_tui\local\mediation\javascript;
 
+use totara_core\path;
 use totara_tui\local\mediation\file;
 use totara_tui\local\locator\bundle;
 
@@ -73,11 +74,11 @@ final class resolver extends \totara_tui\local\mediation\resolver {
 
     /**
      * @inheritDoc
-     * @return string
+     * @return path
      */
-    protected function calculate_cachefile(): string {
+    protected function calculate_cachefile(): path {
         global $CFG;
-        return $CFG->localcachedir . '/totara_tui-javascript/' . $this->get_etag();
+        return new path($CFG->localcachedir, 'totara_tui-javascript', $this->get_etag());
     }
 
     /**
@@ -105,7 +106,7 @@ final class resolver extends \totara_tui\local\mediation\resolver {
         if (!$file || !$file->exists()) {
             return 'unknown';
         }
-        return sha1_file((string)$file);
+        return sha1_file($file->get_path()->out(true));
     }
 
     /**

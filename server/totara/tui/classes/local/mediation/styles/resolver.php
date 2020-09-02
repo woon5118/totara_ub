@@ -30,6 +30,7 @@
 
 namespace totara_tui\local\mediation\styles;
 
+use totara_core\path;
 use totara_tui\local\theme_config;
 
 /**
@@ -116,9 +117,9 @@ final class resolver extends \totara_tui\local\mediation\resolver {
      * @inheritDoc
      * @return string
      */
-    protected function calculate_cachefile(): string {
+    protected function calculate_cachefile(): path {
         global $CFG;
-        $cachefile = join('/', [
+        $cachefile = new path(
             $CFG->localcachedir,
             'totara_tui',
             $this->get_rev(),
@@ -126,7 +127,7 @@ final class resolver extends \totara_tui\local\mediation\resolver {
             ($this->option_rtl) ? 'rtl' : 'ltr',
             $this->tenant,
             "{$this->component}-{$this->suffix}.css"
-        ]);
+        );
         return $cachefile;
     }
 

@@ -23,8 +23,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use totara_core\path;
-
 defined('MOODLE_INTERNAL') || die();
 
 
@@ -105,7 +103,7 @@ class core_setuplib_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
 
         // Test default location - can not be modified in phpunit tests because we override everything in config.php.
-        $this->assertTrue((new path("$CFG->dataroot/localcache"))->equals($CFG->localcachedir));
+        $this->assertSamePath("$CFG->dataroot/localcache", $CFG->localcachedir);
 
         $this->setCurrentTimeStart();
         $timestampfile = "$CFG->localcachedir/.lastpurged";
@@ -114,13 +112,13 @@ class core_setuplib_testcase extends advanced_testcase {
         // to make_localcache_directory.
         remove_dir($CFG->localcachedir, true);
         $dir = make_localcache_directory('', false);
-        $this->assertTrue((new path($CFG->localcachedir))->equals($dir));
+        $this->assertSamePath($CFG->localcachedir, $dir);
         $this->assertFileNotExists("$CFG->localcachedir/.htaccess");
         $this->assertFileExists($timestampfile);
         $this->assertTimeCurrent(filemtime($timestampfile));
 
         $dir = make_localcache_directory('test/test', false);
-        $this->assertTrue((new path($CFG->localcachedir, "test/test"))->equals($dir));
+        $this->assertSamePath("$CFG->localcachedir/test/test", $dir);
 
         // Test custom location.
         $CFG->localcachedir = "$CFG->dataroot/testlocalcache";
@@ -129,17 +127,17 @@ class core_setuplib_testcase extends advanced_testcase {
         $this->assertFileNotExists($timestampfile);
 
         $dir = make_localcache_directory('', false);
-        $this->assertTrue((new path($CFG->localcachedir))->equals($dir));
+        $this->assertSamePath($CFG->localcachedir, $dir);
         $this->assertFileExists("$CFG->localcachedir/.htaccess");
         $this->assertFileExists($timestampfile);
         $this->assertTimeCurrent(filemtime($timestampfile));
 
         $dir = make_localcache_directory('test', false);
-        $this->assertTrue((new path($CFG->localcachedir, "test"))->equals($dir));
+        $this->assertSamePath("$CFG->localcachedir/test", $dir);
 
         $prevtime = filemtime($timestampfile);
         $dir = make_localcache_directory('pokus', false);
-        $this->assertTrue((new path($CFG->localcachedir, "pokus"))->equals($dir));
+        $this->assertSamePath("$CFG->localcachedir/pokus", $dir);
         $this->assertSame($prevtime, filemtime($timestampfile));
 
         // Test purging.
@@ -165,7 +163,7 @@ class core_setuplib_testcase extends advanced_testcase {
 
         $this->setCurrentTimeStart();
         $dir = make_localcache_directory('', false);
-        $this->assertTrue((new path($CFG->localcachedir))->equals($dir));
+        $this->assertSamePath($CFG->localcachedir, $dir);
         $this->assertFileNotExists($testfile);
         $this->assertFileNotExists(dirname($testfile));
         $this->assertFileExists($timestampfile);

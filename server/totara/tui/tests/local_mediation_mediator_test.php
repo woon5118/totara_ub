@@ -28,6 +28,7 @@
  * @package totara_tui
  */
 
+use totara_core\path;
 use totara_tui\local\mediation\mediator;
 
 defined('MOODLE_INTERNAL') || die();
@@ -131,7 +132,7 @@ class totara_tui_local_mediation_mediator_testcase extends advanced_testcase {
         require_once($CFG->libdir . '/configonlylib.php');
         $instance = $this->get_mock_mediator_instance();
         ob_start();
-        $instance->send_cached_file(__FILE__);
+        $instance->send_cached_file(new path(__FILE__));
         ob_end_clean();
         $actual = $this->getDebuggingMessages();
         $this->resetDebugging();

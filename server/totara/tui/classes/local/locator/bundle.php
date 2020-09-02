@@ -84,7 +84,7 @@ final class bundle {
      * @var array[]
      */
     private $map_scss_imports = [];
-    /** @var string[] An array of vendor files, the key is the suffix, and the value the absolute path for that file. */
+    /** @var path[] An array of vendor files, the key is the suffix, and the value the absolute path for that file. */
     private $map_vendors_js = [];
     /**
      * An array of bundle dependencies. The key is the bundle name, the value is an array of dependencies.
@@ -94,7 +94,7 @@ final class bundle {
 
     /**
      * An array of bundle CSS variables json files. The key is the number name, the value is the absolute path to the file
-     * @var string[]
+     * @var path[]
      */
     private $map_bundle_css_variables_json = [];
 
@@ -113,9 +113,9 @@ final class bundle {
      * Given a bundle name return the JS file that should be included.
      * If the bundle does not exist, or the bundle has no JS then null is returned.
      * @param string $bundle
-     * @return string|null
+     * @return path|null
      */
-    public static function get_bundle_js_file(string $bundle): ?string {
+    public static function get_bundle_js_file(string $bundle): ?path {
         return self::instance()->resolve_bundle_js($bundle);
     }
 
@@ -123,9 +123,9 @@ final class bundle {
      * Given a bundle name return the SCSS file that should be included.
      * If the bundle does not exist, or the bundle has no SCSS then null is returned.
      * @param string $bundle
-     * @return string|null
+     * @return path|null
      */
-    public static function get_bundle_css_file(string $bundle): ?string {
+    public static function get_bundle_css_file(string $bundle): ?path {
         return self::instance()->resolve_bundle_scss($bundle);
     }
 
@@ -133,9 +133,9 @@ final class bundle {
      * Given a bundle name return the SCSS file that can be expected to contain variables.
      * If the bundle does not exist, or the bundle has no SCSS variables then null is returned.
      * @param string $bundle
-     * @return string|null
+     * @return path|null
      */
-    public static function get_bundle_css_variables_file(string $bundle) {
+    public static function get_bundle_css_variables_file(string $bundle): ?path {
         return self::instance()->resolve_style_import($bundle, '_variables.scss');
     }
 
@@ -143,17 +143,17 @@ final class bundle {
      * Given a bundle name return the json file that describes the CSS variables used by the bundle.
      * If the bundle does not exist, or the bundle has no CSS variables then null is returned.
      * @param string $bundle
-     * @return string|null
+     * @return path|null
      */
-    public static function get_bundle_css_json_variables_file(string $bundle): ?string {
+    public static function get_bundle_css_json_variables_file(string $bundle): ?path {
         return self::instance()->resolve_bundle_css_variables_json($bundle);
     }
 
     /**
      * Returns the path to the vendors file within the Tui build directory.
-     * @return string|null
+     * @return path|null
      */
-    public static function get_vendors_file(): ?string {
+    public static function get_vendors_file(): ?path {
         return self::instance()->resolve_vendor_js();
     }
 
@@ -161,9 +161,9 @@ final class bundle {
      * Returns the path to the SCSS file to import. Null if it cannot be resolved.
      * @param string $bundle
      * @param string $importpath
-     * @return string|null
+     * @return path|null
      */
-    public static function get_style_import(string $bundle, string $importpath): ?string {
+    public static function get_style_import(string $bundle, string $importpath): ?path {
         return self::instance()->resolve_style_import($bundle, $importpath);
     }
 
@@ -218,9 +218,9 @@ final class bundle {
     /**
      * Given a bundle name resolve the JS file location.
      * @param string $bundle
-     * @return string|null
+     * @return path|null
      */
-    private function resolve_bundle_js(string $bundle): ?string {
+    private function resolve_bundle_js(string $bundle): ?path {
         $this->ensure_map_generated();
         foreach (self::get_js_suffix_for_file() as $suffix) {
             if (isset($this->map_bundle_js[$bundle][$suffix])) {
@@ -233,9 +233,9 @@ final class bundle {
     /**
      * Given a bundle name resolve the CSS file location.
      * @param string $bundle
-     * @return string|null
+     * @return path|null
      */
-    private function resolve_bundle_scss(string $bundle): ?string {
+    private function resolve_bundle_scss(string $bundle): ?path {
         $this->ensure_map_generated();
         foreach (self::get_css_suffix_for_file() as $suffix) {
             if (isset($this->map_bundle_scss[$bundle][$suffix])) {
@@ -247,10 +247,10 @@ final class bundle {
 
     /**
      * Resolve the vendor JS file location.
-     * @return string|null
+     * @return path|null
      * @throws coding_exception
      */
-    private function resolve_vendor_js(): ?string {
+    private function resolve_vendor_js(): ?path {
         $this->ensure_map_generated();
         foreach (self::get_js_suffix_for_file() as $suffix) {
             if (isset($this->map_vendors_js[$suffix])) {
@@ -264,9 +264,9 @@ final class bundle {
      * Resolves the SCSS file that should be imported, given the bundle name, and the import path.
      * @param string $bundle
      * @param string $importpath
-     * @return string|null Absolute path to the file to import, or null if cannot be resolved.
+     * @return path|null Absolute path to the file to import, or null if cannot be resolved.
      */
-    private function resolve_style_import(string $bundle, string $importpath): ?string {
+    private function resolve_style_import(string $bundle, string $importpath): ?path {
         $this->ensure_map_generated();
         foreach (self::get_css_suffix_for_file() as $suffix) {
             if (isset($this->map_scss_imports[$bundle][$suffix][$importpath])) {
@@ -279,9 +279,9 @@ final class bundle {
     /**
      * Resolves the css_variables json file.
      * @param string $bundle
-     * @return string|null The path to the variables JSON file, or null if the component does not have one.
+     * @return path|null The path to the variables JSON file, or null if the component does not have one.
      */
-    private function resolve_bundle_css_variables_json(string $bundle): ?string {
+    private function resolve_bundle_css_variables_json(string $bundle): ?path {
         $this->ensure_map_generated();
         if (isset($this->map_bundle_css_variables_json[$bundle])) {
             return $this->map_bundle_css_variables_json[$bundle];
@@ -470,7 +470,7 @@ final class bundle {
             $this->map_bundle_js[$bundle] = $suffixes;
             $this->map_bundle_scss[$bundle] = $suffixes;
             $this->map_scss_imports[$bundle] = $suffixes_imports;
-            $this->map_bundle_css_variables_json[$bundle] = $directory->join($bundle, 'build', "css_variables.json")->out();
+            $this->map_bundle_css_variables_json[$bundle] = $directory->join($bundle, 'build', "css_variables.json");
             $this->map_bundle_dependencies[$bundle] = [];
             $this->map_bundle($bundle);
         }
@@ -537,11 +537,12 @@ final class bundle {
      * @param string $path_relative
      * @param string $path_absolute
      */
-    private function add_bundle_js_file_to_map(string $bundle, string $suffix, string $path_relative, string $path_absolute) {
+    private function add_bundle_js_file_to_map(string $bundle, string $suffix, string $path_relative, string $path_absolute): void {
+        $path_absolute_path = new path($path_absolute);
         if ($bundle === framework::COMPONENT && $path_relative === 'vendors.js') {
-            $this->map_vendors_js[$suffix] = $path_absolute;
+            $this->map_vendors_js[$suffix] = $path_absolute_path;
         } else {
-            $this->map_bundle_js[$bundle][$suffix] = $path_absolute;
+            $this->map_bundle_js[$bundle][$suffix] = $path_absolute_path;
         }
     }
 
@@ -554,10 +555,11 @@ final class bundle {
      */
     private function add_bundle_scss_file_to_map(string $bundle, string $suffix, string $path_relative, string $path_absolute) {
         $relative = (new path($path_relative))->get_relative('global_styles', true);
+        $path_absolute_path = new path($path_absolute);
         if ($relative !== null) {
-            $this->map_scss_imports[$bundle][$suffix][$relative->out()] = $path_absolute;
+            $this->map_scss_imports[$bundle][$suffix][$relative->out()] = $path_absolute_path;
         } else if ($path_relative === 'tui_bundle.scss') {
-            $this->map_bundle_scss[$bundle][$suffix] = $path_absolute;
+            $this->map_bundle_scss[$bundle][$suffix] = $path_absolute_path;
         } else {
             debugging('Unable to map SCSS file ' . $path_absolute, DEBUG_DEVELOPER);
         }
