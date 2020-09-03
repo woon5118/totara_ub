@@ -62,6 +62,9 @@ final class workspace_image implements query_resolver {
             $url = $file_helper->get_file_url();
         }
 
-        return $url->out();
+        if ($url instanceof \moodle_url) {
+            return $url->out();
+        }
+        return '';
     }
 }
