@@ -33,10 +33,19 @@ class user_auth_method extends base {
     public static function display($auth, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         static $authplugin;
 
-        if (empty($authplugin[$auth])) {
-            $authplugin[$auth] = get_auth_plugin($auth);
+        if (empty($auth)) {
+            return '';
         }
-        return $authplugin[$auth]->get_title();
+
+        if (empty($authplugin[$auth])) {
+            if (exists_auth_plugin($auth)) {
+                $authplugin[$auth] = get_auth_plugin($auth);
+            } else {
+                $authplugin[$auth] = $auth;
+            }
+        }
+
+        return is_object($authplugin[$auth]) ? $authplugin[$auth]->get_title() : $authplugin[$auth];
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {
