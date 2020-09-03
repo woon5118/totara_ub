@@ -315,7 +315,7 @@ class pathway_manual_roles_testcase extends advanced_testcase {
                 $this->fail("Expected {$role}::require_for_user() to throw an exception but it didn't");
             } catch (moodle_exception $exception) {
                 $this->assertEquals(
-                    'You do not have the ' . $role::get_name() . ' role for ' . fullname($user2),
+                    'You do not have the ' . $role::get_display_name() . ' role for this user',
                     $exception->getMessage()
                 );
             }

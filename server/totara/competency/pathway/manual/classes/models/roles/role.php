@@ -23,9 +23,9 @@
 
 namespace pathway_manual\models\roles;
 
-use core\entities\user;
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use totara_competency\helpers\capability_helper;
 
 /**
  * A role that is available for a competency.
@@ -127,11 +127,15 @@ abstract class role {
      */
     final public static function require_for_user(int $subject_user): void {
         if (!static::has_for_user($subject_user)) {
+            $return_url = capability_helper::can_view_profile($subject_user) ?
+                new \moodle_url('/totara/competency/profile', ['user_id' => $subject_user])
+                : new \moodle_url('/');
+
             throw new \moodle_exception(
                 'error_user_lacks_role_for_user',
                 'pathway_manual',
-                new \moodle_url('/totara/competency/profile', ['user_id' => $subject_user]),
-                ['user' => (new user($subject_user))->fullname, 'role' => strtolower(static::get_display_name())]
+                $return_url,
+                static::get_display_name()
             );
         }
     }
