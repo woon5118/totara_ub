@@ -62,6 +62,11 @@ final class article extends resource_item implements time_viewable {
     public const IMAGE_AREA = 'image';
 
     /**
+     * @var string
+     */
+    public const REACTION_AREA = 'media';
+
+    /**
      * @var article_entity
      */
     private $article;

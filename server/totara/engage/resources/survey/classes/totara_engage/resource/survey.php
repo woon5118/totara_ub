@@ -45,6 +45,11 @@ use engage_survey\result\question as question_stat;
  */
 final class survey extends resource_item {
     /**
+     * @var string
+     */
+    public const REACTION_AREA = 'media';
+
+    /**
      * @var survey_entity
      */
     private $survey;

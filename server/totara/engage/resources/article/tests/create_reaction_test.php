@@ -144,4 +144,49 @@ class engage_article_create_reaction_testcase extends advanced_testcase {
         );
     }
 
+    /**
+     * @return void
+     */
+    public function test_create_reaction_with_area(): void {
+        $gen = $this->getDataGenerator();
+
+        /** @var engage_article_generator $articlegen */
+        $articlegen = $gen->get_plugin_generator('engage_article');
+
+        // Create user.
+        $user1 = $gen->create_user();
+        $user2 = $gen->create_user();
+
+        $this->setUser($user2);
+        $user2_article = $articlegen->create_article([
+            'access' => access::PUBLIC
+        ]);
+
+        $reaction = reaction_helper::create_reaction(
+            $user2_article->get_id(),
+            $user2_article->get_resourcetype(),
+            'media',
+            $user2->id
+        );
+
+        $this->assertInstanceOf(\totara_reaction\reaction::class, $reaction);
+
+        // Create article.
+        $this->setUser($user1);
+        $user1_article = $articlegen->create_article([
+            'access' => access::PUBLIC
+        ]);
+
+        $this->expectException(
+            'coding_exception',
+            "Coding error detected, it must be fixed by a programmer: Cannot create the reaction for instance '{$user1_article->get_id()}' within area 'meeeedddia'"
+        );
+
+        reaction_helper::create_reaction(
+            $user1_article->get_id(),
+            $user1_article->get_resourcetype(),
+            'meeeedddia',
+            $user1->id
+        );
+    }
 }

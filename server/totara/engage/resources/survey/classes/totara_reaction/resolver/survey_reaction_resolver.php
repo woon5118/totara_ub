@@ -41,6 +41,10 @@ final class survey_reaction_resolver extends base_resolver {
      * @return bool
      */
     public function can_create_reaction(int $resourceid, int $userid, string $area): bool {
+        if (survey::REACTION_AREA !== $area) {
+            return false;
+        }
+
         $survey = survey::from_resource_id($resourceid);
         return access_manager::can_access($survey, $userid);
     }

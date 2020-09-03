@@ -145,4 +145,51 @@ class engage_survey_create_reaction_testcase extends advanced_testcase {
         );
     }
 
+    /**
+     * @return void
+     */
+    public function test_create_reaction_with_area(): void {
+        $gen = $this->getDataGenerator();
+
+        /** @var engage_survey_generator $surveygen */
+        $surveygen = $gen->get_plugin_generator('engage_survey');
+
+
+        // Create user.
+        $user1 = $gen->create_user();
+        $user2 = $gen->create_user();
+
+        // Create survey.
+        $this->setUser($user2);
+        $user2_survey = $surveygen->create_survey(null, [], answer_type::MULTI_CHOICE, [
+            'access' => access::PUBLIC
+        ]);
+
+        $reaction = reaction_helper::create_reaction(
+            $user2_survey->get_id(),
+            $user2_survey->get_resourcetype(),
+            'media',
+            $user2->id
+        );
+
+        $this->assertInstanceOf(\totara_reaction\reaction::class, $reaction);
+
+        $this->setUser($user1);
+        $user1_survey = $surveygen->create_survey(null, [], answer_type::MULTI_CHOICE, [
+            'access' => access::PUBLIC
+        ]);
+
+        $this->expectException(
+            'coding_exception',
+            "Coding error detected, it must be fixed by a programmer: Cannot create the reaction for instance '{$user1_survey->get_id()}' within area 'meeeedddia'"
+        );
+
+        reaction_helper::create_reaction(
+            $user1_survey->get_id(),
+            $user1_survey->get_resourcetype(),
+            'meeeedddia',
+            $user1->id
+        );
+    }
+
 }
