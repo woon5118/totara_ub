@@ -36,10 +36,6 @@ if ($ADMIN->fulltree) {
         new lang_string('yes'),
     );
 
-    $settings->add(new admin_setting_configselect('auth_manual/expiration',
-        new lang_string('expiration', 'auth_manual'),
-        new lang_string('expiration_desc', 'auth_manual'), 0, $expirationoptions));
-
     $expirationtimeoptions = array(
         '0' => new lang_string('unlimited'), // Totara: do not force password changes by default here.
         '30' => new lang_string('numdays', '', 30),

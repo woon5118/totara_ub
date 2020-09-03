@@ -1,0 +1,2 @@
+expiration,auth_manual
+expiration_desc,auth_manual

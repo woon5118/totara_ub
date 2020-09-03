@@ -46,6 +46,12 @@ function xmldb_auth_manual_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017020700, 'auth', 'manual');
     }
 
+    if ($oldversion < 2017111300.01) {
+        // Remove unused setting, we disable expiration via 'Unlimited' expirationtime option instead.
+        unset_config('expiration', 'auth_manual');
+        upgrade_plugin_savepoint(true, 2017111300.01, 'auth', 'manual');
+    }
+
     // Automatically generated Moodle v3.3.0 release upgrade line.
     // Put any upgrade step following this.
 

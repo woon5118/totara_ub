@@ -46,5 +46,11 @@ function xmldb_auth_approved_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019060400, 'auth', 'approved');
     }
 
+    if ($oldversion < 2020090101) {
+        // Remove unused setting, we disable expiration via 'Unlimited' expirationtime option instead.
+        unset_config('expiration', 'auth_approved');
+        upgrade_plugin_savepoint(true, 2020090101, 'auth', 'approved');
+    }
+
     return true;
 }

@@ -146,11 +146,6 @@ if ($ADMIN->fulltree) {
         'auth_approved/expiration_heading',
         new lang_string('passwdexpire_settings', 'auth_manual'), ''));
 
-    $settingspage->add(new admin_setting_configcheckbox(
-        'auth_approved/expiration',
-        new lang_string('expiration', 'auth_manual'),
-        new lang_string('expiration_desc', 'auth_manual'), 0));
-
     $options = array(
         '0' => new lang_string('unlimited'),
         '30' => new lang_string('numdays', '', 30),
@@ -164,7 +159,7 @@ if ($ADMIN->fulltree) {
     $settingspage->add(new admin_setting_configselect(
         'auth_approved/expirationtime',
         new lang_string('passwdexpiretime', 'auth_manual'),
-        new lang_string('passwdexpiretime_desc', 'auth_manual'), 30, $options));
+        new lang_string('passwdexpiretime_desc', 'auth_manual'), 0, $options)); // Default to disabled expiration.
 
     $options = array(
         '0' => new lang_string('never'),
