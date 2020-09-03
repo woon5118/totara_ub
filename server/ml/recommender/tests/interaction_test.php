@@ -40,9 +40,12 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
 
         // Need a playlist
         $playlist = playlist::create(
-            'Rated Playlist'
+            'Rated Playlist',
+            access::PUBLIC
         );
 
+        $user2 = $this->getDataGenerator()->create_user();
+        $this->setUser($user2);
         advanced_feature::enable('ml_recommender');
         $ec = execution_context::create('ajax', 'totara_playlist_add_rating');
         $parameters = [
@@ -65,17 +68,22 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
             'area' => 'playlist',
             'interaction' => 'rate',
             'item_id' => $playlist->get_id(),
-            'user_id' => $user->id,
+            'user_id' => $user2->id,
         ]);
 
         $this->assertNotFalse($record);
         $this->assertEquals($playlist->get_id(), $record->item_id);
 
+        $this->setUser($user);
         // Disable the feature
         $playlist = playlist::create(
-            'Rated Playlist 2'
+            'Rated Playlist 2',
+            access::PUBLIC
         );
+
         advanced_feature::disable('ml_recommender');
+
+        $this->setUser($user2);
         $ec = execution_context::create('ajax', 'totara_playlist_add_rating');
         $parameters = [
             'playlistid' => $playlist->get_id(),
@@ -97,7 +105,7 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
             'area' => 'playlist',
             'interaction' => 'rate',
             'item_id' => $playlist->get_id(),
-            'user_id' => $user->id,
+            'user_id' => $user2->id,
         ]);
 
         $this->assertFalse($record);

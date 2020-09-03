@@ -55,12 +55,17 @@ use totara_topic\topic_helper;
  */
 final class playlist implements accessible, shareable {
     /**
-     * @var string
+     * Playlist image file area
      */
     public const IMAGE_AREA = 'image';
 
     /**
-     * @var string
+     * Maximum rating allowed
+     */
+    public const RATING_MAX = 5;
+
+    /**
+     * Area used for rating
      */
     public const RATING_AREA = 'playlist';
 

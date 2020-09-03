@@ -27,6 +27,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
+use totara_engage\access\access_manager;
 use totara_engage\event\rating_created;
 use totara_engage\rating\rating_manager;
 use totara_playlist\playlist;
@@ -51,13 +52,26 @@ final class add_rating implements mutation_resolver, has_middleware {
             $ec->set_relevant_context(\context_user::instance($USER->id));
         }
 
+        // Only playlist is allowed to rate at this stage
+        if ($args['ratingarea'] != playlist::RATING_AREA) {
+            throw new \coding_exception('Wrong area used for rating');
+        }
+
+        if ($args['rating'] < 0 || $args['rating'] > playlist::RATING_MAX) {
+            throw new \coding_exception('Rating is out of boundaries');
+        }
+
         $transaction = $DB->start_delegated_transaction();
 
         $playlist = playlist::from_id($args['playlistid']);
-        $rating = rating_manager::instance($playlist->get_id(), 'totara_playlist', $args['ratingarea']);
 
-        if (!$rating->can_rate($playlist->get_userid())) {
-            throw new \coding_exception("Current user with id '{$playlist->get_userid()}' can not rate the playlist");
+        if (!access_manager::can_access($playlist, $USER->id)) {
+            throw new \coding_exception('Access denied');
+        }
+
+        $rating = rating_manager::instance($playlist->get_id(), 'totara_playlist', $args['ratingarea']);
+        if (!$rating->can_rate($USER->id, $playlist->get_userid())) {
+            throw new \coding_exception("User can not rate this playlist");
         }
 
         $rating_record = $rating->add($args['rating'], $USER->id);
