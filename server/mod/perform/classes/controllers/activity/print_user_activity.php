@@ -72,25 +72,31 @@ class print_user_activity extends perform_controller {
 
         $props = [
             'current-user-id' => user::logged_in()->id,
+            'print' => true,
         ];
         $url_args = [];
 
-        $props['subject-instance-id'] = (int) $this->participant_instance->subject_instance_id;
-        $props['participant-instance-id'] = (int) $this->participant_instance->id;
-        $props['name'] = (string) $this->participant_instance->subject_instance->activity->name;
+        if ($this->participant_instance->participant->id == user::logged_in()->id) {
+            $props['subject-instance-id'] = (int)$this->participant_instance->subject_instance_id;
+            $props['participant-instance-id'] = (int)$this->participant_instance->id;
+            $props['name'] = (string)$this->participant_instance->subject_instance->activity->name;
+
+            if ($participant_section_id > 0) {
+                $props['participant-section-id'] = (int)$participant_section_id;
+            }
+        }
 
         if ($participant_section_id > 0) {
-            $props['participant-section-id'] = (int) $participant_section_id;
             $url_args['participant_section_id'] = $participant_section_id;
         } else if ($participant_instance_id > 0) {
             $url_args['participant_instance_id'] = $participant_instance_id;
         }
-        $props['print'] = true;
+
         $url = self::get_url($url_args);
         $this->set_url($url);
 
         return self::create_tui_view('mod_perform/pages/UserActivity', $props)
-            ->set_title($props['name'] . ' ' . get_string('user_activities_page_print', 'mod_perform'));
+            ->set_title(($props['name'] ?? '') . ' ' . get_string('user_activities_page_print', 'mod_perform'));
     }
 
     /**

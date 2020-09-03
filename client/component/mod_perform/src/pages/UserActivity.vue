@@ -95,8 +95,9 @@ export default {
       default: '',
     },
     print: {
-      required: true,
+      required: false,
       type: Boolean,
+      default: false
     },
   },
 

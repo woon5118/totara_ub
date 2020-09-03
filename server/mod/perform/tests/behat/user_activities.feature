@@ -164,3 +164,14 @@ Feature: Viewing and responding to perform activities
     When I click on "Continue" "link"
     Then I should see "Manage participation: “John is participating subject”"
 
+  Scenario: I can't view activity detail where I am not a participant
+    Given I log in as "john"
+    And I navigate to the "view" user activity page for performance activity "John is not participating" where "harry" is the subject and "david" is the participant
+    Then I should see "The requested performance activity could not be found"
+    # Need this to get log out button again
+    And I am on homepage
+    And I log out
+
+    When I log in as "admin"
+    And I navigate to the "view" user activity page for performance activity "John is not participating" where "harry" is the subject and "david" is the participant
+    Then I should see "The requested performance activity could not be found"

@@ -152,3 +152,15 @@ Feature: Viewing user activities list with view-only access
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
     And I should see "Manager (Not yet started)"
     And I should see "Appraiser (View only)"
+
+  Scenario: I can't print activity detail where I am not a participant
+    Given I log in as "david"
+    And I navigate to the "print" user activity page for performance activity "Single section activity" where "john" is the subject and "manager-appraiser" is the participant
+    Then I should see "The requested performance activity could not be found"
+    # Need this to get log out button again
+    And I am on homepage
+    And I log out
+
+    When I log in as "admin"
+    And I navigate to the "print" user activity page for performance activity "Single section activity" where "john" is the subject and "manager-appraiser" is the participant
+    Then I should see "The requested performance activity could not be found"

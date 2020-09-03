@@ -31,12 +31,14 @@ use core\orm\entity\entity;
 use mod_perform\controllers\activity\edit_activity;
 use mod_perform\controllers\activity\manage_activities;
 use mod_perform\controllers\activity\manage_participation;
+use mod_perform\controllers\activity\print_user_activity;
 use mod_perform\controllers\activity\user_activities;
 use mod_perform\controllers\activity\view_external_participant_activity;
 use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\controllers\reporting\performance\view_only_user_activity;
 use mod_perform\entities\activity\activity;
 use mod_perform\entities\activity\external_participant;
+use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\entities\activity\subject_instance;
@@ -1387,6 +1389,28 @@ class behat_mod_perform extends behat_base {
         $this->navigate_to_page($url);
     }
 
+    /**
+     * @When /^I navigate to the "(view|print)" user activity page for performance activity "([^"]*)" where "([^"]*)" is the subject and "([^"]*)" is the participant$/
+     * @param string $page_type
+     * @param string $activity_name
+     * @param string $subject_user_name
+     * @param string $participant_user_name
+     * @throws Exception
+     */
+    public function i_navigate_to_the_user_activity_page_for_activity_subject_participant(
+        string $page_type,
+        string $activity_name,
+        string $subject_user_name,
+        string $participant_user_name
+    ): void {
+        $participant_instance = $this->get_participant_instance_from_activity_subject_participant(
+            $activity_name, $subject_user_name, $participant_user_name
+        );
+
+        $controller_class = $page_type === 'view' ? view_user_activity::class : print_user_activity::class;
+        $this->navigate_to_page($controller_class::get_url(['participant_instance_id' => $participant_instance->id]));
+    }
+
     private function get_user_by_username(string $user_name): entity {
         return user::repository()
             ->where('username', $user_name)
@@ -1403,6 +1427,26 @@ class behat_mod_perform extends behat_base {
             ->join([user::TABLE, 'u'], 'u.id', 'si.subject_user_id')
             ->where('u.username', $subject_user_name)
             ->one(true);
+    }
+
+    private function get_participant_instance_from_activity_subject_participant(
+        string $activity_name,
+        string $subject_user_name,
+        string $participant_user_name
+    ): entity {
+        return participant_instance::repository()
+            ->as('pi')
+            ->join([user::TABLE, 'pu'], 'pu.id', 'pi.participant_id')
+            ->join([subject_instance::TABLE, 'si'], 'si.id', 'pi.subject_instance_id')
+            ->join([track_user_assignment::TABLE, 'tua'], 'tua.id', 'si.track_user_assignment_id')
+            ->join([track::TABLE, 't'], 't.id', 'tua.track_id')
+            ->join([activity::TABLE, 'a'], 'a.id', 't.activity_id')
+            ->join([user::TABLE, 'su'], 'su.id', 'si.subject_user_id')
+            ->where('a.name', $activity_name)
+            ->where('su.username', $subject_user_name)
+            ->where('pu.username', $participant_user_name)
+            ->order_by('id')
+            ->first(true);
     }
 
 }

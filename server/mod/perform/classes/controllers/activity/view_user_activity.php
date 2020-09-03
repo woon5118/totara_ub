@@ -63,7 +63,6 @@ class view_user_activity extends perform_controller {
 
     /**
      * @return tui_view
-     * @throws invalid_parameter_exception
      */
     public function action(): tui_view {
         $participant_instance_id = $this->get_participant_instance_id();
@@ -74,14 +73,16 @@ class view_user_activity extends perform_controller {
         ];
         $url_args = [];
 
-        $props['subject-instance-id'] = (int) $this->participant_instance->subject_instance_id;
-        $props['participant-instance-id'] = (int) $this->participant_instance->id;
+        if ($this->participant_instance->participant->id == user::logged_in()->id) {
+            $props['subject-instance-id'] = (int)$this->participant_instance->subject_instance_id;
+            $props['participant-instance-id'] = (int)$this->participant_instance->id;
 
-        if ($participant_section_id > 0) {
-            $props['participant-section-id'] = (int) $participant_section_id;
-            $url_args['participant_section_id'] = $participant_section_id;
-        } else if ($participant_instance_id > 0) {
-            $url_args['participant_instance_id'] = $participant_instance_id;
+            if ($participant_section_id > 0) {
+                $props['participant-section-id'] = (int)$participant_section_id;
+                $url_args['participant_section_id'] = $participant_section_id;
+            } else if ($participant_instance_id > 0) {
+                $url_args['participant_instance_id'] = $participant_instance_id;
+            }
         }
 
         $url = self::get_url($url_args);
