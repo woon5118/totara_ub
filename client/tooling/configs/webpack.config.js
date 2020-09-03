@@ -23,17 +23,13 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
-const scanEntry = require('../webpack/scan_entry');
+const scanTuiJson = require('../webpack/scan_tui_json');
 const { rootDir, arrayUnique } = require('../lib/common');
 const tuiExternals = require('../webpack/tui_externals');
 const TuiAliasPlugin = require('../webpack/TuiAliasPlugin');
 const babelConfigs = require('./babel');
 const globSync = require('tiny-glob/sync');
 const cssVarExtract = require('./webpack/css_var_extract');
-
-let entryCache = null;
-const getEntry = () =>
-  entryCache ? entryCache : (entryCache = scanEntry({ rootDir }));
 
 const isCoreBundleChunk = function(x) {
   return x.name === 'tui' || x.name.startsWith('tui.');
@@ -50,14 +46,6 @@ const separateNameAndSuffix = function(name) {
     name: name,
     suffix: suffix,
   };
-};
-
-const getTuiDirs = () => {
-  let entry = getEntry();
-  const tuiDirs = arrayUnique(
-    ...Object.values(entry).map(x => (Array.isArray(x) ? x : [x]))
-  ).map(x => path.dirname(x));
-  return tuiDirs;
 };
 
 /**
@@ -77,23 +65,22 @@ const getTuiDirs = () => {
  *     If present, appended to the name of output files with a dot.
  */
 function createConfig({
-  name,
+  variant,
   mode,
   watch,
   define,
   analyze,
   primary,
   bundleTag,
+  tuiComponent,
+  tuiJson,
 }) {
-  let entry = getEntry();
-
-  // update output filenames base on config options
-  entry = Object.entries(entry).reduce((acc, [key, val]) => {
-    const tagSuffix = bundleTag ? '.' + bundleTag : '';
-    const modeSuffix = mode == 'production' ? '' : '.' + mode;
-    acc[key + tagSuffix + modeSuffix] = val;
-    return acc;
-  }, {});
+  // update output filenames based on config options
+  const tagSuffix = bundleTag ? '.' + bundleTag : '';
+  const modeSuffix = mode == 'production' ? '' : '.' + mode;
+  const entry = {
+    [tuiComponent + tagSuffix + modeSuffix]: tuiJson,
+  };
 
   const plugins = [
     new VueLoaderPlugin(),
@@ -121,7 +108,7 @@ function createConfig({
         test: /\.(s?css)($|\?)/i,
       }),
     mode == 'production' && new webpack.HashedModuleIdsPlugin(),
-    analyze == name &&
+    analyze == tuiComponent + '_' + variant &&
       new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)(),
   ].filter(Boolean);
 
@@ -138,15 +125,25 @@ function createConfig({
       test: /\.js$/,
       exclude: /node_modules/,
       use: [
-        babelConfigs[name] && {
+        babelConfigs[variant] && {
           loader: 'babel-loader',
-          options: babelConfigs[name],
+          options: babelConfigs[variant],
         },
       ].filter(Boolean),
     },
     {
       test: /\.vue$/,
-      use: [require.resolve('../webpack/tui_vue_loader'), 'vue-loader'],
+      use: [
+        require.resolve('../webpack/tui_vue_loader'),
+        {
+          loader: 'vue-loader',
+          options: {
+            productionMode: mode === 'production',
+            // having prettify enabled increases build time around 40%
+            prettify: false,
+          },
+        },
+      ],
     },
     {
       test: /\.s?css$/,
@@ -221,7 +218,7 @@ function createConfig({
   };
 
   return {
-    name,
+    name: tuiComponent + '_' + variant,
     entry,
     mode,
     watch,
@@ -239,8 +236,8 @@ function createConfig({
       path: path.resolve(rootDir, 'client/component'),
       filename: pathData => {
         let bits = separateNameAndSuffix(pathData.chunk.name);
-        name = bits.name + '/build/tui_bundle' + bits.suffix + '.js';
-        return name;
+        variant = bits.name + '/build/tui_bundle' + bits.suffix + '.js';
+        return variant;
       },
       chunkFilename: '[name].js',
     },
@@ -275,7 +272,7 @@ function createConfig({
  * @return {object}
  */
 function modernConfig(opts) {
-  return createConfig({ ...opts, name: 'modern', primary: true });
+  return createConfig({ ...opts, variant: 'modern', primary: true });
 }
 
 /**
@@ -287,7 +284,7 @@ function modernConfig(opts) {
 function legacyConfig(opts) {
   return createConfig({
     ...opts,
-    name: 'legacy',
+    variant: 'legacy',
     bundleTag: 'legacy',
     define: { ...opts.define, 'process.env.LEGACY_BUNDLE': 'true' },
   });
@@ -299,7 +296,7 @@ function legacyConfig(opts) {
  * @param {object} opts
  * @return {object}
  */
-function scssToScssConfig({ mode, watch }) {
+function scssToScssConfig({ mode, watch }, { getTuiDirs }) {
   const tuiDirs = getTuiDirs();
 
   const scssEntry = tuiDirs.reduce((acc, dir) => {
@@ -311,7 +308,7 @@ function scssToScssConfig({ mode, watch }) {
         }
         const out = path.join(
           dir.replace(
-            /^\.[\/\\]client[\/\\]component[\/\\]([^\/\\]+)[\/\\]src/,
+            /^\.[/\\]client[/\\]component[/\\]([^/\\]+)[/\\]src/,
             './client/component/$1/build'
           ),
           'global_styles',
@@ -381,11 +378,52 @@ module.exports = function(opts) {
   if (!opts.mode) {
     opts = { ...opts, mode: 'production' };
   }
+
+  let configOpts = {
+    mode: opts.mode,
+    analyze: opts.analyze,
+  };
+
+  let entry = scanTuiJson({ rootDir });
+
+  const getTuiDirs = () => {
+    const tuiDirs = arrayUnique(
+      ...Object.values(entry).map(x => (Array.isArray(x) ? x : [x]))
+    ).map(x => path.dirname(x));
+    return tuiDirs;
+  };
+
   const configs = [
-    modernConfig(opts),
-    legacyConfig(opts),
-    scssToScssConfig(opts),
-    cssVarExtract(opts, { getTuiDirs }),
+    scssToScssConfig(configOpts, { getTuiDirs }),
+    cssVarExtract(configOpts, { getTuiDirs }),
   ];
+
+  Object.keys(entry).forEach(tuiComponent => {
+    if (opts.tuiComponents && !opts.tuiComponents.includes(tuiComponent)) {
+      return;
+    }
+    if (opts.vendor) {
+      const tuiJson = JSON.parse(fs.readFileSync(entry[tuiComponent]));
+      if (tuiJson.vendor != opts.vendor) {
+        return;
+      }
+    }
+    configs.push(
+      modernConfig({
+        ...configOpts,
+        tuiComponent,
+        tuiJson: entry[tuiComponent],
+      })
+    );
+    if (opts.legacy !== false) {
+      configs.push(
+        legacyConfig({
+          ...configOpts,
+          tuiComponent,
+          tuiJson: entry[tuiComponent],
+        })
+      );
+    }
+  });
   return configs.filter(Boolean);
 };

@@ -13,7 +13,7 @@
  * Please contact [licensing@totaralearning.com] for more information.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @module totara_core
+ * @module tui
  */
 
 const path = require('path');
@@ -23,7 +23,7 @@ const globSync = require('tiny-glob/sync');
 /**
  * Scan for tui.json and return the entry points for Webpack
  */
-module.exports = function scanEntry({ rootDir }) {
+module.exports = function scanTuiJson({ rootDir }) {
   // scan for tui.json files
   // NOTE: for some reason, double asterisk wildcard (**) is required to be able to run on Windows
   const tuiConfigFiles = globSync('client/component/**/src/tui.json', { cwd: rootDir });
