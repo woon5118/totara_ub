@@ -102,6 +102,7 @@ class performance_testing extends App {
             ->create_organisations()
             ->create_positions()
             ->create_audiences()
+            ->add_audience_members()
             ->create_scales()
             ->create_competencies()
         //->create_organisation_assignments()
@@ -109,6 +110,8 @@ class performance_testing extends App {
         // ->create_audience_assignments()
             ->create_assignments()
             ->create_courses()
+            // Enrolling users has a huge performance impact
+            // only activate if absolutely necessary
             // ->enrol_users()
             // ->create_course_completions()
             ->create_course_completions_basic()
@@ -151,44 +154,12 @@ class performance_testing extends App {
         if (!$this->assign_groups) {
             $this->create_user_assignments();
         } else {
-            $this->add_audience_members()
-                ->create_audience_assignments();
+            // $this->add_audience_members()
+            //     ->create_audience_assignments();
+
+            $this->create_audience_assignments();
         }
 
-        return $this;
-    }
-
-    public function add_audience_members() {
-        $this->output('Adding audience members');
-
-        if (empty($this->users)) {
-            throw new \Exception('You must create users first');
-        }
-
-        builder::get_db()->transaction(function () {
-            $count = 0;
-
-            $current = reset($this->users);
-            $audience = audience::new()->save_and_return();
-            $this->audiences[] = $audience;
-
-            $members = [];
-            while ($current) {
-                if ($count > 1000) {
-                    $count = 0;
-                    $audience = audience::new()->save_and_return();
-                    $this->audiences[] = $audience;
-                }
-
-                $members[] = $audience->add_member($current);
-
-                $count++;
-                $current = next($this->users);
-            }
-
-            builder::get_db()->insert_records_via_batch('cohort_members', $members);
-
-        });
         return $this;
     }
 
@@ -247,6 +218,42 @@ class performance_testing extends App {
             for ($c = 1; $c <= $size; $c++) {
                 $this->audiences[] = audience::new()->save_and_return();
             }
+        });
+
+        return $this;
+    }
+
+    public function add_audience_members() {
+        $this->output('Adding audience members...');
+
+        if (empty($this->users)) {
+            throw new \Exception('You must create users first');
+        }
+
+        if (empty($this->audiences)) {
+            throw new \Exception('You must create audiences first');
+        }
+
+        builder::get_db()->transaction(function () {
+            $user_per_audience = $this->get_item_size('users_per_audience');
+
+            $users = $this->users;
+
+            $audiences = $this->audiences;
+            // shuffle($audiences);
+
+            $members = [];
+            /** @var audience[] $audiences */
+            foreach ($audiences as $audience) {
+                shuffle($users);
+
+                $users = array_slice($users, 0, $user_per_audience);
+                foreach ($users as $user) {
+                    $members[] = $audience->add_member($user);
+                }
+            }
+
+            builder::get_db()->insert_records_via_batch('cohort_members', $members);
         });
 
         return $this;
@@ -631,6 +638,12 @@ class performance_testing extends App {
     }
 
     public function create_job_assignments() {
+        $this->output('Creating job assignments...');
+        $size = $this->get_item_size('job_assignments');
+
+        if (empty($this->users)) {
+            throw new \coding_exception("Cannot create workspace member when users are empty");
+        }
 
         return $this;
     }
@@ -825,14 +838,14 @@ class performance_testing extends App {
     //['xs', 's', 'm', 'l', 'xl', 'xxl', 'goliath'
     public function get_xs_size() {
         return [
-            'users' => 10,
+            'users' => 2000,
             'courses' => 10,
+            'audiences' => 50,
+            'users_per_audience' => 1000,
             'workspaces' => 1,
             'workspace_members' => 2,
             'workspace_discussions' => 1,
             'workspace_discussion_comments' => 1,
-            'workspace_discussion_replies' => 1,
-            'audiences' => 10,
             'organisations' => [3, 3],
             'positions' => [3, 3],
             'competencies' => [3, 3],
@@ -842,19 +855,20 @@ class performance_testing extends App {
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,
             'completions' => 100, // <-- Note this is a percentage
+            'workspace_discussion_replies' => 1,
         ];
     }
 
     public function get_s_size() {
         return [
-            'users' => 100,
+            'users' => 7000,
             'courses' => 100,
+            'audiences' => 80,
+            'users_per_audience' => 2500,
             'workspaces' => 10,
             'workspace_members' => 5,
             'workspace_discussions' => 5,
             'workspace_discussion_comments' => 3,
-            'workspace_discussion_replies' => 2,
-            'audiences' => 10,
             'organisations' => [4, 4],
             'positions' => [4, 4],
             'competencies' => [4, 4],
@@ -864,19 +878,21 @@ class performance_testing extends App {
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,
             'completions' => 75, // <-- Note this is a percentage
+            'workspace_discussion_replies' => 2,
         ];
     }
 
     public function get_m_size() {
         return [
-            'users' => 1000,
+            'users' => 15000,
             'courses' => 100,
+            'audiences' => 50,
+            'users_per_audience' => 5000,
             'workspaces' => 100,
             'workspace_members' => 100,
             'workspace_discussions' => 100,
             'workspace_discussion_comments' => 100,
             'workspace_discussion_replies' => 100,
-            'audiences' => 100,
             'organisations' => [4, 4],
             'positions' => [4, 4],
             'competencies' => [4, 4],
@@ -891,9 +907,10 @@ class performance_testing extends App {
 
     public function get_l_size() {
         return [
-            'users' => 1000,
+            'users' => 35000,
             'courses' => 100,
-            'audiences' => 100,
+            'audiences' => 80,
+            'users_per_audience' => 10000,
             'workspaces' => 100,
             'workspace_members' => 250,
             'workspace_discussions' => 250,
@@ -913,14 +930,15 @@ class performance_testing extends App {
 
     public function get_xl_size() {
         return [
-            'users' => 1000,
+            'users' => 75000,
             'courses' => 1000,
+            'audiences' => 100,
+            'users_per_audience' => 25000,
             'workspaces' => 1000,
             'workspace_members' => 500,
             'workspace_discussions' => 750,
             'workspace_discussion_comments' => 750,
             'workspace_discussion_replies' => 750,
-            'audiences' => 100,
             'organisations' => [5, 5],
             'positions' => [5, 5],
             'competencies' => [5, 5],
@@ -935,14 +953,14 @@ class performance_testing extends App {
 
     public function get_xxl_size() {
         return [
-            'users' => 10000,
+            'users' => 150000,
             'courses' => 1000,
+            'audiences' => 120,
+            'users_per_audience' => 50000,
             'workspaces' => 1000,
             'workspace_members' => 1000,
             'workspace_discussions' => 1000,
             'workspace_discussion_comments' => 1000,
-            'workspace_discussion_replies' => 1000,
-            'audiences' => 100,
             'organisations' => [5, 5],
             'positions' => [5, 5],
             'competencies' => [5, 5],
@@ -952,19 +970,20 @@ class performance_testing extends App {
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,
             'completions' => 80, // <-- Note this is a percentage
+            'workspace_discussion_replies' => 1000,
         ];
     }
 
     public function get_goliath_size() {
         return [
-            'users' => 100000,
+            'users' => 300000,
             'courses' => 1000,
+            'audiences' => 140,
+            'users_per_audience' => 100000,
             'workspaces' => 1000,
             'workspace_members' => 1000,
             'workspace_discussions' => 1000,
             'workspace_discussion_comments' => 1000,
-            'workspace_discussion_replies' => 1000,
-            'audiences' => 100,
             'organisations' => [5, 5],
             'positions' => [5, 5],
             'competencies' => [6, 5],
@@ -974,6 +993,7 @@ class performance_testing extends App {
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,
             'completions' => 80, // <-- Note this is a percentage
+            'workspace_discussion_replies' => 1000,
         ];
     }
 }
