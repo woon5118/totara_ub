@@ -70,7 +70,9 @@ module.exports = function(jsonSource, map) {
 };
 `;
 
-  if (fs.existsSync(path.resolve(self.context, './global_styles/static.scss'))) {
+  if (
+    fs.existsSync(path.resolve(self.context, './global_styles/static.scss'))
+  ) {
     source += 'require("./global_styles/static.scss");\n';
   }
 
@@ -110,10 +112,7 @@ module.exports = function(jsonSource, map) {
 
   // would be better to derive from entry filename, but i can't find a way to
   // get that (probably by design as a module could be used by multiple entries)
-  this.emitFile(
-    path.join(config.component, 'build/dependencies.json'),
-    genDependenciesJson(config)
-  );
+  this.emitFile('dependencies.json', genDependenciesJson(config));
 
   return this.callback(null, source, map);
 };

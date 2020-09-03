@@ -55,6 +55,12 @@ const runWebpack = util.promisify(function runWebpack(args, cb) {
     tuiComponents,
   });
 
+  if (configs.length == 0) {
+    console.error(chalk.red('no matching builds'));
+    cb(null);
+    return;
+  }
+
   // inject progress reporter for each build
   const pluginState = new ProgressReportPluginState({ key: args.mode });
   configs.forEach(config => {

@@ -393,6 +393,9 @@ const tui = {
   },
 };
 
+// eslint-disable-next-line tui/no-tui-internal
+tui.customBundle = tui._bundle;
+
 /**
  * Internal mount function.
  *

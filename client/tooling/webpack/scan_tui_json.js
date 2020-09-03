@@ -23,10 +23,12 @@ const globSync = require('tiny-glob/sync');
 /**
  * Scan for tui.json and return the entry points for Webpack
  */
-module.exports = function scanTuiJson({ rootDir }) {
+module.exports = function scanTuiJson({ rootDir, components, vendor }) {
   // scan for tui.json files
   // NOTE: for some reason, double asterisk wildcard (**) is required to be able to run on Windows
-  const tuiConfigFiles = globSync('client/component/**/src/tui.json', { cwd: rootDir });
+  const tuiConfigFiles = globSync('client/component/**/src/tui.json', {
+    cwd: rootDir,
+  });
   let entryData = [];
 
   // parse config file and determine output location
@@ -42,9 +44,17 @@ module.exports = function scanTuiJson({ rootDir }) {
       );
     }
 
-    const outFile = config.component;
+    // filter
+    if (components && !components.includes(config.component)) {
+      return;
+    }
+    if (vendor) {
+      if (config.vendor != vendor) {
+        return;
+      }
+    }
 
-    entryData[outFile] = './' + configFile;
+    entryData[config.component] = './' + configFile;
   });
 
   return entryData;
