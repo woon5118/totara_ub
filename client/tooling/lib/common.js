@@ -17,7 +17,11 @@
  */
 
 const path = require('path');
+const findCacheDir = require('find-cache-dir');
+const fs = require('fs');
+const os = require('os');
 const minimatch = require('minimatch');
+const crypto = require('crypto');
 const execFileSync = require('child_process').execFileSync;
 
 /**
@@ -125,6 +129,64 @@ function escapeRegExp(s) {
   return s.replace(/[\\^$.*+?()[\]{}|-]/g, '\\$&');
 }
 
+/**
+ * Get a SHA-256 hex digest of the provided string.
+ *
+ * @param {string} algorithm e.g. sha256
+ * @param {string} str
+ * @param {string} [encoding=hex] hex by default
+ */
+function hash(algorithm, str, encoding = 'hex') {
+  const hash = crypto.createHash(algorithm);
+  hash.update(str);
+  return hash.digest(encoding);
+}
+
+let installHash = null;
+
+/**
+ * Get hash for totara directory.
+ *
+ * @returns {string}
+ */
+function getInstallHash() {
+  if (installHash) {
+    return installHash;
+  }
+  installHash = hash('sha256', rootDir);
+  return installHash;
+}
+
+let installTemp = null;
+
+/**
+ * Get the path to a directory that can be used to store cached data.
+ *
+ * @returns {string}
+ */
+function getCacheDir() {
+  if (installTemp) {
+    return installTemp;
+  }
+
+  const cacheDir = findCacheDir({ name: 'tui', cwd: rootDir, create: true });
+  if (cacheDir) {
+    installTemp = cacheDir;
+    return installTemp;
+  }
+
+  const tuiTemp = path.join(os.tmpdir(), 'tui_cache');
+  if (!fs.existsSync(tuiTemp)) {
+    fs.mkdirSync(tuiTemp);
+  }
+  const installTempPath = path.join(tuiTemp, getInstallHash());
+  if (!fs.existsSync(installTempPath)) {
+    fs.mkdirSync(installTempPath);
+  }
+  installTemp = installTempPath;
+  return installTemp;
+}
+
 module.exports = {
   rootDir,
   clientDir,
@@ -132,4 +194,6 @@ module.exports = {
   filterByGlobs,
   arrayUnique,
   escapeRegExp,
+  hash,
+  getCacheDir,
 };

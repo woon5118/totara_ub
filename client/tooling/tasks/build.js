@@ -20,6 +20,8 @@ const util = require('util');
 const webpack = require('webpack');
 const chalk = require('chalk').stderr;
 const createConfig = require('../configs/webpack.config');
+const ProgressReportPlugin = require('../webpack/progress/ProgressReportPlugin');
+const ProgressReportPluginState = require('../webpack/progress/ProgressReportPluginState');
 
 const args = require('yargs')
   .usage('Usage: $0 [options] [components]')
@@ -51,6 +53,13 @@ const runWebpack = util.promisify(function runWebpack(args, cb) {
     legacy: args.legacy,
     vendor: args.vendor,
     tuiComponents,
+  });
+
+  // inject progress reporter for each build
+  const pluginState = new ProgressReportPluginState({ key: args.mode });
+  configs.forEach(config => {
+    if (!config.plugins) config.plugins = [];
+    config.plugins.push(new ProgressReportPlugin({ pluginState }));
   });
 
   let compiler = webpack(configs);
