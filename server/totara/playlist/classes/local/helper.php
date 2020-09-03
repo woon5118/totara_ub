@@ -28,6 +28,7 @@ use totara_engage\rating\rating_manager;
 use totara_engage\resource\resource_factory;
 use totara_engage\share\manager as share_manager;
 use totara_playlist\entity\playlist_resource;
+use totara_playlist\exception\playlist_exception;
 use totara_playlist\playlist;
 use totara_playlist\repository\playlist_resource_repository;
 
@@ -119,9 +120,20 @@ final class helper {
      * @return void
      */
     public static function swap_card_sort_order(playlist $playlist, int $instanceid, int $order) {
+        if ($order < 0 || $order > (count($playlist->get_resources()) - 1)) {
+            throw playlist_exception::create("update_order");
+        }
+
         /** @var playlist_resource_repository $repo */
         $repo = playlist_resource::repository();
-        $target_resource = $repo->find_resource($instanceid ,$playlist->get_id());
+        $target_resource = $repo->find_resource($instanceid, $playlist->get_id());
+
+        if (empty($target_resource)) {
+            throw new \coding_exception("Resource with {$instanceid} is not in the playlist");
+        }
+
+        //Order is index of array and start with 0 and we need start with 1, so order need to be incremented
+        $order++;
         $source_resource = $repo->find_resource_by_sortorder($order, $playlist->get_id());
 
         // If the result is not zero, we need to fetch resources from range to reorder them.

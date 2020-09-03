@@ -79,6 +79,7 @@ $string['error:sharecapability'] = 'You do not have the required capabilities to
 $string['error:shareprivate'] = 'Playlist is viewable by only you. Change who can view this playlist in order to share it.';
 $string['error:sharerestricted'] = 'Playlist is not viewable by everyone and only the owner is allowed to share it.';
 $string['error:updateaccess'] = "Cannot update access of the playlist";
+$string['error:update_order'] = "Order is out of bounds";
 
 // Field strings
 $string['field:name'] = 'Name';

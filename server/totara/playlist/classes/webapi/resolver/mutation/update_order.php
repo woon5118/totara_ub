@@ -35,7 +35,6 @@ use totara_playlist\playlist;
  * Mutation resolver for updating card order.
  */
 final class update_order implements mutation_resolver, has_middleware {
-
     /**
      * Mutation resolver.
      *
@@ -45,11 +44,12 @@ final class update_order implements mutation_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): bool {
         global $DB, $USER;
+
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context(\context_user::instance($USER->id));
         }
 
-        $playlist = playlist::from_id($args['id']);
+        $playlist = playlist::from_id($args['id'], true);
         $actor = (int)$USER->id;
 
         // If current user is not owner of playlist and not admin, exception has to be fired.
@@ -57,12 +57,10 @@ final class update_order implements mutation_resolver, has_middleware {
             throw new \coding_exception('Current user can not order cards in the playlist');
         }
 
-        // As sortorder starts from 1, order needs to plus 1.
-        $order = ++$args['order'];
-
         $transaction = $DB->start_delegated_transaction();
-        helper::swap_card_sort_order($playlist, $args['instanceid'], $order);
+        helper::swap_card_sort_order($playlist, $args['instanceid'], $args['order']);
         $transaction->allow_commit();
+
         return true;
     }
 

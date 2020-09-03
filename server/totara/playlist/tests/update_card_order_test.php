@@ -20,10 +20,10 @@
  * @author Qingyang Liu <qingyang.liu@totaralearning.com>
  * @package totara_playlist
  */
-use totara_engage\access\access;
+
 use totara_engage\resource\resource_factory;
+use totara_playlist\exception\playlist_exception;
 use totara_playlist\local\helper;
-use totara_playlist\playlist;
 use core\webapi\execution_context;
 use totara_webapi\graphql;
 
@@ -68,7 +68,8 @@ class totara_playlist_update_card_order_testcase extends advanced_testcase {
             )
         );
 
-        helper::swap_card_sort_order($playlist, $article->get_id(), 3);
+        // The last array index is 2.
+        helper::swap_card_sort_order($playlist, $article->get_id(), 2);
 
         $this->assertEquals(
             3,
@@ -96,6 +97,66 @@ class totara_playlist_update_card_order_testcase extends advanced_testcase {
                 ['playlistid' => $playlist->get_id(), 'resourceid' => $article1->get_id()]
             )
         );
+
+        // Test order is negative.
+        $this->expectException(playlist_exception::class, get_string('error:update_order', 'totara_playlist'));
+        helper::swap_card_sort_order($playlist, $article->get_id(), -1);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_swap_card_order_with_exception(): void {
+        $gen = $this->getDataGenerator();
+        $this->setAdminUser();
+
+        /** @var totara_playlist_generator $playlistgen */
+        $playlistgen = $gen->get_plugin_generator('totara_playlist');
+        $playlist = $playlistgen->create_playlist();
+
+        /** @var engage_article_generator $articlegen */
+        $articlegen = $gen->get_plugin_generator('engage_article');
+        $article = $articlegen->create_article();
+        $article1 = $articlegen->create_article();
+        $article2 = $articlegen->create_article();
+        $article3 = $articlegen->create_article();
+
+        $playlist->add_resource(resource_factory::create_instance_from_id($article->get_id()));
+        $playlist->add_resource(resource_factory::create_instance_from_id($article1->get_id()));
+        $playlist->add_resource(resource_factory::create_instance_from_id($article2->get_id()));
+
+        // Test resource is not in the playlist
+        $this->expectException(
+            'coding_exception',
+            "Coding error detected, it must be fixed by a programmer: Resource with {$article3->get_id()} is not in the playlist"
+        );
+        helper::swap_card_sort_order($playlist, $article3->get_id(), 2);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_swap_card_order_out_of_boundary(): void {
+        $gen = $this->getDataGenerator();
+        $this->setAdminUser();
+
+        /** @var totara_playlist_generator $playlistgen */
+        $playlistgen = $gen->get_plugin_generator('totara_playlist');
+        $playlist = $playlistgen->create_playlist();
+
+        /** @var engage_article_generator $articlegen */
+        $articlegen = $gen->get_plugin_generator('engage_article');
+        $article = $articlegen->create_article();
+        $article1 = $articlegen->create_article();
+        $article2 = $articlegen->create_article();
+
+        $playlist->add_resource(resource_factory::create_instance_from_id($article->get_id()));
+        $playlist->add_resource(resource_factory::create_instance_from_id($article1->get_id()));
+        $playlist->add_resource(resource_factory::create_instance_from_id($article2->get_id()));
+
+        // Test is out of boundary.
+        $this->expectException(playlist_exception::class, get_string('error:update_order', 'totara_playlist'));
+        helper::swap_card_sort_order($playlist, $article->get_id(), 5);
     }
 
     /**
@@ -147,5 +208,42 @@ class totara_playlist_update_card_order_testcase extends advanced_testcase {
                 'sortorder',
                 ['resourceid' => $article->get_id(), 'playlistid' => $playlist->get_id()])
         );
+
+        // Check the resource is not in the playlist, exception will be fired.
+        $article3 = $articlegen->create_article();
+        $parameters = [
+            'id' => $playlist->get_id(),
+            'order' => 2,
+            'instanceid' => $article3->get_id()
+        ];
+
+        $ec = execution_context::create('ajax', 'totara_playlist_update_card_order');
+        $result = graphql::execute_operation($ec, $parameters);
+        $this->assertNotEmpty($result->errors);
+
+
+        // Check order is out of boundary
+        $parameters = [
+            'id' => $playlist->get_id(),
+            'order' => -1 ,
+            'instanceid' => $article->get_id()
+        ];
+
+        $ec = execution_context::create('ajax', 'totara_playlist_update_card_order');
+        $result = graphql::execute_operation($ec, $parameters);
+        $this->assertNotEmpty($result->errors);
+
+        // Check order is out of boundary
+        $parameters = [
+            'id' => $playlist->get_id(),
+            'order' => 3 ,
+            'instanceid' => $article3->get_id()
+        ];
+
+        $ec = execution_context::create('ajax', 'totara_playlist_update_card_order');
+        $result = graphql::execute_operation($ec, $parameters);
+        $this->assertNotEmpty($result->errors);
+        $error = current($result->errors);
+        $this->assertEquals(get_string('error:update_order', 'totara_playlist'), $error->getMessage());
     }
 }
