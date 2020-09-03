@@ -23,6 +23,11 @@
 
 namespace degeneration;
 
+use coding_exception;
+use container_workspace\loader\discussion\loader as discussion_loader;
+use container_workspace\loader\member\loader as member_loader;
+use container_workspace\query\discussion\query as discussion_query;
+use container_workspace\query\member\query as member_query;
 use core\orm\collection;
 use core\orm\query\builder;
 use degeneration\items\audience;
@@ -33,9 +38,9 @@ use degeneration\items\course;
 use degeneration\items\course_completion;
 use degeneration\items\course_completion_basic;
 use degeneration\items\criteria\child_competency;
-use degeneration\items\criteria\on_activate;
 use degeneration\items\criteria\course_completion as course_completion_criterion;
 use degeneration\items\criteria\linked_courses as linked_courses_criterion;
+use degeneration\items\criteria\on_activate;
 use degeneration\items\item;
 use degeneration\items\organisation;
 use degeneration\items\pathways\criteria_group;
@@ -44,15 +49,13 @@ use degeneration\items\user;
 use hierarchy_organisation\entities\organisation_framework;
 use hierarchy_position\entities\position_framework;
 use totara_competency\linked_courses;
-use container_workspace\loader\member\loader as member_loader;
-use container_workspace\query\member\query as member_query;
-use container_workspace\loader\discussion\loader as discussion_loader;
-use container_workspace\query\discussion\query as discussion_query;
 
 class performance_testing extends App {
 
     /**
-     * @var user[]
+     * User ids
+     *
+     * @var int[]
      */
     protected $users = [];
 
@@ -93,36 +96,47 @@ class performance_testing extends App {
      * @var array
      */
     protected $workspaces = [];
+    /**
+     * @var array|position[]
+     */
+    private $positions = [];
+    /**
+     * @var array|organisation[]
+     */
+    private $organisations = [];
 
     /**
      *
      */
     public function generate() {
+        // If you don't need caching disable it
+        Cache::disable();
+
         $this->create_users()
             ->create_organisations()
             ->create_positions()
             ->create_audiences()
             ->add_audience_members()
-            ->create_scales()
-            ->create_competencies()
-        //->create_organisation_assignments()
-        //->create_position_assignments()
-        // ->create_audience_assignments()
-            ->create_assignments()
-            ->create_courses()
+            ->create_job_assignments_for_user()
+            // ->create_scales()
+            // ->create_competencies()
+            //->create_organisation_assignments()
+            //->create_position_assignments()
+            // ->create_audience_assignments()
+            // ->create_assignments()
+            // ->create_courses()
             // Enrolling users has a huge performance impact
             // only activate if absolutely necessary
             // ->enrol_users()
             // ->create_course_completions()
-            ->create_course_completions_basic()
-            ->add_linked_courses()
-            ->create_criteria()
-            ->create_workspaces()
-            ->create_workspace_members()
-            ->create_workspace_discussions()
-            ->create_workspace_discussion_comments_replies()
+            // ->create_course_completions_basic()
+            // ->add_linked_courses()
+            // ->create_criteria()
+            // ->create_workspaces()
+            // ->create_workspace_members()
+            // ->create_workspace_discussions()
+            // ->create_workspace_discussion_comments_replies()
             ;
-        //->create_job_assignments();
     }
 
     public function create_users() {
@@ -138,7 +152,9 @@ class performance_testing extends App {
 
             builder::get_db()->insert_records_via_batch('user', $users);
 
-            $this->users = user::load_existing();
+            // We mostly need only the userid,
+            // to save memory we only load those
+            $this->users = user::load_existing_ids();
         });
 
         return $this;
@@ -181,6 +197,8 @@ class performance_testing extends App {
                 ->set_depth($depth)
                 ->set_count($count)
                 ->create_hierarchy();
+
+            $this->organisations = $hierarchy->get_items();
         });
 
         return $this;
@@ -204,6 +222,8 @@ class performance_testing extends App {
                 ->set_depth($depth)
                 ->set_count($count)
                 ->create_hierarchy();
+
+            $this->positions = $hierarchy->get_items();
         });
 
         return $this;
@@ -234,27 +254,24 @@ class performance_testing extends App {
             throw new \Exception('You must create audiences first');
         }
 
-        builder::get_db()->transaction(function () {
-            $user_per_audience = $this->get_item_size('users_per_audience');
+        $user_per_audience = $this->get_item_size('users_per_audience');
 
-            $users = $this->users;
+        $users = $this->users;
 
-            $audiences = $this->audiences;
-            // shuffle($audiences);
+        $audiences = $this->audiences;
 
-            $members = [];
-            /** @var audience[] $audiences */
-            foreach ($audiences as $audience) {
-                shuffle($users);
+        $members = [];
+        /** @var audience[] $audiences */
+        foreach ($audiences as $audience) {
+            shuffle($users);
 
-                $users = array_slice($users, 0, $user_per_audience);
-                foreach ($users as $user) {
-                    $members[] = $audience->add_member($user);
-                }
+            $users = array_slice($users, 0, $user_per_audience);
+            foreach ($users as $user) {
+                $members[] = $audience->add_member($user);
             }
+        }
 
-            builder::get_db()->insert_records_via_batch('cohort_members', $members);
-        });
+        builder::get_db()->insert_records_via_batch('cohort_members', $members);
 
         return $this;
     }
@@ -347,7 +364,7 @@ class performance_testing extends App {
         }
 
         builder::get_db()->transaction(function () {
-            $competencies = $this->get_competencies('assignments');
+            $competencies = $this->get_competencies('competency_assignments');
 
             foreach ($this->audiences as $audience) {
                 foreach ($competencies as $competency) {
@@ -369,13 +386,13 @@ class performance_testing extends App {
         }
 
         builder::get_db()->transaction(function () {
-            $competencies = $this->get_competencies('assignments');
+            $competencies = $this->get_competencies('competency_assignments');
 
             foreach ($this->users as $user) {
                 foreach ($competencies as $competency) {
                     static::competency_generator()
                         ->assignment_generator()
-                        ->create_user_assignment($competency->get_data('id'), $user->get_data()->id);
+                        ->create_user_assignment($competency->get_data('id'), $user);
                 }
             }
         });
@@ -637,13 +654,19 @@ class performance_testing extends App {
         return $criterion->save_and_return();
     }
 
-    public function create_job_assignments() {
+    protected function create_job_assignments_for_user() {
+        $size = $this->get_item_size('job_assignments_for_user');
+        if (!$size) {
+            return $this;
+        }
         $this->output('Creating job assignments...');
-        $size = $this->get_item_size('job_assignments');
 
         if (empty($this->users)) {
             throw new \coding_exception("Cannot create workspace member when users are empty");
         }
+
+        $job_assignment_creator = new job_assignments_creator($this->users, $this->positions, $this->organisations);
+        $job_assignment_creator->generate($size);
 
         return $this;
     }
@@ -675,7 +698,7 @@ class performance_testing extends App {
         $size = $this->get_item_size('workspace_members');
 
         if (empty($this->users)) {
-            throw new \coding_exception("Cannot create workspace member when users are empty");
+            throw new coding_exception("Cannot create workspace member when users are empty");
         }
 
         builder::get_db()->transaction(
@@ -688,11 +711,11 @@ class performance_testing extends App {
                 foreach ($this->workspaces as $workspace) {
                     $i = 0;
                     foreach ($this->users as $user) {
-                        if (isguestuser($user->get_data()->id)) {
+                        if (isguestuser($user)) {
                             continue;
                         }
 
-                        $workspace_generator->create_self_join_member($workspace, $user->get_data()->id);
+                        $workspace_generator->create_self_join_member($workspace, $user);
                         $i++;
 
                         if ($i == $size) {
@@ -711,7 +734,7 @@ class performance_testing extends App {
         $size = $this->get_item_size('workspace_discussions');
 
         builder::get_db()->transaction(
-            function () use($size) {
+            function () use ($size) {
                 foreach ($this->workspaces as $workspace) {
                     $workspace_id = $workspace->get_id();
                     $query = new member_query($workspace_id);
@@ -849,8 +872,8 @@ class performance_testing extends App {
             'organisations' => [3, 3],
             'positions' => [3, 3],
             'competencies' => [3, 3],
-            'assignments' => 100,
-            'job_assignments' => 100,
+            'competency_assignments' => 100,
+            'job_assignments_for_user' => 2,
             'enrolments' => 100,
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,
@@ -872,8 +895,8 @@ class performance_testing extends App {
             'organisations' => [4, 4],
             'positions' => [4, 4],
             'competencies' => [4, 4],
-            'assignments' => 100,
-            'job_assignments' => 50,
+            'competency_assignments' => 100,
+            'job_assignments_for_user' => 1,
             'enrolments' => 100,
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,
@@ -896,8 +919,8 @@ class performance_testing extends App {
             'organisations' => [4, 4],
             'positions' => [4, 4],
             'competencies' => [4, 4],
-            'assignments' => 80,
-            'job_assignments' => 50,
+            'competency_assignments' => 80,
+            'job_assignments_for_user' => 1,
             'enrolments' => 80,
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,
@@ -911,6 +934,7 @@ class performance_testing extends App {
             'courses' => 100,
             'audiences' => 80,
             'users_per_audience' => 10000,
+            'audience_assignments_per_activity' => 10,
             'workspaces' => 100,
             'workspace_members' => 250,
             'workspace_discussions' => 250,
@@ -919,8 +943,8 @@ class performance_testing extends App {
             'organisations' => [4, 4],
             'positions' => [4, 4],
             'competencies' => [4, 4],
-            'assignments' => 100,
-            'job_assignments' => 50,
+            'competency_assignments' => 100,
+            'job_assignments_for_user' => 2,
             'enrolments' => 100,
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,
@@ -942,8 +966,8 @@ class performance_testing extends App {
             'organisations' => [5, 5],
             'positions' => [5, 5],
             'competencies' => [5, 5],
-            'assignments' => 70,
-            'job_assignments' => 100,
+            'competency_assignments' => 70,
+            'job_assignments_for_user' => 2,
             'enrolments' => 70,
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,
@@ -964,8 +988,8 @@ class performance_testing extends App {
             'organisations' => [5, 5],
             'positions' => [5, 5],
             'competencies' => [5, 5],
-            'assignments' => 70,
-            'job_assignments' => 100,
+            'competency_assignments' => 70,
+            'job_assignments_for_user' => 4,
             'enrolments' => 70,
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,
@@ -987,8 +1011,8 @@ class performance_testing extends App {
             'organisations' => [5, 5],
             'positions' => [5, 5],
             'competencies' => [6, 5],
-            'assignments' => 70,
-            'job_assignments' => 100,
+            'competency_assignments' => 70,
+            'job_assignments_for_user' => 5,
             'enrolments' => 70,
             'courses_per_criterion' => 5,
             'variable_courses_per_criterion' => false,

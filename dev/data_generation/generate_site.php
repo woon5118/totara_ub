@@ -34,7 +34,8 @@ require_once(__DIR__ . '/../../server/config.php');
 require_once(App::config()->libdir . '/phpunit/classes/util.php');
 require_once(App::config()->dirroot . "/lib/clilib.php");
 
-
+core_php_time_limit::raise(0);
+raise_memory_limit(MEMORY_UNLIMITED);
 
 [$options, $params] = cli_get_params(
     [
@@ -89,80 +90,6 @@ $generate = function() use ($size) {
 
     $pt->set_size($size)
         ->generate();
-
-    // These commented out as basic examples:
-
-    //
-    // $audience = new audience();
-    // $audience->save();
-    //
-    // $user = new user();
-    // $user->save();
-    //
-    // $audience->add_member($user);
-    //
-    // $course = new course();
-    // $course->save();
-    //
-    // $user->enrol($course);
-    //
-    // $org = new organisation();
-    // $org->save();
-    //
-    // $pos = new position();
-    // $pos->save();
-    //
-    // $comp = new competency();
-    // $comp->save();
-    //
-    // $completion = new \degeneration\items\course_completion();
-    // $completion->by($user)
-    //     ->for($course)
-    //     ->save();
-    //
-    // $ass = new assignment();
-    //
-    // $ass->for($org)
-    //     ->set_competency($comp)
-    //     ->save();
-    //
-    // $cc = new course_completion();
-    // $cc->add_course($course);
-    // $cc->save();
-    //
-    // $c_comp = new child_competency();
-    // $c_comp->for($comp);
-    // $c_comp->save();
-    //
-    // $on_activate = new on_activate();
-    // $on_activate->for($comp);
-    // $on_activate->save();
-    //
-    // $lc = new linked_courses();
-    // $lc->for($comp);
-    // $lc->save();
-    //
-    // $cg_pathway = new criteria_group();
-    //
-    // $cg_pathway->for($comp)
-    //     ->add_criterion($c_comp)
-    //     ->add_criterion($cc)
-    //     ->save();
-    //
-    // $sv = $comp->get_data()->scale->sorted_values_high_to_low()->first();
-    //
-    // $mr = new manual_rating();
-    //
-    // $mr->for($comp)
-    //     ->rate($user)
-    //     ->rate_as($user)
-    //     ->set_value($sv)
-    //     ->save();
-    //
-    // $lpp = new learning_plan();
-    //
-    // $lpp->for($comp);
-    // $lpp->save();
 };
 
 if ($options['transaction']) {

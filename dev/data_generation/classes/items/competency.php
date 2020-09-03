@@ -23,6 +23,7 @@
 
 namespace degeneration\items;
 
+use degeneration\App;
 use totara_competency\entities\competency as competency_entity;
 
 /**
@@ -41,6 +42,20 @@ class competency extends hierarchy_item {
      */
     public function get_type(): string {
         return 'competency';
+    }
+
+    /**
+     * Get properties
+     *
+     * @return array
+     */
+    public function get_properties(): array {
+        return [
+            'fullname' => App::faker()->catchPhrase,
+            'description' => App::faker()->bs,
+            'idnumber' => 'comp'.App::faker()->unique()->randomNumber,
+            'visible' => true,
+        ];
     }
 
     public function get_entity_class(): ?string {

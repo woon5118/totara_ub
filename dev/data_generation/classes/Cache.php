@@ -40,10 +40,29 @@ class Cache {
     protected static $cache = null;
 
     /**
+     * @var bool
+     */
+    protected static $is_enabled = true;
+
+    /**
      * Cache constructor.
      */
     private function __construct() {
         static::$cache = $this;
+    }
+
+    /**
+     * Enable caching
+     */
+    public static function enabled(): void {
+        self::$is_enabled = true;
+    }
+
+    /**
+     * Disable caching
+     */
+    public static function disable(): void {
+        self::$is_enabled = false;
     }
 
     /**
@@ -66,12 +85,14 @@ class Cache {
      * @return $this
      */
     public function add(item $item) {
-
+        if (!self::$is_enabled) {
+            return $this;
+        }
         if (!isset($this->items[$class = get_class($item)])) {
             $this->items[$class] = [];
         }
 
-        $this->items[$item->get_data('id')] = $item;
+        $this->items[$class][$item->get_data('id')] = $item;
 
         return $this;
     }
@@ -84,6 +105,9 @@ class Cache {
      * @return array|mixed|null
      */
     public function fetch(string $class, ?int $id = null) {
+        if (!self::$is_enabled) {
+            return null;
+        }
         if (is_null($id)) {
             return $this->items[$class] ?? [];
         }

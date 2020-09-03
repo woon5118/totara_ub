@@ -38,6 +38,8 @@ use degeneration\Cache;
  */
 class user extends item {
 
+    protected static $roles = [];
+
     /**
      * Array of courses user enrolled in.
      *
@@ -86,6 +88,11 @@ class user extends item {
         ];
     }
 
+    /**
+     * Load existing user items
+     *
+     * @return array
+     */
     public static function load_existing() {
         $users_loaded = user_entity::repository()
             ->get_lazy();
@@ -96,6 +103,20 @@ class user extends item {
         }
 
         return $users;
+    }
+
+    /**
+     * Loads existing user_ids
+     *
+     * @return array
+     */
+    public static function load_existing_ids(): array {
+        $user_ids = user_entity::repository()
+            ->select('id')
+            ->get()
+            ->pluck('id');
+
+        return array_combine($user_ids, $user_ids);
     }
 
     public function fill(entity $entity) {
@@ -140,32 +161,35 @@ class user extends item {
         return App::generator()->create_user($properties, ['noinsert' => true]);
     }
 
-
     /**
      * Enrol user to a given course
      *
+     * @param int $user_id
      * @param course $course
      * @param string $role
      * @return bool
      */
-    public function enrol(course $course, string $role = 'student'): bool {
-        $role_entity = builder::table('role')
-            ->where('shortname', $role)
-            ->one(true);
+    public static function enrol(int $user_id, course $course, string $role = 'student'): bool {
+        if (!isset(self::$roles[$role])) {
+            self::$roles[$role] = builder::table('role')
+                ->where('shortname', $role)
+                ->one(true);
+        }
 
-        $this->add_enrolled_course($course);
+        $role_entity = self::$roles[$role];
 
-        return App::generator()->enrol_user($this->get_data()->id, $course->get_data()->id, $role_entity->id);
+        return App::generator()->enrol_user($user_id, $course->get_data()->id, $role_entity->id);
     }
 
     /**
-     * Enrol user to a given course
+     * Add user to an audience
      *
      * @param audience $audience
-     * @return bool
+     * @return void
      */
-    public function add(audience $audience): bool {
-        return $audience->add_member($this);
+    public function add_to_audience(audience $audience): void {
+        $member = $audience->add_member($this);
+        builder::get_db()->insert_record('cohort_members', $member);
     }
 
 }

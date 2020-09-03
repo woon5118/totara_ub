@@ -23,7 +23,6 @@
 
 namespace degeneration\items;
 
-use core\orm\query\builder;
 use degeneration\App;
 use totara_competency\entities\course as course_entity;
 
@@ -68,16 +67,16 @@ class course extends item {
      */
     public function get_properties(): array {
         return [
-            'shortname' => $this->get_next_shortname(),
+            'shortname' => 'course'.App::faker()->unique()->randomNumber,
             'fullname' => App::faker()->catchPhrase,
             'description' => App::faker()->bs,
         ];
     }
 
     /**
-     * Get enrolled users. This returns ONLY users enrolled via this object
+     * Get enrolled users (ids). This returns ONLY users enrolled via this object
      *
-     * @return array
+     * @return array|int[]
      */
     public function get_enrolled_users(): array {
         return $this->enrolled_users;
@@ -86,10 +85,10 @@ class course extends item {
     /**
      * Add enrolled user to this course, this is informative only
      *
-     * @param user $user
+     * @param int $user_id
      */
-    public function add_enrolled_user(user $user) {
-        $this->enrolled_users[] = $user;
+    public function add_enrolled_user(int $user_id) {
+        $this->enrolled_users[] = $user_id;
     }
 
     /**
@@ -127,37 +126,17 @@ class course extends item {
     /**
      * Enrol user to this course
      *
-     * @param user $user
+     * @param user|int $user_or_id
      * @return bool
      */
-    public function enrol(user $user): bool {
-        $this->add_enrolled_user($user);
-
-        return $user->enrol($this);
-    }
-
-    /**
-     * Get next counter for course short name
-     *
-     * @return int
-     */
-    public function get_next_sn_count(): int {
-        if (is_null(static::$sn_counter)) {
-            static::$sn_counter = builder::table($this->get_table())
-                ->where_like_starts_with('shortname', $this->get_sn_prefix())
-                ->count();
+    public function enrol($user_or_id): bool {
+        if ($user_or_id instanceof user) {
+            $user_or_id = $user_or_id->get_data()->id;
         }
 
-        return static::$sn_counter += 1;
-    }
+        $this->add_enrolled_user($user_or_id);
 
-    /**
-     * Get next short name for the course
-     *
-     * @return string
-     */
-    public function get_next_shortname(): string {
-        return $this->get_sn_prefix() . $this->get_next_sn_count();
+        return user::enrol($user_or_id, $this);
     }
 
 }

@@ -36,9 +36,9 @@ class course_completion extends item {
     protected $for = null;
 
     /**
-     * User to complete a course
+     * User (id) to complete a course
      *
-     * @var user
+     * @var int
      */
     protected $by = null;
 
@@ -57,11 +57,14 @@ class course_completion extends item {
     /**
      * Created by user
      *
-     * @param user $user
+     * @param user|int $user_or_id
      * @return $this
      */
-    public function by(user $user) {
-        $this->by = $user;
+    public function by($user_or_id) {
+        if ($user_or_id instanceof user) {
+            $user_or_id = $user_or_id->get_data()->id;
+        }
+        $this->by = $user_or_id;
 
         return $this;
     }
@@ -83,7 +86,7 @@ class course_completion extends item {
 
         $completion = new \completion_completion([
             'course' => $this->for->get_data('id'),
-            'userid' => $this->by->get_data()->id,
+            'userid' => $this->by,
         ]);
 
         $completion->mark_complete(time());

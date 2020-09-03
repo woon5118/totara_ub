@@ -83,13 +83,17 @@ class audience extends item {
     /**
      * Add user to this audience
      *
-     * @param user $user
+     * @param user|int $user_or_id
      * @return stdClass
      */
-    public function add_member(user $user): stdClass {
+    public function add_member($user_or_id): stdClass {
+        $user_id = $user_or_id;
+        if ($user_or_id instanceof user) {
+            $user_id = $user_or_id->get_data()->id;
+        }
         $record = new stdClass();
         $record->cohortid  = $this->get_data()->id;
-        $record->userid    = $user->get_data()->id;
+        $record->userid    = $user_id;
         $record->timeadded = time();
         return $record;
     }

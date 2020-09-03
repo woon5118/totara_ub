@@ -66,6 +66,8 @@ abstract class item {
         }
 
         $entity->save();
+        
+        $this->data = $entity;
 
         Cache::get()->add($this);
 
@@ -127,7 +129,7 @@ abstract class item {
      * @return mixed
      */
     protected function evaluate_property($value) {
-        if (is_callable($value)) {
+        if ($value instanceof \Closure) {
             return $value($this);
         }
 

@@ -192,8 +192,6 @@ class hierarchy {
     public function create_hierarchy_item(?hierarchy_item $parent): hierarchy_item {
         $item = $this->new_item();
 
-        $this->items[] = $item;
-
         // If parent is null we need to set framework, if parent is not null we need to set the parent id.
         if ($parent === null) {
             if (empty($framework = $this->get_next_framework())) {
@@ -227,6 +225,8 @@ class hierarchy {
             $items = array_merge($items, $parents);
             $c++;
         } while ($c <= $depth);
+
+        $this->items = $items;
 
         return true;
     }

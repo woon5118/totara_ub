@@ -23,6 +23,7 @@
 
 namespace degeneration\items;
 
+use degeneration\App;
 use hierarchy_organisation\entities\organisation as organisation_entity;
 
 /**
@@ -41,6 +42,20 @@ class organisation extends hierarchy_item {
      */
     public function get_type(): string {
         return 'organisation';
+    }
+
+    /**
+     * Get properties
+     *
+     * @return array
+     */
+    public function get_properties(): array {
+        return [
+            'fullname' => App::faker()->company,
+            'description' => App::faker()->bs,
+            'idnumber' => 'org'.App::faker()->unique()->randomNumber,
+            'visible' => true,
+        ];
     }
 
     public function get_entity_class(): ?string {

@@ -24,6 +24,7 @@
 namespace degeneration\items;
 
 use degeneration\App;
+use degeneration\Cache;
 use hierarchy_organisation\entities\organisation_framework;
 use totara_competency\entities\competency_framework;
 use totara_hierarchy\entities\hierarchy_framework;
@@ -85,19 +86,6 @@ abstract class hierarchy_item extends item {
     }
 
     /**
-     * Get properties
-     *
-     * @return array
-     */
-    public function get_properties(): array {
-        return [
-            'fullname' => App::faker()->catchPhrase,
-            'description' => App::faker()->bs,
-            'visible' => true,
-        ];
-    }
-
-    /**
      * Get entity class
      *
      * @return string|null
@@ -141,7 +129,16 @@ abstract class hierarchy_item extends item {
             $record[$key] = $this->evaluate_property($property);
         }
 
-        $this->data = new $class(static::generator()->create_hierarchy($this->framework->id, $this->get_type(), $record, false));
+        $this->data = new $class(
+            static::generator()->create_hierarchy(
+                $this->framework->id,
+                $this->get_type(),
+                $record,
+                false
+            )
+        );
+        
+        Cache::get()->add($this);
 
         return true;
     }

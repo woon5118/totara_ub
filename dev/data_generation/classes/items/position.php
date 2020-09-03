@@ -23,6 +23,7 @@
 
 namespace degeneration\items;
 
+use degeneration\App;
 use hierarchy_position\entities\position as position_entity;
 
 /**
@@ -41,6 +42,20 @@ class position extends hierarchy_item {
      */
     public function get_type(): string {
         return 'position';
+    }
+
+    /**
+     * Get properties
+     *
+     * @return array
+     */
+    public function get_properties(): array {
+        return [
+            'fullname' => App::faker()->jobTitle,
+            'description' => App::faker()->bs,
+            'idnumber' => 'pos'.App::faker()->unique()->randomNumber,
+            'visible' => true,
+        ];
     }
 
     public function get_entity_class(): ?string {
