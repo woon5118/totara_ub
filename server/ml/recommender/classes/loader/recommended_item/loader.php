@@ -106,7 +106,7 @@ abstract class loader {
                         $join->where_raw("(u.tenantid {$in_sql} OR u.tenantid IS NULL)", $parameters);
                     });
                 } else {
-                    $builder->join(['user', 'u'], 'master.userid', 'u.id');
+                    $builder->join(['user', 'u'], $item_owner_col, 'u.id');
                     $builder->where_null('u.tenantid');
                 }
                 $builder->where('u.suspended', 0);

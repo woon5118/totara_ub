@@ -58,9 +58,10 @@ final class workspace extends item {
     }
 
     /**
+     * @param int|null $owner_id
      * @return model
      */
-    public function create_workspace(): model {
+    public function create_workspace(?int $owner_id = null): model {
         $generator = App::generator();
 
         /** @var \container_workspace_generator $workspace_generator */
@@ -71,7 +72,7 @@ final class workspace extends item {
             $properties['name'],
             $properties['description'],
             $properties['description_format'],
-            $properties['owner']
+            $owner_id ?? $properties['owner']
         );
     }
 }
