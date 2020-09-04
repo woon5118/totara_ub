@@ -25,7 +25,10 @@ namespace totara_reportedcontent\webapi\resolver\query;
 
 use context_system;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\middleware\require_system_capability;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_reportedcontent\loader\review_loader;
 use totara_reportedcontent\review;
 
@@ -34,7 +37,7 @@ use totara_reportedcontent\review;
  *
  * @package totara_reportedcontent\webapi\resolver\query
  */
-final class reviews implements query_resolver {
+final class reviews implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -43,13 +46,8 @@ final class reviews implements query_resolver {
      */
     public static function resolve(array $args, execution_context $ec): array {
         global $USER;
-
-        require_login();
-
-        // API is only open to those who can see this capability (eg, users shouldn't be able to look up report details)
-        $has_capability = has_capability('totara/reportedcontent:manage', context_system::instance(), $USER);
-        if (!$has_capability) {
-            throw new \coding_exception('nopermission', 'totara_reportedcontent');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
         }
 
         $item_id = $args['item_id'];
@@ -65,4 +63,15 @@ final class reviews implements query_resolver {
         $paginator = review_loader::get_paginator($item_id, $context_id, $component, $area, $page);
         return $paginator->get_items()->all();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_system_capability('totara/reportedcontent:manage'),
+        ];
+    }
+
 }

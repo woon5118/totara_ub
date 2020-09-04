@@ -25,7 +25,10 @@ namespace ml_recommender\webapi\resolver\query;
 
 use core\pagination\offset_cursor;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use engage_article\totara_engage\resource\article as article_resource;
 use ml_recommender\loader\recommended_item\articles_loader;
 use ml_recommender\query\recommended_item\item_query;
@@ -36,7 +39,7 @@ use totara_core\advanced_feature;
  *
  * @package ml_recommender\webapi\resolver\query
  */
-final class recommended_articles implements query_resolver {
+final class recommended_articles implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -44,7 +47,10 @@ final class recommended_articles implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
         if (advanced_feature::is_disabled('ml_recommender')) {
             return [];
         }
@@ -67,4 +73,14 @@ final class recommended_articles implements query_resolver {
         $paginator = articles_loader::get_recommended_articles($query);
         return $paginator->get_items()->all();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

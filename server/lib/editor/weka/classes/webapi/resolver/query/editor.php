@@ -23,13 +23,15 @@
 namespace editor_weka\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use editor_weka\hook\find_context;
 
 /**
  * Query resolver for editor_weka_editor
  */
-final class editor implements query_resolver {
+final class editor implements query_resolver, has_middleware {
     /**
      * @param array             $args
      * @param execution_context $ec
@@ -38,7 +40,6 @@ final class editor implements query_resolver {
      */
     public static function resolve(array $args, execution_context $ec): \weka_texteditor {
         global $CFG;
-        require_login();
 
         require_once("{$CFG->dirroot}/lib/editor/weka/lib.php");
         $editor = new \weka_texteditor();
@@ -65,4 +66,14 @@ final class editor implements query_resolver {
 
         return $editor;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

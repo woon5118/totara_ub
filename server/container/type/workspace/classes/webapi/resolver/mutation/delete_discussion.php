@@ -24,14 +24,17 @@ namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\discussion\discussion;
 use container_workspace\discussion\discussion_helper;
+use container_workspace\workspace;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 
 /**
  * Mutation for deleting the discussion within workspace
  */
-final class delete_discussion implements mutation_resolver {
+final class delete_discussion implements mutation_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -40,8 +43,6 @@ final class delete_discussion implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec): bool {
         global $USER;
-        require_login();
-        advanced_feature::require('container_workspace');
 
         $discussion = discussion::from_id($args['id']);
         if (!$ec->has_relevant_context()) {
@@ -54,4 +55,15 @@ final class delete_discussion implements mutation_resolver {
         discussion_helper::delete_discussion($discussion, $USER->id);
         return true;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

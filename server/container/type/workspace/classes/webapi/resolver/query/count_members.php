@@ -25,23 +25,27 @@ namespace container_workspace\webapi\resolver\query;
 use container_workspace\loader\member\loader;
 use container_workspace\member\status;
 use container_workspace\query\member\query;
+use container_workspace\workspace;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 
 /**
  * Class count_members
  * @package container_workspace\webapi\resolver\query
  */
-final class count_members implements query_resolver {
+final class count_members implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
      * @return int
      */
     public static function resolve(array $args, execution_context $ec): int {
-        require_login();
-        advanced_feature::require('container_workspace');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
+        }
 
         $query = new query($args['workspace_id']);
         $query->set_member_status(status::get_active());
@@ -53,4 +57,15 @@ final class count_members implements query_resolver {
         $paginator = loader::get_members($query);
         return $paginator->get_total();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

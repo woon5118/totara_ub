@@ -23,11 +23,13 @@
 namespace totara_topic\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_topic\provider\topic_provider;
 use totara_topic\topic;
 
-final class system_topics implements query_resolver {
+final class system_topics implements query_resolver, has_middleware {
     /**
      * @param array             $args
      * @param execution_context $ec
@@ -35,7 +37,20 @@ final class system_topics implements query_resolver {
      * @return topic[]
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
         return topic_provider::get_all();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

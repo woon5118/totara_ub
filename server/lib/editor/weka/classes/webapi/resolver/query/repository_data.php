@@ -23,21 +23,21 @@
 namespace editor_weka\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use editor_weka\local\file_helper;
 
 /**
  * A query resolver for fetching the repository data.
  */
-final class repository_data implements query_resolver {
+final class repository_data implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
-
         $context_id = \context_system::instance()->id;
         if (isset($args['context_id'])) {
             $context = \context::instance_by_id($args['context_id']);
@@ -49,4 +49,14 @@ final class repository_data implements query_resolver {
 
         return file_helper::get_upload_repository($context_id);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

@@ -23,8 +23,10 @@
 namespace totara_playlist\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 use totara_engage\access\access_manager;
 use totara_playlist\local\helper;
 use totara_playlist\playlist;
@@ -32,7 +34,7 @@ use totara_playlist\playlist;
 /**
  * Mutation resolver for updating card order.
  */
-final class update_order implements mutation_resolver {
+final class update_order implements mutation_resolver, has_middleware {
 
     /**
      * Mutation resolver.
@@ -43,9 +45,9 @@ final class update_order implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec): bool {
         global $DB, $USER;
-
-        require_login();
-        advanced_feature::require('engage_resources');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $playlist = playlist::from_id($args['id']);
         $actor = (int)$USER->id;
@@ -63,4 +65,15 @@ final class update_order implements mutation_resolver {
         $transaction->allow_commit();
         return true;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
+        ];
+    }
+
 }

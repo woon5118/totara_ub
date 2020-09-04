@@ -23,15 +23,17 @@
 namespace container_workspace\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use container_workspace\discussion\discussion;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 use container_workspace\workspace;
 
 /**
  * Query resolver for fetching draft ids.
  */
-final class discussion_draft_id implements query_resolver {
+final class discussion_draft_id implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -39,15 +41,12 @@ final class discussion_draft_id implements query_resolver {
      */
     public static function resolve(array $args, execution_context $ec): int {
         global $CFG;
-        require_login();
-        advanced_feature::require('container_workspace');
 
         require_once("{$CFG->dirroot}/lib/filelib.php");
 
         if (empty($args['id'])) {
             return file_get_unused_draft_itemid();
         }
-
 
         $discussion_id = $args['id'];
         $discussion = discussion::from_id($discussion_id);
@@ -68,4 +67,15 @@ final class discussion_draft_id implements query_resolver {
 
         return $draft_id;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

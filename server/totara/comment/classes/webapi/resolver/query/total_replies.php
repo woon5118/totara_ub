@@ -23,14 +23,16 @@
 namespace totara_comment\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_comment\comment;
 use totara_comment\loader\comment_loader;
 
 /**
  * Query resolver to fetch the total number of replies
  */
-final class total_replies implements query_resolver {
+final class total_replies implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -38,10 +40,23 @@ final class total_replies implements query_resolver {
      * @return int
      */
     public static function resolve(array $args, execution_context $ec): int {
-        require_login();
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
         $comment = comment::from_id((int) $args['commentid']);
 
         $paginator = comment_loader::get_replies($comment);
         return $paginator->get_total();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

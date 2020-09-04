@@ -22,16 +22,19 @@
  */
 namespace container_workspace\webapi\resolver\query;
 
+use container_workspace\workspace;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\notification;
 use core\output\notification as output_notification;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 
 /**
  * notifications query resolver
  */
-final class notifications implements query_resolver {
+final class notifications implements query_resolver, has_middleware {
 
     /**
      * Query resolver.
@@ -42,8 +45,9 @@ final class notifications implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
-        advanced_feature::require('container_workspace');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
+        }
 
         $notifications = notification::fetch();
         $data_return = [];
@@ -58,4 +62,15 @@ final class notifications implements query_resolver {
 
         return $data_return;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

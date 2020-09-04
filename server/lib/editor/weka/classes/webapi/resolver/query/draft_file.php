@@ -23,12 +23,14 @@
 namespace editor_weka\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 
 /**
  * Query resolver to get the draft file
  */
-final class draft_file implements query_resolver {
+final class draft_file implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -37,9 +39,11 @@ final class draft_file implements query_resolver {
      */
     public static function resolve(array $args, execution_context $ec): \stored_file {
         global $USER;
-        require_login();
 
         $context = \context_user::instance($USER->id);
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($context);
+        }
         $fs = get_file_storage();
 
         $file = $fs->get_file(
@@ -57,4 +61,14 @@ final class draft_file implements query_resolver {
 
         return $file;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

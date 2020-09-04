@@ -23,22 +23,36 @@
 namespace core\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 
 /**
  * For fetching the unused item id within file storage.
  */
-final class file_unused_draft_item_id implements mutation_resolver {
+final class file_unused_draft_item_id implements mutation_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
      * @return int
      */
     public static function resolve(array $args, execution_context $ec): int {
-        global $CFG;
-        require_login();
+        global $CFG, $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         require_once("{$CFG->dirroot}/lib/filelib.php");
         return file_get_unused_draft_itemid();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

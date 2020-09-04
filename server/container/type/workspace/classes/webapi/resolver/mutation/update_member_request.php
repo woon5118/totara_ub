@@ -24,6 +24,7 @@ namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\member\member_request;
 use container_workspace\query\member\member_request_status;
+use container_workspace\workspace;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -47,6 +48,9 @@ final class update_member_request implements mutation_resolver, has_middleware {
 
         $member_request = member_request::from_id($args['id']);
         $workspace = $member_request->get_workspace();
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($workspace->get_context());
+        }
 
         if ($workspace->is_public()) {
             throw new \coding_exception("Cannot update a member request when the workspace is a public");

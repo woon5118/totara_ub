@@ -26,10 +26,11 @@ use container_workspace\discussion\discussion;
 use container_workspace\discussion\discussion_helper;
 use container_workspace\workspace;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
-use totara_core\advanced_feature;
 use core\webapi\middleware\clean_editor_content;
 
 /**
@@ -45,8 +46,6 @@ final class create_discussion implements mutation_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): discussion {
         global $USER;
-        require_login();
-        advanced_feature::require('container_workspace');
 
         /** @var workspace $workspace */
         $workspace = factory::from_id($args['workspace_id']);
@@ -89,6 +88,8 @@ final class create_discussion implements mutation_resolver, has_middleware {
      */
     public static function get_middleware(): array {
         return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
             new clean_editor_content('content', 'content_format')
         ];
     }

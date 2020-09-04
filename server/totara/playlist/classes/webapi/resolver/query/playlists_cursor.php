@@ -23,8 +23,10 @@
 namespace totara_playlist\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 use totara_playlist\loader\playlist_loader;
 use totara_playlist\pagination\cursor_paginator;
 use totara_playlist\query\playlist_query;
@@ -32,7 +34,7 @@ use totara_playlist\query\playlist_query;
 /**
  * Query resolver for fetching the playlist's cursor - next cursor.
  */
-final class playlists_cursor implements query_resolver {
+final class playlists_cursor implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -40,10 +42,23 @@ final class playlists_cursor implements query_resolver {
      * @return cursor_paginator
      */
     public static function resolve(array $args, execution_context $ec): cursor_paginator {
-        require_login();
-        advanced_feature::require('engage_resources');
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $query = playlist_query::from_parameters($args);
         return playlist_loader::get_playlists($query);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
+        ];
+    }
+
 }

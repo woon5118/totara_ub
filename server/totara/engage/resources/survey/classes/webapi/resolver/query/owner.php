@@ -23,27 +23,42 @@
 namespace engage_survey\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use engage_survey\totara_engage\resource\survey;
-use totara_core\advanced_feature;
 
 /**
  * Class owner
  * @package engage_survey\webapi\resolver\query
  */
-final class owner implements query_resolver {
+final class owner implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
      * @return \stdClass
      */
     public static function resolve(array $args, execution_context $ec): \stdClass {
-        require_login();
-        advanced_feature::require('engage_resources');
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $survey = survey::from_resource_id($args['resourceid']);
         $user_id = $survey->get_userid();
 
         return \core_user::get_user($user_id, '*', MUST_EXIST);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
+        ];
+    }
+
 }

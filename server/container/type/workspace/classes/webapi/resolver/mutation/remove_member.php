@@ -23,16 +23,18 @@
 namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\member\member;
+use container_workspace\webapi\middleware\require_login_workspace;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
-use totara_core\advanced_feature;
 
 /**
  * Mutation for removing member out of a workspace
  */
-final class remove_member implements mutation_resolver {
+final class remove_member implements mutation_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -41,20 +43,31 @@ final class remove_member implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec): bool {
         global $USER;
-        require_login();
-        advanced_feature::require('container_workspace');
 
         $workspace = factory::from_id($args['workspace_id']);
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($workspace->get_context());
+        }
+
         if (!$workspace->is_typeof(workspace::get_type())) {
             throw new \coding_exception("Invalid workspace type");
         }
 
-        $workspace_id = $workspace->get_id();
-        require_login($workspace_id);
-
-        $member = member::from_user($args['user_id'], $workspace_id);
+        $member = member::from_user($args['user_id'], $workspace->get_id());
         $member->removed_from_workspace($USER->id);
 
         return $member->is_suspended();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login_workspace('workspace_id'),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

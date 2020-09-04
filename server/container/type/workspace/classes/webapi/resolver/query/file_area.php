@@ -23,15 +23,17 @@
 namespace container_workspace\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
-use totara_core\advanced_feature;
 
 /**
  * Mutation for preparing a draft area for uploading.
  */
-final class file_area implements mutation_resolver {
+final class file_area implements mutation_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -40,8 +42,6 @@ final class file_area implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec): array {
         global $USER, $CFG;
-        require_login();
-        advanced_feature::require('container_workspace');
 
         require_once("{$CFG->dirroot}/lib/filelib.php");
         require_once("{$CFG->dirroot}/repository/lib.php");
@@ -49,6 +49,10 @@ final class file_area implements mutation_resolver {
         if (isset($args['workspace_id'])) {
             $workspace_id = $args['workspace_id'];
             $workspace = factory::from_id($workspace_id);
+
+            if (!$ec->has_relevant_context()) {
+                $ec->set_relevant_context($workspace->get_context());
+            }
 
             if (!$workspace->is_typeof(workspace::get_type())) {
                 throw new \coding_exception("Invalid workspace");
@@ -58,6 +62,10 @@ final class file_area implements mutation_resolver {
         } else {
             $category_id = workspace::get_default_category_id();
             $context = \context_coursecat::instance($category_id);
+
+            if (!$ec->has_relevant_context()) {
+                $ec->set_relevant_context($context);
+            }
         }
 
         $repositories = \repository::get_instances([
@@ -93,4 +101,15 @@ final class file_area implements mutation_resolver {
             'accept_types' => file_get_typegroup('extension', ['web_image'])
         ];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

@@ -24,17 +24,19 @@ namespace container_workspace\webapi\resolver\query;
 
 use core\files\file_helper;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
 use container_workspace\theme\file\workspace_image as workspace_image_file;
-use totara_core\advanced_feature;
 
 /**
  * Class workspace_image
  * @package container_workspace\webapi\resolver\query
  */
-final class workspace_image implements query_resolver {
+final class workspace_image implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -42,14 +44,19 @@ final class workspace_image implements query_resolver {
      * @return string
      */
     public static function resolve(array $args, execution_context $ec): string {
-        require_login();
-        advanced_feature::require('container_workspace');
-
         if (empty($args['workspace_id'])) {
             $workspace_image = new workspace_image_file();
             $url = $workspace_image->get_current_or_default_url();
+            if (!$ec->has_relevant_context()) {
+                $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
+            }
         } else {
             $workspace = factory::from_id($args['workspace_id']);
+
+            if (!$ec->has_relevant_context()) {
+                $ec->set_relevant_context($workspace->get_context());
+            }
+
             if (!$workspace->is_typeof(workspace::get_type())) {
                 throw new \coding_exception("Cannot fetch image of a container that is not a workspace");
             }
@@ -67,4 +74,15 @@ final class workspace_image implements query_resolver {
         }
         return '';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

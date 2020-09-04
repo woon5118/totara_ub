@@ -23,11 +23,12 @@
 namespace totara_engage\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
 use core\webapi\query_resolver;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 use totara_engage\timeview\time_view;
 
-final class time_view_options implements query_resolver{
+final class time_view_options implements query_resolver, has_middleware {
 
     /**
      * Query resolver.
@@ -37,7 +38,11 @@ final class time_view_options implements query_resolver{
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        advanced_feature::require('engage_resources');
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
+
         return [
             [
                 'value' => time_view::get_code(time_view::LESS_THAN_FIVE),
@@ -53,4 +58,14 @@ final class time_view_options implements query_resolver{
             ]
         ];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('engage_resources'),
+        ];
+    }
+
 }

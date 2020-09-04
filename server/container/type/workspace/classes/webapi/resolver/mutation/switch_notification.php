@@ -59,6 +59,11 @@ final class switch_notification implements mutation_resolver, has_middleware {
 
         /** @var workspace $workspace */
         $workspace = factory::from_id($workspace_id);
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($workspace->get_context());
+        }
+
         if (!$workspace->is_typeof(workspace::get_type())) {
             throw new \coding_exception("Cannot find workspace by id {$workspace_id}");
         }

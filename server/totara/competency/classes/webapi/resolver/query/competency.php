@@ -23,16 +23,18 @@
 
 namespace totara_competency\webapi\resolver\query;
 
-use context_system;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
+use core\webapi\middleware\require_system_capability;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_competency\entities\competency as competency_entity;
-use totara_core\advanced_feature;
 
 /**
  * Query to return a single competency.
  */
-class competency implements query_resolver {
+class competency implements query_resolver, has_middleware {
 
     /**
      * Returns a competency, given its ID.
@@ -42,15 +44,25 @@ class competency implements query_resolver {
      * @return competency_entity
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competencies');
-
-        require_login();
-        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
-
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
         return competency_entity::repository()
             ->with(['framework', 'type'])
             ->where('id', $args['competency_id'])
             ->one();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competencies'),
+            new require_system_capability('totara/hierarchy:viewcompetency'),
+        ];
     }
 
 }

@@ -27,15 +27,17 @@ use container_workspace\query\discussion\query;
 use core\orm\pagination\offset_cursor_paginator;
 use core\pagination\offset_cursor;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
-use totara_core\advanced_feature;
 
 /**
  * Query to fetch the cursor for discussion
  */
-final class discussion_cursor implements query_resolver {
+final class discussion_cursor implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -43,11 +45,12 @@ final class discussion_cursor implements query_resolver {
      * @return offset_cursor_paginator
      */
     public static function resolve(array $args, execution_context $ec): offset_cursor_paginator {
-        require_login();
-        advanced_feature::require('container_workspace');
-
         /** @var workspace $workspace */
         $workspace = factory::from_id($args['workspace_id']);
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($workspace->get_context());
+        }
 
         if (!$workspace->is_typeof(workspace::get_type())) {
             throw new \coding_exception("Cannot count the discussions from a container that is not a workspace");
@@ -70,4 +73,15 @@ final class discussion_cursor implements query_resolver {
 
         return loader::get_discussions($query);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

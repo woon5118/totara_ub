@@ -23,21 +23,26 @@
 namespace totara_comment\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_comment\comment;
 use totara_comment\comment_helper;
 
 /**
  * Mutation for updating a reply
  */
-final class update_reply implements mutation_resolver {
+final class update_reply implements mutation_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
      * @return comment
      */
     public static function resolve(array $args, execution_context $ec): comment {
-        require_login();
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $reply_id = $args['id'];
         $reply = comment::from_id($reply_id);
@@ -64,4 +69,14 @@ final class update_reply implements mutation_resolver {
             $format
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

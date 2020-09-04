@@ -23,9 +23,10 @@
 namespace engage_article\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use engage_article\totara_engage\resource\article;
-use totara_core\advanced_feature;
 use totara_engage\access\access;
 use totara_engage\timeview\time_view;
 use core\webapi\resolver\has_middleware;
@@ -43,8 +44,9 @@ final class create implements mutation_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): article {
         global $USER;
-        require_login();
-        advanced_feature::require('engage_resources');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         if (isset($args['access']) && !is_numeric($args['access']) && is_string($args['access'])) {
             // Format the string access into a proper value that machine can understand.
@@ -72,7 +74,9 @@ final class create implements mutation_resolver, has_middleware {
      */
     public static function get_middleware(): array {
         return [
-            new clean_editor_content('content', 'format')
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
+            new clean_editor_content('content', 'format'),
         ];
     }
 }

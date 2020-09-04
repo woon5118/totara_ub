@@ -23,13 +23,14 @@
 namespace engage_article\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use engage_article\totara_engage\resource\article;
-use totara_core\advanced_feature;
 use totara_engage\access\access_manager;
-use core_user\totara_engage\share\recipient\user as user_recipient;
 
-final class get_article implements query_resolver {
+final class get_article implements query_resolver, has_middleware {
     /**
      * @param array             $args
      * @param execution_context $ec
@@ -38,8 +39,9 @@ final class get_article implements query_resolver {
      */
     public static function resolve(array $args, execution_context $ec): article {
         global $USER;
-        require_login();
-        advanced_feature::require('engage_resources');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         /** @var article $article */
         $article = article::from_resource_id($args['id']);
@@ -50,4 +52,15 @@ final class get_article implements query_resolver {
 
         return $article;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
+        ];
+    }
+
 }

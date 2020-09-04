@@ -25,18 +25,32 @@ namespace totara_competency\webapi\resolver\query;
 
 use context_system;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
+use core\webapi\middleware\require_system_capability;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_core\advanced_feature;
 
-class linked_courses implements query_resolver {
+class linked_courses implements query_resolver, has_middleware {
 
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competencies');
-
-        require_login();
-        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
-
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
         return array_values(\totara_competency\linked_courses::get_linked_courses($args['competency_id']));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competencies'),
+            new require_system_capability('totara/hierarchy:viewcompetency'),
+        ];
     }
 
 }

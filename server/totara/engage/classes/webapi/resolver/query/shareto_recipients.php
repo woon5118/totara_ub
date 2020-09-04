@@ -25,19 +25,19 @@ namespace totara_engage\webapi\resolver\query;
 
 use core\orm\query\builder;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 use totara_engage\access\access;
-use totara_engage\repository\share_repository;
 use totara_engage\share\provider as share_provider;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\share\recipient\recipient;
-use totara_engage\entity\share as share_entity;
 
 /**
  * Resolver for finding destinations to where a user can share to.
  */
-final class shareto_recipients implements query_resolver {
+final class shareto_recipients implements query_resolver, has_middleware {
 
     /**
      * @param array $args
@@ -45,8 +45,10 @@ final class shareto_recipients implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
-        advanced_feature::require('engage_resources');
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $data = [];
 
@@ -174,6 +176,16 @@ final class shareto_recipients implements query_resolver {
         }
 
         return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
+        ];
     }
 
 }

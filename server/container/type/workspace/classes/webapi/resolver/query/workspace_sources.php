@@ -22,15 +22,18 @@
  */
 namespace container_workspace\webapi\resolver\query;
 
+use container_workspace\workspace;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use container_workspace\query\workspace\source;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 
 /**
  * Query resolver to get workspace source
  */
-final class workspace_sources implements query_resolver {
+final class workspace_sources implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -38,8 +41,9 @@ final class workspace_sources implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
-        advanced_feature::require('container_workspace');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
+        }
 
         return [
             source::ALL,
@@ -48,4 +52,15 @@ final class workspace_sources implements query_resolver {
             SOURCE::OTHER
         ];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

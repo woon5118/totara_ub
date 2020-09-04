@@ -23,7 +23,9 @@
 namespace totara_comment\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_comment\loader\comment_loader;
 use totara_comment\pagination\cursor_paginator;
 use totara_comment\resolver_factory;
@@ -31,7 +33,7 @@ use totara_comment\resolver_factory;
 /**
  * Resolver to fetch the comment cursor, which has the metadata about pagination.
  */
-final class comment_cursor implements query_resolver {
+final class comment_cursor implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -39,7 +41,10 @@ final class comment_cursor implements query_resolver {
      * @return cursor_paginator
      */
     public static function resolve(array $args, execution_context $ec): cursor_paginator {
-        require_login();
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $instance_id = $args['instance_id'];
         $component = $args['component'];
@@ -59,4 +64,14 @@ final class comment_cursor implements query_resolver {
             $cursor
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

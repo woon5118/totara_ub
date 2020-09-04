@@ -23,11 +23,13 @@
 
 namespace totara_competency\webapi\resolver\query;
 
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_competency\helpers\capability_helper;
-use totara_core\advanced_feature;
 
-abstract class profile_resolver implements query_resolver {
+abstract class profile_resolver implements query_resolver, has_middleware {
 
     /**
      * Authorize given user, returns user id, or throws an exception if the user is not authorized
@@ -40,13 +42,19 @@ abstract class profile_resolver implements query_resolver {
             throw new \coding_exception('User id is required');
         }
 
-        require_login();
-
-        advanced_feature::require('competency_assignment');
-
         capability_helper::require_can_view_profile($user_id);
 
         return $user_id;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
 
 }

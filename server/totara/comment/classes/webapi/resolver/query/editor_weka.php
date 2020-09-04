@@ -23,7 +23,9 @@
 namespace totara_comment\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use editor_weka\config\factory;
 use totara_comment\comment;
 use totara_comment\resolver_factory;
@@ -32,7 +34,7 @@ use totara_comment\resolver_factory;
  * Query to fetch editor configuration of other component and area, but will be masked with this very component
  * which is totara_comment
  */
-final class editor_weka implements query_resolver {
+final class editor_weka implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -40,8 +42,10 @@ final class editor_weka implements query_resolver {
      * @return \weka_texteditor
      */
     public static function resolve(array $args, execution_context $ec): \weka_texteditor {
-        global $CFG;
-        require_login();
+        global $CFG, $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $component = $args['component'];
         $area = $args['area'];
@@ -78,4 +82,14 @@ final class editor_weka implements query_resolver {
 
         return $editor;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

@@ -23,13 +23,15 @@
 namespace totara_comment\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_comment\comment;
 
 /**
  * Resolver for getting the draft comment
  */
-final class draft_comment implements query_resolver {
+final class draft_comment implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -37,7 +39,20 @@ final class draft_comment implements query_resolver {
      * @return comment
      */
     public static function resolve(array $args, execution_context $ec): comment {
-        require_login();
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
         return comment::from_id($args['id']);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

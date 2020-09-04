@@ -26,14 +26,16 @@ use container_workspace\exception\workspace_exception;
 use container_workspace\interactor\workspace\interactor;
 use container_workspace\workspace;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use core_container\factory;
-use totara_core\advanced_feature;
 
 /**
  * Resolver for updating
  */
-final class update implements mutation_resolver {
+final class update implements mutation_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -42,11 +44,14 @@ final class update implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec): workspace {
         global $USER;
-        require_login();
-        advanced_feature::require('container_workspace');
 
         /** @var workspace $workspace */
         $workspace = factory::from_id($args['id']);
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($workspace->get_context());
+        }
+
         $type = workspace::get_type();
 
         if (!$workspace->is_typeof($type)) {
@@ -54,7 +59,6 @@ final class update implements mutation_resolver {
         }
 
         $owner_id = $workspace->get_user_id();
-        $context = $workspace->get_context();
 
         $interactor = new interactor($workspace, $USER->id);
 
@@ -114,4 +118,15 @@ final class update implements mutation_resolver {
 
         return $workspace;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

@@ -27,15 +27,17 @@ use container_workspace\query\file\query;
 use container_workspace\query\file\sort;
 use core\pagination\offset_cursor;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
-use totara_core\advanced_feature;
 
 /**
  * Query resolver for all the files
  */
-final class files implements query_resolver {
+final class files implements query_resolver, has_middleware {
 
     /**
      * Query resolver.
@@ -45,9 +47,6 @@ final class files implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
-        advanced_feature::require('container_workspace');
-
         $workspace_id = $args['workspace_id'];
         $workspace = factory::from_id($workspace_id);
 
@@ -79,4 +78,15 @@ final class files implements query_resolver {
         $paginator = loader::get_files($query);
         return  $paginator->get_items()->all();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

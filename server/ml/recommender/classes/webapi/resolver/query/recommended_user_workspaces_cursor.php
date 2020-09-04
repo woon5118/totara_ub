@@ -27,7 +27,10 @@ use container_workspace\workspace;
 use core\orm\pagination\offset_cursor_paginator;
 use core\pagination\offset_cursor;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use ml_recommender\loader\recommended_item\workspaces_loader;
 use ml_recommender\query\recommended_item\user_query;
 use totara_core\advanced_feature;
@@ -37,7 +40,7 @@ use totara_core\advanced_feature;
  *
  * @package ml_recommender\webapi\resolver\query
  */
-final class recommended_user_workspaces_cursor implements query_resolver {
+final class recommended_user_workspaces_cursor implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -45,7 +48,9 @@ final class recommended_user_workspaces_cursor implements query_resolver {
      */
     public static function resolve(array $args, execution_context $ec): ?offset_cursor_paginator {
         global $USER;
-        require_login();
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
         if (advanced_feature::is_disabled('ml_recommender')) {
             return null;
         }
@@ -62,5 +67,14 @@ final class recommended_user_workspaces_cursor implements query_resolver {
 
         // Load the interaction items
         return workspaces_loader::get_recommended_workspaces_for_user($query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
     }
 }

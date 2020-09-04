@@ -23,12 +23,14 @@
 namespace engage_survey\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use engage_survey\totara_engage\resource\survey;
-use totara_core\advanced_feature;
 use totara_engage\exception\resource_exception;
 
-final class delete implements mutation_resolver {
+final class delete implements mutation_resolver, has_middleware {
     /**
      * @param array             $args
      * @param execution_context $ec
@@ -37,8 +39,9 @@ final class delete implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec): bool {
         global $USER;
-        require_login();
-        advanced_feature::require('engage_resources');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         try {
             $survey = survey::from_resource_id($args['resourceid']);
@@ -54,4 +57,15 @@ final class delete implements mutation_resolver {
             return false;
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
+        ];
+    }
+
 }

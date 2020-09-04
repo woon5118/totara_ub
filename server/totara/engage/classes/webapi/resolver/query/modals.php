@@ -23,12 +23,15 @@
 namespace totara_engage\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 use totara_engage\modal\loader;
 use totara_engage\modal\modal;
 
-final class modals implements query_resolver {
+final class modals implements query_resolver, has_middleware {
+
     /**
      * @param array             $args
      * @param execution_context $ec
@@ -36,12 +39,25 @@ final class modals implements query_resolver {
      * @return modal[]
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
-        advanced_feature::require('engage_resources');
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         if (!isset($args['exclude'])) {
             $args['exclude'] = [];
         }
         return loader::get_all($args['exclude']);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
+        ];
+    }
+
 }

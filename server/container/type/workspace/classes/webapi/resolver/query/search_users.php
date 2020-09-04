@@ -23,9 +23,11 @@
 namespace container_workspace\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use core_container\factory;
-use totara_core\advanced_feature;
 use container_workspace\workspace;
 use core_message\api;
 use container_workspace\interactor\workspace\interactor;
@@ -34,7 +36,7 @@ use container_workspace\interactor\workspace\interactor;
  * Class search_users
  * @package container_workspace\webapi\resolver\query
  */
-final class search_users implements query_resolver {
+final class search_users implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -43,10 +45,6 @@ final class search_users implements query_resolver {
      */
     public static function resolve(array $args, execution_context $ec): array {
         global $USER;
-
-        require_login();
-        advanced_feature::require('container_workspace');
-
         $workspace_id = $args['workspace_id'];
 
         /** @var workspace $workspace */
@@ -121,4 +119,15 @@ final class search_users implements query_resolver {
 
         return $result_records;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

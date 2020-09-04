@@ -23,8 +23,9 @@
 namespace totara_playlist\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
-use totara_core\advanced_feature;
 use totara_engage\access\access;
 use totara_engage\share\manager as share_manager;
 use totara_engage\share\recipient\manager as recipient_manager;
@@ -44,8 +45,9 @@ final class update implements mutation_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): playlist {
         global $USER;
-        require_login();
-        advanced_feature::require('engage_resources');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $playlist = playlist::from_id($args['id'], true);
 
@@ -95,6 +97,8 @@ final class update implements mutation_resolver, has_middleware {
      */
     public static function get_middleware(): array {
         return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
             // summary field is an optional for this operation. Hence we will not require it.
             new clean_editor_content('summary', 'summary_format', false)
         ];

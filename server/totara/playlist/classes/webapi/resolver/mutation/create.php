@@ -23,8 +23,9 @@
 namespace totara_playlist\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
-use totara_core\advanced_feature;
 use totara_engage\access\access;
 use totara_playlist\playlist;
 use core\webapi\resolver\has_middleware;
@@ -41,8 +42,9 @@ final class create implements mutation_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): playlist {
         global $USER;
-        require_login();
-        advanced_feature::require('engage_resources');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $access = null;
         $summary = null;
@@ -90,6 +92,8 @@ final class create implements mutation_resolver, has_middleware {
      */
     public static function get_middleware(): array {
         return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
             new clean_editor_content('summary', 'summary_format')
         ];
     }

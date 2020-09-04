@@ -24,15 +24,17 @@ namespace container_workspace\webapi\resolver\query;
 
 use container_workspace\loader\file\loader;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
-use totara_core\advanced_feature;
 
 /**
  * Query resolver to get file source
  */
-final class file_extensions implements query_resolver {
+final class file_extensions implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -40,11 +42,12 @@ final class file_extensions implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
-        advanced_feature::require('container_workspace');
-
         $workspace_id = $args['workspace_id'];
         $workspace = factory::from_id($workspace_id);
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($workspace->get_context());
+        }
 
         if (!$workspace->is_typeof(workspace::get_type())) {
             // Prevent the course container to be a pass in here.
@@ -58,4 +61,15 @@ final class file_extensions implements query_resolver {
 
         return loader::get_extensions($workspace->get_id());
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

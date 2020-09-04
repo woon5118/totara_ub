@@ -23,7 +23,9 @@
 namespace totara_reaction\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_reaction\loader\reaction_loader;
 use totara_reaction\reaction_helper;
 
@@ -31,7 +33,7 @@ use totara_reaction\reaction_helper;
  * Class delete
  * @package totara_reaction\webapi\resolver\mutation
  */
-final class delete implements mutation_resolver {
+final class delete implements mutation_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -39,7 +41,9 @@ final class delete implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec): bool {
         global $USER;
-        require_login();
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $component = $args['component'];
         $area = $args['area'];
@@ -64,4 +68,14 @@ final class delete implements mutation_resolver {
 
         return reaction_helper::purge_reaction($reaction, $USER->id);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

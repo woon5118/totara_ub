@@ -23,14 +23,16 @@
 namespace totara_comment\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_comment\comment;
 use totara_comment\comment_helper;
 
 /**
  * Resolver for deleting a reply
  */
-final class delete_reply implements mutation_resolver {
+final class delete_reply implements mutation_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -38,7 +40,11 @@ final class delete_reply implements mutation_resolver {
      * @return comment
      */
     public static function resolve(array $args, execution_context $ec): comment {
-        require_login();
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
+
         $comment = comment::from_id($args['id']);
 
         if (!$comment->is_reply()) {
@@ -47,4 +53,14 @@ final class delete_reply implements mutation_resolver {
 
         return comment_helper::soft_delete($comment->get_id());
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

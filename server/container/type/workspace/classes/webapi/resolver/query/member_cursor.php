@@ -27,16 +27,18 @@ use container_workspace\member\status;
 use container_workspace\query\member\query;
 use core\pagination\offset_cursor;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\orm\pagination\offset_cursor_paginator;
+use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
-use totara_core\advanced_feature;
 
 /**
  * Query resolver to fetch the next cursor for list of members.
  */
-final class member_cursor implements query_resolver {
+final class member_cursor implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -44,8 +46,6 @@ final class member_cursor implements query_resolver {
      * @return offset_cursor_paginator
      */
     public static function resolve(array $args, execution_context $ec): offset_cursor_paginator {
-        require_login();
-        advanced_feature::require('container_workspace');
         $workspace_id = $args['workspace_id'];
 
         /** @var workspace $workspace */
@@ -76,4 +76,15 @@ final class member_cursor implements query_resolver {
 
         return loader::get_members($query);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

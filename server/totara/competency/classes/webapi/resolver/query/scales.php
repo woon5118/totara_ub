@@ -23,17 +23,19 @@
 
 namespace totara_competency\webapi\resolver\query;
 
-use context_system;
 use core\orm\collection;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
+use core\webapi\middleware\require_system_capability;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_competency\models\scale as scale_model;
-use totara_core\advanced_feature;
 
 /**
  * Query to return a scales for one or multiple competencies or scale ids
  */
-class scales implements query_resolver {
+class scales implements query_resolver, has_middleware {
 
     /**
      * @param array $args
@@ -41,14 +43,14 @@ class scales implements query_resolver {
      * @return collection
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competencies');
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         if (!isset($args['id']) && !isset($args['competency_id']) || isset($args['id']) && isset($args['competency_id'])) {
             throw new \coding_exception('Please provide either scale id OR competency id');
         }
-
-        require_login();
-        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         if (isset($args['id'])) {
             $models = scale_model::load_by_ids($args['id']);
@@ -57,6 +59,17 @@ class scales implements query_resolver {
         }
 
         return $models;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competencies'),
+            new require_system_capability('totara/hierarchy:viewcompetency')
+        ];
     }
 
 }

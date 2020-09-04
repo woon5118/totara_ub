@@ -27,13 +27,15 @@ use container_workspace\tracker\tracker;
 use container_workspace\workspace;
 use core\notification;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 
 /**
  * Resolver for deleting a workspace via graphql.
  */
-final class delete implements mutation_resolver {
+final class delete implements mutation_resolver, has_middleware {
 
     /**
      * Mutation resolver.
@@ -45,9 +47,11 @@ final class delete implements mutation_resolver {
     public static function resolve(array $args, execution_context $ec): bool {
         global $USER;
 
-        require_login();
-        advanced_feature::require('container_workspace');
         $workspace = workspace::from_id($args['workspace_id']);
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($workspace->get_context());
+        }
 
         $workspace_id = $workspace->get_id();
         // Clear the tracker for navigating the right page.
@@ -60,4 +64,15 @@ final class delete implements mutation_resolver {
         notification::success(get_string('notification_deleted', 'container_workspace', $workspace->fullname));
         return true;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

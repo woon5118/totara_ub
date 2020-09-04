@@ -24,11 +24,13 @@
 namespace totara_engage\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 use totara_engage\bookmark\bookmark;
 
-final class update_bookmark implements mutation_resolver {
+final class update_bookmark implements mutation_resolver, has_middleware {
 
     /**
      * @param array             $args
@@ -37,9 +39,9 @@ final class update_bookmark implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec): bool {
         global $USER, $DB;
-
-        require_login();
-        advanced_feature::require('engage_resources');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $itemid = $args['itemid'];
         $component = $args['component'];
@@ -53,6 +55,16 @@ final class update_bookmark implements mutation_resolver {
         $transaction->allow_commit();
 
         return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
+        ];
     }
 
 }

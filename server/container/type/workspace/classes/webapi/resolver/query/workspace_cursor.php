@@ -23,25 +23,30 @@
 namespace container_workspace\webapi\resolver\query;
 
 use container_workspace\loader\workspace\loader;
+use container_workspace\workspace;
 use core\orm\pagination\offset_cursor_paginator;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use container_workspace\query\workspace\query;
-use totara_core\advanced_feature;
+use core\webapi\resolver\has_middleware;
 
 /**
  * Query resolver to fetch the cursor information for workspaces.
  */
-final class workspace_cursor implements query_resolver {
+final class workspace_cursor implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
      * @return offset_cursor_paginator
      */
     public static function resolve(array $args, execution_context $ec): offset_cursor_paginator {
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
+        }
+
         global $USER;
-        require_login();
-        advanced_feature::require('container_workspace');
 
         $user_id = $USER->id;
         if (isset($args['user_id'])) {
@@ -51,4 +56,15 @@ final class workspace_cursor implements query_resolver {
         $query = query::from_parameters($args, $user_id);
         return loader::get_workspaces($query);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

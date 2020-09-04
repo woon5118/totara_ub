@@ -23,21 +23,26 @@
 namespace totara_reaction\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_reaction\loader\reaction_loader;
 
 /**
  * Class total
  * @package totara_reaction\webapi\resolver\query
  */
-final class total implements query_resolver {
+final class total implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
      * @return int
      */
     public static function resolve(array $args, execution_context $ec): int {
-        require_login();
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $paginator = reaction_loader::get_paginator(
             $args['component'],
@@ -47,4 +52,14 @@ final class total implements query_resolver {
 
         return (int) $paginator->get_total();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

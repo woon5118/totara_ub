@@ -23,15 +23,17 @@
 namespace engage_survey\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use engage_survey\totara_engage\resource\survey;
-use totara_core\advanced_feature;
 use totara_engage\access\access;
 
 /**
  * Mutation resolver for engage_survey_create
  */
-class create implements mutation_resolver {
+class create implements mutation_resolver, has_middleware {
     /**
      * @param array             $args
      * @param execution_context $ec
@@ -40,8 +42,9 @@ class create implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec): survey {
         global $USER;
-        require_login();
-        advanced_feature::require('engage_resources');
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         if (isset($args['access']) && !is_numeric($args['access']) && is_string($args['access'])) {
             // Format the string access into a proper value that machine can understand.
@@ -54,4 +57,15 @@ class create implements mutation_resolver {
 
         return $resource;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('engage_resources'),
+        ];
+    }
+
 }

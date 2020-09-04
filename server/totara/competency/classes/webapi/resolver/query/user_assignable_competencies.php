@@ -23,18 +23,20 @@
 
 namespace totara_competency\webapi\resolver\query;
 
-use context_system;
 use core\pagination\cursor;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
+use core\webapi\middleware\require_system_capability;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_competency\data_providers\user_assignable_competencies as provider;
 use totara_competency\helpers\capability_helper;
-use totara_core\advanced_feature;
 
 /**
  * Query to return competencies available for self assignment.
  */
-class user_assignable_competencies implements query_resolver {
+class user_assignable_competencies implements query_resolver, has_middleware {
 
     /**
      * Returns a competency, given its ID.
@@ -47,7 +49,6 @@ class user_assignable_competencies implements query_resolver {
         self::authorize($args);
 
         $filters = $args['filters'] ?? [];
-
         $cursor = $args['cursor'] !== null ? cursor::decode($args['cursor']) : null;
 
         return provider::for($args['user_id'])
@@ -57,13 +58,18 @@ class user_assignable_competencies implements query_resolver {
     }
 
     protected static function authorize(array $args) {
-        advanced_feature::require('competency_assignment');
-
-        require_login();
-
-        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
-
         capability_helper::require_can_assign($args['user_id']);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+            new require_system_capability('totara/hierarchy:viewcompetency')
+        ];
     }
 
 }

@@ -23,21 +23,26 @@
 namespace totara_topic\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_topic\provider\topic_provider;
 use totara_topic\topic;
 
 /**
  * Query resolver to query the topics
  */
-final class find_topics implements query_resolver {
+final class find_topics implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
      * @return topic[]
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $exclude_ids = [];
         if (isset($args['exclude']) && is_array($args['exclude'])) {
@@ -46,4 +51,14 @@ final class find_topics implements query_resolver {
 
         return topic_provider::query_by_name($args['search'], $exclude_ids);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }

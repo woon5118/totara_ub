@@ -25,20 +25,20 @@ namespace container_workspace\webapi\resolver\query;
 use container_workspace\loader\discussion\loader;
 use container_workspace\query\discussion\query;
 use container_workspace\query\discussion\sort;
-use core\orm\pagination\cursor_paginator;
-use core\pagination\cursor;
 use core\pagination\offset_cursor;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
 use container_workspace\discussion\discussion;
-use totara_core\advanced_feature;
 
 /**
  * Query resolver for all the discussions
  */
-final class discussions implements query_resolver {
+final class discussions implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
@@ -46,14 +46,15 @@ final class discussions implements query_resolver {
      * @return discussion[]
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
-        advanced_feature::require('container_workspace');
         $workspace = factory::from_id($args['workspace_id']);
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($workspace->get_context());
+        }
 
         if (!$workspace->is_typeof(workspace::get_type())) {
             throw new \coding_exception("Cannot fetch discussions from container that is not a workspace");
         }
-
 
         $query = new query($workspace->get_id());
 
@@ -76,4 +77,15 @@ final class discussions implements query_resolver {
         $paginator = loader::get_discussions($query);
         return $paginator->get_items()->all();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('container_workspace'),
+        ];
+    }
+
 }

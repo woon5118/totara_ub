@@ -23,21 +23,26 @@
 namespace totara_comment\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_comment\comment;
 use totara_comment\loader\comment_loader;
 
 /**
  * Resolver for querying the replies of a comment
  */
-final class replies implements query_resolver {
+final class replies implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
      * @return comment[]
      */
     public static function resolve(array $args, execution_context $ec): array {
-        require_login();
+        global $USER;
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
 
         $page = 1;
         if (isset($args['page'])) {
@@ -50,4 +55,14 @@ final class replies implements query_resolver {
         $replies = $paginator->get_items()->all();
         return array_reverse($replies);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+        ];
+    }
+
 }
