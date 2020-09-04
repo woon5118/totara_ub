@@ -83,28 +83,30 @@ class totara_msteams_botfw_auth_jwt_testcase extends advanced_testcase {
     }
 
     public function data_load_failure_payload() {
+        $time = time();
         return [
             // Expiration time is in the past
-            [['exp' => time() - HOURSECS]],
+            'exp' => [['exp' => $time - HOURSECS], $time],
             // Not before is in the future
-            [['nbf' => time() + HOURSECS]],
+            'nbf' => [['nbf' => $time + HOURSECS], $time],
             // Issued at is in the future
-            [['iat' => time() + HOURSECS]],
+            'iat' => [['iat' => $time + HOURSECS], $time],
         ];
     }
 
     /**
-     * @param mixed $input
+     * @param array $input
+     * @param integer $time
      * @dataProvider data_load_failure_payload
      */
-    public function test_load_failure_payload($input) {
+    public function test_load_failure_payload($input, int $time) {
         $payload = json_encode($input);
         $input = implode('.', [base64url::encode('{"typ":"JWT","alg":"HS256"}'), base64url::encode($payload), 'BMI_HUYbnGhqzQJclgarZIi-AvtIdZVwNWJFj6tJ9nc']);
         try {
-            jwt::load($input);
+            jwt::load($input, $time);
             $this->fail('jwt_exception expected');
         } catch (jwt_exception $ex) {
         }
-        $this->assertNull(jwt::try_load($input));
+        $this->assertNull(jwt::try_load($input, $time));
     }
 }
