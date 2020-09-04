@@ -111,10 +111,7 @@ class user extends item {
      * @return array
      */
     public static function load_existing_ids(): array {
-        $user_ids = user_entity::repository()
-            ->select('id')
-            ->get()
-            ->pluck('id');
+        $user_ids = builder::get_db()->get_fieldset_select('user', 'id', '');
 
         return array_combine($user_ids, $user_ids);
     }

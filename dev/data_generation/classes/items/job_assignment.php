@@ -31,13 +31,6 @@ use totara_job\job_assignment as core_job_assignment;
 
 class job_assignment extends item {
 
-    protected const BATCH_SIZE = BATCH_INSERT_MAX_ROW_COUNT;
-
-    /**
-     * @var array
-     */
-    protected static $bulk_buffer = [];
-
     /**
      * id of the user
      * @var int|null
@@ -61,10 +54,12 @@ class job_assignment extends item {
 
     /** @var organisation|null */
     protected $organisation = null;
+
     /**
      * @var int
      */
     private $sort_order;
+
     /**
      * @var bool
      */
@@ -306,10 +301,7 @@ class job_assignment extends item {
             $properties['sortorder'] = $this->sort_order;
             $properties['timecreated'] = time();
             $properties['timemodified'] = time();
-            self::$bulk_buffer[] = $properties;
-            if (count(self::$bulk_buffer) >= self::BATCH_SIZE) {
-                self::process_bulk();
-            }
+            $this->data = $properties;
         }
 
         return true;
@@ -368,16 +360,6 @@ class job_assignment extends item {
         $this->user = $user_or_id;
 
         return $this;
-    }
-
-    /**
-     * Save all job assignments in bulk which are in the buffer so far
-     */
-    public static function process_bulk() {
-        if (!empty(self::$bulk_buffer)) {
-            builder::get_db()->insert_records(job_assignment_entity::TABLE, self::$bulk_buffer);
-            self::$bulk_buffer = [];
-        }
     }
 
     /**

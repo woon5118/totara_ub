@@ -94,7 +94,13 @@ class job_assignments_creator {
                     $key = array_rand($pool);
                 } while (in_array($key, $exclude_users));
 
-                return $pool[$key];
+                $assignment = $pool[$key];
+
+                if ($assignment && !$assignment instanceof job_assignment) {
+                    $assignment = job_assignment::new()->fill($assignment);
+                }
+
+                return $assignment;
             };
 
             $pick_pos_org = function (array &$pool, array $original) {
@@ -111,51 +117,56 @@ class job_assignments_creator {
                 return $original[$key];
             };
 
+            $buffer = [];
             foreach ($this->users as $current_user_key => $user) {
-                job_assignment::for_user($user)
+                $buffer[] = job_assignment::for_user($user)
                     ->set_sort_order(1)
                     ->use_bulk()
-                    ->save();
+                    ->save_and_return()
+                    ->get_data();
+
+                if (count($buffer) >= BATCH_INSERT_MAX_ROW_COUNT) {
+                    $this->process_bulk($buffer);
+                }
             }
 
             // Make sure all is saved
-            job_assignment::process_bulk();
+            $this->process_bulk($buffer);
 
-            $manager_job_assignments = job_assignment_entity::repository()
+            $manager_job_assignments = builder::table(job_assignment_entity::TABLE)
+                ->results_as_arrays()
                 ->get()
                 ->key_by('userid')
-                ->map(function (job_assignment_entity $assignment) {
-                    return job_assignment::new()->fill($assignment->to_array());
-                })
                 ->all(true);
 
             $count = 0;
             foreach ($this->users as $current_user_key => $user) {
-                // Now get three different random users
-                // to be assigned as manager, appraiser and temporary manager
-                $manager_job_assignment = $pick_assignment(
-                    [
-                        $current_user_key
-                    ],
-                    $manager_job_assignments
-                );
-                $temp_manager_job_assignment = $pick_assignment(
-                    [
-                        $current_user_key,
-                        $manager_job_assignment->get_data('userid')
-                    ],
-                    $manager_job_assignments
-                );
-                $appraiser = $pick_user(
-                    [
-                        $current_user_key,
-                        $manager_job_assignment->get_data('userid'),
-                        $temp_manager_job_assignment->get_data('userid')
-                    ],
-                    $user_pool
-                );
                 for ($i = 1; $i <= $job_assignments_for_user; $i++) {
-                    job_assignment::for_user($user)
+                    // Now get three different random users
+                    // to be assigned as manager, appraiser and temporary manager
+                    $manager_job_assignment = $pick_assignment(
+                        [
+                            $current_user_key
+                        ],
+                        $manager_job_assignments
+                    );
+                    $temp_manager_job_assignment = $pick_assignment(
+                        [
+                            $current_user_key,
+                            $manager_job_assignment->get_data('userid')
+                        ],
+                        $manager_job_assignments
+                    );
+                    $appraiser = $pick_user(
+                        [
+                            $current_user_key,
+                            $manager_job_assignment->get_data('userid'),
+                            $temp_manager_job_assignment->get_data('userid')
+                        ],
+                        $user_pool
+                    );
+
+                    $buffer[] = job_assignment::for_user($user)
                         ->set_manager_job_assignment($manager_job_assignment)
                         ->set_temp_manager_job_assignment($temp_manager_job_assignment)
                         ->set_appraiser_id($appraiser)
@@ -163,7 +174,16 @@ class job_assignments_creator {
                         ->set_organisation($pick_pos_org($org_pool, $this->organisations))
                         ->set_sort_order($i + 1)   // we already have 1, so let's start with 2
                         ->use_bulk()
-                        ->save();
+                        ->save_and_return()
+                        ->get_data();
+
+                    if (count($buffer) >= BATCH_INSERT_MAX_ROW_COUNT) {
+                        $this->process_bulk($buffer);
+                    }
+
+                    unset($manager_job_assignment);
+                    unset($temp_manager_job_assignment);
+                    unset($appraiser);
                 }
 
                 $count++;
@@ -174,8 +194,18 @@ class job_assignments_creator {
             }
 
             // Make sure all records are saved.
-            job_assignment::process_bulk();
+            $this->process_bulk($buffer);
         });
+    }
+
+    /**
+     * Save all job assignments in bulk which are in the buffer so far
+     */
+    public function process_bulk(array &$buffer) {
+        if (!empty($buffer)) {
+            builder::get_db()->insert_records(job_assignment_entity::TABLE, $buffer);
+            $buffer = [];
+        }
     }
 
 }

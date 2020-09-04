@@ -148,14 +148,20 @@ class performance_testing extends App {
             $users = [];
             for ($c = 1; $c <= $size; $c++) {
                 $users[] = (object)user::new()->create_for_bulk();
+                if (count($users) >= BATCH_INSERT_MAX_ROW_COUNT) {
+                    builder::get_db()->insert_records('user', $users);
+                    $users = [];
+                }
             }
 
-            builder::get_db()->insert_records_via_batch('user', $users);
-
-            // We mostly need only the userid,
-            // to save memory we only load those
-            $this->users = user::load_existing_ids();
+            if (!empty($users)) {
+                builder::get_db()->insert_records('user', $users);
+            }
         });
+
+        // We mostly need only the userid,
+        // to save memory we only load those
+        $this->users = user::load_existing_ids();
 
         return $this;
     }
@@ -254,24 +260,31 @@ class performance_testing extends App {
             throw new \Exception('You must create audiences first');
         }
 
-        $user_per_audience = $this->get_item_size('users_per_audience');
+        builder::get_db()->transaction(function () {
+            $user_per_audience = $this->get_item_size('users_per_audience');
 
-        $users = $this->users;
+            $users = $this->users;
 
-        $audiences = $this->audiences;
+            $audiences = $this->audiences;
 
-        $members = [];
-        /** @var audience[] $audiences */
-        foreach ($audiences as $audience) {
-            shuffle($users);
+            $members = [];
+            foreach ($audiences as $audience) {
+                shuffle($users);
 
-            $users = array_slice($users, 0, $user_per_audience);
-            foreach ($users as $user) {
-                $members[] = $audience->add_member($user);
+                $users = array_slice($users, 0, $user_per_audience);
+                foreach ($users as $user) {
+                    $members[] = $audience->add_member($user);
+                    if (count($members) >= BATCH_INSERT_MAX_ROW_COUNT) {
+                        builder::get_db()->insert_records('cohort_members', $members);
+                        $members = [];
+                    }
+                }
             }
-        }
 
-        builder::get_db()->insert_records_via_batch('cohort_members', $members);
+            if (!empty($members)) {
+                builder::get_db()->insert_records('cohort_members', $members);
+            }
+        });
 
         return $this;
     }
