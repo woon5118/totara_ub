@@ -27,6 +27,7 @@ use core\collection;
 use core\entities\cohort;
 use core\entities\user;
 use core\orm\query\builder;
+use core\session\manager;
 use core_container\container_category_helper;
 use core_container\module\module;
 use hierarchy_organisation\entities\organisation;
@@ -583,7 +584,9 @@ class mod_perform_generator extends component_generator_base {
         $previous_user = clone $USER;
 
         // For the activity generation we need to make sure the admin user is set
-        advanced_testcase::setAdminUser();
+        $user = get_admin();
+        manager::init_empty_session();
+        manager::set_user($user);
 
         $manual_idnumbers = relationship::repository()
             ->where('type', relationship::TYPE_MANUAL)

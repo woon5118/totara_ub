@@ -33,6 +33,8 @@ use core\orm\query\builder;
 use degeneration\items\audience;
 use degeneration\items\competency;
 use degeneration\items\competency_scale;
+use degeneration\items\container_perform\activity as activity_item;
+use degeneration\items\container_perform\preset_configurations;
 use degeneration\items\container_workspace\workspace;
 use degeneration\items\course;
 use degeneration\items\course_completion;
@@ -46,8 +48,11 @@ use degeneration\items\organisation;
 use degeneration\items\pathways\criteria_group;
 use degeneration\items\position;
 use degeneration\items\user;
+use Exception;
 use hierarchy_organisation\entities\organisation_framework;
 use hierarchy_position\entities\position_framework;
+use mod_perform\expand_task;
+use mod_perform\task\service\subject_instance_creation;
 use totara_competency\linked_courses;
 
 class performance_testing extends App {
@@ -93,6 +98,13 @@ class performance_testing extends App {
     protected $assign_groups = true;
 
     /**
+     * Check for if track user assignments were expanded.
+     *
+     * @var bool
+     */
+    private $user_assignments_expanded = false;
+
+    /**
      * @var array
      */
     protected $workspaces = [];
@@ -118,6 +130,9 @@ class performance_testing extends App {
             ->create_audiences()
             ->add_audience_members()
             ->create_job_assignments_for_user()
+            ->create_activities()
+            ->expand_track_user_assignments()
+            ->generate_instances()
             // ->create_scales()
             // ->create_competencies()
             //->create_organisation_assignments()
@@ -253,11 +268,11 @@ class performance_testing extends App {
         $this->output('Adding audience members...');
 
         if (empty($this->users)) {
-            throw new \Exception('You must create users first');
+            throw new Exception('You must create users first');
         }
 
         if (empty($this->audiences)) {
-            throw new \Exception('You must create audiences first');
+            throw new Exception('You must create audiences first');
         }
 
         builder::get_db()->transaction(function () {
@@ -373,7 +388,7 @@ class performance_testing extends App {
         $this->output('Creating audience assignments...');
 
         if ($this->competency_hierarchy === null) {
-            throw new \Exception('You must create competency hierarchy first');
+            throw new Exception('You must create competency hierarchy first');
         }
 
         builder::get_db()->transaction(function () {
@@ -395,7 +410,7 @@ class performance_testing extends App {
         $this->output('Creating user assignments...');
 
         if ($this->competency_hierarchy === null) {
-            throw new \Exception('You must create competency hierarchy first');
+            throw new Exception('You must create competency hierarchy first');
         }
 
         builder::get_db()->transaction(function () {
@@ -429,7 +444,7 @@ class performance_testing extends App {
         $this->output('Adding linked courses');
 
         if (empty($this->courses_with_users)) {
-            throw new \Exception('You must create courses and enrol users first');
+            throw new Exception('You must create courses and enrol users first');
         }
 
         builder::get_db()->transaction(function () {
@@ -460,7 +475,7 @@ class performance_testing extends App {
         $this->output('Enrolling users...');
 
         if (empty($this->users) || empty($this->courses)) {
-            throw new \Exception('Users and courses must be created first!');
+            throw new Exception('Users and courses must be created first!');
         }
 
         $percentage = $this->get_item_size('enrolments');
@@ -569,7 +584,7 @@ class performance_testing extends App {
         $scale = $this->scales[$competency->get_data()->scale->id];
 
         if (!$scale) {
-            throw new \Exception('Something went wrong scale value is not found');
+            throw new Exception('Something went wrong scale value is not found');
         }
 
         $on_activate = criteria_group::new()
@@ -607,7 +622,7 @@ class performance_testing extends App {
         $this->output('Creating criteria...');
 
         if (!$this->competency_hierarchy) {
-            throw new \Exception('You must generate your competency hierarchy first');
+            throw new Exception('You must generate your competency hierarchy first');
         }
 
         builder::get_db()->transaction(function () {
@@ -675,7 +690,7 @@ class performance_testing extends App {
         $this->output('Creating job assignments...');
 
         if (empty($this->users)) {
-            throw new \coding_exception("Cannot create workspace member when users are empty");
+            throw new coding_exception("Cannot create workspace member when users are empty");
         }
 
         $job_assignment_creator = new job_assignments_creator($this->users, $this->positions, $this->organisations);
@@ -683,6 +698,81 @@ class performance_testing extends App {
 
         return $this;
     }
+
+    protected function create_activities() {
+        $this->output('Creating activities ...');
+        $activity_size = $this->get_item_size('activities');
+        $configuration_manager = new preset_configurations();
+
+        builder::get_db()->transaction(
+            function () use ($activity_size, $configuration_manager) {
+                $done = 0;
+                for ($x = 0; $x <= $activity_size['count']; $x++) {
+                    $config = $configuration_manager->get_a_configuration();
+                    $config['track']['audiences'] = $this->get_random_audiences($activity_size['audiences_per_activity']);
+                    (activity_item::new())->create_activity($config);
+                    $done++;
+                    echo '.';
+
+                    if ($done%50 === 0) {
+                        $percentage_done = $done*100/$activity_size['count'];
+                        echo "$percentage_done%" . PHP_EOL;
+                    }
+                }
+            }
+        );
+        $this->output('All activities created');
+
+        return $this;
+    }
+
+    private function expand_track_user_assignments() {
+        $this->output('Expanding user assignments...');
+        (new expand_task())->expand_all();
+
+        $this->user_assignments_expanded = true;
+        return $this;
+    }
+
+    private function generate_instances() {
+        if (!$this->user_assignments_expanded) {
+            $this->expand_track_user_assignments();
+        }
+
+        $this->output('Generating subject & participant instance data for activities...');
+        (new subject_instance_creation())->generate_instances();
+
+        return $this;
+    }
+
+    private function get_random_audiences($count) {
+        if (empty($this->audiences)) {
+            throw new coding_exception("You'll need to create audiences & audience users first.");
+        }
+        $audience_keys = array_rand($this->audiences, $count);
+        $audience_ids = [];
+
+        if ($audience_keys === null) {
+            throw new coding_exception('Trying to pick more audiences than created');
+        }
+
+        // Cater for the case when there's only one
+        if (!is_array($audience_keys)) {
+            $audience_keys = [$audience_keys];
+        }
+
+        foreach ($audience_keys as $audience_key) {
+            $audience_ids[] = $this->audiences[$audience_key]->get_data()->id;
+        }
+
+        return $audience_ids;
+    }
+
+    protected function create_random_responses() {
+        $this->output('Creating random responses for activities...');
+        // todo: create_random_responses.
+    }
+
 
     public function create_workspaces() {
         $this->output('Creating workspaces ...');
@@ -783,7 +873,7 @@ class performance_testing extends App {
 
         /** @var \container_workspace_generator $workspace_generator */
         $workspace_generator = $generator->get_plugin_generator('container_workspace');
-        $discussion = $workspace_generator->create_discussion(
+        $workspace_generator->create_discussion(
             $workspace_id,
             $faker->text,
             null,
@@ -834,7 +924,7 @@ class performance_testing extends App {
 
                                         foreach ($members as $inner_member) {
                                             for ($x = 0; $x < $reply_size; $x++) {
-                                                $reply = $comment_generator->create_reply(
+                                                $comment_generator->create_reply(
                                                     $comment->get_id(),
                                                     $faker->text,
                                                     FORMAT_JSON_EDITOR,
@@ -879,6 +969,10 @@ class performance_testing extends App {
             'audiences' => 50,
             'users_per_audience' => 1000,
             'workspaces' => 1,
+            'activities' => [
+                'count' => 5,
+                'audiences_per_activity' => 5,
+            ],
             'workspace_members' => 2,
             'workspace_discussions' => 1,
             'workspace_discussion_comments' => 1,
@@ -902,6 +996,10 @@ class performance_testing extends App {
             'audiences' => 80,
             'users_per_audience' => 2500,
             'workspaces' => 10,
+            'activities' => [
+                'count' => 25,
+                'audiences_per_activity' => 10,
+            ],
             'workspace_members' => 5,
             'workspace_discussions' => 5,
             'workspace_discussion_comments' => 3,
@@ -925,6 +1023,10 @@ class performance_testing extends App {
             'audiences' => 50,
             'users_per_audience' => 5000,
             'workspaces' => 100,
+            'activities' => [
+                'count' => 100,
+                'audiences_per_activity' => 20,
+            ],
             'workspace_members' => 100,
             'workspace_discussions' => 100,
             'workspace_discussion_comments' => 100,
@@ -947,8 +1049,11 @@ class performance_testing extends App {
             'courses' => 100,
             'audiences' => 80,
             'users_per_audience' => 10000,
-            'audience_assignments_per_activity' => 10,
             'workspaces' => 100,
+            'activities' => [
+                'count' => 500,
+                'audiences_per_activity' => 40,
+            ],
             'workspace_members' => 250,
             'workspace_discussions' => 250,
             'workspace_discussion_comments' => 250,
@@ -972,6 +1077,10 @@ class performance_testing extends App {
             'audiences' => 100,
             'users_per_audience' => 25000,
             'workspaces' => 1000,
+            'activities' => [
+                'count' => 1200,
+                'audiences_per_activity' => 60,
+            ],
             'workspace_members' => 500,
             'workspace_discussions' => 750,
             'workspace_discussion_comments' => 750,
@@ -995,6 +1104,10 @@ class performance_testing extends App {
             'audiences' => 120,
             'users_per_audience' => 50000,
             'workspaces' => 1000,
+            'activities' => [
+                'count' => 2500,
+                'audiences_per_activity' => 80,
+            ],
             'workspace_members' => 1000,
             'workspace_discussions' => 1000,
             'workspace_discussion_comments' => 1000,
@@ -1018,6 +1131,10 @@ class performance_testing extends App {
             'audiences' => 140,
             'users_per_audience' => 100000,
             'workspaces' => 1000,
+            'activities' => [
+                'count' => 5000,
+                'audiences_per_activity' => 100,
+            ],
             'workspace_members' => 1000,
             'workspace_discussions' => 1000,
             'workspace_discussion_comments' => 1000,
