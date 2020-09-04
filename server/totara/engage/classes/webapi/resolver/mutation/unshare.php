@@ -52,9 +52,11 @@ final class unshare implements mutation_resolver, has_middleware {
         $item_id = $args['item_id'];
         $component = $args['component'];
 
+        // Get the share provider for the specific component.
         $provider = share_provider::create($component);
         $instance = $provider->get_item_instance($item_id);
 
+        // Unshare the item for this recipient.
         share_manager::unshare($recipient_id, $instance);
 
         $transaction->allow_commit();

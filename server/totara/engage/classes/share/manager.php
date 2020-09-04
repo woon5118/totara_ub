@@ -283,7 +283,16 @@ final class manager {
      * @param shareable $instance
      */
     public static function unshare(int $recipient_id, shareable $instance): void {
-        global $USER;
+        // Confirm that the recipient directly relates to the item being shared.
+        /** @var share_entity $share */
+        $share = share_entity::repository()->get_share($instance->get_id(), $instance::get_resource_type());
+        if (!$share->recipients()
+            ->where('id', $recipient_id)
+            ->where('visibility', 1)
+            ->exists()
+        ) {
+            throw new \coding_exception('Invalid recipient_id for shared item');
+        }
 
         /** @var share_recipient_repository $repo */
         $repo = recipient_entity::repository();
@@ -297,7 +306,6 @@ final class manager {
         if (!$instance->can_unshare($recipient->instanceid, $recipient->area !== user::AREA)) {
             throw new share_exception('error:sharecapability', $instance::get_resource_type());
         }
-
 
         $recipient->visibility = 0;
         $recipient->update();

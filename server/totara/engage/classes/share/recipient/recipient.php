@@ -107,7 +107,7 @@ abstract class recipient {
      * Search for recipient.
      *
      * @param string $search
-     * @param shareable $instance
+     * @param shareable|null $instance
      * @return array
      */
     abstract public static function search(string $search, ?shareable $instance): array;

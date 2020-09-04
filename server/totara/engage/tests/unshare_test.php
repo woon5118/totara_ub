@@ -36,47 +36,45 @@ class totara_engage_unshare_testcase extends advanced_testcase {
 
         $gen = $this->getDataGenerator();
 
-        /** @var engage_article_generator $articlegen */
+        /** @var engage_article_generator $article_gen */
         $article_gen = $gen->get_plugin_generator('engage_article');
+        /** @var engage_survey_generator $survey_gen */
+        $survey_gen = $gen->get_plugin_generator('engage_survey');
 
         // Create users.
         $users = $article_gen->create_users(2);
-
-        // Create article.
         $this->setUser($users[0]);
+
+        // Create items to share.
         $article = $article_gen->create_article();
+        $survey = $survey_gen->create_survey();
 
         // Setup recipients.
         $recipients = $article_gen->create_user_recipients([$users[1]]);
-        $shares = $article_gen->share_article($article, $recipients);
 
-        /** @var \totara_engage\share\share $share */
-        $share = reset($shares);
+        // Get shares.
+        $article_shares = $article_gen->share_article($article, $recipients);
+        $survey_shares = $survey_gen->share_survey($survey, $recipients);
+        $article_share = reset($article_shares);
+        $survey_share = reset($survey_shares);
 
-        $this->assertTrue($DB->record_exists('engage_share', ['id' => $share->get_id()]));
-        $this->assertEquals(1, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $share->get_recipient_id()]));
+        // Confirm that the shares exist and that they are visible.
+        $this->assertTrue($DB->record_exists('engage_share', ['id' => $article_share->get_id()]));
+        $this->assertEquals(1, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $article_share->get_recipient_id()]));
+        $this->assertTrue($DB->record_exists('engage_share', ['id' => $survey_share->get_id()]));
+        $this->assertEquals(1, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $survey_share->get_recipient_id()]));
 
-        share_manager::unshare($share->get_recipient_id(), $article);
+        // Unshare the items and confirm that they are no longer visible by the user.
+        share_manager::unshare($article_share->get_recipient_id(), $article);
+        share_manager::unshare($survey_share->get_recipient_id(), $survey);
+        $this->assertTrue($DB->record_exists('engage_share', ['id' => $article_share->get_id()]));
+        $this->assertEquals(0, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $article_share->get_recipient_id()]));
+        $this->assertTrue($DB->record_exists('engage_share', ['id' => $survey_share->get_id()]));
+        $this->assertEquals(0, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $survey_share->get_recipient_id()]));
 
-        $this->assertTrue($DB->record_exists('engage_share', ['id' => $share->get_id()]));
-        $this->assertEquals(0, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $share->get_recipient_id()]));
-
-        /** @var engage_survey_generator $articlegen */
-        $survey_gen = $gen->get_plugin_generator('engage_survey');
-        $this->setUser($users[0]);
-        $survey = $survey_gen->create_survey();
-
-        $recipients = $survey_gen->create_user_recipients([$users[1]]);
-        $shares = $survey_gen->share_survey($survey, $recipients);
-        $share = reset($shares);
-
-        $this->assertTrue($DB->record_exists('engage_share', ['id' => $share->get_id()]));
-        $this->assertEquals(1, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $share->get_recipient_id()]));
-
-        share_manager::unshare($share->get_recipient_id(), $survey);
-
-        $this->assertTrue($DB->record_exists('engage_share', ['id' => $share->get_id()]));
-        $this->assertEquals(0, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $share->get_recipient_id()]));
+        // Try to unshare a recipient that does not link up to the share.
+        $this->expectException('coding_exception', 'Invalid recipient_id for shared item');
+        share_manager::unshare($survey_share->get_recipient_id(), $article);
     }
 
     /**
@@ -112,7 +110,7 @@ class totara_engage_unshare_testcase extends advanced_testcase {
             'item_id' => $playlist->get_id()
         ];
 
-        // Create share via graphql.
+        // Remove share via graphql.
         $ec = execution_context::create('ajax', 'totara_engage_unshare');
         $result = graphql::execute_operation($ec, $parameters);
 
