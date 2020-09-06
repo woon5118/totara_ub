@@ -22,11 +22,11 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use totara_webapi\graphql;
-use core\webapi\execution_context;
-use totara_comment\comment_helper;
 use core\json_editor\node\attachments;
 use core\json_editor\node\paragraph;
+use core\webapi\execution_context;
+use totara_comment\comment_helper;
+use totara_webapi\graphql;
 
 /**
  * Tests to check if user is able to update comments/replies or not.
@@ -131,5 +131,111 @@ class totara_comment_update_testcase extends advanced_testcase {
         $content_text = file_rewrite_urls_to_pluginfile($content_text, $draft_id);
 
         $this->assertEquals($content_text, $updated_comment->get_content_text());
+    }
+
+    /**
+     * Test whether a deleted comment can still be updated
+     *
+     * @return void
+     */
+    public function test_update_deleted_comment_via_graphql(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
+
+        $this->setUser($user);
+
+        /** @var totara_comment_generator $comment_generator */
+        $comment_generator = $generator->get_plugin_generator('totara_comment');
+        $comment = $comment_generator->create_comment(
+            22,
+            'test_comment',
+            'test_area',
+            'Comment 1'
+        );
+        $comment->soft_delete();
+
+        $this->assertTrue(
+            $DB->record_exists('totara_comment', ['id' => $comment->get_id()])
+        );
+
+        $ec = execution_context::create('ajax', 'totara_comment_update_comment');
+        $result = graphql::execute_operation(
+            $ec,
+            [
+                'id' => $comment->get_id(),
+                'content' => 'Updated Comment',
+                'format' => FORMAT_PLAIN
+            ]
+        );
+
+        $this->assertNotEmpty($result->errors);
+        $this->assertIsArray($result->errors);
+
+        // Message will be held in the topmost error element
+        $error = current($result->errors);
+        $error_string = get_string('error:update', 'totara_comment');
+        $this->assertEquals($error_string, $error->getMessage());
+
+        // Check if the comment has not been updated.
+        $record = $DB->get_record('totara_comment', ['id' => $comment->get_id()]);
+        $this->assertNotEquals('Updated Comment', $record->content);
+        $this->assertEmpty($record->content);
+    }
+
+    /**
+     * Test whether a deleted reply can still be updated
+     *
+     * @return void
+     */
+    public function test_update_deleted_reply_via_graphql(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
+
+        $this->setUser($user);
+
+        /** @var totara_comment_generator $comment_generator */
+        $comment_generator = $generator->get_plugin_generator('totara_comment');
+        $comment = $comment_generator->create_comment(
+            22,
+            'test_comment',
+            'test_area',
+            'Comment 1'
+        );
+        $reply = $comment_generator->create_reply(
+            $comment->get_id(),
+            'Reply 1'
+        );
+        $reply->soft_delete();
+
+        $this->assertTrue(
+            $DB->record_exists('totara_comment', ['id' => $reply->get_id()])
+        );
+
+        $ec = execution_context::create('ajax', 'totara_comment_update_comment');
+        $result = graphql::execute_operation(
+            $ec,
+            [
+                'id' => $reply->get_id(),
+                'content' => 'Updated Reply',
+                'format' => FORMAT_PLAIN
+            ]
+        );
+
+        $this->assertNotEmpty($result->errors);
+        $this->assertIsArray($result->errors);
+
+        // Message will be held in the topmost error element
+        $error = current($result->errors);
+        $error_string = get_string('error:update', 'totara_comment');
+        $this->assertEquals($error_string, $error->getMessage());
+
+        // Check if the comment has not been updated.
+        $record = $DB->get_record('totara_comment', ['id' => $reply->get_id()]);
+        $this->assertNotEquals('Updated Reply', $record->content);
+        $this->assertEmpty($record->content);
     }
 }

@@ -511,6 +511,11 @@ final class comment_helper {
         $component = $comment->get_component();
         $resolver = resolver_factory::create_resolver($component);
 
+        // If the comment is deleted, it cannot be updated further
+        if ($comment->is_soft_deleted()) {
+            throw comment_exception::on_update();
+        }
+
         if ($user_id != $actor_id) {
             // If the actor is not the author of this very comment, then we should run another check that are being
             // implemented at the child level.
