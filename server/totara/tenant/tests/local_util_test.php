@@ -90,6 +90,7 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $data->categoryname = 'Kategorie pro prvniho tenanta';
         $data->cohortname = 'Skupina pro prvniho tenanta';
 
+        $sink = $this->redirectEvents();
         $this->setCurrentTimeStart();
         $tenant = util::create_tenant((array)$data);
         $this->assertInstanceOf(tenant::class, $tenant);
@@ -101,6 +102,23 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $this->assertSame($data->suspended, $tenant->suspended);
         $this->assertTimeCurrent($tenant->timecreated);
         $this->assertSame($USER->id, $tenant->usercreated);
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertInstanceOf(core\event\course_category_created::class, $events[0]);
+        $this->assertEquals($tenant->categoryid, $events[0]->objectid);
+        $this->assertSame('course_categories', $events[0]->objecttable);
+        $this->assertInstanceOf(core\event\cohort_created::class, $events[1]);
+        $this->assertEquals($tenant->cohortid, $events[1]->objectid);
+        $this->assertSame('cohort', $events[1]->objecttable);
+        $this->assertInstanceOf(core\event\tenant_created::class, $events[2]);
+        $this->assertEquals($tenant->id, $events[2]->objectid);
+        $this->assertSame('tenant', $events[2]->objecttable);
+        $this->assertSame(context_tenant::instance($tenant->id)->id, $events[2]->contextid);
+        $this->assertSame('c', $events[2]->crud);
+        $this->assertSame(0, $events[2]->edulevel);
+        $this->assertSame('Tenant created', $events[2]::get_name());
+        $this->assertSame("The user with id '$USER->id' created tenant with id '$tenant->id'.", $events[2]->get_description());
+        $this->assertCount(3, $events);
 
         $coursecat = $DB->get_record('course_categories', ['id' => $tenant->categoryid], '*', MUST_EXIST);
         $coursecatcontext = context_coursecat::instance($coursecat->id);
@@ -178,6 +196,7 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
+        $sink = $this->redirectEvents();
         $data = new stdClass();
         $data->id = $oldtenant->id;
         $data->name = 'First tenant';
@@ -188,6 +207,9 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $data->categoryname = 'First tenant category';
         $data->cohortname = 'First tenant audience';
         $tenant = util::update_tenant((array)$data);
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertCount(3, $events);
 
         $this->assertInstanceOf(tenant::class, $tenant);
         $this->assertSame($data->name, $tenant->name);
@@ -197,6 +219,14 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $this->assertSame($data->suspended, $tenant->suspended);
         $this->assertSame($oldtenant->timecreated, $tenant->timecreated);
         $this->assertSame($oldtenant->usercreated, $tenant->usercreated);
+        $this->assertInstanceOf(core\event\tenant_updated::class, $events[2]);
+        $this->assertEquals($tenant->id, $events[2]->objectid);
+        $this->assertSame('tenant', $events[2]->objecttable);
+        $this->assertSame(context_tenant::instance($tenant->id)->id, $events[2]->contextid);
+        $this->assertSame('u', $events[2]->crud);
+        $this->assertSame(0, $events[2]->edulevel);
+        $this->assertSame('Tenant updated', $events[2]::get_name());
+        $this->assertSame("The user with id '$USER->id' updated tenant with id '$tenant->id'.", $events[2]->get_description());
 
         $coursecat = $DB->get_record('course_categories', ['id' => $tenant->categoryid], '*', MUST_EXIST);
         $coursecatcontext = context_coursecat::instance($coursecat->id);
@@ -205,6 +235,9 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $this->assertSame('0', $coursecat->parent);
         $this->assertSame('1', $coursecat->visible);
         $this->assertSame($tenant->id, $coursecatcontext->tenantid);
+        $this->assertInstanceOf(core\event\course_category_updated::class, $events[0]);
+        $this->assertEquals($tenant->categoryid, $events[0]->objectid);
+        $this->assertSame('course_categories', $events[0]->objecttable);
 
         $audience = $DB->get_record('cohort', ['id' => $tenant->cohortid], '*', MUST_EXIST);
         $this->assertSame($data->cohortname, $audience->name);
@@ -213,6 +246,9 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $this->assertSame('1', $audience->active);
         $this->assertSame('totara_tenant', $audience->component);
         $this->assertSame((string)$coursecatcontext->id, $audience->contextid);
+        $this->assertInstanceOf(core\event\cohort_updated::class, $events[1]);
+        $this->assertEquals($tenant->cohortid, $events[1]->objectid);
+        $this->assertSame('cohort', $events[1]->objecttable);
 
         $data = new stdClass();
         $data->id = $oldtenant->id;
@@ -251,7 +287,7 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
     }
 
     public function test_delete_tenant_delete() {
-        global $DB;
+        global $DB, $USER;
 
         /** @var totara_tenant_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
@@ -265,8 +301,23 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
         $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $user->id]));
         $this->assertTrue($DB->record_exists('cohort_members', ['cohortid' => $tenant->cohortid, 'userid' => $user2->id]));
 
+        $sink = $this->redirectEvents();
         util::delete_tenant($tenant->id, util::DELETE_TENANT_USER_DELETE);
         $this->assertFalse($DB->record_exists('tenant', ['id' => $tenant->id]));
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertCount(3, $events);
+        $this->assertInstanceOf(core\event\user_deleted::class, $events[0]);
+        $this->assertEquals($user->id, $events[0]->objectid);
+        $this->assertInstanceOf(core\event\cohort_member_removed::class, $events[1]);
+        $this->assertEquals($user2->id, $events[1]->relateduserid);
+        $this->assertInstanceOf(core\event\tenant_deleted::class, $events[2]);
+        $this->assertEquals($tenant->id, $events[2]->objectid);
+        $this->assertSame('tenant', $events[2]->objecttable);
+        $this->assertSame('d', $events[2]->crud);
+        $this->assertSame(0, $events[2]->edulevel);
+        $this->assertSame('Tenant deleted', $events[2]::get_name());
+        $this->assertSame("The user with id '$USER->id' deleted tenant with id '$tenant->id'.", $events[2]->get_description());
 
         $coursecat = $DB->get_record('course_categories', ['id' => $tenant->categoryid], '*', MUST_EXIST);
         $coursecatcontext = context_coursecat::instance($coursecat->id);

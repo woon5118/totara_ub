@@ -208,7 +208,13 @@ final class util {
         $trans->allow_commit();
 
         tenant::reset_caches($tenant->id);
-        return tenant::fetch($tenant->id);
+        $tenant = tenant::fetch($tenant->id);
+
+        \core\event\tenant_created::create(
+            ['objectid' => $tenant->id, 'context' => \context_tenant::instance($tenant->id)]
+        )->trigger();
+
+        return $tenant;
     }
 
     /**
@@ -291,6 +297,10 @@ final class util {
         }
 
         $trans->allow_commit();
+
+        \core\event\tenant_updated::create(
+            ['objectid' => $tenant->id, 'context' => \context_tenant::instance($tenant->id)]
+        )->trigger();
 
         // Kill sessions of tenant members if suspending tenant.
         if (!$oldtenant->suspended and $tenant->suspended) {
@@ -390,6 +400,10 @@ final class util {
         tenant::reset_caches($tenant->id);
 
         \context_helper::build_all_paths(true, false);
+
+        \core\event\tenant_deleted::create(
+            ['objectid' => $tenant->id, 'context' => $context]
+        )->trigger();
 
         ignore_user_abort($prevignore);
         return true;
