@@ -36,7 +36,7 @@
       class="tui-sidePanelNavButtonItem__action"
       :aria-current="activeItem ? 'location' : null"
       :text="text"
-      :aria-describedby="notification ? notificationTextId : false"
+      :aria-describedby="notification ? notificationTextId : null"
       :styleclass="{
         transparent: true,
       }"

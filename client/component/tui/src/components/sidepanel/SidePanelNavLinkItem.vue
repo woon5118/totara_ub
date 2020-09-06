@@ -33,7 +33,7 @@
       :href="url"
       class="tui-sidePanelNavLinkItem__action"
       :aria-current="activeItem ? 'location' : null"
-      :aria-describedby="notification ? notificationTextId : false"
+      :aria-describedby="notification ? notificationTextId : null"
       @click="$emit('select', { action: url, id: id })"
     >
       {{ text }}
