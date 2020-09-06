@@ -68,7 +68,7 @@ An element identifier
 """
 type mod_perform_element_identifier {
   id: core_id!
-  identifier: String!
+  identifier(format: core_format = PLAIN): String!
 }
 
 """
