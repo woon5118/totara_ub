@@ -48,7 +48,7 @@ class mf_appid implements checkable {
     }
 
     public function get_helplink(): ?moodle_url {
-        return new moodle_url('https://help.totaralearning.com/display/PROD/Authentication+and+Admin+Set+up');
+        return null;
     }
 
     public function check(): int {
