@@ -413,7 +413,6 @@ extend type Mutation {
   mod_perform_create_activity(
     name: param_text!
     description: param_text
-    status: mod_perform_activity_state_enums
     type: core_id!
   ): mod_perform_activity_result!
 

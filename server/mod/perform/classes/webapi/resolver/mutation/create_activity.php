@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -34,7 +34,6 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\track;
-use mod_perform\state\activity\draft;
 
 class create_activity implements mutation_resolver, has_middleware {
     /**
@@ -72,10 +71,9 @@ class create_activity implements mutation_resolver, has_middleware {
             // Create a performance activity inside the new performance container.
             $name = $args['name'];
             $description = $args['description'] ?? null;
-            $status = $args['status'] ?? draft::get_code();
 
             /** @var perform_container $container */
-            $activity = activity::create($container, $name, $type_model, $description, $status);
+            $activity = activity::create($container, $name, $type_model, $description);
 
             // Create the first track for the entity.
             track::create($activity);
