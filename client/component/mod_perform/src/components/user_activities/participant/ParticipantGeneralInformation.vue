@@ -37,15 +37,12 @@
     <GridItem :units="8">
       <div class="tui-participantGeneralInformation__relationship">
         <p class="tui-participantGeneralInformation__relationship-heading">
-          {{
-            !currentUserIsSubject
-              ? $str(
-                  'user_activities_your_relationship_to_user_internal',
-                  'mod_perform'
-                )
-              : ''
-          }}
-          <span>{{ relationshipToUser }}</span>
+          {{ $str(!currentUserIsSubject
+            ? 'user_activities_your_relationship_to_user_internal'
+            : 'relation_to_subject_self_internal',
+            'mod_perform'
+          ) }}
+          <span v-if="!currentUserIsSubject">{{ relationship }}</span>
         </p>
 
         <div class="tui-participantGeneralInformation__relationship-toSubject">
@@ -96,16 +93,6 @@ export default {
     jobAssignments: Array,
     currentUserIsSubject: Boolean,
     relationship: String,
-  },
-
-  computed: {
-    relationshipToUser() {
-      if (this.currentUserIsSubject) {
-        return this.$str('relation_to_subject_self_internal', 'mod_perform');
-      }
-
-      return this.relationship;
-    },
   },
 };
 </script>
