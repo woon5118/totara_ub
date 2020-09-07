@@ -40,7 +40,7 @@ $config = mod_perform_activity_generator_configuration::new()
 $generator->create_full_activities($config);
 
 if ($do_expand) {
-    (new expand_task())->expand_all();
+    expand_task::create()->expand_all();
 }
 
 if ($do_generate_instances) {

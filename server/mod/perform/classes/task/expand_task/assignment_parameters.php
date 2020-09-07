@@ -98,19 +98,22 @@ class assignment_parameters {
     }
 
     /**
+     * Get a key we can use later for searching this collection faster
+     *
+     * @return string
+     */
+    public function get_key(): string {
+        return $this->user_id.'-'.$this->job_assignment_id;
+    }
+
+    /**
      * Do these assignment parameters match a track user assignment on user id and job assignment.
      *
      * @param track_user_assignment $track_user_assignment
      * @return bool
      */
     public function matches_track_user_assignment(track_user_assignment $track_user_assignment): bool {
-        if ($this->has_job_assignment_id()) {
-            return (int) $track_user_assignment->subject_user_id === $this->get_user_id() &&
-                (int) $track_user_assignment->job_assignment_id === $this->get_job_assignment_id();
-        }
-
-        return (int) $track_user_assignment->subject_user_id === $this->get_user_id() &&
-            $track_user_assignment->job_assignment_id === null;
+        return $track_user_assignment->key === $this->get_key();
     }
 
 }

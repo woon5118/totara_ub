@@ -43,11 +43,55 @@ use mod_perform\task\expand_task\assignment_parameters_collection;
 use mod_perform\task\service\track_schedule_sync;
 use mod_perform\user_groups\grouping;
 
+/**
+ * This class performs the creation of track_user_assignment records for track_assignments.
+ *
+ * "Expansion" refers to the expanding of groups of users to the individual users.
+ *
+ * It goes through all assignments scheduled for expansion and determines whether there are new
+ * track_user_assignments to be created or existing one reactivated which were previously deleted.
+ *
+ * For each user there will always only be one track_user_assignment record per track.
+ *
+ * @package mod_perform
+ */
 class expand_task {
 
-    private $cache = [];
-
     private $assign_buffer = [];
+
+    /**
+     * This variable is set at the very beginning to have
+     * a time to identify all records belonging to this run.
+     * It's not a unique identifier but it would give us an indication
+     * of which records were created by the same task as usually a task
+     * can run only once.
+     *
+     * @var int
+     */
+    private $time_for_run;
+
+    /**
+     * Don't use the constructor directly, use the factory create() method
+     * provided to create a new instance of the expand task.
+     *
+     * @param int|null $time_for_run
+     */
+    private function __construct(int $time_for_run = null) {
+        $this->time_for_run = $time_for_run ?? time();
+    }
+
+    /**
+     * Factory method to create a new instance. This will ensure
+     * the time_for_run is not the same in this script run
+     *
+     * @return static
+     */
+    public static function create(): self {
+        static $time_for_run;
+        $time_for_run = time() !== $time_for_run ? time() : $time_for_run + 1;
+
+        return new expand_task($time_for_run);
+    }
 
     /**
      * Expand all active assignments
@@ -55,7 +99,7 @@ class expand_task {
      * @param bool $force_not_flagged Also expand assignments not flagged for expansion.
      */
     public function expand_all(bool $force_not_flagged = false) {
-        $assignments = $this->get_repository($force_not_flagged)->get();
+        $assignments = $this->build_query($force_not_flagged)->get_lazy();
         foreach ($assignments as $assignment) {
             $this->expand_assignment($assignment);
         }
@@ -71,9 +115,9 @@ class expand_task {
     public function expand_multiple(array $assignment_ids) {
         $assignment_ids = $this->sanitise_ids($assignment_ids);
         if (!empty($assignment_ids)) {
-            $assignments = $this->get_repository()
+            $assignments = $this->build_query()
                 ->filter_by_ids($assignment_ids)
-                ->get();
+                ->get_lazy();
 
             foreach ($assignments as $assignment) {
                 $this->expand_assignment($assignment);
@@ -90,7 +134,7 @@ class expand_task {
      */
     public function expand_single(int $assignment_id) {
         /** @var track_assignment $assignment */
-        $assignment = $this->get_repository()
+        $assignment = $this->build_query()
             ->where('id', $assignment_id)
             ->one();
 
@@ -101,7 +145,13 @@ class expand_task {
         $this->delete_orphaned_user_assignments();
     }
 
-    private function get_repository(bool $force_not_flagged = false): track_assignment_repository {
+    /**
+     * Builds core query for all expand variations
+     *
+     * @param bool $force_not_flagged
+     * @return track_assignment_repository
+     */
+    private function build_query(bool $force_not_flagged = false): track_assignment_repository {
         $repository = track_assignment::repository();
 
         if (!$force_not_flagged) {
@@ -109,8 +159,7 @@ class expand_task {
         }
 
         return $repository->filter_by_active_track_and_activity()
-            ->order_by('id')
-            ->with('track');
+            ->order_by('id');
     }
 
     /**
@@ -119,15 +168,8 @@ class expand_task {
      * @param track_assignment $assignment
      */
     private function expand_assignment(track_assignment $assignment): void {
-        // We ignore missing assignments to not cause failing tasks.
-        // It can happen that an assignment was deleted before the task is run.
-        // On the next run the assignments will be picked up again.
-        if (!$assignment->exists()) {
-            return;
-        }
-
         // Reset the expand flag early as something could change it in between
-        $assignment->expand = false;
+        $assignment->expand = 0;
         $assignment->save();
 
         // load all current source targets relations of the assignment
@@ -136,54 +178,77 @@ class expand_task {
         $existing_user_assignments = $this->load_current_entries($assignment);
 
         $context = activity::load_by_entity($assignment->track->activity)->get_context();
+        $track = track::load_by_entity($assignment->track);
 
+        // Get all users currently in the group
         $expanded_user_ids = $this->get_expanded_users(
             $assignment->user_group_type,
             $assignment->user_group_id,
             $context
         );
 
-        $track = track::load_by_entity($assignment->track);
-        $assignment_parameter_collection = $this->get_assignment_parameters_collection($track, $expanded_user_ids);
+        // Get a collection of parameters which match the users currently in the group
+        $parameters_collection = $this->get_assignment_parameters_collection($track, $expanded_user_ids);
 
-        $create_assignment_parameters = $assignment_parameter_collection->remove_matching_user_assignments(
-            $existing_user_assignments
-        );
+        // Find all parameters where we do not have an existing user assignments yet
+        $assignments_to_create = $parameters_collection->remove_matching_user_assignments($existing_user_assignments);
 
-        if ($create_assignment_parameters->count() > 0) {
-            builder::get_db()->transaction(function () use ($expanded_user_ids, $assignment, $create_assignment_parameters) {
-                // Get all user assignments of the track to be able to check if we just need to link or actually create
-                $existing_track_user_assignments = $this->get_existing_user_assignments_for_track($assignment, $expanded_user_ids);
+        $transaction = builder::get_db()->start_delegated_transaction();
 
-                foreach ($create_assignment_parameters as $assignment_parameters) {
-                    // If there's already a user assignment for the current assignment just link it
-                    // otherwise create a new assignment
-                    $existing_user_assignment = $existing_track_user_assignments->find(
-                        function (track_user_assignment $track_user_assignment) use ($assignment_parameters) {
-                            return $assignment_parameters->matches_track_user_assignment($track_user_assignment);
-                        }
-                    );
+        if ($assignments_to_create->count() > 0) {
+            // A user assignment could already exist linked to a different assignment
+            // but we want a user to be assigned only once per track.
+            // Let's get all existing user_assignments for the track to check
+            // whether if a user_assignment already exists. If yes, link and potentially reactivate it.
+            $existing_track_user_assignments = $this->get_existing_user_assignments_for_track(
+                $assignment,
+                $assignments_to_create->pluck_user_ids()
+            );
 
-                    if ($existing_user_assignment) {
-                        $this->link_assignment($existing_user_assignment, $assignment);
-                        if ($existing_user_assignment->deleted) {
-                            $this->reactivate_user_assignment($existing_user_assignment, new track($assignment->track));
-                        }
-                    } else {
-                        $this->add_to_assign_buffer($assignment, $assignment_parameters);
+            $user_ids_assigned = [];
+            $assignment_to_link = [];
+
+            foreach ($assignments_to_create as $key => $assignment_to_create) {
+                // For performance reasons we use the same search key as created above
+                $existing_track_user_assignment = $existing_track_user_assignments->item($key);
+
+                if ($existing_track_user_assignment) {
+                    $assignment_to_link[] = $existing_track_user_assignment;
+                    if ($existing_track_user_assignment->deleted) {
+                        $this->reactivate_user_assignment($existing_track_user_assignment, $track);
+                    }
+                } else {
+                    $new_users_assigned = $this->add_to_assign_buffer($assignment, $assignment_to_create);
+                    foreach ($new_users_assigned as $user_id) {
+                        $user_ids_assigned[$user_id] = $user_id;
                     }
                 }
+            }
 
-                // Make sure that the buffer got flushed
-                $this->flush_assign_buffer($assignment);
-            });
+            // Make sure that the buffer got flushed
+            $new_users_assigned = $this->flush_assign_buffer($assignment);
+            foreach ($new_users_assigned as $user_id) {
+                $user_ids_assigned[$user_id] = $user_id;
+            }
+
+            // Insert new rows to link the user_assignments with the assignments
+            $this->link_new_assignments($assignment, $user_ids_assigned);
+            $this->link_existing_assignments($assignment, collection::new($assignment_to_link));
+
+            // Trigger an event with all just newly created user assignments
+            if (!empty($user_ids_assigned)) {
+                track_user_assigned_bulk::create_from_user_assignments(
+                    $assignment->track_id,
+                    $user_ids_assigned,
+                    $assignment->type
+                )->trigger();
+            }
         }
 
-        // Unlink all records which are not in the current assignment anymore from it
-        $this->unlink_users($assignment, $existing_user_assignments, $assignment_parameter_collection);
+        // Unlink all records which are not in the current assignment anymore
+        $this->unlink_users($assignment, $existing_user_assignments, $parameters_collection);
 
-        // Restore user assignments which previously have been deleted
-        $this->reactivate_user_assignments($assignment, $assignment_parameter_collection);
+        $transaction->allow_commit();
     }
 
     /**
@@ -193,12 +258,12 @@ class expand_task {
      * @return collection|track_user_assignment[]
      */
     private function load_current_entries(track_assignment $assignment): collection {
-        return $assignment->user_assignments;
+        return $assignment->user_assignments()->get();
     }
 
     /**
-     * Expand the user group. We cache the result of the user groups to speed up subsequent assignments for
-     * the same user group (but with a different track)
+     * Expand the user group, means we get all individual users
+     * who are in that group at this point in time
      *
      * @param int $user_group_type one of the grouping enums.
      * @param int $user_group_id
@@ -210,62 +275,7 @@ class expand_task {
         int $user_group_id,
         context $context
     ): array {
-        if (!$expanded_records = $this->get_cache_entry($user_group_type, $user_group_id)) {
-            $expanded_records = $this->expand_entity($user_group_type, $user_group_id, $context);
-            $this->add_cache_entry($user_group_type, $user_group_id, $expanded_records);
-        }
-        return $expanded_records;
-    }
-
-    /**
-     * Get an array with entries consisting of user_id and job_assignment_id.
-     *
-     * If we are running in per job assignment mode there will be one entry
-     * for each users job assignment.
-     *
-     * If we are running in per user mode there will be an entry for each
-     * user, and the job_assignment_id value will be null.
-     *
-     * @param track $track
-     * @param array $users_ids
-     * @return assignment_parameters_collection
-     */
-    private function get_assignment_parameters_collection(
-        track $track,
-        array $users_ids
-    ): assignment_parameters_collection {
-        if ($track->is_per_job_subject_instance_generation()) {
-            $job_assignments = builder::table('job_assignment')
-                ->select(['id', 'userid'])
-                ->where('userid', $users_ids)
-                ->get();
-
-            return assignment_parameters_collection::create_from_job_assignments($job_assignments);
-        }
-
-        return assignment_parameters_collection::create_from_user_ids($users_ids);
-    }
-
-    /**
-     * Add this record to the cache
-     *
-     * @param string $cache_type
-     * @param int $id
-     * @param array $record
-     */
-    private function add_cache_entry(string $cache_type, int $id, array $record) {
-        $this->cache[$cache_type][$id] = $record;
-    }
-
-    /**
-     * Get entry from cache
-     *
-     * @param string $cache_type
-     * @param int $id
-     * @return array
-     */
-    private function get_cache_entry(string $cache_type, int $id): array {
-        return $this->cache[$cache_type][$id] ?? [];
+        return $this->expand_entity($user_group_type, $user_group_id, $context);
     }
 
     /**
@@ -298,40 +308,64 @@ class expand_task {
     }
 
     /**
+     * Get an array with entries consisting of user_id and job_assignment_id.
+     *
+     * If we are running in per job assignment mode there will be one entry
+     * for each users job assignment.
+     *
+     * If we are running in per user mode there will be an entry for each
+     * user, and the job_assignment_id value will be null.
+     *
+     * @param track $track
+     * @param array $users_ids
+     * @return assignment_parameters_collection
+     */
+    private function get_assignment_parameters_collection(
+        track $track,
+        array $users_ids
+    ): assignment_parameters_collection {
+        if ($track->is_per_job_subject_instance_generation()) {
+            $users_ids_chunks = array_chunk($users_ids, $this->get_max_per_chunk());
+            $job_assignments = [];
+            foreach ($users_ids_chunks as $users_ids_chunk) {
+                $job_assignments_temp = builder::table('job_assignment')
+                    ->select(['id', 'userid'])
+                    ->where('userid', $users_ids_chunk)
+                    ->get();
+
+                foreach ($job_assignments_temp as $item) {
+                    $job_assignments[] = $item;
+                }
+            }
+
+            return assignment_parameters_collection::create_from_job_assignments($job_assignments);
+        }
+
+        return assignment_parameters_collection::create_from_user_ids($users_ids);
+    }
+
+    /**
      * @param track_assignment $assignment
      * @param array $user_ids
      * @return collection|track_user_assignment[]
      */
     private function get_existing_user_assignments_for_track(track_assignment $assignment, array $user_ids): collection {
-        return track_user_assignment::repository()
-            ->where('track_id', $assignment->track_id)
-            ->where('subject_user_id', $user_ids)
-            ->get();
-    }
+        $user_ids_chunks = array_chunk($user_ids, builder::get_db()->get_max_in_params());
 
-    /**
-     * Link an user assignment to an existing assignment
-     *
-     * @param $existing_user_assignment
-     * @param track_assignment $assignment
-     */
-    private function link_assignment($existing_user_assignment, track_assignment $assignment) {
-        $via = new track_user_assignment_via();
-        $via->track_user_assignment_id = $existing_user_assignment->id;
-        $via->track_assignment_id = $assignment->id;
-        $via->save();
-    }
+        $result = [];
+        foreach ($user_ids_chunks as $user_ids_chunk) {
+            /** @var track_user_assignment[] $user_assignments */
+            $user_assignments = track_user_assignment::repository()
+                ->where('track_id', $assignment->track_id)
+                ->where('subject_user_id', $user_ids_chunk)
+                ->get();
 
-    /**
-     * Link multiple user assignments to an existing assignment
-     *
-     * @param collection $existing_user_assignments
-     * @param track_assignment $assignment
-     */
-    private function link_assignments(collection $existing_user_assignments, track_assignment $assignment) {
-        foreach ($existing_user_assignments as $user_assignment) {
-            $this->link_assignment($user_assignment, $assignment);
+            foreach ($user_assignments as $user_assignment) {
+                $result[$user_assignment->key] = $user_assignment;
+            }
         }
+
+        return collection::new($result);
     }
 
     /**
@@ -339,13 +373,14 @@ class expand_task {
      *
      * @param track_assignment $assignment
      * @param assignment_parameters $assignment_parameters
+     * @return array user_ids assigned
      */
-    private function add_to_assign_buffer(track_assignment $assignment, assignment_parameters $assignment_parameters): void {
+    private function add_to_assign_buffer(track_assignment $assignment, assignment_parameters $assignment_parameters): array {
         $this->assign_buffer[] = [
             'track_id' => $assignment->track_id,
             'subject_user_id' => $assignment_parameters->get_user_id(),
-            'created_at' => time(),
-            'deleted' => false,
+            'created_at' => $this->time_for_run,
+            'deleted' => 0,
             'job_assignment_id' => $assignment_parameters->get_job_assignment_id()
         ];
 
@@ -353,20 +388,24 @@ class expand_task {
         // Make sure we inset multiple rows but only to a certain limit
         // to limit memory consumption and prevent leaks
         if ($count >= BATCH_INSERT_MAX_ROW_COUNT) {
-            $this->flush_assign_buffer($assignment);
+            return $this->flush_assign_buffer($assignment);
         }
+        return [];
     }
 
     /**
      * Flush buffer and assign all in bulk (only if buffer count is reached)
      *
      * @param track_assignment $assignment
+     * @return array user_ids assigned
      */
-    private function flush_assign_buffer(track_assignment $assignment) {
+    private function flush_assign_buffer(track_assignment $assignment): array {
         if (!empty($this->assign_buffer)) {
-            $this->assign_bulk($assignment, $this->assign_buffer);
+            $user_ids_assigned = $this->assign_bulk($assignment, $this->assign_buffer);
             $this->assign_buffer = [];
+            return $user_ids_assigned;
         }
+        return [];
     }
 
     /**
@@ -374,15 +413,16 @@ class expand_task {
      *
      * @param track_assignment $assignment
      * @param array $to_create
+     * @return array the user_ids assigned
      */
-    private function assign_bulk(track_assignment $assignment, array $to_create): void {
+    private function assign_bulk(track_assignment $assignment, array $to_create): array {
         // Bulk fetch all the start and end reference dates.
 
         $track_model = new track($assignment->track);
         $date_resolver = $track_model->get_date_resolver(collection::new($to_create));
 
         if ($assignment->track->schedule_use_anniversary) {
-            $date_resolver = new anniversary_of($date_resolver, time());
+            $date_resolver = new anniversary_of($date_resolver, $this->time_for_run);
         }
 
         $resolver_base = $date_resolver->get_resolver_base();
@@ -400,116 +440,57 @@ class expand_task {
         // Insert the assignments.
         builder::get_db()->insert_records('perform_track_user_assignment', $to_create);
 
-        // Get all those newly created assignments from the table.
-        // We get all user assignments with the same user ids we used above which do not have any links to the assignment yet
-        // and link them
-        $new_assignments = track_user_assignment::repository()
-            ->as('ua')
-            ->where('track_id', $assignment->track_id)
-            ->where('subject_user_id', array_column($to_create, 'subject_user_id'))
-            ->left_join([track_user_assignment_via::TABLE, 'via'], function (builder $builder) use ($assignment) {
-                $builder->where_field('ua.id', 'via.track_user_assignment_id')
-                    ->where('via.track_assignment_id', $assignment->id);
-            })
-            ->where('via.id', null)
-            ->get();
-
-        $to_link = [];
-        foreach ($new_assignments as $new_assignment) {
-            $to_link[] = [
-                'track_user_assignment_id' => $new_assignment->id,
-                'track_assignment_id' => $assignment->id,
-                'created_at' => time(),
-            ];
-        }
-        builder::get_db()->insert_records('perform_track_user_assignment_via', $to_link);
-
-        // Trigger an event with all just newly created user assignments
-        track_user_assigned_bulk::create_from_user_assignments(
-            $assignment->track_id,
-            array_column($to_create, 'subject_user_id'),
-            $assignment->type
-        )->trigger();
+        return array_column($to_create, 'subject_user_id');
     }
 
     /**
-     * Restore user assignments which previously have been deleted
+     * Link multiple user assignments to an existing assignment
      *
      * @param track_assignment $assignment
-     * @param assignment_parameters_collection $assignment_parameter_collection
+     * @param collection $existing_user_assignments
      */
-    private function reactivate_user_assignments(
+    private function link_existing_assignments(
         track_assignment $assignment,
-        assignment_parameters_collection $assignment_parameter_collection
-    ): void {
-        if ($assignment_parameter_collection->count() === 0) {
-            // Nothing to reactivate
-            return;
+        collection $existing_user_assignments
+    ) {
+        $inserts = [];
+        foreach ($existing_user_assignments as $user_assignment) {
+            $inserts[] = (object) [
+                'track_user_assignment_id' => $user_assignment->id,
+                'track_assignment_id' => $assignment->id,
+                'created_at' => $this->time_for_run
+            ];
         }
-
-        $user_ids = $assignment_parameter_collection->pluck_user_ids();
-
-        // Load all user assignments which are marked as deleted but
-        // do not have any link to the assignment
-        $possible_deleted_user_assignments = track_user_assignment::repository()
-            ->as('ua')
-            ->where('track_id', $assignment->track_id)
-            ->where('subject_user_id', $user_ids)
-            ->where('deleted', true)
-            ->left_join([track_user_assignment_via::TABLE, 'via'], function (builder $builder) use ($assignment) {
-                $builder->where_field('ua.id', 'via.track_user_assignment_id')
-                    ->where('via.track_assignment_id', $assignment->id);
-            })
-            ->where('via.id', null)
-            ->get();
-
-        // Also need to filter to matching job_assignment_ids too (not just user_id).
-        $deleted_user_assignments = $possible_deleted_user_assignments->filter(
-            function (track_user_assignment $track_user_assignment) use ($assignment_parameter_collection) {
-                return $assignment_parameter_collection->find_from_track_user_assignment($track_user_assignment);
-            }
-        );
-
-        if ($deleted_user_assignments->count() > 0) {
-            // Link them to the assignment and reactivate them
-            $this->link_assignments($possible_deleted_user_assignments, $assignment);
-
-            track_user_assignment::repository()
-                ->where('deleted', true)
-                ->where('id', $possible_deleted_user_assignments->pluck('id'))
-                ->update([
-                    'deleted' => false,
-                    'updated_at' => time()
-                ]);
-
-            // Update the user assignment period according to track schedule settings.
-            $this->sync_schedule_for_user_assignments($possible_deleted_user_assignments);
-
-            // Trigger an event with all just newly reactivated user assignments
-            track_user_assigned_bulk::create_from_user_assignments(
-                $assignment->track_id,
-                $possible_deleted_user_assignments->pluck('subject_user_id'),
-                $assignment->type
-            )->trigger();
+        if (!empty($inserts)) {
+            builder::get_db()->insert_records_via_batch('perform_track_user_assignment_via', $inserts);
         }
     }
 
     /**
-     * @param collection|track_user_assignment[] $user_assignments
+     * Create the track_user_assignments_via records.
+     *
+     * @param track_assignment $assignment
+     * @param array $user_ids
      */
-    private function sync_schedule_for_user_assignments(collection $user_assignments): void {
-        /** @var track_assignment $first_assignment */
-        $first_assignment = $user_assignments->first();
-        $track = new track($first_assignment->track);
+    private function link_new_assignments(track_assignment $assignment, array $user_ids): void {
+        $user_ids_chunks = array_chunk($user_ids, $this->get_max_per_chunk());
 
-        // Bulk fetch all the start and end reference dates.;
-        $date_resolver = $track->get_date_resolver($user_assignments);
+        foreach ($user_ids_chunks as $user_ids_chunk) {
+            [$user_ids_sql, $user_ids_params] = builder::get_db()->get_in_or_equal($user_ids_chunk, SQL_PARAMS_NAMED);
 
-        track_schedule_sync::sync_user_assignment_schedules(
-            $date_resolver,
-            $user_assignments,
-            $track->schedule_use_anniversary
-        );
+            $sql = "
+                INSERT INTO {perform_track_user_assignment_via}
+                    (track_assignment_id, track_user_assignment_id, created_at)
+                SELECT {$assignment->id}, id, {$this->time_for_run} 
+                FROM {perform_track_user_assignment} 
+                WHERE track_id = {$assignment->track_id}
+                    AND subject_user_id {$user_ids_sql}
+                    AND deleted = 0
+                    AND created_at = {$this->time_for_run}
+            ";
+
+            builder::get_db()->execute($sql, $user_ids_params);
+        }
     }
 
     /**
@@ -519,16 +500,25 @@ class expand_task {
      * @param track $track
      */
     private function reactivate_user_assignment(track_user_assignment $user_assignment, track $track): void {
-        $date_resolver = $track->get_date_resolver(collection::new([$user_assignment]));
+        $this->sync_schedule_for_user_assignments($track, collection::new([$user_assignment]));
+
+        $user_assignment->deleted = 0;
+        $user_assignment->save();
+    }
+
+    /**
+     * @param track $track
+     * @param collection|track_user_assignment[] $user_assignments
+     */
+    private function sync_schedule_for_user_assignments(track $track, collection $user_assignments): void {
+        // Bulk fetch all the start and end reference dates.;
+        $date_resolver = $track->get_date_resolver($user_assignments);
 
         track_schedule_sync::sync_user_assignment_schedules(
             $date_resolver,
-            collection::new([$user_assignment]),
+            $user_assignments,
             $track->schedule_use_anniversary
         );
-
-        $user_assignment->deleted = false;
-        $user_assignment->save();
     }
 
     /**
@@ -546,17 +536,18 @@ class expand_task {
     ): void {
         $records_to_delete = $current_records->filter(
             function (track_user_assignment $track_user_assignment) use ($assignment_parameter_collection) {
-                $found = $assignment_parameter_collection->find_from_track_user_assignment($track_user_assignment);
-
-                return !$found;
+                return !$assignment_parameter_collection->find_from_track_user_assignment($track_user_assignment);
             }
         );
 
         if ($records_to_delete->count() > 0) {
-            track_user_assignment_via::repository()
-                ->where('track_assignment_id', $assignment->id)
-                ->where('track_user_assignment_id', $records_to_delete->pluck('id'))
-                ->delete();
+            $ids_chunks = array_chunk($records_to_delete->pluck('id'), $this->get_max_per_chunk());
+            foreach ($ids_chunks as $ids_chunk) {
+                track_user_assignment_via::repository()
+                    ->where('track_assignment_id', $assignment->id)
+                    ->where('track_user_assignment_id', $ids_chunk)
+                    ->delete();
+            }
         }
     }
 
@@ -566,16 +557,22 @@ class expand_task {
     private function delete_orphaned_user_assignments(): void {
         $orphaned_user_assignments = track_user_assignment::repository()
             ->left_join([track_user_assignment_via::TABLE, 'via'], 'id', 'track_user_assignment_id')
+            ->where('deleted', false)
             ->where_null('via.id')
             ->get();
 
         if ($orphaned_user_assignments->count() > 0) {
-            track_user_assignment::repository()
-                ->where('id', $orphaned_user_assignments->pluck('id'))
-                ->update([
-                    'deleted' => true,
-                    'updated_at' => time()
-                ]);
+            $sql = "
+                UPDATE {perform_track_user_assignment}
+                SET deleted = 1, updated_at = {$this->time_for_run}
+                WHERE NOT EXISTS (
+                    SELECT id
+                    FROM {perform_track_user_assignment_via} tuav
+                    WHERE tuav.track_user_assignment_id = {perform_track_user_assignment}.id
+                )
+            ";
+
+            builder::get_db()->execute($sql, []);
 
             /** @var track_user_assignment $assignment_user */
             foreach ($orphaned_user_assignments as $assignment_user) {
@@ -600,6 +597,13 @@ class expand_task {
             }
         );
         return array_map('intval', $ids);
+    }
+
+    /**
+     * @return int
+     */
+    private function get_max_per_chunk(): int {
+        return builder::get_db()->get_dbfamily() === 'mssql' ? 10000 : builder::get_db()->get_max_in_params();
     }
 
 }

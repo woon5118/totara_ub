@@ -43,6 +43,7 @@ use core\orm\entity\relations\has_many_through;
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  *
+ * @property-read string $key a key which is the combination of user id and job assighment id
  * @property-read user $subject_user subject user relation entity
  * @property-read track $track the track this user assignment belongs to
  * @property-read collection|track_assignment[] $assignments All assignments this user assignments is linked to
@@ -97,6 +98,15 @@ final class track_user_assignment extends entity {
      */
     public function is_linked_to_any_assignment(): bool {
         return $this->assignments()->exists();
+    }
+
+    /**
+     * Get a key to identify this user assignments and faster search
+     *
+     * @return string
+     */
+    public function get_key_attribute(): string {
+        return $this->subject_user_id.'-'.$this->job_assignment_id;
     }
 
 }

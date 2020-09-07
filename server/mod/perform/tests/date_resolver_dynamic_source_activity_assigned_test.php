@@ -76,7 +76,7 @@ class mod_perform_date_resolver_dynamic_source_activity_assigned_testcase extend
             3
         );
 
-        (new expand_task())->expand_single($track->assignments->first()->id);
+        expand_task::create()->expand_single($track->assignments->first()->id);
 
         /** @var track_user_assignment $track_user_assignment */
         $track_user_assignment = track_user_assignment::repository()->get()->first();
@@ -126,7 +126,7 @@ class mod_perform_date_resolver_dynamic_source_activity_assigned_testcase extend
             3
         );
 
-        (new expand_task())->expand_single($track->assignments->first()->id);
+        expand_task::create()->expand_single($track->assignments->first()->id);
 
         $first_track_entity = new track_enttity($track->id);
         $copy = $first_track_entity->to_array();

@@ -553,7 +553,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $perform_generator->create_track_assignments_with_existing_groups($activity1->tracks->first(), [$cohort1->id]);
 
         // Make sure we have the instances
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
         (new subject_instance_creation())->generate_instances();
 
         // Newest subject instances at the top of the list

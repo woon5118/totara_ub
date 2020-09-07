@@ -320,7 +320,7 @@ class mod_perform_date_resolver_dynamic_source_another_activity_testcase extends
         foreach ([$activity1_track1, $activity1_track2, $activity2_track1, $activity2_track2] as $track) {
             $perform_generator->create_track_assignments_with_existing_groups($track, [$cohort->id]);
         }
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         return (object)[
             'user1' => $user1,

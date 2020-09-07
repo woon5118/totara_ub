@@ -40,7 +40,7 @@ class expand_assignment_task extends adhoc_task {
             throw new \coding_exception('Missing assignment_ids, assignment_id or expand_all in expand_assignment_task');
         }
 
-        $expand_task = new expand_task();
+        $expand_task = expand_task::create();
         if (!empty($task_data->assignment_id)) {
             $expand_task->expand_single($task_data->assignment_id);
         } else if (!empty($task_data->assignment_ids)) {

@@ -702,7 +702,7 @@ class mod_perform_generator extends component_generator_base {
 
         // Expand assignments to user assignments
         if ($configuration->should_generate_user_assignments()) {
-            (new expand_task())->expand_all();
+            expand_task::create()->expand_all();
         }
         if ($configuration->should_generate_subject_instances()) {
             // Create subject instances for all user assignments

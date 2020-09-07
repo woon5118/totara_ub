@@ -955,7 +955,7 @@ class performance_testing extends App {
 
     private function perform_act_expand_track_user_assignments() {
         $this->output('Expanding user assignments...');
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         $this->user_assignments_expanded = true;
         return $this;

@@ -106,7 +106,7 @@ class mod_perform_subject_sections_model_testcase extends advanced_testcase {
             $sections = $this->create_activity($sections, $cohort->id, array_keys($relationships), $no_of_sections);
         }
 
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
         (new subject_instance_creation())->generate_instances();
 
         $subject_instances = subject_instance_entity::repository()

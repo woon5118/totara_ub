@@ -350,7 +350,7 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
 
         $generator->create_track_assignments_with_existing_groups($data->track1, [$cohort->id]);
 
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         // Generate the subject instances first, they now should be pending
         $subject_instance_service = new subject_instance_creation();

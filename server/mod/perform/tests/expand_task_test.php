@@ -89,7 +89,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
 
         // No user added to cohort so nothing should happen
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
 
@@ -97,7 +97,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
         // The other user is not in a cohort yet
@@ -106,7 +106,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         // Now add the other one
         $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // Should have been expanded
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
@@ -114,7 +114,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // Should have been expanded
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
@@ -129,7 +129,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
 
         // No user added to cohort so nothing should happen
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
 
@@ -137,7 +137,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
         // The other user is not in a cohort yet
@@ -145,7 +145,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
         // The other user is in a different tenant so is not expanded
@@ -173,7 +173,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $track1_id = $test_data->track1->id;
 
         // No user added to cohort so nothing should happen
-        (new expand_task())->expand_single($assignment->id);
+        $this->get_expand_task()->expand_single($assignment->id);
 
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
@@ -192,7 +192,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         ]);
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($assignment->id);
+        $this->get_expand_task()->expand_single($assignment->id);
 
         // Only the first user is assigned as he's in the same tenant as the activity
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false);
@@ -201,7 +201,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         // Now migrate user 1 to tenant 2
         tenant_util::migrate_user_to_tenant($test_data->user1->id, $test_data->tenant2->id);
 
-        (new expand_task())->expand_single($assignment->id);
+        $this->get_expand_task()->expand_single($assignment->id);
 
         // Now the user should have a deleted assignment
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
@@ -212,7 +212,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $assignment->expand = true;
         $assignment->save();
 
-        (new expand_task())->expand_single($assignment->id);
+        $this->get_expand_task()->expand_single($assignment->id);
 
         // Now the user should have a deleted assignment
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
@@ -237,7 +237,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
 
         // No user added to cohort so nothing should happen
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
 
@@ -245,7 +245,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id);
         // The other user is not in a cohort yet
@@ -254,7 +254,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         // Now add the other one
         $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // Should have been expanded
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id);
@@ -278,7 +278,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
 
         // No user added to cohort so nothing should happen
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // Add the users to the cohort
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
@@ -286,7 +286,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         // Now add the other one
         $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // Should have been expanded, but with he job assignment id
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id);
@@ -306,7 +306,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         // Now add the other one
         $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // Neither user should have been expanded
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
@@ -342,7 +342,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
 
         // No user added to cohort so nothing should happen
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
 
@@ -350,7 +350,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id2);
@@ -360,7 +360,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         // Now add the other one
         $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // Should have been expanded
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
@@ -378,13 +378,13 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false);
 
         $this->remove_user_from_cohort($test_data->cohort1->id, $test_data->user1->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // User is now marked as deleted
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
@@ -413,7 +413,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false, null);
@@ -427,7 +427,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $test_data->assignment1->expand = true;
         $test_data->assignment1->save();
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // Assignment should now be swapped to be based on job assignment
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, null);
@@ -441,7 +441,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $test_data->assignment1->expand = true;
         $test_data->assignment1->save();
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // Assignment should now be swapped to be based on job assignment
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
@@ -470,13 +470,13 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
 
         $this->remove_user_from_cohort($test_data->cohort1->id, $test_data->user1->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // User is now marked as deleted
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true, $job_assignment_id1);
@@ -494,7 +494,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $sink = $this->redirectEvents();
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $events = $sink->get_events();
         $sink->close();
@@ -512,7 +512,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $sink = $this->redirectEvents();
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $events = $sink->get_events();
         $sink->close();
@@ -539,11 +539,11 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->remove_user_from_cohort($test_data->cohort1->id, $test_data->user1->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // User is now marked as deleted
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
@@ -551,7 +551,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         // Readd to group
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false);
     }
@@ -578,11 +578,11 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
         // This should now result in a user assignment
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->remove_user_from_cohort($test_data->cohort1->id, $test_data->user1->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         // User is now marked as deleted
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true, $job_assignment_id1);
@@ -590,7 +590,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         // Readd to group
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
     }
@@ -606,12 +606,12 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         // Add user to the cohort - we expect a user assignment with period according to track schedule settings.
         $this->add_user_to_cohort($test_data->cohort1->id, $user_id);
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
         $this->assert_user_assignment_period($track_id, $user_id, $now, null);
 
         // Remove user from cohort - period values should not be affected
         $this->remove_user_from_cohort($test_data->cohort1->id, $user_id);
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
         $this->assert_user_assignment_period($track_id, $user_id, $now, null);
 
         // User assignment is now marked as deleted
@@ -625,7 +625,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         // Re-add user to cohort - we expect the reactivated user assignment gets the updated period settings
         $this->add_user_to_cohort($test_data->cohort1->id, $user_id);
-        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
         $this->assert_user_assignment_period($track_id, $user_id, $yesterday, $tomorrow);
     }
 
@@ -657,7 +657,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user1->id);
 
         // This should now result in only one user assignment even if the user is in two cohorts
-        (new expand_task())->expand_multiple([$test_data->assignment1->id, $test_data->assignment2->id]);
+        $this->get_expand_task()->expand_multiple([$test_data->assignment1->id, $test_data->assignment2->id]);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false);
     }
@@ -671,7 +671,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
         $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
 
-        (new expand_task())->expand_multiple([$test_data->assignment1->id, $test_data->assignment2->id]);
+        $this->get_expand_task()->expand_multiple([$test_data->assignment1->id, $test_data->assignment2->id]);
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false);
         $this->assert_track_has_user_assignments($track1_id, $test_data->user2->id, false);
@@ -686,7 +686,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
         $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
 
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false);
         $this->assert_track_has_user_assignments($track1_id, $test_data->user2->id, false);
@@ -709,7 +709,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
         $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
 
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false);
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id, false);
@@ -729,7 +729,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
         $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
 
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false);
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id, false);
@@ -752,7 +752,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
 
         /** @var track_user_assignment $track_user_assignment */
         $track_user_assignment = track_user_assignment::repository()
@@ -769,7 +769,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
         /** @var track_user_assignment $track_user_assignment */
         $track_user_assignment = track_user_assignment::repository()
             ->where('track_id', $track1_id)
@@ -814,7 +814,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
 
         /** @var track_user_assignment $track_user_assignment */
         $track_user_assignment = track_user_assignment::repository()
@@ -842,7 +842,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
         /** @var track_user_assignment $track_user_assignment */
         $track_user_assignment = track_user_assignment::repository()
             ->where('track_id', $track1_id)
@@ -887,7 +887,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
 
         /** @var track_user_assignment $track_user_assignment */
         $track_user_assignment = track_user_assignment::repository()
@@ -912,7 +912,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
         /** @var track_user_assignment $track_user_assignment */
         $track_user_assignment = track_user_assignment::repository()
             ->where('track_id', $track1_id)
@@ -957,7 +957,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
 
         /** @var track_user_assignment $track_user_assignment */
         $track_user_assignment = track_user_assignment::repository()
@@ -975,7 +975,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
 
-        (new expand_task())->expand_all();
+        $this->get_expand_task()->expand_all();
         /** @var track_user_assignment $track_user_assignment */
         $track_user_assignment = track_user_assignment::repository()
             ->where('track_id', $track1_id)
@@ -1240,5 +1240,13 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         return $test_data;
     }
 
+    /**
+     * Returns a new instance of the expand task
+     * 
+     * @return expand_task
+     */
+    private function get_expand_task(): expand_task {
+        return expand_task::create();
+    }
 
 }

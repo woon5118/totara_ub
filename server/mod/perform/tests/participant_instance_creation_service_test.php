@@ -1125,7 +1125,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             }
         }
 
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         return $activity_tree;
     }

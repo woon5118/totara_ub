@@ -69,7 +69,7 @@ class mod_perform_assignment_organisation_user_group_observer_testcase extends a
             'organisationid' => $data->organisation1->id
         ]);
 
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         // All expand flags are reset
         $this->assert_assignment_not_marked_for_expansion($data->assignment1->id);

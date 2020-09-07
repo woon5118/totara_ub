@@ -39,13 +39,14 @@ class assignment_parameters_collection extends collection {
      * @return static
      */
     public static function create_from_user_ids($user_ids): self {
-        $collection = new static();
+        $items = [];
 
         foreach ($user_ids as $user_id) {
-            $collection->append(assignment_parameters::create_from_user_id($user_id));
+            $item = assignment_parameters::create_from_user_id($user_id);
+            $items[$item->get_key()] = $item;
         }
 
-        return $collection;
+        return new static($items);
     }
 
     /**
@@ -55,33 +56,36 @@ class assignment_parameters_collection extends collection {
      * @return static
      */
     public static function create_from_job_assignments($job_assignments): self {
-        $collection = new static();
+        $items = [];
 
         foreach ($job_assignments as $job_assignment) {
-            $collection->append(assignment_parameters::create_from_job_assignment($job_assignment));
+            $item = assignment_parameters::create_from_job_assignment($job_assignment);
+            $items[$item->get_key()] = $item;
         }
 
-        return $collection;
+        return new static($items);
     }
 
     /**
-     * Return a copy with  all entries that match the supplied track user assignments removed.
+     * Return a copy with all entries that match the supplied track user assignments removed.
      *
      * @param collection|track_user_assignment[] $user_assignments
      * @return assignment_parameters_collection|assignment_parameters[]
      */
     public function remove_matching_user_assignments(collection $user_assignments): assignment_parameters_collection {
-        return $this->filter(
-            function (assignment_parameters $assignment_parameters) use ($user_assignments) {
-                $found = $user_assignments->find(
-                    function (track_user_assignment $track_user_assignment) use ($assignment_parameters) {
-                        return $assignment_parameters->matches_track_user_assignment($track_user_assignment);
-                    }
-                );
+        $filtered_items = [];
 
-                return !$found;
+        // Make sure the user_assignments collection is keyed by
+        // the same key we want to search for.
+        $user_assignments->key_by('key');
+
+        foreach ($this->items as $key => $item) {
+            if (!$user_assignments->item($key)) {
+                $filtered_items[$key] = $item;
             }
-        );
+        }
+
+        return new static($filtered_items);
     }
 
     /**
@@ -102,9 +106,7 @@ class assignment_parameters_collection extends collection {
      * @return assignment_parameters|null
      */
     public function find_from_track_user_assignment(track_user_assignment $track_user_assignment): ?assignment_parameters {
-        return $this->find(function (assignment_parameters $assignment_parameters) use ($track_user_assignment) {
-            return $assignment_parameters->matches_track_user_assignment($track_user_assignment);
-        });
+        return $this->item($track_user_assignment->key);
     }
 
 }

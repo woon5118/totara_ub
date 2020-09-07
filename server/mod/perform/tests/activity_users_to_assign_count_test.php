@@ -269,7 +269,7 @@ class mod_perform_activity_users_to_assign_count_testcase extends advanced_testc
             ->get()
             ->pluck('id');
 
-        (new expand_task())->expand_multiple($track_assignments);
+        expand_task::create()->expand_multiple($track_assignments);
     }
 
     /**

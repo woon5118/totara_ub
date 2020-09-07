@@ -144,7 +144,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
 
         cohort_add_member($cohort_id, $user->id);
 
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         // The new user assignment should have resulted in a new subject instance now
         $this->generate_instances();
@@ -169,7 +169,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
 
         cohort_remove_member($cohort_id, $user_id);
 
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         $deleted_user_assignments = track_user_assignment::repository()
             ->where('deleted', true)
@@ -516,7 +516,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
             cohort_add_member($assignment->user_group_id, $user->id);
         }
 
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         return $data;
     }

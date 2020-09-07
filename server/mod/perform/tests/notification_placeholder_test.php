@@ -62,7 +62,7 @@ class mod_perform_notification_placeholder_testcase extends mod_perform_notifica
         $element = $this->perfgen->create_element(['title' => 'Question one', 'plugin_name' => 'short_text']);
         $this->perfgen->create_section_element($section, $element);
 
-        (new expand_task())->expand_multiple($track->assignments->map(function ($ass) {
+        expand_task::create()->expand_multiple($track->assignments->map(function ($ass) {
             return $ass->id;
         })->all());
 

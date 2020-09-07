@@ -378,7 +378,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
                 );
             }
         }
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
     }
 
     /**

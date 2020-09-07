@@ -73,7 +73,7 @@ class mod_perform_track_schedule_sync_testcase extends advanced_testcase {
         $track->update();
 
         // Expand creates the track_user_assignments with schedule restriction.
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()->one();
         $this->assertEquals($yesterday->get_timestamp(), $user_assignment->period_start_date);
@@ -118,7 +118,7 @@ class mod_perform_track_schedule_sync_testcase extends advanced_testcase {
         $user->save();
 
         // Expand creates the track_user_assignments with schedule restriction.
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()->one();
         $this->assert_anniversary_date($user_assignment->period_start_date, 3, 2);
@@ -153,7 +153,7 @@ class mod_perform_track_schedule_sync_testcase extends advanced_testcase {
         $track->update();
 
         // Expand creates the track_user_assignments with schedule restriction.
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()->one();
         $this->assertEquals($yesterday->get_timestamp(), $user_assignment->period_start_date);
@@ -192,7 +192,7 @@ class mod_perform_track_schedule_sync_testcase extends advanced_testcase {
         $track->update();
 
         // Expand creates the track_user_assignments with schedule restriction.
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()->one();
         $this->assertEquals($yesterday->get_timestamp(), $user_assignment->period_start_date);
@@ -242,7 +242,7 @@ class mod_perform_track_schedule_sync_testcase extends advanced_testcase {
         $this->assertCount(0, subject_instance::repository()->get());
 
         // Expand creates the track_user_assignments with schedule restriction.
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
         $this->assertCount(5, track_user_assignment::repository()->get());
 
         // No subject instances should be created before $tomorrow.
@@ -320,7 +320,7 @@ class mod_perform_track_schedule_sync_testcase extends advanced_testcase {
         $track->update();
 
         // Let expand task create the track_user_assignment with current schedule restrictions.
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()->where('track_id', $track->id)->one();
 

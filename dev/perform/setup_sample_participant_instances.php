@@ -167,7 +167,7 @@ class setup_data {
                 );
             }
         }
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
     }
 }
 

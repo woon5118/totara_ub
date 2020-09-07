@@ -132,7 +132,7 @@ class mod_perform_section_participants_model_testcase extends advanced_testcase 
             }
         }
 
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
         (new subject_instance_creation())->generate_instances();
 
         $subject_instance = subject_instance_entity::repository()

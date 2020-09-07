@@ -37,7 +37,7 @@ class expand_assignments_task extends scheduled_task {
     }
 
     public function execute() {
-        $expand_task = new expand_task();
+        $expand_task = expand_task::create();
         $expand_task->expand_all();
     }
 

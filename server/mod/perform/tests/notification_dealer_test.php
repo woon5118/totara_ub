@@ -65,7 +65,7 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $track = $this->create_single_activity_track_and_assignment($activity, [$user1->id]);
         $element = $this->perfgen->create_element(['title' => 'Question one', 'plugin_name' => 'short_text']);
         $this->perfgen->create_section_element($section, $element);
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         $entities = $this->create_participant_instances_on_track($track);
         $this->assertCount(4, $entities);
@@ -122,7 +122,7 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $element = $this->perfgen->create_element(['title' => 'Question one', 'plugin_name' => 'short_text']);
         $this->perfgen->create_section_element($section, $element);
 
-        (new expand_task())->expand_multiple($track->assignments->map(function ($ass) {
+        expand_task::create()->expand_multiple($track->assignments->map(function ($ass) {
             return $ass->id;
         })->all());
 
@@ -214,7 +214,7 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $element1 = $this->perfgen->create_element(['title' => 'Question one', 'plugin_name' => 'short_text']);
         $this->perfgen->create_section_element($section1, $element1);
 
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         $notif11 = $this->create_notification($activity1, 'mock_one', false);
         $notif12 = $this->create_notification($activity1, 'mock_two', true);
@@ -235,7 +235,7 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $element2 = $this->perfgen->create_element(['title' => 'Question two', 'plugin_name' => 'short_text']);
         $this->perfgen->create_section_element($section2, $element2);
 
-        (new expand_task())->expand_all();
+        expand_task::create()->expand_all();
 
         $notif21 = $this->create_notification($activity2, 'mock_one', false);
         $notif22 = $this->create_notification($activity2, 'mock_two', true);
