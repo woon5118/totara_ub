@@ -44,15 +44,15 @@ class performelement_short_text_response_formatter_testcase extends advanced_tes
 
         $context = context_system::instance();
         $answer = '<h1>This is a <strong>test</strong> answer</h1>';
-        $incoming = json_encode(['answer_text' => $answer]);
 
-        $formatter = new $formatter_class(format::FORMAT_RAW, $context);
-        $expected = json_encode(['answer_text' => $answer]);
-        $this->assertEquals($expected, $formatter->format($incoming), 'wrong formatting');
+        $formatter = new $formatter_class(format::FORMAT_PLAIN, $context);
+        $this->assertEquals($answer, $formatter->format($answer), 'wrong formatting');
 
-        $formatter = new $formatter_class(null, $context);
-        $expected = json_encode(['answer_text' => 'This is a test answer']);
-        $this->assertEquals($expected, $formatter->format($incoming), 'wrong formatting');
+
+        $answer = 'Test special chars & "" {} % # @';
+
+        $formatter = new $formatter_class(format::FORMAT_PLAIN, $context);
+        $this->assertEquals($answer, $formatter->format($answer), 'wrong formatting');
     }
 
     /**
