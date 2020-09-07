@@ -24,6 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use container_perform\perform;
+use mod_perform\models\activity\activity;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\section_element;
@@ -32,12 +33,14 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/static_content_testcase.php');
 
-class performelement_static_content_draft_area_testcase extends performelement_static_content_testcase {
+/**
+ * Class performelement_static_content_clone_testcase
+ */
+class performelement_static_content_clone_testcase extends performelement_static_content_testcase {
 
     use webapi_phpunit_helper;
 
-    public function test_post_create_update(): void {
-        global $USER;
+    public function test_clone(): void {
         $this->setAdminUser();
 
         // Generate some data.
@@ -60,44 +63,47 @@ class performelement_static_content_draft_area_testcase extends performelement_s
             true
         );
 
-        $section_element = section_element::create($section, $element, 123);
+        // Link element to section.
+        section_element::create($section, $element, 123);
 
-        // Test post_create.
+        // Update the element, saving the files and so on.
         /** @var static_content $plugin */
         $plugin = element_plugin::load_by_plugin('static_content');
         $plugin->post_create($element);
 
-        $data = json_decode($element->data, true);
+        // Clone the activity.
+        $new_activity = activity::load_by_id($activity->id)->clone();
+        $sections = $new_activity->get_sections();
 
-        // Confirm that the element_id have been added to the data.
-        $this->assertArrayHasKey('element_id', $data);
-        $this->assertEquals($element->id, $data['element_id']);
+        // Confirm that all static content elements cloned correctly.
+        $count = 0;
+        foreach ($sections as $section) {
+            $section_elements = $section->get_section_elements();
+            foreach ($section_elements as $section_element) {
+                $element = $section_element->get_element();
+                if ($element->plugin_name === 'static_content') {
+                    ++$count;
+                    $data = json_decode($element->data, true);
 
-        // Confirm that the file URL has been rewritten.
-        $this->assertStringContainsString('@@PLUGINFILE@@/test_file.png', $data['wekaDoc']);
+                    // Confirm that the file URL has been rewritten.
+                    $this->assertStringContainsString('@@PLUGINFILE@@/test_file.png', $data['wekaDoc']);
 
-        // Now that the element exists we can test the draft ID mutation.
-        $draft_id = $this->resolve_graphql_mutation(
-            'performelement_static_content_prepare_draft_area',
-            [
-                'section_id' => $section_element->section_id,
-                'element_id' => $section_element->element_id,
-            ]
-        );
+                    // Confirm that the draft area contains the image added to element content.
+                    $fs = get_file_storage();
+                    $file_exist = $fs->file_exists($new_activity->get_context_id(),
+                        'performelement_static_content',
+                        'content',
+                        $element->id,
+                        '/',
+                        'test_file.png'
+                    );
+                    $this->assertEquals(true, $file_exist);
+                }
+            }
+        }
 
-        $this->assertIsInt($draft_id);
-        $this->assertGreaterThan(0, $draft_id);
-
-        // Confirm that the draft area contains the image added to element content.
-        $fs = get_file_storage();
-        $file_exist = $fs->file_exists(\context_user::instance($USER->id)->id,
-            'user',
-            'draft',
-            $draft_id,
-            '/',
-            'test_file.png'
-        );
-        $this->assertEquals(true, $file_exist);
+        // We need to have found exactly 1 element.
+        $this->assertEquals(1, $count, 'Incorrect amount of elements cloned');
     }
 
 }

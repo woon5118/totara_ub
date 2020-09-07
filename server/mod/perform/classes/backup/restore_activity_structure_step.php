@@ -26,6 +26,7 @@ namespace mod_perform\backup;
 
 defined('MOODLE_INTERNAL') || die();
 
+use mod_perform\models\activity\helpers\element_cloning;
 use restore_path_element;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\participant_source;
@@ -232,7 +233,16 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         $activity_id = $this->get_new_parentid('perform');
         $data->context_id = activity::load_by_id($activity_id)->get_context()->id;
 
-        $new_item_id = $DB->insert_record('perform_element', $data);
+        // If the element has its own cloner then use that instead.
+        $class = "\\performelement_{$data->plugin_name}\\models\\helpers\\element_clone";
+        if (class_exists($class)) {
+            /** @var element_cloning $element_clone */
+            $element_clone = new $class();
+            $new_item_id = $element_clone->create($activity_id, $data);
+        } else {
+            $new_item_id = $DB->insert_record('perform_element', $data);
+        }
+
         $this->set_mapping('perform_element', $old_id, $new_item_id);
     }
 
