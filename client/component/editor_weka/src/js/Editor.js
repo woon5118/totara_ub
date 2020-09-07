@@ -151,6 +151,7 @@ export default class Editor {
 
   /**
    * Set the editor state to the specified state.
+   * @param {WekaValue} value
    */
   setValue(value) {
     if (!value.inflated(this)) {

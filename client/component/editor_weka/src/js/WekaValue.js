@@ -20,6 +20,9 @@
 import { EditorState } from 'ext_prosemirror/state';
 import { getDefaultDocument } from './helpers/editor';
 
+/**
+ * Immutable value container for Weka
+ */
 export default class WekaValue {
   /**
    * @private

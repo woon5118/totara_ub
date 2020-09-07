@@ -72,8 +72,7 @@ class IntegrationView {
     );
 
     let initialValue = this.getWekaValue();
-
-    this.wekaValue = null;
+    this.wekaValue = initialValue;
 
     const update = () => {
       if (this.wekaValue) {
@@ -99,6 +98,11 @@ class IntegrationView {
             throttledUpdate();
           },
           blur: update,
+          'editor-ready': () => {
+            if (this.wekaValue.hasHtml()) {
+              update();
+            }
+          },
         },
       },
       el
