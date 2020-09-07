@@ -108,11 +108,6 @@ input mod_perform_track_assignments_input {
   groups: [mod_perform_user_grouping_input!]!
 }
 
-input mod_perform_create_track_input {
-  activity_id: param_integer!
-  description: param_text
-}
-
 input mod_perform_dynamic_date_offset_input {
   count: param_integer!
   unit: mod_perform_track_dynamic_unit_enums!
@@ -158,13 +153,6 @@ type mod_perform_update_track_schedule_result {
 }
 
 extend type Mutation {
-  """
-  Add a new track to a given activity
-  """
-  mod_perform_create_track(
-    details: mod_perform_create_track_input!
-  ): mod_perform_track!
-
   """
   Add track assignments to a given track
   """
