@@ -85,7 +85,7 @@ class engage_article_delete_testcase extends advanced_testcase {
         $resource->update([
             'content' => json_encode($doc),
             'draft_id' => 42,
-            'access' => access::PRIVATE
+            'access' => access::PUBLIC
         ]);
 
         /** @var totara_comment_generator $comment_generator */

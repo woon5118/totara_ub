@@ -23,6 +23,7 @@
 namespace engage_article\totara_reaction\resolver;
 
 use engage_article\totara_engage\resource\article;
+use totara_engage\access\access_manager;
 use totara_reaction\resolver\base_resolver;
 
 /**
@@ -41,9 +42,7 @@ final class article_reaction_resolver extends base_resolver {
      */
     public function can_create_reaction(int $resourceid, int $userid, string $area): bool {
         $article = article::from_resource_id($resourceid);
-        $owner = $article->get_userid();
-
-        return $owner != $userid;
+        return access_manager::can_access($article, $userid);
     }
 
     /**

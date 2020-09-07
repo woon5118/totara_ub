@@ -22,6 +22,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use totara_engage\access\access;
+use totara_engage\answer\answer_type;
 use totara_reaction\resolver\resolver_factory as reaction_resolver_factory;
 use totara_reaction\reaction_helper;
 use totara_engage\resource\resource_factory;
@@ -68,15 +70,23 @@ class totara_engage_rb_engagecontent_report_testcase extends advanced_testcase {
         $workspace_recipient = $workspacegen->create_workspace_recipients($workspace_list);
 
         // Create three artcles.
-        $article1 = $articlegen->create_article(['name' => 'article1']);
-        $article2 = $articlegen->create_article(['name' => 'article2']);
-        $article3 = $articlegen->create_article(['name' => 'article3']);
+        $article1 = $articlegen->create_article(['name' => 'article1', 'access' => access::PUBLIC]);
+        $article2 = $articlegen->create_article(['name' => 'article2', 'access' => access::PUBLIC]);
+        $article3 = $articlegen->create_article(['name' => 'article3', 'access' => access::PUBLIC]);
 
         // Create four surveys.
-        $survey1 = $surveygen->create_survey('survey1?');
-        $survey2 = $surveygen->create_survey('survey2?');
-        $survey3 = $surveygen->create_survey('survey3?');
-        $survey4 = $surveygen->create_survey('survey4?');
+        $survey1 = $surveygen->create_survey('survey1?', [], answer_type::MULTI_CHOICE, [
+            'access' => access::PUBLIC
+        ]);
+        $survey2 = $surveygen->create_survey('survey2?', [], answer_type::MULTI_CHOICE, [
+            'access' => access::PUBLIC
+        ]);
+        $survey3 = $surveygen->create_survey('survey3?', [], answer_type::MULTI_CHOICE, [
+            'access' => access::PUBLIC
+        ]);
+        $survey4 = $surveygen->create_survey('survey4?', [], answer_type::MULTI_CHOICE, [
+            'access' => access::PUBLIC
+        ]);
 
         // Share article1 and survey2-3 to 6 workspaces.
         $articlegen->share_article($article1, $workspace_recipient);
