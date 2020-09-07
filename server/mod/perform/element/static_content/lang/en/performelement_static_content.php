@@ -23,6 +23,7 @@
 
 $string['name'] = 'Static content';
 $string['pluginname'] = 'Static content element';
-$string['title'] = 'Title';
+$string['required'] = 'Required';
 $string['static_content_placeholder'] = 'Content';
+$string['title'] = 'Title';
 $string['weka_enter_content'] = "Enter static content";

@@ -48,6 +48,9 @@
             <Weka
               v-if="draftId"
               :id="id"
+              :class="{
+                'tui-elementEditStaticContent__weka-invalid': errorShow,
+              }"
               component="performelement_static_content"
               area="content"
               :doc="wekaDoc"
@@ -56,6 +59,10 @@
                 $str('weka_enter_content', 'performelement_static_content')
               "
               @update="handleUpdate"
+            />
+            <FieldError
+              v-if="errorShow"
+              :error="$str('required', 'performelement_static_content')"
             />
           </FormRow>
           <FormRow>
@@ -75,6 +82,7 @@
 <script>
 import { Uniform, FormRow, FormText } from 'tui/components/uniform';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
+import FieldError from 'tui/components/form/FieldError';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
 import Weka from 'editor_weka/components/Weka';
@@ -90,6 +98,7 @@ export default {
   components: {
     ElementAdminForm,
     Uniform,
+    FieldError,
     FormRow,
     FormText,
     FormActionButtons,
@@ -123,12 +132,15 @@ export default {
       initialValues: initialValues,
       wekaDoc: null,
       draftId: null,
+      isEmpty: true,
+      errorShow: false,
     };
   },
 
   async mounted() {
     if (this.rawData && this.rawData.wekaDoc) {
       this.wekaDoc = JSON.parse(this.rawData.wekaDoc);
+      this.isEmpty = false;
     }
     if (this.sectionId && this.elementId) {
       await this.$_loadExistingDraftId();
@@ -173,21 +185,27 @@ export default {
        */
       function(opt) {
         this.wekaDoc = opt.getJSON();
+        this.isEmpty = opt.isEmpty();
       },
       250,
       { perArgs: false }
     ),
 
     handleSubmit(values) {
-      this.$emit('update', {
-        title: values.rawTitle,
-        data: {
-          wekaDoc: this.wekaDoc ? JSON.stringify(this.wekaDoc) : null,
-          draftId: this.draftId,
-          format: 'HTML',
-          docFormat: 'FORMAT_JSON_EDITOR',
-        },
-      });
+      this.errorShow = false;
+      if (this.isEmpty) {
+        this.errorShow = true;
+      } else {
+        this.$emit('update', {
+          title: values.rawTitle,
+          data: {
+            wekaDoc: JSON.stringify(this.wekaDoc),
+            draftId: this.draftId,
+            format: 'HTML',
+            docFormat: 'FORMAT_JSON_EDITOR',
+          },
+        });
+      }
     },
 
     cancel() {
@@ -198,11 +216,22 @@ export default {
 </script>
 
 <lang-strings>
-{
-  "performelement_static_content": [
-    "title",
-    "static_content_placeholder",
-    "weka_enter_content"
-  ]
+   {
+     "performelement_static_content": [
+       "title",
+       "required",
+       "static_content_placeholder",
+       "weka_enter_content"
+     ]
+   }
+   </lang-strings>
+<style lang="scss">
+.tui-elementEditStaticContent {
+  &__weka {
+    &-invalid {
+      border-color: var(--form-input-border-color-invalid);
+      box-shadow: var(--form-input-shadow-invalid);
+    }
+  }
 }
-</lang-strings>
+</style>

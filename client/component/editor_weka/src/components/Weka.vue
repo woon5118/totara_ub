@@ -307,7 +307,7 @@ export default {
       if (this.$listeners.update) {
         this.$emit('update', {
           getJSON: () => value.getDoc(),
-          isEmpty: () => value.empty,
+          isEmpty: () => value.isEmpty,
           getFileStorageItemId: () => value.fileStorageItemId,
         });
       }
