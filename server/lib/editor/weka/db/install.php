@@ -27,7 +27,8 @@ defined('MOODLE_INTERNAL') || die();
  * Editor weka installation.
  */
 function xmldb_editor_weka_install() {
-    global $DB;
+    global $DB, $CFG;
+    require_once("{$CFG->dirroot}/lib/editor/weka/db/upgradelib.php");
 
     // ☺️
     $entity = new \stdClass();
@@ -318,4 +319,6 @@ function xmldb_editor_weka_install() {
     $entity->active = 1;
     $DB->insert_record('editor_weka_emojis', $entity);
 
+    // Conditionally add weka editor to enabled text editor.
+    editor_weka_add_weka_to_texteditors();
 }
