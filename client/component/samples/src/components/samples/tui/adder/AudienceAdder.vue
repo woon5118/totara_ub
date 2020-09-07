@@ -38,8 +38,10 @@
     </SamplesExample>
 
     <SamplesCode>
-      <template v-slot:template>{{ codeTemplate }}</template>
-      <template v-slot:script>{{ codeScript }}</template>
+      <template v-slot:template>{{
+        sampleCode && sampleCode.template
+      }}</template>
+      <template v-slot:script>{{ sampleCode && sampleCode.script }}</template>
     </SamplesCode>
   </div>
 </template>
@@ -68,21 +70,53 @@ export default {
       addedIds: [],
       showAdder: false,
       query: cohorts,
-      codeTemplate: `<Button :text="$str('add_audiences', 'totara_core')" @click="adderOpen" />
+    };
+  },
 
-<AudienceAdder
-  :open="showAdder"
-  :existing-items="addedIds"
-  @added="adderUpdate"
-  @cancel="adderCancelled"
-/>
+  methods: {
+    adderOpen() {
+      this.showAdder = true;
+    },
 
-<h5>Selected Items:</h5>
-<div v-for="audience in addedAudiences" :key="audience.id">
-  {{ audience }}
-</div>
-`,
-      codeScript: `import AudienceAdder from 'tui/components/adder/AudienceAdder';
+    adderCancelled() {
+      this.showAdder = false;
+    },
+
+    adderUpdate(selection) {
+      this.addedIds = selection.ids;
+      this.addedAudiences = selection.data;
+      this.showAdder = false;
+    },
+  },
+};
+</script>
+
+<lang-strings>
+{
+  "totara_core": [
+    "add_audiences"
+  ]
+}
+</lang-strings>
+
+<sample-template>
+  <Button :text="$str('add_audiences', 'totara_core')" @click="adderOpen" />
+
+  <AudienceAdder
+    :open="showAdder"
+    :existing-items="addedIds"
+    @added="adderUpdate"
+    @cancel="adderCancelled"
+  />
+
+  <h5>Selected Items:</h5>
+  <div v-for="audience in addedAudiences" :key="audience.id">
+    {{ audience }}
+  </div>
+</sample-template>
+
+<sample-script>
+import AudienceAdder from 'tui/components/adder/AudienceAdder';
 
 export default {
   components: {
@@ -112,32 +146,5 @@ export default {
       this.showAdder = false;
     },
   },
-}`,
-    };
-  },
-
-  methods: {
-    adderOpen() {
-      this.showAdder = true;
-    },
-
-    adderCancelled() {
-      this.showAdder = false;
-    },
-
-    adderUpdate(selection) {
-      this.addedIds = selection.ids;
-      this.addedAudiences = selection.data;
-      this.showAdder = false;
-    },
-  },
-};
-</script>
-
-<lang-strings>
-{
-  "totara_core": [
-    "add_audiences"
-  ]
 }
-</lang-strings>
+</sample-script>
