@@ -67,7 +67,7 @@ final class manager {
         require_once("{$CFG->dirroot}/lib/enrollib.php");
 
         if (!enrol_is_enabled($enrol_type)) {
-            throw new \coding_exception("{$enrol_type} enrollment is not available");
+            throw new \coding_exception("{$enrol_type} enrolment is not available");
         }
 
         $plugin = enrol_get_plugin($enrol_type);

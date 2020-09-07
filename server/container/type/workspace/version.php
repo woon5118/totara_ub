@@ -25,13 +25,14 @@ defined('MOODLE_INTERNAL') || die();
 
 /* NOTE: the following version number must be bumped during each major or minor Totara release. */
 
-$plugin->version  = 2020090100;                 // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2020090101;                 // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2017111309;                 // Requires this Moodle version.
 $plugin->component = 'container_workspace';          // To check on upgrade, that module sits in correct place
 
 $plugin->dependencies = [
     'totara_engage' => 2019101202,
     'editor_weka' => 2019111800,
-    'totara_job' => 2020032300,
-    'totara_comment' => 2019101500
+    'totara_comment' => 2019101500,
+    'enrol_self' => 2017111300,
+    'enrol_manual' => 2017111300
 ];

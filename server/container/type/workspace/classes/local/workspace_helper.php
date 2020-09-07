@@ -71,7 +71,7 @@ final class workspace_helper {
             $category_id = workspace::get_default_category_id();
         }
 
-        $category_interactor = category_interactor::from_category_id($category_id);
+        $category_interactor = category_interactor::from_category_id($category_id, $actor_id);
         // The three types of workspaces (private, public & hidden) have individual capabilities
         // to work with. If you're trying to create a specific type of workspace, the matching
         // capability must be assigned.

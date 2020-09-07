@@ -289,4 +289,40 @@ class container_workspace_create_testcase extends advanced_testcase {
             );
         }
     }
+
+    /**
+     * @return void
+     */
+    public function test_create_workspace_with_self_enrol_disabled(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        set_config('enrol_plugins_enabled', 'manual');
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('self enrolment is not available');
+
+        workspace_helper::create_workspace(
+            'Workspace 101',
+            $user_one->id
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_workspace_with_manual_enrol_disabled(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        set_config('enrol_plugins_enabled', 'self');
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('manual enrolment is not available');
+
+        workspace_helper::create_workspace(
+            'Workspace without manual enrol',
+            $user_one->id
+        );
+    }
 }
