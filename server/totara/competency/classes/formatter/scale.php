@@ -49,7 +49,7 @@ class scale extends formatter {
     }
 
     protected function has_field(string $field): bool {
-        return isset($this->object->$field);
+        return $this->object->has_attribute($field);
     }
 
 }
