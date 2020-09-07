@@ -25,8 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 use totara_engage\access\access;
 use totara_engage\resource\resource_factory;
 use totara_playlist\playlist;
-use core\webapi\execution_context;
-use totara_webapi\graphql;
 
 class totara_playlist_delete_testcase extends advanced_testcase {
     /**
@@ -79,42 +77,6 @@ class totara_playlist_delete_testcase extends advanced_testcase {
         $this->assertFalse($DB->record_exists_sql($sql, $params));
         $this->assertFalse($DB->record_exists('totara_comment', ['id' => $id]));
         $this->assertFalse($DB->record_exists('totara_comment', ['id' => $reply_id]));
-    }
-
-    /**
-     * @return void
-     */
-    public function test_delete_playlist_with_graphql(): void {
-        global $DB;
-
-        $gen = $this->getDataGenerator();
-        $user = $gen->create_user();
-        $this->setUser($user);
-
-        /** @var engage_article_generator $articlegen */
-        $articlegen = $gen->get_plugin_generator('engage_article');
-        $article = $articlegen->create_article([
-            'access' => access::PUBLIC
-        ]);
-
-        $playlist = playlist::create('Hello world');
-        $resouce_item = resource_factory::create_instance_from_id($article->get_id());
-        $playlist->add_resource($resouce_item);
-
-        $parameters = [
-            'id' => $playlist->get_id()
-        ];
-
-        $ec = execution_context::create('ajax', 'totara_playlist_delete_playlist');
-        $result = graphql::execute_operation($ec, $parameters);
-
-        $this->assertEmpty($result->errors);
-        $this->assertNotEmpty($result->data);
-
-        $record = $DB->get_record('engage_resource', ['id' => $resouce_item->get_id()]);
-        $this->assertEquals(0, $record->countusage);
-        $sql = 'SELECT 1 FROM "ttr_playlist" p WHERE p.id = :id';
-        $this->assertFalse($DB->record_exists_sql($sql, $parameters));
     }
 
     /**

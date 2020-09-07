@@ -23,7 +23,6 @@
 namespace totara_playlist\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
-use core\webapi\middleware\clean_editor_content;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;

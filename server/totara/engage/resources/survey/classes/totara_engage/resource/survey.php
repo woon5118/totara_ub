@@ -329,7 +329,7 @@ final class survey extends resource_item {
             return true;
         }
 
-        if (access_manager::can_manage_engage($userid)) {
+        if (access_manager::can_manage_engage($this->get_context(), $userid)) {
             return true;
         }
 
@@ -370,7 +370,7 @@ final class survey extends resource_item {
             return true;
         }
 
-        if (access_manager::can_manage_engage($userid)) {
+        if (access_manager::can_manage_engage($this->get_context(), $userid)) {
             return true;
         }
 
@@ -441,7 +441,7 @@ final class survey extends resource_item {
      * @inheritDoc
      */
     public function can_share(int $userid): bool {
-        if (access_manager::can_manage_engage($userid)) {
+        if (access_manager::can_manage_engage($this->get_context(), $userid)) {
             return true;
         }
         // Check if user is allowed to share surveys.

@@ -25,7 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use core\json_editor\node\paragraph;
 use totara_playlist\playlist;
-use totara_playlist\exception\playlist_exception;
 
 class totara_playlist_webapi_update_playlist_testcase extends advanced_testcase {
     use webapi_phpunit_helper;

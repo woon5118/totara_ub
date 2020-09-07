@@ -254,19 +254,15 @@ final class question {
      * @return bool
      */
     public function can_delete(int $userid): bool {
-        // Workaround for missing capability, will be removed
-        if (is_siteadmin()) {
-            return true;
-        }
-
-        $creator = $this->question->userid;
+        $creatorid = $this->question->userid;
+        $creator_context = \context_user::instance($creatorid);
 
         // Engage manager can do anything.
-        if (access_manager::can_manage_engage($userid)) {
+        if (access_manager::can_manage_engage($creator_context, $userid)) {
             return true;
         }
 
-        if ($creator != $userid) {
+        if ($creatorid != $userid) {
             return false;
         }
 

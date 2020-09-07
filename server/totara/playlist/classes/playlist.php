@@ -296,7 +296,7 @@ final class playlist implements accessible, shareable {
         $context = $this->get_context();
 
         // Admin can do anything.
-        if (access_manager::can_manage_engage($userid)) {
+        if (access_manager::can_manage_engage($context, $userid)) {
             return true;
         }
 
@@ -698,7 +698,7 @@ final class playlist implements accessible, shareable {
      * @return bool
      */
     public function can_update(int $user_id): bool {
-        if (access_manager::can_manage_engage($user_id)) {
+        if (access_manager::can_manage_engage($this->get_context(), $user_id)) {
             return true;
         }
 

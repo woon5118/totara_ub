@@ -87,14 +87,6 @@ final class playlist extends provider {
 
         $results = [];
 
-        if (access_manager::can_manage_engage($USER->id)) {
-            // The admin can see everything.
-            foreach ($objects as $object) {
-                $results[$object->objectid] = true;
-            }
-            return $results;
-        }
-
         $cache = \cache::make('totara_playlist', 'catalog_visibility');
         $access_items = $cache->get($USER->id);
 
@@ -129,6 +121,10 @@ final class playlist extends provider {
                         $visibility->userid == $USER->id || in_array($USER->id, $accessors)
                     );
                     break;
+            }
+
+            if ($results[$object->objectid] == false) {
+                $results[$object->objectid] = access_manager::can_manage_engage(\context::instance_by_id($visibility->contextid));
             }
         }
 
@@ -168,16 +164,18 @@ final class playlist extends provider {
             "pl.id",
             "pl.access",
             "pl.userid",
+            "pl.contextid",
             new raw_field("{$DB->sql_group_concat('esr.instanceid', ',')} AS accessors"),
         ]);
 
         $builder->group_by([
             'pl.id',
             'pl.access',
-            'pl.userid'
+            'pl.userid',
+            'pl.contextid'
         ]);
 
-        if (!empty($CFG->tenantsenabled)) {
+        if (!empty($CFG->tenantsenabled) && !is_siteadmin()) {
             // Multi-tenancy is enabled, therefore we are going to include joins with cohort members
             // in order to filter out what the playlist that this user should be view able.
             $tenant_id = null;

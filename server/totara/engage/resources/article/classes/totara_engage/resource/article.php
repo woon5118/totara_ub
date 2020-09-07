@@ -142,7 +142,7 @@ final class article extends resource_item implements time_viewable {
             return true;
         }
 
-        return access_manager::can_manage_engage($userid);
+        return access_manager::can_manage_engage($this->get_context(), $userid);
     }
 
     /**
@@ -309,7 +309,7 @@ final class article extends resource_item implements time_viewable {
             return true;
         }
 
-        return access_manager::can_manage_engage($userid);
+        return access_manager::can_manage_engage($this->get_context(), $userid);
     }
 
     /**

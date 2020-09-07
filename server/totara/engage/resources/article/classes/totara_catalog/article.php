@@ -89,14 +89,6 @@ final class article extends provider {
 
         $results = [];
 
-        if (access_manager::can_manage_engage($USER->id)) {
-            // The admin can see everything.
-            foreach ($objects as $object) {
-                $results[$object->objectid] = true;
-            }
-            return $results;
-        }
-
         $cache = \cache::make('engage_article', 'catalog_visibility');
         $cached_access_items = $cache->get($USER->id);
 
@@ -113,7 +105,6 @@ final class article extends provider {
             }
 
             $visibility = $cached_access_items[$object->objectid];
-
             switch ($visibility->access) {
                 case access::PRIVATE:
                     $results[$object->objectid] = $visibility->userid == $USER->id;
@@ -126,6 +117,10 @@ final class article extends provider {
 
                     $results[$object->objectid] = $visibility->userid == $USER->id || in_array($USER->id, $accessors);
                     break;
+            }
+
+            if ($results[$object->objectid] == false) {
+                $results[$object->objectid] = access_manager::can_manage_engage(\context::instance_by_id($visibility->contextid));
             }
         }
 
@@ -162,6 +157,7 @@ final class article extends provider {
             'er.instanceid AS id',
             'er.access',
             'er.userid',
+            'er.contextid',
 
             // Field ttr_engage_share_recipient.instanceid is pointing to the user's id.
             new raw_field("{$DB->sql_group_concat('esr.instanceid', ',')} AS accessors")
@@ -170,7 +166,8 @@ final class article extends provider {
         $builder->group_by([
             'er.instanceid',
             'er.access',
-            'er.userid'
+            'er.userid',
+            'er.contextid',
         ]);
 
         $builder->results_as_objects();

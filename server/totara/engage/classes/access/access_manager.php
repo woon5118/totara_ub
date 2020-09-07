@@ -35,19 +35,17 @@ final class access_manager {
     }
 
     /**
-     * Check the super admin capability to see if this
-     * user is able to do admin thing in engage.
+     * Check the if current user is able to admin things in Engage
      *
-     * @param int|null $user_id
+     * @param \context $context - Context in which to check capability
+     * @param int $user_id - User to check capability (current user if 0)
      * @return bool
      */
-    public static function can_manage_engage(int $user_id = null): bool {
+    public static function can_manage_engage(\context $context, int $user_id = 0): bool {
         global $USER;
-        if (empty($user_id)) {
+        if (!$user_id) {
             $user_id = $USER->id;
         }
-
-        $context = \context_user::instance($user_id);
         return has_capability('totara/engage:manage', $context, $user_id);
     }
 
@@ -58,7 +56,7 @@ final class access_manager {
      * @param int $user_id
      * @return bool
      */
-    public static function can_manage_tenant_participants(int $user_id): bool {
+    public static function can_manage_tenant_participants(int $user_id = 0): bool {
         global $USER;
         if (empty($user_id)) {
             $user_id = $USER->id;
@@ -94,7 +92,7 @@ final class access_manager {
             return true;
         }
 
-        if (self::can_manage_engage($user_id)) {
+        if (self::can_manage_engage(\context_user::instance($ownerid), $user_id)) {
             return true;
         }
 
@@ -160,6 +158,7 @@ final class access_manager {
 
     /**
      * Check if user is permitted via a share of this item.
+     * Does not check for multi-tenancy
      *
      * @param accessible $item
      * @param int $user_id
