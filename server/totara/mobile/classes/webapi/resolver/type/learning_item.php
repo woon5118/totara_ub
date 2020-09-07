@@ -88,6 +88,11 @@ class learning_item implements type_resolver {
             }
         }
 
+        // concatenate type and id to form unique identifiers for mobile
+        if ($field == 'id') {
+            return $item->get_type() . '_' . $item->id;
+        }
+
         if ($field == 'duedate' || $field == 'duedate_state') {
             // Make sure we have the due date, this is for programs and certifications, also courses inside learning plans.
             if ($item instanceof item_has_dueinfo) {

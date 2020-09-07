@@ -54,10 +54,9 @@ Current learning item for mobile app.
 type totara_mobile_learning_item {
   """
   ID of the learning item
-  NOTE: there is potential overlap of course/prog/cert ids
-  this field can not be assumed to be unique
+  NOTE: This can not use the core_id type because we are adding the type to ensure uniqueness.
   """
-  id: core_id!
+  id: String!
   """
   Type of the learning item
   (course, program, certification)

@@ -233,7 +233,7 @@ class totara_mobile_webapi_resolver_query_certification_testcase extends advance
             $cscourses = [];
             foreach ($cs1->get_courses() as $course) {
                 $cinfo = [];
-                $cinfo['id'] = $course->id;
+                $cinfo['id'] = 'course_' . $course->id;
                 $cinfo['itemtype'] = 'course';
                 $cinfo['itemcomponent'] = 'core_course';
                 $cinfo['shortname'] = $course->shortname;

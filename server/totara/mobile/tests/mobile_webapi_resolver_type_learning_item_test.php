@@ -140,7 +140,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
         $item = array_pop($items);
         try {
             $value = $this->resolve('id', $item);
-            $this->assertEquals($program->id, $value);
+            $this->assertEquals('program_' . $program->id, $value);
         } catch (\coding_exception $ex) {
             $this->fail($ex->getMessage());
         }
@@ -148,7 +148,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
         $item = array_pop($items);
         try {
             $value = $this->resolve('id', $item);
-            $this->assertEquals($course->id, $value);
+            $this->assertEquals('course_' . $course->id, $value);
         } catch (\coding_exception $ex) {
             $this->fail($ex->getMessage());
         }
@@ -156,7 +156,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
         $item = array_pop($items);
         try {
             $value = $this->resolve('id', $item);
-            $this->assertEquals($certification->id, $value);
+            $this->assertEquals('certification_' . $certification->id, $value);
         } catch (\coding_exception $ex) {
             $this->fail($ex->getMessage());
         }
@@ -174,17 +174,17 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
         // Check that each core instance of learning item gets resolved correctly.
         $item = array_pop($items);
         $value = $this->resolve('id', $item);
-        $this->assertEquals($program->id, $value);
+        $this->assertEquals('program_' . $program->id, $value);
         $this->assertTrue(is_string($value));
 
         $item = array_pop($items);
         $value = $this->resolve('id', $item);
-        $this->assertEquals($course->id, $value);
+        $this->assertEquals('course_' . $course->id, $value);
         $this->assertTrue(is_string($value));
 
         $item = array_pop($items);
         $value = $this->resolve('id', $item);
-        $this->assertEquals($certification->id, $value);
+        $this->assertEquals('certification_' . $certification->id, $value);
         $this->assertTrue(is_string($value));
     }
 
