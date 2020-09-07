@@ -19,6 +19,12 @@
 <template>
   <transition
     :name="transition && 'tui-popoverPositioner--transition-' + transition"
+    @enter="transitionEnter"
+    @after-enter="transitionEnterEnd"
+    @enter-cancelled="transitionEnterEnd"
+    @leave="transitionLeave"
+    @after-leave="transitionLeaveEnd"
+    @leave-cancelled="transitionLeaveEnd"
   >
     <div
       v-show="shouldBeOpen"
@@ -52,6 +58,7 @@ import {
 import { getClosestScrollable } from 'tui/dom/scroll';
 import { position } from 'tui/lib/popover';
 import { Point, Size, Rect } from 'tui/geometry';
+import pending from 'tui/pending';
 
 export default {
   props: {
@@ -225,6 +232,34 @@ export default {
       });
     },
 
+    transitionEnter() {
+      if (this.enterDone) {
+        this.enterDone();
+      }
+      this.enterDone = pending('popover-positioner-enter');
+    },
+
+    transitionEnterEnd() {
+      if (this.enterDone) {
+        this.enterDone();
+        this.enterDone = null;
+      }
+    },
+
+    transitionLeave() {
+      if (this.leaveDone) {
+        this.leaveDone();
+      }
+      this.leaveDone = pending('popover-positioner-leave');
+    },
+
+    transitionLeaveEnd() {
+      if (this.leaveDone) {
+        this.leaveDone();
+        this.leaveDone = null;
+      }
+    },
+
     $_setupOpen() {
       this.$_closeCleanup();
       this.isFixed = this.$_useFixedPositioning();
@@ -249,7 +284,10 @@ export default {
     },
 
     $_useFixedPositioning() {
-      return !!this.$el.closest('.tui-modalContent') && !this.$el.closest('.tui-weka');
+      return (
+        !!this.$el.closest('.tui-modalContent') &&
+        !this.$el.closest('.tui-weka')
+      );
     },
   },
 };
