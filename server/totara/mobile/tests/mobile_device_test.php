@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 use totara_mobile\local\device;
 
 /**
- * Tests program progress information functions
+ * Tests the mobile device class.
  */
 class totara_mobile_device_testcase extends advanced_testcase {
 
@@ -75,8 +75,6 @@ class totara_mobile_device_testcase extends advanced_testcase {
         $event = reset($events);
         $this->assertEquals('\totara_mobile\event\fcmtoken_removed', $event->eventname);
         $eventsink->clear();
-
-
     }
 
 }

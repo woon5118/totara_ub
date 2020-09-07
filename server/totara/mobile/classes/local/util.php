@@ -32,13 +32,14 @@ final class util {
      * API Version
      * Update whenever there is a significant change to the mobile plugins endpoints's expectations or responses.
      */
-    const API_VERSION = '2020051700';
+    const API_VERSION = '2020100100';
 
     /**
      * Minimum supported App version
      * Update whenever an old version of the app becomes unsupported.
+     * Important: update the device emulator, too!
      */
-    const MIN_APP_VERSION = '0.26';
+    const MIN_APP_VERSION = '47';
 
     /**
      * Totara App user agent string

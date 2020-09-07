@@ -43,7 +43,9 @@ final class fcmtoken_observer {
      */
     public static function on_fcmtoken_received(fcmtoken_received $event): void {
         $data = $event->get_data();
-        airnotifier_client::register_device($data['other']['fcmtoken']);
+        if (!empty($data['other']['fcmtoken'])) {
+            airnotifier_client::register_device($data['other']['fcmtoken']);
+        }
     }
 
     /**
@@ -52,6 +54,8 @@ final class fcmtoken_observer {
      */
     public static function on_fcmtoken_removed(fcmtoken_removed $event): void {
         $data = $event->get_data();
-        airnotifier_client::delete_device($data['other']['fcmtoken']);
+        if (!empty($data['other']['fcmtoken'])) {
+            airnotifier_client::delete_device($data['other']['fcmtoken']);
+        }
     }
 }

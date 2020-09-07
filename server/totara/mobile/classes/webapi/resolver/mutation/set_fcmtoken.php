@@ -23,11 +23,13 @@
 
 namespace totara_mobile\webapi\resolver\mutation;
 
+use totara_mobile\local\device;
 use core\webapi\execution_context;
 use core\webapi\resolver\has_middleware;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_login;
 use totara_mobile\event\fcmtoken_received;
+use core\orm\query\builder;
 
 /**
  * Mutation to set an FCM Token for a device
@@ -58,7 +60,7 @@ class set_fcmtoken implements mutation_resolver, has_middleware {
         }
 
         // Make sure the device belongs to the logged in user... just in case.
-        $device = $DB->get_record('totara_mobile_devices', ['id' => $deviceid]);
+        $device = builder::table('totara_mobile_devices')->find($deviceid);
         if (empty($device->userid) || $device->userid != $USER->id) {
             return false;
         }
@@ -70,7 +72,21 @@ class set_fcmtoken implements mutation_resolver, has_middleware {
 
         // Update the field.
         $device->fcmtoken = $args['token'];
-        $DB->set_field('totara_mobile_devices', 'fcmtoken', $device->fcmtoken, ['id' => $deviceid]);
+        $result = builder::table('totara_mobile_devices')
+            ->where('id', $deviceid)
+            ->update(['fcmtoken' => $device->fcmtoken]);
+
+        // Are there other devices which are using the same token? Log them out!
+        // But only if token is not null.
+        if (!empty($device->fcmtoken)) {
+            $other_devices = builder::table('totara_mobile_devices')
+                ->where('fcmtoken', $device->fcmtoken)
+                ->where('id', '<>', $device->id)
+                ->get();
+            foreach ($other_devices as $logout) {
+                device::delete($logout->userid, $logout->id);
+            }
+        }
 
         // Trigger a token-received event.
         fcmtoken_received::create_from_device($device)->trigger();

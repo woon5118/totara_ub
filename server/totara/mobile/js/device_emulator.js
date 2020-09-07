@@ -26,7 +26,7 @@
  */
 var deviceEmulator = {
 
-    version: "0.26",
+    version: "47",
     wwwRoot: false,
     output: document.getElementById("Output"),
     webview: document.getElementById("WebView"),

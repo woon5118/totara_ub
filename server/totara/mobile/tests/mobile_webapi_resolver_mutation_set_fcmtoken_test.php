@@ -239,4 +239,54 @@ class totara_mobile_webapi_resolver_mutation_set_fcmtoken_testcase extends advan
         $device = $DB->get_record('totara_mobile_devices', ['id' => $device->id]);
         $this->assertEmpty($device->fcmtoken);
     }
+
+    /**
+     * Test that a device can set a token, update it, and the previous token can be reused.
+     */
+    public function test_resolve_set_fcm_token_with_duplicate_token() {
+        global $DB;
+
+        $eventsink = $this->redirectEvents();
+        $users = $this->create_faux_devices();
+
+        // Set the fcmtoken for user one.
+        $u1 = array_pop($users);
+        $device = $DB->get_record('totara_mobile_devices', ['userid' => $u1->id]);
+        $this->setUser($u1->id);
+        $this->resolve($device, ['token' => 'abc123']);
+
+        // Check the fcm token has been added.
+        $device = $DB->get_record('totara_mobile_devices', ['userid' => $u1->id]);
+        $this->assertNotEmpty($device);
+        $this->assertEquals('abc123', $device->fcmtoken);
+
+        // Clear the event sink.
+        $eventsink->clear();
+
+        // Set the fcmtoken for user 2 to the same token.
+        $u2 = array_pop($users);
+        $device = $DB->get_record('totara_mobile_devices', ['userid' => $u2->id]);
+        $this->setUser($u2->id);
+        $this->resolve($device, ['token' => 'abc123']);
+
+        // Check the fcm token has been added.
+        $device = $DB->get_record('totara_mobile_devices', ['userid' => $u2->id]);
+        $this->assertNotEmpty($device);
+        $this->assertEquals('abc123', $device->fcmtoken);
+
+        // Check that user 1's device has been logged out (removed)
+        $device = $DB->get_record('totara_mobile_devices', ['userid' => $u1->id]);
+        $this->assertEmpty($device);
+
+        // Check that setting the duplicate token triggered just one event.
+        // Why not two? Because the device that was deleted (u1's) had the same token, which means there should
+        // not have been a token_removed event, which should only fired when a token is completely removed by the system to
+        // prevent a race condition in exactly this case.
+        $events = $eventsink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $this->assertEquals('\totara_mobile\event\fcmtoken_received', $event->eventname);
+        $this->assertEquals($u2->id, $event->userid);
+        $eventsink->clear();
+    }
 }
