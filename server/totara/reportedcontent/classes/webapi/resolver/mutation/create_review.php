@@ -54,6 +54,10 @@ final class create_review implements mutation_resolver, has_middleware {
         $url = $args['url'];
         $complainer_id = $USER->id;
 
+        if (clean_param($url, PARAM_LOCALURL) !== $url || substr($url, 0, 1) === '/') {
+            throw new \invalid_parameter_exception('url is not in a valid format');
+        }
+
         // Get the review details from the appropriate hook
         $hook = new get_review_context($component, $area, $item_id);
         $hook->execute();

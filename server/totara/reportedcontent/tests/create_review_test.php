@@ -28,14 +28,18 @@ use totara_reportedcontent\entity\review as review_entity;
 use totara_reportedcontent\hook\get_review_context;
 use totara_webapi\graphql;
 use totara_core\hook\manager;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class totara_reportedcontent_create_review_testcase extends advanced_testcase {
+    use webapi_phpunit_helper;
+
     /**
      * @return void
      */
     public function test_create_review(): void {
         global $DB, $CFG;
 
+        $CFG->wwwroot = 'https://example.com';
         require_once("{$CFG->dirroot}/totara/reportedcontent/tests/fixtures/review_content_watcher.php");
 
         $user = $this->getDataGenerator()->create_user();
@@ -113,5 +117,64 @@ class totara_reportedcontent_create_review_testcase extends advanced_testcase {
         $this->assertNotEmpty($review['id']);
         $this->assertEquals($id, $review['id']);
         $this->assertFalse($review['success']);
+    }
+
+    public function test_create_review_url() {
+        global $DB, $CFG;
+
+        require_once("{$CFG->dirroot}/totara/reportedcontent/tests/fixtures/review_content_watcher.php");
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+        $target_user = $this->getDataGenerator()->create_user();
+
+        // Add a fake comment
+        $comment = comment::create(
+            22,
+            'Some fake content',
+            'comment',
+            'test_component',
+            FORMAT_PLAIN,
+            $target_user->id
+        );
+
+        // Use a fake watcher instead
+        $watchers = [
+            [
+                'hookname' => get_review_context::class,
+                'callback' => [review_content_watcher::class, 'get_content']
+            ]
+        ];
+        manager::phpunit_replace_watchers($watchers);
+
+        $tpl = [
+            'component' => 'test_component',
+            'area' => 'comment',
+            'item_id' => $comment->get_id(),
+        ];
+
+        $CFG->wwwroot = 'https://example.com/totara';
+        $invalid_urls = [
+            'https://test.example.com/totara',
+            'https://example.net/totara',
+            'https://example.com/kia/ora',
+            'https://example.com/totara_kia_ora',
+            'http://example.com/totara',
+            '/kia/ora'
+        ];
+        foreach ($invalid_urls as $url) {
+            [$unused, $error] = $this->parsed_graphql_operation('totara_reportedcontent_create_review', $tpl + ['url' => $url]);
+            $this->assertNotEmpty($error, $url);
+            $this->assertStringContainsString('url is not in a valid format', $error, $url);
+        }
+        $valid_urls = [
+            'https://example.com/totara',
+            'https://example.com/totara/kia/ora',
+            'https://example.com/totara/../kia/ora', // !?
+        ];
+        foreach ($valid_urls as $url) {
+            [$unused, $error] = $this->parsed_graphql_operation('totara_reportedcontent_create_review', $tpl + ['url' => $url]);
+            $this->assertEmpty($error, $url);
+        }
     }
 }
