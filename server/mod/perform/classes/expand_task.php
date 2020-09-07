@@ -109,6 +109,7 @@ class expand_task {
         }
 
         return $repository->filter_by_active_track_and_activity()
+            ->order_by('id')
             ->with('track');
     }
 
