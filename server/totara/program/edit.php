@@ -140,18 +140,23 @@ $editmessagesurl = "{$CFG->wwwroot}/totara/program/edit_messages.php?id={$progra
 $editcertificationsurl = "{$CFG->wwwroot}/totara/certification/edit_certification.php?id={$program->id}";
 
 //set up textareas
-$program->endnoteformat = FORMAT_HTML;
-$program->summaryformat = FORMAT_HTML;
+// These should be replaced by actual stored formats.
+$program->endnoteformat = \core\json_editor\helper\document_helper::looks_like_json($program->endnote) ? FORMAT_JSON_EDITOR : FORMAT_HTML;
+$program->summaryformat = \core\json_editor\helper\document_helper::looks_like_json($program->summary) ? FORMAT_JSON_EDITOR : FORMAT_HTML;
 
 $summaryeditoroptions = $TEXTAREA_OPTIONS;
 // Programs has XSS risk, so there isn't a need to clean text.
 $summaryeditoroptions['noclean'] = true;
 $summaryeditoroptions['context'] = context_program::instance($program->id);
+// Allow switch to mobile-friendly content
+$summaryeditoroptions['allowjsonconversion'] = true;
 $program = file_prepare_standard_editor($program, 'summary', $summaryeditoroptions, $summaryeditoroptions['context'],
                                           'totara_program', 'summary', 0);
 
 $endnoteeditoroptions = $TEXTAREA_OPTIONS;
 $endnoteeditoroptions['context'] = context_program::instance($program->id);
+// Allow switch to mobile-friendly content
+$endnoteeditoroptions['allowjsonconversion'] = true;
 $program = file_prepare_standard_editor($program, 'endnote', $endnoteeditoroptions, $endnoteeditoroptions['context'],
     'totara_program', 'endnote', 0);
 

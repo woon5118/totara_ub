@@ -1575,10 +1575,14 @@ class programcat_helper extends coursecat_helper {
         if (!$program->has_summary()) {
             return '';
         }
+        $format = FORMAT_HTML;
+        if (\core\json_editor\helper\document_helper::looks_like_json($program->summary)) {
+            $format = FORMAT_JSON_EDITOR;
+        }
         $options = (array)$options;
         $context = context_program::instance($program->id);
         $summary = file_rewrite_pluginfile_urls($program->summary, 'pluginfile.php', $context->id, 'totara_program', 'summary', 0);
-        $summary = format_text($summary, FORMAT_HTML, $options);
+        $summary = format_text($summary, $format, $options);
         if (!empty($this->searchcriteria['search'])) {
             $summary = highlight($this->searchcriteria['search'], $summary);
         }

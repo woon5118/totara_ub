@@ -47,7 +47,7 @@ abstract class formatter {
     const TYPE_PLACEHOLDER_IMAGE     =  5;
     // Dataformatters must return data compatible with progress_bar->export_for_template().
     const TYPE_PLACEHOLDER_PROGRESS  =  6;
-    // Dataformatters must return string suitable for display, may contain html.
+    // Dataformatters must return string suitable for display, may contain HTML or JSON.
     const TYPE_PLACEHOLDER_RICH_TEXT =  7;
     // Dataformatters must return string suitable for including in the FTS index.
     const TYPE_FTS                   =  8;

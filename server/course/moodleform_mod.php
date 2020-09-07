@@ -932,7 +932,7 @@ abstract class moodleform_mod extends moodleform {
         $label = is_null($customlabel) ? get_string('moduleintro') : $customlabel;
 
         // Totara: only allow XSS in labels, the rest of intros should not have any active content.
-        $options = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'noclean' => true, 'context' => $this->context, 'subdirs' => true);
+        $options = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'noclean' => true, 'context' => $this->context, 'subdirs' => true, 'allowjsonconversion' => true);
         if (static::class === 'mod_label_mod_form' and get_config('label', 'allowxss')) {
             $options['allowxss'] = 1;
         }

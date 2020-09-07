@@ -164,8 +164,13 @@ class program_edit_form extends moodleform {
 
         if ($action == 'view') {
             if ($program) {
+                if (\core\json_editor\helper\document_helper::looks_like_json($program->summary)) {
+                    $summary_format = FORMAT_JSON_EDITOR;
+                } else {
+                    $summary_format = FORMAT_HTML;
+                }
                 $summary = file_rewrite_pluginfile_urls($program->summary, 'pluginfile.php', $context->id, 'totara_program', 'summary', 0);
-                $summary = format_text($summary, FORMAT_HTML, ['noclean' => true, 'context' => $context]);
+                $summary = format_text($summary, $summary_format, ['noclean' => true, 'context' => $context]);
                 if (!empty($summary)) {
                     $mform->addElement('static', null, get_string('description', 'totara_program'), $summary);
                 }
@@ -210,8 +215,14 @@ class program_edit_form extends moodleform {
 
         if ($action == 'view') {
             if ($program) {
+                if (\core\json_editor\helper\document_helper::looks_like_json($program->endnote)) {
+                    $endnote_format = FORMAT_JSON_EDITOR;
+                } else {
+                    $endnote_format = FORMAT_HTML;
+                }
                 $endnote = file_rewrite_pluginfile_urls($program->endnote, 'pluginfile.php',
                     $context->id, 'totara_program', 'endnote', 0);
+                $endnote = format_text($endnote, $endnote_format, ['context' => $context]);
                 if (!empty($endnote)) {
                     $mform->addElement('static', null, get_string('endnote', 'totara_program'), $endnote);
                 }

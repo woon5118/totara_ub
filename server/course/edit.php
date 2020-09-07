@@ -96,7 +96,8 @@ if ($id) {
 }
 
 // Prepare course and the editor.
-$editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes'=>$CFG->maxbytes, 'trusttext'=>false, 'noclean'=>true);
+// Totara: Allow JSON conversion.
+$editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $CFG->maxbytes, 'trusttext' => false, 'noclean' => true, 'allowjsonconversion' => true);
 $overviewfilesoptions = course_overviewfiles_options($course);
 if (!empty($course)) {
     // Add context for editor.

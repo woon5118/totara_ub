@@ -341,6 +341,9 @@ final class document_helper {
     /**
      * Detect whether a document is likely to be JSON
      *
+     * This is a very simple test. It is called often and meant to be high performance.
+     * It is not expected to be a validator or sanitizer.
+     *
      * @param string $document
      * @return bool
      */

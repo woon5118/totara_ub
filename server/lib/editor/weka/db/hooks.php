@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Chester <simon.chester@totaralearning.com>
+ * @author Chris Snyder <chris.snyder@totaralearning.com>
  * @package editor_weka
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2020090101;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2017111309;        // Requires this Moodle version
-$plugin->component = 'editor_weka';   // Full name of the plugin (used for diagnostics)
+$watchers = [
+    [
+        // Alter the description formats available, to include mobile-friendly JSON
+        'hookname' => '\core_form\hook\editor_formats_available',
+        'callback' => 'editor_weka\watcher\core_form::extend_editor_formats',
+        'priority' => 100,
+    ]
+];

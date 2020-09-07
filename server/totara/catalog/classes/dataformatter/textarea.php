@@ -23,6 +23,8 @@
 
 namespace totara_catalog\dataformatter;
 
+use core\json_editor\helper\document_helper;
+
 defined('MOODLE_INTERNAL') || die();
 
 class textarea extends formatter {
@@ -85,6 +87,11 @@ class textarea extends formatter {
             throw new \coding_exception("Text area data formatter expects 'itemid'");
         }
 
+        $format = FORMAT_MOODLE;
+        if (document_helper::looks_like_json($data['text'])) {
+            $format = FORMAT_JSON_EDITOR;
+        }
+
         return format_text(
             file_rewrite_pluginfile_urls(
                 $data['text'],
@@ -94,7 +101,7 @@ class textarea extends formatter {
                 $data['filearea'],
                 $data['itemid']
             ),
-            FORMAT_MOODLE,
+            $format,
             ['context' => $context, 'newlines' => false]
         );
     }

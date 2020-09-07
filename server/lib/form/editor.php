@@ -58,7 +58,7 @@ class MoodleQuickForm_editor extends HTML_QuickForm_element implements templatab
     /** @var array options provided to initalize filepicker */
     protected $_options = array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 0, 'changeformat' => 0,
             'areamaxbytes' => FILE_AREA_MAX_BYTES_UNLIMITED, 'context' => null, 'noclean' => 0, 'trusttext' => 0, 'allowxss' => 0,
-            'return_types' => 7, 'enable_filemanagement' => true, 'autosave' => null); // Totara: allow disabling of autosave, yay!
+            'return_types' => 7, 'enable_filemanagement' => true, 'autosave' => null, 'allowjsonconversion' => false); // Totara: allow disabling of autosave, yay! and JSON.
     // $_options['return_types'] = FILE_INTERNAL | FILE_EXTERNAL | FILE_REFERENCE
 
     /** @var array values for editor */
@@ -335,13 +335,10 @@ class MoodleQuickForm_editor extends HTML_QuickForm_element implements templatab
             $formats[$fid] = $strformats[$fid];
         }
 
-        // Totara: allow conversion to JSON if Weka is enabled
-        if ($format == FORMAT_HTML && in_array('weka', array_keys(editors_get_enabled()))) {
-            $formats[FORMAT_JSON_EDITOR] = get_string('mobile_friendly_format', 'core_editor');
-        } else if ($format == FORMAT_JSON_EDITOR && !\core\json_editor\helper\document_helper::looks_like_json($text) && in_array('weka', array_keys(editors_get_enabled()))) {
-            $formats[FORMAT_JSON_EDITOR] = get_string('mobile_friendly_format', 'core_editor');
-            $formats[FORMAT_HTML] = get_string('formathtml');
-        }
+        // Totara: Execute available formats hook to let plugins manipulate format list
+        $hook = new \core_form\hook\editor_formats_available($this->_options, $this->_values, $formats);
+        $hook->execute();
+        $formats = $hook->get_formats();
 
         // get filepicker info
         //

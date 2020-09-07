@@ -90,4 +90,23 @@ class totara_catalog_dataformatter_textarea_testcase extends dataformatter_test_
 
         $this->assert_exceptions($df, $test_params);
     }
+
+    public function test_textarea_supports_json_format() {
+        $context = context_system::instance();
+
+        $df = new textarea('textfield', 'contextidfield', 'componentfield', 'fieldareafield', 'itemidfield');
+        $this->assertSame([formatter::TYPE_PLACEHOLDER_RICH_TEXT], $df->get_suitable_types());
+
+        $text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Some "},{"type":"text","marks":[{"type":"strong"}],"text":"JSON"},{"type":"text","text":" content."}]}]}';
+        $test_params = [
+            'text' => $text,
+            'contextid' => $context->id,
+            'component' => 'totara_catalog',
+            'filearea' => 'testarea',
+            'itemid' => 123,
+        ];
+        $result = $df->get_formatted_value($test_params, $context);
+        $direct_conversion = format_text($text, FORMAT_JSON_EDITOR, ['context' => $context, 'newlines' => false]);
+        $this->assertEquals($direct_conversion, $result);
+    }
 }

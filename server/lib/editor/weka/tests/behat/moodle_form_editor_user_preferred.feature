@@ -45,7 +45,4 @@ Feature: Moodle form weka editor test
     And I set the field "Course full name" to "Course 101"
     And I set the field "Course short name" to "c101"
     When I click on "Save and display" "button"
-    Then I should see "Topic 1"
-    And I should see "Topic 2"
-    And I should see "Topic 3"
-    And I should see "Topic 4"
+    Then I should not see "Edit course settings"
