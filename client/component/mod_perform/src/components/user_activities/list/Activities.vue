@@ -436,6 +436,8 @@ export default {
             'user_activities_status_not_applicable',
             'mod_perform'
           );
+        case 'NOT_SUBMITTED':
+          return this.$str('user_activities_status_not_submitted', 'mod_perform');
         default:
           return '';
       }
@@ -447,34 +449,46 @@ export default {
      * We have to take into account that there can be several participant instances per row (e.g. when the user is both
      * appraiser and manager for the subject). So we get an overall status depending on the combination of individual
      * statuses.
+     * The rules are that we only display not_submitted or not_applicable when there is no other status. Otherwise, if
+     * all are not_started or complete, display that. If there is a mix, display in_progress. For the edge case with a mix
+     * of not_submitted/not_applicable, display not_submitted.
      *
      * @param {Object[]} participantInstances - The participant instances from the subject instance we are getting the progress text for
      * @returns {string}
      */
     getYourProgressText(participantInstances) {
       let allNotApplicable = true;
+      let allNotSubmittedOrNotApplicable = true;
       let allComplete = true;
       let allNotStarted = true;
       this.filterToCurrentUser(participantInstances).forEach(function(
         participant_instance
       ) {
         switch (participant_instance.progress_status) {
+          case 'NOT_SUBMITTED':
+            allNotApplicable = false;
+            break;
           case 'NOT_STARTED':
             allNotApplicable = false;
+            allNotSubmittedOrNotApplicable = false;
             allComplete = false;
             break;
           case 'IN_PROGRESS':
             allNotApplicable = false;
+            allNotSubmittedOrNotApplicable = false;
             allComplete = false;
             allNotStarted = false;
             break;
           case 'COMPLETE':
             allNotApplicable = false;
+            allNotSubmittedOrNotApplicable = false;
             allNotStarted = false;
         }
       });
       let calcStatus = allNotApplicable
         ? 'PROGRESS_NOT_APPLICABLE'
+        : allNotSubmittedOrNotApplicable
+        ? 'NOT_SUBMITTED'
         : allNotStarted
         ? 'NOT_STARTED'
         : allComplete
@@ -601,6 +615,7 @@ export default {
       "user_activities_status_in_progress",
       "user_activities_status_not_applicable",
       "user_activities_status_not_started",
+      "user_activities_status_not_submitted",
       "user_activities_subject_header",
       "user_activities_title_header",
       "user_activities_type_header"

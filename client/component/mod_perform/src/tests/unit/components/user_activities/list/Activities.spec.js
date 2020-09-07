@@ -49,6 +49,8 @@ describe('components/user_activities/list/Activities.vue', () => {
       'mock translated: user_activities_status_not_started,mod_perform';
     const expectedTextInProgress =
       'mock translated: user_activities_status_in_progress,mod_perform';
+    const expectedTextNotSubmitted =
+      'mock translated: user_activities_status_not_submitted,mod_perform';
 
     const dataProvider = [
       {
@@ -63,6 +65,10 @@ describe('components/user_activities/list/Activities.vue', () => {
               is_for_current_user: true,
               progress_status: 'PROGRESS_NOT_APPLICABLE',
             },
+            {
+              is_for_current_user: true,
+              progress_status: 'NOT_SUBMITTED',
+            },
           ],
         ],
       },
@@ -74,6 +80,10 @@ describe('components/user_activities/list/Activities.vue', () => {
             {
               is_for_current_user: true,
               progress_status: 'PROGRESS_NOT_APPLICABLE',
+            },
+            {
+              is_for_current_user: true,
+              progress_status: 'NOT_SUBMITTED',
             },
             { is_for_current_user: true, progress_status: 'NOT_STARTED' },
             { is_for_current_user: true, progress_status: 'NOT_STARTED' },
@@ -89,6 +99,10 @@ describe('components/user_activities/list/Activities.vue', () => {
             {
               is_for_current_user: true,
               progress_status: 'PROGRESS_NOT_APPLICABLE',
+            },
+            {
+              is_for_current_user: true,
+              progress_status: 'NOT_SUBMITTED',
             },
             { is_for_current_user: true, progress_status: 'NOT_STARTED' },
             { is_for_current_user: true, progress_status: 'COMPLETE' },
@@ -119,6 +133,27 @@ describe('components/user_activities/list/Activities.vue', () => {
               progress_status: 'PROGRESS_NOT_APPLICABLE',
             },
             { is_for_current_user: false, progress_status: 'COMPLETE' },
+          ],
+        ],
+      },
+      {
+        expected: expectedTextNotSubmitted,
+        combinations: [
+          [
+            {
+              is_for_current_user: true,
+              progress_status: 'NOT_SUBMITTED',
+            },
+          ],
+          [
+            {
+              is_for_current_user: true,
+              progress_status: 'PROGRESS_NOT_APPLICABLE',
+            },
+            {
+              is_for_current_user: true,
+              progress_status: 'NOT_SUBMITTED',
+            },
           ],
         ],
       },

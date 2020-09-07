@@ -1211,6 +1211,7 @@ $string['user_activities_status_in_progress'] = 'In progress';
 $string['user_activities_status_not_applicable'] = 'n/a (view only)';
 $string['user_activities_status_not_applicable_for_relationship_selector'] = 'View only';
 $string['user_activities_status_not_started'] = 'Not yet started';
+$string['user_activities_status_not_submitted'] = 'Not submitted';
 $string['user_activities_total_completed'] = 'Total completed: {$a}';
 $string['user_activities_total_respondents'] = 'Total respondents: {$a}';
 $string['user_activities_subject_header'] = 'User';
