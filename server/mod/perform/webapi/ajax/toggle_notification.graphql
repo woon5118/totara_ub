@@ -12,6 +12,7 @@ mutation mod_perform_toggle_notification(
         name
         active
       }
+      trigger_label
       triggers
     }
   }

@@ -17,28 +17,31 @@
 -->
 
 <template>
-  <div class="tui-activityNotifications">
-    <h3 class="tui-activityNotifications__header">
-      <span class="tui-activityNotifications__title">{{
-        $str('manage_activities_tabs_notifications', 'mod_perform')
-      }}</span>
-      <span class="tui-activityNotifications__active" aria-hidden="true">{{
-        $str('notification_active', 'mod_perform')
-      }}</span>
-    </h3>
-    <NotificationSection
-      v-for="notification in notifications"
-      :key="notification.class_key"
-      :data="notification"
-      @toggleNotification="onToggleNotification"
-      @toggleRecipient="onToggleRecipient"
-      @updateTriggers="onUpdateTriggers"
-    />
-  </div>
+  <Loader :loading="isLoading">
+    <div class="tui-activityNotifications">
+      <h3 class="tui-activityNotifications__header">
+        <span class="tui-activityNotifications__title">{{
+          $str('manage_activities_tabs_notifications', 'mod_perform')
+        }}</span>
+        <span class="tui-activityNotifications__active" aria-hidden="true">{{
+          $str('notification_active', 'mod_perform')
+        }}</span>
+      </h3>
+      <NotificationSection
+        v-for="notification in notifications"
+        :key="notification.class_key"
+        :data="notification"
+        @toggleNotification="onToggleNotification"
+        @toggleRecipient="onToggleRecipient"
+        @updateTriggers="onUpdateTriggers"
+      />
+    </div>
+  </Loader>
 </template>
 
 <script>
 import { notify } from 'tui/notifications';
+import Loader from 'tui/components/loader/Loader';
 import NotificationSection from 'mod_perform/components/manage_activity/notification/NotificationSection';
 import notificationsQuery from 'mod_perform/graphql/notifications';
 import createNotificationMutation from 'mod_perform/graphql/create_notification';
@@ -49,6 +52,7 @@ import { debounce } from 'tui/util';
 
 export default {
   components: {
+    Loader,
     NotificationSection,
   },
 
@@ -62,6 +66,7 @@ export default {
   data() {
     return {
       notifications: [],
+      isLoading: false,
     };
   },
 
@@ -94,7 +99,6 @@ export default {
                 values: triggers,
               },
             },
-            refetchAll: false,
           });
           notify({
             message: this.$str('toast_success_activity_update', 'mod_perform'),
@@ -115,6 +119,7 @@ export default {
 
   methods: {
     async onToggleNotification(section, active) {
+      this.isLoading = true;
       if (section.id) {
         await this.$apollo.mutate({
           mutation: toggleNotificationMutation,
@@ -124,7 +129,6 @@ export default {
               active,
             },
           },
-          refetchAll: true,
         });
       } else {
         await this.$apollo.mutate({
@@ -136,14 +140,16 @@ export default {
               active,
             },
           },
-          refetchAll: true,
         });
       }
+      await this.$apollo.queries.notifications.refetch();
+      this.isLoading = false;
     },
 
     async createNotificationIfNotExists(section) {
       let id;
       if (!section.id) {
+        this.isLoading = true;
         const mutationResult = await this.$apollo.mutate({
           mutation: createNotificationMutation,
           variables: {
@@ -156,6 +162,8 @@ export default {
         });
         id =
           mutationResult.data.mod_perform_create_notification.notification.id;
+        await this.$apollo.queries.notifications.refetch();
+        this.isLoading = false;
       } else {
         id = section.id;
       }
@@ -163,6 +171,7 @@ export default {
     },
 
     async onToggleRecipient(section, recipient) {
+      this.isLoading = true;
       const id = await this.createNotificationIfNotExists(section);
       await this.$apollo.mutate({
         mutation: toggleNotificationRecipientMutation,
@@ -173,8 +182,9 @@ export default {
             active: recipient.active,
           },
         },
-        refetchAll: true,
       });
+      await this.$apollo.queries.notifications.refetch();
+      this.isLoading = false;
     },
 
     onUpdateTriggers(section, triggers) {

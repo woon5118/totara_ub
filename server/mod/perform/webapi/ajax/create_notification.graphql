@@ -5,12 +5,14 @@ mutation mod_perform_create_notification(
     notification {
       id
       name
+      class_key
       active
       recipients {
         relationship_id
         name
         active
       }
+      trigger_label
       triggers
     }
   }
