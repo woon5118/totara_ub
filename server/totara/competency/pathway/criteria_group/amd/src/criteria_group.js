@@ -20,7 +20,8 @@
  * @package pathway_criteria_group
  */
 
-define(['core/str', 'core/notification', 'core/templates'], function(str, notification, templates) {
+define(['core/str', 'core/notification', 'core/templates', 'totara_competency/loader_manager'],
+function(str, notification, templates, Loader) {
 
     /**
      * Class constructor for the PwCriteriaGroup.
@@ -69,6 +70,8 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
         };
 
         this.filename = 'criteria_group.js';
+        this.busyAddCriterion = '';
+        this.loader = null;
     }
 
     PwCriteriaGroup.prototype = {
@@ -180,6 +183,7 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
 
                 // Propagate up to achievementPaths
                 that.packCriteria();
+                that.unsetBusyAddCriterion();
                 that.triggerEvent('update', {pathway: that.pathway});
             });
 
@@ -215,13 +219,17 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 pwWgt = this.widget.closest('[data-tw-editAchievementPaths-pathway-key]'),
                 svWgt = this.widget.closest('[data-tw-editScaleValuePaths-value]'),
                 pwKey = 0,
-                pwId = 0;
+                pwId = 0,
+                pendingJsKey = 'pathwayCriteriaGroupInit_';
 
             return new Promise(function(resolve) {
                 if (pwWgt) {
                     pwKey = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') : 0;
                     pwId = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') : 0;
+                    pendingJsKey += pwKey;
                 }
+
+                M.util.js_pending(pendingJsKey);
 
                 // Obtain the pathway detail from the dom
 
@@ -254,6 +262,7 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 that.toggleSingleUse(false);
 
                 that.triggerEvent('update', {pathway: that.pathway});
+                M.util.js_complete(pendingJsKey);
                 resolve();
             });
         },
@@ -355,6 +364,12 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 criterionSingleUse = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-singleUse'),
                 criterionKey;
 
+            if (this.busyAddCriterion !== '') {
+                return;
+            }
+
+            this.setBusyAddCriterion(criterionType);
+
             criterionKey = that.getNextCriterionKey();
 
             this.criteria[criterionKey] = {
@@ -376,11 +391,13 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
             // Display the criterion
             templates.renderAppend(templateName, {criteria: this.criteria[criterionKey]}, target).then(function() {
                 templates.runTemplateJS('');
+                // js_complete will be triggered in 'update' event listener
                 that.triggerEvent('dirty', {});
             }).catch(function(e) {
                 e.fileName = that.filename;
                 e.name = 'Error displaying ' + criterionType;
                 notification.exception(e);
+                that.unsetBusyAddCriterion();
             });
         },
 
@@ -457,7 +474,10 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 deletedNode = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-deleted]'),
                 removeIconWgt = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-action="remove"]'),
                 undoIconWgt = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-action="undo"]'),
-                copyObj = {};
+                copyObj = {},
+                pendingJsKey = 'removeCriterion' + criterionKey;
+
+            M.util.js_pending(pendingJsKey);
 
             if (this.criteria[criterionKey]) {
                 // If it is a single use criterion, bubble event up to indicate that we
@@ -500,10 +520,9 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
 
                     this.triggerEvent('update', {pathway: this.pathway});
                     this.triggerEvent('dirty', {});
-                } else {
-                    var pendingJsKey = 'pathwayRemoveLastCriterion';
-                    M.util.js_pending(pendingJsKey);
 
+                    M.util.js_complete(pendingJsKey);
+                } else {
                     // Remove the whole criterion and AND divider
                     if (criterionTarget) {
                         criterionTarget.remove();
@@ -526,6 +545,7 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                     this.packCriteria();
 
                     if (this.pathway.criteria.length == 0) {
+                        // We need to ensure pending_js waits for js code removing the pathway
                         this.triggerEvent('remove', {pendingJsKey: pendingJsKey});
                     } else {
                         this.triggerEvent('update', {pathway: this.pathway});
@@ -536,6 +556,8 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 }
 
                 this.criteriaLength -= 1;
+            } else {
+                M.util.js_complete(pendingJsKey);
             }
         },
 
@@ -554,7 +576,10 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 deletedNode = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-deleted]'),
                 removeIconWgt = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-action="remove"]'),
                 undoIconWgt = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-action="undo"]'),
-                copyObj = {};
+                copyObj = {},
+                pendingJsKey = 'undoRemoveCriterion' + criterionKey;
+
+            M.util.js_pending(pendingJsKey);
 
             // Handle the case where an existing single-use has been removed, another one added
             // and then the user tries to undo removal of the original criterion
@@ -574,6 +599,7 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                         window.scrollTo(0, 0);
                     }).fail(notification.exception);
 
+                    M.util.js_complete(pendingJsKey);
                     return false;
                 }
             }
@@ -613,6 +639,7 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
 
             this.criteriaLength += 1;
 
+            M.util.js_complete(pendingJsKey);
         },
 
         /**
@@ -649,6 +676,25 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
             this.widget.dispatchEvent(propagateEvent);
         },
 
+        /**
+         * set busyAddCriterion to handle slow execution of js and show loading spinner
+         * @param criterionType
+         */
+        setBusyAddCriterion: function (criterionType) {
+            this.busyAddCriterion = criterionType;
+            M.util.js_pending(this.busyAddCriterion);
+            this.loader.show();
+        },
+
+        /**
+         * unset busyAddCriterion and hide loading spinner
+         */
+        unsetBusyAddCriterion: function () {
+            this.loader.hide();
+            M.util.js_complete(this.busyAddCriterion);
+            this.busyAddCriterion = '';
+        }
+
     };
 
     /**
@@ -663,10 +709,13 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
             wgt.setParent(parent);
             wgt.events();
             wgt.bubbledEventsListener();
+            wgt.loader = Loader.init(parent);
             resolve(wgt);
 
             M.util.js_pending('pathwayCriteriaGroup');
+            wgt.loader.show();
             wgt.initData().then(function() {
+                wgt.loader.hide();
                 M.util.js_complete('pathwayCriteriaGroup');
             }).catch(function() {
                 // Failed

@@ -36,6 +36,11 @@ use totara_criteria\criterion_factory;
 class behat_totara_competency extends behat_base {
 
     private const COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR = '//*[@aria-label="Display formats"]//*[@aria-label="Show tables"]/*';
+    private const COMPETENCY_PROFILE_MANUAL_ACHIEVEMENT_LOCATOR = '.tui-pathwayManualAchievementRater';
+    private const COMPETENCY_PROFILE_MANUAL_ACHIEVEMENT_ROLE_LOCATOR = '.tui-pathwayManualAchievementRater__overview-role';
+    private const COMPETENCY_PROFILE_MANUAL_ACHIEVEMENT_CELL_LOCATOR = '.tui-dataTableCell';
+    private const COMPETENCY_PROFILE_MANUAL_ACHIEVEMENT_LABEL_LOCATOR = '.tui-dataTableCell__label';
+    private const COMPETENCY_PROFILE_MANUAL_ACHIEVEMENT_CONTENT_LOCATOR = '.tui-dataTableCell__content';
     private const TOTARA_COMPETENCY_PROFILE_PATH = 'totara/competency/profile/index.php';
     private const TOTARA_COMPETENCY_PROFILE_DETAIL_PATH = 'totara/competency/profile/details/index.php';
     private const TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH = 'totara/competency/profile/assign/index.php';
@@ -781,6 +786,10 @@ class behat_totara_competency extends behat_base {
             $fnd = false;
         }
 
+        if ($text_node === null) {
+            $fnd = false;
+        }
+
         if ($fnd) {
             try {
                 $this->ensure_node_is_visible($text_node);
@@ -1101,7 +1110,7 @@ class behat_totara_competency extends behat_base {
     }
 
     /**
-     * @Given /^I should see "(?P<search_text>(?:[^"]|\\")*)" "(courses|competencies)" completed towards achieving "(?P<scale_value>(?:[^"]|\\")*)" in the competency profile$/
+     * @Given /^I should see "(?P<search_text>(?:[^"]|\\")*)" "(courses|other competencies|child competencies)" completed towards achieving "(?P<scale_value>(?:[^"]|\\")*)" in the competency profile$/
      * @param string $search_text
      * @param string $achievement_type
      * @param string $scale_value
@@ -1110,12 +1119,25 @@ class behat_totara_competency extends behat_base {
     public function i_should_see_in_the_profile_achievement(string $search_text, string $achievement_type, string $scale_value) {
         \behat_hooks::set_step_readonly(true);
 
-        $goal_class = 'tui-criteria' .
-            ($achievement_type === 'courses' ? 'Course' : 'Competency') .
-            'Achievement__goal';
+        $goal_class = 'tui-criteria';
+        $goal_title = '';
+        switch ($achievement_type) {
+            case 'courses':
+                $goal_class .= 'Course';
+                $goal_title = 'Complete courses';
+                break;
+            case 'other competencies':
+            case 'child competencies':
+                $goal_class .= 'Competency';
+                $goal_title = 'Achieve proficiency in ' . $achievement_type;
+                break;
+        }
+        $goal_class .= 'Achievement__goal';
+
         $xpath = '//div[@class="tui-competencyAchievementsScale" ' .
             'and .//span[@class="tui-competencyAchievementsScale__title" and contains(., "' . $scale_value . '")]]' .
-            '//div[@class="' . $goal_class . '" and .//span[@class="tui-progressCircle__circle-text" and contains(., "' . $search_text . '")]]';
+            '//div[@class="' . $goal_class . '" and contains(., "' . $goal_title . '") and ' .
+            '//span[@class="tui-progressCircle__circle-text" and contains(., "' . $search_text . '")]]';
 
         try {
             $this->find('xpath', $xpath);
@@ -1406,6 +1428,149 @@ class behat_totara_competency extends behat_base {
         }
 
         return $this->criteria_item_types[$criterion_type];
+    }
+
+    /**
+     * @Given /^I should see the following manual achievements:$/
+     * @param TableNode $table
+     * @throws Exception
+     */
+    public function i_should_see_the_following_manual_achievements(TableNode $table) {
+        \behat_hooks::set_step_readonly(true);
+
+        $expected = $this->parse_table(
+            $table,
+            ['role', 'rating'],
+            ['rater', 'date', 'actions']
+        );
+        $expected = array_map(function ($row) {
+            $row['role'] = strtolower($row['role']) === 'self' ? 'Your rating' : $row['role'];
+            return $row;
+        }, $expected);
+
+        $columns = array_keys($expected[0]);
+        $actual = [];
+        /** @var NodeElement[] $manual_achievements */
+        $manual_achievements = $this->find_all('css', self::COMPETENCY_PROFILE_MANUAL_ACHIEVEMENT_LOCATOR);
+        foreach ($manual_achievements as $rater_row) {
+            $element = [];
+
+            foreach ($columns as $column) {
+                switch ($column) {
+                    case 'role':
+                        /** @var NodeElement $node */
+                        $node = $this->find('css', self::COMPETENCY_PROFILE_MANUAL_ACHIEVEMENT_ROLE_LOCATOR, false, $rater_row);
+                        if ($node !== null) {
+                            $element['role'] = $node->getText();
+                        }
+                        break;
+
+                    case 'rating':
+                    case 'date':
+                    case 'rater':
+                        $xpath = '//div[contains(@class, "tui-dataTableCell") and ' .
+                            './/span[@class="tui-dataTableCell__label" and contains(., "' . ucfirst($column) . '")]]';
+
+                        try {
+                            /** @var NodeElement $node */
+                            $node = $this->find('xpath', $xpath, false, $rater_row);
+                            /** @var NodeElement $element_node */
+                            $element_node = $this->find('css',
+                                self::COMPETENCY_PROFILE_MANUAL_ACHIEVEMENT_CONTENT_LOCATOR,
+                                false,
+                                $node
+                            );
+                            if ($element_node !== null) {
+                                $element[$column] = $element_node->getText();
+                            }
+                        } catch (Exception $e) {
+                            if ($column === 'rating') {
+                                // When there is no rating, there is no column heading
+                                /** @var NodeElement[] $nodes */
+                                $nodes = $this->find_all('css',
+                                    self::COMPETENCY_PROFILE_MANUAL_ACHIEVEMENT_CONTENT_LOCATOR,
+                                    false,
+                                    $rater_row
+                                );
+                                if (!empty($nodes)) {
+                                    $element[$column] = $nodes[0]->getText();
+                                }
+                            } else {
+                                $element[$column] = '';
+                            }
+                        }
+                        break;
+
+                    case 'actions':
+                        // No heading and always the last column
+                        /** @var NodeElement[] $nodes */
+                        $nodes = $this->find_all('css',
+                            self::COMPETENCY_PROFILE_MANUAL_ACHIEVEMENT_CONTENT_LOCATOR,
+                            false,
+                            $rater_row
+                        );
+                        if (!empty($nodes)) {
+                            $element['actions'] = end($nodes)->getText();
+                        }
+                        break;
+                }
+            }
+
+            $actual[] = $element;
+        }
+
+        $diff = array_udiff_assoc($expected, $actual, function($a, $b): int {
+            return (int)!empty(array_diff_assoc($a, $b));
+        });
+
+        if (!empty($diff)) {
+            throw new ExpectationException("Could not find all expected manual achievements", $this->getSession());
+        }
+    }
+
+    /**
+     * @Given /^I click on "([^"]*)" "([^"]*)" in the manual achievement of "([^"]*)"$/
+     * @Given /^I click on "([^"]*)" "([^"]*)" in the manual achievement of "([^"]*)" "([^"]*)"$/
+     * @param string $element Element we look for
+     * @param string $selector_type The type of what we look for
+     * @param string $role The role of the rater
+     * @param string|null $rater The rater
+     * @throws Exception
+     */
+    public function i_click_on_in_the_manual_achievement_of(
+        string $element,
+        string $selector_type,
+        string $role,
+        ?string $rater = null
+    ) {
+        \behat_hooks::set_step_readonly(false);
+
+        $role = (strtolower($role) === 'self') ? 'Your rating' : $role;
+        $xpath = "//div[contains(concat(' ', @class, ' '), ' tui-pathwayManualAchievementRater ') and " .
+            ".//div[contains(@class, 'tui-pathwayManualAchievementRater__overview-role') and contains(., '{$role}')]]" .
+            "//div[contains(concat(' ', @class, ' '), ' tui-dataTableRow ')";
+        if ($rater !== null) {
+            $xpath .= " and .//div[contains(concat(' ', @class, ' '), ' tui-dataTableCell ') " .
+                "and ./span[@class='tui-dataTableCell__label' and contains(., 'Rater')] " .
+                "and ./div[@class = 'tui-dataTableCell__content' and contains(., '{$rater}')]]";
+        }
+        $xpath .= ']';
+
+        /** @var NodeElement $row */
+        $row = $this->find('xpath', $xpath);
+
+        list($selector, $locator) = $this->transform_selector($selector_type, $element);
+        /** @var NodeElement $element_node */
+        $element_node = $this->find($selector, $locator, false, $row);
+        try {
+            $this->ensure_node_is_visible($element_node);
+            $element_node->click();
+        } catch (Exception $e) {
+            $msg = '"' . $element . '" "' . $selector_type . '" in the manual achievement of "' . $role . '"' .
+                ($rater !== null ? "\"{$rater}\"" : '') . ' is not clickable';
+            throw new ExpectationException($msg, $this->getSession());
+        }
+
     }
 
 }

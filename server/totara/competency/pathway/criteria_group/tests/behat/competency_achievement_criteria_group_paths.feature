@@ -4,8 +4,6 @@ Feature: Manage Criteria group achievement paths
   I need to add a Criteria based achievement paths in the competency's achievement criteria
 
   Background:
-    # TODO Fix randomly failing steps in TL-26571
-    Given I skip the scenario until issue "TL-26571" lands
     Given I am on a totara site
     And a competency scale called "ggb" exists with the following values:
       | name    | description          | idnumber       | proficient | default | sortorder |
@@ -35,6 +33,7 @@ Feature: Manage Criteria group achievement paths
     And the "Apply changes" "button" should be disabled
 
     When I add a "singlevalue" pathway
+    And I wait for pending js
     Then I should see the following singlevalue scale values:
       | name  |
       | Great |
@@ -45,24 +44,29 @@ Feature: Manage Criteria group achievement paths
     And the "Criteria-based paths" "option" should be disabled in the "[data-tw-editachievementpaths-add-pathway]" "css_element"
 
     When I add a criteria group with "coursecompletion" criterion to "Good" scalevalue
+    And I wait for pending js
     Then I should see "coursecompletion" criterion in criteria group "1" in "Good" scalevalue
     When I click on "Remove criteria" "button" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
     And I wait for pending js
-    # TODO Fix this randomly failing step in TL-26571
+    # Adding another wait for now as pending js seems to end too soon - may be due to js_pending and js_complete in different js files?
+    And I wait for the next second
     Then I should see "0" criteria groups in "Good" scalevalue
 
     When I add a criteria group with "coursecompletion" criterion to "Good" scalevalue
+    And I wait for pending js
     And I toggle criterion detail of "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
-    Then I should see "Not enough courses with completion tracking enabled" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
+    Then I should see "No courses added" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
 
     When I click on "Add courses" "button" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
+    And I wait for pending js
     And I toggle the legacy adder list entry "Course 1" in "Select courses"
     And I save my legacy selections and close the "Select courses" adder
     And I wait for pending js
-    Then I should not see "Not enough courses with completion tracking enabled" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
+    Then I should not see "No courses added" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
     And I should see "Course 1" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
 
     When I click on "Add courses" "button" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
+    And I wait for pending js
     Then the legacy adder list entry "Course 1" in "Select courses" should not be enabled
     When I toggle the legacy adder list entry "Course 3" in "Select courses"
     And I toggle the legacy adder list entry "No tracking" in "Select courses"
@@ -77,7 +81,7 @@ Feature: Manage Criteria group achievement paths
     Then I should see "Changes applied successfully"
     And I should see error indicator for "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
     When I toggle criterion detail of "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
-    Then I should see "Completion tracking is disabled" error for "No tracking" item in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
+    Then I should see "Course completion not possible (completion not tracked, or completion settings not valid)" error for "No tracking" item in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
 
     # Reload to ensure all saved and retrieved correctly
     And I navigate to the competency achievement paths page for the "Parent" competency
@@ -87,13 +91,15 @@ Feature: Manage Criteria group achievement paths
     Then I should see "Course 1" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
     And I should see "Course 3" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
     And I should see "No tracking" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
-    And I should see "Completion tracking is disabled" error for "No tracking" item in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
+    And I should see "Course completion not possible (completion not tracked, or completion settings not valid)" error for "No tracking" item in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
 
     When I click on "Remove criteria" "button" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
+    And I wait for pending js
     Then "Remove criteria" "button" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue should not be visible
     And "Undo remove criteria" "button" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue should be visible
 
     When I click on "Undo remove criteria" "button" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
+    And I wait for pending js
     Then "Remove criteria" "button" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue should be visible
     And "Undo remove criteria" "button" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue should not be visible
 
@@ -109,6 +115,7 @@ Feature: Manage Criteria group achievement paths
     # Fist ensure user can achieve proficiency in Child1 competency
     And I navigate to the competency achievement paths page for the "Child1" competency
     And I add a "learning_plan" pathway
+    And I wait for pending js
     And I click on "Apply changes" "button"
     And I wait for pending js
     Then I should see "Changes applied successfully"
@@ -118,24 +125,29 @@ Feature: Manage Criteria group achievement paths
     And I add a "singlevalue" pathway
     And I wait for pending js
     And I add a criteria group with "othercompetency" criterion to "Bad" scalevalue
+    And I wait for pending js
     Then I should see "othercompetency" criterion in criteria group "1" in "Bad" scalevalue
     When I click on "Remove criteria" "button" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
     And I wait for pending js
-    # TODO Fix this randomly failing step in TL-26571
+    # Adding another wait for now as pending js seems to end too soon - may be due to js_pending and js_complete in different js files?
+    And I wait for the next second
     Then I should see "0" criteria groups in "Bad" scalevalue
 
     When I add a criteria group with "othercompetency" criterion to "Bad" scalevalue
+    And I wait for pending js
     And I toggle criterion detail of "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
-    Then I should see "No competencies added yet" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
+    Then I should see "No competencies added" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
 
     When I click on "Add competencies" "button" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
+    And I wait for pending js
     And I toggle the legacy adder list entry "Child1" in "Select competencies"
     And I save my legacy selections and close the "Select competencies" adder
     And I wait for pending js
-    Then I should not see "No competencies added yet" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
+    Then I should not see "No competencies added" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
     And I should see "Child1" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
 
     When I click on "Add competencies" "button" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
+    And I wait for pending js
     Then the legacy adder list entry "Child1" in "Select competencies" should not be enabled
     When I toggle the legacy adder list entry "Child2" in "Select competencies"
     And I save my legacy selections and close the "Select competencies" adder
@@ -149,7 +161,7 @@ Feature: Manage Criteria group achievement paths
     And I should see error indicator for "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
     When I toggle criterion detail of "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
     And I wait for pending js
-    Then I should see "Competency can not become proficient" error for "Child2" item in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
+    Then I should see "Proficiency not possible due to invalid criteria on this competency" error for "Child2" item in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
 
     # Reload to ensure all saved and retrieved correctly
     And I navigate to the competency achievement paths page for the "Parent" competency
@@ -158,17 +170,20 @@ Feature: Manage Criteria group achievement paths
     When I toggle criterion detail of "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
     Then I should see "Child1" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
     And I should see "Child2" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
-    And I should see "Competency can not become proficient" error for "Child2" item in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
+    And I should see "Proficiency not possible due to invalid criteria on this competency" error for "Child2" item in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
 
     When I click on "Remove criteria" "button" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
+    And I wait for pending js
     Then "Remove criteria" "button" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue should not be visible
     And "Undo remove criteria" "button" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue should be visible
 
     When I click on "Undo remove criteria" "button" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
+    And I wait for pending js
     Then "Remove criteria" "button" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue should be visible
     And "Undo remove criteria" "button" in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue should not be visible
 
     When I remove "Child2" item in "othercompetency" criterion "1" in criteria group "1" in "Bad" scalevalue
+    And I wait for pending js
     And I click on "Apply changes" "button"
     And I wait for pending js
     Then I should see "Changes applied successfully"
@@ -180,6 +195,7 @@ Feature: Manage Criteria group achievement paths
     # Fist ensure user can achieve proficiency in Child1 competency
     And I navigate to the competency achievement paths page for the "Child1" competency
     And I add a "learning_plan" pathway
+    And I wait for pending js
     And I click on "Apply changes" "button"
     And I wait for pending js
     Then I should see "Changes applied successfully"
@@ -187,13 +203,18 @@ Feature: Manage Criteria group achievement paths
     # Now for the test
     When I navigate to the competency achievement paths page for the "Parent" competency
     And I add a "singlevalue" pathway
+    And I wait for pending js
     And I add a criteria group with "childcompetency" criterion to "Good" scalevalue
+    And I wait for pending js
     Then I should see "childcompetency" criterion in criteria group "1" in "Good" scalevalue
     When I click on "Remove criteria" "button" in "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
     And I wait for pending js
+    # Adding another wait for now as pending js seems to end too soon - may be due to js_pending and js_complete in different js files?
+    And I wait for the next second
     Then I should see "0" criteria groups in "Good" scalevalue
 
     When I add a criteria group with "childcompetency" criterion to "Good" scalevalue
+    And I wait for pending js
     And I toggle criterion detail of "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
     Then criterion aggregation should be set to complete "all" in "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
     And the "Apply changes" "button" should be enabled
@@ -204,11 +225,12 @@ Feature: Manage Criteria group achievement paths
     And I should see error indicator for "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
     When I toggle criterion detail of "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
     And I wait for pending js
-    Then I should see "This competency does not have enough child competencies in which the user can become proficient" in "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
+    Then I should see "Proficiency not possible due to invalid criteria on one or more child competency" in "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
 
     # Now also ensure that users can become proficient in Child2
     And I navigate to the competency achievement paths page for the "Child2" competency
     And I add a "learning_plan" pathway
+    And I wait for pending js
     And I click on "Apply changes" "button"
     And I wait for pending js
     Then I should see "Changes applied successfully"
@@ -217,7 +239,7 @@ Feature: Manage Criteria group achievement paths
     Then I should not see error indicator for "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
     When I toggle criterion detail of "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
     And I wait for pending js
-    Then I should not see "This competency does not have enough child competencies in which the user can become proficient" in "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
+    Then I should not see "Proficiency not possible due to invalid criteria on one or more child competency" in "childcompetency" criterion "1" in criteria group "1" in "Good" scalevalue
 
 
   Scenario: Manage Criteria group basics with linkedcourses
@@ -232,32 +254,39 @@ Feature: Manage Criteria group achievement paths
     # No linked courses
     When I navigate to the competency achievement paths page for the "Another" competency
     And I add a "singlevalue" pathway
+    And I wait for pending js
     And I add a criteria group with "linkedcourses" criterion to "Good" scalevalue
+    And I wait for pending js
     Then I should see "linkedcourses" criterion in criteria group "1" in "Good" scalevalue
     When I click on "Remove criteria" "button" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     And I wait for pending js
+    # Adding another wait for now as pending js seems to end too soon - may be due to js_pending and js_complete in different js files?
+    And I wait for the next second
     Then I should see "0" criteria groups in "Good" scalevalue
 
     When I add a criteria group with "linkedcourses" criterion to "Good" scalevalue
+    And I wait for pending js
     And I click on "Apply changes" "button"
     And I wait for pending js
     Then I should see "Changes applied successfully"
     And I should see error indicator for "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     When I toggle criterion detail of "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     And I wait for pending js
-    Then I should see "Not enough linked courses with completion tracking enabled" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
+    Then I should see "No courses linked to the competency" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
 
     # Linked courses can all be completed
     When I navigate to the competency achievement paths page for the "Child1" competency
     And I add a "singlevalue" pathway
+    And I wait for pending js
     And I add a criteria group with "linkedcourses" criterion to "Good" scalevalue
+    And I wait for pending js
     And I click on "Apply changes" "button"
     And I wait for pending js
     Then I should see "Changes applied successfully"
     And I should not see error indicator for "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     When I toggle criterion detail of "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     And I wait for pending js
-    Then I should not see "Not enough linked courses with completion tracking enabled" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
+    Then I should not see "No courses linked to the competency" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
 
     # Not enough linked courses
     When I set criterion aggregation to complete "3" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
@@ -267,12 +296,14 @@ Feature: Manage Criteria group achievement paths
     And I should see error indicator for "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     When I toggle criterion detail of "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     And I wait for pending js
-    Then I should see "Not enough linked courses with completion tracking enabled" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
+    Then I should see "Not enough linked courses – link more courses, or reduce the number required" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
 
     # Error is displayed when any of the linked courses can not be completed
     When I navigate to the competency achievement paths page for the "Child2" competency
     And I add a "singlevalue" pathway
+    And I wait for pending js
     And I add a criteria group with "linkedcourses" criterion to "Good" scalevalue
+    And I wait for pending js
     And I toggle criterion detail of "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     And I set criterion aggregation to complete "1" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     And I click on "Apply changes" "button"
@@ -281,7 +312,7 @@ Feature: Manage Criteria group achievement paths
     And I should see error indicator for "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     When I toggle criterion detail of "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     And I wait for pending js
-    Then I should see "Not enough linked courses with completion tracking enabled" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
+    Then I should see "Course completion not possible in one or more linked courses (completion not tracked, or completion settings not valid)" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
 
 
   Scenario: Manage Criteria group basics with onactivate
@@ -290,12 +321,14 @@ Feature: Manage Criteria group achievement paths
 
     # onactivate initially available on all scalevalues
     And I add a "singlevalue" pathway
+    And I wait for pending js
     Then the "onactivate" criterion type option should be enabled in "Great" scalevalue
     And the "onactivate" criterion type option should be enabled in "Good" scalevalue
     And the "onactivate" criterion type option should be enabled in "Bad" scalevalue
 
     # onactivate not available with any other type
     When I add a criteria group with "childcompetency" criterion to "Great" scalevalue
+    And I wait for pending js
     Then I should see "childcompetency" criterion in criteria group "1" in "Great" scalevalue
     And the "onactivate" criterion type option should be disabled in "Great" scalevalue
     And the "onactivate" criterion type option should be enabled in "Good" scalevalue
@@ -304,6 +337,7 @@ Feature: Manage Criteria group achievement paths
 
     # onactivate not available anywhere when added
     When I add a criteria group with "onactivate" criterion to "Bad" scalevalue
+    And I wait for pending js
     Then I should see "onactivate" criterion in criteria group "1" in "Bad" scalevalue
     And I wait for pending js
     And "Add" "button" in "Bad" scalevalue should not be visible
@@ -320,6 +354,7 @@ Feature: Manage Criteria group achievement paths
 
     #check reload after save
     When I add a criteria group with "onactivate" criterion to "Bad" scalevalue
+    And I wait for pending js
     And I click on "Apply changes" "button"
     And I wait for pending js
     And I navigate to the competency achievement paths page for the "Another" competency
@@ -334,7 +369,9 @@ Feature: Manage Criteria group achievement paths
     Given I log in as "admin"
     And I navigate to the competency achievement paths page for the "Another" competency
     And I add a "singlevalue" pathway
+    And I wait for pending js
     And I add a criteria group with "childcompetency" criterion to "Great" scalevalue
+    And I wait for pending js
     And I toggle criterion detail of "childcompetency" criterion "1" in criteria group "1" in "Great" scalevalue
     Then criterion aggregation should be set to complete "all" in "childcompetency" criterion "1" in criteria group "1" in "Great" scalevalue
     And I set criterion aggregation to complete "2" in "childcompetency" criterion "1" in criteria group "1" in "Great" scalevalue
@@ -345,6 +382,7 @@ Feature: Manage Criteria group achievement paths
     And I set criterion aggregation to complete "3" in "coursecompletion" criterion "1" in criteria group "1" in "Great" scalevalue
 
     When I add a criteria group with "linkedcourses" criterion to "Good" scalevalue
+    And I wait for pending js
     And I toggle criterion detail of "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     Then criterion aggregation should be set to complete "all" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
     And I set criterion aggregation to complete "4" in "linkedcourses" criterion "1" in criteria group "1" in "Good" scalevalue
@@ -356,6 +394,7 @@ Feature: Manage Criteria group achievement paths
     And I set criterion aggregation to complete "5" in "othercompetency" criterion "1" in criteria group "2" in "Good" scalevalue
 
     When I add a criteria group with "onactivate" criterion to "Bad" scalevalue
+    And I wait for pending js
     Then the "Apply changes" "button" should be enabled
 
     #check reload after save

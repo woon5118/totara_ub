@@ -465,16 +465,18 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
-     * @Then /^I should see "([^"]*)" under the expanded row of the tui datatable$/
-     * @Then /^I should see "([^"]*)" under the expanded row of the tui datatable in the "([^"]*)" "([^"]*)"$/
-     * @Then /^I should see "([^"]*)" under the expanded row of the tui datatable in the "([^"]*)" "([^"]*)" in the "([^"]*)" tui collapsible$/
-     * @param $expected_text string The expected text in the cell identified by the column header and row
+     * @Then /^I (should|should not) see "([^"]*)" under the expanded row of the tui datatable$/
+     * @Then /^I (should|should not) see "([^"]*)" under the expanded row of the tui datatable in the "([^"]*)" "([^"]*)"$/
+     * @Then /^I (should|should not) see "([^"]*)" under the expanded row of the tui datatable in the "([^"]*)" "([^"]*)" in the "([^"]*)" tui collapsible$/
+     * @param string $not
+     * @param string $expected_text The expected text in the cell identified by the column header and row
      * @param string $table_locator '.my-table' etc
      * @param string|null $table_selector_type css, xpath etc
      * @param string|null $collapsible_label_text
      * @throws ExpectationException
      */
-    public function i_should_see_under_the_expanded_row_of_datatable(
+    public function i_should_see_under_the_expanded_row_of_datatable (
+        string $not,
         string $expected_text,
         string $table_locator = self::DATA_TABLE_DEFAULT_LOCATOR,
         string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE,
@@ -495,38 +497,52 @@ class behat_totara_tui extends behat_base {
             throw new ExpectationException('Expandable row is not visible in the tui datatable', $this->getSession());
         }
 
+        $expected = $not === 'should';
         $row_text = $row->getText();
-        if (strpos($row_text, $expected_text) === false) {
-            throw new ExpectationException("\"{$expected_text}\" text was not found in the tui datatable", $this->getSession());
+        $actual = strpos($row_text, $expected_text) !== false;
+        if ($expected !== $actual) {
+            $msg_expected = $expected ? 'not ' : '';
+            throw new ExpectationException("\"{$expected_text}\" text was {$msg_expected}found in the tui datatable", $this->getSession());
         }
     }
 
     /**
-     * @Then /^I should not see "([^"]*)" under the expanded row of the tui datatable$/
-     * @Then /^I should not see "([^"]*)" under the expanded row of the tui datatable in the "([^"]*)" "([^"]*)"$/
-     * @param $expected_text string The expected text in the cell identified by the column header and row
+     * @Then /^I click on "([^"]*)" "([^"]*)" in the expanded row of the tui datatable$/
+     * @Then /^I click on "([^"]*)" "([^"]*)" in the expanded row of the tui datatable in the "([^"]*)" "([^"]*)"$/
+     * @Then /^I click on "([^"]*)" "([^"]*)" in the expanded row of the tui datatable in the "([^"]*)" "([^"]*)" in the "([^"]*)" tui collapsible$/
+     * @param string $element Element we look for
+     * @param string $selector_type The type of what we look for
      * @param string $table_locator '.my-table' etc
      * @param string|null $table_selector_type css, xpath etc
+     * @param string|null $collapsible_label_text
      * @throws ExpectationException
      */
-    public function i_should_not_see_under_the_expanded_row_of_datatable(
-        string $expected_text,
+    public function i_click_under_the_expanded_row_of_datatable(
+        string $element,
+        string $selector_type,
         string $table_locator = self::DATA_TABLE_DEFAULT_LOCATOR,
-        string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE
+        string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE,
+        string $collapsible_label_text = null
     ): void {
-        $table = $this->find_data_table($table_selector_type, $table_locator);
+        behat_hooks::set_step_readonly(false);
+
+        /** @var NodeElement $top */
+        $root = false;
+        if ($collapsible_label_text !== null) {
+            $root = $this->find_collapsible($collapsible_label_text);
+        }
+
+        $table = $this->find_data_table($table_selector_type, $table_locator, $root);
 
         $row = $table->find('css', '.tui-dataTableExpandableRow');
         if ($row === null || !$row->isVisible()) {
             throw new ExpectationException('Expandable row is not visible in the tui datatable', $this->getSession());
         }
 
-        $row_text = $row->getText();
-        if (strpos($row_text, $expected_text) !== false) {
-            throw new ExpectationException(
-                "\"{$expected_text}\" text was found in the tui datatable but shouldn't be there",
-                $this->getSession()
-            );
+        list($selector, $locator) = $this->transform_selector($selector_type, $element);
+        $node = $row->find($selector, $locator);
+        if ($node !== null) {
+            $node->click();
         }
     }
 

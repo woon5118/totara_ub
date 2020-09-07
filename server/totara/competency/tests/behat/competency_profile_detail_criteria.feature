@@ -2,8 +2,6 @@
 Feature: Test viewing criteria fulfilment for a user on their competency details page.
 
   Background:
-    # TODO Fix randomly failing steps in TL-26571
-    Given I skip the scenario until issue "TL-26571" lands
     Given the following "users" exist:
       | username | firstname | lastname |
       | user     | Staff     | User     |
@@ -49,6 +47,7 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     And I run the scheduled task "totara_competency\task\competency_aggregation_queue"
     And I log in as "user"
     And I navigate to the competency profile details page for the "Comp1" competency
+    And I wait for pending js
 
     # Course completion (aka flexible courses) criteria (Course 1 & 2)
     And I wait until ".tui-competencyAchievementsScale" "css_element" exists
@@ -71,15 +70,18 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     Then I should see "Course 2 Description" under the expanded row of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
 
     # View Course 2
-    When I click on "Go to course" "link" in the ".tui-criteriaCourseAchievement" "css_element"
+    When I click on "Go to course" "link" in the expanded row of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I wait for pending js
     Then I should see "Course 2 Description"
     And I should see "You can not enrol yourself in this course."
     When I click on "Continue" "button"
+    And I wait for pending js
     Then I should see "Competency profile"
 
     # Linked courses criteria (Course 3)
     And I wait until ".tui-competencyAchievementsScale" "css_element" exists
     When I ensure the "Work towards level Just Barely Competent" tui collapsible is expanded
+    And I wait for pending js
     Then I should see "1 / 1" "courses" completed towards achieving "Just Barely Competent" in the competency profile
 
     # Course 3 - 100% Completed
@@ -87,10 +89,12 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     And I should see "100%" under "Progress" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
     And I should see "Complete" under "Completion" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
     When I toggle expanding row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    And I wait for pending js
     Then I should see "Course 3 Description" under the expanded row of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
 
     # View Course 3
-    When I click on "Go to course" "link" in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
+    When I click on "Go to course" "link" in the expanded row of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    And I wait for pending js
     Then I should see "Course 3"
     And I should see "Topic 1"
 
@@ -115,57 +119,61 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     And the following "criteria group pathways" exist in "totara_competency" plugin:
       | competency  | scale_value        | criteria         | sortorder |
       | comp1       | super              | othercompetency  | 1         |
-      | comp1       | super              | childcompetency  | 1         |
       | comp2       | super              | onactivate       | 1         |
+      | comp1       | barely             | childcompetency  | 1         |
     And I run the scheduled task "totara_competency\task\expand_assignments_task"
     And I run the scheduled task "totara_competency\task\competency_aggregation_queue"
 
     When I log in as "user"
     And I navigate to the competency profile details page for the "Comp1" competency
+    And I wait for pending js
 
     # Other competencies
     # Make sure we expand existing headers
     And I wait until ".tui-competencyAchievementsScale" "css_element" exists
     And I ensure the "Work towards level Super Competent" tui collapsible is expanded
-    Then I should see "0 / 2" "competencies" completed towards achieving "Super Competent" in the competency profile
+    And I wait for pending js
+    Then I should see "0 / 2" "other competencies" completed towards achieving "Super Competent" in the competency profile
 
     # Other competency - Comp 4 - is not assigned and can not be self assigned.
-    Then I should see "Comp4" under "Competencies" on row "2" of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
-    And I should see "Not available" under "Achievement level" on row "2" of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
-    And I should see "Not complete" under "Completion" on row "2" of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
-    When I toggle expanding row "2" of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
-    Then I should see "Competency Four" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
+    Then I should see "Comp4" under "Competencies" on row "2" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I should see "Not available" under "Achievement level" on row "2" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I should see "Not complete" under "Completion" on row "2" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
+    When I toggle expanding row "2" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
+    Then I should see "Competency Four" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
     And I should not see "View competency"
     And I should not see "Self assign competency"
 
     # Other competency - Comp3 - is not assigned but we self assign it now.
-    Then I should see "Comp3" under "Competencies" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
-    And I should see "Not available" under "Achievement level" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
-    And I should see "Not complete" under "Completion" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
-    When I toggle expanding row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
-    Then I should see "Competency Three" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
-    And I should see "Self assign competency" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
+    Then I should see "Comp3" under "Competencies" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I should see "Not available" under "Achievement level" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I should see "Not complete" under "Completion" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
+    When I toggle expanding row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
+    Then I should see "Competency Three" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I should see "Self assign competency" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
     When I click on "Self assign competency" "button"
     Then I should see "Are you sure you would like to assign this competency" in the tui modal
     When I confirm the tui confirmation modal
-    Then I should see "View competency" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
+    Then I should see "View competency" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Super Competent" tui collapsible
     When I click on "View competency" "link"
     Then I should see "Competency Details - Comp3"
     When I navigate to the competency profile details page for the "Comp1" competency
 
     # Child competencies
     And I wait until ".tui-competencyAchievementsScale" "css_element" exists
-    Then I should see "Achieve proficiency in child competencies" in the ".tui-competencyAchievementsScale__item:last-child" "css_element"
-    And I should see "1 / 1" in the ".tui-competencyAchievementsScale__item:last-child .tui-progressCircle__circle" "css_element"
+    And I ensure the "Work towards level Just Barely Competent" tui collapsible is expanded
+    And I wait for pending js
+    And I should see "1 / 1" "child competencies" completed towards achieving "Just Barely Competent" in the competency profile
 
     # Child competency - Comp2 - is already assigned and completed.
-    Then I should see "Comp2" under "Competencies" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item:last-child" "css_element"
-    And I should see "Super Competent" under "Achievement level" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item:last-child" "css_element"
-    And I should see "Complete" under "Completion" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item:last-child" "css_element"
-    When I toggle expanding row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item:last-child" "css_element"
-    Then I should see "Competency Two" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item:last-child" "css_element"
-    And I should see "View competency" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item:last-child" "css_element"
-    When I click on "View competency" "link"
+    Then I should see "Comp2" under "Competencies" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    And I should see "Super Competent" under "Achievement level" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    And I should see "Complete" under "Completion" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    When I toggle expanding row "1" of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    Then I should see "Competency Two" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    And I should see "View competency" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    When I click on "View competency" "link" in the expanded row of the tui datatable in the ".tui-competencyAchievementsScale__item" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    And I wait for pending js
     Then I should see "Competency Details - Comp2"
 
   Scenario: View competency assignment activation criteria
@@ -185,6 +193,9 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     And I should see "Achieved on" in the ".tui-criteriaOnActiveAchievement" "css_element"
 
   Scenario: View invalid course criteria
+    Given the following "linkedcourses" exist in "totara_criteria" plugin:
+      | idnumber      | competency | number_required |
+      | linkedcourses | comp1      | all             |
     Given the following "criteria group pathways" exist in "totara_competency" plugin:
       | competency  | scale_value        | criteria         | sortorder |
       | comp1       | barely             | linkedcourses    | 1         |
@@ -198,4 +209,4 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     # Make sure we expand existing headers
     And I ensure the "Work towards level Just Barely Competent" tui collapsible is expanded
     Then I should see "0 / 0" "courses" completed towards achieving "Just Barely Competent" in the competency profile
-    # Need to check colour in TL-26571
+    And "div.tui-progressCircle--complete" "css_element" should not exist

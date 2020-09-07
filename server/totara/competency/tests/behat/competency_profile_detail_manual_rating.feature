@@ -39,10 +39,11 @@ Feature: Test viewing assessment (manual rating) for a user on their competency 
     And I navigate to the competency profile details page for the "Competency" competency
 
     # Self-assessment - currently have no rating
-    Then I should see "Self-assessment" in the ".tui-collapsible:first-child" "css_element"
-    And I should see "Your rating" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
-    And I should see "No rating given" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
-    And I should see "Add rating" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
+    Then I should see the following manual achievements:
+      | role      | rater           | date           | rating                 | actions    |
+      | self      |                 |                | No rating given        | Add rating |
+      | Manager   | Manager User    | 1 January 2020 | Just Barely Competent  |            |
+      | Appraiser | Appraiser User  | 2 January 2020 | Incredibly Incompetent |            |
 
     # Add a rating for self
     When the following "manual ratings" exist in "totara_competency" plugin:
@@ -51,28 +52,24 @@ Feature: Test viewing assessment (manual rating) for a user on their competency 
     And I reload the page
 
     # Self-assessment - now have a rating
-    Then I should see "Staff User" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
-    And I should see "3 January 2020" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
-    And I should see "Super Competent" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
-    When I click on "View comment" "button" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
+    Then I should see the following manual achievements:
+      | role      | rater         | date           | rating                 |
+      | self      | Staff User    | 3 January 2020 | Super Competent        |
+      | Manager   | Manager User  | 1 January 2020 | Just Barely Competent  |
+      | Appraiser | Appraiser User| 2 January 2020 | Incredibly Incompetent |
+
+    # Self
+    When I click on "View comment" "button" in the manual achievement of "self" "Staff User"
     Then I should see "I'm super good!" in the tui popover
     When I close the tui popover
 
-    # Rating by an assessor - Manager
-    Then I should see "Manager User" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    And I should see "1 January 2020" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    And I should see "Just Barely Competent" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    And I should not see "Add rating" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    When I click on "View comment" "button" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
+    # Manager
+    When I click on "View comment" "button" in the manual achievement of "Manager" "Manager User"
     Then I should see "My staff is alright" in the tui popover
     When I close the tui popover
 
-    # Rating by an assessor - Appraiser
-    Then I should see "Appraiser User" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    And I should see "2 January 2020" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    And I should see "Incredibly Incompetent" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    And I should not see "Add rating" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    When I click on "View comment" "button" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
+    # Appraiser
+    When I click on "View comment" "button" in the manual achievement of "Appraiser" "Appraiser User"
     Then I should see "My appraisee is bad" in the tui popover
 
   Scenario: View assessments as manager
@@ -80,26 +77,19 @@ Feature: Test viewing assessment (manual rating) for a user on their competency 
     And I navigate to the competency profile details page for the "Competency" competency and user "user"
 
     # Self-assessment - currently have no rating
-    Then I should see "Self-assessment" in the ".tui-collapsible:first-child" "css_element"
-    And I should see "Staff User" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
-    And I should see "No rating given" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
-    And I should not see "Add rating" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
+    Then I should see the following manual achievements:
+      | role        | rater           | date           | rating                 | actions    |
+      | Staff User  |                 |                | No rating given        |            |
+      | Manager     | Manager User    | 1 January 2020 | Just Barely Competent  | Add rating |
+      | Appraiser   | Appraiser User  | 2 January 2020 | Incredibly Incompetent |            |
 
-    # Rating by an assessor - Manager
-    Then I should see "Manager User" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    And I should see "1 January 2020" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    And I should see "Just Barely Competent" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    And I should see "Add rating" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    When I click on "View comment" "button" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
+    # Manager
+    When I click on "View comment" "button" in the manual achievement of "Manager" "Manager User"
     Then I should see "My staff is alright" in the tui popover
     When I close the tui popover
 
-    # Rating by an assessor - Appraiser
-    Then I should see "Appraiser User" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    And I should see "2 January 2020" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    And I should see "Incredibly Incompetent" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    And I should not see "Add rating" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    When I click on "View comment" "button" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
+    # Appraiser
+    When I click on "View comment" "button" in the manual achievement of "Appraiser" "Appraiser User"
     Then I should see "My appraisee is bad" in the tui popover
 
   Scenario: View assessments as appraiser
@@ -107,24 +97,17 @@ Feature: Test viewing assessment (manual rating) for a user on their competency 
     And I navigate to the competency profile details page for the "Competency" competency and user "user"
 
     # Self-assessment - currently have no rating
-    Then I should see "Self-assessment" in the ".tui-collapsible:first-child" "css_element"
-    And I should see "Staff User" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
-    And I should see "No rating given" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
-    And I should not see "Add rating" in the ".tui-collapsible:first-child .tui-pathwayManualAchievementRater" "css_element"
+    Then I should see the following manual achievements:
+      | role        | rater           | date           | rating                 | actions    |
+      | Staff User  |                 |                | No rating given        |            |
+      | Manager     | Manager User    | 1 January 2020 | Just Barely Competent  |            |
+      | Appraiser   | Appraiser User  | 2 January 2020 | Incredibly Incompetent | Add rating |
 
-    # Rating by an assessor - Manager
-    Then I should see "Manager User" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    And I should see "1 January 2020" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    And I should see "Just Barely Competent" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    And I should not see "Add rating" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
-    When I click on "View comment" "button" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:first-child" "css_element"
+    # Manager
+    When I click on "View comment" "button" in the manual achievement of "Manager" "Manager User"
     Then I should see "My staff is alright" in the tui popover
     When I close the tui popover
 
-    # Rating by an assessor - Appraiser
-    Then I should see "Appraiser User" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    And I should see "2 January 2020" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    And I should see "Incredibly Incompetent" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    And I should see "Add rating" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
-    When I click on "View comment" "button" in the ".tui-collapsible:last-child .tui-pathwayManualAchievementRater:last-child" "css_element"
+    # Appraiser
+    When I click on "View comment" "button" in the manual achievement of "Appraiser" "Appraiser User"
     Then I should see "My appraisee is bad" in the tui popover

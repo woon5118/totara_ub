@@ -129,6 +129,7 @@ Feature: Competency profile landing page - an overview of their progress towards
   Scenario: View the charts and filter the competency charts
     # Assignment progress charts
     Then I should see "Current assignment progress"
+
     And I should see "Position" in the ".tui-competencyProfileCurrentProgress li:nth-child(1)" "css_element"
     And I should see "proficient 0%" in the ".tui-competencyProfileCurrentProgress li:nth-child(1)" "css_element"
     And I should see "Organisation" in the ".tui-competencyProfileCurrentProgress li:nth-child(2)" "css_element"
