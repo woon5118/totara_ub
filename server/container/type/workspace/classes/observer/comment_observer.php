@@ -47,10 +47,11 @@ final class comment_observer {
     }
 
     /**
-     * @param comment $comment
+     * @param comment   $comment
+     * @param int|null  $actor_id
      * @return void
      */
-    private static function touch_discussion(comment $comment): void {
+    private static function touch_discussion(comment $comment, ?int $actor_id = null): void {
         $component = $comment->get_component();
 
         if (workspace::get_type() !== $component) {
@@ -66,7 +67,7 @@ final class comment_observer {
 
             // Update workspace timestamp as well.
             $workspace = $discussion->get_workspace();
-            workspace_helper::update_workspace_timestamp($workspace);
+            workspace_helper::update_workspace_timestamp($workspace, $actor_id);
         }
     }
 
@@ -75,11 +76,13 @@ final class comment_observer {
      * @return void
      */
     public static function on_comment_created(comment_created $event): void {
+        $user_id = $event->get_user_id();
+
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $comment = comment::from_record($record);
 
-        static::touch_discussion($comment);
-        static::handle_comment($comment);
+        static::touch_discussion($comment, $user_id);
+        static::handle_comment($comment, $user_id);
 
         $component = $comment->get_component();
         $area = $comment->get_area();
@@ -102,15 +105,19 @@ final class comment_observer {
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $comment = comment::from_record($record);
 
-        static::touch_discussion($comment);
-        static::handle_comment($comment);
+        static::touch_discussion($comment, $event->userid);
+        static::handle_comment($comment, $event->userid);
     }
 
     /**
-     * Process comment through content handler
-     * @param comment $comment
+     * Process comment through content handler.
+     *
+     * @param comment   $comment
+     * @param int|null  $user_id    This is the user's id of whoever is responsible for creating the content.
+     *
+     * @return void
      */
-    private static function handle_comment($comment): void {
+    private static function handle_comment(comment $comment, ?int $user_id): void {
         $component = $comment->get_component();
         if (workspace::get_type() !== $component) {
             return;
@@ -132,7 +139,8 @@ final class comment_observer {
                 $comment->get_component(),
                 $comment->get_area(),
                 $discussion->get_context()->id,
-                $workspace->get_view_url()
+                $workspace->get_view_url(),
+                $user_id
             );
         }
     }
@@ -145,8 +153,8 @@ final class comment_observer {
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $reply = comment::from_record($record);
 
-        static::touch_discussion($reply);
-        static::handle_comment($reply);
+        static::touch_discussion($reply, $event->userid);
+        static::handle_comment($reply, $event->userid);
     }
 
     /**
@@ -157,7 +165,7 @@ final class comment_observer {
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $reply = comment::from_record($record);
 
-        static::touch_discussion($reply);
+        static::touch_discussion($reply, $event->userid);
     }
 
     /**
@@ -168,6 +176,6 @@ final class comment_observer {
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $comment = comment::from_record($record);
 
-        static::touch_discussion($comment);
+        static::touch_discussion($comment, $event->userid);
     }
 }

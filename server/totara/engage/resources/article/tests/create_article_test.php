@@ -26,6 +26,7 @@ use core\webapi\execution_context;
 use totara_engage\timeview\time_view;
 use totara_webapi\graphql;
 use engage_article\totara_engage\resource\article;
+use engage_article\event\article_created;
 
 class engage_article_create_article_testcase extends advanced_testcase {
     /**
@@ -161,5 +162,67 @@ class engage_article_create_article_testcase extends advanced_testcase {
             "Coding error detected, it must be fixed by a programmer: Validation run for property 'name' has been failed",
             $error->getMessage()
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_article_trigger_event(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $event_sink = phpunit_util::start_event_redirection();
+        $article = article::create(
+            [
+                'name' => 'This is the article',
+                'content' => 'Content 101',
+                'format' => FORMAT_PLAIN
+            ],
+            $user_one->id
+        );
+
+        $events = $event_sink->get_events();
+        self::assertCount(1, $events);
+
+        /** @var article_created $created_event */
+        $created_event = reset($events);
+
+        self::assertInstanceOf(article_created::class, $created_event);
+
+        // Making sure that the article's owner id is the same as the created event user id.
+        self::assertEquals($article->get_userid(), $created_event->get_user_id());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_article_trigger_event_with_guest_user(): void {
+        global $USER;
+        $this->setGuestUser();
+
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $event_sink = phpunit_util::start_event_redirection();
+        article::create(
+            [
+                'content' => 'This is something else',
+                'format' => FORMAT_PLAIN,
+                'name' => 'Article 101'
+            ],
+            $user_one->id
+        );
+
+        $events = $event_sink->get_events();
+        self::assertCount(1, $events);
+
+        /** @var article_created $created_event */
+        $created_event = reset($events);
+        self::assertInstanceOf(article_created::class, $created_event);
+
+        // Making sure that the user who trigger event is not the user in session, as it
+        // is being passed as arguments.
+        self::assertNotEquals($USER->id, $created_event->get_user_id());
+        self::assertEquals($user_one->id, $created_event->get_user_id());
     }
 }

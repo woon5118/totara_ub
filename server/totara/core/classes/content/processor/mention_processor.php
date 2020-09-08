@@ -40,10 +40,8 @@ final class mention_processor extends processor {
      * @return user_mention_notify_task
      */
     private function queue_task(array $userids, content $content): user_mention_notify_task {
-        global $USER;
-
         $task = new user_mention_notify_task();
-        $task->set_userid($USER->id);
+        $task->set_userid($content->get_user_id());
         $task->set_component($content->get_component());
 
         $url = '';
@@ -140,6 +138,11 @@ final class mention_processor extends processor {
             }
 
             $userids[] = $userid;
+        }
+
+        if (empty($userids)) {
+            // Skip queing for the adhoc tasks if there are no user ids found.
+            return;
         }
 
         $this->queue_task($userids, $content);

@@ -40,12 +40,13 @@ final class reply_created extends base {
     }
 
     /**
-     * @param comment $reply
-     * @param int $context_id
+     * @param comment   $reply
+     * @param int       $context_id
+     * @param int|null  $user_id        The actor who is responsible for triggering this event.
      *
      * @return reply_created
      */
-    public static function from_reply(comment $reply, int $context_id): reply_created {
+    public static function from_reply(comment $reply, int $context_id, ?int $user_id = null): reply_created {
         if (!$reply->exists()) {
             throw new \coding_exception(
                 "Cannot create an event from a reply that is not existing in the system"
@@ -56,10 +57,15 @@ final class reply_created extends base {
             );
         }
 
+        if (empty($user_id)) {
+            $user_id = $reply->get_userid();
+        }
+
         $data = [
             'objectid' => $reply->get_id(),
-            'userid' => $reply->get_userid(),
+            'userid' => $user_id,
             'contextid' => $context_id,
+            'relateduserid' => $reply->get_userid(),
             'other' => [
                 'component' => $reply->get_component(),
                 'instance_id' => $reply->get_instanceid(),

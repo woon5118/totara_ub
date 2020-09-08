@@ -60,10 +60,11 @@ abstract class base_article_event extends base implements interaction_event{
             'objectid' => $resource->get_instanceid(),
             'context' => $context,
             'userid' => $actorid,
+            'relateduserid' => $ownerid,
             'other' => [
                 'name' => $resource->get_name(false),
                 'resourceid' => $resource->get_id(),
-                'owner_id' => $resource->get_userid()
+                'owner_id' => $ownerid
             ]
         ];
 

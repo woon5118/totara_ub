@@ -45,8 +45,11 @@ final class article_observer {
      * @return void
      */
     public static function on_created(article_created $event): void {
-        $article = article::from_resource_id($event->get_item_id());
-        static::handle_article($article);
+        $resource_id = $event->get_item_id();
+        $actor_id = $event->get_user_id();
+
+        $article = article::from_resource_id($resource_id);
+        static::handle_article($article, $actor_id);
     }
 
     /**
@@ -54,16 +57,26 @@ final class article_observer {
      * @return void
      */
     public static function on_updated(article_updated $event): void {
-        $article = article::from_resource_id($event->get_item_id());
-        static::handle_article($article);
+        $resource_id = $event->get_item_id();
+        $actor_id = $event->get_user_id();
+
+        $article = article::from_resource_id($resource_id);
+        static::handle_article($article, $actor_id);
     }
 
     /**
      * Pass content through content handlers
-     * @param article $article
+     *
+     * @param article   $article
+     * @param int       $actor_id
+     *
+     * @return void
      */
-    private static function handle_article(article $article): void {
+    private static function handle_article(article $article, int $actor_id): void {
         $handler = content_handler::create();
+
+        // Note that we trust the owner of the article is the responsible one to trigger
+        // the whole process of content handler.
         $handler->handle_with_params(
             $article->get_name(),
             $article->get_content(),
@@ -72,12 +85,14 @@ final class article_observer {
             'engage_article',
             article::CONTENT_AREA,
             $article->get_context()->id,
-            $article->get_url()
+            $article->get_url(),
+            $actor_id
         );
     }
 
     /**
      * @param article_viewed $event
+     * @return void
      */
     public static function on_view_created(article_viewed $event): void {
         global $DB;

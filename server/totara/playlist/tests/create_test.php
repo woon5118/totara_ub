@@ -25,6 +25,10 @@ defined('MOODLE_INTERNAL') || die();
 use totara_playlist\playlist;
 use core\webapi\execution_context;
 use totara_webapi\graphql;
+use core\json_editor\node\mention;
+use core\json_editor\node\paragraph;
+use core\json_editor\node\text;
+use totara_engage\access\access;
 
 class totara_playlist_create_testcase extends advanced_testcase {
     /**
@@ -66,5 +70,106 @@ class totara_playlist_create_testcase extends advanced_testcase {
 
         $this->assertEquals('Hello World', $playlist['name']);
         $this->assertEquals('This is just a summary', $playlist['summary']);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_playlist_with_mention(): void {
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        // Clear out the adhoc tasks.
+        $this->execute_adhoc_tasks();
+        $message_sink = phpunit_util::start_message_redirection();
+
+        playlist::create(
+            "Playlist 101",
+            access::PRIVATE,
+            null,
+            $user_one->id,
+            json_encode([
+                'type' => 'doc',
+                'content' => [
+                    [
+                        'type' => paragraph::get_type(),
+                        'content' => [
+                            text::create_json_node_from_text("This playlist is dedicated for user "),
+                            mention::create_raw_node($user_two->id)
+                        ]
+                    ]
+                ]
+            ]),
+            FORMAT_JSON_EDITOR
+        );
+
+        // Now run adhoc tasks which it should send an email out to user two.
+        $this->execute_adhoc_tasks();
+        $messages = $message_sink->get_messages();
+
+        self::assertCount(1, $messages);
+        $message = reset($messages);
+
+        self::assertIsObject($message);
+        self::assertObjectHasAttribute('useridfrom', $message);
+        self::assertObjectHasAttribute('useridto', $message);
+
+        self::assertEquals($user_one->id, $message->useridfrom);
+        self::assertEquals($user_two->id, $message->useridto);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_playlist_with_mention_and_guest_user_in_session(): void {
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        // Clear out the adhoc tasks.
+        $this->execute_adhoc_tasks();
+        $message_sink = phpunit_util::start_message_redirection();
+
+        $guest_user = guest_user();
+        $this->setUser($guest_user);
+
+        playlist::create(
+            "Playlist 101",
+            access::PRIVATE,
+            null,
+            $user_one->id,
+            json_encode([
+                'type' => 'doc',
+                'content' => [
+                    [
+                        'type' => paragraph::get_type(),
+                        'content' => [
+                            text::create_json_node_from_text("This playlist is dedicated for user two: "),
+                            mention::create_raw_node($user_two->id)
+                        ]
+                    ]
+                ]
+            ]),
+            FORMAT_JSON_EDITOR
+        );
+
+        // Now run adhoc tasks which it should send an email out to user two.
+        $this->execute_adhoc_tasks();
+        $messages = $message_sink->get_messages();
+
+        self::assertCount(1, $messages);
+        $message = reset($messages);
+
+        self::assertIsObject($message);
+        self::assertObjectHasAttribute('useridfrom', $message);
+        self::assertObjectHasAttribute('useridto', $message);
+
+        self::assertNotEquals($guest_user->id, $message->useridfrom);
+
+        self::assertEquals($user_one->id, $message->useridfrom);
+        self::assertEquals($user_two->id, $message->useridto);
     }
 }

@@ -38,7 +38,8 @@ abstract class base_playlist extends base implements interaction_event {
 
     /**
      * @param playlist $playlist
-     * @param int|null $userid
+     * @param int|null $userid      The actor user who is responsible for triggering this event.
+     *
      * @return base_playlist
      */
     public static function from_playlist(playlist $playlist, ?int $userid = null): base_playlist {
@@ -55,7 +56,8 @@ abstract class base_playlist extends base implements interaction_event {
         $data = [
             'objectid' => $playlist->get_id(),
             'userid' => $userid,
-            'context' => $context
+            'context' => $context,
+            'relateduserid' => $playlist->get_userid()
         ];
 
         if (CONTEXT_COURSE == $context->contextlevel) {

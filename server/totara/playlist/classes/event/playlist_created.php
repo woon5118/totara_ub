@@ -42,7 +42,8 @@ final class playlist_created extends base_playlist {
      */
     public static function from_playlist(playlist $playlist, ?int $userid = null): base_playlist {
         if (null == $userid) {
-            // This is an event for just created playlist, therefore, the actor can be the owner of the  playlist.
+            // This is an event for just created playlist, therefore, the actor MUST
+            // be the owner of the  playlist, if it is not set.
             $userid = $playlist->get_userid();
         }
 

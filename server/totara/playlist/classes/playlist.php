@@ -56,6 +56,7 @@ use totara_topic\topic_helper;
 final class playlist implements accessible, shareable {
     /**
      * Playlist image file area
+     * @var string
      */
     public const IMAGE_AREA = 'image';
 
@@ -65,9 +66,16 @@ final class playlist implements accessible, shareable {
     public const RATING_MAX = 5;
 
     /**
-     * Area used for rating
+     * Area used for rating.
+     * @var string
      */
     public const RATING_AREA = 'playlist';
+
+    /**
+     * Area used for comment.
+     * @var string
+     */
+    public const COMMENT_AREA = 'comment';
 
     /**
      * @var playlist_entity
@@ -201,7 +209,7 @@ final class playlist implements accessible, shareable {
         $entity->save();
         $playlist = new static($entity);
 
-        $event = playlist_created::from_playlist($playlist);
+        $event = playlist_created::from_playlist($playlist, $userid);
         $event->trigger();
 
         return $playlist;
@@ -263,7 +271,7 @@ final class playlist implements accessible, shareable {
         $rating_mangager = rating_manager::instance($this->playlist->id, 'totara_playlist', static::RATING_AREA);
         $rating_mangager->delete();
 
-        $event = playlist_deleted::from_playlist($this);
+        $event = playlist_deleted::from_playlist($this, $userid);
         $event->trigger();
 
         share_manager::delete($this->playlist->id, static::get_resource_type());
@@ -750,7 +758,7 @@ final class playlist implements accessible, shareable {
 
         // Note: we don't care much about the processes after everything related to the playlist
         // had done updated. Hence no transaction from here.
-        $event = playlist_updated::from_playlist($this);
+        $event = playlist_updated::from_playlist($this, $userid);
         $event->trigger();
     }
 

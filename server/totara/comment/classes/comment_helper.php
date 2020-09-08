@@ -395,7 +395,7 @@ final class comment_helper {
 
         $context = \context::instance_by_id($context_id);
 
-        $event = comment_created::from_comment($comment, $context);
+        $event = comment_created::from_comment($comment, $context, $actor_id);
         $event->add_record_snapshot(comment::get_entity_table(), $comment->to_record());
         $event->trigger();
 
@@ -478,7 +478,7 @@ final class comment_helper {
             $reply->set_user($user);
         }
 
-        $event = reply_created::from_reply($reply, $context_id);
+        $event = reply_created::from_reply($reply, $context_id, $actor_id);
         $event->add_record_snapshot(comment::get_entity_table(), $reply->to_record());
         $event->trigger();
 
@@ -552,7 +552,7 @@ final class comment_helper {
         $comment->update_content_text($content_text);
 
         $context = \context::instance_by_id($context_id);
-        $event = comment_updated::from_comment($comment, $context);
+        $event = comment_updated::from_comment($comment, $context, $actor_id);
         $event->add_record_snapshot(comment::get_entity_table(), $comment->to_record());
         $event->trigger();
 

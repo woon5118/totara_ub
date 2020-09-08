@@ -22,7 +22,25 @@
  */
 namespace engage_article\event;
 
+use engage_article\totara_engage\resource\article;
+
 final class article_created extends base_article_event {
+    /**
+     * @param article $resource
+     * @param int|null $actor_id
+     *
+     * @return base_article_event
+     */
+    public static function from_article(article $resource, int $actor_id = null): base_article_event {
+        if (empty($actor_id)) {
+            // Normally the user who created article should be the same user that created this event.
+            // This should be rarely happening, unless the upstream code is using this event wrongly.
+            $actor_id = $resource->get_userid();
+        }
+
+        return parent::from_article($resource, $actor_id);
+    }
+
     /**
      * @return void
      */

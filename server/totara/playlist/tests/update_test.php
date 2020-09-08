@@ -26,6 +26,8 @@ use totara_playlist\playlist;
 use totara_engage\access\access;
 use totara_playlist\exception\playlist_exception;
 use core\json_editor\node\paragraph;
+use core\json_editor\node\text;
+use core\json_editor\node\mention;
 
 class totara_playlist_update_testcase extends advanced_testcase {
     /**
@@ -103,5 +105,57 @@ class totara_playlist_update_testcase extends advanced_testcase {
 
         $this->assertEquals(FORMAT_JSON_EDITOR, $playlist->get_summaryformat());
         $this->assertEquals($document, $playlist->get_summary());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_update_playlist_summary_with_mention(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        // Createthe playlist for user one.
+        /** @var totara_playlist_generator $playlist_generator */
+        $playlist_generator = $generator->get_plugin_generator('totara_playlist');
+        $playlist = $playlist_generator->create_playlist(['userid' => $user_one->id]);
+
+        self::assertEquals($user_one->id, $playlist->get_userid());
+        $user_two = $generator->create_user();
+
+        // Clear adhoc tasks.
+        $this->execute_adhoc_tasks();
+        $message_sink = phpunit_util::start_message_redirection();
+
+        $playlist->update(
+            null,
+            null,
+            json_encode([
+                'type' => 'doc',
+                'content' => [
+                    [
+                        'type' => paragraph::get_type(),
+                        'content' => [
+                            text::create_json_node_from_text('This playlist is dedicated for user '),
+                            mention::create_raw_node($user_two->id)
+                        ],
+                    ]
+                ]
+            ]),
+            FORMAT_JSON_EDITOR,
+            $user_one->id
+        );
+
+        $this->execute_adhoc_tasks();
+        $messages = $message_sink->get_messages();
+
+        self::assertCount(1, $messages);
+        $message = reset($messages);
+
+        self::assertIsObject($message);
+        self::assertObjectHasAttribute('useridfrom', $message);
+        self::assertObjectHasAttribute('useridto', $message);
+
+        self::assertEquals($user_one->id, $message->useridfrom);
+        self::assertEquals($user_two->id, $message->useridto);
     }
 }

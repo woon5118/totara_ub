@@ -49,7 +49,7 @@ final class comment_observer {
     public static function on_comment_created(comment_created $event): void {
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $comment = comment::from_record($record);
-        static::handle_comment($comment);
+        static::handle_comment($comment, $event->get_user_id());
     }
 
     /**
@@ -59,7 +59,7 @@ final class comment_observer {
     public static function on_comment_updated(comment_updated $event): void {
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $comment = comment::from_record($record);
-        static::handle_comment($comment);
+        static::handle_comment($comment, $event->userid);
     }
     /**
      * @param reply_created $event
@@ -69,14 +69,17 @@ final class comment_observer {
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $reply = comment::from_record($record);
 
-        static::handle_comment($reply);
+        static::handle_comment($reply, $event->userid);
     }
 
     /**
      * Pass comment through content handlers
-     * @param comment $comment
+     * @param comment   $comment
+     * @param int|null  $user_id
+     *
+     * @return void
      */
-    private static function handle_comment(comment $comment):void {
+    private static function handle_comment(comment $comment, ?int $user_id = null):void {
         $component = $comment->get_component();
         if (article::get_resource_type() !== $component) {
             return;
@@ -96,20 +99,20 @@ final class comment_observer {
                 $comment->get_component(),
                 $comment->get_area(),
                 $resource->get_context()->id,
-                $resource->get_url()
+                $resource->get_url(),
+                $user_id
             );
 
-            self::create_owner_notification_task($comment, $resource, !$comment->is_reply());
+            self::create_owner_notification_task($comment, $resource);
         }
     }
 
     /**
      * @param comment $comment
      * @param article $article
-     * @param bool|null $is_comment
      * @return void
      */
-    protected static function create_owner_notification_task(comment $comment, article $article, ?bool $is_comment = true): void {
+    protected static function create_owner_notification_task(comment $comment, article $article): void {
         // If commenter is not owner, task will be initialized.
         if ($comment->get_userid() !== $article->get_userid()) {
             $task = new comment_notify_task();
@@ -122,7 +125,7 @@ final class comment_observer {
                 'resourcetype' => get_string('message_resource', 'totara_engage'),
                 'commenter' =>   $comment->get_userid(),
                 'name' => $article->get_name(),
-                'is_comment' => $is_comment
+                'is_comment' => !$comment->is_reply()
             ]);
 
             manager::queue_adhoc_task($task);

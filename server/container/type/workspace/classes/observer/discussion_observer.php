@@ -44,7 +44,7 @@ final class discussion_observer {
      * @return void
      */
     public static function on_created(discussion_created $event): void {
-        static::handle_discussion($event->objectid);
+        static::handle_discussion($event->objectid, $event->userid);
     }
 
     /**
@@ -52,14 +52,17 @@ final class discussion_observer {
      * @return void
      */
     public static function on_updated(discussion_updated $event): void {
-        static::handle_discussion($event->objectid);
+        static::handle_discussion($event->objectid, $event->userid);
     }
 
     /**
      * Process discussion through content handler
-     * @param int $discussion_id
+     * @param int       $discussion_id
+     * @param int|null  $actor_id
+     *
+     * @return void
      */
-    private static function handle_discussion(int $discussion_id): void {
+    private static function handle_discussion(int $discussion_id, ?int $actor_id = null): void {
         $discussion = discussion::from_id($discussion_id);
         $workspace = workspace::from_id($discussion->get_workspace_id());
 
@@ -72,7 +75,8 @@ final class discussion_observer {
             'container_workspace',
             discussion::AREA,
             $discussion->get_context()->id,
-            $workspace->get_view_url()
+            $workspace->get_view_url(),
+            $actor_id
         );
     }
 }

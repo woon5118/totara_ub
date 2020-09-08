@@ -35,17 +35,23 @@ final class comment_created extends base implements interaction_event {
     /**
      * @param comment   $comment
      * @param \context  $context
+     * @param int|null  $user_id    The user who is responsible for triggering this event.
      *
      * @return comment_created
      */
-    public static function from_comment(comment $comment, \context $context): comment_created {
+    public static function from_comment(comment $comment, \context $context, ?int $user_id = null): comment_created {
         if (!$comment->exists()) {
             throw new \coding_exception("Cannot create an event from a comment that does not exist in the system");
         } else if ($comment->is_reply()) {
             throw new \coding_exception("Cannot create a comment event from a reply");
         }
 
-        $user_id = $comment->get_userid();
+        if (empty($user_id)) {
+            // We fallback to the author of the comment, as there is no way that someone is creating
+            // comment for somebody else.
+            $user_id = $comment->get_userid();
+        }
+
         $component = $comment->get_component();
         $area = $comment->get_area();
 

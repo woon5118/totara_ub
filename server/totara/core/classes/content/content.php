@@ -68,6 +68,17 @@ final class content {
     private $contexturl;
 
     /**
+     * This is represent the actor id who is responsible to create this very content.
+     * If null is set, then the function will respect global $USER.
+     *
+     * Note that global $USER will not sometimes be the same as the actor, as actor can be passed thru the
+     * to the function as an argument.
+     *
+     * @var int|null
+     */
+    private $user_id;
+
+    /**
      * content_info constructor.
      *
      * @param string $title
@@ -77,7 +88,8 @@ final class content {
      * @param string $component
      * @param string $area
      */
-    public function __construct(string $title, string $content, int $contentformat, int $instanceid, string $component, string $area) {
+    public function __construct(string $title, string $content, int $contentformat, int $instanceid,
+                                string $component, string $area) {
         $this->title = $title;
         $this->content = $content;
         $this->contentformat = $contentformat;
@@ -88,6 +100,17 @@ final class content {
         $this->area = $area;
 
         $this->contexturl = null;
+        $this->user_id = null;
+    }
+
+    /**
+     * Set the actor's id, the user that is responsible to create this pretty content.
+     *
+     * @param int $user_id
+     * @return void
+     */
+    public function set_user_id(int $user_id): void {
+        $this->user_id = $user_id;
     }
 
     /**
@@ -117,8 +140,9 @@ final class content {
      *
      * @return content
      */
-    public static function create(string $title, string $content, int $contentformat, int $instanceid, string $component, string $area,
-                                  ?int $contextid = null, $contexturl = null): content {
+    public static function create(string $title, string $content, int $contentformat, int $instanceid,
+                                  string $component, string $area, ?int $contextid = null,
+                                  $contexturl = null): content {
         $item = new static($title, $content, $contentformat, $instanceid, $component, $area);
 
         if (null != $contextid) {
@@ -192,5 +216,18 @@ final class content {
      */
     public function get_component(): string {
         return $this->component;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_user_id(): int {
+        global $USER;
+        if (empty($this->user_id)) {
+            // This check will include invalid $user_id Zero.
+            return $USER->id;
+        }
+
+        return $this->user_id;
     }
 }

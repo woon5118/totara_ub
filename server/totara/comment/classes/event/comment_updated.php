@@ -34,15 +34,15 @@ final class comment_updated extends base {
     /**
      * @param comment   $comment
      * @param \context  $context
+     * @param int|null  $user_id    The user who is responsible to trigger this event.
      *
      * @return comment_updated
      */
-    public static function from_comment(comment $comment, \context $context): comment_updated {
+    public static function from_comment(comment $comment, \context $context, ?int $user_id = null): comment_updated {
         if (!$comment->exists()) {
             throw new \coding_exception("Cannot create an event from a comment that does not exist in the system");
         }
 
-        $user_id = $comment->get_userid();
         $component = $comment->get_component();
         $area = $comment->get_area();
 
@@ -50,6 +50,7 @@ final class comment_updated extends base {
             'objectid' => $comment->get_id(),
             'userid' => $user_id,
             'context' => $context,
+            'relateduserid' => $comment->get_userid(),
             'other' => [
                 'area' => $area,
                 'component' => $component,

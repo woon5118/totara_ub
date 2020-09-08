@@ -190,7 +190,7 @@ final class discussion_helper {
         workspace_helper::update_workspace_timestamp($workspace, $actor_id);
 
         // Triggering an event.
-        $event = discussion_updated::from_discussion($discussion);
+        $event = discussion_updated::from_discussion($discussion, $actor_id);
         $event->trigger();
 
         return $discussion;

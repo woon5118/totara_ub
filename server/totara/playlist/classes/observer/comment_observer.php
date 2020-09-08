@@ -49,7 +49,7 @@ final class comment_observer {
     public static function on_comment_created(comment_created $event): void {
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $comment = comment::from_record($record);
-        static::handle_comment($comment);
+        static::handle_comment($comment, $event->userid);
     }
 
     /**
@@ -59,7 +59,7 @@ final class comment_observer {
     public static function on_reply_created(reply_created $event): void {
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $reply = comment::from_record($record);
-        static::handle_comment($reply);
+        static::handle_comment($reply, $event->userid);
     }
 
     /**
@@ -69,14 +69,18 @@ final class comment_observer {
     public static function on_comment_updated(comment_updated $event): void {
         $record = $event->get_record_snapshot(comment::get_entity_table(), $event->objectid);
         $comment = comment::from_record($record);
-        static::handle_comment($comment);
+        static::handle_comment($comment, $event->userid);
     }
 
     /**
-     * Pass comment through content handlers
-     * @param comment $comment
+     * Pass comment through content handlers.
+     *
+     * @param comment   $comment
+     * @param int|null  $user_id
+     *
+     * @return void
      */
-    private static function handle_comment($comment): void {
+    private static function handle_comment(comment $comment, ?int $user_id = null): void {
         $component = $comment->get_component();
         if ('totara_playlist' !== $component) {
             return;
@@ -96,20 +100,20 @@ final class comment_observer {
                 'totara_playlist',
                 'comment',
                 $playlist->get_contextid(),
-                $playlist->get_url()
+                $playlist->get_url(),
+                $user_id
             );
 
-            self::create_owner_notification_task($comment, $playlist, !$comment->is_reply());
+            self::create_owner_notification_task($comment, $playlist);
         }
     }
 
     /**
      * @param comment $comment
      * @param playlist $playlist
-     * @param bool|null $is_comment
      * @return void
      */
-    protected static function create_owner_notification_task(comment $comment, playlist $playlist, ?bool $is_comment = true): void {
+    protected static function create_owner_notification_task(comment $comment, playlist $playlist): void {
         if ($comment->get_userid() !== $playlist->get_userid()) {
             $task = new comment_notify_task();
             $task->set_custom_data([
@@ -119,7 +123,7 @@ final class comment_observer {
                 'resourcetype' => get_string('message_playlist', 'totara_playlist'),
                 'commenter' =>   $comment->get_userid(),
                 'name' => $playlist->get_name(),
-                'is_comment' => $is_comment
+                'is_comment' => !$comment->is_reply()
             ]);
             manager::queue_adhoc_task($task);
         }

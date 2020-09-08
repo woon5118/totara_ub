@@ -236,14 +236,14 @@ final class workspace_helper {
             $time = time();
         }
 
-        $workspace->touch($time);
-
         $interactor = new interactor($workspace, $actor_id);
         if (!$interactor->is_joined() && !$interactor->can_update()) {
             // This is to prevent the tracker being updated if user is not either any.
             debugging("User is not a member nor someone who has capability to update the workspace", DEBUG_DEVELOPER);
             return;
         }
+
+        $workspace->touch($time);
 
         $tracker = new tracker($actor_id);
         $tracker->visit_workspace($workspace, $time);

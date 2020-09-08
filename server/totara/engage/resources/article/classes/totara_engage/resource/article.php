@@ -221,11 +221,12 @@ final class article extends resource_item implements time_viewable {
     /**
      * @param article|resource_item $item
      * @param array                 $data
+     * @param int|null              $user_id
      *
      * @return void
      */
-    protected static function post_create(resource_item $item, array $data): void {
-        $event = article_created::from_article($item);
+    protected static function post_create(resource_item $item, array $data, ?int $user_id = null): void {
+        $event = article_created::from_article($item, $user_id);
         $event->trigger();
     }
 
@@ -387,11 +388,13 @@ final class article extends resource_item implements time_viewable {
     }
 
     /**
-     * Triggering event for update
+     * Triggering event for update.
+     *
+     * @param int|null $user_id     The actor's id who is responsible for the whole process.
      * @return void
      */
-    protected function post_update(): void {
-        $event = article_updated::from_article($this);
+    protected function post_update(?int $user_id = null): void {
+        $event = article_updated::from_article($this, $user_id);
         $event->trigger();
     }
 

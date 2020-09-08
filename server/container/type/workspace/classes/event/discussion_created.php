@@ -52,6 +52,12 @@ final class discussion_created extends base {
      * @return discussion_created
      */
     public static function from_discussion(discussion $discussion, ?int $actor_id = null): discussion_created {
+        if (empty($actor_id)) {
+            // We use the author of discussion instead of $USER, because there is no such behaviour that somebody else
+            // create the discussion for someone else.
+            $actor_id = $discussion->get_user_id();
+        }
+
         $workspace_id = $discussion->get_workspace_id();
         $data = [
             'objectid' => $discussion->get_id(),

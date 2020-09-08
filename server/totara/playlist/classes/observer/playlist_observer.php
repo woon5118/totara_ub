@@ -60,7 +60,7 @@ final class playlist_observer {
      */
     public static function on_created(playlist_created $event): void {
         $playlist = playlist::from_id($event->objectid);
-        static::handle_playlist($playlist);
+        static::handle_playlist($playlist, $event->get_user_id());
     }
 
     /**
@@ -69,15 +69,18 @@ final class playlist_observer {
      */
     public static function on_updated(playlist_updated $event): void {
         $playlist = playlist::from_id($event->objectid);
-        static::handle_playlist($playlist);
+        static::handle_playlist($playlist, $event->userid);
     }
 
     /**
-     * Pass content through content handlers
+     * Pass content through content handlers.
      *
      * @param playlist $playlist
+     * @param int|null $user_id
+     *
+     * @return void
      */
-    private static function handle_playlist(playlist $playlist): void {
+    private static function handle_playlist(playlist $playlist, ?int $user_id = null): void {
         $handler = content_handler::create();
         $handler->handle_with_params(
             $playlist->get_name(),
@@ -87,7 +90,8 @@ final class playlist_observer {
             'totara_playlist',
             'playlist',
             $playlist->get_context()->id,
-            $playlist->get_url()
+            $playlist->get_url(),
+            $user_id
         );
     }
 }

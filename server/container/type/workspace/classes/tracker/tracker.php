@@ -113,7 +113,7 @@ final class tracker {
         $last_access = new user_last_access();
         $last_access->userid = $this->user_id;
         $last_access->courseid = $workspace_id;
-        $last_access->timeaccess = time();
+        $last_access->timeaccess = $time;
 
         $last_access->save();
     }

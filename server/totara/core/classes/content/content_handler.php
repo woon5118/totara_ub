@@ -122,16 +122,26 @@ final class content_handler {
      * @param int|null                  $instanceid
      * @param string|null               $area
      * @param \moodle_url|string|null   $contexturl
+     * @param int|null                  $user_id
      *
      * @return void
      */
     public function handle_with_params(string $title, string $content, int $contentformat, int $instanceid,
                                        string $component, string $area, ?int $contextid = null,
-                                       $contexturl = null): void {
-        $item = content::create($title, $content, $contentformat, $instanceid, $component, $area, $contextid);
+                                       $contexturl = null, ?int $user_id = null): void {
+        $item = content::create(
+            $title,
+            $content,
+            $contentformat,
+            $instanceid,
+            $component,
+            $area,
+            $contextid,
+            $contexturl
+        );
 
-        if (null !== $contexturl) {
-            $item->set_contexturl($contexturl);
+        if (!empty($user_id)) {
+            $item->set_user_id($user_id);
         }
 
         $this->handle($item);

@@ -166,7 +166,7 @@ abstract class resource_item implements accessible, shareable {
         // Building cache.
         $resource->refresh(true);
 
-        static::post_create($resource, $data);
+        static::post_create($resource, $data, $userid);
         return $resource;
     }
 
@@ -216,8 +216,11 @@ abstract class resource_item implements accessible, shareable {
      *
      * @param resource_item $item
      * @param array         $data
+     * @param int|null      $user_id    The actor who is responsible for creation of this specific resource.
+     *
+     * @return void
      */
-    protected static function post_create(resource_item $item, array $data): void {
+    protected static function post_create(resource_item $item, array $data, ?int $user_id = null): void {
     }
 
     /**
@@ -278,7 +281,7 @@ abstract class resource_item implements accessible, shareable {
 
             // Rebuild cache.
             $this->refresh(true);
-            $this->post_update();
+            $this->post_update($userid);
         } else {
             debugging("Unable to update the resource of component '{$type}'", DEBUG_DEVELOPER);
         }
@@ -288,13 +291,14 @@ abstract class resource_item implements accessible, shareable {
      * Post update hook, which it should be a place to trigger any kind of events or updating
      * cache field if neccessary.
      *
+     * @param int|null $user_id
      * @return void
      */
-    protected function post_update(): void {
+    protected function post_update(?int $user_id = null): void {
     }
 
     /**
-     * @param int $userid
+     * @param int|null $userid
      * @return void
      */
     public function delete(int $userid = null): void {
