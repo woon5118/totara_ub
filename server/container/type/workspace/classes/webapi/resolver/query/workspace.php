@@ -22,6 +22,7 @@
  */
 namespace container_workspace\webapi\resolver\query;
 
+use container_workspace\exception\workspace_exception;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -29,6 +30,7 @@ use core\webapi\query_resolver;
 use container_workspace\workspace as model;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
+use container_workspace\interactor\workspace\interactor as workspace_interactor;
 
 /**
  * Resolver for querying the workspace
@@ -43,11 +45,7 @@ final class workspace implements query_resolver, has_middleware {
      * @return model
      */
     public static function resolve(array $args, execution_context $ec): model {
-        if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(
-                \context_coursecat::instance(\container_workspace\workspace::get_default_category_id())
-            );
-        }
+        global $USER;
 
         /** @var model $workspace */
         $workspace = factory::from_id($args['id']);
@@ -57,6 +55,15 @@ final class workspace implements query_resolver, has_middleware {
             throw new \coding_exception(
                 "Cannot using graphql for fetching workspace to fetch another type of container"
             );
+        }
+
+        $workspace_interactor = new workspace_interactor($workspace, $USER->id);
+        if (!$workspace_interactor->can_view_workspace()) {
+            throw workspace_exception::on_view();
+        }
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($workspace->get_context());
         }
 
         return $workspace;

@@ -301,16 +301,13 @@ final class interactor {
      * @return bool
      */
     public function can_view_workspace(): bool {
-        global $USER;
-
         if ($this->can_administrate()) {
             return true;
         }
 
-        // Context check first of all, handles any mismatched tenancy checks.
-        // You may be a member, but it's possible shifting tenancies has blocked your access
-        $context = $this->workspace->get_context();
-        if ($context->is_user_access_prevented($USER)) {
+        // Check for tenancy first before checking whether you had been joined
+        // the workspace or not.
+        if (!$this->can_view_workspace_with_tenant_check()) {
             return false;
         }
 
@@ -318,15 +315,12 @@ final class interactor {
             return true;
         }
 
-        if (!$this->can_view_workspace_with_tenant_check()) {
-            return false;
-        }
-
         if ($this->workspace->is_public() || $this->workspace->is_private()) {
             return true;
         }
 
         if ($this->workspace->is_hidden()) {
+            $context = $this->workspace->get_context();
             return has_capability('moodle/course:viewhiddencourses', $context, $this->user_id);
         }
 
@@ -344,6 +338,14 @@ final class interactor {
         }
 
         $context = $this->workspace->get_context();
+
+        // Context check first of all, handles any mismatched tenancy checks.
+        // You may be a member, but it's possible shifting tenancies has blocked your access
+        if ($context->is_user_access_prevented($this->user_id)) {
+            return false;
+        }
+
+        // Workspace extended logic rule.
         $tenant_id = $context->tenantid;
 
         if (null !== $tenant_id) {

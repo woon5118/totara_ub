@@ -25,6 +25,8 @@ defined('MOODLE_INTERNAL') || die();
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use totara_userdata\userdata\target_user;
 use container_workspace\userdata\workspace as user_data_workspace;
+use container_workspace\workspace;
+use container_workspace\exception\workspace_exception;
 
 class container_workspace_webapi_get_workspace_testcase extends advanced_testcase {
     use webapi_phpunit_helper;
@@ -71,5 +73,128 @@ class container_workspace_webapi_get_workspace_testcase extends advanced_testcas
 
         $this->assertArrayHasKey('id', $workspace_data);
         $this->assertEquals($workspace->get_id(), $workspace_data['id']);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_get_public_workspace_as_different_user(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Log in as different user and check if you are able to get the workspace or not.
+        $user_two = $generator->create_user();
+        $this->setUser($user_two);
+        $workspace_id = $workspace->get_id();
+
+        /** @var workspace $fetched_workspace */
+        $fetched_workspace = $this->resolve_graphql_query('container_workspace_workspace', ['id' => $workspace_id]);
+
+        $this->assertNotNull($fetched_workspace);
+        $this->assertInstanceOf(workspace::class, $fetched_workspace);
+        $this->assertEquals($workspace_id, $fetched_workspace->get_id());
+        $this->assertEquals($workspace->get_name(), $fetched_workspace->get_name());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_get_workspace_from_course_id(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $course = $generator->create_course();
+        $this->setUser($user_one);
+
+        $this->expectException(coding_exception::class);
+        $this->resolve_graphql_query('container_workspace_workspace', ['id' => $course->id]);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_get_workspace_with_no_session_user(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace(
+            'workspace_101',
+            null,
+            null,
+            $user_one->id
+        );
+
+        // Start fetching the workspace
+        $this->expectException(require_login_exception::class);
+        $this->resolve_graphql_query(
+            'container_workspace_workspace',
+            [
+                'id' => $workspace->get_id()
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_get_hidden_workspace_by_user_without_permission(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_hidden_workspace();
+
+        // Log in as second user and check if the user is able to fetch the workspace or not.
+        $user_two = $generator->create_user();
+        $this->setUser($user_two);
+
+        $this->expectException(workspace_exception::class);
+        $this->expectExceptionMessage(
+            get_string('error:view_workspace', 'container_workspace')
+        );
+
+        // Fetch workspace.
+        $this->resolve_graphql_query(
+            'container_workspace_workspace',
+            ['id' => $workspace->get_id()]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_get_private_workspace_by_other_user(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_private_workspace();
+
+        // Set the actor to user two and run the graphql query.
+        $user_two = $generator->create_user();
+        $this->setUser($user_two);
+
+        /** @var workspace $fetched_workspace */
+        $fetched_workspace = $this->resolve_graphql_query(
+            'container_workspace_workspace',
+            ['id' => $workspace->get_id()]
+        );
+
+        $this->assertInstanceOf(workspace::class, $fetched_workspace);
+        $this->assertEquals($workspace->get_id(), $fetched_workspace->get_id());
     }
 }
