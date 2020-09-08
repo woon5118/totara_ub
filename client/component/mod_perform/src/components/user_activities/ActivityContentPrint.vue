@@ -62,12 +62,15 @@
         {{ $str('section_element_response_required', 'mod_perform') }}
       </div>
 
-      <Uniform v-if="initialValues" :initial-values="initialValues">
-        <div class="tui-participantContent__section">
-          <div
-            v-for="participantSection in participantSections"
-            :key="participantSection.id"
-            class="tui-participantContent__section"
+      <div class="tui-participantContent__section">
+        <div
+          v-for="participantSection in participantSections"
+          :key="participantSection.id"
+          class="tui-participantContent__section"
+        >
+          <Uniform
+            v-if="participantSection.id in initialValues"
+            :initial-values="initialValues[participantSection.id]"
           >
             <div class="tui-participantContent__sectionHeading">
               <h3
@@ -99,8 +102,11 @@
 
                 <div class="tui-participantContent__sectionItem-content">
                   <ElementParticipantForm
-                    v-if="sectionElement.is_respondable && participantCanAnswer &&
-                            !viewOnlyReportMode"
+                    v-if="
+                      sectionElement.is_respondable &&
+                        participantCanAnswer &&
+                        !viewOnlyReportMode
+                    "
                   >
                     <template v-slot:content>
                       <component
@@ -126,9 +132,9 @@
                 </div>
               </div>
             </div>
-          </div>
+          </Uniform>
         </div>
-      </Uniform>
+      </div>
       <Button
         class="tui-performUserActivityList__action-button"
         :text="$str('print_activity', 'mod_perform')"
@@ -239,7 +245,7 @@ export default {
       activeParticipantSection: {},
       errors: null,
       hasOtherResponse: false,
-      initialValues: null,
+      initialValues: {},
       section: {
         title: '',
         section_elements: [],
@@ -430,7 +436,7 @@ export default {
 
         this.responsesAreVisibleTo = result.responses_are_visible_to;
         this.formValues = {};
-        this.initialValues = {
+        this.initialValues[result.id] = {
           sectionElements: {},
         };
         this.sectionElements[result.id] = result.section_element_responses.map(
@@ -458,7 +464,7 @@ export default {
           }
         );
 
-        if (this.viewOnlyReportMode|| !this.participantCanAnswer) {
+        if (this.viewOnlyReportMode || !this.participantCanAnswer) {
           this.showOtherResponse = true;
           return;
         }
@@ -466,10 +472,9 @@ export default {
         result.section_element_responses
           .filter(item => item.element.is_respondable)
           .forEach(item => {
-            this.initialValues.sectionElements[result.id] = {};
-            this.initialValues.sectionElements[result.id][
+            this.initialValues[result.id].sectionElements[
               item.section_element_id
-              ] = JSON.parse(item.response_data);
+            ] = JSON.parse(item.response_data);
             this.hasOtherResponse = item.other_responder_groups.length > 0;
             item.other_responder_groups.forEach(group => {
               if (group.responses.length > 0 && item.response_data) {
@@ -571,4 +576,3 @@ export default {
   }
 }
 </style>
-
