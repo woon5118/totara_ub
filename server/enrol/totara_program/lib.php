@@ -228,9 +228,10 @@ class enrol_totara_program_plugin extends enrol_plugin {
      * course, the user will not be able to enrol.
      *
      * @param stdClass $instance course enrol instance
+     * @param bool $preventredirect stops the function from adding notifications and redirecting to the course
      * @return bool|int false means not enrolled, integer means timeend
      */
-    public function try_autoenrol(stdClass $instance) {
+    public function try_autoenrol(stdClass $instance, bool $preventredirect = false) {
         global $CFG, $USER, $DB;
 
         if (!advanced_feature::is_enabled('programs') && !advanced_feature::is_enabled('certifications')) {
@@ -250,7 +251,7 @@ class enrol_totara_program_plugin extends enrol_plugin {
 
             if ($result->enroled) {
                 //if we just enrolled them, set a notification
-                if ($result->notify) {
+                if ($result->notify && !$preventredirect) {
                     $a = new stdClass();
                     $a->course = $course->fullname;
                     $a->program = $result->program;

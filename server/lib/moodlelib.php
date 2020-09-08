@@ -3082,7 +3082,7 @@ function require_login($courseorid = null, $autologinguest = true, $cm = null, $
                             continue;
                         }
                         // Get a duration for the enrolment, a timestamp in the future, 0 (always) or false.
-                        $until = $enrols[$instance->enrol]->try_autoenrol($instance);
+                        $until = $enrols[$instance->enrol]->try_autoenrol($instance, $preventredirect);
                         if ($until !== false) {
                             if ($until == 0) {
                                 $until = ENROL_MAX_TIMESTAMP;
