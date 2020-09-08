@@ -1,0 +1,279 @@
+.tui-engageArticle-createArticle {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+}
+
+.tui-engageArticle-articleCard {
+  height: 100%;
+  min-height: var(--totaraEngage-card-height);
+
+  &__imageheader {
+    padding: var(--gap-4) var(--gap-4) 0 var(--gap-4);
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+  }
+
+  &__icons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    & > * + * {
+      margin-left: var(--gap-4);
+    }
+  }
+
+  &__bookmark {
+    /* Negative margin here to neutralise the default redundant edges of icon.*/
+    margin-top: 1px;
+    margin-right: calc(var(--gap-2) * -1);
+  }
+
+  &__title {
+    @include tui-font-heading-x-small();
+    overflow-wrap: break-word;
+  }
+
+  &__subTitle {
+    display: inline-flex;
+    align-items: center;
+    margin-top: var(--gap-2);
+    padding: 0 var(--gap-2) 0 var(--gap-1);
+    border: var(--border-width-thin) solid var(--color-neutral-5);
+    border-radius: 50px;
+
+    &-text {
+      margin-left: var(--gap-1);
+    }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: flex-end;
+
+    & > * + * {
+      margin-left: var(--gap-1);
+    }
+
+    & > :last-child {
+      margin: 0 -5px 0 auto;
+    }
+  }
+}
+
+.tui-articleRelatedCard {
+  display: flex;
+  min-width: 120px;
+  height: 82px;
+  background-color: var(--color-neutral-1);
+
+  &__img {
+    width: 80px;
+    height: 80px;
+    padding: var(--gap-2);
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+    padding: var(--gap-4) 0 var(--gap-2) 0;
+    overflow: hidden;
+
+    & > * {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    > :first-child {
+      @include tui-font-heading-label-small();
+      @include tui-font-heavy();
+      color: inherit;
+      text-decoration: none;
+    }
+
+    > :last-child {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      @include tui-font-body-x-small();
+    }
+  }
+
+  &__bookmark {
+    align-self: flex-start;
+    /* neutralize the default icon padding*/
+    margin-top: -2px;
+  }
+
+  &__timeview {
+    display: flex;
+    margin-right: var(--gap-4);
+    padding: 2px;
+    padding-right: var(--gap-1);
+    border: var(--border-width-thin) solid var(--color-neutral-5);
+    border-radius: 15px;
+  }
+
+  &--dimmed {
+    color: var(--color-neutral-6);
+  }
+}
+
+.tui-articleContent {
+  &__content {
+    flex-grow: 1;
+  }
+}
+
+.tui-articleTitle {
+  display: flex;
+  flex-direction: column;
+
+  &__head {
+    display: flex;
+    align-items: flex-start;
+
+    &__title {
+      @include tui-font-heading-large;
+      width: 93%;
+      margin: 0;
+      margin-top: calc(var(--gap-2) / -1);
+      -ms-word-break: break-all;
+      overflow-wrap: break-word;
+      -webkit-hyphens: none;
+          -ms-hyphens: none;
+              hyphens: none;
+    }
+  }
+}
+
+.tui-articleForm {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-top: var(--gap-4);
+
+  &__title {
+    &.tui-formRow {
+      /* Reset form row margin.*/
+      margin-bottom: 0;
+    }
+    /* Reset the margin of label section when it is hidden. So that it does not give us any extra spaces.*/
+    .tui-formRow {
+      &__desc {
+        margin: 0;
+      }
+    }
+  }
+
+  &__description {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-top: var(--gap-8);
+
+    &__formRow {
+      flex-grow: 1;
+      /* Reset margin of itself.*/
+      &.tui-formRow {
+        margin-bottom: 0;
+      }
+
+      .tui-formRow {
+        /* Reset the margin of label section when it is hidden. So that it does not give us any extra spaces.*/
+        &__desc {
+          margin: 0;
+        }
+
+        &__action {
+          /* Expand the box.*/
+          flex-grow: 1;
+        }
+      }
+    }
+
+    &__tip {
+      position: relative;
+      display: flex;
+      margin-top: var(--gap-2);
+
+      &__content {
+        margin: 0;
+      }
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--gap-8);
+  }
+}
+
+.tui-editArticleTitleForm {
+  width: 100%;
+}
+
+:root {
+  --engage-article-separator-width: 40px;
+}
+.tui-articleSeparator {
+  display: block;
+  width: var(--engage-article-separator-width);
+
+  margin-top: var(--gap-4);
+  margin-bottom: var(--gap-8);
+  border-bottom: solid var(--border-width-thick) var(--color-primary);
+}
+
+.tui-articleSidePanel {
+  &__timeDescription {
+    @include tui-font-body-small();
+  }
+
+  &__playlistBox {
+    margin-top: var(--gap-8);
+  }
+}
+
+.tui-articleRelated {
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+}
+
+.tui-articlePlaylistBox {
+  &__playlistsBox {
+    max-height: 300px;
+    overflow-y: auto;
+    border-top: var(--border-width-thin) solid var(--color-neutral-5);
+    border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
+  }
+
+  &__label {
+    @include tui-font-heading-label-small();
+    margin: 0;
+    margin-bottom: var(--gap-2);
+  }
+}
+
+:root {
+  --engageArticle-min-height: 78vh;
+}
+
+.tui-articleView {
+  .tui-grid-item {
+    min-height: var(--engageArticle-min-height);
+  }
+}
+
