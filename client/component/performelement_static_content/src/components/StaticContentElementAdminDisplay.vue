@@ -79,3 +79,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-staticContentElementAdminDisplay {
+  .tui-responsiveImage {
+    max-height: 10rem;
+  }
+}
+</style>
