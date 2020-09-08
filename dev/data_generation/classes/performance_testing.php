@@ -971,7 +971,7 @@ class performance_testing extends App {
             'workspaces' => 1,
             'activities' => [
                 'count' => 5,
-                'audiences_per_activity' => 5,
+                'audiences_per_activity' => 1,
             ],
             'workspace_members' => 2,
             'workspace_discussions' => 1,
@@ -998,7 +998,7 @@ class performance_testing extends App {
             'workspaces' => 10,
             'activities' => [
                 'count' => 25,
-                'audiences_per_activity' => 10,
+                'audiences_per_activity' => 2,
             ],
             'workspace_members' => 5,
             'workspace_discussions' => 5,
@@ -1025,7 +1025,7 @@ class performance_testing extends App {
             'workspaces' => 100,
             'activities' => [
                 'count' => 100,
-                'audiences_per_activity' => 20,
+                'audiences_per_activity' => 3,
             ],
             'workspace_members' => 100,
             'workspace_discussions' => 100,
@@ -1052,7 +1052,7 @@ class performance_testing extends App {
             'workspaces' => 100,
             'activities' => [
                 'count' => 500,
-                'audiences_per_activity' => 40,
+                'audiences_per_activity' => 5,
             ],
             'workspace_members' => 250,
             'workspace_discussions' => 250,
@@ -1079,7 +1079,7 @@ class performance_testing extends App {
             'workspaces' => 1000,
             'activities' => [
                 'count' => 1200,
-                'audiences_per_activity' => 60,
+                'audiences_per_activity' => 8,
             ],
             'workspace_members' => 500,
             'workspace_discussions' => 750,
@@ -1133,7 +1133,7 @@ class performance_testing extends App {
             'workspaces' => 1000,
             'activities' => [
                 'count' => 5000,
-                'audiences_per_activity' => 100,
+                'audiences_per_activity' => 10,
             ],
             'workspace_members' => 1000,
             'workspace_discussions' => 1000,
