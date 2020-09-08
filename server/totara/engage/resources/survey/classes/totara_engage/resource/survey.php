@@ -366,16 +366,20 @@ final class survey extends resource_item {
      */
     public function can_update(int $userid): bool {
         $owner = $this->get_userid();
-        if ($owner == $userid) {
+        $context = $this->get_context();
+
+        if (access_manager::can_manage_engage($context, $userid)) {
             return true;
         }
 
-        if (access_manager::can_manage_engage($this->get_context(), $userid)) {
-            return true;
+        if (!has_capability('engage/survey:update', $context, $userid)) {
+            // If the user does not have any capability to do update, then we will
+            // skip it from here.
+            return false;
         }
 
-        $context = \context_user::instance($owner);
-        return has_capability('engage/survey:update', $context, $userid);
+        // Otherwise, user can only update the survey when user is the owner of this very survey.
+        return $owner == $userid;
     }
 
     /**
