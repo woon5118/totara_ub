@@ -6,8 +6,7 @@ type mod_perform_add_participants_result {
 }
 
 """
-participant object
-used to add participants to a subject_instance.
+Participant object, used to add participants to a subject_instance.
 """
 input mod_perform_add_participant_input {
     core_relationship_id: core_id!
