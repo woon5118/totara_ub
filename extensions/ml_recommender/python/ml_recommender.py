@@ -67,7 +67,7 @@ def _get_items(data_home, data_file=None, nlp_active=None, top_x_word_count=None
         # Apply NLP processing to text documents.
         bows = _nlp_naive(items['document'])
 
-        # Keep only the top 5 words per document.
+        # Keep only the top X number of words per document.
         bows = _bows_top_x(bows=bows, top_x=top_x_word_count)
 
         # Drop the text content column and replace with BOW matrix.
@@ -101,7 +101,7 @@ def _nlp_naive(docs):
 
     # Retrieve stopwords lists.
     scriptpath, scriptname = os.path.split(os.path.abspath(__file__))
-    with open(scriptpath + '/totara/stopwords-iso/stopwords-iso.json') as json_file:
+    with open(scriptpath + '/totara/stopwords-iso.json') as json_file:
         stopwords_lists = json.load(json_file)
 
         # Normalise input documents as terms (tokens).
@@ -396,8 +396,8 @@ if not (sys_version.major == 3 and sys_version.minor > 5):
 # Define expected arguments.
 parser = argparse.ArgumentParser(description="Totara Engage recommendations")
 parser.add_argument('--query',
-                    help='The type of query to run (mf = matrix factorisation, hybrid = matrix factorisation & content-filtering',
-                    required=True, choices=['mf', 'hybrid'])
+                    help='The type of query to run (mf = matrix factorisation, partial = matrix factorisation & item metadata, hybrid = matrix factorisation & content-filtering',
+                    required=True, choices=['mf', 'partial', 'hybrid'])
 parser.add_argument("--result_count_user", help="Number of items-to-user recommendations to return", required=True,
                     type=int)
 parser.add_argument("--result_count_item", help="Number of items-to-item recommendations to return", required=True,
@@ -455,7 +455,7 @@ for tenant in tenants:
         print('Cannot process tenant ' + tenant + '. Perhaps not enough data yet.')
         continue
     # Load user and item data for hybrid algorithm.
-    if query == 'hybrid':
+    if query == 'hybrid' or query == 'partial':
         # Load and pre-process user data.
         users_raw = _get_users(data_home, 'user_data_' + tenant + '.csv')
         num_users = users_raw.shape[0]
@@ -463,7 +463,10 @@ for tenant in tenants:
         users_raw = None
 
         # Load and pre-process item data.
-        items_raw = _get_items(data_home, 'item_data_' + tenant + '.csv', nlp_active=True, top_x_word_count=top_x_word_count)
+        nlp_active = True
+        if query == 'partial':
+            nlp_active = False
+        items_raw = _get_items(data_home, 'item_data_' + tenant + '.csv', nlp_active, top_x_word_count=top_x_word_count)
         num_items = items_raw.shape[0]
         unique_items = items_raw['item_id']
         item_feature_names = list(items_raw.columns.values)

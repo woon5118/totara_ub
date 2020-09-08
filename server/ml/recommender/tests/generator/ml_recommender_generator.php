@@ -95,7 +95,7 @@ final class ml_recommender_generator extends component_generator_base {
      * @param int $user_id
      * @param int $item_id
      * @param string $component
-     * @param string|null $interation
+     * @param string|null $interaction
      * @param int|null $rating
      * @param string|null $area
      * @return int
@@ -104,7 +104,7 @@ final class ml_recommender_generator extends component_generator_base {
         int $user_id,
         int $item_id,
         string $component,
-        ?string $interation = 'view',
+        ?string $interaction = 'view',
         ?int $rating = 1,
         ?string $area = null
     ):int {
@@ -117,7 +117,7 @@ final class ml_recommender_generator extends component_generator_base {
             'user_id' => $user_id,
             'item_id' => $item_id,
             'component_id' => $component_repo->ensure_id($component, $area),
-            'interaction_type_id' => $type_repo->ensure_id($interation),
+            'interaction_type_id' => $type_repo->ensure_id($interaction),
             'rating' => $rating,
             'time_created' => time()
         ]);

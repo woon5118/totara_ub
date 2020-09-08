@@ -132,16 +132,19 @@ class user_interactions extends export {
             UNION ALL
             SELECT ue.userid AS user_id,
                 e.courseid AS item_id,
-                'container_course' AS component,
+                cc.containertype AS component,
                 ue.timecreated AS mytimestamp,
                 2 AS myrating
             FROM {user_enrolments} ue
             INNER JOIN {enrol} e ON (ue.enrolid = e.id)
+            INNER JOIN {course} cc ON e.courseid = cc.id 
             $tenant_join_sql
-            WHERE e.enrol = 'self' AND e.status = " . ENROL_USER_ACTIVE;
+            WHERE e.enrol = 'self' AND e.status = " . ENROL_USER_ACTIVE .
+            " AND cc.containertype = 'container_course'";
 
         // Set recordset cursor.
         $params = array_merge($params_sql, $components_params);
+        //die(var_dump([$sql, $params]));
         return $DB->get_recordset_sql($sql, $params);
     }
 }

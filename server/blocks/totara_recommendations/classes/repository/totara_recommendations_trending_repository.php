@@ -118,7 +118,6 @@ final class totara_recommendations_trending_repository extends repository {
                 ' . $unique . ' as unique_id,
                 item_id,
                 component,
-                area,
                 COUNT(item_id) AS counter
             FROM {ml_recommender_interactions} mri
             INNER JOIN {ml_recommender_components} mrc ON (mrc.id = mri.component_id)';
@@ -127,7 +126,6 @@ final class totara_recommendations_trending_repository extends repository {
             GROUP BY
                 component,
                 item_id,
-                area,
                 ' . $unique . '
             ORDER BY
                 counter DESC';
