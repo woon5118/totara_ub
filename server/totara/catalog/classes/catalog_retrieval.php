@@ -60,7 +60,7 @@ class catalog_retrieval {
             if (filter_handler::instance()->get_full_text_search_filter()->datafilter->is_active()) {
                 return [
                     'catalogfts.score, catalog.sorttime',
-                    'catalogfts.score DESC, catalog.sorttime DESC'
+                    'catalogfts.score DESC, catalog.sorttime DESC, id DESC'
                 ];
             }
 
@@ -68,13 +68,13 @@ class catalog_retrieval {
                 // Featured not required in columns list because it must already be there if it is enabled.
                 return [
                     'catalog.sorttime',
-                    'COALESCE(featured, 0) DESC, catalog.sorttime DESC'
+                    'COALESCE(featured, 0) DESC, catalog.sorttime DESC, id DESC'
                 ];
             }
 
             return [
                 'catalog.sorttime',
-                'catalog.sorttime DESC'
+                'catalog.sorttime DESC, id DESC'
             ];
         }
 

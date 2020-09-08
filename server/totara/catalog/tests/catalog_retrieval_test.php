@@ -183,7 +183,7 @@ class totara_catalog_catalog_retrieval_testcase extends advanced_testcase {
         // See that 'alpha' is ignored'.
         list($orderbycolumns, $orderbysort) = $rm->invoke($mockedcatalog, 'alpha');
         $this->assertEquals('catalog.sorttime', $orderbycolumns);
-        $this->assertEquals('catalog.sorttime DESC', $orderbysort);
+        $this->assertEquals('catalog.sorttime DESC, id DESC', $orderbysort);
 
         // See that 'featured' is always used when featured learning is enabled.
         $feature = format::get_features()[0];
@@ -196,14 +196,14 @@ class totara_catalog_catalog_retrieval_testcase extends advanced_testcase {
         );
         list($orderbycolumns, $orderbysort) = $rm->invoke($mockedcatalog, 'time');
         $this->assertEquals('catalog.sorttime', $orderbycolumns);
-        $this->assertEquals('COALESCE(featured, 0) DESC, catalog.sorttime DESC', $orderbysort);
+        $this->assertEquals('COALESCE(featured, 0) DESC, catalog.sorttime DESC, id DESC', $orderbysort);
 
         // See that 'score' is always used when full text search is active.
         $fts = filter_handler::instance()->get_full_text_search_filter()->datafilter;
         $fts->set_current_data("some search text");
         list($orderbycolumns, $orderbysort) = $rm->invoke($mockedcatalog, 'featured');
         $this->assertEquals('catalogfts.score, catalog.sorttime', $orderbycolumns);
-        $this->assertEquals('catalogfts.score DESC, catalog.sorttime DESC', $orderbysort);
+        $this->assertEquals('catalogfts.score DESC, catalog.sorttime DESC, id DESC', $orderbysort);
     }
 
     private function normalized(string $in): string {
