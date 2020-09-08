@@ -47,7 +47,7 @@ final class helper {
             $totals['recipients'][] = [
                 'area' => $recipientcount->area,
                 'label' => $info['label'],
-                'total' => $recipientcount->total
+                'total' => (int)$recipientcount->total
             ];
         }
 

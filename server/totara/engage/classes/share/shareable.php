@@ -88,4 +88,10 @@ interface shareable {
      * @return bool
      */
     public function can_unshare(int $sharer_id, ?bool $is_container = false): bool;
+
+    /**
+     * Returns the owning user id.
+     * @return int
+     */
+    public function get_userid(): int;
 }

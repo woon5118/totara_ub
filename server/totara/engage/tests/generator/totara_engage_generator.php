@@ -72,9 +72,10 @@ final class totara_engage_generator extends component_generator_base {
      * @param shareable $item
      * @param int $sharerid
      * @param array $recipients
+     * @param int|null $owninguserid
      * @return share_model[]
      */
-    public function share_item(shareable $item, int $sharerid, array $recipients): array {
+    public function share_item(shareable $item, int $sharerid, array $recipients, $owninguserid = null): array {
         $context = $item->get_context();
 
         // Make the create method public so we can test it.
@@ -82,9 +83,14 @@ final class totara_engage_generator extends component_generator_base {
         $method = $class->getMethod('create');
         $method->setAccessible(true);
 
+        if ($owninguserid === null) {
+            // The item knows ;)
+            $owninguserid = $item->get_userid();
+        }
+
         return $method->invokeArgs(null, [
             $item->get_id(),
-            $item->get_userid(),
+            $owninguserid,
             $item::get_resource_type(),
             $recipients,
             $context->id,
