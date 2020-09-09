@@ -118,10 +118,12 @@ class performance_testing extends App {
     private $organisations = [];
 
     /**
-     *
+     * Enable / disable function calls here to control which data is generated
+     * when you run this script.
      */
     public function generate() {
-        // If you don't need caching disable it
+        // If you need caching enable it here.
+        // Cached data is not used at the moment so disabled by default for now.
         Cache::disable();
 
         $this->create_users()
@@ -130,28 +132,250 @@ class performance_testing extends App {
             ->create_audiences()
             ->add_audience_members()
             ->create_job_assignments_for_user()
-            ->create_activities()
-            // ->expand_track_user_assignments()
-            // ->generate_instances()
+            ->perform_act_create_activities()
+            // ->perform_act_expand_track_user_assignments()   // Use with care as will have considerable performance impact on generation
+            // ->perform_act_generate_instances()              // Use with care as will have considerable performance impact on generation
             // ->create_scales()
             // ->create_competencies()
-            //->create_organisation_assignments()
-            //->create_position_assignments()
-            // ->create_audience_assignments()
-            // ->create_assignments()
+            // ->perform_comp_create_organisation_assignments()
+            // ->perform_comp_create_position_assignments()
+            // ->perform_comp_create_audience_assignments()
+            // ->perform_comp_create_assignments()
             // ->create_courses()
-            // Enrolling users has a huge performance impact
-            // only activate if absolutely necessary
-            // ->enrol_users()
+            // ->enrol_users()                             // Enrolling users has a huge performance impact only activate if absolutely necessary
             // ->create_course_completions()
             // ->create_course_completions_basic()
             // ->add_linked_courses()
-            // ->create_criteria()
-            // ->create_workspaces()
-            // ->create_workspace_members()
-            // ->create_workspace_discussions()
-            // ->create_workspace_discussion_comments_replies()
+            // ->perform_comp_create_criteria()
+            // ->engage_create_workspaces()
+            // ->engage_create_workspace_members()
+            // ->engage_create_workspace_discussions()
+            // ->engage_create_workspace_discussion_comments_replies()
             ;
+    }
+
+    /**
+     * Tweak numbers here
+     *
+     * @return array
+     */
+    public function get_xs_size() {
+        return [
+            'users' => 2000,
+            'courses' => 10,
+            'audiences' => 50,
+            'users_per_audience' => 1000,
+            'workspaces' => 1,
+            'activities' => [
+                'count' => 5,
+                'audiences_per_activity' => 1,
+            ],
+            'workspace_members' => 2,
+            'workspace_discussions' => 1,
+            'workspace_discussion_comments' => 1,
+            'organisations' => [3, 3],
+            'positions' => [3, 3],
+            'competencies' => [3, 3],
+            'competency_assignments' => 100,
+            'job_assignments_for_user' => 2,
+            'enrolments' => 100,
+            'courses_per_criterion' => 5,
+            'variable_courses_per_criterion' => false,
+            'completions' => 100, // <-- Note this is a percentage
+            'workspace_discussion_replies' => 1,
+        ];
+    }
+
+    /**
+     * Tweak numbers here
+     *
+     * @return array
+     */
+    public function get_s_size() {
+        return [
+            'users' => 7000,
+            'courses' => 100,
+            'audiences' => 80,
+            'users_per_audience' => 2500,
+            'workspaces' => 10,
+            'activities' => [
+                'count' => 25,
+                'audiences_per_activity' => 2,
+            ],
+            'workspace_members' => 5,
+            'workspace_discussions' => 5,
+            'workspace_discussion_comments' => 3,
+            'organisations' => [4, 4],
+            'positions' => [4, 4],
+            'competencies' => [4, 4],
+            'competency_assignments' => 100,
+            'job_assignments_for_user' => 1,
+            'enrolments' => 100,
+            'courses_per_criterion' => 5,
+            'variable_courses_per_criterion' => false,
+            'completions' => 75, // <-- Note this is a percentage
+            'workspace_discussion_replies' => 2,
+        ];
+    }
+
+    /**
+     * Tweak numbers here
+     *
+     * @return array
+     */
+    public function get_m_size() {
+        return [
+            'users' => 15000,
+            'courses' => 100,
+            'audiences' => 50,
+            'users_per_audience' => 5000,
+            'workspaces' => 100,
+            'activities' => [
+                'count' => 100,
+                'audiences_per_activity' => 3,
+            ],
+            'workspace_members' => 100,
+            'workspace_discussions' => 100,
+            'workspace_discussion_comments' => 100,
+            'workspace_discussion_replies' => 100,
+            'organisations' => [4, 4],
+            'positions' => [4, 4],
+            'competencies' => [4, 4],
+            'competency_assignments' => 80,
+            'job_assignments_for_user' => 1,
+            'enrolments' => 80,
+            'courses_per_criterion' => 5,
+            'variable_courses_per_criterion' => false,
+            'completions' => 75, // <-- Note this is a percentage
+        ];
+    }
+
+    /**
+     * Tweak numbers here
+     *
+     * @return array
+     */
+    public function get_l_size() {
+        return [
+            'users' => 35000,
+            'courses' => 100,
+            'audiences' => 80,
+            'users_per_audience' => 10000,
+            'workspaces' => 100,
+            'activities' => [
+                'count' => 500,
+                'audiences_per_activity' => 5,
+            ],
+            'workspace_members' => 250,
+            'workspace_discussions' => 250,
+            'workspace_discussion_comments' => 250,
+            'workspace_discussion_replies' => 250,
+            'organisations' => [4, 4],
+            'positions' => [4, 4],
+            'competencies' => [4, 4],
+            'competency_assignments' => 100,
+            'job_assignments_for_user' => 2,
+            'enrolments' => 100,
+            'courses_per_criterion' => 5,
+            'variable_courses_per_criterion' => false,
+            'completions' => 75, // <-- Note this is a percentage
+        ];
+    }
+
+    /**
+     * Tweak numbers here
+     *
+     * @return array
+     */
+    public function get_xl_size() {
+        return [
+            'users' => 75000,
+            'courses' => 1000,
+            'audiences' => 100,
+            'users_per_audience' => 25000,
+            'workspaces' => 1000,
+            'activities' => [
+                'count' => 1200,
+                'audiences_per_activity' => 8,
+            ],
+            'workspace_members' => 500,
+            'workspace_discussions' => 750,
+            'workspace_discussion_comments' => 750,
+            'workspace_discussion_replies' => 750,
+            'organisations' => [5, 5],
+            'positions' => [5, 5],
+            'competencies' => [5, 5],
+            'competency_assignments' => 70,
+            'job_assignments_for_user' => 2,
+            'enrolments' => 70,
+            'courses_per_criterion' => 5,
+            'variable_courses_per_criterion' => false,
+            'completions' => 80, // <-- Note this is a percentage
+        ];
+    }
+
+    /**
+     * Tweak numbers here
+     *
+     * @return array
+     */
+    public function get_xxl_size() {
+        return [
+            'users' => 150000,
+            'courses' => 1000,
+            'audiences' => 120,
+            'users_per_audience' => 50000,
+            'workspaces' => 1000,
+            'activities' => [
+                'count' => 2500,
+                'audiences_per_activity' => 10,
+            ],
+            'workspace_members' => 1000,
+            'workspace_discussions' => 1000,
+            'workspace_discussion_comments' => 1000,
+            'organisations' => [5, 5],
+            'positions' => [5, 5],
+            'competencies' => [5, 5],
+            'competency_assignments' => 70,
+            'job_assignments_for_user' => 4,
+            'enrolments' => 70,
+            'courses_per_criterion' => 5,
+            'variable_courses_per_criterion' => false,
+            'completions' => 80, // <-- Note this is a percentage
+            'workspace_discussion_replies' => 1000,
+        ];
+    }
+
+    /**
+     * Tweak numbers here
+     *
+     * @return array
+     */
+    public function get_goliath_size() {
+        return [
+            'users' => 300000,
+            'courses' => 1000,
+            'audiences' => 140,
+            'users_per_audience' => 100000,
+            'workspaces' => 1000,
+            'activities' => [
+                'count' => 5000,
+                'audiences_per_activity' => 15,
+            ],
+            'workspace_members' => 1000,
+            'workspace_discussions' => 1000,
+            'workspace_discussion_comments' => 1000,
+            'organisations' => [5, 5],
+            'positions' => [5, 5],
+            'competencies' => [6, 5],
+            'competency_assignments' => 70,
+            'job_assignments_for_user' => 5,
+            'enrolments' => 70,
+            'courses_per_criterion' => 5,
+            'variable_courses_per_criterion' => false,
+            'completions' => 80, // <-- Note this is a percentage
+            'workspace_discussion_replies' => 1000,
+        ];
     }
 
     public function create_users() {
@@ -191,14 +415,11 @@ class performance_testing extends App {
         return $this;
     }
 
-    public function create_assignments() {
+    public function perform_comp_create_assignments() {
         if (!$this->assign_groups) {
-            $this->create_user_assignments();
+            $this->perform_comp_create_user_assignments();
         } else {
-            // $this->add_audience_members()
-            //     ->create_audience_assignments();
-
-            $this->create_audience_assignments();
+            $this->perform_comp_create_audience_assignments();
         }
 
         return $this;
@@ -385,17 +606,17 @@ class performance_testing extends App {
         return $this;
     }
 
-    public function create_organisation_assignments() {
+    public function perform_comp_create_organisation_assignments() {
 
         return $this;
     }
 
-    public function create_position_assignments() {
+    public function perform_comp_create_position_assignments() {
 
         return $this;
     }
 
-    public function create_audience_assignments() {
+    public function perform_comp_create_audience_assignments() {
         $this->output('Creating audience assignments...');
 
         if ($this->competency_hierarchy === null) {
@@ -417,7 +638,7 @@ class performance_testing extends App {
         return $this;
     }
 
-    public function create_user_assignments() {
+    public function perform_comp_create_user_assignments() {
         $this->output('Creating user assignments...');
 
         if ($this->competency_hierarchy === null) {
@@ -586,7 +807,7 @@ class performance_testing extends App {
         );
     }
 
-    public function create_criteria_set(competency $competency) {
+    public function perform_comp_create_criteria_set(competency $competency) {
         // Create criteria group - on activate
         // Create criteria group - completion and child competencies
         // Create criteria group - completion and linked course
@@ -629,7 +850,7 @@ class performance_testing extends App {
             ->save_and_return();
     }
 
-    public function create_criteria() {
+    public function perform_comp_create_criteria() {
         $this->output('Creating criteria...');
 
         if (!$this->competency_hierarchy) {
@@ -638,7 +859,7 @@ class performance_testing extends App {
 
         builder::get_db()->transaction(function () {
             foreach ($this->competency_hierarchy->get_items() as $item) {
-                $this->create_criteria_set($item);
+                $this->perform_comp_create_criteria_set($item);
             }
         });
 
@@ -710,7 +931,7 @@ class performance_testing extends App {
         return $this;
     }
 
-    protected function create_activities() {
+    protected function perform_act_create_activities() {
         $this->output('Creating activities ...');
         $activity_size = $this->get_item_size('activities');
         $configuration_manager = new preset_configurations();
@@ -732,7 +953,7 @@ class performance_testing extends App {
         return $this;
     }
 
-    private function expand_track_user_assignments() {
+    private function perform_act_expand_track_user_assignments() {
         $this->output('Expanding user assignments...');
         (new expand_task())->expand_all();
 
@@ -740,9 +961,9 @@ class performance_testing extends App {
         return $this;
     }
 
-    private function generate_instances() {
+    private function perform_act_generate_instances() {
         if (!$this->user_assignments_expanded) {
-            $this->expand_track_user_assignments();
+            $this->perform_act_expand_track_user_assignments();
         }
 
         $this->output('Generating subject & participant instance data for activities...');
@@ -774,13 +995,13 @@ class performance_testing extends App {
         return $audience_ids;
     }
 
-    protected function create_random_responses() {
+    protected function perform_act_create_random_responses() {
         $this->output('Creating random responses for activities...');
         // todo: create_random_responses.
     }
 
 
-    public function create_workspaces() {
+    public function engage_create_workspaces() {
         $this->output('Creating workspaces ...');
         $size = $this->get_item_size('workspaces');
 
@@ -802,7 +1023,7 @@ class performance_testing extends App {
         return $this;
     }
 
-    public function create_workspace_members() {
+    public function engage_create_workspace_members() {
         $this->output('Creating workspace members ...');
         $size = $this->get_item_size('workspace_members');
 
@@ -838,7 +1059,7 @@ class performance_testing extends App {
         return $this;
     }
 
-    public function create_workspace_discussions() {
+    public function engage_create_workspace_discussions() {
         $this->output('Creating workspace discussions ...');
         $size = $this->get_item_size('workspace_discussions');
 
@@ -854,7 +1075,7 @@ class performance_testing extends App {
                         foreach ($members as $member) {
                             $user_id = $member->get_user_id();
                             for ($c = 0; $c <= $size; $c++) {
-                                $this->create_workspace_discussion($workspace->get_id(), $user_id);
+                                $this->engage_create_workspace_discussion($workspace->get_id(), $user_id);
                             }
                         }
 
@@ -873,7 +1094,7 @@ class performance_testing extends App {
         return $this;
     }
 
-    public function create_workspace_discussion($workspace_id, $author_id) {
+    public function engage_create_workspace_discussion($workspace_id, $author_id) {
         $generator = App::generator();
         $faker = App::faker();
 
@@ -890,7 +1111,7 @@ class performance_testing extends App {
         return $this;
     }
 
-    public function create_workspace_discussion_comments_replies() {
+    public function engage_create_workspace_discussion_comments_replies() {
         $this->output('Creating workspace discussion comments and replies...');
         $comment_size = $this->get_item_size('workspace_discussion_comments');
         $reply_size = $this->get_item_size('workspace_discussion_replies');
@@ -983,193 +1204,4 @@ class performance_testing extends App {
         }
     }
 
-    //['xs', 's', 'm', 'l', 'xl', 'xxl', 'goliath'
-    public function get_xs_size() {
-        return [
-            'users' => 2000,
-            'courses' => 10,
-            'audiences' => 50,
-            'users_per_audience' => 1000,
-            'workspaces' => 1,
-            'activities' => [
-                'count' => 5,
-                'audiences_per_activity' => 1,
-            ],
-            'workspace_members' => 2,
-            'workspace_discussions' => 1,
-            'workspace_discussion_comments' => 1,
-            'organisations' => [3, 3],
-            'positions' => [3, 3],
-            'competencies' => [3, 3],
-            'competency_assignments' => 100,
-            'job_assignments_for_user' => 2,
-            'enrolments' => 100,
-            'courses_per_criterion' => 5,
-            'variable_courses_per_criterion' => false,
-            'completions' => 100, // <-- Note this is a percentage
-            'workspace_discussion_replies' => 1,
-        ];
-    }
-
-    public function get_s_size() {
-        return [
-            'users' => 7000,
-            'courses' => 100,
-            'audiences' => 80,
-            'users_per_audience' => 2500,
-            'workspaces' => 10,
-            'activities' => [
-                'count' => 25,
-                'audiences_per_activity' => 2,
-            ],
-            'workspace_members' => 5,
-            'workspace_discussions' => 5,
-            'workspace_discussion_comments' => 3,
-            'organisations' => [4, 4],
-            'positions' => [4, 4],
-            'competencies' => [4, 4],
-            'competency_assignments' => 100,
-            'job_assignments_for_user' => 1,
-            'enrolments' => 100,
-            'courses_per_criterion' => 5,
-            'variable_courses_per_criterion' => false,
-            'completions' => 75, // <-- Note this is a percentage
-            'workspace_discussion_replies' => 2,
-        ];
-    }
-
-    public function get_m_size() {
-        return [
-            'users' => 15000,
-            'courses' => 100,
-            'audiences' => 50,
-            'users_per_audience' => 5000,
-            'workspaces' => 100,
-            'activities' => [
-                'count' => 100,
-                'audiences_per_activity' => 3,
-            ],
-            'workspace_members' => 100,
-            'workspace_discussions' => 100,
-            'workspace_discussion_comments' => 100,
-            'workspace_discussion_replies' => 100,
-            'organisations' => [4, 4],
-            'positions' => [4, 4],
-            'competencies' => [4, 4],
-            'competency_assignments' => 80,
-            'job_assignments_for_user' => 1,
-            'enrolments' => 80,
-            'courses_per_criterion' => 5,
-            'variable_courses_per_criterion' => false,
-            'completions' => 75, // <-- Note this is a percentage
-        ];
-    }
-
-    public function get_l_size() {
-        return [
-            'users' => 35000,
-            'courses' => 100,
-            'audiences' => 80,
-            'users_per_audience' => 10000,
-            'workspaces' => 100,
-            'activities' => [
-                'count' => 500,
-                'audiences_per_activity' => 5,
-            ],
-            'workspace_members' => 250,
-            'workspace_discussions' => 250,
-            'workspace_discussion_comments' => 250,
-            'workspace_discussion_replies' => 250,
-            'organisations' => [4, 4],
-            'positions' => [4, 4],
-            'competencies' => [4, 4],
-            'competency_assignments' => 100,
-            'job_assignments_for_user' => 2,
-            'enrolments' => 100,
-            'courses_per_criterion' => 5,
-            'variable_courses_per_criterion' => false,
-            'completions' => 75, // <-- Note this is a percentage
-        ];
-    }
-
-    public function get_xl_size() {
-        return [
-            'users' => 75000,
-            'courses' => 1000,
-            'audiences' => 100,
-            'users_per_audience' => 25000,
-            'workspaces' => 1000,
-            'activities' => [
-                'count' => 1200,
-                'audiences_per_activity' => 8,
-            ],
-            'workspace_members' => 500,
-            'workspace_discussions' => 750,
-            'workspace_discussion_comments' => 750,
-            'workspace_discussion_replies' => 750,
-            'organisations' => [5, 5],
-            'positions' => [5, 5],
-            'competencies' => [5, 5],
-            'competency_assignments' => 70,
-            'job_assignments_for_user' => 2,
-            'enrolments' => 70,
-            'courses_per_criterion' => 5,
-            'variable_courses_per_criterion' => false,
-            'completions' => 80, // <-- Note this is a percentage
-        ];
-    }
-
-    public function get_xxl_size() {
-        return [
-            'users' => 150000,
-            'courses' => 1000,
-            'audiences' => 120,
-            'users_per_audience' => 50000,
-            'workspaces' => 1000,
-            'activities' => [
-                'count' => 2500,
-                'audiences_per_activity' => 80,
-            ],
-            'workspace_members' => 1000,
-            'workspace_discussions' => 1000,
-            'workspace_discussion_comments' => 1000,
-            'organisations' => [5, 5],
-            'positions' => [5, 5],
-            'competencies' => [5, 5],
-            'competency_assignments' => 70,
-            'job_assignments_for_user' => 4,
-            'enrolments' => 70,
-            'courses_per_criterion' => 5,
-            'variable_courses_per_criterion' => false,
-            'completions' => 80, // <-- Note this is a percentage
-            'workspace_discussion_replies' => 1000,
-        ];
-    }
-
-    public function get_goliath_size() {
-        return [
-            'users' => 300000,
-            'courses' => 1000,
-            'audiences' => 140,
-            'users_per_audience' => 100000,
-            'workspaces' => 1000,
-            'activities' => [
-                'count' => 5000,
-                'audiences_per_activity' => 10,
-            ],
-            'workspace_members' => 1000,
-            'workspace_discussions' => 1000,
-            'workspace_discussion_comments' => 1000,
-            'organisations' => [5, 5],
-            'positions' => [5, 5],
-            'competencies' => [6, 5],
-            'competency_assignments' => 70,
-            'job_assignments_for_user' => 5,
-            'enrolments' => 70,
-            'courses_per_criterion' => 5,
-            'variable_courses_per_criterion' => false,
-            'completions' => 80, // <-- Note this is a percentage
-            'workspace_discussion_replies' => 1000,
-        ];
-    }
 }

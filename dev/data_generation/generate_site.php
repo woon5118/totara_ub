@@ -52,7 +52,7 @@ raise_memory_limit(MEMORY_UNLIMITED);
 
 if ($options['help']) {
     echo "
-This script is designed to generate a vast amount of testing data for perform features of the site.
+This script is designed to generate a vast amount of testing data to test performance.
 The script meant to be executed on a clean (freshly installed) site.
 
 Usage:

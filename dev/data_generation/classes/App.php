@@ -74,7 +74,7 @@ class App {
     }
 
     public function output(string $message) {
-        echo $message . PHP_EOL;
+        echo PHP_EOL . $message . PHP_EOL;
 
         return $this;
     }

@@ -117,7 +117,7 @@ class job_assignments_creator {
                 return $original[$key];
             };
 
-            echo "Creating manager job assignments for users..." . PHP_EOL;
+            echo PHP_EOL . "Creating manager job assignments for users..." . PHP_EOL;
 
             $buffer = [];
             $total = count($this->users) / BATCH_INSERT_MAX_ROW_COUNT;
@@ -138,7 +138,7 @@ class job_assignments_creator {
             // Make sure all is saved
             $this->process_bulk($buffer);
 
-            echo "Creating actual job assignments for users..." . PHP_EOL;
+            echo PHP_EOL . "Creating actual job assignments for users..." . PHP_EOL;
 
             $manager_job_assignments = builder::table(job_assignment_entity::TABLE)
                 ->results_as_arrays()
