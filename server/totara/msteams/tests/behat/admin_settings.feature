@@ -1,5 +1,5 @@
 @engage @totara @totara_msteams @javascript
-Feature: Customise admin settings
+Feature: Customise Teams integration settings
   As an admin
   I would like to have access to a frontend admin settings interface
   So that I can enable and configure the integration to suit the organisation
@@ -10,23 +10,57 @@ Feature: Customise admin settings
     And I am on homepage
     And I navigate to "Microsoft Teams integration" node in "Site administration > Microsoft Teams"
 
-  Scenario: Check maximum string length validation
+  Scenario: Check front-end validation on the site admin page
     When I set the field "Short name" to "it's a very long short app name"
     And I press "Save changes"
     Then I should see "Some settings were not changed due to an error"
     And I should see "Maximum of 30 characters"
 
-    When I set the field "Short name" to "Totara"
-    And I set the field "Full name" to "this is a really really long full application name that is excruciatingly longer than 100 characters."
+    And I set the field "Short name" to "Totara"
+    When I set the field "Full name" to "this is a really really long full application name that is excruciatingly longer than 100 characters."
     And I press "Save changes"
     Then I should see "Some settings were not changed due to an error"
     And I should see "Maximum of 100 characters"
 
+    And I set the field "Full name" to ""
+    When I set the field "Publisher name" to "this is a really really long name"
+    And I press "Save changes"
+    Then I should see "Some settings were not changed due to an error"
+    And I should see "Maximum of 32 characters"
+
+    And I set the field "Publisher name" to "Totara"
+    When I set the field "Microsoft Partner Network ID" to "31415926535"
+    And I press "Save changes"
+    Then I should see "Some settings were not changed due to an error"
+    And I should see "Maximum of 10 characters"
+
+    And I set the field "Microsoft Partner Network ID" to ""
+    When I set the field "Publisher website" to "kia://ora/"
+    And I press "Save changes"
+    Then I should see "Some settings were not changed due to an error"
+    And I should see "This value is not valid"
+
+    And I set the field "Publisher website" to ""
+    When I set the field "Privacy policy" to "kia://ora/"
+    And I press "Save changes"
+    Then I should see "Some settings were not changed due to an error"
+    And I should see "This value is not valid"
+
+    And I set the field "Privacy policy" to ""
+    When I set the field "Terms of use" to "kia://ora/"
+    And I press "Save changes"
+    Then I should see "Some settings were not changed due to an error"
+    And I should see "This value is not valid"
+
   Scenario: Manifest download
     When I set the following fields to these values:
-      | Short name      | Mistletoetara                        |
-      | Full name       |                                      |
-      | Manifest app ID | 31415926-5358-9793-2384-626433832795 |
+      | Short name        | Mistletoetara                        |
+      | Full name         |                                      |
+      | Manifest app ID   | 31415926-5358-9793-2384-626433832795 |
+      | Publisher name    | Totara Learn                         |
+      | Publisher website | https://example.com/                 |
+      | Privacy policy    | https://example.com/                 |
+      | Terms of use      | https://example.com/                 |
     And I press "Save changes"
     Then I should see "Changes saved"
     And I should not see "Some settings were not changed due to an error"

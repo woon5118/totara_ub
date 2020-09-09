@@ -31,13 +31,13 @@ use totara_msteams\check\status;
 use totara_msteams\manifest_helper;
 
 /**
- * Check manifest_app_fullname.
+ * Check publishername.
  */
-class mf_namefull implements checkable {
+class pub_name implements checkable {
     /**
      * Maximum allowed length.
      */
-    const MAX_LENGTH = 100;
+    const MAX_LENGTH = 32;
 
     /**
      * @var string
@@ -45,11 +45,11 @@ class mf_namefull implements checkable {
     protected $result = '';
 
     public function get_name(): string {
-        return get_string('check:mf_namefull', 'totara_msteams');
+        return get_string('publishername', 'admin');
     }
 
     public function get_config_name(): ?string {
-        return 'manifest_app_fullname';
+        return 'publishername';
     }
 
     public function get_helplink(): ?moodle_url {
@@ -57,9 +57,13 @@ class mf_namefull implements checkable {
     }
 
     public function check(): int {
-        $name = (string)get_config('totara_msteams', 'manifest_app_fullname');
-        if (manifest_helper::utf16_strlen($name) > self::MAX_LENGTH) {
-            $this->result = get_string('check:mf_namefull_toolong', 'totara_msteams', self::MAX_LENGTH);
+        global $CFG;
+        if (!isset($CFG->publishername) || (string)$CFG->publishername === '') {
+            $this->result = get_string('check:pub_name_notset', 'totara_msteams');
+            return status::FAILED;
+        }
+        if (manifest_helper::utf16_strlen($CFG->publishername) > self::MAX_LENGTH) {
+            $this->result = get_string('check:pub_name_toolong', 'totara_msteams', self::MAX_LENGTH);
             return status::FAILED;
         }
         return status::PASS;

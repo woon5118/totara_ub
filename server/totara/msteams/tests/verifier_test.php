@@ -37,9 +37,15 @@ use totara_msteams\check\checks\mf_descfull;
 use totara_msteams\check\checks\mf_name;
 use totara_msteams\check\checks\mf_namefull;
 use totara_msteams\check\checks\mf_package;
+use totara_msteams\check\checks\pub_mpnid;
+use totara_msteams\check\checks\pub_name;
+use totara_msteams\check\checks\pub_website;
+use totara_msteams\check\checks\site_privacy;
+use totara_msteams\check\checks\site_terms;
 use totara_msteams\check\checks\sso_auth;
 use totara_msteams\check\checks\sso_id;
 use totara_msteams\check\checks\sso_scope;
+use totara_msteams\check\checks\url_common;
 use totara_msteams\check\status;
 use totara_msteams\check\verifier;
 
@@ -47,12 +53,17 @@ defined('MOODLE_INTERNAL') || die;
 
 /**
  * Test verifier and checkable classes.
+ * @coversDefaultClass totara_msteams\check\verifier
  */
 class totara_msteams_verifier_testcase extends advanced_testcase {
     public function setUp(): void {
         $this->setAdminUser();
     }
 
+    /**
+     * @covers ::execute
+     * @covers ::get_results
+     */
     public function test_verifier() {
         global $CFG;
         // Let admin_catalog fail.
@@ -78,6 +89,11 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
             mf_name::class,
             mf_namefull::class,
             mf_package::class,
+            pub_mpnid::class,
+            pub_name::class,
+            pub_website::class,
+            site_privacy::class,
+            site_terms::class,
             sso_auth::class,
             sso_id::class,
             sso_scope::class,
@@ -130,6 +146,21 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         core_plugin_manager::reset_caches();
     }
 
+    /**
+     * Repeat the smile faces.
+     *
+     * @param integer $count how many times to smile?
+     * @return string
+     */
+    private static function smiles(int $count): string {
+        // U+1F600 aka grinning face.
+        $ch = json_decode('"\ud83d\ude00"');
+        return str_repeat($ch, $count);
+    }
+
+    /**
+     * @covers totara_msteams\check\checks\admin_catalog::check
+     */
     public function test_check_admin_catalog() {
         global $CFG;
         $check = new admin_catalog();
@@ -143,6 +174,9 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\admin_frame::check
+     */
     public function test_check_admin_frame() {
         global $CFG;
         $check = new admin_frame();
@@ -152,6 +186,9 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\admin_gridimage::check
+     */
     public function test_check_admin_gridimage() {
         global $CFG;
         $check = new admin_gridimage();
@@ -169,8 +206,24 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\bot_common::check_bot
+     */
     public function test_check_bot_common() {
-        $check = new testable_bot_common();
+        $check = new class extends bot_common {
+            public function get_name(): string {
+                return '';
+            }
+            public function get_config_name(): ?string {
+                return null;
+            }
+            public function get_helplink(): ?moodle_url {
+                return null;
+            }
+            public function check(): int {
+                return $this->check_bot();
+            }
+        };
         set_config('bot_feature_enabled', 0, 'totara_msteams');
         set_config('messaging_extension_enabled', 0, 'totara_msteams');
         $this->assert_check(status::SKIPPED, $check);
@@ -185,6 +238,9 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\bot_appid::check
+     */
     public function test_check_bot_id() {
         $check = new bot_appid();
         set_config('bot_feature_enabled', 1, 'totara_msteams');
@@ -199,8 +255,12 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\bot_secret::check
+     */
     public function test_check_bot_secret() {
         $check = new bot_secret();
+        $this->assert_check(status::SKIPPED, $check);
         set_config('bot_feature_enabled', 1, 'totara_msteams');
 
         set_config('bot_app_secret', '', 'totara_msteams');
@@ -209,6 +269,9 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\mf_appid::check
+     */
     public function test_check_mf_appid() {
         $check = new mf_appid();
         set_config('manifest_app_id', '', 'totara_msteams');
@@ -221,6 +284,9 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\mf_appversion::check
+     */
     public function test_check_mf_appversion() {
         $check = new mf_appversion();
         set_config('manifest_app_version', '', 'totara_msteams');
@@ -232,6 +298,9 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\mf_desc::check
+     */
     public function test_check_mf_desc() {
         $check = new mf_desc();
         set_config('manifest_app_description', '', 'totara_msteams');
@@ -240,8 +309,13 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::FAILED, $check);
         set_config('manifest_app_description', 'kia ora', 'totara_msteams');
         $this->assert_check(status::PASS, $check);
+        set_config('manifest_app_description', self::smiles(mf_desc::MAX_LENGTH / 2));
+        $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\mf_descfull::check
+     */
     public function test_check_mf_descfull() {
         $check = new mf_descfull();
         set_config('manifest_app_fulldescription', '', 'totara_msteams');
@@ -250,8 +324,13 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::FAILED, $check);
         set_config('manifest_app_fulldescription', 'kia ora', 'totara_msteams');
         $this->assert_check(status::PASS, $check);
+        set_config('manifest_app_fulldescription', self::smiles(mf_descfull::MAX_LENGTH / 2));
+        $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\mf_name::check
+     */
     public function test_check_mf_name() {
         $check = new mf_name();
         set_config('manifest_app_name', '', 'totara_msteams');
@@ -260,8 +339,13 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::FAILED, $check);
         set_config('manifest_app_name', 'kia ora', 'totara_msteams');
         $this->assert_check(status::PASS, $check);
+        set_config('manifest_app_name', self::smiles(mf_name::MAX_LENGTH / 2));
+        $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\mf_namefull::check
+     */
     public function test_check_mf_namefull() {
         $check = new mf_namefull();
         set_config('manifest_app_fullname', 'this is a really really long full application name that is excruciatingly longer than 100 characters.', 'totara_msteams');
@@ -270,8 +354,13 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
         set_config('manifest_app_fullname', 'kia ora', 'totara_msteams');
         $this->assert_check(status::PASS, $check);
+        set_config('manifest_app_fullname', self::smiles(mf_name::MAX_LENGTH / 2));
+        $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\mf_package::check
+     */
     public function test_check_mf_package() {
         $check = new mf_package();
         set_config('manifest_app_package_name', '', 'totara_msteams');
@@ -283,6 +372,145 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\pub_mpnid::check
+     */
+    public function test_check_pub_mpnid() {
+        $check = new pub_mpnid();
+        // Not checking the format at the moment.
+        set_config('publisher_mpnid', '31415926535', 'totara_msteams');
+        $this->assert_check(status::FAILED, $check);
+        set_config('publisher_mpnid', '', 'totara_msteams');
+        $this->assert_check(status::PASS, $check);
+        set_config('publisher_mpnid', '0', 'totara_msteams');
+        $this->assert_check(status::PASS, $check);
+        set_config('publisher_mpnid', 'kia ora', 'totara_msteams');
+        $this->assert_check(status::PASS, $check);
+    }
+
+    /**
+     * @covers totara_msteams\check\checks\pub_name::check
+     */
+    public function test_check_pub_name() {
+        global $CFG;
+        $check = new pub_name();
+        unset($CFG->publishername);
+        $this->assert_check(status::FAILED, $check);
+        $CFG->publishername = '';
+        $this->assert_check(status::FAILED, $check);
+        $CFG->publishername = 'it is a very long publisher name!';
+        $this->assert_check(status::FAILED, $check);
+        $CFG->publishername = 'kia ora';
+        $this->assert_check(status::PASS, $check);
+        $CFG->publishername = '0';
+        $this->assert_check(status::PASS, $check);
+        $CFG->publishername = self::smiles(pub_name::MAX_LENGTH / 2);
+        $this->assert_check(status::PASS, $check);
+    }
+
+    /**
+     * @covers totara_msteams\check\checks\pub_website::check
+     */
+    public function test_check_pub_website() {
+        global $CFG;
+        $check = new pub_website();
+        $CFG->publisherwebsite = 'http://example.com/totara/';
+        $this->assert_check(status::FAILED, $check);
+        $CFG->publisherwebsite = 'https://example.com/totara/en-nz/'.str_repeat('toolong/', 252);
+        $this->assert_check(status::FAILED, $check);
+        $CFG->publisherwebsite = 'https://example.com/totara/';
+        $this->assert_check(status::PASS, $check);
+    }
+
+    /**
+     * @covers totara_msteams\check\checks\site_privacy::check
+     */
+    public function test_check_site_privacy_policy() {
+        global $CFG;
+        $check = new site_privacy();
+        $CFG->privacypolicy = 'http://example.com/totara/';
+        $this->assert_check(status::FAILED, $check);
+        $CFG->privacypolicy = 'https://example.com/totara/en-nz/'.str_repeat('toolong/', 252);
+        $this->assert_check(status::FAILED, $check);
+        $CFG->privacypolicy = 'https://example.com/totara/';
+        $this->assert_check(status::PASS, $check);
+    }
+
+    /**
+     * @covers totara_msteams\check\checks\site_terms::check
+     */
+    public function test_check_site_terms_of_use() {
+        global $CFG;
+        $check = new site_terms();
+        $CFG->termsofuse = 'http://example.com/totara/';
+        $this->assert_check(status::FAILED, $check);
+        $CFG->termsofuse = 'https://example.com/totara/en-nz/'.str_repeat('toolong/', 252);
+        $this->assert_check(status::FAILED, $check);
+        $CFG->termsofuse = 'https://example.com/totara/';
+        $this->assert_check(status::PASS, $check);
+    }
+
+    /**
+     * @covers totara_msteams\check\checks\url_common::check_url
+     */
+    public function test_check_url_common() {
+        global $CFG;
+        $check = new class extends url_common {
+            public function get_name(): string {
+                return '';
+            }
+            public function get_config_name(): ?string {
+                return 'kakapo';
+            }
+            public function check(): int {
+                return $this->check_url('check:kakapo_notset', 'check:kakapo_toolong', 'check:kakapo_insecure');
+            }
+        };
+        $this->overrideLangString('check:kakapo_notset', 'totara_msteams', 'kakapo is not set', true);
+        $this->overrideLangString('check:kakapo_toolong', 'totara_msteams', 'kakapo is too long, must be {$a} characters or less', true);
+        $this->overrideLangString('check:kakapo_insecure', 'totara_msteams', 'kakapo is insecure, mind our environment', true);
+
+        $CFG->wwwroot = 'http://example.com';
+        unset($CFG->kakapo);
+        $this->assert_check(status::FAILED, $check);
+        $this->assertStringContainsString('kakapo is not set', $check->get_report());
+        $CFG->kakapo = '';
+        $this->assert_check(status::FAILED, $check);
+        $this->assertStringContainsString('kakapo is not set', $check->get_report());
+
+        $CFG->wwwroot = 'https://example.com/totara/en-nz/'.str_repeat('toolong/', 252);
+        unset($CFG->kakapo);
+        $this->assert_check(status::FAILED, $check);
+        $this->assertStringContainsString('kakapo is not set', $check->get_report());
+        $CFG->kakapo = '';
+        $this->assert_check(status::FAILED, $check);
+        $this->assertStringContainsString('kakapo is not set', $check->get_report());
+
+        $CFG->wwwroot = 'https://example.com/totara/';
+        unset($CFG->kakapo);
+        $this->assert_check(status::SKIPPED, $check);
+        $this->assertStringContainsString('The site URL is used by default', $check->get_report());
+        $CFG->kakapo = '';
+        $this->assert_check(status::SKIPPED, $check);
+        $this->assertStringContainsString('The site URL is used by default', $check->get_report());
+        $CFG->kakapo = '0';
+        $this->assert_check(status::FAILED, $check);
+        $this->assertStringContainsString('kakapo is insecure', $check->get_report());
+
+        $CFG->wwwroot = 'http://example.com'; // wwwroot doesn't matter now.
+        $CFG->kakapo = 'http://example.com/kakapo/';
+        $this->assert_check(status::FAILED, $check);
+        $this->assertStringContainsString('kakapo is insecure', $check->get_report());
+        $CFG->kakapo = 'https://example.com/kakapo/en-nz/'.str_repeat('toolong/', 252);
+        $this->assert_check(status::FAILED, $check);
+        $this->assertStringContainsString('kakapo is too long, must be 2048 characters or less', $check->get_report());
+        $CFG->kakapo = 'https://example.com/kakapo/';
+        $this->assert_check(status::PASS, $check);
+    }
+
+    /**
+     * @covers totara_msteams\check\checks\sso_auth::check
+     */
     public function test_check_sso_auth() {
         $check = new sso_auth();
         $issuerid = self::add_microsoft_oauth2_issuer();
@@ -310,8 +538,12 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\sso_id::check
+     */
     public function test_check_sso_id() {
         $check = new sso_id();
+        $this->assert_check(status::SKIPPED, $check);
         self::enable_oauth2_plugin(true);
         $issuerid = self::add_microsoft_oauth2_issuer();
         self::add_microsoft_oauth2_endpoints($issuerid);
@@ -327,8 +559,12 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
     }
 
+    /**
+     * @covers totara_msteams\check\checks\sso_scope::check
+     */
     public function test_check_sso_scope() {
         $check = new sso_scope();
+        $this->assert_check(status::SKIPPED, $check);
         self::enable_oauth2_plugin(true);
         $issuerid = self::add_microsoft_oauth2_issuer();
         self::add_microsoft_oauth2_endpoints($issuerid);
@@ -343,23 +579,5 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::FAILED, $check);
         set_config('sso_scope', 'api://example.com/31415926-5358-9793-2384-626433832795', 'totara_msteams');
         $this->assert_check(status::PASS, $check);
-    }
-}
-
-final class testable_bot_common extends bot_common {
-    public function get_name(): string {
-        return '';
-    }
-
-    public function get_config_name(): ?string {
-        return null;
-    }
-
-    public function get_helplink(): ?moodle_url {
-        return null;
-    }
-
-    public function check(): int {
-        return $this->check_bot();
     }
 }

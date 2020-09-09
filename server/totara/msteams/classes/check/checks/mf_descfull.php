@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die;
 use moodle_url;
 use totara_msteams\check\checkable;
 use totara_msteams\check\status;
+use totara_msteams\manifest_helper;
 
 /**
  * Check manifest_app_fulldescription.
@@ -61,7 +62,7 @@ class mf_descfull implements checkable {
             $this->result = get_string('check:mf_descfull_notset', 'totara_msteams');
             return status::FAILED;
         }
-        if (strlen($fulldesc) > self::MAX_LENGTH) {
+        if (manifest_helper::utf16_strlen($fulldesc) > self::MAX_LENGTH) {
             $this->result = get_string('check:mf_descfull_toolong', 'totara_msteams', self::MAX_LENGTH);
             return status::FAILED;
         }

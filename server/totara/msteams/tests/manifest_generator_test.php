@@ -54,6 +54,7 @@ class manifest_generator_testcase extends advanced_testcase {
     private $output;
 
     public function setUp(): void {
+        global $CFG;
         $this->setAdminUser();
         $this->manifestid = generate_uuid();
         $this->ssoid = generate_uuid();
@@ -72,6 +73,8 @@ class manifest_generator_testcase extends advanced_testcase {
         set_config('sso_app_id', $this->ssoid, 'totara_msteams');
         set_config('sso_scope', 'api://example.com/'.$this->ssoid, 'totara_msteams');
         set_config('bot_app_id', $this->botid, 'totara_msteams');
+        $CFG->wwwroot = 'https://example.com/totara';
+        $CFG->publishername = 'Totara';
         $this->generator = new generator();
         $this->output = new memory_output();
     }
@@ -193,11 +196,16 @@ class manifest_generator_testcase extends advanced_testcase {
         $this->assertSame('Test short description', $json['description']['short']);
         $this->assertSame('Test long description', $json['description']['full']);
         $this->assertSame('#123456', $json['accentColor']);
-        $this->assertSame('www.example.com', $json['validDomains'][0]);
+        $this->assertSame('example.com', $json['validDomains'][0]);
+        $this->assertSame('Totara', $json['developer']['name']);
+        $this->assertSame('https://example.com/totara', $json['developer']['websiteUrl']);
+        $this->assertSame('https://example.com/totara', $json['developer']['privacyUrl']);
+        $this->assertSame('https://example.com/totara', $json['developer']['termsOfUseUrl']);
+        $this->assertArrayNotHasKey('mpnId', $json['developer']);
         // Configurable tabs are always provided.
         $this->assertCount(1, $json['configurableTabs']);
-        // FIXME: Need to add a test scenario to confirm the engage-only subscription.
-        // Find learning and Library are always provided.
+        // TODO: Need to add a test scenario to confirm the engage-only subscription i.e. flavour.
+        // Find learning and Library are always provided anyway.
         $this->assertGreaterThanOrEqual(2, $json['staticTabs']);
     }
 
@@ -283,6 +291,27 @@ class manifest_generator_testcase extends advanced_testcase {
         $this->assertCount(1, $json['composeExtensions'][0]['commands']);
         $this->assertSame(true, $json['composeExtensions'][0]['commands'][0]['initialRun']);
         $this->assertCount(1, $json['composeExtensions'][0]['commands'][0]['parameters']);
+    }
+
+    public function test_generate_developer_info() {
+        global $CFG;
+        $CFG->publishername = 'Totara Learning Solutions';
+        $CFG->publisherwebsite = 'https://totaralearning.com';
+        $CFG->privacypolicy = 'https://example.com/privacy-policy/';
+        $CFG->termsofuse = 'https://example.com/terms-of-use/';
+        set_config('publisher_mpnid', 'ToTaRa!!!!', 'totara_msteams');
+
+        $this->generator->generate_files($this->output);
+        $files = $this->output->get_files();
+        $this->assertCount(3, $files);
+        $this->assert_default_images($files);
+
+        $json = json_decode($files['manifest.json'], true);
+        $this->assertSame('Totara Learning Solutions', $json['developer']['name']);
+        $this->assertSame('https://totaralearning.com', $json['developer']['websiteUrl']);
+        $this->assertSame('https://example.com/privacy-policy/', $json['developer']['privacyUrl']);
+        $this->assertSame('https://example.com/terms-of-use/', $json['developer']['termsOfUseUrl']);
+        $this->assertSame('ToTaRa!!!!', $json['developer']['mpnId']);
     }
 
     public function data_custom_images(): array {

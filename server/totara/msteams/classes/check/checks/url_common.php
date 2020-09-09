@@ -28,16 +28,15 @@ defined('MOODLE_INTERNAL') || die;
 use moodle_url;
 use totara_msteams\check\checkable;
 use totara_msteams\check\status;
-use totara_msteams\manifest_helper;
 
 /**
- * Check manifest_app_description.
+ * Check https URL settings.
  */
-class mf_desc implements checkable {
+abstract class url_common implements checkable {
     /**
      * Maximum allowed length.
      */
-    const MAX_LENGTH = 80;
+    const MAX_LENGTH = 2048;
 
     /**
      * @var string
@@ -45,25 +44,40 @@ class mf_desc implements checkable {
     protected $result = '';
 
     public function get_name(): string {
-        return get_string('check:mf_desc', 'totara_msteams');
-    }
-
-    public function get_config_name(): ?string {
-        return 'manifest_app_description';
+        $fieldname = $this->get_config_name();
+        return get_string($fieldname, 'admin');
     }
 
     public function get_helplink(): ?moodle_url {
         return null;
     }
 
-    public function check(): int {
-        $desc = (string)get_config('totara_msteams', 'manifest_app_description');
-        if ($desc === '') {
-            $this->result = get_string('check:mf_desc_notset', 'totara_msteams');
+    /**
+     * Helper function to validate url.
+     *
+     * @param string $id_empty language string id when the url is empty
+     * @param string $id_toolong language string id when the url is too long
+     * @param string $id_insecure language string id when the url is not https
+     * @return integer PASS, SKIPPED or FAILED
+     */
+    protected function check_url(string $id_empty, string $id_toolong, string $id_insecure): int {
+        global $CFG;
+        $fieldname = $this->get_config_name();
+        if (!isset($CFG->{$fieldname}) || (string)$CFG->{$fieldname} === '') {
+            if (is_https() && strlen($CFG->wwwroot) <= static::MAX_LENGTH) {
+                $this->result = get_string('check:pub_url_empty', 'totara_msteams');
+                return status::SKIPPED;
+            } else {
+                $this->result = get_string($id_empty, 'totara_msteams');
+                return status::FAILED;
+            }
+        }
+        if (strpos($CFG->{$fieldname}, 'https://') !== 0) {
+            $this->result = get_string($id_insecure, 'totara_msteams', static::MAX_LENGTH);
             return status::FAILED;
         }
-        if (manifest_helper::utf16_strlen($desc) > self::MAX_LENGTH) {
-            $this->result = get_string('check:mf_desc_toolong', 'totara_msteams', self::MAX_LENGTH);
+        if (strlen($CFG->{$fieldname}) > static::MAX_LENGTH) {
+            $this->result = get_string($id_toolong, 'totara_msteams', static::MAX_LENGTH);
             return status::FAILED;
         }
         return status::PASS;

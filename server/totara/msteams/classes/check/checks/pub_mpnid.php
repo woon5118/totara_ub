@@ -28,16 +28,15 @@ defined('MOODLE_INTERNAL') || die;
 use moodle_url;
 use totara_msteams\check\checkable;
 use totara_msteams\check\status;
-use totara_msteams\manifest_helper;
 
 /**
- * Check manifest_app_fullname.
+ * Check publisher_mpnid.
  */
-class mf_namefull implements checkable {
+class pub_mpnid implements checkable {
     /**
      * Maximum allowed length.
      */
-    const MAX_LENGTH = 100;
+    const MAX_LENGTH = 10;
 
     /**
      * @var string
@@ -45,11 +44,11 @@ class mf_namefull implements checkable {
     protected $result = '';
 
     public function get_name(): string {
-        return get_string('check:mf_namefull', 'totara_msteams');
+        return get_string('settings:publisher_mpnid', 'totara_msteams');
     }
 
     public function get_config_name(): ?string {
-        return 'manifest_app_fullname';
+        return 'publisher_mpnid';
     }
 
     public function get_helplink(): ?moodle_url {
@@ -57,9 +56,9 @@ class mf_namefull implements checkable {
     }
 
     public function check(): int {
-        $name = (string)get_config('totara_msteams', 'manifest_app_fullname');
-        if (manifest_helper::utf16_strlen($name) > self::MAX_LENGTH) {
-            $this->result = get_string('check:mf_namefull_toolong', 'totara_msteams', self::MAX_LENGTH);
+        $name = (string)get_config('totara_msteams', 'publisher_mpnid');
+        if (strlen($name) > self::MAX_LENGTH) {
+            $this->result = get_string('check:pub_mpnid_toolong', 'totara_msteams', self::MAX_LENGTH);
             return status::FAILED;
         }
         return status::PASS;

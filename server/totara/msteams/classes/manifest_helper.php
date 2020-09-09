@@ -58,6 +58,22 @@ final class manifest_helper {
     }
 
     /**
+     * Return the length of the given string in UTF-16 characters.
+     * A surrogate pair is counted as two characters.
+     *
+     * @param mixed $string
+     * @return integer
+     */
+    public static function utf16_strlen($string): int {
+        $string = (string)$string;
+        if ($string === '') {
+            return 0;
+        }
+        $utf16string = iconv('utf-8', 'utf-16le', $string);
+        return strlen($utf16string) / 2;
+    }
+
+    /**
      * Download a manifest file.
      *
      * @throws moodle_exception

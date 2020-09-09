@@ -54,4 +54,26 @@ class totara_msteams_manifest_helper_testcase extends advanced_testcase {
             $this->assertEquals($expected, manifest_helper::is_valid_guid($input));
         }
     }
+
+    public function test_utf16_strlen() {
+        $cases = [
+            'null' => [ null, 0 ],
+            'false' => [ false, 0 ],
+            '(empty)' => [ '', 0 ],
+            // 0 is converted to '0', so 1 character.
+            '0' => [ 0, 1 ],
+            // "New Zealand" is 11 characters.
+            'NZL' => [ 'New Zealand', 11 ],
+            // "New Zealand" in Ukrainian is 13 characters, not 25 characters.
+            'UKR' => [ json_decode('"\u041D\u043E\u0432\u0430 \u0417\u0435\u043B\u0430\u043D\u0434\u0456\u044F"'), 13 ],
+            // "New Zealand" in Chinese simplified is 3 characters, not 9 characters.
+            'CHS' => [ json_decode('"\u65B0\u897F\u5170"'), 3 ],
+            // The New Zealand flag (U+1F1F3, U+1F1FF) is 4 characters, not 8 characters.
+            'Flag' => [ json_decode('"\uD83C\uDDF3\uD83C\uDDFF"'), 4 ],
+        ];
+
+        foreach ($cases as $case => [$input, $expected]) {
+            $this->assertEquals($expected, manifest_helper::utf16_strlen($input), $case);
+        }
+    }
 }

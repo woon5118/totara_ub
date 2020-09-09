@@ -123,6 +123,7 @@ final class generator {
         $this->add_static_tabs($manifest);
         $this->add_bot_feature($manifest);
         $this->add_messaging_extension_feature($manifest);
+        $this->add_developer_information($manifest);
         $this->add_languages($manifest, $output);
         $json = self::to_json($manifest);
         if (!$output->write(self::MANIFEST_JSON, $json)) {
@@ -148,10 +149,7 @@ final class generator {
             'id' => $manifestid,
             'packageName' => get_config('totara_msteams', 'manifest_app_package_name'),
             'developer' => [
-                'name' => 'Totara Learning',
-                'websiteUrl' => 'https://totaralearning.com',
-                'privacyUrl' => 'https://www.totaralearning.com/privacy-policy',
-                'termsOfUseUrl' => 'https://www.totaralearning.com/solutions/totara-cloud/terms-of-service',
+                // To be filled.
             ],
             'icons' => [
                 'color' => self::COLOR_PNG,
@@ -288,6 +286,28 @@ final class generator {
                     ]]
                 ]]
             ]];
+        }
+    }
+
+    /**
+     * Add developer's information.
+     *
+     * @param array $manifest
+     */
+    private function add_developer_information(array &$manifest): void {
+        global $CFG;
+        $url_or_default = function ($url) use ($CFG) {
+            return (string)$url !== '' ? (string)$url : $CFG->wwwroot;
+        };
+        $manifest['developer'] = [
+            'name' => $CFG->publishername,
+            'websiteUrl' => $url_or_default($CFG->publisherwebsite),
+            'privacyUrl' => $url_or_default($CFG->privacypolicy),
+            'termsOfUseUrl' => $url_or_default($CFG->termsofuse),
+        ];
+        $mpnid = (string)get_config('totara_msteams', 'publisher_mpnid');
+        if ($mpnid !== '') {
+            $manifest['developer']['mpnId'] = $mpnid;
         }
     }
 

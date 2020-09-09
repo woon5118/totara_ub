@@ -42,7 +42,6 @@ use core_plugin_manager;
 use lang_string;
 use moodle_url;
 use totara_core\advanced_feature;
-use totara_msteams\botfw\message;
 
 /**
  * Generate admin settings pages.
@@ -90,8 +89,6 @@ final class settings_helper {
      * @param admin_root $admin
      */
     public static function load_settings(admin_root $admin): void {
-        global $CFG;
-
         $hideteams = !self::get_enable_msteams();
 
         $admin->add('root', new admin_category(self::NS, new lang_string('pluginname', 'totara_msteams'), $hideteams));
@@ -263,6 +260,40 @@ final class settings_helper {
                 new lang_string('settings:manifest_accent_colour_default', 'totara_msteams'),
                 null,
                 false));
+
+            $page->add(new admin_setting_heading('totara_msteams/header_publisher',
+                new lang_string('settings:header_publisher', 'totara_msteams'),
+                new lang_string('settings:header_publisher_help', 'totara_msteams')));
+
+            $page->add(new admin_setting_configtext_with_maxlength('publishername',
+                new lang_string('publishername', 'admin'),
+                new lang_string('settings:publisher_name_help', 'totara_msteams'),
+                '',
+                PARAM_TEXT, null, 32));
+
+            $page->add(new admin_setting_configtext_with_maxlength('publisherwebsite',
+                new lang_string('publisherwebsite', 'admin'),
+                new lang_string('settings:publisher_website_help', 'totara_msteams'),
+                '',
+                PARAM_URL, null, 2048));
+
+            $page->add(new admin_setting_configtext_with_maxlength('privacypolicy',
+                new lang_string('privacypolicy', 'admin'),
+                new lang_string('settings:publisher_privacypolicy_help', 'totara_msteams'),
+                '',
+                PARAM_URL, null, 2048));
+
+            $page->add(new admin_setting_configtext_with_maxlength('termsofuse',
+                new lang_string('termsofuse', 'admin'),
+                new lang_string('settings:publisher_termsofuse_help', 'totara_msteams'),
+                '',
+                PARAM_URL, null, 2048));
+
+            $page->add(new admin_setting_configtext_with_maxlength('totara_msteams/publisher_mpnid',
+                new lang_string('settings:publisher_mpnid', 'totara_msteams'),
+                new lang_string('settings:publisher_mpnid_help', 'totara_msteams'),
+                '',
+                PARAM_TEXT, null, 10));
         }
 
         return $page;
