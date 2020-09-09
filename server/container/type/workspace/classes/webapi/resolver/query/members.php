@@ -35,6 +35,7 @@ use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
+use container_workspace\interactor\workspace\interactor as workspace_interactor;
 
 /**
  * Members query resolver
@@ -53,6 +54,11 @@ final class members implements query_resolver, has_middleware {
         $workspace = factory::from_id($workspace_id);
         if (!$workspace->is_typeof(workspace::get_type())) {
             throw new \coding_exception("Cannot find workspace from id '{$workspace_id}'");
+        }
+
+        $interactor = new workspace_interactor($workspace);
+        if (!$interactor->can_view_members()) {
+            throw new \coding_exception("Cannot get the list of members");
         }
 
         if (!$ec->has_relevant_context()) {

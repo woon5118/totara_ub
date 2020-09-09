@@ -453,6 +453,11 @@ final class interactor {
      * @return bool
      */
     public function can_view_members(): bool {
+        if (!$this->can_view_workspace()) {
+            // Safety checks for multi-tenancy.
+            return false;
+        }
+
         if ($this->can_manage()) {
             return true;
         }

@@ -33,6 +33,7 @@ class container_workspace_webapi_member_loader_testcase extends advanced_testcas
 
     /**
      * We will have to set the email for profile card in order to produce the issue.
+     * This test is to check whether the process is respect the email display setting or not.
      *
      * @return void
      */
@@ -101,5 +102,183 @@ class container_workspace_webapi_member_loader_testcase extends advanced_testcas
             $this->assertEquals($workspace_id, $single_member_result['workspace_id']);
             $this->assertTrue(in_array($single_member_result['id'], $member_ids));
         }
+    }
+
+    /**
+     * @return void
+     */
+    public function test_load_members_of_a_private_workspace_as_non_member(): void {
+        $generator = $this->getDataGenerator();
+        $this->setAdminUser();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_private_workspace();
+
+        // Add list of members to the workspaces.
+        for ($i = 0; $i < 5; $i++) {
+            $user = $generator->create_user();
+            member::added_to_workspace($workspace, $user->id, false);
+        }
+
+        // Log in as normal user and try to fetch the members of workspace.
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Cannot get the list of members");
+
+        $this->resolve_graphql_query(
+            'container_workspace_members',
+            [
+                'workspace_id' => $workspace->get_id(),
+                'sort' => member_sort::get_code(member_sort::RECENT_JOIN)
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_load_members_of_a_hidden_workspace_as_non_member(): void {
+        $generator = $this->getDataGenerator();
+        $this->setAdminUser();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_hidden_workspace();
+
+        // Add list of members to the workspaces.
+        for ($i = 0; $i < 5; $i++) {
+            $user = $generator->create_user();
+            member::added_to_workspace($workspace, $user->id, false);
+        }
+
+        // Log in as normal user and try to fetch the members of workspace.
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Cannot get the list of members");
+
+        $this->resolve_graphql_query(
+            'container_workspace_members',
+            [
+                'workspace_id' => $workspace->get_id(),
+                'sort' => member_sort::get_code(member_sort::RECENT_JOIN)
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_load_members_of_a_public_workspace_as_non_member(): void {
+        $generator = $this->getDataGenerator();
+        $this->setAdminUser();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Add list of members to the workspaces.
+        for ($i = 0; $i < 5; $i++) {
+            $user = $generator->create_user();
+            member::added_to_workspace($workspace, $user->id, false);
+        }
+
+        // Log in as normal user and try to fetch the members of workspace.
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+
+        $result = $this->resolve_graphql_query(
+            'container_workspace_members',
+            [
+                'workspace_id' => $workspace->get_id(),
+                'sort' => member_sort::get_code(member_sort::RECENT_JOIN)
+            ]
+        );
+
+        self::assertIsArray($result);
+
+        // 6 because we are including the user admin as well as 5 other members.
+        self::assertCount(6, $result);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_load_members_of_a_private_workspace_as_a_member(): void {
+        $generator = $this->getDataGenerator();
+        $this->setAdminUser();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_private_workspace();
+
+        // Add list of members to the workspaces.
+        for ($i = 0; $i < 3; $i++) {
+            $user = $generator->create_user();
+            member::added_to_workspace($workspace, $user->id, false);
+        }
+
+        // Log in as normal user and try to fetch the members of workspace.
+        $user_one = $generator->create_user();
+
+        // Added to the workspace by admin.
+        member::added_to_workspace($workspace, $user_one->id, false);
+
+        $this->setUser($user_one);
+        $result = $this->resolve_graphql_query(
+            'container_workspace_members',
+            [
+                'workspace_id' => $workspace->get_id(),
+                'sort' => member_sort::get_code(member_sort::RECENT_JOIN)
+            ]
+        );
+
+        self::assertIsArray($result);
+
+        // 3 members + user admin and user one.
+        self::assertCount(5, $result);
+    }
+
+
+    /**
+     * @return void
+     */
+    public function test_load_members_of_a_hidden_workspace_as_a_member(): void {
+        $generator = $this->getDataGenerator();
+        $this->setAdminUser();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_hidden_workspace();
+
+        // Add list of members to the workspaces.
+        for ($i = 0; $i < 3; $i++) {
+            $user = $generator->create_user();
+            member::added_to_workspace($workspace, $user->id, false);
+        }
+
+        // Log in as normal user and try to fetch the members of workspace.
+        $user_one = $generator->create_user();
+
+        // Added to the workspace by admin.
+        member::added_to_workspace($workspace, $user_one->id, false);
+
+        $this->setUser($user_one);
+        $result = $this->resolve_graphql_query(
+            'container_workspace_members',
+            [
+                'workspace_id' => $workspace->get_id(),
+                'sort' => member_sort::get_code(member_sort::RECENT_JOIN)
+            ]
+        );
+
+        self::assertIsArray($result);
+
+        // 3 members + user admin and user one.
+        self::assertCount(5, $result);
     }
 }
