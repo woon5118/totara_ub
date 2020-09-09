@@ -1,9 +1,17 @@
+"""
+A criteria group pathway
+"""
 type pathway_criteria_group_achievement {
-  instance_id: Int! # instance of single criteria
-  type: String! # linkedcourses, childcompetency, etc.
+  """ Instance of a single criteria """
+  instance_id: Int!
+  """ Type of criteria, e.g. linkedcourses, childcompetency, etc. """
+  type: String!
 }
 
 extend type Query {
+  """
+  Fetch a list of criteria groups by instance ID
+  """
   pathway_criteria_group_achievements(
     instance_id: core_id!
   ): [pathway_criteria_group_achievement]!
