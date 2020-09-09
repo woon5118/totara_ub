@@ -67,6 +67,7 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     And I should see "Not available" under "Progress" on row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
     And I should see "Not complete" under "Completion" on row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
     When I toggle expanding row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I wait for pending js
     Then I should see "Course 2 Description" under the expanded row of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
 
     # View Course 2

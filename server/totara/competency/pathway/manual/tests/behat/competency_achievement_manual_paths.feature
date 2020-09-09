@@ -20,6 +20,7 @@ Feature: Manage Manual rating achievement paths
     And the "Apply changes" "button" should be disabled
 
     When I add a "manual" pathway
+    And I wait for pending js
     Then I should not see "No achievement paths added"
     And I should see "manual" pathway
     And I should see "No raters added" in "manual" pathway
@@ -27,6 +28,7 @@ Feature: Manage Manual rating achievement paths
     And I wait for pending js
 
     When I click on "Add raters" "button" in "manual" pathway
+    And I wait for pending js
     And I toggle the legacy adder list entry "Manager" in "Select raters"
     And I save my legacy selections and close the "Select raters" adder
     And I should not see "No raters added" in "manual" pathway
@@ -42,10 +44,12 @@ Feature: Manage Manual rating achievement paths
     And I should see "Manager" in "manual" pathway
 
     When I click on "Add raters" "button"
+    And I wait for pending js
     Then the legacy adder list entry "Manager" in "Select raters" should not be enabled
     When I toggle the legacy adder list entry "Self" in "Select raters"
     When I toggle the legacy adder list entry "Appraiser" in "Select raters"
     And I save my legacy selections and close the "Select raters" adder
+    And I wait for pending js
     Then I should see "Manager" in "manual" pathway
     Then I should see "Self" in "manual" pathway
     Then I should see "Appraiser" in "manual" pathway
@@ -54,6 +58,7 @@ Feature: Manage Manual rating achievement paths
     And I wait for pending js
     Then I should see "Changes applied successfully"
     When I follow "Back to Competency page"
+    And I wait for pending js
     Then I should see "Any scale value" in the ".tui-competencySummaryAchievementConfiguration__scaleValue-header" "css_element"
     And I should see "Manual rating" in the ".tui-competencySummaryAchievementCriteria__criterion-header" "css_element"
     And I should see "Manager" in the ".tui-competencySummaryAchievementCriteria__criterion-items" "css_element"
@@ -64,12 +69,14 @@ Feature: Manage Manual rating achievement paths
     Given I log in as "admin"
     When I navigate to the competency achievement paths page for the "Comp1" competency
     And I add a "manual" pathway
+    And I wait for pending js
     Then I should see "manual" pathway
     And "Remove pathway" "button" should be visible in "manual" pathway
     And "Undo remove pathway" "button" should not be visible in "manual" pathway
     And I wait for pending js
 
     When I click on "Remove pathway" "button" in "manual" pathway
+    And I wait for pending js
     Then I should see "No achievement paths added"
 
     When I add a "manual" pathway

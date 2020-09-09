@@ -174,7 +174,7 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
 
         $events = $sink->get_events();
         $this->assertCount(2, $events);
-        foreach($events as $idx => $event) {
+        foreach ($events as $idx => $event) {
             if ($event instanceof linked_courses_updated) {
                 $this->assertEquals($comp1->id, $event->objectid);
                 unset($events[$idx]);

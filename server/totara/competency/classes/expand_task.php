@@ -183,7 +183,6 @@ class expand_task {
                 if (!empty($to_create)) {
                     $this->assign_bulk($assignment, $to_create);
                 }
-
             });
         }
 

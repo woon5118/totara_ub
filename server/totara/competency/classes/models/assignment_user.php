@@ -79,7 +79,7 @@ class assignment_user {
     public function delete_related_data() {
         $this->must_have_assignment();
 
-        builder::get_db()->transaction(function() {
+        builder::get_db()->transaction(function () {
             $this->delete_achievements()
                 ->delete_log();
         });

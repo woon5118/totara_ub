@@ -475,7 +475,7 @@ class behat_totara_tui extends behat_base {
      * @param string|null $collapsible_label_text
      * @throws ExpectationException
      */
-    public function i_should_see_under_the_expanded_row_of_datatable (
+    public function i_should_see_under_the_expanded_row_of_datatable(
         string $not,
         string $expected_text,
         string $table_locator = self::DATA_TABLE_DEFAULT_LOCATOR,
@@ -1692,7 +1692,7 @@ class behat_totara_tui extends behat_base {
         // We also check the element visibility when running JS tests. Using microsleep as this
         // is a repeated step and global performance is important.
         $this->spin(
-            function($context, $args) {
+            function ($context, $args) {
 
                 foreach ($args['nodes'] as $node) {
                     if ($node->isVisible()) {
@@ -1747,7 +1747,7 @@ class behat_totara_tui extends behat_base {
 
         // We need to ensure all the found nodes are hidden.
         $this->spin(
-            function($context, $args) {
+            function ($context, $args) {
 
                 foreach ($args['nodes'] as $node) {
                     if ($node->isVisible()) {

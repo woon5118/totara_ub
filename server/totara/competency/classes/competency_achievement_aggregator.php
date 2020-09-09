@@ -214,10 +214,10 @@ final class competency_achievement_aggregator {
         $new_comp_achievement->proficient = $data['is_proficient'];
         $new_comp_achievement->status = competency_achievement::ACTIVE_ASSIGNMENT;
         $new_comp_achievement->time_created = $data['aggregation_time'];
-        $new_comp_achievement->time_status = $data['aggregation_time'];;
-        $new_comp_achievement->time_proficient = $data['aggregation_time'];;
-        $new_comp_achievement->time_scale_value = $data['aggregation_time'];;
-        $new_comp_achievement->last_aggregated = $data['aggregation_time'];;
+        $new_comp_achievement->time_status = $data['aggregation_time'];
+        $new_comp_achievement->time_proficient = $data['aggregation_time'];
+        $new_comp_achievement->time_scale_value = $data['aggregation_time'];
+        $new_comp_achievement->last_aggregated = $data['aggregation_time'];
         $new_comp_achievement->save();
 
         return $new_comp_achievement;

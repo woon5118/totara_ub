@@ -212,7 +212,8 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
         $this->assertGreaterThan(0, competency_assignment_user_log::repository()
             ->where('assignment_id', $ass->id)
             ->where('user_id', $user->id)
-            ->count());
+            ->count()
+        );
 
         // We need to remove user from a position and check that the event has been fired
         // To remove user from a position we need to remove the related job assignment record.
@@ -441,7 +442,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
         // We need to get some of the data we're manipulating
         $achievements = competency_achievement::repository()
             ->where('assignment_id', '!=', $assignment->id)
-            ->or_where(function(builder $builder) use ($assignment, $user) {
+            ->or_where(function (builder $builder) use ($assignment, $user) {
                 $builder->where('assignment_id', $assignment->id)
                     ->where('user_id', '!=', $user->id);
             })
@@ -449,7 +450,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
         $assignment_user_log_entries = competency_assignment_user_log::repository()
             ->where('assignment_id', '!=', $assignment->id)
-            ->or_where(function(builder $repository) use ($assignment, $user) {
+            ->or_where(function (builder $repository) use ($assignment, $user) {
                 $repository->where('assignment_id', $assignment->id)
                     ->where('user_id', '!=', $user->id);
             })
@@ -470,7 +471,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
             $data['achievements'],
             competency_achievement::repository()
                 ->where('assignment_id', '!=', $assignment->id)
-                ->or_where(function(builder $repository) use ($assignment, $user) {
+                ->or_where(function (builder $repository) use ($assignment, $user) {
                     $repository->where('assignment_id', $assignment->id)
                         ->where('user_id', '!=', $user->id);
                 })
@@ -482,7 +483,7 @@ class totara_competency_user_unassigned_testcase extends advanced_testcase {
             $data['assignment_user_log_entries'],
             competency_assignment_user_log::repository()
                 ->where('assignment_id', '!=', $assignment->id)
-                ->or_where(function(builder $repository) use ($assignment, $user) {
+                ->or_where(function (builder $repository) use ($assignment, $user) {
                     $repository->where('assignment_id', $assignment->id)
                         ->where('user_id', '!=', $user->id);
                 })

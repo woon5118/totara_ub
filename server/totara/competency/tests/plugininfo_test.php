@@ -144,6 +144,5 @@ class totara_competency_plugininfo_testcase extends advanced_testcase {
 
         // Execute aggregation to create achievements.
         (new competency_aggregation_all())->execute();
-
     }
 }

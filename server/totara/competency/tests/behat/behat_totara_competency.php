@@ -1519,7 +1519,7 @@ class behat_totara_competency extends behat_base {
             $actual[] = $element;
         }
 
-        $diff = array_udiff_assoc($expected, $actual, function($a, $b): int {
+        $diff = array_udiff_assoc($expected, $actual, function ($a, $b): int {
             return (int)!empty(array_diff_assoc($a, $b));
         });
 
@@ -1570,7 +1570,6 @@ class behat_totara_competency extends behat_base {
                 ($rater !== null ? "\"{$rater}\"" : '') . ' is not clickable';
             throw new ExpectationException($msg, $this->getSession());
         }
-
     }
 
 }
