@@ -160,10 +160,15 @@ class auth_plugin_manual extends auth_plugin_base {
      * If user password does not expire, it should return 0 or a positive value.
      * If user password is already expired, it should return negative value.
      *
-     * @param mixed $username username (with system magic quotes)
+     * @param mixed $username username
      * @return integer
      */
     public function password_expire($username) {
+        if (empty($this->config->expiration)) {
+            // Make this work properly outside of login page too.
+            return 0;
+        }
+
         $result = 0;
 
         if (!empty($this->config->expirationtime)) {

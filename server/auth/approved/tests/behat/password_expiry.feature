@@ -1,7 +1,7 @@
 @totara @auth @auth_approved @javascript
 Feature: Password expiration of approved user accounts
 
-  Scenario: Expire password after thirty days without warning
+  Scenario: Do not expire approved account password if expiration disabled
     Given I am on a totara site
     And the following "users" exist:
       | username  | firstname | lastname  | email                 | auth     |
@@ -11,9 +11,33 @@ Feature: Password expiration of approved user accounts
     And I click on "Enable" "link" in the "Self-registration with approval" "table_row"
     And I navigate to "Settings" node in "Site administration > Plugins > Authentication > Self-registration with approval"
     And I set the following fields to these values:
-    | Enable password expiry | 1       |
+    | Enable password expiry | 0       |
     | Password duration      | 30 days |
     | Notification threshold | Never   |
+    And I press "Save changes"
+    And I log out
+
+    When I use magic for auth approved to set last password change to "P31D" for user "user1"
+    And I use magic for persistent login to open the login page
+    And I set the field "Username" to "user1"
+    And I set the field "Password" to "user1"
+    And I press "Log in"
+    Then I should see "You do not have any current learning."
+    And I log out
+
+  Scenario: Expire approved account password after thirty days without warning
+    Given I am on a totara site
+    And the following "users" exist:
+      | username  | firstname | lastname  | email                 | auth     |
+      | user1     | First     | User      | user1@example.com     | approved |
+    And I log in as "admin"
+    And I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
+    And I click on "Enable" "link" in the "Self-registration with approval" "table_row"
+    And I navigate to "Settings" node in "Site administration > Plugins > Authentication > Self-registration with approval"
+    And I set the following fields to these values:
+      | Enable password expiry | 1       |
+      | Password duration      | 30 days |
+      | Notification threshold | Never   |
     And I press "Save changes"
     And I log out
 
@@ -49,7 +73,7 @@ Feature: Password expiration of approved user accounts
     And I should see "You do not have any current learning."
     And I log out
 
-  Scenario: Expire password after thirty days with warning
+  Scenario: Expire approved account password after thirty days with warning
     Given I am on a totara site
     And the following "users" exist:
       | username  | firstname | lastname  | email                 | auth     |

@@ -46,5 +46,15 @@ function xmldb_auth_approved_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019060400, 'auth', 'approved');
     }
 
+    if ($oldversion < 2020090102) {
+        // Replace unlimited passwords with disabled expiry.
+        $expirytime = get_config('auth_approved', 'expirationtime');
+        if ($expirytime !== false && $expirytime <= 0) {
+            set_config('expiration', 0, 'auth_approved');
+            set_config('expirationtime', 30, 'auth_approved');
+        }
+        upgrade_plugin_savepoint(true, 2020090102, 'auth', 'approved');
+    }
+
     return true;
 }

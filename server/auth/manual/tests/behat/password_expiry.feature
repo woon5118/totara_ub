@@ -1,7 +1,30 @@
 @totara @auth @auth_manual @javascript
 Feature: Password expiration of manual user accounts
 
-  Scenario: Expire password after thirty days without warning
+  Scenario: Do not expire manual account password if expiration disabled
+    Given I am on a totara site
+    And the following "users" exist:
+      | username  | firstname | lastname  | email                 | auth   |
+      | user1     | First     | User      | user1@example.com     | manual |
+    And I log in as "admin"
+    And I navigate to "Manage authentication" node in "Site administration > Plugins > Authentication"
+    And I click on "Settings" "link" in the "Manual accounts" "table_row"
+    And I set the following fields to these values:
+      | Enable password expiry | No      |
+      | Password duration      | 30 days |
+      | Notification threshold | Never   |
+    And I press "Save changes"
+    And I log out
+
+    When I use magic for auth manual to set last password change to "P31D" for user "user1"
+    And I use magic for persistent login to open the login page
+    And I set the field "Username" to "user1"
+    And I set the field "Password" to "user1"
+    And I press "Log in"
+    Then I should see "You do not have any current learning."
+    And I log out
+
+  Scenario: Expire manual account password after thirty days without warning
     Given I am on a totara site
     And the following "users" exist:
       | username  | firstname | lastname  | email                 | auth   |
@@ -48,7 +71,7 @@ Feature: Password expiration of manual user accounts
     And I should see "You do not have any current learning."
     And I log out
 
-  Scenario: Expire password after thirty days with warning
+  Scenario: Expire manual account password after thirty days with warning
     Given I am on a totara site
     And the following "users" exist:
       | username  | firstname | lastname  | email                 | auth     |

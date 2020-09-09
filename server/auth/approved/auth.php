@@ -66,6 +66,11 @@ final class auth_plugin_approved extends auth_plugin_base {
      * @return integer number of days
      */
     public function password_expire($username) {
+        if (!get_config('auth_approved', 'expiration')) {
+            // Make this work properly outside of login page too.
+            return 0;
+        }
+
         $expirationtime = get_config('auth_approved', 'expirationtime');
         if (!$expirationtime) {
             return 0;

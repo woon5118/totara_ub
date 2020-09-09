@@ -52,5 +52,15 @@ function xmldb_auth_manual_upgrade($oldversion) {
     // Automatically generated Moodle v3.4.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2017111300.02) {
+        // Replace unlimited passwords with disabled expiry.
+        $expirytime = get_config('auth_manual', 'expirationtime');
+        if ($expirytime !== false && $expirytime <= 0) {
+            set_config('expiration', 0, 'auth_manual');
+            set_config('expirationtime', 30, 'auth_manual');
+        }
+        upgrade_plugin_savepoint(true, 2017111300.02, 'auth', 'manual');
+    }
+
     return true;
 }
