@@ -35,8 +35,10 @@ $PAGE->set_url('/grade/edit/letter/index.php', array('id' => $contextid));
 list($context, $course, $cm) = get_context_info_array($contextid);
 
 // Totara: Added a hook to prevent a letter view for certain containers.
-$hook = new \core_grades\hook\letter_view($course);
-$hook->execute();
+if ($course) {
+    $hook = new \core_grades\hook\letter_view($course);
+    $hook->execute();
+}
 $contextid = null;//now we have a context object throw away the $contextid from the params
 
 //if viewing
