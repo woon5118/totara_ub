@@ -117,7 +117,11 @@ class job_assignments_creator {
                 return $original[$key];
             };
 
+            echo "Creating manager job assignments for users..." . PHP_EOL;
+
             $buffer = [];
+            $total = count($this->users) / BATCH_INSERT_MAX_ROW_COUNT;
+            $done = 0;
             foreach ($this->users as $current_user_key => $user) {
                 $buffer[] = job_assignment::for_user($user)
                     ->set_sort_order(1)
@@ -127,11 +131,14 @@ class job_assignments_creator {
 
                 if (count($buffer) >= BATCH_INSERT_MAX_ROW_COUNT) {
                     $this->process_bulk($buffer);
+                    performance_testing::show_progress($done, $total);
                 }
             }
 
             // Make sure all is saved
             $this->process_bulk($buffer);
+
+            echo "Creating actual job assignments for users..." . PHP_EOL;
 
             $manager_job_assignments = builder::table(job_assignment_entity::TABLE)
                 ->results_as_arrays()
@@ -139,7 +146,8 @@ class job_assignments_creator {
                 ->key_by('userid')
                 ->all(true);
 
-            $count = 0;
+            $total = (count($this->users) * $job_assignments_for_user) / BATCH_INSERT_MAX_ROW_COUNT;
+            $done = 0;
             foreach ($this->users as $current_user_key => $user) {
                 for ($i = 1; $i <= $job_assignments_for_user; $i++) {
                     // Now get three different random users
@@ -179,17 +187,12 @@ class job_assignments_creator {
 
                     if (count($buffer) >= BATCH_INSERT_MAX_ROW_COUNT) {
                         $this->process_bulk($buffer);
+                        performance_testing::show_progress($done, $total);
                     }
 
                     unset($manager_job_assignment);
                     unset($temp_manager_job_assignment);
                     unset($appraiser);
-                }
-
-                $count++;
-
-                if ($count % 300 == 0) {
-                    echo "{$count} users' job assignments created.\n";
                 }
             }
 

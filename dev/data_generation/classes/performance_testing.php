@@ -131,8 +131,8 @@ class performance_testing extends App {
             ->add_audience_members()
             ->create_job_assignments_for_user()
             ->create_activities()
-            ->expand_track_user_assignments()
-            ->generate_instances()
+            // ->expand_track_user_assignments()
+            // ->generate_instances()
             // ->create_scales()
             // ->create_competencies()
             //->create_organisation_assignments()
@@ -161,11 +161,15 @@ class performance_testing extends App {
 
         builder::get_db()->transaction(function () use ($size) {
             $users = [];
+            $total = $size / BATCH_INSERT_MAX_ROW_COUNT;
+            $done = 0;
             for ($c = 1; $c <= $size; $c++) {
                 $users[] = (object)user::new()->create_for_bulk();
                 if (count($users) >= BATCH_INSERT_MAX_ROW_COUNT) {
                     builder::get_db()->insert_records('user', $users);
                     $users = [];
+
+                    self::show_progress($done, $total);
                 }
             }
 
@@ -256,8 +260,11 @@ class performance_testing extends App {
         builder::get_db()->transaction(function () {
             $size = $this->get_item_size('audiences');
 
+            $done = 0;
             for ($c = 1; $c <= $size; $c++) {
                 $this->audiences[] = audience::new()->save_and_return();
+
+                self::show_progress($done, $size);
             }
         });
 
@@ -283,6 +290,8 @@ class performance_testing extends App {
             $audiences = $this->audiences;
 
             $members = [];
+            $total = (count($audiences) * $user_per_audience) / BATCH_INSERT_MAX_ROW_COUNT;
+            $done = 0;
             foreach ($audiences as $audience) {
                 shuffle($users);
 
@@ -292,6 +301,8 @@ class performance_testing extends App {
                     if (count($members) >= BATCH_INSERT_MAX_ROW_COUNT) {
                         builder::get_db()->insert_records('cohort_members', $members);
                         $members = [];
+
+                        self::show_progress($done, $total);
                     }
                 }
             }
@@ -711,13 +722,8 @@ class performance_testing extends App {
                     $config = $configuration_manager->get_a_configuration();
                     $config['track']['audiences'] = $this->get_random_audiences($activity_size['audiences_per_activity']);
                     (activity_item::new())->create_activity($config);
-                    $done++;
-                    echo '.';
 
-                    if ($done%50 === 0) {
-                        $percentage_done = $done*100/$activity_size['count'];
-                        echo "$percentage_done%" . PHP_EOL;
-                    }
+                    self::show_progress($done, $activity_size['count']);
                 }
             }
         );
@@ -959,6 +965,22 @@ class performance_testing extends App {
         );
 
         return $this;
+    }
+
+    /**
+     * Show dot and overall progress
+     *
+     * @param int $done
+     * @param int $total
+     */
+    public static function show_progress(int &$done, int $total) {
+        $done++;
+        echo '.';
+
+        if ($done % 50 === 0) {
+            $percentage_done = round($done * 100 / $total, 0);
+            echo "$percentage_done%" . PHP_EOL;
+        }
     }
 
     //['xs', 's', 'm', 'l', 'xl', 'xxl', 'goliath'
