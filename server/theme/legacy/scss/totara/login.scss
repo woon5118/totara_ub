@@ -91,20 +91,20 @@
   }
 
   #notice {
-    @include make-sm-column(6);
-    @include make-sm-column-push(3);
-    @include make-md-column(4);
-    @include make-md-column-push(4);
+    width: 40%;
+    margin: 64px auto var(--gap-10);
   }
 
   .continuebutton {
-    @include make-sm-column(6);
-    @include make-sm-column-push(3);
-    @include make-md-column(4);
-    @include make-md-column-push(4);
-
+    flex-grow: 1;
     text-align: left;
     clear: both;
+    width: 100%;
+
+    @media (min-width: $tui-screen-md) {
+      width: 40%;
+      margin: 0 auto;
+    }
 
     .form-submit {
       margin-left: 0;
