@@ -95,7 +95,7 @@ class container_workspace_non_member_loader_testcase extends advanced_testcase {
             $generator->create_user([
                 'firstname' => uniqid(),
                 'lastname' => uniqid(),
-                'email' => uniqid() . '@gmail.com'
+                'email' => uniqid() . '@example.com'
             ]);
         }
 

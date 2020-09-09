@@ -222,7 +222,7 @@ final class container_workspace_generator extends component_generator_base {
     public function create_workspace_from_params(array $parameters): workspace {
         if (!isset($parameters['name']) || empty($parameters['owner'])) {
             throw new \coding_exception(
-                "Workspace name, topics and owner are required"
+                "Workspace name and owner are required"
             );
         }
 

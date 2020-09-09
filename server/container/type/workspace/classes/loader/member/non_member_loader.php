@@ -62,18 +62,16 @@ final class non_member_loader {
 
         $search_term = $query->get_search_term();
         if (null !== $search_term) {
-            $first_name_like = $DB->sql_like('u.firstname', ':first_name');
-            $last_name_like = $DB->sql_like('u.lastname', ':last_name');
-            $email_like = $DB->sql_like('u.email', ':email');
-
-            $builder->where_raw(
-                "({$first_name_like} OR {$last_name_like} OR {$email_like})",
-                [
-                    'first_name' => "%{$DB->sql_like_escape($search_term)}%",
-                    'last_name' => "%{$DB->sql_like_escape($search_term)}%",
-                    'email' => "%{$DB->sql_like_escape($search_term)}%"
-                ]
+            require_once("{$CFG->dirroot}/totara/core/searchlib.php");
+            $keywords = totara_search_parse_keywords($search_term);
+            [$sql_search, $parameters] = totara_search_get_keyword_where_clause(
+                $keywords,
+                ['u.firstname', 'u.lastname', 'u.email'],
+                SQL_PARAMS_NAMED,
+                "prefix_workspace"
             );
+
+            $builder->where_raw($sql_search, $parameters);
         }
 
         $guest_id = guest_user()->id;

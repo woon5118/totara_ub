@@ -42,10 +42,11 @@
         <SearchBox
           :value="searchTerm"
           name="user-search-input"
-          :label="$str('filter_users', 'container_workspace')"
-          :show-label="false"
+          :label-visible="false"
           :placeholder="$str('search', 'totara_core')"
-          @submit="searchTerm = $event"
+          :aria-label="$str('filter_users', 'container_workspace')"
+          @input="searchTerm = $event"
+          @submit="triggerSearch = true"
         />
       </template>
     </FilterBar>
@@ -209,17 +210,28 @@ export default {
         };
       },
 
+      skip() {
+        return !this.triggerSearch;
+      },
+
       update({ cursor, users }) {
         return {
           cursor,
           items: users,
         };
       },
+
+      result() {
+        // Set it to false so that we don't trigger search when the search
+        // term is changed.
+        this.triggerSearch = false;
+      },
     },
   },
 
   data() {
     return {
+      triggerSearch: true,
       fields: [],
       users: {
         items: [],
