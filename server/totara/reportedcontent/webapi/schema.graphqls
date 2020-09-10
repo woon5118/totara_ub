@@ -22,23 +22,6 @@ type totara_reportedcontent_review_create_status {
   id: core_id
 }
 
-extend type Query {
-  totara_reportedcontent_reviews(
-    component: param_component!
-    area: param_area!
-    context_id: param_integer!
-    item_id: param_integer!
-    page: param_integer
-  ): [totara_reportedcontent_review!]!
-
-  totara_reportedcontent_total_reviews(
-    component: param_component!
-    area: param_area!
-    context_id: param_integer!
-    item_id: param_integer!
-  ): Int!
-}
-
 extend type Mutation {
   totara_reportedcontent_create_review(
     component: param_component!
