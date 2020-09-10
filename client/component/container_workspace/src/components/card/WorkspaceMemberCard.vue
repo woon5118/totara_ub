@@ -16,18 +16,23 @@
   @module container_workspace
 -->
 <template>
-  <article class="tui-workspaceMemberCard">
+  <article
+    class="tui-workspaceMemberCard"
+    :aria-describedby="owner ? $id('lozenge') : false"
+  >
     <MiniProfileCard
       :display="userCardDisplay"
       :label-id="labelId"
       :drop-down-button-aria-label="
         $str('more_action_for_member', 'container_workspace', userFullName)
       "
+      :aria-describedby="owner ? $id('lozenge') : false"
       class="tui-workspaceMemberCard__profileCard"
     >
       <template v-slot:tag>
         <Lozenge
           v-if="owner"
+          :id="$id('lozenge')"
           :text="$str('admin', 'moodle')"
           type="neutral"
           class="tui-workspaceMemberCard__profileCard__tag"
