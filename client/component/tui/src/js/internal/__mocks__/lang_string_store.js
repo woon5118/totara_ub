@@ -21,6 +21,7 @@ const strings = {
   'foo/baz': 'qux',
   'foo/replace': 'hello {$a}',
   'foo/replace_complex': 'hello {$a->name}, today is {$a->weather}',
+  'core/save': 'Save',
   'moodle/save': 'Save',
 };
 

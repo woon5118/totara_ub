@@ -36,7 +36,7 @@ export const v = {
   required: () => ({
     allowEmpty: false,
     validate: val => !isEmpty(val),
-    message: () => langString('required', 'moodle'),
+    message: () => langString('required', 'core'),
   }),
 
   date: () => ({

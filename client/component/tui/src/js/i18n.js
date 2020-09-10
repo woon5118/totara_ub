@@ -29,8 +29,8 @@ import {
  * @returns {string}
  */
 const normalizeComponent = component => {
-  if (!component || component == 'core') {
-    return 'moodle';
+  if (!component || component === 'moodle') {
+    return 'core';
   } else if (component.startsWith('core_')) {
     return component.slice(5);
   } else if (component.startsWith('mod_')) {

@@ -70,10 +70,12 @@ describe('getString', () => {
   });
 
   it('normalizes component', () => {
+    expect(getString('save', 'moodle')).toBe('Save');
+    expect(rawGetString).toHaveBeenCalledWith('save', 'core');
     expect(getString('save', 'core')).toBe('Save');
-    expect(rawGetString).toHaveBeenCalledWith('save', 'moodle');
+    expect(rawGetString).toHaveBeenCalledWith('save', 'core');
     expect(getString('save')).toBe('Save');
-    expect(rawGetString).toHaveBeenCalledWith('save', 'moodle');
+    expect(rawGetString).toHaveBeenCalledWith('save', 'core');
   });
 });
 
@@ -88,12 +90,12 @@ describe('hasString', () => {
   });
 
   it('normalizes component', () => {
-    expect(hasString('f', 'core')).toBe(false);
-    expect(rawHasString).toHaveBeenCalledWith('f', 'moodle');
-    expect(hasString('save', 'core')).toBe(true);
-    expect(rawHasString).toHaveBeenCalledWith('save', 'moodle');
+    expect(hasString('f', 'moodle')).toBe(false);
+    expect(rawHasString).toHaveBeenCalledWith('f', 'core');
+    expect(hasString('save', 'moodle')).toBe(true);
+    expect(rawHasString).toHaveBeenCalledWith('save', 'core');
     expect(hasString('f')).toBe(false);
-    expect(rawHasString).toHaveBeenCalledWith('f', 'moodle');
+    expect(rawHasString).toHaveBeenCalledWith('f', 'core');
   });
 });
 
@@ -141,7 +143,7 @@ describe('loadStrings', () => {
     const requests = [{ component: 'core', key: 'save' }];
     expect(await loadStrings(requests)).toBe(undefined);
     expect(rawLoadStrings).toHaveBeenCalledWith([
-      { component: 'moodle', key: 'save' },
+      { component: 'core', key: 'save' },
     ]);
   });
 });

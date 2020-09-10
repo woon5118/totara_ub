@@ -38,15 +38,15 @@ describe('Vue#str()', () => {
     vm.$options.langStrings = {
       b: ['a'],
       d: ['c'],
-      moodle: ['e'],
+      core: ['e'],
     };
 
     expect(vm.$str('a', 'b', 'c')).toEqual('a,b,c');
     expect(getString).toHaveBeenCalledWith('a', 'b', 'c');
     expect(vm.$str('c', 'd')).toEqual('c,d,');
     expect(getString).toHaveBeenCalledWith('c', 'd', undefined);
-    expect(vm.$str('e')).toEqual('e,moodle,');
-    expect(getString).toHaveBeenCalledWith('e', 'moodle', undefined);
+    expect(vm.$str('e')).toEqual('e,core,');
+    expect(getString).toHaveBeenCalledWith('e', 'core', undefined);
   });
 
   it('warns for undeclared strings in non-production mode', () => {
@@ -104,7 +104,7 @@ describe('Vue#hasStr()', () => {
     expect(vm.$hasStr('c', 'd')).toEqual(false);
     expect(hasString).toHaveBeenCalledWith('c', 'd');
     expect(vm.$hasStr('e')).toEqual(false);
-    expect(hasString).toHaveBeenCalledWith('e', 'moodle');
+    expect(hasString).toHaveBeenCalledWith('e', 'core');
   });
 });
 
@@ -116,7 +116,7 @@ describe('Vue#tryStr()', () => {
     expect(vm.$tryStr('c', 'd')).toEqual(null);
     expect(hasString).toHaveBeenCalledWith('c', 'd');
     expect(vm.$tryStr('e')).toEqual(null);
-    expect(hasString).toHaveBeenCalledWith('e', 'moodle');
+    expect(hasString).toHaveBeenCalledWith('e', 'core');
   });
 });
 

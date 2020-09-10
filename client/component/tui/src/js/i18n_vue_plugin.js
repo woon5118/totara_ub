@@ -111,7 +111,7 @@ export function collectStrings(component) {
 }
 
 function defaultTotaraComponent(component) {
-  return component == null ? 'moodle' : component;
+  return component == null ? 'core' : component;
 }
 
 /**
