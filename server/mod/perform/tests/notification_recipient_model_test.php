@@ -93,8 +93,19 @@ class mod_perform_notification_recipient_model_testcase extends mod_perform_noti
             [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER, constants::RELATIONSHIP_PEER]
         );
         notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_SUBJECT], false);
+        notification_recipient::create($notification, $this->get_core_relationship(constants::RELATIONSHIP_MANAGER), true);
+        $this->assertCount(4, notification_recipient::load_by_notification($notification, false));
+        $this->assertCount(1, notification_recipient::load_by_notification($notification, true));
 
-        $this->assertCount(2, notification_recipient::load_by_notification($notification, false));
+        $activity = $this->create_activity();
+        $section = $this->create_section($activity);
+        $notification = notification::create($activity, 'completion');
+        $relationships = $this->create_section_relationships(
+            $section,
+            [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_EXTERNAL]
+        );
+        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_SUBJECT], false);
+        $this->assertCount(1, notification_recipient::load_by_notification($notification, false));
         $this->assertCount(0, notification_recipient::load_by_notification($notification, true));
     }
 }

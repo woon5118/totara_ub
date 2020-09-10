@@ -140,6 +140,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'condition' => days_after::class,
                 'is_reminder' => true,
                 'recipients' => recipient::STANDARD | recipient::MANUAL,
+                'all_possible_recipients' => true,
             ],
             'test_due_date_reminder' => [
                 'class' => due_date_reminder::class,
@@ -149,6 +150,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'condition' => days_before::class,
                 'is_reminder' => true,
                 'recipients' => recipient::STANDARD,
+                'all_possible_recipients' => false,
             ],
             'kia_ora_koutou_katoa' => [
                 'class' => mod_perform_notification_loader_testcase::class,
@@ -158,6 +160,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'condition' => after_midnight::class,
                 'is_reminder' => false,
                 'recipients' => recipient::EXTERNAL,
+                'all_possible_recipients' => true,
             ],
             'kia_kaha' => [
                 'class' => mod_perform_mock_broker::class,
@@ -167,6 +170,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'condition' => mod_perform_mock_condition::class,
                 'is_reminder' => false,
                 'recipients' => recipient::MANUAL | recipient::EXTERNAL,
+                'all_possible_recipients' => false,
             ]
         ];
         return loader::create($notifications);
@@ -315,6 +319,18 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         } catch (class_key_not_available $ex) {
             $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
         }
+    }
+
+    /**
+     * @covers ::are_all_possible_recipients
+     */
+    public function test_are_all_possible_recipients() {
+        $loader = $this->create_loader();
+        $this->assertFalse($loader->are_all_possible_recipients('test_instance_created'));
+        $this->assertTrue($loader->are_all_possible_recipients('test_overdue_reminder'));
+        $this->assertFalse($loader->are_all_possible_recipients('test_due_date_reminder'));
+        $this->assertTrue($loader->are_all_possible_recipients('kia_ora_koutou_katoa'));
+        $this->assertFalse($loader->are_all_possible_recipients('kia_kaha'));
     }
 
     /**

@@ -197,10 +197,15 @@ class notification_recipient {
      */
     public static function load_by_notification(notification $parent, bool $active_only = false): collection {
         $loader = factory::create_loader();
-        $builder = builder::table(section_entity::TABLE, 's')
-            ->join([section_relationship_entity::TABLE, 'sr'], 's.id', 'sr.section_id')
-            ->join([relationship_entity::TABLE, 'r'], 'r.id', 'sr.core_relationship_id')
-            ->where('s.activity_id', $parent->activity->id)
+        if ($loader->are_all_possible_recipients($parent->class_key)) {
+            $builder = builder::table(relationship_entity::TABLE, 'r');
+        } else {
+            $builder = builder::table(section_entity::TABLE, 's')
+                ->join([section_relationship_entity::TABLE, 'sr'], 's.id', 'sr.section_id')
+                ->join([relationship_entity::TABLE, 'r'], 'r.id', 'sr.core_relationship_id')
+                ->where('s.activity_id', $parent->activity->id);
+        }
+        $builder
             ->select(['r.id as relationship_id', 'r.sort_order'])
             ->group_by(['r.id', 'r.sort_order'])
             ->order_by('r.sort_order')

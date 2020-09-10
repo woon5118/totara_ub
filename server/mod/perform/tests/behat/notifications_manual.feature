@@ -59,7 +59,6 @@ Feature: Perform activity notifications - manual relationships
   Scenario: mod_perform_notification_201: Select participants notification
     And I switch to "Content" tui tab
     And I click on "Add participants" "button"
-    And I click on "Manager" tui "checkbox"
     And I click on "Peer" tui "checkbox"
     And I click on "Mentor" tui "checkbox"
     And I click on "Done" "button"

@@ -232,6 +232,15 @@ class loader {
     }
 
     /**
+     * @param string $class_key
+     * @return boolean
+     */
+    public function are_all_possible_recipients(string $class_key): bool {
+        $info = $this->get_information($class_key);
+        return $info['all_possible_recipients'] ?? false;
+    }
+
+    /**
      * Throw an exception if the class key is not available.
      *
      * @param string $class_key

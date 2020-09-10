@@ -32,6 +32,7 @@ $notifications = [
         'class' => \mod_perform\notification\brokers\participant_selection::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
         'recipients' => \mod_perform\notification\recipient::STANDARD,
+        'all_possible_recipients' => true,
     ],
     'instance_created' => [ // 18
         'name' => ['notification_broker_instance_created', 'mod_perform'],

@@ -58,6 +58,7 @@ class mod_perform_notification_dealer_participant_selection_testcase extends mod
                 'name' => 'participant selection',
                 'trigger_type' => trigger::TYPE_ONCE,
                 'recipients' => recipient::STANDARD,
+                'all_possible_recipients' => true,
             ],
         ]);
         $this->setAdminUser();
@@ -141,11 +142,7 @@ class mod_perform_notification_dealer_participant_selection_testcase extends mod
         section_element_model::create($section, $element, 1);
         $track = $this->perfgen->create_activity_tracks($activity, 1)->first(true);
         $notification = $this->create_notification($activity, 'kia_ora_koutou_katoa', true);
-        $relationships = $this->create_section_relationships($section, [
-            constants::RELATIONSHIP_SUBJECT,
-            constants::RELATIONSHIP_APPRAISER,
-            constants::RELATIONSHIP_MANAGER,
-            constants::RELATIONSHIP_MANAGERS_MANAGER,
+        $this->create_section_relationships($section, [
             constants::RELATIONSHIP_PEER,
             constants::RELATIONSHIP_REVIEWER,
             constants::RELATIONSHIP_MENTOR,
