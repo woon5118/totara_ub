@@ -91,9 +91,18 @@ if ($hassiteconfig) {
         // Get module list
         $modules = $DB->get_records("modules");
         if ($modules) {
+            // Some modules are not for courses per se.
+            $excluded = [
+                'perform'
+            ];
+
             $defaultmodules = [];
             $modulebyname = [];
             foreach ($modules as $module) {
+                if (in_array($module->name, $excluded)) {
+                    continue;
+                }
+
                 $strmodulename = get_string("modulename", "$module->name");
                 // Deal with modules which are lacking the language string
                 if ($strmodulename == '[[modulename]]') {
