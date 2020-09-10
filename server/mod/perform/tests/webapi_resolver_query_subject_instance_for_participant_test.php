@@ -140,6 +140,31 @@ class mod_perform_webapi_resolver_query_subject_instance_for_participant_testcas
         $this->assertEquals(self::$about_user_but_not_participating->id, $returned_subject_instance->id);
     }
 
+    public function test_get_as_reporting_user(): void {
+        $subject_instance = self::$about_user_but_not_participating;
+        $args = ['subject_instance_id' => $subject_instance->id];
+
+        $reporter = self::getDataGenerator()->create_user();
+        $employee = self::$about_user_but_not_participating->subject_user;
+
+        self::setUser($reporter);
+
+        $context = $this->create_webapi_context(self::QUERY);
+        $context->set_relevant_context($subject_instance->get_context());
+
+        $returned_subject_instance = $this->resolve_graphql_query(self::QUERY, $args);
+        self::assertNull($returned_subject_instance);
+
+        // Grant the reporting capability to the reporter in the context of the employee.
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('mod/perform:report_on_subject_responses', CAP_ALLOW, $roleid, context_system::instance());
+        $emplyee_context = \context_user::instance($employee->id);
+        role_assign($roleid, $reporter->id, $emplyee_context);
+
+        $returned_subject_instance = $this->resolve_graphql_query(self::QUERY, $args);
+        $this->assertEquals(self::$about_user_but_not_participating->id, $returned_subject_instance->id);
+    }
+
     public function test_failed_ajax_query(): void {
         $args = [
             'subject_instance_id' => self::$about_user_and_participating->get_id()

@@ -56,7 +56,8 @@ class subject_instance_for_participant implements query_resolver, has_middleware
 
         $participant_id = user::logged_in()->id;
 
-        if (util::can_manage_participation($participant_id, $subject_instance_entity->subject_user_id)) {
+        if (util::can_manage_participation($participant_id, $subject_instance_entity->subject_user_id) ||
+            util::can_report_on_user($subject_instance_entity->subject_user_id, $participant_id)) {
             return new subject_instance_model($subject_instance_entity);
         }
 
