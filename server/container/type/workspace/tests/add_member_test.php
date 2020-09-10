@@ -117,4 +117,48 @@ class container_workspace_add_member_testcase extends advanced_testcase {
             $DB->record_exists(user_enrolment::TABLE, ['id' => $member->get_id()])
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_add_member_to_hidden_workspace_with_exception(): void {
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+        $user_three = $generator->create_user();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+
+        $this->setUser($user_one);
+        $workspace = $workspace_generator->create_hidden_workspace();
+
+        $this->setUser($user_two);
+        $this->expectException("moodle_exception");
+        $this->expectExceptionMessage("Cannot manual add user to workspace");
+        member::added_to_workspace($workspace, $user_three->id);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_add_member_to_private_workspace_with_exception(): void {
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+        $user_three = $generator->create_user();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+
+        $this->setUser($user_one);
+        $workspace = $workspace_generator->create_private_workspace();
+
+        $this->setUser($user_two);
+        $this->expectException("moodle_exception");
+        $this->expectExceptionMessage("Cannot manual add user to workspace");
+        member::added_to_workspace($workspace, $user_three->id);
+    }
 }

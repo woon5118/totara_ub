@@ -22,6 +22,7 @@
  */
 namespace container_workspace\member;
 
+use container_workspace\exception\enrol_exception;
 use container_workspace\interactor\workspace\interactor;
 use container_workspace\tracker\tracker;
 use container_workspace\workspace;
@@ -185,7 +186,7 @@ final class member {
 
         $owner_id = $workspace->get_user_id();
         if ($user_id == $owner_id) {
-            throw new \coding_exception("Owner of a workspace should not be able to add self to a workspace");
+            throw enrol_exception::on_manual_enrol();
         }
 
         $roles = get_archetype_roles('student');

@@ -197,4 +197,33 @@ class container_workspace_webapi_add_member_testcase extends advanced_testcase {
             $this->assertTrue(in_array($result_member['user']['id'], $user_ids));
         }
     }
+
+    /**
+     * @return void
+     */
+    public function test_add_members_to_hidden_workspace_with_exception(): void {
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+        $user_three = $generator->create_user();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $this->setUser($user_one);
+
+        $workspace = $workspace_generator->create_hidden_workspace();
+        $workspace_id = $workspace->get_id();
+
+        $this->setUser($user_three);
+        $this->expectException("moodle_exception");
+        $this->expectExceptionMessage("Cannot manual add user to workspace");
+        $this->resolve_graphql_mutation(
+            'container_workspace_add_members',
+            [
+                'workspace_id' => $workspace_id,
+                'user_ids' => [$user_two->id]
+            ]
+        );
+    }
 }

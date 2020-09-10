@@ -43,11 +43,14 @@ final class enrol_exception extends \moodle_exception {
     }
 
     /**
-     * @param string $workspace_name
+     * @param string|null $workspace_name
      * @return enrol_exception
      */
-    public static function on_manual_enrol(string $workspace_name): enrol_exception {
-        $workspace_name = format_string($workspace_name);
+    public static function on_manual_enrol(?string $workspace_name = null): enrol_exception {
+        if (null !== $workspace_name) {
+            $workspace_name = format_string($workspace_name);
+        }
+
         return new static('error:manual_enrol', $workspace_name);
     }
 }
