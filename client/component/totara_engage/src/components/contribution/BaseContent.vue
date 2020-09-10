@@ -219,6 +219,10 @@ export default {
     :not(:first-child) {
       margin-left: var(--gap-8);
     }
+
+    :last-child {
+      align-self: center;
+    }
   }
 
   &__filter {
