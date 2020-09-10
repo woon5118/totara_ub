@@ -159,4 +159,65 @@ class engage_survey_update_testcase extends advanced_testcase {
         $this->assertEquals('Is this not a hello world', $question->get_value());
         $this->assertEquals('PUBLIC', $survey['resource']['access']);
     }
+
+    /**
+     * @return void
+     */
+    public function test_survey_question_validation(): void {
+        $gen = $this->getDataGenerator();
+        $user = $gen->create_user();
+        $this->setUser($user);
+        /** @var engage_survey_generator $articlegen */
+        $surveygen = $gen->get_plugin_generator('engage_survey');
+
+        /** @var survey $survey */
+        $survey = $surveygen->create_survey();
+        $questions = $survey->get_questions();
+        $this->assertCount(1, $questions);
+        $question = reset($questions);
+
+        $this->assertEquals(76, core_text::strlen("TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax"));
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage("Validation run for property 'questions' has been failed");
+
+        $survey->update([
+            'questions' => [
+                [
+                    'id' => $question->get_id(),
+                    'answertype' => answer_type::SINGLE_CHOICE,
+                    'value' => "TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax",
+                    'options' => ['Yes', 'No']
+                ]
+            ],
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_survey_answer_validation(): void {
+        $gen = $this->getDataGenerator();
+        $user = $gen->create_user();
+        $this->setUser($user);
+        /** @var engage_survey_generator $articlegen */
+        $surveygen = $gen->get_plugin_generator('engage_survey');
+
+        /** @var survey $survey */
+        $survey = $surveygen->create_survey();
+        $questions = $survey->get_questions();
+        $this->assertCount(1, $questions);
+        $question = reset($questions);
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage("Validation run for property 'questions' has been failed");
+        $survey->update([
+            'questions' => [
+                [
+                    'id' => $question->get_id(),
+                    'answertype' => answer_type::SINGLE_CHOICE,
+                    'options' => ['OoCtvoljRosLba2P8FxNULYk41c6KSdeSGIX3IAj15ayYsbIvS3bSoZubTTwxugQOACkrPMbvHeNmC8E5', 'No']
+                ]
+            ],
+        ]);
+    }
 }

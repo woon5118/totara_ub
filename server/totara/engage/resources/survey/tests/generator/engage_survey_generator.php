@@ -54,6 +54,10 @@ final class engage_survey_generator extends component_generator_base {
 
         if (null === $question) {
             $question = $this->generate_question();
+
+            if (core_text::strlen($question) > 75) {
+                $question = \core_text::substr($question, 0, 75);
+            }
         }
 
         if (empty($options)) {

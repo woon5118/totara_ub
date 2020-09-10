@@ -28,6 +28,8 @@ use engage_survey\event\survey_reshared;
 use engage_survey\event\survey_shared;
 use engage_survey\repository\survey_question_repository;
 use engage_survey\result\vote_result;
+use engage_survey\totara_engage\resource\input\answer_length_validator;
+use engage_survey\totara_engage\resource\input\question_length_validator;
 use totara_engage\access\access_manager;
 use totara_engage\answer\answer_factory;
 use engage_survey\totara_engage\resource\input\question_validator;
@@ -225,7 +227,11 @@ final class survey extends resource_item {
                     [
                         'required-on-add' => true,
                         'required-on-update' => false,
-                        'validators' => [new question_validator()],
+                        'validators' => [
+                            new question_validator(),
+                            new question_length_validator(75),
+                            new answer_length_validator(80),
+                        ],
                     ]
                 )
             ]

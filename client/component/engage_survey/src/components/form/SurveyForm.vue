@@ -30,7 +30,7 @@
         <FormText
           name="question"
           :validations="v => [v.required()]"
-          :maxlength="60"
+          :maxlength="75"
           :aria-label="$str('formtitle', 'engage_survey')"
           :placeholder="$str('formtitle', 'engage_survey')"
           :disabled="submitting"

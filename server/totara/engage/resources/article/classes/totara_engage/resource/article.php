@@ -38,6 +38,7 @@ use totara_engage\entity\engage_resource;
 use totara_engage\link\builder;
 use totara_engage\resource\input\access_validator;
 use totara_engage\resource\input\definition;
+use totara_engage\resource\input\name_length_validator;
 use totara_engage\resource\input\topic_validator;
 use totara_engage\resource\resource_item;
 use totara_engage\share\share as share_model;
@@ -285,7 +286,10 @@ final class article extends resource_item implements time_viewable {
                 'name',
                 [
                     'required-on-add' => true,
-                    'validators' => [new name_validator()]
+                    'validators' => [
+                        new name_validator(),
+                        new name_length_validator(75)
+                    ]
                 ]
             ),
             definition::from_parameters(

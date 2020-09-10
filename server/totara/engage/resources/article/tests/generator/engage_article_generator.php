@@ -52,6 +52,10 @@ final class engage_article_generator extends component_generator_base {
 
         if (!isset($parameters['name'])) {
             $parameters['name'] = $this->get_random_name();
+
+            if (core_text::strlen($parameters['name']) > 75) {
+                $parameters['name'] = \core_text::substr($parameters['name'], 0, 75);
+            }
         }
 
         $userid = null;

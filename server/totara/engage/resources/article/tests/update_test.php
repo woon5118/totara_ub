@@ -156,4 +156,60 @@ class engage_article_update_testcase extends advanced_testcase {
         $this->assertEquals('Bolobala', $article['resource']['name']);
         $this->assertEquals('PUBLIC', $article['resource']['access']);
     }
+
+    /**
+     * @return void
+     */
+    public function test_article_name_validation(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $article = article::create(
+            [
+                'name' => "Hello world",
+                'content' => "test content",
+                'timeview' => time_view::LESS_THAN_FIVE
+            ]
+        );
+
+        $data['name'] = "TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax";
+        $this->assertEquals(76, strlen('TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax'));
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage("Validation run for property 'name' has been failed");
+        $article->update($data, $user->id);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_article_name_validation_via_graphql(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $article = article::create(
+            [
+                'name' => "Hello world",
+                'content' => "Abcde eee",
+                'timeview' => time_view::LESS_THAN_FIVE
+            ]
+        );
+
+        $args = [
+            'resourceid' => $article->get_id(),
+            'name' => "TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax",
+            'access' => 'PUBLIC',
+            'format' => FORMAT_PLAIN
+        ];
+
+        $ec = execution_context::create('ajax', 'engage_article_update_article');
+        $result = graphql::execute_operation($ec, $args);
+
+        $this->assertNotEmpty($result->errors);
+        $error = current($result->errors);
+        $this->assertEquals(
+            "Coding error detected, it must be fixed by a programmer: Validation run for property 'name' has been failed",
+            $error->getMessage()
+        );
+    }
 }

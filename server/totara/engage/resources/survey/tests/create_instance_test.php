@@ -89,4 +89,61 @@ class engage_survey_create_instance_testcase extends advanced_testcase {
 
         $this->assertTrue($DB->record_exists_sql($sql, $params));
     }
+
+    /**
+     * @return void
+     */
+    public function test_survey_question_validation(): void {
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
+
+        $this->setUser($user);
+        $data = [
+            'questions' => [
+                [
+                    'value' => "TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax",
+                    'answertype' => answer_type::SINGLE_CHOICE,
+                    'options' => ['yes', 'no']
+                ]
+            ]
+        ];
+        $this->assertEquals(
+            76,
+            core_text::strlen("TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax")
+        );
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage("Validation run for property 'questions' has been failed");
+        survey::create($data);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_survey_answer_validation(): void {
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
+
+        $this->setUser($user);
+        $data = [
+            'questions' => [
+                [
+                    'value' => "Test answer",
+                    'answertype' => answer_type::SINGLE_CHOICE,
+                    'options' => [
+                        'yes',
+                        'OoCtvoljRosLba2P8FxNULYk41c6KSdeSGIX3IAj15ayYsbIvS3bSoZubTTwxugQOACkrPMbvHeNmC8E5'
+                    ]
+                ]
+            ]
+        ];
+        $this->assertEquals(
+            81,
+            core_text::strlen("OoCtvoljRosLba2P8FxNULYk41c6KSdeSGIX3IAj15ayYsbIvS3bSoZubTTwxugQOACkrPMbvHeNmC8E5")
+        );
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage("Validation run for property 'questions' has been failed");
+        survey::create($data);
+    }
+
 }

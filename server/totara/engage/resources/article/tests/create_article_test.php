@@ -116,4 +116,50 @@ class engage_article_create_article_testcase extends advanced_testcase {
             $error->getMessage()
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_article_name_validation(): void {
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
+
+        $this->setUser($user);
+        $data = [
+            'name' => 'TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax',
+            'content' => 'Wassup wasabi',
+            'timeview' => time_view::LESS_THAN_FIVE
+        ];
+
+        $this->assertEquals(76, strlen('TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax'));
+
+        $this->expectException('coding_exception');
+        $this->expectExceptionMessage("Validation run for property 'name' has been failed");
+        article::create($data);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_article_name_validation_via_graphql(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $parameters = [
+            'name' => 'TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax',
+            'content' => 'Wassup bolobala',
+            'format' => FORMAT_PLAIN,
+            'timeview' => time_view::get_code(time_view::LESS_THAN_FIVE)
+        ];
+
+        $ec = execution_context::create('ajax', 'engage_article_create_article');
+        $result = graphql::execute_operation($ec, $parameters);
+
+        $this->assertNotEmpty($result->errors);
+        $error = current($result->errors);
+        $this->assertEquals(
+            "Coding error detected, it must be fixed by a programmer: Validation run for property 'name' has been failed",
+            $error->getMessage()
+        );
+    }
 }
