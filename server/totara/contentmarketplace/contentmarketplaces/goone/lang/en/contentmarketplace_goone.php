@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['account'] = 'Account';
 $string['addcourse'] = 'Add a new course';
 $string['addcoursego1'] = 'Add courses from the GO1 content marketplace';
-$string['addcoursego1_description'] = 'Create single or multi activity courses based on what is available in the GO1 content marketplace.';
+$string['addcoursego1_description'] = 'Create single or multi-activity courses based on what is available in the GO1 content marketplace.';
 $string['all_content'] = 'All content ({$a})';
 $string['annualcost'] = 'Annual subscription cost';
 $string['availability-filter:all'] = 'All';
