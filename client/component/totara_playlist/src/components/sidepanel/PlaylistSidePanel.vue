@@ -135,7 +135,7 @@ import DropdownItem from 'tui/components/dropdown/DropdownItem';
 
 // GraphQL queries
 import getPlaylist from 'totara_playlist/graphql/get_playlist';
-import updatePlaylist from 'totara_playlist/graphql/update_playlist_summary';
+import updatePlaylist from 'totara_playlist/graphql/update_playlist';
 import deletePlaylist from 'totara_playlist/graphql/delete_playlist';
 import addRating from 'totara_playlist/graphql/add_rating';
 import engageAdvancedFeatures from 'totara_engage/graphql/advanced_features';
