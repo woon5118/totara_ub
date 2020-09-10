@@ -67,15 +67,19 @@ export default {
       const ErrorPageRender = tui.defaultExport(
         tui.require('tui/components/errors/ErrorPageRender')
       );
+      const Loading = tui.defaultExport(
+        tui.require('tui/components/loader/ComponentLoading')
+      );
       promises.push(
         Promise.all([
-          // load error strings
+          // load error/loading strings
           wrapReqTry(() =>
             loadStrings(
               collectStrings({
                 components: {
                   ErrorBoundary,
                   ErrorPageRender,
+                  Loading,
                 },
               })
             )

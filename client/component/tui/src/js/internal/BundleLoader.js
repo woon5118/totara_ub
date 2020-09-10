@@ -20,7 +20,7 @@ import apollo from '../apollo_client';
 import bundleQuery from 'totara_tui/graphql/bundles_nosession';
 import { config } from '../config';
 import pending from '../pending';
-import { pull } from '../util';
+import BatchingSerialLoadQueue from './BatchingSerialLoadQueue';
 
 /**
  * Possible states for a bundle
@@ -37,14 +37,17 @@ const BundleStatus = {
 };
 
 /**
- * Load and track bundles for Totara components
+ * Load and track bundles for Tui components
  *
  * @private
  */
 export default class BundleLoader {
   constructor() {
     this._componentBundleStatus = {};
-    this._loadQueue = [];
+    this._queue = new BatchingSerialLoadQueue({
+      handler: this._loadBundles.bind(this),
+      wait: 10,
+    });
   }
 
   /**
@@ -73,53 +76,57 @@ export default class BundleLoader {
    * @returns {boolean}
    */
   isComponentFinal(comp) {
-    return this._isFinalStatus(comp);
+    return this._isFinalStatus(this._componentBundleStatus[comp]);
   }
 
   /**
-   * Load the bundles needed for the provided Totara component
+   * Load the bundles needed for the provided Tui component
    *
-   * @param {string} totaraComponent
-   * @returns {Promise}
+   * @param {string} tuiComponent
+   * @returns {Promise<void>}
    */
-  async loadBundle(totaraComponent) {
-    if (this.isComponentLoaded(totaraComponent)) {
+  async loadBundle(tuiComponent) {
+    await this.loadBundles([tuiComponent]);
+  }
+
+  /**
+   * Load the bundles needed for the provided Tui components
+   *
+   * @param {string[]} tuiComponent
+   * @returns {Promise<void>}
+   */
+  async loadBundles(tuiComponents) {
+    if (tuiComponents.every(x => this.isComponentLoaded(x))) {
       return Promise.resolve();
     }
-    const result = await this._loadBundles([totaraComponent]);
+    const result = await this._queue.enqueue(tuiComponents);
+
     result.forEach(bundleResult => {
-      if (bundleResult.error == 'error') {
-        throw new Error(bundleResult.error);
+      if (
+        tuiComponents.includes(bundleResult.component) &&
+        bundleResult.status == 'error'
+      ) {
+        const error = new Error(bundleResult.error);
+        error.code = bundleResult.code;
+        throw error;
       }
     });
   }
 
   /**
-   * Load the provided bundles
+   * Load the provided Tui components
    *
    * @private
-   * @param {string[]} totaraComponents
-   * @returns {object[]}
+   * @param {string[]} tuiComponents
+   * @returns {Promise<object[]>}
    */
-  async _loadBundles(totaraComponents) {
-    // queue loads so we don't double up
-    return this._queueLoadTask(() => this._loadBundles_task(totaraComponents));
-  }
-
-  /**
-   * Implementation for _loadBundles
-   *
-   * @private
-   * @param {string[]} totaraComponents
-   * @returns {object[]}
-   */
-  async _loadBundles_task(totaraComponents) {
+  async _loadBundles(tuiComponents) {
     // filter request to bundles that we don't already have
-    totaraComponents = totaraComponents.filter(x =>
-      this._isLoadableStatus(this._componentBundleStatus[x.component])
+    tuiComponents = tuiComponents.filter(x =>
+      this._isLoadableStatus(this._componentBundleStatus[x])
     );
 
-    if (totaraComponents.length == 0) {
+    if (tuiComponents.length == 0) {
       return [];
     }
 
@@ -128,7 +135,7 @@ export default class BundleLoader {
     const result = await apollo.query({
       query: bundleQuery,
       variables: {
-        components: totaraComponents,
+        components: tuiComponents,
         theme: config.theme.name,
       },
       fetchPolicy: 'no-cache',
@@ -144,7 +151,7 @@ export default class BundleLoader {
     });
 
     // find bundles we want but did not get back in response
-    const missing = totaraComponents.filter(
+    const missing = tuiComponents.filter(
       x => !result.data.bundles.some(y => y.component == x)
     );
     // mark as not found so we don't keep requesting them from the server
@@ -156,28 +163,32 @@ export default class BundleLoader {
       bundles
         .map(async bundle => {
           try {
-            await this._loadBundleDefinition(bundle);
+            await this._loadFromDefinition(bundle);
             if (bundle.type == 'js') {
               this._componentBundleStatus[bundle.component] =
                 BundleStatus.LOADED;
             }
-            return { status: 'success' };
+            return { component: bundle.component, status: 'success' };
           } catch (e) {
             if (bundle.type == 'js') {
               this._componentBundleStatus[bundle.component] =
                 BundleStatus.FAILED;
             }
             return {
+              component: bundle.component,
               status: 'error',
               error: `Unable to load bundle "${bundle.name}" for "${bundle.component}"`,
+              code: 'BUNDLE_FAILED',
             };
           }
         })
         // report missing bundles
         .concat(
           missing.map(x => ({
+            component: x,
             status: 'error',
             error: `Unable to find a TUI bundle for "${x}"`,
+            code: 'BUNDLE_NOT_FOUND',
           }))
         )
     );
@@ -190,7 +201,7 @@ export default class BundleLoader {
    * @param {object} bundle
    * @returns {Promise}
    */
-  _loadBundleDefinition(bundle) {
+  _loadFromDefinition(bundle) {
     switch (bundle.type) {
       case 'js':
         return this._loadScript(bundle.url);
@@ -259,42 +270,6 @@ export default class BundleLoader {
       } else {
         document.head.appendChild(link);
       }
-    });
-  }
-
-  /**
-   * Add a task to the load queue.
-   *
-   * @private
-   * @param {function} fn
-   * @returns {Promise}
-   *   resolving or rejecting when the result of fn() resolves or rejects
-   */
-  _queueLoadTask(fn) {
-    return new Promise((resolve, reject) => {
-      this._loadQueue.push(() => {
-        return Promise.resolve(fn()).then(resolve, reject);
-      });
-      // only item in queue, begin
-      if (this._loadQueue.length == 1) {
-        this._nextLoadTask();
-      }
-    });
-  }
-
-  /**
-   * Execute the next task in the load queue. Should not be called except by _queueLoadTask.
-   *
-   * @private
-   */
-  _nextLoadTask() {
-    if (this._loadQueue.length == 0) {
-      return;
-    }
-    const task = this._loadQueue[0];
-    task().then(() => {
-      pull(this._loadQueue, task);
-      this._nextLoadTask();
     });
   }
 

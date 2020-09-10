@@ -52,7 +52,7 @@ module.exports = function(jsonSource, map) {
     console.warn(
       `[tui.json loader] Configuration error in tui.json for ` +
         `${config.component}: "vendor" key is missing. Vendor should be set ` +
-        `to a unique string for each organisation producing Totara components.`
+        `to a unique string for each organisation producing Tui components.`
     );
   }
 

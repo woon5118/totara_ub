@@ -32,14 +32,6 @@ export default class TotaraModuleStore {
         prefix: ['components', 'overrides'],
         replaceWith: ['components'],
       },
-      {
-        prefix: ['containers', 'overrides'],
-        replaceWith: ['containers'],
-      },
-      {
-        prefix: ['presentation', 'overrides'],
-        replaceWith: ['presentation'],
-      },
       { prefix: ['pages', 'overrides'], replaceWith: ['pages'] },
     ];
     this._pendingOverrideChains = {};
@@ -50,7 +42,7 @@ export default class TotaraModuleStore {
   /**
    * Add a set of modules from webpack's `require.context()` or compatible.
    *
-   * @param {string} idBase ID prefix, excluding /. e.g. 'totara_core'.
+   * @param {string} idBase ID prefix, excluding /. e.g. 'tui'.
    * @param {*} req Result of calling `require.context()`.
    */
   addFromContext(idBase, req) {
@@ -81,7 +73,7 @@ export default class TotaraModuleStore {
   /**
    * Add a single module.
    *
-   * @param {string} id Module ID, e.g. 'totara_core/presentation/Test' or 'vue'.
+   * @param {string} id Module ID, e.g. 'tui/components/Test' or 'vue'.
    * @param {function} getter Function returning the module's exports as an
    *     object. Will be called whenever we need to resolve the value of this
    *     module. The result of this function is not cached as whatever is
@@ -164,7 +156,7 @@ export default class TotaraModuleStore {
   syncImportable(id) {
     // hasModule check is not just an optimization - it is needed for
     // syncImportable to return the correct result for modules that are not part
-    // of Totara components - like 'vue'
+    // of Tui components - like 'vue'
     if (this.hasModule(id)) {
       return true;
     }
@@ -178,14 +170,32 @@ export default class TotaraModuleStore {
   /**
    * Get all exports of the module with the provided ID.
    *
-   * @param {string} id Module ID, e.g. 'totara_core/presentation/Test' or 'vue'.
+   * @param {string} id Module ID, e.g. 'tui/components/Test' or 'vue'.
    * @return {*} Module exports.
    * @throws {Error} when module cannot be found.
    */
   require(id) {
     const getter = this._modules[id];
     if (!getter) {
-      const error = new Error("Cannot find module '" + id + "'");
+      const component = this._extractComponent(id);
+      let error;
+      if (this._loader.isComponentLoaded(component)) {
+        error = new Error(
+          `Cannot find module "${id}" in Tui component "${component}"`
+        );
+      } else if (this._loader.isComponentFinal(component)) {
+        // not loaded but in final state: must be an error loading the bundle
+        error = new Error(
+          `Module "${id}" is not available as the Tui component ` +
+            `bundle for "${component}" failed to load`
+        );
+      } else {
+        error = new Error(
+          `Tui component "${component}" is not loaded. Load the module "${id}" ` +
+            `asynchronously with tui.import() or tui.asyncComponent(), or ` +
+            `declare a static dependency on "${component}" in tui.json.`
+        );
+      }
       error.code = 'MODULE_NOT_FOUND';
       throw error;
     }
@@ -213,7 +223,7 @@ export default class TotaraModuleStore {
    * Asynchronously load the module with the provided ID if it is not loaded,
    * then return all its exports.
    *
-   * @param {string} id Module ID, e.g. 'totara_core/presentation/Test' or 'vue'.
+   * @param {string} id Module ID, e.g. 'tui/components/Test' or 'vue'.
    * @returns {Promise}
    *   resolving to module exports, or rejecting when module cannot be found or
    *   bundle load fails.
@@ -222,14 +232,20 @@ export default class TotaraModuleStore {
     if (this.syncImportable(id)) {
       return this.require(id);
     }
-    await this._loader.loadBundle(this._extractComponent(id));
+    try {
+      await this._loader.loadBundle(this._extractComponent(id));
+    } catch (e) {
+      // failed/not found are handled by require with more context
+      if (e.code != 'BUNDLE_FAILED' && e.code != 'BUNDLE_NOT_FOUND') {
+        throw e;
+      }
+    }
     return this.require(id);
   }
 
   /**
-   * Extract the component (e.g. totara_core) from a module id
-   * (e.g. totara_core/foo/bar). If there are no slashes the id will be
-   * returned as-is.
+   * Extract the component (e.g. tui) from a module id (e.g. tui/foo/bar).
+   * If there are no slashes the id will be returned as-is.
    *
    * @param {string} id
    */
@@ -257,8 +273,8 @@ export default class TotaraModuleStore {
   /**
    * Get a list of the loaded submodules of the specified module.
    *
-   * E.g. getLoadedSubmodules('totara_core')
-   * => ['totara_core/foo', 'totara_core/presentation/Comp']
+   * E.g. getLoadedSubmodules('tui')
+   * => ['tui/foo', 'tui/components/Comp']
    *
    * @param {string} prefix
    * @returns {string[]}

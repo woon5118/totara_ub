@@ -18,7 +18,7 @@
 
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
-// "import x from 'totara_core/x'" syntax does not work in this file as we're
+// "import x from 'tui/x'" syntax does not work in this file as we're
 // too early in the load process, so we must use relative imports
 import BundleLoader from './internal/BundleLoader';
 import TotaraModuleStore from './internal/TotaraModuleStore';
@@ -66,7 +66,7 @@ const tui = {
    * Get all exports of the module with the provided ID.
    *
    * @param {string} id Module ID, e.g.
-   *     'totara_core/presentation/Example' or 'vue'.
+   *     'tui/components/Example' or 'vue'.
    * @return {*} Module exports.
    * @throws {Error} when module cannot be found.
    */
@@ -79,7 +79,7 @@ const tui = {
    * then return all its exports.
    *
    * @param {string} id Module ID, e.g.
-   *   'totara_core/presentation/Example' or 'vue'.
+   *   'tui/components/Example' or 'vue'.
    * @returns {Promise}
    *   resolving to module exports, or rejecting when module cannot be found or
    *   bundle load fails.
@@ -129,12 +129,21 @@ const tui = {
    * @returns {function}
    */
   asyncComponent: memoize(id => {
-    return () => ({
-      component: tui.loadComponent(id),
-      error: tui.defaultExport(
-        tui.require('tui/components/errors/ErrorPageRender')
-      ),
-    });
+    const component = () => {
+      const componentPromise = tui.loadComponent(id);
+      const errorInfo = {};
+      componentPromise.catch(e => (errorInfo.error = e));
+      return {
+        component: componentPromise,
+        loading: tui.defaultExport(
+          tui.require('tui/components/loader/ComponentLoading')
+        ),
+        error: asyncComponentError(errorInfo),
+        delay: 0,
+      };
+    };
+    component.toString = () => `[async component ${id}]`;
+    return component;
   }),
 
   /**
@@ -157,7 +166,7 @@ const tui = {
    * If the component has requirements (e.g. language strings), they will be
    * loaded before the component is mounted.
    *
-   * @param {(string|object)} component Component name, e.g. 'totara_core/Example'
+   * @param {(string|object)} component Component name, e.g. 'tui/Example'
    *   or component export.
    * @param {?object} data Component data - see
    * https://vuejs.org/v2/guide/render-function.html#The-Data-Object-In-Depth
@@ -240,16 +249,21 @@ const tui = {
     const hosts = Array.prototype.slice.call(
       el.querySelectorAll('[data-tui-component]')
     );
-    hosts.forEach(function(host) {
+    hosts.forEach(async function(host) {
       try {
         const component = host.getAttribute('data-tui-component');
         const rawProps = host.getAttribute('data-tui-props');
         const props = rawProps ? JSON.parse(rawProps) : null;
         // remove attribute to avoid race condition double init
         host.removeAttribute('data-tui-component');
-        tui.mount(component, { props: props }, host);
+        await tui.mount(component, { props: props }, host);
       } catch (e) {
         console.error(e);
+        tui.mount(
+          'tui/components/errors/ErrorPageRender',
+          { props: { error: e } },
+          host
+        );
       }
     });
   },
@@ -264,7 +278,7 @@ const tui = {
    * @param {object} component Component export. Component must have been processed by
    *     tui-vue-loader otherwise it will not contain the required
    *     information to evaluate the inheritance.
-   * @param {string} parent ID of parent, e.g. 'totara_core/presentation/Example'
+   * @param {string} parent ID of parent, e.g. 'tui/components/Example'
    */
   _processOverride(component, parent) {
     if (typeof parent == 'string') {
@@ -349,25 +363,25 @@ const tui = {
   },
 
   /**
-   * Load the bundles needed for the provided Totara component.
+   * Load the bundles needed for the provided Tui component.
    *
    * @private
-   * @param {string} totaraComponent
+   * @param {string} tuiComponent
    * @returns {Promise}
    */
-  _loadTotaraComponent(totaraComponent) {
-    return loader.loadBundle(totaraComponent);
+  _loadTuiComponent(tuiComponent) {
+    return loader.loadBundle(tuiComponent);
   },
 
   /**
-   * Get a list of the loaded modules of the specified Totara component.
+   * Get a list of the loaded modules of the specified Tui component.
    *
    * @private
-   * @param {string} prefix
+   * @param {string} tuiComponent
    * @returns {string[]}
    */
-  _getLoadedComponentModules(totaraComponent) {
-    return modules.getLoadedSubmodules(totaraComponent);
+  _getLoadedComponentModules(tuiComponent) {
+    return modules.getLoadedSubmodules(tuiComponent);
   },
 
   /**
@@ -424,6 +438,24 @@ function mount(component, data, el) {
   });
   vm.$mount(el);
   return vm.$children[0].$children[0];
+}
+
+function asyncComponentErrorRender(h) {
+  const ErrorPageRender = tui.defaultExport(
+    tui.require('tui/components/errors/ErrorPageRender')
+  );
+  return h(ErrorPageRender, {
+    props: {
+      error: this.$options.errorInfo.error,
+    },
+  });
+}
+
+function asyncComponentError(errorInfo) {
+  return {
+    errorInfo,
+    render: asyncComponentErrorRender,
+  };
 }
 
 export default tui;

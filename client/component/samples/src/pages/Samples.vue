@@ -32,11 +32,11 @@
           />
 
           <SelectFilter
-            v-model="totaraComponentSelection"
-            label="Within plugin"
+            v-model="tuiComponentSelection"
+            label="Within Tui component"
             :show-label="true"
             :stacked="true"
-            :options="totaraComponentOptions"
+            :options="tuiComponentOptions"
           />
 
           <div class="tui-samples__filter">
@@ -90,7 +90,7 @@ const wrapSampleComponent = memoize(sample => {
   return () => ({
     component: tui
       // eslint-disable-next-line tui/no-tui-internal
-      ._loadTotaraComponent(sample.totaraComponent)
+      ._loadTuiComponent(sample.tuiComponent)
       .then(() => tui.loadComponent(sample.component)),
     error: tui.defaultExport(
       tui.require('tui/components/errors/ErrorPageRender')
@@ -113,7 +113,7 @@ export default {
       filter: '',
       samples: [],
       sample: null,
-      totaraComponent: null,
+      tuiComponent: null,
     };
   },
 
@@ -128,10 +128,7 @@ export default {
     results() {
       const filter = this.filter.toLowerCase();
       return this.samples
-        .filter(
-          x =>
-            !this.totaraComponent || x.totaraComponent == this.totaraComponent
-        )
+        .filter(x => !this.tuiComponent || x.tuiComponent == this.tuiComponent)
         .map(x => ({
           sample: x,
           score: this.$_score(x.text, filter),
@@ -146,29 +143,39 @@ export default {
       const groups = [];
       let lastGroup = null;
       results.forEach(result => {
-        if (lastGroup && lastGroup.name == result.totaraComponent) {
+        if (lastGroup && lastGroup.name == result.tuiComponent) {
           lastGroup.results.push(result);
         } else {
-          lastGroup = { name: result.totaraComponent, results: [result] };
+          lastGroup = { name: result.tuiComponent, results: [result] };
           groups.push(lastGroup);
         }
+      });
+      groups.sort((a, b) => {
+        // order tui components at the top
+        if (a.name.startsWith('tui') && !b.name.startsWith('tui')) {
+          return -1;
+        }
+        if (b.name.startsWith('tui') && !a.name.startsWith('tui')) {
+          return 1;
+        }
+        return a < b ? -1 : a > b ? 1 : 0;
       });
       return groups;
     },
 
-    totaraComponentOptions() {
+    tuiComponentOptions() {
       return [{ id: null, label: 'All' }].concat(
-        unique(this.samples.map(x => x.totaraComponent))
+        unique(this.samples.map(x => x.tuiComponent))
       );
     },
 
-    totaraComponentSelection: {
+    tuiComponentSelection: {
       get() {
-        return this.totaraComponent;
+        return this.tuiComponent;
       },
 
       set(value) {
-        this.totaraComponent = value;
+        this.tuiComponent = value;
         this.$_pushState();
       },
     },
@@ -181,10 +188,10 @@ export default {
       .filter(x => x.startsWith(prefix))
       .map(x => {
         const i = x.indexOf('/', prefix.length);
-        const totaraComponent = x.slice(prefix.length, i);
+        const tuiComponent = x.slice(prefix.length, i);
         return {
           component: x,
-          totaraComponent,
+          tuiComponent,
           text: x.slice(i + 1),
           key: x.slice(prefix.length),
         };
@@ -211,8 +218,8 @@ export default {
 
     sampleUrl(result) {
       let params = {};
-      if (this.totaraComponent) {
-        params.tc = this.totaraComponent;
+      if (this.tuiComponent) {
+        params.tc = this.tuiComponent;
       }
       if (result) {
         params.component = result.key;
@@ -233,7 +240,7 @@ export default {
           return acc;
         }, {});
 
-      this.totaraComponent = params.tc || null;
+      this.tuiComponent = params.tc || null;
       const key = params.component;
       this.sample = this.samples.find(x => x.key == key);
     },

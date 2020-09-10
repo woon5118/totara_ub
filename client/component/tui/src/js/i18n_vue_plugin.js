@@ -83,7 +83,7 @@ const collectStringDefinitions = makeScanner({
     }
     return {};
   },
-  mergeSubresult: assignMergedLangStrings,
+  mergeSubresult: mergeLangStrings,
   postprocess(result) {
     // deduplicate
     result = Object.assign({}, result);

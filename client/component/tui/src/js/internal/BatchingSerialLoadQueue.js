@@ -16,7 +16,7 @@
  * @module tui
  */
 
-import pending from 'tui/pending';
+import pending from '../pending';
 
 const STATE_IDLE = 0;
 const STATE_WAITING = 1;
@@ -105,8 +105,8 @@ export default class BatchingSerialLoadQueue {
     this._queuedCallbacks = [];
     Promise.resolve(this._handler(queue))
       .then(
-        () => callbacks.forEach(x => x[0]()),
-        () => callbacks.forEach(x => x[1]())
+        r => callbacks.forEach(x => x[0](r)),
+        r => callbacks.forEach(x => x[1](r))
       )
       .then(() => {
         this.state = STATE_IDLE;
