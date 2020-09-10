@@ -136,7 +136,7 @@ export default {
       if (assignmentList.length >= this.assignments.length) {
         // Add placeholder 'all' option
         assignmentList.unshift({
-          label: this.$str('all', 'moodle'),
+          label: this.$str('all', 'core'),
           id: 0,
         });
         return assignmentList;
@@ -190,7 +190,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "all"
     ],
     "totara_competency": [

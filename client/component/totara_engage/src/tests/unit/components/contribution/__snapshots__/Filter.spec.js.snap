@@ -13,7 +13,7 @@ exports[`totara_engage/components/contribution/Filter.vue Checks snapshot 1`] = 
     class="tui-contributionFilter__sort"
   >
     <selectfilter-stub
-      label="sortby, moodle"
+      label="sortby, core"
       options="[object Object]"
       showlabel="true"
       value=""

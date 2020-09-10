@@ -82,9 +82,9 @@ exports[`presentation/tag/TagList.vue Checks snapshot 1`] = `
       <button
         aria-expanded="false"
         aria-haspopup="menu"
-        aria-label="[[expand, moodle]] [[tag_list, totara_core]]"
+        aria-label="[[expand, core]] [[tag_list, totara_core]]"
         class="tui-iconBtn tui-tagList__expandArrow tui-iconBtn--transparent"
-        title="[[expand, moodle]] [[tag_list, totara_core]]"
+        title="[[expand, core]] [[tag_list, totara_core]]"
         type="button"
       >
         <span

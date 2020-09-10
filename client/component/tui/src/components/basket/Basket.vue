@@ -36,7 +36,7 @@
             :aria-expanded="isOpen ? 'true' : 'false'"
             :caret="true"
             :styleclass="{ primary: true, small: true }"
-            :text="$str('bulkactions')"
+            :text="$str('bulkactions', 'core')"
             :disabled="empty"
             @click="toggle"
           />
@@ -103,8 +103,12 @@ export default {
 
 <lang-strings>
 {
-  "moodle": ["bulkactions"],
-  "totara_core": ["selected"]
+  "core": [
+    "bulkactions"
+  ],
+  "totara_core": [
+    "selected"
+  ]
 }
 </lang-strings>
 

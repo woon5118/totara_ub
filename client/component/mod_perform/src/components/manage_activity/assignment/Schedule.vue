@@ -73,7 +73,7 @@
           />
           <Button
             :disabled="isSaving"
-            :text="$str('cancel', 'moodle')"
+            :text="$str('cancel', 'core')"
             @click="reset"
           />
         </ButtonGroup>
@@ -866,7 +866,7 @@ export default {
       "toast_error_generic_update",
       "toast_success_save_schedule"
     ],
-    "moodle": [
+    "core": [
       "cancel"
     ]
   }

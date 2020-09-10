@@ -27,7 +27,7 @@
 
       <template v-if="$apollo.loading">
         <DropdownItem :disabled="true">
-          {{ $str('loadinghelp', 'moodle') }}
+          {{ $str('loadinghelp', 'core') }}
         </DropdownItem>
       </template>
 
@@ -159,7 +159,7 @@ export default {
     "editor_weka": [
       "matching_hashtags"
     ],
-    "moodle": [
+    "core": [
       "loadinghelp"
     ]
   }

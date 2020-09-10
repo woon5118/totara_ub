@@ -310,7 +310,7 @@ class LinkExtension extends BaseExtension {
           action: () => this._openLinkMarkAt(getRange),
         },
         {
-          label: langString('edit', 'moodle'),
+          label: langString('edit', 'core'),
           action: () => this._editMarkAt(getRange),
         },
         {
@@ -321,7 +321,7 @@ class LinkExtension extends BaseExtension {
             this._markToCardAt(media ? 'link_media' : 'link_block', getRange),
         },
         {
-          label: langString('remove', 'moodle'),
+          label: langString('remove', 'core'),
           action: () => this._removeMarkAt(getRange),
         },
       ],

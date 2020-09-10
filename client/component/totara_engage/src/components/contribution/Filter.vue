@@ -84,7 +84,7 @@
       <div v-if="showSort" class="tui-contributionFilter__sort">
         <SelectFilter
           v-model="sort"
-          :label="$str('sortby', 'moodle')"
+          :label="$str('sortby', 'core')"
           :show-label="true"
           :options="filter.sort.options"
         />
@@ -155,7 +155,7 @@ export default {
 
   data() {
     return {
-      sortLabel: this.$str('sortby', 'moodle'),
+      sortLabel: this.$str('sortby', 'core'),
       selection: {
         access: this.value.access,
         type: this.value.type,
@@ -187,7 +187,7 @@ export default {
         // Adding default selected topic value.
         topics.unshift({
           id: null,
-          label: this.$str('all', 'moodle'),
+          label: this.$str('all', 'core'),
         });
 
         return {
@@ -294,7 +294,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "all",
     "sortby"
   ],

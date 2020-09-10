@@ -25,9 +25,9 @@
       <a
         :href="editUrl"
         class="tui-competencySummary__sectionHeader-edit"
-        :title="$str('edit', 'moodle')"
+        :title="$str('edit', 'core')"
       >
-        <EditIcon :size="200" :alt="$str('edit', 'moodle')" />
+        <EditIcon :size="200" :alt="$str('edit', 'core')" />
       </a>
     </div>
 
@@ -119,7 +119,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "edit"
     ],
     "totara_competency": [

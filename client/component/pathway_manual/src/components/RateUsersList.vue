@@ -32,7 +32,7 @@
       <Table v-if="users.length > 0" :data="users" :expandable-rows="false">
         <template v-slot:header-row>
           <HeaderCell size="5">
-            {{ $str('name') }}
+            {{ $str('name', 'core') }}
           </HeaderCell>
           <HeaderCell size="3">
             {{ $str('competencies', 'totara_hierarchy') }}
@@ -169,7 +169,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "name"
     ],
     "pathway_manual": [

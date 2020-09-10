@@ -18,7 +18,7 @@
 
 <template>
   <div class="tui-componentLoading">
-    <Loading :alt="$str('loading', 'moodle')" />
+    <Loading :alt="$str('loading', 'core')" />
   </div>
 </template>
 
@@ -34,7 +34,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "loading"
   ]
 }

@@ -134,7 +134,7 @@ function extractErrorInfo(error, vm) {
   }
   return [
     {
-      title: langString('error', 'moodle'),
+      title: langString('error', 'core'),
       context,
       debugMessage: error.message,
       stack: error.stack,

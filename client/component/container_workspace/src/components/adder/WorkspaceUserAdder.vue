@@ -65,7 +65,7 @@
       >
         <template v-slot:header-row>
           <HeaderCell size="12" valign="start">
-            {{ $str('name', 'moodle') }}
+            {{ $str('name', 'core') }}
           </HeaderCell>
 
           <HeaderCell
@@ -79,11 +79,7 @@
         </template>
 
         <template v-slot:row="{ row: { card_display, fullname } }">
-          <Cell
-            size="10"
-            :column-header="$str('name', 'moodle')"
-            valign="start"
-          >
+          <Cell size="10" :column-header="$str('name', 'core')" valign="start">
             <div class="tui-workspaceUserAdder__name">
               <Avatar
                 v-if="card_display.profile_picture_url"
@@ -120,7 +116,7 @@
       >
         <template v-slot:header-row>
           <HeaderCell size="12" valign="start">
-            {{ $str('name', 'moodle') }}
+            {{ $str('name', 'core') }}
           </HeaderCell>
 
           <HeaderCell
@@ -133,11 +129,7 @@
           </HeaderCell>
         </template>
         <template v-slot:row="{ row: { card_display, fullname } }">
-          <Cell
-            size="10"
-            :column-header="$str('name', 'moodle')"
-            valign="start"
-          >
+          <Cell size="10" :column-header="$str('name', 'core')" valign="start">
             <div class="tui-workspaceUserAdder__name">
               <Avatar
                 v-if="card_display.profile_picture_url"
@@ -291,7 +283,7 @@ export default {
     "search"
   ],
 
-  "moodle": [
+  "core": [
     "name"
   ]
 }

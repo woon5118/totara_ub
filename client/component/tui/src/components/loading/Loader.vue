@@ -27,7 +27,7 @@
       <div class="tui-loader__overlay-positioner">
         <div class="tui-loader__display">
           <Loading aria-hidden="true" />
-          {{ $str('loading', 'moodle') }}
+          {{ $str('loading', 'core') }}
         </div>
       </div>
     </div>
@@ -57,7 +57,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "loading"
     ]
   }

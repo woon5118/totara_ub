@@ -20,12 +20,12 @@
   <div class="tui-collapsibleGroupToggle">
     <ButtonIcon
       :aria-expanded="allExpanded.toString()"
-      :aria-label="$str(allExpanded ? 'collapseall' : 'expandall', 'moodle')"
+      :aria-label="$str(allExpanded ? 'collapseall' : 'expandall', 'core')"
       class="tui-collapsibleGroupToggle__button"
       :styleclass="{
         transparent: true,
       }"
-      :text="$str(allExpanded ? 'collapseall' : 'expandall', 'moodle')"
+      :text="$str(allExpanded ? 'collapseall' : 'expandall', 'core')"
       @click="toggleAllFilters()"
     >
       <CollapseIcon v-if="allExpanded" size="200" />
@@ -99,7 +99,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "expandall",
     "collapseall"
   ]

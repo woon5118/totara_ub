@@ -89,7 +89,7 @@
             :text="
               interactor.own
                 ? $str('owner', 'container_workspace')
-                : $str('admin', 'moodle')
+                : $str('admin', 'core')
             "
             :aria-label="
               $str(
@@ -97,7 +97,7 @@
                 'container_workspace',
                 interactor.own
                   ? $str('owner', 'container_workspace')
-                  : $str('admin', 'moodle')
+                  : $str('admin', 'core')
               )
             "
             :aria-expanded="isOpen"
@@ -615,7 +615,7 @@ export default {
     "transfer_ownership",
     "error:add_members"
   ],
-  "moodle": [
+  "core": [
     "admin"
   ]
 }

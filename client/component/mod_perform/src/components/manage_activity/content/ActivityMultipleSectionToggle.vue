@@ -166,9 +166,6 @@ export default {
       "modal_confirm",
       "toast_success_activity_update",
       "toast_error_generic_update"
-    ],
-    "moodle": [
-      "help"
     ]
   }
 </lang-strings>

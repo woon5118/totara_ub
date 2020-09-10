@@ -67,7 +67,7 @@ export default {
     confirmButtonText: {
       type: String,
       default() {
-        return this.$str('ok', 'moodle');
+        return this.$str('ok', 'core');
       },
     },
     closeButton: {
@@ -96,7 +96,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "ok"
     ]
   }

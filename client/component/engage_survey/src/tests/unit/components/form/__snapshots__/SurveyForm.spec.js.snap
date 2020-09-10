@@ -23,7 +23,7 @@ exports[`engage_survey/components/form/SurveyForm.vue Checks snapshot 1`] = `
   </formrow-stub>
   <formrow-stub label="optionstitle, engage_survey" isstacked="true" class="tui-engageSurveyForm__answerTitle"></formrow-stub>
   <buttongroup-stub class="tui-engageSurveyForm__buttons tui-engageSurveyForm__buttons--right">
-    <loadingbutton-stub text="next, moodle" type="submit" arialabel="" primary="true" disabled="true" class="tui-engageSurveyForm__button"></loadingbutton-stub>
+    <loadingbutton-stub text="next, core" type="submit" arialabel="" primary="true" disabled="true" class="tui-engageSurveyForm__button"></loadingbutton-stub>
     <cancelbutton-stub class="tui-engageSurveyForm__cancelButton"></cancelbutton-stub>
   </buttongroup-stub>
 </uniform-stub>

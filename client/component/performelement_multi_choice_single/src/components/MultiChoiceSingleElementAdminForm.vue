@@ -79,7 +79,7 @@
                 </template>
                 <template v-slot:add>
                   <ButtonIcon
-                    :aria-label="$str('add', 'moodle')"
+                    :aria-label="$str('add', 'core')"
                     :styleclass="{ small: true }"
                     class="tui-elementEditMultiChoiceSingle__add-option"
                     @click="push()"
@@ -208,21 +208,20 @@ export default {
 };
 </script>
 <lang-strings>
-  {
-    "performelement_multi_choice_single": [
-        "error_question_required",
-        "question_title",
-        "answer_text",
-        "single_select_options"
-    ],
-    "mod_perform": [
-        "section_element_response_required"
-    ],
-    "moodle": [
-      "add",
-      "delete"
-     ]
-  }
+{
+  "core": [
+    "add"
+  ],
+  "performelement_multi_choice_single": [
+    "error_question_required",
+    "question_title",
+    "answer_text",
+    "single_select_options"
+  ],
+  "mod_perform": [
+    "section_element_response_required"
+  ]
+}
 </lang-strings>
 
 <style lang="scss">

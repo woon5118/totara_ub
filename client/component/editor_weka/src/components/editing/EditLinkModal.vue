@@ -173,7 +173,13 @@ export default {
 
 <lang-strings>
 {
-  "editor": ["linkurl"],
+  "core": [
+    "cancel",
+    "ok"
+  ],
+  "editor": [
+    "linkurl"
+  ],
   "editor_weka": [
     "done",
     "displayas",
@@ -181,7 +187,6 @@ export default {
     "edit_link",
     "insert_link",
     "error_no_url_info"
-  ],
-  "moodle": ["ok", "cancel"]
+  ]
 }
 </lang-strings>

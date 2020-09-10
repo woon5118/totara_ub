@@ -76,7 +76,7 @@
           type="submit"
           name="cancel"
           value="1"
-          :text="$str('cancel', 'moodle')"
+          :text="$str('cancel', 'core')"
         />
       </ButtonGroup>
     </Form>
@@ -164,7 +164,7 @@ export default {
     "editor_weka": [
       "pluginname"
     ],
-    "moodle": [
+    "core": [
       "cancel"
     ]
   }

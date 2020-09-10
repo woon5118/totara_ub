@@ -128,9 +128,3 @@ export default {
   },
 };
 </script>
-
-<lang-strings>
-{
-  "moodle": ["more"]
-}
-</lang-strings>

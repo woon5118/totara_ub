@@ -20,7 +20,7 @@
   <div v-show="sharer" class="tui-cardSharedByFootnote">
     <div class="tui-cardSharedByFootnote__sharer">
       <span class="tui-cardSharedByFootnote__text">
-        {{ $str('from', 'moodle') }}
+        {{ $str('from', 'core') }}
       </span>
       <a class="tui-cardSharedByFootnote__url" :href="sharer.url">
         {{ sharer.fullname }}
@@ -132,7 +132,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "from"
   ],
   "totara_engage": [

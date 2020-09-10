@@ -188,7 +188,7 @@
           />
           <Button
             :disabled="isSaving"
-            :text="$str('cancel', 'moodle')"
+            :text="$str('cancel', 'core')"
             @click="resetChanges"
           />
         </ButtonGroup>
@@ -626,7 +626,7 @@ export default {
       "visibility_condition_label_help",
       "visibility_condition_status_mismatch_warning"
     ],
-    "moodle": [
+    "core": [
       "cancel"
     ]
   }

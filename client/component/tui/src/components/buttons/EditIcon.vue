@@ -18,7 +18,7 @@
 
 <template>
   <ButtonIcon
-    :aria-label="ariaLabel || $str('edit', 'moodle')"
+    :aria-label="ariaLabel || $str('edit', 'core')"
     :styleclass="{ transparent: true }"
     @click.prevent="$emit('click', $event)"
   >
@@ -48,7 +48,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "edit"
   ]
 }

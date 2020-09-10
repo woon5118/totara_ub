@@ -26,7 +26,7 @@
       >
         <template v-if="canManage" v-slot:drop-down-items>
           <DropdownItem @click="modal.confirm = true">
-            {{ $str('delete', 'moodle') }}
+            {{ $str('delete', 'core') }}
           </DropdownItem>
         </template>
       </MiniProfileCard>
@@ -339,7 +339,7 @@ export default {
       "deletewarningtitle"
     ],
 
-    "moodle": [
+    "core": [
       "delete"
     ]
   }

@@ -52,7 +52,7 @@
       </PopoverTrigger>
 
       <p class="tui-progressTrackerItem__status">
-        {{ $str('status', 'moodle') + ': ' + stateString }}
+        {{ $str('status', 'core') + ': ' + stateString }}
       </p>
     </div>
     <Popover
@@ -168,8 +168,16 @@ export default {
 
 <lang-strings>
 {
-  "completion": ["completion-n", "completion-y"],
-  "moodle": ["status"],
-  "totara_core": ["a11yachievedrequiredgoal", "a11yachievementtarget"]
+  "completion": [
+    "completion-n",
+    "completion-y"
+  ],
+  "core": [
+    "status"
+  ],
+  "totara_core": [
+    "a11yachievedrequiredgoal",
+    "a11yachievementtarget"
+  ]
 }
 </lang-strings>

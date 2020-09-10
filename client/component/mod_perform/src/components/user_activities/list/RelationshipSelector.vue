@@ -57,7 +57,7 @@
       <template v-slot:buttons>
         <Button
           :styleclass="{ primary: true }"
-          :text="$str('continue', 'moodle')"
+          :text="$str('continue', 'core')"
           :disabled="!relationshipToRespondAs || relationshipConfirmed"
           @click="confirmRelationshipSelection"
         />
@@ -276,7 +276,7 @@ export default {
       "user_activities_status_not_applicable_for_relationship_selector",
       "user_activities_status_not_started"
     ],
-    "moodle": [
+    "core": [
       "continue"
     ]
   }

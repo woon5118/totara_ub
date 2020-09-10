@@ -111,7 +111,7 @@ export default {
     submitButtonText: {
       type: String,
       default() {
-        return this.$str('post', 'moodle');
+        return this.$str('post', 'core');
       },
     },
   },
@@ -191,7 +191,7 @@ export default {
       "discussion",
       "start_discussion"
     ],
-    "moodle": [
+    "core": [
       "post"
     ]
   }

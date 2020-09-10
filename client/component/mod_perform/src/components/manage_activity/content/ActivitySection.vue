@@ -175,7 +175,7 @@
         @click="trySave"
       />
       <Button
-        :text="$str('cancel')"
+        :text="$str('cancel', 'core')"
         :styleclass="{ small: true }"
         :disabled="isSaving || !editMode"
         @click="resetSectionChanges"
@@ -226,7 +226,7 @@
     <ConfirmationModal
       :open="deleteSectionModalOpen"
       :title="$str('modal_section_delete_title', 'mod_perform')"
-      :confirm-button-text="$str('delete')"
+      :confirm-button-text="$str('delete', 'core')"
       :loading="deleting"
       @confirm="deleteSection"
       @cancel="closeDeleteSectionModal"
@@ -665,6 +665,10 @@ export default {
 
 <lang-strings>
   {
+    "core": [
+      "cancel",
+      "delete"
+    ],
     "mod_perform": [
       "activity_participant_view_other_responses",
       "activity_participants_heading",
@@ -683,10 +687,6 @@ export default {
       "unsaved_changes_warning",
       "untitled_section",
       "view_content_elements"
-    ],
-    "moodle": [
-      "cancel",
-      "delete"
     ]
   }
 </lang-strings>

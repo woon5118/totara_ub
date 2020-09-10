@@ -101,7 +101,7 @@
             <template>
               <ButtonIcon
                 :styleclass="{ square: true }"
-                :aria-label="$tryStr('previous', 'moodle') || 'Previous'"
+                :aria-label="$tryStr('previous', 'core') || 'Previous'"
                 :disabled="atStart"
                 @click="previous"
               >
@@ -110,7 +110,7 @@
               <div>{{ errorIndex + 1 }} of {{ errors.length }}</div>
               <ButtonIcon
                 :styleclass="{ square: true }"
-                :aria-label="$tryStr('next', 'moodle') || 'Next'"
+                :aria-label="$tryStr('next', 'core') || 'Next'"
                 :disabled="atEnd"
                 @click="next"
               >
@@ -244,8 +244,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
-    "error",
+  "core": [
     "next",
     "previous"
   ],

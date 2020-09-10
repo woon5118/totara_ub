@@ -23,7 +23,7 @@
           $str('delete_discussion_warning_msg', 'container_workspace')
         "
         :title="$str('delete_warning_title', 'container_workspace')"
-        :confirm-button-text="$str('confirm', 'moodle')"
+        :confirm-button-text="$str('confirm', 'core')"
         @confirm="deleteDiscussion"
       />
     </ModalPresenter>
@@ -122,11 +122,11 @@
         </template>
 
         <DropdownItem v-if="updateAble" @click="edit = true">
-          {{ $str('edit', 'moodle') }}
+          {{ $str('edit', 'core') }}
         </DropdownItem>
 
         <DropdownItem v-if="deleteAble" @click="modal.delete = true">
-          {{ $str('delete', 'moodle') }}
+          {{ $str('delete', 'core') }}
         </DropdownItem>
 
         <DropdownItem v-if="reportAble" @click="reportDiscussion">
@@ -509,7 +509,7 @@ export default {
       "error:report_discussion",
       "removed_discussion"
     ],
-    "moodle": [
+    "core": [
       "edit",
       "delete",
       "confirm"

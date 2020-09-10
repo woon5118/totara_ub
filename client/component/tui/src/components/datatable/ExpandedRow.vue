@@ -43,14 +43,6 @@ export default {
 };
 </script>
 
-<lang-strings>
-{
-  "moodle": [
-    "closebuttontitle"
-  ]
-}
-</lang-strings>
-
 <style lang="scss">
 .tui-dataTableExpandableRow {
   position: relative;

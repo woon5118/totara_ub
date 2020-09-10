@@ -96,14 +96,6 @@ export default {
 };
 </script>
 
-<lang-strings>
-{
-  "moodle": [
-    "filter"
-  ]
-}
-</lang-strings>
-
 <style lang="scss">
 .tui-selectFilter {
   position: relative;

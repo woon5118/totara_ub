@@ -92,13 +92,13 @@ export default {
           label: this.$str('go_to_link', 'editor_weka'),
           action: () => this.open(),
         },
-        { label: this.$str('edit', 'moodle'), action: () => this.edit() },
+        { label: this.$str('edit', 'core'), action: () => this.edit() },
         {
           label: this.$str('display_as_text', 'editor_weka'),
           action: () => this.toLink(),
         },
         {
-          label: this.$str('remove', 'moodle'),
+          label: this.$str('remove', 'core'),
           action: () => this.$emit('remove'),
         },
       ];
@@ -139,8 +139,15 @@ export default {
 
 <lang-strings>
 {
-  "editor_weka": ["display_as_text", "go_to_link", "actions_menu_for"],
-  "moodle": ["edit", "remove"]
+  "core": [
+    "edit",
+    "remove"
+  ],
+  "editor_weka": [
+    "actions_menu_for",
+    "display_as_text",
+    "go_to_link"
+  ]
 }
 </lang-strings>
 

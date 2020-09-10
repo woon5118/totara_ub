@@ -222,9 +222,6 @@ export default {
       "workflow_settings",
       "toast_error_generic_update",
       "toast_success_activity_update"
-    ],
-    "moodle": [
-      "help"
     ]
   }
 </lang-strings>

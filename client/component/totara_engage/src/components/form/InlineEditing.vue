@@ -54,7 +54,7 @@ export default {
     buttonAriaLabel: {
       type: String,
       default() {
-        return this.$str('edit', 'moodle');
+        return this.$str('edit', 'core');
       },
     },
     fullWidth: Boolean,
@@ -90,7 +90,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "edit"
     ]
   }

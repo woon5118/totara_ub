@@ -42,8 +42,8 @@
         <SelectFilter
           v-model="sort"
           :options="filter.sorts"
-          :label="$str('sortby', 'moodle')"
-          :aria-label="$str('sortby', 'moodle')"
+          :label="$str('sortby', 'core')"
+          :aria-label="$str('sortby', 'core')"
         />
       </div>
 
@@ -310,7 +310,7 @@ export default {
       "member_list"
     ],
 
-    "moodle": [
+    "core": [
       "sortby"
     ]
   }

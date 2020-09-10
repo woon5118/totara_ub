@@ -180,7 +180,7 @@ export default {
     buttonContent: {
       type: String,
       default() {
-        return this.$str('next', 'moodle');
+        return this.$str('next', 'core');
       },
     },
 
@@ -262,7 +262,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "next"
     ],
 

@@ -29,7 +29,7 @@
         <span v-else>{{ latestRating.scale_value.name }}</span>
       </template>
       <span v-if="isToday">
-        {{ $str('today') }}
+        {{ $str('today', 'core') }}
       </span>
       <span v-else>
         {{ latestRating.date }}
@@ -102,7 +102,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "today"
     ],
     "pathway_manual": [

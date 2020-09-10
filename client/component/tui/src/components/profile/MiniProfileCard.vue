@@ -219,7 +219,7 @@ export default {
         return this.dropDownButtonAriaLabel;
       }
 
-      return this.$str('actions', 'moodle');
+      return this.$str('actions', 'core');
     },
 
     profileUrl() {
@@ -235,7 +235,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "actions"
     ]
   }

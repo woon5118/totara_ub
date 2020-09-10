@@ -58,7 +58,7 @@
       <div class="tui-workspaceFilter__sortFilter">
         <SelectFilter
           v-model="selection.sort"
-          :label="$str('sortby', 'moodle')"
+          :label="$str('sortby', 'core')"
           :show-label="true"
           :options="options.sorts"
           @input="filterChanged"
@@ -117,7 +117,7 @@ export default {
       update({ sources, sorts, accesses }) {
         accesses = [
           {
-            label: this.$str('all', 'moodle'),
+            label: this.$str('all', 'core'),
             value: null,
           },
         ].concat(accesses);
@@ -182,7 +182,7 @@ export default {
       "workspace_access"
     ],
 
-    "moodle": [
+    "core": [
       "all",
       "sortby"
     ]

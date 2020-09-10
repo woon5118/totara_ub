@@ -63,10 +63,14 @@
         align="center"
         :column-header="$str('proficient', 'totara_competency')"
       >
-        <CheckIcon v-if="row.proficient" size="200" :alt="$str('yes')" />
+        <CheckIcon
+          v-if="row.proficient"
+          size="200"
+          :alt="$str('yes', 'core')"
+        />
         <span v-else>
           <span :aria-hidden="true">-</span>
-          <span class="sr-only">{{ $str('no') }}</span>
+          <span class="sr-only">{{ $str('no', 'core') }}</span>
         </span>
       </Cell>
 
@@ -142,7 +146,10 @@ export default {
 
 <lang-strings>
 {
-  "moodle": ["yes", "no"],
+  "core": [
+    "no",
+    "yes"
+  ],
   "totara_competency": [
     "header_competency",
     "header_reason_assigned",

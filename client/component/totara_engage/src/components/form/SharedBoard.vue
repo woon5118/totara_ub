@@ -26,7 +26,7 @@
         v-if="computedReceipts.length"
         :aria-expanded="showReceipts"
         :aria-label="$str('sharedwith', 'totara_engage')"
-        :text="$str(showReceipts ? 'hide' : 'show', 'moodle')"
+        :text="$str(showReceipts ? 'hide' : 'show', 'core')"
         :styleclass="{
           small: 'true',
           transparent: 'true',
@@ -119,7 +119,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "hide",
       "show"
     ],

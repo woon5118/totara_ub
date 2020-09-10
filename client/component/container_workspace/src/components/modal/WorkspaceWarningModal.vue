@@ -95,14 +95,14 @@ export default {
     confirmButtonText: {
       type: String,
       default() {
-        return this.$str('remove', 'moodle');
+        return this.$str('remove', 'core');
       },
     },
 
     cancelButtonText: {
       type: String,
       default() {
-        return this.$str('cancel', 'moodle');
+        return this.$str('cancel', 'core');
       },
     },
   },
@@ -120,7 +120,7 @@ export default {
 </script>
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "cancel",
       "remove"
     ]

@@ -17,7 +17,7 @@ exports[`totara_comment/components/action/CommentActionDropDown.vue Checks snaps
     role="menuitem"
   >
     
-    edit-moodle
+    edit-core
   
   </dropdownitem-stub>
    
@@ -25,7 +25,7 @@ exports[`totara_comment/components/action/CommentActionDropDown.vue Checks snaps
     role="menuitem"
   >
     
-    delete-moodle
+    delete-core
   
   </dropdownitem-stub>
    

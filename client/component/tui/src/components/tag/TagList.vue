@@ -85,7 +85,7 @@
           class="tui-tagList__expandArrow"
           :aria-expanded="isOpen.toString()"
           :aria-label="
-            $str(isOpen ? 'collapse' : 'expand', 'moodle') +
+            $str(isOpen ? 'collapse' : 'expand', 'core') +
               ' ' +
               $str('tag_list', 'totara_core')
           "
@@ -210,7 +210,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "expand",
     "collapse"
   ],

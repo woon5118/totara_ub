@@ -20,14 +20,14 @@
   <div v-if="!$apollo.loading" class="tui-competencySummaryGeneral">
     <div class="tui-competencySummary__sectionHeader">
       <h3 class="tui-competencySummary__sectionHeader-title">
-        {{ $str('general', 'moodle') }}
+        {{ $str('general', 'core') }}
       </h3>
       <a
         :href="editUrl"
         class="tui-competencySummary__sectionHeader-edit"
-        :title="$str('edit', 'moodle')"
+        :title="$str('edit', 'core')"
       >
-        <EditIcon :size="200" :alt="$str('edit', 'moodle')" />
+        <EditIcon :size="200" :alt="$str('edit', 'core')" />
       </a>
     </div>
 
@@ -213,7 +213,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "edit",
       "general"
     ],

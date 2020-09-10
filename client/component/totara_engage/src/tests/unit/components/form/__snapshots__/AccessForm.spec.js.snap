@@ -27,7 +27,7 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for privat
       class="tui-engageAccessForm__back"
       style="display: none;"
       styleclass="[object Object]"
-      text="back, moodle"
+      text="back, core"
       type="button"
     />
      
@@ -90,7 +90,7 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for public
       class="tui-engageAccessForm__back"
       style="display: none;"
       styleclass="[object Object]"
-      text="back, moodle"
+      text="back, core"
       type="button"
     />
      
@@ -151,7 +151,7 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for restri
       class="tui-engageAccessForm__back"
       style="display: none;"
       styleclass="[object Object]"
-      text="back, moodle"
+      text="back, core"
       type="button"
     />
      

@@ -72,8 +72,8 @@
       <ButtonIcon
         v-if="hasInput"
         :styleclass="{ small: true, alert: true }"
-        :aria-label="$str('delete')"
-        :text="$str('delete')"
+        :aria-label="$str('delete', 'core')"
+        :text="$str('delete', 'core')"
         @click="deleteRating(close)"
       >
         <DeleteIcon />
@@ -81,7 +81,7 @@
       <Button
         v-else
         :styleclass="{ small: true, primary: false }"
-        :text="$str('cancel')"
+        :text="$str('cancel', 'core')"
         @click="cancelRating(close)"
       />
     </template>
@@ -224,7 +224,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "cancel",
       "delete"
     ],

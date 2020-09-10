@@ -19,7 +19,7 @@
 <template>
   <div class="tui-errorDisplay">
     <h1 class="tui-errorDisplay__title">
-      {{ $tryStr('error', 'moodle') || 'Error' }}
+      {{ $tryStr('error', 'core') || 'Error' }}
     </h1>
     <p>
       {{
@@ -77,7 +77,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "error"
   ],
   "totara_core": [

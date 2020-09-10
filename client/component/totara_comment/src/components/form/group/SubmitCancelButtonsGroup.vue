@@ -26,7 +26,7 @@
     />
 
     <Button
-      :text="$str('cancel', 'moodle')"
+      :text="$str('cancel', 'core')"
       :styleclass="{ small: isSmall }"
       :disabled="disableCancel"
       class="tui-commentSubmitCancelButtonGroup__cancel"
@@ -84,7 +84,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "cancel"
     ]
   }

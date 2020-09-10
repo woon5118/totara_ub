@@ -18,7 +18,7 @@
 
 <template>
   <Button
-    :text="$str('cancel', 'moodle')"
+    :text="$str('cancel', 'core')"
     :disabled="disabled"
     @click="$emit('click', $event)"
   />
@@ -39,7 +39,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "cancel"
   ]
 }

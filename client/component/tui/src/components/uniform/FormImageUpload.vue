@@ -76,11 +76,3 @@ export default {
   },
 };
 </script>
-
-<lang-strings>
-{
-  "moodle": [
-    "delete"
-  ]
-}
-</lang-strings>

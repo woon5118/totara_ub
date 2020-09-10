@@ -11,7 +11,7 @@ exports[`totara_engage/components/form/RecipientsSelector.vue matches snapshot 1
       <!----></span></button>
     <div class="tui-popoverPositioner tui-popoverPositioner--transition-default" style="transform: translate3d(0px, 0px, 0); display: none;">
       <div class="tui-popoverFrame tui-popoverFrame--bottom">
-        <div class="tui-arrow tui-arrow--top tui-arrow--normal" style="left: 0px;"></div> <button aria-label="closebuttontitle, moodle" type="button" title="closebuttontitle, moodle" class="tui-iconBtn tui-popoverFrame__close tui-iconBtn--transparent"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><span class=""></span></span>
+        <div class="tui-arrow tui-arrow--top tui-arrow--normal" style="left: 0px;"></div> <button aria-label="closebuttontitle, core" type="button" title="closebuttontitle, core" class="tui-iconBtn tui-popoverFrame__close tui-iconBtn--transparent"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><span class=""></span></span>
           <!----></span>
           <!----></span></button>
         <!---->
@@ -29,7 +29,7 @@ exports[`totara_engage/components/form/RecipientsSelector.vue matches snapshot 1
           <div aria-live="polite" role="status" aria-atomic="false" aria-label="tags_selected, totara_core" aria-relevant="additions" class="tui-tagList__tagItems">
             <div class="tui-tagList__input"><input aria-label="tag_list, totara_core" type="text" class="tui-formInput tui-formInput--transparent" style="display: none;"></div>
           </div> <span class="tui-tagList__suffix" style="display: none;">n_more, totara_core</span>
-        </div> <button aria-expanded="false" aria-label="expand, moodle tag_list, totara_core" type="button" title="expand, moodle tag_list, totara_core" class="tui-iconBtn tui-tagList__expandArrow tui-iconBtn--transparent" aria-haspopup="menu"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><span class=""></span></span>
+        </div> <button aria-expanded="false" aria-label="expand, core tag_list, totara_core" type="button" title="expand, core tag_list, totara_core" class="tui-iconBtn tui-tagList__expandArrow tui-iconBtn--transparent" aria-haspopup="menu"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><span class=""></span></span>
           <!----></span>
           <!----></span></button>
       </div>

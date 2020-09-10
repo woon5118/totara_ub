@@ -166,7 +166,7 @@ export default {
       });
       filters.unshift({
         id: 0,
-        label: this.$str('all'),
+        label: this.$str('all', 'core'),
       });
 
       return filters;
@@ -187,7 +187,7 @@ export default {
       });
       filters.unshift({
         id: 0,
-        label: this.$str('all'),
+        label: this.$str('all', 'core'),
       });
 
       return filters;
@@ -201,7 +201,7 @@ export default {
       return [
         {
           id: 0,
-          label: this.$str('all'),
+          label: this.$str('all', 'core'),
         },
         {
           id: -1,
@@ -287,7 +287,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "all"
     ],
     "pathway_manual": [

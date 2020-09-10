@@ -19,7 +19,7 @@
 <template>
   <Button
     :styleclass="{ primary: 'true' }"
-    :text="$str('submit', 'moodle')"
+    :text="$str('submit', 'core')"
     type="submit"
     @click="$emit('click', $event)"
   />
@@ -37,7 +37,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "submit"
   ]
 }

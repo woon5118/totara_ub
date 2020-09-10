@@ -21,7 +21,7 @@
     <div class="tui-participantContent">
       <ConfirmationModal
         :open="modalOpen"
-        :confirm-button-text="$str('submit', 'moodle')"
+        :confirm-button-text="$str('submit', 'core')"
         :title="
           $str('user_activities_submit_confirmation_title', 'mod_perform')
         "
@@ -1306,7 +1306,7 @@ export default {
       "user_activities_submit_confirmation_title",
       "user_activities_your_relationship_to_user"
     ],
-    "moodle": [
+    "core": [
        "submit"
     ]
   }

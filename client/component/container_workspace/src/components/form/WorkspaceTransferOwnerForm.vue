@@ -76,7 +76,7 @@
 
     <ButtonGroup class="tui-workspaceTransferOwnerForm__buttonGroup">
       <LoadingButton
-        :text="$str('confirm', 'moodle')"
+        :text="$str('confirm', 'core')"
         :primary="true"
         :small="true"
         :loading="submitting"
@@ -85,7 +85,7 @@
       />
       <!-- Separator -->
       <Button
-        :text="$str('cancel', 'moodle')"
+        :text="$str('cancel', 'core')"
         :styleclass="{ small: true }"
         @click="$emit('cancel', $event)"
       />
@@ -206,7 +206,7 @@ export default {
       "transfer_ownership_help_text_one",
       "transfer_ownership_help_text_two"
     ],
-    "moodle": [
+    "core": [
       "cancel",
       "confirm"
     ]

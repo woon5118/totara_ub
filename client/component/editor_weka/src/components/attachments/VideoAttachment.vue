@@ -69,7 +69,7 @@ export default {
 
       rtn = rtn.concat([
         {
-          label: this.$str('remove', 'moodle'),
+          label: this.$str('remove', 'core'),
           action: () => {
             this.$emit('delete');
           },
@@ -78,7 +78,7 @@ export default {
 
       if (this.hasDownloadUrl) {
         rtn.push({
-          label: this.$str('download', 'moodle'),
+          label: this.$str('download', 'core'),
           action: () => {
             this.$emit('download');
           },
@@ -98,7 +98,7 @@ export default {
       "actions_menu_for"
     ],
 
-    "moodle": [
+    "core": [
       "remove",
       "download"
     ]

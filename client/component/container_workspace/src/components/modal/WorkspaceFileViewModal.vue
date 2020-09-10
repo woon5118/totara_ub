@@ -35,7 +35,7 @@
             {{ $str('view_discussion', 'container_workspace') }}
           </a>
           <a :href="downloadUrl" class="tui-workspaceFileViewModal__link">
-            {{ $str('download', 'moodle') }}
+            {{ $str('download', 'core') }}
           </a>
         </div>
       </div>
@@ -139,7 +139,7 @@ export default {
       "file_audio"
     ],
 
-    "moodle": [
+    "core": [
       "download"
     ]
   }

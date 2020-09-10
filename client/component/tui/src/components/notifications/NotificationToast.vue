@@ -91,7 +91,7 @@ export default {
         case 'success':
         case 'warning':
         case 'error':
-          return this.$str(this.type);
+          return this.$str(this.type, 'core');
         default:
           return null;
       }
@@ -112,7 +112,12 @@ export default {
 
 <lang-strings>
 {
-  "moodle": ["info", "success", "warning", "error"]
+  "core": [
+    "error",
+    "info",
+    "success",
+    "warning"
+  ]
 }
 </lang-strings>
 

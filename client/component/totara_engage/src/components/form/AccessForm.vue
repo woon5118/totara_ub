@@ -79,7 +79,7 @@
     <ButtonGroup class="tui-engageAccessForm__buttons">
       <Button
         v-show="showBack"
-        :text="$str('back', 'moodle')"
+        :text="$str('back', 'core')"
         :disabled="submitting"
         class="tui-engageAccessForm__back"
         @click="$emit('back')"
@@ -354,7 +354,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "back"
     ],
 

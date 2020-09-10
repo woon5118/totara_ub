@@ -120,7 +120,7 @@
               </template>
               <template v-slot:add>
                 <ButtonIcon
-                  :aria-label="$str('add', 'moodle')"
+                  :aria-label="$str('add', 'core')"
                   :styleclass="{ small: true }"
                   class="tui-elementEditCustomRatingScale__addOption"
                   @click="push()"

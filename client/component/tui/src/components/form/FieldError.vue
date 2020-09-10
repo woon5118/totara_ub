@@ -23,7 +23,7 @@
 
       <ButtonIcon
         v-if="dismissable"
-        :aria-label="$str('closebuttontitle', 'moodle')"
+        :aria-label="$str('closebuttontitle', 'core')"
         class="tui-formFieldError__dismiss"
         :styleclass="{
           small: true,
@@ -56,7 +56,9 @@ export default {
 
 <lang-strings>
 {
-  "moodle": ["closebuttontitle"]
+  "core": [
+    "closebuttontitle"
+  ]
 }
 </lang-strings>
 

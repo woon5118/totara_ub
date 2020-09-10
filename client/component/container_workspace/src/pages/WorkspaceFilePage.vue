@@ -215,7 +215,7 @@ export default {
       this.innerFile.downloadUrl = download_url;
       this.innerFile.mimeType = mimetype;
       this.innerFile.fileType = file_type;
-      this.innerFile.altText = alt_text || this.$str('imagealt', 'moodle');
+      this.innerFile.altText = alt_text || this.$str('imagealt', 'core');
       this.innerFile.fileUrl = file_url;
 
       this.openModal = true;
@@ -225,7 +225,7 @@ export default {
 </script>
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "imagealt"
     ]
   }

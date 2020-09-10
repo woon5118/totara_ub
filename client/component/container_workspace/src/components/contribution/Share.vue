@@ -23,7 +23,7 @@
         :title="$str('warning_change_title', 'container_workspace')"
         :message-content="warning.message"
         :close-button="false"
-        :confirm-button-text="$str('continue', 'moodle')"
+        :confirm-button-text="$str('continue', 'core')"
         @confirm="shareItems(currentItems)"
       />
     </ModalPresenter>
@@ -209,7 +209,7 @@ export default {
     "workspace:add_library",
     "warning_change_title"
   ],
-  "moodle": [
+  "core": [
     "continue"
   ]
 }

@@ -6,7 +6,7 @@ exports[`totara_engage/components/form/InlineEditing.vue Checks snapshot 1`] = `
 >
    
   <buttonicon-stub
-    arialabel="edit, moodle"
+    arialabel="edit, core"
     class="tui-inlineEditing__btn"
     styleclass="[object Object]"
     type="button"

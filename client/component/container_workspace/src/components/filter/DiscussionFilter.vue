@@ -44,7 +44,7 @@
     <div class="tui-workspaceDiscussionFilter__sortBox">
       <SelectFilter
         v-model="innerSort"
-        :label="$str('sortby', 'moodle')"
+        :label="$str('sortby', 'core')"
         :show-label="true"
         :options="sortOptions"
       />
@@ -138,7 +138,7 @@ export default {
       "browse_files"
     ],
 
-    "moodle": [
+    "core": [
       "sortby"
     ]
   }

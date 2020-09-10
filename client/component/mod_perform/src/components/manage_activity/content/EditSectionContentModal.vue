@@ -161,7 +161,7 @@
     <ConfirmationModal
       :open="deleteModalOpen"
       :title="$str('modal_element_delete_title', 'mod_perform')"
-      :confirm-button-text="$str('delete')"
+      :confirm-button-text="$str('delete', 'core')"
       :loading="isSaving"
       @confirm="deleteSelectedElement"
       @cancel="closeDeleteModal"
@@ -782,6 +782,9 @@ export default {
 
 <lang-strings>
 {
+  "core": [
+    "delete"
+  ],
   "mod_perform": [
     "button_close",
     "modal_element_delete_message",
@@ -793,9 +796,6 @@ export default {
     "toast_success_delete_element",
     "toast_success_save_element",
     "unsaved_changes_warning"
-  ],
-  "moodle": [
-    "delete"
   ]
 }
 </lang-strings>

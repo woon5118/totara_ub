@@ -136,7 +136,7 @@
           >
             <ButtonIcon
               v-if="row.group.id"
-              :aria-label="$str('delete')"
+              :aria-label="$str('delete', 'core')"
               :styleclass="{
                 small: true,
                 transparent: true,
@@ -549,6 +549,9 @@ export default {
 
 <lang-strings>
   {
+    "core": [
+      "delete"
+    ],
     "mod_perform" : [
       "deleted_dynamic_source_label",
       "unsaved_changes_warning",
@@ -568,9 +571,6 @@ export default {
       "user_group_assignment_unique_user_count_link",
       "user_group_assignment_usercount",
       "view_actions"
-    ],
-    "moodle": [
-      "delete"
     ]
   }
 </lang-strings>

@@ -48,12 +48,12 @@
           <ButtonGroup>
             <Button
               :styleclass="{ primary: 'true' }"
-              :text="$str('submit')"
+              :text="$str('submit', 'core')"
               :disabled="!hasSelectedRatings"
               type="submit"
               @click="showSubmitRatingsModal = true"
             />
-            <Button :text="$str('cancel')" @click="$emit('go-back')" />
+            <Button :text="$str('cancel', 'core')" @click="$emit('go-back')" />
           </ButtonGroup>
           <ConfirmationModal
             :open="showSubmitRatingsModal"
@@ -374,6 +374,10 @@ export default {
 
 <lang-strings>
   {
+    "core": [
+      "cancel",
+      "submit"
+    ],
     "pathway_manual": [
       "error_ratings_not_saved",
       "filter_no_competencies",
@@ -385,10 +389,6 @@ export default {
       "modal_submit_ratings_summary_plural_self",
       "no_rateable_competencies",
       "unsaved_ratings_warning"
-    ],
-    "moodle": [
-      "cancel",
-      "submit"
     ]
   }
 </lang-strings>

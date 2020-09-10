@@ -30,7 +30,7 @@
     <Button
       :disabled="loading"
       :styleclass="{ small: true }"
-      :text="$str('cancel', 'moodle')"
+      :text="$str('cancel', 'core')"
       @click="$emit('cancel', $event)"
     />
   </ButtonGroup>
@@ -56,7 +56,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "cancel"
     ],
     "totara_engage": [

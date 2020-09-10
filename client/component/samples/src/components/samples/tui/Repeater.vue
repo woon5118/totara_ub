@@ -31,10 +31,10 @@
       </template>
       <template v-if="customAddButton" v-slot:add>
         <ButtonIcon
-          :aria-label="$str('add', 'moodle')"
+          :aria-label="$str('add', 'core')"
           :styleclass="{ small: true }"
           :disabled="disabled"
-          :text="$str('add', 'moodle')"
+          :text="$str('add', 'core')"
           @click="addNewSection"
         >
           <AddIcon />
@@ -152,9 +152,8 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
-    "add",
-    "delete"
+  "core": [
+    "add"
   ]
 }
 </lang-strings>

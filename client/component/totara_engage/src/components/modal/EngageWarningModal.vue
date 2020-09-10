@@ -46,13 +46,13 @@
         <ButtonGroup>
           <Button
             :styleclass="{ primary: true, small: true }"
-            :text="$str('yes', 'moodle')"
+            :text="$str('yes', 'core')"
             @click="$emit('delete')"
           />
 
           <Button
             :styleclass="{ small: true }"
-            :text="$str('no', 'moodle')"
+            :text="$str('no', 'core')"
             @click="$emit('request-close')"
           />
         </ButtonGroup>
@@ -117,7 +117,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "yes",
       "no"
     ]

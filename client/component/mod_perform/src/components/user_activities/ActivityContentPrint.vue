@@ -542,19 +542,16 @@ export default {
 </script>
 <lang-strings>
 {
-"mod_perform": [
-"print_activity",
-"relation_to_subject_self",
-"section_element_response_optional",
-"section_element_response_required",
-"user_activities_created_at",
-"user_activities_complete_before",
-"user_activities_other_response_show",
-"user_activities_your_relationship_to_user"
-],
-"moodle": [
-"submit"
-]
+  "mod_perform": [
+    "print_activity",
+    "relation_to_subject_self",
+    "section_element_response_optional",
+    "section_element_response_required",
+    "user_activities_created_at",
+    "user_activities_complete_before",
+    "user_activities_other_response_show",
+    "user_activities_your_relationship_to_user"
+  ]
 }
 </lang-strings>
 

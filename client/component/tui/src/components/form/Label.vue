@@ -32,18 +32,18 @@
   >
     <span v-if="accessibleLabel" class="tui-formLabel--hidden">
       {{ accessibleLabel }}
-      <span v-if="required">{{ $str('required', 'moodle') }}</span>
-      <span v-if="optional">{{ $str('optional', 'moodle') }}</span>
+      <span v-if="required">{{ $str('required', 'core') }}</span>
+      <span v-if="optional">{{ $str('optional', 'core') }}</span>
     </span>
 
     {{ label }}
     <span
       v-if="required && !accessibleLabel"
       class="tui-formLabel__required"
-      :title="$str('required', 'moodle')"
+      :title="$str('required', 'core')"
     >
       <span aria-hidden="true">*</span>
-      <span class="sr-only">{{ $str('required', 'moodle') }}</span>
+      <span class="sr-only">{{ $str('required', 'core') }}</span>
     </span>
   </component>
 </template>
@@ -73,7 +73,10 @@ export default {
 
 <lang-strings>
 {
-  "moodle": ["optional", "required"]
+  "core": [
+    "optional",
+    "required"
+  ]
 }
 </lang-strings>
 

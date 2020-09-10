@@ -11,7 +11,7 @@ exports[`components/LastRatingBlock.vue Checks snapshot - for date that is today
      
     <span>
       
-      $str('today')
+      $str('today', 'core')
     
     </span>
      
@@ -57,7 +57,7 @@ exports[`components/LastRatingBlock.vue Checks snapshot - for empty scale value:
      
     <span>
       
-      $str('today')
+      $str('today', 'core')
     
     </span>
      

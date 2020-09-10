@@ -48,7 +48,7 @@
     <ButtonIcon
       v-if="showButtonControl"
       :disabled="opening || closing"
-      :aria-label="$str(isOpen ? 'collapse' : 'expand', 'moodle')"
+      :aria-label="$str(isOpen ? 'collapse' : 'expand', 'core')"
       :aria-expanded="isOpen ? 'true' : 'false'"
       class="tui-sidePanel__outsideClose"
       @click.prevent="isOpen ? collapse() : expand()"
@@ -427,7 +427,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "expand",
     "collapse"
   ]

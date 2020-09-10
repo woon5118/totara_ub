@@ -38,7 +38,7 @@
       <SelectFilter
         v-if="showSort"
         v-model="selection.sort"
-        :label="$str('sortby', 'moodle')"
+        :label="$str('sortby', 'core')"
         :show-label="true"
         :options="filter.sorts"
         class="tui-workspaceFileFilter__sortFilter"
@@ -105,7 +105,7 @@ export default {
         // Adding default extensions value, which should be empty.
         extensions.unshift({
           id: '',
-          label: this.$str('all', 'moodle'),
+          label: this.$str('all', 'core'),
         });
 
         return {
@@ -140,7 +140,7 @@ export default {
       "no_file_found"
     ],
 
-    "moodle": [
+    "core": [
       "sortby",
       "all"
     ]

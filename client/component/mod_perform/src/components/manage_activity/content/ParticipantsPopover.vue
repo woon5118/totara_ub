@@ -45,7 +45,7 @@
       />
       <Button
         :styleclass="{ small: true, primary: false }"
-        :text="$str('cancel')"
+        :text="$str('cancel', 'core')"
         @click="close"
       />
     </template>
@@ -181,14 +181,14 @@ export default {
 
 <lang-strings>
   {
+    "core": [
+      "cancel"
+    ],
     "mod_perform": [
       "activity_participants_select_done",
       "activity_participants_select_heading",
       "activity_participants_add",
       "activity_participants_view_only_add"
-    ],
-    "moodle": [
-      "cancel"
-    ]
+    ]    
   }
 </lang-strings>

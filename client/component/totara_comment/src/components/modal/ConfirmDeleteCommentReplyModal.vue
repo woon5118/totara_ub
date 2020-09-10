@@ -47,12 +47,12 @@
         class="tui-confirmDeleteCommentReplyModal__buttons"
       >
         <Button
-          :text="$str('confirm', 'moodle')"
+          :text="$str('confirm', 'core')"
           :styleclass="{ primary: true, small: true }"
           @click.prevent="$emit('confirm-delete')"
         />
         <Button
-          :text="$str('cancel', 'moodle')"
+          :text="$str('cancel', 'core')"
           :styleclass="{ small: true }"
           @click.prevent="$emit('request-close')"
         />
@@ -94,7 +94,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "cancel",
       "confirm"
     ],

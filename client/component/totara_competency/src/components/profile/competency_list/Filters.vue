@@ -35,7 +35,7 @@
       />
       <SearchFilter
         v-model="filters.search"
-        :label="$str('search')"
+        :label="$str('search', 'core')"
         :stacked="stacked"
         @input="filtersUpdatedDebounced"
       />
@@ -43,7 +43,7 @@
     <template v-slot:filters-right="{ stacked }">
       <SelectFilter
         v-model="order"
-        :label="$str('sortby')"
+        :label="$str('sortby', 'core')"
         :show-label="true"
         :stacked="stacked"
         :options="orderOptions"
@@ -160,6 +160,13 @@ export default {
 
 <lang-strings>
 {
+  "admin": [
+    "filters"
+  ],
+  "core": [
+    "search",
+    "sortby"
+  ],
   "totara_competency": [
     "proficient",
     "not_proficient",
@@ -169,9 +176,7 @@ export default {
     "sort_recently_assigned",
     "proficiency_status",
     "filter_competencies"
-  ],
-  "moodle": ["search", "sortby"],
-  "admin": ["filters"]
+  ]
 }
 </lang-strings>
 

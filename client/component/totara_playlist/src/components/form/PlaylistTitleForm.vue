@@ -93,9 +93,6 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
-      "edit"
-    ],
     "totara_playlist": [
       "playlisttitle"
     ]

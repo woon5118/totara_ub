@@ -41,13 +41,13 @@
         {{ $str('go_to_link', 'editor_weka') }}
       </DropdownButton>
       <DropdownButton @click="edit">
-        {{ $str('edit', 'moodle') }}
+        {{ $str('edit', 'core') }}
       </DropdownButton>
       <DropdownButton @click="toLink">
         {{ $str('display_as_text', 'editor_weka') }}
       </DropdownButton>
       <DropdownButton @click="remove">
-        {{ $str('remove', 'moodle') }}
+        {{ $str('remove', 'core') }}
       </DropdownButton>
     </Dropdown>
   </div>
@@ -95,8 +95,15 @@ export default {
 
 <lang-strings>
 {
-  "editor_weka": ["display_as_text", "go_to_link", "actions_menu_for"],
-  "moodle": ["edit", "remove"]
+  "core": [
+    "edit",
+    "remove"
+  ],
+  "editor_weka": [
+    "actions_menu_for",
+    "display_as_text",
+    "go_to_link"
+  ]
 }
 </lang-strings>
 

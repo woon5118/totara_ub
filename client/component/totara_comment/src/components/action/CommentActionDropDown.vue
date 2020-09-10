@@ -30,11 +30,11 @@
     </template>
 
     <DropdownItem v-if="showUpdateAction" @click="$emit('click-edit')">
-      {{ $str('edit', 'moodle') }}
+      {{ $str('edit', 'core') }}
     </DropdownItem>
 
     <DropdownItem v-if="showDeleteAction" @click="$emit('click-delete')">
-      {{ $str('delete', 'moodle') }}
+      {{ $str('delete', 'core') }}
     </DropdownItem>
 
     <DropdownItem
@@ -89,7 +89,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "delete",
       "edit"
     ],

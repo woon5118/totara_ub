@@ -41,7 +41,7 @@
 
       <template v-if="deleteAble" v-slot:drop-down-items>
         <DropdownItem @click="modal.confirm = true">
-          {{ $str('remove', 'moodle') }}
+          {{ $str('remove', 'core') }}
         </DropdownItem>
       </template>
     </MiniProfileCard>
@@ -162,7 +162,7 @@ export default {
 </script>
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "remove"
     ],
     "container_workspace": [

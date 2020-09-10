@@ -29,7 +29,7 @@
       v-bind="$props"
       :aria-label="ariaLabel || placeholder"
       :disabled="disabled"
-      :placeholder="placeholder || $str('search', 'moodle')"
+      :placeholder="placeholder || $str('search', 'core')"
       @input="input"
       @submit="submit"
     />
@@ -101,7 +101,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "search"
   ]
 }

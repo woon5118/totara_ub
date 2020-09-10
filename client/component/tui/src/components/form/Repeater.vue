@@ -46,7 +46,7 @@
           v-if="deleteIcon"
           class="tui-repeater__delete"
           :style="{ visibility: showDeleteIcon(index) ? null : 'hidden' }"
-          :aria-label="$str('delete', 'moodle')"
+          :aria-label="$str('delete', 'core')"
           :styleclass="{ small: true, stealth: true }"
           :disabled="disabled || !showDeleteIcon(index)"
           @click="$emit('remove', row, index)"
@@ -58,7 +58,7 @@
     <slot name="add">
       <ButtonIcon
         v-if="rows.length < maxRows"
-        :aria-label="$str('add', 'moodle')"
+        :aria-label="$str('add', 'core')"
         :aria-controls="uid"
         :styleclass="{ small: true }"
         :disabled="disabled"
@@ -120,7 +120,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "add",
     "delete"
   ]

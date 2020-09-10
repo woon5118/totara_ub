@@ -34,7 +34,7 @@
             @click="$_handleClick(close)"
           />
           <Button
-            :text="$str('cancel', 'moodle')"
+            :text="$str('cancel', 'core')"
             :styleclass="{ small: true }"
             @click="close"
           />
@@ -71,7 +71,7 @@ export default {
       "done"
     ],
 
-    "moodle": [
+    "core": [
       "cancel"
     ]
   }

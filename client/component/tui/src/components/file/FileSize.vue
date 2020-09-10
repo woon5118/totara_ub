@@ -40,7 +40,7 @@ export default {
       let size = parseInt(this.size);
 
       if (size === -1) {
-        return this.$str('unlimited');
+        return this.$str('unlimited', 'core');
       }
 
       let params = {
@@ -50,16 +50,16 @@ export default {
 
       if (size >= 1073741824) {
         params.size = Math.round((size / 1073741824) * 10) / 10;
-        params.unit = this.$str('sizegb');
+        params.unit = this.$str('sizegb', 'core');
       } else if (size >= 1048576) {
         params.size = Math.round((size / 1048576) * 10) / 10;
-        params.unit = this.$str('sizemb');
+        params.unit = this.$str('sizemb', 'core');
       } else if (size >= 1024) {
         params.size = Math.round((size / 1024) * 10) / 10;
-        params.unit = this.$str('sizekb');
+        params.unit = this.$str('sizekb', 'core');
       } else {
         params.size = size;
-        params.unit = this.$str('sizeb');
+        params.unit = this.$str('sizeb', 'core');
       }
 
       return this.$str('filesize', 'totara_core', params);
@@ -70,15 +70,15 @@ export default {
 
 <lang-strings>
   {
-    "totara_core": [
-      "filesize"
-    ],
-    "moodle": [
+    "core": [
       "unlimited",
       "sizegb",
       "sizemb",
       "sizekb",
       "sizeb"
+    ],
+    "totara_core": [
+      "filesize"
     ]
   }
 </lang-strings>

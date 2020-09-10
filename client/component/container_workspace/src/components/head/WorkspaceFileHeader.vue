@@ -20,11 +20,11 @@
     <div class="tui-workspaceFileHeader__back">
       <ButtonIcon
         :styleclass="{ transparent: true }"
-        :aria-label="$str('back', 'moodle')"
-        :text="$str('back', 'moodle')"
+        :aria-label="$str('back', 'core')"
+        :text="$str('back', 'core')"
         @click="$emit('go-back')"
       >
-        <BackArrow size="200" :alt="$str('back', 'moodle')" />
+        <BackArrow size="200" :alt="$str('back', 'core')" />
       </ButtonIcon>
     </div>
 
@@ -47,7 +47,7 @@ export default {
 </script>
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "back"
     ],
     "container_workspace": [

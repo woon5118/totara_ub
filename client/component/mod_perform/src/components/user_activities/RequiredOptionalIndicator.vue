@@ -21,10 +21,10 @@
     <span
       v-if="isRequired"
       class="tui-performRequiredOptionalIndicator--required"
-      :title="$str('required', 'moodle')"
+      :title="$str('required', 'core')"
     >
       <span aria-hidden="true">*</span>
-      <span class="sr-only">{{ $str('required', 'moodle') }}</span>
+      <span class="sr-only">{{ $str('required', 'core') }}</span>
     </span>
 
     <span
@@ -45,6 +45,9 @@ export default {
 
 <lang-strings>
 {
+  "core": [
+    "required"
+  ],
   "mod_perform": [
     "section_element_response_optional"
   ]

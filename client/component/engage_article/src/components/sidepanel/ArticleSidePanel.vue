@@ -29,7 +29,7 @@
           v-if="article.owned || article.updateable"
           @click="openModalFromAction = true"
         >
-          {{ $str('delete', 'moodle') }}
+          {{ $str('delete', 'core') }}
         </DropdownItem>
         <DropdownItem v-if="!article.owned" @click="reportResource">
           {{ $str('reportresource', 'engage_article') }}
@@ -368,7 +368,7 @@ export default {
       "reportresource",
       "error:reportresource"
     ],
-    "moodle": [
+    "core": [
       "delete"
     ],
     "totara_reportedcontent": [

@@ -259,9 +259,6 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
-      "loading"
-    ],
     "totara_engage": [
       "compress",
       "contribute",

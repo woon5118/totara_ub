@@ -52,7 +52,7 @@
             {{ file.name }} {{ file.progress }}%
             <ButtonIcon
               :styleclass="{ transparent: true }"
-              :aria-label="$str('delete', 'moodle')"
+              :aria-label="$str('delete', 'core')"
               @click="deleteDraft(file)"
             >
               <DeleteIcon />
@@ -95,7 +95,7 @@ export default {
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "delete"
   ]
 }

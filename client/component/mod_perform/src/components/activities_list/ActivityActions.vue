@@ -316,7 +316,7 @@ export default {
       "toast_success_activity_deleted",
       "toast_success_draft_activity_deleted"
     ],
-    "moodle": [
+    "core": [
       "delete"
     ]
   }

@@ -42,7 +42,7 @@ export default {
   computed: {
     displayName() {
       if (!this.fullname) {
-        return this.$str('unknownuser', 'moodle');
+        return this.$str('unknownuser', 'core');
       }
 
       return this.fullname;
@@ -60,7 +60,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "unknownuser"
     ]
   }

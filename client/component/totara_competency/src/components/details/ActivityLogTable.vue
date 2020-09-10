@@ -20,10 +20,10 @@
   <Table :data="log" class="tui-competencyDetailActivityLogTable">
     <template v-slot:header-row>
       <HeaderCell size="2">
-        {{ $str('date', 'moodle') }}
+        {{ $str('date', 'core') }}
       </HeaderCell>
       <HeaderCell size="8">
-        {{ $str('description', 'moodle') }}
+        {{ $str('description', 'core') }}
       </HeaderCell>
       <HeaderCell size="3">
         {{ $str('proficiency_status', 'totara_competency') }}
@@ -34,7 +34,7 @@
     </template>
     <template v-slot:row="{ row, expand }">
       <!-- Date column -->
-      <Cell size="2" :column-header="$str('date', 'moodle')">
+      <Cell size="2" :column-header="$str('date', 'core')">
         <Popover :triggers="['hover']">
           <template v-slot:trigger>
             <span class="tui-competencyDetailActivityLogTable__date">
@@ -48,7 +48,7 @@
       <!-- Description column -->
       <Cell
         size="8"
-        :column-header="$str('description', 'moodle')"
+        :column-header="$str('description', 'core')"
         class="tui-competencyDetailActivityLogTable__description"
       >
         <AddUserIcon v-if="row.assignment_action === 'assigned'" size="200" />
@@ -134,7 +134,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
+    "core": [
       "date",
       "description"
     ],
