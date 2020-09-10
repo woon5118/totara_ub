@@ -42,12 +42,18 @@ final class query implements cursor_query {
     private $source;
 
     /**
-     * The user's workspace that we want to fetch for. Normally, this $user_id
-     * will be the actor who is trying to fetch the workspace.
+     * The user's workspace that we want to fetch for. This is a target user.
      *
      * @var int
      */
     private $user_id;
+
+    /**
+     * The user who runs the query against $user_id. Sometimes it can be the same as $user_id.
+     *
+     * @var int
+     */
+    private $actor_id;
 
     /**
      * This will be works when source is either MEMBER only or both MEMBER_AND_OWNED
@@ -141,7 +147,7 @@ final class query implements cursor_query {
 
     /**
      * @param array     $parameters
-     * @param int|null  $user_id    The owner's id. If it is not set, then user in session will be used.
+     * @param int|null  $user_id    The target user's id. If it is not set, then user in session will be used.
      *
      * @return query
      */
@@ -251,5 +257,25 @@ final class query implements cursor_query {
      */
     public function get_user_id(): int {
         return $this->user_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_actor_id(): int {
+        global $USER;
+
+        if (null === $this->actor_id) {
+            return $USER->id;
+        }
+
+        return $this->actor_id;
+    }
+
+    /**
+     * @param int $actor_id
+     */
+    public function set_actor_id(int $actor_id): void {
+        $this->actor_id = $actor_id;
     }
 }

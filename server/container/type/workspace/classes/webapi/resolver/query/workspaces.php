@@ -23,6 +23,7 @@
 namespace container_workspace\webapi\resolver\query;
 
 use container_workspace\loader\workspace\loader;
+use container_workspace\query\workspace\access;
 use container_workspace\query\workspace\query;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
@@ -46,12 +47,29 @@ final class workspaces implements query_resolver, has_middleware {
             $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
         }
 
-        $user_id = $USER->id;
+        // At this point, target user and actor can be the same until the parameters tell us differently.
+        $actor_id = $USER->id;
+        $target_user_id = $USER->id;
+
         if (isset($args['user_id'])) {
-            $user_id = (int) $args['user_id'];
+            $target_user_id = $args['user_id'];
         }
 
-        $query = query::from_parameters($args, $user_id);
+        if ($actor_id != $target_user_id) {
+            if (isset($args['access']) && !access::is_public(access::get_value($args['access']))) {
+                debugging(
+                    "You are not allowed to fetch target user's non public workspaces, access is reset",
+                    DEBUG_DEVELOPER
+                );
+            }
+
+            // Reset access to PUBLIC as we are only fetching the public.
+            $args['access'] = access::get_code(access::PUBLIC);
+        }
+
+        $query = query::from_parameters($args, $target_user_id);
+        $query->set_actor_id($actor_id);
+
         $paginator = loader::get_workspaces($query);
 
         return $paginator->get_items()->all();

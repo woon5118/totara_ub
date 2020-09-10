@@ -144,9 +144,13 @@ final class loader {
         }
 
         // Note: as of TL-25350 - this totara_visbility_where will support our hidden workspace.
+        // We are not using $user_id in this torara_visiblity_where because $user_id is the target user's id
+        // that we are trying to fetch against, and actor's id is the current user running this loader.
+        // Hence we will have to filter out all the workspaces that the actor user cannot see against the
+        // target user that is being fetched.
         require_once("{$CFG->dirroot}/totara/coursecatalog/lib.php");
         [$sql_where, $sql_params] = totara_visibility_where(
-            $user_id,
+            $query->get_actor_id(),
             'c.id',
             'c.visible',
             'c.audiencevisible',

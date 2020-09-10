@@ -23,6 +23,7 @@
 namespace container_workspace\webapi\resolver\query;
 
 use container_workspace\loader\workspace\loader;
+use container_workspace\query\workspace\access;
 use container_workspace\workspace;
 use core\orm\pagination\offset_cursor_paginator;
 use core\webapi\execution_context;
@@ -42,18 +43,34 @@ final class workspace_cursor implements query_resolver, has_middleware {
      * @return offset_cursor_paginator
      */
     public static function resolve(array $args, execution_context $ec): offset_cursor_paginator {
+        global $USER;
+
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
         }
 
-        global $USER;
+        $actor_id = $USER->id;
+        $target_user_id = $USER->id;
 
-        $user_id = $USER->id;
         if (isset($args['user_id'])) {
-            $user_id = (int) $args['user_id'];
+            $target_user_id = $args['user_id'];
         }
 
-        $query = query::from_parameters($args, $user_id);
+        if ($actor_id != $target_user_id) {
+            $current_access_value = access::get_value($args['access']);
+            if (isset($args['access']) && !access::is_public($current_access_value)) {
+                debugging(
+                    "You are not allowed to fetch target user's non public workspaces, access is reset",
+                    DEBUG_DEVELOPER
+                );
+            }
+
+            // Reset access to PUBLIC as we are only fetching the public.
+            $args['access'] = access::get_code(access::PUBLIC);
+        }
+
+        $query = query::from_parameters($args, $target_user_id);
+        $query->set_actor_id($actor_id);
         return loader::get_workspaces($query);
     }
 
