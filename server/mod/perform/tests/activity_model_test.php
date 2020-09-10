@@ -204,6 +204,36 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
     }
 
     /**
+     * Test updating an active activity manual relationship
+     */
+    public function test_update_manual_relationship_in_draft_status(): void {
+        $activity = $this->perform_generator->create_activity_in_container([
+            'activity_name' => 'Existing activity name',
+            'description' => 'Existing activity description',
+            'activity_type' => 'check-in',
+            'activity_status' => draft::get_code(),
+        ]);
+
+        $manager_relationship = relationship::load_by_idnumber('manager');
+
+        $manual_relationships_args = [];
+        foreach ($activity->manual_relationships as $manual_relationship) {
+            $manual_relationships_args[] = [
+                'manual_relationship_id' => $manual_relationship->id,
+                'selector_relationship_id' => $manager_relationship->id,
+            ];
+        }
+
+        $activity->update_manual_relationship_selections($manual_relationships_args);
+        $relationships = $activity->get_manual_relationships();
+        foreach ($relationships as $relationship) {
+            $this->assertInstanceOf(activity::class, $relationship->get_activity());
+            $this->assertInstanceOf(relationship::class, $relationship->get_selector_relationship());
+            $this->assertInstanceOf(relationship::class, $relationship->get_manual_relationship());
+        }
+    }
+
+    /**
      * @dataProvider update_general_should_validate_new_attributes
      * @param string $new_name
      * @param string $expected_message

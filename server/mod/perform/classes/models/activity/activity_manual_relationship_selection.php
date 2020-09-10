@@ -28,6 +28,19 @@ use core\orm\entity\model;
 use mod_perform\entities\activity\manual_relationship_selection;
 use totara_core\relationship\relationship;
 
+/**
+ * Class activity_manual_relationship_selection
+ *
+ * Represents a single manual relationship.
+ *
+ * @property-read int $id ID
+ * @property-read int $activity_id
+ * @property-read int $manual_relationship_id
+ * @property-read int $selector_relationship_id
+ * @property-read activity $activity
+ * @property-read relationship $manual_relationship
+ * @property-read relationship $selector_relationship
+ */
 class activity_manual_relationship_selection extends model {
 
     protected $entity_attribute_whitelist = [
@@ -66,6 +79,15 @@ class activity_manual_relationship_selection extends model {
      */
     public function get_selector_relationship(): relationship {
         return relationship::load_by_id($this->entity->selector_relationship_id);
+    }
+
+    /**
+     * Get the activity.
+     *
+     * @return activity
+     */
+    public function get_activity(): activity {
+        return activity::load_by_entity($this->entity->activity);
     }
 
     /**
