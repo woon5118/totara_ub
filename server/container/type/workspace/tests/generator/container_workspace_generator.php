@@ -50,11 +50,13 @@ final class container_workspace_generator extends component_generator_base {
      * @param int|null      $owner
      * @param bool          $is_private
      * @param bool          $is_hidden
+     * @param int|null      $draft_id
      * @return workspace
      */
     public function create_workspace(?string $name = null, ?string $summary = null,
                                      ?int $summary_format = null, ?int $owner = null,
-                                     bool $is_private = false, bool $is_hidden = false): workspace {
+                                     bool $is_private = false, bool $is_hidden = false,
+                                     ?int $draft_id = null): workspace {
         global $USER;
 
         if (null === $name || '' === $name) {
@@ -75,7 +77,7 @@ final class container_workspace_generator extends component_generator_base {
             null,
             $summary,
             $summary_format,
-            null,
+            $draft_id,
             $is_private,
             $is_hidden
         );

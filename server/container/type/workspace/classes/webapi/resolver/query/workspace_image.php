@@ -44,8 +44,9 @@ final class workspace_image implements query_resolver, has_middleware {
      * @return string
      */
     public static function resolve(array $args, execution_context $ec): string {
+        $workspace_image = new workspace_image_file();
+
         if (empty($args['workspace_id'])) {
-            $workspace_image = new workspace_image_file();
             $url = $workspace_image->get_current_or_default_url();
             if (!$ec->has_relevant_context()) {
                 $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
@@ -67,6 +68,9 @@ final class workspace_image implements query_resolver, has_middleware {
                 $workspace->get_context()
             );
             $url = $file_helper->get_file_url();
+            if (!$url) {
+                $url = $workspace_image->get_current_or_default_url();
+            }
         }
 
         if ($url instanceof \moodle_url) {
