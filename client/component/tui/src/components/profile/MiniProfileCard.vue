@@ -34,6 +34,7 @@
       <a
         v-if="!readOnly && profileUrl"
         :href="profileUrl"
+        :aria-describedby="ariaDescribedby"
         class="tui-miniProfileCard__avatar"
       >
         <Avatar :src="avatarSrc" :alt="avatarAlt" size="xsmall" />
@@ -71,12 +72,14 @@
 
             <a
               v-else
+              :id="labelId"
               :href="url"
               class="tui-miniProfileCard__description__row__link"
               :class="{
                 'tui-miniProfileCard__description__row__link--bold':
                   index === 0,
               }"
+              :aria-describedby="ariaDescribedby"
             >
               {{ value }}
             </a>
@@ -155,6 +158,8 @@ export default {
       },
     },
     readOnly: Boolean,
+    ariaDescribedby: String,
+    labelId: String,
   },
 
   computed: {
