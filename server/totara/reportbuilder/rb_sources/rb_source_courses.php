@@ -292,9 +292,9 @@ class rb_source_courses extends rb_base_source {
             false
         );
 
-        // Exclude the site course.
-        $sql = "(base.id != :siteid) AND ({$sql})";
-        $params['siteid'] = SITEID;
+        // Exclude the site course and all the non courses container.
+        $sql = "(base.containertype = :containertype) AND ({$sql})";
+        $params['containertype'] = \container_course\course::get_type();
 
         $joins = ['ctx'];
 

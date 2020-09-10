@@ -72,22 +72,33 @@ class rb_source_course_membership extends rb_base_source {
 
         $global_restriction_join = $this->get_global_report_restriction_join('basesub', 'userid');
 
+        $course_type = container_course\course::get_type();
+        $site_type = container_site\site::get_type();
+
         $uniqueid = $DB->sql_concat_join("','", array('userid', 'courseid'));
 
         return  "(SELECT " . $uniqueid . " AS id, userid, courseid
                     FROM (SELECT ue.userid AS userid, e.courseid AS courseid
                            FROM {user_enrolments} ue
                            JOIN {enrol} e ON ue.enrolid = e.id
+                           JOIN {course} c ON e.courseid = c.id AND 
+                                (c.containertype = '{$course_type}' OR c.containertype = '{$site_type}')
                           UNION
                          SELECT cc.userid AS userid, cc.course AS courseid
                            FROM {course_completions} cc
+                           JOIN {course} c ON cc.course = c.id AND 
+                                (c.containertype = '{$course_type}' OR c.containertype = '{$site_type}')
                           UNION
                          SELECT cch.userid AS userid, cch.courseid AS courseid
                            FROM {course_completion_history} cch
+                           JOIN {course} c ON cch.courseid = c.id AND 
+                                (c.containertype = '{$course_type}' OR c.containertype = '{$site_type}')
                           UNION
                          SELECT p1.userid AS userid, pca1.courseid AS courseid
                            FROM {dp_plan_course_assign} pca1
                            JOIN {dp_plan} p1 ON pca1.planid = p1.id
+                           JOIN {course} c ON pca1.courseid = c.id AND
+                                (c.containertype = '{$course_type}' OR c.containertype = '{$site_type}')
                     )
                 basesub
                 {$global_restriction_join})";
