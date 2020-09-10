@@ -26,11 +26,11 @@ defined('MOODLE_INTERNAL') || die();
 $watchers = [
     [
         'hookname' => 'report_log\hook\index_view',
-        'callback' => ['container_workspace\watcher\redirect_watcher', 'redirect_to_workspace']
+        'callback' => ['container_workspace\watcher\container_watcher', 'override_navigation_breadcrumbs']
     ],
     [
         'hookname' => 'report_loglive\hook\index_view',
-        'callback' => ['container_workspace\watcher\redirect_watcher', 'redirect_to_workspace']
+        'callback' => ['container_workspace\watcher\container_watcher', 'override_navigation_breadcrumbs']
     ],
     [
         'hookname' => 'report_outline\hook\index_view',
