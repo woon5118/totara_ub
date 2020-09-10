@@ -47,13 +47,21 @@ class mark_messages_read implements mutation_resolver, has_middleware {
         // Following logic from message\externallib::mark_message_read()
         $timeread = time();
 
+        [$sql, $params] = $DB->get_in_or_equal($message_ids);
+        $messages = $DB->get_records_select('message', 'id ' . $sql, $params, 'id', '*');
         $message_read_ids = [];
         foreach ($message_ids as $message_id) {
-            $message = $DB->get_record('message', array('id' => $message_id), '*', MUST_EXIST);
+            if (!isset($messages[$message_id])) {
+                throw new \invalid_parameter_exception('Invalid messageid, the message doesn\'t exist');
+            }
+            $message = $messages[$message_id];
             if ($message->useridto != $USER->id) {
                 throw new \invalid_parameter_exception('Invalid messageid, you don\'t have permissions to mark this message as read');
             }
+        }
 
+        foreach ($message_ids as $message_id) {
+            $message = $messages[$message_id];
             // This returns an updated message id, because the message has changed tables.
             $message_read_ids[] = message_mark_message_read($message, $timeread);
         }

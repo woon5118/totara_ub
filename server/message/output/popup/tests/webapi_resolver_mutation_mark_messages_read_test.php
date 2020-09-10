@@ -142,6 +142,45 @@ class message_popup_webapi_resolver_mutation_mark_messages_read_testcase extends
     }
 
     /**
+     * Test the results of the query with recipient trying to resolve an another recipient's message
+     */
+    public function test_resolve_another_recipient_user() {
+        global $DB;
+        $sender = $this->getDataGenerator()->create_user(array('firstname' => 'Test1', 'lastname' => 'User1'));
+        $recipient1 = $this->getDataGenerator()->create_user(array('firstname' => 'Test2', 'lastname' => 'User2'));
+        $recipient2 = $this->getDataGenerator()->create_user(array('firstname' => 'Test3', 'lastname' => 'User3'));
+
+        $message_ids = [];
+        $message_ids[] = $this->send_fake_unread_popup_notification($sender, $recipient1, 'Message 1', 1);
+        $message_ids[] = $this->send_fake_unread_popup_notification($sender, $recipient2, 'Message 2', 2);
+        $message_ids[] = $this->send_fake_unread_popup_notification($sender, $recipient1, 'Message 3', 3);
+
+        $this->assertEquals(3, $DB->count_records('message', ['useridfrom' => $sender->id]));
+        $this->assertEquals(0, $DB->count_records('message_read', ['useridfrom' => $sender->id]));
+
+        $this->setUser($recipient1);
+        try {
+            $input = $this->standard_input(array_keys($message_ids), $message_ids);
+            $this->resolve_graphql_mutation('message_popup_mark_messages_read', $input);
+            $this->fail('invalid_parameter_exception expected');
+        } catch (\invalid_parameter_exception $ex) {
+            $this->assertStringContainsString("Invalid messageid, you don't have permissions to mark this message as read", $ex->getMessage());
+        }
+        try {
+            $message_ids[1] = -42;
+            $input = $this->standard_input(array_keys($message_ids), $message_ids);
+            $this->resolve_graphql_mutation('message_popup_mark_messages_read', $input);
+            $this->fail('invalid_parameter_exception expected');
+        } catch (\invalid_parameter_exception $ex) {
+            $this->assertStringContainsString("Invalid messageid, the message doesn't exist", $ex->getMessage());
+        }
+
+        // Make sure no messages are marked as read
+        $this->assertEquals(3, $DB->count_records('message', ['useridfrom' => $sender->id]));
+        $this->assertEquals(0, $DB->count_records('message_read', ['useridfrom' => $sender->id]));
+    }
+
+    /**
      * Test the results of the AJAX query through the GraphQL stack.
      */
     public function test_ajax_query() {
