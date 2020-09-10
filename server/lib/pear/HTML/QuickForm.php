@@ -64,6 +64,7 @@ $GLOBALS['_HTML_QuickForm_registered_rules'] = array(
     'lettersonly'   => array('html_quickform_rule_regex',    'HTML/QuickForm/Rule/Regex.php'),
     'alphanumeric'  => array('html_quickform_rule_regex',    'HTML/QuickForm/Rule/Regex.php'),
     'numeric'       => array('html_quickform_rule_regex',    'HTML/QuickForm/Rule/Regex.php'),
+    'integer'       => array('html_quickform_rule_regex',    'HTML/QuickForm/Rule/Regex.php'),
     'nopunctuation' => array('html_quickform_rule_regex',    'HTML/QuickForm/Rule/Regex.php'),
     'nonzero'       => array('html_quickform_rule_regex',    'HTML/QuickForm/Rule/Regex.php'),
     'callback'      => array('html_quickform_rule_callback', 'HTML/QuickForm/Rule/Callback.php'),

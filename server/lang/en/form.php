@@ -31,6 +31,7 @@ $string['display'] = 'Display';
 $string['err_alphanumeric'] = 'You must enter only letters or numbers here.';
 $string['err_email'] = 'You must enter a valid email address here.';
 $string['err_json_editor'] = 'Invalid content provided';
+$string['err_integer'] = 'You must enter a whole number here.';
 $string['err_lettersonly'] = 'You must enter only letters here.';
 $string['err_maxfiles'] = 'You must not attach more than {$a} files here.';
 $string['err_maxlength'] = 'You must enter no more than {$a->format} characters here.';
