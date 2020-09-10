@@ -187,6 +187,7 @@ $capabilities = [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
         ],
     ],

@@ -403,6 +403,16 @@ final class interactor {
      * @return bool
      */
     public function can_view_discussions(): bool {
+        if (!$this->can_view_workspace()) {
+            return false;
+        }
+
+        // Note that is_joined && is_public had already been used in can view workspace.
+        // However it does not mean that when u can view workspace u can view the discussion,
+        // it is just another layer check to say that if u cannot see a workspace, you can not go here.
+        // If we remove is_joined and is_public in this check then user can be a normal member without
+        // any capability to manage the workspace then user cannot see the discussion.
+        // Hence these checks have to stay here.
         if ($this->can_manage() || $this->is_joined() || $this->workspace->is_public()) {
             return true;
         }
