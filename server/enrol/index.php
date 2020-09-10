@@ -106,6 +106,8 @@ foreach ($forms as $form) {
 }
 
 if (!$forms) {
+    // Totara: ignore the wanted URL, most likely we cannot go there without enrolment.
+    unset($SESSION->wantsurl);
     if (isguestuser()) {
         echo get_string('noguestaccess', 'enrol') . ' ' . html_writer::link(get_login_url(), get_string('login', 'core'), array('class' => 'btn btn-default'));
     } else if ($returnurl) {
