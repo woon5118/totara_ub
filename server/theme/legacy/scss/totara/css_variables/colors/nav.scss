@@ -41,7 +41,6 @@
   --nav-tab-mobile-bg-color-focus: var(--color-state-highlight-neutral);
   // Primary tab selected
   --nav-tab-bg-color-selected: var(--color-neutral-1);
-  --nav-tab-border-color-selected: var(--nav-tab-bg-color-selected);
   --nav-tab-border-inner-color-selected: var(--color-primary);
   --nav-tab-text-color-selected: var(--color-neutral-7);
 
@@ -71,7 +70,6 @@
 
   // Sub tab
   --nav-sub-tab-bg-color: var(--color-neutral-1);
-  --nav-sub-tab-border-color: var(--color-neutral-1);
   --nav-sub-tab-text-color: var(--color-neutral-7);
   // Sub tab hover/focus
   --nav-sub-tab-bg-color-focus: var(--color-state-highlight-neutral);

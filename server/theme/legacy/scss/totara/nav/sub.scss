@@ -41,14 +41,14 @@
         padding: var(--gap-2) var(--gap-4);
         color: var(--nav-sub-tab-text-color);
         background: var(--nav-sub-tab-bg-color);
-        border: var(--border-width-thick) solid var(--nav-sub-tab-border-color);
+        border: var(--border-width-thick) solid transparent;
 
         &:focus,
         &:hover {
           color: var(--nav-sub-tab-text-color-focus);
           text-decoration: none;
           background: var(--nav-sub-tab-bg-color-focus);
-          border-color: var(--nav-sub-tab-border-color-focus);
+          border-color: transparent;
         }
       }
 

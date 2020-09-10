@@ -44,7 +44,7 @@
     // Tab colours on mobile
     &_item_link {
       color: var(--nav-tab-text-color);
-      background: var(--nav-tab-bg-color);
+      background: transparent;
       border: var(--border-width-thin) solid var(--nav-tab-border-color);
 
       &:focus,
@@ -79,7 +79,7 @@
       z-index: 3;
       width: 80%;
       overflow-y: scroll;
-      background: inherit;
+      background: var(--nav-tab-bg-color);
       box-shadow: var(--shadow-2);
       transition: 0.5s;
     }
@@ -162,7 +162,7 @@
     &--list_item {
       display: inline-block;
       vertical-align: top;
-      background: var(--nav-tab-bg-color);
+      background: transparent;
 
       &_label {
         position: relative;
@@ -181,8 +181,7 @@
       &_link {
         padding: var(--gap-2) var(--gap-4);
         color: var(--nav-tab-text-color);
-        border: var(--border-width-thin) solid var(--nav-tab-border-color);
-        border-right-color: transparent;
+        border: none;
 
         // Hide by default (only shown with _hasChildren class)
         .totaraNav--expand_indent {
@@ -192,8 +191,7 @@
         &:focus,
         &:hover {
           color: var(--nav-tab-text-color-focus);
-          background: var(--nav-tab-bg-color-focus);
-          border: var(--border-width-thin) solid var(--nav-tab-border-color-focus);
+          background: inherit;
 
           .totaraNav_prim--list_item_label {
             &::after {
@@ -202,11 +200,6 @@
             }
           }
         }
-      }
-
-      // Add border to last item unless it is selected
-      &:last-child:not(.totaraNav_prim--list_item_selected) &_link {
-        border-right-color: var(--nav-tab-border-color);
       }
 
       &_hasChildren &_link {
@@ -221,28 +214,15 @@
 
       // Selected (current page) tab
       &_selected {
-        // Prevent border from next item doubling the width
-        + .totaraNav_prim--list_item {
-          .totaraNav_prim--list_item_link {
-            border-left-color: transparent;
-          }
-        }
-
         // Style of selected tab link
         .totaraNav_prim--list_item {
           &_link {
             color: var(--nav-tab-text-color-selected);
             font-weight: var(--nav-tab-text-weight-selected);
-            background: var(--nav-tab-bg-color-selected);
-            border: var(--border-width-thin) solid
-              var(--nav-tab-border-color-selected);
 
             &:focus,
             &:hover {
               color: var(--nav-tab-text-color-selected);
-              background: var(--nav-tab-bg-color-selected);
-              border: var(--border-width-thin) solid
-                var(--nav-tab-border-color-selected);
 
               .totaraNav_prim--list_item_label {
                 &::after {
