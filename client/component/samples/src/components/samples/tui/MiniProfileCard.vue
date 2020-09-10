@@ -119,6 +119,8 @@ import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
+import { config } from 'tui/config';
+import { createSilhouetteImage } from '../../../../../tui/src/js/internal/placeholder_generator.js';
 
 export default {
   components: {
@@ -133,17 +135,16 @@ export default {
     return {
       modalOpen: false,
       special: {
-        profile_picture_alt: 'Mohamad Bin Assalamurahim picture',
-        profile_picture_url:
-          'https://www.greenbiz.com/sites/default/files/images/articles/featured/unicorn_sstock.jpg',
+        profile_picture_alt: 'Charles F. Oliver picture',
+        profile_picture_url: createSilhouetteImage('#3c9'),
         profile_url: this.$url('/user/profile.php'),
         display_fields: [
           {
-            value: 'Mohamad Bin Assalamurahim',
+            value: 'Charles F. Oliver',
             associate_url: this.$url('/user/profile.php'),
           },
           {
-            value: '@mohamad-ba',
+            value: '@herecomescharlie',
             associate_url: null,
           },
           {
@@ -151,16 +152,15 @@ export default {
             associate_url: null,
           },
           {
-            value: 'mohamad.bin.assalam.s.jkiokjogfkowpjoiji@example.com',
+            value: 'charles.f.oliver@example.com',
             associate_url: null,
           },
         ],
       },
       users: [
         {
-          profile_picture_url:
-            'https://newfreewallpaper.com/blog/wp-content/uploads/2019/04/BG9-850x478.jpg',
-          profile_picture_alt: 'Lisa',
+          profile_picture_url: createSilhouetteImage('#93c'),
+          profile_picture_alt: 'Black Pink picture',
           profile_url: this.$url('/user/profile.php'),
           display_fields: [
             {
@@ -196,7 +196,7 @@ export default {
             },
             {
               value: 'my homepage',
-              associate_url: 'https://google.co.nz',
+              associate_url: config.wwwroot,
             },
           ],
         },

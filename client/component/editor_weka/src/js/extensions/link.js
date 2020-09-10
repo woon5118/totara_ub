@@ -598,12 +598,12 @@ const linkPlugins = [
     name: 'YouTube',
     matches: [
       {
-        // https://www.youtube.com/watch?v=vZw35VUBdzo
+        // https://www.youtube.com/watch?v=ParCfETbJ80
         match: /^https?:\/\/(?:www\.)?youtube.com\/watch\?v=([a-zA-Z0-9_-]+)/,
         details: match => ({ id: match[1] }),
       },
       {
-        // https://youtu.be/vZw35VUBdzo
+        // https://youtu.be/ParCfETbJ80
         match: /^https?:\/\/(?:www\.)?youtu.be\/([a-zA-Z0-9_-]+)/,
         details: match => ({ id: match[1] }),
       },

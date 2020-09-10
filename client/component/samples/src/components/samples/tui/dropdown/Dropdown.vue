@@ -43,7 +43,7 @@
           <DropdownButton @click="doThing">
             Button
           </DropdownButton>
-          <DropdownItem href="https://www.google.com/">
+          <DropdownItem href="https://www.totaralearning.com/">
             External link
           </DropdownItem>
           <template v-if="values.many">

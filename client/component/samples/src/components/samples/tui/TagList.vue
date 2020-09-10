@@ -49,6 +49,7 @@
 import Avatar from 'tui/components/avatar/Avatar';
 import Button from 'tui/components/buttons/Button';
 import TagList from 'tui/components/tag/TagList';
+import { createSquareImage } from '../../../../../tui/src/js/internal/placeholder_generator.js';
 
 export default {
   components: {
@@ -81,62 +82,62 @@ export default {
     this.fetchData = [
       {
         id: 1,
-        url: 'https://i.imgur.com/SnSRJUH.jpg',
+        url: createSquareImage('#f66'),
         name: 'Mike',
       },
       {
         id: 2,
-        url: 'https://i.imgur.com/14WAio1.jpg',
+        url: createSquareImage('#fc6'),
         name: 'John',
       },
       {
         id: 3,
-        url: 'https://i.imgur.com/SnSRJUH.jpg',
+        url: createSquareImage('#ff6'),
         name: 'Eric',
       },
       {
         id: 4,
-        url: 'https://i.imgur.com/14WAio1.jpg',
+        url: createSquareImage('#3f9'),
         name: 'George',
       },
       {
         id: 5,
-        url: 'https://i.imgur.com/SnSRJUH.jpg',
+        url: createSquareImage('#39f'),
         name: 'Mike',
       },
       {
         id: 6,
-        url: 'https://i.imgur.com/14WAio1.jpg',
+        url: createSquareImage('#c6f'),
         name: 'John',
       },
       {
         id: 7,
-        url: 'https://i.imgur.com/SnSRJUH.jpg',
+        url: createSquareImage('#f66'),
         name: 'Eric',
       },
       {
         id: 8,
-        url: 'https://i.imgur.com/14WAio1.jpg',
+        url: createSquareImage('#fc6'),
         name: 'George',
       },
       {
         id: 9,
-        url: 'https://i.imgur.com/SnSRJUH.jpg',
+        url: createSquareImage('#ff6'),
         name: 'Mike',
       },
       {
         id: 10,
-        url: 'https://i.imgur.com/14WAio1.jpg',
+        url: createSquareImage('#3f9'),
         name: 'John',
       },
       {
         id: 11,
-        url: 'https://i.imgur.com/SnSRJUH.jpg',
+        url: createSquareImage('#39f'),
         name: 'Eric',
       },
       {
         id: 12,
-        url: 'https://i.imgur.com/14WAio1.jpg',
+        url: createSquareImage('#c6f'),
         name: 'George',
       },
     ];

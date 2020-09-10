@@ -36,6 +36,7 @@
 
 <script>
 import Avatar from 'tui/components/avatar/Avatar';
+import { createSilhouetteImage } from '../../../../../tui/src/js/internal/placeholder_generator.js';
 
 export default {
   components: {
@@ -44,8 +45,8 @@ export default {
 
   data() {
     return {
-      url1: 'https://i.imgur.com/SnSRJUH.jpg',
-      url2: 'https://i.imgur.com/14WAio1.jpg',
+      url1: createSilhouetteImage('#00f'),
+      url2: createSilhouetteImage('#f09'),
     };
   },
 };

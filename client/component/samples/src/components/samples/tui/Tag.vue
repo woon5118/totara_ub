@@ -35,7 +35,7 @@
     </Tag>
 
     <Tag :text="text2" />
-    <Tag :text="text3" href="https://www.google.com" />
+    <Tag :text="text3" href="https://www.totaralearning.com/" />
   </div>
 </template>
 
@@ -54,7 +54,7 @@ export default {
     return {
       text1: 'Wellington',
       text2: 'Auckland',
-      text3: 'Google',
+      text3: 'Totara',
     };
   },
 };

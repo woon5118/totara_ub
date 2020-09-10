@@ -105,18 +105,18 @@ export default {
                 {
                   type: 'link',
                   attrs: {
-                    href: 'https://www.youtube.com/watch?v=vZw35VUBdzo',
+                    href: 'https://www.youtube.com/watch?v=ParCfETbJ80',
                   },
                 },
               ],
-              text: 'https://www.youtube.com/watch?v=vZw35VUBdzo',
+              text: 'https://www.youtube.com/watch?v=ParCfETbJ80',
             },
           ],
         },
         {
           type: 'link_media',
           attrs: {
-            url: 'https://www.youtube.com/watch?v=vZw35VUBdzo',
+            url: 'https://www.youtube.com/watch?v=ParCfETbJ80',
           },
         },
         { type: 'paragraph' },
