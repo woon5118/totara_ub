@@ -31,6 +31,7 @@
           <Radio value="info">Info</Radio>
           <Radio value="success">Success</Radio>
           <Radio value="warning">Warning</Radio>
+          <Radio value="neutral">Neutral</Radio>
         </RadioGroup>
       </FormRow>
 

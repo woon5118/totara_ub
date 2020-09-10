@@ -44,9 +44,9 @@ export default {
   display: inline-flex;
   padding: 0 var(--gap-2) calc(var(--gap-1) / 2);
   color: var(--color-neutral-1);
-  @include tui-font-heading-label-small();
-  font-weight: 500;
-  line-height: 1.2;
+  @include tui-font-body-x-small();
+  font-weight: 700;
+  line-height: 1.25;
   background: var(--color-prompt-info);
   border-radius: var(--border-radius-small);
 
