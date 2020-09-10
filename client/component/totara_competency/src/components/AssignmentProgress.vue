@@ -71,9 +71,10 @@ export default {
 <style lang="scss">
 .tui-assignmentProgress {
   width: 180px;
-  padding: var(--gap-3);
+  padding: var(--gap-8) var(--gap-3) 0;
 
   &__header {
+    margin-top: var(--gap-3);
     overflow: hidden;
     font-size: var(--font-size-16);
     white-space: nowrap;
@@ -82,7 +83,7 @@ export default {
   }
 
   &__progress-card {
-    padding: var(--gap-3) var(--gap-4);
+    padding: 0 var(--gap-4);
   }
 }
 </style>

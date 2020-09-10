@@ -17,63 +17,68 @@
 -->
 
 <template>
-  <div class="tui-competencyProfile">
-    <Loader :loading="$apollo.loading">
+  <Loader :loading="$apollo.loading">
+    <div class="tui-competencyProfile">
       <UserHeader
         v-if="!isMine"
         :user-name="userName"
         :profile-picture="profilePicture"
       />
-      <div
-        class="tui-competencyProfile__split tui-competencyProfile__titleSection"
-      >
-        <h2 class="tui-competencyProfile__title">
+      <div class="tui-competencyProfile__heading">
+        <h2 class="tui-competencyProfile__heading-title">
           {{ $str('competency_profile', 'totara_competency') }}
         </h2>
-        <div v-if="!noAssignments" class="tui-competencyProfile__buttons">
-          <ActionLink
-            v-if="rateCompetenciesUrl"
-            :href="rateCompetenciesUrl"
-            :text="$str('rate_competencies', 'pathway_manual')"
-          />
-          <ActionLink
-            :href="selfAssignmentUrl"
-            :text="
-              isMine
-                ? $str('self_assign_competencies', 'totara_competency')
-                : $str('assign_competencies', 'totara_competency')
-            "
-          />
-        </div>
       </div>
+
       <NoCompetencyAssignments
         v-if="noAssignments"
         :is-mine="isMine"
         :self-assignment-url="selfAssignmentUrl"
       />
       <div v-else>
-        <h3 class="tui-competencyProfile__sectionTitle">
-          {{ $str('current_assignment_progress', 'totara_competency') }}
-        </h3>
+        <div class="tui-competencyProfile__currentHeading">
+          <h3 class="tui-competencyProfile__currentHeading-title">
+            {{ $str('current_assignment_progress', 'totara_competency') }}
+          </h3>
+          <div
+            v-if="!noAssignments"
+            class="tui-competencyProfile__currentHeading-buttons"
+          >
+            <ActionLink
+              v-if="rateCompetenciesUrl"
+              :href="rateCompetenciesUrl"
+              :text="$str('rate_competencies', 'pathway_manual')"
+            />
+            <ActionLink
+              :href="selfAssignmentUrl"
+              :text="
+                $str(
+                  isMine ? 'self_assign_competencies' : 'assign_competencies',
+                  'totara_competency'
+                )
+              "
+            />
+          </div>
+        </div>
+
         <CurrentProgress
           :data="currentProgressData"
-          :latest-achievement="data.latest_achievement"
           :is-current-user="isMine"
         />
+
         <Responsive
           v-slot="{ currentBoundaryName }"
+          class="tui-competencyProfile__competencies"
           :breakpoints="[
             { name: 'small', boundaries: [0, 700] },
             { name: null, boundaries: [701, 701] },
           ]"
         >
-          <div>
+          <div class="tui-competencyProfile__competencies-content">
             <h3 class="tui-competencyProfile__sectionTitle">
               {{ $str('header_competencies', 'totara_competency') }}
             </h3>
-            <div
-              class="tui-competencyProfile__split tui-competencyProfile__filtersBar"
-            >
+            <div class="tui-competencyProfile__filtersBar">
               <ProgressAssignmentFilters
                 v-model="selectedFilters"
                 :filters="filterOptions"
@@ -123,8 +128,8 @@
           </div>
         </Responsive>
       </div>
-    </Loader>
-  </div>
+    </div>
+  </Loader>
 </template>
 <script>
 import BarChartIcon from 'tui/components/icons/BarChart';
@@ -200,9 +205,7 @@ export default {
 
   data() {
     return {
-      data: {
-        latest_achievement: null,
-      },
+      data: {},
       activeTab: 'charts',
       selectedFilters: this.$_addFilterKey({
         status: ACTIVE_ASSIGNMENT,
@@ -379,7 +382,6 @@ export default {
     "toggle_table",
     "assign_competencies",
     "self_assign_competencies",
-    "latest_achievement",
     "current_assignment_progress",
     "header_competencies"
   ],
@@ -394,43 +396,71 @@ export default {
   // disable scroll anchoring as it is problematic when switching between chart/list views
   overflow-anchor: none;
 
-  &__split {
+  & > * + * {
+    margin-top: var(--gap-8);
+  }
+
+  &__heading {
+    display: flex;
+
+    &-title {
+      margin: 0;
+      @include tui-font-heading-medium();
+    }
+  }
+
+  &__currentHeading {
+    display: flex;
+    flex-direction: column;
+
+    &-title {
+      margin: 0;
+      @include tui-font-heading-small();
+    }
+
+    &-buttons {
+      & > * {
+        margin-top: var(--gap-4);
+        margin-left: var(--gap-2);
+      }
+    }
+  }
+
+  &__competencies {
+    margin-top: var(--gap-6);
+    padding-top: var(--gap-6);
+    border-top: var(--border-width-thin) solid var(--color-neutral-5);
+
+    &-content {
+      & > * + * {
+        margin-top: var(--gap-8);
+      }
+    }
+  }
+
+  &__sectionTitle {
+    margin: 0;
+    @include tui-font-heading-small();
+  }
+
+  &__filtersBar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
   }
-
-  &__titleSection {
-    margin: var(--gap-6) 0 var(--gap-4) 0;
-  }
-
-  &__title {
-    @include tui-font-heading-medium();
-    margin: 0;
-  }
-
-  &__buttons {
-    > * {
-      margin-top: var(--gap-4);
-    }
-  }
-
-  &__sectionTitle {
-    @include tui-font-heading-small();
-    margin: var(--gap-4) 0 var(--gap-2) 0;
-  }
-
-  &__filtersBar {
-    margin: var(--gap-6) 0;
-  }
 }
 
-@media (min-width: $tui-screen-xs) {
+@media (min-width: $tui-screen-sm) {
   .tui-competencyProfile {
-    &__buttons {
-      > * {
-        margin-top: 0;
+    &__currentHeading {
+      flex-direction: row;
+      &-buttons {
+        margin-left: auto;
+
+        & > * {
+          margin-top: 0;
+        }
       }
     }
   }

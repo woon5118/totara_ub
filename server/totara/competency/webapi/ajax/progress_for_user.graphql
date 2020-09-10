@@ -29,7 +29,6 @@ query totara_competency_progress_for_user(
         }
       }
     }
-    latest_achievement
     filters {
       name
       status_name
