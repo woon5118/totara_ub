@@ -83,9 +83,25 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
         title="[numberofcomments, totara_engage - 1]"
       />
     </staticon-stub>
+    <staticon-stub
+      statnumber="10"
+      title="[numberofshares, totara_engage - 10]"
+    >
+      <svgicongenerated-stub
+        title="[numberofshares, totara_engage - 10]"
+      />
+    </staticon-stub>
+    <staticon-stub
+      statnumber="5"
+      title="[numberwithinplaylist, engage_article - 5]"
+    >
+      <svgicongenerated-stub
+        title="[numberwithinplaylist, engage_article - 5]"
+      />
+    </staticon-stub>
      
     <accessicon-stub
-      access="PRIVATE"
+      access="PUBLIC"
       coloring="true"
       customclass="tui-engageArticle-articleCard__visibilityIcon"
       size="300"

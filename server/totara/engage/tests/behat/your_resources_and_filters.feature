@@ -56,6 +56,10 @@ Feature: Your resources and filters
     And I wait for the next second
 
     Then I should see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
+    And "span[aria-label='0 like(s)']" "css_element" should exist
+    And "span[aria-label='0 comment(s)']" "css_element" should exist
+    And "span[aria-label='0 share(s)']" "css_element" should exist
+    And "span[aria-label='Appears in 0 playlist(s)']" "css_element" should exist
     And I should not see "Test Article 2" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should not see "Test Article 3" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should see "Test Survey 1?" in the ".tui-contributionBaseContent__cards" "css_element"
@@ -69,6 +73,10 @@ Feature: Your resources and filters
 
     Then I should not see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should see "Test Article 2" in the ".tui-contributionBaseContent__cards" "css_element"
+    And "span[aria-label='0 like(s)']" "css_element" should not exist
+    And "span[aria-label='0 comment(s)']" "css_element" should not exist
+    And "span[aria-label='0 share(s)']" "css_element" should not exist
+    And "span[aria-label='Appears in 0 playlist(s)']" "css_element" should not exist
     And I should not see "Test Article 3" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should not see "Test Survey 1?" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should see "Test Survey 2?" in the ".tui-contributionBaseContent__cards" "css_element"
@@ -82,6 +90,10 @@ Feature: Your resources and filters
     Then I should not see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should not see "Test Article 2" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should see "Test Article 3" in the ".tui-contributionBaseContent__cards" "css_element"
+    And "span[aria-label='0 like(s)']" "css_element" should exist
+    And "span[aria-label='0 comment(s)']" "css_element" should exist
+    And "span[aria-label='0 share(s)']" "css_element" should not exist
+    And "span[aria-label='Appears in 0 playlist(s)']" "css_element" should not exist
     And I should not see "Test Survey 1?" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should not see "Test Survey 2?" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should see "Test Survey 3?" in the ".tui-contributionBaseContent__cards" "css_element"

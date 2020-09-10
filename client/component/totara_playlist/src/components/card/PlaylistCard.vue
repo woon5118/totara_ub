@@ -126,7 +126,7 @@ import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import StatIcon from 'totara_engage/components/icons/StatIcon';
 import StarRating from 'totara_engage/components/icons/StarRating';
 import ShareIcon from 'tui/components/icons/Share';
-import CommentIcon from 'tui/components/icons/Share';
+import CommentIcon from 'tui/components/icons/Comment';
 import MoreIcon from 'tui/components/icons/More';
 import { cardMixin, AccessManager } from 'totara_engage/index';
 import AccessIcon from 'totara_engage/components/icons/access/computed/AccessIcon';
@@ -137,17 +137,17 @@ import updateBookmark from 'totara_engage/graphql/update_bookmark';
 
 export default {
   components: {
-    ButtonIcon,
-    BaseCard,
-    ImageHeader,
-    CardHeader,
-    StatIcon,
-    StarRating,
-    ShareIcon,
-    CommentIcon,
-    MoreIcon,
     AccessIcon,
+    BaseCard,
     BookmarkButton,
+    ButtonIcon,
+    CardHeader,
+    CommentIcon,
+    ImageHeader,
+    MoreIcon,
+    ShareIcon,
+    StarRating,
+    StatIcon,
   },
 
   mixins: [cardMixin],
@@ -158,18 +158,7 @@ export default {
       innerBookmarked: this.bookmarked,
       hovered: false,
       extraData: JSON.parse(this.extra),
-      statIcons: [
-        {
-          type: 'comment',
-          icon: CommentIcon,
-          title: this.$str(
-            'numberofcomments',
-            'totara_engage',
-            this.totalComments
-          ),
-          statNumber: this.totalComments,
-        },
-      ],
+      statIcons: [],
     };
   },
 
@@ -195,15 +184,7 @@ export default {
   },
 
   created() {
-    if (AccessManager.isPublic(this.access)) {
-      // Adding stat icon depending the visibility
-      this.statIcons.push({
-        type: 'share',
-        icon: ShareIcon,
-        title: this.$str('numberofshares', 'totara_engage', this.sharedbycount),
-        statNumber: this.sharedbycount,
-      });
-    }
+    this.$_setStatIcons();
   },
 
   methods: {
@@ -221,6 +202,44 @@ export default {
 
     $_handleMoreActions() {
       // Todo: update this functionality
+    },
+
+    $_setStatIcons() {
+      if (AccessManager.isPrivate(this.access)) {
+        return;
+      }
+
+      const restrictedStatIcons = [
+        {
+          type: 'comment',
+          icon: CommentIcon,
+          title: this.$str(
+            'numberofcomments',
+            'totara_engage',
+            this.totalComments
+          ),
+          statNumber: this.totalComments,
+        },
+      ];
+
+      if (AccessManager.isRestricted(this.access)) {
+        this.statIcons = restrictedStatIcons;
+        return;
+      }
+
+      if (AccessManager.isPublic(this.access)) {
+        this.statIcons = restrictedStatIcons.concat({
+          type: 'share',
+          icon: ShareIcon,
+          title: this.$str(
+            'numberofshares',
+            'totara_engage',
+            this.sharedbycount
+          ),
+          statNumber: this.sharedbycount,
+        });
+        return;
+      }
     },
 
     updateBookmark() {
@@ -363,7 +382,7 @@ export default {
     align-items: flex-end;
 
     & > * + * {
-      margin-left: var(--gap-1);
+      margin-left: var(--gap-2);
     }
 
     & > :last-child {

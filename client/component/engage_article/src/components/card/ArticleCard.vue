@@ -128,27 +128,73 @@ import updateBookmark from 'totara_engage/graphql/update_bookmark';
 
 export default {
   components: {
-    ButtonIcon,
-    BaseCard,
-    ImageHeader,
-    StatIcon,
-    CardHeader,
-    ShareIcon,
-    AddToListIcon,
-    MoreIcon,
     AccessIcon,
-    TimeIcon,
+    AddToListIcon,
+    BaseCard,
     BookmarkButton,
+    ButtonIcon,
+    CardHeader,
+    ImageHeader,
+    MoreIcon,
+    ShareIcon,
+    StatIcon,
+    TimeIcon,
   },
 
   mixins: [cardMixin],
 
   data() {
     return {
+      actions: [
+        {
+          alt: this.$str('addtoplaylist', 'engage_article'),
+          component: 'AddToListIcon',
+        },
+        {
+          alt: this.$str('share', 'totara_engage'),
+          component: 'ShareIcon',
+        },
+        {
+          alt: this.$str('more', 'totara_engage'),
+          component: 'MoreIcon',
+        },
+      ],
+      extraData: JSON.parse(this.extra),
       // Assign the value to the inner child, as we do not want to mutate the prop.
       innerBookmarked: this.bookmarked,
       hovered: false,
-      statIcons: [
+      statIcons: [],
+    };
+  },
+
+  computed: {
+    getTimeView() {
+      if (TimeViewType.isLessThanFive(this.extraData.timeview)) {
+        return this.$str('timelessthanfive', 'engage_article');
+      } else if (TimeViewType.isFiveToTen(this.extraData.timeview)) {
+        return this.$str('timefivetoten', 'engage_article');
+      } else if (TimeViewType.isMoreThanTen(this.extraData.timeview)) {
+        return this.$str('timemorethanten', 'engage_article');
+      }
+      return null;
+    },
+  },
+
+  created() {
+    this.$_setStatIcons();
+  },
+
+  methods: {
+    $_handleHovered(hovered) {
+      this.hovered = hovered;
+    },
+
+    $_setStatIcons() {
+      if (AccessManager.isPrivate(this.access)) {
+        return;
+      }
+
+      const restrictedStatIcons = [
         {
           type: 'reaction',
           title: this.$str(
@@ -169,69 +215,38 @@ export default {
           icon: CommentIcon,
           statNumber: this.totalComments,
         },
-      ],
-      actions: [
-        {
-          alt: this.$str('addtoplaylist', 'engage_article'),
-          component: 'AddToListIcon',
-        },
-        {
-          alt: this.$str('share', 'totara_engage'),
-          component: 'ShareIcon',
-        },
-        {
-          alt: this.$str('more', 'totara_engage'),
-          component: 'MoreIcon',
-        },
-      ],
-      extraData: JSON.parse(this.extra),
-    };
-  },
+      ];
 
-  computed: {
-    getTimeView() {
-      if (TimeViewType.isLessThanFive(this.extraData.timeview)) {
-        return this.$str('timelessthanfive', 'engage_article');
-      } else if (TimeViewType.isFiveToTen(this.extraData.timeview)) {
-        return this.$str('timefivetoten', 'engage_article');
-      } else if (TimeViewType.isMoreThanTen(this.extraData.timeview)) {
-        return this.$str('timemorethanten', 'engage_article');
+      if (AccessManager.isRestricted(this.access)) {
+        this.statIcons = restrictedStatIcons;
+        return;
       }
-      return null;
-    },
-  },
 
-  created() {
-    // Add more stat icons depending on the visibility status of the card
-    if (AccessManager.isPublic(this.access)) {
-      this.statIcons = this.statIcons.concat([
-        {
-          type: 'share',
-          title: this.$str(
-            'numberofshares',
-            'totara_engage',
-            this.sharedbycount
-          ),
-          icon: ShareIcon,
-          statNumber: this.sharedbycount,
-        },
-        {
-          type: 'playlistUsage',
-          title: this.$str(
-            'numberwithinplaylist',
-            'engage_article',
-            this.extraData.usage
-          ),
-          icon: AddToListIcon,
-          statNumber: this.extraData.usage,
-        },
-      ]);
-    }
-  },
-
-  methods: {
-    $_handleHovered(hovered) {
-      this.hovered = hovered;
+      if (AccessManager.isPublic(this.access)) {
+        this.statIcons = restrictedStatIcons.concat([
+          {
+            type: 'share',
+            title: this.$str(
+              'numberofshares',
+              'totara_engage',
+              this.sharedbycount
+            ),
+            icon: ShareIcon,
+            statNumber: this.sharedbycount,
+          },
+          {
+            type: 'playlistUsage',
+            title: this.$str(
+              'numberwithinplaylist',
+              'engage_article',
+              this.extraData.usage
+            ),
+            icon: AddToListIcon,
+            statNumber: this.extraData.usage,
+          },
+        ]);
+        return;
+      }
     },
 
     updateBookmark() {
@@ -324,7 +339,7 @@ export default {
     align-items: flex-end;
 
     & > * + * {
-      margin-left: var(--gap-1);
+      margin-left: var(--gap-2);
     }
 
     & > :last-child {

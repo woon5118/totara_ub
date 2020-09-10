@@ -51,7 +51,7 @@ describe('engage_article/components/card/ArticleCard.vue', () => {
         userId: 12,
         userFullName: 'Bolo bala',
         userProfileImageUrl: 'http://example.com',
-        access: 'PRIVATE',
+        access: 'PUBLIC',
         timeCreated: 'Monday 18th, September, 2019',
         rating: 0,
         labelId: 'article-1',
