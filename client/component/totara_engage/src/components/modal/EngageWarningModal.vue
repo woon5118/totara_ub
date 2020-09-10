@@ -22,6 +22,8 @@
     class="tui-engageWarningModal"
   >
     <ModalContent
+      :title="title"
+      :title-visible="false"
       :close-button="closeButton"
       :title-id="id"
       @dismiss="$emit('request-close')"
@@ -107,7 +109,7 @@ export default {
         esc: true,
         backdropClick: false,
       },
-      id: this.$id(this.title),
+      id: this.$id('modal-title'),
     };
   },
 };

@@ -73,7 +73,11 @@ export default {
   },
 
   mounted() {
-    if (!this.title && !(this.$slots.title && this.$slots.title.length > 0)) {
+    if (
+      this.titleVisible &&
+      !this.title &&
+      !(this.$slots.title && this.$slots.title.length > 0)
+    ) {
       console.error(
         '[ModalContent] You must pass either a non-empty title prop or define a non-empty title slot.'
       );
