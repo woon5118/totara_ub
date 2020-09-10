@@ -856,7 +856,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
                     delete this.pathways[pwKey];
                     this.nPaths -= 1;
-                    this.singlevalShown = this.hasSingleValuePaths();
                     this.showHideNoPaths();
 
                     if (pwTarget) {

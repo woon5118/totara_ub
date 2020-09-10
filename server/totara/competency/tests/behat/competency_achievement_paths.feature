@@ -84,5 +84,30 @@ Feature: Manage Competency achievement paths
     When I toggle criterion detail of "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
     Then I should see "Course 1" in "coursecompletion" criterion "1" in criteria group "1" in "Good" scalevalue
 
+  Scenario: Removing multi-value pathways doesn't impact the display of criteria-based block
+    Given I log in as "admin"
+    And I navigate to the competency achievement paths page for the "Parent" competency
+    Then I should see "No achievement paths added"
+
+    When I add a "singlevalue" pathway
+    Then I should see the following singlevalue scale values:
+      | name  |
+      | Great |
+      | Good  |
+      | Bad   |
+    When I add a "manual" pathway
+    And I wait for pending js
+    Then I should see "manual" pathway "after" criteria groups
+    And "Remove pathway" "button" should be visible in "manual" pathway "1" "after" criteria groups
+
+    When I click on "Remove pathway" "button" in "manual" pathway "1" "after" criteria groups
+    And I wait for pending js
+    Then I should not see "manual" pathway "after" criteria groups
+    And I should not see "No achievement paths added"
+    And I should see the following singlevalue scale values:
+      | name  |
+      | Great |
+      | Good  |
+      | Bad   |
 
 

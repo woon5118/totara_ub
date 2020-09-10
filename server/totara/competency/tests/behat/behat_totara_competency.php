@@ -413,7 +413,7 @@ class behat_totara_competency extends behat_base {
      * @Given /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(?P<pathway_idx>[^"][0-9]*)" "(before|after)" criteria groups$/
      * @param string $element Element we look for
      * @param string $selector_type The type of what we look for
-     * @param string pathway_type
+     * @param string $pathway_type
      * @param string|null $pathway_idx
      * @param string|null $position
      */
@@ -441,15 +441,16 @@ class behat_totara_competency extends behat_base {
     /**
      * @Given /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" (should|should not) be visible in "(?P<pathway_type>(?:[^"]|\\")*)" pathway$/
      * @Given /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" (should|should not) be visible in "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(?P<pathway_idx>[^"][0-9]*)"$/
-     * @Given /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" (should|should not) be visible in "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(?P<pathway_idx>[^"][0-0])" "(before|after)" criteria groups$/
+     * @Given /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" (should|should not) be visible in "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(?P<pathway_idx>[^"][0-9]*)" "(before|after)" criteria groups$/
      * @param string $element Element we look for
      * @param string $selector_type The type of what we look for
-     * @param string pathway_type
+     * @param string $not
+     * @param string $pathway_type
      * @param string|null $pathway_idx
      * @param string|null $position
      */
-    public function element_in_pathway_should_be_visible(string $element, string $selector_type, string $not, string $pathway_type,
-        ?string $pathway_idx = null, ?string $position = null
+    public function element_in_pathway_should_be_visible(string $element, string $selector_type, string $not,
+        string $pathway_type, ?string $pathway_idx = null, ?string $position = null
     ) {
         \behat_hooks::set_step_readonly(true);
 
