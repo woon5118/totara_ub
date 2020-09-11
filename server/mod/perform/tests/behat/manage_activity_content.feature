@@ -15,7 +15,7 @@ Feature: Adding, Updating, Removing activity elements.
     And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
     And I click on "Edit content elements" "button"
     And I click on "Add element" "button"
-    And I click on "Short text" "link"
+    And I click on "Short text" "button"
     Then the focused element is "[name=rawTitle]" "css_element"
 
     When I set the following fields to these values:
@@ -25,7 +25,7 @@ Feature: Adding, Updating, Removing activity elements.
     Then I should see "Element saved." in the tui success notification toast
     When I close the tui notification toast
     And I click on "Add element" "button"
-    And I click on "Short text" "link"
+    And I click on "Short text" "button"
     Then the focused element is "[name=rawTitle]" "css_element"
 
     When I set the following fields to these values:
@@ -33,7 +33,7 @@ Feature: Adding, Updating, Removing activity elements.
       | identifier | Identifier 2 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Add element" "button"
-    And I click on "Short text" "link"
+    And I click on "Short text" "button"
     Then the focused element is "[name=rawTitle]" "css_element"
 
     When I set the following fields to these values:
@@ -144,7 +144,7 @@ Feature: Adding, Updating, Removing activity elements.
     And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
     And I click on "Edit content elements" "button"
     And I click on "Add element" "button"
-    And I click on "Short text" "link"
+    And I click on "Short text" "button"
     Then the focused element is "[name=rawTitle]" "css_element"
     When I set the following fields to these values:
       | rawTitle   | Question 1   |
@@ -153,7 +153,7 @@ Feature: Adding, Updating, Removing activity elements.
     Then  I should not see drag icon visible in the question "Question 1"
 
     When I click on "Add element" "button"
-    And I click on "Short text" "link"
+    And I click on "Short text" "button"
     And the focused element is "[name=rawTitle]" "css_element"
     And I set the following fields to these values:
       | rawTitle   | Question 2   |
@@ -163,7 +163,7 @@ Feature: Adding, Updating, Removing activity elements.
     And I should see drag icon visible in the question "Question 2"
 
     When I click on "Add element" "button"
-    And I click on "Short text" "link"
+    And I click on "Short text" "button"
     And the focused element is "[name=rawTitle]" "css_element"
 
     And I set the following fields to these values:

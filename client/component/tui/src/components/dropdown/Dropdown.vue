@@ -234,7 +234,7 @@ export default {
         return;
       }
 
-      const contentNodeList = this.$refs.dropdownContent.children;
+      const contentNodeList = getTabbableElements(this.$refs.dropdownContent);
       const contentNodeCount = contentNodeList.length;
       switch (event.key) {
         case 'ArrowDown':
@@ -300,7 +300,7 @@ export default {
     overflow-y: auto;
     background-color: var(--dropdown-menu-bg-color);
     background-clip: padding-box;
-    border: 1px solid var(--dropdown-menu-border-color);
+    border: var(--border-width-thin) solid var(--dropdown-menu-border-color);
     box-shadow: var(--shadow-2);
   }
 
@@ -308,7 +308,8 @@ export default {
     display: flex;
     flex-direction: column;
     &--separator > * + * {
-      border-top: 1px solid var(--dropdown-menu-border-color);
+      border-top: var(--border-width-thin) solid
+        var(--dropdown-menu-border-color);
     }
   }
 

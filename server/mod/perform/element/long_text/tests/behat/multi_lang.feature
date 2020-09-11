@@ -18,7 +18,7 @@ Feature: Long text element supports multi-lang filters in titles
     # Adding a new item
     And I navigate to manage perform activity content page
     And I click on "Add element" "button"
-    And I click on "Long text" "link"
+    And I click on "Long text" "button"
     And I set the following fields to these values:
       | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
     # Currently a changed text won't be filtered until saved

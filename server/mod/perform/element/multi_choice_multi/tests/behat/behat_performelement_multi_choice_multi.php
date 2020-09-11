@@ -37,7 +37,7 @@ class behat_performelement_multi_choice_multi extends behat_base {
         $behat_general = behat_context_helper::get('behat_general');
 
         $behat_general->i_click_on("Add element", "button");
-        $behat_general->i_click_on("Multiple choice: multi-select", "link");
+        $behat_general->i_click_on("Multiple choice: multi-select", "button");
     }
 
     /**

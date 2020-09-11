@@ -17,7 +17,7 @@
 -->
 <template>
   <div class="tui-performEditSectionContentAddElement">
-    <Dropdown :separator="true">
+    <Dropdown>
       <template v-slot:trigger="{ toggle, isOpen }">
         <ButtonIcon
           :aria-expanded="isOpen ? 'true' : 'false'"
@@ -30,36 +30,32 @@
           <AddIcon size="200" />
         </ButtonIcon>
       </template>
-      <span
-        tabindex="-1"
-        role="menugroup"
-        class="tui-dropdownItem tui-performEditSectionContentAddElement__dropDownGroupItem"
+
+      <DropdownGroup
+        :separator="true"
+        :text="$str('section_dropdown_question_elements', 'mod_perform')"
       >
-        {{ $str('section_dropdown_question_elements', 'mod_perform') }}
-      </span>
-      <DropdownItem
-        v-for="plugin in questionElement"
-        :key="plugin.plugin_name"
-        class="tui-performEditSectionContentAddElement__dropDownItem"
-        @click="addElementPlugin(plugin)"
+        <DropdownButton
+          v-for="plugin in questionElement"
+          :key="plugin.plugin_name"
+          @click="addElementPlugin(plugin)"
+        >
+          {{ plugin.name }}
+        </DropdownButton>
+      </DropdownGroup>
+
+      <DropdownGroup
+        :separator="true"
+        :text="$str('section_dropdown_other_elements', 'mod_perform')"
       >
-        {{ plugin.name }}
-      </DropdownItem>
-      <span
-        tabindex="-1"
-        role="menugroup"
-        class="tui-dropdownItem tui-performEditSectionContentAddElement__dropDownGroupItem"
-      >
-        {{ $str('section_dropdown_other_elements', 'mod_perform') }}
-      </span>
-      <DropdownItem
-        v-for="plugin in otherElement"
-        :key="plugin.plugin_name"
-        class="tui-performEditSectionContentAddElement__dropDownItem"
-        @click="addElementPlugin(plugin)"
-      >
-        {{ plugin.name }}
-      </DropdownItem>
+        <DropdownButton
+          v-for="plugin in otherElement"
+          :key="plugin.plugin_name"
+          @click="addElementPlugin(plugin)"
+        >
+          {{ plugin.name }}
+        </DropdownButton>
+      </DropdownGroup>
     </Dropdown>
   </div>
 </template>
@@ -67,7 +63,8 @@
 import AddIcon from 'tui/components/icons/Add';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Dropdown from 'tui/components/dropdown/Dropdown';
-import DropdownItem from 'tui/components/dropdown/DropdownItem';
+import DropdownButton from 'tui/components/dropdown/DropdownButton';
+import DropdownGroup from 'tui/components/dropdown/DropdownGroup';
 import performElementPluginsQuery from 'mod_perform/graphql/element_plugins';
 
 export default {
@@ -75,7 +72,8 @@ export default {
     AddIcon,
     ButtonIcon,
     Dropdown,
-    DropdownItem,
+    DropdownButton,
+    DropdownGroup,
   },
   data() {
     return {
@@ -125,42 +123,3 @@ export default {
     ]
   }
 </lang-strings>
-
-<style lang="scss">
-.tui-performEditSectionContentAddElement {
-  // Mobile Dropdown Width
-  @media screen and (max-width: $tui-screen-sm) {
-    width: 100%;
-  }
-
-  // Tablet/Small Desktop Dropdown Width
-  @media screen and (min-width: $tui-screen-sm) and (max-width: $tui-screen-lg) {
-    width: 50%;
-  }
-
-  // Desktop Dropdown Width
-  @media screen and (min-width: $tui-screen-lg) {
-    width: 30%;
-  }
-
-  & &__dropDownGroupItem {
-    font-weight: bold;
-    font-size: var(--font-size-14);
-    cursor: text;
-    pointer-events: none;
-
-    &:hover {
-      background-color: var(--dropdown-item-bg-color);
-    }
-
-    &:focus {
-      background-color: var(--dropdown-item-bg-color);
-    }
-  }
-
-  & &__dropDownItem {
-    padding-left: var(--gap-8);
-    font-size: var(--font-size-14);
-  }
-}
-</style>

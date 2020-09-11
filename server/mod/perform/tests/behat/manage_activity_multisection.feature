@@ -74,7 +74,7 @@ Feature: Managing an activity with multiple sections
     And I close the tui notification toast
     And I navigate to manage perform activity content page of "1" activity section
     And I click on "Add element" "button"
-    And I click on "Short text" "link"
+    And I click on "Short text" "button"
     And I set the following fields to these values:
       | rawTitle | S1Q1 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
@@ -93,7 +93,7 @@ Feature: Managing an activity with multiple sections
     And I close the tui notification toast
     And I navigate to manage perform activity content page of "1" activity section
     And I click on "Add element" "button"
-    And I click on "Short text" "link"
+    And I click on "Short text" "button"
     And I set the following fields to these values:
       | rawTitle | S2Q1 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"

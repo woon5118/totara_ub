@@ -61,7 +61,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I close the tui notification toast
     And I click on "Edit content elements" "button"
     And I click on "Add element" "button"
-    And I click on "Short text" "link"
+    And I click on "Short text" "button"
     When I set the following fields to these values:
       | rawTitle   | Question 1   |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"

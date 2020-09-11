@@ -26,6 +26,7 @@
       'tui-dropdownItem--noPadding': noPadding,
     }"
     :disabled="disabled"
+    :role="role"
     @click="clickDropdownButton"
   >
     <slot />
@@ -37,6 +38,10 @@ export default {
   props: {
     disabled: Boolean,
     noPadding: Boolean,
+    role: {
+      type: String,
+      default: 'menuitem',
+    },
   },
 
   methods: {

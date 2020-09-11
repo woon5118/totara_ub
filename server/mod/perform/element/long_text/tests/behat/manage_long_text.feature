@@ -13,7 +13,7 @@ Feature: Manage performance activity long text elements
     When I navigate to the edit perform activities page for activity "Add Element Activity"
     And I click on "Edit content elements" "button"
     And I click on "Add element" "button"
-    And I click on "Long text" "link"
+    And I click on "Long text" "button"
     When I set the following fields to these values:
       | rawTitle   | Question 1   |
       | identifier | Identifier 1 |
@@ -23,7 +23,7 @@ Feature: Manage performance activity long text elements
     When I click on identifier icon for question "Question 1"
     Then I should see "Identifier 1"
     When I click on "Add element" "button"
-    And I click on "Long text" "link"
+    And I click on "Long text" "button"
     And I set the following fields to these values:
       | rawTitle | Question 2 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"

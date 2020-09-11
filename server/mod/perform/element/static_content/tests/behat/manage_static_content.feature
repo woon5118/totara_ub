@@ -13,7 +13,7 @@ Feature: Manage performance activity static content
     When I navigate to the edit perform activities page for activity "Add Element Activity"
     And I click on "Edit content" "button"
     And I click on "Add element" "button"
-    And I click on "Static content" "link"
+    And I click on "Static content" "button"
     And I set the following fields to these values:
       | rawTitle | Static content 1 |
     And I activate the weka editor with css ".tui-weka"
@@ -46,7 +46,7 @@ Feature: Manage performance activity static content
     When I navigate to the edit perform activities page for activity "Add Element Activity"
     And I click on "Edit content" "button"
     And I click on "Add element" "button"
-    And I click on "Static content" "link"
+    And I click on "Static content" "button"
     And I activate the weka editor with css ".tui-weka"
     And I type "I see trees of green, red roses too. I see them bloom for me and you. And I think to myself what a wonderful world." in the weka editor
     And I wait for the next second
@@ -64,7 +64,7 @@ Feature: Manage performance activity static content
     When I navigate to the edit perform activities page for activity "Add Element Activity"
     And I click on "Edit content" "button"
     And I click on "Add element" "button"
-    And I click on "Static content" "link"
+    And I click on "Static content" "button"
     And I wait for the next second
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     Then I should see "Required"
@@ -72,7 +72,7 @@ Feature: Manage performance activity static content
 
     # Add a static content element with no content
     And I click on "Add element" "button"
-    And I click on "Static content" "link"
+    And I click on "Static content" "button"
     And I set the following fields to these values:
       | rawTitle | Static content 1 |
     And I wait for the next second
