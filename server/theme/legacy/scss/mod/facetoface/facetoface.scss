@@ -997,7 +997,6 @@ select.menuf2f-select {
         @include with-heading();
 
         background: var(--color-neutral-2);
-        color: var(--color-neutral-1);
       }
 
       &__cancellation-cancellation {  // NOTE: this is not a typo.
