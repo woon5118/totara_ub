@@ -224,6 +224,37 @@ class core_webapi_formatter_text_field_formatter_testcase extends advanced_testc
         $formatter->format($value);
     }
 
+    /**
+     * Test the exception given by unsuported formats.
+     */
+    public function test_markdown_format() {
+        $formatter = new text_field_formatter(format::FORMAT_MARKDOWN, context_system::instance());
+
+        $value = '<span class="myhtml">test</span>';
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('MARKDOWN format is currently not supported by the text formatter.');
+
+        $formatter->format($value);
+    }
+
+    /**
+     * Test the exception given by unsuported formats.
+     */
+    public function test_json_editor_format() {
+        $formatter = new text_field_formatter(format::FORMAT_JSON_EDITOR, context_system::instance());
+
+        $value = '<span class="myhtml">test</span>';
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('JSON_EDITOR format is currently not supported by the text formatter.');
+
+        $formatter->format($value);
+    }
+
+    /**
+     * Test the exception given by invalid formats
+     */
     public function test_unknown_format() {
         $context = context_system::instance();
         $formatter = new text_field_formatter('foo', $context);

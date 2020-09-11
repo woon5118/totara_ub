@@ -86,6 +86,14 @@ class text_field_formatter extends base {
             format::FORMAT_HTML,
             format::FORMAT_PLAIN
         ];
+
+        // Do a custom check for valid but (currently) unsupported formats for this formatter,
+        // anything else should go through to base for the generic exception.
+        $unsupported_formats = array_diff(format::get_available(), $valid_formats);
+        if (in_array($this->format, $unsupported_formats)) {
+            throw new \coding_exception($this->format . ' format is currently not supported by the text formatter.');
+        }
+
         return in_array($this->format, $valid_formats);
     }
 
