@@ -208,6 +208,11 @@
   }
 }
 
+// Reset change password page backgrounds
+#page-login-change_password.path-login #page {
+  background-color: inherit;
+}
+
 .core__forgotpassword {
   @include make-sm-column(6);
   @include make-sm-column-push(3);
