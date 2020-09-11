@@ -357,7 +357,7 @@ final class workspace extends container implements category_name_provider {
 
         if (isset($data->category) && $this->category != $data->category) {
             // We need to prevent the move of category between workspace.
-            throw workspace_exception::on_update($this->fullname);
+            throw workspace_exception::on_update();
         }
 
         if (!property_exists($data, 'id')) {

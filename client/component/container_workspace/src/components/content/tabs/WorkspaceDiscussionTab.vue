@@ -329,11 +329,7 @@ export default {
         this.$emit('add-discussion');
       } catch (e) {
         await notify({
-          message: this.$str(
-            'error:create_discussion',
-            'container_workspace',
-            this.workspaceId
-          ),
+          message: this.$str('error:create_discussion', 'container_workspace'),
           type: 'error',
         });
       } finally {

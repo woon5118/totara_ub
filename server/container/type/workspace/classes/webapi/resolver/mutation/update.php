@@ -64,7 +64,7 @@ final class update implements mutation_resolver, has_middleware {
 
         if ($USER->id != $owner_id && !$interactor->can_update()) {
             // Not a same owner and also not a site admin, therefore we skip it.
-            throw workspace_exception::on_update($workspace->fullname);
+            throw workspace_exception::on_update();
         }
 
         $is_private = $args['private'] ?? $workspace->is_private();

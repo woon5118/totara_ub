@@ -38,11 +38,10 @@ final class workspace_exception extends \moodle_exception {
     }
 
     /**
-     * @param string $workspace_name
      * @return workspace_exception
      */
-    public static function on_update(string $workspace_name): workspace_exception {
-        return new static('error:update', $workspace_name);
+    public static function on_update(): workspace_exception {
+        return new static('error:update');
     }
 
     /**

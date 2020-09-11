@@ -123,7 +123,7 @@ final class manager {
         );
 
         if (null === $record || false === $record) {
-            throw enrol_exception::on_self_enrol($this->workspace->fullname);
+            throw enrol_exception::on_self_enrol();
         }
 
         $context = $this->workspace->get_context();

@@ -45,11 +45,10 @@ final class discussion_exception extends \moodle_exception {
     }
 
     /**
-     * @param string $workspace_name
      * @return discussion_exception
      */
-    public static function on_create(string $workspace_name): discussion_exception {
-        return new static('error:create_discussion', $workspace_name);
+    public static function on_create(): discussion_exception {
+        return new static('error:create_discussion');
     }
 
     /**
