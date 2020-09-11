@@ -35,6 +35,7 @@
       <template v-slot:trigger="{ isOpen }">
         <Button
           :aria-expanded="isOpen ? 'true' : 'false'"
+          :aria-label="triggerAriaLabelText"
           :text="String(labelText)"
           :styleclass="{ transparent: true, small: true }"
           @click="$emit('open', $event)"
@@ -86,6 +87,20 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    labelAriaLabel: {
+      type: String,
+      default: '',
+    },
+  },
+
+  computed: {
+    triggerAriaLabelText() {
+      if (this.labelAriaLabel !== '') {
+        return this.labelAriaLabel;
+      } else {
+        return this.labelText;
+      }
     },
   },
 };

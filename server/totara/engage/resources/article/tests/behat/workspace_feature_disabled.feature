@@ -24,13 +24,13 @@ Feature: Workspaces should not be mentioned on resources when the feature is dis
     Given I log in as "user1"
 
     When I view article "Test Article 1"
-    And I click on "Share" "button"
+    And I click on "Share resource" "button"
     And I wait for the next second
     Then I should see "Share to specific people or workspaces (optional)"
 
     When I disable the "container_workspace" advanced feature
     And I view article "Test Article 1"
-    And I press "Share"
+    And I click on "Share resource" "button"
     And I wait for the next second
     Then I should see "Share to specific people"
     And I should not see "Share to specific people or workspaces (optional)"
@@ -39,13 +39,13 @@ Feature: Workspaces should not be mentioned on resources when the feature is dis
   Scenario: Should not see workspaces when another user is sharing a resource
     Given I log in as "user2"
     And I view article "Test Article 1"
-    And I press "Share"
+    And I click on "Reshare resource" "button"
     And I wait for the next second
     Then I should see "Reshare to specific people or workspaces"
 
     When I disable the "container_workspace" advanced feature
     When I view article "Test Article 1"
-    And I press "Share"
+    And I click on "Reshare resource" "button"
     And I wait for the next second
     Then I should see "Reshare to specific people"
     And I should not see "Share to specific people or workspaces"

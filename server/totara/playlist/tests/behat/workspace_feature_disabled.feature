@@ -24,13 +24,13 @@ Feature: Workspaces should not be mentioned on playlists when the feature is dis
     Given I log in as "user1"
 
     When I view playlist "Test Playlist 1"
-    And I press "Share"
+    And I click on "Share playlist" "button"
     And I wait for the next second
     Then I should see "Share to specific people or workspaces (optional)"
 
     When I disable the "container_workspace" advanced feature
     When I view playlist "Test Playlist 1"
-    And I press "Share"
+    And I click on "Share playlist" "button"
     And I wait for the next second
     Then I should see "Share to specific people"
     And I should not see "Share to specific people or workspaces (optional)"
@@ -40,13 +40,13 @@ Feature: Workspaces should not be mentioned on playlists when the feature is dis
     Given I log in as "user2"
 
     When I view playlist "Test Playlist 1"
-    And I press "Share"
+    And I click on "Reshare playlist" "button"
     And I wait for the next second
     Then I should see "Reshare to specific people or workspaces"
 
     When I disable the "container_workspace" advanced feature
     When I view playlist "Test Playlist 1"
-    And I press "Share"
+    And I click on "Reshare playlist" "button"
     And I wait for the next second
     Then I should see "Reshare to specific people"
     And I should not see "Share to specific people or workspaces"

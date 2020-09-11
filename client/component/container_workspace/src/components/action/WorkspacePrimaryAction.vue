@@ -91,6 +91,15 @@
                 ? $str('owner', 'container_workspace')
                 : $str('admin', 'moodle')
             "
+            :aria-label="
+              $str(
+                'actions_label',
+                'container_workspace',
+                interactor.own
+                  ? $str('owner', 'container_workspace')
+                  : $str('admin', 'moodle')
+              )
+            "
             :aria-expanded="isOpen"
             :caret="true"
             class="tui-workspacePrimaryAction__dropDown__button"
@@ -192,6 +201,13 @@
           <template v-slot:trigger="{ toggle, isOpen }">
             <Button
               :text="$str('joined', 'container_workspace')"
+              :aria-label="
+                $str(
+                  'actions_label',
+                  'container_workspace',
+                  $str('member', 'container_workspace')
+                )
+              "
               :caret="true"
               :aria-expanded="isOpen"
               class="tui-workspacePrimaryAction__dropDown__button"
@@ -572,6 +588,9 @@ export default {
 <lang-strings>
 {
   "container_workspace": [
+    "actions",
+    "actions_label",
+    "member",
     "joined",
     "join_workspace",
     "join_space",

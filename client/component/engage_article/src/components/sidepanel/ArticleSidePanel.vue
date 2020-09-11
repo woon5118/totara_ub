@@ -79,6 +79,7 @@
         :owned="article.owned"
         :access-value="article.resource.access"
         :instance-id="resourceId"
+        :share-button-aria-label="shareButtonLabel"
         :shared-by-count="article.sharedbycount"
         :like-button-aria-label="likeButtonLabel"
         :liked="article.reacted"
@@ -192,8 +193,20 @@ export default {
       return this.article.resource.user;
     },
 
-    sharedByCount() {
-      return this.article.sharedByCount;
+    shareButtonLabel() {
+      if (this.article.owned) {
+        return this.$str(
+          'shareresource',
+          'engage_article',
+          this.article.resource.name
+        );
+      }
+
+      return this.$str(
+        'reshareresource',
+        'engage_article',
+        this.article.resource.name
+      );
     },
 
     likeButtonLabel() {
@@ -344,6 +357,8 @@ export default {
     "engage_article": [
       "deletewarningmsg",
       "deletewarningtitle",
+      "reshareresource",
+      "shareresource",
       "timelessthanfive",
       "timefivetoten",
       "timemorethanten",

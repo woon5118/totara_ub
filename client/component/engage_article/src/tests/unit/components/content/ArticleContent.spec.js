@@ -54,6 +54,7 @@ describe('engage_article/components/content/ArticleContent.vue', function() {
       propsData: {
         resourceId: 'ArticleContent',
         content: '',
+        title: '',
         updateAble: true,
       },
 

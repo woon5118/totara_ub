@@ -35,8 +35,10 @@
       <template v-slot:trigger>
         <a
           href="#"
+          role="button"
+          :aria-label="numberAriaLabelText"
           class="tui-totaraEngage-buttonLabel__label"
-          @click="$emit('open')"
+          @click.prevent="$emit('click')"
         >
           {{ number }}
         </a>
@@ -81,6 +83,20 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    numberAriaLabel: {
+      type: String,
+      default: '',
+    },
+  },
+
+  computed: {
+    numberAriaLabelText() {
+      if (this.numberAriaLabel !== '') {
+        return this.numberAriaLabel;
+      } else {
+        return String(this.number);
+      }
     },
   },
 

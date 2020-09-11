@@ -52,7 +52,7 @@
                           small: true,
                         }"
                         :aria-label="
-                          $str('tag_remove', 'totara_core') + ' ' + tag.text
+                          $str('tag_remove', 'totara_core', tag.text)
                         "
                         @click.stop.prevent="handleRemove(tag, index)"
                       >

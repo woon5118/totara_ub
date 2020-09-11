@@ -33,6 +33,7 @@
       v-if="accessValue === 'PUBLIC'"
       :instance-id="instanceId"
       :component="componentName"
+      :button-aria-label="shareButtonAriaLabel"
       :owned="owned"
       :access-value="accessValue"
       :shared-by-count="sharedByCount"
@@ -79,6 +80,10 @@ export default {
     componentName: {
       type: String,
       required: true,
+    },
+    shareButtonAriaLabel: {
+      type: String,
+      default: '',
     },
     sharedByCount: {
       type: Number,

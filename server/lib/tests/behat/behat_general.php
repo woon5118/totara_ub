@@ -384,6 +384,44 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Generic hackery click action. Directly click on the element of the specified type.
+     * Please do not abuse this step.
+     *
+     * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" with keyboard$/
+     * @param string $element Element we look for
+     * @param string $selectortype The type of what we look for
+     * @since Totara 13
+     */
+    public function i_click_on_with_keyboard($element, $selectortype) {
+        \behat_hooks::set_step_readonly(false);
+
+        // Gets the node based on the requested selector type and locator.
+        $node = $this->get_selected_node($selectortype, $element);
+        $this->ensure_node_is_visible($node);
+        if ($selectortype === 'option') {
+            // Clicking on an option no longer works
+            throw new DriverException('Clicking on option elements is no longer supported, please use set field instead');
+        } else {
+            $this->click_hidden_node($node);
+        }
+    }
+
+    /**
+     * Click a hidden element.
+     *
+     * @param Behat\Mink\Element\NodeElement $input_element
+     */
+    private function click_hidden_node($node): void {
+        if ($this->running_javascript()) {
+            $script = 'document.evaluate(' . json_encode($node->getXpath(), JSON_UNESCAPED_SLASHES) . ', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();';
+            $this->getSession()->getDriver()->executeScript($script);
+            $this->wait_for_pending_js();
+            return;
+        }
+        $this->click_node($node);
+    }
+
+    /**
      * Sets the focus and takes away the focus from an element, generating blur JS event.
      *
      * @When /^I take focus off "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/

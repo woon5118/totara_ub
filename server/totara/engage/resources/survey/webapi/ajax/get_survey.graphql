@@ -6,6 +6,7 @@ query engage_survey_get_survey($resourceid: param_integer!) {
     resource {
       __typename
       id
+      name(format: PLAIN)
       access
       user {
         __typename

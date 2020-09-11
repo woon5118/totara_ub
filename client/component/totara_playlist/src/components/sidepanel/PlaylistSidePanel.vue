@@ -90,6 +90,7 @@
             :owned="canManage"
             :access-value="playlist.access"
             :instance-id="playlistId"
+            :share-button-aria-label="shareButtonLabel"
             :shared-by-count="playlist.sharedbycount"
             :show-like-button="false"
             component-name="totara_playlist"
@@ -216,6 +217,22 @@ export default {
     isPrivate() {
       return AccessManager.isPrivate(this.playlist.access);
     },
+
+    shareButtonLabel() {
+      if (this.playlist.owned) {
+        return this.$str(
+          'shareplaylist',
+          'totara_playlist',
+          this.playlist.name
+        );
+      }
+
+      return this.$str(
+        'reshareplaylist',
+        'totara_playlist',
+        this.playlist.name
+      );
+    },
   },
 
   methods: {
@@ -315,6 +332,8 @@ export default {
 <lang-strings>
   {
     "totara_playlist": [
+      "reshareplaylist",
+      "shareplaylist",
       "deletewarningmsg",
       "deletewarningtitle"
     ],

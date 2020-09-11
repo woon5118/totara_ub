@@ -19,6 +19,7 @@
   <div class="tui-articleContent">
     <InlineEditing
       v-show="!editing"
+      :button-aria-label="$str('editarticlecontent', 'engage_article', title)"
       :full-width="true"
       :restricted-mode="true"
       :update-able="updateAble"
@@ -62,6 +63,11 @@ export default {
      */
     resourceId: {
       type: [String, Number],
+      required: true,
+    },
+
+    title: {
+      type: String,
       required: true,
     },
 
@@ -144,6 +150,14 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+  {
+    "engage_article": [
+      "editarticlecontent"
+    ]
+  }
+</lang-strings>
 
 <style lang="scss">
 .tui-articleContent {

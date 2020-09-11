@@ -36,6 +36,7 @@
           @bookmark="updateBookmark"
         />
         <ArticleContent
+          :title="articleName"
           :update-able="article.updateable"
           :content="article.content"
           :resource-id="resourceId"

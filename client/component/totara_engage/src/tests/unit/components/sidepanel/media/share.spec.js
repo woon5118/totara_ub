@@ -38,6 +38,7 @@ describe('totara_engage/components/sidepanel/media/share', () => {
       accessValue: 'PUBLIC', // values: 'PUBLIC', 'PRIVATE', 'RESTRICTED'
       instanceId: 4,
       component: 'engage_article',
+      buttonAriaLabel: 'Share resource "unicorn"',
       sharedByCount: 5,
       sharedTo: [],
     };

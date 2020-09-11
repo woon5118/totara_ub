@@ -23,6 +23,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['actions'] = 'Actions';
+$string['actions_label'] = '{$a} actions';
 $string['active'] = 'Active';
 $string['add_members'] = 'Add members';
 $string['add_members_to_space'] = 'Add members to workspace';

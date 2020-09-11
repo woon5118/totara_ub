@@ -20,6 +20,7 @@ mutation engage_survey_update_survey(
     resource {
       __typename
       id
+      name(format: PLAIN)
       access
       user {
         __typename
@@ -27,6 +28,9 @@ mutation engage_survey_update_survey(
         fullname
         profileimagealt
         profileimageurl
+        card_display {
+          __typename
+        }
       }
     }
     questions {

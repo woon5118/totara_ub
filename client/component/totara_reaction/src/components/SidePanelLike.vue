@@ -20,6 +20,7 @@
     <template v-if="!$apollo.loading">
       <ButtonIconWithLabel
         :button-aria-label="buttonAriaLabel"
+        :label-aria-label="labelAriaLabel"
         :label-text="count"
         :disabled="disabled"
         @popover-open-changed="showPopover = $event"
@@ -179,6 +180,16 @@ export default {
     };
   },
 
+  computed: {
+    labelAriaLabel() {
+      if (this.count === 0) {
+        return this.$str('nolikes', 'totara_reaction');
+      } else {
+        return this.$str('numberoflikes', 'totara_reaction', this.count);
+      }
+    },
+  },
+
   watch: {
     /**
      *
@@ -300,6 +311,8 @@ export default {
 <lang-strings>
   {
     "totara_reaction": [
+      "nolikes",
+      "numberoflikes",
       "error:create_like",
       "error:remove_like"
     ]

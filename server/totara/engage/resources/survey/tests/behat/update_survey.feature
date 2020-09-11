@@ -36,7 +36,7 @@ Feature: Update survey
     When I click on "Actions" "button"
     Then I should see "Delete survey"
     When I click on "Delete survey" "link"
-    And I press "No"
+    And I close the tui modal
     And I click on "Share" "button"
     Then I should see "Only you"
     And I should see "Limited people"
@@ -49,7 +49,7 @@ Feature: Update survey
     When I click on "Actions" "button"
     Then I should see "Delete survey"
     When I click on "Delete survey" "link"
-    And I press "No"
+    And I close the tui modal
     And I click on "Share" "button"
     Then I should see "Only you"
     And I should see "Limited people"
@@ -62,7 +62,7 @@ Feature: Update survey
     When I click on "Actions" "button"
     Then I should see "Delete survey"
     When I click on "Delete survey" "link"
-    And I press "No"
+    And I close the tui modal
     And I click on "Share" "button"
     Then I should see "Only you"
     And I should see "Limited people"
@@ -76,7 +76,7 @@ Feature: Update survey
     And I should see "Share"
     When I click on "Actions" "button"
     And I click on "Delete survey" "link"
-    And I press "No"
+    And I close the tui modal
     And I click on "Share" "button"
     Then I should see "Only you"
     And I should see "Limited people"

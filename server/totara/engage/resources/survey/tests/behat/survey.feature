@@ -74,5 +74,5 @@ Feature: Vote survey
     And I view survey "Test Survey 2?"
     Then I should not see "Reshare"
     When I view survey "Test Survey 1?"
-    And I click on "Share" "button" in the ".tui-shareSetting" "css_element"
+    And I click on "Reshare survey" "button"
     Then I should see "Reshare" in the ".tui-modalContent__header-title" "css_element"

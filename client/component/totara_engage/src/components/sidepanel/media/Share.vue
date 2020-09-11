@@ -20,7 +20,8 @@
   <div class="tui-shareSetting">
     <ButtonLabel
       :number="sharedByCountDisplay"
-      :aria-label="$str('share', 'totara_engage')"
+      :number-aria-label="sharedByCountAriaLabel"
+      :aria-label="buttonAriaLabel"
       class="tui-shareSetting__buttonLabel"
       @click="showReciptsModal"
     >
@@ -29,7 +30,7 @@
       </template>
       <template v-slot:hoverContent>
         <div class="tui-shareSetting__buttonLabel-hoverContent">
-          {{ $str('tipnumberofresharer', 'totara_engage') }}
+          {{ sharedByCountAriaLabel }}
         </div>
       </template>
     </ButtonLabel>
@@ -140,6 +141,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    buttonAriaLabel: {
+      type: String,
+      required: true,
+    },
     sharedByCount: {
       type: Number,
       required: true,
@@ -163,6 +168,15 @@ export default {
       return this.sharedByCountLocal
         ? this.sharedByCountLocal
         : this.sharedByCount;
+    },
+
+    sharedByCountAriaLabel() {
+      const count = this.sharedByCountDisplay;
+      if (count === 0) {
+        return this.$str('noshares', 'totara_engage');
+      } else {
+        return this.$str('numberofshares', 'totara_engage', count);
+      }
     },
   },
 
@@ -228,6 +242,7 @@ export default {
       "noshares",
       "reshare",
       "resharedbypeople",
+      "numberofshares",
       "share",
       "tipnumberofresharer"
     ]

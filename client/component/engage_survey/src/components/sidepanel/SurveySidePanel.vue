@@ -79,6 +79,7 @@
             :owned="survey.owned"
             :access-value="survey.resource.access"
             :instance-id="resourceId"
+            :share-button-aria-label="shareButtonLabel"
             :shared-by-count="survey.sharedbycount"
             :like-button-aria-label="likeButtonLabel"
             :liked="survey.reacted"
@@ -157,8 +158,21 @@ export default {
     userEmail() {
       return this.survey.resource.user.email || '';
     },
-    sharedByCount() {
-      return this.survey.sharedByCount;
+
+    shareButtonLabel() {
+      if (this.survey.owned) {
+        return this.$str(
+          'sharesurvey',
+          'engage_survey',
+          this.survey.resource.name
+        );
+      }
+
+      return this.$str(
+        'resharesurvey',
+        'engage_survey',
+        this.survey.resource.name
+      );
     },
 
     likeButtonLabel() {
@@ -304,6 +318,8 @@ export default {
     "engage_survey": [
       "deletewarningmsg",
       "likesurvey",
+      "resharesurvey",
+      "sharesurvey",
       "removelikesurvey",
       "deletesurvey",
       "reportsurvey",

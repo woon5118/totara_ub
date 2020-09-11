@@ -20,6 +20,7 @@
     <div class="tui-articleTitle__head">
       <InlineEditing
         v-show="!editing"
+        :button-aria-label="$str('editarticletitle', 'engage_article', title)"
         :update-able="updateAble"
         :full-width="true"
         @click="editing = true"
@@ -176,6 +177,9 @@ export default {
   {
     "totara_engage": [
       "unsaved_changes_warning"
+    ],
+    "engage_article": [
+      "editarticletitle"
     ]
   }
 </lang-strings>
