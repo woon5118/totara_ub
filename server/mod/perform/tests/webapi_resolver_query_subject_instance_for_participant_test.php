@@ -21,7 +21,9 @@
  * @package mod_perform
  */
 
+use mod_perform\entities\activity\subject_static_instance;
 use totara_core\advanced_feature;
+use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
@@ -117,6 +119,78 @@ class mod_perform_webapi_resolver_query_subject_instance_for_participant_testcas
         ];
 
         self::assertEquals($expected, $this->strip_expected_dates($actual));
+    }
+
+    public function test_subject_static_instance_manager_is_resolved(): void {
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $subject_user = self::getDataGenerator()->create_user();
+        $manager_user = self::getDataGenerator()->create_user();
+
+        $subject_instance = $generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject_user->id,
+            'other_participant_id' => null,
+            'include_questions' => false,
+        ]);
+
+        $manager_ja = job_assignment::create([
+            'userid' => $manager_user->id,
+            'fullname' => 'manager_user_ja',
+            'shortname' => 'manager_user_ja',
+            'idnumber' => 'manager_user_ja',
+            'managerjaid' => null,
+        ]);
+
+        $main_user_ja = job_assignment::create([
+            'userid' => $manager_user->id,
+            'fullname' => 'main_user_ja',
+            'shortname' => 'main_user_ja',
+            'idnumber' => 'main_user_ja',
+            'managerjaid' => $manager_ja->id,
+        ]);
+
+        $static_instance = new subject_static_instance();
+        $static_instance->subject_instance_id = $subject_instance->id;
+        $static_instance->job_assignment_id = $main_user_ja->id;
+        $static_instance->manager_job_assignment_id = $manager_ja->id;
+        $static_instance->save();
+
+        self::setUser($subject_user->id);
+
+        $args = [
+            'subject_instance_id' => $subject_instance->id,
+        ];
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+        $actual = $this->get_webapi_operation_data($result);
+
+        self::assertCount(1, $actual['static_instances']);
+
+        $actual_manager_ja = $actual['static_instances'][0]['managerja'];
+        self::assertEquals($actual_manager_ja['id'], $manager_ja->id);
+        self::assertEquals($actual_manager_ja['fullname'], $manager_ja->fullname);
+
+        // Event should fire to null out the manager_ja reference.
+        job_assignment::delete($manager_ja);
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+        $actual = $this->get_webapi_operation_data($result);
+        self::assertNull($actual['static_instances'][0]['managerja']);
+
+        // Event should fire to delete the subject_static_instance record.
+        $main_user_ja = job_assignment::get_with_id($main_user_ja->id); // Refresh manager reference.
+        job_assignment::delete($main_user_ja);
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+        $actual = $this->get_webapi_operation_data($result);
+        self::assertEmpty($actual['static_instances']);
     }
 
     public function test_get_as_participation_manager(): void {

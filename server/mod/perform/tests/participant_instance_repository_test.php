@@ -53,7 +53,7 @@ class mod_perform_participant_instance_repository_testcase extends advanced_test
             'include_questions' => false,
         ]);
 
-        $can_view = participant_instance::repository()->user_can_view_other_users_profile($main_user->id, $other_user->id);
+        $can_view = participant_instance::repository()::user_can_view_other_users_profile($main_user->id, $other_user->id);
 
         self::assertFalse($can_view);
     }
@@ -152,7 +152,7 @@ class mod_perform_participant_instance_repository_testcase extends advanced_test
             'include_questions' => false,
         ]);
 
-        $can_view = participant_instance::repository()->user_can_view_other_users_profile($main_user->id, $other_user->id);
+        $can_view = participant_instance::repository()::user_can_view_other_users_profile($main_user->id, $other_user->id);
 
         self::assertTrue($can_view);
     }
@@ -173,7 +173,7 @@ class mod_perform_participant_instance_repository_testcase extends advanced_test
             'include_questions' => false,
         ]);
 
-        $can_view = participant_instance::repository()->user_can_view_other_users_profile($main_user->id, $other_user->id);
+        $can_view = participant_instance::repository()::user_can_view_other_users_profile($main_user->id, $other_user->id);
 
         self::assertFalse($can_view);
     }

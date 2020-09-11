@@ -39,9 +39,10 @@ class subject_static_instance_hierarchy {
         subject_static_instance::repository()
             ->where('job_assignment_id', $event->objectid)
             ->delete();
+
         subject_static_instance::repository()
             ->where('manager_job_assignment_id', $event->objectid)
-            ->update(['manager_job_assignment_id', null]);
+            ->update(['manager_job_assignment_id' => null]);
     }
 
     /**

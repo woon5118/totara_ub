@@ -37,6 +37,8 @@ use core\orm\entity\relations\belongs_to;
  * @property int $created_at
  * @property int $updated_at
  *
+ * @method static subject_static_instance_repository repository
+ *
  * @package mod_perform\entities
  */
 class subject_static_instance extends entity {

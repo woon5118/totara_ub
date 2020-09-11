@@ -117,6 +117,10 @@ $observers = [
         'callback' => subject_static_instance_hierarchy::class.'::position_deleted',
     ],
     [
+        'eventname' => job_assignment_deleted::class,
+        'callback' => subject_static_instance_hierarchy::class.'::job_assignment_deleted',
+    ],
+    [
         'eventname' => organisation_deleted::class,
         'callback' => subject_static_instance_hierarchy::class.'::organisation_deleted',
     ],

@@ -36,6 +36,7 @@ use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\manual_relationship_selector;
 use mod_perform\entities\activity\participant_instance;
+use mod_perform\entities\activity\subject_static_instance;
 use mod_perform\util;
 use totara_core\hook\base;
 
@@ -104,7 +105,7 @@ class user {
         // If both users are both participants in an activity or the target
         // user is the subject and the viewing user a participant.
         if (participant_instance::repository()
-            ->user_can_view_other_users_profile($hook->viewing_user_id, $hook->target_user_id)
+            ::user_can_view_other_users_profile($hook->viewing_user_id, $hook->target_user_id)
         ) {
             $hook->give_permission();
             return;
@@ -121,8 +122,15 @@ class user {
         }
 
         // This is just a small safety check. The query should have taken care of the checks
-        // whether the user can be shown
+        // whether the user can be shown.
         if (util::can_potentially_manage_participants($hook->viewing_user_id)) {
+            $hook->give_permission();
+            return;
+        }
+
+        // Is the user a manager or appraiser in one of the users subject static instance records.
+        if (subject_static_instance::repository()
+            ::user_can_view_other_users_profile($hook->viewing_user_id, $hook->target_user_id)) {
             $hook->give_permission();
             return;
         }

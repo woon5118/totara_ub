@@ -30,7 +30,8 @@ use mod_perform\models\activity\participant_source;
 class participant_instance_repository extends repository {
 
     /**
-     * Should one user be able to see the other users profile details in the context of mod perform.
+     * Should one user be able to see the other users profile details in the context of mod perform
+     * based on participant instance records.
      *
      * Will return true if the viewing user share a subject instance with the target user,
      * or if the the target user is the subject of a subject_instance that the viewing user is participating in.
@@ -38,8 +39,9 @@ class participant_instance_repository extends repository {
      * @param int $viewing_user_id The user requesting to view the target user
      * @param int $target_user_id The user who's
      * @return bool
+     * @see subject_static_instance_repository::user_can_view_other_users_profile
      */
-    public function user_can_view_other_users_profile(int $viewing_user_id, int $target_user_id): bool {
+    public static function user_can_view_other_users_profile(int $viewing_user_id, int $target_user_id): bool {
         $shared_subject_instance = builder::table(participant_instance::TABLE)
             ->as('other_pi')
             ->select('id')

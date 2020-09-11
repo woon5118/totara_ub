@@ -50,6 +50,11 @@ class core_user_access_controller {
 
         switch ($hook->field) {
             case 'email':
+            case 'fullname':
+            case 'profileimageurl':
+            case 'profileimageurlsmall':
+            case 'profileimagealt':
+            case 'imagealt':
                 if (self::users_share_relationships($hook->target_user_id, $hook->viewing_user_id)) {
                     $hook->give_permission();
                 }
