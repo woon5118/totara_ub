@@ -242,7 +242,7 @@ export default {
      * @return {Boolean}
      */
     criteriaComplete() {
-      return this.achievedCompetencies >= this.numberOfRequiredCompetencies;
+      return this.numberOfRequiredCompetencies > 0 && this.achievedCompetencies >= this.numberOfRequiredCompetencies;
     },
 
     /**
@@ -270,9 +270,9 @@ export default {
      */
     noCompetenciesString() {
       if (this.type === 'otherCompetency') {
-        return this.$str('no_competencies', 'criteria_othercompetency');
+        return this.$str('error_no_competencies', 'criteria_othercompetency');
       }
-      return this.$str('no_competencies', 'criteria_childcompetency');
+      return this.$str('error_no_children', 'criteria_childcompetency');
     },
 
     /**
@@ -361,10 +361,10 @@ export default {
 <lang-strings>
   {
     "criteria_childcompetency": [
-      "no_competencies"
+      "error_no_children"
     ],
     "criteria_othercompetency": [
-      "no_competencies"
+      "error_no_competencies"
     ],
     "totara_criteria": [
       "achieve_proficiency_in_child_competencies",

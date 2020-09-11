@@ -183,3 +183,19 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     And I wait until ".tui-competencyAchievementsScale" "css_element" exists
     Then I should see "Value achieved when the competency is assigned" in the ".tui-criteriaOnActiveAchievement" "css_element"
     And I should see "Achieved on" in the ".tui-criteriaOnActiveAchievement" "css_element"
+
+  Scenario: View invalid course criteria
+    Given the following "criteria group pathways" exist in "totara_competency" plugin:
+      | competency  | scale_value        | criteria         | sortorder |
+      | comp1       | barely             | linkedcourses    | 1         |
+    And I run the scheduled task "totara_competency\task\expand_assignments_task"
+    And I run the scheduled task "totara_competency\task\competency_aggregation_queue"
+    And I log in as "user"
+    And I navigate to the competency profile details page for the "Comp1" competency
+
+    # Course completion (aka flexible courses) criteria (Course 1 & 2)
+    And I wait until ".tui-competencyAchievementsScale" "css_element" exists
+    # Make sure we expand existing headers
+    And I ensure the "Work towards level Just Barely Competent" tui collapsible is expanded
+    Then I should see "0 / 0" "courses" completed towards achieving "Just Barely Competent" in the competency profile
+    # Need to check colour in TL-26571

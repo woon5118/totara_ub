@@ -55,6 +55,7 @@ $string['error_invalid_configuration'] = 'The criterion configuration is invalid
 $string['hidden_course'] = 'This course is not available to view';
 $string['network_error'] = 'Network error';
 $string['no'] = 'No';
+$string['no_competencies'] = 'There are no competencies available to view';
 $string['no_courses'] = 'There are no courses available to view';
 $string['not_available'] = 'Not available';
 $string['not_complete'] = 'Not complete';

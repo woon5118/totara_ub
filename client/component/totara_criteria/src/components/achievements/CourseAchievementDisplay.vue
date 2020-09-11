@@ -157,7 +157,7 @@ export default {
      * @return {Boolean}
      */
     criteriaFulfilled() {
-      return this.completedNumberOfCourses >= this.targetNumberOfCourses;
+      return this.targetNumberOfCourses > 0 && this.completedNumberOfCourses >= this.targetNumberOfCourses;
     },
 
     /**
