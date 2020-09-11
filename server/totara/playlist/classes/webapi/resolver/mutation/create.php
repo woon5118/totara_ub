@@ -23,6 +23,7 @@
 namespace totara_playlist\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\clean_content_format;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
@@ -94,7 +95,8 @@ final class create implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('engage_resources'),
-            new clean_editor_content('summary', 'summary_format')
+            new clean_editor_content('summary', 'summary_format', false),
+            new clean_content_format('summary_format', FORMAT_JSON_EDITOR)
         ];
     }
 }

@@ -23,6 +23,7 @@
 namespace totara_playlist\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\clean_content_format;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
@@ -100,7 +101,11 @@ final class update implements mutation_resolver, has_middleware {
             new require_login(),
             new require_advanced_feature('engage_resources'),
             // summary field is an optional for this operation. Hence we will not require it.
-            new clean_editor_content('summary', 'summary_format', false)
+            new clean_editor_content('summary', 'summary_format', false),
+
+            // We leave the default value to null, because we want to fallback to the current playlist
+            // format if the summary format is not set.
+            new clean_content_format('summary_format')
         ];
     }
 }
