@@ -20,8 +20,8 @@
  * @package totara_competency
  */
 
-define(['core/templates', 'core/ajax', 'core/modal_factory', 'core/modal_events', 'core/notification', 'core/str'],
-function(templates, ajax, modalFactory, modalEvents, notification, str) {
+define(['core/templates', 'core/ajax', 'core/modal_factory', 'core/modal_events', 'core/notification', 'core/str','totara_competency/loader_manager'],
+function(templates, ajax, modalFactory, modalEvents, notification, str,Loader) {
 
     /**
      * Class constructor for the AchievementPaths.
@@ -42,6 +42,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         this.draggedNode = '';
         this.filename = 'achievement_paths.js';
         this.lastKey = 0;
+        this.loader = null;
         this.markedForDeletionPathways = [];
         this.nDeletedPaths = 0;
         this.nPaths = 0;
@@ -72,7 +73,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             var that = this;
 
             this.widget.addEventListener('click', function(e) {
-                if (!e.target) {
+                if (!e.target || that.busyAddPathway !== '') {
                     return;
                 }
 
@@ -134,7 +135,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             });
 
             this.widget.addEventListener('change', function(e) {
-                if (!e.target) {
+                if (!e.target || that.busyAddPathway !== '') {
                     return;
                 }
 
@@ -254,7 +255,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
                 // Reset busyAddPw to allow adding of another pw
                 // TODO: May want to check the current value against the update value. Just make sure it works during init
-                that.busyAddPathway = '';
+                that.unsetBusyAddPathway();
             });
 
             this.widget.addEventListener(pwEvents + 'remove', function(e) {
@@ -425,7 +426,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 return;
             }
 
-            this.busyAddPathway = pathType;
+            this.setBusyAddPathway(pathType);
 
             var that = this,
                 target,
@@ -533,7 +534,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             if (this.busyAddPathway !== '') {
                 return;
             }
-            this.busyAddPathway = 'criteria_group';
+            that.setBusyAddPathway('criteria_group');
 
             key = this.getNextKey();
             criterionKey = key + '_criterion_1';
@@ -1351,6 +1352,23 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             if (this.dropPlaceholder.parentNode) {
                 this.dropPlaceholder.remove();
             }
+        },
+
+        /**
+         * set busyAddPathway to handle slow execution of js and show loading spinner
+         * @param pathType
+         */
+        setBusyAddPathway: function (pathType) {
+            this.busyAddPathway = pathType;
+            this.loader.show();
+        },
+
+        /**
+         * unset busyAddPathway and hide loading spinner
+         */
+        unsetBusyAddPathway: function () {
+            this.busyAddPathway = '';
+            this.loader.hide();
         }
 
     };
@@ -1367,10 +1385,13 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             wgt.setParent(parent);
             wgt.events();
             wgt.bubbledEventsListener();
+            wgt.loader = Loader.init(parent);
             resolve(wgt);
 
             M.util.js_pending('competencyAchievementPaths');
+            wgt.loader.show();
             wgt.initData().then(function() {
+                wgt.loader.hide();
                 M.util.js_complete('competencyAchievementPaths');
             }).catch(function() {
                 // Failed

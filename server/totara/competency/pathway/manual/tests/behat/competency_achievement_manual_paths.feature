@@ -24,6 +24,7 @@ Feature: Manage Manual rating achievement paths
     And I should see "manual" pathway
     And I should see "No raters added" in "manual" pathway
     And the "Apply changes" "button" should be enabled
+    And I wait for pending js
 
     When I click on "Add raters" "button" in "manual" pathway
     And I toggle the legacy adder list entry "Manager" in "Select raters"
@@ -66,6 +67,7 @@ Feature: Manage Manual rating achievement paths
     Then I should see "manual" pathway
     And "Remove pathway" "button" should be visible in "manual" pathway
     And "Undo remove pathway" "button" should not be visible in "manual" pathway
+    And I wait for pending js
 
     When I click on "Remove pathway" "button" in "manual" pathway
     Then I should see "No achievement paths added"
@@ -73,6 +75,7 @@ Feature: Manage Manual rating achievement paths
     When I add a "manual" pathway
     And I wait for pending js
     Then I should see "manual" pathway
+    And I wait for pending js
     When I click on "Apply changes" "button"
     And I wait for pending js
     Then I should see "Changes applied successfully"
