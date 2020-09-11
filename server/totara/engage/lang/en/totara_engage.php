@@ -210,6 +210,7 @@ $string['timeviewfivetoten'] = '5 to 10 mins';
 $string['timeviewlessthanfive'] = 'Less than 5 mins';
 $string['timeviewmorethanten'] = 'More than 10 mins';
 $string['timetoread'] = 'Time to read';
+$string['tipnumberofresharer'] = 'Number of people who have reshared this content';
 $string['title'] = 'Title';
 $string['topic'] = 'Topic';
 $string['type'] = 'Type';

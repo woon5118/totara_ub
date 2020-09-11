@@ -21,20 +21,16 @@
     <ButtonLabel
       :number="sharedByCountDisplay"
       :aria-label="$str('share', 'totara_engage')"
-      @open="showResharerModal"
+      class="tui-shareSetting__buttonLabel"
       @click="showReciptsModal"
-      @popover-opened="showUsers"
     >
       <template v-slot:icon>
         <Share />
       </template>
       <template v-slot:hoverContent>
-        <LazyList
-          :no-items="$str('noshares', 'totara_engage')"
-          :names="sharedByNames"
-          :total="sharedByCountDisplay"
-          :loading="!sharedByLoaded"
-        />
+        <div class="tui-shareSetting__buttonLabel-hoverContent">
+          {{ $str('tipnumberofresharer', 'totara_engage') }}
+        </div>
       </template>
     </ButtonLabel>
     <ModalPresenter
@@ -66,90 +62,38 @@
         </ModalContent>
       </Modal>
     </ModalPresenter>
-
-    <ModalPresenter
-      v-if="sharedBy && sharedBy.length"
-      :open="resharerModalOpen"
-      @request-close="resharerModalRequestClose"
-    >
-      <NameListModal
-        :title="$str('resharedbypeople', 'totara_engage', sharedBy.length)"
-        :profiles="sharedBy"
-        @dismiss="resharerModalRequestClose"
-      />
-    </ModalPresenter>
   </div>
 </template>
 
 <script>
-import ButtonLabel from 'totara_engage/components/buttons/ButtonLabel';
-import Share from 'tui/components/icons/Share';
-import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
-import RecipientsSelector from 'totara_engage/components/form/access/RecipientsSelector';
-import SharedBoard from 'totara_engage/components/form/SharedBoard';
-import DoneCancelGroup from 'totara_engage/components/buttons/DoneCancelGroup';
-import LazyList from 'totara_engage/components/sidepanel/media/LazyList';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import Share from 'tui/components/icons/Share';
 
 import { AccessManager } from 'totara_engage/index';
+import ButtonLabel from 'totara_engage/components/buttons/ButtonLabel';
+import DoneCancelGroup from 'totara_engage/components/buttons/DoneCancelGroup';
+import RecipientsSelector from 'totara_engage/components/form/access/RecipientsSelector';
+import SharedBoard from 'totara_engage/components/form/SharedBoard';
 
-import NameListModal from 'totara_engage/components/modal/NameListModal';
-
-import sharesTotals from 'totara_engage/graphql/share_totals';
-import shareWith from 'totara_engage/graphql/share';
+// GraphQL queries
 import shareRecipients from 'totara_engage/graphql/share_recipients';
-import sharedBy from 'totara_engage/graphql/share_sharers';
+import shareWith from 'totara_engage/graphql/share';
 
 export default {
   components: {
     ButtonLabel,
-    Share,
-    ModalPresenter,
+    DoneCancelGroup,
     Modal,
     ModalContent,
+    ModalPresenter,
     RecipientsSelector,
+    Share,
     SharedBoard,
-    DoneCancelGroup,
-    NameListModal,
-    LazyList,
   },
 
   apollo: {
-    sharedBy: {
-      query: sharedBy,
-      skip: true,
-      variables() {
-        return {
-          itemid: this.instanceId,
-          component: this.component,
-        };
-      },
-      update({ sharers }) {
-        const users = sharers.map(recipient => {
-          return {
-            name: recipient.fullname,
-            src: recipient.profileimageurlsmall,
-            id: recipient.id,
-          };
-        });
-        this.sharedByLoaded = true;
-        return users;
-      },
-    },
-    sharedToCount: {
-      query: sharesTotals,
-      variables() {
-        return {
-          itemid: this.instanceId,
-          component: this.component,
-        };
-      },
-      update({ shares: { totalrecipients } }) {
-        return totalrecipients;
-      },
-    },
-
     sharedTo: {
       query: shareRecipients,
       skip: true,
@@ -177,10 +121,6 @@ export default {
   },
 
   props: {
-    owned: {
-      type: Boolean,
-      required: true,
-    },
     accessValue: {
       type: String,
       required: true,
@@ -188,12 +128,16 @@ export default {
         return AccessManager.isValid(prop);
       },
     },
+    component: {
+      type: String,
+      required: true,
+    },
     instanceId: {
       type: [String, Number],
       required: true,
     },
-    component: {
-      type: String,
+    owned: {
+      type: Boolean,
       required: true,
     },
     sharedByCount: {
@@ -204,13 +148,13 @@ export default {
 
   data() {
     return {
-      resharerModalOpen: false,
-      reciptsModalOpen: false,
       access: this.accessValue,
       newShares: [],
-      sharedTo: { people: [], workspaces: [] },
-      sharedByLoaded: false,
+      reciptsModalOpen: false,
+      resharerModalOpen: false,
       sharedByCountLocal: 0,
+      sharedByLoaded: false,
+      sharedTo: { people: [], workspaces: [] },
     };
   },
 
@@ -219,31 +163,6 @@ export default {
       return this.sharedByCountLocal
         ? this.sharedByCountLocal
         : this.sharedByCount;
-    },
-
-    sharedByNames() {
-      if (this.sharedBy) {
-        return this.sharedBy.map(sharedBy => {
-          return sharedBy.name;
-        });
-      } else {
-        return [];
-      }
-    },
-
-    /**
-     *
-     * @returns {boolean}
-     */
-    restrictedDisabled() {
-      return AccessManager.isPublic(this.accessValue);
-    },
-
-    privateDisabled() {
-      return (
-        AccessManager.isPublic(this.accessValue) ||
-        AccessManager.isRestricted(this.accessValue)
-      );
     },
   },
 
@@ -256,16 +175,23 @@ export default {
   },
 
   methods: {
-    $_loadSharedBy: async function() {
-      if (!this.sharedByLoaded) {
-        await this.$apollo.queries.sharedBy.start();
-      }
+    addNewShare(instance) {
+      const share = {
+        instanceid: instance.instanceid,
+        component: instance.component,
+        area: instance.area,
+      };
+      this.newShares.push(share);
     },
 
-    showUsers: async function(isOpen) {
-      if (isOpen) {
-        this.$_loadSharedBy();
-      }
+    reciptsModalRequestClose() {
+      this.reciptsModalOpen = false;
+    },
+
+    removeNewShare(instance) {
+      this.newShares = this.newShares.filter(
+        newShare => newShare.instanceid !== instance.instanceid
+      );
     },
 
     showReciptsModal() {
@@ -275,29 +201,6 @@ export default {
         this.$apollo.queries.sharedTo.start();
         this.reciptsModalOpen = true;
       }
-    },
-    reciptsModalRequestClose() {
-      this.reciptsModalOpen = false;
-    },
-
-    showResharerModal() {
-      this.resharerModalOpen = true;
-    },
-    resharerModalRequestClose() {
-      this.resharerModalOpen = false;
-    },
-    addNewShare(instance) {
-      const share = {
-        instanceid: instance.instanceid,
-        component: instance.component,
-        area: instance.area,
-      };
-      this.newShares.push(share);
-    },
-    removeNewShare(instance) {
-      this.newShares = this.newShares.filter(
-        newShare => newShare.instanceid !== instance.instanceid
-      );
     },
 
     submit: async function() {
@@ -322,10 +225,11 @@ export default {
 <lang-strings>
   {
     "totara_engage": [
+      "noshares",
       "reshare",
       "resharedbypeople",
       "share",
-      "noshares"
+      "tipnumberofresharer"
     ]
   }
 </lang-strings>
@@ -336,6 +240,12 @@ export default {
 }
 
 .tui-shareSetting {
+  &__buttonLabel {
+    &-hoverContent {
+      text-align: center;
+      hyphens: none;
+    }
+  }
   &__recipient {
     display: flex;
     flex-direction: column;

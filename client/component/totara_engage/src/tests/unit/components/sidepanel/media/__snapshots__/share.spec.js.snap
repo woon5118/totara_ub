@@ -7,6 +7,7 @@ exports[`totara_engage/components/sidepanel/media/share matches snapshot 1`] = `
 >
   <buttonlabel-stub
     arialabel="share, totara_engage"
+    class="tui-shareSetting__buttonLabel"
     number="5"
     styleclass="[object Object]"
   />
@@ -39,14 +40,6 @@ exports[`totara_engage/components/sidepanel/media/share matches snapshot 1`] = `
         </div>
       </modalcontent-stub>
     </modal-stub>
-  </modalpresenter-stub>
-   
-  <modalpresenter-stub>
-    <namelistmodal-stub
-      allloaded="true"
-      profiles="Brian Barnes"
-      title="resharedbypeople, totara_engage"
-    />
   </modalpresenter-stub>
 </div>
 `;
