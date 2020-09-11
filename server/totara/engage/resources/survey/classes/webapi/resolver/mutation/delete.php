@@ -45,9 +45,6 @@ final class delete implements mutation_resolver, has_middleware {
 
         try {
             $survey = survey::from_resource_id($args['resourceid']);
-
-            // Remove topics first before any delete.
-            $survey->remove_topics_by_ids();
             $survey->delete($USER->id);
 
             return true;

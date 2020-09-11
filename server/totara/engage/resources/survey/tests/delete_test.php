@@ -33,7 +33,18 @@ class engage_survey_delete_testcase extends advanced_testcase {
     public function test_delete_survey(): void {
         global $DB;
 
+        $this->setAdminUser();
+
         $user = $this->getDataGenerator()->create_user();
+
+        /** @var totara_topic_generator $topic_generator */
+        $topic_generator = $this->getDataGenerator()->get_plugin_generator('totara_topic');
+
+        for ($i = 0; $i < 5; $i++) {
+            $topic = $topic_generator->create_topic();
+            $topics[$topic->get_id()] = $topic;
+        }
+
         $this->setUser($user);
 
         $data = [
@@ -45,7 +56,8 @@ class engage_survey_delete_testcase extends advanced_testcase {
                         '12', '13', '14', '15', '16'
                     ]
                 ]
-            ]
+            ],
+            'topics' => array_keys($topics)
         ];
 
         $component = survey::get_resource_type();
@@ -66,6 +78,15 @@ class engage_survey_delete_testcase extends advanced_testcase {
 
         $this->assertTrue($DB->record_exists_sql($sql, $params));
 
+        $resource_id = $resource->get_id();
+        
+        $topic_tags = core_tag_tag::get_item_tags(
+            $component,
+            'engage_resource',
+            $resource->get_id()
+        );
+        $this->assertCount(5, $topic_tags);
+
         $x = [$resource->get_instanceid()];
         $questionsql = 'SELECT 1 FROM "ttr_engage_survey_question" WHERE surveyid = ?';
         $this->assertTrue($DB->record_exists_sql($questionsql, $x));
@@ -73,6 +94,14 @@ class engage_survey_delete_testcase extends advanced_testcase {
         $resource->delete();
         $this->assertFalse($DB->record_exists_sql($sql, $params));
         $this->assertFalse($DB->record_exists_sql($questionsql, $x));
+
+        // Check that topic tag usage got deleted
+        $topic_tags = core_tag_tag::get_item_tags(
+            $component,
+            'engage_resource',
+            $resource_id
+        );
+        $this->assertCount(0, $topic_tags);
     }
 
     /**

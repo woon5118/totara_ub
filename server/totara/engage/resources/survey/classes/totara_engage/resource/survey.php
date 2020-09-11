@@ -22,6 +22,7 @@
  */
 namespace engage_survey\totara_engage\resource;
 
+use core\orm\query\builder;
 use engage_survey\entity\survey as survey_entity;
 use engage_survey\event\survey_deleted;
 use engage_survey\event\survey_reshared;
@@ -33,12 +34,13 @@ use engage_survey\totara_engage\resource\input\question_length_validator;
 use totara_engage\access\access_manager;
 use totara_engage\answer\answer_factory;
 use engage_survey\totara_engage\resource\input\question_validator;
-use totara_engage\link\builder;
+use totara_engage\link\builder as link_builder;
 use totara_engage\question\question;
 use totara_engage\entity\engage_resource;
 use totara_engage\resource\input\definition;
 use totara_engage\resource\resource_item;
 use engage_survey\entity\survey_question;
+use totara_engage\share\manager as share_manager;
 use totara_engage\share\share as share_model;
 use engage_survey\result\question as question_stat;
 
@@ -243,20 +245,31 @@ final class survey extends resource_item {
      * @return bool
      */
     protected function do_delete(int $userid): bool {
-        $this->load_survey_questions();
+        $event = builder::get_db()->transaction(function () use ($userid) {
+            share_manager::delete($this->get_id(), static::get_resource_type());
 
-        foreach ($this->surveyquestions as $survey_question) {
-            $question = question::from_id($survey_question->questionid);
-            $question->delete($userid);
+            $this->load_survey_questions();
 
-            $survey_question->delete();
-        }
+            foreach ($this->surveyquestions as $survey_question) {
+                $question = question::from_id($survey_question->questionid);
+                $question->delete($userid);
 
-        $event = survey_deleted::from_survey($this, $userid);
+                $survey_question->delete();
+            }
+
+            $event = survey_deleted::from_survey($this, $userid);
+
+            $this->remove_topics_by_ids();
+
+            $this->survey->delete();
+            $this->resource->delete();
+
+            return $event;
+        });
+
         $event->trigger();
 
-        $this->survey->delete();
-        return $this->survey->deleted();
+        return true;
     }
 
     /**
@@ -527,7 +540,7 @@ final class survey extends resource_item {
      * @return string
      */
     public function get_url(): string {
-        return builder::to(survey::get_resource_type(), ['id' => $this->get_id()])
+        return link_builder::to(survey::get_resource_type(), ['id' => $this->get_id()])
             ->out();
     }
 

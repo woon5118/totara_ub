@@ -22,6 +22,7 @@
  */
 namespace totara_engage\resource;
 
+use coding_exception;
 use totara_engage\access\access;
 use totara_engage\access\access_manager;
 use totara_engage\exception\resource_exception;
@@ -136,7 +137,7 @@ abstract class resource_item implements accessible, shareable {
         $record->save();
 
         if (!$record->exists()) {
-            throw new \coding_exception("The resource record is not able to be created in the system");
+            throw new coding_exception("The resource record is not able to be created in the system");
         }
 
         $instanceid = static::do_create($data, $record, $userid);
@@ -309,22 +310,14 @@ abstract class resource_item implements accessible, shareable {
         }
 
         if (!$this->is_exists(true)) {
-            debugging("Cannot delete a resource instance that is not existing in the system", DEBUG_DEVELOPER);
-            return;
+            throw new coding_exception('Cannot delete a resource instance that is not existing in the system');
         }
 
         if (!$this->can_delete($userid)) {
             throw resource_exception::create('delete', static::get_resource_type());
         }
 
-        share_manager::delete($this->get_id(), static::get_resource_type());
-        $result = $this->do_delete($userid);
-
-        if ($result) {
-            $this->resource->delete();
-        } else {
-            debugging("Cannot delete the resource", DEBUG_DEVELOPER);
-        }
+        $this->do_delete($userid);
     }
 
     /**
