@@ -178,6 +178,21 @@ class core_weblib_testcase extends advanced_testcase {
             format_text_email('Two bullets: &#x2022; &#8226;', FORMAT_HTML));
         $this->assertSame(core_text::code2utf8(0x7fd2).core_text::code2utf8(0x7fd2),
             format_text_email('&#x7fd2;&#x7FD2;', FORMAT_HTML));
+        $this->assertSame("This is a test.\n",
+            format_text_email('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"This is a test."}]}]}', FORMAT_JSON_EDITOR));
+        $this->assertSame("This is a test.\n",
+            format_text_email('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"This is a test."}]}]}', FORMAT_HTML));
+        // Some unhappy cases
+        $this->assertSame("",
+            format_text_email('{"type":"doc","some":"json"}', FORMAT_JSON_EDITOR));
+        $this->assertSame('{"type":"doc","some":"json"}',
+            format_text_email('{"type":"doc","some":"json"}', FORMAT_HTML));
+        $this->assertSame("",
+            format_text_email('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"foo","text":"This is a test."}]}]}', FORMAT_JSON_EDITOR));
+        $this->assertDebuggingCalled("Attempting to format unknown node type 'foo'");
+        $this->assertSame("",
+            format_text_email('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"foo","text":"This is a test."}]}]}', FORMAT_HTML));
+        $this->assertDebuggingCalled(["Class for node type 'foo' does not exist", "Attempting to format unknown node type 'foo'"]);
     }
 
     public function test_obfuscate_email() {
@@ -732,9 +747,12 @@ EXPECTED;
             array("<span lang='en' class='multilang'>english</span>
 <span lang='ca' class='multilang'>català</span>
 <span lang='es' class='multilang'>español</span>
-<span lang='fr' class='multilang'>français</span>", FORMAT_HTML, "english català español français")
+<span lang='fr' class='multilang'>français</span>", FORMAT_HTML, "english català español français"),
+            array('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"This is a test."}]}]}', FORMAT_JSON_EDITOR, 'This is a test.'),
+            array('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"This is a test."}]}]}', FORMAT_HTML, 'This is a test.'),
+            array('{"type":"doc","some":"json"}', FORMAT_JSON_EDITOR, ''),
+            array('{"type":"doc","some":"json"}', FORMAT_HTML, '{"type":"doc","some":"json"}'),
         );
-
     }
 
     public function test_markdown_to_html() {

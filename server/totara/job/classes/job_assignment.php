@@ -503,8 +503,8 @@ class job_assignment {
      */
     public function update_description(string $text, string $format = FORMAT_HTML) {
         global $DB;
-        if ($format !== FORMAT_HTML) {
-            debugging('Job assignment description does not currently allow formats other than HTML', DEBUG_DEVELOPER);
+        if ($format !== FORMAT_HTML && $format !== FORMAT_JSON_EDITOR) {
+            debugging('Job assignment description does not currently allow formats other than HTML or JSON', DEBUG_DEVELOPER);
         }
         $DB->set_field('job_assignment', 'description', $text, ['id' => $this->id]);
         $this->description = $text;

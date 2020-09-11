@@ -88,16 +88,23 @@ final class document_helper {
     /**
      * Running check against the document for every single node.
      *
-     * @param string $json_document
+     * @param null|string $json_document
      * @return bool
      */
-    public static function is_valid_json_document(string $json_document): bool {
+    public static function is_valid_json_document(?string $json_document): bool {
+        $json_document = trim($json_document);
+
         if (empty($json_document)) {
             // Document is empty, which it should not go here.
             return false;
         }
 
         if (!self::looks_like_json($json_document)) {
+            return false;
+        }
+
+        // Minimal document is '{"type":"doc","content":[]}'
+        if (strlen($json_document) < 27) {
             return false;
         }
 
@@ -344,11 +351,14 @@ final class document_helper {
      * This is a very simple test. It is called often and meant to be high performance.
      * It is not expected to be a validator or sanitizer.
      *
-     * @param string $document
+     * @param null|string $document
      * @return bool
      */
-    public static function looks_like_json(string $document): bool {
+    public static function looks_like_json(?string $document): bool {
         $document = trim($document);
+        if (empty($document)) {
+            return false;
+        }
         return (substr($document, 0, 1) == '{' && substr($document, -1) == '}');
     }
 }

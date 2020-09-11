@@ -314,6 +314,32 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
         );
     }
 
+    public function test_is_valid_json_document(): void {
+        $tests = [
+            null => false,
+            '' => false,
+            'no' => false,
+            '{"doc": true}' => false,
+            '{"type":"doc"}' => false,
+            '{type:"doc",content:[]}' => false,
+            '{"type":"doc","content":""}' => false,
+            '{"type":"doc","content":[]}' => true,
+            '{"type":"doc","content":[{"cat": "dog"}]}' => false,
+            '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"."}]}]}' => true,
+            '{"type": "doc", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "."}]}]} ' => true,
+            '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"."}]}]}}' => false,
+            ' {"type":"doc","content":[]} ' => true,
+            '{"type":"doc","content":{}}' => true,
+            '{"content":[],"type":"doc"}' => true,
+        ];
+
+        foreach ($tests as $test => $expected) {
+            $this->assertEquals($expected, document_helper::is_valid_json_document($test), $test);
+            // Invlid JSON triggers a debugging message in document_helper::parse_document() that we don't care about here.
+            $this->resetDebugging();
+        }
+    }
+
     /**
      * @return void
      */
@@ -324,10 +350,14 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
             'Too many cooks spoils the broth.' => false,
             '{}' => true,
             ' {"space": "is hard"} ' => true,
-            '' => false
+            '' => false,
+            false => false,
         ];
+        $this->assertCount(7, $tests);
         foreach ($tests as $test => $expected) {
-            $this->assertEquals($expected, document_helper::looks_like_json($test));
+            $this->assertEquals($expected, document_helper::looks_like_json($test), $test);
         }
+        // Test null (should be same as '')
+        $this->assertEquals(false, document_helper::looks_like_json(null), $test);
     }
 }

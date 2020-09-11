@@ -50,6 +50,16 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         return $text;
     }
 
+    /**
+     * Totara: wrap text in JSON editor doc envelope.
+     *
+     * @param string $text
+     * @return string
+     */
+    private function json_text(string $text): string {
+        return '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"' . addslashes($text) . '"}]}]}';
+    }
+
     public function test_option_filter_at_system_context() {
         global $CFG;
 
@@ -61,6 +71,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $censored_plain = $text; // Plain text is NEVER filtered!
         $censored_markdown = "<p>I have <span class=\"censoredtext\" title=\"one\">**</span> <span class=\"censoredtext\" title=\"red\">**</span> balloon</p>\n";
         $censored_moodle = '<div class="text_to_html">I have <span class="censoredtext" title="one">**</span> <span class="censoredtext" title="red">**</span> balloon</div>';
+        $censored_json = '<p>I have <span class="censoredtext" title="one">**</span> <span class="censoredtext" title="red">**</span> balloon</p>';
 
         // Filters turned on.
         $options = ['filter' => true];
@@ -68,6 +79,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         self::assertSame($censored_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame($censored_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame($censored_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame($censored_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         // Filters turned off.
         $options = ['filter' => false];
@@ -75,6 +87,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         self::assertSame($text, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame('<p>' . $text . "</p>\n", format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame('<div class="text_to_html">' . $text . '</div>', format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame('<p>' . $text . '</p>', format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         // Filters default (on).
         $options = [];
@@ -82,6 +95,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         self::assertSame($censored_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame($censored_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame($censored_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame($censored_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_option_filter_at_course_context_filter() {
@@ -99,11 +113,13 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'I have one red balloon';
         $expected_markdown = "<p>I have one red balloon</p>\n";
         $expected_moodle = '<div class="text_to_html">I have one red balloon</div>';
+        $expected_json = '<p>I have one red balloon</p>';
 
         $censored_html = 'I have <span class="censoredtext" title="one">**</span> <span class="censoredtext" title="red">**</span> balloon';
         $censored_plain = $text; // Plain text is NEVER filtered!
         $censored_markdown = "<p>I have <span class=\"censoredtext\" title=\"one\">**</span> <span class=\"censoredtext\" title=\"red\">**</span> balloon</p>\n";
         $censored_moodle = '<div class="text_to_html">I have <span class="censoredtext" title="one">**</span> <span class="censoredtext" title="red">**</span> balloon</div>';
+        $censored_json = '<p>I have <span class="censoredtext" title="one">**</span> <span class="censoredtext" title="red">**</span> balloon</p>';
 
         // Filters turned on.
         $options = ['filter' => true, 'context' => \context_system::instance()];
@@ -111,12 +127,14 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         self::assertSame($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         $options = ['filter' => true, 'context' => $context];
         self::assertSame($censored_html, format_text($text, FORMAT_HTML, $options));
         self::assertSame($censored_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame($censored_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame($censored_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame($censored_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         // Filters turned off.
         $options = ['filter' => false, 'context' => \context_system::instance()];
@@ -124,12 +142,14 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         self::assertSame($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         $options = ['filter' => false, 'context' => $context];
         self::assertSame($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertSame($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         // Filters default (on).
         $options = ['context' => \context_system::instance()];
@@ -137,12 +157,14 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         self::assertSame($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         $options = ['context' => $context];
         self::assertSame($censored_html, format_text($text, FORMAT_HTML, $options));
         self::assertSame($censored_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame($censored_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame($censored_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame($censored_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         // Finally test with the legacy courseid context arg.
         $options = [];
@@ -150,6 +172,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         self::assertSame($censored_plain, format_text($text, FORMAT_PLAIN, $options, $course->id));
         self::assertSame($censored_markdown, format_text($text, FORMAT_MARKDOWN, $options, $course->id));
         self::assertSame($censored_moodle, format_text($text, FORMAT_MOODLE, $options, $course->id));
+        self::assertSame($censored_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options, $course->id));
     }
 
     public function test_utf8_thai() {
@@ -161,11 +184,13 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = $text;
         $expected_markdown = '<p>' . $text . "</p>\n";
         $expected_moodle = '<div class="text_to_html">' . $text . '</div>';
+        $expected_json = '<p>' . $text . '</p>';
 
         self::assertSame($expected_html, format_text($text, FORMAT_HTML));
         self::assertSame($expected_plain, format_text($text, FORMAT_PLAIN));
         self::assertSame($expected_markdown, format_text($text, FORMAT_MARKDOWN));
         self::assertSame($expected_moodle, format_text($text, FORMAT_MOODLE));
+        self::assertSame($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR));
     }
 
     public function test_ut8_anglo_saxan() {
@@ -174,17 +199,20 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $chars = 'ᚠᛁᛋᚳ᛫ᚠᛚᚩᛞᚢ᛫ᚪᚻᚩᚠᚩᚾᚠᛖᚱᚷ ᛖᚾᛒᛖᚱᛁᚷ ᚹᚪᚱᚦᚷᚪ᛬ᛋᚱᛁᚳᚷᚱᚩᚱᚾᚦᚫᚱᚻᛖᚩᚾᚷᚱᛖᚢᛏᚷᛁᛋᚹᚩᛗ ᚻ' .
             'ᚱᚩᚾᚫᛋᛒᚪᚾ ᛗᚫᚷᛁᚠᛁᛋᚳ᛫ᚠᛚᚩᛞᚢ᛫ᚪᚻᚩᚠᚩᚾᚠᛖᚱᚷ ᛖᚾᛒᛖᚱᛁᚷ ᚹᚪᚱᚦᚷᚪ᛬ᛋᚱᛁᚳᚷᚱᚩᚱᚾᚦᚫᚱᚻᛖᚩᚾᚷᚱᛖᚢᛏᚷᛁᛋᚹᚩᛗ ᚻᚱᚩᚾᚫᛋᛒᚪᚾ ᛗᚫᚷᛁ';
         $text = '<a href="https://en.wikipedia.org/wiki/Franks_Casket#ᛖᚾᛒᛖᚱᛁᚷ">'.$chars.'</a>';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","marks":[{"type":"link","attrs":{"href":"https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7"}}],"text":"' . $chars . '"}]}]}';
         $options = ['newlines' => true, 'para' => true, 'blanktarget' => true];
 
         $expected_html = '<a href="https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7" target="_blank" rel="noreferrer noopener">' . $chars . '</a>';
         $expected_plain = '<p>&lt;a href="https://en.wikipedia.org/wiki/Franks_Casket#ᛖᚾᛒᛖᚱᛁᚷ"&gt;' . $chars . '&lt;/a&gt;</p>';
         $expected_markdown = '<p><a href="https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7" target="_blank" rel="noreferrer noopener">' . $chars . '</a></p>';
         $expected_moodle = '<div class="text_to_html"><a href="https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7" target="_blank" rel="noreferrer noopener">' . $chars . '</a></div>';
+        $expected_json = '<p><a href="https://en.wikipedia.org/wiki/Franks_Casket#%E1%9B%96%E1%9A%BE%E1%9B%92%E1%9B%96%E1%9A%B1%E1%9B%81%E1%9A%B7" target="_blank" rel="noreferrer noopener">' . $chars . '</a></p>';
 
         self::assertSame($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertSame($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_utf8_thors_map_ruins() {
@@ -197,11 +225,13 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = '<p>' . $text . '</p>';
         $expected_markdown = '<p>' . $text . '</p>';
         $expected_moodle = '<div class="text_to_html">' . $text . '</div>';
+        $expected_json = '<p>' . $text . '</p>';
 
         self::assertSame($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertSame($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertSame($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertSame($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertSame($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_empty_values() {
@@ -210,32 +240,42 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         self::assertSame('', format_text('', FORMAT_PLAIN));
         self::assertSame('', format_text('', FORMAT_MARKDOWN));
         self::assertSame('', format_text('', FORMAT_MOODLE));
+        self::assertSame('', format_text('', FORMAT_JSON_EDITOR));
 
         self::assertSame('', format_text(null));
         self::assertSame('', format_text(null, FORMAT_HTML));
         self::assertSame('', format_text(null, FORMAT_PLAIN));
         self::assertSame('', format_text(null, FORMAT_MARKDOWN));
         self::assertSame('', format_text(null, FORMAT_MOODLE));
+        self::assertSame('', format_text(null, FORMAT_JSON_EDITOR));
 
         self::assertSame('<div class="text_to_html">0</div>', format_text(0));
         self::assertSame('0', format_text(0, FORMAT_HTML));
         self::assertSame('0', format_text(0, FORMAT_PLAIN));
         self::assertSame("<p>0</p>\n", format_text(0, FORMAT_MARKDOWN));
         self::assertSame('<div class="text_to_html">0</div>', format_text(0, FORMAT_MOODLE));
+        self::assertSame('', format_text(0, FORMAT_JSON_EDITOR));
+        $this->resetDebugging();
+        self::assertSame('<p>0</p>', format_text($this->json_text(0), FORMAT_JSON_EDITOR));
 
         self::assertSame('<div class="text_to_html">0</div>', format_text('0'));
         self::assertSame('0', format_text('0', FORMAT_HTML));
         self::assertSame('0', format_text('0', FORMAT_PLAIN));
         self::assertSame("<p>0</p>\n", format_text('0', FORMAT_MARKDOWN));
         self::assertSame('<div class="text_to_html">0</div>', format_text('0', FORMAT_MOODLE));
+        self::assertSame('', format_text('0', FORMAT_JSON_EDITOR));
+        $this->resetDebugging();
+        self::assertSame('<p>0</p>', format_text($this->json_text('0'), FORMAT_JSON_EDITOR));
     }
 
     public function test_removal_of_onclick_alert() {
         $text = 'I\'m the needle<a onclick="alert(1)">Hack</a>';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"I\'m the needle"},{"type":"text","marks":[{"type":"link","attrs":{"onclick":"alert(1);"}}],"text":"Hack"}]}]}';
         $expected_html = 'I\'m the needle<a>Hack</a>';
         $expected_plain = 'I&#039;m the needle&lt;a onclick=&quot;alert(1)&quot;&gt;Hack&lt;/a&gt;';
         $expected_markdown = "<p>I'm the needle<a>Hack</a></p>\n";
         $expected_moodle = '<div class="text_to_html">I\'m the needle<a>Hack</a></div>';
+        $expected_json = '<p>I&#039;m the needle<a>Hack</a></p>';
 
         self::assertEquals($expected_moodle, format_text($text));
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML));
@@ -243,6 +283,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE));
         self::assertEquals($expected_moodle, format_text($text, 'sam')); // Fake format.
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR));
     }
 
     public function test_wiki() {
@@ -256,34 +297,40 @@ class core_weblib_format_text_testcase extends advanced_testcase {
 
     public function test_option_none() {
         $text = 'I\'m the needle<a onclick="alert(1)">Hack</a>';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"I\'m the needle"},{"type":"text","marks":[{"type":"link","attrs":{"onclick":"alert(1);"}}],"text":"Hack"}]}]}';
         $expected_html = 'I\'m the needle<a>Hack</a>';
         $expected_plain = 'I&#039;m the needle&lt;a onclick=&quot;alert(1)&quot;&gt;Hack&lt;/a&gt;';
         $expected_markdown = "<p>I'm the needle<a>Hack</a></p>\n";
         $expected_moodle = '<div class="text_to_html">I\'m the needle<a>Hack</a></div>';
+        $expected_json = '<p>I&#039;m the needle<a>Hack</a></p>';
 
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, []));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, []));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, []));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, []));
         self::assertEquals($expected_moodle, format_text($text, 'sam', [])); // Fake format.
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, []));
 
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, (object)[]));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, (object)[]));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, (object)[]));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, (object)[]));
         self::assertEquals($expected_moodle, format_text($text, 'sam', (object)[])); // Fake format.
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, (object)[]));
 
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, 0));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, 0));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, 0));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, 0));
         self::assertEquals($expected_moodle, format_text($text, 'sam', 0)); // Fake format.
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, 0));
 
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, '0'));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, '0'));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, '0'));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, '0'));
         self::assertEquals($expected_moodle, format_text($text, 'sam', '0')); // Fake format.
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, '0'));
     }
 
     public function test_legacy_option_noclean() {
@@ -293,53 +340,66 @@ class core_weblib_format_text_testcase extends advanced_testcase {
 
         // Test it when off
         $text = 'Check out <img src="#" onerror="alert(1)" />';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out "},{"type":"image","attrs":{"filename":"#","url":"#","onerror":"alert(1)"}}]}]}';
         $options = ['noclean' => false];
         $expected_html = 'Check out <img src="#" alt="#" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
+        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test it when on
         $text = 'Check out <img src="#" onerror="alert(1)" />';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out "},{"type":"image","attrs":{"filename":"#","url":"#","onerror":"alert(1)"}}]}]}';
         $options = ['noclean' => true];
         $expected_html = 'Check out <img src="#" alt="#" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
+        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         $CFG->disableconsistentcleaning = true;
 
         // Test it when off but legacy cleaning is on.
         $text = 'Check out <img src="#" onerror="alert(1)" />';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out "},{"type":"image","attrs":{"filename":"#","url":"#","onerror":"alert(1)"}}]}]}';
         $options = ['noclean' => false];
         $expected_html = 'Check out <img src="#" alt="#" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
+        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test it when on but legacy cleaning is on.
         $text = 'Check out <img src="#" onerror="alert(1)" />';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out "},{"type":"image","attrs":{"filename":"#","url":"#","onerror":"alert(1)"}}]}]}';
         $options = ['noclean' => true];
         $expected_html = 'Check out <img src="#" onerror="alert(1)" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" onerror=\"alert(1)\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" onerror="alert(1)" /></div>';
+        // HTML built from JSON should never have an onerror attribute, no matter what.
+        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_legacy_option_trusttext() {
@@ -352,165 +412,204 @@ class core_weblib_format_text_testcase extends advanced_testcase {
 
         // Test it when off
         $text = 'Check out <img src="#" onerror="alert(1)" />';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out "},{"type":"image","attrs":{"filename":"#","url":"#","onerror":"alert(1)"}}]}]}';
         $options = ['trusted' => false];
         $expected_html = 'Check out <img src="#" alt="#" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
+        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test it when on
         $text = 'Check out <img src="#" onerror="alert(1)" />';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out "},{"type":"image","attrs":{"filename":"#","url":"#","onerror":"alert(1)"}}]}]}';
         $options = ['trusted' => true];
         $expected_html = 'Check out <img src="#" alt="#" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
+        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         $CFG->disableconsistentcleaning = true;
 
         // Test it when off but legacy cleaning is on.
         $text = 'Check out <img src="#" onerror="alert(1)" />';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out "},{"type":"image","attrs":{"filename":"#","url":"#","onerror":"alert(1)"}}]}]}';
         $options = ['trusted' => false];
         $expected_html = 'Check out <img src="#" alt="#" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
+        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test it when on but legacy cleaning is on.
         $text = 'Check out <img src="#" onerror="alert(1)" />';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out "},{"type":"image","attrs":{"filename":"#","url":"#","onerror":"alert(1)"}}]}]}';
         $options = ['trusted' => true];
         $expected_html = 'Check out <img src="#" onerror="alert(1)" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" onerror=\"alert(1)\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" onerror="alert(1)" /></div>';
+        // HTML built from JSON should never have an onerror attribute, no matter what.
+        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         $CFG->enabletrusttext = 0;
 
         // Test it when on and legacy cleaning is on but trusttext is disabled.
         $text = 'Check out <img src="#" onerror="alert(1)" />';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out "},{"type":"image","attrs":{"filename":"#","url":"#","onerror":"alert(1)"}}]}]}';
         $options = ['trusted' => true];
         $expected_html = 'Check out <img src="#" alt="#" />';
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
+        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_option_nocache() {
         // Test it when off
         $text = 'Check out my <a href="favourite">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['nocache' => false];
         $expected_html = 'Check out my <a href="favourite">favourite course</a> today';
         $expected_plain = 'Check out my &lt;a href=&quot;favourite&quot;&gt;favourite course&lt;/a&gt; today';
         $expected_markdown = "<p>Check out my <a href=\"favourite\">favourite course</a> today</p>\n";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test it when on
         $text = 'Check out my <a href="favourite">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['nocache' => true];
         $expected_html = 'Check out my <a href="favourite">favourite course</a> today';
         $expected_plain = 'Check out my &lt;a href=&quot;favourite&quot;&gt;favourite course&lt;/a&gt; today';
         $expected_markdown = "<p>Check out my <a href=\"favourite\">favourite course</a> today</p>\n";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test default is off
         $text = 'Check out my <a href="favourite">favourite course</a> today';
-        $options = ['nocache' => true];
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
+        $options = [];
         $expected_html = 'Check out my <a href="favourite">favourite course</a> today';
         $expected_plain = 'Check out my &lt;a href=&quot;favourite&quot;&gt;favourite course&lt;/a&gt; today';
         $expected_markdown = "<p>Check out my <a href=\"favourite\">favourite course</a> today</p>\n";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_option_para() {
         // Test it when off
         $text = 'Check out my <a href="favourite">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['para' => false];
         $expected_html = 'Check out my <a href="favourite">favourite course</a> today';
         $expected_plain = 'Check out my &lt;a href=&quot;favourite&quot;&gt;favourite course&lt;/a&gt; today';
         $expected_markdown = "<p>Check out my <a href=\"favourite\">favourite course</a> today</p>\n";
         $expected_moodle = 'Check out my <a href="favourite">favourite course</a> today';
+        $expected_json = '<p>Check out my <a href="favourite">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test it when on
         $text = 'Check out my <a href="favourite">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['para' => true];
         $expected_html = 'Check out my <a href="favourite">favourite course</a> today';
         $expected_plain = 'Check out my &lt;a href=&quot;favourite&quot;&gt;favourite course&lt;/a&gt; today';
         $expected_markdown = "<p>Check out my <a href=\"favourite\">favourite course</a> today</p>\n";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test the default is on.
         $text = 'Check out my <a href="favourite">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = [];
         $expected_html = 'Check out my <a href="favourite">favourite course</a> today';
         $expected_plain = 'Check out my &lt;a href=&quot;favourite&quot;&gt;favourite course&lt;/a&gt; today';
         $expected_markdown = "<p>Check out my <a href=\"favourite\">favourite course</a> today</p>\n";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_option_newlines() {
         // Test it when off
         $text = "My favourite fruit:\n\t# Banana's\n\t# Apples \n\t#\tOranges\n\nWhat are your favourite?";
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My favourite fruit:"},{"type":"hard_break"},{"type":"text","text":" Bananas"},{"type":"hard_break"},{"type":"text","text":" Apples"},{"type":"hard_break"},{"type":"text","text":" Oranges"},{"type":"hard_break"},{"type":"hard_break"},{"type":"text","text":"What are your favourite?"}]}]}';
         $options = ['newlines' => false];
         $expected_html = "My favourite fruit:\n\t# Banana's\n\t# Apples \n\t#\tOranges\n\nWhat are your favourite?";
         $expected_plain = "My favourite fruit:<br />\n\t# Banana&#039;s<br />\n\t# Apples <br />\n\t#\tOranges<br />\n<br />\nWhat are your favourite?";
         $expected_markdown = "<p>My favourite fruit:\n    # Banana's\n    # Apples \n    #   Oranges</p>\n\n<p>What are your favourite?</p>\n";
         $expected_moodle = "<div class=\"text_to_html\">My favourite fruit:\n\t# Banana's\n\t# Apples \n\t#\tOranges\n\nWhat are your favourite?</div>";
+        $expected_json = '<p>My favourite fruit:<br/> Bananas<br/> Apples<br/> Oranges<br/><br/>What are your favourite?</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test it when on
         $text = "My favourite fruit:\n\t# Banana's\n\t# Apples \n\t#\tOranges\n\nWhat are your favourite?";
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My favourite fruit:"},{"type":"hard_break"},{"type":"text","text":" Bananas"},{"type":"hard_break"},{"type":"text","text":" Apples"},{"type":"hard_break"},{"type":"text","text":" Oranges"},{"type":"hard_break"},{"type":"hard_break"},{"type":"text","text":"What are your favourite?"}]}]}';
         $options = ['newlines' => true];
         $expected_html = "My favourite fruit:\n\t# Banana's\n\t# Apples \n\t#\tOranges\n\nWhat are your favourite?";
         $expected_plain = "My favourite fruit:<br />\n\t# Banana&#039;s<br />\n\t# Apples <br />\n\t#\tOranges<br />\n<br />\nWhat are your favourite?";
         $expected_markdown = "<p>My favourite fruit:\n    # Banana's\n    # Apples \n    #   Oranges</p>\n\n<p>What are your favourite?</p>\n";
         $expected_moodle = "<div class=\"text_to_html\">My favourite fruit:<br />\n\t# Banana's<br />\n\t# Apples <br />\n\t#\tOranges<br />\n<br />\nWhat are your favourite?</div>";
+        $expected_json = '<p>My favourite fruit:<br/> Bananas<br/> Apples<br/> Oranges<br/><br/>What are your favourite?</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -518,14 +617,17 @@ class core_weblib_format_text_testcase extends advanced_testcase {
             $this->fix_newlines($expected_moodle),
             $this->fix_newlines(format_text($text, FORMAT_MOODLE, $options))
         );
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test default (on)
         $text = "My favourite fruit:\n\t# Banana's\n\t# Apples \n\t#\tOranges\n\nWhat are your favourite?";
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"My favourite fruit:"},{"type":"hard_break"},{"type":"text","text":" Bananas"},{"type":"hard_break"},{"type":"text","text":" Apples"},{"type":"hard_break"},{"type":"text","text":" Oranges"},{"type":"hard_break"},{"type":"hard_break"},{"type":"text","text":"What are your favourite?"}]}]}';
         $options = [];
         $expected_html = "My favourite fruit:\n\t# Banana's\n\t# Apples \n\t#\tOranges\n\nWhat are your favourite?";
         $expected_plain = "My favourite fruit:<br />\n\t# Banana&#039;s<br />\n\t# Apples <br />\n\t#\tOranges<br />\n<br />\nWhat are your favourite?";
         $expected_markdown = "<p>My favourite fruit:\n    # Banana's\n    # Apples \n    #   Oranges</p>\n\n<p>What are your favourite?</p>\n";
         $expected_moodle = "<div class=\"text_to_html\">My favourite fruit:<br />\n\t# Banana's<br />\n\t# Apples <br />\n\t#\tOranges<br />\n<br />\nWhat are your favourite?</div>";
+        $expected_json = '<p>My favourite fruit:<br/> Bananas<br/> Apples<br/> Oranges<br/><br/>What are your favourite?</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -533,6 +635,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
             $this->fix_newlines($expected_moodle),
             $this->fix_newlines(format_text($text, FORMAT_MOODLE, $options))
         );
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_option_overflowdiv() {
@@ -544,10 +647,12 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = '<div class="no-overflow">A test of the overflow div system</div>';
         $expected_markdown = "<div class=\"no-overflow\"><p>A test of the overflow div system</p>\n</div>";
         $expected_moodle = '<div class="no-overflow"><div class="text_to_html">A test of the overflow div system</div></div>';
+        $expected_json = '<div class="no-overflow"><p>A test of the overflow div system</p></div>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         // Test off.
         $options = ['overflowdiv' => false];
@@ -555,10 +660,12 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'A test of the overflow div system';
         $expected_markdown = "<p>A test of the overflow div system</p>\n";
         $expected_moodle = '<div class="text_to_html">A test of the overflow div system</div>';
+        $expected_json = '<p>A test of the overflow div system</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         // Test the default is off.
         $options = [];
@@ -566,10 +673,12 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'A test of the overflow div system';
         $expected_markdown = "<p>A test of the overflow div system</p>\n";
         $expected_moodle = '<div class="text_to_html">A test of the overflow div system</div>';
+        $expected_json = '<p>A test of the overflow div system</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_option_allowid() {
@@ -581,10 +690,12 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'The &lt;span id=&quot;frank&quot;&gt;allowid&lt;/span&gt; option';
         $expected_markdown = "<p>The <span id=\"frank\">allowid</span> option</p>\n";
         $expected_moodle = '<div class="text_to_html">The <span id="frank">allowid</span> option</div>';
+        $expected_json = '<p>The &lt;span id=&quot;frank&quot;&gt;allowid&lt;/span&gt; option</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         // Test off.
         $options = ['allowid' => false];
@@ -592,10 +703,12 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'The &lt;span id=&quot;frank&quot;&gt;allowid&lt;/span&gt; option';
         $expected_markdown = "<p>The <span>allowid</span> option</p>\n";
         $expected_moodle = '<div class="text_to_html">The <span>allowid</span> option</div>';
+        $expected_json = '<p>The &lt;span id=&quot;frank&quot;&gt;allowid&lt;/span&gt; option</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         // Test the default is off.
         $options = [];
@@ -603,108 +716,134 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'The &lt;span id=&quot;frank&quot;&gt;allowid&lt;/span&gt; option';
         $expected_markdown = "<p>The <span>allowid</span> option</p>\n";
         $expected_moodle = '<div class="text_to_html">The <span>allowid</span> option</div>';
+        $expected_json = '<p>The &lt;span id=&quot;frank&quot;&gt;allowid&lt;/span&gt; option</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_option_blanktarget() {
         // Test on, basic text
         $text = 'Check out my <a href="favourite">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['blanktarget' => true];
         $expected_html = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite"&gt;favourite course&lt;/a&gt; today</p>';
         $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer noopener\">favourite course</a> today</p>";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test on, many properties
         $text = 'Check out my <a href="favourite" title="Basic 101" tabindex=0>favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite","title":"Basic 101","tabindex":"0"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['blanktarget' => true];
         $expected_html = '<p>Check out my <a href="favourite" title="Basic 101" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" title="Basic 101" tabindex=0&gt;favourite course&lt;/a&gt; today</p>';
         $expected_markdown = "<p>Check out my <a href=\"favourite\" title=\"Basic 101\" target=\"_blank\" rel=\"noreferrer noopener\">favourite course</a> today</p>";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" title="Basic 101" target="_blank" rel="noreferrer noopener">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test on, already defined but to parent - it changes them to blank :(
         $text = 'Check out my <a href="favourite" target="_parent" rel="nofollow">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite","target":"_parent","rel":"nofollow"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['blanktarget' => true];
         $expected_html = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" target="_parent" rel="nofollow"&gt;favourite course&lt;/a&gt; today</p>';
         $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer noopener\">favourite course</a> today</p>";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test on, already defined to blank
         $text = 'Check out my <a href="favourite" target="_blank" rel="nofollow">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite","target":"_blank","rel":"nofollow"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['blanktarget' => true];
         $expected_html = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" target="_blank" rel="nofollow"&gt;favourite course&lt;/a&gt; today</p>';
         $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer noopener\">favourite course</a> today</p>";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test on, already defined to _parent and allowxss which avoids cleaning.
         $text = 'Check out my <a href="favourite" target="_parent" rel="nofollow">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite","target":"_parent","rel":"nofollow"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['blanktarget' => true, 'allowxss' => true];
         $expected_html = '<p>Check out my <a href="favourite" target="_parent" rel="nofollow">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" target="_parent" rel="nofollow"&gt;favourite course&lt;/a&gt; today</p>';
         $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_parent\" rel=\"nofollow\">favourite course</a> today</p>";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_parent" rel="nofollow">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test on, defined only with a rel
         $text = 'Check out my <a href="favourite" rel="nofollow">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite","rel":"nofollow"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['blanktarget' => true];
         $expected_html = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" rel="nofollow"&gt;favourite course&lt;/a&gt; today</p>';
         $expected_markdown = "<p>Check out my <a href=\"favourite\" target=\"_blank\" rel=\"noreferrer noopener\">favourite course</a> today</p>";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test on, defined only with a rel and with allowxss which avoids cleaning.
         $text = 'Check out my <a href="favourite" rel="nofollow">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite","rel":"nofollow"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['blanktarget' => true, 'allowxss' => true];
         $expected_html = '<p>Check out my <a href="favourite" rel="nofollow noreferrer noopener" target="_blank">favourite course</a> today</p>';
         $expected_plain = '<p>Check out my &lt;a href="favourite" rel="nofollow"&gt;favourite course&lt;/a&gt; today</p>';
         $expected_markdown = "<p>Check out my <a href=\"favourite\" rel=\"nofollow noreferrer noopener\" target=\"_blank\">favourite course</a> today</p>";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite" rel="nofollow noreferrer noopener" target="_blank">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite" target="_blank" rel="noreferrer noopener">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test it when off
         $text = 'Check out my <a href="favourite" target="_parent" rel="nofollow">favourite course</a> today';
+        $json_text = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Check out my "},{"type":"text","marks":[{"type":"link","attrs":{"href":"favourite","target":"_parent","rel":"nofollow"}}],"text":"favourite course"},{"type":"text","text":" today"}]}]}';
         $options = ['blanktarget' => false];
         $expected_html = 'Check out my <a href="favourite">favourite course</a> today';
         $expected_plain = 'Check out my &lt;a href=&quot;favourite&quot; target=&quot;_parent&quot; rel=&quot;nofollow&quot;&gt;favourite course&lt;/a&gt; today';
         $expected_markdown = "<p>Check out my <a href=\"favourite\">favourite course</a> today</p>\n";
         $expected_moodle = '<div class="text_to_html">Check out my <a href="favourite">favourite course</a> today</div>';
+        $expected_json = '<p>Check out my <a href="favourite">favourite course</a> today</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($json_text, FORMAT_JSON_EDITOR, $options));
 
         // Test known problem case if blanktarget is called before clean_text().
         $text = 'I am >super< awesome';
@@ -713,10 +852,12 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = '<p>I am &gt;super&lt; awesome</p>';
         $expected_markdown = "<p>I am &gt;super&lt; awesome</p>";
         $expected_moodle = '<div class="text_to_html">I am &gt;super&lt; awesome</div>';
+        $expected_json = '<p>I am &gt;super&lt; awesome</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
 
         $text = 'I am >super< awesome';
         $options = ['blanktarget' => false];
@@ -724,10 +865,12 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'I am &gt;super&lt; awesome';
         $expected_markdown = "<p>I am &gt;super&lt; awesome</p>\n";
         $expected_moodle = '<div class="text_to_html">I am &gt;super&lt; awesome</div>';
+        $expected_json = '<p>I am &gt;super&lt; awesome</p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
         self::assertEquals($expected_moodle, format_text($text, FORMAT_MOODLE, $options));
+        self::assertEquals($expected_json, format_text($this->json_text($text), FORMAT_JSON_EDITOR, $options));
     }
 
     public function test_option_allowxss() {

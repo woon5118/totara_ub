@@ -175,6 +175,15 @@ function file_prepare_standard_editor($data, $field, array $options, $context=nu
         }
 
     } else {
+        // Totara: Make sure data field is a string, and if valid JSON document, use FORMAT_JSON_EDITOR.
+        if (!isset($data->{$field})) {
+            $data->{$field} = '';
+        }
+        if (\core\json_editor\helper\document_helper::is_valid_json_document($data->{$field})) {
+            $data->{$field.'format'} = FORMAT_JSON_EDITOR;
+            // TODO: TL-27568 Enable debugging message in order to notify developers about need to track content formats.
+            // debugging('JSON editor content passed to file_prepare_standard_editor() as format ' . $data->{$field.'format'}, DEBUG_DEVELOPER);
+        }
         if ($options['trusttext']) {
             // noclean ignored if trusttext enabled
             if (!isset($data->{$field.'trust'})) {

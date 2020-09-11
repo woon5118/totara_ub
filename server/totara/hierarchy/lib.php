@@ -1386,8 +1386,9 @@ class hierarchy {
 
         foreach ($cols as $datatype) {
             if ($datatype == 'description') {
-                // Description is entered in a textarea
-                $value = file_rewrite_pluginfile_urls($item->$datatype, 'pluginfile.php', context_system::instance()->id, 'totara_hierarchy', $this->shortprefix, $item->id);
+                $value = file_rewrite_pluginfile_urls($item->{$datatype}, 'pluginfile.php', context_system::instance()->id, 'totara_hierarchy', $this->shortprefix, $item->id);
+                // Description is entered in a textarea - and should be run through format_text().
+                $value = format_text($value, FORMAT_HTML);
                 $data[] = array(
                     'title' => get_string($datatype.'view', 'totara_hierarchy'),
                     'value' => $value,

@@ -1337,6 +1337,13 @@ function format_text($text, $format = FORMAT_MOODLE, $options = null, $courseidd
     $cleantext = !$allowxss;
     $filtertext = $options['filter'];
 
+    // Totara: Detect FORMAT_JSON_EDITOR text passed when format is declared as something else.
+    if (($format == FORMAT_MOODLE || $format == FORMAT_HTML) && \core\json_editor\helper\document_helper::is_valid_json_document($text)) {
+        // TODO: TL-27568 Enable debugging message in order to notify developers about need to track content formats.
+        // debugging('JSON editor content passed to format_text() as format ' . $format, DEBUG_DEVELOPER);
+        $format = FORMAT_JSON_EDITOR;
+    }
+
     switch ($format) {
         case FORMAT_HTML:
             // Nothing to do here, HTML text will be cleaned and filtered.
@@ -1656,6 +1663,13 @@ function wikify_links($string) {
  */
 function format_text_email($text, $format) {
 
+    // Totara: Detect FORMAT_JSON_EDITOR text passed when format is declared as something else.
+    if (($format == FORMAT_MOODLE || $format == FORMAT_HTML) && \core\json_editor\helper\document_helper::is_valid_json_document($text)) {
+        // TODO: TL-27568 Enable debugging message in order to notify developers about need to track content formats.
+        // debugging('JSON editor content passed to format_text_email() as format ' . $format, DEBUG_DEVELOPER);
+        $format = FORMAT_JSON_EDITOR;
+    }
+
     switch ($format) {
 
         case FORMAT_PLAIN:
@@ -1675,7 +1689,7 @@ function format_text_email($text, $format) {
         case FORMAT_JSON_EDITOR:
             // Totara: Added support for json_editor content.
             $editor = \core\json_editor\json_editor::default();
-            return $editor->to_html($text);
+            return html_to_text($editor->to_html($text));
             break;
 
         case FORMAT_MOODLE:
@@ -2310,10 +2324,18 @@ function html_to_text($html, $width = 75, $dolinks = true) {
  *   multilang filter is applied to headings.
  *
  * @param string $content The text as entered by the user
- * @param int|false $contentformat False for strings or the text format: FORMAT_MOODLE/FORMAT_HTML/FORMAT_PLAIN/FORMAT_MARKDOWN
+ * @param int|false $contentformat False for strings or the text format:
+ *                  [FORMAT_MOODLE, FORMAT_HTML, FORMAT_PLAIN, FORMAT_MARKDOWN, FORMAT_JSON_EDITOR]
  * @return string Plain text.
  */
 function content_to_text($content, $contentformat) {
+
+    // Totara: Detect FORMAT_JSON_EDITOR text passed when format is declared as something else.
+    if (($contentformat == FORMAT_MOODLE || $contentformat == FORMAT_HTML) && \core\json_editor\helper\document_helper::is_valid_json_document($content)) {
+        // TODO: TL-27568 Enable debugging message in order to notify developers about need to track content formats.
+        // debugging('JSON editor content passed to content_to_text() as format ' . $contentformat, DEBUG_DEVELOPER);
+        $contentformat = FORMAT_JSON_EDITOR;
+    }
 
     switch ($contentformat) {
         case FORMAT_PLAIN:
