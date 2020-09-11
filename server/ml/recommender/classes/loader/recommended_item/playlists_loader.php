@@ -29,6 +29,7 @@ use ml_recommender\entity\recommended_item;
 use ml_recommender\entity\recommended_user_item;
 use ml_recommender\query\recommended_item\item_query;
 use ml_recommender\query\recommended_item\user_query;
+use totara_engage\access\access;
 use totara_engage\card\card_resolver;
 use totara_playlist\entity\playlist as playlist_entity;
 use totara_playlist\playlist;
@@ -36,21 +37,16 @@ use totara_playlist\playlist;
 /**
  * Loader class for a recommended item
  */
-final class playlists_loader {
-    /**
-     * Preventing this class from construction
-     */
-    private function __construct() {
-    }
-
+final class playlists_loader extends loader {
     /**
      * Select all related playlists based on the provided component id
      *
      * @param item_query $query
+     * @param int $actor_id
      * @return offset_cursor_paginator
      */
-    public static function get_recommended_playlists(item_query $query): offset_cursor_paginator {
-        $builder = static::get_base_playlist_query(recommended_item::TABLE);
+    public static function get_recommended(item_query $query, int $actor_id = 0): offset_cursor_paginator {
+        $builder = static::get_base_playlist_query(recommended_item::TABLE, $actor_id);
 
         $builder->where('r.target_item_id', $query->get_target_item_id());
         $builder->where('r.target_component', $query->get_target_component());
@@ -64,10 +60,11 @@ final class playlists_loader {
      * Select all recommended playlists for the user
      *
      * @param user_query $query
+     * @param int $actor_id
      * @return offset_cursor_paginator
      */
-    public static function get_recommended_playlists_for_user(user_query $query): offset_cursor_paginator {
-        $builder = static::get_base_playlist_query(recommended_user_item::TABLE);
+    public static function get_recommended_for_user(user_query $query, int $actor_id = 0): offset_cursor_paginator {
+        $builder = static::get_base_playlist_query(recommended_user_item::TABLE, $actor_id);
 
         $builder->where('r.user_id', $query->get_target_user_id());
         $builder->where('r.component', $query->get_target_component());
@@ -79,9 +76,10 @@ final class playlists_loader {
 
     /**
      * @param string $table
+     * @param int $actor_id
      * @return builder
      */
-    private static function get_base_playlist_query(string $table): builder {
+    private static function get_base_playlist_query(string $table, int $actor_id = 0): builder {
         $builder = builder::table($table, 'r');
 
         // Join against playlists
@@ -92,7 +90,10 @@ final class playlists_loader {
             'r.component as component'
         ]);
         $builder->where('r.component', 'totara_playlist');
+        $builder->where('p.access', access::PUBLIC);
         $builder->results_as_arrays();
+
+        static::filter_multi_tenancy($builder, 'p.userid', $actor_id);
 
         $builder->order_by_raw('r.score DESC');
         $builder->map_to(

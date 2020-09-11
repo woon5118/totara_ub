@@ -1,10 +1,8 @@
 # Load recommended workspaces for the user
 query ml_recommender_get_recommended_user_workspaces(
-  $user_id: param_integer
   $cursor: param_text
 ) {
   cursor: ml_recommender_recommended_user_workspaces_cursor(
-    user_id: $user_id
     cursor: $cursor
   ) {
     __typename
@@ -13,7 +11,6 @@ query ml_recommender_get_recommended_user_workspaces(
   }
 
   workspaces: ml_recommender_recommended_user_workspaces(
-    user_id: $user_id
     cursor: $cursor
   ) {
     __typename

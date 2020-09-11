@@ -34,6 +34,7 @@ use engage_article\totara_engage\resource\article as article_resource;
 use ml_recommender\loader\recommended_item\articles_loader;
 use ml_recommender\query\recommended_item\item_query;
 use totara_core\advanced_feature;
+use totara_engage\access\access_manager;
 
 /**
  * Recommended articles cursor
@@ -60,6 +61,9 @@ final class recommended_articles_cursor implements query_resolver, has_middlewar
         if (!$target_article) {
             throw new \coding_exception("Could not find the target engage_article to recommend against");
         }
+        if (!access_manager::can_access($target_article, $USER->id)) {
+            throw new \coding_exception('Access denied');
+        }
 
         // Build our query
         $query = new item_query($target_article->get_id(), $target_article::get_resource_type());
@@ -70,7 +74,7 @@ final class recommended_articles_cursor implements query_resolver, has_middlewar
         }
 
         // Load the interaction items
-        return articles_loader::get_recommended_articles($query);
+        return articles_loader::get_recommended($query);
     }
 
     /**

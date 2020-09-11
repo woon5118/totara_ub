@@ -34,6 +34,7 @@ $string['interactions_period_help'] = 'Number of weeks from which to draw user-i
 $string['interactions_period_option'] = '{$a} weeks';
 $string['item_result_count_label'] = 'Number of items-to-item recommendations';
 $string['item_result_count_help'] = 'Number of items-to-item recommendations to be returned by recommender system.';
+$string['invalid_user'] = 'Invalid user';
 $string['pluginname'] = 'Recommendation engine';
 $string['py3path_label'] = 'File path for python executable';
 $string['py3path_help'] = 'Path to the python executable that will run the recommendations script.';

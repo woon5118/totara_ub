@@ -33,6 +33,7 @@ use core\webapi\resolver\has_middleware;
 use ml_recommender\loader\recommended_item\playlists_loader;
 use ml_recommender\query\recommended_item\item_query;
 use totara_core\advanced_feature;
+use totara_engage\access\access_manager;
 use totara_playlist\playlist;
 
 /**
@@ -68,9 +69,12 @@ final class recommended_playlists_cursor implements query_resolver, has_middlewa
             $cursor = offset_cursor::decode($args['cursor']);
             $query->set_cursor($cursor);
         }
+        if (!access_manager::can_access($target_playlist, $USER->id)) {
+            throw new \coding_exception('Access denied');
+        }
 
         // Load the interaction items
-        return playlists_loader::get_recommended_playlists($query);
+        return playlists_loader::get_recommended($query);
     }
 
     /**

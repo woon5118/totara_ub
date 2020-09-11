@@ -32,33 +32,4 @@ extend type Query {
     """
     cursor: param_text
   ): ml_recommender_cursor
-
-  """
-  Query to fetch all playlists that related to the provided user ID
-  """
-  ml_recommender_recommended_user_playlists(
-    """
-    The ID of the user to find recommended playlists for
-    """
-    user_id: param_integer
-    """
-    Fetch some results based on the provided cursor
-    """
-    cursor: param_text
-  ): [totara_engage_card!]
-
-  """
-  Query to fetch the next cursor for the recommended playlists by user ID
-  """
-  ml_recommender_recommended_user_playlists_cursor(
-    """
-    The ID of the playlist to find recommended playlists for
-    """
-    user_id: param_integer
-    """
-    This is current cursor that we are looking at, and it is used
-    to determine what the next cursor should be.
-    """
-    cursor: param_text
-  ): ml_recommender_cursor
 }

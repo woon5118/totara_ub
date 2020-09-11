@@ -31,28 +31,23 @@ use ml_recommender\entity\recommended_user_item;
 use ml_recommender\local\environment;
 use ml_recommender\query\recommended_item\item_query;
 use ml_recommender\query\recommended_item\user_query;
+use totara_engage\access\access;
 use totara_engage\card\card_resolver;
 use totara_engage\entity\engage_resource;
 
 /**
  * Loader class for a recommended item
  */
-final class articles_loader {
-    /**
-     * loader constructor.
-     * Preventing this class from construction
-     */
-    private function __construct() {
-    }
-
+final class articles_loader extends loader {
     /**
      * Get the related articles for the provided component & id
      *
      * @param item_query $query
+     * @param int $actor_id
      * @return offset_cursor_paginator
      */
-    public static function get_recommended_articles(item_query $query): offset_cursor_paginator {
-        $builder = static::get_base_article_query(recommended_item::TABLE);
+    public static function get_recommended(item_query $query, int $actor_id = 0): offset_cursor_paginator {
+        $builder = static::get_base_article_query(recommended_item::TABLE, $actor_id);
 
         $builder->where('r.target_item_id', $query->get_target_item_id());
         $builder->where('r.target_component', $query->get_target_component());
@@ -67,10 +62,11 @@ final class articles_loader {
      * Get the articles recommended for the provided user
      *
      * @param user_query $query
+     * @param int $actor_id
      * @return offset_cursor_paginator
      */
-    public static function get_recommended_articles_for_user(user_query $query): offset_cursor_paginator {
-        $builder = static::get_base_article_query(recommended_user_item::TABLE);
+    public static function get_recommended_for_user(user_query $query, int $actor_id = 0): offset_cursor_paginator {
+        $builder = static::get_base_article_query(recommended_user_item::TABLE, $actor_id);
 
         $builder->where('r.user_id', $query->get_target_user_id());
         $builder->where('r.component', $query->get_target_component());
@@ -83,15 +79,18 @@ final class articles_loader {
     /**
      * Build the base article fetch query
      *
+     * @param string $table
+     * @param int $actor_id
      * @return builder
      */
-    private static function get_base_article_query(string $table): builder {
+    private static function get_base_article_query(string $table, int $actor_id = 0): builder {
         $builder = builder::table($table, 'r');
         $builder->join([engage_resource::TABLE, 'er'], 'r.item_id', 'er.id');
         $builder->results_as_arrays();
 
-        // We only want to return articles
+        // We only want to return public articles
         $builder->where('er.resourcetype', article::get_resource_type());
+        $builder->where('er.access', access::PUBLIC);
         $builder->order_by_raw('r.score DESC');
 
         $builder->select(
@@ -106,6 +105,8 @@ final class articles_loader {
                 'er.extra',
             ]
         );
+
+        static::filter_multi_tenancy($builder, 'er.userid', $actor_id);
 
         $builder->map_to(
             function(array $record) {

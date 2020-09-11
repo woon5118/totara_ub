@@ -141,100 +141,110 @@ class ml_recommender_get_recommended_playlists_testcase extends advanced_testcas
     }
 
     /**
-     * Test playlists are recommended by user id
+     * Verify that we cannot be recommended playlists belonging to another tenant
      */
-    public function test_recommended_playlists_by_user_graphql() {
+    public function test_recommended_playlists_graphql_tenancy() {
         $generator = $this->getDataGenerator();
         /** @var totara_playlist_generator $playlist_generator */
         $playlist_generator = $generator->get_plugin_generator('totara_playlist');
         /** @var totara_topic_generator $topic_generator */
         $topic_generator = $generator->get_plugin_generator('totara_topic');
+        /** @var ml_recommender_generator $recommendations_generator */
+        $recommendations_generator = $generator->get_plugin_generator('ml_recommender');
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+
+        $tenant_generator->enable_tenants();
+        advanced_feature::enable('ml_recommender');
+        advanced_feature::enable('engage_resources');
 
         $this->setAdminUser();
         $topic = $topic_generator->create_topic();
 
-        $user = $generator->create_user();
-        $this->setUser($user);
+        // User 1 & 2 belong to tenant 1, 3 & 4 belong to tenant 2
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
 
-        /** @var ml_recommender_generator $recommendations_generator */
-        $recommendations_generator = $generator->get_plugin_generator('ml_recommender');
-
-        // We're going to recommend for user 2
+        $user1 = $generator->create_user();
         $user2 = $generator->create_user();
+        $user3 = $generator->create_user();
+        $user4 = $generator->create_user();
 
-        // Going to create a few playlists, then recommend *some* of them
-        $playlists = [];
-        for ($i = 1; $i <= 10; $i++) {
-            $playlist = $playlist_generator->create_playlist([
-                'name' => 'P' . $i,
-                'userid' => $user->id,
-                'access' => access::PUBLIC,
-                'topics' => [$topic->get_id()],
-            ]);
-            $playlists[] = $playlist;
+        $tenant_generator->migrate_user_to_tenant($user1->id, $tenant1->id);
+        $tenant_generator->migrate_user_to_tenant($user2->id, $tenant1->id);
+        $tenant_generator->migrate_user_to_tenant($user3->id, $tenant2->id);
+        $tenant_generator->migrate_user_to_tenant($user4->id, $tenant2->id);
 
-            // Recommend it if it's > 5
-            if ($i > 5) {
-                $recommendations_generator->create_user_recommendation(
-                    $user2->id,
-                    $playlist->get_id(),
-                    $playlist::get_resource_type(),
-                    null,
-                    2.5
-                );
-            }
+        // Create an playlist in tenant1
+        $this->setUser($user1);
+        $base_playlist = $playlist_generator->create_playlist([
+            'userid' => $user1->id,
+            'access' => access::PUBLIC,
+            'name' => 'Tenant 1 Playlist',
+            'topics' => [$topic->get_id()],
+        ]);
+
+        // Create a playlist in tenant 1 & tenant 2, and recommend both to base playlist
+        $tenant1_playlist = $playlist_generator->create_playlist([
+            'userid' => $user1->id,
+            'access' => access::PUBLIC,
+            'name' => 'Tenant 1 Recommended',
+            'topics' => [$topic->get_id()],
+        ]);
+
+        $this->setUser($user3);
+        $tenant2_playlist = $playlist_generator->create_playlist([
+            'userid' => $user3->id,
+            'access' => access::PUBLIC,
+            'name' => 'Tenant 2 Recommended',
+            'topics' => [$topic->get_id()],
+        ]);
+
+        $this->setAdminUser();
+        foreach ([$tenant1_playlist, $tenant2_playlist] as $playlist) {
+            $recommendations_generator->create_item_recommendation(
+                $base_playlist->get_id(),
+                $playlist->get_id(),
+                'totara_playlist',
+                null,
+                2.5
+            );
         }
 
-        // Now we're going to ask for some recommended playlists
-        advanced_feature::enable('ml_recommender');
-        $ec = execution_context::create('ajax', 'ml_recommender_get_recommended_user_playlists');
-        $parameters = [
-            'user_id' => $user2->id,
-            'cursor' => null,
-        ];
-        $result = graphql::execute_operation($ec, $parameters);
-        $this->assertNotNull($result->data);
-
-        $cursor = $result->data['cursor'];
-        $results = $result->data['playlists'];
-
-        $this->assertEquals(5, $cursor['total']);
-        $this->assertCount(5, $results);
-
-        // Quick check
-        $expected = ['P5', 'P6', 'P7', 'P8', 'P9', 'P10'];
-        foreach ($results as $result) {
-            $this->assertTrue(in_array($result['name'], $expected));
+        // Make sure users can see profiles (make it global)
+        $roles = get_archetype_roles('user');
+        foreach ($roles as $role) {
+            assign_capability('moodle/user:viewdetails', CAP_ALLOW, $role->id, context_system::instance(), true);
         }
 
-        // Now check for no results
+        // User 2 should see the recommended playlist
+        $this->setUser($user2);
+        $ec = execution_context::create('ajax', 'ml_recommender_get_recommended_playlists');
         $parameters = [
-            'user_id' => $user->id,
+            'playlist_id' => $base_playlist->get_id(),
             'cursor' => null,
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
+        $this->assertIsArray($result->data['playlists']);
+        $this->assertCount(1, $result->data['playlists']);
 
-        $cursor = $result->data['cursor'];
-        $results = $result->data['playlists'];
+        $playlist = current($result->data['playlists']);
+        $this->assertSame('Tenant 1 Recommended', $playlist['name']);
 
-        $this->assertEquals(0, $cursor['total']);
-        $this->assertCount(0, $results);
-
-        // Disable the feature
-        advanced_feature::disable('ml_recommender');
-        $ec = execution_context::create('ajax', 'ml_recommender_get_recommended_user_playlists');
+        // User 4 should see nothing
+        $this->setUser($user1);
+        $ec = execution_context::create('ajax', 'ml_recommender_get_recommended_playlists');
         $parameters = [
-            'user_id' => $user2->id,
+            'playlist_id' => $base_playlist->get_id(),
             'cursor' => null,
         ];
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotNull($result->data);
+        $this->assertIsArray($result->data['playlists']);
+        $this->assertCount(1, $result->data['playlists']);
 
-        $cursor = $result->data['cursor'];
-        $results = $result->data['playlists'];
-
-        $this->assertNull($cursor);
-        $this->assertEmpty($results);
+        $playlist = current($result->data['playlists']);
+        $this->assertSame('Tenant 1 Recommended', $playlist['name']);
     }
 }
