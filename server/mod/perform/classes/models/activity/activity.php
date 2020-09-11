@@ -365,6 +365,9 @@ class activity extends model {
         $entity->description = $description;
 
         if (isset($type_id)) {
+            if (is_null(activity_type::load_by_id($type_id))) {
+                throw new coding_exception("Invalid activity type");
+            }
             if (!$this->is_draft()) {
                 throw new coding_exception("Cannot change type of activity {$this->id} since it is no longer a draft");
             }

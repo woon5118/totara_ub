@@ -267,6 +267,17 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $active_activity->set_general_info('New name for existing activity', null, 2)->update();
     }
 
+    public function test_update_general_should_fail_for_invalid_activity_type() {
+        $activity =  $this->perform_generator->create_activity_in_container([
+            'activity_name' => 'New activity name',
+            'description' => 'New activity description',
+        ]);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Invalid activity type");
+        $activity->set_general_info('New name for existing activity', null, 100)->update();
+    }
+
     public function update_general_should_validate_new_attributes(): array {
         return [
             'Name not present' => [
