@@ -308,25 +308,7 @@ final class playlist implements accessible, shareable {
             return true;
         }
 
-        if (CONTEXT_USER == $context->contextlevel) {
-            if ($this->playlist->userid != $userid) {
-                return false;
-            }
-
-            return has_capability('totara/playlist:delete', $context, $userid);
-        } else {
-            if (CONTEXT_COURSE == $context->contextlevel) {
-                // todo: Add container check here
-            }
-
-            debugging(
-                "Invalid context level '{$context->contextlevel}' being added as original place for " .
-                "playlist '{$this->playlist->id}'",
-                DEBUG_DEVELOPER
-            );
-        }
-
-        return true;
+        return $this->playlist->userid == $userid;
     }
 
     /**
@@ -802,13 +784,15 @@ final class playlist implements accessible, shareable {
      * @inheritDoc
      */
     public function can_share(int $userid): bool {
-        // First check if user is allowed to share playlists.
-        $context = \context_user::instance($userid);
-        if (!has_capability('totara/playlist:share', $context, $userid)) {
-            return false;
+        $context = $this->get_context();
+
+        if (access_manager::can_manage_engage($context, $userid)) {
+            return true;
         }
 
-        return true;
+        // Every one can share the playlist. Note that the intention of this function
+        // does not check whether the playlist is able to be shared or not.
+        return has_capability('totara/playlist:share', $context, $userid);
     }
 
     /**
