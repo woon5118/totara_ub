@@ -20,7 +20,6 @@
  * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
  * @package container_workspace
  */
-
 namespace container_workspace\webapi\resolver\query;
 
 use container_workspace\totara_engage\share\recipient\library;
@@ -33,6 +32,8 @@ use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use totara_engage\card\card_loader;
 use totara_engage\query\query;
+use core_container\factory;
+use container_workspace\interactor\workspace\interactor as workspace_interactor;
 
 final class contributions implements query_resolver, has_middleware {
     /**
@@ -42,13 +43,38 @@ final class contributions implements query_resolver, has_middleware {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
+        global $USER;
+
+        $workspace_id = $args['workspace_id'];
+        $workspace_type = workspace::get_type();
+
+        /** @var workspace $workspace */
+        $workspace = factory::from_id($workspace_id);
+        if (!$workspace->is_typeof($workspace_type)) {
+            throw new \coding_exception("Cannot find workspace", $workspace_id);
+        }
+
+        // Checking if the user is able to see the workspace or not.
+        $workspace_interactor = new workspace_interactor($workspace, $USER->id);
+        if (!$workspace_interactor->can_view_library()) {
+            // Current actor does not have ability to view the library.
+            throw new \coding_exception("Cannot fetch the workspace's library");
+        }
+
         if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
+            $context = $workspace->get_context();
+            $ec->set_relevant_context($context);
         }
 
         $query = new query();
         $query->set_filters($args['filter']);
-        $query->set_component('container_workspace');
+        $query->set_component($workspace_type);
+
+        $contribution_area = $args['area'] ?? '';
+        if ('adder' !== $contribution_area) {
+            throw new \coding_exception('Contribution area is invalid');
+        }
+
         $query->set_area($args['area']);
 
         if (!empty($args['cursor'])) {

@@ -142,6 +142,8 @@ final class playlist_provider implements queryable, container {
      * @return builder|null
      */
     private function create_playlist_builder(query $query): ?builder {
+        global $DB;
+
         // Leave when filtered by type and type is not playlist.
         $type = $query->get_type();
         if (!empty($type) && $type !== 'totara_playlist') {
@@ -151,6 +153,9 @@ final class playlist_provider implements queryable, container {
         $userid = $query->get_userid();
         $unique = builder::concat("p.id", "'-totara_playlist'");
         $builder = builder::table(playlist_entity::TABLE, 'p');
+
+        // This is for supporting old version of database
+        $playlist_component_value = $DB->sql_cast_2char("'totara_playlist'");
         $builder->select(
             [
                 new raw_field("{$unique} AS uniqueid"),
@@ -162,7 +167,7 @@ final class playlist_provider implements queryable, container {
                 "p.timecreated AS timecreated",
                 "p.timemodified AS timemodified",
                 new raw_field("NULL AS extra"),
-                new raw_field("'totara_playlist' AS component")
+                new raw_field("{$playlist_component_value} AS component")
             ]
         );
 

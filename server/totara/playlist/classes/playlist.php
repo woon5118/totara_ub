@@ -44,7 +44,6 @@ use totara_playlist\event\playlist_updated;
 use totara_playlist\exception\playlist_exception;
 use totara_playlist\local\helper;
 use totara_playlist\local\image_processor;
-use totara_playlist\repository\playlist_repository;
 use totara_playlist\repository\playlist_resource_repository;
 use totara_engage\resource\resource_item;
 use totara_topic\provider\topic_provider;

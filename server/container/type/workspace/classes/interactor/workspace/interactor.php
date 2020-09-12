@@ -439,6 +439,10 @@ final class interactor {
      * @return bool
      */
     public function can_view_library(): bool {
+        if (!$this->can_view_workspace()) {
+            return false;
+        }
+
         if ($this->can_manage()) {
             return true;
         }
