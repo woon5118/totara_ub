@@ -92,6 +92,7 @@ $string['hashtag_tip_help'] = 'Hashtags make it easier to find information on sp
 $string['hidden'] = 'Hidden';
 $string['hidden_workspace'] = 'Hidden workspace';
 $string['hidden_workspace_text'] = 'Hide this workspace from non-members';
+$string['invalid_access'] = 'Invalid access';
 $string['invalid_workspace'] = 'Invalid workspace';
 $string['joined'] = 'Joined';
 $string['join_me'] = 'Join';

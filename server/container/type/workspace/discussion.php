@@ -48,7 +48,7 @@ $PAGE->set_pagelayout('legacynolayout');
 $interactor = new interactor($workspace);
 $tui = new component('container_workspace/pages/WorkspaceEmptyPage');
 
-if ($interactor->can_view_workspace()) {
+if ($interactor->can_view_discussions()) {
     $tui = new component(
         'container_workspace/pages/WorkspaceDiscussionPage',
         ['discussion-id' => $discussion_id]
