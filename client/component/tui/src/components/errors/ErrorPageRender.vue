@@ -19,7 +19,7 @@
 <template>
   <div class="tui-errorDisplay">
     <h1 class="tui-errorDisplay__title">
-      {{ $str('error', 'moodle') }}
+      {{ $tryStr('error', 'moodle') || 'Error' }}
     </h1>
     <p>
       {{

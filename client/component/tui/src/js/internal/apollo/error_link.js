@@ -19,13 +19,28 @@
 import { totaraUrl } from '../../util';
 import { onError } from 'apollo-link-error';
 
-export const errorLink = onError(({ networkError }) => {
-  if (networkError.result && networkError.result.errors) {
-    const loginCategory = networkError.result.errors.find(
-      x => x.extensions && x.extensions.category === 'require_login'
-    );
-    if (loginCategory) {
-      window.location = totaraUrl('/login/index.php');
+export const createErrorLink = () => {
+  return onError(({ graphQLErrors, networkError }) => {
+    if (graphQLErrors) {
+      const loginCategory = graphQLErrors.find(
+        x => x.extensions && x.extensions.category === 'require_login'
+      );
+      if (loginCategory) {
+        window.location = totaraUrl('/login/index.php');
+      }
     }
-  }
-});
+
+    if (
+      networkError &&
+      networkError.result &&
+      Array.isArray(networkError.result.errors)
+    ) {
+      const loginCategory = networkError.result.errors.find(
+        x => x.extensions && x.extensions.category === 'require_login'
+      );
+      if (loginCategory) {
+        window.location = totaraUrl('/login/index.php');
+      }
+    }
+  });
+};

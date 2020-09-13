@@ -28,6 +28,7 @@ import requirements from './internal/requirements';
 import { memoize } from './util';
 import apolloClient from './apollo_client';
 import theme from './theme';
+import { vueApolloErrorHandler } from './errors';
 
 Vue.use(tuiPlugin);
 Vue.use(VueApollo);
@@ -40,6 +41,7 @@ const modules = new TotaraModuleStore({ bundleLoader: loader });
 
 const apolloProvider = new VueApollo({
   defaultClient: apolloClient,
+  errorHandler: vueApolloErrorHandler,
 });
 
 const emptyComponent = {};

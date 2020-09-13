@@ -18,6 +18,7 @@
 
 <script>
 import ErrorPageRender from 'tui/components/errors/ErrorPageRender';
+import { showError } from 'tui/errors';
 
 export default {
   // must declare here so it is picked up by lang string scanner
@@ -36,15 +37,12 @@ export default {
     // we only care about render errors - we don't want to unmount the
     // entire tree because an event handler threw an exception
     if (info == 'render') {
-      // report error normally
-      setTimeout(() => {
-        throw err;
-      });
       this.errored = true;
       this.error = err;
-      // mark this error as handled
-      return false;
+      return;
     }
+
+    showError(err, { vm });
   },
 
   methods: {

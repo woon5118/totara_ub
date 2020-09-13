@@ -117,7 +117,7 @@ final class util {
         self::log_exception($ex);
 
         $response = [
-            'errors' => FormattedError::createFromException($ex, (bool)$CFG->debugdeveloper),
+            'errors' => [FormattedError::createFromException($ex, (bool)$CFG->debugdeveloper)],
         ];
 
         self::send_response($response, 500);
