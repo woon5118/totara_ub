@@ -148,3 +148,27 @@ Feature: Test various aspects of the totara_mobile_scorm query
     And I switch to "WebView" iframe
     Then I should not see "click here to return to the course"
     And I should not see "Awesome SCORM package"
+
+  Scenario: Test webview settings override for SCORM player, new window (simple)
+    When I follow "Edit settings"
+    And I set the following fields to these values:
+      | Display package | 2 |
+    And I click on "Save and display" "button"
+    And I log out
+    When I am using the mobile emulator
+    Then I should see "Device emulator loading..."
+    And I should see "Making login_setup request"
+    And I set the field "username" to "student1"
+    And I set the field "password" to "student1"
+    When I click on "Submit Credentials 1" "button"
+    Then I should see "Native login OK"
+    And I should see "Setting up new GraphQL browser"
+    When I set the field "jsondata2" to "{\"operationName\": \"totara_mobile_create_webview\",\"variables\": {\"url\": \"/mod/scorm/player.php?mode=normal&newattempt=on&cm=2&scoid=0\"}}"
+    And I click on "Submit Request 2" "button"
+    When I switch to the main window
+    And I switch to "WebView" iframe
+    And I should not see "Awesome SCORM package"
+    And I switch to "scorm_object" iframe
+    Then I should not see "Your content is playing in another window."
+    And I switch to "contentFrame" iframe
+    And I should see "Play of the game"

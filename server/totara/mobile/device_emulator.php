@@ -41,6 +41,7 @@ $syscontext = context_system::instance();
 
 $PAGE->set_context($syscontext);
 $PAGE->set_pagelayout('webview'); // No fancy UIs or navigation.
+$PAGE->set_title('Mobile Device Emulator');
 
 if (!get_config('totara_mobile', 'enable')) {
     util::webview_error(get_string('errormobileunavailable', 'totara_mobile'));

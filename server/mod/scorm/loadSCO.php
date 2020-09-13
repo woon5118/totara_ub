@@ -66,6 +66,19 @@ require_login($course, false, $cm, false, true); // Totara: no redirects here.
 require_capability('mod/scorm:view', context_module::instance($cm->id));
 require_capability('mod/scorm:launch', context_module::instance($cm->id));
 
+$iswebview = $PAGE->pagelayout == 'webview';
+
+// Override some settings for webview
+if ($iswebview) {
+    $scorm->hidetoc = SCORM_TOC_DISABLED;
+    $scorm->nav = '0';
+    $scorm->popup = 0;
+
+    // Remove any size settings
+    $scorm->width = 0;
+    $scorm->height = 0;
+}
+
 scorm_send_headers_totara();
 
 // Check if SCORM is available.
