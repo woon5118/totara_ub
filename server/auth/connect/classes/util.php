@@ -39,8 +39,13 @@ class util {
     /** Client delete was requested, but server was not told yet. Record will be deleted later. */
     const SERVER_STATUS_DELETING = 1;
 
-    /** How much time do we give user to login on SSO server in seconds? */
-    const REQUEST_LOGIN_TIMEOUT = 600;
+    /**
+     * How much time do we give user to login on SSO server in seconds?
+     *
+     * NOTE: this should be longer than regular session lifetime
+     *       to prevent errors when users leave browser open on the login page.
+     */
+    const REQUEST_LOGIN_TIMEOUT = 60 * 60 * 24;
 
     const MIN_API_VERSION = 1;
     const MAX_API_VERSION = 2;
@@ -2033,21 +2038,18 @@ class util {
             return null;
         }
 
-        $request = $DB->get_record('auth_connect_sso_requests', array('sid' => session_id()));
-        if ($request and time() - $request->timecreated > self::REQUEST_LOGIN_TIMEOUT) {
+        if ($DB->record_exists('auth_connect_sso_requests', array('sid' => session_id()))) {
             // Delete previous timed-out attempt and try again with different request id.
             $DB->delete_records('auth_connect_sso_requests', array('sid' => session_id()));
-            $request = null;
+            util::log_sso_attempt_error('Unfinished SSO request deleted, user must have navigated away from login page somehow');
         }
 
-        if (!$request) {
-            $request = new \stdClass();
-            $request->serverid     = $server->id;
-            $request->requesttoken = self::create_unique_hash('auth_connect_sso_requests', 'requesttoken');
-            $request->sid          = session_id();
-            $request->timecreated  = time();
-            $request->id = $DB->insert_record('auth_connect_sso_requests', $request);
-        }
+        $request = new \stdClass();
+        $request->serverid     = $server->id;
+        $request->requesttoken = self::create_unique_hash('auth_connect_sso_requests', 'requesttoken');
+        $request->sid          = session_id();
+        $request->timecreated  = time();
+        $request->id = $DB->insert_record('auth_connect_sso_requests', $request);
 
         $requestparams = array('clientidnumber' => $server->clientidnumber, 'requesttoken' => $request->requesttoken);
         return new \moodle_url(self::get_sso_request_url($server), $requestparams);

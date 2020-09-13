@@ -3331,19 +3331,19 @@ class auth_connect_util_testcase extends advanced_testcase {
         $this->assertSame(40, strlen($request1->requesttoken));
         $this->assertCount(1, $DB->get_records('auth_connect_sso_requests'));
 
-        // Allow repeated request.
+        // Do not allow repeated request.
         $result2 = util::create_sso_request($server);
         $this->assertInstanceOf('moodle_url', $result2);
-        $this->assertEquals($result1, $result2);
+        $this->assertNotEquals($result1, $result2);
         $this->assertCount(1, $DB->get_records('auth_connect_sso_requests'));
 
         $request1->timecreated = $request1->timecreated - util::REQUEST_LOGIN_TIMEOUT + 10;
         $DB->update_record('auth_connect_sso_requests', $request1);
         $result2b = util::create_sso_request($server);
         $this->assertInstanceOf('moodle_url', $result2b);
-        $this->assertEquals($result2, $result2b);
+        $this->assertNotEquals($result2, $result2b);
         $this->assertCount(1, $DB->get_records('auth_connect_sso_requests'));
-        $this->assertTrue($DB->record_exists('auth_connect_sso_requests', array('id' => $request1->id)));
+        $this->assertFalse($DB->record_exists('auth_connect_sso_requests', array('id' => $request1->id)));
 
         // Next request as guest.
         $this->setGuestUser();
