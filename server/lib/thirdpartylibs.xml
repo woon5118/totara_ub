@@ -6,6 +6,7 @@
     <license>LGPL</license>
     <version>5.20.15</version>
     <licenseversion>2.1+</licenseversion>
+    <repository>https://github.com/ADOdb/ADOdb</repository>
   </library>
   <library>
     <location>bennu</location>
@@ -20,6 +21,7 @@
     <license>BSD</license>
     <version></version>
     <licenseversion></licenseversion>
+    <repository>https://www.phpclasses.org/package/2695-PHP-Safely-evaluate-mathematical-expressions.html</repository>
   </library>
   <library>
     <location>lessphp</location>
@@ -27,6 +29,7 @@
     <license>Apache</license>
     <version>1.7.0.10</version>
     <licenseversion>2.0</licenseversion>
+    <repository>https://github.com/oyejorge/less.php</repository>
   </library>
   <library>
     <location>phpspreadsheet</location>
@@ -34,6 +37,7 @@
     <license>MIT</license>
     <version>1.12.0</version>
     <licenseversion></licenseversion>
+    <repository>https://github.com/PHPOffice/PhpSpreadsheet</repository>
   </library>
   <library>
     <location>google</location>
@@ -41,6 +45,7 @@
     <license>Apache</license>
     <version>1.1.7</version>
     <licenseversion>2.0</licenseversion>
+    <repository>https://github.com/google/google-api-php-client</repository>
   </library>
   <library>
     <location>jabber</location>
@@ -55,6 +60,7 @@
     <license>MIT</license>
     <version>1.3.62</version>
     <licenseversion></licenseversion>
+    <repository>https://github.com/matthiasmullie/minify</repository>
   </library>
   <library>
     <location>minify/matthiasmullie-pathconverter</location>
@@ -62,6 +68,7 @@
     <license>MIT</license>
     <version>1.1.2</version>
     <licenseversion></licenseversion>
+    <repository>https://github.com/matthiasmullie/path-converter</repository>
   </library>
   <library>
     <location>pear/Auth/RADIUS.php</location>
@@ -104,6 +111,7 @@
     <license>PHP</license>
     <version>1.4.5</version>
     <licenseversion>3.0</licenseversion>
+    <repository>https://github.com/pear/pear-core</repository>
   </library>
   <library>
     <location>simplepie</location>
@@ -111,6 +119,7 @@
     <license>BSD</license>
     <version>1.5.3</version>
     <licenseversion></licenseversion>
+    <repository>https://github.com/simplepie/simplepie</repository>
   </library>
   <library>
     <location>tcpdf</location>
@@ -124,7 +133,7 @@
     <name>YUI</name>
     <license>BSD</license>
     <version>3.17.2</version>
-    <licenseversion></licenseversion>
+    <repository>https://github.com/yui/yui3</repository>
   </library>
   <library>
     <location>yuilib/gallery</location>
@@ -139,6 +148,7 @@
     <license>MIT</license>
     <version>3.4.1</version>
     <licenseversion></licenseversion>
+    <repository>https://github.com/jquery/jquery</repository>
   </library>
   <library>
     <location>jquery</location>
@@ -146,6 +156,7 @@
     <license>MIT</license>
     <version>1.12.1</version>
     <licenseversion></licenseversion>
+    <repository>https://github.com/jquery/jquery-ui</repository>
   </library>
   <library>
     <location>html2text</location>
@@ -153,6 +164,7 @@
     <license>GPL</license>
     <version>4.2.1</version>
     <licenseversion>2.0+</licenseversion>
+    <repository>https://github.com/mtibben/html2text</repository>
   </library>
   <library>
     <location>markdown</location>
@@ -160,6 +172,7 @@
     <license>BSD</license>
     <version>1.9.0</version>
     <licenseversion></licenseversion>
+    <repository>https://github.com/michelf/php-markdown</repository>
   </library>
   <library>
     <location>recaptchalib.php</location>
@@ -174,6 +187,7 @@
     <license>Apache</license>
     <version>0.9.4</version>
     <licenseversion>2.0</licenseversion>
+    <repository>https://github.com/longxinH/xhprof</repository>
   </library>
   <library>
     <location>xmlize.php</location>
@@ -188,6 +202,7 @@
     <license>LGPL/BSD</license>
     <version>2.30.2</version>
     <licenseversion>2.1</licenseversion>
+    <repository>https://github.com/horde/horde/tree/horde_core-2.30.2</repository>
   </library>
   <library>
     <location>requirejs</location>
@@ -195,6 +210,7 @@
     <license>MIT</license>
     <version>2.3.5</version>
     <licenseversion></licenseversion>
+    <repository>https://github.com/requirejs/requirejs</repository>
   </library>
   <library>
     <location>amd/src/loglevel.js</location>
@@ -207,12 +223,14 @@
     <name>Mustache</name>
     <license>MIT</license>
     <version>2.13.0</version>
+    <repository>https://github.com/bobthecow/mustache.php</repository>
   </library>
   <library>
     <location>amd/src/mustache.js</location>
     <name>Mustache.js</name>
     <license>MIT</license>
     <version>2.2.1</version>
+    <repository>https://github.com/janl/mustache.js</repository>
   </library>
   <library>
     <location>graphlib.php</location>
@@ -225,42 +243,49 @@
     <name>PHP-CSS-Parser</name>
     <license>MIT</license>
     <version>8.3.0+ (a80a97d)</version>
+    <repository>https://github.com/sabberworm/PHP-CSS-Parser</repository>
   </library>
   <library>
     <location>rtlcss</location>
     <name>RTLCSS for PHP</name>
     <license>MIT</license>
     <version>1.0.0</version>
+    <repository>https://github.com/moodlehq/rtlcss-php</repository>
   </library>
   <library>
     <location>scssphp</location>
     <name>scssphp</name>
     <license>MIT</license>
     <version>1.0.5</version>
+    <repository>https://github.com/scssphp/scssphp</repository>
   </library>
   <library>
     <location>amd/src/chartjs-lazy.js</location>
     <name>Chart.js</name>
     <license>MIT</license>
     <version>2.8.0</version>
+    <repository>https://github.com/chartjs/Chart.js</repository>
   </library>
   <library>
     <location>amd/src/chartjs-plugin-doughnutlabel.js</location>
     <name>Chart.js Doughnut plugin</name>
     <license>MIT</license>
     <version>2.0.3</version>
+    <repository>https://github.com/ciprianciurea/chartjs-plugin-doughnutlabel</repository>
   </library>
   <library>
     <location>maxmind/GeoIp2</location>
     <name>GeoIP2 PHP API</name>
     <license>Apache 2.0</license>
     <version>2.9.0</version>
+    <repository>https://github.com/maxmind/GeoIP2-php</repository>
   </library>
   <library>
     <location>maxmind/MaxMind</location>
     <name>MaxMind DB Reader API</name>
     <license>Apache 2.0</license>
     <version>1.5.0</version>
+    <repository>https://github.com/maxmind/MaxMind-DB-Reader-php</repository>
   </library>
   <library>
     <location>ltiprovider</location>
@@ -268,6 +293,7 @@
     <license>Apache</license>
     <version>3.0.2</version>
     <licenseversion>2.0</licenseversion>
+    <repository>https://github.com/IMSGlobal/LTI-Tool-Provider-Library-PHP</repository>
   </library>
   <library>
     <location>amd/src/truncate.js</location>
@@ -296,9 +322,10 @@
   </library>
   <library>
     <location>php-jwt</location>
-    <name>A simple library to encode and decode JSON Web Tokens (JWT) in PHP, conforming to RFC 7519</name>
+    <name>PHP-JWT</name>
     <license>BSD</license>
     <version>5.0.0</version>
     <licenseversion>3-Clause</licenseversion>
+    <repository>https://github.com/firebase/php-jwt</repository>
   </library>
 </libraries>

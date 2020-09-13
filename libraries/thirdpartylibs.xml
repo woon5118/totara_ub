@@ -6,6 +6,7 @@
     <license>Apache</license>
     <version>2.7.3</version>
     <licenseversion>2.0</licenseversion>
+    <repository>https://github.com/box/spout</repository>
   </library>
   <library>
     <location>required/ezyang/htmlpurifier</location>
@@ -13,6 +14,7 @@
     <license>LGPL</license>
     <version>4.13.0</version>
     <licenseversion>2.1+</licenseversion>
+    <repository>https://repo.or.cz/w/htmlpurifier.git</repository>
   </library>
   <library>
     <location>required/phpmailer/phpmailer</location>
@@ -20,6 +22,7 @@
     <license>LGPL</license>
     <version>6.1.6</version>
     <licenseversion>2.1</licenseversion>
+    <repository>https://github.com/PHPMailer/PHPMailer</repository>
   </library>
   <library>
     <location>required/webonyx/graphql-php</location>
@@ -27,5 +30,6 @@
     <license>MIT</license>
     <version>0.13.2</version>
     <licenseversion></licenseversion>
+    <repository>https://github.com/webonyx/graphql-php</repository>
   </library>
 </libraries>
