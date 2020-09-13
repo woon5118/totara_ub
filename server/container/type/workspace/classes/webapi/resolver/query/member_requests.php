@@ -34,6 +34,7 @@ use container_workspace\member\member_request;
 use core_container\factory;
 use container_workspace\workspace;
 use container_workspace\loader\member\member_request_loader;
+use  container_workspace\interactor\workspace\interactor as workspace_interactor;
 
 /**
  * A query to fetch a list of member requests to join to the workspace
@@ -47,10 +48,17 @@ final class member_requests implements query_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): array {
         $workspace_id = $args['workspace_id'];
+
+        /** @var workspace $workspace */
         $workspace = factory::from_id($workspace_id);
 
         if (!$workspace->is_typeof(workspace::get_type())) {
             throw new \coding_exception("Cannot fetch the list of member requests for different container");
+        }
+
+        $workspace_interactor = new workspace_interactor($workspace);
+        if (!$workspace_interactor->can_manage()) {
+            throw new \coding_exception("Cannot fetch the workspace member requests");
         }
 
         $query = new member_request_query($workspace_id);

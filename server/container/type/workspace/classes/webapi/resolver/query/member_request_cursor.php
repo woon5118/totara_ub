@@ -34,6 +34,7 @@ use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
+use container_workspace\interactor\workspace\interactor as workspace_interactor;
 
 final class member_request_cursor implements query_resolver, has_middleware {
     /**
@@ -54,6 +55,11 @@ final class member_request_cursor implements query_resolver, has_middleware {
         if (!$ec->has_relevant_context()) {
             $context = $workspace->get_context();
             $ec->set_relevant_context($context);
+        }
+
+        $workspace_interactor = new workspace_interactor($workspace);
+        if (!$workspace_interactor->can_manage()) {
+            throw new \coding_exception("Cannot fetch the member request cursor");
         }
 
         $query = new member_request_query($workspace_id);
