@@ -53,13 +53,13 @@ require_capability('totara/hierarchy:deletecompetencyscale', $sitecontext);
 admin_externalpage_setup($prefix.'manage');
 
 if (!$scale = $DB->get_record('comp_scale', array('id' => $id))) {
-    print_error('incorrectcompetencyscaleid', 'totara_hierarchy');
+    print_error('error:invalidscaleid', 'totara_hierarchy');
 }
 
 $returnurl = "{$CFG->wwwroot}/totara/hierarchy/framework/index.php?prefix=competency";
 $deleteurl = "{$CFG->wwwroot}/totara/hierarchy/prefix/competency/scale/delete.php?id={$scale->id}&amp;delete=".md5($scale->timemodified)."&amp;sesskey={$USER->sesskey}&amp;prefix=competency";
 
-$scale_model = scale::load_by_id_with_values($scaleid);
+$scale_model = scale::load_by_id_with_values($scale->id);
 
 // Can't delete if the scale is in use or assigned
 if ($scale_model->is_in_use()) {

@@ -55,7 +55,7 @@ require_capability('totara/hierarchy:deletecompetencyscale', $sitecontext);
 admin_externalpage_setup($prefix.'manage');
 
 if (!$value = $DB->get_record('comp_scale_values', array('id' => $id))) {
-    print_error('incorrectcompetencyscalevalueid', 'totara_hierarchy');
+    print_error('error:invalidscalevalueid', 'totara_hierarchy');
 }
 
 $scale = $DB->get_record('comp_scale', array('id' => $value->scaleid));
