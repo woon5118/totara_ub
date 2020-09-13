@@ -63,7 +63,7 @@ if (empty($request['version']) or !is_string($request['version'])) {
     util::send_error('Invalid site_info request', 400);
 }
 
-$app_version = clean_param($request['version'], PARAM_FLOAT);
+$app_version = clean_param($request['version'], PARAM_TEXT);
 if (empty($app_version)) {
     util::send_error('Invalid site_info request', 400);
 }

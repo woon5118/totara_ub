@@ -37,9 +37,9 @@ final class util {
     /**
      * Minimum supported App version
      * Update whenever an old version of the app becomes unsupported.
-     * Important: update the device emulator, too!
+     * Important: Mirror any updates here in totara_mobile/js/device_emulator.js
      */
-    const MIN_APP_VERSION = '47';
+    const MIN_APP_VERSION = '1.0.0';
 
     /**
      * Totara App user agent string
@@ -351,12 +351,13 @@ final class util {
     /**
      * Get site configuration info for mobile app to use.
      *
+     * @param string $app_version
      * @return string
      */
-    public static function get_site_info($app_version): array {
+    public static function get_site_info(string $app_version): array {
         global $CFG;
 
-        if ($app_version < self::MIN_APP_VERSION) {
+        if (version_compare(self::MIN_APP_VERSION, $app_version, '>')) {
             return [
                 'upgrade' => self::MIN_APP_VERSION,
                 'app_version' => $app_version,
