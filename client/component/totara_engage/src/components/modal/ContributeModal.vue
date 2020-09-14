@@ -27,7 +27,10 @@
       :close-button="false"
       :title="getTitle"
     >
-      <div v-if="adder" class="tui-contributeModal__adderContainer">
+      <div
+        v-if="adder && !hideTabs"
+        class="tui-contributeModal__adderContainer"
+      >
         <span>
           {{ $str('or', 'totara_engage') }}
           <Button
@@ -54,22 +57,22 @@
           :key="modal.id"
           :name="modal.label"
           :disabled="disabledId === modal.id"
-        >
-          <div
-            v-if="!$apollo.loading"
-            class="tui-contributeModal__componentContent"
-          >
-            <!-- This is where the content is -->
-            <component
-              :is="selectedTab"
-              :container="container"
-              @change-title="stage = $event"
-              @done="$emit('done', $event)"
-              @cancel="$emit('request-close')"
-            />
-          </div>
-        </Tab>
+        />
       </Tabs>
+
+      <div
+        v-if="!$apollo.loading"
+        class="tui-contributeModal__componentContent"
+      >
+        <!-- This is where the content of selectedTab is -->
+        <component
+          :is="selectedTab"
+          :container="container"
+          @change-title="stage = $event"
+          @done="$emit('done', $event)"
+          @cancel="$emit('request-close')"
+        />
+      </div>
 
       <ButtonIcon
         v-if="expandable"
@@ -214,6 +217,9 @@ export default {
         this.expanded = false;
       }
     },
+    stage() {
+      this.hideTabs = this.stage !== 0;
+    }
   },
 
   methods: {
@@ -264,8 +270,13 @@ export default {
 </lang-strings>
 
 <style lang="scss">
+:root {
+  --contributionModal-min-height: 744px;
+  --contributionContent-min-height: 574px;
+}
 .tui-contributeModal {
   position: relative;
+  min-height: var(--contributionModal-min-height);
 
   &__adderContainer {
     margin-bottom: var(--gap-2);
@@ -307,8 +318,8 @@ export default {
     flex-direction: column;
     width: 100%;
     height: 100%;
-    min-height: 510px;
-    padding: 0 var(--gap-8);
+    min-height: var(--contributionContent-min-height);
+    padding: var(--gap-8);
   }
 
   .tui-modalContent__title {
@@ -318,16 +329,9 @@ export default {
   .tui-modalContent__content {
     display: flex;
     flex-direction: column;
-    min-height: 510px;
+    min-height: var(--contributionContent-min-height);
     margin-top: 0;
     padding: 0;
-  }
-
-  .tui-tabContent {
-    position: relative;
-    flex: 1;
-    min-height: 400px;
-    padding: var(--gap-8) 0;
   }
 
   .tui-modalContent__header-title {
