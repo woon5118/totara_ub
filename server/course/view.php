@@ -31,14 +31,15 @@
         print_error('unspecifycourseid', 'error');
     }
 
-    // Totara: allow the plugins to redirect out of here if course is not a legacy course.
-    $hook = new \core_course\hook\course_view($id);
-    $hook->execute();
 
     $course = $DB->get_record('course', $params, '*', MUST_EXIST);
     $urlparams = array('id' => $course->id);
 
-    // Sectionid should get priority over section number
+    // Totara: allow the plugins to redirect out of here if course is not a legacy course.
+    $hook = new \core_course\hook\course_view($course);
+    $hook->execute();
+
+// Sectionid should get priority over section number
     if ($sectionid) {
         $section = $DB->get_field('course_sections', 'section', array('id' => $sectionid, 'course' => $course->id), MUST_EXIST);
     }
