@@ -432,9 +432,9 @@ export default {
           this.participantSections =
             result.participant_instance.participant_sections;
           this.progressStatus = result.progress_status;
+          this.responsesAreVisibleTo = result.responses_are_visible_to;
         }
 
-        this.responsesAreVisibleTo = result.responses_are_visible_to;
         this.formValues = {};
         this.initialValues[result.id] = {
           sectionElements: {},

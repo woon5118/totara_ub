@@ -39,9 +39,9 @@ class view_only_section extends entity_model_formatter {
 
     protected function get_map(): array {
         return [
+            'id' => null,
             'section' => null,
             'section_element_responses' => null,
-            'responses_are_visible_to' => null,
             'siblings' => null,
         ];
     }
