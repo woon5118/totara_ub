@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
- * @package theme_ventura
+ * @package totara_tui
  */
 
-use theme_ventura\controllers\theme_settings;
+use totara_tui\controllers\theme_tenants;
 
 require_once(__DIR__ . '/../../config.php');
-(new theme_settings())->process();
+(new theme_tenants())->process();

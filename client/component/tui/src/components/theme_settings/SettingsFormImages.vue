@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Dave Wallace <dave.wallace@totaralearning.com>
-  @package theme_ventura
+  @package tui
 -->
 
 <template>
@@ -26,12 +26,12 @@
     @submit="submit"
   >
     <Collapsible
-      :label="$str('formimages_group_core', 'theme_ventura')"
+      :label="$str('formimages_group_core', 'totara_tui')"
       :initial-state="true"
     >
       <FormRowStack>
         <FormRow
-          :label="$str('formimages_label_displaylogin', 'theme_ventura')"
+          :label="$str('formimages_label_displaylogin', 'totara_tui')"
           :is-stacked="true"
         >
           <FormCheckbox
@@ -44,7 +44,7 @@
         </FormRow>
 
         <FormRow
-          :label="$str('formimages_label_login', 'theme_ventura')"
+          :label="$str('formimages_label_login', 'totara_tui')"
           :is-stacked="true"
         >
           <ImageUploadSetting
@@ -52,19 +52,19 @@
             :aria-label-extension="
               $str(
                 'defaultimage',
-                'theme_ventura',
-                $str('formimages_label_login', 'theme_ventura')
+                'totara_tui',
+                $str('formimages_label_login', 'totara_tui')
               )
             "
             :aria-describedby="$id('formimages-login-details')"
           />
           <FormRowDetails :id="$id('formimages-login-details')">
-            {{ $str('formimages_details_login', 'theme_ventura') }}
+            {{ $str('formimages_details_login', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
 
         <FormRow
-          :label="$str('formimages_label_loginalttext', 'theme_ventura')"
+          :label="$str('formimages_label_loginalttext', 'totara_tui')"
           :is-stacked="true"
         >
           <FormText
@@ -72,19 +72,19 @@
             :aria-describedby="$id('formimages-loginalttext-details')"
           />
           <FormRowDetails :id="$id('formimages-loginalttext-details')">
-            {{ $str('formimages_details_loginalttext', 'theme_ventura') }}
+            {{ $str('formimages_details_loginalttext', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
       </FormRowStack>
     </Collapsible>
 
     <Collapsible
-      :label="$str('formimages_group_learn', 'theme_ventura')"
+      :label="$str('formimages_group_learn', 'totara_tui')"
       :initial-state="true"
     >
       <FormRowStack>
         <FormRow
-          :label="$str('formimages_label_course', 'theme_ventura')"
+          :label="$str('formimages_label_course', 'totara_tui')"
           :is-stacked="true"
         >
           <ImageUploadSetting
@@ -92,18 +92,18 @@
             :aria-label-extension="
               $str(
                 'defaultimage',
-                'theme_ventura',
-                $str('formimages_label_course', 'theme_ventura')
+                'totara_tui',
+                $str('formimages_label_course', 'totara_tui')
               )
             "
             :aria-describedby="$id('formimages-course-details')"
           />
           <FormRowDetails :id="$id('formimages-course-details')">
-            {{ $str('formimages_details_course', 'theme_ventura') }}
+            {{ $str('formimages_details_course', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
         <FormRow
-          :label="$str('formimages_label_program', 'theme_ventura')"
+          :label="$str('formimages_label_program', 'totara_tui')"
           :is-stacked="true"
         >
           <ImageUploadSetting
@@ -111,18 +111,18 @@
             :aria-label-extension="
               $str(
                 'defaultimage',
-                'theme_ventura',
-                $str('formimages_label_program', 'theme_ventura')
+                'totara_tui',
+                $str('formimages_label_program', 'totara_tui')
               )
             "
             :aria-describedby="$id('formimages-program-details')"
           />
           <FormRowDetails :id="$id('formimages-program-details')">
-            {{ $str('formimages_details_program', 'theme_ventura') }}
+            {{ $str('formimages_details_program', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
         <FormRow
-          :label="$str('formimages_label_cert', 'theme_ventura')"
+          :label="$str('formimages_label_cert', 'totara_tui')"
           :is-stacked="true"
         >
           <ImageUploadSetting
@@ -130,26 +130,26 @@
             :aria-label-extension="
               $str(
                 'defaultimage',
-                'theme_ventura',
-                $str('formimages_label_cert', 'theme_ventura')
+                'totara_tui',
+                $str('formimages_label_cert', 'totara_tui')
               )
             "
             :aria-describedby="$id('formimages-cert-details')"
           />
           <FormRowDetails :id="$id('formimages-cert-details')">
-            {{ $str('formimages_details_cert', 'theme_ventura') }}
+            {{ $str('formimages_details_cert', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
       </FormRowStack>
     </Collapsible>
 
     <Collapsible
-      :label="$str('formimages_group_engage', 'theme_ventura')"
+      :label="$str('formimages_group_engage', 'totara_tui')"
       :initial-state="true"
     >
       <FormRowStack>
         <FormRow
-          :label="$str('formimages_label_resource', 'theme_ventura')"
+          :label="$str('formimages_label_resource', 'totara_tui')"
           :is-stacked="true"
         >
           <ImageUploadSetting
@@ -157,18 +157,18 @@
             :aria-label-extension="
               $str(
                 'defaultimage',
-                'theme_ventura',
-                $str('formimages_label_resource', 'theme_ventura')
+                'totara_tui',
+                $str('formimages_label_resource', 'totara_tui')
               )
             "
             :aria-describedby="$id('formimages-resource-details')"
           />
           <FormRowDetails :id="$id('formimages-resource-details')">
-            {{ $str('formimages_details_resource', 'theme_ventura') }}
+            {{ $str('formimages_details_resource', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
         <FormRow
-          :label="$str('formimages_label_workspace', 'theme_ventura')"
+          :label="$str('formimages_label_workspace', 'totara_tui')"
           :is-stacked="true"
         >
           <ImageUploadSetting
@@ -176,14 +176,14 @@
             :aria-label-extension="
               $str(
                 'defaultimage',
-                'theme_ventura',
-                $str('formimages_label_workspace', 'theme_ventura')
+                'totara_tui',
+                $str('formimages_label_workspace', 'totara_tui')
               )
             "
             :aria-describedby="$id('formimages-workspace-details')"
           />
           <FormRowDetails :id="$id('formimages-workspace-details')">
-            {{ $str('formimages_details_workspace', 'theme_ventura') }}
+            {{ $str('formimages_details_workspace', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
       </FormRowStack>
@@ -198,7 +198,7 @@
             $str(
               'saveextended',
               'totara_core',
-              $str('tabimages', 'theme_ventura') +
+              $str('tabimages', 'totara_tui') +
                 ' ' +
                 $str('settings', 'totara_core')
             )
@@ -212,7 +212,7 @@
 </template>
 
 <script>
-import futils from 'theme_ventura/formutils';
+import theme_settings from 'tui/lib/theme_settings';
 import Collapsible from 'tui/components/collapsible/Collapsible';
 import {
   Uniform,
@@ -220,7 +220,7 @@ import {
   FormCheckbox,
   FormText,
 } from 'tui/components/uniform';
-import ImageUploadSetting from 'theme_ventura/components/settings/ImageUploadSetting';
+import ImageUploadSetting from 'tui/components/theme_settings/ImageUploadSetting';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
 import FormRowDefaults from 'tui/components/form/FormRowDefaults';
 import FormRowStack from 'tui/components/form/FormRowStack';
@@ -293,7 +293,7 @@ export default {
       errorsForm: null,
       valuesForm: null,
       resultForm: null,
-      formutils: futils,
+      theme_settings: theme_settings,
     };
   },
 
@@ -305,11 +305,11 @@ export default {
     // - use previously saved Form data from GraphQL query
     // - missing field data then supplied by Theme JSON mapping data
     // - then locally held state until (takes precedence until page is reloaded)
-    let mergedFormData = this.formutils.mergeFormData(this.initialValues, [
+    let mergedFormData = this.theme_settings.mergeFormData(this.initialValues, [
       this.savedFormFieldData,
       this.valuesForm || [],
     ]);
-    this.initialValues = this.formutils.getResolvedInitialValues(
+    this.initialValues = this.theme_settings.getResolvedInitialValues(
       mergedFormData
     );
 
@@ -390,7 +390,7 @@ export default {
 
 <lang-strings>
 {
-  "theme_ventura": [
+  "totara_tui": [
     "defaultimage",
     "form_details_default",
     "formimages_group_core",

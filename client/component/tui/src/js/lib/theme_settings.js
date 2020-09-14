@@ -13,7 +13,7 @@
  * Please contact [licensing@totaralearning.com] for more information.
  *
  * @author Dave Wallace <dave.wallace@totaralearning.com>
- * @module theme_ventura
+ * @module tui
  */
 
 import theme from 'tui/theme';

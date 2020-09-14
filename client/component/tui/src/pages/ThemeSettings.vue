@@ -14,7 +14,7 @@
 
   @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
   @author Dave Wallace <dave.wallace@totaralearning.com>
-  @module theme_ventura
+  @module tui
 -->
 
 <template>
@@ -33,7 +33,7 @@
           @change="autoSubmitTenantForm"
         >
           <FormRow
-            :label="$str('formtenant_label_tenant', 'theme_ventura')"
+            :label="$str('formtenant_label_tenant', 'totara_tui')"
             :is-stacked="true"
           >
             <FormToggleSwitch
@@ -41,7 +41,7 @@
               :toggle-first="true"
             />
             <FormRowDetails>
-              {{ $str('formtenant_details_tenant', 'theme_ventura') }}
+              {{ $str('formtenant_details_tenant', 'totara_tui') }}
             </FormRowDetails>
           </FormRow>
         </Uniform>
@@ -54,7 +54,7 @@
         >
           <Tab
             :id="'themesettings-tab-0'"
-            :name="$str('tabbrand', 'theme_ventura')"
+            :name="$str('tabbrand', 'totara_tui')"
             :always-render="true"
           >
             <SettingsFormBrand
@@ -67,7 +67,7 @@
           </Tab>
           <Tab
             :id="'themesettings-tab-1'"
-            :name="$str('tabcolours', 'theme_ventura')"
+            :name="$str('tabcolours', 'totara_tui')"
             :always-render="true"
           >
             <SettingsFormColours
@@ -86,7 +86,7 @@
           <Tab
             v-if="!selectedTenantId"
             :id="'themesettings-tab-2'"
-            :name="$str('tabimages', 'theme_ventura')"
+            :name="$str('tabimages', 'totara_tui')"
             :always-render="true"
           >
             <SettingsFormImages
@@ -100,7 +100,7 @@
           <Tab
             v-if="!selectedTenantId"
             :id="'themesettings-tab-3'"
-            :name="$str('tabcustom', 'theme_ventura')"
+            :name="$str('tabcustom', 'totara_tui')"
             :always-render="true"
             :disabled="!customCSSEnabled"
           >
@@ -123,15 +123,15 @@ import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
 import { Uniform, FormRow, FormToggleSwitch } from 'tui/components/uniform';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
-import SettingsFormBrand from 'theme_ventura/components/settings/SettingsFormBrand';
-import SettingsFormColours from 'theme_ventura/components/settings/SettingsFormColours';
-import SettingsFormImages from 'theme_ventura/components/settings/SettingsFormImages';
-import SettingsFormCustom from 'theme_ventura/components/settings/SettingsFormCustom';
+import SettingsFormBrand from 'tui/components/theme_settings/SettingsFormBrand';
+import SettingsFormColours from 'tui/components/theme_settings/SettingsFormColours';
+import SettingsFormImages from 'tui/components/theme_settings/SettingsFormImages';
+import SettingsFormCustom from 'tui/components/theme_settings/SettingsFormCustom';
 import tuiQueryThemesWithVariables from 'totara_tui/graphql/themes_with_variables';
 import tuiQueryThemeSettings from 'core/graphql/get_theme_settings';
 import tuiUpdateThemeSettings from 'core/graphql/update_theme_settings';
 import { notify } from 'tui/notifications';
-import futils from 'theme_ventura/formutils';
+import theme_settings from 'tui/lib/theme_settings';
 
 export default {
   components: {
@@ -170,7 +170,7 @@ export default {
     return {
       tenantOverridesEnabled: false,
       query: tuiQueryThemeSettings,
-      formutils: futils,
+      theme_settings: theme_settings,
       initialValues: {
         formtenant_field_tenant: {
           value: false,
@@ -254,10 +254,11 @@ export default {
      * Prepare data for consumption within this component's Uniform
      **/
     setTenantFormValues() {
-      let mergedFormData = this.formutils.mergeFormData(this.initialValues, [
-        this.embeddedFormData.formFieldData.tenant,
-      ]);
-      this.initialValues = this.formutils.getResolvedInitialValues(
+      let mergedFormData = this.theme_settings.mergeFormData(
+        this.initialValues,
+        [this.embeddedFormData.formFieldData.tenant]
+      );
+      this.initialValues = this.theme_settings.getResolvedInitialValues(
         mergedFormData
       );
 
@@ -314,11 +315,11 @@ export default {
       }
 
       // merge all theme CSS variable data in the theme inheritance chain
-      let mergedDefaultThemeVariableData = this.formutils.mergeCSSVariableData(
+      let mergedDefaultThemeVariableData = this.theme_settings.mergeCSSVariableData(
         fetchData
       );
 
-      let mergedProcessedCSSVariableData = this.formutils.processCSSVariableData(
+      let mergedProcessedCSSVariableData = this.theme_settings.processCSSVariableData(
         mergedDefaultThemeVariableData
       );
 
@@ -425,12 +426,12 @@ export default {
         });
 
         notify({
-          message: this.$str('settings_success_save', 'theme_ventura'),
+          message: this.$str('settings_success_save', 'totara_tui'),
           type: 'success',
         });
       } catch (e) {
         notify({
-          message: this.$str('settings_error_save', 'theme_ventura'),
+          message: this.$str('settings_error_save', 'totara_tui'),
           type: 'error',
         });
         console.error(e);
@@ -463,7 +464,7 @@ export default {
 
 <lang-strings>
 {
-  "theme_ventura": [
+  "totara_tui": [
     "formtenant_label_tenant",
     "formtenant_details_tenant",
     "settings_error_save",

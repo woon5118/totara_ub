@@ -13,28 +13,28 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
-  @module theme_ventura
+  @module tui
 -->
 
 <template>
   <div>
     <h2>{{ theme }}</h2>
-    <h3>{{ $str('sitebranding', 'theme_ventura') }}</h3>
-    <p>{{ $str('sitebrandinginformation', 'theme_ventura') }}</p>
+    <h3>{{ $str('sitebranding', 'totara_tui') }}</h3>
+    <p>{{ $str('sitebrandinginformation', 'totara_tui') }}</p>
     <ActionLink
       :href="configLink"
-      :text="$str('editsitebranding', 'theme_ventura')"
+      :text="$str('editsitebranding', 'totara_tui')"
       :styleclass="{
         primary: true,
       }"
     />
 
-    <h3>{{ $str('tenantbranding', 'theme_ventura') }}</h3>
+    <h3>{{ $str('tenantbranding', 'totara_tui') }}</h3>
     <Table :data="tenants">
       <template v-slot:header-row>
         <HeaderCell>{{ $str('tenant', 'totara_tenant') }}</HeaderCell>
         <HeaderCell>{{ $str('tenantidnumber', 'totara_tenant') }}</HeaderCell>
-        <HeaderCell>{{ $str('branding', 'theme_ventura') }}</HeaderCell>
+        <HeaderCell>{{ $str('branding', 'totara_tui') }}</HeaderCell>
         <HeaderCell>{{ $str('actions', 'core') }}</HeaderCell>
       </template>
       <template v-slot:row="{ row }">
@@ -47,13 +47,13 @@
         <Cell>
           {{
             row.customBranding
-              ? $str('custom', 'theme_ventura')
-              : $str('site', 'theme_ventura')
+              ? $str('custom', 'totara_tui')
+              : $str('site', 'totara_tui')
           }}
         </Cell>
         <Cell>
-          <a :href="tennantLink + row.id">
-            <Edit :alt="$str('edittenantsetting', 'theme_ventura', row.name)" />
+          <a :href="tenantLink(row.id)">
+            <Edit :alt="$str('edittenantsetting', 'totara_tui', row.name)" />
           </a>
         </Cell>
       </template>
@@ -68,8 +68,6 @@ import HeaderCell from 'tui/components/datatable/HeaderCell';
 import Cell from 'tui/components/datatable/Cell';
 import Edit from 'tui/components/icons/Edit';
 
-import { config } from 'tui/config';
-
 export default {
   components: {
     ActionLink,
@@ -83,7 +81,6 @@ export default {
     theme: {
       type: String,
       required: true,
-      validator: v => ['ventura', 'roots', 'basis'].some(t => t === v),
     },
     tenants: {
       type: Array,
@@ -94,17 +91,26 @@ export default {
 
   data() {
     return {
-      configLink: config.wwwroot + '/theme/ventura/theme_settings.php',
-      tennantLink:
-        config.wwwroot + '/theme/ventura/theme_settings.php?tenant_id=',
+      configLink: this.$url('/totara/tui/theme_settings.php', {
+        theme: this.theme,
+      }),
     };
+  },
+
+  methods: {
+    tenantLink(tenant_id) {
+      return this.$url('/totara/tui/theme_settings.php', {
+        theme: this.theme,
+        tenant_id: tenant_id,
+      });
+    },
   },
 };
 </script>
 <lang-strings>
 {
   "core": ["actions"],
-  "theme_ventura": [
+  "totara_tui": [
     "branding",
     "custom",
     "editsitebranding",

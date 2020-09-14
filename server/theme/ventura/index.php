@@ -21,7 +21,7 @@
  * @package theme_ventura
  */
 
-use theme_ventura\controllers\settings;
+use totara_tui\controllers\settings;
 
 require_once(__DIR__ . '/../../config.php');
-(new settings())->process();
+(new settings('ventura'))->process();

@@ -18,10 +18,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
- * @package theme_ventura
+ * @package totara_tui
  */
 
-namespace theme_ventura\controllers;
+namespace totara_tui\controllers;
 
 use totara_mvc\admin_controller;
 use totara_mvc\tui_view;
@@ -30,9 +30,14 @@ use totara_tenant\entity\tenant;
 class theme_settings extends admin_controller {
 
     /**
+     * @var string
+     */
+    protected $theme;
+
+    /**
      * @inheritDoc
      */
-    protected $admin_external_page_name = 'ventura_editor';
+    protected $admin_external_page_name;
 
     /**
      * @inheritDoc
@@ -49,9 +54,19 @@ class theme_settings extends admin_controller {
     /**
      * @inheritDoc
      */
+    public function process(string $action = '') {
+        // Get the theme name from parameter.
+        $this->theme = $this->get_required_param('theme', PARAM_COMPONENT);
+        $this->admin_external_page_name = "{$this->theme}_editor";
+        parent::process($action);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function action(): tui_view {
         $props = [
-            'theme' => 'ventura',
+            'theme' => $this->theme,
         ];
 
         // If tenant is selected then get selected tenant details.
@@ -65,8 +80,8 @@ class theme_settings extends admin_controller {
             }
         }
 
-        $tui_view = tui_view::create('theme_ventura/pages/Settings', $props);
-        $tui_view->set_title(get_string('theme_settings', 'theme_ventura'));
+        $tui_view = tui_view::create('tui/pages/ThemeSettings', $props);
+        $tui_view->set_title(get_string('theme_settings', 'totara_tui'));
 
         return $tui_view;
     }

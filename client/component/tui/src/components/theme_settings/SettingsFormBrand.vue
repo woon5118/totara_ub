@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Dave Wallace <dave.wallace@totaralearning.com>
-  @package theme_ventura
+  @package tui
 -->
 
 <template>
@@ -21,22 +21,49 @@
     v-if="initialValuesSet"
     :initial-values="initialValues"
     :errors="errorsForm"
+    :validate="validate"
     @change="handleChange"
     @submit="submit"
   >
     <FormRow
-      :label="$str('formcustom_label_customcss', 'theme_ventura')"
+      :label="$str('formbrand_label_logo', 'totara_tui')"
       :is-stacked="true"
     >
-      <FormTextarea
-        :name="['formcustom_field_customcss', 'value']"
-        spellcheck="false"
-        rows="6"
-        char-length="full"
-        :aria-describedby="$id('formcustom-customcss-details')"
+      <ImageUploadSetting
+        :metadata="fileData.sitelogo"
+        :aria-describedby="$id('formbrand-logo-details')"
+        :aria-label-extension="$str('formbrand_label_logo', 'totara_tui')"
       />
-      <FormRowDetails :id="$id('formcustom-customcss-details')">
-        {{ $str('formcustom_details_customcss', 'theme_ventura') }}
+      <FormRowDetails :id="$id('formbrand-logo-details')">
+        {{ $str('formbrand_details_logo', 'totara_tui') }}
+      </FormRowDetails>
+    </FormRow>
+
+    <FormRow
+      :label="$str('formbrand_label_logoalttext', 'totara_tui')"
+      :is-stacked="true"
+    >
+      <FormText
+        :name="['formbrand_field_logoalttext', 'value']"
+        :aria-describedby="$id('formbrand-logoalttext-details')"
+        required
+      />
+      <FormRowDetails :id="$id('formbrand-logoalttext-details')">
+        {{ $str('formbrand_details_logoalttext', 'totara_tui') }}
+      </FormRowDetails>
+    </FormRow>
+
+    <FormRow
+      :label="$str('formbrand_label_favicon', 'totara_tui')"
+      :is-stacked="true"
+    >
+      <ImageUploadSetting
+        :metadata="fileData.sitefavicon"
+        :aria-describedby="$id('formbrand-favicon-details')"
+        :aria-label-extension="$str('formbrand_label_favicon', 'totara_tui')"
+      />
+      <FormRowDetails :id="$id('formbrand-favicon-details')">
+        {{ $str('formbrand_details_favicon', 'totara_tui') }}
       </FormRowDetails>
     </FormRow>
 
@@ -49,7 +76,7 @@
             $str(
               'saveextended',
               'totara_core',
-              $str('tabcustom', 'theme_ventura') +
+              $str('tabbrand', 'totara_tui') +
                 ' ' +
                 $str('settings', 'totara_core')
             )
@@ -63,8 +90,9 @@
 </template>
 
 <script>
-import futils from 'theme_ventura/formutils';
-import { Uniform, FormRow, FormTextarea } from 'tui/components/uniform';
+import theme_settings from 'tui/lib/theme_settings';
+import { Uniform, FormRow, FormText } from 'tui/components/uniform';
+import ImageUploadSetting from 'tui/components/theme_settings/ImageUploadSetting';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
 import Button from 'tui/components/buttons/Button';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
@@ -74,7 +102,8 @@ export default {
     Uniform,
     FormRow,
     FormRowDetails,
-    FormTextarea,
+    FormText,
+    ImageUploadSetting,
     Button,
     ButtonGroup,
   },
@@ -84,6 +113,14 @@ export default {
     // of this Form. There is only an Object present in this Array if it came
     // from the server as it was previously saved
     savedFormFieldData: {
+      type: Array,
+      default: function() {
+        return [];
+      },
+    },
+    // Array of Objects, each describing the properties for specifically file
+    // upload fields that are part of this Form.
+    fileFormFieldData: {
       type: Array,
       default: function() {
         return [];
@@ -101,16 +138,20 @@ export default {
   data() {
     return {
       initialValues: {
-        formcustom_field_customcss: {
-          value: '',
+        formbrand_field_logoalttext: {
+          value: null,
           type: 'text',
         },
       },
+      fileData: {
+        sitefavicon: null,
+        sitelogo: null,
+      },
       initialValuesSet: false,
-      formutils: futils,
       errorsForm: null,
       valuesForm: null,
       resultForm: null,
+      theme_settings: theme_settings,
     };
   },
 
@@ -122,17 +163,33 @@ export default {
     // - use previously saved Form data from GraphQL query
     // - missing field data then supplied by Theme JSON mapping data
     // - then locally held state until (takes precedence until page is reloaded)
-    let mergedFormData = this.formutils.mergeFormData(this.initialValues, [
+    let mergedFormData = this.theme_settings.mergeFormData(this.initialValues, [
       this.savedFormFieldData,
       this.valuesForm || [],
     ]);
-    this.initialValues = this.formutils.getResolvedInitialValues(
+    this.initialValues = this.theme_settings.getResolvedInitialValues(
       mergedFormData
     );
+
+    // handle fileuploader setup independently of Uniform and initialValues
+    // because file uploading doesn't really work in a way that Uniform can
+    // fully support
+    for (let i = 0; i < this.fileFormFieldData.length; i++) {
+      let fileData = this.fileFormFieldData[i];
+      if (typeof this.fileData[fileData.ui_key] !== 'undefined') {
+        this.fileData[fileData.ui_key] = fileData;
+      }
+    }
+
     this.initialValuesSet = true;
   },
 
   methods: {
+    validate() {
+      const errors = {};
+      return errors;
+    },
+
     handleChange(values) {
       this.valuesForm = values;
       if (this.errorsForm) {
@@ -163,16 +220,26 @@ export default {
      **/
     formatDataForMutation(currentValues) {
       let data = {
-        form: 'custom',
+        form: 'brand',
         fields: [],
+        files: [],
       };
 
+      // handle non-image upload form fields
       Object.keys(currentValues).forEach(field => {
         data.fields.push({
           name: field,
           type: currentValues[field].type,
           value: String(currentValues[field].value),
         });
+      });
+
+      // image upload form field data formatting as it is handled
+      // differently to other form fields in our GraphQL mutation
+      Object.keys(this.fileData).forEach(file => {
+        if (this.fileData[file]) {
+          data.files.push(this.fileData[file]);
+        }
       });
 
       return data;
@@ -183,10 +250,15 @@ export default {
 
 <lang-strings>
 {
-  "theme_ventura": [
-    "formcustom_label_customcss",
-    "formcustom_details_customcss",
-    "tabcustom"
+  "totara_tui": [
+    "form_details_default",
+    "formbrand_label_logo",
+    "formbrand_details_logo",
+    "formbrand_label_logoalttext",
+    "formbrand_details_logoalttext",
+    "formbrand_label_favicon",
+    "formbrand_details_favicon",
+    "tabbrand"
   ],
   "totara_core": [
     "save",

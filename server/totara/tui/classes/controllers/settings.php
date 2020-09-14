@@ -18,24 +18,39 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
- * @package theme_ventura
+ * @package totara_tui
  */
 
-namespace theme_ventura\controllers;
+namespace totara_tui\controllers;
 
 use totara_mvc\admin_controller;
 
 class settings extends admin_controller {
 
     /**
+     * @var string
+     */
+    protected $theme;
+
+    /**
      * @inheritDoc
      */
-    protected $admin_external_page_name = 'ventura_editor';
+    protected $admin_external_page_name;
 
     /**
      * @inheritDoc
      */
     protected $layout = 'noblocks';
+
+    /**
+     * settings constructor.
+     * @param string $theme
+     */
+    public function __construct(string $theme) {
+        $this->theme = $theme;
+        $this->admin_external_page_name = "{$theme}_editor";
+        return parent::__construct();
+    }
 
     /**
      * @inheritDoc
@@ -52,11 +67,11 @@ class settings extends admin_controller {
 
         // If multi-tenancy is enabled then we display tenants otherwise go straight to settings.
         if (!empty($CFG->tenantsenabled)) {
-            $tenants_url = "{$CFG->wwwroot}/theme/ventura/theme_tenants.php";
-            redirect($tenants_url);
+            $tenants_url = new \moodle_url("/totara/tui/theme_tenants.php", ['theme' => $this->theme]);
+            redirect($tenants_url->out());
         } else {
-            $settings_url = "{$CFG->wwwroot}/theme/ventura/theme_settings.php";
-            redirect($settings_url);
+            $settings_url = new \moodle_url("/totara/tui/theme_settings.php", ['theme' => $this->theme]);
+            redirect($settings_url->out());
         }
     }
 

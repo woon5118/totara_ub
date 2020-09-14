@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Dave Wallace <dave.wallace@totaralearning.com>
-  @package theme_ventura
+  @package tui
 -->
 
 <template>
@@ -26,7 +26,7 @@
     @submit="submit"
   >
     <FormRow
-      :label="$str('formcolours_label_primary', 'theme_ventura')"
+      :label="$str('formcolours_label_primary', 'totara_tui')"
       :is-stacked="true"
     >
       <FormColor
@@ -40,36 +40,36 @@
       />
       <FormRowDefaults :id="$id('formcolours-primary-defaults')">
         {{
-          formutils.getCSSVarDefault(
+          theme_settings.getCSSVarDefault(
             mergedProcessedCssVariableData,
             'color-state'
           )
         }}
       </FormRowDefaults>
       <FormRowDetails :id="$id('formcolours-primary-details')">
-        {{ $str('formcolours_details_primary', 'theme_ventura') }}
+        {{ $str('formcolours_details_primary', 'totara_tui') }}
       </FormRowDetails>
     </FormRow>
 
     <FormRow
-      :label="$str('formcolours_label_useoverrides', 'theme_ventura')"
+      :label="$str('formcolours_label_useoverrides', 'totara_tui')"
       :is-stacked="true"
     >
       <FormToggleSwitch
-        :aria-label="$str('formcolours_label_useoverrides', 'theme_ventura')"
+        :aria-label="$str('formcolours_label_useoverrides', 'totara_tui')"
         :name="['formcolours_field_useoverrides', 'value']"
         :toggle-first="true"
         :aria-describedby="$id('formcolours-useoverrides-details')"
       />
       <FormRowDetails :id="$id('formcolours-useoverrides-details')">
-        {{ $str('formcolours_details_useoverrides', 'theme_ventura') }}
+        {{ $str('formcolours_details_useoverrides', 'totara_tui') }}
       </FormRowDetails>
     </FormRow>
 
     <FormFieldset v-if="colourOverridesEnabled">
       <FormRowStack>
         <FormRow
-          :label="$str('formcolours_label_primarybuttons', 'theme_ventura')"
+          :label="$str('formcolours_label_primarybuttons', 'totara_tui')"
           :is-stacked="true"
         >
           <FormColor
@@ -83,19 +83,19 @@
           />
           <FormRowDefaults :id="$id('formcolours-primarybuttons-defaults')">
             {{
-              formutils.getCSSVarDefault(
+              theme_settings.getCSSVarDefault(
                 mergedProcessedCssVariableData,
                 'btn-prim-accent-color'
               )
             }}
           </FormRowDefaults>
           <FormRowDetails :id="$id('formcolours-primarybuttons-details')">
-            {{ $str('formcolours_details_primarybuttons', 'theme_ventura') }}
+            {{ $str('formcolours_details_primarybuttons', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
 
         <FormRow
-          :label="$str('formcolours_label_secondarybuttons', 'theme_ventura')"
+          :label="$str('formcolours_label_secondarybuttons', 'totara_tui')"
           :is-stacked="true"
         >
           <FormColor
@@ -109,19 +109,19 @@
           />
           <FormRowDefaults :id="$id('formcolours-secondarybuttons-defaults')">
             {{
-              formutils.getCSSVarDefault(
+              theme_settings.getCSSVarDefault(
                 mergedProcessedCssVariableData,
                 'btn-accent-color'
               )
             }}
           </FormRowDefaults>
           <FormRowDetails :id="$id('formcolours-secondarybuttons-details')">
-            {{ $str('formcolours_details_secondarybuttons', 'theme_ventura') }}
+            {{ $str('formcolours_details_secondarybuttons', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
 
         <FormRow
-          :label="$str('formcolours_label_links', 'theme_ventura')"
+          :label="$str('formcolours_label_links', 'totara_tui')"
           :is-stacked="true"
         >
           <FormColor
@@ -135,14 +135,14 @@
           />
           <FormRowDefaults :id="$id('formcolours-links-defaults')">
             {{
-              formutils.getCSSVarDefault(
+              theme_settings.getCSSVarDefault(
                 mergedProcessedCssVariableData,
                 'link-color'
               )
             }}
           </FormRowDefaults>
           <FormRowDetails :id="$id('formcolours-links-details')">
-            {{ $str('formcolours_details_links', 'theme_ventura') }}
+            {{ $str('formcolours_details_links', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
 
@@ -152,7 +152,7 @@
 
     <FormRowStack>
       <FormRow
-        :label="$str('formcolours_label_accent', 'theme_ventura')"
+        :label="$str('formcolours_label_accent', 'totara_tui')"
         :is-stacked="true"
       >
         <FormColor
@@ -166,22 +166,22 @@
         />
         <FormRowDefaults :id="$id('formcolours-accent-defaults')">
           {{
-            formutils.getCSSVarDefault(
+            theme_settings.getCSSVarDefault(
               mergedProcessedCssVariableData,
               'color-primary'
             )
           }}
         </FormRowDefaults>
         <FormRowDetails :id="$id('formcolours-accent-details')">
-          {{ $str('formcolours_details_accent', 'theme_ventura') }}
+          {{ $str('formcolours_details_accent', 'totara_tui') }}
         </FormRowDetails>
       </FormRow>
     </FormRowStack>
 
-    <Collapsible :label="$str('formcolours_moresettings', 'theme_ventura')">
+    <Collapsible :label="$str('formcolours_moresettings', 'totara_tui')">
       <FormRowStack>
         <FormRow
-          :label="$str('formcolours_label_headerbg', 'theme_ventura')"
+          :label="$str('formcolours_label_headerbg', 'totara_tui')"
           :is-stacked="true"
         >
           <FormColor
@@ -195,19 +195,19 @@
           />
           <FormRowDefaults :id="$id('formcolours-headerbg-defaults')">
             {{
-              formutils.getCSSVarDefault(
+              theme_settings.getCSSVarDefault(
                 mergedProcessedCssVariableData,
                 'nav-bg-color'
               )
             }}
           </FormRowDefaults>
           <FormRowDetails :id="$id('formcolours-headerbg-details')">
-            {{ $str('formcolours_details_headerbg', 'theme_ventura') }}
+            {{ $str('formcolours_details_headerbg', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
 
         <FormRow
-          :label="$str('formcolours_label_headertext', 'theme_ventura')"
+          :label="$str('formcolours_label_headertext', 'totara_tui')"
           :is-stacked="true"
         >
           <FormColor
@@ -221,19 +221,19 @@
           />
           <FormRowDefaults :id="$id('formcolours-headertext-defaults')">
             {{
-              formutils.getCSSVarDefault(
+              theme_settings.getCSSVarDefault(
                 mergedProcessedCssVariableData,
                 'nav-text-color'
               )
             }}
           </FormRowDefaults>
           <FormRowDetails :id="$id('formcolours-headertext-details')">
-            {{ $str('formcolours_details_headertext', 'theme_ventura') }}
+            {{ $str('formcolours_details_headertext', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
 
         <FormRow
-          :label="$str('formcolours_label_pagetext', 'theme_ventura')"
+          :label="$str('formcolours_label_pagetext', 'totara_tui')"
           :is-stacked="true"
         >
           <FormColor
@@ -247,14 +247,14 @@
           />
           <FormRowDefaults :id="$id('formcolours-pagetext-defaults')">
             {{
-              formutils.getCSSVarDefault(
+              theme_settings.getCSSVarDefault(
                 mergedProcessedCssVariableData,
                 'color-text'
               )
             }}
           </FormRowDefaults>
           <FormRowDetails :id="$id('formcolours-pagetext-details')">
-            {{ $str('formcolours_details_pagetext', 'theme_ventura') }}
+            {{ $str('formcolours_details_pagetext', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
       </FormRowStack>
@@ -269,7 +269,7 @@
             $str(
               'saveextended',
               'totara_core',
-              $str('tabcolours', 'theme_ventura') +
+              $str('tabcolours', 'totara_tui') +
                 ' ' +
                 $str('settings', 'totara_core')
             )
@@ -283,7 +283,7 @@
 </template>
 
 <script>
-import futils from 'theme_ventura/formutils';
+import theme_settings from 'tui/lib/theme_settings';
 import Collapsible from 'tui/components/collapsible/Collapsible';
 import Separator from 'tui/components/decor/Separator';
 import {
@@ -400,7 +400,7 @@ export default {
       errorsForm: null,
       valuesForm: null,
       resultForm: null,
-      formutils: futils,
+      theme_settings: theme_settings,
     };
   },
 
@@ -412,13 +412,13 @@ export default {
     // - use previously saved Form data from GraphQL query
     // - missing field data then supplied by Theme JSON mapping data
     // - then locally held state (takes precedence until page is reloaded)
-    let mergedFormData = this.formutils.mergeFormData(this.initialValues, [
+    let mergedFormData = this.theme_settings.mergeFormData(this.initialValues, [
       this.mergedProcessedCssVariableData,
       this.savedFormFieldData,
       this.valuesForm || [],
     ]);
 
-    this.initialValues = this.formutils.getResolvedInitialValues(
+    this.initialValues = this.theme_settings.getResolvedInitialValues(
       mergedFormData
     );
 
@@ -551,7 +551,7 @@ export default {
               name: variableName + '-' + state,
               type: 'value',
               value: String(
-                this.formutils.resolveCSSVariableValue(
+                this.theme_settings.resolveCSSVariableValue(
                   variableData,
                   currentValues
                 )
@@ -568,7 +568,7 @@ export default {
 
 <lang-strings>
 {
-  "theme_ventura": [
+  "totara_tui": [
     "form_details_default",
     "formcolours_label_primary",
     "formcolours_details_primary",
