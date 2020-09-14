@@ -48,7 +48,7 @@ class trending_mode implements block_mode {
      * @return bool
      */
     public function hide_if_empty(): bool {
-        return false;
+        return true;
     }
 
     /**
