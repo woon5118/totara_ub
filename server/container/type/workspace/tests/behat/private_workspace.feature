@@ -4,9 +4,10 @@ Feature: Private workspace workflow
     Given I am on a totara site
     And I set the site theme to "ventura"
     And the following "users" exist:
-      | username | firstname | lastname | email           |
-      | user_one | User      | One      | one@example.com |
-      | user_two | User      | Two      | two@example.com |
+      | username   | firstname | lastname | email             |
+      | user_one   | User      | One      | one@example.com   |
+      | user_two   | User      | Two      | two@example.com   |
+      | user_three | User      | Three    | three@example.com |
     # This is for temporary solution
     And I log in as "admin"
     And I set the following system permissions of "Authenticated user" role:
@@ -61,3 +62,13 @@ Feature: Private workspace workflow
     And I click on "Your Workspaces" in the totara menu
     And I follow "Members"
     And I should see "2 members"
+
+  Scenario: Check access restriction on the private hidden workspace
+    Given the following "workspaces" exist in "container_workspace" plugin:
+      | name               | owner    | private | hidden | summary                             |
+      | User one workspace | user_one | 1       | 1      | This is user's one privateworkspace |
+    And I am on a totara site
+    And I log in as "user_three"
+    And I access the "User one workspace" workspace
+    And I should see "You don't have permission to view this page."
+    And I should not see "User one workspace"

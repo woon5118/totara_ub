@@ -102,6 +102,17 @@ class behat_container_workspace extends behat_base {
     }
 
     /**
+     * @When /^I access the "([^"]*)" workspace$/
+     * @param string $workspace_name
+     */
+    public function i_access_the_workspace(string $workspace_name): void {
+        behat_hooks::set_step_readonly(false);
+        $workspace = $this->get_workspace_by_name($workspace_name);
+        $workspace_url = $workspace->get_workspace_url();
+        $this->getSession()->visit($this->locate_path($workspace_url->out(false)));
+    }
+
+    /**
      * @param string $name
      * @return workspace
      */
