@@ -24,6 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core\format;
+use totara_core\user_learning\item_base;
 use totara_core\user_learning\item_helper;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -266,8 +267,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         }
 
         // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        $this->assert_raw_format_not_authorized_exception('shortname', $item);
 
         $this->setAdminUser();
         $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
@@ -294,8 +294,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         }
 
         // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        $this->assert_raw_format_not_authorized_exception('shortname', $item);
 
         $this->setAdminUser();
         $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
@@ -322,8 +321,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         }
 
         // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        $this->assert_raw_format_not_authorized_exception('shortname', $item);
 
         $this->setAdminUser();
         $value = $this->resolve('shortname', $item, ['format' => format::FORMAT_RAW]);
@@ -359,8 +357,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         }
 
         // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        $this->assert_raw_format_not_authorized_exception('fullname', $item);
 
         $this->setAdminUser();
         $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
@@ -387,8 +384,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         }
 
         // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        $this->assert_raw_format_not_authorized_exception('fullname', $item);
 
         $this->setAdminUser();
         $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
@@ -415,8 +411,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         }
 
         // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        $this->assert_raw_format_not_authorized_exception('fullname', $item);
 
         $this->setAdminUser();
         $value = $this->resolve('fullname', $item, ['format' => format::FORMAT_RAW]);
@@ -452,8 +447,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         }
 
         // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        $this->assert_raw_format_not_authorized_exception('description', $item);
 
         $this->setAdminUser();
         $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
@@ -485,8 +479,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         }
 
         // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        $this->assert_raw_format_not_authorized_exception('description', $item);
 
         $this->setAdminUser();
         $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
@@ -514,8 +507,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         }
 
         // Check the permissions required for format::FORMAT_RAW
-        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
-        $this->assertNull($value);
+        $this->assert_raw_format_not_authorized_exception('description', $item);
 
         $this->setAdminUser();
         $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
@@ -647,4 +639,23 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
         $this->assertEquals(null, $value);
         $this->assertTrue(is_null($value));
     }
+
+    /**
+     * @param string $field
+     * @param item_base $item
+     */
+    private function assert_raw_format_not_authorized_exception(string $field, item_base $item) {
+        try {
+            $this->resolve($field, $item, ['format' => format::FORMAT_RAW]);
+            $this->fail('Expected failure on RAW $format');
+        } catch (\coding_exception $ex) {
+            // 'description' gets transformed to 'summary' in the resolver.
+            $auth_field = ($field === 'description') ? 'summary' : $field;
+            $this->assertStringContainsString(
+                "Not authorized to request this format for '{$auth_field}'",
+                $ex->getMessage()
+            );
+        }
+    }
+
 }

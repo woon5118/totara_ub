@@ -60,7 +60,7 @@ class learning_item implements type_resolver {
         $context = self::get_item_context($item);
         $authfield = ($field == 'description') ? 'summary' : $field;
         if (!$classpath::authorize($authfield, $format, $context)) {
-            return null;
+            throw new \coding_exception("Not authorized to request this format for '{$authfield}'");
         }
 
         // Transform the format field from the constants to a core_format string.
