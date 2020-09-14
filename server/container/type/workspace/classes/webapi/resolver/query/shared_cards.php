@@ -23,6 +23,7 @@
 
 namespace container_workspace\webapi\resolver\query;
 
+use container_workspace\interactor\workspace\interactor as workspace_interactor;
 use container_workspace\totara_engage\share\recipient\library;
 use container_workspace\workspace;
 use core\pagination\offset_cursor;
@@ -53,6 +54,11 @@ final class shared_cards implements query_resolver, has_middleware {
 
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context($workspace->get_context());
+        }
+
+        $interactor = new workspace_interactor($workspace);
+        if (!$interactor->can_view_library()) {
+            throw new \moodle_exception('access_denied', 'container_workspace');
         }
 
         $query = new query();

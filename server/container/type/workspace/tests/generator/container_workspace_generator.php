@@ -357,4 +357,14 @@ final class container_workspace_generator extends component_generator_base {
     public function create_self_join_member(workspace $workspace, int $user_id): member {
         return member::join_workspace($workspace, $user_id);
     }
+
+    /**
+     * @param workspace $workspace
+     * @param int $user_id
+     * @param int $actor_id
+     * @return member
+     */
+    public function add_member(workspace $workspace, int $member_id, ?int $actor_id = null): member {
+        return member::added_to_workspace($workspace, $member_id, false, $actor_id);
+    }
 }
