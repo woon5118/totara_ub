@@ -16,7 +16,7 @@ Feature: Manipulate playlist instance
     And the following "playlists" exist in "totara_playlist" plugin:
       | name         | username | access     | topics  |
       | Playlist 101 | userone  | PRIVATE    |         |
-      | Playlist 102 | userone  | RESTRICTED |         |
+      | Playlist 102 | userone  | RESTRICTED | Topic 1 |
       | Playlist 103 | userone  | PUBLIC     | Topic 1 |
 
   @javascript
@@ -64,3 +64,30 @@ Feature: Manipulate playlist instance
     And I click on "Expand" "button"
     And I click on "Share" "button" in the ".tui-shareSetting" "css_element"
     Then I should see "Settings" in the ".tui-modalContent__header-title" "css_element"
+
+  @javascript
+  Scenario: Creator view a private playlist
+    Given I log in as "userone"
+    And I click on "Your Library" in the totara menu
+    And I follow "Playlist 101"
+    Then I should see "Playlist 101"
+    When I click on "Expand" "button"
+    Then I should not see "0 rating"
+
+  @javascript
+  Scenario: Creator view a public playlist
+    Given I log in as "userone"
+    And I click on "Your Library" in the totara menu
+    And I follow "Playlist 102"
+    Then I should see "Playlist 102"
+    When I click on "Expand" "button"
+    Then I should see "rating"
+
+  @javascript
+  Scenario: Creator view a restricted playlist
+    Given I log in as "userone"
+    And I click on "Your Library" in the totara menu
+    And I follow "Playlist 103"
+    Then I should see "Playlist 103"
+    When I click on "Expand" "button"
+    Then I should see "rating"
