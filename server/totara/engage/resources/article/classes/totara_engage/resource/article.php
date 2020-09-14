@@ -22,6 +22,7 @@
  */
 namespace engage_article\totara_engage\resource;
 
+use core\orm\query\builder;
 use engage_article\entity\article as article_entity;
 use engage_article\event\article_created;
 use engage_article\event\article_deleted;
@@ -35,7 +36,7 @@ use engage_article\totara_engage\resource\input\name_validator;
 use totara_engage\access\access;
 use totara_engage\access\access_manager;
 use totara_engage\entity\engage_resource;
-use totara_engage\link\builder;
+use totara_engage\link\builder as link_builder;
 use totara_engage\resource\input\access_validator;
 use totara_engage\resource\input\definition;
 use totara_engage\resource\input\name_length_validator;
@@ -43,6 +44,7 @@ use totara_engage\resource\input\topic_validator;
 use totara_engage\resource\resource_item;
 use totara_engage\share\share as share_model;
 use totara_engage\timeview\time_viewable;
+use totara_engage\share\manager as share_manager;
 use totara_reaction\reaction_helper;
 
 /**
@@ -235,40 +237,42 @@ final class article extends resource_item implements time_viewable {
      * @return bool
      */
     protected function do_delete(int $userid): bool {
-        // Deleting comments.
-        comment_helper::purge_area_comments(
-            static::get_resource_type(),
-            'comment',
-            $this->resource->id
-        );
+        $event = builder::get_db()->transaction(function () use ($userid) {
+            share_manager::delete($this->get_id(), static::get_resource_type());
 
-        // Deleting reaction from the article.
-        $result = reaction_helper::purge_area_reactions(
-            static::get_resource_type(),
-            'media',
-            $this->resource->id
-        );
+            // Deleting comments.
+            comment_helper::purge_area_comments(
+                static::get_resource_type(),
+                'comment',
+                $this->resource->id
+            );
 
-        if (!$result) {
-            debugging("Reaction not being deleted from Sidepanel", DEBUG_DEVELOPER);
-        }
+            // Deleting reaction from the article.
+            reaction_helper::purge_area_reactions(
+                static::get_resource_type(),
+                'media',
+                $this->resource->id
+            );
 
-        $result = helper::delete_files($this);
-        if (!$result) {
-            debugging("Files not being deleted from {$this->get_name()}", DEBUG_DEVELOPER);
-        }
+            helper::delete_files($this);
 
-        // Delete the attached image file.
-        $resourceid = $this->get_id();
-        $contextid = $this->get_context_id();
-        $processor = image_processor::make($resourceid, $contextid);
-        $processor->delete_existing_image();
+            // Delete the attached image file.
+            $resourceid = $this->get_id();
+            $contextid = $this->get_context_id();
+            $processor = image_processor::make($resourceid, $contextid);
+            $processor->delete_existing_image();
 
-        $event = article_deleted::from_article($this, $userid);
+            $event = article_deleted::from_article($this, $userid);
+
+            $this->article->delete();
+            $this->resource->delete();
+
+            return $event;
+        });
+
         $event->trigger();
 
-        $this->article->delete();
-        return $this->article->deleted();
+        return true;
     }
 
     /**
@@ -516,7 +520,7 @@ final class article extends resource_item implements time_viewable {
      * @return string
      */
     public function get_url(): string {
-        return builder::to(self::get_resource_type(), ['id' => $this->get_id()])->out(true);
+        return link_builder::to(self::get_resource_type(), ['id' => $this->get_id()])->out(true);
     }
 
     /**
