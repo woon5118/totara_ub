@@ -625,9 +625,10 @@ class stored_file {
      * Returns information about image,
      * information is determined from the file content
      *
+     * @param boolean $load_orientation set true to load the orientation information tag
      * @return mixed array with width, height and mimetype; false if not an image
      */
-    public function get_imageinfo() {
+    public function get_imageinfo($load_orientation = false) {
         $path = $this->get_content_file_location();
         if (!is_readable($path)) {
             if (!$this->fs->try_content_recovery($this) or !is_readable($path)) {
@@ -642,6 +643,13 @@ class stored_file {
         if (empty($image['width']) or empty($image['height']) or empty($image['mimetype'])) {
             // gd can not parse it, sorry
             return false;
+        }
+        if ($load_orientation && $mimetype === 'image/jpeg') {
+            // Add orientation information.
+            $exif = exif_read_data($path, 'IFD0');
+            if ($exif !== false && isset($exif['Orientation'])) {
+                $image['orientation'] = $exif['Orientation'];
+            }
         }
         return $image;
     }
@@ -1123,6 +1131,7 @@ class stored_file {
 
     /**
      * Generates a thumbnail for this stored_file.
+     * Note that the EXIF orientation information takes into account.
      *
      * If the GD library has at least version 2 and PNG support is available, the returned data
      * is the content of a transparent PNG file containing the thumbnail. Otherwise, the function
@@ -1141,7 +1150,7 @@ class stored_file {
         }
 
         // Fetch the image information for this image.
-        $imageinfo = @getimagesizefromstring($this->get_content());
+        $imageinfo = $this->get_imageinfo(true);
         if (empty($imageinfo)) {
             return false;
         }
@@ -1155,17 +1164,19 @@ class stored_file {
 
     /**
      * Generate a resized image for this stored_file.
+     * Note that the EXIF orientation information takes into account.
      *
      * @param int|null $width The desired width, or null to only use the height.
      * @param int|null $height The desired height, or null to only use the width.
      * @return string|false False when a problem occurs, else the image data.
+     * @since Totara 13
      */
     public function resize_image($width, $height) {
         global $CFG;
         require_once($CFG->libdir . '/gdlib.php');
 
         // Fetch the image information for this image.
-        $imageinfo = @getimagesizefromstring($this->get_content());
+        $imageinfo = $this->get_imageinfo(true);
         if (empty($imageinfo)) {
             return false;
         }
@@ -1179,17 +1190,19 @@ class stored_file {
 
     /**
      * Generate a crop-resized image for this stored_file.
+     * Note that the EXIF orientation information takes into account.
      *
      * @param int|null $width The desired width, or null to only use the height.
      * @param int|null $height The desired height, or null to only use the width.
      * @return string|false False when a problem occurs, else the image data.
+     * @since Totara 13
      */
     public function crop_image($width, $height) {
         global $CFG;
         require_once($CFG->libdir . '/gdlib.php');
 
         // Fetch the image information for this image.
-        $imageinfo = @getimagesizefromstring($this->get_content());
+        $imageinfo = $this->get_imageinfo(true);
         if (empty($imageinfo)) {
             return false;
         }

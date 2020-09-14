@@ -166,6 +166,7 @@ class core_gdlib_testcase extends basic_testcase {
         $pngpath = $this->fixturepath . 'gd-logo.png';
         $origimageinfo = getimagesize($pngpath);
         $imagecontent = file_get_contents($pngpath);
+        $origimageinfo = ['width' => $origimageinfo[0], 'height' => $origimageinfo[1]];
 
         // Same aspect ratio
         $imageresource = imagecreatefromstring($imagecontent);

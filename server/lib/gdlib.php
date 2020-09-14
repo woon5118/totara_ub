@@ -304,8 +304,9 @@ function resize_image($filepath, $width, $height, $forcecanvas = false) {
 /**
  * Resize an image from an image object.
  *
- * @param resource $original The image to work on.
+ * @param resource $original The image to work on. The resource will be imagedestroyed when the function succeeds.
  * @param array $imageinfo Contains [0] => originalwidth, [1] => originalheight.
+ *                         Or ['width' => originalwidth, 'height' => originalheight, 'mimetype' => mimetype, 'orientation' => orientation].
  * @param int|null $width The max width of the resized image, or null to only use the height.
  * @param int|null $height The max height of the resized image, or null to only use the width.
  * @param bool $forcecanvas Whether the final dimensions should be set to $width and $height.
@@ -323,10 +324,22 @@ function resize_image_from_image($original, $imageinfo, $width, $height, $forcec
         return false;
     }
 
-    $originalwidth  = $imageinfo[0];
-    $originalheight = $imageinfo[1];
+    // Totara: Try new format first.
+    if (isset($imageinfo['width']) && isset($imageinfo['height'])) {
+        $originalwidth = $imageinfo['width'];
+        $originalheight = $imageinfo['height'];
+        $orientation = (int)($imageinfo['orientation'] ?? false);
+    } else {
+        $originalwidth  = $imageinfo[0];
+        $originalheight = $imageinfo[1];
+    }
     if (empty($originalwidth) or empty($originalheight)) {
         return false;
+    }
+
+    // Exchange width and height for orientation 5 through 8.
+    if (!empty($orientation) && 5 <= $orientation && $orientation <= 8) {
+        [$width, $height] = [$height, $width];
     }
 
     if (function_exists('imagepng')) {
@@ -384,10 +397,39 @@ function resize_image_from_image($original, $imageinfo, $width, $height, $forcec
 
     imagecopybicubic($newimage, $original, $dstx, $dsty, 0, 0, $targetwidth, $targetheight, $originalwidth, $originalheight);
 
+    // Totara: Handle the orientation information tag.
+    // https://exiftool.org/TagNames/EXIF.html
+    if (!empty($orientation) && 1 <= $orientation && $orientation <= 8) {
+        if ($orientation === 3) {
+            // Rotate 180deg.
+            $rotate = imagerotate($newimage, 180, 0);
+        } else if ($orientation === 6 || $orientation === 7) {
+            // Rotate 90deg clockwise.
+            $rotate = imagerotate($newimage, -90, 0);
+        } else if ($orientation === 5 || $orientation === 8) {
+            // Rotate 270deg clockwise.
+            $rotate = imagerotate($newimage, -270, 0);
+        }
+        if (!empty($rotate)) {
+            imagedestroy($newimage);
+            $newimage = $rotate;
+            imagesavealpha($newimage, true);
+        }
+        if ($orientation === 2) {
+            // Mirror horizontally.
+            imageflip($newimage, IMG_FLIP_HORIZONTAL);
+        } else if (in_array($orientation, [4, 5, 7])) {
+            // Mirror vertically.
+            // NOTE: orientation #5 and #7 need to flip vertically because of rotation.
+            imageflip($newimage, IMG_FLIP_VERTICAL);
+        }
+    }
+
     // Capture the image as a string object, rather than straight to file.
     ob_start();
     if (!$imagefnc($newimage, null, $quality, $filters)) {
         ob_end_clean();
+        imagedestroy($newimage);
         return false;
     }
     $data = ob_get_clean();
@@ -464,13 +506,16 @@ function generate_image_thumbnail_from_image($original, $imageinfo, $width, $hei
  * Crop and Resize an image from the centre of an image object.
  *
  * @param resource $original The image to work on.
- * @param array $imageinfo Contains [0] => originalwidth, [1] => originalheight.
+ * @param array $imageinfo Contains ['width' => originalwidth, 'height' => originalheight, 'orientation' => orientation].
  * @param int|null $width The max width of the resized image
  * @param int|null $height The max height of the resized image
  * @return string|bool False if a problem occurs, else the resized image data.
+ * @since Totara 13
  */
 function crop_resize_image_from_image($original, array $imageinfo, int $width, int $height) {
-    [$original_width, $original_height] = $imageinfo;
+    $original_width = $imageinfo['width'];
+    $original_height = $imageinfo['height'];
+    $orientation = (int)($imageinfo['orientation'] ?? 0);
 
     // Calculate crop size.
     $crop_x = 0;
@@ -478,11 +523,20 @@ function crop_resize_image_from_image($original, array $imageinfo, int $width, i
     $crop_width = $original_width;
     $crop_height = $original_height;
 
-    if ($original_width / $original_height > $width / $height) {
-        $crop_width = (int) ceil($width * $original_height / $height);
+    // Exchange width and height for orientation 5 through 8.
+    if (5 <= $orientation && $orientation <= 8) {
+        $actual_width = $height;
+        $actual_height = $width;
+    } else {
+        $actual_width = $width;
+        $actual_height = $height;
+    }
+
+    if ($original_width / $original_height > $actual_width / $actual_height) {
+        $crop_width = (int) ceil($actual_width * $original_height / $actual_height);
         $crop_x = (int) ceil(($original_width - $crop_width) / 2);
     } else {
-        $crop_height = (int) ceil($height * $original_width / $width);
+        $crop_height = (int) ceil($actual_height * $original_width / $actual_width);
         $crop_y = (int) ceil(($original_height - $crop_height) / 2);
     }
 
@@ -494,6 +548,9 @@ function crop_resize_image_from_image($original, array $imageinfo, int $width, i
         'height' => $crop_height
     ]);
 
+    $imageinfo['width'] = $crop_width;
+    $imageinfo['height'] = $crop_height;
+
     // Generate the resized image.
-    return resize_image_from_image($original, [$crop_width, $crop_height], $width, $height);
+    return resize_image_from_image($original, $imageinfo, $width, $height);
 }

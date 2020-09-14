@@ -296,7 +296,7 @@ final class image_processor {
 
         $fs = get_file_storage();
         foreach ($file_records as $file_record) {
-            /** @var $file_record stdClass */
+            /** @var stdClass $file_record */
             $files[] = $fs->get_file_instance($file_record);
         }
 
@@ -344,7 +344,11 @@ final class image_processor {
             }
 
             // We've got a cell, but it now needs to be rescaled to our ratio
-            $image_info = [imagesx($source_image), imagesy($source_image)];
+            if ($image instanceof stored_file) {
+                $image_info = $image->get_imageinfo(true);
+            } else {
+                $image_info = ['width' => imagesx($source_image), 'height' => imagesy($source_image)];
+            }
             $cropped_image = crop_resize_image_from_image(
                 $source_image,
                 $image_info,

@@ -3,6 +3,9 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* stored_file::get_imageinfo() added 1st parameter to optionally load the orientation information on a jpeg file.
+* stored_file::generate_image_thumbnail() updated to use the orientation information of a jpeg file.
+* resize_image_from_image updated to handle the orientation information passed through the 2nd parameter.
 * Updated alt text and title for core\output::render_user_picture method for better screen reader experience.
 * plugin_renderer_base::render_navigation_node - Removed tabindex="0" from non-interactive elements of breadcrumbs.
 * New methods for iteration over very large record sets were added to DML, see $DB->get_huge_recorset methods.
