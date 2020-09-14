@@ -10,6 +10,7 @@ query totara_mobile_course($courseid: core_id!) {
       enddate(format: ISO8601)
       lang
       image
+      format
       sections {
         id
         title

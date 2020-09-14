@@ -161,6 +161,7 @@ class totara_mobile_webapi_resolver_query_course_testcase extends advanced_testc
             $this->assertArrayHasKey('enddate', $course);
             $this->assertArrayHasKey('lang', $course);
             $this->assertArrayHasKey('image', $course);
+            $this->assertArrayHasKey('format', $course);
             $this->assertArrayHasKey('__typename', $course);
 
             $this->assertArrayHasKey('sections', $course);
