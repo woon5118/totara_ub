@@ -42,25 +42,11 @@ class client_aware_exception extends Exception implements ClientAware {
     private $default_category = 'internal';
 
     /**
-     * Default http status code.
-     *
-     * @var int
-     */
-    private $default_http_status_code = 400;
-
-    /**
      * Exception wrapped as client aware.
      *
      * @var Throwable
      */
     private $exception;
-
-    /**
-     * Http status code for client exception.
-     *
-     * @var int
-     */
-    private $http_status_code;
 
     /**
      * Category for exception.
@@ -82,12 +68,11 @@ class client_aware_exception extends Exception implements ClientAware {
      * @param Throwable $exception
      * @param array $exception_data
      */
-    public function __construct(Throwable $exception,array $data = []) {
+    public function __construct(Throwable $exception, array $data = []) {
         $exception_data = $this->parse_data($data);
 
         $this->exception = $exception;
         $this->process_category($exception_data['category']);
-        $this->http_status_code = $exception_data['http_status_code'];
         $this->is_client_safe = $exception_data['category'] !== $this->default_category;
         parent::__construct($exception->getMessage(), $exception->getCode());
     }
@@ -101,7 +86,6 @@ class client_aware_exception extends Exception implements ClientAware {
     private function parse_data(array $data): array {
         $default = [
             'category' => $this->default_category,
-            'http_status_code' => $this->default_http_status_code,
         ];
         return array_merge($default, $data);
     }
@@ -121,16 +105,6 @@ class client_aware_exception extends Exception implements ClientAware {
     public function getCategory() {
         return $this->category;
     }
-
-    /**
-     * Get http status code for the exception.
-     *
-     * @return int
-     */
-    public function get_http_status_code(): int {
-        return $this->http_status_code;
-    }
-
 
     /**
      * Sets and run the category post action.

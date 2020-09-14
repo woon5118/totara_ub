@@ -85,7 +85,11 @@ export default {
       query: statusNosessionQuery,
       update: data => data.totara_webapi_status,
       error(error) {
-        this.nosessionError = error.networkError.result.errors;
+        this.nosessionError =
+          error.graphQLErrors.length > 0
+            ? error.graphQLErrors
+            : error.networkError;
+        return false;
       },
       skip: true,
       fetchPolicy: 'no-cache',
@@ -94,7 +98,11 @@ export default {
       query: statusSessionQuery,
       update: data => data.totara_webapi_status,
       error: function(error) {
-        this.sessionError = error.networkError.result.errors;
+        this.sessionError =
+          error.graphQLErrors.length > 0
+            ? error.graphQLErrors
+            : error.networkError;
+        return false;
       },
       skip: true,
       fetchPolicy: 'no-cache',

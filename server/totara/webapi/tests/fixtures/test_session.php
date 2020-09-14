@@ -37,7 +37,8 @@ $PAGE->set_context($context);
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_title($title);
 
-$PAGE->requires->tui_bundle('totara_core');
+$component = new component('totara_webapi/pages/TestSession');
+$component->register($PAGE);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title);
@@ -48,5 +49,5 @@ echo $OUTPUT->notification($msg, notification::NOTIFY_SUCCESS);
 // We display a developer debug message as well to ensure that this doesn't not get shown during behat testing.
 debugging('This is a developer resource, please contact your system admin if you have arrived here by mistake.', DEBUG_DEVELOPER);
 
-echo $OUTPUT->render(new component('totara_webapi/pages/TestSession'));
+echo $OUTPUT->render($component);
 echo $OUTPUT->footer();

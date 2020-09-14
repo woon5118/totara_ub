@@ -34,14 +34,10 @@ class totara_webapi_client_aware_exception_test extends advanced_testcase {
     public function test_new_client_aware_exception_with_data() {
         $exception = new client_aware_exception(
             new coding_exception('with data'),
-            [
-                'http_status_code' => 407,
-                'category' => 'unique_category'
-            ]
+            ['category' => 'unique_category']
         );
         $this->assertTrue($exception->isClientSafe());
         $this->assertEquals('unique_category', $exception->getCategory());
-        $this->assertEquals(407, $exception->get_http_status_code());
     }
 
     /**
@@ -51,6 +47,5 @@ class totara_webapi_client_aware_exception_test extends advanced_testcase {
         $exception = new client_aware_exception(new coding_exception('no data'));
         $this->assertFalse($exception->isClientSafe());
         $this->assertEquals('internal', $exception->getCategory());
-        $this->assertEquals(400, $exception->get_http_status_code());
     }
 }

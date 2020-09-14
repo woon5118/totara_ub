@@ -44,10 +44,9 @@ class totara_webapi_client_aware_exception_collection_test extends advanced_test
      *
      * @dataProvider exceptions_provider
      */
-    public function test_get_data_for_registered_exception(Throwable $exception, $category, $http_status_code) {
+    public function test_get_data_for_registered_exception(Throwable $exception, $category) {
         $data = [
             'category' => $category,
-            'http_status_code' => $http_status_code,
         ];
         $this->assertEqualsCanonicalizing(
             $data,
@@ -62,8 +61,8 @@ class totara_webapi_client_aware_exception_collection_test extends advanced_test
      */
     public function exceptions_provider(): array {
         return [
-            [new require_login_exception('require login'), 'require_login', 401],
-            [new require_login_session_timeout_exception(), 'require_login', 401],
+            [new require_login_exception('require login'), 'require_login'],
+            [new require_login_session_timeout_exception(), 'require_login'],
         ];
     }
 
@@ -91,7 +90,6 @@ class totara_webapi_client_aware_exception_collection_test extends advanced_test
         $exception = client_aware_exception_helper::create(new coding_exception('sample'));
         $this->assertFalse($exception->isClientSafe());
         $this->assertEquals('internal', $exception->getCategory());
-        $this->assertEquals(400, $exception->get_http_status_code());
     }
 
     /**
@@ -101,6 +99,5 @@ class totara_webapi_client_aware_exception_collection_test extends advanced_test
         $exception = client_aware_exception_helper::create(new require_login_exception('sample'));
         $this->assertTrue($exception->isClientSafe());
         $this->assertEquals('require_login', $exception->getCategory());
-        $this->assertEquals(401, $exception->get_http_status_code());
     }
 }

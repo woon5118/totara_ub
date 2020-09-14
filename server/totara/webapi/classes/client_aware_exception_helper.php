@@ -42,11 +42,9 @@ class client_aware_exception_helper {
     private static $registered_exceptions = [
         require_login_exception::class => [
             'category' => 'require_login',
-            'http_status_code' => 401,
         ],
         require_login_session_timeout_exception::class => [
             'category' => 'require_login',
-            'http_status_code' => 401,
         ],
     ];
 

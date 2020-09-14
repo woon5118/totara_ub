@@ -196,13 +196,13 @@ export default {
     showArchiveConfirmDialog() {
       this.showArchiveConfirmation = true;
     },
-    makeArchiveAssignmentMutation() {
+    async makeArchiveAssignmentMutation() {
       let { assignment_id } = this.activeAssignmentList.find(
         assignment => assignment.id === this.value
       );
 
-      this.$apollo
-        .mutate({
+      try {
+        await this.$apollo.mutate({
           mutation: ArchiveUserAssignment,
           variables: {
             assignment_id: assignment_id,
@@ -217,36 +217,16 @@ export default {
             },
           ],
           refetchAll: false,
-        })
-        .then(() => {
-          notify({
-            type: 'success',
-            message: this.$str(
-              'event_assignment_archived',
-              'totara_competency'
-            ),
-          });
-          this.selectedAssignment = 0;
-        })
-        .catch(error => {
-          let hasErrorMessage =
-            error &&
-            error.networkError &&
-            error.networkError.result &&
-            error.networkError.result.error;
-          let errorMessage = this.$str(
-            'error_generic_mutation',
-            'totara_competency'
-          );
-
-          if (hasErrorMessage) {
-            errorMessage = error.networkError.result.error;
-          }
-          notify({ type: 'error', message: errorMessage });
-        })
-        .finally(() => {
-          this.showArchiveConfirmation = false;
         });
+
+        notify({
+          type: 'success',
+          message: this.$str('event_assignment_archived', 'totara_competency'),
+        });
+        this.selectedAssignment = 0;
+      } finally {
+        this.showArchiveConfirmation = false;
+      }
     },
   },
 };

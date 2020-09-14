@@ -214,27 +214,10 @@ function getGraphQLErrors(error) {
     return error.graphQLErrors;
   }
 
-  // backend currently returns a 500 status if there are any errors, try and
-  // extract it from the networkError...
+  // sometimes a graphql-error-like object is returned for critical server errors
   if (error.networkError && error.networkError.result) {
-    // non batched
     if (Array.isArray(error.networkError.result.errors)) {
-      return error.networkError.result.errors || [];
-    }
-
-    // batched
-    if (
-      Array.isArray(error.networkError.result) &&
-      error.networkError.result.length > 0 &&
-      error.networkError.result.some(x => x.errors)
-    ) {
-      const errors = [];
-      error.networkError.result.forEach(queryResult => {
-        if (Array.isArray(queryResult.errors)) {
-          queryResult.errors.forEach(x => errors.push(x));
-        }
-      });
-      return errors;
+      return error.networkError.result.errors;
     }
   }
 
