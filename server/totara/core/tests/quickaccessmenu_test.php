@@ -168,7 +168,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
-                'mod_perform_manage_activities' => 'Activity Management',
+                'mod_perform_manage_activities' => 'Activity management',
                 'mod_perform_activity_response_data' => 'Performance activity response data',
                 'goalmanage' => 'Goals',
                 'competency_assignment' => 'Competency assignments',
@@ -223,7 +223,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
-                'mod_perform_manage_activities' => 'Activity Management',
+                'mod_perform_manage_activities' => 'Activity management',
                 'goalmanage' => 'Goals',
                 'competency_assignment' => 'Competency assignments',
             ],
