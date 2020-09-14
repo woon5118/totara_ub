@@ -50,11 +50,11 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => [
-                    'iso' => '1991-12-04',
+                    'iso' => '1991-12-04T03:30:30', // // Should be forced to the start of the day.
                     'timezone' => 'UTC', // Important to note that only the to timezone is saved.
                 ],
                 'schedule_fixed_to' => [
-                    'iso' => '1991-12-05',
+                    'iso' => '1991-12-05T03:30:30', // Should be forced to the end of the day.
                     'timezone' => 'UTC',
                 ],
                 'due_date_is_enabled' => false,

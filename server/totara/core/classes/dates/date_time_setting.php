@@ -115,18 +115,31 @@ class date_time_setting {
     }
 
     /**
+     * Create a clone of this instance but adjusted to the start of the day (00:00:00).
+     *
+     * @return static
+     */
+    public function to_start_of_day(): self {
+        return $this->clone_to_time('T00:00:00');
+    }
+
+    /**
      * Create a clone of this instance but adjusted to the end of the day (23:59:59).
      *
      * @return static
      */
     public function to_end_of_day(): self {
+        return $this->clone_to_time('T23:59:59');
+    }
+
+    private function clone_to_time(string $time): self {
         $date_time = new DateTime("@{$this->timestamp}");
         $date_time->setTimezone(new DateTimeZone($this->timezone));
 
-        $end_of_day_iso = $date_time->format(self::ISO_DATE_ONLY) . 'T23:59:59';
+        $adjusted_iso = $date_time->format(self::ISO_DATE_ONLY) . $time;
 
         return self::create_from_array([
-            'iso' => $end_of_day_iso,
+            'iso' => $adjusted_iso,
             'timezone' => $this->timezone,
         ]);
     }

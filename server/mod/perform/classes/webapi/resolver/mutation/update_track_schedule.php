@@ -57,7 +57,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
 
         // Fixed and dynamic schedules.
         if ($track_schedule['schedule_is_fixed']) {
-            $from = date_time_setting::create_from_array($track_schedule['schedule_fixed_from']);
+            $from = date_time_setting::create_from_array($track_schedule['schedule_fixed_from'])->to_start_of_day();
 
             if ($track_schedule['schedule_is_open']) {
                 $track->set_schedule_open_fixed($from);

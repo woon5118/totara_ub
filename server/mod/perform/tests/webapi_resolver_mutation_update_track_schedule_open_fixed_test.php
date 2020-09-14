@@ -52,7 +52,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => [
-                    'iso' => '1991-12-04',
+                    'iso' => '1991-12-04T04:30:30', // Should be forced to the start of the day.
                     'timezone' => 'Pacific/Auckland',
                 ],
                 'due_date_is_enabled' => false,

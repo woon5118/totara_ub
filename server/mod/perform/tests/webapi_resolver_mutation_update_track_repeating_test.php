@@ -49,7 +49,7 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => ['iso' => (new date_time_setting(222))->get_iso()],
+                'schedule_fixed_from' => ['iso' => '2020-01-01T00:00:00'],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
                 'subject_instance_generation' => constants::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
@@ -75,7 +75,7 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 1;
         $affected_track->schedule_is_fixed = 1;
-        $affected_track->schedule_fixed_from = 222;
+        $affected_track->schedule_fixed_from = (new DateTime('2020-01-01T00:00:00'))->getTimestamp();
         $affected_track->schedule_fixed_timezone = core_date::get_user_timezone();
         $affected_track->schedule_fixed_to = null;
         $affected_track->schedule_dynamic_from = null;
@@ -126,7 +126,7 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
                 'track_id' => $track1->id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => ['iso' => (new date_time_setting(222))->get_iso()],
+                'schedule_fixed_from' => ['iso' => '2020-01-01T00:00:00'],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => true,
                 'repeating_type' => 'AFTER_CREATION_WHEN_COMPLETE',
@@ -160,7 +160,7 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
         $affected_track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
         $affected_track->schedule_is_open = 1;
         $affected_track->schedule_is_fixed = 1;
-        $affected_track->schedule_fixed_from = 222;
+        $affected_track->schedule_fixed_from = (new DateTime('2020-01-01T00:00:00'))->getTimestamp();
         $affected_track->schedule_fixed_to = null;
         $affected_track->schedule_fixed_timezone = core_date::get_user_timezone();
         $affected_track->schedule_dynamic_from = null;
