@@ -107,7 +107,12 @@ class core_myprofilelib_testcase extends advanced_testcase {
         $reflector = new ReflectionObject($this->tree);
         $nodes = $reflector->getProperty('nodes');
         $nodes->setAccessible(true);
-        $this->assertArrayNotHasKey('fullprofile', $nodes->getValue($this->tree));
+
+        if (class_exists('\totara_engage\watcher\core_user') && \totara_engage\watcher\core_user::feature_requires_view_profile()) {
+            $this->assertArrayHasKey('fullprofile', $nodes->getValue($this->tree));
+        } else {
+            $this->assertArrayNotHasKey('fullprofile', $nodes->getValue($this->tree));
+        }
     }
 
     /**

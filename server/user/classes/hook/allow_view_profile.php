@@ -82,6 +82,13 @@ class allow_view_profile extends base {
         $this->viewing_user_id = $viewing_user_id;
         $this->course = $course;
         $this->course_context = $course_context;
+
+        if ($this->course === null && $this->course_context !== null) {
+            throw new \coding_exception('If a course context is passed a course object must be passed.');
+        }
+        if ($this->course_context !== null && $this->course_context->instanceid != $this->course->id) {
+            throw new \coding_exception('The course object and course context do not match.');
+        }
     }
 
     /**
@@ -97,6 +104,9 @@ class allow_view_profile extends base {
      * @return context_course|null
      */
     public function get_course_context(): ?context_course {
+        if ($this->course !== null && $this->course_context === null) {
+            $this->course_context = \context_course::instance($this->course->id);
+        }
         return $this->course_context;
     }
 

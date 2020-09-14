@@ -2,7 +2,7 @@
 /**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author  Johannes Cilliers <johannes.cilliers@totaralearning.com>
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
  * @package totara_engage
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->version = 2020090200;          // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;         // Requires this Totara version.
-$plugin->component = 'totara_engage';
-
-$plugin->dependencies = [
-    'totara_reaction' => 2019081200,
-    'totara_topic'=> 2019112700
+$watchers = [
+    [
+        // Totara Engage gives users the ability to view other users profiles by default if Engage features are turn
+        'hookname' => \core_user\hook\allow_view_profile::class,
+        'callback' => [\totara_engage\watcher\core_user::class, 'handle_allow_view_profile'],
+    ],
 ];

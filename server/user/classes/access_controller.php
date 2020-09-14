@@ -508,15 +508,17 @@ class access_controller {
         global $CFG;
 
         if ($this->userdeleted) {
+            // Deleted users do not have profiles.
             return false;
         }
 
         if ($this->is_user_access_prevented()) {
+            // Tenants say no.
             return false;
         }
 
-        // Do we need to be logged in?
         if (empty($CFG->forceloginforprofiles)) {
+            // You don't need to be logged in for profiles. Anyone can see them.
             return true;
         } else {
             if (!isloggedin() || (isguestuser() && !$this->iscurrentuser)) {
@@ -527,16 +529,21 @@ class access_controller {
         }
 
         if ($this->courseid && !$this->is_enrolled()) {
-            // NOTE: this is a major change compared to previous version,
-            //       use get_profile_url() if you are creating links to profiles instead.
+            // The user who is being viewed is not enrolled in the course. They cannot possibly have a course profile.
+            // We MUST return false here. Even if it is the current user.
+            // NOTE: this changed in t13, use get_profile_url() if you are creating links to profiles instead.
             return false;
         }
 
         return (
+            // Quickest check.
             $this->iscurrentuser ||
+            // Single query lookup.
             $this->has_coursecontact_role() ||
-            $this->has_view_details_capability() ||
-            $this->has_plugin_granting_view_profile()
+            // The last check, on capabilities is going to be slow! So allow plugins to answer first.
+            $this->has_plugin_granting_view_profile() ||
+            // Finally, check capabilities. This means resolving all user relationships between courses.
+            $this->has_view_details_capability()
         );
     }
 
