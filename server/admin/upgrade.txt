@@ -2,6 +2,7 @@ This files describes API changes in /admin/*.
 
 === 13.0 ===
 
+* Shortname for a new role will accept the alphanumeric characters only and fails for the hyphen and underscore characters
 * Hub registration functionality has been removed
 * Deprecated core_admin_renderer::registration_warning() has been removed
 * Deprecated setting 'uselegacybrowselistofusersreport' has been removed

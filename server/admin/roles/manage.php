@@ -171,12 +171,15 @@ $firstrole = reset($roles);
 $lastrole = end($roles);
 foreach ($roles as $role) {
     // Basic data.
-    $row = array(
-        '<a href="' . $defineurl . '?action=view&amp;roleid=' . $role->id . '">' . $role->localname . '</a>',
-        role_get_description($role),
-        s($role->shortname),
-        '',
+    // The hyphen causing the problem in SQL query, lets warn admin.
+    $warn = preg_match('/-/', $role->shortname) ?
+        $OUTPUT->pix_icon('i/warning', get_string('errorbadroleshortname', 'core_role'), 'moodle') :
+        '';
+    $rolenamelink = \html_writer::link(
+        new \moodle_url('/admin/roles/define.php', ['action' => 'view', 'roleid' => $role->id]),
+        $role->localname . $warn
     );
+    $row = [$rolenamelink, role_get_description($role), s($role->shortname), ''];
 
     // Move up.
     if ($role->sortorder != $firstrole->sortorder) {

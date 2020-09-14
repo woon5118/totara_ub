@@ -458,6 +458,10 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         $userlistcolumnlink = $DB->sql_group_concat($DB->sql_concat_join("' '", $usernamefieldslink), ', ');
 
         foreach ($sessionroles as $role) {
+            if (preg_match('/-/', $role->shortname)) {
+                // The hyphen causing the problem in SQL query, skip the role.
+                continue;
+            }
             $field = $role->shortname;
             $roleid = $role->id;
 
@@ -501,6 +505,10 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         }
 
         foreach ($sessionroles as $sessionrole) {
+            if (preg_match('/-/', $sessionrole->shortname)) {
+                // The hyphen causing the problem in SQL query, skip the role.
+                continue;
+            }
             $field = $sessionrole->shortname;
             $name = $sessionrole->name;
             if (empty($name)) {
@@ -644,6 +652,10 @@ abstract class rb_facetoface_base_source extends rb_base_source {
         }
 
         foreach ($sessionroles as $sessionrole) {
+            if (preg_match('/-/', $sessionrole->shortname)) {
+                // The hyphen causing the problem in SQL query, skip the role.
+                continue;
+            }
             $field = $sessionrole->shortname;
             $name = $sessionrole->name;
             if (empty($name)) {

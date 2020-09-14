@@ -97,7 +97,8 @@ class core_role_define_role_table_advanced extends core_role_capability_table_wi
         if (!is_null($shortname)) {
             $this->role->shortname = $shortname;
             $this->role->shortname = core_text::specialtoascii($this->role->shortname);
-            $this->role->shortname = core_text::strtolower(clean_param($this->role->shortname, PARAM_ALPHANUMEXT));
+            // Not allowing non-alphanumeric characters as report builder column fails.
+            $this->role->shortname = core_text::strtolower(clean_param($this->role->shortname, PARAM_ALPHANUM));
             if (empty($this->role->shortname)) {
                 $this->errors['shortname'] = get_string('errorbadroleshortname', 'core_role');
             } else if (core_text::strlen($this->role->shortname) > 100) { // Check if it exceeds the max of 100 characters.
@@ -616,6 +617,9 @@ class core_role_define_role_table_advanced extends core_role_capability_table_wi
 
     public function display() {
         global $OUTPUT;
+        if (preg_match('/-/', $this->role->shortname)) {
+            $this->errors['shortname'] = get_string('errorbadroleshortname', 'core_role');
+        }
         // Extra fields at the top of the page.
         echo '<div class="topfields clearfix">';
         $this->print_field('shortname', get_string('roleshortname', 'core_role'),

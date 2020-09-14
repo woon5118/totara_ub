@@ -5287,7 +5287,7 @@ class admin_setting_pickroles extends admin_setting_configmulticheckbox {
      * @return bool true=>success, false=>error
      */
     public function load_choices() {
-        global $CFG, $DB;
+        global $OUTPUT;
         if (during_initial_install()) {
             return false;
         }
@@ -5295,7 +5295,14 @@ class admin_setting_pickroles extends admin_setting_configmulticheckbox {
             return true;
         }
         if ($roles = get_all_roles()) {
-            $this->choices = role_fix_names($roles, null, ROLENAME_ORIGINAL, true);
+            $roleoptions = role_fix_names($roles, null, ROLENAME_ORIGINAL);
+            foreach ($roleoptions as $rid => $role) {
+                // The hyphen causing the problem in SQL query, lets warn admin.
+                $warn = preg_match('/-/', $role->shortname) ?
+                    $OUTPUT->pix_icon('i/warning', get_string('errorbadroleshortname', 'core_role'), 'moodle') :
+                    '';
+                $this->choices[$rid] = $role->localname . $warn;
+            }
             return true;
         } else {
             return false;

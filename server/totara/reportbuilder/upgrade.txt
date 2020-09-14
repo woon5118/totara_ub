@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* totara report builder does not accept a seminar event role column with the hyphen
 * rb_filter_type::get_filter() has a new optional parameter $filteringrequired
 * all filters must implement \rb_filter_type::is_filtering() method
 * all embedded reports need to be updated to use \totara_reportbuilder_renderer::showhide_button($report)
