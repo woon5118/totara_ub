@@ -18,18 +18,22 @@ Feature: Workspaces should not be mentioned on resources when the feature is dis
     And the following "articles" exist in "engage_article" plugin:
       | name           | username | content | access | topics |
       | Test Article 1 | user1    | blah    | PUBLIC | Topic1 |
+    And I log in as "admin"
+    And I set the following system permissions of "Authenticated user" role:
+      | moodle/user:viewalldetails | Allow |
+    And I log out
 
   @javascript
   Scenario: Should not see workspaces when owner is sharing a resource
     Given I log in as "user1"
 
     When I view article "Test Article 1"
-    And I press "Share"
+    And I click on "Share" "button"
     And I wait for the next second
     Then I should see "Share to specific people or workspaces (optional)"
 
     When I disable the "container_workspace" advanced feature
-    When I view article "Test Article 1"
+    And I view article "Test Article 1"
     And I press "Share"
     And I wait for the next second
     Then I should see "Share to specific people"
@@ -37,9 +41,8 @@ Feature: Workspaces should not be mentioned on resources when the feature is dis
 
   @javascript
   Scenario: Should not see workspaces when another user is sharing a resource
-    Given I log in as "admin"
-
-    When I view article "Test Article 1"
+    Given I log in as "user2"
+    And I view article "Test Article 1"
     And I press "Share"
     And I wait for the next second
     Then I should see "Reshare to specific people or workspaces"

@@ -39,8 +39,8 @@ Feature: Update survey
     And I view survey "Test Survey 1?"
     And I should see "Share"
     When I click on "Actions" "button"
-    Then I should see "Delete"
-    When I click on "Delete" "link"
+    Then I should see "Delete survey"
+    When I click on "Delete survey" "link"
     And I press "No"
     And I click on "Share" "button"
     Then I should see "Only you"
@@ -52,8 +52,8 @@ Feature: Update survey
     When I view survey "Test Survey 2?"
     Then I should see "Share"
     When I click on "Actions" "button"
-    Then I should see "Delete"
-    When I click on "Delete" "link"
+    Then I should see "Delete survey"
+    When I click on "Delete survey" "link"
     And I press "No"
     And I click on "Share" "button"
     Then I should see "Only you"
@@ -65,8 +65,8 @@ Feature: Update survey
     When I view survey "Test Survey 3?"
     Then I should see "Share"
     When I click on "Actions" "button"
-    Then I should see "Delete"
-    When I click on "Delete" "link"
+    Then I should see "Delete survey"
+    When I click on "Delete survey" "link"
     And I press "No"
     And I click on "Share" "button"
     Then I should see "Only you"
@@ -75,13 +75,12 @@ Feature: Update survey
     And I click on "Cancel" "button"
 
   @javascript
-  Scenario: Recipient can update/delete survey
-    Given I log in as "user2"
+  Scenario: Owner can update/delete restricted survey
+    Given I log in as "user1"
     And I view survey "Test Survey 2?"
     And I should see "Share"
     When I click on "Actions" "button"
-    Then I should see "Delete"
-    When I click on "Delete" "link"
+    And I click on "Delete survey" "link"
     And I press "No"
     And I click on "Share" "button"
     Then I should see "Only you"
@@ -92,3 +91,12 @@ Feature: Update survey
     And I click on "Topic 2" option in the dropdown menu
     Then the "Done" "button" should be enabled
     And I click on "Done" "button"
+
+  @javascript
+  Scenario: Recipient can not update/delete restricted survey
+    Given I log in as "user2"
+    And I view survey "Test Survey 2?"
+    And I should not see "Share"
+    When I click on "Actions" "button"
+    Then I should not see "Delete survey"
+    And I should see "Report content"
