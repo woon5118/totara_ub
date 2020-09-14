@@ -60,12 +60,7 @@ final class totara_engage_generator extends component_generator_base {
      * @param int $userid
      */
     public function set_capabilities(int $permission, int $userid) {
-        $roles = get_archetype_roles('user');
-        foreach ($roles as $role) {
-            // Can view user full details.
-            $user_context = context_user::instance($userid, MUST_EXIST);
-            assign_capability('moodle/user:viewdetails', $permission, $role->id, $user_context, true);
-        }
+        // Nothing to do here.
     }
 
     /**

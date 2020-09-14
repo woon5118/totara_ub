@@ -171,10 +171,6 @@ final class totara_playlist_generator extends component_generator_base {
     public function set_capabilities(int $permission, int $userid, context $context): void {
         $roles = get_archetype_roles('user');
         foreach ($roles as $role) {
-            // Can view user full details.
-            $user_context = context_user::instance($userid, MUST_EXIST);
-            assign_capability('moodle/user:viewdetails', $permission, $role->id, $user_context, true);
-
             // Can share a playlist.
             role_assign($role->id, $userid, $context->id);
             assign_capability('totara/playlist:share', $permission, $role->id, $context, true);

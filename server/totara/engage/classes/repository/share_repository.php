@@ -89,20 +89,25 @@ final class share_repository extends repository {
      * @param int|null $visibility
      * @return array
      */
-    public function get_sharers(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): array {
+    public function get_sharers(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): \Generator {
         $builder = builder::table(share::TABLE, 's')
+            ->select('u.*')
             ->join([share_recipient::TABLE, 'sr'], function(builder $joining) {
                 $joining
                     ->where_raw('sr.shareid = s.id')
                     ->where_raw('sr.sharerid != s.ownerid');
             })
-            ->select('sr.sharerid')
+            ->join(['user', 'u'], 'sr.sharerid', '=', 'u.id')
             ->where('s.itemid', $itemid)
             ->where('s.component', $component)
             ->where('sr.visibility', $visibility)
             ->group_by('sr.sharerid');
 
-        return $builder->get()->to_array();
+        foreach ($builder->get() as $sharer) {
+            if (\core_user\access_controller::for($sharer)->can_view_profile()) {
+                yield $sharer;
+            }
+        }
     }
 
     /**
@@ -161,6 +166,15 @@ final class share_repository extends repository {
             $recipients = array_values(array_filter($recipients, function(array $share) {
                 return $share['component'] !== 'container_workspace';
             }));
+        }
+
+        if (!empty($recipients)) {
+            $recipients = array_filter($recipients, function($recipient) {
+                if ($recipient['area'] !== 'USER') {
+                    return true;
+                }
+                return \core_user\access_controller::for_user_id($recipient['instanceid'])->can_view_profile();
+            });
         }
 
         return $recipients;

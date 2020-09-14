@@ -52,15 +52,7 @@ final class share_sharers implements query_resolver, has_middleware {
 
         /** @var share_repository $repo */
         $repo = share::repository();
-        $sharers = $repo->get_sharers($itemid, $component);
-
-        // Return users.
-        return array_map(
-            function (array $sharer): \stdClass {
-                return \core_user::get_user($sharer['sharerid'], '*', MUST_EXIST);
-            },
-            $sharers
-        );
+        return iterator_to_array($repo->get_sharers($itemid, $component));
     }
 
     /**
