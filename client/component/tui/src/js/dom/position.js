@@ -220,3 +220,32 @@ function isNoneTransform(transform) {
     transform == 'matrix(1, 0, 0, 1, 0, 0)'
   );
 }
+
+/**
+ * Get the coords of the selected text. If no text is selected returns the caret position.
+ *
+ * @returns {Rect}
+ */
+export function getSelectionClientRect() {
+  const selection = window.getSelection();
+  const range = selection.getRangeAt(0).cloneRange();
+  range.collapse(true);
+  const rects = range.getClientRects();
+  let rect = rects[0];
+
+  if (rect && rect.x !== 0 && rect.y !== 0) {
+    return Rect(rect.x, rect.y, rect.width, rect.height);
+  }
+
+  // insert a temporary element
+  const span = document.createElement('span');
+  span.appendChild(document.createTextNode('\u200b'));
+  range.insertNode(span);
+
+  rect = span.getClientRects()[0];
+  const spanParent = span.parentNode;
+  spanParent.removeChild(span);
+  spanParent.normalize();
+
+  return Rect(rect.x, rect.y, rect.width, rect.height);
+}

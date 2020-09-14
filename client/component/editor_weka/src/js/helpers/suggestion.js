@@ -18,6 +18,8 @@
 
 import { ResolvedPos } from 'ext_prosemirror/model';
 import Vue from 'vue';
+import { getSelectionClientRect } from 'tui/dom/position';
+import { getClosestScrollable } from 'tui/dom/scroll';
 
 export default class Suggestion {
   /**
@@ -116,16 +118,30 @@ export default class Suggestion {
    */
   showList({ view, component, state: { range, text }, callback }) {
     const element = document.createElement('span');
-
     this._editor.viewExtrasLiveEl.appendChild(element);
+
+    const scrollParent = getClosestScrollable(element);
     const position = view.coordsAtPos(range.from);
     const parentCoords = this._editor.viewExtrasLiveEl.offsetParent.getBoundingClientRect();
+    let y = position.bottom - parentCoords.top;
+
+    // handle the case where the top of the parent is at the top of viewBox
+    // NOTE: may be possible to use getSelectionCoords() as the primary way of determining popover positioning
+    if (scrollParent && !scrollParent.offsetParent && parentCoords.top <= 0) {
+      y = getSelectionClientRect().bottom;
+    }
+
+    // the scrollParent is not the document
+    // -> add the internal scrollTop to account for this
+    if (scrollParent && scrollParent.offsetParent) {
+      y = y + scrollParent.scrollTop;
+    }
 
     this._instance = new (Vue.extend(component.component))({
       parent: this._editor.getParent(),
       propsData: {
         x: position.left - parentCoords.left,
-        y: position.bottom - parentCoords.top,
+        y,
         pattern: text,
       },
     });
