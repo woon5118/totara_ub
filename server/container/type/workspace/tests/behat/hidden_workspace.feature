@@ -7,11 +7,6 @@ Feature: Hidden workspace workflow
       | username | firstname | lastname | email           |
       | user_one | User      | One      | one@example.com |
       | user_two | User      | Two      | two@example.com |
-    # This is for temporary solution
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
   Scenario: Create hidden workspace
     Given I am on a totara site

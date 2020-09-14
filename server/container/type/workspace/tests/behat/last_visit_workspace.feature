@@ -13,12 +13,6 @@ Feature: Last visit workspace should not redirect user to a course
       | user    | course | role    |
       | userone | c101   | student |
 
-    # This is for temporary solution
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   @javascript
   Scenario: Normal user should be navigated to the last visted workspace
     Given I log in as "userone"

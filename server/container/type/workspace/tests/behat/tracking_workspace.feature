@@ -7,12 +7,6 @@ Feature: Tracking user's visited workspace
       | username | firstname | lastname | email           |
       | userone  | User      | One      | one@example.com |
 
-    # This is for temporary solution
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   @javascript
   Scenario: User goes to last visited workspace
     Given I log in as "userone"

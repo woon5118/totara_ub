@@ -3,7 +3,6 @@ Feature: Report & remove comments in workspaces
 
   Scenario: A user can report other comments but not their own
     Given I am on a totara site
-    And I set the site theme to "ventura"
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | User1     | One      | user1@example.com |
@@ -15,10 +14,6 @@ Feature: Report & remove comments in workspaces
     And the following "workspaces" exist in "container_workspace" plugin:
       | name        | owner | summary       | topics |
       | Workspace 1 | user3 | The Workspace | Topic1 |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
     # Create the comments & discussions as user 1
     When I log in as "user1"

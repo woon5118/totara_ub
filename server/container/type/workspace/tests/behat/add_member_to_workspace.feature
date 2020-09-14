@@ -10,12 +10,6 @@ Feature: Add users to a workspace
     And the following "workspaces" exist in "container_workspace" plugin:
       | name          | owner | summary           |
       | Workspace 101 | admin | Workspace summary |
-    And I log in as "admin"
-    And I set the site theme to "ventura"
-    # Temporary solution for user visibility
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
   @javascript
   Scenario: Workspace owner search for non member users.

@@ -8,11 +8,6 @@ Feature: Workspace general feature
       | user1    | First     | User     | first@example.com  |
       | user2    | Second    | User     | second@example.com |
 
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   @javascript
   Scenario: Create a new workspace
     Given I am on a totara site

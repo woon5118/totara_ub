@@ -6,7 +6,6 @@ Feature: Users can navigate between resources/surveys inside a playlist.
 
   Background:
     Given I am on a totara site
-    And I set the site theme to "ventura"
     And I enable the "engage_resources" advanced feature
     And the following "users" exist:
       | username | firstname | lastname | email             |
@@ -34,10 +33,6 @@ Feature: Users can navigate between resources/surveys inside a playlist.
       | engage_article | Article 2 | Test Playlist 1 | user1 |
       | engage_survey  | Survey 3  | Test Playlist 1 | user1 |
       | engage_survey  | Survey 4  | Test Playlist 1 | user1 |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
   Scenario: Users can navigate through resources on a playlist
     Given I log in as "user2"

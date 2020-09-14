@@ -12,12 +12,6 @@ Feature: Functionalities around mute button in workspace
       | name          | owner    | summary           |
       | Workspace 101 | user_one | Workspace |
 
-     # This is for temporary solution
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   @javascript
   Scenario: Normal user can only see mute button when joined the workspace
     Given I log in as "user_two"

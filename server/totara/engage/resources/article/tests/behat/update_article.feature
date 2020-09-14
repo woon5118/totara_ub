@@ -46,11 +46,7 @@ Feature: Update article
 
   @javascript
   Scenario: Update resource without permission
-    Given I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-    And I log in as "user2"
+    Given I log in as "user2"
     And I view article "Test Article 1"
     And I click on "//h3[contains(text(),'Test Article 1')]/parent::*[button[@title='Edit']]" "xpath_element"
     And I should not see "Done"

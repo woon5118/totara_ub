@@ -67,11 +67,6 @@ Feature: Share existing items with workspace
       | name            | username | access     | topics |
       | Test Playlist 3 | user2    | PUBLIC     | Topic1 |
 
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   Scenario: Test All library and All site filter of the adder
     Given I log in as "user1"
     And I click on "Your Workspaces" in the totara menu

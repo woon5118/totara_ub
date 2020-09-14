@@ -8,12 +8,6 @@ Feature: Removing members from the workspace
       | user_one | User      | One      | one@example.com |
       | user_two | User      | Two      | two@example.com |
 
-    # This is for temporary solution
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   @javascript
   Scenario: Workspace owner remove member
     Given I log in as "user_one"

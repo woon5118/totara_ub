@@ -49,11 +49,6 @@ Feature: Shared with you and filters
       | sharer | recipient |
       | user1  | user2     |
 
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   Scenario: Default filter should show all shared resources and playlists
     Given I log in as "user2"
     And I click on "Your Library" in the totara menu

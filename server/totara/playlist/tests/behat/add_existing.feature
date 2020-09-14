@@ -53,11 +53,6 @@ Feature: Add existing items to playlist
       | name            | username | access     | topics |
       | Test Playlist 1 | user1    | PRIVATE    | Topic1 |
 
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   Scenario: Test adding All library and All site filter of the adder into the playlist
     Given I log in as "user1"
     And I click on "Your Library" in the totara menu

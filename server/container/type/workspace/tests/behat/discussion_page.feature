@@ -10,10 +10,6 @@ Feature: Single discussion page
     And the following "workspaces" exist in "container_workspace" plugin:
       | name          | owner    | summary         |
       | Workspace 101 | user_one | This is summary |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
   Scenario: Member can navigate to the discussion page and put comment on it
     Given I log in as "user_one"

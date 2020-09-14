@@ -27,11 +27,6 @@ Feature: Unshare resource
       | user1  | user2     |
       | user1  | user3     |
 
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   Scenario: I unlink article from share with me page
     Given I log in as "user2"
     And I click on "Your Library" in the totara menu

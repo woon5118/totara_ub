@@ -7,12 +7,6 @@ Feature: View logs page for workspace
     And the following "workspaces" exist in "container_workspace" plugin:
       | name          | owner    | summary               |
       | Workspace 101 | user_one | This is workspace 101 |
-    And I log in as "admin"
-    And I set the site theme to "ventura"
-    # Temporary solution to make this work
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
   @javascript
   Scenario: Admin user is able to see logs in workspace context

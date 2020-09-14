@@ -18,10 +18,6 @@ Feature: Users can navigate back to the parent page from a survey.
     And the following "surveys" exist in "engage_survey" plugin:
       | question | username | access | topics |
       | Survey 1 | user2    | PUBLIC | Topic1 |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
   Scenario: Survey shows the correct back button when opening from a workspace.
     Given the following "workspaces" exist in "container_workspace" plugin:

@@ -17,11 +17,6 @@ Feature: Empty spaces page
       | component           | name          | username |
       | container_workspace | Workspace 101 | usertwo  |
 
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   @javascript
   Scenario: Other user should be able to see recommended spaces
     Given I log in as "usertwo"

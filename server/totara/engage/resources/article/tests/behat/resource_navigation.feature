@@ -19,10 +19,6 @@ Feature: Users can navigate back to the parent page from a resource.
       | name      | username | content | access | topics |
       | Article 1 | user1    | A1      | PUBLIC | Topic1 |
       | Article 2 | user2    | A2      | PUBLIC | Topic1 |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
   Scenario: Resource shows the correct back button when opening from a workspace.
     Given the following "workspaces" exist in "container_workspace" plugin:

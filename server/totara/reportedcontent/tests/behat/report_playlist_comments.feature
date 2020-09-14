@@ -3,7 +3,6 @@ Feature: Report & remove comments in engage playlists
 
   Scenario: A user can report other comments but not their own in playlists
     Given I am on a totara site
-    And I set the site theme to "ventura"
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | User1     | One      | user1@example.com |
@@ -19,10 +18,6 @@ Feature: Report & remove comments in engage playlists
       | name       | username | component       | area    | content                |
       | Playlist 1 | user2    | totara_playlist | comment | comment not reportable |
       | Playlist 2 | user1    | totara_playlist | comment | comment is reportable  |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
     And I log in as "user2"
 
     # Reportable

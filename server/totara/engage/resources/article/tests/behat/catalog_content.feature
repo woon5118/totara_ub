@@ -6,12 +6,7 @@ Feature: Article catalog content
 
   Background:
     Given I am on a totara site
-    And I set the site theme to "ventura"
-
     And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-
     And I click on "Find Learning" in the totara menu
     And I follow "Configure catalogue"
     And I follow "General"

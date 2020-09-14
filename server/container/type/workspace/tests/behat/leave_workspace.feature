@@ -6,13 +6,6 @@ Feature: User leaves a workspace that user is a member of
       | user_one | User      | One      | one@example.com |
       | user_two | User      | Two      | two@example.com |
 
-    # This is for temporary solution
-    And I log in as "admin"
-    And I set the site theme to "ventura"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   @javascript
   Scenario: User leaves the workspace
     Given I log in as "user_one"

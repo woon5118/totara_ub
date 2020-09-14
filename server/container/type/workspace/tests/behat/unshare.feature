@@ -18,11 +18,6 @@ Feature: Unshare resources from workspace
       | name             | summary   | owner |
       | Test Workspace 1 | Worskpace | user1 |
 
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   Scenario: Unshare resource from workspace
     Given I log in as "user1"
     And I click on "Your Workspaces" in the totara menu

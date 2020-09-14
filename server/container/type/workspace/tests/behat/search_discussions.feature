@@ -11,12 +11,6 @@ Feature: User search discussions
       | name           | summary         | owner    |
       | Workspace 1010 | This is summary | user_one |
 
-    # This is for temporary solution
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   @javascript
   Scenario: Search for the discussion with case insensitive
     Given I am on a totara site

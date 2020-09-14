@@ -30,11 +30,6 @@ Feature: Test edit the block config for the recently viewed block
       | Test Playlist 2 | user1    | PUBLIC | Topic2 |
       | Test Playlist 3 | user1    | PUBLIC | Topic2 |
 
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
     And I log in as "user1"
     And I view playlist "Test Playlist 1"
     And I view article "Test Article 1"

@@ -3,7 +3,6 @@ Feature: Report & remove comments in engage surveys
 
   Scenario: A user can report other comments but not their own in resources
     Given I am on a totara site
-    And I set the site theme to "ventura"
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | User1     | One      | user1@example.com |
@@ -18,10 +17,6 @@ Feature: Report & remove comments in engage surveys
     And "engage_survey" "Test Survey 1?" is shared with the following users:
       | sharer | recipient |
       | user1  | user2     |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
     And I log in as "user2"
 
     # Not reportable

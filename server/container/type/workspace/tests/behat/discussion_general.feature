@@ -10,10 +10,6 @@ Feature: General behat test for discussion feature within a workspace
     And the following "workspaces" exist in "container_workspace" plugin:
       | name          | owner    | summary         |
       | Workspace 101 | user_one | This is summary |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
   Scenario: None member user should not be able to see discussion form.
     Given I log in as "user_one"

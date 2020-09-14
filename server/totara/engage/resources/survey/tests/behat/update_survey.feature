@@ -26,11 +26,6 @@ Feature: Update survey
       | sharer | recipient |
       | user1  | user2     |
 
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   @javascript
   Scenario: Admin can update/delete survey
 

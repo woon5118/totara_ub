@@ -6,7 +6,6 @@ Feature: Rate the playliat
 
   Background:
     Given I am on a totara site
-    And I set the site theme to "ventura"
 
     And the following "users" exist:
       | username | firstname | lastname | email          |
@@ -29,11 +28,7 @@ Feature: Rate the playliat
       | user1  | user3    |
 
   Scenario: Rate a playlist
-    Given I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-    Then I log in as "user2"
+    Given I log in as "user2"
     And I view playlist "Test Playlist 1"
     And I click on "Add your rating" "button"
     And I rate the playlist 0

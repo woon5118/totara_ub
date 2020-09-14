@@ -6,8 +6,6 @@ Feature: Delete article
 
   Background:
     Given I am on a totara site
-    And I set the site theme to "ventura"
-
     And the following "topics" exist in "totara_topic" plugin:
       | name    |
       | Topic 1 |
@@ -39,10 +37,6 @@ Feature: Delete article
 
   @javascript
   Scenario: Delete resource without permission
-    Given I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-    And I log in as "user2"
+    Given I log in as "user2"
     And I view article "Test Article 1"
     And I should not see "Delete"

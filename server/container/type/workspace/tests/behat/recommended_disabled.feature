@@ -12,12 +12,6 @@ Feature: Recommendations will not appear in workspaces when recommenders engine 
       | name             | summary   | owner |
       | Test Workspace 1 | Workspace | user1 |
 
-    # This is for temporary solution
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   Scenario: Disabling the recommender plugin will hide the recently viewed block from view mode
     Given I log in as "admin"
     And I click on "Your Workspaces" in the totara menu

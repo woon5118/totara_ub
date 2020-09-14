@@ -3,12 +3,6 @@ Feature: Like article
 
   Background:
     Given I am on a totara site
-    And I set the site theme to "ventura"
-
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
     And the following "topics" exist in "totara_topic" plugin:
       | name    |

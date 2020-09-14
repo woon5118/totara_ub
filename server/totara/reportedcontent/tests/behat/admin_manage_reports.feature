@@ -3,7 +3,6 @@ Feature: Admin can remove or approve comments that have been reported.
 
   Background:
     Given I am on a totara site
-    And I set the site theme to "ventura"
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | User1     | One      | user1@example.com |
@@ -28,10 +27,6 @@ Feature: Admin can remove or approve comments that have been reported.
       | name       | username | component       | area    | content          |
       | Article 1  | user1    | engage_article  | comment | article comment  |
       | Playlist 1 | user1    | totara_playlist | comment | playlist comment |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
     # Create the reports
     And I log in as "user2"

@@ -3,7 +3,6 @@ Feature: Report & remove engage articles
 
   Scenario: A user can report other comments but not their own in resources
     Given I am on a totara site
-    And I set the site theme to "ventura"
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | User1     | One      | user1@example.com |
@@ -15,10 +14,6 @@ Feature: Report & remove engage articles
       | name      | username | content      | format       | access | topics  |
       | Article 1 | user1    | Test Article | FORMAT_PLAIN | PUBLIC | Topic 1 |
       | Article 2 | user2    | Test Article | FORMAT_PLAIN | PUBLIC | Topic 1 |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
     And I log in as "user2"
 
     # Not reportable

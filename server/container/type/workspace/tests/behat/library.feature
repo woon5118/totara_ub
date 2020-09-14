@@ -47,12 +47,6 @@ Feature: Shared with workspace and filters
       | engage_survey   | Test Survey 2?  | user1  | Test Workspace 1 |
       | totara_playlist | Test Playlist 3 | user1  | Test Workspace 1 |
 
-    # This is for temporary solution
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
-
   Scenario: Default filter should show all shared resources and playlists
     Given I log in as "user2"
     And I click on "Your Workspaces" in the totara menu
