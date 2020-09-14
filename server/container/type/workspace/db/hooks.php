@@ -162,7 +162,7 @@ $watchers = [
     ],
     [
         'hookname' => 'core_user\hook\allow_view_profile_field',
-        'callback' => ['container_workspace\watcher\profile_watcher', 'watch_allow_profile_field']
+        'callback' => ['container_workspace\watcher\core_user', 'watch_allow_profile_field']
     ],
     [
         'hookname' => 'totara_reportedcontent\hook\get_review_context',

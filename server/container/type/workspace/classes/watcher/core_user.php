@@ -22,28 +22,15 @@
  */
 namespace container_workspace\watcher;
 
-use container_workspace\loader\member\loader;
 use core_user\hook\allow_view_profile_field;
-use core_container\factory;
 use container_workspace\workspace;
+use core_user\profile\display_setting;
+use totara_core\advanced_feature;
 
 /**
  * This is for resolving all the profile field view request.
  */
-final class profile_watcher {
-    /**
-     * Constant for only valid user fields that this workspace allow other user to see.
-     *
-     * @var array
-     */
-    private const VALID_FIELDS = [
-        'fullname',
-        'email',
-        'profileimageurl',
-        'profileimagealt',
-        'imagealt'
-    ];
-
+final class core_user {
     /**
      * @param allow_view_profile_field $hook
      * @return void
@@ -51,42 +38,46 @@ final class profile_watcher {
     public static function watch_allow_profile_field(allow_view_profile_field $hook): void {
         global $DB;
 
+        if ($hook->has_permission()) {
+            return;
+        }
+
+        if (!advanced_feature::is_enabled('container_workspace')) {
+            return;
+        }
+
         $course = $hook->get_course();
-        if (null === $course || $hook->has_permission()) {
+        if (null === $course || workspace::get_type() !== $course->containertype) {
             // Context is not appearing.
             return;
         }
 
         // We are only allowing several fields within workspace, but not all.
         $field = $hook->field;
-        if (!in_array($field, static::VALID_FIELDS)) {
+        $valid_fields = array_merge(
+            array_values(display_setting::get_display_fields()),
+            display_setting::get_default_display_picture_fields(),
+            ['fullname']
+        );
+
+        if (!in_array($field, $valid_fields)) {
             return;
         }
 
-        $workspace = factory::from_record($course);
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            return;
-        }
-
-        // Note: this just a temporary solution to help by-pass the field fullname. So that
-        // i can be unblocked from this access controller. The right way to fix it is to fix
+        // Note: this just a temporary solution to help by-pass any profile fields. So that
+        // it can be unblocked from this access controller. The right way to fix it is to fix
         // it within access_controller class itself.
         if (is_siteadmin($hook->viewing_user_id)) {
+            // It is a hack for pretty much site_admin.
             $hook->give_permission();
         }
 
-        // So this course is a workspace and the actor is viewing the target user within the workspace.
-        // We will have to resolve whether the current actor if the actor is still a member of the workspace or not.
-        $actor_member = loader::get_for_user($hook->viewing_user_id, $workspace->get_id());
-        if (null !== $actor_member && !$actor_member->is_suspended()) {
-            // This user is still active within the workspace.
-            if ('email' !== $field) {
-                // We handle email differently.
-                $hook->give_permission();
-                return;
-            }
+        // Note: we do not check for member here or any public/private/hidden workspaces.
+        // This is intentional as those checks should have been performed before this point.
 
+        if ('email' === $field) {
             // We have to respect the mail display settings from user record.
+            // Note: this is a temporary solution, ideally the access_controller should handle this for us.
             $mail_display = $DB->get_field('user', 'maildisplay', ['id' => $hook->target_user_id]);
             $valid_settings = [
                 \core_user::MAILDISPLAY_EVERYONE,
@@ -96,6 +87,11 @@ final class profile_watcher {
             if (in_array($mail_display, $valid_settings)) {
                 $hook->give_permission();
             }
+
+            return;
         }
+
+        // The rest of fields will be given with permission.
+        $hook->give_permission();
     }
 }

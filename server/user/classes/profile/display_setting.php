@@ -94,6 +94,36 @@ final class display_setting {
     }
 
     /**
+     * Return a list of the fields that need to be used to show the profile image.
+     * Note that this function will not taking account of whether the profile picture is enabled or not.
+     *
+     * @return array
+     */
+    public static function get_default_display_picture_fields(): array {
+        return [
+            'profileimageurl',
+            'profileimageurlsmall',
+            'profileimagealt',
+        ];
+    }
+
+    /**
+     * Return a list of the fields that need to be used to show the profile image.
+     * Note that this function will be taking account of whether the profile picture is enabled or not.
+     * If profile picture is enabled then list of fields in
+     * {@see display_setting::get_default_display_picture_fields()} will be returned.
+     *
+     * @return array
+     */
+    public static function get_display_picture_fields(): array {
+        if (!static::display_user_picture()) {
+            return [];
+        }
+
+        return static::get_default_display_picture_fields();
+    }
+
+    /**
      * @return bool
      */
     public static function display_user_picture(): bool {
