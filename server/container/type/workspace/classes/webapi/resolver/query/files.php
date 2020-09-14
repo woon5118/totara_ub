@@ -22,6 +22,7 @@
  */
 namespace container_workspace\webapi\resolver\query;
 
+use container_workspace\interactor\workspace\interactor;
 use container_workspace\loader\file\loader;
 use container_workspace\query\file\query;
 use container_workspace\query\file\sort;
@@ -60,6 +61,11 @@ final class files implements query_resolver, has_middleware {
             $ec->set_relevant_context($context);
         }
 
+        $interactor = new interactor($workspace);
+        if (!$interactor->can_view_discussions()) {
+            throw new \moodle_exception('invalid_access', 'container_workspace');
+        }
+
         $query = new query($workspace->get_id());
 
         if (isset($args['cursor'])) {
@@ -88,5 +94,4 @@ final class files implements query_resolver, has_middleware {
             new require_advanced_feature('container_workspace'),
         ];
     }
-
 }

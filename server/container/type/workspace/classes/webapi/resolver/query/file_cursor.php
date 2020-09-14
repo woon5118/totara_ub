@@ -22,6 +22,7 @@
  */
 namespace container_workspace\webapi\resolver\query;
 
+use container_workspace\interactor\workspace\interactor;
 use container_workspace\loader\file\loader;
 use container_workspace\query\file\query;
 use core\orm\pagination\offset_cursor_paginator;
@@ -54,6 +55,11 @@ final class file_cursor implements query_resolver, has_middleware {
 
         if (!$workspace->is_typeof(workspace::get_type())) {
             throw new \coding_exception("Cannot count the files from a container that is not a workspace");
+        }
+
+        $interactor = new interactor($workspace);
+        if (!$interactor->can_view_discussions()) {
+            throw new \moodle_exception('invalid_access', 'container_workspace');
         }
 
         $query = new query($workspace->get_id());

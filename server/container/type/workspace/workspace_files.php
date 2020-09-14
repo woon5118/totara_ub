@@ -21,10 +21,12 @@
  * @package container_workspace
  */
 
+use container_workspace\interactor\workspace\interactor;
 use container_workspace\query\file\sort;
 use container_workspace\totara\menu\your_spaces;
 use core_container\factory;
 use totara_core\advanced_feature;
+use totara_tui\output\component;
 
 require_once(__DIR__ . "/../../../config.php");
 global $OUTPUT, $PAGE;
@@ -50,15 +52,21 @@ if (!sort::is_valid($sort)) {
     $sort = sort::RECENT;
 }
 
-$tui = new \totara_tui\output\component(
-    'container_workspace/pages/WorkspaceFilePage',
-    [
-        'workspace-id' => $workspace_id,
-        'workspace-name' => $workspace->fullname,
-        'selected-sort' => sort::get_code($sort),
-        'selected-extension' => $extension,
-    ]
-);
+$tui = new component('container_workspace/pages/WorkspaceEmptyPage');
+
+$interactor = new interactor($workspace);
+if ($interactor->can_view_discussions()) {
+    $tui = new component(
+        'container_workspace/pages/WorkspaceFilePage',
+        [
+            'workspace-id' => $workspace_id,
+            'workspace-name' => $workspace->fullname,
+            'selected-sort' => sort::get_code($sort),
+            'selected-extension' => $extension,
+        ]
+    );
+}
+
 $tui->register($PAGE);
 
 echo $OUTPUT->header();

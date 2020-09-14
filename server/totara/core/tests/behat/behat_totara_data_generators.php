@@ -509,6 +509,11 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'workspace_owners',
                 'required' => array('username', 'workspace'),
             ),
+            'discussions' => array(
+                'plugin' => 'container_workspace',
+                'datagenerator' => 'discussions',
+                'required' => array('username', 'workspace', 'content'),
+            ),
         ),
         'ml_recommender' => array(
             'user recommendations' => array(

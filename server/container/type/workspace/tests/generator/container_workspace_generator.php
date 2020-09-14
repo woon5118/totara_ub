@@ -20,14 +20,16 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package container_workspace
  */
-use container_workspace\workspace;
-use container_workspace\local\workspace_helper;
+
 use container_workspace\discussion\discussion;
-use core\json_editor\node\paragraph;
 use container_workspace\discussion\discussion_helper;
 use container_workspace\interactor\workspace\interactor as workspace_interactor;
+use container_workspace\local\workspace_helper;
 use container_workspace\member\member;
 use container_workspace\totara_engage\share\recipient\library as library_recipient;
+use container_workspace\workspace;
+use core\json_editor\node\attachments;
+use core\json_editor\node\paragraph;
 
 /**
  * Generator for container workspace
@@ -275,6 +277,63 @@ final class container_workspace_generator extends component_generator_base {
 
         $manager = $workspace->get_enrolment_manager();
         $manager->self_enrol_user($user->id, $role->id);
+    }
+
+    /**
+     * Behat generator to create discussions in a workspace, optionally with attached files.
+     *
+     * @param array $parameters
+     */
+    public function create_discussions(array $parameters): void {
+        global $DB, $CFG;
+
+        if (empty($parameters['username']) || empty($parameters['workspace'] || empty($parameters['content']))) {
+            throw new \coding_exception('`workspace` and `username` are required');
+        }
+
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+
+        $user = core_user::get_user_by_username($parameters['username']);
+        $workspace_id = $DB->get_field('course', 'id', ['shortname' => strtolower($parameters['workspace'])]);
+
+        $content = [
+            'type' => 'doc',
+            'content' => [
+                paragraph::create_json_node_from_text($parameters['content'] ?? 'Discussion'),
+            ]
+        ];
+
+        $discussion = discussion::create(json_encode($content), $workspace_id, null, FORMAT_JSON_EDITOR, $user->id);
+        if (empty($parameters['files'])) {
+            return;
+        }
+
+        $files = explode(',', $parameters['files']);
+        $fs = get_file_storage();
+
+        // Store the files directly against the discussion, bypassing the draft feature.
+        // We don't want to store in the user draft as the core api uses the session $USER which
+        // conflicts with this generator.
+        $stored_files = [];
+        foreach ($files as $file_path) {
+            $path = $CFG->dirroot . '/container/type/workspace/tests/fixtures/' . trim($file_path);
+            $record = [
+                'component' => 'container_workspace',
+                'filearea' => 'discussion',
+                'contextid' => $discussion->get_context()->id,
+                'itemid' => $discussion->get_id(),
+                'filename' => basename(trim($file_path)) ?? 'file.txt',
+                'filepath' => '/'
+            ];
+            $stored_files[] = $fs->create_file_from_pathname($record, $path);
+        }
+
+        $content['content'][] = attachments::create_raw_node_from_list($stored_files);
+
+        // Update the discussion content to include the attached files. We have to prevent the update_content
+        // call from deleting the files during the update as it likes to clean up things.
+        $discussion->set_prevent_delete_files_on_update(true);
+        $discussion->update_content(json_encode($content), null, FORMAT_JSON_EDITOR, $user->id);
     }
 
     /**

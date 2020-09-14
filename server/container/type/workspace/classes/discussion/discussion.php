@@ -79,6 +79,11 @@ final class discussion {
     private $total_reactions;
 
     /**
+     * @var bool
+     */
+    private $prevent_delete_files_on_update;
+
+    /**
      * discussion constructor.
      * @param workspace_discussion $entity
      */
@@ -88,6 +93,7 @@ final class discussion {
 
         $this->total_comments = null;
         $this->total_reactions = null;
+        $this->prevent_delete_files_on_update = false;
     }
 
     /**
@@ -330,7 +336,7 @@ final class discussion {
             $draft_id
         );
 
-        if (null === $draft_id || 0 === $draft_id) {
+        if ((null === $draft_id || 0 === $draft_id) && !$this->prevent_delete_files_on_update) {
             // Draft's id is empty, therefore we should go thru the current trailing files
             // to remove them.
             require_once("{$CFG->dirroot}/lib/filelib.php");
@@ -644,5 +650,18 @@ final class discussion {
             "/container/type/workspace/discussion.php",
             ['id' => $this->entity->id]
         );
+    }
+
+    /**
+     * Prevent the update_content method from deleting any hanging discussion files.
+     * Only available to unit & behat tests.
+     *
+     * @param bool $prevent_delete_files_on_update
+     */
+    public function set_prevent_delete_files_on_update(bool $prevent_delete_files_on_update): void {
+        if ((!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) && (!defined('BEHAT_TEST') || !BEHAT_TEST)) {
+            throw new \coding_exception('Cannot call set_prevent_delete_files_on_update outside of a phpunit or behat test.');
+        }
+        $this->prevent_delete_files_on_update = $prevent_delete_files_on_update;
     }
 }

@@ -22,6 +22,7 @@
  */
 namespace container_workspace\webapi\resolver\query;
 
+use container_workspace\interactor\workspace\interactor;
 use container_workspace\loader\file\loader;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
@@ -52,6 +53,11 @@ final class file_extensions implements query_resolver, has_middleware {
         if (!$workspace->is_typeof(workspace::get_type())) {
             // Prevent the course container to be a pass in here.
             throw new \coding_exception("Cannot find the workspace from id: '{$workspace_id}'");
+        }
+
+        $interactor = new interactor($workspace);
+        if (!$interactor->can_view_discussions()) {
+            throw new \moodle_exception('invalid_access', 'container_workspace');
         }
 
         if (!$ec->has_relevant_context()) {
