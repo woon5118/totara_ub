@@ -178,8 +178,9 @@ export default {
      * Get list of elements
      */
     getListOfElements() {
-      this.elementList = [];
-      this.getElementList(this.$refs.root.children);
+      this.elementList = Array.prototype.slice.apply(
+        this.$refs.root.querySelectorAll('article')
+      );
     },
 
     /**
@@ -495,22 +496,6 @@ export default {
           break;
         }
       }
-    },
-
-    /**
-     * Recursively store all article items in an array
-     *
-     * @param {Array} children
-     */
-    getElementList(children) {
-      let list = children;
-      Object.keys(list).forEach(i => {
-        if (list[i].nodeName === 'ARTICLE') {
-          this.elementList.push(list[i]);
-        } else {
-          this.getElementList(list[i].children);
-        }
-      });
     },
 
     /**
