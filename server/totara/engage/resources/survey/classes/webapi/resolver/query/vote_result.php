@@ -29,6 +29,7 @@ use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use engage_survey\totara_engage\resource\survey;
+use totara_engage\access\access_manager;
 
 /**
  * Resolver for querying the vote result of a survey.
@@ -46,6 +47,11 @@ final class vote_result implements query_resolver, has_middleware {
         }
 
         $survey = survey::from_resource_id($args['resourceid']);
+
+        if (!access_manager::can_access($survey, $USER->id)) {
+            throw new \coding_exception("User with id '{$USER->id}' does not have access to this survey result");
+        }
+
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context($survey->get_context());
         }
