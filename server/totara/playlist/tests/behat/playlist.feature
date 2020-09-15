@@ -14,8 +14,10 @@ Feature: Manipulate playlist instance
       | Topic 1 |
 
     And the following "playlists" exist in "totara_playlist" plugin:
-      | name         | username | access  |
-      | Playlist 101 | userone  | PRIVATE |
+      | name         | username | access     | topics  |
+      | Playlist 101 | userone  | PRIVATE    |         |
+      | Playlist 102 | userone  | RESTRICTED |         |
+      | Playlist 103 | userone  | PUBLIC     | Topic 1 |
 
   @javascript
   Scenario: User edit the playlist's summary and make private playlist to public playlist
@@ -45,3 +47,20 @@ Feature: Manipulate playlist instance
 
     When I click on "Done" "button"
     Then I should see "Everyone can view" in the ".tui-accessDisplay__accessIcon__icons" "css_element"
+
+  @javascript
+  Scenario: User views restricted playlist and public playlist
+    #View restricted playlist
+    Given I log in as "userone"
+    And I click on "Your Library" in the totara menu
+    And I follow "Playlist 102"
+    Then I should see "Playlist 102"
+    When I click on "Expand" "button"
+    Then I should not see "Reshare"
+
+    # View public playlist
+    When I follow "Playlist 103"
+    Then I should see "Playlist 103"
+    And I click on "Expand" "button"
+    And I click on "Share" "button" in the ".tui-shareSetting" "css_element"
+    Then I should see "Settings" in the ".tui-modalContent__header-title" "css_element"

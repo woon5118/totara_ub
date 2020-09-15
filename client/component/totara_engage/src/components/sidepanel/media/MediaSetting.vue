@@ -30,7 +30,7 @@
       @removed-like="$emit('update-like-status', false)"
     />
     <Share
-      v-if="accessValue === 'PUBLIC' || (accessValue === 'RESTRICTED' && owned)"
+      v-if="accessValue === 'PUBLIC'"
       :instance-id="instanceId"
       :component="componentName"
       :owned="owned"

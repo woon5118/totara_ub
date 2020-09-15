@@ -18,8 +18,9 @@ Feature: Vote survey
       | Topic 2 |
 
     And the following "surveys" exist in "engage_survey" plugin:
-      | question       | username | access  | topics           | options                      |
-      | Test Survey 1? | user1    | PUBLIC  | Topic 1, Topic 2 |  Option 1, Option 2, Option 3|
+      | question       | username | access      | topics           | options                      |
+      | Test Survey 1? | user1    | PUBLIC      | Topic 1, Topic 2 |  Option 1, Option 2, Option 3|
+      | Test Survey 2? | user1    | RESTRICTED  | Topic 1, Topic 2 |  Option 1, Option 2, Option 3|
 
     And "engage_survey" "Test Survey 1?" is shared with the following users:
       | sharer | recipient |
@@ -67,3 +68,11 @@ Feature: Vote survey
     And I should see "1"
     And I click on "Remove like" "button"
     And I should see "0"
+
+  Scenario: User views restricted survey and public survey
+    Given I log in as "admin"
+    And I view survey "Test Survey 2?"
+    Then I should not see "Reshare"
+    When I view survey "Test Survey 1?"
+    And I click on "Share" "button" in the ".tui-shareSetting" "css_element"
+    Then I should see "Reshare" in the ".tui-modalContent__header-title" "css_element"
