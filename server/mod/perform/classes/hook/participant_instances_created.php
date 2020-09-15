@@ -24,6 +24,7 @@
 namespace mod_perform\hook;
 
 use core\collection;
+use mod_perform\task\service\data\subject_instance_activity_collection;
 use mod_perform\task\service\participant_instance_dto;
 use totara_core\hook\base;
 
@@ -41,9 +42,16 @@ class participant_instances_created extends base {
     protected $participant_instance_dtos;
 
     /**
-     * @param collection|participant_instance_dto[] $participant_instance_dtos
+     * @var subject_instance_activity_collection
      */
-    public function __construct(collection $participant_instance_dtos) {
+    private $activity_collection;
+
+    /**
+     * @param collection|participant_instance_dto[] $participant_instance_dtos
+     * @param subject_instance_activity_collection|null $activity_collection
+     */
+    public function __construct(collection $participant_instance_dtos, subject_instance_activity_collection $activity_collection = null) {
+        $this->activity_collection = $activity_collection ?? new subject_instance_activity_collection();
         $this->participant_instance_dtos = $participant_instance_dtos;
     }
 
@@ -54,4 +62,10 @@ class participant_instances_created extends base {
         return $this->participant_instance_dtos;
     }
 
+    /**
+     * @return subject_instance_activity_collection
+     */
+    public function get_activity_collection() {
+        return $this->activity_collection;
+    }
 }

@@ -23,16 +23,15 @@
 
 namespace mod_perform\task\service;
 
+use coding_exception;
 use core\collection;
 use core\entities\user;
 use core\orm\query\builder;
 use mod_perform\constants;
-use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section;
 use mod_perform\entities\activity\section_relationship;
 use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\subject_instance_manual_participant;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\event\participant_instance_manually_added;
@@ -48,6 +47,7 @@ use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_instance\progress_not_applicable;
 use mod_perform\state\subject_instance\closed;
 use mod_perform\state\subject_instance\pending;
+use mod_perform\task\service\data\subject_instance_activity_collection;
 use stdClass;
 use totara_core\relationship\helpers\relationship_collection_manager as core_relationship_collection_manager;
 use totara_core\relationship\relationship as core_relationship;
@@ -77,13 +77,23 @@ class participant_instance_creation {
     private $buffer_count = BATCH_INSERT_MAX_ROW_COUNT;
 
     /**
+     * Collection of activities for the subject instance dtos.
+     *
+     * @var subject_instance_activity_collection
+     */
+    private $activity_collection;
+
+    /**
      * Generates participant instances for a collection of subject instances.
      *
      * @param collection|subject_instance_dto[] $subject_instance_dtos
+     * @param subject_instance_activity_collection|null $subject_instance_activity_collection
      *
      * @return void
      */
-    public function generate_instances(collection $subject_instance_dtos): void {
+    public function generate_instances(collection $subject_instance_dtos, subject_instance_activity_collection $subject_instance_activity_collection = null): void {
+        $this->activity_collection = $subject_instance_activity_collection ?? new subject_instance_activity_collection();
+
         $this->aggregate_participant_instances($subject_instance_dtos);
         $this->save_data();
     }
@@ -201,6 +211,7 @@ class participant_instance_creation {
                 ),
                 [new relationship_resolver_dto($participant_relationship['participant_id'])]
             );
+            $this->save_data();
             $added_instances_data[] = [
                 'subject_instance_id' => $subject_instance_id,
                 'core_relationship_id' => $participant_relationship['core_relationship_id'],
@@ -235,13 +246,13 @@ class participant_instance_creation {
             ->order_by('id')
             ->first();
         if (!$subject_instance) {
-            throw new \coding_exception('Invalid subject_instance_ids detected');
+            throw new coding_exception('Invalid subject_instance_ids detected');
         }
         $activity_id = $subject_instance->activity()->id;
 
         // Activity must be active.
         if ((int)$subject_instance->activity()->status !== active::get_code()) {
-            throw new \coding_exception('Cannot add participant instances for inactive activity.');
+            throw new coding_exception('Cannot add participant instances for inactive activity.');
         }
 
         // Subject instances must be for the same activity.
@@ -275,7 +286,7 @@ class participant_instance_creation {
         $bad_subject_instance_ids = array_diff($subject_instance_ids, $subject_instance_ids_filtered);
         if (count($bad_subject_instance_ids) > 0) {
             $bad_subject_instance_ids = implode(',', $bad_subject_instance_ids);
-            throw new \coding_exception(
+            throw new coding_exception(
                 "Subject instances with these ids do not belong to activity {$activity_id}: {$bad_subject_instance_ids}"
             );
         }
@@ -303,7 +314,7 @@ class participant_instance_creation {
         if (count($bad_relationship_ids) > 0) {
             sort($bad_relationship_ids);
             $bad_relationship_ids = implode(',', $bad_relationship_ids);
-            throw new \coding_exception(
+            throw new coding_exception(
                 "Relationships with these ids cannot be used in activity {$activity_id}: {$bad_relationship_ids}"
             );
         }
@@ -323,7 +334,7 @@ class participant_instance_creation {
         $bad_user_ids = array_diff($user_ids, $user_ids_filtered_by_existing);
         if (count($bad_user_ids) > 0) {
             $bad_user_ids = implode(',', $bad_user_ids);
-            throw new \coding_exception("Users with these ids do not exist: {$bad_user_ids}");
+            throw new coding_exception("Users with these ids do not exist: {$bad_user_ids}");
         }
     }
 
@@ -358,8 +369,6 @@ class participant_instance_creation {
      * @return void
      */
     private function aggregate_participant_instances(collection $subject_instance_dtos): void {
-        $subject_instance_dtos = $this->filter_out_pending_instances($subject_instance_dtos);
-
         // Find all the activities that are related to the subject instances.
         $activity_ids = array_unique($subject_instance_dtos->pluck('activity_id'), SORT_NUMERIC);
         $section_relationships = $this->get_section_relationships($activity_ids);
@@ -375,6 +384,9 @@ class participant_instance_creation {
 
         // Process each subject instance, one at a time.
         foreach ($subject_instance_dtos as $subject_instance) {
+            if ($subject_instance->status === pending::get_code()) {
+                continue;
+            }
             // If there are no relationships defined for the activity then there is nothing to do.
             $has_no_relationships_for_activity =
                 !isset($section_relationships_per_core_relationship_per_activity[$subject_instance->activity_id]);
@@ -408,11 +420,18 @@ class participant_instance_creation {
      * @return collection
      */
     private function get_section_relationships(array $activity_ids): collection {
-        return section_relationship::repository()
-            ->with('section')
-            ->join([section::TABLE, 'section'], 'section_id', 'id')
-            ->where_in('section.activity_id', $activity_ids)
-            ->get();
+        $section_relationships = new collection();
+        $this->activity_collection->load_activity_configs_if_missing($activity_ids);
+
+        foreach ($activity_ids as $key => $activity_id) {
+            $activity = $this->activity_collection->get_activity_config($activity_id);
+
+            foreach ($activity->get_section_relationships() as $section_relationship) {
+                $section_relationships->append($section_relationship);
+            }
+        }
+
+        return $section_relationships;
     }
 
     /**
@@ -489,8 +508,6 @@ class participant_instance_creation {
                 );
             }
         }
-
-        $this->delete_manual_participant_selection_data($subject_instance->id);
     }
 
     /**
@@ -522,7 +539,7 @@ class participant_instance_creation {
             $progress = progress_not_applicable::get_code();
             $availability = availability_not_applicable::get_code();
         } else {
-            throw new \coding_exception(
+            throw new coding_exception(
                 'Tried to create participant instance related to no sections which can view or answer'
             );
         }
@@ -573,7 +590,6 @@ class participant_instance_creation {
                 $this->save_data();
             }
         }
-        $this->save_data();
     }
 
     /**
@@ -610,40 +626,8 @@ class participant_instance_creation {
                     participant_instance_dto::create_from_data($section_data)
                 );
             }
-            (new participant_instances_created($created_participants_dtos))->execute();
+            (new participant_instances_created($created_participants_dtos, $this->activity_collection))->execute();
             $this->participation_creation_list = [];
         });
     }
-
-    /**
-     * Filter out all subject instances which are pending, we do not need to create
-     * participant instances for them at this point
-     *
-     * @param collection $subject_instance_dtos
-     * @return collection
-     */
-    private function filter_out_pending_instances(collection $subject_instance_dtos): collection {
-        return $subject_instance_dtos->filter(function (subject_instance_dto $subject_instance) {
-            return $subject_instance->get_status() != pending::get_code();
-        });
-    }
-
-    /**
-     * Deletes the users that were manually selected to participate.
-     * After generating participant instances based upon relationships, we no longer need to store the users.
-     *
-     * @param int $subject_instance_id
-     */
-    private function delete_manual_participant_selection_data(int $subject_instance_id): void {
-        subject_instance_manual_participant::repository()
-            ->where('subject_instance_id', $subject_instance_id)
-            ->delete();
-
-        // The perform_manual_relationship_selector table has a cascading delete foreign key on
-        // perform_manual_relationship_selector_progress, so this deletes records from both of the tables.
-        manual_relationship_selection_progress::repository()
-            ->where('subject_instance_id', $subject_instance_id)
-            ->delete();
-    }
-
 }

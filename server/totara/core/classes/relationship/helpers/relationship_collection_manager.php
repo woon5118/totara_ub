@@ -132,6 +132,7 @@ class relationship_collection_manager {
     private function get_relationships_from_ids(array $relationship_ids): array {
         return relationship_entity::repository()
             ->where_in('id', $relationship_ids)
+            ->with('resolvers')
             ->get()
             ->map_to(relationship::class)
             ->all(true);

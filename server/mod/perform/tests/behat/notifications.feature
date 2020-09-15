@@ -73,7 +73,10 @@ Feature: Perform activity notifications - core relationships
     And I confirm the tui confirmation modal
     And I wait for the next second
     And I trigger cron
-    And I press the "back" button in the browser
+
+    # run adhoc task to send notifications.
+    And I run the adhoc scheduled tasks "mod_perform\task\send_participant_instance_creation_notifications_task"
+    And I am on homepage
     And I log out
 
     # user1 should receive a notification

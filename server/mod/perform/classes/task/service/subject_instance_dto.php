@@ -67,9 +67,11 @@ class subject_instance_dto {
      * Create a new dto from a given entity
      *
      * @param subject_instance $subject_instance
+     * @param array|null $track_data Optional track data containing track id and activity id.
+     *
      * @return static
      */
-    public static function create_from_entity(subject_instance $subject_instance): self {
+    public static function create_from_entity(subject_instance $subject_instance, array $track_data = null): self {
         $instance = new self();
         $instance->id = (int) $subject_instance->id;
         $instance->track_user_assignment_id = (int) $subject_instance->track_user_assignment_id;
@@ -77,8 +79,12 @@ class subject_instance_dto {
         $instance->job_assignment_id = (int) $subject_instance->job_assignment_id;
         $instance->created_at = (int) $subject_instance->created_at;
         $instance->updated_at = (int) $subject_instance->updated_at;
-        $instance->activity_id = (int) $subject_instance->track->activity_id;
-        $instance->track_id = (int) $subject_instance->track->id;
+        $instance->activity_id = empty($track_data['activity_id'])
+            ? (int) $subject_instance->track->activity_id
+            : $track_data['activity_id'];
+        $instance->track_id = empty($track_data['track_id'])
+            ? (int) $subject_instance->track->id
+            : $track_data['track_id'];
         $instance->status = (int) $subject_instance->status;
 
         return $instance;

@@ -23,6 +23,8 @@
  */
 
 use core\collection;
+use core\task\adhoc_task;
+use core\task\manager;
 use mod_perform\constants;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
@@ -38,6 +40,7 @@ use mod_perform\observers\notification as notification_observer;
 use mod_perform\state\activity\draft;
 use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\pending;
+use mod_perform\task\send_participant_instance_creation_notifications_task;
 use mod_perform\task\service\participant_instance_dto;
 use mod_perform\watcher\notification as notification_watcher;
 use totara_job\job_assignment;
@@ -125,7 +128,7 @@ class mod_perform_notification_watcher_testcase extends mod_perform_notification
         $activity = $this->create_activity(['activity_status' => draft::get_code()]);
         $section = $this->create_section($activity);
         $this->create_section_relationships($section);
-        $track = $this->perfgen->create_activity_tracks($activity, 1)->first(true);
+        $track = $this->perfgen->create_activity_tracks($activity, 1)->first();
 
         $user_assignment = new track_user_assignment_entity();
         $user_assignment->track_id = $track->id;
@@ -157,7 +160,65 @@ class mod_perform_notification_watcher_testcase extends mod_perform_notification
     }
 
     /**
-     * @covers mod_perform\watcher\notification::create_participant_instances
+     * @covers \mod_perform\watcher\notification::create_participant_instances
+     */
+    public function test_create_participant_instances_queues_adhoc_tasks() {
+        $hook = new participant_instances_created(new collection([
+            participant_instance_dto::create_from_data([
+                'id' => $this->participant_instances1[constants::RELATIONSHIP_SUBJECT]->id,
+                'activity_id' => $this->activity1->id,
+                'core_relationship_id' => $this->participant_instances1[constants::RELATIONSHIP_SUBJECT]->core_relationship_id,
+            ]),
+            participant_instance_dto::create_from_data([
+                'id' => $this->participant_instances1[constants::RELATIONSHIP_MANAGER]->id,
+                'activity_id' => $this->activity1->id,
+                'core_relationship_id' => $this->participant_instances1[constants::RELATIONSHIP_MANAGER]->core_relationship_id,
+            ]),
+            participant_instance_dto::create_from_data([
+                'id' => $this->participant_instances1[constants::RELATIONSHIP_APPRAISER]->id,
+                'activity_id' => $this->activity1->id,
+                'core_relationship_id' => $this->participant_instances1[constants::RELATIONSHIP_APPRAISER]->core_relationship_id,
+            ]),
+            participant_instance_dto::create_from_data([
+                'id' => $this->participant_instances2[constants::RELATIONSHIP_SUBJECT]->id,
+                'activity_id' => $this->activity2->id,
+                'core_relationship_id' => $this->participant_instances1[constants::RELATIONSHIP_SUBJECT]->core_relationship_id,
+            ]),
+            participant_instance_dto::create_from_data([
+                'id' => $this->participant_instances2[constants::RELATIONSHIP_MANAGER]->id,
+                'activity_id' => $this->activity2->id,
+                'core_relationship_id' => $this->participant_instances1[constants::RELATIONSHIP_MANAGER]->core_relationship_id,
+            ]),
+        ]));
+        notification_watcher::create_participant_instances($hook);
+
+        $custom_data = [
+            'participant_instance_ids' => $hook->get_dtos()->pluck('id')
+        ];
+        $adhoc_task = $this->get_mod_perform_adhoc_task_with_data($custom_data);
+        $this->assertNotNull($adhoc_task);
+    }
+
+    /**
+     * Gets specific adhoc task with data.
+     *
+     * @param array $custom_data
+     * @return stdClass|null
+     */
+    private function get_mod_perform_adhoc_task_with_data(array $custom_data): ?adhoc_task {
+        $tasks = manager::get_adhoc_tasks(send_participant_instance_creation_notifications_task::class);
+        $custom_data = json_encode($custom_data);
+
+        foreach ($tasks as $task) {
+            if ($task->get_custom_data_as_string() === $custom_data) {
+                return $task;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @covers \mod_perform\task\send_participant_instance_creation_notifications_task::execute
      * @covers mod_perform\notification\factory::create_dealer_on_participant_instances
      */
     public function test_create_participant_instances() {
@@ -192,6 +253,12 @@ class mod_perform_notification_watcher_testcase extends mod_perform_notification
         $sink = factory::create_sink();
         $sink->clear();
         notification_watcher::create_participant_instances($hook);
+
+        $custom_data = [
+            'participant_instance_ids' => $hook->get_dtos()->pluck('id')
+        ];
+        $notification_task = $this->get_mod_perform_adhoc_task_with_data($custom_data);
+        $notification_task->execute();
         $this->assertCount(5, $sink->get_all());
         $creation = $sink->get_by_class_key('instance_created');
         $this->assertCount(5, $creation);

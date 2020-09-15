@@ -24,12 +24,10 @@
 namespace mod_perform\task\service;
 
 use coding_exception;
-use core\orm\lazy_collection;
+use core\collection;
+use core\orm\entity\repository;
 use core\orm\query\builder;
-use core\orm\query\subquery;
 use mod_perform\dates\date_offset;
-use mod_perform\entities\activity\section;
-use mod_perform\entities\activity\section_relationship;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
@@ -37,7 +35,7 @@ use mod_perform\hook\subject_instances_created;
 use mod_perform\state\subject_instance\active;
 use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\pending;
-use totara_core\entities\relationship;
+use mod_perform\task\service\data\subject_instance_activity_collection;
 
 /**
  * This class is responsible for creating new subject instances for users who
@@ -52,34 +50,41 @@ class subject_instance_creation {
     public function generate_instances() {
         // Get all user assignments that potentially should have a subject instance created.
         $user_assignments = $this->get_user_assignments_potentially_needing_instances();
+        $dtos = new collection();
+        $activity_collection = new subject_instance_activity_collection();
 
-        $dtos = new \core\collection();
-
-        foreach ($user_assignments as $user_assignment) {
-            if (!$this->is_it_time_for_a_new_subject_instance($user_assignment)) {
-                continue;
-            }
-
-            $status = active::get_code();
-            if ($user_assignment->manual_relationships !== null) {
-                $status = pending::get_code();
-            }
-
+        builder::get_db()->transaction(function () use ($user_assignments, $dtos, $activity_collection) {
             $now = time();
-            $subject_instance = new subject_instance();
-            $subject_instance->track_user_assignment_id = $user_assignment->id;
-            $subject_instance->subject_user_id = $user_assignment->subject_user_id;
-            $subject_instance->job_assignment_id = $user_assignment->job_assignment_id;
-            $subject_instance->status = $status;
-            $subject_instance->created_at = $now;
-            $subject_instance->due_date = $this->calculate_due_date($user_assignment, $now);
-            $subject_instance->save();
+            foreach ($user_assignments as $user_assignment) {
+                $activity = $user_assignment->track->activity;
+                $activity_collection->add_activity_config($activity);
 
-            $dtos->append(subject_instance_dto::create_from_entity($subject_instance));
-        }
+                if (!$this->is_it_time_for_a_new_subject_instance($user_assignment)) {
+                    continue;
+                }
 
-        $hook = new subject_instances_created($dtos);
-        $hook->execute();
+                $status = $activity_collection->get_activity_config($activity->id)->has_manual_relationship()
+                    ? pending::get_code()
+                    : active::get_code();
+                $subject_instance = new subject_instance();
+                $subject_instance->track_user_assignment_id = $user_assignment->id;
+                $subject_instance->subject_user_id = $user_assignment->subject_user_id;
+                $subject_instance->job_assignment_id = $user_assignment->job_assignment_id;
+                $subject_instance->status = $status;
+                $subject_instance->created_at = $now;
+                $subject_instance->due_date = $this->calculate_due_date($user_assignment, $now);
+                $subject_instance->save();
+
+                $track_data = [
+                    'track_id' => $user_assignment->track_id,
+                    'activity_id' => $activity->id,
+                ];
+                $dtos->append(subject_instance_dto::create_from_entity($subject_instance, $track_data));
+            }
+
+            $hook = new subject_instances_created($dtos, $activity_collection);
+            $hook->execute();
+        });
     }
 
     /**
@@ -154,31 +159,26 @@ class subject_instance_creation {
      *  - track is not flagged for schedule synchronisation because that should happen before we create instances
      *  - assignment either doesn't have any instances or the repeat config is such that it potentially can have more
      *
-     * @return lazy_collection|track_user_assignment[]
+     * @return collection|track_user_assignment[]
      */
-    private function get_user_assignments_potentially_needing_instances(): lazy_collection {
+    private function get_user_assignments_potentially_needing_instances(): collection {
         return track_user_assignment::repository()
             ->as('tua')
             ->select('*')
-            // This subquery will return a column with null if there are
-            // no manual relationships involved and a value > 0 if there are.
-            ->add_select((new subquery(function (builder $builder) {
-                $builder->from(section_relationship::TABLE)
-                    ->select('MAX(id)')
-                    ->join([section::TABLE, 's'], 'section_id', 'id')
-                    ->join([relationship::TABLE, 'r'], 'core_relationship_id', 'id')
-                    ->where_field('s.activity_id', 't.activity_id')
-                    ->where('r.type', relationship::TYPE_MANUAL);
-            }))->as('manual_relationships'))
             ->join([track::TABLE, 't'], 'track_id', 'id')
             ->filter_by_possibly_has_subject_instances_to_create()
             ->filter_by_active()
             ->filter_by_active_track_and_activity()
             ->filter_by_time_interval()
             ->filter_by_does_not_need_schedule_sync()
+            ->with([
+                'track.activity' => function (repository $repository) {
+                    $repository->eager_load_instance_creation_data();
+                }
+            ])
             ->order_by('t.activity_id')
             ->order_by('id')
-            ->get_lazy();
+            ->get();
     }
 
 }

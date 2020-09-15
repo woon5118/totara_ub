@@ -24,7 +24,9 @@
 namespace mod_perform\observers;
 
 use core\collection;
+use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\subject_instance_manual_participant;
 use mod_perform\event\subject_instance_activated;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
@@ -46,6 +48,7 @@ class subject_instance_manual_status {
         $subject_instance_dto = subject_instance_dto::create_from_entity($subject_instance);
 
         self::generate_instances($subject_instance_dto);
+        self::delete_manual_participant_selection_data($subject_instance->id);
     }
 
     /**
@@ -57,5 +60,23 @@ class subject_instance_manual_status {
         $subject_instance_dto_collection = new collection([$subject_instance_dto]);
         (new participant_instance_creation())
             ->generate_instances($subject_instance_dto_collection);
+    }
+
+    /**
+     * Deletes the users that were manually selected to participate.
+     * After generating participant instances based upon relationships, we no longer need to store the users.
+     *
+     * @param int $subject_instance_id
+     */
+    private static function delete_manual_participant_selection_data(int $subject_instance_id): void {
+        subject_instance_manual_participant::repository()
+            ->where('subject_instance_id', $subject_instance_id)
+            ->delete();
+
+        // The perform_manual_relationship_selector table has a cascading delete foreign key on
+        // perform_manual_relationship_selector_progress, so this deletes records from both of the tables.
+        manual_relationship_selection_progress::repository()
+            ->where('subject_instance_id', $subject_instance_id)
+            ->delete();
     }
 }

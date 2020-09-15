@@ -23,8 +23,8 @@
 
 namespace mod_perform\hook;
 
-use coding_exception;
 use core\collection;
+use mod_perform\task\service\data\subject_instance_activity_collection;
 use mod_perform\task\service\subject_instance_dto;
 use totara_core\hook\base;
 
@@ -39,18 +39,20 @@ class subject_instances_created extends base {
     /**
      * @var collection|subject_instance_dto[]
      */
-    protected $subject_instance_dtos;
+    private $subject_instance_dtos;
+
+    /**
+     * @var subject_instance_activity_collection
+     */
+    private $activity_collection;
 
     /**
      * @param collection|subject_instance_dto[] $subject_instance_dtos
+     * @param subject_instance_activity_collection|null $activity_collection
      */
-    public function __construct(collection $subject_instance_dtos) {
-        // Validate that this only contains dtos
-        $non_dtos = $subject_instance_dtos->filter(function ($item) {
-            return !$item instanceof subject_instance_dto;
-        });
-        if ($non_dtos->count() > 0) {
-            throw new coding_exception('Expecting a collection of subject instance dtos');
+    public function __construct(collection $subject_instance_dtos, subject_instance_activity_collection $activity_collection = null) {
+        if ($activity_collection) {
+            $this->activity_collection = $activity_collection;
         }
         $this->subject_instance_dtos = $subject_instance_dtos;
     }
@@ -59,4 +61,10 @@ class subject_instances_created extends base {
         return $this->subject_instance_dtos;
     }
 
+    /**
+     * @return subject_instance_activity_collection
+     */
+    public function get_activity_collection() {
+        return $this->activity_collection;
+    }
 }

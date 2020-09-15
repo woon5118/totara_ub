@@ -352,6 +352,14 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
 
         $this->generate_instances();
 
+        // tests static instance is created for manual relationships as well.
+        $created_static_instances = subject_static_instance_entity::repository()->get();
+        $user_assignments = track_user_assignment::repository()->get();
+        $this->assertEqualsCanonicalizing(
+            $user_assignments->pluck('job_assignment_id'),
+            $created_static_instances->pluck('job_assignment_id')
+        );
+
         // All subject instances are marked as pending
         $created_instances = subject_instance::repository()->get();
         $this->assertCount(3, $created_instances);

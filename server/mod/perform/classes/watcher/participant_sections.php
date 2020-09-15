@@ -43,6 +43,6 @@ class participant_sections
      */
     public static function create_participant_sections(participant_instances_created $participant_instances_created_hook): void {
         $participation_service = new participant_section_creation();
-        $participation_service->generate_sections($participant_instances_created_hook->get_dtos());
+        $participation_service->generate_sections($participant_instances_created_hook->get_dtos(), $participant_instances_created_hook->get_activity_collection());
     }
 }

@@ -41,6 +41,6 @@ class participant_instances
      */
     public static function create_participants(subject_instances_created $subject_instances_created_hook): void {
         $participation_service = new participant_instance_creation();
-        $participation_service->generate_instances($subject_instances_created_hook->get_dtos());
+        $participation_service->generate_instances($subject_instances_created_hook->get_dtos(), $subject_instances_created_hook->get_activity_collection());
     }
 }

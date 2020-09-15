@@ -23,19 +23,17 @@
 
 namespace mod_perform\watcher;
 
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use core\task\manager;
 use mod_perform\hook\participant_instances_created;
-use mod_perform\notification\factory;
+use mod_perform\task\send_participant_instance_creation_notifications_task;
 
 class notification {
     /**
      * @param participant_instances_created $hook
      */
     public static function create_participant_instances(participant_instances_created $hook): void {
-        $participant_instances = participant_instance_entity::repository()->where_in('id', $hook->get_dtos()->map_to(function ($dto) {
-            return $dto->id;
-        })->all())->get()->all();
-        $dealer = factory::create_dealer_on_participant_instances($participant_instances);
-        $dealer->dispatch('instance_created');
+        $participant_instance_ids = $hook->get_dtos()->pluck('id');
+        $task = send_participant_instance_creation_notifications_task::create_for_new_participants($participant_instance_ids);
+        manager::queue_adhoc_task($task);
     }
 }

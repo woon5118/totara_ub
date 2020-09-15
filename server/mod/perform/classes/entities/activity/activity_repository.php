@@ -91,4 +91,13 @@ class activity_repository extends repository {
             ->get();
     }
 
+    /**
+     * Get activity configuration needed for participant instance creation.
+     *
+     * @return activity_repository
+     */
+    public function eager_load_instance_creation_data() {
+        return $this->with('notifications.recipients')
+            ->with('sections.section_relationships.core_relationship');
+    }
 }

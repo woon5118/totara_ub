@@ -23,6 +23,7 @@
 
 use core\collection;
 use core\event\message_sent;
+use core\task\manager;
 use mod_perform\constants;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\external_participant;
@@ -45,6 +46,7 @@ use mod_perform\state\subject_instance\closed;
 use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\in_progress;
 use mod_perform\state\subject_instance\open;
+use mod_perform\task\send_participant_instance_creation_notifications_task;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
@@ -203,7 +205,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             ->set_number_of_tracks_per_activity(2)
             ->set_number_of_users_per_user_group_type(2)
             ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER]);
-        $activity = $generator->create_full_activities($config)->first();
+        $generator->create_full_activities($config)->first();
 
         $this->assertEquals(4, participant_instance::repository()->count());
         $this->assertEquals(4, participant_section::repository()->count());
@@ -560,7 +562,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     public function test_add_participants_must_pass_existing_subject_instance_ids(array $subject_instance_ids) {
         /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $data = $this->generate_test_data_for_adding_participants([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER]);
+        $this->generate_test_data_for_adding_participants([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER]);
 
         $subject_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
         $new_subject = $this->getDataGenerator()->create_user();
@@ -699,6 +701,12 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $manual_participant_instances = (new participant_instance_creation())
             ->add_instances([$subject_instance_id], $relationship_participants)
             ->key_by('id');
+
+        // run notification adhoc tasks.
+        $notification_adhoc_tasks = manager::get_adhoc_tasks(send_participant_instance_creation_notifications_task::class);
+        foreach ($notification_adhoc_tasks as $notification_task) {
+            $notification_task->execute();
+        }
 
         $events = $sink->get_events();
         $events_perform = array_filter($events, function ($event) {
@@ -1136,8 +1144,6 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      * @param collection $subject_instances subject instances to use.
      */
     private function setup_manual_participants(collection $subject_instances): void {
-        $data_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-
         foreach ($subject_instances as $subject) {
             foreach (self::MANUAL_RELATIONSHIPS as $relationship) {
                 $relationship_id = relationship::load_by_idnumber($relationship)->id;

@@ -33,6 +33,7 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\track;
 use mod_perform\state\participant_instance\not_started;
+use mod_perform\task\service\data\subject_instance_activity_collection;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\participant_instance_dto;
 use mod_perform\task\service\participant_section_creation;
@@ -160,7 +161,9 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
         $this->setup_multiple_activities();
         $participant_section_service = new participant_section_creation();
         $participant_instance_dto_collection = $this->setup_participant_instances();
-        $participant_section_service->generate_sections($participant_instance_dto_collection);
+        $subject_instance_activity_collection = (new subject_instance_activity_collection())
+            ->load_activity_configs_if_missing($participant_instance_dto_collection->pluck('activity_id'));
+        $participant_section_service->generate_sections($participant_instance_dto_collection, $subject_instance_activity_collection);
 
         $sections = section::repository()->get();
         $created_participant_sections = participant_section::repository()->get();

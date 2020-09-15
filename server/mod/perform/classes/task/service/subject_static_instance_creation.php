@@ -23,12 +23,12 @@
 
 namespace mod_perform\task\service;
 
+use coding_exception;
 use core\collection;
 use core\orm\query\builder;
 use mod_perform\entities\activity\subject_static_instance;
 use stdClass;
 use totara_job\entities\job_assignment as job_assignment_entity;
-use totara_job\job_assignment;
 
 /**
  * Class subject_static_instance_creation
@@ -41,6 +41,11 @@ class subject_static_instance_creation {
      * @var array
      */
     private $subject_static_instances = [];
+
+    /**
+     * @var collection
+     */
+    private $all_existing_static_instances;
 
     /**
      * Maximum number of static instances aggregated before bulk insert.
@@ -59,26 +64,40 @@ class subject_static_instance_creation {
     public function generate_instances(collection $subject_instances): void {
         builder::get_db()->transaction(
             function () use ($subject_instances) {
-                foreach ($subject_instances as $subject_instance) {
-                    // If subject instance is per job assignment then get specific job assignment.
-                    // Else get all job assignments of subject.
-                    if (!empty($subject_instance->job_assignment_id)) {
-                        $entity = new job_assignment_entity($subject_instance->job_assignment_id);
-                        $job_assignments = [job_assignment::from_entity($entity)];
-                    } else {
-                        $job_assignments = job_assignment::get_all($subject_instance->subject_user_id);
-                    }
+                $subject_instance_chunks = array_chunk($subject_instances->all(), builder::get_db()->get_max_in_params());
 
-                    foreach ($job_assignments as $job_assignment) {
-                        $data = new stdClass();
-                        $data->subject_instance_id = $subject_instance->id;
-                        $data->job_assignment_id = $job_assignment->id;
-                        $data->manager_job_assignment_id = $job_assignment->managerjaid;
-                        $data->position_id = $job_assignment->positionid;
-                        $data->organisation_id = $job_assignment->organisationid;
-                        $data->created_at = time();
-                        $data->updated_at = $data->created_at;
-                        $this->aggregate_static_subject_instances($data);
+                foreach ($subject_instance_chunks as $subject_instances) {
+                    $subject_instances = new collection($subject_instances);
+                    $all_subject_job_assignments = job_assignment_entity::repository()
+                        ->where_in('userid', $subject_instances->pluck('subject_user_id'))
+                        ->get();
+
+                    $this->all_existing_static_instances = subject_static_instance::repository()
+                        ->where_in('subject_instance_id', $subject_instances->pluck('id'))
+                        ->get();
+
+                    foreach ($subject_instances as $subject_instance) {
+                        // If subject instance is per job assignment then get specific job assignment.
+                        // Else get all job assignments of subject.
+                        if (!empty($subject_instance->job_assignment_id)) {
+                            $job_assignments = [$all_subject_job_assignments->find('id', $subject_instance->job_assignment_id)];
+                        } else {
+                            $job_assignments = $all_subject_job_assignments
+                                ->filter('userid', $subject_instance->subject_user_id)
+                                ->all();
+                        }
+
+                        foreach ($job_assignments as $job_assignment) {
+                            $data = new stdClass();
+                            $data->subject_instance_id = $subject_instance->id;
+                            $data->job_assignment_id = $job_assignment->id;
+                            $data->manager_job_assignment_id = $job_assignment->managerjaid;
+                            $data->position_id = $job_assignment->positionid;
+                            $data->organisation_id = $job_assignment->organisationid;
+                            $data->created_at = time();
+                            $data->updated_at = $data->created_at;
+                            $this->aggregate_static_subject_instances($data);
+                        }
                     }
                 }
                 $this->save_subject_static_instances();
@@ -97,10 +116,15 @@ class subject_static_instance_creation {
         int $subject_instance_id,
         int $job_assignment_id
     ): bool {
-        return subject_static_instance::repository()
-            ->where('subject_instance_id', $subject_instance_id)
-            ->where('job_assignment_id', $job_assignment_id)
-            ->exists();
+        if ($this->all_existing_static_instances instanceof collection) {
+            return $this->all_existing_static_instances->has(
+                function ($existing_subject_instance) use ($subject_instance_id, $job_assignment_id) {
+                    return (int)$existing_subject_instance->subject_instance_id === $subject_instance_id &&
+                        (int)$existing_subject_instance->job_assignment_id == $job_assignment_id;
+                }
+            );
+        }
+        throw new coding_exception('Existing static subject instances not loaded.');
     }
 
     /**
@@ -110,7 +134,6 @@ class subject_static_instance_creation {
      * @return void
      */
     private function aggregate_static_subject_instances(stdClass $data): void {
-        // Leave if already exist.
         if ($this->subject_static_instance_exists($data->subject_instance_id, $data->job_assignment_id)) {
             return;
         }
