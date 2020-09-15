@@ -43,12 +43,12 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
      * Create some users and various learning items.
      * @return []
      */
-    private function create_faux_learning_items() {
+    private function create_faux_learning_items($format = 'html') {
         $prog_gen = $this->getDataGenerator()->get_plugin_generator('totara_program');
 
         $user = $this->getDataGenerator()->create_user();
 
-        $course = $this->getDataGenerator()->create_course(['shortname' => 'crs1', 'fullname' => 'course1', 'summary' => 'first course']);
+        $course = $this->getDataGenerator()->create_course(['shortname' => 'crs1', 'fullname' => 'course1', 'summary' => $this->summary_format('first course', $format)]);
 
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student', 'manual');
 
@@ -56,16 +56,24 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
         $c2 = $this->getDataGenerator()->create_course();
         $c3 = $this->getDataGenerator()->create_course();
 
-        $program = $prog_gen->create_program(['shortname' => 'prg1', 'fullname' => 'program1', 'summary' => 'first program']);
+        $program = $prog_gen->create_program(['shortname' => 'prg1', 'fullname' => 'program1', 'summary' => $this->summary_format('first program', $format)]);
         $prog_gen->add_courses_and_courseset_to_program($program, [[$c1, $c2], [$c3]], CERTIFPATH_STD);
         $prog_gen->assign_program($program->id, [$user->id]);
 
-        $certification = $prog_gen->create_certification(['shortname' => 'crt1', 'fullname' => 'certification1', 'summary' => 'first certification']);
+        $certification = $prog_gen->create_certification(['shortname' => 'crt1', 'fullname' => 'certification1', 'summary' => $this->summary_format('first certification', $format)]);
         $prog_gen->add_courses_and_courseset_to_program($certification, [[$c1, $c2], [$c3]], CERTIFPATH_CERT);
         $prog_gen->add_courses_and_courseset_to_program($certification, [[$c1], [$c3]], CERTIFPATH_RECERT);
         $prog_gen->assign_program($certification->id, [$user->id]);
 
         return [$user, $course, $program, $certification];
+    }
+
+    private function summary_format(string $text, string $format) {
+        if ($format == 'json') {
+            return '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"' . addslashes($text) . '"}]}]}';
+        } else {
+            return $text;
+        }
     }
 
     /**
@@ -425,13 +433,13 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
     }
 
     /**
-     * Test the learning item type resolver for the description field
+     * Test the learning item type resolver for the HTML description field
      */
-    public function test_resolve_description() {
+    public function test_resolve_description_html() {
         list($user, $course, $program, $certification) = $this->create_faux_learning_items();
         $this->setUser($user);
         $items = $this->get_learning_items($user->id);
-        $formats = [format::FORMAT_HTML, format::FORMAT_PLAIN];
+        $formats = [format::FORMAT_HTML, format::FORMAT_PLAIN, format::FORMAT_MOBILE];
 
         // Check that each core instance of learning item gets resolved correctly.
         $item = array_pop($items);
@@ -476,7 +484,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
 
         foreach ($formats as $format) {
             $value = $this->resolve('description', $item, ['format' => $format]);
-            if ($format == format::FORMAT_PLAIN) {
+            if ($format == format::FORMAT_PLAIN || $format == format::FORMAT_MOBILE) {
                 $this->assertEquals('first course', $value);
             }
             if ($format == format::FORMAT_HTML) {
@@ -524,9 +532,120 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
     }
 
     /**
-     * Test the learning item type resolver for the description_format field
+     * Test the learning item type resolver for the JSON description field
      */
-    public function test_resolve_description_format() {
+    public function test_resolve_description_json() {
+        list($user, $course, $program, $certification) = $this->create_faux_learning_items('json');
+        $this->setUser($user);
+        $items = $this->get_learning_items($user->id);
+
+        // Check that each core instance of learning item gets resolved correctly.
+        $item = array_pop($items);
+
+        try {
+            $value = $this->resolve('description', $item);
+            $this->fail('Expected failure on null $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                'Coding error detected, it must be fixed by a programmer: Invalid format given',
+                $ex->getMessage()
+            );
+        }
+
+        $formats = [
+            // TODO TL-27575 should convert from JSON_EDITOR to other formats
+            //format::FORMAT_HTML => '<p>first program</p>',
+            //format::FORMAT_PLAIN => 'first program',
+            format::FORMAT_MOBILE => '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"first program"}]}]}',
+        ];
+        foreach ($formats as $format => $expected) {
+            $value = $this->resolve('description', $item, ['format' => $format]);
+            $this->assertEquals($expected, $value);
+            $this->assertTrue(is_string($value));
+        }
+
+        // Check the permissions required for format::FORMAT_RAW
+        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+        $this->assertNull($value);
+
+        $this->setAdminUser();
+        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+        $this->assertEquals($formats[format::FORMAT_MOBILE], $value);
+
+        // Get the course next.
+        $this->setUser($user);
+        $item = array_pop($items);
+
+        try {
+            $value = $this->resolve('description', $item);
+            $this->fail('Expected failure on null $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                'Coding error detected, it must be fixed by a programmer: Invalid format given',
+                $ex->getMessage()
+            );
+        }
+
+        $formats = [
+            // TODO TL-27575 should convert from JSON_EDITOR to other formats
+            //format::FORMAT_HTML => '<p>first course</p>',
+            //format::FORMAT_PLAIN => 'first course',
+            format::FORMAT_MOBILE => '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"first course"}]}]}',
+        ];
+        foreach ($formats as $format => $expected) {
+            $value = $this->resolve('description', $item, ['format' => $format]);
+            $this->assertEquals($expected, $value);
+            $this->assertTrue(is_string($value));
+        }
+
+        // Check the permissions required for format::FORMAT_RAW
+        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+        $this->assertNull($value);
+
+        $this->setAdminUser();
+        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+        $this->assertEquals($formats[format::FORMAT_MOBILE], $value);
+
+
+        // Finally the certification.
+        $this->setUser($user);
+        $item = array_pop($items);
+
+        try {
+            $value = $this->resolve('description', $item);
+            $this->fail('Expected failure on null $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                'Coding error detected, it must be fixed by a programmer: Invalid format given',
+                $ex->getMessage()
+            );
+        }
+
+        $formats = [
+            // TODO TL-27575 should convert from JSON_EDITOR to other formats
+            //format::FORMAT_HTML => '<p>first certification</p>',
+            //format::FORMAT_PLAIN => 'first certification',
+            format::FORMAT_MOBILE => '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"first certification"}]}]}',
+        ];
+        foreach ($formats as $format => $expected) {
+            $value = $this->resolve('description', $item, ['format' => $format]);
+            $this->assertEquals($expected, $value);
+            $this->assertTrue(is_string($value));
+        }
+
+        // Check the permissions required for format::FORMAT_RAW
+        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+        $this->assertNull($value);
+
+        $this->setAdminUser();
+        $value = $this->resolve('description', $item, ['format' => format::FORMAT_RAW]);
+        $this->assertEquals($formats[format::FORMAT_MOBILE], $value);
+    }
+
+    /**
+     * Test the learning item type resolver for the HTML description_format field
+     */
+    public function test_resolve_description_format_html() {
         list($user, $course, $program, $certification) = $this->create_faux_learning_items();
         $this->setUser($user);
         $items = $this->get_learning_items($user->id);
@@ -566,6 +685,58 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
         $value = $this->resolve('description_format', $item);
         $this->assertTrue(is_string($value));
         $this->assertEquals('HTML', $value);
+
+        foreach ($formats as $format => $expected) {
+            $item->description_format = $format;
+            $value = $this->resolve('description_format', $item);
+            $this->assertTrue(is_string($value));
+            $this->assertEquals($expected, $value);
+        }
+    }
+
+    /**
+     * Test the learning item type resolver for the JSON description_format field
+     */
+    public function test_resolve_description_format_json() {
+        list($user, $course, $program, $certification) = $this->create_faux_learning_items('json');
+        $this->setUser($user);
+        $items = $this->get_learning_items($user->id);
+        $formats = [ // Note: HTML is default so not included here, and RAW is not a saved format.
+            FORMAT_PLAIN => format::FORMAT_PLAIN,
+            FORMAT_MARKDOWN => format::FORMAT_MARKDOWN,
+            FORMAT_JSON_EDITOR => format::FORMAT_JSON_EDITOR,
+        ];
+
+        // Check that each core instance of learning item gets resolved correctly.
+        $item = array_pop($items);
+        $value = $this->resolve('description_format', $item);
+        $this->assertTrue(is_string($value));
+        $this->assertEquals('JSON_EDITOR', $value);
+
+        // Also check all non default values.
+        foreach ($formats as $format => $expected) {
+            $item->description_format = $format;
+            $value = $this->resolve('description_format', $item);
+            $this->assertTrue(is_string($value));
+            $this->assertEquals($expected, $value);
+        }
+
+        $item = array_pop($items);
+        $value = $this->resolve('description_format', $item);
+        $this->assertTrue(is_string($value));
+        $this->assertEquals('JSON_EDITOR', $value);
+
+        foreach ($formats as $format => $expected) {
+            $item->description_format = $format;
+            $value = $this->resolve('description_format', $item);
+            $this->assertTrue(is_string($value));
+            $this->assertEquals($expected, $value);
+        }
+
+        $item = array_pop($items);
+        $value = $this->resolve('description_format', $item);
+        $this->assertTrue(is_string($value));
+        $this->assertEquals('JSON_EDITOR', $value);
 
         foreach ($formats as $format => $expected) {
             $item->description_format = $format;

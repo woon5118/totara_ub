@@ -78,7 +78,7 @@ type totara_mobile_learning_item {
   """
   Learning item description
   """
-  description(format: core_format = HTML): String
+  description(format: core_format = MOBILE): String
   """
   The format of the learning item description
   """
@@ -135,7 +135,7 @@ type totara_mobile_program {
   """
   Program summary
   """
-  summary(format: core_format = HTML): String
+  summary(format: core_format = MOBILE): String
   """
   The format of the program summary
   """
@@ -143,7 +143,11 @@ type totara_mobile_program {
   """
   Program endnnote to be displayed on completion
   """
-  endnote(format: core_format = HTML): String
+  endnote(format: core_format = MOBILE): String
+  """
+  The format of the Certification endnote
+  """
+  endnoteformat: core_format
   """
   The date the current user is due in the program
   """
@@ -257,7 +261,7 @@ type totara_mobile_certification {
   """
   Certification summary
   """
-  summary(format: core_format = HTML): String
+  summary(format: core_format = MOBILE): String
   """
   The format of the Certification summary
   """
@@ -265,7 +269,11 @@ type totara_mobile_certification {
   """
   Certification endnnote to be displayed on completion
   """
-  endnote(format: core_format = HTML): String
+  endnote(format: core_format = MOBILE): String
+  """
+  The format of the Certification endnote
+  """
+  endnoteformat: core_format
   """
   The date the current user is due in the Certification
   """

@@ -7,8 +7,8 @@ Feature: Test the totara_mobile_program query
       | username | firstname | lastname | email                |
       | student1 | Student   | 1        | student1@example.com |
     And the following "programs" exist in "totara_program" plugin:
-      | fullname  | shortname | category |
-      | Program 1 | prog1     |          |
+      | fullname  | shortname | category | summary | endnote |
+      | Program 1 | prog1     |          | HTML    | LMTH    |
     And the following "program assignments" exist in "totara_program" plugin:
       | program | user     |
       | prog1   | student1 |
@@ -35,13 +35,49 @@ Feature: Test the totara_mobile_program query
     And I should see "\"shortname\": \"prog1\"" in the "#response2" "css_element"
     And I should see "\"duedate\": null" in the "#response2" "css_element"
     And I should see "\"duedateState\": null" in the "#response2" "css_element"
-    And I should see "\"summary\": \"\"" in the "#response2" "css_element"
-    And I should see "\"endnote\": \"\"" in the "#response2" "css_element"
+    And I should see "\"summary\": \"HTML\"" in the "#response2" "css_element"
+    And I should see "\"summaryformat\": \"HTML\"" in the "#response2" "css_element"
+    And I should see "\"endnote\": \"LMTH\"" in the "#response2" "css_element"
+    And I should see "\"endnoteformat\": \"HTML\"" in the "#response2" "css_element"
     And I should see "\"completion\": {" in the "#response2" "css_element"
     And I should see "\"currentCourseSets\": []" in the "#response2" "css_element"
     And I should see "\"countUnavailableSets\": 0" in the "#response2" "css_element"
     And I should see "\"courseSetHeader\": \"\"" in the "#response2" "css_element"
     And I should see "\"imageSrc\": \"\"" in the "#response2" "css_element"
+
+  Scenario: Test the query with a program that has JSON summary and endnote
+    When I navigate to "Manage programs" node in "Site administration > Programs"
+    And I click on "Miscellaneous" "link"
+    And I click on "Program 1" "link"
+    And I click on "Edit program details" "button"
+    And I click on "Details" "link"
+    And I set the field with xpath "//select[@name='summary_editor[format]']" to "5"
+    And I set the field with xpath "//select[@name='endnote_editor[format]']" to "5"
+    And I click on "Save changes" "button"
+    And I activate the weka editor with css "#uid-1"
+    And I select the text "HTML" in the weka editor
+    And I type "JSON" in the weka editor
+    And I activate the weka editor with css "#uid-2"
+    And I select the text "LMTH" in the weka editor
+    And I type "NOSJ" in the weka editor
+    And I click on "Save changes" "button"
+    And I log out
+    When I am using the mobile emulator
+    Then I should see "Device emulator loading..."
+    And I should see "Making login_setup request"
+    And I set the field "username" to "student1"
+    And I set the field "password" to "student1"
+    When I click on "Submit Credentials 1" "button"
+    Then I should see "Native login OK"
+    And I should see "Setting up new GraphQL browser"
+    When I set the field "jsondata2" to "{\"operationName\": \"totara_mobile_program\",\"variables\": {\"programid\": 1}}"
+    And I click on "Submit Request 2" "button"
+    Then I should not see "Coding error detected" in the "#response2" "css_element"
+    And I should see "\"fullname\": \"Program 1\"" in the "#response2" "css_element"
+    And I should see "\"summary\": \"{\\"type" in the "#response2" "css_element"
+    And I should see "\"summaryformat\": \"JSON_EDITOR\"" in the "#response2" "css_element"
+    And I should see "\"endnote\": \"{\\"type" in the "#response2" "css_element"
+    And I should see "\"endnoteformat\": \"JSON_EDITOR\"" in the "#response2" "css_element"
 
   Scenario: Test the query with a program that has an image
     When I navigate to "Manage programs" node in "Site administration > Programs"

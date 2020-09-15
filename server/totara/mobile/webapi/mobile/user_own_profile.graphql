@@ -12,7 +12,7 @@ query totara_mobile_user_own_profile {
     city
     country
     timezone
-    description(format: PLAIN)
+    description(format: MOBILE)
     descriptionformat
     webpage: url
     skypeid: skype

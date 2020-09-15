@@ -4,7 +4,7 @@ query totara_mobile_course($courseid: core_id!) {
       id
       fullname
       shortname
-      summary(format: PLAIN)
+      summary(format: MOBILE)
       summaryformat
       startdate(format: ISO8601)
       enddate(format: ISO8601)
@@ -16,7 +16,7 @@ query totara_mobile_course($courseid: core_id!) {
         title
         available
         availablereason(format: PLAIN)
-        summary(format: PLAIN)
+        summary(format: MOBILE)
         summaryformat
         data: modules {
           id
@@ -29,7 +29,7 @@ query totara_mobile_course($courseid: core_id!) {
           completion
           completionstatus
           showdescription
-          description(format: PLAIN)
+          description(format: MOBILE)
           descriptionformat
           gradefinal
           gradepercentage

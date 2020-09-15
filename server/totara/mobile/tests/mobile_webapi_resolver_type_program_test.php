@@ -42,7 +42,7 @@ class totara_mobile_webapi_resolver_type_program_testcase extends advanced_testc
      * Create some users and various learning items.
      * @return array
      */
-    private function create_faux_programs() {
+    private function create_faux_programs($format = 'html') {
         $prog_gen = $this->getDataGenerator()->get_plugin_generator('totara_program');
 
         $user = $this->getDataGenerator()->create_user();
@@ -51,11 +51,18 @@ class totara_mobile_webapi_resolver_type_program_testcase extends advanced_testc
         $c2 = $this->getDataGenerator()->create_course();
         $c3 = $this->getDataGenerator()->create_course();
 
+        $summary = 'first program';
+        $endnote = 'Congratulations on completing the program';
+        if ($format == 'json') {
+            $summary = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"first program"}]}]}';
+            $endnote = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Congratulations on completing the program"}]}]}';
+        }
+
         $program = $prog_gen->create_program([
             'shortname' => 'prg1',
             'fullname' => 'program1',
-            'summary' => 'first program',
-            'endnote' => 'Congratulations on completing the program'
+            'summary' => $summary,
+            'endnote' => $endnote,
         ]);
         $prog_gen->add_courses_and_courseset_to_program($program, [[$c1, $c2], [$c3]], CERTIFPATH_STD);
         $prog_gen->assign_program($program->id, [$user->id]);
@@ -191,7 +198,7 @@ class totara_mobile_webapi_resolver_type_program_testcase extends advanced_testc
     /**
      * Test the program type resolver for the summary field
      */
-    public function test_resolve_summary() {
+    public function test_resolve_summary_html() {
         list($user, $program) = $this->create_faux_programs();
         $this->setUser($user);
         $formats = [format::FORMAT_HTML, format::FORMAT_PLAIN];
@@ -221,16 +228,152 @@ class totara_mobile_webapi_resolver_type_program_testcase extends advanced_testc
         $this->assertEquals('first program', $value);
     }
 
+    public function test_resolve_summary_json() {
+        list($user, $program) = $this->create_faux_programs('json');
+        $this->setUser($user);
+        $formats = [
+            // TODO TL-27575 should convert from JSON_EDITOR to other formats
+            //format::FORMAT_HTML => '<p>first program</p>',
+            //format::FORMAT_PLAIN => 'first program',
+            format::FORMAT_MOBILE => '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"first program"}]}]}',
+        ];
+
+        try {
+            $value = $this->resolve('summary', $program);
+            $this->fail('Expected failure on null $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                'Coding error detected, it must be fixed by a programmer: Invalid format given',
+                $ex->getMessage()
+            );
+        }
+
+        foreach ($formats as $format => $expected) {
+            $value = $this->resolve('summary', $program, ['format' => $format]);
+            $this->assertEquals($expected, $value, "Format {$format}");
+            $this->assertTrue(is_string($value));
+        }
+
+        // Check the permissions required for format::FORMAT_RAW
+        $value = $this->resolve('summary', $program, ['format' => format::FORMAT_RAW]);
+        $this->assertNull($value);
+
+        $this->setAdminUser();
+        $value = $this->resolve('summary', $program, ['format' => format::FORMAT_RAW]);
+        $this->assertEquals('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"first program"}]}]}', $value);
+    }
+
     /**
      * Test the learning item type resolver for the summary_format field
      */
-    public function test_resolve_summary_format() {
+    public function test_resolve_summary_format_html() {
         list($user, $program) = $this->create_faux_programs();
         $this->setUser($user);
 
         // Check that each core instance of learning item gets resolved correctly.
         $value = $this->resolve('summaryformat', $program);
         $this->assertEquals('HTML', $value);
+        $this->assertTrue(is_string($value));
+    }
+
+    public function test_resolve_summary_format_json() {
+        list($user, $program) = $this->create_faux_programs('json');
+        $this->setUser($user);
+
+        // Check that each core instance of learning item gets resolved correctly.
+        $value = $this->resolve('summaryformat', $program);
+        $this->assertEquals('JSON_EDITOR', $value);
+        $this->assertTrue(is_string($value));
+    }
+
+    /**
+     * Test the program type resolver for the endnote field
+     */
+    public function test_resolve_endnote_html() {
+        list($user, $program) = $this->create_faux_programs();
+        $this->setUser($user);
+        $formats = [format::FORMAT_HTML, format::FORMAT_PLAIN];
+
+        try {
+            $value = $this->resolve('endnote', $program);
+            $this->fail('Expected failure on null $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                'Coding error detected, it must be fixed by a programmer: Invalid format given',
+                $ex->getMessage()
+            );
+        }
+
+        foreach ($formats as $format) {
+            $value = $this->resolve('endnote', $program, ['format' => $format]);
+            $this->assertEquals('Congratulations on completing the program', $value);
+            $this->assertTrue(is_string($value));
+        }
+
+        // Check the permissions required for format::FORMAT_RAW
+        $value = $this->resolve('endnote', $program, ['format' => format::FORMAT_RAW]);
+        $this->assertNull($value);
+
+        $this->setAdminUser();
+        $value = $this->resolve('endnote', $program, ['format' => format::FORMAT_RAW]);
+        $this->assertEquals('Congratulations on completing the program', $value);
+    }
+
+    public function test_resolve_endnote_json() {
+        list($user, $program) = $this->create_faux_programs('json');
+        $this->setUser($user);
+        $formats = [
+            // TODO TL-27575 should convert from JSON_EDITOR to other formats
+            //format::FORMAT_HTML => '<p>Congratulations on completing the program</p>',
+            //format::FORMAT_PLAIN => 'Congratulations on completing the program',
+            format::FORMAT_MOBILE => '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Congratulations on completing the program"}]}]}',
+        ];
+
+        try {
+            $value = $this->resolve('endnote', $program);
+            $this->fail('Expected failure on null $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                'Coding error detected, it must be fixed by a programmer: Invalid format given',
+                $ex->getMessage()
+            );
+        }
+
+        foreach ($formats as $format => $expected) {
+            $value = $this->resolve('endnote', $program, ['format' => $format]);
+            $this->assertEquals($expected, $value, "Format {$format}");
+            $this->assertTrue(is_string($value));
+        }
+
+        // Check the permissions required for format::FORMAT_RAW
+        $value = $this->resolve('endnote', $program, ['format' => format::FORMAT_RAW]);
+        $this->assertNull($value);
+
+        $this->setAdminUser();
+        $value = $this->resolve('endnote', $program, ['format' => format::FORMAT_RAW]);
+        $this->assertEquals('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Congratulations on completing the program"}]}]}', $value);
+    }
+
+    /**
+     * Test the learning item type resolver for the endnote_format field
+     */
+    public function test_resolve_endnote_format_html() {
+        list($user, $program) = $this->create_faux_programs();
+        $this->setUser($user);
+
+        // Check that each core instance of learning item gets resolved correctly.
+        $value = $this->resolve('endnoteformat', $program);
+        $this->assertEquals('HTML', $value);
+        $this->assertTrue(is_string($value));
+    }
+
+    public function test_resolve_endnote_format_json() {
+        list($user, $program) = $this->create_faux_programs('json');
+        $this->setUser($user);
+
+        // Check that each core instance of learning item gets resolved correctly.
+        $value = $this->resolve('endnoteformat', $program);
+        $this->assertEquals('JSON_EDITOR', $value);
         $this->assertTrue(is_string($value));
     }
 

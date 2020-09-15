@@ -23,6 +23,7 @@
 
 namespace totara_mobile\webapi\resolver\type;
 
+use core\json_editor\helper\document_helper;
 use totara_mobile\local\duedate_state as mobile_duedate_state;
 use totara_mobile\formatter\mobile_certification_formatter;
 use core\format;
@@ -74,8 +75,14 @@ class certification implements type_resolver {
             return null;
         }
 
-        if ($field == 'summaryformat') {
-            return 'HTML';
+        $formatfields = ['summaryformat', 'endnoteformat'];
+        if (in_array($field, $formatfields)) {
+            $prop = substr($field, 0, -6);
+            if (document_helper::is_valid_json_document($certification->{$prop})) {
+                return 'JSON_EDITOR';
+            } else {
+                return 'HTML';
+            }
         }
 
         if ($field == 'category') {

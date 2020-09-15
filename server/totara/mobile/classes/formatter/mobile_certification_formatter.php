@@ -58,6 +58,7 @@ class mobile_certification_formatter extends certification_formatter {
                     ->set_pluginfile_url_options($this->context, $component, $filearea, $itemid)
                     ->format($value);
             },
+            'endnoteformat' => null,
             'availablefrom' => date_field_formatter::class,
             'availableuntil' => date_field_formatter::class,
             'activeperiod' => null, // Currently string from the database as "1 Month" this won't be translatable though.

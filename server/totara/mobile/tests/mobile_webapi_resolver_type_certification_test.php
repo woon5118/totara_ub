@@ -42,7 +42,7 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
      * Create some users and various learning items.
      * @return array
      */
-    private function create_faux_certifications() {
+    private function create_faux_certifications($format = 'html') {
         $prog_gen = $this->getDataGenerator()->get_plugin_generator('totara_program');
 
         $user = $this->getDataGenerator()->create_user();
@@ -51,11 +51,18 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
         $c2 = $this->getDataGenerator()->create_course();
         $c3 = $this->getDataGenerator()->create_course();
 
+        $summary = 'first certification';
+        $endnote = 'Congratulations on completing the certification';
+        if ($format == 'json') {
+            $summary = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"first certification"}]}]}';
+            $endnote = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Congratulations on completing the certification"}]}]}';
+        }
+
         $certification = $prog_gen->create_certification([
             'shortname' => 'prg1',
             'fullname' => 'certification1',
-            'summary' => 'first certification',
-            'endnote' => 'Congratulations on completing the certification'
+            'summary' => $summary,
+            'endnote' => $endnote
         ]);
         $prog_gen->add_courses_and_courseset_to_program($certification, [[$c1, $c2], [$c3]], CERTIFPATH_STD);
         $prog_gen->assign_program($certification->id, [$user->id]);
@@ -203,10 +210,10 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
     /**
      * Test the certification type resolver for the summary field
      */
-    public function test_resolve_summary() {
+    public function test_resolve_summary_html() {
         list($user, $certification) = $this->create_faux_certifications();
         $this->setUser($user);
-        $formats = [format::FORMAT_HTML, format::FORMAT_PLAIN];
+        $formats = [format::FORMAT_HTML, format::FORMAT_PLAIN, format::FORMAT_MOBILE];
 
         try {
             $value = $this->resolve('summary', $certification);
@@ -220,7 +227,7 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
 
         foreach ($formats as $format) {
             $value = $this->resolve('summary', $certification, ['format' => $format]);
-            $this->assertEquals('first certification', $value);
+            $this->assertEquals('first certification', $value, "Format {$format}");
             $this->assertTrue(is_string($value));
         }
 
@@ -233,16 +240,158 @@ class totara_mobile_webapi_resolver_type_certification_testcase extends advanced
         $this->assertEquals('first certification', $value);
     }
 
+    public function test_resolve_summary_json() {
+        list($user, $certification) = $this->create_faux_certifications('json');
+        $this->setUser($user);
+        $formats = [
+            // TODO TL-27575 should convert from JSON_EDITOR to other formats
+            //format::FORMAT_HTML => '<p>first certification</p>',
+            //format::FORMAT_PLAIN => 'first certification',
+            format::FORMAT_MOBILE => '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"first certification"}]}]}',
+        ];
+
+        try {
+            $value = $this->resolve('summary', $certification);
+            $this->fail('Expected failure on null $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                'Coding error detected, it must be fixed by a programmer: Invalid format given',
+                $ex->getMessage()
+            );
+        }
+
+        foreach ($formats as $format => $expected) {
+            $value = $this->resolve('summary', $certification, ['format' => $format]);
+            $this->assertEquals($expected, $value, "Format {$format}");
+            $this->assertTrue(is_string($value));
+        }
+
+        // Check the permissions required for format::FORMAT_RAW
+        $value = $this->resolve('summary', $certification, ['format' => format::FORMAT_RAW]);
+        $this->assertNull($value);
+
+        $this->setAdminUser();
+        $value = $this->resolve('summary', $certification, ['format' => format::FORMAT_RAW]);
+        $this->assertEquals('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"first certification"}]}]}', $value);
+    }
+
     /**
      * Test the learning item type resolver for the summary_format field
      */
-    public function test_resolve_summary_format() {
+    public function test_resolve_summary_format_html() {
         list($user, $certification) = $this->create_faux_certifications();
         $this->setUser($user);
 
         // Check that each core instance of learning item gets resolved correctly.
         $value = $this->resolve('summaryformat', $certification);
         $this->assertEquals('HTML', $value);
+        $this->assertTrue(is_string($value));
+    }
+
+    /**
+     * Test the learning item type resolver for the summary_format field
+     */
+    public function test_resolve_summary_format_json() {
+        list($user, $certification) = $this->create_faux_certifications('json');
+        $this->setUser($user);
+
+        // Check that each core instance of learning item gets resolved correctly.
+        $value = $this->resolve('summaryformat', $certification);
+        $this->assertEquals('JSON_EDITOR', $value);
+        $this->assertTrue(is_string($value));
+    }
+
+    /**
+     * Test the certification type resolver for the endnote field
+     */
+    public function test_resolve_endnote_html() {
+        list($user, $certification) = $this->create_faux_certifications();
+        $this->setUser($user);
+        $formats = [format::FORMAT_HTML, format::FORMAT_PLAIN, format::FORMAT_MOBILE];
+
+        try {
+            $value = $this->resolve('endnote', $certification);
+            $this->fail('Expected failure on null $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                'Coding error detected, it must be fixed by a programmer: Invalid format given',
+                $ex->getMessage()
+            );
+        }
+
+        foreach ($formats as $format) {
+            $value = $this->resolve('endnote', $certification, ['format' => $format]);
+            $this->assertEquals('Congratulations on completing the certification', $value, "Format {$format}");
+            $this->assertTrue(is_string($value));
+        }
+
+        // Check the permissions required for format::FORMAT_RAW
+        $value = $this->resolve('endnote', $certification, ['format' => format::FORMAT_RAW]);
+        $this->assertNull($value);
+
+        $this->setAdminUser();
+        $value = $this->resolve('endnote', $certification, ['format' => format::FORMAT_RAW]);
+        $this->assertEquals('Congratulations on completing the certification', $value);
+    }
+
+    public function test_resolve_endnote_json() {
+        list($user, $certification) = $this->create_faux_certifications('json');
+        $this->setUser($user);
+        $formats = [
+            // TODO TL-27575 should convert from JSON_EDITOR to other formats
+            //format::FORMAT_HTML => '<p>first certification</p>',
+            //format::FORMAT_PLAIN => 'first certification',
+            format::FORMAT_MOBILE => '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Congratulations on completing the certification"}]}]}',
+        ];
+
+        try {
+            $value = $this->resolve('endnote', $certification);
+            $this->fail('Expected failure on null $format');
+        } catch (\coding_exception $ex) {
+            $this->assertSame(
+                'Coding error detected, it must be fixed by a programmer: Invalid format given',
+                $ex->getMessage()
+            );
+        }
+
+        foreach ($formats as $format => $expected) {
+            $value = $this->resolve('endnote', $certification, ['format' => $format]);
+            $this->assertEquals($expected, $value, "Format {$format}");
+            $this->assertTrue(is_string($value));
+        }
+
+        // Check the permissions required for format::FORMAT_RAW
+        $value = $this->resolve('endnote', $certification, ['format' => format::FORMAT_RAW]);
+        $this->assertNull($value);
+
+        $this->setAdminUser();
+        $value = $this->resolve('endnote', $certification, ['format' => format::FORMAT_RAW]);
+        $this->assertEquals('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Congratulations on completing the certification"}]}]}', $value);
+    }
+
+    /**
+     * Test the learning item type resolver for the endnote_format field
+     */
+    public function test_resolve_endnote_format_html() {
+        list($user, $certification) = $this->create_faux_certifications();
+        $this->setUser($user);
+
+        // Check that each core instance of learning item gets resolved correctly.
+        $value = $this->resolve('endnoteformat', $certification);
+        $this->assertEquals('HTML', $value);
+        $this->assertTrue(is_string($value));
+    }
+
+    /**
+     * Test the learning item type resolver for the endnote_format field
+     */
+    public function test_resolve_endnote_format_json() {
+        list($user, $certification) = $this->create_faux_certifications('json');
+        $this->setUser($user);
+
+        // Check that each core instance of learning item gets resolved correctly.
+        $value = $this->resolve('endnoteformat', $certification);
+        $this->assertEquals('JSON_EDITOR', $value);
         $this->assertTrue(is_string($value));
     }
 

@@ -23,6 +23,7 @@
 
 namespace totara_mobile\webapi\resolver\type;
 
+use core\json_editor\helper\document_helper;
 use totara_mobile\formatter\mobile_program_formatter;
 use totara_mobile\local\duedate_state as mobile_duedate_state;
 use core\format;
@@ -73,9 +74,14 @@ class program implements type_resolver {
             return null;
         }
 
-        if ($field == 'summaryformat') {
-            // Programs don't actually have a summaryformat, they are just always HTML.
-            return 'HTML';
+        $formatfields = ['summaryformat', 'endnoteformat'];
+        if (in_array($field, $formatfields)) {
+            $prop = substr($field, 0, -6);
+            if (document_helper::is_valid_json_document($program->{$prop})) {
+                return 'JSON_EDITOR';
+            } else {
+                return 'HTML';
+            }
         }
 
         if ($field == 'category') {

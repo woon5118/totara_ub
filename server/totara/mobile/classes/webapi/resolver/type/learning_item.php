@@ -24,6 +24,7 @@
 
 namespace totara_mobile\webapi\resolver\type;
 
+use core\json_editor\helper\document_helper;
 use core\orm\query\builder;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
@@ -70,7 +71,11 @@ class learning_item implements type_resolver {
             switch ($item->description_format) {
                 case FORMAT_MOODLE:
                 case FORMAT_HTML:
-                    return 'HTML';
+                    if (document_helper::is_valid_json_document($item->description)) {
+                        return 'JSON_EDITOR';
+                    } else {
+                        return 'HTML';
+                    }
                     break;
                 case FORMAT_PLAIN:
                     return 'PLAIN';

@@ -57,6 +57,7 @@ class mobile_program_formatter extends program_formatter {
                     ->set_pluginfile_url_options($this->context, $component, $filearea, $itemid)
                     ->format($value);
             },
+            'endnoteformat' => null,
             'availablefrom' => date_field_formatter::class,
             'availableuntil' => date_field_formatter::class,
             'category' => null, // Default - core\category_formatter::class

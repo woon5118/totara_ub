@@ -253,6 +253,65 @@ class core_webapi_formatter_text_field_formatter_testcase extends advanced_testc
     }
 
     /**
+     * Test format_mobile with valid JSON doc
+     */
+    public function test_mobile_format_with_json() {
+        $formatter = new text_field_formatter(format::FORMAT_MOBILE, context_system::instance());
+        $formatter->disabled_pluginfile_url_rewrite();
+
+        $value = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"this is a <test>"}]}]}';
+        $result = $formatter->format($value);
+
+        // Nothing should have changed
+        $this->assertEquals($result, $value);
+    }
+
+    /**
+     * Test format_mobile with invalid JSON doc
+     */
+    public function test_mobile_format_with_invalid_json() {
+        $formatter = new text_field_formatter(format::FORMAT_MOBILE, context_system::instance());
+        $formatter->disabled_pluginfile_url_rewrite();
+
+        $value = '{"type":"<super>","content":"<values!>"}';
+        $result = $formatter->format($value);
+
+        // Tags are stripped
+        $expected = '{"type":"","content":""}';
+        $this->assertEquals($result, $expected);
+    }
+
+    /**
+     * Test format_mobile with HTML
+     */
+    public function test_mobile_format_with_html() {
+        $formatter = new text_field_formatter(format::FORMAT_MOBILE, context_system::instance());
+        $formatter->disabled_pluginfile_url_rewrite();
+
+        $value = '<p>This <b>is</b></p><p>a test.</p>';
+        $result = $formatter->format($value);
+
+        // Tags are stripped, paragraphs to newlines, bold is uppercased
+        $expected = "This IS\n\na test.\n";
+        $this->assertEquals($result, $expected);
+    }
+
+    /**
+     * Test format_mobile with plain text
+     */
+    public function test_mobile_format_with_text() {
+        $formatter = new text_field_formatter(format::FORMAT_MOBILE, context_system::instance());
+        $formatter->disabled_pluginfile_url_rewrite();
+
+        $value = "The quick brown fox jumped\n   over\nthe lazy dog.";
+        $result = $formatter->format($value);
+
+        // Tags are stripped, paragraphs to newlines, bold is uppercased
+        $expected = "The quick brown fox jumped over the lazy dog.";
+        $this->assertEquals($result, $expected);
+    }
+
+    /**
      * Test the exception given by invalid formats
      */
     public function test_unknown_format() {

@@ -41,6 +41,27 @@ Feature: Test the totara_mobile_course query
     And I should see "\"native\": false" in the "#response2" "css_element"
     And I should see "\"imageSrc\": \"\"" in the "#response2" "css_element"
 
+  Scenario: Test the query with a course that has JSON summary
+    When I follow "Edit settings"
+    And I set the field with xpath "//select[@name='summary_editor[format]']" to "5"
+    And I click on "Save and display" "button"
+    And I click on "Save and display" "button"
+    And I log out
+    When I am using the mobile emulator
+    Then I should see "Device emulator loading..."
+    And I should see "Making login_setup request"
+    And I set the field "username" to "student1"
+    And I set the field "password" to "student1"
+    When I click on "Submit Credentials 1" "button"
+    Then I should see "Native login OK"
+    And I should see "Setting up new GraphQL browser"
+    When I set the field "jsondata2" to "{\"operationName\": \"totara_mobile_course\",\"variables\": {\"courseid\": 2}}"
+    And I click on "Submit Request 2" "button"
+    Then I should not see "Coding error detected" in the "#response2" "css_element"
+    And I should see "\"fullname\": \"Course 1\"" in the "#response2" "css_element"
+    And I should see "\"summary\": \"{\\"type" in the "#response2" "css_element"
+    And I should see "\"summaryformat\": \"JSON_EDITOR\"" in the "#response2" "css_element"
+
   Scenario: Test the query with a course that has an image
     When I follow "Edit settings"
     And I expand all fieldsets

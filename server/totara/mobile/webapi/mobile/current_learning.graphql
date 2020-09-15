@@ -5,7 +5,7 @@ query totara_mobile_current_learning {
     itemcomponent
     shortname
     fullname
-    summary: description(format: PLAIN)
+    summary: description(format: MOBILE)
     summaryFormat: description_format
     progress
     urlView: url_view

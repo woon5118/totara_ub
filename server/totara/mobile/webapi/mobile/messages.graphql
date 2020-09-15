@@ -2,7 +2,7 @@ query totara_mobile_messages {
   message_popup_messages {
     id
     subject
-    fullmessage: fullmessagehtml(format: PLAIN)
+    fullmessage: fullmessagehtml(format: MOBILE)
     fullmessageformat
     timecreated
     isread

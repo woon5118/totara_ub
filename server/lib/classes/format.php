@@ -36,6 +36,7 @@ class format implements format_interface {
     public const FORMAT_PLAIN = 'PLAIN';
     public const FORMAT_MARKDOWN = 'MARKDOWN';
     public const FORMAT_JSON_EDITOR = 'JSON_EDITOR';
+    public const FORMAT_MOBILE = 'MOBILE';
 
     public static function is_defined(string $format): bool {
         return defined('self::FORMAT_'.strtoupper($format));
@@ -47,7 +48,8 @@ class format implements format_interface {
             self::FORMAT_HTML,
             self::FORMAT_PLAIN,
             self::FORMAT_MARKDOWN,
-            self::FORMAT_JSON_EDITOR
+            self::FORMAT_JSON_EDITOR,
+            self::FORMAT_MOBILE
         ];
     }
 

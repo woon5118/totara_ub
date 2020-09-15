@@ -26,6 +26,8 @@ namespace core\webapi\formatter\field;
 use coding_exception;
 use context;
 use core\format;
+use core\json_editor\helper\document_helper;
+use core\json_editor\json_editor;
 
 /**
  * Formats a given text by running it through format_text()
@@ -84,7 +86,8 @@ class text_field_formatter extends base {
         $valid_formats = [
             format::FORMAT_RAW,
             format::FORMAT_HTML,
-            format::FORMAT_PLAIN
+            format::FORMAT_PLAIN,
+            format::FORMAT_MOBILE
         ];
 
         // Do a custom check for valid but (currently) unsupported formats for this formatter,
@@ -247,6 +250,34 @@ class text_field_formatter extends base {
 
         $h2t = new \core_html2text($this->format_html($value), $options);
         return $h2t->getText();
+    }
+
+    /**
+     * Format the text with format_text() and html_to_text() on top of it
+     *
+     * @param string $value
+     * @return string
+     */
+    protected function format_mobile(string $value): string {
+        global $CFG;
+
+        if (document_helper::is_valid_json_document($value)) {
+            if ($this->pluginfile_url_rewrite_enabled === true) {
+                $value = $this->rewrite_urls($value);
+                $editor = json_editor::create(null);
+                $value = $editor->filter_json_content($value, $this->context);
+            }
+            return $value;
+        } else {
+            require_once($CFG->libdir . '/html2text/lib.php');
+            $options = [
+                'width' => 0,
+                'do_links' => 'inline',
+            ];
+
+            $h2t = new \core_html2text($this->format_html($value), $options);
+            return $h2t->getText();
+        }
     }
 
 }
