@@ -42,6 +42,26 @@ class certif_status extends \totara_reportbuilder\rb\display\base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $CERTIFSTATUS;
 
+        if (!empty($column->extracontext['precalculated'])) {
+            // Special case where the status is calculated in SQL,
+            // this makes it compatible with aggregation,
+            // 'active' and 'unassigned' flags are not supported here.
+            if (isset($value) && isset($CERTIFSTATUS[$value])) {
+                switch ($value) {
+                    case CERTIFSTATUS_ASSIGNED:
+                        return get_string('notcertified', 'totara_certification');
+                    case CERTIFSTATUS_COMPLETED:
+                        return get_string('certified', 'totara_certification');
+                    default:
+                        return get_string($CERTIFSTATUS[$value], 'totara_certification');
+                }
+            } else if (isset($value)) {
+                return get_string('error:invalidstatus', 'totara_program');
+            } else {
+                return get_string('notassigned', 'totara_certification');
+            }
+        }
+
         $extrafields = self::get_extrafields_row($row, $column);
 
         if (isset($extrafields->active) && $extrafields->active != 1) {

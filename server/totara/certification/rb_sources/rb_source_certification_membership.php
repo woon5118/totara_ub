@@ -118,13 +118,14 @@ class rb_source_certification_membership extends rb_base_source {
             'certmembership',
             'status',
             get_string('status', 'rb_source_certification_membership'),
-            'certif_completion.status',
+            "CASE
+               WHEN certif_completion.status = 3 AND certif_completion.timeexpires < " . time() ." THEN 4
+               ELSE certif_completion.status
+             END",
             array(
                 'joins' => 'certif_completion',
                 'displayfunc' => 'certif_status',
-                'extrafields' => array(
-                    'timeexpires' => 'certif_completion.timeexpires',
-                ),
+                'extracontext' => ['precalculated' => true],
             )
         );
         $columnoptions[] = new rb_column_option(

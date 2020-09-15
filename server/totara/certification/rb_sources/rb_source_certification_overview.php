@@ -650,13 +650,14 @@ class rb_source_certification_overview extends rb_base_source {
             'certif_completion',
             'status',
             get_string('status', 'rb_source_dp_certification'),
-            'certif_completion.status',
+            "CASE
+               WHEN certif_completion.status = 3 AND certif_completion.timeexpires < " . time() ." THEN 4
+               ELSE certif_completion.status
+             END",
             array(
                 'joins' => 'certif_completion',
                 'displayfunc' => 'certif_status',
-                'extrafields' => array(
-                    'timeexpires' => 'certif_completion.timeexpires',
-                )
+                'extracontext' => ['precalculated' => true],
             )
         );
 

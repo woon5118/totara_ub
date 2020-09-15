@@ -281,7 +281,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 'extrafields' => array(
                     'active' => 'base.active',
                     'timeexpires' => 'base.timeexpires',
-                )
+                ),
+                'iscompound' => true,
             )
         );
 

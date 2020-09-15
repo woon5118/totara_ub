@@ -316,7 +316,8 @@ class rb_source_dp_certification extends rb_base_source {
                     'extrafields' => array(
                         'unassigned' => 'certif_completion.unassigned',
                         'timeexpires' => 'certif_completion.timeexpires',
-                    )
+                    ),
+                    'iscompound' => true,
                 )
         );
 
