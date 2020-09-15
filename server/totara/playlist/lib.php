@@ -50,9 +50,9 @@ function totara_playlist_pluginfile($course, $cm, $context, $filearea, $args, $f
 
     require_login();
 
-    /** @var playlist $article */
-    $article = playlist::from_id((int) $args[0]);
-    if (!access_manager::can_access($article, $USER->id)) {
+    /** @var playlist $playlist */
+    $playlist = playlist::from_id((int) $args[0]);
+    if (!access_manager::can_access($playlist, $USER->id)) {
         send_file_not_found();
     }
 

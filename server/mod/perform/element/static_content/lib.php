@@ -21,6 +21,8 @@
  * @package performelement_static_content
  */
 
+use mod_perform\models\activity\helpers\external_participant_token_validator;
+
 /**
  * This is a callback from the file system. Use for serving the file to the user.
  * @see file_pluginfile
@@ -36,19 +38,54 @@
  * @return void
  */
 function performelement_static_content_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $options) {
-    global $CFG;
+    global $CFG, $DB, $SESSION;
+
     require_once("{$CFG->dirroot}/lib/filelib.php");
-
-    // TODO: Is there further access control here?
-
-    // Check multi-tenancy.
-    if ($context->is_user_access_prevented()) {
-        send_file_not_found();
-    }
 
     // Whitelisted file areas.
     if (!in_array($filearea, ['content'])) {
-        return;
+        send_file_not_found();
+    }
+
+    // It could be a request from an external respondent.
+    // The only way at the moment to determine this is to extract
+    // the token from the wantsurl and validate it.
+    $token = null;
+    $wantsurl = $SESSION->wantsurl ?? '';
+    if ($wantsurl) {
+        $found = preg_match("/token=([a-z0-9]{64})/", $wantsurl, $matches);
+        if ($found > 0 && !empty($matches[1])) {
+            $token = $matches[1];
+        }
+    }
+
+    if ($token) {
+        $validator = new external_participant_token_validator($token);
+        if (!$validator->is_valid()) {
+            send_file_not_found();
+        }
+        $token_context = $validator->get_participant_instance()->get_context();
+        if ($token_context->id !== $context->id) {
+            send_file_not_found();
+        }
+    } else {
+        require_login();
+
+        // Check multi-tenancy.
+        if ($context->is_user_access_prevented()) {
+            send_file_not_found();
+        }
+    }
+
+    if ($context->contextlevel == CONTEXT_MODULE) {
+        $element = [
+            'context_id' => $context->id,
+            'plugin_name' => 'static_content',
+        ];
+        if (!$DB->record_exists('perform_element', $element)) {
+            // somebody tries to gain illegal access!
+            send_file_not_found();
+        }
     }
 
     $relativepath = implode("/", $args);
@@ -58,7 +95,7 @@ function performelement_static_content_pluginfile($course, $cm, $context, $filea
     $file = $fs->get_file_by_hash(sha1($fullpath));
 
     if (!$file) {
-        return;
+        send_file_not_found();
     }
 
     send_stored_file($file, 360, 0, $forcedownload, $options);
