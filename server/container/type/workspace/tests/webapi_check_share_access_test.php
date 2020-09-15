@@ -22,6 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use container_workspace\exception\workspace_exception;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use totara_engage\access\access;
 use container_workspace\workspace;
@@ -196,5 +197,81 @@ class container_workspace_check_share_access_testcase extends advanced_testcase 
 
         $this->assertFalse($result['warning']);
         $this->assertEmpty($result['message']);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_access_not_other_private_workspace(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        $this->setUser($user_one);
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_private_workspace();
+
+        /** @var engage_article_generator $article_generator */
+        $article_generator = $generator->get_plugin_generator('engage_article');
+        $article = $article_generator->create_article(['access' => access::PUBLIC]);
+
+        $this->setUser($user_two);
+        $this->expectException(workspace_exception::class);
+        $this->expectExceptionMessage("You don't have permission to view this page.");
+        $this->resolve_graphql_query(
+            'container_workspace_check_share_access',
+            [
+                'items' => [
+                    [
+                        'itemid' => $article->get_id(),
+                        'component' => $article::get_resource_type()
+                    ]
+                ],
+                'workspace' => [
+                    'instanceid' => $workspace->get_id(),
+                    'component' => workspace::get_type(),
+                    'area' => library::AREA
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_access_not_other_hidden_workspace(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        $this->setUser($user_one);
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_hidden_workspace();
+
+        /** @var engage_article_generator $article_generator */
+        $article_generator = $generator->get_plugin_generator('engage_article');
+        $article = $article_generator->create_article(['access' => access::PUBLIC]);
+
+        $this->setUser($user_two);
+        $this->expectException(workspace_exception::class);
+        $this->expectExceptionMessage("You don't have permission to view this page.");
+        $this->resolve_graphql_query(
+            'container_workspace_check_share_access',
+            [
+                'items' => [
+                    [
+                        'itemid' => $article->get_id(),
+                        'component' => $article::get_resource_type()
+                    ]
+                ],
+                'workspace' => [
+                    'instanceid' => $workspace->get_id(),
+                    'component' => workspace::get_type(),
+                    'area' => library::AREA
+                ]
+            ]
+        );
     }
 }

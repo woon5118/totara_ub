@@ -22,6 +22,8 @@
  */
 namespace container_workspace\webapi\resolver\query;
 
+use container_workspace\exception\workspace_exception;
+use container_workspace\interactor\workspace\interactor as workspace_interactor;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
@@ -42,6 +44,8 @@ final class check_share_access implements query_resolver, has_middleware {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec): array {
+        global $USER;
+
         $workspace_id = $args['workspace']['instanceid'];
 
         /** @var workspace $workspace */
@@ -53,6 +57,11 @@ final class check_share_access implements query_resolver, has_middleware {
 
         if (!$workspace->is_typeof(workspace::get_type())) {
             throw new \coding_exception("Cannot find workspace by id '{$workspace_id}'");
+        }
+
+        $workspace_interactor = new workspace_interactor($workspace, $USER->id);
+        if (!$workspace_interactor->can_view_library()) {
+            throw workspace_exception::on_view();
         }
 
         $warning = false;
