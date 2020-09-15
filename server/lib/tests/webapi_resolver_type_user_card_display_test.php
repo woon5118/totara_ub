@@ -47,18 +47,21 @@ class core_webapi_resolver_type_user_card_display_testcase extends advanced_test
         $this->setUser($user_two);
         $resolver = user_field_resolver::from_record($user_one);
         $card_display = card_display::create($resolver);
+        $picture = (new user_picture($user_one, 1))->get_url($PAGE)->out(false);
 
-        $empty_result = $this->resolve_graphql_type('core_user_card_display', 'profile_picture_url', $card_display, []);
-        $this->assertNull($empty_result);
+        $result = $this->resolve_graphql_type('core_user_card_display', 'profile_picture_url', $card_display, []);
+        if (\totara_engage\lib::allow_view_user_profile()) {
+            self::assertSame($picture, $result);
+        } else {
+            $this->assertNull($result);
+        }
 
-        // Viewing user's profile picture as admi, since
+        // Viewing user's profile picture as admin, since they can see everything.
         $this->setAdminUser();
         $resolver = user_field_resolver::from_record($user_one);
         $card_display = card_display::create($resolver);
 
-        $picture = new user_picture($user_one, 1);
-        $result = $this->resolve_graphql_type('core_user_card_display', 'profile_picture_url', $card_display, []);
-        $this->assertSame($picture->get_url($PAGE)->out(false), $result);
+        $this->assertSame($picture, $this->resolve_graphql_type('core_user_card_display', 'profile_picture_url', $card_display, []));
     }
 
     /**

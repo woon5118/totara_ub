@@ -588,7 +588,7 @@ class core_user_userlib_testcase extends advanced_testcase {
         // User 3 should not be able to see user 1, either by passing their own course (course 2) or user 1's course (course 1).
         $this->setUser($user3);
         $this->assertFalse(user_can_view_profile($user1, $course2));
-        $this->assertFalse(user_can_view_profile($user1, $course1));
+        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), user_can_view_profile($user1, $course1));
 
         // Remove capability moodle/user:viewdetails in course 2.
         assign_capability('moodle/user:viewdetails', CAP_PROHIBIT, $studentrole->id, $coursecontext);
@@ -613,13 +613,13 @@ class core_user_userlib_testcase extends advanced_testcase {
         $this->assertTrue(user_can_view_profile($user7));
         // User 1 is in a course with user 2 and has the right capability - return true.
         $this->assertTrue(user_can_view_profile($user2));
-        // User 1 is not in a course with user 3 - return false.
-        $this->assertFalse(user_can_view_profile($user3));
+        // User 1 is not in a course with user 3 - return false unless engage gives access
+        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), user_can_view_profile($user3));
 
         // Set current user to user 2.
         $this->setUser($user2);
-        // User 2 is in a course with user 3 but does not have the right capability - return false.
-        $this->assertFalse(user_can_view_profile($user3));
+        // User 2 is in a course with user 3 but does not have the right capability - return false unless engage gives access.
+        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), user_can_view_profile($user3));
 
         // Set user 1 in one group and users 4 and 5 in another group.
         $group1 = $this->getDataGenerator()->create_group(array('courseid' => $course3->id));
@@ -628,15 +628,15 @@ class core_user_userlib_testcase extends advanced_testcase {
         groups_add_member($group2->id, $user4->id);
         groups_add_member($group2->id, $user5->id);
         $this->setUser($user1);
-        // Check that user 1 can not see user 4.
-        $this->assertFalse(user_can_view_profile($user4));
+        // Check that user 1 can not see user 4 unless Engage gives access
+        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), user_can_view_profile($user4));
         // Check that user 5 can see user 4.
         $this->setUser($user5);
         $this->assertTrue(user_can_view_profile($user4));
 
-        // Test the user:viewalldetails cap check using the course creator role which, by default, can't see student profiles.
+        // Test the user:viewalldetails cap check using the course creator role which, by default, can't see student profiles unless Engage gives access.
         $this->setUser($user7);
-        $this->assertFalse(user_can_view_profile($user4));
+        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), user_can_view_profile($user4));
         assign_capability('moodle/user:viewalldetails', CAP_ALLOW, $coursecreatorrole->id, context_system::instance()->id, true);
         reload_all_capabilities();
         $this->assertTrue(user_can_view_profile($user4));

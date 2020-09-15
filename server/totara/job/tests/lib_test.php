@@ -219,7 +219,7 @@ class totara_job_lib_testcase extends advanced_testcase {
         // Guest user
         $guest = get_guest_role();
         $this->setUser($guest);
-        $this->assertFalse(totara_job_can_view_job_assignments($user2));
+        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), totara_job_can_view_job_assignments($user2));
 
         // Deleted user
         $this->setUser($user1);
@@ -232,7 +232,7 @@ class totara_job_lib_testcase extends advanced_testcase {
         role_assign($roleid, $user1->id, $coursecontext);
 
         // Course access
-        $this->assertFalse(totara_job_can_view_job_assignments($user2, $course));
+        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), totara_job_can_view_job_assignments($user2, $course));
 
         assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $coursecontext->id, true);
         $this->assertTrue(totara_job_can_view_job_assignments($user2, $course));
@@ -248,7 +248,7 @@ class totara_job_lib_testcase extends advanced_testcase {
 
         // Reset the caps.
         assign_capability('moodle/user:viewalldetails', CAP_INHERIT, $roleidx, $user2context->id, true);
-        $this->assertFalse(totara_job_can_view_job_assignments($user2));
+        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), totara_job_can_view_job_assignments($user2));
         assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleidx, $user2context->id, true);
         $this->assertTrue(totara_job_can_view_job_assignments($user2));
     }

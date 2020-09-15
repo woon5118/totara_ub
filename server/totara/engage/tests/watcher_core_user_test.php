@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-class totara_engage_watcher_user_testcase extends advanced_testcase {
+class totara_engage_watcher_core_user_testcase extends advanced_testcase {
 
     private const ENGAGE_FEATURES = [
         'engage_resources',
@@ -39,13 +39,15 @@ class totara_engage_watcher_user_testcase extends advanced_testcase {
             \totara_core\advanced_feature::disable($feature);
         }
 
-        self::assertFalse(\totara_engage\watcher\core_user::handle_allow_view_profile($hook));
+        \totara_engage\watcher\core_user::handle_allow_view_profile($hook);
+        self::assertFalse($hook->has_permission());
 
         foreach (self::ENGAGE_FEATURES as $feature) {
             \totara_core\advanced_feature::enable($feature);
         }
 
-        self::assertTrue(\totara_engage\watcher\core_user::handle_allow_view_profile($hook));
+        \totara_engage\watcher\core_user::handle_allow_view_profile($hook);
+        self::assertTrue($hook->has_permission());
     }
 
     public function test_allow_view_profile_permission_already_granted() {
@@ -53,7 +55,8 @@ class totara_engage_watcher_user_testcase extends advanced_testcase {
         $hook->give_permission();
 
         // It does not matter that the users are invalid, as permission has been granted already.
-        self::assertTrue(\totara_engage\watcher\core_user::handle_allow_view_profile($hook));
+        \totara_engage\watcher\core_user::handle_allow_view_profile($hook);
+        self::assertTrue($hook->has_permission());
     }
 
     public function test_allow_view_profile_permission_forced_on() {
@@ -63,7 +66,8 @@ class totara_engage_watcher_user_testcase extends advanced_testcase {
         $hook = new \core_user\hook\allow_view_profile(64, 66);
 
         // It does not matter that the users are invalid, as it is forced on.
-        self::assertTrue(\totara_engage\watcher\core_user::handle_allow_view_profile($hook));
+        \totara_engage\watcher\core_user::handle_allow_view_profile($hook);
+        self::assertTrue($hook->has_permission());
     }
 
     public function test_allow_view_profile_permission_forced_off() {
@@ -73,7 +77,8 @@ class totara_engage_watcher_user_testcase extends advanced_testcase {
         $hook = new \core_user\hook\allow_view_profile(64, 66);
 
         // It does not matter that the users are invalid, as it is forced on.
-        self::assertFalse(\totara_engage\watcher\core_user::handle_allow_view_profile($hook));
+        \totara_engage\watcher\core_user::handle_allow_view_profile($hook);
+        self::assertFalse($hook->has_permission());
     }
 
     public function test_allow_view_profile_permission_forced_incorrectly() {
@@ -86,13 +91,15 @@ class totara_engage_watcher_user_testcase extends advanced_testcase {
             \totara_core\advanced_feature::disable($feature);
         }
 
-        self::assertFalse(\totara_engage\watcher\core_user::handle_allow_view_profile($hook));
+        \totara_engage\watcher\core_user::handle_allow_view_profile($hook);
+        self::assertFalse($hook->has_permission());
 
         foreach (self::ENGAGE_FEATURES as $feature) {
             \totara_core\advanced_feature::enable($feature);
         }
 
-        self::assertTrue(\totara_engage\watcher\core_user::handle_allow_view_profile($hook));
+        \totara_engage\watcher\core_user::handle_allow_view_profile($hook);
+        self::assertTrue($hook->has_permission());
     }
 
 }
