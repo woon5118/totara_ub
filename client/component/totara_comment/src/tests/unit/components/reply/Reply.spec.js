@@ -39,6 +39,7 @@ describe('totara_comment/components/reply/Reply.vue', () => {
         commentId: 45,
         edited: false,
         deleted: false,
+        component: 'totara_comment',
       },
 
       mocks: {

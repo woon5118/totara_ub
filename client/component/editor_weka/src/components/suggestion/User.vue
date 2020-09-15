@@ -18,7 +18,11 @@
 
 <template>
   <div class="tui-editorWeka-user" :style="positionStyle">
-    <Dropdown :separator="true" :open="$apollo.loading || users.length" @dismiss="$emit('dismiss')">
+    <Dropdown
+      :separator="true"
+      :open="$apollo.loading || users.length > 0"
+      @dismiss="$emit('dismiss')"
+    >
       <span class="sr-only">
         {{ $str('matching_users', 'editor_weka') }}:
       </span>

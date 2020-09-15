@@ -39,24 +39,18 @@ exports[`totara_engage/components/modal/ContributeModal.vue Checks snapshot 1`] 
       <tab-stub
         id="engage_article"
         name="cc"
-      >
-        <div
-          class="tui-contributeModal__componentContent"
-        >
-          <engage_survey-stub />
-        </div>
-      </tab-stub>
+      />
       <tab-stub
         id="engage_survey"
         name="cd"
-      >
-        <div
-          class="tui-contributeModal__componentContent"
-        >
-          <engage_survey-stub />
-        </div>
-      </tab-stub>
+      />
     </tabs-stub>
+     
+    <div
+      class="tui-contributeModal__componentContent"
+    >
+      <engage_survey-stub />
+    </div>
      
     <buttonicon-stub
       arialabel="expand, totara_engage"
