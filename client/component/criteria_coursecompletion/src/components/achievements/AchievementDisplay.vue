@@ -17,7 +17,10 @@
 -->
 
 <template>
-  <CourseAchievementDisplay :achievements="achievements" />
+  <CourseAchievementDisplay
+    :achievements="achievements"
+    :displayed="displayed"
+  />
 </template>
 
 <script>
@@ -38,6 +41,7 @@ export default {
       required: true,
       type: Number,
     },
+    displayed: Boolean,
   },
 
   data: function() {

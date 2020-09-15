@@ -42,27 +42,30 @@
         </template>
 
         <!-- Proficiency criteria content -->
-        <template v-for="(item, itemid) in achievement.items">
-          <div :key="itemid" :class="'tui-competencyAchievementsScale__item'">
-            <component
-              :is="item.component"
-              v-bind="item.props"
-              @loaded="itemLoaded"
-            />
-          </div>
+        <template v-slot="{ expanded }">
+          <template v-for="(item, itemid) in achievement.items">
+            <div :key="itemid" :class="'tui-competencyAchievementsScale__item'">
+              <component
+                :is="item.component"
+                v-bind="item.props"
+                :displayed="expanded"
+                @loaded="itemLoaded"
+              />
+            </div>
 
-          <!-- Or separator if multiple paths to fulfilling criteria-->
-          <div
-            v-if="!isLastItem(itemid, achievement.items)"
-            :key="itemid + 'orseparator'"
-            class="tui-competencyAchievementsScale__separator"
-          >
-            <AchievementLayout :no-borders="true">
-              <template v-slot:left>
-                <OrBox />
-              </template>
-            </AchievementLayout>
-          </div>
+            <!-- Or separator if multiple paths to fulfilling criteria-->
+            <div
+              v-if="!isLastItem(itemid, achievement.items)"
+              :key="itemid + 'orseparator'"
+              class="tui-competencyAchievementsScale__separator"
+            >
+              <AchievementLayout :no-borders="true">
+                <template v-slot:left>
+                  <OrBox />
+                </template>
+              </AchievementLayout>
+            </div>
+          </template>
         </template>
       </Collapsible>
     </div>

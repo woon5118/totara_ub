@@ -24,6 +24,7 @@
         <component
           :is="component.component"
           v-bind="component.props"
+          :displayed="displayed"
           @loaded="itemLoaded"
         />
       </div>
@@ -68,6 +69,7 @@ export default {
     dateAchieved: {
       type: String,
     },
+    displayed: Boolean,
     instanceId: {
       required: true,
       type: Number,

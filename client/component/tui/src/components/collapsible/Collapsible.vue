@@ -49,7 +49,7 @@
       role="region"
       :aria-labelledby="generatedId + 'label'"
     >
-      <slot />
+      <slot :expanded="expanded" />
     </div>
   </div>
 </template>
