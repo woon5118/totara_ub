@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -17,21 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
- * @package totara_engage
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die;
+/**
+ * @coversDefaultClass \mod_perform\util.
+ *
+ * @group perform
+ */
+class mod_perform_user_watcher_testcase extends advanced_testcase {
 
-$watchers = [
-    [
-        // Totara Engage gives users the ability to view other users profiles by default if Engage features are turn
-        'hookname' => \core_user\hook\allow_view_profile::class,
-        'callback' => [\totara_engage\watcher\core_user::class, 'handle_allow_view_profile'],
-    ],
-    [
-        // Totara Engage gives users the ability to view some users profile fields by default if Engage features are turned on
-        'hookname' => \core_user\hook\allow_view_profile_field::class,
-        'callback' => [\totara_engage\watcher\core_user::class, 'handle_allow_view_profile_field'],
-    ],
-];
+    public function test_xyz(): void {
+    }
+
+}

@@ -49,4 +49,8 @@ extend type Query {
     """ Filters that can be applied to limit the results returned """
     filters: mod_perform_selectable_users_filters
   ): [core_user]!
+
+  mod_perform_user(
+    userid: Int!
+  ): core_user!
 }

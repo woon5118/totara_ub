@@ -42,10 +42,11 @@ final class discussion implements query_resolver, has_middleware {
      * @return model
      */
     public static function resolve(array $args, execution_context $ec): model {
-        if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
-        }
         $discussion = model::from_id($args['id']);
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($discussion->get_workspace()->get_context());
+        }
 
         // Cannot load discussions if you can't see the workspace
         $workspace_interactor = interactor::from_workspace_id($discussion->get_workspace_id());

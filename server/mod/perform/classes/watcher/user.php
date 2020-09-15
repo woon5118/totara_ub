@@ -38,16 +38,17 @@ use mod_perform\entities\activity\manual_relationship_selector;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_static_instance;
 use mod_perform\util;
+use totara_core\advanced_feature;
 use totara_core\hook\base;
 
 class user {
 
-    protected const ALLOWED_FIELDS = [
+    protected const PERFORM_ALLOWED_FIELDS = [
         'id',
         'fullname',
         'profileimageurl',
         'profileimageurlsmall',
-        'profileimagealt'
+        'profileimagealt',
     ];
 
     /**
@@ -60,80 +61,93 @@ class user {
             return;
         }
 
-        // We allow a combination of fields we use for the participation
-        // forms, activities list and user selectors
-        if (!in_array($hook->field, self::ALLOWED_FIELDS, true)
-            && !in_array($hook->field, display_setting::get_display_fields())
-        ) {
+        if (!advanced_feature::is_enabled('performance_activities')) {
             return;
         }
 
-        self::allow_view($hook);
-    }
-
-    /**
-     * User access hook to check if one user can view another users profile in the context of mod perform.
-     *
-     * @param allow_view_profile $hook
-     */
-    public static function allow_view_profile(allow_view_profile $hook): void {
-        self::allow_view($hook);
-    }
-
-    /**
-     * User access hook to check if one user can view another users profile field in the context of mod perform.
-     *
-     * @param base|allow_view_profile|allow_view_profile_field $hook
-     */
-    private static function allow_view(base $hook): void {
-        if ($hook->has_permission()) {
-            return;
-        }
-
-        $course = $hook->get_course();
         // Ignore anything other than perform containers
+        $course = $hook->get_course();
         if (!$course || $course->containertype !== perform::get_type()) {
             return;
         }
 
-        // Handle site admins explicitly
+        // Handle site admins explicitly (performance optimisation)
         if (is_siteadmin()) {
             $hook->give_permission();
             return;
         }
 
-        // If both users are both participants in an activity or the target
+        // Check for any user data which is required specifically for perform (which may
+        // or may not have overlap with the user profile card fields below).
+        if (in_array($hook->field, self::PERFORM_ALLOWED_FIELDS)) {
+            if (self::can_view_user($hook)) {
+                $hook->give_permission();
+                return;
+            }
+        }
+
+        // If the field is one required to display a user profile card and hasn't already been granted
+        // above then check if the viewer is in any situation where they need to be able to select from
+        // all (tenant) users.
+        if ($hook->field == 'id'
+            || in_array($hook->field, display_setting::get_display_fields())
+            || in_array($hook->field, display_setting::get_display_picture_fields())
+        ) {
+            if (self::can_select_any_user($hook)) {
+                $hook->give_permission();
+                return;
+            }
+        }
+
+        return;
+    }
+
+    /**
+     * User access hook to check if one user can select any (tenant) user in the context of mod perform.
+     *
+     * @param base|allow_view_profile|allow_view_profile_field $hook
+     * @return bool
+     */
+    private static function can_select_any_user(base $hook): bool {
+        if (self::is_involved_in_manual_instance_progress($hook)) {
+            return true;
+        }
+
+        if (util::can_potentially_manage_participants($hook->viewing_user_id)) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * User access hook to check if one user can view another users profile data in the context of mod perform.
+     *
+     * @param base|allow_view_profile|allow_view_profile_field $hook
+     * @return bool
+     */
+    private static function can_view_user(base $hook): bool {
+
+        // If both users are participants in an activity or the target
         // user is the subject and the viewing user a participant.
         if (participant_instance::repository()
             ::user_can_view_other_users_profile($hook->viewing_user_id, $hook->target_user_id)
         ) {
-            $hook->give_permission();
-            return;
-        }
-
-        if (self::is_involved_in_manual_instance_progress($hook)) {
-            $hook->give_permission();
-            return;
+            return true;
         }
 
         if (util::can_report_on_user($hook->target_user_id, $hook->viewing_user_id)) {
-            $hook->give_permission();
-            return;
-        }
-
-        // This is just a small safety check. The query should have taken care of the checks
-        // whether the user can be shown.
-        if (util::can_potentially_manage_participants($hook->viewing_user_id)) {
-            $hook->give_permission();
-            return;
+            return true;
         }
 
         // Is the user a manager or appraiser in one of the users subject static instance records.
         if (subject_static_instance::repository()
             ::user_can_view_other_users_profile($hook->viewing_user_id, $hook->target_user_id)) {
-            $hook->give_permission();
-            return;
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -153,7 +167,7 @@ class user {
             ->where('mrsp.status', manual_relationship_selection_progress::STATUS_PENDING)
             ->where('user_id', $hook->viewing_user_id)
             ->when(true, function (repository $repository) use ($hook) {
-                // This make sure this query is multi tenancy compatible
+                // This makes sure this query is multi tenancy compatible
                 // and both users are in the same tenant
                 tenant_orm_helper::restrict_users(
                     $repository,

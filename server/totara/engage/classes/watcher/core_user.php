@@ -18,12 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author  Sam Hemelryk <sam.hemelryk@totaralearning.com>
+ * @author  Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package totara_engage
  */
 
 namespace totara_engage\watcher;
 
 use core_user\hook\allow_view_profile;
+use core_user\hook\allow_view_profile_field;
+use core_user\profile\display_setting;
+use totara_engage\lib as engage_lib;
 
 /**
  * Class to handle user hooks.
@@ -39,10 +43,12 @@ final class core_user {
      */
     public static function handle_allow_view_profile(allow_view_profile $hook) {
         global $CFG;
+
         if ($hook->has_permission()) {
             // They already have permission.
             return;
         }
+
         // Fastest resolution. This is never set through the interface, and must be defined in config.php
         // explicit type checks on true|false ensure that it did not come from the database.
         if (isset($CFG->totara_engage_allow_view_profiles)) {
@@ -53,10 +59,53 @@ final class core_user {
                 return;
             }
         }
+
         // Finally, check if any of the engage features have been turned on.
-        if (\totara_engage\lib::allow_view_user_profile()) {
+        if (engage_lib::allow_view_user_profile()) {
             $hook->give_permission();
+            return;
         }
     }
 
+    /**
+     * User access hook to check if one user can view another users profile field.
+     *
+     * @param allow_view_profile_field $hook
+     */
+    public static function handle_allow_view_profile_field(allow_view_profile_field $hook): void {
+        if ($hook->has_permission()) {
+            return;
+        }
+
+        if (!engage_lib::allow_view_user_profile()) {
+            return;
+        }
+
+        $course = $hook->get_course();
+        if ($course) {
+            // TODO think about this. Or run the tests and update this to fix failures.
+            if ($course->containertype == 'course_category') {
+                // TODO If it's an engage category then continue with the checks below?
+                return;
+            } else {
+                return;
+            }
+        }
+
+        // We allow all users to see all profile card fields of all other users. This allows users
+        // to share resources. We don't know that this operation is happening in the context of a
+        // resource, so we have to assume that it could be.
+        if (in_array($hook->field, display_setting::get_display_fields())
+            || in_array($hook->field, display_setting::get_display_picture_fields())
+        ) {
+            $hook->give_permission();
+            return;
+        }
+
+        // If there are other properties, beyond the profile card, that need to be accessed due to
+        // some situation in engage then we should check both the field and that access should be
+        // allow here.
+        // TODO try setting user profile card to show ONLY email and then run all engage tests.
+        return;
+    }
 }

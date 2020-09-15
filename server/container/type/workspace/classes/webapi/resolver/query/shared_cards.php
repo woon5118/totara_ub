@@ -31,6 +31,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use core_container\factory;
 use totara_engage\card\card_loader;
 use totara_engage\query\query;
 
@@ -43,7 +44,8 @@ final class shared_cards implements query_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): array {
         if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_coursecat::instance(workspace::get_default_category_id()));
+            $workspace = factory::from_id($args['workspace_id']);
+            $ec->set_relevant_context($workspace->get_context());
         }
 
         $query = new query();
