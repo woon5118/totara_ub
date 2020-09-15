@@ -216,7 +216,7 @@ export default {
 
       Object.keys(values).forEach(relationshipId => {
         if (this.isExternal(relationshipId)) {
-          errors[relationshipId] = {};
+          errors[relationshipId] = [];
           let externalValues = values[relationshipId];
           let emails = [];
           Object.keys(externalValues).forEach(formId => {
