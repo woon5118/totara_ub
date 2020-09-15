@@ -87,6 +87,11 @@ class has_many_through extends relation {
      * @return void
      */
     public function constraints_for_entity() {
+        if (!$this->entity->exists()) {
+            $this->repo->where_raw('1 = 2');
+            return;
+        }
+
         $this->repo->join($this->intermediate::TABLE, $this->get_related_key(), $this->get_intermediate_related_foreign_key())
             ->where(new field(
                 $this->get_intermediate_foreign_key(),
@@ -101,9 +106,8 @@ class has_many_through extends relation {
      * @param collection $collection
      * @return void
      */
-    public function load_for_collection($name, collection $collection) {
-        // Extracting keys to load related objects by.
-        $keys = $collection->pluck($this->get_key());
+    public function load_for_collection(string $name, collection $collection) {
+        $keys = $this->get_keys_from_collection($collection);
 
         $intermediate_builder = builder::table($this->intermediate::TABLE);
 
@@ -144,11 +148,17 @@ class has_many_through extends relation {
             }
         }
 
+        // No need to proceed
+        if (empty($grouped)) {
+            return;
+        }
+
         // Now iterate over original collection and append the results there
         $collection->map(
-            function ($item) use ($grouped, $name) {
-                /** @var entity $item */
-                $item->relate($name, new collection($grouped[$item->{$this->get_key()}] ?? []));
+            function (entity $item) use ($grouped, $name) {
+                if ($item->exists()) {
+                    $item->relate($name, new collection($grouped[$item->{$this->get_key()}] ?? []));
+                }
 
                 return $item;
             }

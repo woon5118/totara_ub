@@ -40,6 +40,11 @@ abstract class one_to_one extends relation {
      * @return void
      */
     public function constraints_for_entity() {
+        if (!$this->entity->exists()) {
+            $this->repo->where_raw('1 = 2');
+            return;
+        }
+
         $this->repo->where($this->get_foreign_key(), $this->entity->get_attribute($this->get_key()));
     }
 
@@ -49,6 +54,11 @@ abstract class one_to_one extends relation {
      * @return collection|entity|null
      */
     public function load_for_entity() {
+        // If we don't have a value save us a query
+        if ($this->entity->{$this->get_key()} === null) {
+            return null;
+        }
+
         return $this->get_repo()
             ->unless($this->has_order_by(), function (repository $builder) {
                 $builder->order_by('id');
@@ -63,9 +73,8 @@ abstract class one_to_one extends relation {
      * @param collection $collection
      * @return void
      */
-    public function load_for_collection($name, collection $collection) {
-        // Extracting keys to load related objects by.
-        $keys = $collection->pluck($this->get_key());
+    public function load_for_collection(string $name, collection $collection) {
+        $keys = $this->get_keys_from_collection($collection);
 
         // Chunk this to avoid too many value for IN condition
         $keys_chunked = array_chunk($keys, builder::get_db()->get_max_in_params());
@@ -85,7 +94,21 @@ abstract class one_to_one extends relation {
             // Now iterate over original collection of models and inject appropriate results there.
             $collection->map(
                 function (entity $item) use ($results, $name) {
-                    $item->relate($name, $results->item($item->{$this->get_key()}));
+                    // Skip if the entity does not exist
+                    if (!$item->exists()) {
+                        return $item;
+                    }
+
+                    // Make sure it's marked as loaded even if we don't have any results yet
+                    // as this could be chunked
+                    if (!$item->relation_loaded($name)) {
+                        $item->relate($name, null);
+                    }
+
+                    $value = $results->item($item->{$this->get_key()});
+                    if ($value) {
+                        $item->relate($name, $value);
+                    }
 
                     return $item;
                 }

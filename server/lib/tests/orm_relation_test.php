@@ -460,7 +460,7 @@ class sample_relation extends relation {
      * @param collection $collection Collection of models to append the relation to
      * @return $this
      */
-    public function load_for_collection($name, collection $collection) {
+    public function load_for_collection(string $name, collection $collection) {
         return $this;
     }
 

@@ -105,8 +105,9 @@ class core_orm_relation_has_many_test extends orm_entity_relation_testcase {
 
         $empty = new sample_parent_entity([]);
 
-        $this->assertEmpty($empty->children);
-        $this->assertEmpty($empty->children()->get());
+        $this->assertNull($empty->children);
+        $this->assertDebuggingCalled('Entity does not exist.');
+        $this->assertCount(0, $empty->children()->get());
 
         // Let's load the one that doesn't have any items in it.
         $entity = sample_parent_entity::repository()
@@ -114,9 +115,9 @@ class core_orm_relation_has_many_test extends orm_entity_relation_testcase {
             ->with('children')
             ->one();
 
-        $this->assertTrue($entity->relation_loaded('children'));
+        $this->assertFalse($entity->relation_loaded('children'));
         $this->assertEmpty($entity->children->all());
-        $this->assertEmpty($entity->children()->get());
+        $this->assertCount(0, $entity->children()->get());
     }
 
     public function test_it_handles_lazy_dynamic_conditions() {

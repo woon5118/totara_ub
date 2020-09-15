@@ -907,7 +907,7 @@ abstract class entity implements \JsonSerializable {
             $this->load_relation($name);
         }
 
-        return $this->relations[$name];
+        return $this->relation_loaded($name) ? $this->relations[$name] : null;
     }
 
     /**
@@ -918,7 +918,11 @@ abstract class entity implements \JsonSerializable {
      */
     public function load_relation(string $name) {
         if (!$this->relation_exists($name)) {
-            debugging("Relation '$name' does not exist");
+            debugging("Relation '$name' does not exist", DEBUG_DEVELOPER);
+            return $this;
+        }
+        if (!$this->exists()) {
+            debugging("Entity does not exist.", DEBUG_DEVELOPER);
             return $this;
         }
 

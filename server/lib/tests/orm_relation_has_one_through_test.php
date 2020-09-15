@@ -89,8 +89,9 @@ class core_orm_relation_has_one_through_test extends orm_entity_relation_testcas
 
         $empty = new sample_parent_entity([]);
 
-        $this->assertEmpty($empty->a_sibling);
-        $this->assertEmpty($empty->a_sibling()->get());
+        $this->assertNull($empty->a_sibling);
+        $this->assertDebuggingCalled('Entity does not exist.');
+        $this->assertCount(0, $empty->a_sibling()->get());
 
         // Let's make sure we have an item without related things
         $entity = sample_parent_entity::repository()

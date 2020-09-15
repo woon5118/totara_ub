@@ -107,8 +107,9 @@ class core_orm_relation_has_one_test extends orm_entity_relation_testcase {
 
         $empty = new sample_parent_entity([]);
 
-        $this->assertEmpty($empty->passport);
-        $this->assertEmpty($empty->passport()->get());
+        $this->assertNull($empty->passport);
+        $this->assertDebuggingCalled('Entity does not exist.');
+        $this->assertCount(0, $empty->passport()->get());
 
         // Let's load the one that doesn't have any items in it.
         $entity = sample_parent_entity::repository()

@@ -367,14 +367,18 @@ abstract class relation {
      * @param collection $collection Collection of models to append the relation to
      * @return $this
      */
-    abstract public function load_for_collection($name, collection $collection);
+    abstract public function load_for_collection(string $name, collection $collection);
 
     /**
      * By default this relationship loads a collection, overrideable for example when you need only one result.
      *
-     * @return collection
+     * @return collection|null
      */
     public function load_for_entity() {
+        if ($this->entity->{$this->get_key()} === null) {
+            return null;
+        }
+
         return $this->get_repo()->get();
     }
 
@@ -384,4 +388,20 @@ abstract class relation {
      * @return $this
      */
     abstract public function constraints_for_entity();
+
+    /**
+     * Get uniqued keys from collection, making sure no null values are included
+     *
+     * @param collection $collection
+     * @return array
+     */
+    protected function get_keys_from_collection(collection $collection) {
+        $keys = array_unique($collection->pluck($this->get_key()));
+        // There could be null values in there, filter them out
+        $keys = array_filter($keys, function ($value) {
+            return $value !== null;
+        });
+
+        return $keys;
+    }
 }

@@ -100,8 +100,11 @@ class core_orm_relation_belongs_to_test extends orm_entity_relation_testcase {
 
         $empty = new sample_child_entity([]);
 
-        $this->assertEmpty($empty->parent);
-        $this->assertEmpty($empty->parent()->get());
+        $this->assertNull($empty->parent);
+        $this->assertDebuggingCalled('Entity does not exist.');
+        $this->assertCount(0, $empty->parent()->get());
+
+        $queries_count_before = $this->db()->perf_get_reads();
 
         // Let's load the one that doesn't have any items in it.
         $entity = sample_child_entity::repository()
@@ -109,9 +112,23 @@ class core_orm_relation_belongs_to_test extends orm_entity_relation_testcase {
             ->with('parent')
             ->one();
 
-        $this->assertTrue($entity->relation_loaded('parent'));
+        $queries_count_after = $this->db()->perf_get_reads();
+
+        // No query for the relation got issued as it has a null value
+        $this->assertEquals(1, $queries_count_after - $queries_count_before);
+
+        $this->assertFalse($entity->relation_loaded('parent'));
         $this->assertNull($entity->parent);
         $this->assertEmpty($entity->parent()->one());
+
+        $queries_count_before = $this->db()->perf_get_reads();
+
+        // Now lazy load the relation and check that it does not trigger an additional query
+        $parent = $entity->parent;
+        $this->assertNull($parent);
+
+        $queries_count_after = $this->db()->perf_get_reads();
+        $this->assertEquals(0, $queries_count_after - $queries_count_before);
     }
 
     public function test_it_allows_to_disassociate_the_related_entity() {

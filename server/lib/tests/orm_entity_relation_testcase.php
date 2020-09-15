@@ -173,7 +173,7 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
         $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, 'John Doe');
         $table->add_field('type', XMLDB_TYPE_INTEGER, '10', null, false, null, 0);
-        $table->add_field('parent_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('parent_id', XMLDB_TYPE_INTEGER, '10', null, false);
         $table->add_field('description', XMLDB_TYPE_TEXT);
 
         $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null);
@@ -462,7 +462,7 @@ abstract class orm_entity_relation_testcase extends advanced_testcase {
                 [
                     'name' => 'The Big Unknown',
                     'type' => 69,
-                    'parent_id' => 0,
+                    'parent_id' => null,
                     'description' => 'The Big Unknown is so well known so it doesn\'t need a description',
                     'created_at' => 0, // Now
                     'updated_at' => 0, // Now

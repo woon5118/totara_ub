@@ -23,6 +23,7 @@
 
 namespace core\orm\entity\relations;
 
+use coding_exception;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\repository;
@@ -49,6 +50,11 @@ class has_one_through extends has_many_through {
      * @return collection|entity|null
      */
     public function load_for_entity() {
+        // If we don't have a value save us a query
+        if ($this->entity->{$this->get_key()} === null) {
+            return null;
+        }
+
         return $this->get_repo()
             ->unless($this->has_order_by(), function (repository $builder) {
                 $builder->order_by('id');
@@ -63,9 +69,8 @@ class has_one_through extends has_many_through {
      * @param collection $collection
      * @return void
      */
-    public function load_for_collection($name, collection $collection) {
-        // Extracting keys to load related objects by.
-        $keys = $collection->pluck($this->get_key());
+    public function load_for_collection(string $name, collection $collection) {
+        $keys = $this->get_keys_from_collection($collection);
 
         $intermediate_builder = $this->get_intermediate_builder();
 
@@ -96,14 +101,27 @@ class has_one_through extends has_many_through {
 
             // Now iterate over original collection and append the results there
             $collection->map(
-                function ($item) use ($results, $name) {
-                    /** @var entity $item */
-                    $item->relate($name, $results->item($item->{$this->get_key()}));
+                function (entity $item) use ($results, $name) {
+                    // Skip if the entity does not exist
+                    if (!$item->exists()) {
+                        return $item;
+                    }
 
-                    // We add this key temporarily to link children to the parent,
-                    // Since we do want to return entities in a valid state,
-                    // We'll unset it
-                    unset($item->{$this->get_intermediate_key_name()});
+                    // Make sure it's marked as loaded even if we don't have any results yet
+                    // as this could be chunked
+                    if (!$item->relation_loaded($name)) {
+                        $item->relate($name, null);
+                    }
+
+                    $value = $results->item($item->{$this->get_key()});
+                    if ($value) {
+                        $item->relate($name, $value);
+
+                        // We add this key temporarily to link children to the parent,
+                        // Since we do want to return entities in a valid state,
+                        // We'll unset it
+                        unset($item->{$this->get_intermediate_key_name()});
+                    }
 
                     return $item;
                 }
