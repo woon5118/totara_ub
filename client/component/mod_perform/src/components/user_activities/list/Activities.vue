@@ -52,7 +52,12 @@
         </HeaderCell>
       </template>
       <template v-slot:row="{ row: subjectInstance, expand, expandState }">
-        <ExpandCell :expand-state="expandState" size="1" @click="expand()" />
+        <ExpandCell
+          :aria-label="getExpandLabel(subjectInstance)"
+          :expand-state="expandState"
+          size="1"
+          @click="expand()"
+        />
         <Cell
           :size="isAboutOthers ? '3' : '7'"
           :column-header="$str('user_activities_title_header', 'mod_perform')"
@@ -544,6 +549,22 @@ export default {
     },
 
     /**
+     * The label to show for the expand row button.
+     *
+     * @param {Object} subjectInstance
+     * @returns {string}
+     */
+    getExpandLabel(subjectInstance) {
+      if (!this.isAboutOthers) {
+        return subjectInstance.subject.activity.name;
+      }
+      return this.$str('activity_title_for_subject', 'mod_perform', {
+        activity: subjectInstance.subject.activity.name,
+        user: subjectInstance.subject.subject_user.fullname,
+      });
+    },
+
+    /**
      * Does the logged in user have multiple relationships to the subject on an activity.
      *
      * @param {Array} participantInstances
@@ -602,6 +623,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "activity_title_for_subject",
       "all_job_assignments",
       "is_overdue",
       "print_activity",

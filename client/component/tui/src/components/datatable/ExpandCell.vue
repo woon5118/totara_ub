@@ -25,11 +25,11 @@
     <template v-if="!header || empty">
       <ButtonIcon
         :aria-expanded="expandState.toString()"
-        :aria-label="$str('a11y_row', 'totara_core', ariaLabel)"
+        :aria-label="$str('a11y_row_details', 'totara_core', ariaLabel)"
         :styleclass="{
           transparent: true,
         }"
-        :text="$str('a11y_row', 'totara_core', ariaLabel)"
+        :text="text"
         @click="$emit('click', $event)"
       >
         <CollapseIcon v-if="expandState" size="100" />
@@ -53,9 +53,27 @@ export default {
 
   props: {
     ariaLabel: String,
+    text: {
+      required: false,
+      type: String,
+      default() {
+        return this.$str('details', 'totara_core');
+      },
+    },
     empty: Boolean,
     expandState: Boolean,
     header: Boolean,
+  },
+
+  mounted() {
+    if (
+      !this.header &&
+      (this.ariaLabel == null || this.ariaLabel.length === 0)
+    ) {
+      console.error(
+        '[ExpandCell] You must pass either aria-label or set hidden to true.'
+      );
+    }
   },
 };
 </script>
@@ -63,7 +81,8 @@ export default {
 <lang-strings>
 {
   "totara_core": [
-    "a11y_row"
+    "a11y_row_details",
+    "details"
   ]
 }
 </lang-strings>

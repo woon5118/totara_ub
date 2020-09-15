@@ -47,6 +47,7 @@
           <template v-slot:row="{ row, expand, expandState }">
             <!-- Competency details expand cell -->
             <ExpandCell
+              :aria-label="row.competency.fullname"
               size="1"
               :expand-state="expandState"
               @click="expand()"

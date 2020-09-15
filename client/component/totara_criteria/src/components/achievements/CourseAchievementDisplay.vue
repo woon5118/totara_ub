@@ -48,7 +48,11 @@
         >
           <template v-slot:row="{ row, expand, expandState }">
             <!-- Course details expand cell -->
-            <ExpandCell :expand-state="expandState" @click="expand()" />
+            <ExpandCell
+              :aria-label="getCourseName(row)"
+              :expand-state="expandState"
+              @click="expand()"
+            />
 
             <!-- Course name cell -->
             <Cell size="9" :column-header="$str('courses', 'totara_criteria')">

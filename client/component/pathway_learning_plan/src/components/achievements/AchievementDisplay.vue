@@ -68,7 +68,7 @@
               <template v-else>
                 <!-- learning plan expand cell -->
                 <ExpandCell
-                  v-if="row.can_view"
+                  :aria-label="row.name"
                   :expand-state="expandState"
                   @click="expand()"
                 />
