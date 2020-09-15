@@ -239,6 +239,10 @@ final class playlist_provider implements queryable, container {
         // Search.
         if ($query->is_search()) {
             $builder = $this->search_library($builder, $query->get_search());
+        } else if ($query->is_adder() && !empty($query->get_search())) {
+            // For adder just add simple search for names/summary.
+            $builder = $this->add_search($builder, $query->get_search());
+            $this->add_sub_conditions($builder);
         } else {
             // Add conditions so that we fetch records that exists in either
             // shared, saved, or owned.

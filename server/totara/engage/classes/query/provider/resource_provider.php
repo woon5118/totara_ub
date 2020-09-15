@@ -205,6 +205,10 @@ abstract class resource_provider implements queryable {
         // Search.
         if ($query->is_search()) {
             $builder = $this->search_library($builder, $query);
+        } else if ($query->is_adder() && !empty($query->get_search())) {
+            // For adder just add simple search for name.
+            $builder = $this->add_search($builder, $query->get_search());
+            $this->add_sub_conditions($builder);
         } else {
             $this->add_sub_conditions($builder);
         }
