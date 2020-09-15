@@ -44,6 +44,9 @@ class cohorts implements query_resolver, has_middleware {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
+
         $query = $args['query'] ?? [];
         $context_id = $query['context_id'] ?? null;
         $order_by = $query['order_by'] ?? 'name';
