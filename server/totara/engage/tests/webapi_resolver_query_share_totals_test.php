@@ -239,18 +239,8 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
 
-        self::assertDebuggingNotCalled();
         $article = $this->create_article('test', $user1->id);
-        self::assertDebuggingCalled('Exception encountered in event observer \'engage_article\observer\article_observer::on_created\': The guest user is not allowed to do this');
-        self::resetDebugging();
-
-        try {
-            $this->create_workspace('test workspace 1', $user1->id);
-            // TODO: The guest account can currently create workspaces - that is interesting! Fix it.
-            // self::fail('The guest account was allowed to create a workspace!');
-        } catch (\container_workspace\exception\workspace_exception $exception) {
-            self::assertStringContainsString('Cannot create a workspace', $exception->getMessage());
-        }
+        $this->create_workspace('test workspace 1', $user1->id);
 
         $this->setUser($user1);
         $workspace1 = $this->create_workspace('test workspace 1', $user1->id);
