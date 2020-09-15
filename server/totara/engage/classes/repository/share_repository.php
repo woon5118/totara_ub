@@ -25,6 +25,7 @@ namespace totara_engage\repository;
 use core\orm\entity\repository;
 use core\orm\query\builder;
 use core_user\access_controller;
+use core_user\totara_engage\share\recipient\user;
 use totara_core\advanced_feature;
 use totara_engage\entity\share;
 use totara_engage\entity\share_recipient;
@@ -176,12 +177,29 @@ final class share_repository extends repository {
         }
 
         if (!empty($recipients)) {
-            $recipients = array_filter($recipients, function ($recipient) {
-                if ($recipient['area'] !== 'USER') {
-                    return true;
+            $recipients = array_filter(
+                $recipients,
+                function ($recipient) {
+                    global $DB;
+
+                    if ('core_user' !== $recipient['component'] && $recipient['area'] !== 'USER') {
+                        return true;
+                    }
+
+                    $access_controller = access_controller::for_user_id($recipient['instanceid']);
+                    if (!$access_controller->can_view_profile()) {
+                        return false;
+                    }
+
+                    $sql = '
+                        SELECT 1 FROM "ttr_user" 
+                        WHERE id = :user_id 
+                        AND (deleted = 0 AND confirmed = 1)
+                    ';
+
+                    return $DB->record_exists_sql($sql, ['user_id' => $recipient['instanceid']]);
                 }
-                return access_controller::for_user_id($recipient['instanceid'])->can_view_profile();
-            });
+            );
         }
 
         return $recipients;

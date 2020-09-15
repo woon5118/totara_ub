@@ -41,6 +41,7 @@ final class playlist_query {
     private $cursor;
 
     /**
+     * The target user that we want to fetch playlists against.
      * @var int
      */
     private $user_id;

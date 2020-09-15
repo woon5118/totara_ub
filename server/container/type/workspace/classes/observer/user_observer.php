@@ -2,7 +2,7 @@
 /**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,17 +18,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
- * @package totara_playlist
+ * @package container_workspace
  */
-defined('MOODLE_INTERNAL') || die();
+namespace container_workspace\observer;
 
-$plugin->version = 2020090101;          // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;         // Requires this Totara version.
-$plugin->component = 'totara_playlist';
+use core\event\user_deleted;
 
-$plugin->dependencies = [
-    'totara_engage' => 2019101201,
-    'totara_topic' => 2019112700,
-    'totara_comment' => 2019101500,
-    'editor_weka' => 2019111800
-];
+final class user_observer {
+    /**
+     * @param user_deleted $event
+     * @return void
+     */
+    public static function on_user_deleted(user_deleted $event): void {
+        global $DB;
+
+        $sql = 'UPDATE "ttr_workspace" SET user_id = NULL WHERE user_id = :user_id';
+
+        $user_id = $event->objectid;
+        $DB->execute($sql, ['user_id' => $user_id]);
+    }
+}

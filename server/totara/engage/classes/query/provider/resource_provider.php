@@ -128,6 +128,19 @@ abstract class resource_provider implements queryable {
             ]
         );
 
+        // Excluding those resources from deleted and suspended users.
+        $unique_alias = uniqid("user_table_");
+        $builder->join(
+            ['user', $unique_alias],
+            function (builder $join) : void {
+                $join->where_field("er.userid", "id");
+                $join->where("deleted", 0);
+
+                // And check for confirmed user.
+                $join->where("confirmed", 1);
+            }
+        );
+
         return $builder;
     }
 

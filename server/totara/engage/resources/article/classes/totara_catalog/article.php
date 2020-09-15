@@ -143,6 +143,16 @@ final class article extends provider {
             }
         );
 
+        // Join the user so that we can exclude any deleted user.
+        $builder->join(
+            ['user', 'out_user'],
+            function (builder $join): void {
+                $join->where_field('er.userid', 'out_user.id');
+                $join->where('out_user.deleted', 0);
+                $join->where('out_user.confirmed', 1);
+            }
+        );
+
         $builder->left_join(
             ['engage_share_recipient', 'esr'],
             function (builder $join): void {
@@ -303,6 +313,9 @@ final class article extends provider {
             JOIN "ttr_engage_resource" res 
                 ON res.instanceid = art.id
                 AND res.resourcetype = \'engage_article\'
+            JOIN "ttr_user" u
+                ON res.userid = u.id
+                AND u.deleted = 0 AND u.confirmed = 1
             JOIN "ttr_context" con
                 ON con.contextlevel = :level
                 AND con.instanceid = res.userid

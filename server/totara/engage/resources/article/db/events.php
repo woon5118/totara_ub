@@ -77,5 +77,9 @@ $observers = [
     [
         'eventname' => '\engage_article\event\article_viewed',
         'callback' => ['engage_article\observer\article_observer', 'on_view_created']
-    ]
+    ],
+    [
+        'eventname' => \core\event\user_deleted::class,
+        'callback' => [\engage_article\totara_catalog\article::class, 'object_update_observer']
+    ],
 ];

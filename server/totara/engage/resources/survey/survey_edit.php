@@ -26,6 +26,7 @@ use engage_survey\totara_engage\resource\survey;
 use totara_core\advanced_feature;
 use totara_engage\access\access_manager;
 use totara_playlist\totara_engage\link\nav_helper;
+use totara_tui\output\component;
 
 require_once(__DIR__ . "/../../../../config.php");
 global $OUTPUT, $PAGE, $USER;
@@ -40,30 +41,54 @@ $source_url = optional_param("source_url", '', PARAM_URL);
 
 /** @var survey $survey */
 $survey = survey::from_resource_id($id);
-$survey->redirect_vote_page((int)$USER->id, $source, $source_url);
-
 $url = new \moodle_url("/totara/engage/resources/survey/survey_edit.php", ['id' => $id]);
-$context = $survey->get_context();
 
 $PAGE->set_url($url);
-$PAGE->set_context(\context_user::instance($USER->id));
-$PAGE->set_title($survey->get_name());
 $PAGE->set_pagelayout('legacynolayout');
 
-// Build the back button & nav buttons
-[$back_button, $navigation_buttons] = nav_helper::build_resource_nav_buttons($survey->get_id(), $survey->get_userid(), $source);
-$tui = new \totara_tui\output\component(
-    'engage_survey/pages/SurveyEditView',
-    [
-        'resource-id' => $id,
-        'back-button' => $back_button,
-        'navigation-buttons' => $navigation_buttons,
-    ]
-);
-$tui->register($PAGE);
+$tui = null;
 
-$event = survey_viewed::from_survey($survey);
-$event->trigger();
+if (!$survey->is_available()) {
+    $message = get_string('survey_unavailable', 'engage_survey');
+
+    // Default to context system.
+    $PAGE->set_context(\context_system::instance());
+    $PAGE->set_title($message);
+
+    $tui = new component(
+        'totara_engage/pages/EngageUnavailableResource',
+        ['message' => $message]
+    );
+
+    $tui->register($PAGE);
+} else {
+    $survey->redirect_vote_page((int)$USER->id, $source, $source_url);
+    $context = $survey->get_context();
+
+    $PAGE->set_context($context);
+    $PAGE->set_title($survey->get_name());
+
+    // Build the back button & nav buttons
+    [$back_button, $navigation_buttons] = nav_helper::build_resource_nav_buttons(
+        $survey->get_id(),
+        $survey->get_userid(),
+        $source
+    );
+
+    $tui = new component(
+        'engage_survey/pages/SurveyEditView',
+        [
+            'resource-id' => $id,
+            'back-button' => $back_button,
+            'navigation-buttons' => $navigation_buttons,
+        ]
+    );
+
+    $tui->register($PAGE);
+
+    $event = survey_viewed::from_survey($survey);
+    $event->trigger();
+}
 
 echo $OUTPUT->header();
 echo $OUTPUT->render($tui);

@@ -55,7 +55,15 @@ final class loader {
         $builder = builder::table('user_enrolments', 'ue');
 
         $builder->join(['enrol', 'e'], 'ue.enrolid', 'e.id');
-        $builder->join(['user', 'u'], 'ue.userid', 'u.id');
+        $builder->join(
+            ['user', 'u'],
+            function(builder $join): void {
+                $join->where_field('ue.userid', 'u.id');
+                $join->where('u.deleted', 0);
+                $join->where('u.confirmed', 1);
+            }
+        );
+
         $builder->left_join(
             [workspace::TABLE, 'w'],
             function (builder $join): void {

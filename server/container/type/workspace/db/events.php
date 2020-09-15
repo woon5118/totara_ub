@@ -33,6 +33,8 @@ use totara_engage\event\share_created;
 use container_workspace\observer\share_observer;
 use container_workspace\event\discussion_created;
 use container_workspace\event\discussion_updated;
+use core\event\user_deleted;
+use container_workspace\observer\user_observer;
 
 $observers = [
     [
@@ -66,5 +68,9 @@ $observers = [
     [
         'eventname' => discussion_updated::class,
         'callback' => [discussion_observer::class, 'on_updated']
+    ],
+    [
+        'eventname' => user_deleted::class,
+        'callback' => [user_observer::class, 'on_user_deleted']
     ],
 ];

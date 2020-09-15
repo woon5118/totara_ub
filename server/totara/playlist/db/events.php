@@ -85,5 +85,9 @@ $observers = [
     [
         'eventname' => '\totara_comment\event\comment_updated',
         'callback' => ['totara_playlist\observer\comment_observer', 'on_comment_updated']
-    ]
+    ],
+    [
+        'eventname' => '\core\event\user_deleted',
+        'callback' => ['\totara_playlist\totara_catalog\playlist', 'object_update_observer']
+    ],
 ];

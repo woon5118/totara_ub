@@ -177,6 +177,7 @@ $string['resourcedeletedevent'] = 'Resource removed';
 $string['resourcenavprevious'] = 'Previous resource in playlist';
 $string['resourcenavnext'] = 'Next resource in playlist';
 $string['resourceonly'] = 'Show standalone resources only';
+$string['resource_unavailable'] = 'The resource is no longer available';
 $string['restricted'] = "Limited people";
 $string['savedresources'] = 'Saved resources';
 $string['searchlibrary'] = 'Search your library';

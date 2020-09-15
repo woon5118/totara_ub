@@ -59,7 +59,6 @@ class behat_engage_article extends behat_base {
     public static function get_item_by_name(string $name): resource_item {
         global $DB;
         $resourceid = $DB->get_field(engage_resource::TABLE, 'id', ['name' => $name]);
-        return article::from_instance($resourceid, article::get_resource_type());
+        return article::from_resource_id($resourceid);
     }
-
 }

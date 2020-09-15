@@ -54,6 +54,7 @@ $string['surveyreshared'] = 'Survey re-shared';
 $string['surveyshared'] = 'Survey shared';
 $string['surveyupdated'] = 'Survey updated';
 $string['surveyvoted'] = 'Survey voted';
+$string['survey_unavailable'] = 'The survey is no longer available';
 $string['tagarea_engage_resource'] = 'Survey';
 $string['user_data_item_survey'] = 'Survey';
 $string['user_data_item_survey_completion'] = 'Survey Vote';

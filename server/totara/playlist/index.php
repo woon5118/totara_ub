@@ -41,18 +41,31 @@ $source = optional_param('source', null, PARAM_TEXT);
 
 $playlist = playlist::from_id($id);
 
-$PAGE->set_context($playlist->get_context());
 $PAGE->set_url("/totara/playlist/index.php", ['id' => $playlist->get_id()]);
 $PAGE->set_pagelayout('legacynolayout');
-$PAGE->set_title($playlist->get_name());
 
 $back_button = nav_helper::build_back_button($playlist->get_userid(), $source);
+$tui = null;
 
-if (access_manager::can_access($playlist)) {
+if (!$playlist->is_available()) {
+    $message = get_string('playlist_unavailable', 'totara_playlist');
+
+    // Default to system context.
+    $PAGE->set_context(\context_system::instance());
+    $PAGE->set_title($message);
+
+    $tui = new component(
+        'totara_engage/pages/EngageUnavailableResource',
+        ['message' => $message]
+    );
+    $tui->register($PAGE);
+} else if (access_manager::can_access($playlist)) {
+    $PAGE->set_context($playlist->get_context());
+    $PAGE->set_title($playlist->get_name());
+
     $event = playlist_viewed::from_playlist($playlist);
     $event->trigger();
 
-    $tui = null;
     if ($library_view) {
         $tui = new component('totara_engage/pages/LibraryView', [
             'id' => "playlist_{$id}",
@@ -82,12 +95,16 @@ if (access_manager::can_access($playlist)) {
     }
 
     $tui->register($PAGE);
-    echo $OUTPUT->header();
-    echo $OUTPUT->render($tui);
-
 } else {
+    $PAGE->set_context(\context_system::instance());
+}
 
-    echo $OUTPUT->header();
+// Rendering the page.
+echo $OUTPUT->header();
+
+if (null !== $tui) {
+    echo $OUTPUT->render($tui);
+} else {
     notification::error(get_string('cannotviewplaylist', 'totara_playlist'));
 }
 

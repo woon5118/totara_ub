@@ -349,6 +349,24 @@ abstract class resource_item implements accessible, shareable {
     }
 
     /**
+     * Extended the logic check to check against the owner user of this resource.
+     * Since the resource is no longer available when user is deleted/suspended or any
+     * non confirmed user.
+     *
+     * @return bool
+     */
+    public function is_available(): bool {
+        global $DB;
+        $valid_owner_sql = '
+            SELECT 1 FROM "ttr_user" WHERE id = :owner_id 
+            AND deleted = 0 AND confirmed = 1
+        ';
+
+        $owner_id = $this->get_userid();
+        return $DB->record_exists_sql($valid_owner_sql, ['owner_id' => $owner_id]);
+    }
+
+    /**
      * @return int|null
      */
     public function get_timemodified(): ?int {

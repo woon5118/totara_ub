@@ -143,6 +143,17 @@ final class playlist extends provider {
         }
 
         $builder = builder::table('playlist', 'pl');
+        $builder->join(
+            ['user', 'out_user'],
+            function (builder $join): void {
+                $join->where_field('pl.userid', 'out_user.id');
+                $join->where('out_user.deleted', 0);
+
+                // Excluded non confirmed user.
+                $join->where('out_user.confirmed', 1);
+            }
+        );
+
         $builder->left_join(
             ['engage_share', 'es'],
             function (builder $join): void {
@@ -323,11 +334,16 @@ final class playlist extends provider {
      * @return array
      */
     public function get_all_objects_sql(): array {
-
-        $sql = "SELECT plst.id as objectid, 'playlist' as objecttype, con.id as contextid
-                  FROM {playlist} plst
-                  JOIN {context} con
-                    ON con.contextlevel = :level AND con.instanceid = plst.userid";
+        $sql = '
+            SELECT plst.id as objectid, \'playlist\' as objecttype, con.id as contextid
+            FROM "ttr_playlist" plst
+            INNER JOIN "ttr_context" con
+                ON con.contextlevel = :level AND con.instanceid = plst.userid
+            INNER JOIN "ttr_user" u 
+                ON plst.userid = u.id
+                AND u.deleted = 0
+                AND u.confirmed = 1
+        ';
 
         return [$sql, ['level' => CONTEXT_USER]];
     }

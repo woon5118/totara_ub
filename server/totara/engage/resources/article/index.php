@@ -40,18 +40,25 @@ $source = optional_param('source', null, PARAM_TEXT);
 
 /** @var article $resource */
 $resource = article::from_resource_id($id);
-
 $url = new \moodle_url("/totara/engage/resources/article/index.php", ['id' => $id]);
-$context = $resource->get_context();
 
 $PAGE->set_url($url);
-$PAGE->set_context(\context_user::instance($USER->id));
-$PAGE->set_title($resource->get_name());
-
 $PAGE->set_pagelayout('legacynolayout');
 
 $tui = null;
-if (access_manager::can_access($resource, $USER->id)) {
+if (!$resource->is_available()) {
+    $message = get_string('resource_unavailable', 'totara_engage');
+
+    // Fallback to the context system.
+    $PAGE->set_context(\context_system::instance());
+    $PAGE->set_title($message);
+
+    $tui = new component('totara_engage/pages/EngageUnavailableResource');
+    $tui->register($PAGE);
+} else if (access_manager::can_access($resource, $USER->id)) {
+    $PAGE->set_context($resource->get_context());
+    $PAGE->set_title($resource->get_name());
+
     // Build the back button
     [$back_button, $navigation_buttons] = nav_helper::build_resource_nav_buttons($resource->get_id(), $resource->get_userid(), $source);
 
@@ -69,6 +76,8 @@ if (access_manager::can_access($resource, $USER->id)) {
 
     $event = article_viewed::from_article($resource);
     $event->trigger();
+} else {
+    $PAGE->set_context(\context_system::instance());
 }
 
 echo $OUTPUT->header();

@@ -54,7 +54,16 @@ final class playlist_loader {
         // The first builder is where we are fetching all the playlists that are own
         // by the user or the playlists that are being set to public.
         $first_builder = builder::table(playlist_entity::TABLE, 'p');
-        $first_builder->join(['user', 'u'], 'p.userid', 'u.id');
+        $first_builder->join(
+            ['user', 'u'],
+            function (builder $join): void {
+                $join->where_field('p.userid', 'u.id');
+                $join->where('u.deleted', 0);
+                $join->where('u.suspended', 0);
+
+                $join->where('u.confirmed', 1);
+            }
+        );
 
         $first_builder->select('p.*');
         $first_builder->add_select_raw($user_fields_sql);
@@ -83,7 +92,17 @@ final class playlist_loader {
             // Second builder is where we are fetching the shared playlist with the current user.
             // will be union to the first builder.
             $second_builder = builder::table(playlist_entity::TABLE, 'p');
-            $second_builder->join(['user', 'u'], 'p.userid', 'u.id');
+            $second_builder->join(
+                ['user', 'u'],
+                function (builder $join): void {
+                    $join->where_field('p.userid', 'u.id');
+                    $join->where('u.deleted', 0);
+                    $join->where('u.suspended', 0);
+
+                    $join->where('u.confirmed', 1);
+                }
+            );
+
             $second_builder->join(
                 [share_entity::TABLE, 'es'],
                 function (builder $join): void {
@@ -216,8 +235,13 @@ final class playlist_loader {
                 //      u.picture           as user_picture
                 //  FROM phpu_00playlist "p"
                 //  INNER JOIN phpu_00user "u" ON p.userid = u.id
+                //  AND u.deleted = 0
+                //  AND u.suspended = 0
+                //  AND u.confirmed = 1
                 //  WHERE (p.userid = $1 OR p.access = $2)
+                //
                 //  UNION
+                //
                 //  # Union with all the playlists that are shared to this user.
                 //  SELECT p.*,
                 //  u.firstnamephonetic AS user_firstnamephonetic,
@@ -232,6 +256,9 @@ final class playlist_loader {
                 //  u.picture           as user_picture
                 //  FROM phpu_00playlist "p"
                 //  INNER JOIN phpu_00user "u" ON p.userid = u.id
+                //  AND u.deleted = 0
+                //  AND u.suspended = 0
+                //  AND u.confirmed = 1
                 //  INNER JOIN phpu_00engage_share "es" ON es.itemid = p.id AND es.component = $3
                 //  INNER JOIN phpu_00engage_share_recipient "esr"
                 //      ON esr.shareid = es.id AND "esr".component = $4 AND "esr".area = $5

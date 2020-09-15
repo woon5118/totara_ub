@@ -66,6 +66,7 @@ $string['selectexistingresource'] = "select an existing resource";
 $string['tagarea_playlist'] = "Playlist";
 $string['userdataitemplaylist'] = "Playlist";
 $string['playlist_resource'] = 'Playlist resources';
+$string['playlist_unavailable'] = 'This playlist is no longer available';
 $string['toaddplaylist'] = 'to add in this playlist';
 $string['yourplaylists'] = 'Your playlists';
 $string['resourceplaylistposition'] = '{$a->current} of {$a->total} resources';
