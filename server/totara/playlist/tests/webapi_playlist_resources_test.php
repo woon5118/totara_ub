@@ -1,0 +1,110 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Cody Finegan <cody.finegan@totaralearning.com>
+ * @package totara_playlist
+ */
+defined('MOODLE_INTERNAL') || die();
+
+use core\webapi\execution_context;
+use totara_engage\answer\answer_type;
+use totara_webapi\graphql;
+use totara_webapi\phpunit\webapi_phpunit_helper;
+
+class totara_playlist_webapi_playlist_resources_testcase extends advanced_testcase {
+    use webapi_phpunit_helper;
+
+    /**
+     * Verify the playlist resources call returns the resource topics
+     *
+     * @return void
+     */
+    public function test_graphql_playlist_resources_include_topics(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setAdminUser();
+        /** @var totara_topic_generator $topic_generator */
+        $topic_generator = $generator->get_plugin_generator('totara_topic');
+        $topic1 = $topic_generator->create_topic('topic1');
+        $topic2 = $topic_generator->create_topic('topic2');
+        $topics = [
+            $topic1->get_id(),
+            $topic2->get_id()
+        ];
+
+        $this->setUser($user_one);
+
+        /** @var totara_playlist_generator $playlist_generator */
+        $playlist_generator = $generator->get_plugin_generator('totara_playlist');
+        $playlist = $playlist_generator->create_playlist();
+
+        /** @var engage_article_generator $article_generator */
+        $article_generator = $generator->get_plugin_generator('engage_article');
+        $article = $article_generator->create_article([
+            'topics' => $topics,
+        ]);
+
+        /** @var engage_survey_generator $survey_generator */
+        $survey_generator = $generator->get_plugin_generator('engage_survey');
+        $survey = $survey_generator->create_survey(
+            null,
+            [],
+            answer_type::MULTI_CHOICE,
+            [
+                'topics' => $topics,
+            ]
+        );
+
+        // Load the playlist resources call which will returns resources *not* in this playlist.
+        // Then verify the topics were correctly loaded. We're using the graphql test and not phpunit helper
+        // as we're testing the results of the type resolve as well.
+        $ec = execution_context::create('ajax', 'totara_playlist_resources');
+        $parameters = [
+            'playlist_id' => $playlist->get_id(),
+            'area' => '',
+            'filter' => [
+                'page' => 1,
+            ],
+            'include_footnotes' => false,
+        ];
+        $results = graphql::execute_operation($ec, $parameters);
+
+        $this->assertEmpty($results->errors);
+        $this->assertNotEmpty($results->data);
+        $this->assertIsArray($results->data['resources']['cards']);
+        $this->assertCount(2, $results->data['resources']['cards']);
+
+        $topic_ids = [$topic1->get_id(), $topic2->get_id()];
+        $topic_names = [$topic1->get_display_name(), $topic2->get_display_name()];
+
+        $cards = $results->data['resources']['cards'];
+        foreach ($cards as $card) {
+            $resource = $card['component'] === 'engage_article' ? $article : $survey;
+            $this->assertEquals($resource->get_id(), $card['instanceid']);
+            $this->assertNotEmpty($card['topics']);
+            $this->assertIsArray($card['topics']);
+
+            foreach ($card['topics'] as $topic) {
+                $this->assertTrue(in_array($topic['id'], $topic_ids));
+                $this->assertTrue(in_array($topic['value'], $topic_names));
+            }
+        }
+    }
+}

@@ -140,7 +140,7 @@ final class survey_card extends card {
      */
     public function  get_topics(): array {
         $id = $this->get_instanceid();
-        return topic_provider::get_for_item($id, $this->component, 'engage_survey');
+        return topic_provider::get_for_item($id, $this->component, 'engage_resource');
     }
 
     /**

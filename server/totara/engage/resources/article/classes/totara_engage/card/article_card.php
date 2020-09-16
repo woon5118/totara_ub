@@ -76,7 +76,7 @@ final class article_card extends card {
      */
     public function get_topics(): array {
         $id = $this->get_instanceid();
-        return topic_provider::get_for_item($id, $this->component, 'engage_article');
+        return topic_provider::get_for_item($id, $this->component, 'engage_resource');
     }
 
     /**
