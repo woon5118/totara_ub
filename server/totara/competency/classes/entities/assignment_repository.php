@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara Learn
+ * This file is part of Totara Perform
  *
  * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
@@ -105,6 +105,17 @@ class assignment_repository extends repository {
      */
     public function filter_by_draft(): self {
         $this->where('status', assignment::STATUS_DRAFT);
+
+        return $this;
+    }
+
+    /**
+     * Return only non-draft assignments
+     *
+     * @return $this
+     */
+    public function filter_by_not_draft(): self {
+        $this->where('status', '<>', assignment::STATUS_DRAFT);
 
         return $this;
     }

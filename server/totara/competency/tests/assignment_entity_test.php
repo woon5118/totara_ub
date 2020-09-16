@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara Learn
+ * This file is part of Totara Perform
  *
  * Copyright (C) 2018 onwards Totara Learning Solutions LTD
  *
@@ -58,6 +58,14 @@ class totara_competency_assignment_entity_testcase extends advanced_testcase {
 
         $this->assertCount(1, $result);
         $this->assertEquals($ass1->id, $result->first()->id);
+
+        $result = assignment::repository()
+            ->filter_by_not_draft()
+            ->get();
+
+        $this->assertCount(2, $result);
+        $ids = $result->pluck('id');
+        $this->assertNotContains($ass1->id, $ids);
     }
 
     public function test_status_name() {

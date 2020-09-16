@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara Learn
+ * This file is part of Totara Perform
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
@@ -48,6 +48,8 @@ use core\orm\entity\relations\has_many_through;
  * @property-read assignment $assignment
  * @property-read scale_value $value
  * @property-read pathway_achievement[] $achieved_via
+ *
+ * @method static competency_achievement_repository repository()
  */
 class competency_achievement extends entity {
 
