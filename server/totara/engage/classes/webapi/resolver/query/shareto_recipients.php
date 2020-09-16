@@ -30,6 +30,8 @@ use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use totara_engage\access\access;
+use totara_engage\access\access_manager;
+use totara_engage\access\accessible;
 use totara_engage\share\provider as share_provider;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\share\recipient\recipient;
@@ -50,74 +52,90 @@ final class shareto_recipients implements query_resolver, has_middleware {
             $ec->set_relevant_context(\context_user::instance($USER->id));
         }
 
-        $data = [];
+        $itemid = $args['itemid'];
+        $component = $args['component'];
 
-        if (!empty($args['search'])) {
-            $access = access::get_value($args['access']);
-            $itemid = $args['itemid'];
-            $component = $args['component'];
+        $access = access::get_value($args['access']);
+        if (access::is_private($access)) {
+            throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, 'Cannot access item ' . $itemid);
+        }
 
-            // Get an instance of the item we are trying to share.
-            $instance = null;
-            if (!empty($itemid)) {
+        // Get an instance of the item we are trying to share.
+        $instance = null;
+        if (!empty($itemid)) {
+            try {
                 $provider = share_provider::create($component);
                 $instance = $provider->get_item_instance($itemid);
+            } catch (\dml_exception $ex) {
+                // Don't expose internal exceptions!
+                throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, $ex->getMessage());
             }
 
-            /** @var recipient[] $classes */
-            $classes = recipient_helper::get_recipient_classes(true);
+            if ($instance instanceof accessible) {
+                if (!access_manager::can_access($instance, $USER->id)) {
+                    throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, 'Cannot access item ' . $instance->get_id());
+                }
+            } else {
+                // Something that is shareable must be accessible. It is a one way binding.
+                throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, get_class($instance));
+            }
+        }
 
-            // Execute search on each handler.
-            foreach ($classes as $class) {
-                /** @var recipient[] $recipients */
-                $recipients = $class::search($args['search'], $instance);
+        /** @var recipient[] $classes */
+        $classes = recipient_helper::get_recipient_classes(true);
 
-                // Only user is explicitly specified as a return type in the graphql query
-                // as we need the user to pass through the graphql user type resolver's
-                // validations.
-                $area = strtolower($class::AREA);
-                if ($area !== 'user') {
-                    $area = 'other';
+        // Execute search on each handler.
+        foreach ($classes as $class) {
+            // If search is not set, we fetch all the recipients back.
+            /** @var recipient[] $recipients */
+            $recipients = $class::search($args['search'] ?? '', $instance);
+
+            // Only user is explicitly specified as a return type in the graphql query
+            // as we need the user to pass through the graphql user type resolver's
+            // validations.
+            $area = strtolower($class::AREA);
+            if ($area !== 'user') {
+                $area = 'other';
+            }
+
+            // Get recipients that already received the share.
+            $already_recipients = [];
+            if (!empty($instance)) {
+                $already_recipients = self::get_already_recipients($itemid, $component, $recipients, $access);
+            }
+
+            $data = [];
+            // Setup recipient return data.
+            foreach ($recipients as $recipient) {
+                // Allow only recipients that matches at least the item's access level.
+                if (!self::has_valid_access($recipient, $access)) {
+                    continue;
                 }
 
-                // Get recipients that already received the share.
-                $already_recipients = [];
-                if (!empty($instance)) {
-                    $already_recipients = self::get_already_recipients($itemid, $component, $recipients, $access);
-                }
+                $recipient_id = $recipient->get_id();
+                $recipient_area = $recipient->get_area();
+                $recipient_component = $recipient->get_component();
 
-                // Setup recipient return data.
-                foreach ($recipients as $recipient) {
-                    // Allow only recipients that matches at least the item's access level.
-                    if (!self::has_valid_access($recipient, $access)) {
-                        continue;
+                $isrecipient = false;
+                foreach ($already_recipients as $already_recipient) {
+                    if ($already_recipient->instanceid == $recipient_id
+                        && $already_recipient->area === $recipient_area
+                        && $already_recipient->component === $recipient_component) {
+                        $isrecipient = true;
+                        break;
                     }
-
-                    $recipient_id = $recipient->get_id();
-                    $recipient_area = $recipient->get_area();
-                    $recipient_component = $recipient->get_component();
-
-                    $isrecipient = false;
-                    foreach ($already_recipients as $already_recipient) {
-                        if ($already_recipient->instanceid == $recipient_id
-                            && $already_recipient->area === $recipient_area
-                            && $already_recipient->component === $recipient_component) {
-                            $isrecipient = true;
-                            break;
-                        }
-                    }
-
-                    // Add to return data.
-                    $data[] = [
-                        'component' => $recipient_component,
-                        'area' => $recipient_area,
-                        'instanceid' => $recipient_id,
-                        'alreadyshared' => $isrecipient,
-                        'summary' => $recipient->get_summary(),
-                        'minimum_access' => access::get_code($recipient->get_minimum_access()),
-                        $area => $recipient->get_data()
-                    ];
                 }
+
+                // Add to return data.
+                $data[] = [
+                    'component' => $recipient_component,
+                    'area' => $recipient_area,
+                    'instanceid' => $recipient_id,
+                    'alreadyshared' => $isrecipient,
+                    'summary' => $recipient->get_summary(),
+                    'minimum_access' => access::get_code($recipient->get_minimum_access()),
+                    $area => $recipient->get_data()
+                ];
             }
         }
 
