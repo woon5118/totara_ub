@@ -27,7 +27,9 @@ use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use totara_comment\comment;
+use totara_comment\exception\comment_exception;
 use totara_comment\loader\comment_loader;
+use totara_comment\resolver_factory;
 
 /**
  * Resolver for querying the replies of a comment
@@ -40,9 +42,6 @@ final class replies implements query_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): array {
         global $USER;
-        if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_user::instance($USER->id));
-        }
 
         $page = 1;
         if (isset($args['page'])) {
@@ -50,6 +49,21 @@ final class replies implements query_resolver, has_middleware {
         }
 
         $comment = comment::from_id($args['commentid']);
+
+        // Verify with the resolver the active user is allowed to see these replies
+        $component = $comment->get_component();
+        $resolver = resolver_factory::create_resolver($component);
+        $context_id = $resolver->get_context_id($comment->get_instanceid(), $comment->get_area());
+        $context = \context::instance_by_id($context_id);
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($context);
+        }
+
+        if ($context->is_user_access_prevented($USER->id)) {
+            throw comment_exception::on_access_denied();
+        }
+
         $paginator = comment_loader::get_replies($comment, $page);
 
         $replies = $paginator->get_items()->all();

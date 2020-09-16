@@ -27,6 +27,7 @@ use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use totara_comment\comment;
+use totara_comment\exception\comment_exception;
 use totara_comment\loader\comment_loader;
 use totara_comment\resolver_factory;
 
@@ -39,15 +40,25 @@ final class comments implements query_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): array {
         global $USER;
-        if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_user::instance($USER->id));
-        }
 
         $instance_id = $args['instanceid'];
         $component = $args['component'];
         $area = $args['area'];
 
         $resolver = resolver_factory::create_resolver($component);
+
+        // Verify with the resolver the active user is allowed to see these comments
+        $context_id = $resolver->get_context_id($instance_id, $area);
+        $context = \context::instance_by_id($context_id);
+
+        if (!$ec->has_relevant_context()) {
+            $ec->set_relevant_context($context);
+        }
+
+        if ($context->is_user_access_prevented($USER->id)) {
+            throw comment_exception::on_access_denied();
+        }
+
         $cursor = $resolver->get_default_cursor($area);
 
         if (isset($args['cursor'])) {

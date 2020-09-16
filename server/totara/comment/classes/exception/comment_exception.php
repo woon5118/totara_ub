@@ -58,4 +58,11 @@ final class comment_exception extends \moodle_exception {
     public static function on_soft_delete(): comment_exception {
         return new static('softdelete');
     }
+
+    /**
+     * @return comment_exception
+     */
+    public static function on_access_denied(): comment_exception {
+        return new static('accessdenied');
+    }
 }

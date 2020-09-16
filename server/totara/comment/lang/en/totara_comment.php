@@ -46,6 +46,7 @@ $string['user_data_item_reply_help'] = 'When purging, all the reactions associat
 $string['viewreplies'] = "View replies";
 
 // Using for error exceptions.
+$string['error:accessdenied'] = "Comment access denied";
 $string['error:create'] = "Cannot create a comment";
 $string['error:update'] = "Cannot update a comment";
 $string['error:reportcomment'] = "Cannot report the comment";

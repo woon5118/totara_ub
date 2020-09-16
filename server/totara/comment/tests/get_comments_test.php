@@ -22,14 +22,18 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use totara_comment\comment;
-use totara_comment\loader\comment_loader;
 use core\webapi\execution_context;
-use totara_webapi\graphql;
-use totara_comment\resolver_factory;
+use totara_comment\comment;
+use totara_comment\exception\comment_exception;
+use totara_comment\loader\comment_loader;
 use totara_comment\pagination\cursor;
+use totara_comment\resolver_factory;
+use totara_webapi\graphql;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class totara_comment_get_comments_testcase extends advanced_testcase {
+    use webapi_phpunit_helper;
+
     /**
      * @param int $instanceid
      * @param string $component
@@ -132,5 +136,109 @@ class totara_comment_get_comments_testcase extends advanced_testcase {
             $this->assertArrayHasKey('content', $comment);
             $this->assertArrayHasKey('timedescription', $comment);
         }
+    }
+
+    /**
+     * Verify that comments cannot be accessed across different tenants
+     */
+    public function test_get_comments_across_tenants_via_graphql(): void {
+        /** @var totara_tenant_generator $tenancy_generator */
+        $tenancy_generator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
+        $tenancy_generator->enable_tenants();
+
+        $tenant1 = $tenancy_generator->create_tenant();
+        $tenant2 = $tenancy_generator->create_tenant();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $user4 = $this->getDataGenerator()->create_user();
+
+        $tenancy_generator->migrate_user_to_tenant($user1->id, $tenant1->id);
+        $tenancy_generator->migrate_user_to_tenant($user2->id, $tenant1->id);
+        $tenancy_generator->migrate_user_to_tenant($user3->id, $tenant2->id);
+        $tenancy_generator->migrate_user_to_tenant($user4->id, $tenant2->id);
+
+        // User 1 & 2 are in tenant 1, User 3 & 4 are in tenant 2.
+        // User 1 & 3 will create comments, while 2 & 4 will view
+        /** @var totara_comment_generator $comment_generator */
+        $comment_generator = $this->getDataGenerator()->get_plugin_generator('totara_comment');
+
+        $comment1 = $comment_generator->create_comment(1, 'totara_comment', 'xx_xx', null, null, $user1->id);
+        $comment2 = $comment_generator->create_comment(2, 'totara_comment', 'xx_xx', null, null, $user3->id);
+
+        // We're going to override the resolver to return the correct tenant context
+        // for each comment specified by the instanceid. This is a mock to avoid coupling to another
+        // component like workspaces to figure out context.
+        $callback = function (int $instanceid, string $area) use ($tenant1, $tenant2): int {
+            $context = $instanceid == 1 ? $tenant1->context : $tenant2->context;
+            return $context->id;
+        };
+        totara_comment_default_resolver::add_callback('get_context_id', $callback);
+
+        // User 1 & 2 should see comment 1 (via instance1), and fail to see comment 2
+        $this->assert_can_see_comment(1, $user1, $comment1);
+        $this->assert_can_see_comment(1, $user2, $comment1);
+        $this->assert_cannot_see_comment(2, $user1);
+        $this->assert_cannot_see_comment(2, $user2);
+
+        // User 3 & 4 should see comment 2 (via instance2) and fail to see comment 1
+        $this->assert_can_see_comment(2, $user3, $comment2);
+        $this->assert_can_see_comment(2, $user4, $comment2);
+        $this->assert_cannot_see_comment(1, $user3);
+        $this->assert_cannot_see_comment(1, $user4);
+    }
+
+    /**
+     * Fetch the comments for the instance
+     *
+     * @param int $instance_id
+     * @return mixed|null
+     */
+    private function get_comments_ajax(int $instance_id) {
+        return $this->resolve_graphql_query(
+            'totara_comment_comments',
+            [
+                'component' => 'totara_comment',
+                'area' => 'xx_xx',
+                'instanceid' => $instance_id
+            ]
+        );
+    }
+
+    /**
+     * Call the graphql query & check that we see the comment that's expected
+     *
+     * @param int $instance_id
+     * @param stdClass $user
+     * @param comment $expected_comment
+     */
+    private function assert_can_see_comment(int $instance_id, stdClass $user, comment $expected_comment): void {
+        $this->setUser($user);
+        $results = $this->get_comments_ajax($instance_id);
+        $this->assertNotNull($results);
+        $this->assertCount(1, $results);
+        /** @var comment $comment */
+        $comment = current($results);
+        $this->assertSame($comment->get_id(), $expected_comment->get_id());
+    }
+
+    /**
+     * Call the graphql query & check that we cannot see any comments for the specific instance.
+     *
+     * @param int $instance_id
+     * @param stdClass $user
+     */
+    private function assert_cannot_see_comment(int $instance_id, stdClass $user): void {
+        $this->setUser($user);
+        $exception = null;
+        try {
+            $this->get_comments_ajax($instance_id);
+        } catch (comment_exception $ex) {
+            $exception = $ex;
+        }
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(comment_exception::class, $exception);
+        $this->assertStringContainsString('Comment access denied', $exception->getMessage());
     }
 }

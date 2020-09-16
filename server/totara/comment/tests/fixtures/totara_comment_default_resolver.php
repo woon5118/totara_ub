@@ -150,6 +150,12 @@ final class totara_comment_default_resolver extends resolver {
             throw new \coding_exception("Not a unit test environment");
         }
 
+        $callback = static::$callbacks[__FUNCTION__] ?? null;
+        if (is_callable($callback)) {
+            $closure = \Closure::fromCallable($callback);
+            return $closure->__invoke($instanceid, $area);
+        }
+
         $context = context_system::instance();
         return $context->id;
     }
