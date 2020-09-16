@@ -57,7 +57,13 @@ final class rb_engagedusers_embedded extends rb_base_embedded {
 
         $this->defaultsortcolumn = "engagedusers_namelink";
         $this->defaultsortorder = SORT_DESC;
-        $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
+        $this->contentmode = REPORT_BUILDER_CONTENT_MODE_ALL;
+
+        $this->contentsettings = array(
+            'user_visibility' => array(
+                'enable' => 1,
+            )
+        );
 
         parent::__construct();
     }

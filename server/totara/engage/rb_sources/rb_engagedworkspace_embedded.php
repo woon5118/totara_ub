@@ -57,7 +57,13 @@ final class rb_engagedworkspace_embedded extends rb_base_embedded {
 
         $this->defaultsortcolumn = "engagedworkspace_title";
         $this->defaultsortorder = SORT_DESC;
-        $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
+        $this->contentmode = REPORT_BUILDER_CONTENT_MODE_ALL;
+
+        $this->contentsettings = array(
+            'course_visibility' => array(
+                'enable' => 1,
+            )
+        );
 
         parent::__construct();
     }
