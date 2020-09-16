@@ -41,6 +41,9 @@
           latestRating.rater.fullname
         )
       }}</span>
+      <span v-else-if="raterPurged">
+        {{ $str('rater_details_removed', 'pathway_manual') }}
+      </span>
     </span>
     <span v-else class="tui-bulkManualRatingLastRatingBlock__neverRated">{{
       $str('never_rated', 'pathway_manual')
@@ -88,6 +91,9 @@ export default {
      * @returns {boolean}
      */
     isCurrentUser() {
+      if (this.raterPurged) {
+        return false;
+      }
       return parseInt(this.latestRating.rater.id) === this.currentUserId;
     },
   },
@@ -101,6 +107,7 @@ export default {
     ],
     "pathway_manual": [
       "never_rated",
+      "rater_details_removed",
       "rating_set_to_none",
       "user_fullname_wrapper"
     ]
