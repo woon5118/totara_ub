@@ -42,6 +42,7 @@ class user_assignment extends base {
 
         $props = [
             'user-id' => $this->user->id,
+            'is-mine' => $this->is_for_current_user(),
             'base-page-heading' => $this->get_base_page_heading(),
             'go-back-link' => (string) $this->get_profile_url(),
             'go-back-text' => $this->get_back_to_profile_text(),

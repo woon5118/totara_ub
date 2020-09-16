@@ -86,7 +86,7 @@ export default {
 <style lang="scss">
 .tui-rateUserCompetencies {
   & > * + * {
-    margin-top: var(--gap-2);
+    margin-top: var(--gap-4);
   }
 }
 </style>

@@ -50,8 +50,9 @@ Feature: Test miscellaneous bulk manual rating features.
     When I click on "Close" "button" in the ".tui-popoverFrame" "css_element"
 
     And I click on "User One" "link"
-    Then I should see "Rate User One" in the "#page h2" "css_element"
-    Then I should see "Previous rating"
+    Then I should see "Rate competencies" in the ".tui-pageHeading__title" "css_element"
+    And I should see "User One" in the ".tui-miniProfileCard" "css_element"
+    And I should see "Previous rating"
     When I click on "Show help for Previous rating" "button"
     Then I should see "The last rating this employee was given by someone in this role" in the ".tui-popoverFrame" "css_element"
     When I click on "Close" "button" in the ".tui-popoverFrame" "css_element"

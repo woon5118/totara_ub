@@ -19,13 +19,10 @@
 <template>
   <Loader :loading="$apollo.loading">
     <div class="tui-competencyProfile">
-      <UserHeader
-        v-if="!isMine"
-        :user-name="userName"
-        :profile-picture="profilePicture"
-      />
-
-      <PageHeading :title="$str('competency_profile', 'totara_competency')" />
+      <div class="tui-competencyProfile__header">
+        <MiniProfileCard v-if="user && !isMine" :display="user.card_display" />
+        <PageHeading :title="$str('competency_profile', 'totara_competency')" />
+      </div>
 
       <NoCompetencyAssignments
         v-if="noAssignments"
@@ -136,17 +133,18 @@ import CompetencyList from 'totara_competency/components/profile/competency_list
 import CurrentProgress from 'totara_competency/components/profile/CurrentProgress';
 import ListIcon from 'tui/components/icons/List';
 import Loader from 'tui/components/loading/Loader';
+import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import NoCompetencyAssignments from 'totara_competency/components/profile/NoCompetencyAssignments';
 import PageHeading from 'tui/components/layouts/PageHeading';
 import ProgressAssignmentFilters from 'totara_competency/components/ProgressAssignmentFilters';
 import Responsive from 'tui/components/responsive/Responsive';
 import ToggleButton from 'tui/components/toggle/ToggleButton';
 import ToggleSet from 'tui/components/toggle/ToggleSet';
-import UserHeader from 'totara_competency/components/UserHeader';
 import { notify } from 'tui/notifications';
 import { pick, groupBy } from 'tui/util';
 // Query
 import ProgressQuery from 'totara_competency/graphql/progress_for_user';
+import UserQuery from 'totara_competency/graphql/user';
 
 const ACTIVE_ASSIGNMENT = 1;
 
@@ -159,20 +157,16 @@ export default {
     CurrentProgress,
     ListIcon,
     Loader,
+    MiniProfileCard,
     NoCompetencyAssignments,
     PageHeading,
     ProgressAssignmentFilters,
     Responsive,
     ToggleButton,
     ToggleSet,
-    UserHeader,
   },
 
   props: {
-    profilePicture: {
-      required: true,
-      type: String,
-    },
     selfAssignmentUrl: {
       required: true,
       type: String,
@@ -180,10 +174,6 @@ export default {
     userId: {
       required: true,
       type: Number,
-    },
-    userName: {
-      required: true,
-      type: String,
     },
     baseUrl: {
       required: true,
@@ -205,6 +195,7 @@ export default {
   data() {
     return {
       data: {},
+      user: null,
       activeTab: 'charts',
       selectedFilters: this.$_addFilterKey({
         status: ACTIVE_ASSIGNMENT,
@@ -268,6 +259,16 @@ export default {
             );
           }
         }
+      },
+    },
+    user: {
+      query: UserQuery,
+      variables() {
+        return { user_id: this.userId };
+      },
+      update: data => data.totara_competency_user,
+      skip() {
+        return this.isMine;
       },
     },
   },
@@ -397,6 +398,12 @@ export default {
 
   & > * + * {
     margin-top: var(--gap-8);
+  }
+
+  &__header {
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
   }
 
   &__currentHeading {

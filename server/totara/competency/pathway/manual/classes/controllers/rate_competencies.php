@@ -81,11 +81,7 @@ class rate_competencies extends controller {
      */
     public function action() {
         $vue_props = [
-            'user' => [
-                'id' => (int) $this->user->id,
-                'fullname' => $this->user->fullname,
-                'profileimageurl' => $this->get_user_picture_url(),
-            ],
+            'user-id' => (int) $this->user->id,
             'current-user-id' => (int) $this->currently_logged_in_user()->id,
             'return-url' => $this->get_return_url()->out(false),
         ];
@@ -126,15 +122,6 @@ class rate_competencies extends controller {
         } else {
             manager::require_for_user($this->user->id);
         }
-    }
-
-    /**
-     * Get user profile picture URL
-     */
-    private function get_user_picture_url(): string {
-        $user_picture = new \user_picture((object) $this->user->to_array());
-        $user_picture->size = 1; // Size f1.
-        return $user_picture->get_url($this->get_page());
     }
 
     /**

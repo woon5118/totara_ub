@@ -18,9 +18,15 @@
 
 <template>
   <div class="tui-competencySelfAssignment">
-    <a :href="goBackLink">{{ goBackText }}</a>
-
-    <PageHeading :title="pageHeading" />
+    <div class="tui-competencySelfAssignment__header">
+      <MiniProfileCard v-if="!isMine && user" :display="user.card_display" />
+      <div>
+        <a :href="goBackLink">
+          {{ goBackText }}
+        </a>
+      </div>
+      <PageHeading :title="pageHeading" />
+    </div>
 
     <Grid :stack-at="900" class="tui-competencySelfAssignment__actions">
       <GridItem :units="3">
@@ -143,13 +149,16 @@ import FilterSidePanel from 'tui/components/filters/FilterSidePanel';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import Loader from 'tui/components/loading/Loader';
+import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import MultiSelectFilter from 'tui/components/filters/MultiSelectFilter';
 import PageHeading from 'tui/components/layouts/PageHeading';
 import SearchFilter from 'tui/components/filters/SearchFilter';
 import SelectFilter from 'tui/components/filters/SelectFilter';
 import SelectionTable from 'totara_competency/components/user_assignment/SelectionTable';
-import UserAssignableCompetenciesQuery from 'totara_competency/graphql/user_assignable_competencies';
 import { notify } from 'tui/notifications';
+// Queries
+import UserAssignableCompetenciesQuery from 'totara_competency/graphql/user_assignable_competencies';
+import UserQuery from 'totara_competency/graphql/user';
 
 export default {
   components: {
@@ -162,6 +171,7 @@ export default {
     Grid,
     GridItem,
     Loader,
+    MiniProfileCard,
     MultiSelectFilter,
     PageHeading,
     SearchFilter,
@@ -192,6 +202,10 @@ export default {
     userId: {
       required: true,
       type: Number,
+    },
+    isMine: {
+      required: true,
+      type: Boolean,
     },
   },
 
@@ -250,6 +264,7 @@ export default {
           action: this.showConfirmationModal,
         },
       ],
+      user: null,
     };
   },
   computed: {
@@ -451,6 +466,16 @@ export default {
         },
       };
     },
+    user: {
+      query: UserQuery,
+      variables() {
+        return { user_id: this.userId };
+      },
+      update: data => data.totara_competency_user,
+      skip() {
+        return this.isMine;
+      },
+    },
   },
 };
 </script>
@@ -496,6 +521,12 @@ export default {
 
   &__actions {
     justify-content: space-between;
+  }
+
+  &__header {
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
   }
 
   &__loadMore {

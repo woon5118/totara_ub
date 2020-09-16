@@ -35,7 +35,6 @@ use user_picture;
 class index extends base {
 
     public function action() {
-
         $this->get_page()->set_url(
             $this->set_url('/totara/competency/profile/index.php', ['user_id' => $this->user->id])
                 ->url
@@ -44,13 +43,9 @@ class index extends base {
         // Add breadcrumbs.
         $this->add_navigation();
 
-        $formatter = new string_field_formatter(format::FORMAT_PLAIN, $this->context);
-
         $props = [
-            'profile-picture' => $this->get_my_profile_picture_url(),
             'self-assignment-url' => (string) $this->get_user_assignment_url(),
-            'user-id' => $this->user->id,
-            'user-name' => $formatter->format($this->user->fullname),
+            'user-id' => (int) $this->user->id,
             'is-mine' => $this->is_for_current_user(),
             'base-url' => (string) $this->get_base_url(),
             'can-assign' => capability_helper::can_assign($this->user->id, $this->context),
@@ -62,9 +57,4 @@ class index extends base {
             ->set_title(get_string('competency_profile', 'totara_competency'));
     }
 
-    protected function get_my_profile_picture_url(int $size = 100): string {
-        $avatar = new user_picture((object)($this->user->to_array()));
-        $avatar->size = $size;
-        return $avatar->get_url($this->get_page());
-    }
 }

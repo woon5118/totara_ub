@@ -19,21 +19,20 @@
 <template>
   <Loader :loading="$apollo.loading">
     <div class="tui-competencyDetail">
-      <!-- Back Link -->
-      <div class="tui-competencyDetail__backLink">
-        <a :href="goBackLink">
-          {{ goBackText }}
-        </a>
-      </div>
-
-      <NotificationBanner
-        v-if="!data.competency && !$apollo.loading"
-        :dismissable="false"
-        :message="$str('competency_does_not_exist', 'totara_competency')"
-        type="error"
-      />
-      <template v-else-if="data.competency">
-        <PageHeading :title="data.competency.fullname" />
+      <template v-if="data.competency">
+        <!-- User details, back link and page title -->
+        <div class="tui-competencyDetail__header">
+          <MiniProfileCard
+            v-if="user && !isMine"
+            :display="user.card_display"
+          />
+          <div>
+            <a :href="goBackLink">
+              {{ goBackText }}
+            </a>
+          </div>
+          <PageHeading :title="data.competency.fullname" />
+        </div>
 
         <!-- Competency description & archived / activity log button -->
         <Grid :stack-at="700">
@@ -132,14 +131,15 @@ import Button from 'tui/components/buttons/Button';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import Loader from 'tui/components/loading/Loader';
+import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import Modal from 'tui/components/modal/Modal';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
-import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import PageHeading from 'tui/components/layouts/PageHeading';
 import Progress from 'totara_competency/components/details/Progress';
 import { notify } from 'tui/notifications';
 // GraphQL
 import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';
+import UserQuery from 'totara_competency/graphql/user';
 
 export default {
   components: {
@@ -151,9 +151,9 @@ export default {
     Grid,
     GridItem,
     Loader,
+    MiniProfileCard,
     Modal,
     ModalPresenter,
-    NotificationBanner,
     PageHeading,
     Progress,
   },
@@ -175,6 +175,10 @@ export default {
       required: true,
       type: Number,
     },
+    isMine: {
+      required: true,
+      type: Boolean,
+    },
     showActivityLogByDefault: {
       default: false,
       type: Boolean,
@@ -193,6 +197,7 @@ export default {
         competency: null,
         items: [],
       },
+      user: null,
     };
   },
 
@@ -213,6 +218,16 @@ export default {
         }
 
         return { competency: details.competency, items: details.items };
+      },
+    },
+    user: {
+      query: UserQuery,
+      variables() {
+        return { user_id: this.userId };
+      },
+      update: data => data.totara_competency_user,
+      skip() {
+        return this.isMine;
       },
     },
   },
@@ -403,6 +418,12 @@ export default {
 .tui-competencyDetail {
   & > * + * {
     margin-top: var(--gap-2);
+  }
+
+  &__header {
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
   }
 
   &__body {

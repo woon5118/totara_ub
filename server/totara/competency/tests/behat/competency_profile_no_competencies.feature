@@ -43,7 +43,7 @@ Feature: Message is shown if there are no competencies to be shown for a user's 
     When I log in as "user2"
     And I navigate to the competency profile of user "user1"
     Then I should see "User One" in the ".breadcrumb-nav" "css_element"
-    And I should see "User One" in the ".tui-competencyUserHeader" "css_element"
+    And I should see "User One" in the ".tui-miniProfileCard" "css_element"
     And I should see "There are no competencies currently assigned."
     And I should not see "Current assignment progress"
 
@@ -54,6 +54,6 @@ Feature: Message is shown if there are no competencies to be shown for a user's 
     And I run the scheduled task "totara_competency\task\expand_assignments_task"
 
     Then I should see "User One" in the ".breadcrumb-nav" "css_element"
-    And I should see "User One" in the ".tui-competencyUserHeader" "css_element"
+    And I should see "User One" in the ".tui-miniProfileCard" "css_element"
     And I should not see "There are no competencies currently assigned."
     And I should see "Current assignment progress"

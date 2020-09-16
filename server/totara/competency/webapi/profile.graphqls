@@ -171,4 +171,9 @@ extend type Query {
     user_id: core_id
     competency_id: core_id
   ): totara_competency_profile_competency_progress
+
+  """
+  Gets a single user
+  """
+  totara_competency_user(user_id: core_id!): core_user!
 }

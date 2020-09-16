@@ -34,6 +34,7 @@ Feature: Test rating a competency for a user as different roles via the user's c
     When I navigate to the competency profile of user "user1"
     And I click on "Rate competencies" "link"
     Then I should see "Rate competencies" in the ".tui-pageHeading__title" "css_element"
+    And ".tui-miniProfileCard" "css_element" should not exist
     And I should not see "Rating as self"
 
     # Actually make a rating
@@ -49,7 +50,8 @@ Feature: Test rating a competency for a user as different roles via the user's c
     Given I log in as "user2"
     When I navigate to the competency profile of user "user1"
     And I click on "Rate competencies" "link"
-    Then I should see "Rate User One" in the ".tui-pageHeading__title" "css_element"
+    Then I should see "Rate competencies" in the ".tui-pageHeading__title" "css_element"
+    And I should see "User One" in the ".tui-miniProfileCard" "css_element"
     And I should see "Rating as a manager"
 
     # Actually make a rating
@@ -65,7 +67,8 @@ Feature: Test rating a competency for a user as different roles via the user's c
     Given I log in as "user3"
     When I navigate to the competency profile of user "user1"
     And I click on "Rate competencies" "link"
-    Then I should see "Rate User One" in the ".tui-pageHeading__title" "css_element"
+    Then I should see "Rate competencies" in the ".tui-pageHeading__title" "css_element"
+    And I should see "User One" in the ".tui-miniProfileCard" "css_element"
     And I should see "Rating as an appraiser"
 
     # Actually make a rating

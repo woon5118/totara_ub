@@ -102,10 +102,3 @@ Feature: Competency profile detail page - an overview of their progress (or lack
     Then I should see "Typing slow"
     And I should see "The ability to type slow."
     And I should see "There are no active assignments"
-
-  Scenario: I am shown a warning when I navigate directly to the details page of a competency that does not exist
-    When I log in as "admin"
-    And I navigate to the competency profile details page for competency id "9999"
-
-    Then I should see "Back to your competency profile"
-    And I should see "The requested competency does not exist." in the tui error notification banner

@@ -21,17 +21,23 @@
  * @package criteria_childcompetency
  */
 
+use core_user\hook\allow_view_profile_field;
 use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_competency\hook\competency_configuration_changed;
 use totara_competency\watcher\configuration as configuration_watcher;
+use totara_competency\watcher\core_user;
 use totara_competency\watcher\notify_users_of_proficiency_change;
 
 defined('MOODLE_INTERNAL') || die();
 
 $watchers = [
     [
+        'hookname' => allow_view_profile_field::class,
+        'callback' => [core_user::class, 'allow_view_profile_field'],
+    ],
+    [
         'hookname' => competency_configuration_changed::class,
-        'callback' => configuration_watcher::class.'::configuration_changed',
+        'callback' => [configuration_watcher::class, 'configuration_changed'],
     ],
     [
         'hookname' => competency_achievement_updated_bulk::class,

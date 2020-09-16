@@ -40,19 +40,25 @@ class competency_details extends base {
             ]
         );
 
-        $title = get_string('competencydetails', 'totara_hierarchy');
-
-        if ($competency = competency::repository()->find($competency_id)) {
+        $competency = competency::repository()->find($competency_id);
+        if ($competency) {
             $title = get_string('competencydetails_competencyname', 'totara_hierarchy', format_string($competency->fullname));
+        } else {
+            $title = get_string('competencydetails', 'totara_hierarchy');
         }
 
         // Add breadcrumbs.
         $this->add_navigation($title);
 
+        if (!$competency) {
+            throw new \moodle_exception('competency_does_not_exist', 'totara_competency', $this->get_profile_url());
+        }
+
         $show_activity_log_by_default = $this->get_optional_param('show_activity_log', null, PARAM_INT) == 1;
 
         $props = [
             'user-id'                      => $this->user->id,
+            'is-mine'                      => $this->is_for_current_user(),
             'competency-id'                => $competency_id,
             'base-url'                     => (string)$this->get_base_url(),
             'go-back-link'                 => (string)$this->get_profile_url(),

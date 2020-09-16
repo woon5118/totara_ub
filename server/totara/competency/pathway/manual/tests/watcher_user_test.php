@@ -23,11 +23,11 @@
  */
 
 use core_user\access_controller;
-use pathway_manual\models\roles\manager;
-use totara_webapi\phpunit\webapi_phpunit_helper;
-use totara_core\hook\manager as hook_manager;
 use core_user\hook\allow_view_profile_field;
-use pathway_manual\watcher\user;
+use pathway_manual\models\roles\manager;
+use totara_competency\watcher\core_user;
+use totara_core\hook\manager as hook_manager;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class pathway_manual_watcher_user_testcase extends advanced_testcase {
 
@@ -55,7 +55,7 @@ class pathway_manual_watcher_user_testcase extends advanced_testcase {
         hook_manager::phpunit_replace_watchers([
             [
                 'hookname' => allow_view_profile_field::class,
-                'callback' => [user::class, 'allow_view_profile_field']
+                'callback' => [core_user::class, 'allow_view_profile_field']
             ]
         ]);
         access_controller::clear_instance_cache();
