@@ -216,6 +216,7 @@ $string['topic'] = 'Topic';
 $string['type'] = 'Type';
 $string['unassigned'] = 'Unassigned';
 $string['unbookmark'] = 'Unbookmark';
+$string['unsaved_changes_warning'] = 'Your unsaved changes will be lost';
 $string['userdataitembookmark'] = 'Bookmark';
 $string['userdataitemshare'] = 'Share';
 $string['usersresources'] = '{$a}\'s library';
