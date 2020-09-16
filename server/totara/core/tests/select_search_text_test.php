@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class select_search_text_test extends advanced_testcase {
+class totara_core_select_search_text_testcase extends advanced_testcase {
 
     public function test_create() {
 

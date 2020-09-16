@@ -33,7 +33,7 @@ require_once(__DIR__ . '/relationship_resolver_test.php');
  * @covers \totara_core\webapi\resolver\type\relationship
  * @group totara_core_relationship
  */
-class totara_core_webapi_resolver_query_relationships_testcase extends advanced_testcase {
+class totara_core_webapi_resolver_type_relationship_testcase extends advanced_testcase {
 
     use webapi_phpunit_helper;
 

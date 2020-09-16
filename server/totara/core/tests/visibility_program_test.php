@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * vendor/bin/phpunit totara_core_program_visibility_testcase
  *
  */
-class totara_core_program_visibility_testcase extends advanced_testcase {
+class totara_core_visibility_program_testcase extends advanced_testcase {
 
     public function test_complex_traditional_setup_no_multitenancy() {
         global $CFG, $DB;

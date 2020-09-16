@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * vendor/bin/phpunit totara_core_course_visibility_testcase
  *
  */
-class totara_core_course_visibility_testcase extends advanced_testcase {
+class totara_core_visibility_course_testcase extends advanced_testcase {
 
     private const CAP = 'moodle/course:viewhiddencourses';
 

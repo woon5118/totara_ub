@@ -33,7 +33,7 @@ global $CFG;
  * Tests recursive function progressinfo->aggregate_score_weight to ensure it
  * aggregates weight and progress correctly
  */
-class progressinfo_aggregate_score_weight_testcase extends \advanced_testcase {
+class totara_core_progressinfo_aggregate_score_weight_testcase extends \advanced_testcase {
 
     public function test_no_criteria() {
         $pinfo = progressinfo::from_data(progressinfo::AGGREGATE_ALL, 1, 1);

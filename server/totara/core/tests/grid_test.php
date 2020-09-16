@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class grid_test extends advanced_testcase {
+class totara_core_grid_testcase extends advanced_testcase {
 
     public function test_create() {
         $tiles = [];

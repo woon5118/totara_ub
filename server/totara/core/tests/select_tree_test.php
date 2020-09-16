@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class select_tree_test extends advanced_testcase {
+class totara_core_select_tree_testcase extends advanced_testcase {
 
     public function test_create() {
         $optionsdeep = [

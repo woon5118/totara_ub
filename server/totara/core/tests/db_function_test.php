@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class totara_core_dbfunction_testcase extends advanced_testcase {
+class totara_core_db_function_testcase extends advanced_testcase {
     public function test_max_params() {
         global $DB;
 

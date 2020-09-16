@@ -32,11 +32,10 @@ require_once($CFG->libdir . '/reminderlib.php');
  * This tests the functions and methods within lib/reminderlib.php. Put here to avoid conflicts with
  * any merges we make from Moodle.
  */
-class core_reminderlib_testcase extends advanced_testcase {
+class totara_core_reminderlib_testcase extends advanced_testcase {
 
     protected function setUp(): void {
         parent::setUp();
-        $this->resetAfterTest(true);
     }
 
     /**

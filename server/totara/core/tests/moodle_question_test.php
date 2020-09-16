@@ -29,13 +29,9 @@ global $CFG;
 require_once($CFG->dirroot . '/question/category_form.php');
 require_once($CFG->dirroot . '/question/editlib.php');
 
-class moodle_question_testcase extends advanced_testcase
-{
-    public function test_check_for_invalid_question_category_parents()
-    {
+class totara_core_moodle_question_testcase extends advanced_testcase {
+    public function test_check_for_invalid_question_category_parents() {
         global $DB;
-
-        $this->resetAfterTest();
 
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
 

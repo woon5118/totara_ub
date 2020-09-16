@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class select_region_primary_test extends advanced_testcase {
+class totara_core_select_region_primary_testcase extends advanced_testcase {
 
     public function test_create() {
         $options = [

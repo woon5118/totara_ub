@@ -23,10 +23,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class event_myreport_test extends advanced_testcase {
+class totara_core_event_myreport_testcase extends advanced_testcase {
 
     public function test_myreport_viewed_event() {
-        $this->resetAfterTest();
+
         $context = context_system::instance();
 
         // Trigger event.
