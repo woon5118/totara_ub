@@ -923,6 +923,8 @@ abstract class entity implements \JsonSerializable {
         }
         if (!$this->exists()) {
             debugging("Entity does not exist.", DEBUG_DEVELOPER);
+            // The entity might have been just deleted, in this case remove already loaded relations
+            unset($this->relations[$name]);
             return $this;
         }
 
