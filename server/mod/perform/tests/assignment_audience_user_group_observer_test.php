@@ -22,6 +22,7 @@
  */
 
 use mod_perform\entities\activity\track_assignment;
+use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\user_groups\grouping;
@@ -89,6 +90,47 @@ class mod_perform_assignment_audience_user_group_observer_testcase extends advan
 
         $this->assert_assignment_marked_for_expansion($data->assignment1->id);
         $this->assert_assignment_not_marked_for_expansion($data->assignment2->id);
+    }
+
+    public function test_deleting_cohort_removes_assignment() {
+        $data = $this->prepare_assignments();
+
+        cohort_add_member($data->cohort1->id, $data->user1->id);
+        cohort_add_member($data->cohort2->id, $data->user2->id);
+
+        expand_task::create()->expand_all();
+
+        $this->assertTrue(track_assignment::repository()->where('user_group_id', $data->cohort1->id)->exists());
+        $this->assertTrue(track_assignment::repository()->where('user_group_id', $data->cohort2->id)->exists());
+        $this->assertEquals(
+            2,
+            track_user_assignment::repository()
+                ->where('deleted', 0)
+                ->count()
+        );
+
+        // Deleting the cohort will remove the assignment
+        // and will mark all orphaned user assignments as deleted
+        cohort_delete_cohort($data->cohort1);
+
+        $this->assertFalse(track_assignment::repository()->where('user_group_id', $data->cohort1->id)->exists());
+        $this->assertTrue(track_assignment::repository()->where('user_group_id', $data->cohort2->id)->exists());
+
+        $this->assertEquals(
+            1,
+            track_user_assignment::repository()
+                ->where('deleted', 1)
+                ->where('subject_user_id', $data->user1->id)
+                ->count()
+        );
+
+        $this->assertEquals(
+            1,
+            track_user_assignment::repository()
+                ->where('deleted', 0)
+                ->where('subject_user_id', $data->user2->id)
+                ->count()
+        );
     }
 
     protected function assert_assignment_not_marked_for_expansion(int $assignment_id) {

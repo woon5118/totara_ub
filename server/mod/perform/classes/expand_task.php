@@ -554,7 +554,7 @@ class expand_task {
     /**
      * Mark all user assignments which are not linked to any assignment anymore as deleted
      */
-    private function delete_orphaned_user_assignments(): void {
+    public function delete_orphaned_user_assignments(): void {
         $orphaned_user_assignments = track_user_assignment::repository()
             ->left_join([track_user_assignment_via::TABLE, 'via'], 'id', 'track_user_assignment_id')
             ->where('deleted', false)

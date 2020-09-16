@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use core\event\cohort_deleted;
 use core\event\cohort_member_added;
 use core\event\cohort_member_removed;
 use core\event\user_tenant_membership_changed;
@@ -59,6 +60,10 @@ $observers = [
     [
         'eventname' => cohort_member_removed::class,
         'callback' => track_assignment_user_groups::class.'::cohort_updated',
+    ],
+    [
+        'eventname' => cohort_deleted::class,
+        'callback' => track_assignment_user_groups::class.'::cohort_deleted',
     ],
     [
         'eventname' => participant_section_progress_updated::class,

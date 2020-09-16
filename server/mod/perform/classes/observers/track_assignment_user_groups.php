@@ -24,10 +24,12 @@
 namespace mod_perform\observers;
 
 use core\event\base;
+use core\event\cohort_deleted;
 use core\event\cohort_member_added;
 use core\event\cohort_member_removed;
 use hierarchy_organisation\event\organisation_deleted;
 use hierarchy_position\event\position_deleted;
+use mod_perform\expand_task;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment;
 use mod_perform\models\activity\track_assignment_type;
@@ -60,30 +62,38 @@ class track_assignment_user_groups {
     }
 
     /**
-     * When organisation gets deleted.
+     * When a cohort is deleted we need to remove it from track assignments.
+     *
+     * @param cohort_deleted $event
+     */
+    public static function cohort_deleted(cohort_deleted $event) {
+        self::remove_track_assignments(grouping::cohort($event->objectid));
+    }
+
+    /**
+     * When an organisation is deleted we need to remove it from track assignments.
      *
      * @param organisation_deleted $event
      */
     public static function organisation_deleted(organisation_deleted $event): void {
-        // When an organisation is deleted we need to remove it from track assignments.
-        $grouping = grouping::org($event->objectid);
-        $assignments = track_assignment::get_all_for_grouping($grouping);
-
-        /** @var track_assignment $assignment */
-        foreach ($assignments as $assignment) {
-            $track = track::load_by_id($assignment->track_id);
-            $track->remove_assignment(track_assignment_type::ADMIN, $grouping);
-        }
+        self::remove_track_assignments(grouping::org($event->objectid));
     }
 
     /**
-     * When position gets deleted.
+     * When an position is deleted we need to remove it from track assignments.
      *
      * @param position_deleted $event
      */
     public static function position_deleted(position_deleted $event) {
-        // When an position is deleted we need to remove it from track assignments.
-        $grouping = grouping::org($event->objectid);
+        self::remove_track_assignments(grouping::pos($event->objectid));
+    }
+
+    /**
+     * Remove assignments for deleted user group
+     *
+     * @param grouping $grouping
+     */
+    private static function remove_track_assignments(grouping $grouping): void {
         $assignments = track_assignment::get_all_for_grouping($grouping);
 
         /** @var track_assignment $assignment */
@@ -91,6 +101,8 @@ class track_assignment_user_groups {
             $track = track::load_by_id($assignment->track_id);
             $track->remove_assignment(track_assignment_type::ADMIN, $grouping);
         }
+
+        expand_task::create()->delete_orphaned_user_assignments();
     }
 
     /**
