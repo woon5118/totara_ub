@@ -914,7 +914,8 @@ class core_weblib_format_text_testcase extends advanced_testcase {
             'img',
             [
                 'src' => $url->out(false),
-                'alt' => ''
+                'alt' => '',
+                'class' => 'img-responsive',
             ]
         );
 

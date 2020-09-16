@@ -65,7 +65,8 @@ final class image extends base_file implements block_node {
             'img',
             [
                 'src' => $this->get_file_url()->out(false),
-                'alt' => $this->alttext
+                'alt' => $this->alttext,
+                'class' => 'img-responsive',
             ]
         );
     }
