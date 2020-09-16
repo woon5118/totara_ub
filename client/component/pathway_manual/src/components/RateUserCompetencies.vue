@@ -27,62 +27,66 @@
         @go-back="$emit('go-back')"
       />
     </div>
-    <Loader :loading="$apollo.loading" />
-    <div v-if="!$apollo.loading && competencies.framework_groups.length > 0">
-      <FrameworkGroup
-        v-for="group in competencies.framework_groups"
-        :key="group.framework.id"
-        class="tui-bulkManualRatingRateUserCompetencies__frameworkGroup"
-        :group="group"
-        :role="role"
-        :current-user-id="currentUserId"
-        :selected-ratings="selectedRatings"
-        :is-expanded="expandFrameworkGroups"
-        @update-rating="updateRating"
-        @delete-rating="deleteRating"
-      />
-      <div class="tui-bulkManualRatingRateUserCompetencies__submitButtons">
-        <ButtonGroup>
-          <Button
-            :styleclass="{ primary: 'true' }"
-            :text="$str('submit')"
-            :disabled="!hasSelectedRatings"
-            type="submit"
-            @click="showSubmitRatingsModal = true"
-          />
-          <Button :text="$str('cancel')" @click="$emit('go-back')" />
-        </ButtonGroup>
-        <ConfirmationModal
-          :open="showSubmitRatingsModal"
-          :title="
-            $str('modal_submit_ratings_confirmation_title', 'pathway_manual')
-          "
-          :loading="isSaving"
-          @confirm="submitRatings"
-          @cancel="showSubmitRatingsModal = false"
-        >
-          <p>{{ submitRatingsModalMessage }}</p>
-          <p>
-            {{
-              $str(
-                'modal_submit_ratings_confirmation_question',
-                'pathway_manual'
-              )
-            }}
-          </p>
-        </ConfirmationModal>
+    <Loader :loading="$apollo.loading">
+      <div
+        v-if="!$apollo.loading && competencies.framework_groups.length > 0"
+        class="tui-bulkManualRatingRateUserCompetencies__frameworks"
+      >
+        <FrameworkGroup
+          v-for="group in competencies.framework_groups"
+          :key="group.framework.id"
+          class="tui-bulkManualRatingRateUserCompetencies__frameworkGroup"
+          :group="group"
+          :role="role"
+          :current-user-id="currentUserId"
+          :selected-ratings="selectedRatings"
+          :is-expanded="expandFrameworkGroups"
+          @update-rating="updateRating"
+          @delete-rating="deleteRating"
+        />
+        <div class="tui-bulkManualRatingRateUserCompetencies__submitButtons">
+          <ButtonGroup>
+            <Button
+              :styleclass="{ primary: 'true' }"
+              :text="$str('submit')"
+              :disabled="!hasSelectedRatings"
+              type="submit"
+              @click="showSubmitRatingsModal = true"
+            />
+            <Button :text="$str('cancel')" @click="$emit('go-back')" />
+          </ButtonGroup>
+          <ConfirmationModal
+            :open="showSubmitRatingsModal"
+            :title="
+              $str('modal_submit_ratings_confirmation_title', 'pathway_manual')
+            "
+            :loading="isSaving"
+            @confirm="submitRatings"
+            @cancel="showSubmitRatingsModal = false"
+          >
+            <p>{{ submitRatingsModalMessage }}</p>
+            <p>
+              {{
+                $str(
+                  'modal_submit_ratings_confirmation_question',
+                  'pathway_manual'
+                )
+              }}
+            </p>
+          </ConfirmationModal>
+        </div>
       </div>
-    </div>
-    <div
-      v-else-if="!$apollo.loading"
-      class="tui-bulkManualRatingRateUserCompetencies__noCompetencies"
-    >
-      {{
-        hasSelectedFilters
-          ? $str('filter_no_competencies', 'pathway_manual')
-          : $str('no_rateable_competencies', 'pathway_manual')
-      }}
-    </div>
+      <div
+        v-else-if="!$apollo.loading"
+        class="tui-bulkManualRatingRateUserCompetencies__noCompetencies"
+      >
+        {{
+          hasSelectedFilters
+            ? $str('filter_no_competencies', 'pathway_manual')
+            : $str('no_rateable_competencies', 'pathway_manual')
+        }}
+      </div>
+    </Loader>
   </div>
 </template>
 
@@ -391,14 +395,14 @@ export default {
 
 <style lang="scss">
 .tui-bulkManualRatingRateUserCompetencies {
-  margin-top: var(--gap-4);
-
-  &__filters {
-    margin-bottom: var(--gap-5);
+  & > * + * {
+    margin-top: var(--gap-5);
   }
 
-  &__frameworkGroup {
-    margin-bottom: var(--gap-5);
+  &__frameworks {
+    & > * + * {
+      margin-top: var(--gap-5);
+    }
   }
 
   &__noCompetencies {

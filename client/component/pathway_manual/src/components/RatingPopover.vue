@@ -23,42 +23,44 @@
     @open-changed="popoverOpenChanged"
   >
     <h2 class="sr-only">{{ $str('add_rating', 'pathway_manual') }}</h2>
-    <div class="tui-bulkManualRatingPopover__scaleValues">
-      <label :id="$id('scale-value-heading')">
-        {{ $str('select_scale_value', 'pathway_manual') }}
-      </label>
-      <RadioGroup
-        v-model="inputScaleValueId"
-        :aria-labelledby="$id('scale-value-heading')"
-      >
-        <Radio
-          v-for="(scaleValue, key) in scale.values"
-          :key="key"
-          :label="scaleValue.name"
-          :value="scaleValue.id"
-          :name="$id('scale-radio')"
+    <div class="tui-bulkManualRatingPopover">
+      <div class="tui-bulkManualRatingPopover__scaleValues">
+        <label :id="$id('scale-value-heading')">
+          {{ $str('select_scale_value', 'pathway_manual') }}
+        </label>
+        <RadioGroup
+          v-model="inputScaleValueId"
+          :aria-labelledby="$id('scale-value-heading')"
         >
-          <template>
-            {{ scaleValue.name }}
-          </template>
-        </Radio>
-        <span class="tui-bulkManualRatingPopover__divider" />
-        <Radio :value="noneOptionValue" :name="$id('scale-radio')">
-          <template>
-            {{ $str('rating_set_to_none', 'pathway_manual') }}
-          </template>
-        </Radio>
-      </RadioGroup>
-    </div>
-    <div class="tui-bulkManualRatingPopover__comment">
-      <label :id="$id('comment-heading')">
-        {{ $str('add_comment', 'pathway_manual') }}
-      </label>
-      <Textarea
-        v-model="inputComment"
-        class="tui-bulkManualRatingPopover__textarea"
-        :aria-labelledby="$id('comment-heading')"
-      />
+          <Radio
+            v-for="(scaleValue, key) in scale.values"
+            :key="key"
+            :label="scaleValue.name"
+            :value="scaleValue.id"
+            :name="$id('scale-radio')"
+          >
+            <template>
+              {{ scaleValue.name }}
+            </template>
+          </Radio>
+          <span class="tui-bulkManualRatingPopover__divider" />
+          <Radio :value="noneOptionValue" :name="$id('scale-radio')">
+            <template>
+              {{ $str('rating_set_to_none', 'pathway_manual') }}
+            </template>
+          </Radio>
+        </RadioGroup>
+      </div>
+      <div class="tui-bulkManualRatingPopover__comment">
+        <label :id="$id('comment-heading')">
+          {{ $str('add_comment', 'pathway_manual') }}
+        </label>
+        <Textarea
+          v-model="inputComment"
+          class="tui-bulkManualRatingPopover__textarea"
+          :aria-labelledby="$id('comment-heading')"
+        />
+      </div>
     </div>
     <template v-slot:buttons="{ close }">
       <Button
@@ -83,8 +85,8 @@
         @click="cancelRating(close)"
       />
     </template>
-    <template v-slot:trigger>
-      <slot name="rating-trigger" />
+    <template v-slot:trigger="{ isOpen }">
+      <slot name="rating-trigger" :is-open="isOpen" />
     </template>
   </Popover>
 </template>
@@ -241,8 +243,8 @@ export default {
 
 <style lang="scss">
 .tui-bulkManualRatingPopover {
-  &__scaleValues {
-    margin-bottom: var(--gap-4);
+  & > * + * {
+    margin-top: var(--gap-4);
   }
 
   &__comment,

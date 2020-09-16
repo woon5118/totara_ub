@@ -233,7 +233,6 @@ export default {
 .tui-bulkManualRatingRoleSelector {
   display: flex;
   align-items: center;
-  margin-top: var(--gap-4);
 
   &__ratingAs {
     @include tui-font-heading-x-small;

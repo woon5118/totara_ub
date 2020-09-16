@@ -66,6 +66,7 @@
         >
           <RatingCell
             :comp-id="row.competency.id"
+            :competency="row.competency.display_name"
             :scale="group"
             :rating="getRating(row.competency.id)"
             @update-rating="value => updateRating(row.competency.id, value)"

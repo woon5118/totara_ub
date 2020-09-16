@@ -26,10 +26,14 @@
       @update-rating="updateRating"
       @delete-rating="deleteRating"
     >
-      <template v-slot:rating-trigger>
+      <template v-slot:rating-trigger="{ isOpen }">
         <Button
           :text="$str('rate', 'pathway_manual')"
           :styleclass="{ small: true }"
+          :aria-expanded="isOpen ? 'true' : 'false'"
+          :aria-label="
+            $str('rate_competency_a11y', 'pathway_manual', competency)
+          "
           :title="$str('add_rating', 'pathway_manual')"
         />
       </template>
@@ -62,15 +66,13 @@
         @update-rating="updateRating"
         @delete-rating="deleteRating"
       >
-        <template v-slot:rating-trigger>
+        <template v-slot:rating-trigger="{ isOpen }">
           <ButtonIcon
-            :aria-label="$str('edit_rating', 'pathway_manual')"
+            :aria-expanded="isOpen ? 'true' : 'false'"
+            :aria-label="$str('edit_rating_a11y', 'pathway_manual', competency)"
             :styleclass="{ small: true }"
           >
-            <EditIcon
-              size="200"
-              :title="$str('edit_rating', 'pathway_manual')"
-            />
+            <EditIcon :title="$str('edit_rating', 'pathway_manual')" />
           </ButtonIcon>
         </template>
       </RatingPopover>
@@ -97,6 +99,10 @@ export default {
   },
 
   props: {
+    competency: {
+      required: true,
+      type: String,
+    },
     compId: {
       required: true,
       type: String,
@@ -105,9 +111,7 @@ export default {
       required: true,
       type: Object,
     },
-    rating: {
-      type: Object,
-    },
+    rating: Object,
   },
 
   computed: {
@@ -192,7 +196,9 @@ export default {
     "pathway_manual": [
       "add_rating",
       "edit_rating",
-      "rate"
+      "edit_rating_a11y",
+      "rate",
+      "rate_competency_a11y"
     ]
   }
 </lang-strings>
@@ -212,7 +218,7 @@ export default {
     margin-right: var(--gap-2);
 
     &-hasComment {
-      margin-left: var(--gap-1);
+      margin-left: var(--gap-2);
     }
 
     &-noValue {

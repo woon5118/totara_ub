@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div>
+  <div class="tui-rateCompetencies">
     <PageHeader :user="user" :is-for-another-user="isForAnotherUser" />
     <RoleSelector
       v-if="isForAnotherUser"
@@ -114,3 +114,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-rateCompetencies {
+  & > * + * {
+    margin-top: var(--gap-4);
+  }
+}
+</style>
