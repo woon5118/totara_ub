@@ -116,6 +116,7 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
     }
 
     public function test_arrange_log_data_competency_achievement() {
+        $user = $this->getDataGenerator()->create_user();
 
         $competency_id = 100;
         $achievement_date = 200;
@@ -135,9 +136,15 @@ class totara_competency_data_provider_activity_log_testcase extends advanced_tes
         $assignment->save();
 
         $achievement = new competency_achievement();
+        $achievement->user_id = $user->id;
+        $achievement->competency_id = $competency_id;
+        $achievement->proficient = 0;
+        $achievement->status = 0;
+        $achievement->time_status = $achievement_date;
         $achievement->time_created = $achievement_date;
         $achievement->assignment_id = $assignment->id;
         $achievement->scale_value_id = $scale_value->id;
+        $achievement->save();
 
         $mock1 = $this->getMockBuilder(activity_log::class)->setMethods(['get_date'])->getMockForAbstractClass();
         $mock1->method('get_date')->willReturn(2);

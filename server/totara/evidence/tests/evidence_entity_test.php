@@ -68,7 +68,9 @@ class totara_evidence_entity_testcase extends totara_evidence_testcase {
 
         $item->delete();
         $item->load_relation('data');
+        $this->assertDebuggingCalled('Entity does not exist.');
         $this->assertEmpty($item->data);
+        $this->assertDebuggingCalled('Entity does not exist.');
     }
 
     /**
@@ -114,7 +116,9 @@ class totara_evidence_entity_testcase extends totara_evidence_testcase {
 
         $type->delete();
         $type->load_relation('fields');
+        $this->assertDebuggingCalled('Entity does not exist.');
         $this->assertEmpty($type->fields);
+        $this->assertDebuggingCalled('Entity does not exist.');
     }
 
     /**

@@ -32,6 +32,8 @@ class totara_competency_models_activity_log_config_change_testcase extends advan
         $config_change = new configuration_change();
         $config_change->time_changed = $time;
         $config_change->change_type = configuration_change::CHANGED_AGGREGATION;
+        $config_change->competency_id = 1;
+        $config_change->save();
 
         $entry = activity_log\configuration_change::load_by_entity($config_change);
 
@@ -46,6 +48,8 @@ class totara_competency_models_activity_log_config_change_testcase extends advan
         $config_change = new configuration_change();
         $config_change->time_changed = $time;
         $config_change->change_type = configuration_change::CHANGED_CRITERIA;
+        $config_change->competency_id = 1;
+        $config_change->save();
 
         $entry = activity_log\configuration_change::load_by_entity($config_change);
 
@@ -75,6 +79,8 @@ class totara_competency_models_activity_log_config_change_testcase extends advan
         $config_change->time_changed = $time;
         $config_change->change_type = configuration_change::CHANGED_MIN_PROFICIENCY;
         $config_change->related_info = json_encode(['new_min_proficiency_id' => $great->id]);
+        $config_change->competency_id = 1;
+        $config_change->save();
 
         $entry = activity_log\configuration_change::load_by_entity($config_change);
 

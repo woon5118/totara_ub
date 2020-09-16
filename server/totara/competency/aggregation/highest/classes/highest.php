@@ -50,7 +50,7 @@ class highest extends overall_aggregation {
         foreach ($this->pathways as $pathway) {
             $achievement = $this->get_or_create_current_pathway_achievement($current_achievements, $pathway, $user_id);
 
-            $value_achieved = $achievement->scale_value;
+            $value_achieved = $achievement->exists() ? $achievement->scale_value : null;
 
             if (!is_null($value_achieved)) {
                 if (is_null($highest_achievement)) {

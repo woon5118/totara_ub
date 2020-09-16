@@ -24,6 +24,7 @@
 namespace aggregation_first;
 
 
+use totara_competency\entities\scale_value;
 use totara_competency\overall_aggregation;
 use totara_competency\pathway;
 
@@ -46,8 +47,9 @@ class first extends overall_aggregation {
         $current_achievements = $this->get_current_pathway_achievements_for_user($ordered_pathways, $user_id);
         foreach ($ordered_pathways as $pathway) {
             $achievement = $this->get_or_create_current_pathway_achievement($current_achievements, $pathway, $user_id);
-            if ($achievement->scale_value) {
-                $this->set_user_achievement($user_id, [$achievement], $achievement->scale_value);
+            $value_achieved = $achievement->exists() ? $achievement->scale_value : null;
+            if ($value_achieved) {
+                $this->set_user_achievement($user_id, [$achievement], $value_achieved);
                 break;
             }
         }

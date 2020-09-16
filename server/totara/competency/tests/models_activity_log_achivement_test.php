@@ -41,6 +41,17 @@ class totara_competency_models_activity_log_achievement_testcase extends advance
         $achievement->scale_value_id = null;
         $achievement->assignment_id = $assignment->id;
 
+        $achievement = new competency_achievement();
+        $achievement->user_id = 1;
+        $achievement->competency_id = 100;
+        $achievement->scale_value_id = null;
+        $achievement->proficient = 0;
+        $achievement->status = 0;
+        $achievement->time_created = time();
+        $achievement->time_status = time();
+        $achievement->assignment_id = $assignment->id;
+        $achievement->save();
+
         $entry = activity_log\competency_achieved_via::load_by_entity($achievement);
         $this->assertEquals('Rating value reset', $entry->get_description());
     }
@@ -70,10 +81,15 @@ class totara_competency_models_activity_log_achievement_testcase extends advance
         $assignment->save();
 
         $achievement = new competency_achievement();
+        $achievement->user_id = 1;
         $achievement->time_created = $time;
+        $achievement->time_status = $time;
         $achievement->proficient = true;
         $achievement->scale_value_id = $great->id;
         $achievement->assignment_id = $assignment->id;
+        $achievement->competency_id = 100;
+        $achievement->status = 0;
+        $achievement->save();
 
         $entry = activity_log\competency_achievement::load_by_entity($achievement);
 

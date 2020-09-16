@@ -42,6 +42,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_TRACKING_START;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -54,6 +56,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_TRACKING_END;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -77,6 +81,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_ASSIGNED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -89,6 +95,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -101,6 +109,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -124,6 +134,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_ASSIGNED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -136,6 +148,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -148,6 +162,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -177,6 +193,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_ASSIGNED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -189,6 +207,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -201,6 +221,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -232,6 +254,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_ASSIGNED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -244,6 +268,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -256,6 +282,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -282,6 +310,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_ASSIGNED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -294,6 +324,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -306,6 +338,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -333,6 +367,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_ASSIGNED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -345,6 +381,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -357,6 +395,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -371,9 +411,6 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
 
         $manager = $this->getDataGenerator()->create_user(['firstname' => 'Isaac', 'lastname' => 'Newton']);
 
-        // Todo: Somehow the fact this is the users manager when assigning will be added. But this is not implemented yet.
-        $this->markTestSkipped();
-
         $assignment = new assignment();
         $assignment->type = assignment::TYPE_OTHER;
         $assignment->user_group_type = user_groups::USER;
@@ -386,6 +423,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_ASSIGNED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -398,6 +437,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 
@@ -410,6 +451,8 @@ class totara_competency_models_activity_log_assignment_testcase extends advanced
         $assignment_log->created_at = $time;
         $assignment_log->action = competency_assignment_user_log::ACTION_UNASSIGNED_USER_GROUP;
         $assignment_log->assignment_id = $assignment->id;
+        $assignment_log->user_id = 1;
+        $assignment_log->save();
 
         $entry = activity_log\assignment::load_by_entity($assignment_log);
 

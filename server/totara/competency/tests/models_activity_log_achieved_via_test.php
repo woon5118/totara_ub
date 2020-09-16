@@ -62,8 +62,12 @@ class totara_competency_models_activity_log_achieved_via_testcase extends advanc
         $achievement->user_id = $user_id;
         $achievement->competency_id = $competency_id;
         $achievement->scale_value_id = $great->id;
+        $achievement->proficient = 0;
+        $achievement->status = 0;
         $achievement->time_created = $achievement_time;
+        $achievement->time_status = $achievement_time;
         $achievement->assignment_id = $assignment->id;
+        $achievement->save();
 
         $entry = activity_log\competency_achieved_via::load_by_entity($achievement);
 
