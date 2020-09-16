@@ -242,7 +242,10 @@ export default {
      * @return {Boolean}
      */
     criteriaComplete() {
-      return this.numberOfRequiredCompetencies > 0 && this.achievedCompetencies >= this.numberOfRequiredCompetencies;
+      return (
+        this.numberOfRequiredCompetencies > 0 &&
+        this.achievedCompetencies >= this.numberOfRequiredCompetencies
+      );
     },
 
     /**

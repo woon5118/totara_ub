@@ -217,14 +217,12 @@ export default {
 
   &--hasTop {
     padding-top: var(--gap-4);
-    border-top: var(--border-width-thin) solid
-      var(--filter-bar-border-color);
+    border-top: var(--border-width-thin) solid var(--filter-bar-border-color);
   }
 
   &--hasBottom {
     padding-bottom: var(--gap-4);
-    border-bottom: var(--border-width-thin) solid
-      var(--filter-bar-border-color);
+    border-bottom: var(--border-width-thin) solid var(--filter-bar-border-color);
   }
 
   &__heading {

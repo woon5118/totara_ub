@@ -364,8 +364,7 @@ export default {
       }
 
       &--withBorderBottom {
-        border-bottom: var(--border-width-thin) solid
-          var(--color-neutral-5);
+        border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
       }
     }
   }

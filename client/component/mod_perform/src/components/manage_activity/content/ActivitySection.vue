@@ -739,8 +739,7 @@ export default {
 
     &--autoSave {
       margin-top: var(--gap-4);
-      border-bottom: var(--border-width-thin) solid
-        var(--card-border-color);
+      border-bottom: var(--border-width-thin) solid var(--card-border-color);
     }
   }
 

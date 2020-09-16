@@ -437,7 +437,10 @@ export default {
             'mod_perform'
           );
         case 'NOT_SUBMITTED':
-          return this.$str('user_activities_status_not_submitted', 'mod_perform');
+          return this.$str(
+            'user_activities_status_not_submitted',
+            'mod_perform'
+          );
         default:
           return '';
       }
@@ -589,7 +592,7 @@ export default {
         subjectInstance.sections
       );
       const url = this.$url('/mod/perform/activity/print.php', {
-        participant_section_id: participantSection.id
+        participant_section_id: participantSection.id,
       });
       window.open(url);
     },

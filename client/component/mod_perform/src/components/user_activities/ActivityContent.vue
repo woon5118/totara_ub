@@ -259,18 +259,18 @@
               <FormRow>
                 <ButtonGroup
                   v-if="
-                  !activeSectionIsClosed &&
-                    participantCanAnswer &&
-                    !viewOnlyReportMode
-                "
+                    !activeSectionIsClosed &&
+                      participantCanAnswer &&
+                      !viewOnlyReportMode
+                  "
                   class="tui-participantContent__buttons"
                 >
                   <ButtonSubmit @click="fullSubmit(getSubmitting)" />
                   <Button
                     v-if="hasSaveDraft"
                     :text="
-                    $str('participant_section_button_draft', 'mod_perform')
-                  "
+                      $str('participant_section_button_draft', 'mod_perform')
+                    "
                     type="submit"
                     @click="draftSubmit(getSubmitting)"
                   />
@@ -280,7 +280,6 @@
                   />
                 </ButtonGroup>
               </FormRow>
-
 
               <div class="tui-participantContent__navigation">
                 <Grid
@@ -1139,7 +1138,9 @@ export default {
         // handle initValue is null, but formValue is empty string or array
         // convert empty formValue to null, then we can compare the difference
         let isEmptyForm =
-          formValue === null || !Object.values(formValue)[0] || Object.values(formValue)[0].length === 0;
+          formValue === null ||
+          !Object.values(formValue)[0] ||
+          Object.values(formValue)[0].length === 0;
 
         if (isEmptyForm) {
           formValue = null;

@@ -200,9 +200,7 @@ export default {
   &::after {
     position: absolute;
     top: calc((var(--form-input-height) - var(--select-icon-size)) / 2);
-    right: calc(
-      (var(--form-input-height) - var(--select-icon-size) * 2) / 2
-    );
+    right: calc((var(--form-input-height) - var(--select-icon-size) * 2) / 2);
     display: block;
     width: 0;
     height: 0;
@@ -224,12 +222,9 @@ export default {
     height: var(--form-input-height-large);
 
     &::after {
-      top: calc(
-        (var(--form-input-height-large) - var(--select-icon-size)) / 2
-      );
+      top: calc((var(--form-input-height-large) - var(--select-icon-size)) / 2);
       right: calc(
-        (var(--form-input-height-large) - var(--select-icon-size) * 2) /
-          2
+        (var(--form-input-height-large) - var(--select-icon-size) * 2) / 2
       );
     }
   }

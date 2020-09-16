@@ -173,8 +173,7 @@ export default {
 
     .tui-contextInvalid & {
       border-color: var(--form-input-border-color-invalid);
-      box-shadow: var(--shadow-none),
-        var(--form-input-shadow-invalid-focus);
+      box-shadow: var(--shadow-none), var(--form-input-shadow-invalid-focus);
     }
   }
 
@@ -201,8 +200,7 @@ export default {
     border-color: var(--form-checkbox-check-color);
     border-style: solid;
     /*rtl:ignore*/
-    border-width: 0 0 var(--checkbox-check-width)
-      var(--checkbox-check-width);
+    border-width: 0 0 var(--checkbox-check-width) var(--checkbox-check-width);
     transform: rotate(-45deg);
     opacity: 0;
     transition: opacity var(--transition-form-function)

@@ -35,7 +35,10 @@
         class="tui-surveySidePanel__profile"
       >
         <template v-slot:drop-down-items>
-          <DropdownItem v-if="survey.owned || survey.updateable" @click="openModalFromAction = true">
+          <DropdownItem
+            v-if="survey.owned || survey.updateable"
+            @click="openModalFromAction = true"
+          >
             {{ $str('deletesurvey', 'engage_survey') }}
           </DropdownItem>
           <DropdownItem v-if="!survey.owned" @click="reportSurvey">

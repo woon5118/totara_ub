@@ -270,8 +270,7 @@ export default {
 @media (min-width: $tui-screen-sm) {
   .tui-assignmentScheduleToggles {
     &__group {
-      border-right: var(--border-width-thin) solid
-        var(--color-neutral-6);
+      border-right: var(--border-width-thin) solid var(--color-neutral-6);
 
       &:last-child {
         border-right: none;

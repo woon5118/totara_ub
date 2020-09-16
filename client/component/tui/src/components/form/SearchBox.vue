@@ -119,8 +119,8 @@ export default {
   &__button {
     border-color: var(--form-input-border-color);
     border-style: solid;
-    border-width: var(--form-input-border-size)
-      var(--form-input-border-size) var(--form-input-border-size) 0;
+    border-width: var(--form-input-border-size) var(--form-input-border-size)
+      var(--form-input-border-size) 0;
 
     &:hover,
     &:active,
@@ -128,8 +128,8 @@ export default {
       background-color: var(--btn-bg-color-focus);
       border-color: var(--form-input-border-color);
       border-style: solid;
-      border-width: var(--form-input-border-size)
-        var(--form-input-border-size) var(--form-input-border-size) 0;
+      border-width: var(--form-input-border-size) var(--form-input-border-size)
+        var(--form-input-border-size) 0;
       box-shadow: var(--btn-shadow-focus);
     }
   }

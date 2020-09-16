@@ -219,7 +219,7 @@ export default {
     },
     stage() {
       this.hideTabs = this.stage !== 0;
-    }
+    },
   },
 
   methods: {

@@ -24,7 +24,10 @@
       :no-border="true"
     >
       <template v-slot:drop-down-items>
-        <DropdownItem v-if="article.owned || article.updateable" @click="openModalFromAction = true">
+        <DropdownItem
+          v-if="article.owned || article.updateable"
+          @click="openModalFromAction = true"
+        >
           {{ $str('delete', 'moodle') }}
         </DropdownItem>
         <DropdownItem v-if="!article.owned" @click="reportResource">

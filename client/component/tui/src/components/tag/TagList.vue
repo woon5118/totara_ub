@@ -235,9 +235,7 @@ export default {
     align-items: center;
     width: 100%;
     min-width: 0;
-    min-height: calc(
-      var(--tag-height) + (2 * var(--border-width-thin))
-    );
+    min-height: calc(var(--tag-height) + (2 * var(--border-width-thin)));
   }
 
   &__tagItems {

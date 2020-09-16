@@ -192,14 +192,8 @@ export default {
   }
 }
 
-@include tui-notification-banner-color(
-  'success',
-  var(--color-prompt-success)
-);
-@include tui-notification-banner-color(
-  'warning',
-  var(--color-prompt-warning)
-);
+@include tui-notification-banner-color('success', var(--color-prompt-success));
+@include tui-notification-banner-color('warning', var(--color-prompt-warning));
 @include tui-notification-banner-color('error', var(--color-prompt-alert));
 
 @media screen and (min-width: $tui-screen-sm) {

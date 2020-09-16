@@ -318,7 +318,10 @@ export default {
         case 'COMPLETE':
           return this.$str('user_activities_status_complete', 'mod_perform');
         case 'NOT_SUBMITTED':
-          return this.$str('user_activities_status_not_submitted', 'mod_perform');
+          return this.$str(
+            'user_activities_status_not_submitted',
+            'mod_perform'
+          );
         default:
           return '';
       }

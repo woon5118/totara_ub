@@ -263,8 +263,7 @@ export default {
       &.tui-grid {
         margin-top: var(--gap-4);
         padding-top: var(--gap-4);
-        border-top: var(--border-width-thin) solid
-          var(--card-border-color);
+        border-top: var(--border-width-thin) solid var(--card-border-color);
       }
     }
   }

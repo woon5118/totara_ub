@@ -37,11 +37,14 @@
     <GridItem :units="8">
       <div class="tui-participantGeneralInformation__relationship">
         <p class="tui-participantGeneralInformation__relationship-heading">
-          {{ $str(!currentUserIsSubject
-            ? 'user_activities_your_relationship_to_user_internal'
-            : 'relation_to_subject_self_internal',
-            'mod_perform'
-          ) }}
+          {{
+            $str(
+              !currentUserIsSubject
+                ? 'user_activities_your_relationship_to_user_internal'
+                : 'relation_to_subject_self_internal',
+              'mod_perform'
+            )
+          }}
           <span v-if="!currentUserIsSubject">{{ relationship }}</span>
         </p>
 
@@ -161,8 +164,7 @@ export default {
     flex-direction: row;
 
     &__userDetails {
-      border-right: var(--border-width-thin) solid
-        var(--color-neutral-5);
+      border-right: var(--border-width-thin) solid var(--color-neutral-5);
       border-bottom: none;
     }
 

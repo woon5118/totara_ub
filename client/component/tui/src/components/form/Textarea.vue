@@ -97,8 +97,7 @@ export default {
   font-size: var(--form-input-font-size);
   font-family: inherit;
   line-height: inherit;
-  border: var(--form-input-border-size) solid
-    var(--form-input-border-color);
+  border: var(--form-input-border-size) solid var(--form-input-border-color);
   resize: none;
 
   @include tui-char-length-classes();

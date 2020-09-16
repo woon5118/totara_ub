@@ -439,21 +439,15 @@ export default {
     #{$mod-horizontal} & {
       top: var(--tab-border-width);
       padding-top: calc(var(--tab-v-padding) - var(--tab-border-width));
-      padding-bottom: calc(
-        var(--tab-v-padding) + var(--tab-border-width)
-      );
+      padding-bottom: calc(var(--tab-v-padding) + var(--tab-border-width));
       border-color: var(--tabs-border-color);
       box-shadow: var(--shadow-3);
     }
 
     #{$mod-vertical} & {
       left: var(--tab-border-width);
-      padding-right: calc(
-        var(--tab-v-padding) + var(--tab-border-width)
-      );
-      padding-left: calc(
-        var(--tab-h-padding) - var(--tab-border-width)
-      );
+      padding-right: calc(var(--tab-v-padding) + var(--tab-border-width));
+      padding-left: calc(var(--tab-h-padding) - var(--tab-border-width));
       border-color: var(--tabs-border-color);
       box-shadow: var(--shadow-2);
     }
@@ -506,9 +500,7 @@ export default {
   &__tab--active&__tab--small {
     #{$mod-horizontal} & {
       #{$block}__link {
-        padding-top: calc(
-          var(--tab-small-v-padding) - var(--tab-border-width)
-        );
+        padding-top: calc(var(--tab-small-v-padding) - var(--tab-border-width));
         padding-bottom: calc(
           var(--tab-small-v-padding) + var(--tab-border-width)
         );

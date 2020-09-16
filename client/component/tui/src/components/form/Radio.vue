@@ -147,8 +147,7 @@ export default {
 
     .tui-contextInvalid & {
       border-color: var(--form-input-border-color-invalid);
-      box-shadow: var(--shadow-none),
-        var(--form-input-shadow-invalid-focus);
+      box-shadow: var(--shadow-none), var(--form-input-shadow-invalid-focus);
     }
   }
 
@@ -162,8 +161,7 @@ export default {
 
     .tui-contextInvalid & {
       border-color: var(--form-input-border-color-invalid);
-      box-shadow: var(--shadow-none),
-        var(--form-input-shadow-invalid-focus);
+      box-shadow: var(--shadow-none), var(--form-input-shadow-invalid-focus);
     }
   }
 

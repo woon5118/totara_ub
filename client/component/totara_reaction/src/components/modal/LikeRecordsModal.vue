@@ -144,8 +144,7 @@ export default {
         padding: var(--gap-2) 0;
 
         + li {
-          border-top: var(--border-width-thin) solid
-            var(--color-neutral-5);
+          border-top: var(--border-width-thin) solid var(--color-neutral-5);
         }
       }
     }

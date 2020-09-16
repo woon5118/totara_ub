@@ -70,8 +70,7 @@ export default {
 @media (min-width: $tui-screen-xs) {
   .tui-achievementLayout {
     &__left {
-      border-right: var(--border-width-normal) solid
-        var(--color-neutral-5);
+      border-right: var(--border-width-normal) solid var(--color-neutral-5);
 
       .tui-grid--stacked & {
         border-right: none;
