@@ -19,7 +19,7 @@
 const prettier = require('prettier');
 const fs = require('fs');
 const path = require('path');
-const globSync = require('tiny-glob/sync');
+const fg = require('fast-glob');
 const { rootDir, filterByGlobs, listChangedFiles } = require('./common');
 const patterns = require('./patterns');
 
@@ -39,7 +39,7 @@ async function run(opts) {
 
   // resolve globs to get an array of files to check
   const files = [].concat(
-    ...finalFilePatterns.map(glob => globSync(glob, { cwd: rootDir }))
+    ...finalFilePatterns.map(glob => fg.sync(glob, { cwd: rootDir }))
   );
 
   // format/check each file

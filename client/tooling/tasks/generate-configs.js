@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const globSync = require('tiny-glob/sync');
+const fg = require('fast-glob');
 const prettier = require('prettier');
 const { rootDir } = require('../lib/common');
 const { dirMaps } = require('../lib/resolution');
@@ -22,9 +22,7 @@ function writeJson(path, json) {
  * Generate project configs for editor support
  */
 function generateProjectConfigs() {
-  const tuiConfigFiles = globSync('server/**/tui/tui.json', { cwd: rootDir }).concat(
-    globSync('client/component/*/src/tui.json', { cwd: rootDir })
-  );
+  const tuiConfigFiles = fg.sync('client/component/*/src/tui.json', { cwd: rootDir });
 
   const baseFolders = tuiConfigFiles.reduce((acc, configFile) => {
     const config = JSON.parse(

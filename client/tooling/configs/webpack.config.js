@@ -28,7 +28,7 @@ const { rootDir, arrayUnique } = require('../lib/common');
 const tuiExternals = require('../webpack/tui_externals');
 const TuiAliasPlugin = require('../webpack/TuiAliasPlugin');
 const babelConfigs = require('./babel');
-const globSync = require('tiny-glob/sync');
+const fg = require('fast-glob');
 const cssVarExtract = require('./webpack/css_var_extract');
 
 /**
@@ -326,7 +326,7 @@ function scssToScssConfig({ mode, watch }, { getTuiDirs }) {
 
   const scssEntry = tuiDirs.reduce((acc, dir) => {
     if (fs.existsSync(path.join(rootDir, dir, 'global_styles'))) {
-      globSync('global_styles/**/*.scss', { cwd: dir }).forEach(x => {
+      fg.sync('global_styles/**/*.scss', { cwd: dir }).forEach(x => {
         if (x == 'global_styles/static.scss') {
           // already included in bundle (see tui_json_loader)
           return;

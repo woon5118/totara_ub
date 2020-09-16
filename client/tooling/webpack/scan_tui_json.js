@@ -18,21 +18,18 @@
 
 const path = require('path');
 const fs = require('fs');
-const globSync = require('tiny-glob/sync');
+const fg = require('fast-glob');
 
 /**
  * Scan for tui.json and return the entry points for Webpack
  */
 module.exports = function scanTuiJson({ rootDir, components, vendor }) {
   // scan for tui.json files
-  // NOTE: for some reason, double asterisk wildcard (**) is required to be able to run on Windows
-  const tuiConfigFiles = globSync('client/component/**/src/tui.json', {
-    cwd: rootDir,
-  });
+  const files = fg.sync('client/component/*/src/tui.json', { cwd: rootDir });
   let entryData = [];
 
   // parse config file and determine output location
-  tuiConfigFiles.forEach(configFile => {
+  files.forEach(configFile => {
     configFile = configFile.replace(/\\/g, '/');
     const config = JSON.parse(
       fs.readFileSync(path.resolve(rootDir, configFile))
