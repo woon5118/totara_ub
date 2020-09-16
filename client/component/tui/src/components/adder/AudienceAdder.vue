@@ -215,7 +215,7 @@ export default {
       variables() {
         return {
           query: {
-            context_id: this.contextId,
+            leaf_context_id: this.contextId,
             filters: {
               name: this.filters.search,
             },
@@ -242,7 +242,7 @@ export default {
       variables() {
         return {
           query: {
-            context_id: this.contextId,
+            leaf_context_id: this.contextId,
             filters: {
               ids: [],
             },
@@ -273,7 +273,7 @@ export default {
       this.$apollo.queries.audiences.fetchMore({
         variables: {
           query: {
-            context_id: this.contextId,
+            leaf_context_id: this.contextId,
             cursor: this.nextPage,
             filters: {
               name: this.filters.search,
@@ -323,7 +323,7 @@ export default {
       try {
         await this.$apollo.queries.selectedAudiences.refetch({
           query: {
-            context_id: this.contextId,
+            leaf_context_id: this.contextId,
             filters: {
               ids: selection,
             },

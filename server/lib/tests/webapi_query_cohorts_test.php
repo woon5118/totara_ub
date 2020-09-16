@@ -26,8 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 use core\collection;
 use core\entities\cohort as cohort_entity;
-use core\orm\query\builder;
-use core\webapi\resolver\query\cohorts;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -282,7 +280,7 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
 
         $args = [
             'query' => [
-                'context_id' => $cat2->get_context()->id
+                'leaf_context_id' => $cat2->get_context()->id
             ]
         ];
 
@@ -304,7 +302,7 @@ class core_webapi_query_cohorts_testcase extends advanced_testcase {
 
         $args = [
             'query' => [
-                'context_id' => $cat11->get_context()->id,
+                'leaf_context_id' => $cat11->get_context()->id,
             ]
         ];
 

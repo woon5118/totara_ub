@@ -48,7 +48,7 @@ class cohorts implements query_resolver, has_middleware {
         require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
         $query = $args['query'] ?? [];
-        $context_id = $query['context_id'] ?? null;
+        $leaf_context_id = $query['leaf_context_id'] ?? null;
         $order_by = $query['order_by'] ?? 'name';
         $order_dir = $query['order_dir'] ?? 'ASC';
         $result_size = $query['result_size'] ?? cohorts_provider::DEFAULT_PAGE_SIZE;
@@ -73,8 +73,8 @@ class cohorts implements query_resolver, has_middleware {
             }
         }
 
-        if (!empty($context_id)) {
-            $context = context::instance_by_id($context_id);
+        if (!empty($leaf_context_id)) {
+            $context = context::instance_by_id($leaf_context_id);
         } else {
             $context = context_system::instance();
         }
