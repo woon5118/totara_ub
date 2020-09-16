@@ -18,7 +18,12 @@
 <template>
   <div class="tui-performElementResponse">
     <div v-if="error">{{ error }}</div>
-    <FormRow :label="$str('your_response', 'mod_perform')">
+    <FormRow
+      :label="$str('your_response', 'mod_perform')"
+      :accessible-label="accessibleLabel"
+      :required="required"
+      :optional="optional"
+    >
       <slot name="content" />
     </FormRow>
   </div>
@@ -33,6 +38,9 @@ export default {
     name: String,
     type: Object,
     error: String,
+    accessibleLabel: String,
+    required: Boolean,
+    optional: Boolean,
   },
 };
 </script>

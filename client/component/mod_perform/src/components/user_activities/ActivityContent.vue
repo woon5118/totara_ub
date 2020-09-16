@@ -228,6 +228,8 @@
                             participantCanAnswer &&
                             !viewOnlyReportMode
                         "
+                        :accessible-label="sectionElement.element.title"
+                        :required="sectionElement.element.is_required"
                       >
                         <template v-slot:content>
                           <component

@@ -17,32 +17,28 @@
 -->
 
 <template>
-  <span
-    class="tui-performRequiredOptionalIndicator"
-    :class="{
-      'tui-performRequiredOptionalIndicator--required': isRequired,
-      'tui-performRequiredOptionalIndicator--optional': !isRequired,
-    }"
-  >
-    {{ text }}
+  <span class="tui-performRequiredOptionalIndicator">
+    <span
+      v-if="isRequired"
+      class="tui-performRequiredOptionalIndicator--required"
+      :title="$str('required', 'moodle')"
+    >
+      <span aria-hidden="true">*</span>
+      <span class="sr-only">{{ $str('required', 'moodle') }}</span>
+    </span>
+
+    <span
+      v-if="!isRequired"
+      class="tui-performRequiredOptionalIndicator--optional"
+    >
+      ({{ $str('section_element_response_optional', 'mod_perform') }})
+    </span>
   </span>
 </template>
 <script>
 export default {
   props: {
     isRequired: Boolean,
-  },
-  computed: {
-    text() {
-      if (this.isRequired) {
-        return '*';
-      }
-
-      return `(${this.$str(
-        'section_element_response_optional',
-        'mod_perform'
-      )})`;
-    },
   },
 };
 </script>
