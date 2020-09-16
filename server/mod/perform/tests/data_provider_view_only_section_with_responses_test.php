@@ -182,7 +182,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
         $section = section::repository()->one(true);
 
         $static_element = $generator->create_element(['title' => 'Static element', 'plugin_name' => 'static_content']);
-        $generator->create_section_element(new \mod_perform\models\activity\section($section), $static_element, 3);
+        $generator->create_section_element(new section_model($section), $static_element, 3);
 
         $data_provider = new view_only_section_with_responses($section, $subject_instance);
 
@@ -290,7 +290,7 @@ class data_provider_view_only_section_with_responses_testcase extends advanced_t
         $siblings = $view_only_section->get_siblings();
 
         $actual_section_values = $siblings->map(
-            function (\mod_perform\models\activity\section $section) {
+            function (section_model $section) {
                 return [
                     'sort_order' => $section->sort_order,
                     'activity_id' => $section->activity_id,

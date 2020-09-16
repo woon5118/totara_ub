@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['default_number_label'] = 'Default value';
 $string['high_value_label'] = 'Maximum numeric value';
 $string['low_value_label'] = 'Minimum numeric value';
-$string['name'] = 'Numeric Rating scale';
+$string['name'] = 'Numeric rating scale';
 $string['no_response_submitted'] = 'No response submitted';
 $string['pluginname'] = 'Rating scale element';
 $string['preview'] = 'Preview';

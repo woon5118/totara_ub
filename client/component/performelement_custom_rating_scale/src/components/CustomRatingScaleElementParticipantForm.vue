@@ -44,10 +44,10 @@ export default {
     Radio,
     FormRadioGroup,
   },
-
   props: {
     path: [String, Array],
     error: String,
+    isDraft: Boolean,
     element: {
       type: Object,
       required: true,
@@ -60,6 +60,10 @@ export default {
      * @return {function[]}
      */
     answerValidator(val) {
+      if (this.isDraft) {
+        return null;
+      }
+
       if (this.element.is_required && !val) {
         return this.$str('required', 'performelement_custom_rating_scale');
       }

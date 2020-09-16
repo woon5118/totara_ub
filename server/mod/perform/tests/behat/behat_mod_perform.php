@@ -82,6 +82,13 @@ class behat_mod_perform extends behat_base {
     public const QUESTION_DRAG_MOVE_ICON_LOCATOR = '.tui-performEditSectionContentModal__draggableItem-moveIcon';
     public const RESPONSE_VISIBILITY_DESCRIPTION_LOCATOR = '.tui-participantContent__sectionHeadingOtherResponsesDescription';
 
+    public const ADMIN_FORM_RESPONSE_REQUIRED = 'input[name="responseRequired"]';
+    public const ADMIN_FORM_TITLE_INPUT = 'input[name=rawTitle]';
+    public const ADMIN_FORM_DONE_BUTTON = '.tui-elementAdminFormActionButtons__done';
+    public const ADMIN_FORM = '.tui-performElementAdminForm';
+    public const ADMIN_FORM_STATIC_CONTENT_WEKA = '.tui-elementEditStaticContent';
+    public const FORM_BUILDER_ADD_ELEMENT_BUTTONS = '.tui-performEditSectionContentAddElement__dropDownItem';
+
     /**
      * Navigate to the specified page and wait for JS.
      *
@@ -1306,6 +1313,113 @@ class behat_mod_perform extends behat_base {
         $today_date_formatted = (new DateTime())->format('j F Y');
 
         $this->i_should_see_in_the_line_of_the_perform_activities_instance_info_card($today_date_formatted, $label_text);
+    }
+
+    /**
+     * @Given /^I add one of every element type in the mod perform form builder (and make them required)$/
+     * @Given /^I add one of every element type in the mod perform form builder$/
+     * @param bool $required
+     */
+    public function i_add_one_of_every_element_type_in_the_mod_perform_form_builder(bool $required = false): void {
+        foreach ($this->get_form_builder_element_add_buttons() as $i => $element_add_button) {
+            $this->execute('behat_general::i_click_on', ['Add element', 'link_or_button']);
+
+            if (!$element_add_button->isVisible()) {
+                $element_add_button->focus(); // Ensure we scroll the element option into view.
+            }
+
+            $element_add_button->click();
+
+            $this->wait_for_pending_js();
+
+            $this->fill_last_element_settings_in_form_builder(trim($element_add_button->getHtml()), $required);
+
+            $this->wait_for_pending_js();
+        }
+    }
+
+    /**
+     * @return NodeElement[]
+     */
+    private function get_form_builder_element_add_buttons(): array {
+        $this->execute('behat_general::i_click_on', ['Add element', 'link_or_button']);
+        $element_add_buttons = $this->find_all('css', self::FORM_BUILDER_ADD_ELEMENT_BUTTONS);
+        $this->execute('behat_general::i_click_on', ['Add element', 'link_or_button']);
+
+        return $element_add_buttons;
+    }
+
+    private function fill_last_element_settings_in_form_builder(string $title, bool $required): void {
+        $element_setting_containers = $this->find_all('css', self::ADMIN_FORM);
+
+        /** @var NodeElement $element_setting_container */
+        $element_setting_container = end($element_setting_containers);
+
+        switch ($title) {
+            case 'Multiple choice: multi-select':
+                $this->fill_multi_choice_multi_admin_form_settings($element_setting_container);
+                break;
+            case 'Numeric rating scale':
+                $this->fill_numeric_rating_scale_admin_form_settings($element_setting_container);
+                break;
+            case 'Static content':
+                $this->fill_static_content_admin_form_settings();
+                break;
+            default:
+                $this->fill_element_admin_form_settings($element_setting_container);
+        }
+
+        $element_title = $element_setting_container->find('css', self::ADMIN_FORM_TITLE_INPUT);
+        $element_title->setValue($title);
+
+        if ($required && $title !== 'Static content') {
+            $response_required_input = $element_setting_container->find('css', self::ADMIN_FORM_RESPONSE_REQUIRED);
+            $response_required_input->getParent()->find('css', 'label')->click();
+        }
+
+        $element_setting_container->find('css', self::ADMIN_FORM_DONE_BUTTON)->click();
+    }
+
+    private function fill_element_admin_form_settings(NodeElement $element_setting_container): void {
+        $inputs = $element_setting_container->findAll('css', 'input');
+
+        /** @var NodeElement $input */
+        foreach ($inputs as $i => $input) {
+            $type = $input->getAttribute('type');
+
+            if (in_array($type, ['text', 'number'], true)) {
+                $input->focus();
+                $input->setValue($i + 1);
+            }
+        }
+    }
+
+    private function fill_multi_choice_multi_admin_form_settings(NodeElement $settings_container): void {
+        $answer_0 = $settings_container->find('css', 'input[name="answers[0]"]');
+        $answer_0->focus();
+        $answer_0->setValue('Choice 0');
+
+        $answer_1 = $settings_container->find('css', 'input[name="answers[1]"]');
+        $answer_1->focus();
+        $answer_1->setValue('Choice 1');
+    }
+
+    private function fill_numeric_rating_scale_admin_form_settings(NodeElement $settings_container): void {
+        $low_value = $settings_container->find('css', 'input[name=lowValue]');
+        $low_value->focus();
+        $low_value->setValue('1');
+
+        $high_value = $settings_container->find('css', 'input[name=highValue]');
+        $high_value->focus();
+        $high_value->setValue('3');
+
+        $default_value = $settings_container->find('css', 'input[name=defaultValue]');
+        $default_value->focus();
+        $default_value->setValue('2');
+    }
+
+    private function fill_static_content_admin_form_settings(): void {
+        $this->execute('behat_weka::i_set_the_weka_editor_with_css_to', [self::ADMIN_FORM_STATIC_CONTENT_WEKA, 'static content']);
     }
 
     /**
