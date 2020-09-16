@@ -23,8 +23,10 @@
 
 namespace core_user\totara_engage\share\recipient;
 
+use core_user\access_controller;
 use totara_engage\access\access;
 use totara_engage\entity\share as share_entity;
+use totara_engage\exception\share_exception;
 use totara_engage\repository\share_repository;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\share\recipient\recipient;
@@ -42,9 +44,14 @@ class user extends recipient {
      * @inheritDoc
      */
     public function validate(): void {
-        // Make sure that this is a valid user.
-        if (!\core_user::is_real_user($this->instanceid, true)) {
-            throw new \coding_exception("Invalid user with ID {$this->instanceid}");
+        $target_user_record = \core_user::get_user($this->instanceid, '*');
+        if (empty($target_user_record->id)) {
+            throw new share_exception('error:invalid_recipient', 'totara_engage');
+        }
+        $controller = access_controller::for($target_user_record);
+        if (!$controller->can_view_profile()) {
+            // This is not a user that can be resolved by the current user.
+            throw new share_exception('error:invalid_recipient', 'totara_engage');
         }
     }
 

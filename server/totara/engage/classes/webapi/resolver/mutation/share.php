@@ -32,6 +32,7 @@ use totara_engage\repository\share_repository;
 use totara_engage\share\provider as share_provider;
 use totara_engage\share\recipient\manager as recipient_manager;
 use totara_engage\share\manager as share_manager;
+use totara_engage\webapi\middleware\require_valid_recipients;
 
 /**
  * Resolver for sharing items.
@@ -79,6 +80,7 @@ final class share implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('engage_resources'),
+            new require_valid_recipients('recipients'),
         ];
     }
 

@@ -33,6 +33,7 @@ use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\access\access;
 use totara_engage\share\recipient\recipient;
 use totara_engage\share\shareable;
+use totara_engage\exception\share_exception;
 
 class library extends recipient {
 
@@ -45,11 +46,23 @@ class library extends recipient {
      * @inheritDoc
      */
     public function validate(): void {
+        global $USER;
         advanced_feature::require('container_workspace');
 
         // Make sure that this is a valid workspace.
         if (!workspace_loader::exists($this->instanceid)) {
             throw new \coding_exception("Invalid workspace with ID {$this->instanceid}");
+        }
+
+        $workspace = factory::from_id($this->instanceid);
+        $type = workspace::get_type();
+        if (!$workspace->is_typeof($type)) {
+            throw new \coding_exception('invalid workspace instanceid');
+        }
+
+        $workspace_interactor = new interactor($workspace, $USER->id);
+        if (!$workspace_interactor->can_share_resources()) {
+            throw new share_exception('error:share_to_workspace', 'container_workspace');
         }
     }
 

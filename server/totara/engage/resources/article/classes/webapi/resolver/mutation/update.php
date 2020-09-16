@@ -25,6 +25,7 @@ namespace engage_article\webapi\resolver\mutation;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
+use totara_engage\webapi\middleware\require_valid_recipients;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use engage_article\totara_engage\resource\article;
@@ -91,6 +92,7 @@ final class update implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('engage_resources'),
+            new require_valid_recipients('shares'),
         ];
     }
 

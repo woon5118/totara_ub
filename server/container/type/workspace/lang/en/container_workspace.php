@@ -248,6 +248,7 @@ $string['error:join_space'] = 'Cannot join a workspace';
 $string['error:leave_space'] = 'Cannot leave the workspace';
 $string['error:manual_enrol'] = 'Cannot manual add user to workspace';
 $string['error:self_enrol'] = 'Cannot self enrol to workspace';
+$string['error:share_to_workspace'] = 'You don\'t have permission to share to this workspace';
 $string['error:update'] = 'Cannot update the workspace';
 $string['error:update_discussion'] = 'Cannot update the discussion';
 $string['error:upload_image'] = 'Sorry, the file failed to upload. Please try again';

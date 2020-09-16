@@ -244,6 +244,7 @@ $string['error:create'] = "Cannot create an instance of a resource '{\$a->type}'
 $string['error:createquestion'] = "Cannot create a question";
 $string['error:delete'] = "Cannot delete an instance of a resource '{\$a->type}'";
 $string['error:deletequestion'] = "Cannot delete the question";
+$string['error:invalid_recipient'] = "Invalid recipient";
 $string['error:permissiondenied'] = 'Permission denied';
 $string['error:sharecapability'] = 'You do not have the required capabilities to share this resource.';
 $string['error:shareprivate'] = 'Resource is viewable by only you. Change who can view this resource in order to share it.';

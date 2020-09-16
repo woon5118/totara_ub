@@ -49,6 +49,11 @@ class totara_playlist_share_graphql_testcase extends advanced_testcase {
             'access' => access::PUBLIC
         ]);
 
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $playlistgen->set_capabilities(CAP_ALLOW, $user->id, $playlist->get_context());
+        }
+
         // Set user to someone other than the owner of the survey.
         $this->setUser($users[1]);
 

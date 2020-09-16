@@ -326,6 +326,7 @@ class totara_playlist_share_testcase extends advanced_testcase {
         $recipients2 = $playlistgen->create_user_recipients([$users[1], $users[3], $users[4]]);
 
         // Share playlists.
+        $this->engage_capabilize($users[0]);
         $this->setUser($users[0]);
         $shares1 = $playlistgen->share_playlist($playlist1, $recipients1);
         $shares2 = $playlistgen->share_playlist($playlist2, $recipients2);
@@ -430,5 +431,12 @@ class totara_playlist_share_testcase extends advanced_testcase {
 
         $access = access_manager::can_access($playlist3, $users[1]->id);
         $this->assertTrue($access);
+    }
+
+    private function engage_capabilize($user) {
+        $roleid = $this->getDataGenerator()->create_role();
+        $syscontext = context_system::instance();
+        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $syscontext);
+        role_assign($roleid, $user->id, $syscontext);
     }
 }

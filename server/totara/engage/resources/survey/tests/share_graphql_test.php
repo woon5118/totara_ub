@@ -51,6 +51,11 @@ class engage_survey_share_graphql_testcase extends advanced_testcase {
             'access' => access::PUBLIC
         ]);
 
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $surveygen->set_capabilities(CAP_ALLOW, $user->id, $survey->get_context());
+        }
+
         // Set user to someone other than the owner of the survey.
         $this->setUser($users[1]);
 
@@ -89,6 +94,11 @@ class engage_survey_share_graphql_testcase extends advanced_testcase {
 
         // Create users.
         $users = $surveygen->create_users(2);
+
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $surveygen->set_capabilities(CAP_ALLOW, $user->id, context_system::instance());
+        }
 
         // Set owner of survey.
         $this->setUser($users[0]);
@@ -141,6 +151,11 @@ class engage_survey_share_graphql_testcase extends advanced_testcase {
             'access' => access::PUBLIC
         ]);
 
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $surveygen->set_capabilities(CAP_ALLOW, $user->id, $survey->get_context());
+        }
+
         // Create share via graphql.
         $ec = execution_context::create('ajax', 'engage_survey_update_survey');
         $parameters = [
@@ -181,6 +196,11 @@ class engage_survey_share_graphql_testcase extends advanced_testcase {
         $survey = $surveygen->create_survey(null, [], answer_type::MULTI_CHOICE, [
             'access' => access::RESTRICTED
         ]);
+
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $surveygen->set_capabilities(CAP_ALLOW, $user->id, $survey->get_context());
+        }
 
         // Share survey.
         $recipients = $surveygen->create_user_recipients([$users[0]]);
@@ -278,6 +298,11 @@ class engage_survey_share_graphql_testcase extends advanced_testcase {
 
         // Create survey.
         $survey = $surveygen->create_survey(access::PUBLIC);
+
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $surveygen->set_capabilities(CAP_ALLOW, $user->id, $survey->get_context());
+        }
 
         // Share survey.
         $recipients = $surveygen->create_user_recipients([$users[0]]);

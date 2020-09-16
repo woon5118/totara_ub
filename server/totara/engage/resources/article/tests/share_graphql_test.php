@@ -50,6 +50,11 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
             'access' => access::PUBLIC
         ]);
 
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $articlegen->set_capabilities(CAP_ALLOW, $user->id, $article->get_context());
+        }
+
         // Set user to someone other than the owner of the survey.
         $this->setUser($users[1]);
 
@@ -88,6 +93,11 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
 
         // Create users.
         $users = $articlegen->create_users(2);
+
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $articlegen->set_capabilities(CAP_ALLOW, $user->id, context_system::instance());
+        }
 
         // Set owner of article.
         $this->setUser($users[0]);
@@ -136,6 +146,11 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
             'access' => access::PUBLIC
         ]);
 
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $articlegen->set_capabilities(CAP_ALLOW, $user->id, $article->get_context());
+        }
+
         // Create share via graphql.
         $ec = execution_context::create('ajax', 'engage_article_update_article');
         $parameters = [
@@ -178,6 +193,11 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
         $article = $articlegen->create_article([
             'access' => access::PUBLIC
         ]);
+
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $articlegen->set_capabilities(CAP_ALLOW, $user->id, $article->get_context());
+        }
 
         // Share article.
         $this->setUser($users[1]);
@@ -277,6 +297,11 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
         $article = $articlegen->create_article([
             'access' => access::PUBLIC
         ]);
+
+        // Set capabilities for all users.
+        foreach ($users as $user) {
+            $articlegen->set_capabilities(CAP_ALLOW, $user->id, $article->get_context());
+        }
 
         // Share article.
         $recipients = $articlegen->create_user_recipients([$users[0]]);

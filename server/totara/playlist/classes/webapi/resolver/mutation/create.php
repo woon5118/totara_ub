@@ -28,6 +28,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use totara_engage\access\access;
+use totara_engage\webapi\middleware\require_valid_recipients;
 use totara_playlist\playlist;
 use core\webapi\resolver\has_middleware;
 use core\webapi\middleware\clean_editor_content;
@@ -95,6 +96,7 @@ final class create implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('engage_resources'),
+            new require_valid_recipients('shares'),
             new clean_editor_content('summary', 'summary_format', false),
             new clean_content_format('summary_format', FORMAT_JSON_EDITOR)
         ];

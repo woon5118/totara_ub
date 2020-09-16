@@ -330,6 +330,14 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
         $user2 = $this->getDataGenerator()->create_user();
         $user3 = $this->getDataGenerator()->create_user();
 
+        // Assign capability to Engage with other users
+        $roleid = $this->getDataGenerator()->create_role();
+        $syscontext = context_system::instance();
+        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $syscontext);
+        role_assign($roleid, $user->id, $syscontext);
+        role_assign($roleid, $user2->id, $syscontext);
+        role_assign($roleid, $user3->id, $syscontext);
+
         // Make an article to reshare
         $article = article::create([
             'name' => 'Test Resource',

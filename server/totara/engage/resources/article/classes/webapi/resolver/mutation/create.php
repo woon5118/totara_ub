@@ -31,6 +31,7 @@ use totara_engage\access\access;
 use totara_engage\timeview\time_view;
 use core\webapi\resolver\has_middleware;
 use core\webapi\middleware\clean_editor_content;
+use totara_engage\webapi\middleware\require_valid_recipients;
 
 /**
  * Mutation resolver for engage_article_create
@@ -76,6 +77,7 @@ final class create implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('engage_resources'),
+            new require_valid_recipients('shares'),
             new clean_editor_content('content', 'format'),
         ];
     }

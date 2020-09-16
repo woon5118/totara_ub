@@ -40,6 +40,7 @@ class container_workspace_share_to_workspace_testcase extends advanced_testcase 
         $user_two = $generator->create_user();
         $user_three  = $generator->create_user();
 
+        $this->engage_capabilize($user_one);
         $this->setUser($user_one);
 
         /** @var engage_article_generator $article_generator */
@@ -82,6 +83,7 @@ class container_workspace_share_to_workspace_testcase extends advanced_testcase 
         $user_two = $generator->create_user();
         $user_three = $generator->create_user();
 
+        $this->engage_capabilize($user_one);
         $this->setUser($user_one);
 
         // Create survey and exclusively share to user_three only.
@@ -154,5 +156,12 @@ class container_workspace_share_to_workspace_testcase extends advanced_testcase 
         member::added_to_workspace($workspace, $user_three->id);
         $this->assertTrue(access_manager::can_access($restricted_playlist, $user_three->id));
         $this->assertTrue(access_manager::can_access($restricted_playlist, $user_two->id));
+    }
+
+    private function engage_capabilize($user) {
+        $roleid = $this->getDataGenerator()->create_role();
+        $syscontext = context_system::instance();
+        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $syscontext);
+        role_assign($roleid, $user->id, $syscontext);
     }
 }

@@ -31,6 +31,7 @@ use engage_survey\totara_engage\resource\survey;
 use totara_engage\access\access;
 use totara_engage\share\manager as share_manager;
 use totara_engage\share\recipient\manager as recipient_manager;
+use totara_engage\webapi\middleware\require_valid_recipients;
 
 final class update implements mutation_resolver, has_middleware {
     /**
@@ -85,6 +86,7 @@ final class update implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('engage_resources'),
+            new require_valid_recipients('shares'),
         ];
     }
 

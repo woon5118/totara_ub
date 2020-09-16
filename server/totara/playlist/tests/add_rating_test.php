@@ -176,6 +176,7 @@ class totara_playlist_add_rating_test extends advanced_testcase {
         $user2 = $gen->create_user();
         $user3 = $gen->create_user();
 
+        $this->engage_capabilize($user1);
         $this->setUser($user1);
         $playlist = $playlistgen->create_playlist([
             'access' => access::RESTRICTED,
@@ -211,6 +212,7 @@ class totara_playlist_add_rating_test extends advanced_testcase {
         $user1 = $gen->create_user();
         $user2 = $gen->create_user();
 
+        $this->engage_capabilize($user1);
         $this->setUser($user1);
         $playlist = $playlistgen->create_playlist([
             'access' => access::RESTRICTED,
@@ -263,5 +265,12 @@ class totara_playlist_add_rating_test extends advanced_testcase {
             'userid' => $user1->id // Owner
         ]);
         return [$playlist, $user1, $user2];
+    }
+
+    private function engage_capabilize($user) {
+        $roleid = $this->getDataGenerator()->create_role();
+        $syscontext = context_system::instance();
+        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $syscontext);
+        role_assign($roleid, $user->id, $syscontext);
     }
 }

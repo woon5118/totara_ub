@@ -294,6 +294,8 @@ class engage_article_share_testcase extends advanced_testcase {
         // Create users.
         $users = $articlegen->create_users(5);
 
+        $this->engage_capabilize($users[0]);
+
         // Create articles.
         $this->setUser($users[0]);
         $article1 = $articlegen->create_article([
@@ -412,5 +414,12 @@ class engage_article_share_testcase extends advanced_testcase {
 
         $access = access_manager::can_access($article3, $users[1]->id);
         $this->assertTrue($access);
+    }
+
+    private function engage_capabilize($user) {
+        $roleid = $this->getDataGenerator()->create_role();
+        $syscontext = context_system::instance();
+        assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $syscontext);
+        role_assign($roleid, $user->id, $syscontext);
     }
 }
