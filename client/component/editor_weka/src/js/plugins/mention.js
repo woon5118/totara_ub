@@ -16,6 +16,7 @@
  * @module editor_weka
  */
 
+import { debounce } from 'tui/util';
 import { Plugin, PluginKey } from 'ext_prosemirror/state';
 import Suggestion from '../helpers/suggestion';
 import UserSuggestion from 'editor_weka/components/suggestion/User';
@@ -40,7 +41,7 @@ export default function(editor) {
          *
          * @param {EditorView} view
          */
-        update: view => {
+        update: debounce(view => {
           const { text, active, range } = this.key.getState(view.state);
           suggestion.destroyInstance();
 
@@ -66,7 +67,7 @@ export default function(editor) {
               range,
             },
           });
-        },
+        }, 250),
       };
     },
 
