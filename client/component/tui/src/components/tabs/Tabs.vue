@@ -501,9 +501,8 @@ export default {
     #{$mod-horizontal} & {
       #{$block}__link {
         padding-top: calc(var(--tab-small-v-padding) - var(--tab-border-width));
-        padding-bottom: calc(
-          var(--tab-small-v-padding) + var(--tab-border-width)
-        );
+        // prettier-ignore
+        padding-bottom: calc(var(--tab-small-v-padding) + var(--tab-border-width));
         color: var(--tabs-text-color-selected);
       }
     }

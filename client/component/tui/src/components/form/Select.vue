@@ -223,9 +223,8 @@ export default {
 
     &::after {
       top: calc((var(--form-input-height-large) - var(--select-icon-size)) / 2);
-      right: calc(
-        (var(--form-input-height-large) - var(--select-icon-size) * 2) / 2
-      );
+      // prettier-ignore
+      right: calc((var(--form-input-height-large) - var(--select-icon-size) * 2) / 2);
     }
   }
 

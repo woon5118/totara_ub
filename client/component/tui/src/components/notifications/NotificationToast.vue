@@ -145,12 +145,10 @@ export default {
     color: var(--color-neutral-1);
     background: var(--color-prompt-success);
     // -1px to avoid isue with razor thin white line between icon container and notification border
-    border-top-left-radius: calc(
-      var(--border-radius-small) - var(--border-width-thin) - 1px
-    );
-    border-bottom-left-radius: calc(
-      var(--border-radius-small) - var(--border-width-thin) - 1px
-    );
+    // prettier-ignore
+    border-top-left-radius: calc(var(--border-radius-small) - var(--border-width-thin) - 1px);
+    // prettier-ignore
+    border-bottom-left-radius: calc(var(--border-radius-small) - var(--border-width-thin) - 1px);
   }
 
   &__message {
@@ -184,12 +182,10 @@ export default {
 
     &__icon {
       // -1px to avoid isue with razor thin white line between icon container and notification border
-      border-top-left-radius: calc(
-        var(--border-radius-normal) - var(--border-width-thin) - 1px
-      );
-      border-bottom-left-radius: calc(
-        var(--border-radius-normal) - var(--border-width-thin) - 1px
-      );
+      // prettier-ignore
+      border-top-left-radius: calc(var(--border-radius-normal) - var(--border-width-thin) - 1px);
+      // prettier-ignore
+      border-bottom-left-radius: calc(var(--border-radius-normal) - var(--border-width-thin) - 1px);
     }
   }
 }

@@ -96,9 +96,8 @@ export default {
     // Below the specified width, (width - 100%) evaluates to a large
     // positve flex basis, and forces each item to take up its own line.
     // Magic!
-    flex-basis: calc(
-      (#{tui-char-length($size)} - (100% - var(--input-set-spacing))) * 999
-    );
+    // prettier-ignore
+    flex-basis: calc((#{tui-char-length($size)} - (100% - var(--input-set-spacing))) * 999);
   }
 }
 .tui-inputSet {

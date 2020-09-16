@@ -167,13 +167,8 @@ export default {
   min-width: var(--btn-min-width);
   max-width: 100%;
   min-height: var(--btn-min-height);
-  padding: 0 var(--gap-4);
-
-  padding: calc(
-      (3.6rem - var(--form-input-font-size) * 1.2) / 2 -
-        var(--form-input-border-size)
-    )
-    var(--gap-4);
+  // prettier-ignore
+  padding: calc((3.6rem - var(--form-input-font-size) * 1.2) / 2 - var(--form-input-border-size)) var(--gap-4);
 
   color: var(--btn-text-color);
   font-size: var(--form-input-font-size);
@@ -321,11 +316,8 @@ export default {
 
   &--small {
     min-height: var(--form-input-height);
-    padding: calc(
-        (var(--form-input-height) - var(--form-input-font-size-sm) * 1.2) / 2 -
-          var(--form-input-border-size)
-      )
-      var(--gap-3);
+    // prettier-ignore
+    padding: calc((var(--form-input-height) - var(--form-input-font-size-sm) * 1.2) / 2 - var(--form-input-border-size)) var(--gap-3);
 
     font-size: var(--form-input-font-size-sm);
     line-height: 1.2;

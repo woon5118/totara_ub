@@ -108,10 +108,8 @@ export default {
     flex-direction: row;
     flex-wrap: wrap;
     // stylelint-disable length-zero-no-unit
-    margin-top: calc(
-      0px - var(--form-checkbox-group-spacing-v) +
-        var(--form-checkbox-group-padding)
-    );
+    // prettier-ignore
+    margin-top: calc(0px - var(--form-checkbox-group-spacing-v) + var(--form-checkbox-group-padding));
     padding-top: 0;
 
     & > * {
