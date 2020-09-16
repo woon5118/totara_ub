@@ -14,7 +14,7 @@ Feature: Create engage resource
     Then I click on "Contribute" "button"
     And the "Next" "button" should be disabled
     And I set the field "Enter resource title" to "Article 1010"
-    And I activate the weka editor with css ".tui-articleForm__description__formRow"
+    And I activate the weka editor with css ".tui-articleForm__description-formRow"
     And I type "Create article" in the weka editor
     And I wait for the next second
     And I click on "Next" "button"

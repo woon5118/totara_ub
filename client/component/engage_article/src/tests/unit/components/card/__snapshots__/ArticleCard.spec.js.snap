@@ -23,21 +23,27 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
         styleclass="[object Object]"
         type="button"
       >
-        <addtolisticon-stub />
+        <addtolisticon-stub
+          size="200"
+        />
       </buttonicon-stub>
       <buttonicon-stub
         arialabel="[share, totara_engage - undefined]"
         styleclass="[object Object]"
         type="button"
       >
-        <shareicon-stub />
+        <shareicon-stub
+          size="200"
+        />
       </buttonicon-stub>
       <buttonicon-stub
         arialabel="[more, totara_engage - undefined]"
         styleclass="[object Object]"
         type="button"
       >
-        <moreicon-stub />
+        <moreicon-stub
+          size="200"
+        />
       </buttonicon-stub>
     </div>
   </imageheader-stub>
@@ -72,6 +78,7 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
       title="[numberoflikes, totara_engage - 15]"
     >
       <svgicongenerated-stub
+        size="200"
         title="[numberoflikes, totara_engage - 15]"
       />
     </staticon-stub>
@@ -80,6 +87,7 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
       title="[numberofcomments, totara_engage - 1]"
     >
       <svgicongenerated-stub
+        size="200"
         title="[numberofcomments, totara_engage - 1]"
       />
     </staticon-stub>
@@ -88,6 +96,7 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
       title="[numberofshares, totara_engage - 10]"
     >
       <svgicongenerated-stub
+        size="200"
         title="[numberofshares, totara_engage - 10]"
       />
     </staticon-stub>
@@ -96,6 +105,7 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
       title="[numberwithinplaylist, engage_article - 5]"
     >
       <svgicongenerated-stub
+        size="200"
         title="[numberwithinplaylist, engage_article - 5]"
       />
     </staticon-stub>

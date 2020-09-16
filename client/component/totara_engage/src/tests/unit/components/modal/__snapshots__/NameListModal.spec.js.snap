@@ -24,12 +24,16 @@ exports[`totara_engage/components/modal/NameListModal Matchs snapshot 1`] = `
   <div
     class="tui-engage__components__modal__namelistmodal-content"
   >
-    <loading-stub />
+    <loading-stub
+      size="200"
+    />
      
     <div
       class="tui-engage__components__modal__namelistmodal-content-loadmore"
     >
-      <loading-stub />
+      <loading-stub
+        size="200"
+      />
       
       loading, core
     

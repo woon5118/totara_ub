@@ -42,7 +42,7 @@
         :hidden="true"
         :label="$str('content', 'engage_article')"
         :required="true"
-        class="tui-articleForm__description__formRow"
+        class="tui-articleForm__description-formRow"
         :is-stacked="false"
       >
         <Weka
@@ -56,28 +56,11 @@
         />
       </FormRow>
 
-      <div class="tui-articleForm__description__tip">
+      <div class="tui-articleForm__description-tip">
         <p>{{ $str('contributetip', 'totara_engage') }}</p>
-        <Popover position="right">
-          <template v-slot:trigger="{ isOpen }">
-            <ButtonIcon
-              :aria-expanded="isOpen.toString()"
-              :aria-label="$str('info', 'moodle')"
-              class="tui-articleForm__description__iconButton"
-              :styleclass="{
-                primary: true,
-                small: true,
-                transparentNoPadding: true,
-              }"
-            >
-              <InfoIcon />
-            </ButtonIcon>
-          </template>
-
-          <p class="tui-articleForm__description__tip__content">
-            {{ $str('contributetip_help', 'totara_engage') }}
-          </p>
-        </Popover>
+        <InfoIconButton :aria-label="$str('info', 'moodle')">
+          {{ $str('contributetip_help', 'totara_engage') }}
+        </InfoIconButton>
       </div>
     </div>
 
@@ -99,31 +82,27 @@
 <script>
 import InputText from 'tui/components/form/InputText';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
-import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import CancelButton from 'tui/components/buttons/Cancel';
 import Button from 'tui/components/buttons/Button';
-import Popover from 'tui/components/popover/Popover';
 import Weka from 'editor_weka/components/Weka';
 import WekaValue from 'editor_weka/WekaValue';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
-import InfoIcon from 'tui/components/icons/Info';
+import InfoIconButton from 'tui/components/buttons/InfoIconButton';
 
 // GraphQL queries
 import fileDraftId from 'core/graphql/file_unused_draft_item_id';
 
 export default {
   components: {
-    ButtonIcon,
     InputText,
     ButtonGroup,
     Button,
     CancelButton,
-    Popover,
     Weka,
     Form,
     FormRow,
-    InfoIcon,
+    InfoIconButton,
   },
 
   props: {
@@ -251,7 +230,7 @@ export default {
     flex-grow: 1;
     margin-top: var(--gap-8);
 
-    &__formRow {
+    &-formRow {
       flex-grow: 1;
       // Reset margin of itself.
       &.tui-formRow {
@@ -276,14 +255,10 @@ export default {
       }
     }
 
-    &__tip {
+    &-tip {
       position: relative;
       display: flex;
       margin-top: var(--gap-2);
-
-      &__content {
-        margin: 0;
-      }
     }
   }
 

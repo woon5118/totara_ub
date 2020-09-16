@@ -18,26 +18,46 @@
 
 import SvgIconWrap from 'tui/components/icons/implementation/SvgIconWrap';
 
-export function createIconComponent([type, attrs, content], opts = {}) {
+const propDefs = {
+  title: String,
+  alt: String,
+  size: {
+    type: [Number, String],
+    default: 200,
+    validator(prop) {
+      if (prop == null) {
+        return true;
+      }
+      const num = Number(prop);
+      return [100, 200, 300, 400, 500, 600, 700].includes(num);
+    },
+  },
+  state: String,
+  customClass: {
+    type: [String, Object, Array],
+    default: undefined,
+  },
+};
+
+export function createIconComponent([type, svgAttrs, content], opts = {}) {
   // svgc (content string) is the only supported type
   if (type != 'svgc') throw new Error('Unsupported icon type');
   return {
     name: 'SvgIconGenerated',
     functional: true,
     components: { SvgIconWrap },
-    render(h, { props }) {
+    props: propDefs,
+    render(h, { data, props }) {
       return h(SvgIconWrap, {
-        class: opts.class,
-        props: Object.assign(
-          {
-            htmlContent: content,
-            viewBox: attrs.viewBox,
-            rootFill: attrs.fill,
-            state: opts.state,
-            flipRtl: opts.flipRtl,
-          },
-          props
-        ),
+        class: [opts.class, data.staticClass, data.class],
+        attrs: data.attrs,
+        props: Object.assign({}, props, {
+          htmlContent: content,
+          viewBox: svgAttrs.viewBox,
+          rootFill: svgAttrs.fill,
+          state: opts.state || props.state,
+          flipRtl: opts.flipRtl,
+        }),
       });
     },
   };

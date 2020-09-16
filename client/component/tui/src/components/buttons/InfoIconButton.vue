@@ -23,9 +23,8 @@
         :aria-expanded="isOpen.toString()"
         :aria-label="ariaLabel"
         :disabled="disabled"
-        class="tui-InfoIconButton"
+        class="tui-infoIconButton"
         :styleclass="{
-          circle: true,
           primary: true,
           small: true,
           transparent: true,
@@ -61,11 +60,11 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-InfoIconButton {
+.tui-infoIconButton {
   &.tui-iconBtn {
     width: auto;
     height: auto;
-    padding: 0;
+    vertical-align: -0.125em;
   }
 }
 </style>

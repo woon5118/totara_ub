@@ -20,10 +20,6 @@
 export default {
   functional: true,
   props: {
-    iconName: {
-      type: String,
-      default: 'box',
-    },
     rootFill: {
       type: String,
       default: 'currentColor',
@@ -48,6 +44,7 @@ export default {
       type: [String, Object, Array],
       default: undefined,
     },
+    flipRtl: Boolean,
   },
 
   render(h, { props, data }) {
@@ -62,7 +59,7 @@ export default {
           data.class,
           props.customClass,
         ],
-        attrs: {
+        attrs: Object.assign({}, data.attrs, {
           xmlns: 'http://www.w3.org/2000/svg',
           'xmlns:xlink': 'http://www.w3.org/1999/xlink',
           width: '1em',
@@ -71,7 +68,7 @@ export default {
           role: 'presentation',
           focusable: 'false',
           fill: props.rootFill,
-        },
+        }),
         domProps: {
           innerHTML: props.htmlContent,
         },
@@ -84,6 +81,10 @@ export default {
 
 <style lang="scss">
 .tui-svgIcon {
+  // same as the bootstrap icons default css
+  // better alignment in most cases than vertical-align: middle
+  vertical-align: text-bottom;
+
   &--size {
     &-100 {
       font-size: 1.4rem;

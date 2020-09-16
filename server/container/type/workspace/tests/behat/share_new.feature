@@ -66,7 +66,7 @@ Feature: Contribute new resource and share with workspace
     Then the "Next" "button" should be disabled
 
     When I set the field "Enter playlist title" to "Playlist1"
-    And I activate the weka editor with css ".tui-playlistForm__description__formRow__textArea"
+    And I activate the weka editor with css ".tui-playlistForm__description-textArea"
     And I type "Some description" in the weka editor
     And I wait for the next second
     Then the "Next" "button" should be enabled

@@ -145,5 +145,13 @@ export default {
   &--disabled {
     color: var(--color-state-disabled);
   }
+
+  &__previousLink {
+    margin-right: var(--gap-1);
+  }
+
+  &__nextLink {
+    margin-left: var(--gap-1);
+  }
 }
 </style>

@@ -18,7 +18,7 @@ exports[`totara_playlist/components/form/PlaylistForm.vue Checks snapshot 1`] = 
     class="tui-playlistForm__description"
   >
     <formrow-stub
-      class="tui-playlistForm__description__formRow"
+      class="tui-playlistForm__description-formRow"
       hidden="true"
       isstacked="true"
       label="playlistdescription, totara_playlist"
@@ -26,25 +26,19 @@ exports[`totara_playlist/components/form/PlaylistForm.vue Checks snapshot 1`] = 
     />
      
     <div
-      class="tui-playlistForm__description__tip"
+      class="tui-playlistForm__description-tip"
     >
       <p>
         contributetip, totara_engage
       </p>
        
-      <popover-stub
-        position="right"
-        triggers="click"
+      <infoiconbutton-stub
+        arialabel="info, moodle"
       >
-         
-        <p
-          class="tui-playlistForm__description__tip__content"
-        >
-          
-          contributetip_help, totara_engage
         
-        </p>
-      </popover-stub>
+        contributetip_help, totara_engage
+      
+      </infoiconbutton-stub>
     </div>
   </div>
    

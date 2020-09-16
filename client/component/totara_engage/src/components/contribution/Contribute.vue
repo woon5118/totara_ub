@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div>
+  <div class="tui-engageContribute">
     <ButtonIcon
       :aria-label="ariaLabel"
       :text="text"
@@ -109,3 +109,10 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-engageContribute {
+  display: flex;
+  align-items: center;
+}
+</style>

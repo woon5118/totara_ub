@@ -14,7 +14,7 @@ Feature: Create playlist
     When I click on "Contribute playlist" "button"
     Then the "Next" "button" should be disabled
     And I set the field "Enter playlist title" to "Playlist1"
-    And I activate the weka editor with css ".tui-playlistForm__description__formRow__textArea"
+    And I activate the weka editor with css ".tui-playlistForm__description-textArea"
     And I type "Some description" in the weka editor
     Then the "Next" "button" should be enabled
     And I click on "Next" "button"
@@ -32,7 +32,7 @@ Feature: Create playlist
     When I click on "Contribute playlist" "button"
     Then the "Next" "button" should be disabled
     And I set the field "Enter playlist title" to "Playlist1"
-    And I activate the weka editor with css ".tui-playlistForm__description__formRow__textArea"
+    And I activate the weka editor with css ".tui-playlistForm__description-textArea"
     And I type "#hashtag " in the weka editor
     Then the "Next" "button" should be enabled
     And I click on "Next" "button"

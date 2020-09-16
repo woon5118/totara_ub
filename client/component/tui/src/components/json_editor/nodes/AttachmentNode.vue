@@ -170,16 +170,7 @@ export default {
   border-radius: var(--card-border-radius);
 
   &__info {
-    width: 72%;
-
-    @media (max-width: 490px) {
-      width: 65%;
-    }
-
-    @media (max-width: 350px) {
-      width: 50%;
-    }
-
+    width: calc(100% - 3.2rem - var(--gap-2) - 2.2em);
     &__fileSize {
       margin: 0;
       font-size: var(--font-size-3);
@@ -189,7 +180,7 @@ export default {
     &__filename {
       position: relative;
 
-      p {
+      > p {
         margin: 0;
         overflow: hidden;
         white-space: nowrap;
@@ -201,7 +192,7 @@ export default {
           position: absolute;
           top: 0;
           left: 100%;
-          width: 100%;
+          width: 2.2em;
           content: attr(data-file-extension);
         }
       }
@@ -209,7 +200,8 @@ export default {
   }
 
   &__icon {
-    flex-basis: 9%;
+    flex-shrink: 0;
+    width: 3.2rem;
     margin-right: var(--gap-2);
     color: var(--color-state);
   }

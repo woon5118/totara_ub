@@ -20,7 +20,9 @@ exports[`presentation/form/Repeater.vue matches snapshot 1`] = `
       styleclass="[object Object]"
       type="button"
     >
-      <deleteicon-stub />
+      <deleteicon-stub
+        size="200"
+      />
     </buttonicon-stub>
   </div>
   <div
@@ -33,7 +35,9 @@ exports[`presentation/form/Repeater.vue matches snapshot 1`] = `
       styleclass="[object Object]"
       type="button"
     >
-      <deleteicon-stub />
+      <deleteicon-stub
+        size="200"
+      />
     </buttonicon-stub>
   </div>
   <div
@@ -46,7 +50,9 @@ exports[`presentation/form/Repeater.vue matches snapshot 1`] = `
       styleclass="[object Object]"
       type="button"
     >
-      <deleteicon-stub />
+      <deleteicon-stub
+        size="200"
+      />
     </buttonicon-stub>
   </div>
    
@@ -56,7 +62,9 @@ exports[`presentation/form/Repeater.vue matches snapshot 1`] = `
     styleclass="[object Object]"
     type="button"
   >
-    <addicon-stub />
+    <addicon-stub
+      size="200"
+    />
   </buttonicon-stub>
 </div>
 `;

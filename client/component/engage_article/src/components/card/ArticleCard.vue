@@ -339,11 +339,11 @@ export default {
     align-items: flex-end;
 
     & > * + * {
-      margin-left: var(--gap-2);
+      margin-left: var(--gap-3);
     }
 
     & > :last-child {
-      margin: 0 -5px 0 auto;
+      margin: 0 -3px 0 auto;
     }
   }
 }

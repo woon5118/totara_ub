@@ -270,13 +270,9 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-:root {
-  --contributionModal-min-height: 744px;
-  --contributionContent-min-height: 574px;
-}
 .tui-contributeModal {
   position: relative;
-  min-height: var(--contributionModal-min-height);
+  min-height: 744px;
 
   &__adderContainer {
     margin-bottom: var(--gap-2);
@@ -318,8 +314,9 @@ export default {
     flex-direction: column;
     width: 100%;
     height: 100%;
-    min-height: var(--contributionContent-min-height);
+    min-height: 574px;
     padding: var(--gap-8);
+    padding-bottom: 0;
   }
 
   .tui-modalContent__title {
@@ -329,7 +326,7 @@ export default {
   .tui-modalContent__content {
     display: flex;
     flex-direction: column;
-    min-height: var(--contributionContent-min-height);
+    min-height: 574px;
     margin-top: 0;
     padding: 0;
   }

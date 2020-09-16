@@ -229,6 +229,7 @@ export default {
   &--circle {
     width: 3.6rem;
     min-height: 3.6rem;
+    padding: 0;
     border-radius: 50%;
 
     &.tui-iconBtn--small {

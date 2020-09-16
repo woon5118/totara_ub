@@ -43,7 +43,7 @@
 
     <div v-if="topics.length" class="tui-accessDisplay__topics">
       <TagIcon
-        size="200"
+        size="300"
         :alt="$str('tags', 'totara_engage')"
         custom-class="tui-icon--dimmed"
       />
@@ -205,7 +205,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    margin-top: var(--gap-1);
+    margin-top: var(--gap-2);
     line-height: normal;
 
     &__topic {
@@ -215,7 +215,7 @@ export default {
     }
 
     > :first-child {
-      margin-right: var(--gap-1);
+      margin-right: var(--gap-2);
       color: var(--color-neutral-6);
     }
   }

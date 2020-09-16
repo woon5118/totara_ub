@@ -40,7 +40,9 @@ exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = 
         styleclass="[object Object]"
         type="button"
       >
-        <shareicon-stub />
+        <shareicon-stub
+          size="200"
+        />
       </buttonicon-stub>
        
       <!---->
@@ -86,6 +88,7 @@ exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = 
       title="[numberofcomments, totara_engage - 0]"
     >
       <svgicongenerated-stub
+        size="200"
         title="[numberofcomments, totara_engage - 0]"
       />
     </staticon-stub>
@@ -94,6 +97,7 @@ exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = 
       title="[numberofshares, totara_engage - 0]"
     >
       <svgicongenerated-stub
+        size="200"
         title="[numberofshares, totara_engage - 0]"
       />
     </staticon-stub>

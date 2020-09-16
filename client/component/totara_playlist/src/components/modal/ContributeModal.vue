@@ -23,11 +23,11 @@
     :dismissable="dismissable"
   >
     <ModalContent
-      class="tui-contributeModal"
+      class="tui-playlistContributeModal"
       :close-button="false"
       :title="getTitle"
     >
-      <div class="tui-contributeModal__componentContent">
+      <div class="tui-playlistContributeModal__componentContent">
         <CreatePlaylist
           @cancel="$emit('request-close')"
           @change-title="stage = $event"
@@ -82,3 +82,38 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-playlistContributeModal {
+  position: relative;
+  min-height: 744px;
+
+  &__componentContent {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 574px;
+    padding: var(--gap-8);
+    padding-bottom: 0;
+  }
+
+  .tui-modalContent__title {
+    display: none;
+  }
+
+  .tui-modalContent__content {
+    display: flex;
+    flex-direction: column;
+    min-height: 574px;
+    margin-top: 0;
+    padding: 0;
+  }
+
+  .tui-modalContent__header-title {
+    margin-bottom: var(--gap-2);
+  }
+}
+</style>

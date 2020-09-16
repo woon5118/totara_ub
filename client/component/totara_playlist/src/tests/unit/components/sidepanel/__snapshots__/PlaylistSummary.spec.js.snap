@@ -32,7 +32,9 @@ exports[`totara_playlist/components/sidepanel/PlaylistSummary Checks snapshot 1`
             aria-hidden="true"
             class="tui-iconBtn__icon"
           >
-            <span />
+            <span
+              class=""
+            />
           </span>
            
           <!---->

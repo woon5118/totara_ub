@@ -140,6 +140,7 @@ export default {
   flex-direction: column;
   width: 100%;
   padding: var(--gap-2) var(--gap-4) var(--gap-2) var(--gap-4);
+  overflow: hidden;
 
   &__title {
     @include tui-font-heading-small-regular();
@@ -173,7 +174,7 @@ export default {
 
   &__icon {
     align-self: flex-end;
-    margin-right: -14px;
+    margin-right: -3px;
   }
 }
 </style>
