@@ -738,6 +738,18 @@
             display: none;
           }
         }
+
+        input[type='checkbox']:focus + .preference-state-status-container {
+          box-shadow: var(--shadow-2);
+          background-color: var(--color-neutral-7);
+        }
+
+        input[type='checkbox']:focus:checked
+          + .preference-state-status-container {
+          background: var(--color-state-focus);
+          border-color: var(--color-state-focus);
+        }
+
         .preference-state-status-container {
           width: 30px;
           height: 30px;
