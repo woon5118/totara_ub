@@ -32,6 +32,15 @@ use totara_engage\card\card_loader;
 use totara_engage\query\query;
 
 final class contributions implements query_resolver, has_middleware {
+    /**
+     * @var string[]
+     */
+    private static $areas = [
+        'saved',
+        'owned',
+        'search',
+        'shared'
+    ];
 
     /**
      * @param array             $args
@@ -45,9 +54,17 @@ final class contributions implements query_resolver, has_middleware {
             $ec->set_relevant_context(\context_user::instance($USER->id));
         }
 
+        if ($args['component'] !== "totara_engage") {
+            throw new \coding_exception("The component {$args['component']} is not supported.");
+        }
+
+        if (!in_array($args['area'], self::$areas)) {
+            throw new \coding_exception("The area {$args['area']} is not supported.");
+        }
+
         $query = new query();
-        $query->set_component($args['component'] ?? null);
-        $query->set_area($args['area'] ?? null);
+        $query->set_component($args['component']);
+        $query->set_area($args['area']);
         $query->set_filters($args['filter']);
 
         if (!empty($args['cursor'])) {
