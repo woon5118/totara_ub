@@ -146,6 +146,7 @@ final class chartjs extends base {
 
         foreach ($values as $k => $val) {
             // Ensure val is a numeric data type
+            $val = rtrim($val, "%");
             if ($val === '' or !is_numeric($val)) {
                 // There is no way to plot non-numeric data
                 $val = null;
