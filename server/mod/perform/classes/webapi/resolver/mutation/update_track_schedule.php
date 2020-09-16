@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
+use mod_perform\entities\activity\track_assignment;
 use totara_core\dates\date_time_setting;
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
@@ -151,6 +152,14 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         );
 
         $track->update();
+
+        // Make sure we expand the updated track on the next cron run
+        track_assignment::repository()
+            ->where('track_id', $track_id)
+            ->update([
+                'expand' => true,
+                'updated_at' => time()
+            ]);
 
         // The track model just records schedule changes and does not actually
         // persist them until it is saved. This is why the event is fired here

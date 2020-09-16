@@ -27,7 +27,9 @@ require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
 use mod_perform\constants;
 use mod_perform\dates\date_offset;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entities\activity\track_assignment;
 use mod_perform\event\track_schedule_changed;
 use totara_core\advanced_feature;
 use totara_core\dates\date_time_setting;
@@ -84,6 +86,12 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
 
         $result = $this->get_webapi_operation_data($result);
         $result_track = $result['track'];
+
+        $is_expanded = track_assignment::repository()
+            ->where('expand', 1)
+            ->where('track_id', $this->track1_id)
+            ->exists();
+        $this->assertTrue($is_expanded);
 
         // Verify the resulting graphql data.
         self::assertEquals($this->track1_id, $result_track['id']);

@@ -27,6 +27,7 @@ require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
+use mod_perform\entities\activity\track_assignment;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 
@@ -84,6 +85,9 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
         $activity1 = $activities->first();
         /** @var track $track1 */
         $track1 = $activity1->get_tracks()->first();
+
+        // All track assignments are expanded
+        $this->assertFalse(track_assignment::repository()->where('expand', 1)->exists());
 
         $this->track1_id = $track1->id;
     }
