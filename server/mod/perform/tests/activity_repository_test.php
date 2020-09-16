@@ -25,6 +25,8 @@ use mod_perform\constants;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\state\activity\draft;
+use mod_perform\state\activity\active;
 
 /**
  * @group perform
@@ -153,5 +155,23 @@ class mod_perform_activity_respository_testcase extends advanced_testcase {
 
     private function get_perform_generator(): mod_perform_generator {
         return self::getDataGenerator()->get_plugin_generator('mod_perform');
+    }
+
+    public function test_filter_by_not_draft() {
+        self::setAdminUser();
+        $generator = $this->get_perform_generator();
+
+        $draft_activity = $generator->create_activity_in_container(['activity_status' => draft::get_code()]);
+        $active_activity = $generator->create_activity_in_container(['activity_status' => active::get_code()]);
+
+        // Should return both.
+        $this->assertEquals(2, activity_entity::repository()->count());
+
+        $result = activity_entity::repository()->filter_by_not_draft()->get();
+        // Should return one.
+        $this->assertEquals(1, count($result));
+        $activity = $result->first();
+        // Should return the active one.
+        $this->assertEquals($active_activity->id, $activity->id);
     }
 }

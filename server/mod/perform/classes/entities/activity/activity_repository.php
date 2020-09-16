@@ -49,6 +49,17 @@ class activity_repository extends repository {
     }
 
     /**
+     * Return all non-draft activities, independent of visibility settings.
+     *
+     * @return $this
+     */
+    public function filter_by_not_draft(): self {
+        $this->where('status', '<>', draft::get_code());
+
+        return $this;
+    }
+
+    /**
      * @param int ...$subject_user_ids
      * @return collection|activity[]
      */
