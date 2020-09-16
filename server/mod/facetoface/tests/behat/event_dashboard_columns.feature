@@ -14,6 +14,15 @@ Feature: Verify which columns are removed from the seminar event dashboard
       | learner1  | C1      | student        |
       | teacher   | C1      | editingteacher |
 
+  Scenario: Test activity default setting
+    Given I log in as "admin"
+    And I navigate to "Activity defaults" node in "Site administration > Seminars"
+    And I set the field "Events table - hide empty columns" to "1"
+    And I press "Save changes"
+    And I am on "Course 1" course homepage with editing mode on
+    And I add a "Seminar" to section "1"
+    And the field "Events table - hide empty columns" matches value "1"
+
   Scenario: Test columns of a waitlisted event
     And the following "seminars" exist in "mod_facetoface" plugin:
       | name      | course | decluttersessiontable |

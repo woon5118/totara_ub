@@ -185,7 +185,7 @@ if ($ADMIN->fulltree) {
     // vvv Appearance vvv
     $settings->add(new admin_setting_heading('facetoface/appearance', new lang_string('appearanceheader', 'mod_facetoface'), ''));
 
-    $settings->add(new admin_setting_configcheckbox('facetoface_decluttersessiontable',
+    $settings->add(new admin_setting_configcheckbox('facetoface/decluttersessiontable',
         new lang_string('decluttersessiontable', 'mod_facetoface'),
         new lang_string('decluttersessiontable_help', 'mod_facetoface'), 0));
 
