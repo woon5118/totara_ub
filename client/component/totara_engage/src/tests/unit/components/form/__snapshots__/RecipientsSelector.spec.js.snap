@@ -2,6 +2,8 @@
 
 exports[`totara_engage/components/form/RecipientsSelector.vue matches snapshot 1`] = `
 <div class="tui-sharedRecipientsSelector" selectedrecipients=""><label for="abc123" class="tui-formLabel tui-sharedRecipientsSelector__label">
+    <!---->
+
     resharetorecipients, totara_engage
     <!----></label>
   <div class="tui-sharedRecipientsSelector__icon"><button aria-expanded="false" aria-label="info, moodle" type="button" title="info, moodle" class="tui-iconBtn tui-infoIconButton tui-iconBtn--prim tui-iconBtn--small tui-iconBtn--transparent"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><span class=""></span></span>

@@ -8,7 +8,9 @@ exports[`presentation/form/SearchBox.vue matches snapshot 1`] = `
     class="tui-formLabel tui-formLabel--hidden"
     for="tempid"
   >
+    <!---->
     
+
   label
   
     <!---->

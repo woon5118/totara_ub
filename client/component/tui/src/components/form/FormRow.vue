@@ -26,8 +26,10 @@
           :for-id="generatedId"
           :legend="labelLegend"
           :hidden="hidden"
+          :accessible-label="accessibleLabel"
           :label="label"
           :required="required"
+          :optional="optional"
           :subfield="subfield"
           :inline="true"
         /><HelpIcon
@@ -77,9 +79,11 @@ export default {
     helpmsg: String,
     helpTitle: String,
     hidden: Boolean,
+    accessibleLabel: String,
     id: String,
     label: String,
     required: Boolean,
+    optional: Boolean,
     isStacked: {
       type: Boolean,
       default: true,

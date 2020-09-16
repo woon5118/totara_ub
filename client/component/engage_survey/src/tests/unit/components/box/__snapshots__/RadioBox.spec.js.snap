@@ -15,7 +15,9 @@ exports[`engage_survey/components/box/RadioBox.vue Checks snapshot 1`] = `
         for="some-undefined"
         id="some-label"
       >
+        <!---->
         
+
   Label for the group of radios
   
         <!---->

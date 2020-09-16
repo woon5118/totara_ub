@@ -15,7 +15,9 @@ exports[`engage_survey/components/box/SquareBox.vue Checks snapshot 1`] = `
         for="id"
         id="id-label"
       >
+        <!---->
         
+
   Label for the group of checkboxes
   
         <!---->

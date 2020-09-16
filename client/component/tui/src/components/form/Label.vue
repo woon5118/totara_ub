@@ -30,9 +30,15 @@
       charLength ? 'tui-input--customSize' : null,
     ]"
   >
+    <span v-if="accessibleLabel" class="tui-formLabel--hidden">
+      {{ accessibleLabel }}
+      <span v-if="required">{{ $str('required', 'moodle') }}</span>
+      <span v-if="optional">{{ $str('optional', 'moodle') }}</span>
+    </span>
+
     {{ label }}
     <span
-      v-if="required"
+      v-if="required && !accessibleLabel"
       class="tui-formLabel__required"
       :title="$str('required', 'moodle')"
     >
@@ -56,16 +62,18 @@ export default {
       type: String,
     },
     required: Boolean,
+    optional: Boolean,
     subfield: Boolean,
     inline: Boolean,
     charLength: charLengthProp,
+    accessibleLabel: String,
   },
 };
 </script>
 
 <lang-strings>
 {
-  "moodle": ["required"]
+  "moodle": ["optional", "required"]
 }
 </lang-strings>
 
