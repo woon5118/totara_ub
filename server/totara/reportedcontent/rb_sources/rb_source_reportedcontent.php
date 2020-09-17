@@ -291,9 +291,6 @@ class rb_source_reportedcontent extends rb_base_source {
         $defaultcolumns[] = array('type' => 'reportedcontent', 'value' => 'url');
         $defaultcolumns[] = array('type' => 'reportedcontent', 'value' => 'time_created');
         $defaultcolumns[] = array('type' => 'reportedcontent', 'value' => 'action');
-        $defaultcolumns[] = array('type' => 'reportedcontent', 'value' => 'status');
-
-
          return $defaultcolumns;
     }
 
