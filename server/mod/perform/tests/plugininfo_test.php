@@ -54,7 +54,6 @@ class mod_perform_plugininfo_testcase extends advanced_testcase {
             ->set_number_of_tracks_per_activity(1)
             ->set_number_of_users_per_user_group_type(1)
             ->set_number_of_elements_per_section(2)
-
             ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT]);
         $activity = $generator->create_full_activities($config)->first();
         $subject_instance = subject_instance::repository()
