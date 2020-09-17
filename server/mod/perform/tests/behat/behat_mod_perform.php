@@ -87,7 +87,7 @@ class behat_mod_perform extends behat_base {
     public const ADMIN_FORM_DONE_BUTTON = '.tui-elementAdminFormActionButtons__done';
     public const ADMIN_FORM = '.tui-performElementAdminForm';
     public const ADMIN_FORM_STATIC_CONTENT_WEKA = '.tui-elementEditStaticContent';
-    public const FORM_BUILDER_ADD_ELEMENT_BUTTONS = '.tui-performEditSectionContentAddElement__dropDownItem';
+    public const FORM_BUILDER_ADD_ELEMENT_BUTTONS = '.tui-dropdownButton';
 
     /**
      * Navigate to the specified page and wait for JS.
