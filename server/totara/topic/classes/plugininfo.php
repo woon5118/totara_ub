@@ -1,8 +1,8 @@
 <?php
-/**
- * This file is part of Totara Engage
+/*
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
- * @package container_workspace
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @package totara_topic
  */
-namespace container_workspace;
 
-use container_workspace\entity\workspace_discussion;
-use core\orm\query\builder;
-use core\plugininfo\container;
-use totara_core\advanced_feature;
+namespace totara_topic;
 
-final class plugininfo extends container {
+use core\plugininfo\totara;
+use core_tag\entity\tag_instance;
+use core_tag\entity\tag;
+
+defined('MOODLE_INTERNAL') || die();
+
+class plugininfo extends totara {
     public function get_usage_for_registration_data() {
         $data = array();
-        $data['numworkspaces'] = builder::table('workspace')->count();
-        $data['numworkspacediscussions'] = workspace_discussion::repository()->count_all_non_deleted();
-        $data['workspacesenabled'] = (int)advanced_feature::is_enabled('container_workspace');
+
+        $data['numtopics'] = tag::repository()->count_tags_for_collection('Topics', 'totara_topic');
+        $data['numtopicinstances'] = tag_instance::repository()->count_instances_for_collection('Topics', 'totara_topic');
 
         return $data;
     }

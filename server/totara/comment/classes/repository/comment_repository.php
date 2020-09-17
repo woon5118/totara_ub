@@ -164,4 +164,11 @@ final class comment_repository extends repository {
 
         return $builder->count();
     }
+
+    /**
+     * @return int
+     */
+    public function count_all_non_deleted_comments(): int {
+        return $this->where_null('timedeleted')->count();
+    }
 }

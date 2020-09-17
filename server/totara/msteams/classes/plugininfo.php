@@ -1,8 +1,8 @@
 <?php
-/**
+/*
  * This file is part of Totara Engage
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
- * @package container_workspace
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @package totara_msteams
  */
-namespace container_workspace;
 
-use container_workspace\entity\workspace_discussion;
+namespace totara_msteams;
+
 use core\orm\query\builder;
-use core\plugininfo\container;
+use core\plugininfo\totara;
 use totara_core\advanced_feature;
 
-final class plugininfo extends container {
+defined('MOODLE_INTERNAL') || die();
+
+class plugininfo extends totara {
     public function get_usage_for_registration_data() {
         $data = array();
-        $data['numworkspaces'] = builder::table('workspace')->count();
-        $data['numworkspacediscussions'] = workspace_discussion::repository()->count_all_non_deleted();
-        $data['workspacesenabled'] = (int)advanced_feature::is_enabled('container_workspace');
+        $data['msteamsenabled'] = (int)advanced_feature::is_enabled('totara_msteams');
+        $data['numbots'] = builder::table('totara_msteams_bot')->count();
+        $data['numusers'] = builder::table('totara_msteams_user')->count();
+        $data['numchannels'] = builder::table('totara_msteams_channel')->count();
+        $data['numsubscriptions'] = builder::table('totara_msteams_subscription')->count();
+        $data['numtenants'] = builder::table('totara_msteams_tenant')->count();
 
         return $data;
     }

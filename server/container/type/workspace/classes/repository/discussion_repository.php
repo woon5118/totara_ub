@@ -150,4 +150,16 @@ final class discussion_repository extends repository {
 
         return $builder->count();
     }
+
+    /**
+     * Return a count of non-deleted workspace discussions across the whole site.
+     *
+     * @return int
+     */
+    public function count_all_non_deleted(): int {
+        $builder = builder::table(static::get_table());
+        $builder->where_null('time_deleted');
+
+        return $builder->count();
+    }
 }

@@ -22,7 +22,9 @@
  */
 namespace ml_recommender;
 
+use core\orm\query\builder;
 use core\plugininfo\ml;
+use totara_core\advanced_feature;
 
 /**
  * Plugin info for recommender
@@ -34,5 +36,16 @@ final class plugininfo extends ml {
      */
     public function is_uninstall_allowed(): bool {
         return false;
+    }
+
+    public function get_usage_for_registration_data() {
+        $data = array();
+        $data['recommenderenabled'] = (int)advanced_feature::is_enabled('ml_recommender');
+        $data['numinteractions'] = builder::table('ml_recommender_interactions')->count();
+        $data['numitems'] = builder::table('ml_recommender_items')->count();
+        $data['numtrending'] = builder::table('ml_recommender_trending')->count();
+        $data['numusers'] = builder::table('ml_recommender_users')->count();
+
+        return $data;
     }
 }

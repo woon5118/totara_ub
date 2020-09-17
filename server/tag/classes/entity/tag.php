@@ -17,39 +17,47 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
- * @package totara_engage
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @package core_tag
  */
-
-namespace totara_engage\entity;
+namespace core_tag\entity;
 
 use core\orm\entity\entity;
-use totara_engage\repository\bookmark_repository;
+use core_tag\repository\tag_repository;
 
 /**
- * @property int        $id
- * @property int        $userid
- * @property int        $itemid
- * @property string     $component
- * @property int        $timecreated
+ * @property int    $userid
+ * @property string $name
+ * @property string $rawname
+ * @property string $description
+ * @property int    $descriptionformat
+ * @property int    $flag
+ * @property int    $timemodified
+ * @property int    $tagcollid
+ * @property int    $isstandard
  *
- * @method static bookmark_repository repository()
+ * @method static tag_repository repository()
  */
-class engage_bookmark extends entity {
+final class tag extends entity {
     /**
      * @var string
      */
-    public const TABLE = 'engage_bookmark';
+    public const TABLE = 'tag';
 
     /**
      * @var string
      */
-    public const CREATED_TIMESTAMP = 'timecreated';
+    public const UPDATED_TIMESTAMP = 'timemodified';
+
+    /**
+     * @var bool
+     */
+    public const SET_UPDATED_WHEN_CREATED = true;
 
     /**
      * @return string
      */
     public static function repository_class_name(): string {
-        return bookmark_repository::class;
+        return tag_repository::class;
     }
 }

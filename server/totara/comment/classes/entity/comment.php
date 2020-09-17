@@ -41,6 +41,8 @@ use totara_comment\repository\comment_repository;
  * @property int|null       $timedeleted
  * @property int|null       $reasondeleted
  * @property string|null    $contenttext
+ *
+ * @method static comment_repository repository()
  */
 final class comment extends entity {
     /**

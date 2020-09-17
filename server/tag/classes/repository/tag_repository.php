@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
  * @package core_tag
  */
 namespace core_tag\repository;
@@ -25,36 +25,23 @@ namespace core_tag\repository;
 use core\orm\entity\repository;
 use core\orm\query\builder;
 use core_tag\entity\tag_collection;
-use core_tag\entity\tag_instance;
 
 /**
- * Repository class for tag_instance
+ * Repository class for tag
  */
-final class tag_instance_repository extends repository {
+final class tag_repository extends repository {
     /**
-     * @param int $tagid
-     * @return tag_instance[]
-     */
-    public function get_instances_of_tag(int $tagid): array {
-        $builder = builder::table(static::get_table());
-        $builder->map_to(tag_instance::class);
-
-        $builder->where('tagid', $tagid);
-        return $builder->fetch();
-    }
-
-    /**
-     * Returns the count of the number of tag instances for a specified collection.
+     * Returns the count of the number of tags for a specified collection.
      *
      * @param string $name
      * @param string $component
      * @return int
      */
-    public function count_instances_for_collection(string $name, string $component): int {
+    public function count_tags_for_collection(string $name, string $component): int {
         $builder = builder::table(static::get_table());
+
         return $builder
-            ->join(['tag', 't'], 'tagid', '=', 'id')
-            ->join([tag_collection::TABLE, 'tc'], 'tc.id', '=', 't.tagcollid')
+            ->join([tag_collection::TABLE, 'tc'], 'tagcollid', '=', 'id')
             ->where('tc.name', '=', $name)
             ->where('tc.component', '=', $component)
             ->count();

@@ -35,6 +35,8 @@ use core_tag\repository\tag_instance_repository;
  * @property int    $ordering
  * @property int    $timecreated
  * @property int    $timemodified
+ *
+ * @method static tag_instance_repository repository()
  */
 final class tag_instance extends entity {
     /**
