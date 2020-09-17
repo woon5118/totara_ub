@@ -210,6 +210,7 @@ export default {
 .tui-spaceImagePicker {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   width: 100%;
   height: 100%;
 
