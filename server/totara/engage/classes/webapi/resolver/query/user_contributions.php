@@ -58,8 +58,13 @@ final class user_contributions implements query_resolver, has_middleware {
 
         // Only support the one area
         if (!in_array($args['area'], self::$valid_areas)) {
-            throw new \coding_exception("Query user_contributions does not suporrt the '{$args['area']}' area.");
+            throw new \coding_exception("Query user_contributions does not support the '{$args['area']}' area.");
         }
+
+        if (!isset($args['component'])) {
+            throw new \coding_exception('Component is a required field.');
+        }
+        $filter = $args['filter'] ?? [];
 
         // If the user cannot access the target user, return nothing
         // We silently fail here as we want the parent page to handle it
@@ -72,9 +77,9 @@ final class user_contributions implements query_resolver, has_middleware {
         }
 
         $query = new query();
-        $query->set_component($args['component'] ?? null);
+        $query->set_component($args['component']);
         $query->set_area($args['area']);
-        $query->set_filters($args['filter']);
+        $query->set_filters($filter);
 
         // User who owns the cards we want to display
         $query->set_userid($target_user_id);

@@ -10,10 +10,6 @@ query totara_engage_user_contribution_cards(
   $search: param_text
   $section: param_integer
   $include_footnotes: Boolean!
-  $footnotes_type: param_text
-  $footnotes_item_id: core_id
-  $footnotes_area: param_text
-  $footnotes_component: param_component
   $cursor: String
   $source: String
 ) {
@@ -29,12 +25,6 @@ query totara_engage_user_contribution_cards(
       sort: $sort
       search: $search
       section: $section
-    }
-    footnotes: {
-      type: $footnotes_type
-      item_id: $footnotes_item_id
-      area: $footnotes_area
-      component: $footnotes_component
     }
     cursor: $cursor
   ) {
@@ -66,12 +56,8 @@ query totara_engage_user_contribution_cards(
         id
         value(format: PLAIN)
       }
-      footnotes(
-        type: $footnotes_type
-        item_id: $footnotes_item_id
-        area: $footnotes_area
-        component: $footnotes_component
-      ) @include(if: $include_footnotes) {
+      footnotes
+      @include(if: $include_footnotes) {
         component
         tuicomponent
         props
