@@ -25,6 +25,7 @@ namespace container_workspace\webapi\resolver\mutation;
 use container_workspace\exception\workspace_exception;
 use container_workspace\interactor\workspace\interactor;
 use container_workspace\workspace;
+use core\json_editor\helper\document_helper;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -95,7 +96,7 @@ final class update implements mutation_resolver, has_middleware {
             $record->fullname = $args['name'];
         }
 
-        if (isset($args['description'])) {
+        if (array_key_exists('description', $args)) {
             $record->summary = $args['description'];
         }
 

@@ -24,6 +24,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use container_workspace\workspace;
+use core\json_editor\node\paragraph;
 
 class container_workspace_webapi_update_workspace_testcase extends advanced_testcase {
     use webapi_phpunit_helper;
@@ -156,5 +157,82 @@ class container_workspace_webapi_update_workspace_testcase extends advanced_test
                 'hidden' => true
             ]
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_update_workspace_with_null_description(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+        $original_description = json_encode([
+            'type' => 'doc',
+            'content' => [
+                paragraph::create_json_node_from_text("This is the text")
+            ]
+        ]);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace(null, $original_description, FORMAT_JSON_EDITOR);
+
+        $workspace_id = $workspace->get_id();
+        self::assertEquals($original_description, $DB->get_field('course', 'summary', ['id' => $workspace_id]));
+
+        // Run mutation to update description.
+        $this->resolve_graphql_mutation(
+            'container_workspace_update',
+            [
+                'id' => $workspace_id,
+                'name' => $workspace->get_name(),
+                'description' => null
+            ]
+        );
+
+        $after_updated_description = $DB->get_field('course', 'summary', ['id' => $workspace_id]);
+        self::assertNotEquals($original_description, $after_updated_description);
+        self::assertNull($after_updated_description);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_update_workspace_without_description_specified(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+        $original_description = json_encode([
+            'type' => 'doc',
+            'content' => [
+                paragraph::create_json_node_from_text("This is the text")
+            ]
+        ]);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace(null, $original_description, FORMAT_JSON_EDITOR);
+
+        $workspace_id = $workspace->get_id();
+        self::assertEquals($original_description, $DB->get_field('course', 'summary', ['id' => $workspace_id]));
+
+        // Run mutation to update description.
+        $this->resolve_graphql_mutation(
+            'container_workspace_update',
+            [
+                'id' => $workspace_id,
+                'name' => 'New Name',
+            ]
+        );
+
+        $after_updated_description = $DB->get_field('course', 'summary', ['id' => $workspace_id]);
+        self::assertEquals($original_description, $after_updated_description);
+        self::assertNotEquals($workspace->get_name(), $DB->get_field('course', 'fullname', ['id' => $workspace_id]));
     }
 }
