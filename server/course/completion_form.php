@@ -158,6 +158,13 @@ class course_completion_form extends moodleform {
                        AND c.id <> {$course->id}
               ORDER BY c.sortorder");
 
+        // Totara: enforce tenant separation rules.
+        foreach ($courses as $key => $c) {
+            if (context_coursecat::instance($c->category)->is_user_access_prevented()) {
+                unset($courses[$key]);
+            }
+        }
+
         if (!empty($courses)) {
             // Get category list.
             require_once($CFG->libdir. '/coursecatlib.php');
