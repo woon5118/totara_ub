@@ -113,6 +113,7 @@ abstract class base extends controller {
      * @return $this
      */
     protected function add_navigation(...$pages) {
+        $this->get_page()->set_totara_menu_selected('totara_competency\totara\menu\my_competencies');
         $this->get_page()->navigation->extend_for_user((object)($this->user->to_array()));
 
         if (!empty($pages)) {
