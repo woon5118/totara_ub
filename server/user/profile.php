@@ -49,9 +49,19 @@ if (!empty($CFG->forceloginforprofiles)) {
     if (isguestuser()) {
         $PAGE->set_context(context_system::instance());
         echo $OUTPUT->header();
+
+        // Use a GET button
+        $continue_button = new single_button(
+            new moodle_url(get_login_url()),
+            get_string('continue'),
+            'get',
+            true
+        );
         echo $OUTPUT->confirm(get_string('guestcantaccessprofiles', 'error'),
-                              get_login_url(),
-                              $CFG->wwwroot);
+            $continue_button,
+            $CFG->wwwroot
+        );
+
         echo $OUTPUT->footer();
         die;
     }
