@@ -550,4 +550,27 @@ final class question {
     public function exists(): bool {
         return 0 != $this->question->id && $this->question->exists();
     }
+
+    /**
+     * Ensure that answers submitted by user exist.
+     *
+     * @param array $user_options
+     * @return bool
+     */
+    public function verify_submitted_options_exist(array $user_options) : bool {
+        // Get valid option ids.
+        $valid_options = [];
+        foreach ($this->options as $question_option) {
+            $valid_options[] = $question_option->id;
+        }
+
+        // Check that user options exist.
+        foreach ($user_options as $user_option) {
+            if (!in_array($user_option, $valid_options)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

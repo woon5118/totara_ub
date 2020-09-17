@@ -73,6 +73,7 @@ $string['survey:update'] = "Update survey";
 $string['survey:unshare'] = "Unlink survey";
 
 // For error usage, mostly will be invoked at the parent level - totara_engage.
+$string['error:answer'] = "Cannot answer the survey";
 $string['error:create'] = "Cannot create survey";
 $string['error:delete'] = "Cannot delete the survey";
 $string['error:sharecapability'] = 'You do not have the required capabilities to share this survey.';

@@ -31,6 +31,8 @@ use core\webapi\resolver\has_middleware;
 use engage_survey\event\vote_created;
 use engage_survey\task\vote_notify_task;
 use engage_survey\totara_engage\resource\survey;
+use totara_engage\access\access_manager;
+use totara_engage\exception\resource_exception;
 
 /**
  * Mutation resolver for creating answers.
@@ -50,6 +52,9 @@ final class create_answer implements mutation_resolver, has_middleware {
 
         /** @var survey $survey */
         $survey = survey::from_resource_id($args['resourceid']);
+        if (!access_manager::can_access($survey, $USER->id)) {
+            throw resource_exception::create('answer', $survey::get_resource_type());
+        }
 
         $result = $survey->add_answer($args['questionid'], $args['options']);
 

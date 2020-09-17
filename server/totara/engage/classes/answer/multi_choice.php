@@ -59,6 +59,10 @@ class multi_choice extends answer {
             return $question->get_answer_for_user($userid);
         }
 
+        if (!$question->verify_submitted_options_exist($options)) {
+            throw new \coding_exception("Cannot create answers for options that are not in the system");
+        }
+
         $choices = [];
 
         foreach ($options as $optionid) {
