@@ -257,6 +257,71 @@ class mod_perform_util_testcase extends advanced_testcase {
         self::assertTrue(util::can_report_on_element($reporter->id, $element->id));
     }
 
+    public function test_can_report_on_user(): void {
+        $subject_user = self::getDataGenerator()->create_user();
+        $viewing_user1 = self::getDataGenerator()->create_user();
+        $viewing_user2 = self::getDataGenerator()->create_user();
+        self::setUser($viewing_user1);
+
+        self::assertFalse(util::can_report_on_user($subject_user->id, 0));
+        self::assertFalse(util::can_report_on_user(0, $viewing_user1->id));
+
+        self::assertFalse(util::can_report_on_user($subject_user->id, $viewing_user1->id));
+        self::assertFalse(util::can_report_on_user($subject_user->id, $viewing_user2->id));
+
+        // Grant report_on_subject_responses capability to viewing user 1 in the context of the subject user.
+        $roleid = self::getDataGenerator()->create_role();
+        assign_capability('mod/perform:report_on_subject_responses', CAP_ALLOW, $roleid, context_system::instance());
+        $subject_user_context = context_user::instance($subject_user->id);
+        role_assign($roleid, $viewing_user1->id, $subject_user_context);
+
+        self::assertTrue(util::can_report_on_user($subject_user->id, $viewing_user1->id));
+
+        // Grant report_on_all_subjects_responses capability to viewing user 2.
+        $roleid = self::getDataGenerator()->create_role();
+        assign_capability('mod/perform:report_on_all_subjects_responses', CAP_ALLOW, $roleid, context_system::instance());
+        $viewing_user2_context = context_user::instance($viewing_user2->id);
+        role_assign($roleid, $viewing_user2->id, $viewing_user2_context);
+
+        self::assertTrue(util::can_report_on_user($subject_user->id, $viewing_user2->id));
+
+        // Delete subject user.
+        delete_user($subject_user);
+        self::assertFalse(util::can_report_on_user($subject_user->id, $viewing_user1->id));
+        self::assertFalse(util::can_report_on_user($subject_user->id, $viewing_user2->id));
+    }
+
+    public function test_can_manage_participation(): void {
+        $subject_user = self::getDataGenerator()->create_user();
+        $manager1 = self::getDataGenerator()->create_user();
+        $manager2 = self::getDataGenerator()->create_user();
+        self::setUser($manager1);
+
+        self::assertFalse(util::can_manage_participation($manager1->id, $subject_user->id));
+        self::assertFalse(util::can_manage_participation($manager2->id, $subject_user->id));
+
+        // Grant manage_all_participation capability to manager 1.
+        $roleid = self::getDataGenerator()->create_role();
+        assign_capability('mod/perform:manage_all_participation', CAP_ALLOW, $roleid, context_system::instance());
+        $manager1_context = context_user::instance($manager1->id);
+        role_assign($roleid, $manager1->id, $manager1_context);
+
+        self::assertTrue(util::can_manage_participation($manager1->id, $subject_user->id));
+
+        // Grant manage_subject_user_participation capability to manager 2 in the context of the subject user.
+        $roleid = self::getDataGenerator()->create_role();
+        assign_capability('mod/perform:manage_subject_user_participation', CAP_ALLOW, $roleid, context_system::instance());
+        $subject_user_context = context_user::instance($subject_user->id);
+        role_assign($roleid, $manager2->id, $subject_user_context);
+
+        self::assertTrue(util::can_manage_participation($manager2->id, $subject_user->id));
+
+        // Delete subject user.
+        delete_user($subject_user);
+        self::assertFalse(util::can_manage_participation($manager1->id, $subject_user->id));
+        self::assertFalse(util::can_manage_participation($manager2->id, $subject_user->id));
+    }
+
     /**
      * @param string $capability
      * @param stdClass $manager

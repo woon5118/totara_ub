@@ -26,14 +26,11 @@ namespace mod_perform;
 use container_perform\perform as perform_container;
 use context_user;
 use core\collection;
-use core\entities\cohort;
-use core\entities\tenant;
 use core\orm\query\builder;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\activity_type;
 use context;
 use context_coursecat;
-use context_system;
 use core_text;
 use mod_perform\entities\activity\element;
 use mod_perform\models\activity\activity;
@@ -263,11 +260,15 @@ class util {
      */
     public static function can_manage_participation(int $manager_id, int $subject_user_id): bool {
         if (static::has_manage_all_participants_capability($manager_id)) {
-            $subject_user_context = context_user::instance($subject_user_id);
+            // Take into consideration that subject user may be deleted.
+            $subject_user_context = context_user::instance($subject_user_id, IGNORE_MISSING);
+            if ($subject_user_context === false) {
+                return false;
+            }
             return !$subject_user_context->is_user_access_prevented($manager_id);
         }
 
-        // Allow for deleted subject user.
+        // Take into consideration that subject user may be deleted.
         $subject_user_context = context_user::instance($subject_user_id, IGNORE_MISSING);
         if ($subject_user_context === false) {
             return false;
@@ -341,7 +342,11 @@ class util {
             return false;
         }
 
-        $subject_user_context = context_user::instance($subject_user_id);
+        // Take into consideration that subject user may be deleted.
+        $subject_user_context = context_user::instance($subject_user_id, IGNORE_MISSING);
+        if ($subject_user_context === false) {
+            return false;
+        }
 
         if (has_capability('mod/perform:report_on_subject_responses', $subject_user_context, $viewing_user_id)) {
             return true;
