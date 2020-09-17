@@ -206,7 +206,7 @@ final class response {
             }
             return $message;
         }
-        // Bot API : { "error" : { "code" : "error code", "message": "error message"} }
+        // Bot API : { "error" : { "code" : "error code", "message": "error message" } }
         if (isset($json->error->message)) {
             $message = $json->error->message;
             if (isset($json->error->code)) {
