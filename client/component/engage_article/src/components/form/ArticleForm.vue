@@ -295,6 +295,11 @@ export default {
           // Expand the box.
           flex-grow: 1;
         }
+
+        // override flex wrap to make video not over flow
+        &__inner {
+          flex-wrap: nowrap;
+        }
       }
     }
 
