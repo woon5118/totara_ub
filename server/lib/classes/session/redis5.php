@@ -184,6 +184,14 @@ final class redis5 extends handler {
             ini_set('session.serialize_handler', 'igbinary');
         }
 
+        // Make sure admins did not break things by forcing PHP settings in web server config.
+        if (ini_get('session.save_handler') !== 'redis') {
+            error_log("Error setting 'session.save_handler' handler to 'redis', Totara sessions will not work properly");
+        }
+        if (ini_get('session.save_path') !== $savepath) {
+            error_log("Error setting 'session.save_path', Totara sessions will not work properly");
+        }
+
         return parent::start($uselocking);
     }
 
