@@ -13,6 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kian Nguyen <kian.nguyen@totaralearning.com>
+  @author Alvin Smith <alvin.smith@totaralearning.com>
   @module samples
 -->
 <template>
@@ -29,7 +30,7 @@
       class="tui-samples-miniProfileCard__card"
     >
       <template v-slot:drop-down-items>
-        <DropdownItem @click="modalOpen = true">Ez Game ?</DropdownItem>
+        <DropdownItem @click="modalOpen = true">Open Modal</DropdownItem>
       </template>
     </MiniProfileCard>
 
@@ -38,19 +39,9 @@
       class="tui-samples-miniProfileCard__card"
     >
       <template v-slot:drop-down-items>
-        <DropdownItem @click="modalOpen = true"
-          >You know what is cooking ? BOOM!</DropdownItem
-        >
+        <DropdownItem @click="modalOpen = true">Open Modal</DropdownItem>
       </template>
     </MiniProfileCard>
-
-    <ModalPresenter :open="modalOpen" @request-close="modalOpen = false">
-      <Modal>
-        <ModalContent :close="true">
-          <h4>LAKAD MATATAG, NORMALIN NORMALIN</h4>
-        </ModalContent>
-      </Modal>
-    </ModalPresenter>
 
     <MiniProfileCard
       :display="users[0]"
@@ -58,54 +49,56 @@
       class="tui-samples-miniProfileCard__card"
     >
       <template v-slot:drop-down-items>
-        <DropdownItem @click="modalOpen = true">
-          You know what is cooking ? BOOM!
-        </DropdownItem>
+        <DropdownItem @click="modalOpen = true">Open Modal</DropdownItem>
       </template>
     </MiniProfileCard>
 
     <div class="tui-samples-miniProfileCard__smallerBox">
-      <p>----- CARD WITHOUT BORDER -----</p>
+      <Separator :thick="true" :spread="true">
+        CARD WITHOUT BORDER BEGIN
+      </Separator>
       <MiniProfileCard
         :display="special"
         :no-border="true"
         class="tui-samples-miniProfileCard__card"
       >
         <template v-slot:drop-down-items>
-          <DropdownItem @click="modalOpen = true">
-            You know what is cooking ? BOOM!
-          </DropdownItem>
+          <DropdownItem @click="modalOpen = true">Open Modal</DropdownItem>
         </template>
       </MiniProfileCard>
-      <p>----- CARD WITHOUT BORDER -----</p>
+      <Separator :thick="true" :spread="true">
+        CARD WITHOUT BORDER END
+      </Separator>
 
-      <p>----- CARD WITHOUT BORDER -----</p>
+      <MiniProfileCard
+        :display="special"
+        class="tui-samples-miniProfileCard__card"
+      >
+        <template v-slot:drop-down-items>
+          <DropdownItem @click="modalOpen = true">Open Modal</DropdownItem>
+        </template>
+      </MiniProfileCard>
+
+      <Separator :thick="true" :spread="true">
+        CARD WITHOUT BORDER BEGIN
+      </Separator>
       <MiniProfileCard
         :display="users[1]"
         :no-border="true"
         class="tui-samples-miniProfileCard__card"
       >
         <template v-slot:drop-down-items>
-          <DropdownItem @click="modalOpen = true">
-            You know what is cooking ? BOOM!
-          </DropdownItem>
+          <DropdownItem @click="modalOpen = true">Open Modal</DropdownItem>
         </template>
       </MiniProfileCard>
-      <p>----- CARD WITHOUT BORDER -----</p>
-
-      <MiniProfileCard
-        :display="special"
-        class="tui-samples-miniProfileCard__card"
-      >
-        <template v-slot:drop-down-items>
-          <DropdownItem @click="modalOpen = true">Ez Game ?</DropdownItem>
-        </template>
-      </MiniProfileCard>
+      <Separator :thick="true" :spread="true">
+        CARD WITHOUT BORDER END
+      </Separator>
 
       <ModalPresenter :open="modalOpen" @request-close="modalOpen = false">
         <Modal>
-          <ModalContent title="You know what is cooking ? BOOM !" :close="true">
-            <h5>LAKAD MATATAG, NORMALIN NORMALIN</h5>
+          <ModalContent title="Title prop for the ModalContent" :close="true">
+            <h5>This is modal content which could be easily customised</h5>
           </ModalContent>
         </Modal>
       </ModalPresenter>
@@ -114,13 +107,14 @@
 </template>
 
 <script>
-import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
-import DropdownItem from 'tui/components/dropdown/DropdownItem';
-import ModalPresenter from 'tui/components/modal/ModalPresenter';
-import Modal from 'tui/components/modal/Modal';
-import ModalContent from 'tui/components/modal/ModalContent';
 import { config } from 'tui/config';
 import { createSilhouetteImage } from '../../../../../tui/src/js/internal/placeholder_generator.js';
+import DropdownItem from 'tui/components/dropdown/DropdownItem';
+import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import Separator from 'tui/components/decor/Separator';
 
 export default {
   components: {
@@ -129,6 +123,7 @@ export default {
     ModalPresenter,
     Modal,
     ModalContent,
+    Separator,
   },
 
   data() {
@@ -159,20 +154,20 @@ export default {
       },
       users: [
         {
-          profile_picture_url: createSilhouetteImage('#93c'),
-          profile_picture_alt: 'Black Pink picture',
+          profile_picture_url: createSilhouetteImage('#000'),
+          profile_picture_alt: 'Alvin Smith picture',
           profile_url: this.$url('/user/profile.php'),
           display_fields: [
             {
-              value: 'Black Pink',
+              value: 'Alvin Smith',
               associate_url: this.$url('/user/profile.php'),
             },
             {
-              value: 'black.pink@example.com',
+              value: 'alvin.smith@totaralearning.com',
               associate_url: null,
             },
             {
-              value: 'wop wow',
+              value: 'Penetration Tester',
               associate_url: null,
             },
           ],
