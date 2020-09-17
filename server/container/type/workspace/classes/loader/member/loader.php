@@ -91,18 +91,17 @@ final class loader {
 
         $search_term = $query->get_search_term();
         if (null !== $search_term && '' !== $search_term) {
-            $first_name_like = $DB->sql_like('u.firstname', ':first_name');
-            $last_name_like = $DB->sql_like('u.lastname', ':last_name');
-            $email_like = $DB->sql_like('u.email', ':email');
+            require_once("{$CFG->dirroot}/totara/core/searchlib.php");
+            $user_name_fields = get_all_user_name_fields(false, null, 'u.');
+            $keywords = totara_search_parse_keywords($search_term);
 
-            $builder->where_raw(
-                "({$first_name_like} OR {$last_name_like} OR {$email_like})",
-                [
-                    'first_name' => "%{$DB->sql_like_escape($search_term)}%",
-                    'last_name' => "%{$DB->sql_like_escape($search_term)}%",
-                    'email' => "%{$DB->sql_like_escape($search_term)}%",
-                ]
+            [$like_sql, $like_parameters] = totara_search_get_keyword_where_clause(
+                $keywords,
+                array_values($user_name_fields),
+                SQL_PARAMS_NAMED
             );
+
+            $builder->where_raw($like_sql, $like_parameters);
         }
 
         // By default we always include the user owner on top.

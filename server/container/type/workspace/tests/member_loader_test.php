@@ -121,4 +121,195 @@ class container_workspace_member_loader_testcase extends advanced_testcase {
             $this->assertFalse(in_array($member->get_user_id(), $users_in_workspace_two));
         }
     }
+
+    /**
+     * @return void
+     */
+    public function test_search_from_members_with_case_insensitive(): void {
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+
+        $user_two = $generator->create_user([
+            'firstname' => 'User',
+            'lastname' => 'Two'
+        ]);
+
+        $user_three = $generator->create_user([
+            'firstname' => 'User',
+            'lastname' => 'Three'
+        ]);
+
+        // Log in as first user to create a workspace.
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Add user two and three to the workspace.
+        member::added_to_workspace($workspace, $user_two->id, false, $user_one->id);
+        member::added_to_workspace($workspace, $user_three->id, false, $user_one->id);
+
+        // Fetch for user two with search term.
+        $query = new query($workspace->get_id());
+        $query->set_search_term('two');
+
+        $user_two_result = loader::get_members($query);
+        self::assertEquals(1, $user_two_result->get_total());
+
+        /** @var member[] $user_two_members */
+        $user_two_members = $user_two_result->get_items()->all();
+        $user_two_member = reset($user_two_members);
+
+        self::assertEquals($user_two->id, $user_two_member->get_user_id());
+
+        // Search for user three.
+        $query->set_search_term('user three');
+        $user_three_result = loader::get_members($query);
+
+        self::assertEquals(1, $user_three_result->get_total());
+
+        /** @var member[] $user_three_members */
+        $user_three_members = $user_three_result->get_items()->all();
+        $user_three_member = reset($user_three_members);
+
+        self::assertEquals($user_three->id, $user_three_member->get_user_id());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_search_from_members_with_middle_name(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Add two users to the workspace.
+        $user_two = $generator->create_user(['middlename' => 'bolobala']);
+        $user_three = $generator->create_user(['middlename' => 'bob']);
+
+        member::added_to_workspace($workspace, $user_two->id, false, $user_one->id);
+        member::added_to_workspace($workspace, $user_three->id, false, $user_one->id);
+
+        $query = new query($workspace->get_id());
+        $query->set_search_term('bolobala');
+
+        $result = loader::get_members($query);
+        self::assertEquals(1, $result->get_total());
+
+        /** @var member[] $members */
+        $members = $result->get_items()->all();
+        self::assertCount(1, $members);
+
+        $member = reset($members);
+        self::assertEquals($user_two->id, $member->get_user_id());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_search_from_members_with_first_name_phonetic(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Add two users to the workspace.
+        $user_two = $generator->create_user(['firstnamephonetic' => 'bolobala']);
+        $user_three = $generator->create_user(['firstnamephonetic' => 'bob']);
+
+        member::added_to_workspace($workspace, $user_two->id, false, $user_one->id);
+        member::added_to_workspace($workspace, $user_three->id, false, $user_one->id);
+
+        $query = new query($workspace->get_id());
+        $query->set_search_term('bolobala');
+
+        $result = loader::get_members($query);
+        self::assertEquals(1, $result->get_total());
+
+        /** @var member[] $members */
+        $members = $result->get_items()->all();
+        self::assertCount(1, $members);
+
+        $member = reset($members);
+        self::assertEquals($user_two->id, $member->get_user_id());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_search_from_members_with_last_name_phonetic(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Add two users to the workspace.
+        $user_two = $generator->create_user(['lastnamephonetic' => 'bolobala']);
+        $user_three = $generator->create_user(['lastnamephonetic' => 'bob']);
+
+        member::added_to_workspace($workspace, $user_two->id, false, $user_one->id);
+        member::added_to_workspace($workspace, $user_three->id, false, $user_one->id);
+
+        $query = new query($workspace->get_id());
+        $query->set_search_term('bolobala');
+
+        $result = loader::get_members($query);
+        self::assertEquals(1, $result->get_total());
+
+        /** @var member[] $members */
+        $members = $result->get_items()->all();
+        self::assertCount(1, $members);
+
+        $member = reset($members);
+        self::assertEquals($user_two->id, $member->get_user_id());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_search_from_members_with_alternate_name(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Add two users to the workspace.
+        $user_two = $generator->create_user(['alternatename' => 'bolobala']);
+        $user_three = $generator->create_user(['alternatename' => 'bob']);
+
+        member::added_to_workspace($workspace, $user_two->id, false, $user_one->id);
+        member::added_to_workspace($workspace, $user_three->id, false, $user_one->id);
+
+        $query = new query($workspace->get_id());
+        $query->set_search_term('bolobala');
+
+        $result = loader::get_members($query);
+        self::assertEquals(1, $result->get_total());
+
+        /** @var member[] $members */
+        $members = $result->get_items()->all();
+        self::assertCount(1, $members);
+
+        $member = reset($members);
+        self::assertEquals($user_two->id, $member->get_user_id());
+    }
 }
