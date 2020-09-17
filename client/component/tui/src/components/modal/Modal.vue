@@ -286,6 +286,13 @@ export default {
     },
 
     $_handleDocumentKeydown(e) {
+      // Make sure that only the current modal is the one that is interacted with
+      const modals = document.querySelectorAll('.tui-modal');
+      const currentModal = modals[modals.length -1];
+      if (this.$refs.modal != currentModal) {
+        return;
+      }
+
       switch (e.key) {
         case 'Escape':
           if (this.dismissableSources.esc) {
