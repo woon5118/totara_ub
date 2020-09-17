@@ -1252,9 +1252,6 @@ while ($linenum <= $previewrows and $fields = $cir->next()) {
         if ($rowcols['username'] !== $stdusername) {
             $rowcols['status'][] = get_string('invalidusernameupload');
         }
-        if ($userid = $DB->get_field('user', 'id', array('username'=>$stdusername, 'mnethostid'=>$CFG->mnet_localhost_id))) {
-            $rowcols['username'] = html_writer::link(new moodle_url('/user/profile.php', array('id'=>$userid)), $rowcols['username']);
-        }
     } else {
         $rowcols['status'][] = get_string('missingusername');
     }
@@ -1284,10 +1281,26 @@ while ($linenum <= $previewrows and $fields = $cir->next()) {
     // Check if rowcols have custom profile field with correct data and update error state.
     $noerror = uu_check_custom_profile_data($rowcols) && $noerror;
     // Totara: data must be converted from plain text to html right before display, not before validation!
-    $status = implode('<br />', array_map('s', $rowcols['status']));
-    unset($rowcols['status']);
-    $rowcols = array_map('s', $rowcols);
-    $rowcols['status'] = $status;
+    foreach($rowcols as $k => $v) {
+        if ($k === 'status') {
+            $rowcols[$k] = implode('<br />', array_map('s', $v));
+            continue;
+        }
+        if ($k === 'username') {
+            if (core_user::clean_field($v, 'username') === $v) {
+                $userid = $DB->get_field('user', 'id', ['username' => $v, 'mnethostid' => $CFG->mnet_localhost_id, 'deleted' => 0]);
+            } else {
+                $userid = false;
+            }
+            if ($userid) {
+                $rowcols[$k] = html_writer::link(new moodle_url('/user/profile.php', ['id' => $userid]), s($v));
+            } else {
+                $rowcols[$k] = s($v);
+            }
+            continue;
+        }
+        $rowcols[$k] = s($v);
+    }
     $data[] = $rowcols;
 }
 if ($fields = $cir->next()) {
