@@ -185,13 +185,7 @@ if ($type === 'editor') {
         }
     }
 
-    $csscontent = $theme->get_css_content_by($type);
-
-    // Include any content that might have been changed by theme settings.
-    if (!during_initial_install() && $type === $themename) {
-        $theme_settings = new \core\theme\settings($theme, $tenant);
-        $csscontent .= $theme_settings->get_css_variables();
-    }
+    $csscontent = $theme->get_css_content_by($type, $tenant);
 
     // Totara: Removed chunking support as it's not used by currently supported browsers
 

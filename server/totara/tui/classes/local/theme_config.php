@@ -56,10 +56,11 @@ final class theme_config extends \theme_config {
      * Get CSS content for type and subtype. Called by styles.php.
      *
      * @param string $type
+     * @param int $tenant_id
      * @return string
      */
-    public function get_css_content_by($type) {
-        $csscontent = $this->get_tui_css_content($type);
+    public function get_css_content_by($type, int $tenant_id) {
+        $csscontent = $this->get_tui_css_content($type, $tenant_id);
         $csscontent = $this->post_process($csscontent);
         return $csscontent;
     }
@@ -100,11 +101,12 @@ final class theme_config extends \theme_config {
      * Get the compiled TUI CSS content for the provided Totara component
      *
      * @param string $component
+     * @param int $tenant_id
      * @return string Compiled CSS
      */
-    private function get_tui_css_content(string $component): string {
+    private function get_tui_css_content(string $component, int $tenant_id): string {
         $tui_scss = $this->get_tui_scss_instance();
-        return $tui_scss->get_compiled_css($component);
+        return $tui_scss->get_compiled_css($component, $this, $tenant_id);
     }
 
     /**

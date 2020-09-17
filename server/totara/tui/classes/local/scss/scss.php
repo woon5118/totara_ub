@@ -31,6 +31,7 @@
 namespace totara_tui\local\scss;
 
 use totara_tui\local\locator\bundle;
+use totara_tui\local\theme_config;
 
 /**
  * Encapsulates logic for compiling TUI SCSS
@@ -69,9 +70,18 @@ class scss {
      * Compile SCSS for the provided Totara component.
      *
      * @param string $component Component to build CSS for.
+     * @param theme_config|null $theme_config $theme_config
+     * @param int|null $tenant_id
      * @return string
      */
-    public function get_compiled_css(string $component): string {
+    public function get_compiled_css(string $component, ?theme_config $theme_config = null, ?int $tenant_id = null): string {
+        // Include any content that might have been changed by theme settings.
+        $settings_css = '';
+        if (!during_initial_install() && isset($theme_config) && isset($tenant_id)) {
+            $theme_settings = new \core\theme\settings($theme_config, $tenant_id);
+            $settings_css = $theme_settings->get_css_variables();
+        }
+
         $import_data = $this->get_imports($component);
 
         $legacy_var_values = [];
@@ -81,6 +91,14 @@ class scss {
                 false
             );
             $legacy_var_values = $this->options->get_cssvars()->get_custom_property_values($css_realvars_legacy);
+
+            // Include any content that might have been changed by theme settings.
+            if (!during_initial_install()) {
+                $legacy_var_values = array_merge(
+                    $legacy_var_values,
+                    $this->options->get_cssvars()->get_custom_property_values($settings_css)
+                );
+            }
         }
 
         $output = $this->build_import_code($import_data->imports);
@@ -90,6 +108,8 @@ class scss {
 
         if ($this->options->get_legacy()) {
             $output = $this->options->get_cssvars()->transform($output, ['override_values' => $legacy_var_values]);
+        } else {
+            $output .= $settings_css;
         }
 
         return $output;

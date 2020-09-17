@@ -166,14 +166,6 @@ final class resolver extends \totara_tui\local\mediation\resolver {
      */
     protected function get_content_to_cache() {
         $theme = $this->get_theme();
-        $content = $theme->get_css_content_by($this->component);
-
-        // Include any content that might have been changed by theme settings.
-        if (!during_initial_install()) {
-            $theme_settings = new \core\theme\settings($this->theme, $this->tenant);
-            $content .= $theme_settings->get_css_variables();
-        }
-
-        return $content;
+        return $theme->get_css_content_by($this->component, $this->tenant);
     }
 }

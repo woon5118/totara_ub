@@ -970,13 +970,14 @@ class theme_config {
      * Get CSS content for type. Called by styles.php.
      *
      * @param string $type
+     * @param int $tenant_id
      * @return string
      */
-    public function get_css_content_by($type) {
+    public function get_css_content_by($type, int $tenant_id) {
         if ($type === 'all' || $type === 'all-rtl') {
             $csscontent = $this->get_css_cached_content();
             if (!$csscontent) {
-                $csscontent = $this->get_css_content();
+                $csscontent = $this->get_css_content($tenant_id);
                 $this->set_css_content_cache($csscontent);
             }
             return $csscontent;
@@ -990,9 +991,10 @@ class theme_config {
      *
      * NOTE: this method is not expected to be used from any addons.
      *
+     * @param int $tenant_id
      * @return string CSS markup compressed
      */
-    public function get_css_content() {
+    public function get_css_content(int $tenant_id) {
 
         $csscontent = '';
         foreach ($this->get_css_files(false) as $type => $value) {
@@ -1014,6 +1016,24 @@ class theme_config {
                 }
             }
         }
+
+        // Include any content that might have been changed by theme settings.
+        if (!during_initial_install()) {
+            $theme_settings = new \core\theme\settings($this, $tenant_id);
+            $vars = $theme_settings->get_css_variables();
+            if ($this->legacybrowser) {
+                $cssvars = new \core\cssvars();
+                $csscontent = $cssvars->transform(
+                    $csscontent,
+                    [
+                        'override_values' => $cssvars->get_custom_property_values($vars)
+                    ]
+                );
+            } else {
+                $csscontent .= $vars;
+            }
+        }
+
         $csscontent = $this->post_process($csscontent);
         if ($this->minify_css) {
             $csscontent = core_minify::css($csscontent);
