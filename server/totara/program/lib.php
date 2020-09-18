@@ -52,11 +52,6 @@ function prog_can_view_users_required_learning($learnerid) {
         return true;
     }
 
-    // If the user cannot view any programs
-    if (!has_capability('totara/program:viewprogram', $systemcontext)) {
-        return false;
-    }
-
     // If this is the current user's own required learning
     if ($learnerid == $USER->id) {
         return true;
