@@ -33,11 +33,7 @@
         class="tui-playlistSummary__content"
         v-html="summary"
       />
-      <div
-        v-else
-        slot="content"
-        class="tui-playlistSummary__placeholder"
-      >
+      <div v-else slot="content" class="tui-playlistSummary__placeholder">
         {{ $str('adddescription', 'totara_playlist') }}
       </div>
     </InlineEditing>
