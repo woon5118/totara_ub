@@ -527,6 +527,7 @@ $string['eventshandlersinuse'] = 'The following plugins in your system are using
 $string['everyonewhocan'] = 'Everyone who can \'{$a}\'';
 $string['exceptions'] = 'exceptions';
 $string['execpathnotallowed'] = 'Setting executable and local paths disabled in config.php';
+$string['exifrecommended'] = 'Installing the optional EXIF extension is recommended. It will enable Totara to automatically adjust images taken by digital devices.';
 $string['experimental'] = 'Experimental';
 $string['experimentalsettings'] = 'Experimental settings';
 $string['extendedusernamechars'] = 'Allow extended characters in usernames';

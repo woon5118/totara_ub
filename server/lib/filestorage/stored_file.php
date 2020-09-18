@@ -644,7 +644,7 @@ class stored_file {
             // gd can not parse it, sorry
             return false;
         }
-        if ($load_orientation && $mimetype === 'image/jpeg') {
+        if ($load_orientation && $mimetype === 'image/jpeg' && function_exists('exif_read_data')) {
             // Add orientation information.
             $exif = exif_read_data($path, 'IFD0');
             if ($exif !== false && isset($exif['Orientation'])) {
