@@ -63,7 +63,6 @@ export default {
     fileItemId: [Number, String],
     component: String,
     area: String,
-    doc: Object,
     options: {
       type: Object,
       validator: prop =>
@@ -90,25 +89,6 @@ export default {
   },
 
   watch: {
-    doc(value) {
-      if (!value) {
-        if (!this.value) {
-          this.displayedValue = WekaValue.empty();
-          if (this.editor) {
-            this.editor.setValue(this.displayedValue);
-          }
-        }
-        return;
-      }
-
-      if (!this.displayedValue || this.displayedValue.getDoc() !== value) {
-        this.displayedValue = WekaValue.fromDoc(value);
-        if (this.editor) {
-          this.editor.setValue(this.displayedValue);
-        }
-      }
-    },
-
     value(value) {
       if (this.displayedValue === value) {
         return;
@@ -136,8 +116,6 @@ export default {
     this.updateToolbarThrottled = throttle(this.updateToolbar, 100);
     if (this.value) {
       this.displayedValue = this.value;
-    } else if (this.doc) {
-      this.displayedValue = WekaValue.fromDoc(this.doc);
     } else {
       this.displayedValue = WekaValue.empty();
     }
@@ -288,8 +266,7 @@ export default {
       this.updateToolbar();
 
       // Event emitted to make the parent component knowing that this editor has been mounted properly.
-      this.$emit('editor-mounted');
-      this.$emit('editor-ready');
+      this.$emit('ready');
     },
 
     updateToolbar() {
@@ -304,13 +281,6 @@ export default {
     $_onUpdate(value) {
       this.displayedValue = value;
       this.$emit('input', value);
-      if (this.$listeners.update) {
-        this.$emit('update', {
-          getJSON: () => value.getDoc(),
-          isEmpty: () => value.isEmpty,
-          getFileStorageItemId: () => value.fileStorageItemId,
-        });
-      }
     },
   },
 };

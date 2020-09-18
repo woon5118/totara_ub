@@ -46,12 +46,11 @@
       >
         <Weka
           :id="id"
+          v-model="summary"
           component="totara_playlist"
           area="summary"
-          :doc="summary.doc"
           :placeholder="$str('adddescription', 'totara_playlist')"
           class="tui-playlistForm__description__formRow__textArea"
-          @update="handleUpdate"
         />
       </FormRow>
 
@@ -106,7 +105,7 @@ import FormRow from 'tui/components/form/FormRow';
 import Form from 'tui/components/form/Form';
 import InfoIcon from 'tui/components/icons/Info';
 import Weka from 'editor_weka/components/Weka';
-import { debounce } from 'tui/util';
+import WekaValue from 'editor_weka/WekaValue';
 import { FORMAT_JSON_EDITOR } from 'tui/format';
 
 export default {
@@ -139,11 +138,7 @@ export default {
     return {
       description: this.$id('engageContribute-description'),
       submitting: false,
-      summary: {
-        // Default state of editor
-        doc: null,
-        isEmpty: true,
-      },
+      summary: WekaValue.empty(),
     };
   },
 
@@ -157,33 +152,12 @@ export default {
     submit() {
       const params = {
         name: this.playlist.name,
-        summary: JSON.stringify(this.summary.doc),
+        summary: JSON.stringify(this.summary.getDoc()),
         summary_format: FORMAT_JSON_EDITOR,
       };
 
       this.$emit('next', params);
     },
-
-    /**
-     *
-     * @param {Object} opt
-     */
-    handleUpdate(opt) {
-      this.$_readJson(opt);
-    },
-
-    $_readJson: debounce(
-      /**
-       *
-       * @param {Object} opt
-       */
-      function(opt) {
-        this.summary.doc = opt.getJSON();
-        this.summary.isEmpty = opt.isEmpty();
-      },
-      250,
-      { perArgs: false }
-    ),
   },
 };
 </script>

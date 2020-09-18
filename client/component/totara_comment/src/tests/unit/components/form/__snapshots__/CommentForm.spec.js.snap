@@ -16,6 +16,7 @@ exports[`totara_comment/components/form/CommentForm.vue Checks snapshot 1`] = `
       data-key="totara_comment_editor_weka_1"
       fileitemid="500"
       placeholder="entercomment-totara_comment"
+      value="[object Object]"
     />
      
     <buttongroup-stub

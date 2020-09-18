@@ -25,24 +25,23 @@
       <Weka
         v-if="!$apollo.queries.editorOption.loading && draftId"
         :key="editorKey"
+        v-model="content"
         :data-key="editorKey"
         area="comment"
         component="totara_comment"
         :options="editorOption"
-        :doc="content.doc"
         :file-item-id="draftId"
         :placeholder="$str('entercomment', 'totara_comment')"
         :data-file-item-id="draftId"
         class="tui-commentForm__form__editor"
-        @editor-mounted="$emit('form-ready')"
-        @update="onUpdate"
+        @ready="$emit('form-ready')"
       />
 
       <ButtonGroup class="tui-commentForm__form__buttonGroup">
         <Button
           :text="submitButtonText"
           :aria-label="submitButtonText"
-          :disabled="content.empty || submitting"
+          :disabled="content.isEmpty || submitting"
           :styleclass="{ primary: true, small: isSmall }"
           class="tui-commentForm__form__buttonGroup__button"
           @click="submit"
@@ -54,8 +53,9 @@
 
 <script>
 import Weka from 'editor_weka/components/Weka';
+import WekaValue from 'editor_weka/WekaValue';
 import Form from 'tui/components/form/Form';
-import { debounce, uniqueId } from 'tui/util';
+import { uniqueId } from 'tui/util';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import Button from 'tui/components/buttons/Button';
 import { FORMAT_JSON_EDITOR } from 'tui/format';
@@ -141,10 +141,7 @@ export default {
       editorKey: `totara_comment_editor_weka_${uniqueId()}`,
       editorOption: null,
       draftId: null,
-      content: {
-        doc: null,
-        empty: true,
-      },
+      content: WekaValue.empty(),
     };
   },
 
@@ -166,27 +163,6 @@ export default {
       this.draftId = item_id;
     },
 
-    $_readJson: debounce(
-      /***
-       *
-       * @param {Object} option
-       */
-      function(option) {
-        this.content.doc = option.getJSON();
-        this.content.empty = option.isEmpty();
-      },
-      100,
-      {}
-    ),
-
-    /**
-     *
-     * @param {Object} option
-     */
-    onUpdate(option) {
-      this.$_readJson(option);
-    },
-
     /**
      * Submitting the content to the server.
      */
@@ -196,13 +172,12 @@ export default {
       }
 
       this.$emit('submit', {
-        content: JSON.stringify(this.content.doc),
+        content: JSON.stringify(this.content.getDoc()),
         format: FORMAT_JSON_EDITOR,
         itemId: this.draftId,
       });
 
-      this.content.doc = null;
-      this.content.empty = true;
+      this.content = WekaValue.empty();
 
       // Changing the key so that the editor can be re-constructed
       await this.$apollo.queries.editorOption.refetch();

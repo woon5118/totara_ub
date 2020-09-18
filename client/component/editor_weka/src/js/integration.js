@@ -98,7 +98,7 @@ class IntegrationView {
             throttledUpdate();
           },
           blur: update,
-          'editor-ready': () => {
+          ready: () => {
             if (this.wekaValue.hasHtml()) {
               update();
             }

@@ -48,12 +48,11 @@
         <Weka
           v-if="draftId"
           :id="id"
+          v-model="content"
           component="engage_article"
           area="content"
-          :doc="content.doc"
           :file-item-id="draftId"
           :placeholder="$str('entercontent', 'engage_article')"
-          @update="handleUpdate"
         />
       </FormRow>
 
@@ -104,8 +103,8 @@ import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import CancelButton from 'tui/components/buttons/Cancel';
 import Button from 'tui/components/buttons/Button';
 import Popover from 'tui/components/popover/Popover';
-import { debounce } from 'tui/util';
 import Weka from 'editor_weka/components/Weka';
+import WekaValue from 'editor_weka/WekaValue';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
 import InfoIcon from 'tui/components/icons/Info';
@@ -143,12 +142,7 @@ export default {
     return {
       // Caching the name separately
       name: this.articleName,
-      content: {
-        // Default state of editor
-        doc: null,
-        isEmpty: true,
-      },
-
+      content: WekaValue.empty(),
       draftId: null,
       submitting: false,
     };
@@ -173,10 +167,10 @@ export default {
         }
 
         try {
-          this.content.doc = JSON.parse(value);
+          this.content = WekaValue.fromDoc(JSON.parse(value));
         } catch (e) {
           // Silenced any invalid json string.
-          this.content.doc = null;
+          this.content = WekaValue.empty();
         }
       },
     },
@@ -187,14 +181,6 @@ export default {
   },
 
   methods: {
-    /**
-     *
-     * @param {Object} opt
-     */
-    handleUpdate(opt) {
-      this.$_readJson(opt);
-    },
-
     async $_loadDraftId() {
       const {
         data: { item_id },
@@ -202,23 +188,10 @@ export default {
       this.draftId = item_id;
     },
 
-    $_readJson: debounce(
-      /**
-       *
-       * @param {Object} opt
-       */
-      function(opt) {
-        this.content.doc = opt.getJSON();
-        this.content.isEmpty = opt.isEmpty();
-      },
-      250,
-      { perArgs: false }
-    ),
-
     submit() {
       const params = {
         name: this.name,
-        content: JSON.stringify(this.content.doc),
+        content: JSON.stringify(this.content.getDoc()),
         itemId: this.draftId,
       };
 

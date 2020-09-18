@@ -27,14 +27,13 @@
         v-if="!$apollo.queries.draftId.loading"
         :id="id"
         :key="editorKey"
+        v-model="formContent"
         component="container_workspace"
         area="discussion"
         :file-item-id="draftId"
         :instance-id="discussionId"
-        :doc="formContent.document"
         :placeholder="$str('start_discussion', 'container_workspace')"
         class="tui-workspaceDiscussionForm__editor"
-        @update="handleUpdate"
       />
     </FormRow>
     <ButtonGroup class="tui-workspaceDiscussionForm__buttonGroup">
@@ -63,8 +62,9 @@ import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import CancelButton from 'tui/components/buttons/Cancel';
 import LoadingButton from 'totara_engage/components/buttons/LoadingButton';
 import WekaEditor from 'editor_weka/components/Weka';
+import WekaValue from 'editor_weka/WekaValue';
 import { FORMAT_JSON_EDITOR } from 'tui/format';
-import { debounce, uniqueId } from 'tui/util';
+import { uniqueId } from 'tui/util';
 
 // GraphQL queries
 import discussionDraftId from 'container_workspace/graphql/discussion_draft_id';
@@ -127,10 +127,7 @@ export default {
     return {
       editorKey: `editor-weka-${uniqueId()}`,
       draftId: null,
-      formContent: {
-        document: null,
-        isEmpty: true,
-      },
+      formContent: WekaValue.empty(),
     };
   },
 
@@ -152,14 +149,11 @@ export default {
       handler(value) {
         if (FORMAT_JSON_EDITOR == this.contentFormat) {
           if (!value) {
-            this.formContent.document = null;
-            this.formContent.isEmpty = true;
-
+            this.formContent = WekaValue.empty();
             return;
           }
 
-          this.formContent.document = JSON.parse(this.content);
-          this.formContent.isEmpty = false;
+          this.formContent = WekaValue.fromDoc(JSON.parse(this.content));
         }
       },
     },
@@ -168,39 +162,17 @@ export default {
   methods: {
     submit() {
       this.$emit('submit', {
-        content: JSON.stringify(this.formContent.document),
+        content: JSON.stringify(this.formContent.getDoc()),
         itemId: this.draftId,
       });
 
       // Reset back
-      this.formContent.document = null;
-      this.formContent.isEmpty = true;
+      this.formContent = WekaValue.empty();
 
       // Changing the editor key so that we can force re-construction of the form.
       this.editorKey = `editor-weka-${uniqueId()}`;
       this.$forceUpdate();
     },
-
-    /**
-     *
-     * @param {Object} opt
-     */
-    handleUpdate(opt) {
-      this.$_readJson(opt);
-    },
-
-    $_readJson: debounce(
-      /**
-       *
-       * @param {Object} opt
-       */
-      function(opt) {
-        this.formContent.document = opt.getJSON();
-        this.formContent.isEmpty = opt.isEmpty();
-      },
-      250,
-      { perArgs: false }
-    ),
   },
 };
 </script>

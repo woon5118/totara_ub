@@ -48,17 +48,16 @@
             <Weka
               v-if="draftId"
               :id="id"
+              v-model="content"
               :class="{
                 'tui-elementEditStaticContent__weka-invalid': errorShow,
               }"
               component="performelement_static_content"
               area="content"
-              :doc="wekaDoc"
               :file-item-id="draftId"
               :placeholder="
                 $str('weka_enter_content', 'performelement_static_content')
               "
-              @update="handleUpdate"
             />
             <FieldError
               v-if="errorShow"
@@ -86,9 +85,7 @@ import FieldError from 'tui/components/form/FieldError';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
 import Weka from 'editor_weka/components/Weka';
-
-// Utils
-import { debounce } from 'tui/util';
+import WekaValue from 'editor_weka/WekaValue';
 
 // GraphQL queries
 import fileDraftId from 'core/graphql/file_unused_draft_item_id';
@@ -130,17 +127,15 @@ export default {
     };
     return {
       initialValues: initialValues,
-      wekaDoc: null,
+      content: WekaValue.empty(),
       draftId: null,
-      isEmpty: true,
       errorShow: false,
     };
   },
 
   async mounted() {
     if (this.rawData && this.rawData.wekaDoc) {
-      this.wekaDoc = JSON.parse(this.rawData.wekaDoc);
-      this.isEmpty = false;
+      this.content = WekaValue.fromDoc(JSON.parse(this.rawData.wekaDoc));
     }
     if (this.sectionId && this.elementId) {
       await this.$_loadExistingDraftId();
@@ -150,14 +145,6 @@ export default {
   },
 
   methods: {
-    /**
-     *
-     * @param {Object} opt
-     */
-    handleUpdate(opt) {
-      this.$_readJson(opt);
-    },
-
     async $_loadNewDraftId() {
       const {
         data: { item_id },
@@ -178,28 +165,15 @@ export default {
       this.draftId = draft_id;
     },
 
-    $_readJson: debounce(
-      /**
-       *
-       * @param {Object} opt
-       */
-      function(opt) {
-        this.wekaDoc = opt.getJSON();
-        this.isEmpty = opt.isEmpty();
-      },
-      250,
-      { perArgs: false }
-    ),
-
     handleSubmit(values) {
       this.errorShow = false;
-      if (this.isEmpty) {
+      if (this.content.isEmpty) {
         this.errorShow = true;
       } else {
         this.$emit('update', {
           title: values.rawTitle,
           data: {
-            wekaDoc: JSON.stringify(this.wekaDoc),
+            wekaDoc: JSON.stringify(this.content.getDoc()),
             draftId: this.draftId,
             format: 'HTML',
             docFormat: 'FORMAT_JSON_EDITOR',

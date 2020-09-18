@@ -19,15 +19,15 @@
 <template>
   <div class="tui-sample-weka">
     <Weka
-      v-if="draftId"
+      v-if="draftId && showEditor"
+      v-model="content"
       component="editor_weka"
       area="default"
-      :doc="doc"
       :file-item-id="draftId"
-      @update="handleUpdate"
     />
     <hr />
     <Button text="Reset" @click="reset" />
+    <Button text="Toggle editor" @click="showEditor = !showEditor" />
     <br />
     <div class="tui-sample-weka__json" v-text="json" />
   </div>
@@ -48,82 +48,17 @@ export default {
 
   data() {
     return {
-      doc: null,
+      showEditor: true,
+      content: null,
       json: '',
       draftId: null,
     };
   },
 
-  created() {
-    this.defaultDoc = {
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [
-            { type: 'text', text: 'As ' },
-            {
-              type: 'mention',
-              attrs: { type: 'user', id: 1, display: 'Gregor Samsa' },
-            },
-            {
-              type: 'text',
-              text:
-                ' awoke one morning from uneasy dreams he found himself transformed in his bed into a gigantic insect.',
-            },
-            {
-              type: 'emoji',
-              attrs: { id: 11, shortcode: '1F602' },
-            },
-          ],
-        },
-        {
-          type: 'paragraph',
-          content: [
-            { type: 'text', text: 'This is a ' },
-            { type: 'text', text: 'link', marks: [{ type: 'strong' }] },
-            { type: 'text', text: ' card:' },
-          ],
-        },
-        { type: 'ruler' },
-        {
-          type: 'link_block',
-          attrs: {
-            url: 'http://ogp.me/',
-            image: 'http://ogp.me/logo.png',
-            title: 'Open Graph protocol',
-            description:
-              'The Open Graph protocol enables any web page to become a rich object in a social graph.',
-          },
-        },
-        {
-          type: 'paragraph',
-          content: [
-            {
-              type: 'text',
-              marks: [
-                {
-                  type: 'link',
-                  attrs: {
-                    href: 'https://www.youtube.com/watch?v=ParCfETbJ80',
-                  },
-                },
-              ],
-              text: 'https://www.youtube.com/watch?v=ParCfETbJ80',
-            },
-          ],
-        },
-        {
-          type: 'link_media',
-          attrs: {
-            url: 'https://www.youtube.com/watch?v=ParCfETbJ80',
-          },
-        },
-        { type: 'paragraph' },
-      ],
-    };
-    this.doc = this.defaultDoc;
-    this.json = JSON.stringify(this.doc, null, 2);
+  watch: {
+    content(value) {
+      this.json = value && value.getDoc();
+    },
   },
 
   async mounted() {
@@ -136,17 +71,8 @@ export default {
   },
 
   methods: {
-    handleUpdate(opt) {
-      this.readJson(opt);
-    },
-
-    readJson(opt) {
-      this.doc = opt.getJSON();
-      this.json = JSON.stringify(opt.getJSON(), null, 2);
-    },
-
     reset() {
-      this.doc = this.defaultDoc;
+      this.content = null;
     },
   },
 };

@@ -188,7 +188,7 @@ export default class WekaValue {
   }
 
   get fileStorageItemId() {
-    return this._editor && this._editor.getFileStorageItemId();
+    return this._editor ? this._editor.getFileStorageItemId() : null;
   }
 }
 

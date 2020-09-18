@@ -24,7 +24,7 @@
     <div class="tui-workspaceForm__container">
       <div class="tui-workspaceForm__container__inputs">
         <FormRow
-          v-slot="{ id, label }"
+          v-slot="{ id }"
           :label="$str('space_name_label', 'container_workspace')"
           class="tui-workspaceForm__container__inputs__formRow"
         >
@@ -39,13 +39,12 @@
             <div class="tui-workspaceForm__container__inputs__formRow__editor">
               <Weka
                 :id="id"
+                v-model="description"
                 :aria-disabled="submitting"
-                :doc="description.doc"
                 class="tui-workspaceForm__container__inputs__formRow__editor__weka"
                 component="container_workspace"
                 area="description"
-                @update="updateDescription"
-                @editor-mounted="editorReady = true"
+                @ready="editorReady = true"
               />
 
               <div
@@ -186,7 +185,7 @@ import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import Button from 'tui/components/buttons/Button';
 import LoadingButton from 'totara_engage/components/buttons/LoadingButton';
 import Weka from 'editor_weka/components/Weka';
-import { debounce } from 'tui/util';
+import WekaValue from 'editor_weka/WekaValue';
 import SpaceImagePicker from 'container_workspace/components/form/upload/SpaceImagePicker';
 import FieldError from 'tui/components/form/FieldError';
 import { FORMAT_JSON_EDITOR } from 'tui/format';
@@ -261,10 +260,7 @@ export default {
   data() {
     return {
       name: this.workspaceName,
-      description: {
-        doc: null,
-        empty: true,
-      },
+      description: WekaValue.empty(),
       descriptionFormat: this.workspaceDescriptionFormat,
       draftId: null,
       innerWorkspacePrivate: this.workspacePrivate || !this.canSetPublic,
@@ -332,18 +328,10 @@ export default {
           return;
         }
 
-        let description = null;
         try {
-          description = JSON.parse(value);
+          this.description = WekaValue.fromDoc(JSON.parse(value));
         } catch (e) {
-          // Make the description as null when occurring error
-          description = null;
-        }
-
-        if (description) {
-          // There is document - so we will skip it.
-          this.description.doc = description;
-          this.description.empty = false;
+          this.description = WekaValue.empty();
         }
       },
 
@@ -364,8 +352,8 @@ export default {
   methods: {
     submit() {
       let description = null;
-      if (!this.description.empty) {
-        description = JSON.stringify(this.description.doc);
+      if (!this.description.isEmpty) {
+        description = JSON.stringify(this.description.getDoc());
       }
 
       const params = {
@@ -378,31 +366,6 @@ export default {
       };
 
       this.$emit('submit', params);
-    },
-
-    $_readJSON: debounce(
-      /**
-       *
-       * @param {{
-       *   getJSON: Function,
-       *   isEmpty: Function
-       * }} option
-       */
-      function(option) {
-        this.description.doc = option.getJSON();
-        this.description.empty = option.isEmpty();
-      },
-      250
-    ),
-
-    /**
-     *
-     * @param {{
-     *   getJSON: Function
-     * }} option
-     */
-    updateDescription(option) {
-      this.$_readJSON(option);
     },
   },
 };

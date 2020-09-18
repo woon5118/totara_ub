@@ -20,22 +20,21 @@
     <Form class="tui-replyForm__form">
       <Weka
         v-if="!$apollo.queries.editorOption.loading && draftId"
+        v-model="content"
         component="totara_comment"
         area="reply"
         :options="editorOption"
-        :doc="content.doc"
         :placeholder="$str('enterreply', 'totara_comment')"
         :file-item-id="draftId"
         :data-file-item-id="draftId"
         class="tui-replyForm__form__editor"
-        @update="update"
-        @editor-mounted="$emit('form-ready')"
+        @ready="$emit('form-ready')"
       />
 
       <SubmitCancelButtonsGroup
         :submit-text="$str('reply', 'totara_comment')"
         :size="size"
-        :disable-submit="content.empty || submitting"
+        :disable-submit="content.isEmpty || submitting"
         :disable-cancel="submitting"
         @click-submit="submit"
         @click-cancel="$emit('cancel')"
@@ -46,10 +45,10 @@
 
 <script>
 import Weka from 'editor_weka/components/Weka';
+import WekaValue from 'editor_weka/WekaValue';
 import Form from 'tui/components/form/Form';
 import SubmitCancelButtonsGroup from 'totara_comment/components/form/group/SubmitCancelButtonsGroup';
 import { FORMAT_JSON_EDITOR } from 'tui/format';
-import { debounce } from 'tui/util';
 import { createMentionContent } from 'editor_weka/helpers/mention';
 import { isValid, SIZE_SMALL } from 'totara_comment/size';
 import ResponseBox from 'totara_comment/components/form/box/ResponseBox';
@@ -115,7 +114,6 @@ export default {
       },
 
       update({ editor }) {
-        console.log(editor);
         return editor;
       },
     },
@@ -125,10 +123,7 @@ export default {
     return {
       draftId: null,
       editorOption: null,
-      content: {
-        doc: null,
-        empty: true,
-      },
+      content: WekaValue.empty(),
     };
   },
 
@@ -147,13 +142,11 @@ export default {
       immediate: true,
       handler(value) {
         if (!value) {
-          this.content.doc = null;
-          this.content.empty = true;
+          this.content = WekaValue.empty();
           return;
         }
 
-        this.content.doc = createMentionContent(value);
-        this.content.empty = false;
+        this.content = WekaValue.fromDoc(createMentionContent(value));
       },
     },
   },
@@ -170,39 +163,18 @@ export default {
       this.draftId = item_id;
     },
 
-    $_readJSON: debounce(
-      /**
-       *
-       * @param {Object} opt
-       */
-      function(opt) {
-        this.content.doc = opt.getJSON();
-        this.content.empty = opt.isEmpty();
-      },
-      100
-    ),
-
-    /**
-     *
-     * @param {Object} opt
-     */
-    update(opt) {
-      this.$_readJSON(opt);
-    },
-
     submit() {
       if (this.submitting) {
         return;
       }
 
       this.$emit('submit', {
-        content: JSON.stringify(this.content.doc),
+        content: JSON.stringify(this.content.getDoc()),
         format: FORMAT_JSON_EDITOR,
         commentId: this.commentId,
       });
 
-      this.content.doc = null;
-      this.content.empty = true;
+      this.content = WekaValue.empty();
 
       this.$_loadDraftId();
     },

@@ -40,12 +40,11 @@
 
     <Form v-else>
       <Weka
+        v-model="content"
         component="totara_playlist"
         area="summary"
-        :doc="content.doc"
         :placeholder="$str('adddescription', 'totara_playlist')"
         class="tui-playlistSummary__editor"
-        @update="handleUpdate"
       />
       <DoneCancelGroup
         :loading="submitting"
@@ -58,10 +57,10 @@
 </template>
 
 <script>
-import { debounce } from 'tui/util';
 import tui from 'tui/tui';
 import { FORMAT_JSON_EDITOR } from 'tui/format';
 import Weka from 'editor_weka/components/Weka';
+import WekaValue from 'editor_weka/WekaValue';
 
 import DoneCancelGroup from 'totara_engage/components/buttons/DoneCancelGroup';
 import InlineEditing from 'totara_engage/components/form/InlineEditing';
@@ -96,11 +95,7 @@ export default {
     return {
       editing: false,
       submitting: false,
-      content: {
-        doc: null,
-        isEmpty: true,
-        summaryformat: null,
-      },
+      content: WekaValue.empty(),
     };
   },
 
@@ -118,14 +113,7 @@ export default {
       result({ data: { playlist } }) {
         if (playlist) {
           if (playlist.summary) {
-            this.content.doc = JSON.parse(playlist.summary);
-            if (this.content.doc.content[0].content) {
-              this.content.isEmpty = false;
-            }
-          }
-
-          if (playlist.summaryformat) {
-            this.content.summaryformat = playlist.summaryformat;
+            this.content = WekaValue.fromDoc(JSON.parse(playlist.summary));
           }
         }
       },
@@ -144,20 +132,6 @@ export default {
       this.$_readJson(opt);
     },
 
-    $_readJson: debounce(
-      /**
-       *
-       * @param {Object} opt
-       */
-      function(opt) {
-        this.content.doc = opt.getJSON();
-        this.content.isEmpty =
-          opt.isEmpty() || !this.content.doc.content[0].content;
-      },
-      250,
-      { perArgs: false }
-    ),
-
     submit() {
       this.submitting = true;
 
@@ -166,7 +140,7 @@ export default {
           mutation: updatePlaylist,
           variables: {
             id: this.instanceId,
-            summary: JSON.stringify(this.content.doc),
+            summary: JSON.stringify(this.content.getDoc()),
             summary_format: FORMAT_JSON_EDITOR,
           },
 
@@ -181,8 +155,7 @@ export default {
               variables: {
                 id: this.instanceId,
               },
-
-              data: data,
+              data,
             });
           },
         })

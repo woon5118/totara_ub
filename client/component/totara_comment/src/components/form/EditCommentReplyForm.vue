@@ -20,19 +20,18 @@
     <template v-if="!$apollo.loading">
       <Weka
         v-if="!$apollo.queries.editorOption.loading"
+        v-model="content"
         :area="item.comment_area"
         :instance-id="itemId"
         :file-item-id="item.file_draft_id"
         component="totara_comment"
         :options="editorOption"
-        :doc="content.doc"
         class="tui-editCommentReplyForm__editor"
-        @update="update"
       />
 
       <SubmitCancelButtonsGroup
         :submit-text="$str('done', 'totara_comment')"
-        :disable-submit="content.empty || submitting"
+        :disable-submit="content.isEmpty || submitting"
         :size="size"
         @click-submit="submit"
         @click-cancel="$emit('cancel')"
@@ -43,8 +42,8 @@
 
 <script>
 import Weka from 'editor_weka/components/Weka';
+import WekaValue from 'editor_weka/WekaValue';
 import Form from 'tui/components/form/Form';
-import { debounce } from 'tui/util';
 import { SIZE_SMALL, isValid } from 'totara_comment/size';
 import SubmitCancelButtonsGroup from 'totara_comment/components/form/group/SubmitCancelButtonsGroup';
 
@@ -70,8 +69,7 @@ export default {
       },
 
       result({ data: { draftitem } }) {
-        this.content.doc = JSON.parse(draftitem.content);
-        this.content.empty = false;
+        this.content = WekaValue.fromDoc(JSON.parse(draftitem.content));
       },
 
       update({ draftitem }) {
@@ -127,44 +125,17 @@ export default {
     return {
       editorOption: null,
       item: {},
-      content: {
-        doc: null,
-        empty: true,
-        // Note that this is for file storage item id, not comment nor reply id.
-        itemId: null,
-      },
+      content: WekaValue.empty(),
     };
   },
 
   methods: {
-    $_readJSON: debounce(
-      /**
-       *
-       * @param {Object} option
-       */
-      function(option) {
-        this.content.doc = option.getJSON();
-        this.content.empty = option.isEmpty();
-        this.content.itemId = option.getFileStorageItemId();
-      },
-      100,
-      {}
-    ),
-
-    /**
-     *
-     * @param {Object} option
-     */
-    update(option) {
-      this.$_readJSON(option);
-    },
-
     submit() {
       const params = {
         id: this.itemId,
-        content: JSON.stringify(this.content.doc),
+        content: JSON.stringify(this.content.getDoc()),
         format: this.item.format,
-        itemId: this.content.itemId,
+        itemId: this.content.fileStorageItemId,
       };
 
       this.$emit('update-item', params);

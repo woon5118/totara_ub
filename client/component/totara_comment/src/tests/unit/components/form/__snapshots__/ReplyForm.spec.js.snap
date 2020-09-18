@@ -15,6 +15,7 @@ exports[`totara_comment/components/form/ReplyForm.vue Checks snapshot 1`] = `
       data-file-item-id="100"
       fileitemid="100"
       placeholder="enterreply-totara_comment"
+      value="[object Object]"
     />
      
     <submitcancelbuttonsgroup-stub
