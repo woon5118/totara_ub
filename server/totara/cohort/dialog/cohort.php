@@ -47,18 +47,21 @@ if ($instancetype === COHORT_ASSN_ITEMTYPE_COURSE) {
     if (!empty($CFG->audiencevisibility) && has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
         $capable = true;
     }
-
 } else if ($instancetype === COHORT_ASSN_ITEMTYPE_CATEGORY) {
     $context = context_coursecat::instance($instanceid);
-    require_capability('totara/coursecatalog:manageaudiencevisibility', $context);
-
+    if (has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
+        $capable = true;
+    }
 } else if ($instancetype === COHORT_ASSN_ITEMTYPE_PROGRAM || $instancetype === COHORT_ASSN_ITEMTYPE_CERTIF) {
     $context = context_program::instance($instanceid);
-    require_capability('totara/coursecatalog:manageaudiencevisibility', $context);
-
+    if (has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
+        $capable = true;
+    }
 } else {
     $context = context_system::instance();
-    require_capability('totara/coursecatalog:manageaudiencevisibility', $context);
+    if (has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
+        $capable = true;
+    }
 }
 
 if (has_capability('moodle/cohort:view', $context) || has_capability('moodle/cohort:manage', $context)) {
