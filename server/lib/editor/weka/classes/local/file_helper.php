@@ -22,6 +22,11 @@
  */
 namespace editor_weka\local;
 
+use context;
+use context_system;
+use moodle_url;
+use repository;
+
 /**
  * Local API for preparing the fileupload area.
  */
@@ -35,11 +40,13 @@ final class file_helper {
         require_once("{$CFG->dirroot}/repository/lib.php");
 
         if (null === $context_id) {
-            $context_id = \context_system::instance()->id;
+            $context = context_system::instance();
+        } else {
+            $context = context::instance_by_id($context_id);
         }
 
-        $repositories = \repository::get_instances([
-            'currentcontextid' => $context_id,
+        $repositories = repository::get_instances([
+            'currentcontext' => $context,
             'type' => 'upload',
             'userid' => $USER->id
         ]);
@@ -52,7 +59,7 @@ final class file_helper {
 
         return [
             'repository_id' => $repository_id,
-            'url' => (new \moodle_url('/repository/repository_ajax.php', ['action' => 'upload']))->out()
+            'url' => (new moodle_url('/repository/repository_ajax.php', ['action' => 'upload']))->out()
         ];
     }
 }
