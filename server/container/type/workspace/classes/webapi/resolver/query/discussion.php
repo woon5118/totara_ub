@@ -23,7 +23,6 @@
 namespace container_workspace\webapi\resolver\query;
 
 use container_workspace\interactor\workspace\interactor;
-use container_workspace\workspace;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -45,7 +44,7 @@ final class discussion implements query_resolver, has_middleware {
         $discussion = model::from_id($args['id']);
 
         if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context($discussion->get_workspace()->get_context());
+            $ec->set_relevant_context($discussion->get_context());
         }
 
         // Cannot load discussions if you can't see the workspace

@@ -102,7 +102,7 @@ final class share_repository extends repository {
             ->where('s.itemid', $itemid)
             ->where('s.component', $component)
             ->where('sr.visibility', $visibility)
-            ->group_by('sr.sharerid');
+            ->group_by('u.id');
 
         $sharers = [];
         foreach ($builder->get() as $sharer) {

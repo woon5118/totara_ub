@@ -44,7 +44,6 @@ use totara_core\hook\base;
 class core_user {
 
     protected const PERFORM_ALLOWED_FIELDS = [
-        'id',
         'fullname',
         'profileimageurl',
         'profileimageurlsmall',

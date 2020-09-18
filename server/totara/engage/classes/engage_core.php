@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die;
  *
  * Contains static methods only, that are to be treated as public API.
  */
-final class lib {
+final class engage_core {
 
     public static function allow_view_user_profile(): bool {
         $features = [

@@ -42,9 +42,16 @@ final class shared_cards implements query_resolver, has_middleware {
      *
      * @return array
      */
+
     public static function resolve(array $args, execution_context $ec): array {
+        /** @var workspace $workspace */
+        $workspace = factory::from_id($args['workspace_id']);
+
+        if (!$workspace->is_typeof(workspace::get_type())) {
+            throw new \coding_exception("Cannot fetch discussions from container that is not a workspace");
+        }
+
         if (!$ec->has_relevant_context()) {
-            $workspace = factory::from_id($args['workspace_id']);
             $ec->set_relevant_context($workspace->get_context());
         }
 

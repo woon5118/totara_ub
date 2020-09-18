@@ -27,7 +27,7 @@ namespace totara_engage\watcher;
 use core_user\hook\allow_view_profile;
 use core_user\hook\allow_view_profile_field;
 use core_user\profile\display_setting;
-use totara_engage\lib as engage_lib;
+use totara_engage\engage_core;
 
 /**
  * Class to handle user hooks.
@@ -61,11 +61,18 @@ final class core_user {
         }
 
         // Finally, check if any of the engage features have been turned on.
-        if (engage_lib::allow_view_user_profile()) {
+        if (engage_core::allow_view_user_profile()) {
             $hook->give_permission();
             return;
         }
     }
+
+    protected const ENGAGE_ALLOWED_FIELDS = [
+        'fullname',
+        'profileimageurl',
+        'profileimageurlsmall',
+        'profileimagealt',
+    ];
 
     /**
      * User access hook to check if one user can view another users profile field.
@@ -77,7 +84,7 @@ final class core_user {
             return;
         }
 
-        if (!engage_lib::allow_view_user_profile()) {
+        if (!engage_core::allow_view_user_profile()) {
             return;
         }
 
@@ -99,10 +106,13 @@ final class core_user {
             return;
         }
 
-        // If there are other properties, beyond the profile card, that need to be accessed due to
-        // some situation in engage then we should check both the field accessed and that access
-        // should be allow (such as users having some measurable/testable relationship) here.
-        // TODO try setting user profile card to show ONLY email and then run all engage tests.
-        return;
+        // Engage allows users to see some hard-coded user properties of other users. For example,
+        // when a user has commented on a public article.  We don't know that this operation is
+        // happening in the context of a resource, so we have to assume that it could be.
+        // TODO try setting user profile card to show ONLY email AND disable profile watcher above and then run all engage tests.
+        if (in_array($hook->field, self::ENGAGE_ALLOWED_FIELDS)) {
+            $hook->give_permission();
+            return;
+        }
     }
 }
