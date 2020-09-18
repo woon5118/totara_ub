@@ -174,19 +174,6 @@ final class settings {
     }
 
     /**
-     * Get enabled product flavours.
-     *
-     * @return array
-     */
-    public function get_flavours(): array {
-        return [
-            'engage' => true, //!advanced_feature::is_disabled('engage_resources'),
-            'perform' => true,
-            'learn' => true,
-        ];
-    }
-
-    /**
      * @param array $categories
      */
     public function validate_categories(array $categories): void {

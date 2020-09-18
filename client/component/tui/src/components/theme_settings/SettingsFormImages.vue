@@ -79,6 +79,7 @@
     </Collapsible>
 
     <Collapsible
+      v-if="flavoursData.learn"
       :label="$str('formimages_group_learn', 'totara_tui')"
       :initial-state="true"
     >
@@ -103,6 +104,7 @@
           </FormRowDetails>
         </FormRow>
         <FormRow
+          v-if="fileData.learnprogram"
           :label="$str('formimages_label_program', 'totara_tui')"
           :is-stacked="true"
         >
@@ -122,6 +124,7 @@
           </FormRowDetails>
         </FormRow>
         <FormRow
+          v-if="fileData.learncert"
           :label="$str('formimages_label_cert', 'totara_tui')"
           :is-stacked="true"
         >
@@ -144,11 +147,16 @@
     </Collapsible>
 
     <Collapsible
+      v-if="
+        flavoursData.engage &&
+          (fileData.engageresource || fileData.engageworkspace)
+      "
       :label="$str('formimages_group_engage', 'totara_tui')"
       :initial-state="true"
     >
       <FormRowStack>
         <FormRow
+          v-if="fileData.engageresource"
           :label="$str('formimages_label_resource', 'totara_tui')"
           :is-stacked="true"
         >
@@ -168,6 +176,7 @@
           </FormRowDetails>
         </FormRow>
         <FormRow
+          v-if="fileData.engageworkspace"
           :label="$str('formimages_label_workspace', 'totara_tui')"
           :is-stacked="true"
         >
@@ -258,6 +267,16 @@ export default {
       type: Array,
       default: function() {
         return [];
+      },
+    },
+    // Object with keys present for each 'Flavour' of Totara possible on the
+    // site, each key value is a Boolean representing whether that Flavour is
+    // currently enabled. We use this to determine whether to show various
+    // settings related to a given Flavour
+    flavoursData: {
+      type: Object,
+      default: function() {
+        return {};
       },
     },
     // Saving state, controlled by parent component GraphQl mutation handling

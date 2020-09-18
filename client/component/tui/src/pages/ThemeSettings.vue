@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <div>
+  <div class="tui-themesettings">
     <h2>{{ pageTitle }}</h2>
     <Loader :loading="!allDataLoaded">
       <div
@@ -92,6 +92,7 @@
             <SettingsFormImages
               v-if="embeddedFormData.formFieldData.images"
               :saved-form-field-data="embeddedFormData.formFieldData.images"
+              :flavours-data="embeddedFormData.flavours"
               :file-form-field-data="embeddedFormData.fileData"
               :is-saving="isSaving"
               @submit="submit"

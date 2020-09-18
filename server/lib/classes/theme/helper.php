@@ -25,6 +25,7 @@ namespace core\theme;
 
 use core\theme\settings as theme_settings;
 use core\theme\file\theme_file;
+use totara_core\advanced_feature;
 
 /**
  * Theme appearance settings helper.
@@ -70,10 +71,22 @@ final class helper {
             ];
         }
 
+        // Flavours.
+        $engage_resources = advanced_feature::is_enabled('engage_resources');
+        $container_workspace = advanced_feature::is_enabled('container_workspace');
+        $flavours  = [
+            // Learn will always be true as creating a course is part of core.
+            'learn' => true,
+            // No settings yet for perform.
+            'perform' => false,
+            // Determine if the engage flavour is enabled.
+            'engage' => $engage_resources || $container_workspace,
+        ];
+
         return [
             'categories' => $categories,
             'files' => $files,
-            'flavours' => $theme_settings->get_flavours(),
+            'flavours' => $flavours,
         ];
     }
 
