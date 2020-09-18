@@ -307,9 +307,9 @@ class auth extends \auth_plugin_base {
      *
      * @param array $externaldata data from authorization server
      * @param stdClass $userdata Current data of the user to be updated
-     * @return stdClass The updated user record, or the existing one if there's nothing to be updated.
+     * @return array The updated user record, or the existing one if there's nothing to be updated.
      */
-    private function update_user(array $externaldata, $userdata) {
+    private function update_user(array $externaldata, $userdata): array {
         global $CFG;
         require_once($CFG->dirroot.'/user/profile/lib.php');
 
@@ -320,7 +320,7 @@ class auth extends \auth_plugin_base {
         // We can only update if the default authentication type of the user is set to OAuth2 as well. Otherwise, we might mess
         // up the user data of other users that use different authentication mechanisms (e.g. linked logins).
         if ($userdata->auth !== $this->authtype) {
-            return $userdata;
+            return (array) $userdata;
         }
 
         // Go through each field from the external data.
@@ -358,7 +358,7 @@ class auth extends \auth_plugin_base {
         profile_save_data($user);
 
         // Refresh user for $USER variable.
-        return get_complete_user_data('id', $user->id);
+        return (array) get_complete_user_data('id', $user->id);
     }
 
     /**

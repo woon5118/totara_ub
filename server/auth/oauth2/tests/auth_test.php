@@ -49,4 +49,28 @@ class auth_oauth2_auth_testcase extends advanced_testcase {
                 'your password cannot be reset because you are using your account on another site to log in',
                 $info['message']);
     }
+
+    /**
+     * Test that \oauth2_auth\auth::update_user() returns an array, not object.
+     */
+    public function test_update_user_array() {
+        global $USER;
+
+        $this->setAdminUser();
+
+        $oauth = new \auth_oauth2\auth();
+        $reflection = new ReflectionClass($oauth);
+        $method = $reflection->getMethod('update_user');
+        $method->setAccessible(true);
+
+        // Positive test.
+        $USER->auth = 'oauth2';
+        $result = $method->invoke($oauth, [], $USER);
+        $this->assertIsArray($result);
+
+        // Negative test.
+        $USER->auth = 'oauth';
+        $result = $method->invoke($oauth, [], $USER);
+        $this->assertIsArray($result);
+    }
 }
