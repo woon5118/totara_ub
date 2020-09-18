@@ -234,7 +234,7 @@ class engage_article_share_testcase extends advanced_testcase {
         $sharer = reset($sharers);
 
         // Sharer should match the user details.
-        $user = \core_user::get_user($sharer['sharerid']);
+        $user = \core_user::get_user($sharer->id);
         $this->assertEquals('Some1', $user->firstname);
         $this->assertEquals('Any1', $user->lastname);
     }

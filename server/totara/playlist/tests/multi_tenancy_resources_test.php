@@ -41,21 +41,9 @@ class totara_playlist_multi_tenancy_resources_testcase extends advanced_testcase
         $user_one = $generator->create_user();
         $user_two = $generator->create_user();
 
-        // Log in as user one/two and assign caps for each other.
-
-        /** @var totara_engage_generator $engage_generator */
-        $engage_generator = $generator->get_plugin_generator('totara_engage');
-
-        $this->setUser($user_two);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_one->id);
-
-        $this->setUser($user_one);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_two->id);
-
         /** @var totara_tenant_generator $tenant_generator */
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
         $tenant_generator->enable_tenants();
-
 
         /** @var totara_playlist_generator $playlist_generator */
         $playlist_generator = $generator->get_plugin_generator('totara_playlist');
@@ -140,17 +128,8 @@ class totara_playlist_multi_tenancy_resources_testcase extends advanced_testcase
     public function test_fetching_resources_not_added(): void {
         $generator = $this->getDataGenerator();
 
-        /** @var totara_engage_generator $engage_generator */
-        $engage_generator = $generator->get_plugin_generator('totara_engage');
-
         $user_one = $generator->create_user();
         $user_two = $generator->create_user();
-
-        $this->setUser($user_one);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_two->id);
-
-        $this->setUser($user_two);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_one->id);
 
         $this->setAdminUser();
         /** @var totara_topic_generator $topic_generator */
@@ -243,28 +222,10 @@ class totara_playlist_multi_tenancy_resources_testcase extends advanced_testcase
     public function test_fetching_resources_not_added_by_participant(): void {
         $generator = $this->getDataGenerator();
 
-        /** @var totara_engage_generator $engage_generator */
-        $engage_generator = $generator->get_plugin_generator('totara_engage');
-
         $user_one = $generator->create_user();
         $user_two = $generator->create_user();
         $user_three = $generator->create_user();
         $user_four = $generator->create_user();
-
-        $this->setUser($user_one);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_two->id);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_three->id);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_four->id);
-
-        $this->setUser($user_two);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_one->id);
-
-        $this->setUser($user_three);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_one->id);
-
-        $this->setUser($user_four);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_one->id);
-
 
         $this->setAdminUser();
         /** @var totara_topic_generator $topic_generator */

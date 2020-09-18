@@ -8,11 +8,6 @@ Feature: Private workspace workflow
       | user_one   | User      | One      | one@example.com   |
       | user_two   | User      | Two      | two@example.com   |
       | user_three | User      | Three    | three@example.com |
-    # This is for temporary solution
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
   Scenario: Create private workspace
     Given I am on a totara site

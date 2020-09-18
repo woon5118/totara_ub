@@ -33,7 +33,7 @@ use pathway_manual\webapi\resolver\type\role_rating as role_rating_type;
 use totara_competency\expand_task;
 use totara_competency\models\assignment;
 
-require_once(__DIR__ . '/pathway_manual_base_test.php');
+require_once(__DIR__ . '/pathway_manual_base_testcase.php');
 
 /**
  * Tests the query to fetch all roles and their latest ratings for a given user and competency

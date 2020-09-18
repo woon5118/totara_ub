@@ -52,9 +52,8 @@ class container_workspace_multi_tenancy_library_testcase extends advanced_testca
         $user_two = $generator->create_user();
         $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant->id);
 
-        // Login as user one and start creeating the workspace
+        // Login as user one and start creating the workspace
         $this->setUser($user_one);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_two->id);
 
         /** @var container_workspace_generator $workspace_generator */
         $workspace_generator = $generator->get_plugin_generator('container_workspace');
@@ -127,12 +126,6 @@ class container_workspace_multi_tenancy_library_testcase extends advanced_testca
 
         /** @var totara_engage_generator $engage_generator */
         $engage_generator = $generator->get_plugin_generator('totara_engage');
-
-        $this->setUser($user_one);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_two->id);
-
-        $this->setUser($user_two);
-        $engage_generator->set_capabilities(CAP_ALLOW, $user_one->id);
 
         $this->setAdminUser();
 

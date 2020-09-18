@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package totara_engage
  */
 

@@ -31,7 +31,7 @@ use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/pathway_manual_base_test.php');
+require_once(__DIR__ . '/pathway_manual_base_testcase.php');
 
 class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase {
 

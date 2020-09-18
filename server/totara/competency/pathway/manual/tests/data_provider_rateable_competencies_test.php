@@ -32,7 +32,7 @@ use totara_competency\expand_task;
 use totara_competency\models\assignment;
 use totara_competency\user_groups;
 
-require_once(__DIR__ . '/pathway_manual_base_test.php');
+require_once(__DIR__ . '/pathway_manual_base_testcase.php');
 
 class pathway_manual_data_provider_user_rateable_competencies_testcase extends pathway_manual_base_testcase {
 

@@ -41,7 +41,7 @@ use mod_perform\util;
 use totara_core\advanced_feature;
 use totara_core\hook\base;
 
-class user {
+class core_user {
 
     protected const PERFORM_ALLOWED_FIELDS = [
         'id',

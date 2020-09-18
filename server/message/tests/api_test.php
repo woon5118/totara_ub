@@ -23,6 +23,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core_user\access_controller;
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -38,6 +41,19 @@ require_once($CFG->dirroot . '/message/tests/messagelib_test.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class core_message_api_testcase extends core_message_messagelib_testcase {
+
+    private function disable_engage_features() {
+        advanced_feature::disable('engage_resources');
+        access_controller::clear_instance_cache();
+    }
+
+    public function setUp(): void {
+        parent::setUp();
+
+        // Engage allows several properties of users to become visible to all other users. To test that user
+        // properties are hidden when appropritate, we need to disable engage.
+        $this->disable_engage_features();
+    }
 
     public function test_mark_all_read_for_user_touser() {
         $sender = $this->getDataGenerator()->create_user(array('firstname' => 'Test1', 'lastname' => 'User1'));
@@ -290,8 +306,6 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         // Perform a search.
         $messages = \core_message\api::search_messages($user1->id, 'o');
 
-        $isonline = \totara_engage\lib::allow_view_user_profile() ? false : null;
-
         // Confirm the data is correct.
         $this->assertEquals(2, count($messages));
 
@@ -304,7 +318,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertTrue($message1->ismessaging);
         $this->assertEquals('Word.', $message1->lastmessage);
         $this->assertNotEmpty($message1->messageid);
-        $this->assertSame($isonline, $message1->isonline);
+        $this->assertNull($message1->isonline);
         $this->assertFalse($message1->isread);
         $this->assertFalse($message1->isblocked);
         $this->assertNull($message1->unreadcount);
@@ -315,7 +329,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertTrue($message2->ismessaging);
         $this->assertEquals('Yo!', $message2->lastmessage);
         $this->assertNotEmpty($message2->messageid);
-        $this->assertSame($isonline, $message1->isonline);
+        $this->assertNull($message2->isonline);
         $this->assertTrue($message2->isread);
         $this->assertFalse($message2->isblocked);
         $this->assertNull($message2->unreadcount);
@@ -355,7 +369,6 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
 
         // Retrieve the conversations.
         $conversations = \core_message\api::get_conversations($user1->id);
-        $isonline = \totara_engage\lib::allow_view_user_profile() ? false : null;
 
         // Confirm the data is correct.
         $this->assertEquals(3, count($conversations));
@@ -369,7 +382,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertTrue($message1->ismessaging);
         $this->assertEquals('Dope.', $message1->lastmessage);
         $this->assertEquals($messageid3, $message1->messageid);
-        $this->assertSame($isonline, $message1->isonline);
+        $this->assertNull($message1->isonline);
         $this->assertFalse($message1->isread);
         $this->assertFalse($message1->isblocked);
         $this->assertEquals(1, $message1->unreadcount);
@@ -379,7 +392,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertTrue($message2->ismessaging);
         $this->assertEquals('Cool.', $message2->lastmessage);
         $this->assertEquals($messageid2, $message2->messageid);
-        $this->assertSame($isonline, $message2->isonline);
+        $this->assertNull($message2->isonline);
         $this->assertFalse($message2->isread);
         $this->assertFalse($message2->isblocked);
         $this->assertEquals(2, $message2->unreadcount);
@@ -389,7 +402,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertTrue($message3->ismessaging);
         $this->assertEquals('Word.', $message3->lastmessage);
         $this->assertEquals($messageid1, $message3->messageid);
-        $this->assertSame($isonline, $message1->isonline);
+        $this->assertNull($message3->isonline);
         $this->assertFalse($message3->isread);
         $this->assertFalse($message3->isblocked);
         $this->assertEquals(2, $message3->unreadcount);
@@ -426,7 +439,6 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
 
         // Retrieve the conversations.
         $conversations = \core_message\api::get_conversations($user1->id, 1, 1);
-        $isonline = \totara_engage\lib::allow_view_user_profile() ? false : null;
 
         // We should only have one conversation because of the limit.
         $this->assertCount(1, $conversations);
@@ -438,7 +450,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertTrue($conversation->ismessaging);
         $this->assertEquals('Cool.', $conversation->lastmessage);
         $this->assertEquals($messageid2, $conversation->messageid);
-        $this->assertSame($isonline, $conversation->isonline);
+        $this->assertNull($conversation->isonline);
         $this->assertFalse($conversation->isread);
         $this->assertFalse($conversation->isblocked);
         $this->assertEquals(2, $conversation->unreadcount);
@@ -456,7 +468,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertTrue($conversation->ismessaging);
         $this->assertEquals('Word.', $conversation->lastmessage);
         $this->assertEquals($messageid1, $conversation->messageid);
-        $this->assertSame($isonline, $conversation->isonline);
+        $this->assertNull($conversation->isonline);
         $this->assertFalse($conversation->isread);
         $this->assertFalse($conversation->isblocked);
         $this->assertEquals(2, $conversation->unreadcount);
@@ -948,8 +960,6 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         // Retrieve the contacts.
         $contacts = \core_message\api::get_contacts($user1->id);
 
-        $isonline = \totara_engage\lib::allow_view_user_profile() ? false : null;
-
         // Confirm the data is correct.
         $this->assertEquals(3, count($contacts));
 
@@ -962,7 +972,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertFalse($contact1->ismessaging);
         $this->assertNull($contact1->lastmessage);
         $this->assertNull($contact1->messageid);
-        $this->assertSame($isonline, $contact1->isonline);
+        $this->assertNull($contact1->isonline);
         $this->assertFalse($contact1->isread);
         $this->assertFalse($contact1->isblocked);
         $this->assertNull($contact1->unreadcount);
@@ -972,7 +982,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertFalse($contact2->ismessaging);
         $this->assertNull($contact2->lastmessage);
         $this->assertNull($contact2->messageid);
-        $this->assertSame($isonline, $contact2->isonline);
+        $this->assertNull($contact2->isonline);
         $this->assertFalse($contact2->isread);
         $this->assertFalse($contact2->isblocked);
         $this->assertNull($contact2->unreadcount);
@@ -982,7 +992,7 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertFalse($contact3->ismessaging);
         $this->assertNull($contact3->lastmessage);
         $this->assertNull($contact3->messageid);
-        $this->assertSame($isonline, $contact3->isonline);
+        $this->assertNull($contact3->isonline);
         $this->assertFalse($contact3->isread);
         $this->assertFalse($contact3->isblocked);
         $this->assertNull($contact3->unreadcount);
@@ -1084,24 +1094,13 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $profile = \core_message\api::get_profile($user1->id, $user2->id);
 
         $this->assertEquals($user2->id, $profile->userid);
-
-        if (\totara_engage\lib::allow_view_user_profile()) {
-            $this->assertSame($user2->email, $profile->email);
-            $this->assertSame($user2->country, $profile->country);
-            $this->assertSame($user2->city, $profile->city);
-            $this->assertEquals(fullname($user2), $profile->fullname);
-            $this->assertSame(false, $profile->isonline);
-            $this->assertSame(false, $profile->isblocked);
-            $this->assertSame(false, $profile->iscontact);
-        } else {
-            $this->assertEmpty($profile->email);
-            $this->assertEmpty($profile->country);
-            $this->assertEmpty($profile->city);
-            $this->assertEquals(fullname($user2), $profile->fullname);
-            $this->assertNull($profile->isonline);
-            $this->assertFalse($profile->isblocked);
-            $this->assertFalse($profile->iscontact);
-        }
+        $this->assertEmpty($profile->email);
+        $this->assertEmpty($profile->country);
+        $this->assertEmpty($profile->city);
+        $this->assertEquals(fullname($user2), $profile->fullname);
+        $this->assertNull($profile->isonline);
+        $this->assertFalse($profile->isblocked);
+        $this->assertFalse($profile->iscontact);
     }
 
     /**

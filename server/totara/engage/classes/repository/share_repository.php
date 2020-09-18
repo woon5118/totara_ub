@@ -24,6 +24,7 @@ namespace totara_engage\repository;
 
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use core_user\access_controller;
 use totara_core\advanced_feature;
 use totara_engage\entity\share;
 use totara_engage\entity\share_recipient;
@@ -67,7 +68,7 @@ final class share_repository extends repository {
      */
     public function get_total_sharers(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): int {
         $builder = builder::table(share::TABLE, 's')
-            ->join([share_recipient::TABLE, 'sr'], function(builder $joining) {
+            ->join([share_recipient::TABLE, 'sr'], function (builder $joining) {
                 $joining
                     ->where_raw('sr.shareid = s.id')
                     ->where_raw('sr.sharerid != s.ownerid');
@@ -89,10 +90,10 @@ final class share_repository extends repository {
      * @param int|null $visibility
      * @return array
      */
-    public function get_sharers(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): \Generator {
+    public function get_sharers(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): array {
         $builder = builder::table(share::TABLE, 's')
             ->select('u.*')
-            ->join([share_recipient::TABLE, 'sr'], function(builder $joining) {
+            ->join([share_recipient::TABLE, 'sr'], function (builder $joining) {
                 $joining
                     ->where_raw('sr.shareid = s.id')
                     ->where_raw('sr.sharerid != s.ownerid');
@@ -103,11 +104,13 @@ final class share_repository extends repository {
             ->where('sr.visibility', $visibility)
             ->group_by('sr.sharerid');
 
+        $sharers = [];
         foreach ($builder->get() as $sharer) {
-            if (\core_user\access_controller::for($sharer)->can_view_profile()) {
-                yield $sharer;
+            if (access_controller::for($sharer)->can_view_profile()) {
+                $sharers[] = $sharer;
             }
         }
+        return $sharers;
     }
 
     /**
@@ -131,7 +134,11 @@ final class share_repository extends repository {
      * @param int|null $visibility
      * @return array
      */
-    public function get_total_recipients_per_area(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): array {
+    public function get_total_recipients_per_area(
+        int $itemid,
+        string $component,
+        ?int $visibility = share_model::VISIBILITY_VISIBLE
+    ): array {
         $builder = builder::table(share_recipient::TABLE, 'sr')
             ->join([share::TABLE, 's'], 'shareid', '=', 'id')
             ->select_raw('sr.area, count(*) as total')
@@ -163,17 +170,17 @@ final class share_repository extends repository {
 
         // If workspaces aren't enabled, filter out any previous workspace shares
         if ($recipients && advanced_feature::is_disabled('container_workspace')) {
-            $recipients = array_values(array_filter($recipients, function(array $share) {
+            $recipients = array_values(array_filter($recipients, function (array $share) {
                 return $share['component'] !== 'container_workspace';
             }));
         }
 
         if (!empty($recipients)) {
-            $recipients = array_filter($recipients, function($recipient) {
+            $recipients = array_filter($recipients, function ($recipient) {
                 if ($recipient['area'] !== 'USER') {
                     return true;
                 }
-                return \core_user\access_controller::for_user_id($recipient['instanceid'])->can_view_profile();
+                return access_controller::for_user_id($recipient['instanceid'])->can_view_profile();
             });
         }
 

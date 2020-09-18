@@ -22,6 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
+use core_user\access_controller;
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -58,10 +61,19 @@ class core_myprofilelib_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
+    private function disable_engage_features() {
+        advanced_feature::disable('engage_resources');
+        access_controller::clear_instance_cache();
+    }
+
     public function setUp(): void {
         // Set the $PAGE->url value so core_myprofile_navigation() doesn't complain.
         global $PAGE;
         $PAGE->set_url('/admin/tool/phpunit/index.php');
+
+        // Engage allows several properties of users to become visible to all other users. To test that user
+        // properties are hidden when appropritate, we need to disable engage.
+        $this->disable_engage_features();
 
         $this->user = $this->getDataGenerator()->create_user();
         $this->user2 = $this->getDataGenerator()->create_user();
@@ -107,12 +119,7 @@ class core_myprofilelib_testcase extends advanced_testcase {
         $reflector = new ReflectionObject($this->tree);
         $nodes = $reflector->getProperty('nodes');
         $nodes->setAccessible(true);
-
-        if (\totara_engage\lib::allow_view_user_profile()) {
-            $this->assertArrayHasKey('fullprofile', $nodes->getValue($this->tree));
-        } else {
-            $this->assertArrayNotHasKey('fullprofile', $nodes->getValue($this->tree));
-        }
+        $this->assertArrayNotHasKey('fullprofile', $nodes->getValue($this->tree));
     }
 
     /**

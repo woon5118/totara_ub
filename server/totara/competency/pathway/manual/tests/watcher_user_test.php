@@ -22,10 +22,12 @@
  * @subpackage test
  */
 
+use core_user\access_controller;
 use pathway_manual\models\roles\manager;
+use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
-class watcher_user_testcase extends advanced_testcase {
+class pathway_manual_watcher_user_testcase extends advanced_testcase {
 
     use webapi_phpunit_helper;
 
@@ -44,8 +46,18 @@ class watcher_user_testcase extends advanced_testcase {
      */
     protected $manager_user;
 
+    private function disable_engage_features() {
+        advanced_feature::disable('engage_resources');
+        access_controller::clear_instance_cache();
+    }
+
     protected function setUp(): void {
         parent::setUp();
+
+        // Engage allows several properties of users to become visible to all other users. To test that user
+        // properties are hidden when appropritate, we need to disable engage.
+        $this->disable_engage_features();
+
         $this->generator = self::getDataGenerator()->get_plugin_generator('totara_competency');
         $this->staff_user = self::getDataGenerator()->create_user();
         $this->manager_user = self::getDataGenerator()->create_user();
@@ -102,10 +114,8 @@ class watcher_user_testcase extends advanced_testcase {
         $invalid_rating1 = $this->generator->create_manual_rating($competency, $user2, $user3, manager::class);
         $invalid_rating2 = $this->generator->create_manual_rating($competency, $user3, $user2, manager::class);
 
-        if (!\totara_engage\lib::allow_view_user_profile()) {
-            $this->expectException(coding_exception::class);
-            $this->expectExceptionMessageMatches('/You did not check you can view a user before resolving them./');
-        }
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessageMatches('/You did not check you can view a user before resolving them./');
         $this->resolve_graphql_type('core_user', 'fullname', $user2);
     }
 
@@ -119,11 +129,7 @@ class watcher_user_testcase extends advanced_testcase {
         $invalid_rating1 = $this->generator->create_manual_rating($competency, $user2, $user3, manager::class);
         $invalid_rating2 = $this->generator->create_manual_rating($competency, $user3, $user2, manager::class);
 
-        if (\totara_engage\lib::allow_view_user_profile()) {
-            $this->assertIsString($this->resolve_graphql_type('core_user', 'profileimageurl', $user2));
-        } else {
-            $this->assertNull($this->resolve_graphql_type('core_user', 'profileimageurl', $user2));
-        }
+        $this->assertNull($this->resolve_graphql_type('core_user', 'profileimageurl', $user2));
     }
 
     public function allowed_fields_data_provider(): array {
@@ -132,7 +138,7 @@ class watcher_user_testcase extends advanced_testcase {
             ['fullname', true],
             ['profileimageurl', true],
             ['address', false],
-            ['email', \totara_engage\lib::allow_view_user_profile()],
+            ['email', false],
             ['phone1', false],
         ];
     }

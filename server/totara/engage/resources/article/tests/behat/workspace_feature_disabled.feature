@@ -18,10 +18,6 @@ Feature: Workspaces should not be mentioned on resources when the feature is dis
     And the following "articles" exist in "engage_article" plugin:
       | name           | username | content | access | topics |
       | Test Article 1 | user1    | blah    | PUBLIC | Topic1 |
-    And I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
 
   @javascript
   Scenario: Should not see workspaces when owner is sharing a resource

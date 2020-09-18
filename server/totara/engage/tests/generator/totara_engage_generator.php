@@ -56,14 +56,6 @@ final class totara_engage_generator extends component_generator_base {
     }
 
     /**
-     * @param int $permission
-     * @param int $userid
-     */
-    public function set_capabilities(int $permission, int $userid) {
-        // Nothing to do here.
-    }
-
-    /**
      * @param shareable $item
      * @param int $sharerid
      * @param array $recipients

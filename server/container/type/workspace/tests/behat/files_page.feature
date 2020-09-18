@@ -23,10 +23,6 @@ Feature: View the workspace files page
     Then I should see "file.txt"
 
   Scenario: Non-member cannot see files
-    Given I log in as "admin"
-    And I set the following system permissions of "Authenticated user" role:
-      | moodle/user:viewalldetails | Allow |
-    And I log out
     And I log in as "user_two"
     And I click on "Find Workspaces" in the totara menu
     And I follow "Workspace 101"

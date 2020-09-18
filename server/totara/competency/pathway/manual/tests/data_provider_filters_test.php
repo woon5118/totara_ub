@@ -33,7 +33,7 @@ use totara_competency\models\assignment_reason;
 use totara_competency\user_groups;
 use totara_job\job_assignment;
 
-require_once(__DIR__ . '/pathway_manual_base_test.php');
+require_once(__DIR__ . '/pathway_manual_base_testcase.php');
 
 class pathway_manual_data_provider_filters_testcase extends pathway_manual_base_testcase {
 

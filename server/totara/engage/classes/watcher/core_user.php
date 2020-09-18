@@ -83,13 +83,10 @@ final class core_user {
 
         $course = $hook->get_course();
         if ($course) {
-            // TODO think about this. Or run the tests and update this to fix failures.
-            if ($course->containertype == 'course_category') {
-                // TODO If it's an engage category then continue with the checks below?
-                return;
-            } else {
-                return;
-            }
+            // We assume that all queries relating to access between users in relation to engage happen
+            // in the context of a user, and not in the context of a course container. When the resource
+            // relates to a workspace, the workspace user watcher will grant permission where appropriate.
+            return;
         }
 
         // We allow all users to see all profile card fields of all other users. This allows users
@@ -103,8 +100,8 @@ final class core_user {
         }
 
         // If there are other properties, beyond the profile card, that need to be accessed due to
-        // some situation in engage then we should check both the field and that access should be
-        // allow here.
+        // some situation in engage then we should check both the field accessed and that access
+        // should be allow (such as users having some measurable/testable relationship) here.
         // TODO try setting user profile card to show ONLY email and then run all engage tests.
         return;
     }

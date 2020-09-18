@@ -22,6 +22,9 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core_user\access_controller;
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -46,9 +49,18 @@ class user_search_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
+    private function disable_engage_features() {
+        advanced_feature::disable('engage_resources');
+        access_controller::clear_instance_cache();
+    }
+
     public function setUp(): void {
         $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);
+
+        // Engage allows several properties of users to become visible to all other users. To test that user
+        // properties are hidden when appropritate, we need to disable engage.
+        $this->disable_engage_features();
 
         $this->userareaid = \core_search\manager::generate_areaid('core_user', 'user');
 
@@ -166,7 +178,6 @@ class user_search_testcase extends advanced_testcase {
         $this->getDataGenerator()->create_group_member(array('userid' => $user2->id, 'groupid' => $group1->id));
         $this->getDataGenerator()->create_group_member(array('userid' => $user3->id, 'groupid' => $group1->id));
         $this->getDataGenerator()->create_group_member(array('userid' => $user4->id, 'groupid' => $group2->id));
-        $profileaccess = \totara_engage\lib::allow_view_user_profile() ? \core_search\manager::ACCESS_GRANTED : \core_search\manager::ACCESS_DELETED;
 
         $this->setAdminUser();
         $this->assertEquals(\core_search\manager::ACCESS_GRANTED, $searcharea->check_access($user1->id));
@@ -180,12 +191,12 @@ class user_search_testcase extends advanced_testcase {
         $this->setUser($user1);
         $this->assertEquals(\core_search\manager::ACCESS_GRANTED, $searcharea->check_access($user1->id));
         $this->assertEquals(\core_search\manager::ACCESS_GRANTED, $searcharea->check_access($user2->id));
-        $this->assertEquals($profileaccess, $searcharea->check_access($user3->id));
-        $this->assertEquals($profileaccess, $searcharea->check_access($user4->id));
-        $this->assertEquals($profileaccess, $searcharea->check_access(1));
-        $this->assertEquals($profileaccess, $searcharea->check_access(2));
+        $this->assertEquals(\core_search\manager::ACCESS_DENIED, $searcharea->check_access($user3->id));
+        $this->assertEquals(\core_search\manager::ACCESS_DENIED, $searcharea->check_access($user4->id));
+        $this->assertEquals(\core_search\manager::ACCESS_DENIED, $searcharea->check_access(1));// Guest user can't be accessed.
+        $this->assertEquals(\core_search\manager::ACCESS_DENIED, $searcharea->check_access(2));// Admin user can't be accessed.
         $this->assertEquals(\core_search\manager::ACCESS_DELETED, $searcharea->check_access(-123));
-        $this->assertEquals($profileaccess, $searcharea->check_access($unconfirmeduser->id));
+        $this->assertEquals(\core_search\manager::ACCESS_DENIED, $searcharea->check_access($unconfirmeduser->id));
         $this->assertEquals(\core_search\manager::ACCESS_GRANTED, $searcharea->check_access($suspendeduser->id));
 
         $this->setUser($user2);
@@ -195,10 +206,10 @@ class user_search_testcase extends advanced_testcase {
         $this->assertEquals(\core_search\manager::ACCESS_GRANTED, $searcharea->check_access($user4->id));
 
         $this->setUser($user3);
-        $this->assertEquals($profileaccess, $searcharea->check_access($user1->id));
+        $this->assertEquals(\core_search\manager::ACCESS_DENIED, $searcharea->check_access($user1->id));
         $this->assertEquals(\core_search\manager::ACCESS_GRANTED, $searcharea->check_access($user2->id));
         $this->assertEquals(\core_search\manager::ACCESS_GRANTED, $searcharea->check_access($user3->id));
-        $this->assertEquals($profileaccess, $searcharea->check_access($suspendeduser->id));
+        $this->assertEquals(\core_search\manager::ACCESS_DENIED, $searcharea->check_access($suspendeduser->id));
 
         $this->setGuestUser();
         $this->assertEquals(\core_search\manager::ACCESS_DENIED, $searcharea->check_access($user1->id));

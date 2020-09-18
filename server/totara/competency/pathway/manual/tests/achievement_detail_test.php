@@ -32,7 +32,7 @@ use totara_competency\entities\pathway_achievement;
 use totara_job\job_assignment;
 use totara_userdata\userdata\target_user;
 
-require_once(__DIR__ . '/pathway_manual_base_test.php');
+require_once(__DIR__ . '/pathway_manual_base_testcase.php');
 
 class pathway_manual_achievement_detail_testcase extends pathway_manual_base_testcase {
 

@@ -22,9 +22,25 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use core_user\access_controller;
 use core_user\profile\user_field_resolver;
+use totara_core\advanced_feature;
 
 class core_user_user_field_resolver_testcase extends advanced_testcase {
+
+    private function disable_engage_features() {
+        advanced_feature::disable('engage_resources');
+        access_controller::clear_instance_cache();
+    }
+
+    public function setUp(): void {
+        parent::setUp();
+
+        // Engage allows several properties of users to become visible to all other users. To test that user
+        // properties are hidden when appropritate, we need to disable engage.
+        $this->disable_engage_features();
+    }
+
     /**
      * @return void
      */
@@ -38,11 +54,7 @@ class core_user_user_field_resolver_testcase extends advanced_testcase {
         $this->setUser($user_two);
 
         $resolver = user_field_resolver::from_record($user_one);
-        if (\totara_engage\lib::allow_view_user_profile()) {
-            $this->assertSame('mailto:' . $user_one->email, $resolver->get_field_value('mailtourl'));
-        } else {
-            $this->assertNull($resolver->get_field_value('mailtourl'));
-        }
+        $this->assertNull($resolver->get_field_value('mailtourl'));
 
         // Enrol these two users within a same course.
         $course = $generator->create_course();
@@ -68,11 +80,7 @@ class core_user_user_field_resolver_testcase extends advanced_testcase {
         $this->setUser($user_two);
 
         $resolver = user_field_resolver::from_record($user_one);
-        if (\totara_engage\lib::allow_view_user_profile()) {
-            $this->assertIsString($resolver->get_field_value('profileurl'));
-        } else {
-            $this->assertNull($resolver->get_field_value('profileurl'));
-        }
+        $this->assertNull($resolver->get_field_value('profileurl'));
 
         // Enrol these two users within a same course.
         $course = $generator->create_course();

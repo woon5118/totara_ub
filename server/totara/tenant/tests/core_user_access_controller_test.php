@@ -22,6 +22,7 @@
  */
 
 use core_user\access_controller;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -29,6 +30,20 @@ defined('MOODLE_INTERNAL') || die();
  * Tests covering core_user\access_controller tenant support.
  */
 class totara_tenant_core_user_access_controller_testcase extends advanced_testcase {
+
+    private function disable_engage_features() {
+        advanced_feature::disable('engage_resources');
+        access_controller::clear_instance_cache();
+    }
+
+    public function setUp(): void {
+        parent::setUp();
+
+        // Engage allows several properties of users to become visible to all other users. To test that user
+        // properties are hidden when appropritate, we need to disable engage.
+        $this->disable_engage_features();
+    }
+
     public function test_can_view_profile() {
         global $DB;
 
@@ -212,7 +227,7 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
 
         $this->setUser($user0_1);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
@@ -222,50 +237,50 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
         $this->assertTrue(access_controller::for($user1_1)->can_view_profile());
         $this->assertTrue(access_controller::for($user1_1, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1, $course2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2, $course2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user0_2);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
@@ -274,39 +289,39 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1, $course2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user1_1);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
@@ -316,7 +331,7 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
@@ -331,7 +346,7 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertTrue(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
@@ -339,12 +354,12 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
         $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
         $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
@@ -353,23 +368,23 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
 
         $this->setUser($user1_2);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
         $this->assertTrue(access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
         $this->assertTrue(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
@@ -378,7 +393,7 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertTrue(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
@@ -386,12 +401,12 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
         $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
         $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
@@ -400,29 +415,29 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
 
         $this->setUser($user1_3);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
         $this->assertTrue(access_controller::for($user1_3)->can_view_profile());
@@ -433,12 +448,12 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
         $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
         $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
@@ -447,17 +462,17 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
 
         $this->setUser($user2_1);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
@@ -487,24 +502,24 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
         $this->assertTrue(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user2_2);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
@@ -534,24 +549,24 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
         $this->assertTrue(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user2_3);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
@@ -571,15 +586,15 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1, $course2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2, $course2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
         $this->assertTrue(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
@@ -700,7 +715,7 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
         $this->assertTrue(access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
         $this->assertTrue(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
@@ -731,7 +746,7 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
 
         $this->setUser($user0_1);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
@@ -741,50 +756,50 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user0_2);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
@@ -793,55 +808,55 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user1_1);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
         $this->assertTrue(access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
         $this->assertTrue(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
@@ -850,45 +865,45 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertTrue(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user1_2);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
         $this->assertTrue(access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
         $this->assertTrue(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
@@ -897,51 +912,51 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertTrue(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user1_3);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
         $this->assertTrue(access_controller::for($user1_3)->can_view_profile());
@@ -949,49 +964,49 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user2_1);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
@@ -1006,39 +1021,39 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
         $this->assertTrue(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user2_2);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
@@ -1053,52 +1068,52 @@ class totara_tenant_core_user_access_controller_testcase extends advanced_testca
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
         $this->assertTrue(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course2_1)->can_view_profile());
 
         $this->setUser($user2_3);
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($admin)->can_view_profile());
+        $this->assertFalse(access_controller::for($admin)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($admin, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user0_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user0_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user0_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course0_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_1, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course0_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_2, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_2, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_2, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_3)->can_view_profile());
+        $this->assertFalse(access_controller::for($user1_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course1_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user1_3, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_1, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_1, $course2_1)->can_view_profile());
 
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user2_2)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course0_1)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_2, $course1_1)->can_view_profile());
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), access_controller::for($user1_1, $course1_1)->can_view_profile());
+        $this->assertFalse(access_controller::for($user2_2, $course2_1)->can_view_profile());
 
         $this->assertTrue(access_controller::for($user2_3)->can_view_profile());
         $this->assertFalse(access_controller::for($user2_3, $course0_1)->can_view_profile());

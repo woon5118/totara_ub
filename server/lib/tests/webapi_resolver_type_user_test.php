@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use core_user\access_controller;
+use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use core\format;
 use core\date_format;
@@ -35,6 +37,19 @@ use core_user\profile\card_display;
 class core_webapi_resolver_type_user_testcase extends advanced_testcase {
 
     use webapi_phpunit_helper;
+
+    private function disable_engage_features() {
+        advanced_feature::disable('engage_resources');
+        access_controller::clear_instance_cache();
+    }
+
+    public function setUp(): void {
+        parent::setUp();
+
+        // Engage allows several properties of users to become visible to all other users. To test that user
+        // properties are hidden when appropritate, we need to disable engage.
+        $this->disable_engage_features();
+    }
 
     public function test_resolver_id() {
         $user = $this->getDataGenerator()->create_user();
@@ -131,18 +146,10 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
         self::assertSame($value, $this->resolve_graphql_type('core_user', 'email', $user, []));
 
         $this->setUser($this->getDataGenerator()->create_user());
-        if (\totara_engage\lib::allow_view_user_profile()) {
-            self::assertSame($value, $this->resolve_graphql_type('core_user', 'email', $user, []));
-        } else {
-            self::assertNull($this->resolve_graphql_type('core_user', 'email', $user, []));
-        }
+        self::assertNull($this->resolve_graphql_type('core_user', 'email', $user, []));
 
         $this->setGuestUser();
-        if (\totara_engage\lib::allow_view_user_profile()) {
-            self::assertSame($value, $this->resolve_graphql_type('core_user', 'email', $user, []));
-        } else {
-            self::assertNull($this->resolve_graphql_type('core_user', 'email', $user, []));
-        }
+        self::assertNull($this->resolve_graphql_type('core_user', 'email', $user, []));
     }
 
     public function test_resolver_address() {
@@ -261,47 +268,35 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
     public function test_resolver_description() {
         global $CFG;
 
-        $value = '<p>This is a test</p>';
-        $value_plain = "This is a test\n";
-        $user = $this->getDataGenerator()->create_user(['description' => $value]);
+        $user = $this->getDataGenerator()->create_user(['description' => '<p>This is a test</p>']);
         $this->setUser($user);
-        self::assertSame($value, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_HTML]));
-        self::assertSame($value_plain, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_PLAIN]));
-        self::assertSame($value, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_RAW]));
+        self::assertSame('<p>This is a test</p>', $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_HTML]));
+        self::assertSame("This is a test\n", $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_PLAIN]));
+        self::assertSame('<p>This is a test</p>', $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_RAW]));
 
         $context = \context_user::instance($user->id);
         $roleid = $this->getDataGenerator()->create_role([]);
         role_assign($roleid, $user->id, $context);
         assign_capability('moodle/user:editownprofile', CAP_PROHIBIT, $roleid, $context);
-        self::assertSame($value, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_HTML]));
-        self::assertSame($value_plain, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_PLAIN]));
+        self::assertSame('<p>This is a test</p>', $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_HTML]));
+        self::assertSame("This is a test\n", $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_PLAIN]));
         self::assertNull($this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_RAW]));
 
         $user2 = $this->getDataGenerator()->create_user();
         $this->setUser($user2);
-        if (\totara_engage\lib::allow_view_user_profile()) {
-            self::assertSame($value, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_HTML]));
-            self::assertSame($value_plain, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_PLAIN]));
-            self::assertSame(null, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_RAW]));
-        } else {
-            self::assertNull($this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_HTML]));
-            self::assertNull($this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_PLAIN]));
-            self::assertNull($this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_RAW]));
-        }
+        self::assertNull($this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_HTML]));
+        self::assertNull($this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_PLAIN]));
+        self::assertNull($this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_RAW]));
 
         $CFG->forceloginforprofiles = false;
-        self::assertSame($value, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_HTML]));
-        self::assertSame($value_plain, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_PLAIN]));
+        self::assertSame('<p>This is a test</p>', $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_HTML]));
+        self::assertSame("This is a test\n", $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_PLAIN]));
         self::assertSame(null, $this->resolve_graphql_type('core_user', 'description', $user, ['format' => \core\format::FORMAT_RAW]));
     }
 
     public function test_resolver_descriptionformat() {
         $user = $this->getDataGenerator()->create_user(['description' => 'test', 'descriptionformat' => FORMAT_HTML]);
-        if (\totara_engage\lib::allow_view_user_profile()) {
-            self::assertSame('HTML', $this->resolve_graphql_type('core_user', 'descriptionformat', $user, []));
-        } else {
-            self::assertNull($this->resolve_graphql_type('core_user', 'descriptionformat', $user, []));
-        }
+        self::assertNull($this->resolve_graphql_type('core_user', 'descriptionformat', $user, []));
 
         $this->setAdminUser();
         self::assertSame('HTML', $this->resolve_graphql_type('core_user', 'descriptionformat', $user, []));

@@ -21,6 +21,9 @@
  * @package totara_job
  */
 
+use core_user\access_controller;
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -37,9 +40,18 @@ class totara_job_lib_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
+    private function disable_engage_features() {
+        advanced_feature::disable('engage_resources');
+        access_controller::clear_instance_cache();
+    }
+
     public function setUp(): void {
         parent::setup();
         $this->resetAfterTest();
+
+        // Engage allows several properties of users to become visible to all other users. To test that user
+        // properties are hidden when appropritate, we need to disable engage.
+        $this->disable_engage_features();
 
         $this->data_generator = $this->getDataGenerator();
     }
@@ -219,7 +231,7 @@ class totara_job_lib_testcase extends advanced_testcase {
         // Guest user
         $guest = get_guest_role();
         $this->setUser($guest);
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), totara_job_can_view_job_assignments($user2));
+        $this->assertFalse(totara_job_can_view_job_assignments($user2));
 
         // Deleted user
         $this->setUser($user1);
@@ -232,7 +244,7 @@ class totara_job_lib_testcase extends advanced_testcase {
         role_assign($roleid, $user1->id, $coursecontext);
 
         // Course access
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), totara_job_can_view_job_assignments($user2, $course));
+        $this->assertFalse(totara_job_can_view_job_assignments($user2, $course));
 
         assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleid, $coursecontext->id, true);
         $this->assertTrue(totara_job_can_view_job_assignments($user2, $course));
@@ -248,7 +260,7 @@ class totara_job_lib_testcase extends advanced_testcase {
 
         // Reset the caps.
         assign_capability('moodle/user:viewalldetails', CAP_INHERIT, $roleidx, $user2context->id, true);
-        $this->assertSame(\totara_engage\lib::allow_view_user_profile(), totara_job_can_view_job_assignments($user2));
+        $this->assertFalse(totara_job_can_view_job_assignments($user2));
         assign_capability('moodle/user:viewdetails', CAP_ALLOW, $roleidx, $user2context->id, true);
         $this->assertTrue(totara_job_can_view_job_assignments($user2));
     }

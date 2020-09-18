@@ -22,7 +22,6 @@
  */
 
 use core_container\hook\module_supported_in_container;
-use core_user\hook\allow_view_profile;
 use mod_perform\watcher\activity;
 use mod_perform\hook\subject_instances_created;
 use mod_perform\watcher\subject_static_instances;
@@ -31,7 +30,7 @@ use mod_perform\watcher\participant_sections;
 use mod_perform\hook\participant_instances_created;
 use core_user\hook\allow_view_profile_field;
 use mod_perform\watcher\notification;
-use mod_perform\watcher\user;
+use mod_perform\watcher\core_user;
 use mod_perform\watcher\userdata_label;
 use totara_userdata\hook\userdata_normalise_label;
 
@@ -50,7 +49,7 @@ $watchers = [
     ],
     [
         'hookname' => allow_view_profile_field::class,
-        'callback' => [user::class, 'allow_view_profile_field'],
+        'callback' => [core_user::class, 'allow_view_profile_field'],
     ],
     [
         'hookname' => participant_instances_created::class,

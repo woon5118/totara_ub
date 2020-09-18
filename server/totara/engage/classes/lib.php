@@ -23,6 +23,8 @@
 
 namespace totara_engage;
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die;
 
 /**
@@ -35,12 +37,11 @@ final class lib {
     public static function allow_view_user_profile(): bool {
         $features = [
             'engage_resources',
-            'container_workspace',
             // 'ml_recommender', Not required for recommenders. Left here for posterity only as this is an Engage feature.
             // 'totara_msteams', Not required for MS teams. Left here for posterity only as this is an Engage feature.
         ];
         foreach ($features as $feature) {
-            if (\totara_core\advanced_feature::is_enabled($feature)) {
+            if (advanced_feature::is_enabled($feature)) {
                 return true;
             }
         }
