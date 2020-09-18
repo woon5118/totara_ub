@@ -55,7 +55,8 @@ final class comments implements query_resolver, has_middleware {
             $ec->set_relevant_context($context);
         }
 
-        if ($context->is_user_access_prevented($USER->id)) {
+        if ($context->is_user_access_prevented($USER->id) ||
+            !$resolver->can_see_comments($instance_id, $area, $USER->id)) {
             throw comment_exception::on_access_denied();
         }
 

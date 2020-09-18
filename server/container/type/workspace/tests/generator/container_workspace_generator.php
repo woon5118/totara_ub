@@ -283,6 +283,7 @@ final class container_workspace_generator extends component_generator_base {
      * Behat generator to create discussions in a workspace, optionally with attached files.
      *
      * @param array $parameters
+     * @return void
      */
     public function create_discussions(array $parameters): void {
         global $DB, $CFG;

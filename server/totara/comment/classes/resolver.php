@@ -135,4 +135,30 @@ abstract class resolver {
 
         return true;
     }
+
+    /**
+     * Check if acting user is allowed to view the instance's comments
+     *
+     * @param int       $instance_id
+     * @param string    $area
+     * @param int       $actor_id
+     *
+     * @return bool
+     */
+    public function can_see_comments(int $instance_id, string $area, int $actor_id): bool {
+        return true;
+    }
+
+    /**
+     * Check if the acting user is allowed to view the instance's replies.
+     *
+     * @param int       $instance_id
+     * @param string    $area
+     * @param int       $actor_id
+     *
+     * @return bool
+     */
+    public function can_see_replies(int $instance_id, string $area, int $actor_id): bool {
+        return $this->can_see_comments($instance_id, $area, $actor_id);
+    }
 }

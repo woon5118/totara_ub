@@ -181,4 +181,24 @@ final class comment_resolver extends resolver {
 
         throw new \coding_exception("Invalid area that is not supported yet");
     }
+
+    /**
+     * @param int $instance_id
+     * @param string $area
+     * @param int $actor_id
+     *
+     * @return bool
+     */
+    public function can_see_comments(int $instance_id, string $area, int $actor_id): bool {
+        if (discussion::AREA === $area) {
+            $discussion = discussion::from_id($instance_id);
+            $workspace = $discussion->get_workspace();
+
+            // As long as the actor can view the discussions, meaning that user is able to view comments.
+            $workspace_interactor = new workspace_interactor($workspace, $actor_id);
+            return $workspace_interactor->can_view_discussions();
+        }
+
+        throw new \coding_exception("Invalid area that is not supported yet");
+    }
 }

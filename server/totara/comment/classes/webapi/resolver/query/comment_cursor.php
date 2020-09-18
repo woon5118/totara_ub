@@ -26,6 +26,7 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use totara_comment\exception\comment_exception;
 use totara_comment\loader\comment_loader;
 use totara_comment\pagination\cursor_paginator;
 use totara_comment\resolver_factory;
@@ -42,17 +43,27 @@ final class comment_cursor implements query_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): cursor_paginator {
         global $USER;
-        if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_user::instance($USER->id));
-        }
 
         $instance_id = $args['instance_id'];
         $component = $args['component'];
         $area = $args['area'];
 
         $resolver = resolver_factory::create_resolver($component);
-        $cursor = $resolver->get_default_cursor($area);
+        if (!$ec->has_relevant_context()) {
+            $context_id = $resolver->get_context_id($instance_id, $area);
+            $context = \context::instance_by_id($context_id);
 
+            $ec->set_relevant_context($context);
+        } else {
+            $context = $ec->get_relevant_context();
+        }
+
+        if ($context->is_user_access_prevented($USER->id) ||
+            !$resolver->can_see_comments($instance_id, $area, $USER->id)) {
+            throw comment_exception::on_access_denied();
+        }
+
+        $cursor = $resolver->get_default_cursor($area);
         if (isset($args['cursor'])) {
             $cursor = $cursor::decode($args['cursor']);
         }

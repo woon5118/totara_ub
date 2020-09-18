@@ -111,7 +111,18 @@ class totara_comment_get_comments_testcase extends advanced_testcase {
      */
     public function test_get_comments_via_graphql(): void {
         $this->create_comments(42, 'totara_comment', 'xx_xx');
+
+        /** @var totara_comment_default_resolver $resolver */
         $resolver = resolver_factory::create_resolver('totara_comment');
+        $resolver->add_callback(
+            'get_context_id',
+            function (): int {
+                global $USER;
+                $context = context_user::instance($USER->id);
+
+                return $context->id;
+            }
+        );
 
         $variables = [
             'instanceid' => 42,

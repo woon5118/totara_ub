@@ -70,6 +70,12 @@ final class article extends resource_item implements time_viewable {
     public const REACTION_AREA = 'media';
 
     /**
+     * Using for comment area.
+     * @var string
+     */
+    public const COMMENT_AREA = 'comment';
+
+    /**
      * @var article_entity
      */
     private $article;

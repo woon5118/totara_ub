@@ -50,17 +50,22 @@ final class replies implements query_resolver, has_middleware {
 
         $comment = comment::from_id($args['commentid']);
 
+        $instance_area = $comment->get_area();
+        $instance_id = $comment->get_instanceid();
+
         // Verify with the resolver the active user is allowed to see these replies
         $component = $comment->get_component();
         $resolver = resolver_factory::create_resolver($component);
-        $context_id = $resolver->get_context_id($comment->get_instanceid(), $comment->get_area());
+
+        $context_id = $resolver->get_context_id($instance_id, $instance_area);
         $context = \context::instance_by_id($context_id);
 
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context($context);
         }
 
-        if ($context->is_user_access_prevented($USER->id)) {
+        if ($context->is_user_access_prevented($USER->id) ||
+            !$resolver->can_see_replies($instance_id, $instance_area, $USER->id)) {
             throw comment_exception::on_access_denied();
         }
 
