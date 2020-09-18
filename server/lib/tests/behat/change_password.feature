@@ -44,7 +44,6 @@ Feature: User can change their password
     And I press "Save changes"
     Then I should see "Password has been changed"
 
-    When I press "Continue"
     And I log out
     Then I should see "Log in"
     And I should not see "You are not logged in"
@@ -90,7 +89,6 @@ Feature: User can change their password
     And I press "Save changes"
     Then I should see "Password has been changed"
 
-    When I press "Continue"
     And I log out
     Then I should see "Log in"
     And I should not see "You are not logged in"

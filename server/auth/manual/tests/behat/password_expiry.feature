@@ -60,7 +60,6 @@ Feature: Password expiration of manual user accounts
     | New password (again)| Xuseruser1! |
     And I press "Save changes"
     And I should see "Password has been changed"
-    And I press "Continue"
     And I am on homepage
     And I should see "You do not have any current learning."
     And I log out
@@ -116,7 +115,6 @@ Feature: Password expiration of manual user accounts
       | New password (again)| Xuseruser1! |
     And I press "Save changes"
     And I should see "Password has been changed"
-    And I press "Continue"
     And I am on homepage
     And I should see "You do not have any current learning."
     And I log out
@@ -140,7 +138,6 @@ Feature: Password expiration of manual user accounts
       | New password (again)| Xuseruser2! |
     And I press "Save changes"
     And I should see "Password has been changed"
-    And I press "Continue"
     And I am on homepage
     And I should see "You do not have any current learning."
     And I log out

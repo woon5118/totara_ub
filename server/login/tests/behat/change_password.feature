@@ -19,7 +19,6 @@ Feature: Change password
     And I set the field "New password (again)" to "NewPassword1*"
     And I click on "Save changes" "button"
     Then I should see "Password has been changed"
-    And I click on "Continue" "button"
     And I should see "Preferences" in the "region-main" "region"
     And I log out
     And I follow "Log in"
@@ -37,7 +36,6 @@ Feature: Change password
     And I set the field "New password (again)" to "NewPassword1*"
     And I click on "Save changes" "button"
     Then I should see "Password has been changed"
-    And I click on "Continue" "button"
     And I am on site homepage
 
   @javascript
@@ -59,5 +57,4 @@ Feature: Change password
     And I set the field "New password (again)" to "NewPassword1*"
     And I click on "Save changes" "button"
     And I should see "Password has been changed"
-    And I click on "Continue" "button"
     And I should see "Course 1"

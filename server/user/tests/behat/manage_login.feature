@@ -135,7 +135,6 @@ Feature: Account login management
       | New password         | Argh!!666 |
       | New password (again) | Argh!!666 |
     And I press "Save changes"
-    And I press "Continue"
     Then I should see "You do not have any current learning. For previously completed learning see your Record of Learning."
 
   Scenario: Login manager cannot change password if auth plugin does not support it

@@ -138,9 +138,7 @@ if ($mform->is_cancelled()) {
     unset_user_preference('create_password', $USER);
 
     $strpasswordchanged = get_string('passwordchanged');
-    $redirecturl = $CFG->wwwroot . '/user/preferences.php?userid=' . $USER->id . '&amp;course=' . $course->id;
-
-    redirect($redirecturl, $strpasswordchanged, null, \core\output\notification::NOTIFY_SUCCESS);
+    redirect(new moodle_url($PAGE->url, array('return'=>1)), $strpasswordchanged, null, \core\output\notification::NOTIFY_SUCCESS);
 
     exit;
 }

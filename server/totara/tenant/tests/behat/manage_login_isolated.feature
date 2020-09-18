@@ -118,7 +118,6 @@ Feature: Tenant account login management with full tenant isolation
       | New password         | Argh!!666 |
       | New password (again) | Argh!!666 |
     And I press "Save changes"
-    And I press "Continue"
     Then I should see "You do not have any current learning. For previously completed learning see your Record of Learning."
 
   Scenario: Tenant login manager resets user password with full tenant isolation
