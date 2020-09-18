@@ -95,7 +95,7 @@
 <script>
 import CardsGrid from 'totara_engage/components/contribution/CardsGrid';
 import Button from 'tui/components/buttons/Button';
-import PageLoader from 'tui/components/loader/Loader';
+import PageLoader from 'tui/components/loading/Loader';
 
 export default {
   components: {

@@ -144,7 +144,7 @@ import CreateUserAssignmentMutation from 'totara_competency/graphql/create_user_
 import FilterSidePanel from 'tui/components/filters/FilterSidePanel';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import MultiSelectFilter from 'tui/components/filters/MultiSelectFilter';
 import SearchFilter from 'tui/components/filters/SearchFilter';
 import SelectFilter from 'tui/components/filters/SelectFilter';

@@ -46,7 +46,7 @@
 <script>
 import SurveySidePanel from 'engage_survey/components/sidepanel/SurveySidePanel';
 import SurveyForm from 'engage_survey/components/form/SurveyForm';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import Layout from 'tui/components/layouts/LayoutOneColumnContentWithSidePanel';
 import ResourceNavigationBar from 'totara_engage/components/header/ResourceNavigationBar';
 import { surveyPageMixin } from 'engage_survey/index';

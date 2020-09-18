@@ -34,7 +34,7 @@
   </Loader>
 </template>
 <script>
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import MyHistoricActivities from 'mod_perform/components/user_activities/list/MyHistoricActivities';
 import OtherHistoricActivities from 'mod_perform/components/user_activities/list/OtherHistoricActivities';
 // Query

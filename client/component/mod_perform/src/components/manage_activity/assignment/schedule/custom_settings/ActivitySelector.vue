@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import { FormRow, FormSelect, FormScope } from 'tui/components/uniform';
 // graphQL
 import performActivitiesQuery from 'mod_perform/graphql/activities';

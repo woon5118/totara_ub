@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'tui/components/loader/Loader';
+import component from 'tui/components/loading/Loader';
 let wrapper;
 
 const props = {

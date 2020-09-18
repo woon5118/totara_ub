@@ -51,7 +51,7 @@ import Card from 'tui/components/card/Card';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
 import ElementQuery from 'mod_perform/graphql/element';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import Uniform from 'tui/components/uniform/Uniform';
 import RequiredOptionalIndicator from 'mod_perform/components/user_activities/RequiredOptionalIndicator';
 

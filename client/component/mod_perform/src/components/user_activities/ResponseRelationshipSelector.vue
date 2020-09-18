@@ -36,7 +36,7 @@
 
 <script>
 import SelectFilter from 'tui/components/filters/SelectFilter';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import relationshipsInvolvedInActivityQuery from 'mod_perform/graphql/responding_relationships_involved_in_subject_instance';
 
 export default {

@@ -31,7 +31,7 @@
 <script>
 // Components
 import ArchivedAssignmentsTable from 'totara_competency/components/details/ArchivedAssignmentsTable';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 // GraphQL
 import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';
 

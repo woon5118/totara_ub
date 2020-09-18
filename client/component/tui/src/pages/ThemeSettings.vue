@@ -119,7 +119,7 @@
 </template>
 
 <script>
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
 import { Uniform, FormRow, FormToggleSwitch } from 'tui/components/uniform';

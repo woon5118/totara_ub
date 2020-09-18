@@ -131,7 +131,7 @@ import Assignment from 'totara_competency/components/details/Assignment';
 import Button from 'tui/components/buttons/Button';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import Modal from 'tui/components/modal/Modal';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import NotificationBanner from 'tui/components/notifications/NotificationBanner';

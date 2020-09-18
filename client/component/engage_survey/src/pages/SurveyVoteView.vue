@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import Layout from 'tui/components/layouts/LayoutOneColumnContentWithSidePanel';
 import SurveySidePanel from 'engage_survey/components/sidepanel/SurveySidePanel';
 import ResourceNavigationBar from 'totara_engage/components/header/ResourceNavigationBar';

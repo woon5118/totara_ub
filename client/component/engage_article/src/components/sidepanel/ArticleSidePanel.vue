@@ -114,7 +114,7 @@
 
 <script>
 import apolloClient from 'tui/apollo_client';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import SidePanelCommentBox from 'totara_comment/components/box/SidePanelCommentBox';
 import AccessDisplay from 'totara_engage/components/sidepanel/access/AccessDisplay';

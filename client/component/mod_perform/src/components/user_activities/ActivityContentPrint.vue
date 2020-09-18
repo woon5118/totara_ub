@@ -151,7 +151,7 @@ import { RELATIONSHIP_SUBJECT } from 'mod_perform/constants';
 // Components
 import Button from 'tui/components/buttons/Button';
 import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
 import RequiredOptionalIndicator from 'mod_perform/components/user_activities/RequiredOptionalIndicator';

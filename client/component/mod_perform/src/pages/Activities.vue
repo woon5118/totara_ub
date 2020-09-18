@@ -81,7 +81,7 @@ import Button from 'tui/components/buttons/Button';
 import Cell from 'tui/components/datatable/Cell';
 import CreateActivityForm from 'mod_perform/components/manage_activity/CreateActivityForm';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import performActivitiesQuery from 'mod_perform/graphql/activities';
 import Table from 'tui/components/datatable/Table';

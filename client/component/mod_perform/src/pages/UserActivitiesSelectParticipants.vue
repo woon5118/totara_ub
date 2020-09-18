@@ -72,7 +72,7 @@
 
 <script>
 import ActivityParticipants from 'mod_perform/components/user_activities/participant_selector/ActivityParticipants';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import ManualParticipantSelectionInstancesQuery from 'mod_perform/graphql/manual_participant_selection_instances';
 import SetManualParticipantsMutation from 'mod_perform/graphql/set_manual_participants';
 import { notify } from 'tui/notifications';

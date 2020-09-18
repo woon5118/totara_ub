@@ -52,7 +52,7 @@
 <script>
 import ActionLink from 'tui/components/links/ActionLink';
 import Button from 'tui/components/buttons/Button';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';

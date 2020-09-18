@@ -110,7 +110,7 @@ import performReportableElementIdentifiersQuery from 'mod_perform/graphql/report
 import TagList from 'tui/components/tag/TagList';
 import Separator from 'tui/components/decor/Separator';
 import { FormRow, Uniform, FormSelect } from 'tui/components/uniform';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 
 export default {
   components: {

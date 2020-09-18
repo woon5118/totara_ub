@@ -53,7 +53,7 @@
 <script>
 import Responsive from 'tui/components/responsive/Responsive';
 import WorkspaceFilter from 'container_workspace/components/filter/WorkspaceFilter';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import SpaceCardsGrid from 'container_workspace/components/grid/SpaceCardsGrid';
 import { cardGrid } from 'container_workspace/index';
 import apolloClient from 'tui/apollo_client';

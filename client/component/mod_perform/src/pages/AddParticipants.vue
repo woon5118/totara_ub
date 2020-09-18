@@ -70,7 +70,7 @@
 import ActionLink from 'tui/components/links/ActionLink';
 import ActivityParticipants from 'mod_perform/components/user_activities/participant_selector/ActivityParticipants';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 // util
 import {
   RELATIONSHIP_SUBJECT,

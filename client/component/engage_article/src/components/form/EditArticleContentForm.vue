@@ -45,7 +45,7 @@ import Form from 'tui/components/form/Form';
 import Weka from 'editor_weka/components/Weka';
 import { debounce } from 'tui/util';
 import DoneCancelGroup from 'totara_engage/components/buttons/DoneCancelGroup';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 
 // GraphQL queries
 import getDraftItem from 'engage_article/graphql/draft_item';

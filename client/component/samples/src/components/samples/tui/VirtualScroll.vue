@@ -178,7 +178,7 @@
 
 <script>
 import VirtualScroll from 'tui/components/virtualscroll/VirtualScroll';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import Tabs from 'tui/components/tabs/Tabs';

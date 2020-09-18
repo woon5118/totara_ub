@@ -120,7 +120,7 @@ import SelectFilter from 'tui/components/filters/SelectFilter';
 import apolloClient from 'tui/apollo_client';
 import VirtualScroll from 'tui/components/virtualscroll/VirtualScroll';
 import Button from 'tui/components/buttons/Button';
-import PageLoader from 'tui/components/loader/Loader';
+import PageLoader from 'tui/components/loading/Loader';
 import WorkspaceMemberRequestList from 'container_workspace/components/content/WorkspaceMemberRequestList';
 
 // GraphQL queries

@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import FormRow from 'tui/components/form/FormRow';
 import Radio from 'tui/components/form/Radio';
 import RadioGroup from 'tui/components/form/RadioGroup';
@@ -81,7 +81,7 @@ export default {
       codeTemplate: `<Loader :loading="true">
   ...content...
 </Loader>`,
-      codeScript: `import Loader from 'tui/components/loader/Loader';
+      codeScript: `import Loader from 'tui/components/loading/Loader';
 
 export default {
   components: {

@@ -41,7 +41,7 @@
 
 <script>
 import { notify } from 'tui/notifications';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import NotificationSection from 'mod_perform/components/manage_activity/notification/NotificationSection';
 import notificationsQuery from 'mod_perform/graphql/notifications';
 import createNotificationMutation from 'mod_perform/graphql/create_notification';

@@ -116,7 +116,7 @@ import Table from 'tui/components/datatable/Table';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
 import Cell from 'tui/components/datatable/Cell';
 import Button from 'tui/components/buttons/Button';
-import PageLoader from 'tui/components/loader/Loader';
+import PageLoader from 'tui/components/loading/Loader';
 
 // GraphQL queries
 import getFiles from 'container_workspace/graphql/get_files';

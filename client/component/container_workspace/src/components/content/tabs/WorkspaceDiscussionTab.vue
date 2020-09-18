@@ -119,7 +119,7 @@ import postDiscussion from 'container_workspace/graphql/post_discussion';
 import getDiscussions from 'container_workspace/graphql/get_discussions';
 import VirtualScroll from 'tui/components/virtualscroll/VirtualScroll';
 import Button from 'tui/components/buttons/Button';
-import PageLoader from 'tui/components/loader/Loader';
+import PageLoader from 'tui/components/loading/Loader';
 
 import VirtualScrollMixin from 'container_workspace/mixins/virtual_scroll_mixin';
 

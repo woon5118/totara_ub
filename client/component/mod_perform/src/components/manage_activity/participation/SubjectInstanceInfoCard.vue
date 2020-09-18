@@ -29,7 +29,7 @@
 <script>
 import subjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_participant';
 import InstanceInfoCard from 'mod_perform/components/manage_activity/participation/InstanceInfoCard';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 
 export default {
   components: {

@@ -89,7 +89,7 @@ import Cell from 'tui/components/datatable/Cell';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
 import LastRatingBlock from 'pathway_manual/components/LastRatingBlock';
 import LastRatingHelp from 'pathway_manual/components/LastRatingHelp';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import RateableUsersQuery from 'pathway_manual/graphql/rateable_users';
 import SearchBox from 'tui/components/form/SearchBox';
 import Table from 'tui/components/datatable/Table';

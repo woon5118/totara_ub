@@ -53,7 +53,7 @@
 import SurveySidePanel from 'engage_survey/components/sidepanel/SurveySidePanel';
 import ResourceNavigationBar from 'totara_engage/components/header/ResourceNavigationBar';
 import SurveyVoteTitle from 'engage_survey/components/content/SurveyVoteTitle';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import Layout from 'tui/components/layouts/LayoutOneColumnContentWithSidePanel';
 import SurveyVoteContent from 'engage_survey/components/content/SurveyVoteContent';
 import { surveyPageMixin } from 'engage_survey/index';

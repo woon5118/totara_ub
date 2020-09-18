@@ -42,7 +42,7 @@
 
 <script>
 import subjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_participant';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import ActivityContent from 'mod_perform/components/user_activities/ActivityContent';
 

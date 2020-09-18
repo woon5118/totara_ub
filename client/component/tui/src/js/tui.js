@@ -138,7 +138,7 @@ const tui = {
       return {
         component: componentPromise,
         loading: tui.defaultExport(
-          tui.require('tui/components/loader/ComponentLoading')
+          tui.require('tui/components/loading/ComponentLoading')
         ),
         error: asyncComponentError(errorInfo),
         delay: 0,

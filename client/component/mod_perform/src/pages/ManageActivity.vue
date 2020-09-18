@@ -84,7 +84,7 @@ import ActivityStatusBanner from 'mod_perform/components/manage_activity/Activit
 import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/AssignmentsTab';
 import GeneralInfoTab from 'mod_perform/components/manage_activity/GeneralInfoTab';
 import NotificationsTab from 'mod_perform/components/manage_activity/notification/NotificationsTab';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
 import { notify } from 'tui/notifications';

@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import CompetencyProgressQuery from 'totara_competency/graphql/competency_progress_for_user';
 import CompetencyScalesQuery from 'totara_competency/graphql/scales';
 import Filters from 'totara_competency/components/profile/competency_list/Filters';

@@ -69,7 +69,7 @@ import { engageGrid, calculateRow } from 'totara_engage/index';
 import EngageCard from 'totara_engage/components/card/compute/EngageCard';
 import theme from 'tui/theme';
 import VirtualScroll from 'tui/components/virtualscroll/VirtualScroll';
-import PageLoader from 'tui/components/loader/Loader';
+import PageLoader from 'tui/components/loading/Loader';
 
 export default {
   components: {

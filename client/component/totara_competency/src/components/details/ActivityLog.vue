@@ -48,7 +48,7 @@
 // Components
 import ActivityLogTable from 'totara_competency/components/details/ActivityLogTable';
 import FilterBar from 'tui/components/filters/FilterBar';
-import Loader from 'tui/components/loader/Loader';
+import Loader from 'tui/components/loading/Loader';
 import SelectFilter from 'tui/components/filters/SelectFilter';
 // GraphQL
 import ActivityLogQuery from 'totara_competency/graphql/activity_log';

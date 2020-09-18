@@ -68,7 +68,7 @@ export default {
         tui.require('tui/components/errors/ErrorPageRender')
       );
       const Loading = tui.defaultExport(
-        tui.require('tui/components/loader/ComponentLoading')
+        tui.require('tui/components/loading/ComponentLoading')
       );
       promises.push(
         Promise.all([
