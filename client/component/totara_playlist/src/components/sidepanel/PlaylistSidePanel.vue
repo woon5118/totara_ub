@@ -214,8 +214,8 @@ export default {
     },
 
     isPrivate() {
-      return AccessManager.isPrivate(this.playlist.access)
-    }
+      return AccessManager.isPrivate(this.playlist.access);
+    },
   },
 
   methods: {
