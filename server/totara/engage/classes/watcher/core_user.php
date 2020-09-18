@@ -67,13 +67,6 @@ final class core_user {
         }
     }
 
-    protected const ENGAGE_ALLOWED_FIELDS = [
-        'fullname',
-        'profileimageurl',
-        'profileimageurlsmall',
-        'profileimagealt',
-    ];
-
     /**
      * User access hook to check if one user can view another users profile field.
      *
@@ -106,13 +99,11 @@ final class core_user {
             return;
         }
 
-        // Engage allows users to see some hard-coded user properties of other users. For example,
-        // when a user has commented on a public article.  We don't know that this operation is
-        // happening in the context of a resource, so we have to assume that it could be.
+        // If there are other properties, beyond the profile card, that need to be accessed due to
+        // some situation in engage then we should check both the field accessed and that access
+        // should be allow (such as users having some measurable/testable relationship), if posible,
+        // here.
         // TODO try setting user profile card to show ONLY email AND disable profile watcher above and then run all engage tests.
-        if (in_array($hook->field, self::ENGAGE_ALLOWED_FIELDS)) {
-            $hook->give_permission();
-            return;
-        }
+        return;
     }
 }

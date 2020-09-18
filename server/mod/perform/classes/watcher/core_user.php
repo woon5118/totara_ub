@@ -43,13 +43,6 @@ use totara_core\hook\base;
 
 class core_user {
 
-    protected const PERFORM_ALLOWED_FIELDS = [
-        'fullname',
-        'profileimageurl',
-        'profileimageurlsmall',
-        'profileimagealt',
-    ];
-
     /**
      * User access hook to check if one user can view another users profile field in the context of mod perform.
      *
@@ -78,7 +71,9 @@ class core_user {
 
         // Check for any user data which is required specifically for perform (which may
         // or may not have overlap with the user profile card fields below).
-        if (in_array($hook->field, self::PERFORM_ALLOWED_FIELDS)) {
+        if ($hook->field == 'fullname'
+            || in_array($hook->field, display_setting::get_default_display_picture_fields())
+        ) {
             if (self::can_view_user($hook)) {
                 $hook->give_permission();
                 return;

@@ -33,5 +33,10 @@ $watchers = [
     [
         'hookname' => '\editor_weka\hook\find_context',
         'callback' => ['\totara_comment\watcher\editor_weka_watcher', 'load_context']
-    ]
+    ],
+    [
+        // Totara Comments gives users the ability to view some users profile fields
+        'hookname' => \core_user\hook\allow_view_profile_field::class,
+        'callback' => [\totara_comment\watcher\core_user::class, 'handle_allow_view_profile_field'],
+    ],
 ];
