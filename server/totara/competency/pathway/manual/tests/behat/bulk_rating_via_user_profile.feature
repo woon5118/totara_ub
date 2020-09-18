@@ -33,11 +33,10 @@ Feature: Test rating a competency for a user as different roles via the rate com
     Given I log in as "user2"
     And I am on profile page for user "user2"
     When I click on "Rate others' competencies" "link" in the ".block_totara_user_profile_category_development" "css_element"
-    Then I should see "Rate competencies" in the "#page h2" "css_element"
+    Then I should see "Rate competencies" in the ".tui-pageHeading__title" "css_element"
     And I should see "Rating as a manager"
     When I click on "User One" "link"
-    Then I should see "Rate User One" in the "#page h2" "css_element"
-    And I should see the "User One" image in the ".tui-bulkManualRatingPageHeader" "css_element"
+    Then I should see "Rate User One" in the ".tui-pageHeading__title" "css_element"
     And I should see "Rating as a manager"
 
     # Actually make a rating
@@ -53,11 +52,10 @@ Feature: Test rating a competency for a user as different roles via the rate com
     Given I log in as "user3"
     And I am on profile page for user "user3"
     When I click on "Rate others' competencies" "link" in the ".block_totara_user_profile_category_development" "css_element"
-    Then I should see "Rate competencies" in the "#page h2" "css_element"
+    Then I should see "Rate competencies" in the ".tui-pageHeading__title" "css_element"
     And I should see "Rating as an appraiser"
     When I click on "User One" "link"
-    Then I should see "Rate User One" in the "#page h2" "css_element"
-    And I should see the "User One" image in the ".tui-bulkManualRatingPageHeader" "css_element"
+    Then I should see "Rate User One" in the ".tui-pageHeading__title" "css_element"
     And I should see "Rating as an appraiser"
 
     # Actually make a rating

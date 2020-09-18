@@ -17,10 +17,10 @@
 -->
 
 <template>
-  <div>
+  <div class="tui-competencySelfAssignment">
     <a :href="goBackLink">{{ goBackText }}</a>
 
-    <h2>{{ pageHeading }}</h2>
+    <PageHeading :title="pageHeading" />
 
     <Grid :stack-at="900" class="tui-competencySelfAssignment__actions">
       <GridItem :units="3">
@@ -63,10 +63,7 @@
       </GridItem>
     </Grid>
 
-    <Grid
-      :stack-at="900"
-      class="tui-competencySelfAssignment__filter-table-grid"
-    >
+    <Grid :stack-at="900">
       <GridItem v-if="!isViewingSelections" :units="3">
         <FilterSidePanel
           v-model="filters"
@@ -105,10 +102,11 @@
             v-model="selectedItems"
             :competencies="data.items"
             :total-competency-count="data.total"
-            class="tui-competencySelfAssignment__table"
           />
+          <p v-else />
           <Button
             v-if="shouldShowLoadMoreButton"
+            class="tui-competencySelfAssignment__loadMore"
             :text="$str('loadmore', 'totara_core')"
             @click="loadMore"
           />
@@ -146,6 +144,7 @@ import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import Loader from 'tui/components/loading/Loader';
 import MultiSelectFilter from 'tui/components/filters/MultiSelectFilter';
+import PageHeading from 'tui/components/layouts/PageHeading';
 import SearchFilter from 'tui/components/filters/SearchFilter';
 import SelectFilter from 'tui/components/filters/SelectFilter';
 import SelectionTable from 'totara_competency/components/user_assignment/SelectionTable';
@@ -164,6 +163,7 @@ export default {
     GridItem,
     Loader,
     MultiSelectFilter,
+    PageHeading,
     SearchFilter,
     SelectFilter,
     SelectionTable,
@@ -490,38 +490,16 @@ export default {
 
 <style lang="scss">
 .tui-competencySelfAssignment {
-  &__table {
-    & > * + * {
-      margin-top: var(--gap-2);
-    }
-  }
-
-  &__tableExpand {
-    & > * + * {
-      margin: var(--gap-2) 0 0;
-    }
-
-    &-header {
-      @include tui-font-heading-small();
-    }
-
-    &-subHeader {
-      @include tui-font-heading-x-small();
-    }
+  & > * + * {
+    margin-top: var(--gap-4);
   }
 
   &__actions {
     justify-content: space-between;
-    margin-bottom: var(--gap-5);
   }
 
-  &__header {
-    margin: 0;
-    @include tui-font-heading-small();
-  }
-
-  &__table {
-    margin-bottom: var(--gap-5);
+  &__loadMore {
+    margin-top: var(--gap-4);
   }
 }
 </style>

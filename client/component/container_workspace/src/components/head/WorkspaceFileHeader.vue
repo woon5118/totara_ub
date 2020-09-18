@@ -66,14 +66,16 @@ export default {
   }
 
   &__back {
+    margin-top: var(--gap-4);
+
     .tui-iconBtn {
       padding: 0;
     }
   }
 
   &__title {
-    @include tui-font-heading-large();
-    margin-top: var(--gap-10);
+    @include tui-font-heading-page-title;
+    margin-top: var(--gap-2);
     margin-bottom: var(--gap-12);
   }
 }

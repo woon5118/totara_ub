@@ -18,11 +18,14 @@
 
 <template>
   <div class="tui-performActivityParticipantSelector">
-    <h3 class="tui-performActivityParticipantSelector-title">
+    <h3 class="tui-performActivityParticipantSelector__title">
       {{ instanceTitle }}
     </h3>
 
-    <div v-if="$slots.meta" class="tui-performActivityParticipantSelector-meta">
+    <div
+      v-if="$slots.meta"
+      class="tui-performActivityParticipantSelector__meta"
+    >
       <slot name="meta" />
     </div>
 
@@ -30,7 +33,7 @@
       :initial-values="initialValues"
       :validate="validateExternal"
       input-width="full"
-      class="tui-performActivityParticipantSelector-form"
+      class="tui-performActivityParticipantSelector__form"
       @change="updateHasChanges"
       @submit="submit"
     >
@@ -49,7 +52,7 @@
 
         <FormField
           v-else
-          v-slot="{ id, value, update }"
+          v-slot="{ value, update }"
           :name="relationship.id"
           :validate="validateInternal"
           :char-length="30"
@@ -323,20 +326,19 @@ export default {
 
 <style lang="scss">
 .tui-performActivityParticipantSelector {
-  margin-top: var(--gap-4);
   padding: var(--gap-4);
   border: var(--border-width-thin) solid var(--card-border-color);
 
-  &-title {
+  &__title {
     @include tui-font-heading-small;
     margin: 0;
   }
 
-  &-meta {
+  &__meta {
     margin-top: var(--gap-2);
   }
 
-  &-form {
+  &__form {
     margin-top: var(--gap-4);
   }
 }

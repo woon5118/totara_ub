@@ -18,7 +18,14 @@
 
 <template>
   <div class="tui-rateCompetencies">
-    <PageHeader :user="user" :is-for-another-user="isForAnotherUser" />
+    <PageHeading
+      :title="
+        isForAnotherUser
+          ? $str('rate_user', 'pathway_manual', user.fullname)
+          : $str('rate_competencies', 'pathway_manual')
+      "
+    />
+
     <RoleSelector
       v-if="isForAnotherUser"
       :user-id="user.id"
@@ -40,13 +47,13 @@
 </template>
 
 <script>
-import PageHeader from 'pathway_manual/components/PageHeader';
+import PageHeading from 'tui/components/layouts/PageHeading';
 import RateUserCompetencies from 'pathway_manual/components/RateUserCompetencies';
 import RoleSelector from 'pathway_manual/components/RoleSelector';
 
 export default {
   components: {
-    PageHeader,
+    PageHeading,
     RateUserCompetencies,
     RoleSelector,
   },
@@ -114,6 +121,15 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+  {
+    "pathway_manual": [
+      "rate_competencies",
+      "rate_user"
+    ]
+  }
+</lang-strings>
 
 <style lang="scss">
 .tui-rateCompetencies {

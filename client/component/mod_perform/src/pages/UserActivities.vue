@@ -18,18 +18,14 @@
 
 <template>
   <div class="tui-performUserActivities">
-    <div class="tui-performUserActivities__header-row">
-      <h2 class="tui-performUserActivities__heading">
-        {{ $str('user_activities_page_title', 'mod_perform') }}
-      </h2>
-
-      <Button
-        v-if="canPotentiallyManageParticipants"
-        class="tui-performUserActivities__action-button"
-        :text="$str('manage_participation', 'mod_perform')"
-        @click="openParticipationModal = true"
-      />
-    </div>
+    <PageHeading :title="$str('user_activities_page_title', 'mod_perform')">
+      <template v-if="canPotentiallyManageParticipants" v-slot:buttons>
+        <Button
+          :text="$str('manage_participation', 'mod_perform')"
+          @click="openParticipationModal = true"
+        />
+      </template>
+    </PageHeading>
 
     <ManualParticipantsSelectionBanner
       v-if="requireManualParticipantsNotification"
@@ -83,6 +79,7 @@
 <script>
 import Button from 'tui/components/buttons/Button';
 import ManualParticipantsSelectionBanner from 'mod_perform/components/user_activities/ManualParticipantsSelectionBanner';
+import PageHeading from 'tui/components/layouts/PageHeading';
 import SelectActivityModal from 'mod_perform/components/manage_activity/participation/SelectActivityModal';
 import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
@@ -94,6 +91,7 @@ export default {
   components: {
     Button,
     ManualParticipantsSelectionBanner,
+    PageHeading,
     SelectActivityModal,
     Tab,
     Tabs,
@@ -189,38 +187,10 @@ export default {
 
 <style lang="scss">
 .tui-performUserActivities {
-  &__header-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-
-  &__heading {
-    margin: 0;
-    padding-right: var(--gap-8);
-  }
-
-  &__action-buttons {
-    margin-top: var(--gap-4);
-  }
-
-  &__content {
-    margin-top: var(--gap-4);
-  }
-
   @include tui-font-body();
-}
 
-@media (min-width: $tui-screen-xs) {
-  .tui-performUserActivities {
-    &__action-buttons {
-      margin-top: var(--gap-4);
-    }
-
-    &__content {
-      margin-top: var(--gap-4);
-    }
+  & > * + * {
+    margin-top: var(--gap-4);
   }
 }
 </style>

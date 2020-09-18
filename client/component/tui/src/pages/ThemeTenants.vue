@@ -18,7 +18,7 @@
 
 <template>
   <div>
-    <h2>{{ theme }}</h2>
+    <PageHeading :title="theme" />
     <h3>{{ $str('sitebranding', 'totara_tui') }}</h3>
     <p>{{ $str('sitebrandinginformation', 'totara_tui') }}</p>
     <ActionLink
@@ -65,6 +65,7 @@
 import ActionLink from 'tui/components/links/ActionLink';
 import Table from 'tui/components/datatable/Table';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
+import PageHeading from 'tui/components/layouts/PageHeading';
 import Cell from 'tui/components/datatable/Cell';
 import Edit from 'tui/components/icons/Edit';
 
@@ -73,6 +74,7 @@ export default {
     ActionLink,
     Table,
     HeaderCell,
+    PageHeading,
     Cell,
     Edit,
   },

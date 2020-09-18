@@ -17,10 +17,9 @@
 -->
 
 <template>
-  <div>
-    <h2>
-      {{ $str('rate_competencies', 'pathway_manual') }}
-    </h2>
+  <div class="tui-rateUserCompetencies">
+    <PageHeading :title="$str('rate_competencies', 'pathway_manual')" />
+
     <RoleSelector
       :specified-role="specifiedRole"
       :has-default-selected="true"
@@ -31,12 +30,17 @@
 </template>
 
 <script>
+import PageHeading from 'tui/components/layouts/PageHeading';
 import RateUsersList from 'pathway_manual/components/RateUsersList';
 import RoleSelector from 'pathway_manual/components/RoleSelector';
 import { notify } from 'tui/notifications';
 
 export default {
-  components: { RateUsersList, RoleSelector },
+  components: {
+    PageHeading,
+    RateUsersList,
+    RoleSelector,
+  },
 
   props: {
     specifiedRole: {
@@ -78,3 +82,11 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-rateUserCompetencies {
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+}
+</style>

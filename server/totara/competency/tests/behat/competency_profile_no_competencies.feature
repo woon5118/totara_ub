@@ -23,7 +23,7 @@ Feature: Message is shown if there are no competencies to be shown for a user's 
     And I navigate to the competency profile of user "user1"
     Then I should see "User One" in the ".breadcrumb-nav" "css_element"
     And I should see "Competency profile" in the ".breadcrumb-nav" "css_element"
-    And I should see "Competency profile" in the ".tui-competencyProfile__heading" "css_element"
+    And I should see "Competency profile" in the ".tui-pageHeading__title" "css_element"
     And I should see "There are no competencies currently assigned."
     And I should not see "Current assignment progress"
 
@@ -35,7 +35,7 @@ Feature: Message is shown if there are no competencies to be shown for a user's 
 
     Then I should see "User One" in the ".breadcrumb-nav" "css_element"
     And I should see "Competency profile" in the ".breadcrumb-nav" "css_element"
-    And I should see "Competency profile" in the ".tui-competencyProfile__heading" "css_element"
+    And I should see "Competency profile" in the ".tui-pageHeading__title" "css_element"
     And I should not see "There are no competencies currently assigned."
     And I should see "Current assignment progress"
 

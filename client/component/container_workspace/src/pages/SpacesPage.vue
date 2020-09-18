@@ -21,9 +21,7 @@
     class="tui-spacesPage"
     @responsive-resize="currentBoundaryName = $event"
   >
-    <h1 class="tui-spacesPage__header">
-      {{ $str('find_spaces', 'container_workspace') }}
-    </h1>
+    <PageHeading :title="$str('find_spaces', 'container_workspace')" />
 
     <Loader :loading="$apollo.loading" :fullpage="true" />
 
@@ -51,6 +49,7 @@
 </template>
 
 <script>
+import PageHeading from 'tui/components/layouts/PageHeading';
 import Responsive from 'tui/components/responsive/Responsive';
 import WorkspaceFilter from 'container_workspace/components/filter/WorkspaceFilter';
 import Loader from 'tui/components/loading/Loader';
@@ -67,6 +66,7 @@ export default {
   components: {
     SpaceCardsGrid,
     WorkspaceFilter,
+    PageHeading,
     Responsive,
     Loader,
   },
@@ -295,15 +295,15 @@ export default {
 
 <style lang="scss">
 .tui-spacesPage {
+  margin-top: var(--gap-12);
   padding: 0 var(--gap-8);
 
-  &__header {
-    @include tui-font-heading-large();
-    margin: calc(var(--gap-8) * 2) 0;
+  &__filter {
+    margin-top: var(--gap-8);
   }
 
-  &__filter {
-    margin-bottom: var(--gap-4);
+  &__grid {
+    margin-top: var(--gap-4);
   }
 }
 </style>

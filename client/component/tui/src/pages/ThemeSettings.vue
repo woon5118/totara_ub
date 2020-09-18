@@ -19,7 +19,7 @@
 
 <template>
   <div class="tui-themesettings">
-    <h2>{{ pageTitle }}</h2>
+    <PageHeading :title="pageTitle" />
     <Loader :loading="!allDataLoaded">
       <div
         v-if="dataIsReady && embeddedFormData.formFieldData.brand"
@@ -124,6 +124,7 @@ import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
 import { Uniform, FormRow, FormToggleSwitch } from 'tui/components/uniform';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
+import PageHeading from 'tui/components/layouts/PageHeading';
 import SettingsFormBrand from 'tui/components/theme_settings/SettingsFormBrand';
 import SettingsFormColours from 'tui/components/theme_settings/SettingsFormColours';
 import SettingsFormImages from 'tui/components/theme_settings/SettingsFormImages';
@@ -143,6 +144,7 @@ export default {
     FormRow,
     FormRowDetails,
     FormToggleSwitch,
+    PageHeading,
     SettingsFormBrand,
     SettingsFormColours,
     SettingsFormImages,
@@ -481,3 +483,11 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-themesettings {
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+}
+</style>

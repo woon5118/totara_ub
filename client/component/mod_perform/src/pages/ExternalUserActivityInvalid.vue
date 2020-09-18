@@ -18,26 +18,26 @@
 
 <template>
   <div class="tui-performUserActivityInvalid">
-    <h2 class="tui-performUserActivityInvalid__header">
-      {{ $str('external_participation_invalid_heading', 'mod_perform') }}
-    </h2>
+    <PageHeading
+      :title="$str('external_participation_invalid_heading', 'mod_perform')"
+    />
 
-    <p>{{ $str('external_participation_invalid_message', 'mod_perform') }}</p>
+    <div>
+      {{ $str('external_participation_invalid_message', 'mod_perform') }}
+    </div>
   </div>
 </template>
 
 <script>
+import PageHeading from 'tui/components/layouts/PageHeading';
+
 export default {
-  components: {},
-  props: {},
-
-  data() {
-    return {};
+  components: {
+    PageHeading,
   },
-
-  computed: {},
 };
 </script>
+
 <lang-strings>
   {
     "mod_perform": [
@@ -51,14 +51,8 @@ export default {
 .tui-performUserActivityInvalid {
   @include tui-font-body();
 
-  margin: var(--gap-8) 0 0;
-
   & > * + * {
     margin-top: var(--gap-6);
-  }
-
-  &__header {
-    @include tui-font-heading-medium();
   }
 }
 </style>

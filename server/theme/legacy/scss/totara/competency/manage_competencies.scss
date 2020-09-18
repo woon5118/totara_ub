@@ -23,7 +23,7 @@
 
 .tw-editCompetency {
   &__title {
-    @include tui-font-heading-medium();
+    @include tui-font-heading-page-title();
   }
 }
 

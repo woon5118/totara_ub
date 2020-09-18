@@ -57,7 +57,7 @@ Feature: Viewing and responding to perform activities
       | David is subject | Appraisal | David Two | Not yet started  | Not yet started |
 
     When I click on "David is subject" "link"
-    Then I should see "David is subject" in the ".tui-participantContent__header" "css_element"
+    Then I should see "David is subject" in the ".tui-pageHeading__title" "css_element"
     And I should see that show others responses is toggled "off"
     And I should see perform "short text" question "Question one" is unanswered
     And I should see perform "short text" question "Question two" is unanswered
@@ -140,7 +140,7 @@ Feature: Viewing and responding to perform activities
       | John is participating subject | Appraisal | Not yet started  | Not yet started |
 
     When I click on "John is participating subject" "link"
-    Then I should see "John is participating subject" in the ".tui-participantContent__header" "css_element"
+    Then I should see "John is participating subject" in the ".tui-pageHeading__title" "css_element"
 
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:

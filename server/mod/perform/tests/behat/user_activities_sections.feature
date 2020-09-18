@@ -107,7 +107,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
       | Manager              | David Two      | Not yet started  |
       | Manager              | combined Three | Not yet started  |
     When I click on "Single section Activity" "link_or_button_exact"
-    Then I should see "Single section Activity" in the ".tui-participantContent__header" "css_element"
+    Then I should see "Single section Activity" in the ".tui-pageHeading__title" "css_element"
     And I should see "Question 4"
     And I should see perform activity relationship to user "yourself"
     When I click on "Cancel" "button"
@@ -123,7 +123,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
       | Manager              | David Two      | Not yet started  |
       | Manager              | combined Three | Not yet started  |
     When I click on "Single section Activity" "link_or_button_exact"
-    Then I should see "Single section Activity" in the ".tui-participantContent__header" "css_element"
+    Then I should see "Single section Activity" in the ".tui-pageHeading__title" "css_element"
     And I should see "Question 4"
     And I should see perform activity relationship to user "yourself"
     When I click on "Submit" "button"
@@ -172,7 +172,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
     And I should see "Section 2" in the ".tui-performUserActivityListSection:nth-child(2) .tui-performUserActivityListSection__header" "css_element"
     And "Section 3" "link_or_button" should exist in the ".tui-performUserActivityListSection:nth-child(3) .tui-performUserActivityListSection__header" "css_element"
     When I click on "Section 1" "link_or_button" in the ".tui-performUserActivityListSection:nth-child(1) .tui-performUserActivityListSection__header" "css_element"
-    Then I should see "Multiple section Activity" in the ".tui-participantContent__header" "css_element"
+    Then I should see "Multiple section Activity" in the ".tui-pageHeading__title" "css_element"
     Then I should see "Section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should see "Question 1"
     And I should see perform activity relationship to user "yourself"
@@ -198,7 +198,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
       | Relationship to user | User | Section progress |
       | Subject              | You  | Not yet started  |
     When I click on "Section 3" "link_or_button" in the ".tui-performUserActivityListSection:nth-child(3) .tui-performUserActivityListSection__header" "css_element"
-    Then I should see "Multiple section Activity" in the ".tui-participantContent__header" "css_element"
+    Then I should see "Multiple section Activity" in the ".tui-pageHeading__title" "css_element"
     Then I should see "Section 3" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should see "Question 3"
     And I should see perform activity relationship to user "yourself"
@@ -253,7 +253,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
     And "Section anon 3" "link_or_button" should exist in the ".tui-performUserActivityListSections" "css_element"
 
     When I click on "Section anon 3" "link_or_button" in the ".tui-performUserActivityListSections" "css_element"
-    Then I should see "Anonymous responses - Multiple section Activity" in the ".tui-participantContent__header" "css_element"
+    Then I should see "Anonymous responses - Multiple section Activity" in the ".tui-pageHeading__title" "css_element"
     Then I should see "Section anon 3" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should see "Question 3"
     And I should see perform activity relationship to user "yourself"
@@ -295,7 +295,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
     And the "Appraiser (Not yet started)" radio button is not selected
     When I click on the "Appraiser (Not yet started)" tui radio
     And I click on "Continue" "button"
-    Then I should see "Anonymous responses - Multiple section Activity" in the ".tui-participantContent__header" "css_element"
+    Then I should see "Anonymous responses - Multiple section Activity" in the ".tui-pageHeading__title" "css_element"
     And I should see "Section anon 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should see "Question 1"
     And I should see perform activity relationship to user "Appraiser"
@@ -343,7 +343,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
     And the "Appraiser (Not yet started)" radio button is not selected
     When I click on the "Appraiser (Not yet started)" tui radio
     And I click on "Continue" "button"
-    Then I should see "Multiple section Activity" in the ".tui-participantContent__header" "css_element"
+    Then I should see "Multiple section Activity" in the ".tui-pageHeading__title" "css_element"
     And I should see "Section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should see "Question 1"
     And I should see perform activity relationship to user "Appraiser"
@@ -369,7 +369,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
       | Relationship to user | User     | Section progress |
       | Subject              | John One | Not yet started  |
     When I click on "Section 2" "link_or_button" in the ".tui-performUserActivityListSection:nth-child(2) .tui-performUserActivityListSection__header" "css_element"
-    Then I should see "Multiple section Activity" in the ".tui-participantContent__header" "css_element"
+    Then I should see "Multiple section Activity" in the ".tui-pageHeading__title" "css_element"
     And I should see "Section 2" in the ".tui-participantContent__sectionHeading-title" "css_element"
     And I should see "Question 2"
     And I should see perform activity relationship to user "Manager"

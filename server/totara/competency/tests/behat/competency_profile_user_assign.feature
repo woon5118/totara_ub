@@ -36,7 +36,7 @@ Feature: Test competencies can be user assigned
     # Should have "self-assignment" title/heading/nav
     Then I should see "Self assignment" in the ".breadcrumb" "css_element"
     And I should see "Back to your competency profile"
-    And I should see "Self-assign competencies" in the "a + h2" "css_element"
+    And I should see "Self-assign competencies" in the ".tui-pageHeading__title" "css_element"
 
     And I should not see "Competency assignment" in the ".breadcrumb" "css_element"
     And I should not see "Back to competency profile"
@@ -228,7 +228,7 @@ Feature: Test competencies can be user assigned
 
     Then I should see "Competency assignment" in the ".breadcrumb" "css_element"
     And I should see "Back to competency profile"
-    And I should see "Assign competencies" in the "a + h2" "css_element"
+    And I should see "Assign competencies" in the ".tui-pageHeading__title" "css_element"
 
     And I should not see "Self assignment"
     And I should not see "Back to your competency profile"

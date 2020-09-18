@@ -18,25 +18,27 @@
 
 <template>
   <div class="tui-competencySummary">
-    <div class="tui-competencySummary__header">
-      <a :href="backLinkUrl">
-        {{ $str('back_to', 'totara_competency', frameworkName) }}
-      </a>
-      <h2 class="tui-competencySummary__header-title">
-        {{
+    <a :href="backLinkUrl">
+      {{ $str('back_to', 'totara_competency', frameworkName) }}
+    </a>
+
+    <div class="tui-competencySummary__content">
+      <PageHeading
+        :title="
           $str('competency_title', 'totara_hierarchy', {
             framework: frameworkName,
             fullname: competencyName,
           })
-        }}
-      </h2>
+        "
+      />
+
+      <General :competency-id="competencyId" />
+      <LinkedCourses :competency-id="competencyId" />
+      <AchievementConfiguration
+        v-if="performEnabled"
+        :competency-id="competencyId"
+      />
     </div>
-    <General :competency-id="competencyId" />
-    <LinkedCourses :competency-id="competencyId" />
-    <AchievementConfiguration
-      v-if="performEnabled"
-      :competency-id="competencyId"
-    />
   </div>
 </template>
 
@@ -44,12 +46,14 @@
 import AchievementConfiguration from 'totara_competency/components/summary/AchievementConfiguration';
 import General from 'totara_competency/components/summary/CompetencySummaryGeneral';
 import LinkedCourses from 'totara_competency/components/summary/LinkedCourses';
+import PageHeading from 'tui/components/layouts/PageHeading';
 
 export default {
   components: {
     AchievementConfiguration,
     General,
     LinkedCourses,
+    PageHeading,
   },
 
   props: {
@@ -102,13 +106,12 @@ export default {
   @include tui-font-body();
 
   & > * + * {
-    margin-top: var(--gap-4);
+    margin-top: var(--gap-2);
   }
 
-  &__header {
-    &-title {
-      @include tui-font-heading-medium();
-      margin: var(--gap-2) 0 0;
+  &__content {
+    & > * + * {
+      margin-top: var(--gap-4);
     }
   }
 

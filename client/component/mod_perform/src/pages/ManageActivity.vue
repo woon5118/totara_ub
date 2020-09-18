@@ -17,64 +17,58 @@
 -->
 
 <template>
-  <div class="tui-performManageActivity">
-    <a :href="goBackLink">
-      {{ $str('back_to_all_activities', 'mod_perform') }}
-    </a>
+  <Loader :loading="$apollo.loading">
+    <div class="tui-performManageActivity">
+      <a :href="goBackLink">
+        {{ $str('back_to_all_activities', 'mod_perform') }}
+      </a>
 
-    <Loader
-      :loading="$apollo.loading"
-      class="tui-performManageActivity__content"
-    >
-      <h2 v-if="activity" class="tui-performManageActivity__title">
-        {{ activity.name }}
-      </h2>
+      <div v-if="activity" class="tui-performManageActivity__content">
+        <PageHeading :title="activity.name" />
 
-      <ActivityStatusBanner
-        v-if="activity"
-        :activity="activity"
-        :disabled="activateModalLoading"
-        @activate="activateActivity"
-      />
+        <ActivityStatusBanner
+          :activity="activity"
+          :disabled="activateModalLoading"
+          @activate="activateActivity"
+        />
 
-      <Tabs
-        v-if="activity"
-        :selected="currentTabId"
-        :controlled="true"
-        @input="changeTabRequest"
-      >
-        <Tab
-          v-for="({ component, name, id }, index) in tabs"
-          :id="id"
-          :key="index"
-          :name="name"
-          :always-render="true"
+        <Tabs
+          :selected="currentTabId"
+          :controlled="true"
+          @input="changeTabRequest"
         >
-          <component
-            :is="component"
-            v-model="activity"
-            :activity-id="activityId"
-            :activity-state="activityState"
-            :activity-context-id="parseInt(activity.context_id)"
-            :activity-has-unsaved-changes="unsavedChanges"
-            @unsaved-changes="setUnsavedChanges"
-            @mutation-error="showMutationErrorNotification"
-            @mutation-success="showMutationSuccessNotification"
-          />
-        </Tab>
-      </Tabs>
+          <Tab
+            v-for="({ component, name, id }, index) in tabs"
+            :id="id"
+            :key="index"
+            :name="name"
+            :always-render="true"
+          >
+            <component
+              :is="component"
+              v-model="activity"
+              :activity-id="activityId"
+              :activity-state="activityState"
+              :activity-context-id="parseInt(activity.context_id)"
+              :activity-has-unsaved-changes="unsavedChanges"
+              @unsaved-changes="setUnsavedChanges"
+              @mutation-error="showMutationErrorNotification"
+              @mutation-success="showMutationSuccessNotification"
+            />
+          </Tab>
+        </Tabs>
 
-      <ActivateActivityModal
-        v-if="activity"
-        :activity="activity"
-        :trigger-open="showActivateModal"
-        @close-activate-modal="updateShowActivateModal"
-        @update-loading="uploadLoading"
-        @unsaved-changes="setUnsavedChanges"
-        @refetch="refetch"
-      />
-    </Loader>
-  </div>
+        <ActivateActivityModal
+          :activity="activity"
+          :trigger-open="showActivateModal"
+          @close-activate-modal="updateShowActivateModal"
+          @update-loading="uploadLoading"
+          @unsaved-changes="setUnsavedChanges"
+          @refetch="refetch"
+        />
+      </div>
+    </div>
+  </Loader>
 </template>
 
 <script>
@@ -83,8 +77,9 @@ import ActivityContentTab from 'mod_perform/components/manage_activity/content/A
 import ActivityStatusBanner from 'mod_perform/components/manage_activity/ActivityStatusBanner';
 import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/AssignmentsTab';
 import GeneralInfoTab from 'mod_perform/components/manage_activity/GeneralInfoTab';
-import NotificationsTab from 'mod_perform/components/manage_activity/notification/NotificationsTab';
 import Loader from 'tui/components/loading/Loader';
+import NotificationsTab from 'mod_perform/components/manage_activity/notification/NotificationsTab';
+import PageHeading from 'tui/components/layouts/PageHeading';
 import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
 import { notify } from 'tui/notifications';
@@ -99,11 +94,12 @@ export default {
     ActivityContentTab,
     ActivityStatusBanner,
     AssignmentsTab,
+    GeneralInfoTab,
+    Loader,
+    NotificationsTab,
+    PageHeading,
     Tab,
     Tabs,
-    Loader,
-    GeneralInfoTab,
-    NotificationsTab,
   },
 
   props: {
@@ -278,15 +274,14 @@ export default {
 .tui-performManageActivity {
   @include tui-font-body();
 
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+
   &__content {
     & > * + * {
       margin-top: var(--gap-8);
     }
-  }
-
-  &__title {
-    @include tui-font-heading-medium;
-    margin: var(--gap-2) 0 0;
   }
 }
 </style>

@@ -19,38 +19,40 @@
 
 <template>
   <div class="tui-performAddParticipants">
-    <a :href="$url(goBackLink)">{{
-      $str('back_to_manage_participation', 'mod_perform')
-    }}</a>
+    <a :href="$url(goBackLink)">
+      {{ $str('back_to_manage_participation', 'mod_perform') }}
+    </a>
 
-    <h2 class="tui-performAddParticipants__title">
-      {{ $str('add_participants_page_title', 'mod_perform') }}
-    </h2>
+    <div class="tui-performAddParticipants__content">
+      <PageHeading
+        :title="$str('add_participants_page_title', 'mod_perform')"
+      />
 
-    <Loader :loading="$apollo.loading" />
+      <Loader :loading="$apollo.loading" />
 
-    <ActivityParticipants
-      v-if="subjectInstance"
-      ref="form"
-      :subject-instance="subjectInstance"
-      :relationships="relationships"
-      :require-input="false"
-      :is-saving="isSaving"
-      :validate="validate"
-      @submit="showConfirmModal"
-    >
-      <template v-if="relationships.length === 0" v-slot:meta>
-        <p>
-          {{ $str('manual_participant_add_no_relationships', 'mod_perform') }}
-        </p>
-      </template>
-      <template v-slot:buttons>
-        <ActionLink
-          :href="goBackLink"
-          :text="$str('button_cancel', 'mod_perform')"
-        />
-      </template>
-    </ActivityParticipants>
+      <ActivityParticipants
+        v-if="subjectInstance"
+        ref="form"
+        :subject-instance="subjectInstance"
+        :relationships="relationships"
+        :require-input="false"
+        :is-saving="isSaving"
+        :validate="validate"
+        @submit="showConfirmModal"
+      >
+        <template v-if="relationships.length === 0" v-slot:meta>
+          <p>
+            {{ $str('manual_participant_add_no_relationships', 'mod_perform') }}
+          </p>
+        </template>
+        <template v-slot:buttons>
+          <ActionLink
+            :href="goBackLink"
+            :text="$str('button_cancel', 'mod_perform')"
+          />
+        </template>
+      </ActivityParticipants>
+    </div>
 
     <ConfirmationModal
       :open="openConfirmationModal"
@@ -71,6 +73,7 @@ import ActionLink from 'tui/components/links/ActionLink';
 import ActivityParticipants from 'mod_perform/components/user_activities/participant_selector/ActivityParticipants';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import Loader from 'tui/components/loading/Loader';
+import PageHeading from 'tui/components/layouts/PageHeading';
 // util
 import {
   RELATIONSHIP_SUBJECT,
@@ -88,6 +91,7 @@ export default {
     ActionLink,
     ConfirmationModal,
     Loader,
+    PageHeading,
   },
 
   props: {
@@ -285,9 +289,14 @@ export default {
 
 <style lang="scss">
 .tui-performAddParticipants {
-  &__title {
-    @include tui-font-heading-medium;
-    padding-top: var(--gap-2);
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+
+  &__content {
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
   }
 }
 </style>

@@ -18,71 +18,75 @@
 
 <template>
   <div class="tui-performUserActivitiesSelectParticipants">
-    <a :href="$url(userActivitiesUrl)">{{
-      $str('back_to_all_activities', 'mod_perform')
-    }}</a>
+    <a :href="$url(userActivitiesUrl)">
+      {{ $str('back_to_all_activities', 'mod_perform') }}
+    </a>
 
-    <h2 class="tui-performUserActivitiesSelectParticipants__title">
-      {{
+    <PageHeading
+      :title="
         $str('user_activities_select_participants_page_title', 'mod_perform')
-      }}
-    </h2>
+      "
+    />
 
-    <Loader
-      v-if="$apollo.loading || participantSelectionInstances.length > 0"
-      :loading="$apollo.loading"
-    >
-      <p>
-        {{ $str('user_activities_select_participants_note', 'mod_perform') }}
-      </p>
-
-      <ActivityParticipants
-        v-for="selectionInstance in participantSelectionInstances"
-        :key="selectionInstance.subject_instance.id"
-        :subject-instance="selectionInstance.subject_instance"
-        :relationships="selectionInstance.manual_relationships"
-        :require-input="true"
-        :is-saving="savingId === selectionInstance.subject_instance.id"
-        @submit="submit($event, selectionInstance.subject_instance.id)"
+    <Loader :loading="$apollo.loading">
+      <div
+        v-if="$apollo.loading || participantSelectionInstances.length > 0"
+        class="tui-performUserActivitiesSelectParticipants__content"
       >
-        <template v-slot:meta>
-          <JobAssignmentInformation
-            :job-assignments="
-              selectionInstance.subject_instance.static_instances
-            "
-          />
-          <p>
-            {{
-              $str(
-                'user_activities_created_at',
-                'mod_perform',
-                selectionInstance.subject_instance.created_at
-              )
-            }}
-          </p>
-        </template>
-      </ActivityParticipants>
-    </Loader>
+        <div>
+          {{ $str('user_activities_select_participants_note', 'mod_perform') }}
+        </div>
 
-    <p v-else>
-      {{ $str('user_activities_select_participants_none', 'mod_perform') }}
-    </p>
+        <ActivityParticipants
+          v-for="selectionInstance in participantSelectionInstances"
+          :key="selectionInstance.subject_instance.id"
+          :subject-instance="selectionInstance.subject_instance"
+          :relationships="selectionInstance.manual_relationships"
+          :require-input="true"
+          :is-saving="savingId === selectionInstance.subject_instance.id"
+          @submit="submit($event, selectionInstance.subject_instance.id)"
+        >
+          <template v-slot:meta>
+            <JobAssignmentInformation
+              :job-assignments="
+                selectionInstance.subject_instance.static_instances
+              "
+            />
+            <p>
+              {{
+                $str(
+                  'user_activities_created_at',
+                  'mod_perform',
+                  selectionInstance.subject_instance.created_at
+                )
+              }}
+            </p>
+          </template>
+        </ActivityParticipants>
+      </div>
+
+      <div v-else>
+        {{ $str('user_activities_select_participants_none', 'mod_perform') }}
+      </div>
+    </Loader>
   </div>
 </template>
 
 <script>
 import ActivityParticipants from 'mod_perform/components/user_activities/participant_selector/ActivityParticipants';
+import JobAssignmentInformation from 'mod_perform/components/user_activities/participant/JobAssignmentInformation';
 import Loader from 'tui/components/loading/Loader';
+import PageHeading from 'tui/components/layouts/PageHeading';
 import ManualParticipantSelectionInstancesQuery from 'mod_perform/graphql/manual_participant_selection_instances';
 import SetManualParticipantsMutation from 'mod_perform/graphql/set_manual_participants';
 import { notify } from 'tui/notifications';
-import JobAssignmentInformation from 'mod_perform/components/user_activities/participant/JobAssignmentInformation';
 
 export default {
   components: {
     ActivityParticipants,
     JobAssignmentInformation,
     Loader,
+    PageHeading,
   },
 
   props: {
@@ -175,9 +179,14 @@ export default {
 
 <style lang="scss">
 .tui-performUserActivitiesSelectParticipants {
-  &__title {
-    @include tui-font-heading-medium;
-    padding-top: var(--gap-2);
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+
+  &__content {
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
   }
 }
 </style>

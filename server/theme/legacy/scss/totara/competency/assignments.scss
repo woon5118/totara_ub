@@ -22,6 +22,10 @@
 // @package   theme_roots
 
 .tw-assignComp {
+  &__title {
+    @include tui-font-heading-page-title;
+  }
+
   &__archiveActionModal {
     &_confirm {
       display: flex;
@@ -70,6 +74,10 @@
 }
 
 .tw-assignCompSave {
+  &__title {
+    @include tui-font-heading-page-title;
+  }
+
   &__activate {
     margin-bottom: var(--gap-2);
   }
@@ -91,6 +99,11 @@
         font-weight: normal;
       }
     }
+  }
+
+  &__backLink {
+    display: block;
+    padding-bottom: var(--gap-1);
   }
 
   &__basket {

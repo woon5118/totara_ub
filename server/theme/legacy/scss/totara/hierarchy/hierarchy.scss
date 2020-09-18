@@ -67,8 +67,7 @@ table.hierarchy-index .depth10 {
 }
 
 .competency-edit-general-title {
-  @include tui-font-heading-medium();
-  margin: auto 0;
+  @include tui-font-heading-page-title();
 }
 
 .competency-edit-general-small-title {

@@ -18,7 +18,8 @@
 
 <template>
   <div class="tui-performManageActivityList">
-    <h2 v-text="$str('perform:manage_activity', 'mod_perform')" />
+    <PageHeading :title="$str('perform:manage_activity', 'mod_perform')" />
+
     <div class="tui-performManageActivityList__add">
       <Button
         v-if="canAdd"
@@ -42,15 +43,15 @@
         class="tui-performManageActivityList__table"
       >
         <template v-slot:header-row>
-          <HeaderCell size="9">{{
-            $str('view_name', 'mod_perform')
-          }}</HeaderCell>
-          <HeaderCell size="2">{{
-            $str('view_type', 'mod_perform')
-          }}</HeaderCell>
-          <HeaderCell size="2">{{
-            $str('view_status', 'mod_perform')
-          }}</HeaderCell>
+          <HeaderCell size="9">
+            {{ $str('view_name', 'mod_perform') }}
+          </HeaderCell>
+          <HeaderCell size="2">
+            {{ $str('view_type', 'mod_perform') }}
+          </HeaderCell>
+          <HeaderCell size="2">
+            {{ $str('view_status', 'mod_perform') }}
+          </HeaderCell>
           <HeaderCell size="1" />
         </template>
         <template v-slot:row="{ row }">
@@ -83,9 +84,11 @@ import CreateActivityForm from 'mod_perform/components/manage_activity/CreateAct
 import HeaderCell from 'tui/components/datatable/HeaderCell';
 import Loader from 'tui/components/loading/Loader';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
-import performActivitiesQuery from 'mod_perform/graphql/activities';
+import PageHeading from 'tui/components/layouts/PageHeading';
 import Table from 'tui/components/datatable/Table';
 import { notify } from 'tui/notifications';
+// Query
+import performActivitiesQuery from 'mod_perform/graphql/activities';
 
 export default {
   components: {
@@ -96,6 +99,7 @@ export default {
     HeaderCell,
     Loader,
     ModalPresenter,
+    PageHeading,
     Table,
   },
   props: {
@@ -185,19 +189,19 @@ export default {
 
 <style lang="scss">
 .tui-performManageActivityList {
-  &__add {
-    text-align: right;
+  & > * + * {
+    margin-top: var(--gap-4);
   }
 
-  &__table {
-    padding-top: var(--gap-4);
+  &__add {
+    text-align: right;
   }
 }
 
 @media (min-width: $tui-screen-sm) {
   .tui-performManageActivityList {
-    &__table {
-      padding-top: var(--gap-2);
+    & > * + * {
+      margin-top: var(--gap-2);
     }
   }
 }

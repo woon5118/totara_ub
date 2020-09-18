@@ -133,7 +133,7 @@
 }
 
 @mixin tui-font-heading-medium {
-  font-weight: bold;
+  font-weight: 500;
   font-size: var(--font-size-30);
   line-height: 1;
 }
@@ -166,4 +166,9 @@
   font-weight: bold;
   font-size: var(--font-size-13);
   line-height: 1.15;
+}
+
+@mixin tui-font-heading-page-title {
+  margin: 0;
+  @include tui-font-heading-medium;
 }

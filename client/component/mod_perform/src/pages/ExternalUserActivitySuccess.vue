@@ -18,25 +18,32 @@
 
 <template>
   <div class="tui-performUserActivitySuccess">
-    <h2 class="tui-performUserActivitySuccess__header">
-      {{ $str('external_participation_success_heading', 'mod_perform') }}
-    </h2>
+    <PageHeading
+      :title="$str('external_participation_success_heading', 'mod_perform')"
+    />
 
-    <p>{{ $str('external_participation_success_message', 'mod_perform') }}</p>
-    <p v-if="!isClosed">
-      <a :href="reviewUrl">{{
-        $str('external_participation_success_review_link', 'mod_perform')
-      }}</a>
-    </p>
-    <p v-else>
+    <div>
+      {{ $str('external_participation_success_message', 'mod_perform') }}
+    </div>
+    <div v-if="!isClosed">
+      <a :href="reviewUrl">
+        {{ $str('external_participation_success_review_link', 'mod_perform') }}
+      </a>
+    </div>
+    <div v-else>
       {{ $str('external_participation_success_message_closed', 'mod_perform') }}
-    </p>
+    </div>
   </div>
 </template>
 
 <script>
+import PageHeading from 'tui/components/layouts/PageHeading';
+
 export default {
-  components: {},
+  components: {
+    PageHeading,
+  },
+
   props: {
     reviewUrl: {
       required: true,
@@ -47,14 +54,9 @@ export default {
       type: Boolean,
     },
   },
-
-  data() {
-    return {};
-  },
-
-  computed: {},
 };
 </script>
+
 <lang-strings>
   {
     "mod_perform": [
@@ -70,14 +72,8 @@ export default {
 .tui-performUserActivitySuccess {
   @include tui-font-body();
 
-  margin: var(--gap-8) 0 0;
-
   & > * + * {
     margin-top: var(--gap-6);
-  }
-
-  &__header {
-    @include tui-font-heading-medium();
   }
 }
 </style>

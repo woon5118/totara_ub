@@ -265,11 +265,7 @@ export default {
           word-break: break-word;
           hyphens: none;
 
-          @include tui-font-heading-small();
-
-          @media (min-width: $tui-screen-lg) {
-            @include tui-font-heading-medium();
-          }
+          @include tui-font-heading-page-title;
         }
 
         &__buttonIcon {

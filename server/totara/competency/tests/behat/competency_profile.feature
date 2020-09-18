@@ -265,7 +265,7 @@ Feature: Competency profile landing page - an overview of their progress towards
     When I click on "001_Pos_NotProficient" "link"
     Then I should see "Back to competency profile"
     And I should see "Competency Details"
-    And I should see "001_Pos_NotProficient" in the ".tui-competencyDetail__title" "css_element"
+    And I should see "001_Pos_NotProficient" in the ".tui-pageHeading__title" "css_element"
 
   Scenario: View message shows if no active assignments
     Given all assignments for the "position" assignment type are archived

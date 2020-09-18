@@ -208,12 +208,13 @@ export default {
   &__header {
     display: flex;
     justify-content: space-between;
-    margin-top: var(--gap-8);
-    margin-bottom: calc(var(--gap-8) * 2);
+    margin: var(--gap-4) 0 var(--gap-12);
 
     &__title {
-      @include tui-font-heading-large;
-      flex: 1;
+      @include tui-font-heading-page-title();
+      flex-basis: auto;
+      flex-grow: 0;
+      flex-shrink: 1;
     }
 
     :not(:first-child) {
