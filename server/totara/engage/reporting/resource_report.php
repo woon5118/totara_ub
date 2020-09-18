@@ -29,6 +29,8 @@ require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
+require_login();
+
 // Can only access if either workspaces or resources are enabled
 if (advanced_feature::is_disabled('engage_resources')) {
     throw new feature_not_available_exception('engage_resources');
