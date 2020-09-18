@@ -24,8 +24,10 @@
 
 use core_user\access_controller;
 use pathway_manual\models\roles\manager;
-use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+use totara_core\hook\manager as hook_manager;
+use core_user\hook\allow_view_profile_field;
+use pathway_manual\watcher\user;
 
 class pathway_manual_watcher_user_testcase extends advanced_testcase {
 
@@ -46,17 +48,17 @@ class pathway_manual_watcher_user_testcase extends advanced_testcase {
      */
     protected $manager_user;
 
-    private function disable_engage_features() {
-        advanced_feature::disable('engage_resources');
-        access_controller::clear_instance_cache();
-    }
-
     protected function setUp(): void {
         parent::setUp();
 
-        // Engage allows several properties of users to become visible to all other users. To test that user
-        // properties are hidden when appropritate, we need to disable engage.
-        $this->disable_engage_features();
+        // Reset the hook watchers so that the tests can be more accurage.
+        hook_manager::phpunit_replace_watchers([
+            [
+                'hookname' => allow_view_profile_field::class,
+                'callback' => [user::class, 'allow_view_profile_field']
+            ]
+        ]);
+        access_controller::clear_instance_cache();
 
         $this->generator = self::getDataGenerator()->get_plugin_generator('totara_competency');
         $this->staff_user = self::getDataGenerator()->create_user();

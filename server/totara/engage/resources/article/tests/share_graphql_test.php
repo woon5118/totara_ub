@@ -246,11 +246,6 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
             'access' => access::PUBLIC
         ]);
 
-        // Set capabilities for all users.
-        foreach ($users as $user) {
-            $articlegen->set_capabilities(CAP_ALLOW, $user->id, $article->get_context());
-        }
-
         // Share article - as the owner.
         $recipients = $articlegen->create_user_recipients([$users[1]]);
         $articlegen->share_article($article, $recipients);

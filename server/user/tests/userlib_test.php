@@ -24,7 +24,7 @@
  */
 
 use core_user\access_controller;
-use totara_core\advanced_feature;
+use totara_core\hook\manager as hook_manager;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -41,17 +41,12 @@ require_once($CFG->dirroot.'/user/lib.php');
  */
 class core_user_userlib_testcase extends advanced_testcase {
 
-    private function disable_engage_features() {
-        advanced_feature::disable('engage_resources');
-        access_controller::clear_instance_cache();
-    }
-
     public function setUp(): void {
         parent::setUp();
 
-        // Engage allows several properties of users to become visible to all other users. To test that user
-        // properties are hidden when appropritate, we need to disable engage.
-        $this->disable_engage_features();
+        // Remove hook's watchers so that we can have more accurate tests.
+        hook_manager::phpunit_replace_watchers([]);
+        access_controller::clear_instance_cache();
     }
 
     /**

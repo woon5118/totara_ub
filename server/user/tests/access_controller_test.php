@@ -22,21 +22,28 @@
  */
 
 use core_user\access_controller;
-use totara_core\advanced_feature;
+use totara_core\hook\manager as hook_manager;
+use core_user\hook\allow_view_profile_field;
+use core_user\hook\allow_view_profile;
+use totara_job\watcher\core_user_access_controller;
 
 class core_user_access_controller_testcase extends advanced_testcase {
-
-    private function disable_engage_features() {
-        advanced_feature::disable('engage_resources');
-        access_controller::clear_instance_cache();
-    }
 
     public function setUp(): void {
         parent::setUp();
 
-        // Engage allows several properties of users to become visible to all other users. To test that user
-        // properties are hidden when appropritate, we need to disable engage.
-        $this->disable_engage_features();
+        // Reset the hook watchers so that we can have more accurate tests.
+        hook_manager::phpunit_replace_watchers([
+            [
+                'hookname' => allow_view_profile_field::class,
+                'callback' => [core_user_access_controller::class, 'allow_view_profile_field']
+            ],
+            [
+                'hookname' => allow_view_profile::class,
+                'callback' => [core_user_access_controller::class, 'allow_view_profile']
+            ]
+        ]);
+        access_controller::clear_instance_cache();
     }
 
     public function test_for_creation() {

@@ -23,27 +23,22 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core_user\access_controller;
-use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use core_user\profile\user_field_resolver;
 use core_user\profile\card_display;
 use core_user\profile\display_setting;
+use totara_core\hook\manager as hook_manager;
 
 class core_webapi_resolver_type_user_card_display_testcase extends advanced_testcase {
 
     use webapi_phpunit_helper;
 
-    private function disable_engage_features() {
-        advanced_feature::disable('engage_resources');
-        access_controller::clear_instance_cache();
-    }
-
     public function setUp(): void {
         parent::setUp();
 
-        // Engage allows several properties of users to become visible to all other users. To test that user
-        // properties are hidden when appropritate, we need to disable engage.
-        $this->disable_engage_features();
+        // Clear all the hooks so that the test can be accurate.
+        hook_manager::phpunit_replace_watchers([]);
+        access_controller::clear_instance_cache();
     }
 
     /**

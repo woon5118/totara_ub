@@ -38,11 +38,6 @@ class totara_engage_shareto_graphql_testcase extends advanced_testcase {
         $users = $engagegen->create_users(3);
         $this->setUser($users[1]);
 
-        // Set capabilities for all users.
-        foreach ($users as $user) {
-            $engagegen->set_capabilities(CAP_ALLOW, $user->id);
-        }
-
         // Get recipients via graphql.
         $ec = execution_context::create('ajax', 'totara_engage_shareto_recipients');
         $parameters = [

@@ -24,6 +24,7 @@
 
 use core_user\access_controller;
 use totara_core\advanced_feature;
+use totara_core\hook\manager as hook_manager;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -61,11 +62,6 @@ class core_myprofilelib_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    private function disable_engage_features() {
-        advanced_feature::disable('engage_resources');
-        access_controller::clear_instance_cache();
-    }
-
     public function setUp(): void {
         // Set the $PAGE->url value so core_myprofile_navigation() doesn't complain.
         global $PAGE;
@@ -73,7 +69,8 @@ class core_myprofilelib_testcase extends advanced_testcase {
 
         // Engage allows several properties of users to become visible to all other users. To test that user
         // properties are hidden when appropritate, we need to disable engage.
-        $this->disable_engage_features();
+        hook_manager::phpunit_replace_watchers([]);
+        access_controller::clear_instance_cache();
 
         $this->user = $this->getDataGenerator()->create_user();
         $this->user2 = $this->getDataGenerator()->create_user();

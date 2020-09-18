@@ -52,7 +52,7 @@ final class share_sharers implements query_resolver, has_middleware {
 
         /** @var share_repository $repo */
         $repo = share::repository();
-        return iterator_to_array($repo->get_sharers($itemid, $component));
+        return $repo->get_sharers($itemid, $component);
     }
 
     /**
