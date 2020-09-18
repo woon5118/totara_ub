@@ -38,7 +38,7 @@ define(['core/webapi', 'core/modal_factory', 'core/modal_events'], function(WebA
   };
 
   var init = function() {
-    var parent = document.getElementById('reportedcontent');
+    var parent = document.querySelector('table[data-source="rb_source_reportedcontent"]');
     // If there are no results on the page, there's nothing to boot/bind.
     if (!parent || parent === null) {
       return;

@@ -159,3 +159,27 @@ Feature: Admin can remove or approve comments that have been reported.
     And I click on "Your Library" in the totara menu
     Then I should not see "Article 1"
     And I should not see "Survey 1"
+
+  Scenario: The remove and approve buttons also work with manually created user reports.
+    Given I log in as "admin"
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
+    And I press "Create report"
+    And I set the field "search_input" to "Inappropriate content"
+    And I click on "button.tw-selectSearchText__btn" "css_element"
+    And I click on "div[data-tw-grid-item-id=\"reportedcontent-source\"]" "css_element"
+    And I wait for pending js
+    And I press "Create and view"
+    And I set the field "reportedcontent-status_op" to "1"
+    And I press "id_submitgroupstandard_addfilter"
+
+    When I click on "table[data-source='rb_source_reportedcontent'] tr:nth-child(1) [data-action='remove']" "css_element"
+    And I press "Confirm"
+    And I wait for pending js
+    Then I should see "Removed"
+
+    # Modal goes funky with behat, so refresh the page for the second action
+    When I set the field "reportedcontent-status_op" to "1"
+    And I press "id_submitgroupstandard_addfilter"
+    And I click on "table[data-source='rb_source_reportedcontent'] tr:nth-child(1) [data-action='approve']" "css_element"
+    And I wait for pending js
+    Then I should see "Allowed"
