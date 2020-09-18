@@ -47,7 +47,7 @@
         :participant-section-id="participantSectionId"
         :subject-user="subjectInstance.subject_user"
         :token="token"
-        :job-assignments="subjectInstance.static_instances"
+        :job-assignments="jobAssignments"
       />
     </Loader>
   </div>
@@ -103,6 +103,7 @@ export default {
 
   data() {
     return {
+      jobAssignments: [],
       userActivity: null,
       subjectInstance: null,
     };
@@ -153,6 +154,18 @@ export default {
       }
 
       return !this.$apollo.loading && this.subjectInstance === null;
+    },
+  },
+
+  watch: {
+    /**
+     * Extracts the job assignments from the associated subject instance.
+     */
+    subjectInstance() {
+      this.jobAssignments =
+        this.subjectInstance && !this.isExternalParticipant
+          ? this.subjectInstance.static_instances
+          : [];
     },
   },
 };

@@ -206,7 +206,6 @@ class mod_perform_webapi_resolver_query_subject_instance_for_external_participan
             'id' => (string) $expected_subject_instance->id,
             'progress_status' => $expected_subject_instance->get_progress_status(),
             'instance_count' => 1,
-            'job_assignment' => null,
             'activity' => [
                 'name' => $expected_subject_instance->get_activity()->name,
                 'settings' => [
@@ -223,7 +222,7 @@ class mod_perform_webapi_resolver_query_subject_instance_for_external_participan
                 'id' => $subject_user->id,
                 'fullname' => $subject_user->fullname,
                 'profileimageurlsmall' => self::get_default_image_url()->out(true),
-            ],
+            ]
         ];
 
         self::assertEquals($expected, $this->strip_expected_dates($actual));
