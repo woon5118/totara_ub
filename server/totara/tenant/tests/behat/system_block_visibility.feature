@@ -64,5 +64,9 @@ Feature: Tenant member can see system blocks on profile without tenant isolation
     And I should see "Calendar"
 
     And I am on profile page for user "user3"
-    And I should see "The details of this user are not available to you"
+    And I should see "Third NonMember"
+
+    When I disable the "engage_resources" advanced feature
+    And I am on profile page for user "user3"
+    Then I should see "The details of this user are not available to you"
 
