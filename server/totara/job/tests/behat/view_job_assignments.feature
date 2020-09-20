@@ -32,7 +32,8 @@ Feature: View job assignments where I am assigned as temporary manager
     And "User Two" "link" should exist in the "#appraisertitle" "css_element"
 
   Scenario: View job assignments where I am the the temporary manager. User has existing manager and appraiser
-    Given I log in as "manager2"
+    Given I disable the "engage_resources" advanced feature
+    And I log in as "manager2"
     Then I should see "You are now User Two's temporary manager"
     When I click on "You are now User Two's temporary manager" "link"
     Then the following fields match these values:
