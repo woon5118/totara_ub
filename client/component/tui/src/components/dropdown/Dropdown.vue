@@ -23,6 +23,7 @@
     :class="{
       'tui-dropdown--open': isOpen,
       'tui-dropdown--disabled': disabled,
+      'tui-dropdown--flexibleWidth': matchWidth,
     }"
   >
     <div
@@ -35,10 +36,11 @@
     </div>
 
     <PopoverPositioner
-      v-if="!disabled && this.$scopedSlots.default"
+      v-if="!disabled && $scopedSlots.default"
       :position="position"
       :open="isOpen"
-      :reference-element="this.$refs.trigger"
+      :reference-element="$refs.trigger"
+      :match-width="matchWidth"
       transition="dropdown"
     >
       <div
@@ -112,6 +114,7 @@ export default {
       default: true,
     },
     open: Boolean,
+    matchWidth: Boolean,
   },
 
   data() {
@@ -302,6 +305,11 @@ export default {
     background-clip: padding-box;
     border: var(--border-width-thin) solid var(--dropdown-menu-border-color);
     box-shadow: var(--shadow-2);
+  }
+
+  &--flexibleWidth &__menu {
+    min-width: 0;
+    max-width: none;
   }
 
   &__content {

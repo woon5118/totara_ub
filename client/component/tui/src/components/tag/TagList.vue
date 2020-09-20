@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <Dropdown :close-on-click="false" :separator="separator">
+  <Dropdown :close-on-click="false" :separator="separator" match-width>
     <template v-slot:trigger="{ toggle, isOpen }">
       <div class="tui-tagList" @click="handleClick(toggle, isOpen)">
         <div class="tui-tagList__tags">
@@ -82,6 +82,7 @@
         </div>
         <ButtonIcon
           ref="expandArrow"
+          class="tui-tagList__expandArrow"
           :aria-expanded="isOpen.toString()"
           :aria-label="
             $str(isOpen ? 'collapse' : 'expand', 'moodle') +
@@ -263,6 +264,10 @@ export default {
 
   &__input {
     margin: -2px 0;
+  }
+
+  &__expandArrow {
+    height: calc(var(--tag-height) + (2 * var(--border-width-thin)));
   }
 }
 </style>

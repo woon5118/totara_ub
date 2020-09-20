@@ -20,14 +20,14 @@ exports[`totara_engage/components/form/RecipientsSelector.vue matches snapshot 1
       </div>
     </div>
   </div>
-  <div class="tui-dropdown" id="abc123">
+  <div class="tui-dropdown tui-dropdown--flexibleWidth" id="abc123">
     <div id="abc123" class="tui-dropdown__trigger">
       <div class="tui-tagList">
         <div class="tui-tagList__tags">
           <div aria-live="polite" role="status" aria-atomic="false" aria-label="tags_selected, totara_core" aria-relevant="additions" class="tui-tagList__tagItems">
             <div class="tui-tagList__input"><input aria-label="tag_list, totara_core" type="text" class="tui-formInput tui-formInput--transparent" style="display: none;"></div>
           </div> <span class="tui-tagList__suffix" style="display: none;">n_more, totara_core</span>
-        </div> <button aria-expanded="false" aria-label="expand, moodle tag_list, totara_core" type="button" title="expand, moodle tag_list, totara_core" class="tui-iconBtn tui-iconBtn--transparent" aria-haspopup="menu"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><span class=""></span></span>
+        </div> <button aria-expanded="false" aria-label="expand, moodle tag_list, totara_core" type="button" title="expand, moodle tag_list, totara_core" class="tui-iconBtn tui-tagList__expandArrow tui-iconBtn--transparent" aria-haspopup="menu"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><span class=""></span></span>
           <!----></span>
           <!----></span></button>
       </div>

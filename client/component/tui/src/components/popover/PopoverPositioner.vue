@@ -73,12 +73,15 @@ export default {
     // allow popover to slide along the side in preference to moving to different side
     // if this is true, it will still slide if it can't fit on any side
     preferSlide: Boolean,
+    // match the width of the reference element
+    matchWidth: Boolean,
   },
 
   data() {
     return {
       location: new Point(0, 0),
       size: new Size(0, 0),
+      referenceWidth: null,
       innerPadding: 0,
       shouldBeOpen: false,
       computedSide: null,
@@ -91,11 +94,17 @@ export default {
     style() {
       const left = Math.round(this.location.x);
       const top = Math.round(this.location.y);
-      return {
+      const style = {
         // use translate rather than top/left to avoid popover getting
         // compressed if it's near the right edge of the viewport
         transform: `translate3d(${left}px, ${top}px, 0)`,
       };
+
+      if (this.matchWidth && this.referenceWidth != null) {
+        style.width = this.referenceWidth + 'px';
+      }
+
+      return style;
     },
   },
 
@@ -128,6 +137,9 @@ export default {
 
     this.resizeObserver = new ResizeObserver(this.handleResizeThrottled);
     this.resizeObserver.observe(this.$el);
+    if (this.referenceElement) {
+      this.resizeObserver.observe(this.referenceElement);
+    }
 
     window.addEventListener('resize', this.handleResizeThrottled);
     window.addEventListener('scroll', this.handleResizeThrottled, {
@@ -144,7 +156,12 @@ export default {
 
   methods: {
     updatePosition() {
-      if (!this.referenceElement) return;
+      const refEl = this.referenceElement;
+      if (!refEl) return;
+
+      if (this.matchWidth && this.referenceWidth != refEl.offsetWidth) {
+        this.referenceWidth = refEl.offsetWidth;
+      }
 
       let refRect;
       let viewport = null;
@@ -153,15 +170,14 @@ export default {
           position: 'fixed',
         });
         if (process.env.NODE_ENV !== 'production') {
-          const referenceContainingBlock = getContainingBlockInfo(
-            this.referenceElement,
-            { position: 'fixed' }
-          );
+          const referenceContainingBlock = getContainingBlockInfo(refEl, {
+            position: 'fixed',
+          });
           if (containingBlock.el != referenceContainingBlock.el) {
             console.warn(
               '[PopoverPositioner] Reference element and PopoverPositioner are not in the same containing block.'
             );
-            console.log('Reference element', this.referenceElement);
+            console.log('Reference element', refEl);
             console.log(
               'Reference element containing block',
               referenceContainingBlock.el
@@ -173,7 +189,7 @@ export default {
             );
           }
         }
-        refRect = getBox(this.referenceElement).borderBox;
+        refRect = getBox(refEl).borderBox;
         viewport = new Rect(
           0,
           0,
@@ -184,23 +200,18 @@ export default {
         if (
           process.env.NODE_ENV !== 'production' &&
           this.$el.offsetParent &&
-          this.referenceElement.offsetParent != this.$el.offsetParent
+          refEl.offsetParent != this.$el.offsetParent
         ) {
           console.warn(
             '[PopoverPositioner] Reference element and PopoverPositioner are not in the same offset parent.'
           );
-          console.log('Reference element', this.referenceElement);
-          console.log(
-            'Reference element offset parent',
-            this.referenceElement.offsetParent
-          );
+          console.log('Reference element', refEl);
+          console.log('Reference element offset parent', refEl.offsetParent);
           console.log('PopoverPositioner', this.$el);
           console.log('PopoverPositioner offset parent', this.$el.offsetParent);
         }
-        refRect = getOffsetRect(this.referenceElement);
-        const offsetParentPosition = getDocumentPosition(
-          this.referenceElement.offsetParent
-        );
+        refRect = getOffsetRect(refEl);
+        const offsetParentPosition = getDocumentPosition(refEl.offsetParent);
         viewport = getViewportRect().sub(offsetParentPosition);
       }
 
