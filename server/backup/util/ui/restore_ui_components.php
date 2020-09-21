@@ -405,7 +405,7 @@ class restore_category_search extends restore_search_base  {
 
         $select     = " SELECT c.id, c.name, c.visible, c.sortorder, c.description, c.descriptionformat ";
         $from       = " FROM {course_categories} c ";
-        $where      = " WHERE ".$DB->sql_like('c.name', ':namesearch', false);
+        $where      = " WHERE ".$DB->sql_like('c.name', ':namesearch', false) . " AND c.issystem=0";
         $orderby    = " ORDER BY c.sortorder";
 
         return array($select.$ctxselect.$from.$ctxjoin.$where.$orderby, $params);
