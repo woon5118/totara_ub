@@ -29,9 +29,10 @@ use totara_tui\output\component;
 require_once(__DIR__ . "/../../../config.php");
 global $OUTPUT, $PAGE;
 
+require_login();
+
 // Requiring discussion's id
 $discussion_id = required_param('id', PARAM_INT);
-require_login();
 advanced_feature::require('container_workspace');
 
 $discussion = discussion::from_id($discussion_id);

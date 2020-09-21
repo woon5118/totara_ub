@@ -34,11 +34,9 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Teest that the action() method needs to overridden by the controller
      */
-    public function test_action_needs_override() {
+    public function test_action_needs_override(): void {
         // Use an anonymous class here to ease testing
         $controller = new my_test_controller();
-
-        $controller->set_require_login(false);
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessageMatches('/No default action defined./');
@@ -49,7 +47,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Test that the action() method is calles and the output is rendered
      */
-    public function test_action_with_simple_output() {
+    public function test_action_with_simple_output(): void {
         $controller = new class() extends my_test_controller {
             public function action() {
                 return new class implements viewable {
@@ -59,7 +57,6 @@ class totara_mvc_controller_testcase extends advanced_testcase {
                 };
             }
         };
-        $controller->set_require_login(false);
 
         $this->expectOutputString('test output');
 
@@ -69,9 +66,8 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Test that an exception is thrown if an invalid/non-existing action is called
      */
-    public function test_invalid_custom_action() {
+    public function test_invalid_custom_action(): void {
         $controller = new my_test_controller();
-        $controller->set_require_login(false);
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Missing action method action_invalid_method');
@@ -82,7 +78,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Test that a custom action is successfully called
      */
-    public function test_valid_custom_action() {
+    public function test_valid_custom_action(): void {
         $controller = new class() extends my_test_controller {
             public function action_valid_method() {
                 return new class implements viewable {
@@ -93,8 +89,6 @@ class totara_mvc_controller_testcase extends advanced_testcase {
             }
         };
 
-        $controller->set_require_login(false);
-
         $this->expectOutputString('test output');
 
         $controller->process('valid_method');
@@ -103,8 +97,17 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Test that the require login works and the user gets redirected if not logged in
      */
-    public function test_require_login() {
-        $controller = new class() extends my_test_controller {
+    public function test_require_login(): void {
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Unsupported redirect detected, script execution terminated');
+
+        new class() extends controller {
+            protected $url = '/totara/mvc/version.php';
+
+            protected function setup_context(): context {
+                return context_system::instance();
+            }
+
             public function action() {
                 return new class implements viewable {
                     public function render(): string {
@@ -113,19 +116,59 @@ class totara_mvc_controller_testcase extends advanced_testcase {
                 };
             }
         };
+    }
 
-        $controller->set_require_login(true);
-
+    public function test_require_login_is_called_on_failed_context_setup(): void {
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Unsupported redirect detected, script execution terminated');
 
-        $controller->process();
+        new class() extends controller {
+            protected $url = '/totara/mvc/version.php';
+
+            protected function setup_context(): context {
+                throw new InvalidArgumentException('');
+            }
+
+            public function action() {
+                return new class implements viewable {
+                    public function render(): string {
+                        return 'test output';
+                    }
+                };
+            }
+        };
+    }
+
+    public function test_context_setup_exceptions_are_throw_after_authorize(): void {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Bad context set up');
+
+        new class() extends controller {
+            protected $url = '/totara/mvc/version.php';
+
+
+            protected function setup_context(): context {
+                throw new InvalidArgumentException('Bad context set up');
+            }
+
+            public function action() {
+                return new class implements viewable {
+                    public function render(): string {
+                        return 'test output';
+                    }
+                };
+            }
+
+            protected function authorize(): void {
+
+            }
+        };
     }
 
     /**
      * Test that overriding the default context methods works
      */
-    public function test_override_default_context() {
+    public function test_override_default_context(): void {
         $this->setAdminUser();
 
         $controller = new class() extends controller {
@@ -141,7 +184,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Test that layout can be defined in the controller and it is applied
      */
-    public function test_layout_can_be_defined() {
+    public function test_layout_can_be_defined(): void {
         $controller = new class() extends my_test_controller {
             protected $layout = 'custom_layout';
         };
@@ -154,7 +197,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Test the shortcut method to get the currently logged in user
      */
-    public function test_currently_logged_in_user() {
+    public function test_currently_logged_in_user(): void {
         global $USER;
 
         $this->setAdminUser();
@@ -167,7 +210,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Test the shortcut method for optional params
      */
-    public function test_get_optional_params_shortcuts() {
+    public function test_get_optional_params_shortcuts(): void {
         $_GET['test1'] = 'value1';
         $_GET['test2'] = 2;
         $_GET['test3'] = true;
@@ -199,7 +242,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Test the shortcut method for requireds params
      */
-    public function test_get_required_params_shortcuts() {
+    public function test_get_required_params_shortcuts(): void {
         $_GET['test1'] = 'value1';
         $_GET['test2'] = 2;
         $_GET['test3'] = true;
@@ -236,7 +279,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Test the shortcut method for require_capability, positive test if user has capability
      */
-    public function test_require_capability_shortcut() {
+    public function test_require_capability_shortcut(): void {
         $this->setAdminUser();
 
         $controller = new my_test_controller();
@@ -247,14 +290,14 @@ class totara_mvc_controller_testcase extends advanced_testcase {
     /**
      * Test the shortcut method for require_capability, negative test if user does not have capability
      */
-    public function test_require_capability_shortcut_fails() {
+    public function test_require_capability_shortcut_fails(): void {
         $controller = new my_test_controller();
 
         $this->expectException(required_capability_exception::class);
         $controller->require_capability('moodle/site:config', context_system::instance());
     }
 
-    public function test_returning_array_gets_json_encoded() {
+    public function test_returning_array_gets_json_encoded(): void {
         $controller = new class() extends my_test_controller {
             protected $require_login = false;
 
@@ -268,7 +311,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
         $controller->process();
     }
 
-    public function test_returning_std_class_gets_json_encoded() {
+    public function test_returning_std_class_gets_json_encoded(): void {
         $std_class = new stdClass();
         $std_class->foo = 'bar';
 
@@ -286,7 +329,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
         $controller->process();
     }
 
-    public function test_returning_to_string_class() {
+    public function test_returning_to_string_class(): void {
         $controller = new class() extends my_test_controller {
             protected $require_login = false;
 
@@ -303,13 +346,13 @@ class totara_mvc_controller_testcase extends advanced_testcase {
         $controller->process();
     }
 
-    public function test_returning_invalid_class() {
+    public function test_returning_invalid_class(): void {
         $controller = new class() extends my_test_controller {
             protected $require_login = false;
 
             public function action() {
                 return new class() {
-                    public function just_another_method() {
+                    public function just_another_method(): string {
                         return 'test output';
                     }
                 };
@@ -321,7 +364,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
         $controller->process();
     }
 
-    public function test_returning_json_serializable_gets_json_encoded() {
+    public function test_returning_json_serializable_gets_json_encoded(): void {
         $std_class = new stdClass();
         $std_class->foo = 'bar';
 
@@ -341,7 +384,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
         $controller->process();
     }
 
-    public function test_single_action() {
+    public function test_single_action(): void {
         $this->setAdminUser();
 
         $_GET['name'] = 'World';
@@ -359,7 +402,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
         $controller->process();
     }
 
-    public function test_override_url_param() {
+    public function test_override_url_param(): void {
         global $PAGE;
 
         $this->setAdminUser();
@@ -383,7 +426,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
         );
     }
 
-    public function test_missing_url() {
+    public function test_missing_url(): void {
         $this->setAdminUser();
 
         $this->expectException(coding_exception::class);
@@ -400,7 +443,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
         $controller->process();
     }
 
-    public function test_set_url_with_params() {
+    public function test_set_url_with_params(): void {
         global $PAGE;
 
         $this->setAdminUser();
@@ -424,7 +467,7 @@ class totara_mvc_controller_testcase extends advanced_testcase {
         );
     }
 
-    public function test_set_url_with_moodle_url_object() {
+    public function test_set_url_with_moodle_url_object(): void {
         global $PAGE;
 
         $this->setAdminUser();
@@ -456,6 +499,10 @@ class my_test_controller extends controller {
 
     protected function setup_context(): context {
         return context_system::instance();
+    }
+
+    protected function authorize(): void {
+
     }
 
 }

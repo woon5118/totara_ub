@@ -63,8 +63,13 @@ abstract class base extends controller {
      */
     protected function authorize(): void {
         advanced_feature::require('competency_assignment');
-
         // parent::authorize(); We don't need to call require login here, it's always required.
+
+        // User will not be set if the record could not be found.
+        if ($this->user === null) {
+            throw new moodle_exception('invaliduser');
+        }
+
         capability_helper::require_can_view_profile($this->user->id, $this->context);
     }
 

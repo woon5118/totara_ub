@@ -39,6 +39,9 @@ use container_workspace\totara\menu\find_spaces;
 require_once(__DIR__ . "/../../../config.php");
 global $OUTPUT, $PAGE, $USER;
 
+// Note: This is intentional to not use the $id for function `require_login` as it will redirect user to the enrol page.
+require_login();
+
 $id = required_param('id', PARAM_INT);
 $member_sort = optional_param('member_sort', member_sort::NAME, PARAM_INT);
 $discussion_sort = optional_param('discussion_sort', discussion_sort::RECENT, PARAM_INT);
@@ -54,8 +57,6 @@ if (!$workspace->is_typeof(workspace::get_type())) {
     throw new \coding_exception("Invalid type of container");
 }
 
-// Note: This is intentional to not use the $id for function `require_login` as it will redirect user to the enrol page.
-require_login();
 advanced_feature::require('container_workspace');
 
 $interactor = new interactor($workspace);

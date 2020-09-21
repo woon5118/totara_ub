@@ -26,10 +26,12 @@ namespace totara_mvc;
 
 use coding_exception;
 use context;
+use context_system;
 use JsonSerializable;
 use moodle_page;
 use moodle_url;
 use stdClass;
+use Throwable;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -99,6 +101,8 @@ abstract class controller {
      * @return void
      */
     protected function init_page_object() {
+        global $CFG;
+
         $page = $this->get_page();
 
         // Set the page layout if specified here rather than in the view
@@ -108,8 +112,26 @@ abstract class controller {
             $page->set_pagelayout($this->layout);
         }
 
-        $this->context = $this->setup_context();
+        $context_setup_exception = null;
+
+        try {
+            $this->context = $this->setup_context();
+        } catch (Throwable $e) {
+            // We don't want to display context setup issues to unauthorized users.
+            // So if anything goes wrong in the context set up we carry one so
+            // authorize call call require_login() if appropriate.
+            $context_setup_exception = $e;
+        }
+
         $page->set_context($this->context);
+
+        if ($this->require_login || $CFG->forcelogin) {
+            $this->authorize();
+        }
+
+        if ($context_setup_exception !== null) {
+            throw $context_setup_exception;
+        }
     }
 
     /**
@@ -125,11 +147,6 @@ abstract class controller {
      * @param string $action if omitted the default action() method is called
      */
     public function process(string $action = '') {
-        global $CFG;
-        if ($this->require_login || $CFG->forcelogin) {
-            $this->authorize();
-        }
-
         $view = $this->run_action($action);
 
         if (empty($this->url)) {
@@ -163,8 +180,13 @@ abstract class controller {
      * @return void
      */
     protected function authorize(): void {
-        [$context, $course, $cm] = get_context_info_array($this->context->id);
-        require_login($course, $this->auto_login_guest, $cm);
+        if ($this->context) {
+            [$context, $course, $cm] = get_context_info_array($this->context->id);
+            require_login($course, $this->auto_login_guest, $cm);
+        } else {
+            require_login(null, $this->auto_login_guest);
+        }
+
     }
 
     /**
@@ -215,18 +237,6 @@ abstract class controller {
         $stringfile = ''
     ) {
         require_capability($capability, $context, $userid, $doanything, $errormessage, $stringfile);
-        return $this;
-    }
-
-    /**
-     * Set whether the controller will trigger a require login call
-     *
-     * @param bool $require_login
-     * @return $this
-     */
-    final public function set_require_login(bool $require_login): self {
-        $this->require_login = $require_login;
-
         return $this;
     }
 
