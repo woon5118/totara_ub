@@ -82,6 +82,7 @@ final class notify_new_workspace_owner_task extends adhoc_task {
         $message->fullmessagehtml = $rendered_content;
         $message->component = workspace::get_type();
         $message->name = 'transfer_ownership';
+        $message->courseid = $workspace->get_id();
 
         message_send($message);
     }
