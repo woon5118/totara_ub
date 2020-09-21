@@ -106,7 +106,7 @@ export default {
     }
 
     &__card {
-      height: var(--totaraEngage-card-height);
+      height: var(--totara-engage-card-height);
     }
   }
 }

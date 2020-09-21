@@ -144,7 +144,7 @@ export default {
 
   &__title {
     @include tui-font-heading-small-regular();
-    flex-basis: 72%;
+    flex-grow: 1;
     height: 100%;
     overflow: hidden;
     -ms-word-break: break-all;
@@ -154,8 +154,8 @@ export default {
 
   &__footer {
     display: flex;
-    flex-basis: 28%;
     flex-direction: column;
+    flex-shrink: 0;
     justify-content: flex-end;
   }
 

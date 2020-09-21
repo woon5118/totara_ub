@@ -289,7 +289,7 @@ export default {
 <style lang="scss">
 .tui-engageArticle-articleCard {
   height: 100%;
-  min-height: var(--totaraEngage-card-height);
+  min-height: var(--totara-engage-card-height);
 
   &__imageheader {
     padding: var(--gap-4) var(--gap-4) 0 var(--gap-4);

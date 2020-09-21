@@ -277,7 +277,7 @@ export default {
 
 <style lang="scss">
 .tui-totaraPlaylist-playlistCard {
-  min-height: var(--totaraEngage-card-height);
+  min-height: var(--totara-engage-card-height);
 
   &__imageHeader {
     position: relative;

@@ -165,10 +165,6 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-:root {
-  --totaraEngage-card-height: 340px;
-}
-
 .tui-totaraEngage-cardsGrid {
   &__row.tui-grid {
     margin-bottom: var(--gap-8);

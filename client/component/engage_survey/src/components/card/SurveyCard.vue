@@ -213,11 +213,11 @@ export default {
     width: 100%;
 
     &__calcHeight {
-      height: calc(var(--totaraEngage-card-height) - 22px);
+      height: calc(var(--totara-engage-card-height) - 22px);
     }
 
     &__height {
-      height: var(--totaraEngage-card-height);
+      height: var(--totara-engage-card-height);
     }
 
     &:hover {
