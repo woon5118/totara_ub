@@ -62,7 +62,7 @@ class totara_tui_local_scss_testcase extends basic_testcase {
     }
 
     /**
-     * Test that CSS is compiled in the correct order for Totara components
+     * Test that CSS is compiled in the correct order for Tui core
      */
     public function test_import_resolution_tui() {
         global $CFG;
@@ -75,7 +75,7 @@ class totara_tui_local_scss_testcase extends basic_testcase {
         $expected->cssvars_legacy_imports = [];
 
         $srcroot = (new path($CFG->srcroot));
-        if (file_exists($CFG->srcroot . '/client/component/tui/build/vendors.development.js')) {
+        if (file_exists($CFG->srcroot . '/client/component/tui/build/vendors.js')) {
             $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out();
             $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out();
             $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();
@@ -88,7 +88,7 @@ class totara_tui_local_scss_testcase extends basic_testcase {
 
         $tui_scss->get_options()->set_legacy(true);
 
-        if (file_exists($CFG->srcroot . '/client/component/tui/build/vendors.development.js')) {
+        if (file_exists($CFG->srcroot . '/client/component/tui/build/vendors.js')) {
             $expected->cssvars_legacy_imports = [
                 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out(),
                 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out(),
@@ -103,7 +103,7 @@ class totara_tui_local_scss_testcase extends basic_testcase {
     }
 
     /**
-     * Test that CSS is compiled in the correct order for Totara components
+     * Test that CSS is compiled in the correct order for themes
      */
     public function test_import_resolution_theme_ventura() {
         global $CFG;
@@ -116,21 +116,22 @@ class totara_tui_local_scss_testcase extends basic_testcase {
         $expected->cssvars_legacy_imports = [];
 
         $srcroot = (new path($CFG->srcroot));
-        if (file_exists($CFG->srcroot . '/client/component/tui/build/vendors.development.js')) {
-            $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();
+        if (file_exists($CFG->srcroot . '/client/component/tui/build/vendors.js')) {
             $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out();
             $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();
+            $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();
             $expected->imports[] = 'output_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();
+            // what about the bundle??? (ah there isn't one atm)
         }
         $result = $method->invoke($tui_scss, 'theme_ventura');
         $this->assertEquals($expected, $result);
 
         $tui_scss->get_options()->set_legacy(true);
 
-        if (file_exists($CFG->srcroot . '/client/component/tui/build/vendors.development.js')) {
+        if (file_exists($CFG->srcroot . '/client/component/tui/build/vendors.js')) {
             $expected->cssvars_legacy_imports = [
-                'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out(),
                 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out(),
+                'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out(),
                 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out(),
                 'output_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out(),
                 'output_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out(),
@@ -138,6 +139,90 @@ class totara_tui_local_scss_testcase extends basic_testcase {
         }
 
         $result = $method->invoke($tui_scss, 'theme_ventura');
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test that CSS is compiled in the correct order for Tui components
+     */
+    public function test_import_resolution_samples() {
+        global $CFG;
+        $tui_scss = $this->create_tui_scss();
+        $method = new ReflectionMethod($tui_scss, 'get_imports');
+        $method->setAccessible(true);
+
+        $expected = new \stdClass;
+        $expected->imports = [];
+        $expected->cssvars_legacy_imports = [];
+
+        $srcroot = (new path($CFG->srcroot));
+        if (file_exists($CFG->srcroot . '/client/component/samples/build/tui_bundle.js')) {
+            /// think this is right???
+            $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out();
+            $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/samples/build/global_styles/_variables.scss')->out();
+            $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();
+            $expected->imports[] = 'output_only!internal_absolute:'.$srcroot->join('/client/component/samples/build/global_styles/_variables.scss')->out();
+            $expected->imports[] = 'internal_absolute:'.$srcroot->join('/client/component/samples/build/tui_bundle.scss')->out();
+        }
+        $result = $method->invoke($tui_scss, 'samples');
+        $this->assertEquals($expected, $result);
+
+        $tui_scss->get_options()->set_legacy(true);
+
+        if (file_exists($CFG->srcroot . '/client/component/samples/build/tui_bundle.js')) {
+            $expected->cssvars_legacy_imports = [
+                'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out(),
+                'definitions_only!internal_absolute:'.$srcroot->join('/client/component/samples/build/global_styles/_variables.scss')->out(),
+                'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out(),
+                'output_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out(),
+                'output_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out(),
+            ];
+        }
+
+        $result = $method->invoke($tui_scss, 'samples');
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test that CSS is compiled in the correct order for Tui components that depend on other components
+     */
+    public function test_import_resolution_test_fixture_a() {
+        global $CFG;
+        $tui_scss = $this->create_tui_scss();
+        $method = new ReflectionMethod($tui_scss, 'get_imports');
+        $method->setAccessible(true);
+
+        $expected = new \stdClass;
+        $expected->imports = [];
+        $expected->cssvars_legacy_imports = [];
+
+        $srcroot = (new path($CFG->srcroot));
+        if (file_exists($CFG->srcroot . '/client/component/test_fixture_a/build/tui_bundle.js')) {
+            $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out();
+            $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/samples/build/global_styles/_variables.scss')->out();
+            $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/test_fixture_a/build/global_styles/_variables.scss')->out();
+            $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();
+            $expected->imports[] = 'output_only!internal_absolute:'.$srcroot->join('/client/component/test_fixture_a/build/global_styles/_variables.scss')->out();
+            $expected->imports[] = 'internal_absolute:'.$srcroot->join('/client/component/test_fixture_a/build/tui_bundle.scss')->out();
+        }
+        $result = $method->invoke($tui_scss, 'test_fixture_a');
+        $this->assertEquals($expected, $result);
+
+        $tui_scss->get_options()->set_legacy(true);
+
+        if (file_exists($CFG->srcroot . '/client/component/samples/build/tui_bundle.js')) {
+            $expected->cssvars_legacy_imports = [
+                'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out(),
+                'definitions_only!internal_absolute:'.$srcroot->join('/client/component/samples/build/global_styles/_variables.scss')->out(),
+                'definitions_only!internal_absolute:'.$srcroot->join('/client/component/test_fixture_a/build/global_styles/_variables.scss')->out(),
+                'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out(),
+                'output_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out(),
+                'output_only!internal_absolute:'.$srcroot->join('/client/component/samples/build/global_styles/_variables.scss')->out(),
+                'output_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out(),
+            ];
+        }
+
+        $result = $method->invoke($tui_scss, 'test_fixture_a');
         $this->assertEquals($expected, $result);
     }
 

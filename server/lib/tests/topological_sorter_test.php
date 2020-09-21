@@ -23,21 +23,21 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class core_topological_sort_testcase extends basic_testcase {
+class core_topological_sorter_testcase extends basic_testcase {
     public function test_single_node() {
-        $sorter = new \core\topological_sort();
+        $sorter = new \core\topological_sorter();
         $sorter->add('foo');
         $this->assertEquals(['foo'], $sorter->sort());
     }
 
     public function test_single_node_with_deps() {
-        $sorter = new \core\topological_sort();
+        $sorter = new \core\topological_sorter();
         $sorter->add('foo', ['bar']);
         $this->assertEquals(['bar', 'foo'], $sorter->sort());
     }
 
     public function test_multiple_graphs() {
-        $sorter = new \core\topological_sort();
+        $sorter = new \core\topological_sorter();
         $sorter->add('foo', ['bar']);
         $sorter->add('bar', ['bar-1', 'bar-2']);
         $sorter->add('baz', ['qux']);
@@ -46,7 +46,7 @@ class core_topological_sort_testcase extends basic_testcase {
     }
 
     public function test_dependencies_are_ordered_correctly() {
-        $sorter = new \core\topological_sort();
+        $sorter = new \core\topological_sorter();
         // let's make a stir fry!
         $sorter->add('sauce', ['oyster_sauce', 'soy_sauce']);
         $sorter->add('chopped_broccoli', ['raw_broccoli', 'knife']);
@@ -85,18 +85,18 @@ class core_topological_sort_testcase extends basic_testcase {
     }
 
     public function test_circular_dependency_throws() {
-        $this->expectException(\core\topological_sort_circular_dependency_exception::class);
+        $this->expectException(\core\topological_sorter_circular_dependency_exception::class);
         $this->expectExceptionMessage('There is a circular dependency between "foo" and "bar".');
-        $sorter = new \core\topological_sort();
+        $sorter = new \core\topological_sorter();
         $sorter->add('foo', ['bar']);
         $sorter->add('bar', ['foo']);
         $sorter->sort();
     }
 
     public function test_circular_dependency_3_node_throws() {
-        $this->expectException(\core\topological_sort_circular_dependency_exception::class);
+        $this->expectException(\core\topological_sorter_circular_dependency_exception::class);
         $this->expectExceptionMessage('There is a circular dependency between "foo" and "baz".');
-        $sorter = new \core\topological_sort();
+        $sorter = new \core\topological_sorter();
         $sorter->add('foo', ['bar']);
         $sorter->add('bar', ['baz']);
         $sorter->add('baz', ['foo']);
@@ -104,9 +104,9 @@ class core_topological_sort_testcase extends basic_testcase {
     }
 
     public function test_self_reference_throws() {
-        $this->expectException(\core\topological_sort_circular_dependency_exception::class);
+        $this->expectException(\core\topological_sorter_circular_dependency_exception::class);
         $this->expectExceptionMessage('There is a circular dependency in "foo".');
-        $sorter = new \core\topological_sort();
+        $sorter = new \core\topological_sorter();
         $sorter->add('foo', ['foo']);
         $sorter->sort();
     }

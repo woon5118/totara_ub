@@ -30,6 +30,7 @@
 
 namespace totara_tui\local\scss;
 
+use core\topological_sorter;
 use totara_tui\local\locator\bundle;
 use totara_tui\local\theme_config;
 
@@ -109,7 +110,9 @@ class scss {
         if ($this->options->get_legacy()) {
             $output = $this->options->get_cssvars()->transform($output, ['override_values' => $legacy_var_values]);
         } else {
-            $output .= $settings_css;
+            if (strpos($component, 'theme_') === 0) {
+                $output .= $settings_css;
+            }
         }
 
         return $output;
@@ -235,14 +238,25 @@ class scss {
 
         $component_files = $this->get_component_tui_scss_files($component);
         $tui_core_files = $this->get_component_tui_scss_files('tui');
-        $themes_files = $this->get_themes_tui_scss();
+        $theme_file_sets = $this->get_themes_tui_scss();
+
+        $sorter = new topological_sorter();
+        $this->add_with_deps($sorter, $component);
+        $deps = $sorter->sort();
+        $dep_file_sets = [];
+        foreach ($deps as $dep) {
+            if ($dep === 'tui' || $dep === $component) {
+                continue;
+            }
+            $dep_file_sets[] = $this->get_component_tui_scss_files($dep);
+        }
 
         $imports = [];
 
         $is_theme = strpos($component, 'theme_') === 0;
 
         // SCSS vars
-        $def_file_sets = array_merge([$component_files, $tui_core_files], $themes_files);
+        $def_file_sets = array_merge([$tui_core_files], $dep_file_sets, [$component_files], $theme_file_sets);
 
         foreach ($def_file_sets as $def_files) {
             foreach ($def_files['variables'] as $def_file) {
@@ -254,10 +268,21 @@ class scss {
         $cssvars_legacy_imports = [];
         if ($this->options->get_legacy()) {
             $cssvars_legacy_imports = $imports;
+
+            // tui core vars
             foreach ($tui_core_files['variables'] as $theme_file) {
                 $cssvars_legacy_imports[] = "output_only!internal_absolute:" . $theme_file;
             }
-            foreach ($themes_files as $theme_files) {
+
+            // vars from tui components we depend on
+            foreach ($dep_file_sets as $dep_files) {
+                foreach ($dep_files['variables'] as $theme_file) {
+                    $cssvars_legacy_imports[] = "output_only!internal_absolute:" . $theme_file;
+                }
+            }
+
+            // vars from theme
+            foreach ($theme_file_sets as $theme_files) {
                 foreach ($theme_files['variables'] as $theme_file) {
                     $cssvars_legacy_imports[] = "output_only!internal_absolute:" . $theme_file;
                 }
@@ -265,7 +290,7 @@ class scss {
         }
 
         // CSS vars and component content
-        $source_file_sets = $is_theme ? $themes_files : [$component_files];
+        $source_file_sets = $is_theme ? $theme_file_sets : [$component_files];
         foreach ($source_file_sets as $source_files) {
             foreach ($source_files['variables'] as $source_file) {
                 $imports[] = "output_only!internal_absolute:" . $source_file;
@@ -280,6 +305,21 @@ class scss {
         $return->cssvars_legacy_imports = $cssvars_legacy_imports;
 
         return $return;
+    }
+
+    /**
+     * Add Tui component with its dependencies to the topological sorter.
+     *
+     * @param topological_sorter $sorter
+     * @param string $component
+     */
+    private function add_with_deps(topological_sorter $sorter, string $component) {
+        $deps = bundle::get_bundle_dependencies($component);
+        $sorter->add($component, $deps);
+        foreach ($deps as $dep) {
+            if ($sorter->has($dep)) continue;
+            $this->add_with_deps($sorter, $dep);
+        }
     }
 
     /**

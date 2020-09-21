@@ -132,7 +132,7 @@ class cssvars {
      * @return string[]
      */
     private function resolve_var_references(array $values): array {
-        $sorter = new topological_sort();
+        $sorter = new topological_sorter();
 
         foreach ($values as $key => $value) {
             $matches_found = preg_match_all(self::CSS_VAR_REGEX, $value, $matches);

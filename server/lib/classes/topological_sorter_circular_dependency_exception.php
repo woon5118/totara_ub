@@ -26,9 +26,9 @@ namespace core;
 /**
  * Circular dependency exception.
  *
- * This exception is thrown by topological_sort when a cycle is detected in the dependency graph.
+ * This exception is thrown by topological_sorter when a cycle is detected in the dependency graph.
  */
-class topological_sort_circular_dependency_exception extends \moodle_exception {
+class topological_sorter_circular_dependency_exception extends \moodle_exception {
     /**
      * @var string The key of the node we were processing.
      */

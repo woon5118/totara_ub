@@ -30,7 +30,7 @@ namespace core;
  *
  * More info: https://en.wikipedia.org/wiki/Topological_sorting
  */
-class topological_sort {
+class topological_sorter {
     /**
      * @var array Map of node keys to their dependencies.
      * This is the dependency graph represented as an adjacency list.
@@ -55,6 +55,10 @@ class topological_sort {
      */
     public function add(string $node_key, array $deps = []) {
         $this->nodes[$node_key] = $deps;
+    }
+
+    public function has(string $node_key) {
+        return array_key_exists($node_key, $this->nodes);
     }
 
     /**
@@ -83,7 +87,7 @@ class topological_sort {
         }
         if ($this->is_node_processing($node_key)) {
             // we're already processing this dependency, so there must be a cycle in the graph
-            throw new topological_sort_circular_dependency_exception($node_key, $dependent_node_key);
+            throw new topological_sorter_circular_dependency_exception($node_key, $dependent_node_key);
         }
 
         $this->mark_node_as_processing($node_key);
