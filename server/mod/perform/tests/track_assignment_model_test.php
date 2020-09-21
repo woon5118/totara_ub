@@ -28,7 +28,7 @@ use mod_perform\models\activity\track_assignment_type;
 use mod_perform\user_groups\grouping;
 
 /**
- * @coversDefaultClass track_assignment.
+ * @coversDefaultClass \mod_perform\models\activity\track_assignment
  *
  * @group perform
  */

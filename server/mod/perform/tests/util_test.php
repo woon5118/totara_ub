@@ -29,7 +29,7 @@ use mod_perform\util;
 use totara_job\job_assignment;
 
 /**
- * @coversDefaultClass \mod_perform\util.
+ * @coversDefaultClass \mod_perform\util
  *
  * @group perform
  */

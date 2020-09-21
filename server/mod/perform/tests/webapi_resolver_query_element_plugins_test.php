@@ -22,12 +22,11 @@
  */
 
 use mod_perform\models\activity\element_plugin;
-use mod_perform\webapi\resolver\query\element_plugins;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass element_plugins.
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\element_plugins
  *
  * @group perform
  */

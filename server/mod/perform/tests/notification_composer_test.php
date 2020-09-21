@@ -33,7 +33,7 @@ use totara_core\relationship\relationship;
 require_once(__DIR__ . '/notification_testcase.php');
 
 /**
- * @coversDefaultClass mod_perform\notification\composer
+ * @coversDefaultClass \mod_perform\notification\composer
  * @group perform
  */
 class mod_perform_notification_composer_testcase extends mod_perform_notification_testcase {

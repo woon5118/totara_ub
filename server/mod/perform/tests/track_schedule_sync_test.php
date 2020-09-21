@@ -40,7 +40,7 @@ use totara_core\dates\date_time_setting;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @coversDefaultClass expand_task.
+ * @coversDefaultClass \mod_perform\expand_task
  *
  * @group perform
  */

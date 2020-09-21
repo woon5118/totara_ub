@@ -33,7 +33,7 @@ use totara_core\relationship\resolvers\subject;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass toggle_notification_recipient
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\toggle_notification_recipient
  *
  * @group perform
  */

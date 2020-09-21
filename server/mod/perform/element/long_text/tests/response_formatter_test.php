@@ -25,11 +25,10 @@
 use core\format;
 use mod_perform\formatter\response\element_response_formatter;
 use mod_perform\models\activity\element_plugin;
-
 use performelement_long_text\formatter\response_formatter;
 
 /**
- * @coversDefaultClass response_formatter.
+ * @coversDefaultClass \performelement_long_text\formatter\response_formatter
  *
  * @group perform
  */

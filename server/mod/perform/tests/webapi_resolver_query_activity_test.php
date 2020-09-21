@@ -31,7 +31,7 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
 require_once(__DIR__.'/relationship_testcase.php');
 
 /**
- * @coversDefaultClass activity.
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\activity
  *
  * @group perform
  */

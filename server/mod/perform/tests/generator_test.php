@@ -37,7 +37,7 @@ use totara_job\entities\job_assignment as job_assignment_entity;
 use totara_job\job_assignment;
 
 /**
- * @coversDefaultClass mod_perform_generator.
+ * @coversDefaultClass \mod_perform_generator
  *
  * @group perform
  */

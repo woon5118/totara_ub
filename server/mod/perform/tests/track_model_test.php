@@ -41,7 +41,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use totara_core\dates\date_time_setting;
 
 /**
- * @coversDefaultClass track.
+ * @coversDefaultClass \mod_perform\models\activity\track
  *
  * @group perform
  */

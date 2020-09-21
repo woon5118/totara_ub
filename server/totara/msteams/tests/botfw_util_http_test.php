@@ -24,7 +24,7 @@
 use totara_msteams\botfw\util\http;
 
 /**
- * @coversDefaultClass totara_msteams\botfw\util\http
+ * @coversDefaultClass \totara_msteams\botfw\util\http
  */
 class totara_msteams_botfw_util_http_testcase extends advanced_testcase {
     /**

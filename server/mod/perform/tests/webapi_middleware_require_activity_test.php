@@ -32,7 +32,7 @@ use mod_perform\webapi\middleware\require_activity;
 use mod_perform\models\activity\notification as notification_model;
 
 /**
- * @coversDefaultClass require_activity.
+ * @coversDefaultClass \mod_perform\webapi\middleware\require_activity
  *
  * @group perform
  */

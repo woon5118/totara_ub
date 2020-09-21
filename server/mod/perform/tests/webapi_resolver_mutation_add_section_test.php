@@ -32,7 +32,7 @@ use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass activate_activity.
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\activate_activity
  *
  * @group perform
  */

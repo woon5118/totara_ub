@@ -23,13 +23,12 @@
 
 use mod_perform\constants;
 use totara_core\relationship\relationship;
-use mod_perform\relationship\resolvers\peer;
 
 require_once(__DIR__ . '/perform_relationship_resolver_testcase.php');
 
 /**
  * @group perform
- * @covers peer
+ * @covers \mod_perform\relationship\resolvers\peer
  */
 class relationship_resolver_peer_testcase extends perform_relationship_resolver_testcase {
 

@@ -29,7 +29,7 @@ use totara_core\dates\date_time_setting;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass tracks.
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\tracks
  *
  * @group perform
  */

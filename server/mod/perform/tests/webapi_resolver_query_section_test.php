@@ -21,12 +21,11 @@
  * @package mod_perform
  */
 
-use mod_perform\webapi\resolver\query\section_admin;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass section_admin
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\section_admin
  *
  * @group perform
  */

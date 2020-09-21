@@ -43,7 +43,7 @@ use totara_job\job_assignment;
 require_once(__DIR__ . '/notification_testcase.php');
 
 /**
- * @coversDefaultClass mod_perform\notification\mailer
+ * @coversDefaultClass \mod_perform\notification\mailer
  * @group perform
  */
 class mod_perform_notification_mailer_testcase extends mod_perform_notification_testcase {

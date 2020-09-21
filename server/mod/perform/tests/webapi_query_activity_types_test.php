@@ -30,7 +30,7 @@ use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass activity_types.
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\activity_types
  *
  * @group perform
  */

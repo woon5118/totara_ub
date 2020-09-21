@@ -29,7 +29,7 @@ use mod_perform\entities\activity\participant_section_repository;
 use mod_perform\models\activity\participant_source;
 
 /**
- * @covers participant_section_repository
+ * @covers \mod_perform\entities\activity\participant_section_repository
  * @group perform
 */
 class mod_perform_participant_section_repository_test extends advanced_testcase {

@@ -51,7 +51,7 @@ use totara_tenant\local\util as tenant_util;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * @coversDefaultClass expand_task.
+ * @coversDefaultClass \mod_perform\expand_task
  *
  * @group perform
  */

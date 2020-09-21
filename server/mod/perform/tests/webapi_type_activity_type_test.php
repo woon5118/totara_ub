@@ -27,7 +27,7 @@ use mod_perform\webapi\resolver\type\activity_type;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass activity_type.
+ * @coversDefaultClass \mod_perform\webapi\resolver\type\activity_type
  *
  * @group perform
  */
@@ -61,7 +61,7 @@ class mod_perform_webapi_type_activity_type_testcase extends advanced_testcase {
     }
 
     /**
-     * @covers ::run
+     * @covers ::resolve
      */
     public function test_resolve(): void {
         // Note: cannot use dataproviders here because PHPUnit runs these before

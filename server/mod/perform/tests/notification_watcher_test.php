@@ -219,7 +219,7 @@ class mod_perform_notification_watcher_testcase extends mod_perform_notification
 
     /**
      * @covers \mod_perform\task\send_participant_instance_creation_notifications_task::execute
-     * @covers mod_perform\notification\factory::create_dealer_on_participant_instances
+     * @covers \mod_perform\notification\factory::create_dealer_on_participant_instances
      */
     public function test_create_participant_instances() {
         $hook = new participant_instances_created(new collection([
@@ -268,8 +268,8 @@ class mod_perform_notification_watcher_testcase extends mod_perform_notification
     }
 
     /**
-     * @covers mod_perform\observers\notification::send_completion_notification
-     * @covers mod_perform\notification\factory::create_dealer_on_subject_instance
+     * @covers \mod_perform\observers\notification::send_completion_notification
+     * @covers \mod_perform\notification\factory::create_dealer_on_subject_instance
      */
     public function test_send_completion_notification() {
         $sink = factory::create_sink();

@@ -29,7 +29,7 @@ use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass toggle_activity_multisection_setting.
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\toggle_activity_multisection_setting
  *
  * @group perform
  */

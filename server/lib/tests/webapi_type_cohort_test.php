@@ -29,7 +29,7 @@ use core\webapi\resolver\type\cohort as cohort_type;
 
 
 /**
- * @coversDefaultClass cohort.
+ * @coversDefaultClass \core\webapi\resolver\type\cohort
  *
  * @group core_cohort
  */

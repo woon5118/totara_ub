@@ -22,7 +22,7 @@
  */
 
 /**
- * @coversDefaultClass mod_perform_activity_name_generator
+ * @coversDefaultClass \mod_perform_activity_name_generator
  *
  * @group perform
  */

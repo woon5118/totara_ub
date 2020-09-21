@@ -28,7 +28,7 @@ use mod_perform\notification\factory;
 require_once(__DIR__ . '/notification_testcase.php');
 
 /**
- * @coversDefaultClass mod_perform\notification\factory
+ * @coversDefaultClass \mod_perform\notification\factory
  * @group perform
  */
 class mod_perform_notification_factory_testcase extends mod_perform_notification_testcase {

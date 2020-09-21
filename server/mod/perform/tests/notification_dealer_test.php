@@ -37,8 +37,8 @@ use totara_tenant\local\util;
 require_once(__DIR__ . '/notification_testcase.php');
 
 /**
- * @coversDefaultClass mod_perform\notification\dealer
- * @covers mod_perform\notification\factory
+ * @coversDefaultClass \mod_perform\notification\dealer
+ * @covers \mod_perform\notification\factory
  * @group perform
  */
 class mod_perform_notification_dealer_testcase extends mod_perform_notification_testcase {

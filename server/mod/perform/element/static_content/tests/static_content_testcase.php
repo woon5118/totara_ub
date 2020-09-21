@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class performelement_static_content_testcase extends advanced_testcase {
+abstract class performelement_static_content_testcase extends advanced_testcase {
 
     protected function create_element_data(): string {
         global $USER;
@@ -82,5 +82,4 @@ class performelement_static_content_testcase extends advanced_testcase {
             JSON_UNESCAPED_SLASHES
         );
     }
-
 }

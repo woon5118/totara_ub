@@ -25,7 +25,7 @@
 use mod_perform\models\activity\track;
 
 /**
- * @coversDefaultClass track.
+ * @coversDefaultClass \mod_perform\models\activity\track
  *
  * @group perform
  */

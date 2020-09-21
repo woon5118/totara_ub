@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/repository/lib.php');
 require_once($CFG->libdir . '/filestorage/stored_file.php');
 
 /**
- * @coversDefaultClass file_storage
+ * @coversDefaultClass \stored_file
  */
 class core_files_stored_file_testcase extends advanced_testcase {
     public function setUp(): void {

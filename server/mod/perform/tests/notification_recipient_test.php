@@ -30,7 +30,7 @@ use totara_core\relationship\relationship as relationship_model;
 
 
 /**
- * @coversDefaultClass mod_perform\notification\recipient
+ * @coversDefaultClass \mod_perform\notification\recipient
  * @group perform
  */
 class mod_perform_notification_recipient_testcase extends advanced_testcase {

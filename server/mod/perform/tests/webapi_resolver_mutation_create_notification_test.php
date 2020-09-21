@@ -28,7 +28,7 @@ use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass create_notification
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\create_notification
  *
  * @group perform
  */

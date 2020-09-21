@@ -23,12 +23,11 @@
 
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
-use mod_perform\webapi\resolver\mutation\toggle_notification;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass toggle_notification
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\toggle_notification
  *
  * @group perform
  */

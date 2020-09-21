@@ -22,12 +22,11 @@
  */
 
 use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\webapi\resolver\mutation\delete_activity;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass delete_activity
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\delete_activity
  *
  * @group perform
  */

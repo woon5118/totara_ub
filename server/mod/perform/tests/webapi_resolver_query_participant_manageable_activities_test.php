@@ -24,12 +24,11 @@
 use core\entities\user;
 use core\orm\query\builder;
 use mod_perform\models\activity\activity;
-use mod_perform\webapi\resolver\query\participant_manageable_activities;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass participant_manageable_activities.
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\participant_manageable_activities
  *
  * @group perform
  */

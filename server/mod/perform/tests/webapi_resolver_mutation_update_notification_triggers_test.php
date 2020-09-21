@@ -23,12 +23,11 @@
 
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
-use mod_perform\webapi\resolver\mutation\update_notification_triggers;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass update_notification_triggers
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\update_notification_triggers
  *
  * @group perform
  */

@@ -27,7 +27,7 @@ use mod_perform\models\activity\activity_type;
 use mod_perform\entities\activity\activity_type as activity_type_entity;
 
 /**
- * @coversDefaultClass activity_type.
+ * @coversDefaultClass \mod_perform\models\activity\activity_type
  *
  * @group perform
  */
@@ -72,7 +72,6 @@ class mod_perform_activity_type_model_testcase extends advanced_testcase {
 
     /**
      * @covers ::load_by_name
-     * @covers ::activities
      */
     public function test_activities(): void {
         $this->setAdminUser();
@@ -107,7 +106,7 @@ class mod_perform_activity_type_model_testcase extends advanced_testcase {
     }
 
     /**
-     * @covers mod_perform\models\activity\activity_type::get_display_name
+     * @covers \mod_perform\models\activity\activity_type::get_display_name
      */
     public function test_get_display_name(): void {
         $system_types = activity_type_entity::repository()

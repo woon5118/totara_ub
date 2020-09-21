@@ -31,7 +31,7 @@ use mod_perform\event\track_user_group_unassigned;
 use mod_perform\user_groups\grouping;
 
 /**
- * @coversDefaultClass track.
+ * @coversDefaultClass \mod_perform\models\activity\track
  *
  * @group perform
  */

@@ -26,7 +26,7 @@ use mod_perform\webapi\resolver\mutation\update_section_elements;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass update_section_elements.
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\update_section_elements
  *
  * @group perform
  * Tests the mutation to add, update and delete section elements

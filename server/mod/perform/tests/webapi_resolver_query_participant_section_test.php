@@ -24,12 +24,11 @@
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\webapi\resolver\query\participant_section;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass participant_section
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\participant_section
  *
  * @group perform
  */

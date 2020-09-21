@@ -30,7 +30,7 @@ require_once(__DIR__ . '/relationship_resolver_test.php');
 
 /**
  * @group totara_core_relationship
- * @covers relationship_provider
+ * @covers \totara_core\relationship\relationship_provider
  */
 class totara_core_relationship_provider_testcase extends advanced_testcase {
 

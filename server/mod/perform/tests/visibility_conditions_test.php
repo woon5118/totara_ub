@@ -35,7 +35,7 @@ use mod_perform\state\participant_instance\progress_not_applicable;
 use mod_perform\state\participant_section\availability_not_applicable;
 
 /**
- * @covers visibility_manager
+ * @covers \mod_perform\models\activity\settings\visibility_conditions\visibility_manager
  *
  * @group perform
 */

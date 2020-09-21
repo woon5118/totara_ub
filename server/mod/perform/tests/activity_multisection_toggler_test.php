@@ -32,7 +32,7 @@ use mod_perform\models\activity\helpers\activity_multisection_toggler;
 use mod_perform\state\activity\draft;
 
 /**
- * @coversDefaultClass activity_multisection_toggler.
+ * @coversDefaultClass \mod_perform\models\activity\helpers\activity_multisection_toggler
  *
  * @group perform
  */

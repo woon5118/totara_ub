@@ -22,14 +22,13 @@
  */
 
 use mod_perform\constants;
-use mod_perform\relationship\resolvers\external;
 use totara_core\relationship\relationship;
 
 require_once(__DIR__ . '/perform_relationship_resolver_testcase.php');
 
 /**
  * @group perform
- * @covers external
+ * @covers \mod_perform\relationship\resolvers\external
  */
 class relationship_resolver_external_testcase extends perform_relationship_resolver_testcase {
     public function test_get_external_participants_by_subject_instance_id() {

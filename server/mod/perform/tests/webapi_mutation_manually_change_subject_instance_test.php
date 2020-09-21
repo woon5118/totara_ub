@@ -43,7 +43,7 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 
 /**
- * @coversDefaultClass create_track.
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\create_track
  *
  * @group perform
  */

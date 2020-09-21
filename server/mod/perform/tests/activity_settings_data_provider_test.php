@@ -27,7 +27,7 @@ use mod_perform\models\activity\activity_setting;
 use mod_perform\entities\activity\activity_setting as activity_setting_entity;
 
 /**
- * @coversDefaultClass activity_settings.
+ * @coversDefaultClass \mod_perform\data_providers\activity\activity_settings
  *
  * @group perform
  */
@@ -81,7 +81,6 @@ class mod_perform_activity_settings_data_provider_testcase extends advanced_test
     }
 
     /**
-     * @covers ::names
      * @covers ::update
      */
     public function test_access_by_activity(): void {

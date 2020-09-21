@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class core_orm_collection_testcase
  *
- * @covers collection
+ * @covers \core\collection
  * @package core
  * @group orm
  */

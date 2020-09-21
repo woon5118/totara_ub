@@ -31,7 +31,7 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
 
 
 /**
- * @coversDefaultClass user_grouping.
+ * @coversDefaultClass \mod_perform\webapi\resolver\type\user_grouping
  *
  * @group perform
  *
@@ -70,7 +70,7 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
     }
 
     /**
-     * @covers ::run
+     * @covers ::resolve
      */
     public function test_resolve(): void {
         // Note: cannot use dataproviders here because PHPUnit runs these before

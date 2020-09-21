@@ -28,7 +28,7 @@ use mod_perform\webapi\resolver\type\track_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass track_assignment.
+ * @coversDefaultClass \mod_perform\webapi\resolver\type\track_assignment
  *
  * @group perform
  */
@@ -64,7 +64,7 @@ class mod_perform_webapi_type_track_assignment_testcase extends advanced_testcas
     }
 
     /**
-     * @covers ::run
+     * @covers ::resolve
      */
     public function test_resolve(): void {
         // Note: cannot use dataproviders here because PHPUnit runs these before

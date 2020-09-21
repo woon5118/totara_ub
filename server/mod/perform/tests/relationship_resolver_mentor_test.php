@@ -23,13 +23,12 @@
 
 use mod_perform\constants;
 use totara_core\relationship\relationship;
-use mod_perform\relationship\resolvers\mentor;
 
 require_once(__DIR__ . '/perform_relationship_resolver_testcase.php');
 
 /**
  * @group perform
- * @covers mentor
+ * @covers \mod_perform\relationship\resolvers\mentor
  */
 class relationship_resolver_mentor_testcase extends perform_relationship_resolver_testcase {
     public function test_get_users_by_subject_instance_id() {

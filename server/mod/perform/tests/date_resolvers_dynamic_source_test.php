@@ -24,10 +24,9 @@
 
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
-use mod_perform\models\activity\track;
 
 /**
- * @coversDefaultClass track.
+ * @coversDefaultClass \mod_perform\models\activity\track
  *
  * @group perform
  */

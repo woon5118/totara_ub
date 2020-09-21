@@ -24,7 +24,7 @@
 use totara_webapi\client_aware_exception;
 
 /**
- * @covers client_aware_exception
+ * @covers \totara_webapi\client_aware_exception
 */
 class totara_webapi_client_aware_exception_test extends advanced_testcase {
 

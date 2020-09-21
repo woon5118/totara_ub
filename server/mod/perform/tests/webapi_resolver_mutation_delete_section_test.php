@@ -24,11 +24,10 @@
 use mod_perform\constants;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
-use mod_perform\webapi\resolver\mutation\delete_section;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass delete_section
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\delete_section
  *
  * @group perform
  */

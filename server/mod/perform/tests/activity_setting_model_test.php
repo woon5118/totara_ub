@@ -30,7 +30,7 @@ use mod_perform\models\activity\settings\visibility_conditions\own_response;
 use mod_perform\state\activity\draft;
 
 /**
- * @coversDefaultClass activity_setting.
+ * @coversDefaultClass \mod_perform\models\activity\activity_setting
  *
  * @group perform
  */

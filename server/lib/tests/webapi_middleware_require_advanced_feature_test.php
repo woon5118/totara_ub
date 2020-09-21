@@ -30,7 +30,7 @@ use totara_core\advanced_feature;
 use totara_core\feature_not_available_exception;
 
 /**
- * @coversDefaultClass require_advanced_feature.
+ * @coversDefaultClass \core\webapi\middleware\require_advanced_feature
  *
  * @group core_webapi
  */

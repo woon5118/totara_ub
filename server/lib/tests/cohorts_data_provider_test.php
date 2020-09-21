@@ -33,7 +33,7 @@ global $CFG;
 require_once($CFG->dirroot.'/totara/cohort/lib.php');
 
 /**
- * @coversDefaultClass cohort.
+ * @coversDefaultClass \core\data_providers\cohorts
  *
  * @group core_cohort
  */

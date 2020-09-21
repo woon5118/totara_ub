@@ -30,7 +30,7 @@ use mod_perform\models\activity\external_participant;
 /**
  * Tests the participant model.
  *
- * @covers participant
+ * @covers \mod_perform\models\activity\participant
  * @group perform
 */
 class mod_perform_participant_model_testcase extends advanced_testcase {

@@ -32,7 +32,7 @@ use totara_core\relationship\relationship_provider;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass create_activity.
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\create_activity
  *
  * @group perform
  */

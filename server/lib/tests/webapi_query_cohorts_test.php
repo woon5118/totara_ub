@@ -29,7 +29,7 @@ use core\entities\cohort as cohort_entity;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass cohorts.
+ * @coversDefaultClass \core\webapi\resolver\query\cohorts
  *
  * @group core_cohort
  */

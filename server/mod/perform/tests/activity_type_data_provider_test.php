@@ -26,7 +26,7 @@ use mod_perform\data_providers\activity\activity_type;
 use mod_perform\models\activity\activity_type as activity_type_model;
 
 /**
- * @coversDefaultClass activity_type.
+ * @coversDefaultClass \mod_perform\data_providers\activity\activity_type
  *
  * @group perform
  */

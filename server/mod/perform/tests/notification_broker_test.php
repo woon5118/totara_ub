@@ -125,7 +125,7 @@ class mod_perform_notification_broker_testcase extends mod_perform_notification_
     }
 
     /**
-     * @covers mod_perform\notification\brokers\instance_created_reminder
+     * @covers \mod_perform\notification\brokers\instance_created_reminder
      */
     public function test_is_triggerable_now_of_instance_created_reminder() {
         $instance_created_reminder = new instance_created_reminder();
@@ -138,7 +138,7 @@ class mod_perform_notification_broker_testcase extends mod_perform_notification_
     }
 
     /**
-     * @covers mod_perform\notification\brokers\due_date
+     * @covers \mod_perform\notification\brokers\due_date
      */
     public function test_is_triggerable_now_of_due_date() {
         $due_date = new due_date();
@@ -151,7 +151,7 @@ class mod_perform_notification_broker_testcase extends mod_perform_notification_
     }
 
     /**
-     * @covers mod_perform\notification\brokers\due_date_reminder
+     * @covers \mod_perform\notification\brokers\due_date_reminder
      */
     public function test_is_triggerable_now_of_due_date_reminder() {
         $due_date_reminder = new due_date_reminder();
@@ -164,7 +164,7 @@ class mod_perform_notification_broker_testcase extends mod_perform_notification_
     }
 
     /**
-     * @covers mod_perform\notification\brokers\overdue_reminder
+     * @covers \mod_perform\notification\brokers\overdue_reminder
      */
     public function test_is_triggerable_now_of_overdue_reminder() {
         $overdue_reminder = new overdue_reminder();

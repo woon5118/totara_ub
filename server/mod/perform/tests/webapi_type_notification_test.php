@@ -27,7 +27,7 @@ use mod_perform\models\activity\notification as notification_model;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass notification_model.
+ * @coversDefaultClass \mod_perform\webapi\resolver\type\notification
  *
  * @group perform
  */
@@ -90,7 +90,7 @@ class mod_perform_webapi_type_notification_testcase extends advanced_testcase {
     }
 
     /**
-     * @covers ::run
+     * @covers ::resolve
      * @dataProvider data_class_keys
      */
     public function test_resolve(string $class_key): void {

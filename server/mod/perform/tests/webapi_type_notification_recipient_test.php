@@ -30,7 +30,7 @@ use mod_perform\models\activity\section_relationship;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass recipient_model.
+ * @coversDefaultClass \mod_perform\webapi\resolver\type\notification_recipient
  *
  * @group perform
  */
@@ -89,7 +89,7 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
     }
 
     /**
-     * @covers ::run
+     * @covers ::resolve
      */
     public function test_resolve(): void {
         // Note: cannot use dataproviders here because PHPUnit runs these before

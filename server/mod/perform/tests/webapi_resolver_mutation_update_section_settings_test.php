@@ -26,14 +26,13 @@ use mod_perform\entities\activity\section as section_entity;
 use mod_perform\models\activity\section;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
-use mod_perform\webapi\resolver\mutation\update_section_settings;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
 /**
- * @coversDefaultClass update_section_settings.
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\update_section_settings
  *
  * @group perform
  */

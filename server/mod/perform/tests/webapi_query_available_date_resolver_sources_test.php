@@ -23,12 +23,11 @@
  */
 
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
-use mod_perform\models\activity\track;
 use mod_perform\webapi\resolver\query\available_dynamic_date_sources;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass track.
+ * @coversDefaultClass \mod_perform\models\activity\track
  *
  * @group perform
  */

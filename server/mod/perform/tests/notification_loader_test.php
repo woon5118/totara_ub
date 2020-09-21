@@ -35,7 +35,7 @@ use mod_perform\notification\recipient;
 use mod_perform\notification\trigger;
 
 /**
- * @coversDefaultClass mod_perform\notification\loader
+ * @coversDefaultClass \mod_perform\notification\loader
  * @group perform
  */
 class mod_perform_notification_loader_testcase extends advanced_testcase {

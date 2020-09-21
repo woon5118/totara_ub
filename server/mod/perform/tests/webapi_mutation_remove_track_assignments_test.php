@@ -30,7 +30,7 @@ use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass remove_track_assignments.
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\remove_track_assignments
  *
  * @group perform
  */

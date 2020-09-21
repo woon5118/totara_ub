@@ -22,12 +22,11 @@
  */
 
 use core\collection;
-use mod_perform\webapi\resolver\query\activities;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass activities.
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\activities
  *
  * @group perform
  */

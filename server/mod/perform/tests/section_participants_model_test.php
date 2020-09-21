@@ -34,7 +34,7 @@ use mod_perform\task\service\subject_instance_creation;
 use totara_job\job_assignment;
 
 /**
- * @coversDefaultClass section_participants.
+ * @coversDefaultClass \mod_perform\models\response\section_participants
  *
  * @group perform
  */
