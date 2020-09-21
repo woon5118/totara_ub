@@ -1,0 +1,1182 @@
+.tui-performActivityActions {
+  display: flex;
+  justify-content: flex-start;
+
+  &__item {
+    margin-right: var(--gap-2);
+    padding: 0 var(--gap-1);
+  }
+}
+
+@media screen and (min-width: $tui-screen-xs) {
+  .tui-performActivityActions {
+    justify-content: flex-end;
+
+    &__item {
+      margin-right: 0;
+    }
+  }
+}
+
+.tui-performElementEditDisplay {
+  display: flex;
+  flex-direction: column;
+  padding: var(--gap-2) var(--gap-3);
+  background: var(--color-neutral-2);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+  border-radius: var(--border-radius-normal);
+
+  &__action {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  &__title {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: var(--gap-3);
+    @include tui-font-heading-x-small;
+
+    &-response-required {
+      @include tui-font-heading-label();
+      margin-left: var(--gap-1);
+      color: var(--color-prompt-alert);
+    }
+  }
+  &__content {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__reportingId {
+    &-header {
+      margin: 0;
+      @include tui-font-heading-label();
+    }
+    &-content {
+      margin-top: var(--gap-2);
+    }
+  }
+
+  &__actions {
+    padding: 0 var(--gap-2);
+    .tui-iconBtn {
+      padding: 0;
+    }
+  }
+}
+
+.tui-performElementAdminForm {
+  padding: var(--gap-2) var(--gap-3);
+  background: var(--color-neutral-2);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+  border-radius: var(--border-radius-normal);
+  cursor: pointer;
+
+  &__type {
+    margin-bottom: var(--gap-2);
+    font-weight: bold;
+  }
+}
+
+.tui-performElementReadOnlyDisplay {
+  padding: var(--gap-2) var(--gap-3);
+  background: var(--color-neutral-2);
+  border: var(--border-width-thin) solid var(--color-neutral-5);
+  border-radius: var(--border-radius-normal);
+
+  &__title {
+    display: flex;
+    flex-direction: row;
+  }
+  &__content {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: row;
+  }
+  &__action {
+    display: flex;
+    align-items: end;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
+
+.tui-performElementParticipantResponse {
+  display: flex;
+  &__name {
+    @include tui-font-body();
+    margin-left: var(--gap-3);
+  }
+}
+
+.tui-activityStatusBanner__helpIcon {
+  margin-left: var(--gap-2);
+}
+
+.tui-performManageActivityGeneralInfo {
+  &__heading {
+    @include tui-font-heading-small();
+
+    & > * + * {
+      margin-top: var(--gap-12);
+    }
+  }
+  &__warning {
+    max-width: 712px;
+  }
+}
+
+.tui-performManageActivityManualRelationships {
+  margin-top: var(--gap-6);
+  & > * + * {
+    margin-top: var(--gap-6);
+  }
+  &__heading {
+    @include tui-font-heading-small();
+  }
+}
+
+.tui-performManageActivityAssignmentsForm {
+  &__heading {
+    @include tui-font-heading-small();
+    margin: var(--gap-4) 0 0;
+  }
+
+  &__add {
+    display: flex;
+    margin-top: var(--gap-2);
+
+    &-dropdown {
+      margin-left: auto;
+    }
+  }
+
+  &__table {
+    margin-top: var(--gap-4);
+  }
+}
+
+.tui-performAssignmentSchedule {
+  & > * + * {
+    margin-top: var(--gap-8);
+  }
+
+  &__heading {
+    margin: var(--gap-12) 0 0;
+    @include tui-font-heading-small;
+  }
+
+  &__form {
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+
+    &-section {
+      padding: var(--gap-8);
+      background: var(--color-neutral-3);
+    }
+  }
+
+  .tui-performAssignmentSchedule__form {
+    &-additional {
+      margin-top: var(--gap-12);
+      margin-left: var(--gap-8);
+    }
+
+    &-buttons {
+      margin-top: var(--gap-8);
+      margin-left: var(--gap-8);
+    }
+  }
+}
+
+.tui-assignmentScheduleAdditionalSettings {
+  &__description {
+    @include tui-font-body-placeholder();
+  }
+}
+
+.tui-assignmentScheduleCreationRange {
+  &__title {
+    margin: 0;
+    @include tui-font-heading-x-small();
+  }
+
+  &__description {
+    margin-top: var(--gap-4);
+  }
+
+  &__form {
+    margin-top: var(--gap-8);
+
+    &-checkbox {
+      margin-top: var(--gap-2);
+    }
+  }
+}
+
+.tui-assignmentScheduleDueDate {
+  &__title {
+    margin: 0;
+    @include tui-font-heading-x-small();
+  }
+
+  &__description {
+    margin-top: var(--gap-4);
+  }
+
+  &__form {
+    margin-top: var(--gap-8);
+  }
+}
+
+.tui-assignmentScheduleFrequencySettings {
+  &__title {
+    margin: 0;
+    @include tui-font-heading-x-small();
+  }
+
+  &__description {
+    margin-top: var(--gap-4);
+  }
+
+  &__form {
+    margin-top: var(--gap-8);
+  }
+}
+
+.tui-assignmentScheduleToggles {
+  display: flex;
+  flex-wrap: wrap;
+
+  &__group {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: var(--gap-4);
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  &__item {
+    margin-right: var(--gap-4);
+
+    &-header {
+      margin: var(--gap-4) 0 0;
+      @include tui-font-heading-label;
+    }
+
+    &-toggle {
+      margin-top: var(--gap-4);
+    }
+  }
+}
+
+@media (min-width: $tui-screen-sm) {
+  .tui-assignmentScheduleToggles {
+    &__group {
+      border-right: var(--border-width-thin) solid var(--color-neutral-6);
+
+      &:last-child {
+        border-right: none;
+      }
+    }
+
+    &__item {
+      &-header {
+        margin: 0;
+      }
+    }
+  }
+}
+
+.tui-performManageActivityContent {
+  & > * + * {
+    margin: var(--gap-8) 0 0;
+  }
+
+  &__items {
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+  }
+
+  &__heading {
+    @include tui-font-heading-small();
+  }
+}
+
+.tui-performActivitySection {
+  &--editing {
+    padding: var(--gap-4);
+    border: solid var(--color-secondary) var(--border-width-normal);
+  }
+
+  &__title {
+    margin: 0;
+  }
+
+  &__multiple {
+    padding: var(--gap-4);
+    & > * + * {
+      margin-top: var(--gap-6);
+    }
+  }
+
+  &.tui-card {
+    display: block;
+  }
+
+  &__action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    .tui-iconBtn {
+      min-width: auto;
+    }
+  }
+  &__saveButtons {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__action-edit {
+    min-width: auto;
+  }
+
+  &__divider {
+    margin-top: var(--gap-8);
+    margin-bottom: 0;
+  }
+
+  &__content {
+    margin-top: var(--gap-4);
+
+    &--autoSave {
+      margin-top: var(--gap-4);
+      border-bottom: var(--border-width-thin) solid var(--card-border-color);
+    }
+  }
+
+  &__can-view-others-legend {
+    display: block;
+  }
+
+  &__participant-heading {
+    margin-top: var(--gap-2);
+  }
+
+  &__participant-items {
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
+  }
+
+  &__participant-groups {
+    margin-top: var(--gap-2);
+  }
+
+  &__participant-group {
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+  }
+
+  &__participant-info {
+    font-style: italic;
+  }
+
+  &__participant-heading {
+    display: inline-block;
+    margin-top: var(--gap-4);
+    margin-bottom: 0;
+    @include tui-font-heading-label();
+  }
+}
+
+@media (min-width: $tui-screen-sm) {
+  .tui-performActivitySection {
+    &__can-view-others-legend {
+      display: inline;
+    }
+
+    &__content-buttons {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}
+
+.tui-performActivitySectionElementSummary {
+  &__count {
+    @include tui-font-heavy;
+  }
+}
+
+.tui-performActivitySectionRelationship {
+  &__item {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin: 0;
+  }
+
+  &__item-name {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+    padding: var(--gap-2);
+    border: var(--border-width-thin) solid var(--color-neutral-5);
+    border-radius: var(--border-radius-normal);
+  }
+
+  &__item-options {
+    margin-top: var(--gap-2);
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-performActivitySectionRelationship {
+    &__item {
+      flex-direction: row;
+    }
+
+    &__item-name {
+      max-width: 20rem;
+    }
+
+    &__item-options {
+      margin: auto 0;
+      padding: var(--gap-2);
+    }
+  }
+}
+
+.tui-performEditSectionContentModal {
+  &__title {
+    margin: 0;
+    @include tui-font-heading-medium;
+  }
+
+  &__required {
+    color: var(--color-prompt-alert);
+  }
+
+  &__form {
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+  }
+
+  &__dragList {
+    > [data-tui-draggable-placeholder] {
+      margin-top: var(--gap-3);
+    }
+  }
+
+  &__draggableItem {
+    position: relative;
+    margin-top: var(--gap-3);
+    -webkit-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+
+    &-moveIcon {
+      position: absolute;
+      top: var(--gap-1);
+      left: var(--gap-2);
+      display: none;
+    }
+
+    &:hover &-moveIcon,
+    &--dragging &-moveIcon {
+      display: block;
+    }
+  }
+}
+
+.tui-performActivityWorkflowSettings {
+  &__heading {
+    @include tui-font-heading-small();
+  }
+  &__warning {
+    max-width: 712px;
+  }
+}
+
+@media (min-width: $tui-screen-sm) {
+  .tui-performActivityWorkflowSettings {
+    & > * + * {
+      padding-top: var(--gap-4);
+    }
+  }
+}
+
+.tui-activityNotificationSettings {
+  margin-bottom: var(--gap-4);
+
+  &__toggle {
+    margin-right: var(--gap-1);
+  }
+}
+.tui-activityNotificationsRecipients {
+  margin: var(--gap-4) 0;
+}
+
+.tui-activityNotifications {
+  &__header {
+    display: flex;
+    align-items: baseline;
+    margin-top: var(--gap-2); /* Check the content tab before changing this.*/
+  }
+
+  &__title {
+    @include tui-font-heading-small();
+    flex-basis: 100%;
+  }
+
+  &__active {
+    @include tui-font-heading-label-small();
+    margin-right: var(--gap-4);
+  }
+}
+
+.tui-activityNotificationsRecipientsTable {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__row {
+    margin: 0 0 var(--gap-4);
+    padding: 0;
+  }
+}
+
+.tui-activityNotificationsTriggersTable {
+  width: 100%;
+  &__banner {
+    margin-top: var(--gap-2);
+  }
+}
+.tui-activityNotificationsTriggers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tui-activityNotificationsTrigger {
+  $value-width: 6em;
+  width: 100%;
+  margin: 0 0 var(--gap-2) 0;
+  padding: 0;
+  &__field {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+  }
+  &__value {
+    width: $value-width;
+  }
+  &__format {
+    width: calc(100% - #{$value-width} - var(--gap-4));
+    margin: 0 var(--gap-2);
+  }
+  &__error {
+    margin-top: var(--gap-1);
+  }
+}
+
+.tui-instanceInfoCard {
+  &__title {
+    @include tui-font-heading-x-small();
+    margin-top: 0;
+  }
+
+  &__info-section {
+    @include tui-font-body();
+    display: table;
+  }
+
+  &__info-row {
+    display: table-row;
+  }
+
+  &__info-label {
+    display: table-cell;
+    padding-right: var(--gap-8);
+    padding-bottom: var(--gap-3);
+  }
+
+  &__info-value {
+    display: table-cell;
+    padding-bottom: var(--gap-3);
+  }
+}
+
+.tui-elementResponseReportingActionCard {
+  margin-bottom: var(--gap-10);
+}
+
+.tui-performReportPerformanceReportingIdBanner {
+  margin-bottom: var(--gap-8);
+  padding: var(--gap-2) var(--gap-3);
+  background: var(--color-neutral-3);
+  border: none;
+  border-radius: var(--border-radius-normal);
+
+  &__tag {
+    margin-left: var(--gap-2);
+  }
+}
+
+.tui-performReportPerformanceResponseByContent {
+  display: flex;
+  flex-direction: column;
+  &__heading {
+    @include tui-font-heading-small();
+  }
+  &__divider {
+    max-width: 250px;
+  }
+}
+
+.tui-participantContent {
+  @include tui-font-body();
+
+  &__layout.tui-grid {
+    margin-top: var(--gap-6);
+  }
+
+  &__header {
+    margin: var(--gap-6) 0 0;
+    @include tui-font-heading-medium();
+  }
+
+  &__buttons {
+    margin-top: var(--gap-4);
+  }
+
+  &__user {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--gap-2) var(--gap-4);
+    border: var(--border-width-thin) solid var(--color-border);
+    border-radius: var(--border-radius-normal);
+
+    & > * + * {
+      margin-top: var(--gap-4);
+    }
+
+    &-relationship {
+      display: flex;
+      padding-top: var(--gap-3);
+    }
+
+    &-relationshipValue {
+      display: inline;
+      margin: auto 0 auto var(--gap-1);
+      @include tui-font-heading-x-small();
+    }
+  }
+
+  &__navigation {
+    margin-top: var(--gap-4);
+
+    &-buttons {
+      text-align: right;
+
+      :not(:first-child) {
+        margin-left: var(--gap-4);
+      }
+    }
+  }
+
+  &__sectionHeading {
+    justify-content: flex-end;
+    margin-top: var(--gap-6);
+
+    &-title {
+      flex: 1;
+      margin: auto 0;
+      @include tui-font-heading-small();
+    }
+  }
+
+  &__infoBar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-top: var(--gap-6);
+    padding-bottom: var(--gap-6);
+    border-top: solid var(--color-neutral-5) var(--border-width-thin);
+    border-bottom: solid var(--color-neutral-5) var(--border-width-thin);
+  }
+
+  &__sectionHeadingOtherResponsesDescription {
+    margin: 0;
+  }
+
+  &__sectionHeading-otherResponseSwitch {
+    margin-top: var(--gap-4);
+    margin-left: 0;
+  }
+
+  &__section {
+    &-requiredContainer {
+      margin-top: var(--gap-2);
+    }
+
+    &-responseRequired {
+      display: inline-flex;
+      @include tui-font-heading-label();
+      color: var(--color-prompt-alert);
+    }
+  }
+
+  &__sectionItem {
+    margin-top: var(--gap-4);
+
+    &-content {
+      & > * {
+        margin-top: var(--gap-4);
+      }
+    }
+    &-contentHeader {
+      display: inline-flex;
+      @include tui-font-heading-x-small();
+      margin-left: 0;
+    }
+  }
+
+  &__staticElement {
+    display: flex;
+    &__name {
+      @include tui-font-body();
+      margin-left: var(--gap-3);
+    }
+  }
+
+  &__readonly {
+    padding-top: var(--gap-1);
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-participantContent {
+    /* Spit the avatar and relationship blurb on tablet an larger.*/
+    &__user {
+      flex-direction: row;
+      align-items: center;
+
+      & > * + * {
+        margin-top: 0;
+      }
+
+      &-info {
+        padding-right: var(--gap-4);
+      }
+
+      &-relationship {
+        display: block;
+        padding-top: 0;
+      }
+
+      &-relationshipValue {
+        display: block;
+        margin: var(--gap-1) 0 0;
+      }
+    }
+
+    &__infoBar {
+      flex-wrap: nowrap;
+      margin-top: var(--gap-6);
+    }
+
+    &__sectionHeading-otherResponseSwitch {
+      flex-shrink: 0;
+      margin-top: 0;
+      margin-left: var(--gap-6);
+    }
+  }
+}
+
+.tui-participantContentPrint {
+  @include tui-font-body();
+
+  &__header {
+    @include tui-font-heading-medium();
+    margin: var(--gap-12) 0 var(--gap-4) 0;
+    padding: var(--gap-2) var(--gap-4);
+    text-align: center;
+    border: var(--border-width-thin) solid var(--color-prompt-success);
+
+    &-date {
+      @include tui-font-body-small();
+      padding: var(--gap-6) var(--gap-4) 0;
+      color: var(--color-neutral-6);
+    }
+  }
+}
+
+.tui-performManualParticipantSelectionBanner {
+  margin-top: var(--gap-5);
+  margin-bottom: var(--gap-5);
+}
+
+.tui-performRequiredOptionalIndicator {
+  &--required {
+    @include tui-font-heading-label();
+    color: var(--color-prompt-alert);
+  }
+  &--optional {
+    @include tui-font-body();
+    @include tui-font-hint();
+  }
+}
+
+.tui-performUserHistoricActivities {
+  &__heading {
+    margin: var(--gap-8) 0 var(--gap-6) 0;
+    padding-right: var(--gap-8);
+  }
+
+  @include tui-font-body();
+}
+
+.tui-performMyHistoricActivityList {
+  @include tui-font-body();
+}
+
+.tui-performOtherHistoricActivityList {
+  @include tui-font-body();
+}
+
+.tui-performUserActivityListSections {
+  padding: var(--gap-4);
+
+  & > * + * {
+    margin-top: var(--gap-12);
+  }
+}
+
+.tui-performUserActivityDateSummary {
+  padding: var(--gap-6) var(--gap-4) 0;
+  color: var(--color-neutral-6);
+}
+
+.tui-performUserActivityListSection {
+  max-width: 800px;
+
+  & > * + * {
+    margin-top: var(--gap-2);
+  }
+
+  &__header {
+    margin: 0;
+    @include tui-font-body();
+  }
+
+  &__header button {
+    @include tui-font-link();
+  }
+}
+
+.tui-jobAssignment {
+  @include tui-font-body();
+
+  &__jobAssignmentDetails {
+    @include tui-font-body-small();
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: var(--gap-1);
+
+    span {
+      margin-right: var(--gap-1);
+    }
+  }
+
+  &__spacing {
+    margin-right: var(--gap-1);
+  }
+}
+
+.tui-otherParticipantResponses {
+  &__response {
+    width: 100%;
+    margin-top: var(--gap-1);
+
+    & > * + * {
+      margin-top: var(--gap-6);
+    }
+
+    &-participant {
+      & > * + * {
+        margin-top: var(--gap-2);
+      }
+    }
+  }
+
+  &__noParticipant {
+    margin-top: var(--gap-1);
+    @include tui-font-hint();
+  }
+}
+
+.tui-participantGeneralInformation {
+  @include tui-font-body();
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: var(--border-width-thin) solid var(--color-border);
+  border-radius: var(--border-radius-normal);
+
+  &__userDetails {
+    min-width: 30%;
+    height: 100%;
+    padding: var(--gap-2) var(--gap-4);
+    border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
+  }
+
+  &__relationship {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: var(--gap-2) var(--gap-4) var(--gap-1) var(--gap-4);
+    background: var(--color-neutral-2);
+    border-radius: var(--border-radius-normal);
+  }
+
+  &__relationship-heading {
+    @include tui-font-heading-small-regular();
+
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: var(--gap-1);
+
+    span {
+      @include tui-font-heading-small();
+      /* margin-left: 4px;*/
+    }
+  }
+
+  &__relationshipHeadingDetails {
+    @include tui-font-heading-small();
+  }
+
+  &__relationship-toSubject {
+    @include tui-font-body-small();
+    margin-bottom: var(--gap-1);
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-participantGeneralInformation {
+    flex-direction: row;
+
+    &__userDetails {
+      border-right: var(--border-width-thin) solid var(--color-neutral-5);
+      border-bottom: none;
+    }
+
+    &__relationship-heading {
+      span {
+        margin-left: var(--gap-1);
+      }
+    }
+  }
+}
+
+.tui-participantUserHeader {
+  display: flex;
+  align-items: center;
+
+  &__avatar {
+    flex-shrink: 0;
+  }
+
+  &__name {
+    @include tui-font-heading-x-small();
+    margin-left: var(--gap-2);
+  }
+}
+
+.tui-responsesAreVisibleToDescription {
+  & > * + * {
+    margin-top: var(--gap-1);
+  }
+
+  &__viewOnly {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    & > * + * {
+      margin-top: var(--gap-2);
+    }
+
+    &-lozenge {
+      flex-shrink: 0;
+    }
+  }
+
+  &__text {
+    margin-bottom: 0;
+  }
+
+  @media (min-width: $tui-screen-xs) {
+    &__viewOnly {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      & > * + * {
+        margin-top: 0;
+        margin-left: var(--gap-2);
+      }
+    }
+  }
+}
+
+.tui-performActivityParticipantSelector {
+  margin-top: var(--gap-4);
+  padding: var(--gap-4);
+  border: var(--border-width-thin) solid var(--card-border-color);
+
+  &-title {
+    @include tui-font-heading-small;
+    margin: 0;
+  }
+
+  &-meta {
+    margin-top: var(--gap-2);
+  }
+
+  &-form {
+    margin-top: var(--gap-4);
+  }
+}
+
+.tui-performManageActivityList {
+  &__add {
+    text-align: right;
+  }
+
+  &__table {
+    padding-top: var(--gap-4);
+  }
+}
+
+@media (min-width: $tui-screen-sm) {
+  .tui-performManageActivityList {
+    &__table {
+      padding-top: var(--gap-2);
+    }
+  }
+}
+
+.tui-performAddParticipants {
+  &__title {
+    @include tui-font-heading-medium;
+    padding-top: var(--gap-2);
+  }
+}
+
+.tui-performUserActivityInvalid {
+  @include tui-font-body();
+
+  margin: var(--gap-8) 0 0;
+
+  & > * + * {
+    margin-top: var(--gap-6);
+  }
+
+  &__header {
+    @include tui-font-heading-medium();
+  }
+}
+
+.tui-performUserActivitySuccess {
+  @include tui-font-body();
+
+  margin: var(--gap-8) 0 0;
+
+  & > * + * {
+    margin-top: var(--gap-6);
+  }
+
+  &__header {
+    @include tui-font-heading-medium();
+  }
+}
+
+.tui-performManageActivity {
+  @include tui-font-body();
+
+  &__content {
+    & > * + * {
+      margin-top: var(--gap-8);
+    }
+  }
+
+  &__title {
+    @include tui-font-heading-medium;
+    margin: var(--gap-2) 0 0;
+  }
+}
+
+.tui-performUserActivities {
+  &__header-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  &__heading {
+    margin: 0;
+    padding-right: var(--gap-8);
+  }
+
+  &__action-buttons {
+    margin-top: var(--gap-4);
+  }
+
+  &__content {
+    margin-top: var(--gap-4);
+  }
+
+  @include tui-font-body();
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-performUserActivities {
+    &__action-buttons {
+      margin-top: var(--gap-4);
+    }
+
+    &__content {
+      margin-top: var(--gap-4);
+    }
+  }
+}
+
+.tui-performUserActivitiesSelectParticipants {
+  &__title {
+    @include tui-font-heading-medium;
+    padding-top: var(--gap-2);
+  }
+}
+
