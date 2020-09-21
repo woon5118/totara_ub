@@ -188,6 +188,33 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
         $this->assert_course_has_progress($data->course3->fullname, 0, $result);
     }
 
+    public function test_criteria_validity_is_returned_correctly() {
+        $this->setAdminUser();
+
+        $data = $this->create_data();
+
+        // criterion with all courses completable should be valid
+        $valid_criteria = $this->get_criterion()
+            ->set_aggregation_method(criterion::AGGREGATE_ANY_N)
+            ->set_aggregation_params(['req_items' => 1])
+            ->set_item_ids([$data->course1->id, $data->course2->id])
+            ->save();
+
+        $args = ['instance_id' => $valid_criteria->get_id(), 'user_id' => $data->user->id];
+        $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
+        $this->assertTrue($result['is_valid']);
+
+        // criterion with any not completable course should be invalid
+        $invalid_criteria = $this->get_criterion()
+            ->set_aggregation_method(criterion::AGGREGATE_ANY_N)
+            ->set_aggregation_params(['req_items' => 1])
+            ->set_item_ids([$data->course1->id, $data->course4->id])
+            ->save();
+        $args = ['instance_id' => $invalid_criteria->get_id(), 'user_id' => $data->user->id];
+        $result = $this->get_resolver_classname()::resolve($args, $this->get_execution_context());
+        $this->assertNotTrue($result['is_valid']);
+    }
+
     public function test_hidden_course_is_not_returned() {
         global $DB;
 
@@ -332,6 +359,7 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
             public $course1;
             public $course2;
             public $course3;
+            public $course4;
             public $user;
         };
 
@@ -360,6 +388,10 @@ abstract class totara_criteria_course_achievements_testcase extends advanced_tes
         $data->course3 = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
         $this->getDataGenerator()->create_module('forum', array('course' => $data->course3->id));
         $this->getDataGenerator()->create_module('forum', array('course' => $data->course3->id));
+
+        $data->course4 = $this->getDataGenerator()->create_course(['enablecompletion' => false]);
+        $this->getDataGenerator()->create_module('forum', ['course' => $data->course4->id]);
+        $this->getDataGenerator()->create_module('forum', ['course' => $data->course4->id]);
 
         $data->user = $this->getDataGenerator()->create_user();
 

@@ -10,6 +10,7 @@ type criteria_childcompetency_achievements {
   aggregation_method: Int!
   required_items: Int!
   items: [criteria_childcompetency_achievement_item!]
+  is_valid: Boolean!
 }
 
 extend type Query {

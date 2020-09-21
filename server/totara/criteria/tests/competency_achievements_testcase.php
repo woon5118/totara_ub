@@ -217,6 +217,24 @@ abstract class totara_criteria_competency_achievements_testcase extends advanced
         $this->assertFalse($item['self_assignable']);
     }
 
+    public function test_criteria_validity_is_returned_correctly() {
+        $this->setUser($this->data['user']);
+
+        $args = [
+            'instance_id'   => $this->data['valid_criterion']->get_id(),
+            'user_id'       => $this->data['user']->id,
+        ];
+        $result = $this->execute_resolver($args);
+        $this->assertTrue($result['is_valid']);
+
+        $args = [
+            'instance_id'   => $this->data['invalid_criterion']->get_id(),
+            'user_id'       => $this->data['user']->id,
+        ];
+        $result = $this->execute_resolver($args);
+        $this->assertNotTrue($result['is_valid']);
+    }
+
     /**
      * Create achievement record.
      *

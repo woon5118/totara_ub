@@ -8,6 +8,7 @@ query criteria_linkedcourses_achievements(
   ) {
     aggregation_method
     required_items
+    is_valid
     items {
       course {
         fullname

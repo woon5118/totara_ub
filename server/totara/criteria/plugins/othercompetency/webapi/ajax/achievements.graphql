@@ -11,6 +11,7 @@ query criteria_othercompetency_achievements(
     current_user
     aggregation_method
     required_items
+    is_valid
     items {
       assigned
       self_assignable

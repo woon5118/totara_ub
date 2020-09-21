@@ -95,6 +95,7 @@ abstract class competency_achievements implements query_resolver {
             'required_items'     => $completion_criteria->get_aggregation_params()['req_items'] ?? 1,
             'current_user'       => static::is_for_current_user($user_id),
             'items'              => $items,
+            'is_valid'           => $completion_criteria->is_valid(),
         ];
     }
 

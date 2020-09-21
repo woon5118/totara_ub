@@ -86,7 +86,8 @@ abstract class course_achievements implements query_resolver {
         return [
             'aggregation_method' => $completion_criteria->get_aggregation_method(),
             'required_items' => $completion_criteria->get_aggregation_params()['req_items'] ?? 1,
-            'items' => $items
+            'items' => $items,
+            'is_valid' => $completion_criteria->is_valid(),
         ];
     }
 

@@ -244,6 +244,7 @@ export default {
      */
     criteriaComplete() {
       return (
+        this.isValid &&
         this.numberOfRequiredCompetencies > 0 &&
         this.achievedCompetencies >= this.numberOfRequiredCompetencies
       );
@@ -289,6 +290,16 @@ export default {
         return this.achievements.items.length;
       }
       return this.achievements.required_items;
+    },
+
+    /**
+     * Returns true if it is possible for the achievement path to be competed. Returns false if it is not possible
+     * (e.g. an other/child competency item has a course completion not being tracked).
+     *
+     * @return {Boolean}
+     */
+    isValid() {
+      return this.achievements.is_valid;
     },
   },
 

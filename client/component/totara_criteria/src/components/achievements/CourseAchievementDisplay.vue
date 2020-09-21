@@ -163,6 +163,7 @@ export default {
      */
     criteriaFulfilled() {
       return (
+        this.isValid &&
         this.targetNumberOfCourses > 0 &&
         this.completedNumberOfCourses >= this.targetNumberOfCourses
       );
@@ -209,6 +210,15 @@ export default {
         return this.numberOfCourses;
       }
       return this.achievements.required_items;
+    },
+
+    /**
+     * Returns true if it is possible for the achievement path to be competed. Returns false if it is not possible (e.g. course completion not being tracked).
+     *
+     * @return {Boolean}
+     */
+    isValid() {
+      return this.achievements.is_valid;
     },
   },
 

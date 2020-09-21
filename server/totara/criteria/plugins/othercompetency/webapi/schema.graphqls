@@ -10,6 +10,7 @@ type criteria_othercompetency_achievements {
   aggregation_method: Int!
   required_items: Int!
   items: [criteria_othercompetency_achievement_item!]
+  is_valid: Boolean!
 }
 
 extend type Query {

@@ -180,6 +180,12 @@ class criteria_othercompetency_webapi_query_achievements_testcase extends totara
 
         $criterion = $criteria_generator->create_othercompetency(['competencyids' => $other_competency_ids]);
         $criterion_with_no_competency = $criteria_generator->create_othercompetency(['competencyids' => []]);
+        $valid_criterion = $criteria_generator->create_othercompetency(['competencyids' => $other_competency_ids])
+            ->set_valid(true)
+            ->save();
+        $invalid_criterion = $criteria_generator->create_othercompetency(['competencyids' => $other_competency_ids])
+            ->set_valid(false)
+            ->save();
 
         $assignment = $this->competency_generator->assignment_generator()->create_assignment(
             [
@@ -231,6 +237,8 @@ class criteria_othercompetency_webapi_query_achievements_testcase extends totara
         return [
             'criterion'                    => $criterion,
             'criterion_with_no_competency' => $criterion_with_no_competency,
+            'valid_criterion'              => $valid_criterion,
+            'invalid_criterion'            => $invalid_criterion,
             'competencies'                 => $this->other_competency_items,
             'assignments'                  => $assignments,
             'assignment'                   => $assignment,
