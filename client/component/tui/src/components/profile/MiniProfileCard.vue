@@ -19,12 +19,11 @@
 
 <template>
   <div
-    :no-border="noBorder"
     class="tui-miniProfileCard"
     :class="{
       'tui-miniProfileCard--border': !noBorder,
       'tui-miniProfileCard--hasShadow': hasShadow,
-      'tui-miniProfileCard--no-padding': noBorder,
+      'tui-miniProfileCard--no-padding': noPadding,
       'tui-miniProfileCard--no-avatar': !noBorder && !hasAvatar,
       'tui-miniProfileCard--no-dropdown': !noBorder && !hasDropDown,
     }"
@@ -134,6 +133,7 @@ export default {
     buttonIconSize: String,
     dropDownButtonAriaLabel: String,
     noBorder: Boolean,
+    noPadding: Boolean,
     hasShadow: Boolean,
     display: {
       type: Object,

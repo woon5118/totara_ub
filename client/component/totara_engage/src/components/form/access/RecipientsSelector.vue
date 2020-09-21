@@ -45,6 +45,7 @@
         >
           <MiniProfileCard
             :no-border="true"
+            :no-padding="true"
             :read-only="true"
             :display="item.user.card_display"
           />

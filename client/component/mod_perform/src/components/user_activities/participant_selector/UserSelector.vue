@@ -27,6 +27,7 @@
     <template v-slot:item="{ item }">
       <MiniProfileCard
         :no-border="true"
+        :no-padding="true"
         :read-only="true"
         :display="item.card_display"
       />

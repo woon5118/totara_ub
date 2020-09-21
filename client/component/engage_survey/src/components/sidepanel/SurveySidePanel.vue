@@ -31,6 +31,7 @@
 
       <MiniProfileCard
         :no-border="true"
+        :no-padding="true"
         :display="survey.resource.user.card_display"
         class="tui-engageSurveySidePanel__profile"
       >

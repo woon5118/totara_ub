@@ -22,6 +22,7 @@
       slot="author-profile"
       :display="user.card_display"
       :no-border="true"
+      :no-padding="true"
     >
       <template v-slot:drop-down-items>
         <DropdownItem

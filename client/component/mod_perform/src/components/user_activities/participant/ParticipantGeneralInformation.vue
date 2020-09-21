@@ -30,6 +30,7 @@
           :display="subjectUser.card_display"
           :label-id="$id('user-info')"
           no-border
+          no-padding
           read-only
         />
       </div>

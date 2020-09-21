@@ -52,6 +52,7 @@
             v-slot:item="{ item: { card_display } }"
           >
             <MiniProfileCard
+              :no-padding="true"
               :no-border="true"
               :display="card_display"
               :read-only="true"

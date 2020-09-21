@@ -29,7 +29,7 @@
 
       <template v-if="$apollo.loading">
         <DropdownItem :disabled="true">
-          {{ $str('loadinghelp', 'moodle') }}
+          <Loader :loading="true" />
         </DropdownItem>
       </template>
 
@@ -50,12 +50,14 @@ import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import findUsers from 'editor_weka/graphql/find_users_by_pattern';
 import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
+import Loader from 'tui/components/loading/Loader';
 
 export default {
   components: {
     Dropdown,
     DropdownItem,
     MiniProfileCard,
+    Loader,
   },
 
   props: {
@@ -136,9 +138,6 @@ export default {
   {
     "editor_weka": [
       "matching_users"
-    ],
-    "moodle": [
-      "loadinghelp"
     ]
   }
 </lang-strings>

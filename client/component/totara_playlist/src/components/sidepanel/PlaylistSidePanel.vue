@@ -21,6 +21,7 @@
       <MiniProfileCard
         :display="user.card_display"
         :no-border="true"
+        :no-padding="true"
         class="tui-playlistSidePanel__profile"
       >
         <template v-if="canManage" v-slot:drop-down-items>

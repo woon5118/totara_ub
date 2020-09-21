@@ -60,6 +60,7 @@
       <MiniProfileCard
         :display="special"
         :no-border="true"
+        :no-padding="true"
         class="tui-samples-miniProfileCard__card"
       >
         <template v-slot:drop-down-items>
@@ -85,6 +86,7 @@
       <MiniProfileCard
         :display="users[1]"
         :no-border="true"
+        :no-padding="true"
         class="tui-samples-miniProfileCard__card"
       >
         <template v-slot:drop-down-items>
