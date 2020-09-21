@@ -140,7 +140,7 @@ final class resolver extends \totara_tui\local\mediation\resolver {
             $theme = theme_config::load($this->themename);
             $theme->force_svg_use(true);
             $theme->set_rtl_mode($this->option_rtl);
-            if (\core_useragent::is_ie()) {
+            if (\core_useragent::is_ie() || \core_useragent::is_edge()) {
                 $theme->set_legacy_browser(true);
             }
             if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {

@@ -36,7 +36,6 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use coding_exception;
-use core_useragent;
 use totara_core\path;
 use totara_tui\output\framework;
 
@@ -321,7 +320,7 @@ final class bundle {
     private static function get_js_suffix_for_file(): array {
         $suffixes = [];
         $development = self::is_javascript_development();
-        $legacy = core_useragent::is_ie();
+        $legacy = \core_useragent::is_ie();
 
         if ($legacy) {
             if ($development) {
@@ -344,7 +343,7 @@ final class bundle {
      * @return string
      */
     public static function get_css_suffix_for_url(): string {
-        if (\core_useragent::is_ie()) {
+        if (\core_useragent::is_ie() || \core_useragent::is_edge()) {
             if (self::is_css_development()) {
                 return self::$map_file_to_param[self::SUFFIX_DEVELOPMENT_LEGACY];
             }
