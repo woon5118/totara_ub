@@ -508,8 +508,9 @@ if (!empty($searchcriteria)) {
     $sql = "SELECT cc.*, $ctxselect
                 FROM {course_categories} cc
                 JOIN {context} ctx ON cc.id = ctx.instanceid
-                    WHERE cc.parent = :parentid AND
-                          ctx.contextlevel = :contextlevel
+                    WHERE cc.issystem = 0
+                      AND cc.parent = :parentid
+                      AND ctx.contextlevel = :contextlevel
                           $categorywhere
                     ORDER BY cc.sortorder ASC";
     $subcategories = $DB->get_recordset_sql($sql, array('parentid' => $coursecat->id, 'contextlevel' => CONTEXT_COURSECAT));
