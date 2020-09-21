@@ -1638,7 +1638,10 @@ require(['core/autoinitialise'], function(ai) {
         // is forced, usually by moving the mouse over the affected element.
         $code .= html_writer::tag('script', '/** Required in order to fix style inclusion problems in IE with YUI **/', array('id'=>'firstthemesheet', 'type'=>'text/css'));
 
-        $urls = array_values($this->cssthemeurls);
+        $urls = array_merge(
+            array_values($this->cssthemeurls),
+            array_values($this->cssurls)
+        );
         foreach ($this->frameworks as $manager) {
             $manager->inject_css_urls($urls);
         }
