@@ -44,6 +44,15 @@ class core_files_stored_file_testcase extends advanced_testcase {
     }
 
     /**
+     * Do markTestSkipped if the exif extension is not loaded.
+     */
+    private function check_exif_extension() {
+        if (!extension_loaded('exif') || !function_exists('exif_read_data')) {
+            $this->markTestSkipped('The EXIF extension is not available.');
+        }
+    }
+
+    /**
      * @return stored_file[]
      */
     public function upload_files(): array {
@@ -101,6 +110,7 @@ class core_files_stored_file_testcase extends advanced_testcase {
      * @covers ::get_imageinfo
      */
     public function test_get_imageinfo() {
+        $this->check_exif_extension();
         $files = $this->upload_files();
         foreach ($files as $i => $file) {
             $info1 = $file->get_imageinfo();
@@ -131,6 +141,7 @@ class core_files_stored_file_testcase extends advanced_testcase {
      * @covers ::generate_image_thumbnail
      */
     public function test_generate_image_thumbnail() {
+        $this->check_exif_extension();
         $files = $this->upload_files();
         $references = [];
         foreach ($files as $i => $file) {
@@ -167,6 +178,7 @@ class core_files_stored_file_testcase extends advanced_testcase {
      * @covers ::resize_image
      */
     public function test_resize_image() {
+        $this->check_exif_extension();
         $files = $this->upload_files();
         $references = [];
         foreach ($files as $i => $file) {
@@ -203,6 +215,7 @@ class core_files_stored_file_testcase extends advanced_testcase {
      * @covers ::crop_image
      */
     public function test_crop_image() {
+        $this->check_exif_extension();
         $files = $this->upload_files();
         $references = [];
         foreach ($files as $i => $file) {
