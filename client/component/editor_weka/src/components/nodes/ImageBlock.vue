@@ -202,7 +202,6 @@ export default {
       const params = {
         filename: this.filename,
         alttext: newValue,
-        mimeType: this.file.mime_type,
       };
 
       this.context.updateImage(this.getRange, params);

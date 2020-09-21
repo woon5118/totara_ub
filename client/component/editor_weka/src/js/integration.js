@@ -30,6 +30,7 @@ import WekaValue from './WekaValue';
  * @param {boolean} options.showtoolbar
  * @param {number} options.file_item_id   The file draft's item id.
  * @param {number} options.context_id     The context's id.
+ * @param {object[]} options.files        The array of current files within the specific area.
  */
 export function setupTextarea({
   id,
@@ -37,6 +38,7 @@ export function setupTextarea({
   showtoolbar,
   file_item_id,
   context_id,
+  files,
 }) {
   const el = document.getElementById(id);
   if (!el) {
@@ -49,6 +51,7 @@ export function setupTextarea({
     extensions,
     showtoolbar,
     context_id,
+    files,
     file_item_id: file_item_id,
   };
 

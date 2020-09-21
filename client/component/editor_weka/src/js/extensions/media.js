@@ -389,10 +389,10 @@ class MediaExtension extends BaseExtension {
    * @param {Function} getRange
    * @param {String} altText
    * @param {String} filename
-   * @param {String} mimeType
+   *
    * @private
    */
-  _updateImage(getRange, { filename, alttext, mimeType }) {
+  _updateImage(getRange, { filename, alttext }) {
     this.editor.execute((state, dispatch) => {
       const transaction = state.tr,
         range = getRange();
@@ -401,7 +401,6 @@ class MediaExtension extends BaseExtension {
         filename: filename,
         url: this._getFileUrl(filename),
         alttext: alttext,
-        mime_type: mimeType,
       });
 
       dispatch(transaction.replaceWith(range.from, range.to, node));

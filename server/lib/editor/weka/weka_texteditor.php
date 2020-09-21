@@ -281,6 +281,8 @@ final class weka_texteditor extends texteditor {
 
     /**
      * Only returning files - without the directories.
+     * Note that this function will return the actual area files given by $component and $area
+     *
      * @param string $component
      * @param string $area
      * @param int $item_id
@@ -319,6 +321,37 @@ final class weka_texteditor extends texteditor {
     }
 
     /**
+     * Only returning files without the directories.
+     * Note that this function will only return files that had moved to the draft area.
+     *
+     * @param int $draft_item_id
+     * @param int|null $user_id
+     * @return stored_file[]
+     */
+    public function get_draft_files(int $draft_item_id, ?int $user_id = null): array {
+        global $USER, $CFG;
+        if (empty($user_id)) {
+            $user_id = $USER->id;
+        }
+
+        require_once("{$CFG->dirroot}/lib/filelib.php");
+        $fs = get_file_storage();
+
+        // Most of the draft files are stored under the user's context.
+        $user_context = context_user::instance($user_id);
+        $files = $fs->get_area_files(
+            $user_context->id,
+            'user',
+            'draft',
+            $draft_item_id,
+            "itemid, filepath, filename",
+            false
+        );
+
+        return array_values($files);
+    }
+
+    /**
      * @param string     $elementid
      * @param array|null $options
      *
@@ -332,7 +365,8 @@ final class weka_texteditor extends texteditor {
             // Always shows the toolbar.
             'showtoolbar' => true,
             'file_item_id' => $options['item_id'] ?? null,
-            'context_id' => $this->contextid ?? context_system::instance()->id
+            'context_id' => $this->contextid ?? context_system::instance()->id,
+            'files' => []
         ];
 
         $component = $options['component'] ?? 'editor_weka';
@@ -365,6 +399,27 @@ final class weka_texteditor extends texteditor {
                 // editor's extension type in graphql
                 'options' => $json
             ];
+        }
+
+        // Get current files from draft item id.
+        if (isset($params['file_item_id'])) {
+            // Note: if the draft files do not exist - then something went wrong at the start of the page
+            // where developer may have forgotten to move the area files to draft. Or the files never existed at all.
+            $draft_files = $this->get_draft_files($params['file_item_id']);
+            $params['files'] = array_map(
+                function (stored_file $file): array {
+                    return [
+                        'filename' => $file->get_filename(),
+                        'file_size' => $file->get_filesize(),
+                        'url' => moodle_url::make_draftfile_url(
+                            $file->get_itemid(),
+                            $file->get_filepath(),
+                            $file->get_filename()
+                        )->out(false)
+                    ];
+                },
+                $draft_files
+            );
         }
 
         return $params;
