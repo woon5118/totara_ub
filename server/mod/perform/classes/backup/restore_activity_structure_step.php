@@ -500,6 +500,11 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         $data->manual_relation_select_progress_id = $this->get_mappingid('perform_manual_relation_selection_progress', $data->manual_relation_select_progress_id);
         $data->user_id = $this->get_mappingid('user', $data->user_id);
 
+        if ($this->get_setting_value('is_cloning')) {
+            $data->notified_at = null;
+        } else {
+            $data->notified_at = $this->apply_date_offset($data->notified_at);
+        }
         $data->created_at = $this->apply_date_offset($data->created_at);
 
         $new_item_id = $DB->insert_record('perform_manual_relation_selector', $data);

@@ -34,6 +34,7 @@ use core\orm\entity\relations\has_one_through;
  * @property-read int $id record id
  * @property int $manual_relation_select_progress_id associated selection progress
  * @property int $user_id assigned participant.
+ * @property int $notified_at notification time
  * @property int $created_at record creation time
  *
  * @property-read manual_relationship_selection_progress $progress

@@ -47,6 +47,9 @@ class manual_participant_progress {
     /** @var array */
     protected $selectors_to_insert = [];
 
+    /** @var array */
+    protected $subject_instances_to_process = [];
+
     public function generate() {
         $pending_subject_instances = $this->load_pending_subject_instances();
 
@@ -72,7 +75,7 @@ class manual_participant_progress {
         if (!empty($this->selectors_to_insert)) {
             builder::get_db()->insert_records_via_batch(manual_relationship_selector::TABLE, $this->selectors_to_insert);
             // Send notifications.
-            $dealer = factory::create_dealer_on_subject_instances_for_manual_participants($pending_subject_instances->all());
+            $dealer = factory::create_dealer_on_subject_instances_for_manual_participants($this->subject_instances_to_process);
             $dealer->dispatch('participant_selection');
         }
     }
@@ -156,7 +159,7 @@ class manual_participant_progress {
             );
 
             $expected_user_ids = array_map(
-                function($user_dto) {
+                function ($user_dto) {
                     return $user_dto->get_user_id();
                 },
                 $expected_users[$selector_relationship_id]
@@ -167,13 +170,17 @@ class manual_participant_progress {
 
             // Work out who to add
             $user_ids_to_add = array_diff($expected_user_ids, $current_user_ids);
-            foreach ($user_ids_to_add as $user_id) {
-                $selector = new stdClass();
-                $selector->manual_relation_select_progress_id = $progress->id;
-                $selector->user_id = $user_id;
-                $selector->created_at = $now;
+            if (!empty($user_ids_to_add)) {
+                $this->subject_instances_to_process[$subject_instance->id] = $subject_instance;
 
-                $this->selectors_to_insert[] = $selector;
+                foreach ($user_ids_to_add as $user_id) {
+                    $selector = new stdClass();
+                    $selector->manual_relation_select_progress_id = $progress->id;
+                    $selector->user_id = $user_id;
+                    $selector->created_at = $now;
+
+                    $this->selectors_to_insert[] = $selector;
+                }
             }
         }
     }
@@ -258,6 +265,8 @@ class manual_participant_progress {
 
                 $this->selectors_to_insert[] = $selector;
             }
+
+            $this->subject_instances_to_process[$subject_instance->id] = $subject_instance;
         }
     }
 

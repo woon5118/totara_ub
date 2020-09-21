@@ -39,5 +39,21 @@ function xmldb_perform_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 2020090103) {
+
+        // Define field notified_at to be added to perform_manual_relation_selector.
+        $table = new xmldb_table('perform_manual_relation_selector');
+        $field = new xmldb_field('notified_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'user_id');
+
+        // Conditionally launch add field notified_at.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020090103, 'perform');
+    }
+
+
     return true;
 }

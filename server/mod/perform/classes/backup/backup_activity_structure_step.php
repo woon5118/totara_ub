@@ -307,6 +307,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             [
                 'manual_relation_select_progress_id',
                 'user_id',
+                'notified_at',
                 'created_at'
             ]
         );

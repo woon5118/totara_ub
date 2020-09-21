@@ -29,6 +29,8 @@ use mod_perform\entities\activity\manual_relationship_selector;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\expand_task;
+use mod_perform\models\activity\notification;
+use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\track;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
@@ -96,6 +98,11 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
     public function test_generate_without_multiple_jobs() {
         $data = $this->create_data();
 
+        $notification = notification::create($data->activity1, 'participant_selection', true);
+        $this->toggle_recipients($notification, [
+            constants::RELATIONSHIP_MANAGER => true,
+        ]);
+
         /** @var subject_instance $subject_instance1 */
         $subject_instance1 = subject_instance::repository()
             ->where('subject_user_id', $data->user1->id)
@@ -105,6 +112,8 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
         $subject_instance2 = subject_instance::repository()
             ->where('subject_user_id', $data->user2->id)
             ->one();
+
+        $sink = $this->redirectMessages();
 
         $progress_service = new manual_participant_progress();
         $progress_service->generate();
@@ -122,6 +131,24 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
         ];
 
         $this->assert_selectors_are_present($expected);
+
+        // Now check that all three users got notified
+        $messages = $sink->get_messages();
+
+        $this->assertCount(3, $messages);
+        $this->assertEqualsCanonicalizing(
+            [
+                $data->manager1->id,
+                $data->manager2->id,
+                $data->manager3->id,
+            ],
+            array_column($messages, 'useridto')
+        );
+
+        $sink->clear();
+
+        // Now all selectors should be marked as notified
+        $this->assertEquals(3, manual_relationship_selector::repository()->where('notified_at', '>', 0)->count());
 
         // Now the manager changes, make sure the syncing works
         $new_manager = $this->getDataGenerator()->create_user();
@@ -147,6 +174,17 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
         ];
 
         $this->assert_selectors_are_present($expected);
+
+        // Now check that only the newly added one got notified
+        $messages = $sink->get_messages();
+
+        $this->assertCount(1, $messages);
+        $this->assertEqualsCanonicalizing([$new_manager->id], array_column($messages, 'useridto'));
+
+        $sink->clear();
+
+        // Now all selectors should be marked as notified
+        $this->assertEquals(4, manual_relationship_selector::repository()->where('notified_at', '>', 0)->count());
 
         // Now change the selector_relationship and check whether the sync picks it up.
         // This won't happen as we do not allow changing the data on active activities
@@ -385,6 +423,27 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
 
         // All expected ones should be tackled
         $this->assertEmpty($expected, 'Discrepancy found: Selectors found which should not be there');
+    }
+
+    /**
+     * Activate/deactivate the recipients.
+     *
+     * @param notification $notification
+     * @param boolean[] $relationships array of [idnumber => active]
+     */
+    protected function toggle_recipients(notification $notification, array $relationships): void {
+        $recipients = $notification->get_recipients();
+        foreach ($relationships as $idnumber => $active) {
+            $relationship = $this->generator()->get_core_relationship($idnumber);
+            $rel_id = $relationship->id;
+            $recipient = $recipients->find('relationship_id', $rel_id);
+            /** @var notification_recipient $recipient */
+            if ($recipient->get_recipient_id()) {
+                $recipient->activate($active);
+            } else {
+                notification_recipient::create($notification, $relationship, $active);
+            }
+        }
     }
 
 }
