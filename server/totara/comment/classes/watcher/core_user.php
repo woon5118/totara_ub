@@ -49,6 +49,12 @@ final class core_user {
             return;
         }
 
+        $course = $hook->get_course();
+        if ($course) {
+            // Course does exist in the context - hence those course related component should handle it.
+            return;
+        }
+
         // Comments could be made in any type of context, so we don't examine the hook course property.
 
         // We allow users to see some hard-coded user properties of other users. The comment could appear in

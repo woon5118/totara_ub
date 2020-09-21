@@ -60,6 +60,12 @@ final class core_user {
             }
         }
 
+        $course = $hook->get_course();
+        if ($course) {
+            // Nope, we are within course context - need to stay away from it.
+            return;
+        }
+
         // Finally, check if any of the engage features have been turned on.
         if (engage_core::allow_view_user_profile()) {
             $hook->give_permission();
