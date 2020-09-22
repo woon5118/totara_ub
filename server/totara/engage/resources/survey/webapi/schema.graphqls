@@ -94,16 +94,6 @@ extend type Query {
   engage_survey_instance(resourceid: param_integer!): engage_survey_survey!
 
   """
-  A query for getting the question instance from an id.
-  """
-  engage_survey_questions(
-    """
-    Survey's id
-    """
-    resourceid: param_integer!
-  ): [engage_survey_question!]!
-
-  """
   A query for returning the vote result of a surve. Collection of question's result
   """
   engage_survey_vote_result(
