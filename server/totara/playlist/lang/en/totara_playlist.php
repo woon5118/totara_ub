@@ -75,6 +75,7 @@ $string['error:access'] = "Cannot access to the playlist";
 $string['error:addresource'] = "Cannot add a resource to the playlist";
 $string['error:create'] = 'Cannot create playlist';
 $string['error:update'] = "Cannot update the playlist";
+$string['error:permissiondenied'] = 'Permission denied';
 $string['error:sharecapability'] = 'You do not have the required capabilities to share this playlist.';
 $string['error:shareprivate'] = 'Playlist is viewable by only you. Change who can view this playlist in order to share it.';
 $string['error:sharerestricted'] = 'Playlist is not viewable by everyone and only the owner is allowed to share it.';

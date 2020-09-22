@@ -28,8 +28,10 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use totara_engage\access\access_manager;
 use totara_engage\card\card;
 use totara_engage\query\query;
+use totara_playlist\playlist;
 use totara_playlist\totara_engage\card\loader;
 
 final class cards implements query_resolver, has_middleware {
@@ -43,6 +45,44 @@ final class cards implements query_resolver, has_middleware {
         global $USER;
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
+
+        // Do not expose internal exception out.
+        try {
+            $playlist = playlist::from_id($args['id']);
+        } catch (\dml_exception $ex) {
+            throw new \moodle_exception('error:permissiondenied', 'totara_playlist', '', null, $ex->getMessage());
+        }
+
+        if (!access_manager::can_access($playlist, $USER->id)) {
+            throw new \moodle_exception('error:permissiondenied', 'totara_playlist', '', null, 'Cannot access item ' . $playlist->get_id());
+        }
+
+        if (isset($args['footnotes'])) {
+            $footnotes = $args['footnotes'];
+            if (isset($footnotes['item_id'])) {
+                if ($footnotes['item_id'] != $playlist->get_id()) {
+                    throw new \coding_exception("Footnotes are not from playlist with {$footnotes['item_id']}");
+                }
+            }
+
+            if (isset($footnotes['type'])) {
+                if ($footnotes['type'] != 'playlist') {
+                    throw new \coding_exception("Footnotes type is invalid");
+                }
+            }
+
+            if (isset($footnotes['area'])) {
+                if ($footnotes['area'] != 'playlist') {
+                    throw new \coding_exception("Footnotes area is invalid");
+                }
+            }
+
+            if (isset($footnotes['component'])) {
+                if ($footnotes['component'] != 'totara_playlist') {
+                    throw new \coding_exception("Footnotes component is invalid");
+                }
+            }
         }
 
         $query = new query();
