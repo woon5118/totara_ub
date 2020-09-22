@@ -181,23 +181,13 @@ class api {
         $usercontext = \context_user::instance($userid);
         $tenantjoin = "";
         $tenantvisible = "";
-        if ($CFG->tenantsenabled and $CFG->tenantsisolated) {
+        if ($CFG->tenantsenabled) {
             if ($usercontext->tenantid) {
                 $tenant = \core\record\tenant::fetch($usercontext->tenantid);
                 $tenantjoin = 'JOIN "ttr_cohort_members" tcm ON tcm.userid = u.id AND tcm.cohortid = ' . $tenant->cohortid;
             } else {
-                $sql = 'SELECT t.cohortid
-                          FROM "ttr_tenant" t
-                          JOIN "ttr_cohort_members" tm ON tm.cohortid = t.cohortid
-                         WHERE tm.userid = :userid';
-                $myparticipations = $DB->get_fieldset_sql($sql, ['userid' => $userid]);
-                if (!$myparticipations) {
+                if (!empty($CFG->tenantsisolated)) {
                     $tenantvisible = 'AND u.tenantid IS NULL';
-                } else {
-                    $cohortids = implode(',', $myparticipations);
-                    $tenantvisible = 'AND (u.tenantid IS NULL OR (
-                        EXISTS (SELECT 1 FROM "ttr_cohort_members" tcm WHERE tcm.userid = u.id AND tcm.cohortid IN (' . $cohortids. '))
-                    ))';
                 }
             }
         }

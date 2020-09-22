@@ -23,8 +23,10 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\orm\query\builder;
 use core_user\access_controller;
 use totara_core\advanced_feature;
+use totara_tenant\local\util;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -283,6 +285,120 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         // Check that we retrieved the correct non-contacts.
         $this->assertEquals(1, count($noncontacts));
         $this->assertEquals($user5->id, $noncontacts[0]->userid);
+    }
+
+    public function test_search_users_with_multi_tenancy() {
+        $generator = $this->getDataGenerator();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        $tenant_category1 = builder::table('course_categories')->find_or_fail($tenant1->categoryid);
+        $tenant_category2 = builder::table('course_categories')->find_or_fail($tenant2->categoryid);
+
+        $sytemusers1 = $generator->create_user();
+        $sytemusers2 = $generator->create_user();
+
+        // Make this user a participant
+        util::add_other_participant($tenant1->id, $sytemusers2->id);
+
+        $user11 = $generator->create_user(['tenantid' => $tenant1->id]);
+        $user12 = $generator->create_user(['tenantid' => $tenant1->id]);
+        $user13 = $generator->create_user(['tenantid' => $tenant1->id]);
+        $user14 = $generator->create_user(['tenantid' => $tenant1->id]);
+
+        $user21 = $generator->create_user(['tenantid' => $tenant2->id]);
+        $user22 = $generator->create_user(['tenantid' => $tenant2->id]);
+        $user23 = $generator->create_user(['tenantid' => $tenant2->id]);
+
+        $course11 = $generator->create_course(['category' => $tenant_category1->id]);
+        $course12 = $generator->create_course(['category' => $tenant_category1->id]);
+        $course13 = $generator->create_course(['category' => $tenant_category1->id]);
+
+        $course21 = $generator->create_course(['category' => $tenant_category2->id]);
+        $course22 = $generator->create_course(['category' => $tenant_category2->id]);
+        $course23 = $generator->create_course(['category' => $tenant_category2->id]);
+
+        // Add some users as contacts.
+        message_add_contact($user12->id, 0, $user11->id);
+        message_add_contact($user13->id, 0, $user11->id);
+        // Now this is a special case where a user from another tenant is a contact.
+        // This is an edge case which could occur when a user got moved from one tenant to another.
+        // At the moment we would still exclude the user.
+        message_add_contact($user22->id, 0, $user11->id);
+
+        $role = builder::table('role')->where('shortname', 'student')->one();
+        $generator->enrol_user($user11->id, $course11->id, $role->id);
+        $generator->enrol_user($user11->id, $course12->id, $role->id);
+        $generator->enrol_user($user11->id, $course13->id, $role->id);
+        // Now this is a special case where a user is enrolled in a course from another tenant.
+        // This is an edge case which could occur when a user got moved from one tenant to another.
+        // At the moment we would still exclude the course.
+        $generator->enrol_user($user11->id, $course21->id, $role->id);
+
+        // Set as the user performing the search.
+        $this->setUser($user11);
+
+        // Perform a search.
+        [$contacts, $courses, $noncontacts] = \core_message\api::search_users($user11->id, '');
+
+        $this->assertCount(2, $contacts);
+        $this->assertEqualsCanonicalizing([$user12->id, $user13->id], array_column($contacts, 'userid'));
+
+        $this->assertCount(2, $noncontacts);
+        $this->assertEqualsCanonicalizing([$user14->id, $sytemusers2->id], array_column($noncontacts, 'userid'));
+
+        $this->assertCount(3, $courses);
+        $this->assertEqualsCanonicalizing([$course11->id, $course12->id, $course13->id], array_column($courses, 'id'));
+
+        // Set as the user performing the search.
+        $this->setUser($sytemusers1);
+
+        // Perform a search.
+        [$contacts, $courses, $noncontacts] = \core_message\api::search_users($sytemusers1->id, '');
+
+        // This user has no contacts or is enrolled in any courses
+        $this->assertCount(0, $contacts);
+        $this->assertCount(0, $courses);
+
+        $this->assertCount(9, $noncontacts);
+        $this->assertEqualsCanonicalizing(
+            [
+                get_admin()->id,
+                $sytemusers2->id,
+                $user11->id,
+                $user12->id,
+                $user13->id,
+                $user14->id,
+                $user21->id,
+                $user22->id,
+                $user23->id,
+            ],
+            array_column($noncontacts, 'userid')
+        );
+
+        // Now with isolation on
+        set_config('tenantsisolated', 1);
+
+        // Perform a search.
+        [$contacts, $courses, $noncontacts] = \core_message\api::search_users($sytemusers1->id, '');
+
+        // This user has no contacts or is enrolled in any courses
+        $this->assertCount(0, $contacts);
+        $this->assertCount(0, $courses);
+
+        $this->assertCount(2, $noncontacts);
+        $this->assertEqualsCanonicalizing(
+            [
+                get_admin()->id,
+                $sytemusers2->id,
+            ],
+            array_column($noncontacts, 'userid')
+        );
     }
 
     /**
