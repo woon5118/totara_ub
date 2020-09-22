@@ -33,6 +33,7 @@ use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
 use container_workspace\workspace;
+use container_workspace\interactor\workspace\interactor as workspace_interactor;
 
 /**
  * Query to fetch the cursor for discussion
@@ -54,6 +55,11 @@ final class discussion_cursor implements query_resolver, has_middleware {
 
         if (!$workspace->is_typeof(workspace::get_type())) {
             throw new \coding_exception("Cannot count the discussions from a container that is not a workspace");
+        }
+
+        $workspace_interactor = new workspace_interactor($workspace);
+        if (!$workspace_interactor->can_view_discussions()) {
+            throw new \coding_exception("Cannot get the discussion's cursor");
         }
 
         $query = new query($workspace->get_id());
