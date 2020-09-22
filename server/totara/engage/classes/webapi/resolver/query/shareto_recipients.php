@@ -97,12 +97,12 @@ final class shareto_recipients implements query_resolver, has_middleware {
                     $recipient_area = $recipient->get_area();
                     $recipient_component = $recipient->get_component();
 
-                    $isrecipient = false;
+                    $is_recipient = false;
                     foreach ($already_recipients as $already_recipient) {
                         if ($already_recipient->instanceid == $recipient_id
                             && $already_recipient->area === $recipient_area
                             && $already_recipient->component === $recipient_component) {
-                            $isrecipient = true;
+                            $is_recipient = true;
                             break;
                         }
                     }
@@ -112,7 +112,7 @@ final class shareto_recipients implements query_resolver, has_middleware {
                         'component' => $recipient_component,
                         'area' => $recipient_area,
                         'instanceid' => $recipient_id,
-                        'alreadyshared' => $isrecipient,
+                        'alreadyshared' => $is_recipient,
                         'summary' => $recipient->get_summary(),
                         'minimum_access' => access::get_code($recipient->get_minimum_access()),
                         $area => $recipient->get_data()

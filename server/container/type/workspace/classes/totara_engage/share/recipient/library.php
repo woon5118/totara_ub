@@ -133,31 +133,24 @@ class library extends recipient {
      * @inheritDoc
      */
     public static function search(string $search, ?shareable $instance): array {
-        global $DB, $USER;
+        global $USER;
 
         // If workspaces are disabled, search will always return nothing
         if (advanced_feature::is_disabled('container_workspace')) {
             return [];
         }
 
-        $uniqueparam = $DB->get_unique_param();
-
-        // Find all workspaces that this user has joined or any public workspaces.
+        // Find all workspaces that this user has joined
         $builder = builder::table('course', 'c')
+            ->select('id')
             ->left_join(['enrol', 'e'], 'e.courseid', 'c.id')
             ->left_join(['user_enrolments', 'ue'], 'ue.enrolid', 'e.id')
             ->left_join(['user', 'u'], 'u.id', 'ue.userid')
             ->where('c.category', workspace::get_default_category_id())
             ->where('c.containertype', workspace::get_type())
-            ->where(function(builder $builder) use($USER) {
-                // TODO: using visible flag for now until proper workspace access is implemented
-                $builder->where('ue.userid', $USER->id)
-                    ->or_where('c.visible', 1);
-            })
-            ->where_raw(
-                $DB->sql_like('c.fullname', ":{$uniqueparam}", false),
-                [$uniqueparam => "%{$search}%"]
-            );
+            ->where('ue.userid', $USER->id)
+            ->where('c.fullname', 'ilike', $search)
+            ->limit(20);
 
         $records = $builder->fetch();
         $recipients = [];
