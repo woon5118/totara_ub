@@ -24,10 +24,14 @@
 
 namespace core\entities;
 
+use context;
+use core\orm\collection;
 use core\orm\entity\filter\basket;
 use core\orm\entity\filter\in;
 use core\orm\entity\filter\user_name;
 use core\orm\entity\repository;
+use core\orm\query\field;
+use core\tenant_orm_helper;
 use core_user\profile\display_setting;
 use user_picture;
 
@@ -42,6 +46,17 @@ class user_repository extends repository {
             'text' => new user_name(),
             'ids' => new in('id')
         ];
+    }
+
+    /**
+     * Filter only users who are confirmed
+     *
+     * @return $this
+     */
+    public function filter_by_confirmed(): self {
+        $this->where('confirmed', 1);
+
+        return $this;
     }
 
     /**
@@ -194,6 +209,44 @@ class user_repository extends repository {
      */
     private function get_user_full_name_fields(): array {
         return totara_get_all_user_name_fields(false, $this->get_alias_sql(), null, null, true);
+    }
+
+    /**
+     * Search for a user by search pattern
+     *
+     * @param context $context pass the context the search should be in relation to, usually the user context of current user
+     * @param string $search_string a string to search for, currently this supports searching the fullname only
+     * @param int $limit an optional limit
+     * @param bool $include_guest optionally include the guest users, false by default
+     * @return collection
+     */
+    public static function search(
+        context $context,
+        string $search_string = '',
+        int $limit = 0,
+        bool $include_guest = false
+    ): collection {
+        return user::repository()
+            ->when(true, function (self $repository) use ($context) {
+                tenant_orm_helper::restrict_users(
+                    $repository,
+                    new field('id', $repository->get_builder()),
+                    $context
+                );
+            })
+            ->filter_by_not_deleted()
+            ->filter_by_confirmed()
+            ->when(!$include_guest, function (self $repository) use ($context) {
+                $repository->filter_by_not_guest();
+            })
+            ->when(strlen($search_string) > 0, function (self $repository) use ($search_string) {
+                $repository->filter_by_full_name($search_string);
+            })
+            ->order_by_full_name()
+            ->when($limit > 0, function (repository $repository) use ($limit) {
+                $repository->limit($limit);
+            })
+            ->get();
     }
 
 }

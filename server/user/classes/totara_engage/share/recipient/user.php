@@ -23,6 +23,8 @@
 
 namespace core_user\totara_engage\share\recipient;
 
+use context_user;
+use core\entities\user_repository;
 use core_user\access_controller;
 use totara_engage\access\access;
 use totara_engage\entity\share as share_entity;
@@ -89,19 +91,20 @@ class user extends recipient {
      */
     public static function search(string $search, ?shareable $instance): array {
         global $USER;
-        [$contacts, $courses, $noncontacts] = \core_message\api::search_users($USER->id, $search, 20);
-        $users = array_merge($contacts, $noncontacts);
+
+        $context = context_user::instance($USER->id);
+        $user_ids = user_repository::search($context, $search, 20)->pluck('id');
 
         $recipients = [];
-        foreach ($users as $user) {
+        foreach ($user_ids as $user_id) {
             // Exclude the shareable item owner.
             if (!empty($instance)) {
-                if ((int)$user->userid === $instance->get_userid()) {
+                if ((int)$user_id === $instance->get_userid()) {
                     continue;
                 }
             }
 
-            $recipients[] = new self($user->userid);
+            $recipients[] = new self($user_id);
         }
 
         return $recipients;

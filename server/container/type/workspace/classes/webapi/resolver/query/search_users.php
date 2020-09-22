@@ -20,17 +20,21 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package container_workspace
  */
+
 namespace container_workspace\webapi\resolver\query;
 
+use container_workspace\interactor\workspace\interactor;
+use container_workspace\workspace;
+use context_user;
+use core\entities\user;
+use core\entities\user_repository;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
-use container_workspace\workspace;
-use core_message\api;
-use container_workspace\interactor\workspace\interactor;
+use moodle_exception;
 
 /**
  * Class search_users
@@ -51,73 +55,44 @@ final class search_users implements query_resolver, has_middleware {
         $workspace = factory::from_id($workspace_id);
 
         if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Cannot find workspace by id '{$workspace_id}'");
+            throw new moodle_exception('invalid_access', 'container_workspace');
         }
 
-        if ($workspace->is_private()) {
-            // Workspace is a private one, hence we will have to check if the actor is a member of this workspace.
-            $actor_interactor = new interactor($workspace, $USER->id);
-            if (!$actor_interactor->is_joined()) {
-                throw new \coding_exception("Actor is not a member of the workspace");
-            }
+        $actor_interactor = new interactor($workspace, $USER->id);
+        if (!$actor_interactor->can_manage()) {
+            throw new moodle_exception('invalid_access', 'container_workspace');
         }
 
+        $context = $workspace->get_context();
         if (!$ec->has_relevant_context()) {
-            $context = $workspace->get_context();
             $ec->set_relevant_context($context);
         }
 
         $pattern = $args['pattern'] ?? '';
 
-        [$contacts, $courses, $non_contacts] = api::search_users($USER->id, $pattern, 20);
-        $user_contacts = array_merge($contacts, $non_contacts);
-
-        $user_name_fields = get_all_user_name_fields();
-
-        // Reset on keys.
-        $user_name_fields = array_values($user_name_fields);
-
-        // Adding more additional fields in order to make resolver work.
-        $user_name_fields[] = 'picture';
-        $user_name_fields[] = 'imagealt';
-        $user_name_fields[] = 'email';
-
-        $user_name_fields = implode(", ", $user_name_fields);
+        $users = user_repository::search($context, $pattern, 20);
 
         $result_records = [];
         $current_owner_id = $workspace->get_user_id();
 
-        foreach ($user_contacts as $user_contact) {
-            if ($user_contact->userid == $current_owner_id) {
+        foreach ($users as $user) {
+            if ($user->id == $current_owner_id) {
                 // We will skip the current owner for now.
                 continue;
             }
 
-            // The contact record does not have the information we need.
-            $user_record = clone $user_contact;
-            $user_record->id = $user_contact->userid;
-
-            $field_record = \core_user::get_user($user_record->id, $user_name_fields, MUST_EXIST);
-            $field_attributes = get_object_vars($field_record);
-
-            foreach ($field_attributes as $field_attribute => $value) {
-                $user_record->{$field_attribute} = $value;
-            }
-
-            $result_records[] = $user_record;
+            $result_records[$user->id] = $user;
         }
 
-        if (empty($pattern) && $current_owner_id != $USER->id) {
+        if (empty($pattern) && $current_owner_id != $USER->id && !isset($result_records[$user->id])) {
             // Actor is not an owner and we are not looking for specific users.
             // Hence add the current user as an option. This is happening because
             // we want to make this actor's record available for the list of options.
-            $actor = \core_user::get_user($USER->id, $user_name_fields, MUST_EXIST);
-            $actor->id = $USER->id;
-
-            $result_records = array_merge([$actor], $result_records);
+            $actor = user::repository()->find_or_fail($USER->id);
+            array_unshift($result_records, $actor);
         }
 
-        return $result_records;
+        return array_values($result_records);
     }
 
     /**
