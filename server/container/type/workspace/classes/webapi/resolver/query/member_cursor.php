@@ -25,6 +25,7 @@ namespace container_workspace\webapi\resolver\query;
 use container_workspace\loader\member\loader;
 use container_workspace\member\status;
 use container_workspace\query\member\query;
+use container_workspace\webapi\middleware\require_workspace_members_access;
 use core\pagination\offset_cursor;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
@@ -33,7 +34,6 @@ use core\webapi\query_resolver;
 use core\orm\pagination\offset_cursor_paginator;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
-use container_workspace\workspace;
 
 /**
  * Query resolver to fetch the next cursor for list of members.
@@ -48,17 +48,11 @@ final class member_cursor implements query_resolver, has_middleware {
     public static function resolve(array $args, execution_context $ec): offset_cursor_paginator {
         $workspace_id = $args['workspace_id'];
 
-        /** @var workspace $workspace */
-        $workspace = factory::from_id($workspace_id);
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Cannot find the workspace from id '{$workspace_id}'");
-        }
-
         if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context($workspace->get_context());
+            $ec->set_relevant_context(factory::from_id($workspace_id)->get_context());
         }
 
-        $query = new query($workspace->get_id());
+        $query = new query($workspace_id);
 
         if (isset($args['cursor'])) {
             $cursor = offset_cursor::decode($args['cursor']);
@@ -84,6 +78,7 @@ final class member_cursor implements query_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('container_workspace'),
+            new require_workspace_members_access('workspace_id'),
         ];
     }
 

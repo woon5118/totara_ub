@@ -26,6 +26,7 @@ use container_workspace\member\member;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use container_workspace\query\member\sort as member_sort;
 use core_user\profile\display_setting;
+use container_workspace\exception\workspace_exception;
 use container_workspace\loader\member\loader as member_loader;
 
 class container_workspace_webapi_member_loader_testcase extends advanced_testcase {
@@ -125,8 +126,8 @@ class container_workspace_webapi_member_loader_testcase extends advanced_testcas
         $user_one = $generator->create_user();
         $this->setUser($user_one);
 
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage("Cannot get the list of members");
+        $this->expectException(workspace_exception::class);
+        $this->expectExceptionMessage("You don't have permission to view this page.");
 
         $this->resolve_graphql_query(
             'container_workspace_members',
@@ -158,8 +159,8 @@ class container_workspace_webapi_member_loader_testcase extends advanced_testcas
         $user_one = $generator->create_user();
         $this->setUser($user_one);
 
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage("Cannot get the list of members");
+        $this->expectException(workspace_exception::class);
+        $this->expectExceptionMessage("You don't have permission to view this page.");
 
         $this->resolve_graphql_query(
             'container_workspace_members',

@@ -24,6 +24,7 @@ namespace container_workspace\webapi\resolver\query;
 
 use container_workspace\loader\member\non_member_loader;
 use container_workspace\query\member\non_member_query;
+use container_workspace\webapi\middleware\require_workspace_members_access;
 use core\pagination\offset_cursor;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
@@ -31,7 +32,6 @@ use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
-use container_workspace\workspace;
 
 /**
  * Query resolver to fetch all the users that are not yet member of the target workspace.
@@ -43,19 +43,13 @@ final class non_member_users implements query_resolver, has_middleware {
      * @return \stdClass[]
      */
     public static function resolve(array $args, execution_context $ec): array {
-        /** @var workspace $workspace */
-        $workspace = factory::from_id($args['workspace_id']);
-
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Cannot find workspace by id '{$args['workspace_id']}'");
-        }
+        $workspace_id = $args['workspace_id'];
 
         if (!$ec->has_relevant_context()) {
-            $context = $workspace->get_context();
-            $ec->set_relevant_context($context);
+            $ec->set_relevant_context(factory::from_id($workspace_id)->get_context());
         }
 
-        $query = new non_member_query($workspace->get_id());
+        $query = new non_member_query($workspace_id);
         if (isset($args['search_term'])) {
             $query->set_search_term($args['search_term']);
         }
@@ -75,7 +69,8 @@ final class non_member_users implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
-            new require_advanced_feature('container_workspace')
+            new require_advanced_feature('container_workspace'),
+            new require_workspace_members_access('workspace_id'),
         ];
     }
 }

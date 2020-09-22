@@ -24,6 +24,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use container_workspace\member\member;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+use container_workspace\exception\workspace_exception;
 use container_workspace\query\member\sort as member_sort;
 
 class container_workspace_webapi_members_multi_tenancy_testcase extends advanced_testcase {
@@ -66,8 +67,8 @@ class container_workspace_webapi_members_multi_tenancy_testcase extends advanced
         // Log in as user two and check if user two is able to fetch the list of members.
         $this->setUser($user_two);
 
-        self::expectException(coding_exception::class);
-        self::expectExceptionMessage("Cannot get the list of members");
+        $this->expectException(workspace_exception::class);
+        $this->expectExceptionMessage("You don't have permission to view this page.");
 
         $this->resolve_graphql_query(
             'container_workspace_members',
@@ -161,8 +162,8 @@ class container_workspace_webapi_members_multi_tenancy_testcase extends advanced
         // Log in as user two and check if user two is able to fetch the list of members.
         $this->setUser($user_two);
 
-        self::expectException(coding_exception::class);
-        self::expectExceptionMessage("Cannot get the list of members");
+        $this->expectException(workspace_exception::class);
+        $this->expectExceptionMessage("You don't have permission to view this page.");
 
         $this->resolve_graphql_query(
             'container_workspace_members',
