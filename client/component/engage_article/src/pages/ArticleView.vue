@@ -130,6 +130,23 @@ export default {
           component: 'engage_article',
           bookmarked: this.bookmarked,
         },
+        update: proxy => {
+          let { article } = proxy.readQuery({
+            query: getArticle,
+            variables: {
+              id: this.resourceId,
+            },
+          });
+
+          article = Object.assign({}, article);
+          article.bookmarked = this.bookmarked;
+
+          proxy.writeQuery({
+            query: getArticle,
+            variables: { id: this.resourceId },
+            data: { article: article },
+          });
+        },
       });
     },
   },
