@@ -2,6 +2,7 @@
 Feature: Manage Competency achievement paths
 
   Background:
+    Given I skip the scenario until issue "TL-26571" lands
     Given I am on a totara site
     And a competency scale called "ggb" exists with the following values:
       | name    | description          | idnumber       | proficient | default | sortorder |

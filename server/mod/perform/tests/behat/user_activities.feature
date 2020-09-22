@@ -84,7 +84,7 @@ Feature: Viewing and responding to perform activities
       | Activity title                | Type      | User     | Relationship to user | Overall progress | Your progress   |
       | single user manager-appraiser | Appraisal | John One | Manager, Appraiser   | Not yet started  | Not yet started |
 
-    When I click on "single user manager-appraiser" "button"
+    When I click on "single user manager-appraiser" "button_exact"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
     And the "Manager (Not yet started)" radio button is selected
     And the "Appraiser (Not yet started)" radio button is not selected
@@ -101,7 +101,7 @@ Feature: Viewing and responding to perform activities
     Then I should see "Performance activities"
     And I should see "Section submitted." in the tui success notification toast
 
-    When I click on "single user manager-appraiser" "button"
+    When I click on "single user manager-appraiser" "button_exact"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
     And the "Manager (Complete)" radio button is selected
     And the "Appraiser (Not yet started)" radio button is not selected
@@ -119,7 +119,7 @@ Feature: Viewing and responding to perform activities
     Then I should see "Performance activities"
     And I should see "Section submitted." in the tui success notification toast
 
-    When I click on "single user manager-appraiser" "button"
+    When I click on "single user manager-appraiser" "button_exact"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
     And the "Manager (Complete)" radio button is selected
     And the "Appraiser (Complete)" radio button is not selected

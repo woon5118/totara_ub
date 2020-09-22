@@ -148,7 +148,7 @@ Feature: Viewing user activities list with view-only access
       | Relationship to user | User     | Section progress |
       | Subject              | John One | Not yet started  |
       | Manager              | You      | Not yet started  |
-    When I click on "Single section activity" "link_or_button"
+    When I click on "Single section activity" "link_or_button_exact"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
     And I should see "Manager (Not yet started)"
     And I should see "Appraiser (View only)"

@@ -106,7 +106,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
       | Subject              | You            | Not yet started  |
       | Manager              | David Two      | Not yet started  |
       | Manager              | combined Three | Not yet started  |
-    When I click on "Single section Activity" "link_or_button"
+    When I click on "Single section Activity" "link_or_button_exact"
     Then I should see "Single section Activity" in the ".tui-participantContent__header" "css_element"
     And I should see "Question 4"
     And I should see perform activity relationship to user "yourself"
@@ -122,7 +122,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
       | Subject              | You            | In progress      |
       | Manager              | David Two      | Not yet started  |
       | Manager              | combined Three | Not yet started  |
-    When I click on "Single section Activity" "link_or_button"
+    When I click on "Single section Activity" "link_or_button_exact"
     Then I should see "Single section Activity" in the ".tui-participantContent__header" "css_element"
     And I should see "Question 4"
     And I should see perform activity relationship to user "yourself"
@@ -417,7 +417,7 @@ Feature: Viewing the section list in the user activities view and navigating to 
     And I should see the subject instance should be completed before "##+ 1 day##j F Y, g:##" in the ".tui-performUserActivityDateSummary" "css_element"
 
     # Complete Single section activity
-    And I click on "Single section Activity" "link_or_button"
+    And I click on "Single section Activity" "link_or_button_exact"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast

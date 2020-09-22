@@ -207,7 +207,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     # Appraiser was the last person that needed to make a selection, so participant instances should exist now
     When I click on "Activities about others" "link"
     And I should not see "No items to display"
-    When I click on "Act1" "button"
+    When I click on "Act1" "button_exact"
     Then I should see "Select relationship to continue"
     And I should see "Appraiser (Not yet started)"
     And I should see "Peer (Not yet started)"
@@ -218,7 +218,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     Then I should see perform activity relationship to user "Appraiser"
     When I press the "back" button in the browser
     And I click on "Activities about others" "link"
-    And I click on "Act1" "button"
+    And I click on "Act1" "button_exact"
     And I click on the "Peer (Not yet started)" tui radio
     And I click on "Continue" "button"
     Then I should see perform activity relationship to user "Peer"
@@ -246,7 +246,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     And I should not see "No items to display"
-    When I click on "Act1" "button"
+    When I click on "Act1" "button_exact"
     Then I should see "Select relationship to continue"
     And I should see "Manager (Not yet started)"
     And I should see "Reviewer (Not yet started)"
@@ -257,7 +257,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     Then I should see perform activity relationship to user "Manager"
     When I press the "back" button in the browser
     And I click on "Activities about others" "link"
-    And I click on "Act1" "button"
+    And I click on "Act1" "button_exact"
     And I click on the "Reviewer (Not yet started)" tui radio
     And I click on "Continue" "button"
     Then I should see perform activity relationship to user "Reviewer"
@@ -290,14 +290,14 @@ Feature: Allow users to select manual (internal and external) participants for a
     When I log in as "manager"
     And I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
-    And I click on "Act1" "button"
+    And I click on "Act1" "button_exact"
     Then the "Manager (In progress)" radio button is selected
     When I click on "Continue" "button"
     Then I should see that show others responses is toggled "off"
     And I answer "short text" question "Question 1" with "My Answer one"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
-    And I click on "Act1" "button"
+    And I click on "Act1" "button_exact"
     Then the "Manager (Complete)" radio button is selected
     When I click on "Continue" "button"
     And I wait until ".tui-otherParticipantResponses" "css_element" exists
@@ -320,7 +320,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     When I log in as "appraiser"
     And I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
-    And I click on "Act1" "button"
+    And I click on "Act1" "button_exact"
     Then I should see "Select relationship to continue"
     And I should see "Appraiser (In progress)"
     And I should see "Peer (In progress)"
@@ -332,7 +332,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
-    And I click on "Act1" "button"
+    And I click on "Act1" "button_exact"
     Then I should see "Select relationship to continue"
     And I should see "Appraiser (Complete)"
     And I should see "Peer (In progress)"
@@ -378,7 +378,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     And I should not see "No items to display"
-    When I click on "Act1" "button"
+    When I click on "Act1" "button_exact"
     Then I should see "Select relationship to continue"
     And I should see "Manager (Complete)"
     And I should see "Reviewer (In progress)"
@@ -391,7 +391,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I confirm the tui confirmation modal
     And I close the tui notification toast
     When I click on "Activities about others" "link"
-    And I click on "Act1" "button"
+    And I click on "Act1" "button_exact"
     And I click on the "Reviewer (In progress)" tui radio
     And I click on "Continue" "button"
     Then I should see perform activity relationship to user "Reviewer"
