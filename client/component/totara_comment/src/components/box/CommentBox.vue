@@ -313,8 +313,12 @@ export default {
     }
   }
 
+  &__comments {
+    flex-grow: 1;
+  }
+
   &__commentForm {
-    flex-basis: 20%;
+    flex: 0 0 120px;
     margin-top: var(--gap-4);
 
     &--withBorder {

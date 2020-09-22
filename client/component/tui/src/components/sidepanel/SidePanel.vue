@@ -572,7 +572,7 @@ export default {
    * Transitioned container for arbitrary SidePanel content
    **/
   &__content {
-    max-height: 100%;
+    height: 100%;
     overflow: hidden;
 
     .ie & {
