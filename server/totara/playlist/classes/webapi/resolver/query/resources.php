@@ -29,7 +29,9 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use totara_engage\access\access_manager;
 use totara_engage\query\query;
+use totara_playlist\playlist;
 use totara_playlist\totara_engage\card\loader;
 
 final class resources implements query_resolver, has_middleware {
@@ -43,6 +45,11 @@ final class resources implements query_resolver, has_middleware {
         global $USER;
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context(\context_user::instance($USER->id));
+        }
+
+        $playlist = playlist::from_id($args['playlist_id']);
+        if (!access_manager::can_access($playlist, $USER->id)) {
+            throw new \moodle_exception('error:permissiondenied', 'totara_playlist');
         }
 
         $query = new query();
