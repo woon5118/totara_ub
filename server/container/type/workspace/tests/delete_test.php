@@ -22,12 +22,19 @@
  */
 
 use container_workspace\local\workspace_helper;
+use container_workspace\tracker\tracker;
 use core\webapi\execution_context;
+use totara_core\advanced_feature;
 use totara_webapi\graphql;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 defined('MOODLE_INTERNAL') || die();
 
 class container_workspace_delete_testcase extends advanced_testcase {
+    private const MUTATION = 'container_workspace_delete_workspace';
+
+    use webapi_phpunit_helper;
+
     /**
      * @return void
      */
@@ -36,7 +43,6 @@ class container_workspace_delete_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $workspace = workspace_helper::create_workspace('Workspace 1010', $USER->id);
-
 
         $sql = '
             SELECT 1 FROM "ttr_course" c
@@ -60,7 +66,11 @@ class container_workspace_delete_testcase extends advanced_testcase {
 
         $workspace = workspace_helper::create_workspace('Workspace 1010',  $user->id);
 
-        $ec = execution_context::create('ajax', 'container_workspace_delete_workspace');
+        $tracker = new tracker($user->id);
+        $tracker->visit_workspace($workspace);
+        $this->assertEquals($workspace->id, $tracker->get_last_visit_workspace(), 'wrong visited workspace');
+
+        $ec = execution_context::create('ajax', self::MUTATION);
         $result = graphql::execute_operation(
             $ec,
             ['workspace_id' => $workspace->get_id()]
@@ -76,6 +86,41 @@ class container_workspace_delete_testcase extends advanced_testcase {
         ';
 
         $this->assertFalse($DB->record_exists_sql($sql, ['course_id' => $workspace->id]));
+        $this->assertNull($tracker->get_last_visit_workspace(), 'wrong visited workspace');
     }
 
+    /**
+     * @return void
+     */
+    public function test_failed_graphql_call(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $workspace = workspace_helper::create_workspace('Workspace 1010',  $user->id);
+        $args = ['workspace_id' => $workspace->get_id()];
+
+        $feature = 'container_workspace';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, "Feature $feature is not available.");
+        advanced_feature::enable($feature);
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, []);
+        $this->assert_webapi_operation_failed($result, 'Variable "$workspace_id" of required type "param_integer!" was not provided.');
+
+        $args['workspace_id'] = 1293;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'Can not find data record in database');
+
+        $user1 = $this->getDataGenerator()->create_user();
+        self::setUser($user1);
+        $tracker = new tracker($user1->id);
+        $tracker->visit_workspace($workspace);
+        $this->assertEquals($workspace->id, $tracker->get_last_visit_workspace(), 'wrong visited workspace');
+
+        $args = ['workspace_id' => $workspace->get_id()];
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'The actor cannot delete the workspace');
+        $this->assertEquals($workspace->id, $tracker->get_last_visit_workspace(), 'wrong visited workspace');
+    }
 }

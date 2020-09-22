@@ -31,6 +31,7 @@ use container_workspace\query\member\query;
 use container_workspace\task\notify_new_workspace_owner_task;
 use container_workspace\tracker\tracker;
 use container_workspace\workspace;
+use core\orm\query\builder;
 use core\task\manager;
 
 /**
@@ -154,6 +155,8 @@ final class workspace_helper {
             throw new \coding_exception("The actor cannot delete the workspace");
         }
 
+        $transaction = builder::get_db()->start_delegated_transaction();
+
         $query = new query($workspace->get_id());
         $cursor = $query->get_cursor();
 
@@ -172,12 +175,18 @@ final class workspace_helper {
             }
         }
 
+        // Clear the tracker for navigating the right page.
+        tracker::clear_all_for_workspace($workspace->get_id());
+
         // After deleting the member, we now need to delete all the instances.
         $manager = $workspace->get_enrolment_manager();
         $manager->delete_enrol_instances($actor_id);
 
         // Then finally, deleted the workspace itself.
         $workspace->delete();
+
+        // Make all the changes permanent.
+        $transaction->allow_commit();
     }
 
     /**

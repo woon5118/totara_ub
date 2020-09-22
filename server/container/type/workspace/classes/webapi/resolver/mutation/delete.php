@@ -23,7 +23,6 @@
 namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\local\workspace_helper;
-use container_workspace\tracker\tracker;
 use container_workspace\workspace;
 use core\notification;
 use core\webapi\execution_context;
@@ -52,10 +51,6 @@ final class delete implements mutation_resolver, has_middleware {
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context($workspace->get_context());
         }
-
-        $workspace_id = $workspace->get_id();
-        // Clear the tracker for navigating the right page.
-        tracker::clear_all_for_workspace($workspace_id);
 
         // Delete the workspace.
         workspace_helper::delete_workspace($workspace, $USER->id);
