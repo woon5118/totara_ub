@@ -189,6 +189,7 @@ $string['share'] = "Share";
 $string['share_message'] = '{$a->fullname} has shared \'{$a->name}\' with you.';
 $string['share_message_subject'] = 'New {$a} has been shared with you';
 $string['share_message_view'] = 'View content: ';
+$string['sharedwith'] = "Shared with";
 $string['sharedwithyou'] = "Shared with you";
 $string['sharehelpinfo'] = "This content will appear in the 'Shared with you' area of the selected person's library. Only people that have never previously had this content shared to them are available to be selected.";
 $string['sharehelpinfoworkspaces'] = "This content will appear in the 'Shared with you' area of the selected person's library. Only people/workspaces that have never previously had this content shared to them are available to be selected.";

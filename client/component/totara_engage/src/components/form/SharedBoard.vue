@@ -25,6 +25,7 @@
       <Button
         v-if="computedReceipts.length"
         :aria-expanded="showReceipts"
+        :aria-label="$str('sharedwith', 'totara_engage')"
         :text="$str(showReceipts ? 'hide' : 'show', 'moodle')"
         :styleclass="{
           small: 'true',
@@ -124,6 +125,7 @@ export default {
     ],
 
     "totara_engage": [
+      "sharedwith",
       "sharedwithpeople",
       "sharedwithpeopleworkspaces"
     ]
