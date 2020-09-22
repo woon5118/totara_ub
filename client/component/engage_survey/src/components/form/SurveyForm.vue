@@ -68,6 +68,7 @@
     </FormRow>
 
     <FormRow
+      v-slot="{ labelId }"
       :label="$str('optionstitle', 'engage_survey')"
       class="tui-totaraEngage-surveyForm__answerTitle"
     >
@@ -80,6 +81,7 @@
           :delete-icon="true"
           :allow-deleting-first-items="false"
           class="tui-totaraEngage-surveyForm__repeater"
+          :aria-labelledby="labelId"
           @add="push(newOption())"
           @remove="(item, i) => remove(i)"
         >

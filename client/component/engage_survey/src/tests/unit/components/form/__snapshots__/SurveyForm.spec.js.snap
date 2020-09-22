@@ -21,9 +21,7 @@ exports[`engage_survey/components/form/SurveyForm.vue Checks snapshot 1`] = `
       </radio-stub>
     </formradiogroup-stub>
   </formrow-stub>
-  <formrow-stub label="optionstitle, engage_survey" isstacked="true" class="tui-totaraEngage-surveyForm__answerTitle">
-    <fieldarray-stub path="options"></fieldarray-stub>
-  </formrow-stub>
+  <formrow-stub label="optionstitle, engage_survey" isstacked="true" class="tui-totaraEngage-surveyForm__answerTitle"></formrow-stub>
   <buttongroup-stub class="tui-totaraEngage-surveyForm__buttons tui-totaraEngage-surveyForm__buttons--right">
     <loadingbutton-stub text="next, moodle" type="submit" arialabel="" primary="true" disabled="true" class="tui-totaraEngage-surveyForm__button"></loadingbutton-stub>
     <cancelbutton-stub class="tui-totaraEngage-surveyForm__cancelButton"></cancelbutton-stub>
