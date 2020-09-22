@@ -569,15 +569,6 @@ final class discussion {
     }
 
     /**
-     * This function will bump the timestamp of the discussion, so that we can tell the recently updated.
-     * @return void
-     */
-    public function touch(): void {
-        $this->entity->timestamp = time();
-        $this->entity->save();
-    }
-
-    /**
      * Returning the array of stored file record, only if there are files.
      *
      * Note that this function will only return the files that are uploaded under
@@ -663,5 +654,9 @@ final class discussion {
             throw new \coding_exception('Cannot call set_prevent_delete_files_on_update outside of a phpunit or behat test.');
         }
         $this->prevent_delete_files_on_update = $prevent_delete_files_on_update;
+    }
+
+    public function reload() {
+        $this->entity->refresh();
     }
 }

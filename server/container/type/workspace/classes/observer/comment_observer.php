@@ -63,8 +63,6 @@ final class comment_observer {
             $discussion_id = $comment->get_instanceid();
             $discussion = discussion::from_id($discussion_id);
 
-            $discussion->touch();
-
             // Update workspace timestamp as well.
             $workspace = $discussion->get_workspace();
             workspace_helper::update_workspace_timestamp($workspace, $actor_id);

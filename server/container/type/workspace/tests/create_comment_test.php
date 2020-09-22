@@ -262,4 +262,55 @@ class container_workspace_create_comment_testcase extends advanced_testcase {
         self::assertEquals($user_one->id, $message->useridto);
         self::assertEquals($user_two->id,$message->useridfrom);
     }
+
+    public function test_create_comment_on_discussion_not_change_discussion_modified_time() {
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
+
+        $this->setUser($user);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace('workspace 101');
+
+        // Create a discussion in the workspace.
+        $discussion = discussion_helper::create_discussion(
+            $workspace,
+            json_encode(
+                [
+                    'type'    => 'doc',
+                    'content' => [paragraph::create_json_node_from_text("Discussion 101")],
+                ]
+            ),
+            null,
+            FORMAT_JSON_EDITOR
+        );
+
+        // Create comment on discussion
+        comment_helper::create_comment(
+            workspace::get_type(),
+            discussion::AREA,
+            $discussion->get_id(),
+            json_encode(
+                [
+                    'type'    => 'doc',
+                    'content' => [
+                        [
+                            'type'    => paragraph::get_type(),
+                            'content' => [
+                                text::create_json_node_from_text("Mention user one "),
+                                mention::create_raw_node($user->id),
+                            ],
+                        ],
+                    ],
+                ]
+            ),
+            FORMAT_JSON_EDITOR,
+            null,
+            $user->id
+        );
+
+        $discussion->reload();
+        self::assertNull($discussion->get_time_modified());
+    }
 }
