@@ -58,4 +58,20 @@ final class article_reaction_resolver extends base_resolver {
         $article = article::from_resource_id($resourceid);
         return $article->get_context();
     }
+
+    /**
+     * @param int       $instance_id
+     * @param int       $user_id
+     * @param string    $area
+     *
+     * @return bool
+     */
+    public function can_view_reactions(int $instance_id, int $user_id, string $area): bool {
+        if (article::REACTION_AREA === $area) {
+            $article = article::from_resource_id($instance_id);
+            return access_manager::can_access($article, $user_id);
+        }
+
+        throw new \coding_exception("Invalid area passed into the article resolver: {$area}");
+    }
 }

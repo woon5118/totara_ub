@@ -44,4 +44,11 @@ final class reaction_exception extends \moodle_exception {
     public static function on_delete(): reaction_exception {
         return new static('error:delete');
     }
+
+    /**
+     * @return reaction_exception
+     */
+    public static function on_view(): reaction_exception {
+        return new static('error:view');
+    }
 }

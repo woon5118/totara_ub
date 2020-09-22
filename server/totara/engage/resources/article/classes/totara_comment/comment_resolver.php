@@ -106,4 +106,23 @@ final class comment_resolver extends resolver {
         $article = article::from_resource_id($instance_id);
         return access_manager::can_access($article, $actor_id);
     }
+
+    /**
+     * @param comment $comment
+     * @param int $actor_id
+     *
+     * @return bool
+     */
+    public function can_view_reactions_of_comment(comment $comment, int $actor_id): bool {
+        $area = $comment->get_area();
+
+        if (!$this->is_valid_area($area)) {
+            throw new \coding_exception("Not supported area by component '{$this->component}'");
+        }
+
+        $instance_id = $comment->get_instanceid();
+        $article = article::from_resource_id($instance_id);
+
+        return access_manager::can_access($article, $actor_id);
+    }
 }

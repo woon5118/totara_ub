@@ -38,3 +38,4 @@ $string['user_data_item_reaction'] = 'Like';
 $string['error:create_like'] = 'Cannot create like for item';
 $string['error:delete'] = 'Cannot delete reaction';
 $string['error:remove_like'] = 'Cannot remove like for item';
+$string['error:view'] = 'Cannot view the reactions';

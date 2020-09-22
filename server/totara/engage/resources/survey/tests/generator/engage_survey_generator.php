@@ -42,6 +42,8 @@ final class engage_survey_generator extends component_generator_base {
     private static $options;
 
     /**
+     * By default the access is private for survey.
+     *
      * @param string|null $question
      * @param array       $options
      * @param int         $answertype

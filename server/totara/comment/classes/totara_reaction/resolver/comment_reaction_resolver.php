@@ -53,6 +53,26 @@ final class comment_reaction_resolver extends base_resolver {
     }
 
     /**
+     * @param string $area
+     * @param comment $comment
+     *
+     * @return void
+     */
+    protected function validate_instance_with_area(string $area, comment $comment): void {
+        if (comment::REPLY_AREA === $area && !$comment->is_reply()) {
+            throw new \coding_exception(
+                "Expecting the comment record to be a reply according to the value of parameter area"
+            );
+        }
+
+        if (comment::COMMENT_AREA === $area && $comment->is_reply()) {
+            throw new \coding_exception(
+                "Expecting the comment record to be a comment according to the value of parameter area"
+            );
+        }
+    }
+
+    /**
      * Since the component totara_comment is quite a universal component, therefore what we are going to do
      * is to ask the comment resolver - which is drilled down to the component that is using this totara_comment
      * component to check whether we are allowing the actor ($user_id) to be able to create the reaction on the
@@ -73,20 +93,39 @@ final class comment_reaction_resolver extends base_resolver {
         $comment = comment::from_id($comment_id);
 
         // Start running check on the $area against the model just in case the $area is being used wrongly.
-        if (comment::REPLY_AREA === $area && !$comment->is_reply()) {
-            throw new \coding_exception(
-                "Expecting the comment record to be a reply according to the value of parameter area"
-            );
-        } else if (comment::COMMENT_AREA === $area && $comment->is_reply()) {
-            throw new \coding_exception(
-                "Expecting the comment record to be a comment according to the value of parameter area"
-            );
-        }
+        $this->validate_instance_with_area($area, $comment);
 
         // Now we really need the comment_resolver of a specific component.
         $comment_component = $comment->get_component();
 
         $resolver = comment_resolver_factory::create_resolver($comment_component);
         return $resolver->can_create_reaction_on_comment($comment, $user_id);
+    }
+
+    /**
+     * Since the component totara_comment is an universal component, hence we are going to ask
+     * the comment resolver whether the actor ($user_id) is able to view the reactions or not.
+     *
+     * @param int       $instance_id
+     * @param int       $user_id
+     * @param string    $area
+     *
+     * @return bool
+     */
+    public function can_view_reactions(int $instance_id, int $user_id, string $area): bool {
+        if (!in_array($area, [comment::REPLY_AREA, comment::COMMENT_AREA])) {
+            throw new \coding_exception("Invalid area passed to comment resolver: {$area}");
+        }
+
+        $comment = comment::from_id($instance_id);
+
+        // Start running check on the $area against the model just in case the $area is being used wrongly.
+        $this->validate_instance_with_area($area, $comment);
+
+        // Now we really need the comment_resolver of a specific component.
+        $comment_component = $comment->get_component();
+        $resolver = comment_resolver_factory::create_resolver($comment_component);
+
+        return $resolver->can_view_reactions_of_comment($comment, $user_id);
     }
 }

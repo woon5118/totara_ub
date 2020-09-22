@@ -116,7 +116,7 @@ abstract class resolver {
      * the $actor_id is having the ability to create its reaction on the comment record or not.
      *
      * Note that whatever the result return from this function (whether it is being overridden from the parent),
-     * it will be applied fro both comment and reply.
+     * it will be applied for both comment and reply.
      *
      * Several general rules:
      * + If the owner of the comment cannot like his/her own comment is the actor then comment cannot be reacted
@@ -133,6 +133,22 @@ abstract class resolver {
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * This function is allowing us to ask the component that using this totara_comment component to check whether
+     * the $actor_id is having the ability to view the reaction records on the comment record or not.
+     *
+     * Note that whatever the result return from this function (whether it is being overridden from the parent),
+     * it will be applied for both comment and reply.
+     *
+     * @param comment   $comment
+     * @param int       $actor_id
+     *
+     * @return bool
+     */
+    public function can_view_reactions_of_comment(comment $comment, int $actor_id): bool {
         return true;
     }
 

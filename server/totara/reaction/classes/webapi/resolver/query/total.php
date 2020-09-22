@@ -26,7 +26,9 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use totara_reaction\exception\reaction_exception;
 use totara_reaction\loader\reaction_loader;
+use totara_reaction\resolver\resolver_factory;
 
 /**
  * Class total
@@ -36,12 +38,28 @@ final class total implements query_resolver, has_middleware {
     /**
      * @param array $args
      * @param execution_context $ec
+     *
      * @return int
      */
     public static function resolve(array $args, execution_context $ec): int {
         global $USER;
+
+        $component = $args['component'];
+        $area = $args['area'];
+        $instance_id = $args['instanceid'];
+
+        $resolver = resolver_factory::create_resolver($component);
+
         if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_user::instance($USER->id));
+            $context = $resolver->get_context($instance_id, $area);
+            $ec->set_relevant_context($context);
+        }
+
+        $context = $ec->get_relevant_context();
+
+        if ($context->is_user_access_prevented($USER->id) ||
+            !$resolver->can_view_reactions($instance_id, $USER->id, $area)) {
+            throw reaction_exception::on_view();
         }
 
         $paginator = reaction_loader::get_paginator(

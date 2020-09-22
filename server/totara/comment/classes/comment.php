@@ -298,7 +298,9 @@ final class comment {
     }
 
     /**
-     * Returning the component where this comment is being used - or belongging to.
+     * Returning the parent comment's id. If the value returned is null, then this comment record
+     * is a comment otherwise it is a reply.
+     *
      * @return int|null
      */
     public function get_parent_id(): ?int {

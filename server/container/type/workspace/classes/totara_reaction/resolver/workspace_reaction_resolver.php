@@ -25,6 +25,7 @@ namespace container_workspace\totara_reaction\resolver;
 use container_workspace\discussion\discussion;
 use totara_reaction\resolver\base_resolver;
 use container_workspace\interactor\discussion\interactor as discussion_interactor;
+use container_workspace\interactor\workspace\interactor as workspace_interactor;
 
 /**
  * This is mainly for the discussion within the workspace
@@ -62,5 +63,24 @@ final class workspace_reaction_resolver extends base_resolver {
         }
 
         throw new \coding_exception("Invalid area passed into the resolver: '${area}'");
+    }
+
+    /**
+     * @param int       $instance_id
+     * @param int       $user_id
+     * @param string    $area
+     *
+     * @return bool
+     */
+    public function can_view_reactions(int $instance_id, int $user_id, string $area): bool {
+        if (discussion::AREA === $area) {
+            $discussion = discussion::from_id($instance_id);
+            $workspace = $discussion->get_workspace();
+
+            $workspace_interactor = new workspace_interactor($workspace, $user_id);
+            return $workspace_interactor->can_view_discussions();
+        }
+
+        throw new \coding_exception("Invalid area passed into the resolver: {$area}");
     }
 }

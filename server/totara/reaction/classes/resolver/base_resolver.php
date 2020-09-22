@@ -78,4 +78,17 @@ abstract class base_resolver {
      * @return bool
      */
     public abstract function can_create_reaction(int $instanceid, int $userid, string $area): bool;
+
+    /**
+     * Checking if the user actor is able to view the record of who reacted to the instance.
+     *
+     * @param int       $instance_id
+     * @param int       $user_id
+     * @param string    $area
+     *
+     * @return bool
+     */
+    public function can_view_reactions(int $instance_id, int $user_id, string $area): bool {
+        return true;
+    }
 }

@@ -201,4 +201,40 @@ final class comment_resolver extends resolver {
 
         throw new \coding_exception("Invalid area that is not supported yet");
     }
+
+    /**
+     * If the user actor is able to see the discussions/workspace then user should be
+     * able to see the reactions related to the comments.
+     *
+     * @param comment   $comment
+     * @param int       $actor_id
+     *
+     * @return bool
+     */
+    public function can_view_reactions_of_comment(comment $comment, int $actor_id): bool {
+        global $DB;
+        $area = $comment->get_area();
+
+        if (discussion::AREA === $area) {
+            $discussion_id = $comment->get_instanceid();
+            $sql = '
+                SELECT c.id FROM "ttr_course" c
+                INNER JOIN "ttr_workspace_discussion" wd ON c.id = wd.course_id
+                WHERE c.containertype = :workspace_type
+                AND wd.id = :discussion_id
+            ';
+
+            $params = [
+                'workspace_type' => workspace::get_type(),
+                'discussion_id' => $discussion_id
+            ];
+
+            $workspace_id = $DB->get_field_sql($sql, $params, MUST_EXIST);
+            $workspace_interactor = workspace_interactor::from_workspace_id($workspace_id, $actor_id);
+
+            return $workspace_interactor->can_view_discussions();
+        }
+
+        throw new \coding_exception("Invalid area that is not supported yet");
+    }
 }

@@ -55,7 +55,23 @@ final class survey_reaction_resolver extends base_resolver {
      * @return \context
      */
     public function get_context(int $resourceid, string $area): \context {
-        $article = survey::from_resource_id($resourceid);
-        return $article->get_context();
+        $survey = survey::from_resource_id($resourceid);
+        return $survey->get_context();
+    }
+
+    /**
+     * @param int       $instance_id
+     * @param int       $user_id
+     * @param string    $area
+     *
+     * @return bool
+     */
+    public function can_view_reactions(int $instance_id, int $user_id, string $area): bool {
+        if (survey::REACTION_AREA === $area) {
+            $survey = survey::from_resource_id($instance_id);
+            return access_manager::can_access($survey, $user_id);
+        }
+
+        throw new \coding_exception("Invalid area passed into the survey resolver: {$area}");
     }
 }

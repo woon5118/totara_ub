@@ -103,4 +103,23 @@ final class comment_resolver extends resolver {
         $playlist = playlist::from_id($instance_id);
         return access_manager::can_access($playlist, $actor_id);
     }
+
+    /**
+     * @param comment   $comment
+     * @param int       $actor_id
+     *
+     * @return bool
+     */
+    public function can_view_reactions_of_comment(comment $comment, int $actor_id): bool {
+        $area = $comment->get_area();
+
+        if (playlist::COMMENT_AREA === $area) {
+            $playlist_id = $comment->get_instanceid();
+            $playlist = playlist::from_id($playlist_id);
+
+            return access_manager::can_access($playlist, $actor_id);
+        }
+
+        throw new \coding_exception("Invalid area that is not supported yet");
+    }
 }
