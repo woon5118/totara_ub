@@ -112,11 +112,6 @@ extend type Query {
     """
     resourceid: param_integer!
   ): [engage_survey_question_result!]!
-
-  """
-  A query to fetch the owner of the survey.
-  """
-  engage_survey_owner(resourceid: param_integer!): core_user!
 }
 
 extend type Mutation {
