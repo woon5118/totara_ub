@@ -59,12 +59,12 @@
     </div>
 
     <div v-if="showButton" class="tui-accessDisplay__editSettings">
-      <span
+      <Button
         class="tui-accessDisplay__editSettings__text"
-        @click.prevent="$emit('request-open')"
-      >
-        {{ $str('editsettings', 'totara_engage') }}
-      </span>
+        :text="$str('editsettings', 'totara_engage')"
+        :styleclass="{ transparent: true, small: true }"
+        @click="$emit('request-open')"
+      />
     </div>
   </div>
 </template>
@@ -222,17 +222,6 @@ export default {
 
   &__editSettings {
     margin-top: var(--gap-2);
-
-    &__text {
-      @include tui-font-body-small();
-      color: var(--color-state);
-
-      &:focus,
-      &:hover {
-        text-decoration: underline;
-        cursor: pointer;
-      }
-    }
   }
 }
 </style>

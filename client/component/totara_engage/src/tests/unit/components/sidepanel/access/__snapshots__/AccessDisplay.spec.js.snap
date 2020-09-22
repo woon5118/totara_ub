@@ -39,13 +39,12 @@ exports[`totara_engage/components/sidepanel/access/AccessSeting.vue Checks snaps
   <div
     class="tui-accessDisplay__editSettings"
   >
-    <span
+    <button-stub
       class="tui-accessDisplay__editSettings__text"
-    >
-      
-      editsettings-totara_engage
-    
-    </span>
+      styleclass="[object Object]"
+      text="editsettings-totara_engage"
+      type="button"
+    />
   </div>
 </div>
 `;
