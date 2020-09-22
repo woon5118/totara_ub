@@ -87,7 +87,7 @@ $string['filter_users'] = 'Filter users';
 $string['find_contents'] = 'Find contents';
 $string['find_spaces'] = 'Find Workspaces';
 $string['format'] = 'Format';
-$string['hashtag_tip'] = 'Tip: Add a hash tag to make this more findable';
+$string['hashtag_tip'] = 'Tip: Add a hashtag to make this more findable';
 $string['hashtag_tip_help'] = 'Hashtags make it easier to find information on specific themes. For example, a workspace for Health and Safety Officers might include hashtags like #healthandsafety #staysafe #hazards';
 $string['hidden'] = 'Hidden';
 $string['hidden_workspace'] = 'Hidden workspace';
@@ -207,7 +207,7 @@ $string['workspace_type'] = 'Workspace type';
 $string['workspace_type_help'] = '
 Anyone can join and participate in Public workspaces.
 
-Private workspaces require approval from the owner to join and content is only visible to members. They can also be hidden from search. To become a member of a hidden workspace, the owner must directly add them
+Private workspaces require approval from the owner to join and content is only visible to members. They can also be hidden from search. To become a member of a hidden workspace, the owner must directly add them.
 ';
 $string['workspace_updated'] = 'Workspace updated';
 $string['workspace_updated_notification'] = '{$a} workspace had been updated recently';
