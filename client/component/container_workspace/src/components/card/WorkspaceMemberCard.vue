@@ -26,7 +26,7 @@
       :drop-down-button-aria-label="
         $str('more_action_for_member', 'container_workspace', userFullName)
       "
-      :aria-describedby="owner ? $id('lozenge') : false"
+      :aria-describedby="owner ? $id('lozenge') : null"
       class="tui-workspaceMemberCard__profileCard"
     >
       <template v-slot:tag>
