@@ -201,13 +201,21 @@ export default class Editor {
    * @return {EditorView}
    */
   createView(el) {
+    let attributes = {
+      class: 'tui-weka-editor',
+      role: 'region',
+      'aria-label': langString('pluginname', 'editor_weka'),
+    };
+
+    this._options.placeholder
+      ? (attributes['aria-label'] = this._options.placeholder)
+      : attributes;
+
     this.view = new EditorView(el, {
       state: this.state,
       dispatchTransaction: this.dispatch,
       nodeViews: this._nodeViews,
-      attributes: {
-        class: 'tui-weka-editor',
-      },
+      attributes,
     });
 
     this.view.dom.addEventListener('focus', e => {
@@ -229,7 +237,10 @@ export default class Editor {
   }
 
   allStrings() {
-    return this._toolbarItems.filter(x => x.label).map(x => x.label);
+    return this._toolbarItems
+      .filter(x => x.label)
+      .map(x => x.label)
+      .concat([langString('pluginname', 'editor_weka')]);
   }
 
   getParent() {

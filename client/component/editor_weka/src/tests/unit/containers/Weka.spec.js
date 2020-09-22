@@ -73,6 +73,7 @@ const factory = (option, instanceId) => {
     propsData: {
       options: option,
       instanceId,
+      ariaLabel: 'Weka label',
     },
     mocks: {
       $apollo: {
