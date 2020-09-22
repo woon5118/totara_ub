@@ -235,4 +235,34 @@ class container_workspace_webapi_update_workspace_testcase extends advanced_test
         self::assertEquals($original_description, $after_updated_description);
         self::assertNotEquals($workspace->get_name(), $DB->get_field('course', 'fullname', ['id' => $workspace_id]));
     }
+
+    public function test_update_workspace_with_hashtag(): void {
+        global $CFG, $DB;
+
+        $this->setAdminUser();
+        $generator = $this->getDataGenerator();
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace('oookokokokoko');
+
+        $summary = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"This is a summary with a "},{"type":"hashtag","attrs":{"text":"testme"}},{"type":"text","text":" hashtag."}]}]}';
+
+        $this->resolve_graphql_mutation(
+            'container_workspace_update',
+            [
+                'id' => $workspace->get_id(),
+                'name' => $workspace->get_name(),
+                'description' => $summary,
+                'description_format' => FORMAT_JSON_EDITOR,
+                'private' => false,
+                'hidden' => false
+            ]
+        );
+
+        // Check that hashtag was identified and stored.
+        $where = "tagcollid = " . $CFG->hashtag_collection_id;
+        $sql_result = $DB->get_field_select('tag', 'name', $where, null, MUST_EXIST);
+        $this->assertEquals('testme', $sql_result);
+    }
 }

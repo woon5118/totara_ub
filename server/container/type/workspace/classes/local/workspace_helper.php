@@ -33,6 +33,8 @@ use container_workspace\tracker\tracker;
 use container_workspace\workspace;
 use core\orm\query\builder;
 use core\task\manager;
+use totara_core\content\processor\hashtag_processor;
+use totara_core\content\content;
 
 /**
  * Class workspace_helper
@@ -133,6 +135,9 @@ final class workspace_helper {
         if (null !== $draft_id && 0 !== $draft_id) {
             $workspace->save_image($draft_id, $actor_id);
         }
+
+        // Process hashtags.
+        self::workspace_summary_hashtags($workspace);
 
         return $workspace;
     }
@@ -326,5 +331,47 @@ final class workspace_helper {
 
         $task = notify_new_workspace_owner_task::from_workspace($workspace_id, $actor_id);
         manager::queue_adhoc_task($task);
+    }
+
+    /**
+     * Process any hashtags that have been included in workspace summary.
+     *
+     * @param workspace $workspace
+     */
+    public static function workspace_summary_hashtags(workspace $workspace): void {
+        // Leave if nothing to process.
+        if ($workspace->summary === null) {
+            return;
+        }
+
+        // Create a content object to enable hashtag processing.
+        $content = new content(
+            $workspace->get_name(),
+            $workspace->summary,
+            $workspace->summaryformat,
+            $workspace->get_id(),
+            $workspace->containertype,
+            ' '
+        );
+
+        $processor = new hashtag_processor();
+        switch ($workspace->summaryformat) {
+            case FORMAT_PLAIN:
+                $processor->process_format_text($content);
+                break;
+
+            case FORMAT_HTML:
+                $processor->process_format_html($content);
+                break;
+
+            case FORMAT_JSON_EDITOR:
+                $processor->process_format_json_editor($content);
+                break;
+
+            case FORMAT_MOODLE:
+            default:
+                $processor->process_format_moodle($content);
+                break;
+        }
     }
 }

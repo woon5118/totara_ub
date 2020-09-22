@@ -325,4 +325,37 @@ class container_workspace_create_testcase extends advanced_testcase {
             $user_one->id
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_create_workspace_with_hashtag(): void {
+        global $CFG, $DB;
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        // This is a summary with a #testme hashtag.
+        $summary = '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"This is a summary with a "},{"type":"hashtag","attrs":{"text":"testme"}},{"type":"text","text":" hashtag."}]}]}';
+
+        $ec = execution_context::create('ajax', 'container_workspace_create_workspace');
+        $result = graphql::execute_operation(
+            $ec,
+            [
+                'name' => 'Hello world ?',
+                'description' => $summary,
+                'summary_format' => FORMAT_JSON_EDITOR,
+                'hidden' => false,
+                'private' => false
+            ]
+        );
+
+        // Ensure we have a workspace.
+        $this->assertEmpty($result->errors);
+        $this->assertNotEmpty($result->data);
+
+        // Check that hashtag was identified and stored.
+        $where = "tagcollid = " . $CFG->hashtag_collection_id;
+        $sql_result = $DB->get_field_select('tag', 'name', $where, null, MUST_EXIST);
+        $this->assertEquals('testme', $sql_result);
+    }
 }

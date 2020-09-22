@@ -32,6 +32,7 @@ use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
+use container_workspace\local\workspace_helper;
 
 /**
  * Resolver for updating
@@ -116,6 +117,9 @@ final class update implements mutation_resolver, has_middleware {
         if (!empty($args['draft_id'])) {
             $workspace->save_image((int) $args['draft_id']);
         }
+
+        // Process hashtags.
+        workspace_helper::workspace_summary_hashtags($workspace);
 
         return $workspace;
     }
