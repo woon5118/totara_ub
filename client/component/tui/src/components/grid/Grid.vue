@@ -369,6 +369,12 @@ export default {
     &-gap {
       @include grid-item-generate-gutters(top, var(--grid-gutter));
     }
+
+    // IE11 doesn't distribute vertical space without an explicit height set
+    // on the container, so the safest thing to do is revert to block layout
+    .ie & {
+      display: block;
+    }
   }
 
   &--wrapped-gap .tui-grid-item--wrapped {
