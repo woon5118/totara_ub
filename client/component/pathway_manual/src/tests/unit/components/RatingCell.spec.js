@@ -26,6 +26,7 @@ const props = {
   scaleValueId: '1',
   compId: '123',
   comment: 'Test comment',
+  competency: 'Test competency',
 };
 
 describe('components/RatingCell.vue', () => {
