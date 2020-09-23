@@ -82,7 +82,6 @@
 
 <script>
 import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
-
 import Avatar from 'tui/components/avatar/Avatar';
 import InfoIconButton from 'tui/components/buttons/InfoIconButton';
 import CheckSuccess from 'tui/components/icons/CheckSuccess';
@@ -152,10 +151,6 @@ export default {
         };
       },
 
-      skip() {
-        return this.skip;
-      },
-
       result({ data: { recipients } }) {
         let tmp_recipients = [];
 
@@ -201,7 +196,6 @@ export default {
 
   data() {
     return {
-      skip: true,
       query: '',
       recipients: [],
       publicTags: [],
@@ -295,6 +289,7 @@ export default {
      */
     find(query) {
       if ('' === query) {
+        this.query = query;
         return;
       }
 
@@ -321,6 +316,8 @@ export default {
       }
 
       this.$emit('pick-recipient', item);
+      // Reset query to empty string
+      this.query = '';
     },
 
     /**
