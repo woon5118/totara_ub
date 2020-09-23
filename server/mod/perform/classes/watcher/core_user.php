@@ -72,6 +72,7 @@ class core_user {
         // Check for any user data which is required specifically for perform (which may
         // or may not have overlap with the user profile card fields below).
         if ($hook->field == 'fullname'
+            || in_array($hook->field, display_setting::get_display_fields())
             || in_array($hook->field, display_setting::get_default_display_picture_fields())
         ) {
             if (self::can_view_user($hook)) {
@@ -83,8 +84,7 @@ class core_user {
         // If the field is one required to display a user profile card and hasn't already been granted
         // above then check if the viewer is in any situation where they need to be able to select from
         // all (tenant) users.
-        if ($hook->field == 'id'
-            || in_array($hook->field, display_setting::get_display_fields())
+        if (in_array($hook->field, display_setting::get_display_fields())
             || in_array($hook->field, display_setting::get_display_picture_fields())
         ) {
             if (self::can_select_any_user($hook)) {
