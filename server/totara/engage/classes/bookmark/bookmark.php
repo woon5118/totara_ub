@@ -23,6 +23,7 @@
 
 namespace totara_engage\bookmark;
 
+use totara_engage\access\access_manager;
 use totara_engage\entity\engage_bookmark;
 use totara_engage\event\bookmark_added;
 use totara_engage\event\bookmark_removed;
@@ -51,6 +52,24 @@ class bookmark {
         $this->component = $component;
     }
 
+    /**
+     * @param int $user_id
+     * @return bool
+     */
+    public function can_bookmark(?int $user_id = null): bool {
+        global $USER;
+        if (empty($user_id)) {
+            $user_id = $USER->id;
+        }
+
+        $resource = provider::create($this->component)->get_item_instance($this->itemid);
+        // Owner can not bookmark own resource.
+        if ($user_id === $resource->get_userid() || $resource->is_private()) {
+            return false;
+        }
+
+        return access_manager::can_access($resource, $user_id);
+    }
     /**
      * Add bookmark for the item.
      */

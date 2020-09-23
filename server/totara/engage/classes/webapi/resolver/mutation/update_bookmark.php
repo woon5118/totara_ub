@@ -43,15 +43,35 @@ final class update_bookmark implements mutation_resolver, has_middleware {
             $ec->set_relevant_context(\context_user::instance($USER->id));
         }
 
+        if (!isset($args['itemid'])) {
+            throw new \coding_exception('ItemID is a required field.');
+        }
+
+        if (!isset($args['component'])) {
+            throw new \coding_exception('Component is a required field.');
+        }
+
+        if (!isset($args['bookmarked'])) {
+            throw new \coding_exception('Bookmarked is a required field.');
+        }
+
         $itemid = $args['itemid'];
         $component = $args['component'];
         $bookmarked = $args['bookmarked'];
 
         $transaction = $DB->start_delegated_transaction();
-
         $bookmark = new bookmark($USER->id, $itemid, $component);
-        $bookmarked ? $bookmark->add_bookmark() : $bookmark->remove_bookmark();
 
+        // Do not expose internal exception out, so we just throw new moodle exception.
+        try {
+            if (!$bookmark->can_bookmark($USER->id)) {
+                throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, 'Cannot bookmark item ' . $itemid);
+            }
+        } catch (\Exception $ex) {
+            throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, 'Cannot bookmark item ' . $itemid);
+        }
+
+        $bookmarked ? $bookmark->add_bookmark() : $bookmark->remove_bookmark();
         $transaction->allow_commit();
 
         return true;
