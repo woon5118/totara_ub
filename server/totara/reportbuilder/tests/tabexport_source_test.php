@@ -80,6 +80,10 @@ class totara_reportbuilder_tabexport_source_testcase extends advanced_testcase {
 
         // Test cache info is printed.
 
+        if (!$DB->is_create_table_from_select_supported()) {
+            $this->markTestSkipped('DB does not support Report builder caching');
+        }
+
         set_config('enablereportcaching', 1);
         $DB->execute('UPDATE {report_builder} SET cache = 1 WHERE id = ?', array($rid));
         reportbuilder_schedule_cache($rid, array('initschedule' => 1));

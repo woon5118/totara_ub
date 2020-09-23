@@ -82,6 +82,11 @@ class totara_reportbuilder_rb_jobassignment_cache_testcase extends reportcache_a
      * tests that filters of the type job_assignment can be added to the report
      */
     public function test_cache_filters() {
+        global $DB;
+        if (!$DB->is_create_table_from_select_supported()) {
+            $this->markTestSkipped('DB does not support Report builder caching');
+        }
+
         set_config('enablereportcaching', 1);
         $this->resetAfterTest();
         $this->enable_caching($this->report_builder_data['id']);
@@ -109,7 +114,11 @@ class totara_reportbuilder_rb_jobassignment_cache_testcase extends reportcache_a
      * Checks that there is not collisions in the column names in the database between the filters and columns
      */
     public function test_cache_job_assignment_sql_collsion(){
-        $this->resetAfterTest();
+        global $DB;
+        if (!$DB->is_create_table_from_select_supported()) {
+            $this->markTestSkipped('DB does not support Report builder caching');
+        }
+
         set_config('enablereportcaching', 1);
         $this->enable_caching($this->report_builder_data['id']);
         $this->assertSame(RB_CACHE_FLAG_OK, $this->get_report_cache_status($this->report_builder_data['id'], array()));

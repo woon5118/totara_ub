@@ -2507,6 +2507,9 @@ class core_dml_testcase extends database_driver_testcase {
         }
     }
 
+    /**
+     * NOTE: the order of records is not guaranteed.
+     */
     public function test_insert_records() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();
@@ -2526,7 +2529,6 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertCount(0, $DB->get_records($tablename));
 
         $record = new stdClass();
-        $record->id = '1';
         $record->course = '1';
         $record->oneint = null;
         $record->onenum = '1.00';
@@ -2537,19 +2539,18 @@ class core_dml_testcase extends database_driver_testcase {
         $records = array();
         for ($i = 1; $i <= 2000; $i++) { // This may take a while, it should be higher than defaults in DML drivers.
             $rec = clone($record);
-            $rec->id = (string)$i;
             $rec->oneint = (string)$i;
-            $expected[$i] = $rec;
+            $expected[$rec->oneint] = $rec;
             $rec = clone($rec);
-            unset($rec->id);
-            $records[$i] = $rec;
+            $records[$rec->oneint] = $rec;
         }
 
         $DB->insert_records($tablename, $records);
-        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $stored = $DB->get_records($tablename, array(), 'oneint ASC', 'oneint,course,onenum,onechar,onetext');
         $this->assertEquals($expected, $stored);
 
         // Test there can be some extra properties including id.
+        $record->id = '1';
         $count = $DB->count_records($tablename);
         $rec1 = (array)$record;
         $rec1['xxx'] = 1;
@@ -6529,6 +6530,8 @@ class core_dml_testcase extends database_driver_testcase {
 
     /**
      * Totara specific bulk insert.
+     *
+     * NOTE: the order of records is not guaranteed.
      */
     public function test_insert_records_via_batch() {
         $DB = $this->tdb;
@@ -6550,7 +6553,6 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertCount(0, $DB->get_records($tablename));
 
         $record = new stdClass();
-        $record->id = '1';
         $record->course = '1';
         $record->oneint = null;
         $record->onebit = null;
@@ -6562,17 +6564,15 @@ class core_dml_testcase extends database_driver_testcase {
         $records = array();
         for ($i = 1; $i <= 2000; $i++) { // This may take a while, it should be higher than defaults in DML drivers.
             $rec = clone($record);
-            $rec->id = (string)$i;
             $rec->oneint = (string)$i;
             $rec->onebit = (string)($i % 2);
-            $expected[$i] = $rec;
+            $expected[$rec->oneint] = $rec;
             $rec = clone($rec);
-            unset($rec->id);
-            $records[$i] = $rec;
+            $records[$rec->oneint] = $rec;
         }
 
         $DB->insert_records_via_batch($tablename, $records);
-        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $stored = $DB->get_records($tablename, array(), 'oneint ASC', 'oneint,course,onebit,onenum,onechar,onetext');
         $this->assertEquals($expected, $stored);
 
         $DB->delete_records($tablename, array());
@@ -6580,7 +6580,7 @@ class core_dml_testcase extends database_driver_testcase {
 
         // Test iterator works the same.
         $DB->insert_records_via_batch($tablename, new ArrayIterator($records));
-        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $stored = $DB->get_records($tablename, array(), 'oneint ASC', 'oneint,course,onebit,onenum,onechar,onetext');
         $this->assertEquals($expected, $stored);
 
         $DB->delete_records($tablename, array());
@@ -6591,14 +6591,12 @@ class core_dml_testcase extends database_driver_testcase {
         $records = array();
         for ($i = 1; $i <= 2; $i++) {
             $rec = clone($record);
-            $rec->id = $i;
             $rec->oneint = $i;
             $rec->onetext = 'xxxx';
-            $expected[$i] = $rec;
+            $expected[$rec->oneint] = $rec;
             $rec = clone($rec);
-            unset($rec->id);
             $rec->onetext = 'xx';
-            $records[$i] = $rec;
+            $records[$rec->oneint] = $rec;
         }
         $process = function($item, $a) {
             foreach ($item as $k => $v) {
@@ -6612,7 +6610,7 @@ class core_dml_testcase extends database_driver_testcase {
             return (($item instanceof stdClass) and $p === 'param');
         };
         $DB->insert_records_via_batch($tablename, $records, $process, array('onetext'), $validate, array('param'));
-        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $stored = $DB->get_records($tablename, array(), 'oneint ASC', 'oneint,course,onebit,onenum,onechar,onetext');
         $this->assertEquals($expected, $stored);
 
         $DB->insert_records_via_batch($tablename, $records, 'ccc c cc c');
@@ -6630,20 +6628,20 @@ class core_dml_testcase extends database_driver_testcase {
 
         $rec = clone($record);
         $rec->oneint = '666';
+        $rec->course = 1;
         $records[] = clone($rec);
-        $rec->id = 1;
-        $expected[$rec->id] = $rec;
+        $expected[$rec->course] = $rec;
 
         $rec = clone($record);
         unset($rec->oneint);
+        $rec->course = 2;
         $records[] = clone($rec);
-        $rec->id = 2;
         $rec->oneint = null;
-        $expected[$rec->id] = $rec;
+        $expected[$rec->course] = $rec;
 
         $DB->insert_records_via_batch($tablename, $records);
         $this->assertDebuggingCalled('All items passed to insert_records_via_batch() must have the same structure!');
-        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $stored = $DB->get_records($tablename, array(), 'course ASC', 'course,oneint,onebit,onenum,onechar,onetext');
         $this->assertEquals($expected , $stored);
 
         $DB->delete_records($tablename, array());
@@ -6655,20 +6653,20 @@ class core_dml_testcase extends database_driver_testcase {
 
         $rec = clone($record);
         $rec->onebit = false;
+        $rec->oneint = 1;
         $records[] = clone($rec);
-        $rec->id = '1';
         $rec->onebit = 0;
-        $expected[$rec->id] = $rec;
+        $expected[$rec->oneint] = $rec;
 
         $rec = clone($record);
         $rec->onebit = true;
+        $rec->oneint = 2;
         $records[] = clone($rec);
-        $rec->id = '2';
         $rec->onebit = 1;
-        $expected[$rec->id] = $rec;
+        $expected[$rec->oneint] = $rec;
 
         $DB->insert_records_via_batch($tablename, $records);
-        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $stored = $DB->get_records($tablename, array(), 'oneint ASC', 'oneint,course,onebit,onenum,onechar,onetext');
         $this->assertEquals($expected , $stored);
 
         $DB->delete_records($tablename, array());
@@ -6679,23 +6677,21 @@ class core_dml_testcase extends database_driver_testcase {
         $records = array();
 
         $rec = clone($record);
-        $rec->id = '10';
         $rec->xxx = 1;
+        $rec->oneint = 1;
         $records[] = clone($rec);
         unset($rec->xxx);
-        $rec->id = 1;
-        $expected[$rec->id] = $rec;
+        $expected[$rec->oneint] = $rec;
 
         $rec = clone($record);
-        $rec->id = '4';
         $rec->xxx = 112;
+        $rec->oneint = 2;
         $records[] = clone($rec);
         unset($rec->xxx);
-        $rec->id = 2;
-        $expected[$rec->id] = $rec;
+        $expected[$rec->oneint] = $rec;
 
         $DB->insert_records_via_batch($tablename, $records);
-        $stored = $DB->get_records($tablename, array(), 'id ASC');
+        $stored = $DB->get_records($tablename, array(), 'oneint ASC', 'oneint,course,onebit,onenum,onechar,onetext');
         $this->assertEquals($expected , $stored);
     }
 

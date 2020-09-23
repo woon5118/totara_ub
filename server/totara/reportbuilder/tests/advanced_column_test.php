@@ -346,7 +346,10 @@ class totara_reportbuilder_advanced_column_testcase extends advanced_testcase {
     public function test_caching() {
         global $DB, $CFG;
 
-        $this->resetAfterTest();
+        if (!$DB->is_create_table_from_select_supported()) {
+            $this->markTestSkipped('DB does not support Report builder caching');
+        }
+
         $this->setAdminUser();
 
         set_config('enablereportcaching', 1);

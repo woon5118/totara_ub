@@ -1112,6 +1112,8 @@ class pgsql_native_moodle_database extends moodle_database {
      * This method is intended for inserting of large number of small objects,
      * do not use for huge objects with text or binary fields.
      *
+     * NOTE: order of record ids is not guaranteed to match the order of $dataobjects
+     *
      * @since Moodle 2.7
      *
      * @param string $table  The database table to be inserted into

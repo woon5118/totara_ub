@@ -453,7 +453,9 @@ class reportbuilder {
         // Use config settings.
         $this->reportfor = $config->get_reportfor();
         $this->_sid = empty($config->get_sid()) && !$this->has_searched() ? $this->get_user_default_search() : $config->get_sid();
-        if (empty($CFG->enablereportcaching)) {
+        if (!$DB->is_create_table_from_select_supported()) {
+            $this->cacheignore = true;
+        } else if (empty($CFG->enablereportcaching)) {
             $this->cacheignore = true;
         } else {
             $this->cacheignore = $config->get_nocache();
@@ -679,7 +681,12 @@ class reportbuilder {
      * @return string[]
      */
     public function get_caching_problems() {
-        global $CFG;
+        global $CFG, $DB;
+
+        if (!$DB->is_create_table_from_select_supported()) {
+            // Caching is not compatible.
+            return [];
+        }
 
         if (!empty($CFG->tenantsenabled)) {
             // Caching is not compatible.
@@ -4194,9 +4201,9 @@ class reportbuilder {
      * @return array containing the full SQL query, SQL params, and cache meta information
      */
     function build_query($countonly = false, $filtered = false, $allowcache = true) {
-        global $CFG;
+        global $CFG, $DB;
 
-        if ($allowcache && !empty($CFG->enablereportcaching)) {
+        if ($allowcache && !empty($CFG->enablereportcaching) && $DB->is_create_table_from_select_supported()) {
             $cached = $this->build_cache_query($countonly, $filtered);
             if ($cached[0] != '') {
                 return $cached;
@@ -6837,7 +6844,7 @@ function reportbuilder_get_cached($reportid) {
  */
 function reportbuilder_get_all_cached() {
     global $DB, $CFG;
-    if (empty($CFG->enablereportcaching)) {
+    if (empty($CFG->enablereportcaching) || !$DB->is_create_table_from_select_supported()) {
         return array();
     }
     $sql = "SELECT rbc.*, rb.cache, rb.fullname, rb.shortname, rb.embedded

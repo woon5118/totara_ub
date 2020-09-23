@@ -1075,6 +1075,10 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             return;
         }
 
+        if (!$DB->is_create_table_from_select_supported()) {
+            return;
+        }
+
         if ($DB->get_dbvendor() === 'mysql') {
             $info = $DB->get_server_info();
             if (version_compare($info['version'], '5.7', '<')) {

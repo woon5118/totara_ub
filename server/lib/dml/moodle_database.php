@@ -265,6 +265,20 @@ abstract class moodle_database {
     }
 
     /**
+     * Is the creation of database tables from select statements supported?
+     *
+     * @return bool
+     */
+    public function is_create_table_from_select_supported(): bool {
+        if (!isset($this->dboptions['create_table_from_select_supported'])) {
+            return true;
+        }
+        // Admins that want to set up MySQL GTID based replication should disable this in config.php,
+        // it will remove Report builder caching settings completely.
+        return (bool)$this->dboptions['create_table_from_select_supported'];
+    }
+
+    /**
      * Returns the language used for full text search.
      *
      * NOTE: admin must run admin/cli/fts_rebuild_indexes.php after change of lang!
@@ -2059,6 +2073,8 @@ abstract class moodle_database {
      *
      * This method is intended for inserting of large number of small objects,
      * do not use for huge objects with text or binary fields.
+     *
+     * NOTE: order of record ids is not guaranteed to match the order of $dataobjects
      *
      * @since Moodle 2.7
      *

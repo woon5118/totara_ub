@@ -312,6 +312,11 @@ if (!empty($CFG->tenantsenabled)) {
     $CFG->config_php_settings['enablereportcaching'] = $CFG->enablereportcaching;
     $CFG->mnet_dispatcher_mode = 'off';
     $CFG->config_php_settings['mnet_dispatcher_mode'] = $CFG->mnet_dispatcher_mode;
+} else if (!$DB->is_create_table_from_select_supported()) {
+    // Report caching cannot work if creation of tables from select is not supported,
+    // such as with MySQL GTID replication.
+    $CFG->enablereportcaching = '0';
+    $CFG->config_php_settings['enablereportcaching'] = $CFG->enablereportcaching;
 }
 
 if (isset($CFG->debug)) {

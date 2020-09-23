@@ -146,7 +146,11 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
 
     public function test_useclonedb_on_cached() {
         global $CFG, $DB;
-        $this->resetAfterTest();
+
+        if (!$DB->is_create_table_from_select_supported()) {
+            $this->markTestSkipped('DB does not support Report builder caching');
+        }
+
         $this->setAdminUser();
 
         $this->getDataGenerator()->create_user();

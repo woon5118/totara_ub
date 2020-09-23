@@ -25,6 +25,8 @@ use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $DB;
+
 /**
  * @var admin_root $ADMIN
  * @var admin_settingpage $optionalsubsystems
@@ -141,7 +143,7 @@ if ($hassiteconfig && isset($optionalsubsystems)) {
     );
 
     // Report caching and global restrictions.
-    if (empty($CFG->tenantsenabled)) {
+    if (empty($CFG->tenantsenabled) && $DB->is_create_table_from_select_supported()) {
         $optionalsubsystems->add(
             new admin_setting_configcheckbox(
                 'enablereportcaching',

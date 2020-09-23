@@ -43,8 +43,8 @@ trait report_testing {
     protected function enable_caching($reportid) {
         global $DB;
 
-        if ($DB->get_dbfamily() !== 'postgres') {
-            $this->preventResetByRollback();
+        if (!$DB->is_create_table_from_select_supported()) {
+            $this->markTestSkipped('DB does not support Report builder caching');
         }
 
         set_config('enablereportcaching', 1);

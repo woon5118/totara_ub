@@ -272,6 +272,10 @@ Database configuration: MySQL + MariaDB
 //    1. admin/cli/fts_rebuild_indexes.php
 //    2. admin/cli/fts_repopulate_tables.php
 //
+// When using MySQL GTID based clustering/replication (only Mysql 8.0.21 or later supported) the following setting must be used
+// to disable all features that create database tables from select statements (such as Report builder caching).
+//
+// $CFG->dboptions['create_table_from_select_supported'] = false;
 
 /***********************************************************************************************************************
 Database configuration: MSSQL

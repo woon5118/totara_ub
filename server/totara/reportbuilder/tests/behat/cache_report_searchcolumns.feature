@@ -5,7 +5,8 @@ Feature: Caching works as expected when adding search columns
   I need to be able set up caching and add search columns as filters
 
   Background:
-    Given I log in as "admin"
+    Given this test is skipped if tables cannot be created from select
+    And I log in as "admin"
     And I set the following administration settings values:
       | Enable report caching | 1 |
 

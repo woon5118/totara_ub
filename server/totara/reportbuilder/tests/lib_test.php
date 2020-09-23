@@ -572,6 +572,12 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     }
 
     public function test_get_caching_problems() {
+        global $DB;
+
+        if (!$DB->is_create_table_from_select_supported()) {
+            $this->markTestSkipped('DB does not support Report builder caching');
+        }
+
         set_config('enablereportcaching', 0);
         $rb = reportbuilder::create_embedded($this->shortname);
         $problems = $rb->get_caching_problems();

@@ -157,4 +157,19 @@ class behat_totara_reportbuilder extends behat_base {
         }
         throw new ExpectationException('The given value was found within the report builder report', $this->getSession());
     }
+
+    /**
+     * Checks if database family used is using one of the specified, else skip. (mysql, postgres, mssql, oracle, etc.)
+     *
+     * @Given /^this test is skipped if tables cannot be created from select$/
+     * @return void.
+     * @throws \Moodle\BehatExtension\Exception\SkippedException
+     */
+    public function skip_test_if_crate_table_from_select_not_supported() {
+        global $DB;
+
+        if (!$DB->is_create_table_from_select_supported()) {
+            throw new \Moodle\BehatExtension\Exception\SkippedException();
+        }
+    }
 }
