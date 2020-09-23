@@ -54,6 +54,7 @@ export default {
             ? this.convertToBoolean(value)
             : data[i].custom || data[i].default,
         type: data[i].type,
+        selectors: data[i].selectors || null,
       };
     }
 
@@ -80,6 +81,7 @@ export default {
         type: initialFormData[field].type,
         default: initialFormData[field].value,
         custom: null,
+        selectors: initialFormData[field].selectors || null,
       };
 
       // iterate supplied Arrays, overriding fieldData values with each
@@ -96,6 +98,9 @@ export default {
             }
             if (typeof currentArray[j].custom !== 'undefined') {
               fieldData.custom = currentArray[j].custom;
+            }
+            if (typeof currentArray[j].selectors !== 'undefined') {
+              fieldData.selectors = currentArray[j].selectors;
             }
           }
         }

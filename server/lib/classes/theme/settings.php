@@ -296,12 +296,17 @@ final class settings {
             // Each colour property needs to be in the root element
             // of the document tree.
             if ($category['name'] === 'colours') {
+                $switches = array_filter($category['properties'], function (array $property) {
+                    return $property['type'] === 'boolean';
+                });
                 $css = ':root{';
                 foreach($category['properties'] as $property) {
                     if ($property['type'] !== 'value') {
                         continue;
                     }
-                    $css .= "--{$property['name']}: {$property['value']};";
+                    if ($this->is_on($switches, $property['name'])) {
+                        $css .= "--{$property['name']}: {$property['value']};";
+                    }
                 }
                 $css .= '}';
                 continue;
@@ -319,12 +324,29 @@ final class settings {
     }
 
     /**
+     * Check if a value is controlled by a switch and that the switch is on.
+     *
+     * @param array $switches
+     * @param string $name
+     *
+     * @return bool
+     */
+    private function is_on(array $switches, string $name): bool {
+        foreach ($switches as $switch) {
+            if (isset($switch['selectors']) && in_array($name, $switch['selectors'])) {
+                return filter_var($switch['value'], FILTER_VALIDATE_BOOLEAN);
+            }
+        }
+        return true;
+    }
+
+    /**
      * Check if a setting is enabled.
      *
      * @param string $category
      * @param string $property
-     *
      * @param bool $default
+     *
      * @return bool
      */
     public function is_enabled(string $category, string $property, bool $default = false): bool {

@@ -121,11 +121,15 @@ class login_image extends theme_file {
     }
 
     /**
-     * Check whether the login page image should be shown or not.
-     *
-     * @return bool
+     * @inheritDoc
      */
-    public function show_image(): bool {
+    public function is_available(): bool {
+        // Check if feature is disabled.
+        if (!$this->is_enabled()) {
+            return false;
+        }
+
+        // Check if setting is enabled.
         $settings = new settings($this->theme_config, 0);
         return $settings->is_enabled('images', 'formimages_field_displaylogin', true);
     }

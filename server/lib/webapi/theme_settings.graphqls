@@ -25,6 +25,7 @@ type core_theme_property {
     name: String!
     type: core_theme_property_type!
     value: String!
+    selectors: [String!]
 }
 
 """
@@ -74,6 +75,7 @@ input core_theme_property_input {
     name: param_alphanumext!
     type: core_theme_property_type!
     value: String!
+    selectors: [param_alphanumext!]
 }
 
 """

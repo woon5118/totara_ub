@@ -110,6 +110,12 @@ class favicon_image extends theme_file {
      * @inheritDoc
      */
     public function is_available(): bool {
+        // Check if feature is disabled.
+        if (!$this->is_enabled()) {
+            return false;
+        }
+
+        // Fall back on global setting when tenant favicon not set.
         if ($this->tenant_id > 0) {
             $settings = new settings($this->theme_config, $this->tenant_id);
             if (!$settings->is_enabled('tenant', 'formtenant_field_tenant', false)) {

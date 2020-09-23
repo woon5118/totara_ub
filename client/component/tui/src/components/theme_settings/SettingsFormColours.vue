@@ -361,6 +361,11 @@ export default {
         formcolours_field_useoverrides: {
           value: false,
           type: 'boolean',
+          selectors: [
+            'btn-prim-accent-color',
+            'btn-accent-color',
+            'link-color',
+          ],
         },
         'nav-bg-color': {
           value: null,
@@ -474,53 +479,28 @@ export default {
         fields: null,
       };
 
-      // save form field values that are non-default values
-      let nonDefaultFields = [];
+      // save form field values
+      let fields = [];
       Object.keys(currentValues).forEach(fieldName => {
         let currentField = currentValues[fieldName];
-
-        // push all non-default valued CSS fields in
-        if (currentField.type === 'value') {
-          for (let i = 0; i < this.mergedProcessedCssVariableData.length; i++) {
-            let cssDefault = this.mergedProcessedCssVariableData[i];
-
-            if (
-              fieldName === cssDefault.name &&
-              currentField.value !== cssDefault.default
-            ) {
-              console.log(
-                `Non-default value found for currentField: ${fieldName}`
-              );
-              nonDefaultFields.push({
-                name: cssDefault.name,
-                type: currentField.type,
-                value: String(currentField.value),
-              });
-              break;
-            }
-          }
-        }
-
-        // push all other fields in
-        if (currentField.type !== 'value') {
-          nonDefaultFields.push({
-            name: fieldName,
-            type: currentField.type,
-            value: String(currentField.value),
-          });
-        }
+        fields.push({
+          name: fieldName,
+          type: currentField.type,
+          value: String(currentField.value),
+          selectors: currentField.selectors || null,
+        });
       });
 
-      // for fields that have are now non-default, also save derived values that
-      // are not expressed in the UI, for example if link colour has changed
-      // then also save data for its programatically generated 'hover' state
-      const derivedFields = this.resolveDerivedFields(
-        currentValues,
-        nonDefaultFields,
-        ['hover', 'focus', 'active']
-      );
+      // save derived values that are not expressed in the UI, for example if
+      // link colour has changed then also save data for its programmatically
+      // generated 'hover' state
+      const derivedFields = this.resolveDerivedFields(currentValues, fields, [
+        'hover',
+        'focus',
+        'active',
+      ]);
 
-      data.fields = nonDefaultFields.concat(derivedFields);
+      data.fields = fields.concat(derivedFields);
       return data;
     },
 
@@ -557,10 +537,34 @@ export default {
                 )
               ),
             });
+            this.addSelectorState(nonDefaultFields, variableName, state);
           }
         });
       });
       return derivedFields;
+    },
+
+    /**
+     * Some fields, like switches, controls other properties. The properties
+     * they control are defined in the selectors array and we need to update
+     * the selectors in case any selector is state related.
+     *
+     * @param {Array} nonDefaultFields
+     * @param {String} selector
+     * @param {String} state
+     */
+    addSelectorState(nonDefaultFields, selector, state) {
+      nonDefaultFields.forEach(field => {
+        if (field.selectors) {
+          const selectorState = selector + '-' + state;
+          if (
+            !field.selectors.some(s => s === selectorState) &&
+            field.selectors.some(s => s === selector)
+          ) {
+            field.selectors.push(selectorState);
+          }
+        }
+      });
     },
   },
 };

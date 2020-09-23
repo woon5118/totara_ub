@@ -130,7 +130,7 @@ class logo_image extends theme_file {
      * @return string
      */
     public function get_alt_text(): string {
-        $settings = new settings($this->theme_config, 0);
+        $settings = new settings($this->theme_config, $this->tenant_id);
         $property = $settings->get_property('brand', 'formbrand_field_logoalttext');
         if (!empty($property)) {
             return $property['value'];
@@ -142,6 +142,12 @@ class logo_image extends theme_file {
      * @inheritDoc
      */
     public function is_available(): bool {
+        // Check if feature is disabled.
+        if (!$this->is_enabled()) {
+            return false;
+        }
+
+        // Fall back on global setting when tenant logo not set.
         if ($this->tenant_id > 0) {
             $settings = new settings($this->theme_config, $this->tenant_id);
             if (!$settings->is_enabled('tenant', 'formtenant_field_tenant', false)) {

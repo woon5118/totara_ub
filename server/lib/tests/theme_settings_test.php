@@ -1,0 +1,800 @@
+<?php
+/**
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
+ * @package core
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+use core\theme\file\favicon_image;
+use core\theme\file\login_image;
+use core\theme\file\logo_image;
+use core\theme\helper;
+use core\theme\settings;
+use totara_tui\local\locator\bundle;
+use totara_tui\local\mediation\resolver;
+use totara_tui\local\mediation\styles\resolver as styles_resolver;
+use totara_tui\local\mediation\styles\mediator;
+use totara_webapi\phpunit\webapi_phpunit_helper;
+
+class core_theme_settings_testcase extends advanced_testcase {
+    use webapi_phpunit_helper;
+
+    /**
+     * Confirm that categories are valid.
+     *
+     * @param $categories
+     */
+    protected function validate_default_categories($categories) {
+        // Confirm brand.
+        $brand = array_filter($categories, function (array $category) {
+            $this->assertArrayHasKey('name', $category);
+            return $category['name'] === 'brand';
+        });
+        $this->assertIsArray($brand);
+        $brand = array_values($brand);
+        $this->assertEquals(1, sizeof($brand));
+        $this->assertArrayHasKey('properties', $brand[0]);
+        $this->assertEquals(3, sizeof($brand[0]['properties']));
+
+        foreach ($brand[0]['properties'] as $property) {
+            $this->assertArrayHasKey('name', $property);
+            $this->assertArrayHasKey('type', $property);
+            $this->assertArrayHasKey('value', $property);
+            switch ($property['name']) {
+                case 'formbrand_field_logoalttext':
+                    $this->assertEquals('text', $property['type']);
+                    $this->assertEquals('Totara Logo', $property['value']);
+                    break;
+                case 'sitelogo':
+                case 'sitefavicon':
+                    $this->assertEquals('file', $property['type']);
+                    $this->assertEquals('', $property['value']);
+                    break;
+                default:
+                    $this->fail('Unexpected default property');
+            }
+        }
+
+        // Confirm images.
+        $images = array_filter($categories, function (array $category) {
+            $this->assertArrayHasKey('name', $category);
+            return $category['name'] === 'images';
+        });
+        $this->assertIsArray($images);
+        $images = array_values($images);
+        $this->assertEquals(1, sizeof($images));
+        $this->assertArrayHasKey('properties', $images[0]);
+        $this->assertEquals(9, sizeof($images[0]['properties']));
+
+        foreach ($images[0]['properties'] as $property) {
+            $this->assertArrayHasKey('name', $property);
+            $this->assertArrayHasKey('type', $property);
+            $this->assertArrayHasKey('value', $property);
+
+            switch ($property['name']) {
+                case 'formimages_field_displaylogin':
+                    $this->assertEquals('boolean', $property['type']);
+                    $this->assertEquals('true', $property['value']);
+                    break;
+                case 'formimages_field_loginalttext':
+                    $this->assertEquals('text', $property['type']);
+                    $this->assertEquals('Totara Login', $property['value']);
+                    break;
+                case 'engageworkspace':
+                case 'sitelogin':
+                case 'learncourse':
+                case 'engageresource':
+                case 'engagesurvey':
+                case 'learncert':
+                case 'learnprogram':
+                    $this->assertEquals('file', $property['type']);
+                    $this->assertEquals('', $property['value']);
+                    break;
+                default:
+                    $this->fail('Unexpected default property');
+            }
+        }
+    }
+
+    /**
+     * Test default properties via the web api.
+     */
+    public function test_webapi_get_theme_settings() {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+        $user_context = context_user::instance($user_one->id);
+
+        // Test user that does not have permission.
+        $result = $this->execute_graphql_operation(
+            'core_get_theme_settings', [
+                'theme' => 'ventura'
+            ]
+        );
+        $this->assertNotEmpty($result->errors);
+        $this->assertEquals(
+            'Sorry, but you do not currently have permissions to do that (Configure site appearance settings)',
+            $result->errors[0]->message
+        );
+
+        // Grant user permission.
+        $roles = get_archetype_roles('user');
+        $role = reset($roles);
+        assign_capability('totara/core:appearance', CAP_ALLOW, $role->id, $user_context, true);
+
+        // Test with capability.
+        $result = $this->execute_graphql_operation(
+            'core_get_theme_settings', [
+                'theme' => 'ventura'
+            ]
+        );
+        $this->assertEmpty($result->errors);
+        $this->assertNotEmpty($result->data);
+
+        // Confirm that the default categories are correct.
+        $this->assertArrayHasKey('core_get_theme_settings', $result->data);
+        $this->assertArrayHasKey('categories', $result->data['core_get_theme_settings']);
+        $categories = $result->data['core_get_theme_settings']['categories'];
+        $this->assertIsArray($categories);
+        $this->assertEquals(2, sizeof($categories));
+        $this->validate_default_categories($categories);
+    }
+
+    public function test_webapi_update_theme_settings() {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+        $user_context = context_user::instance($user_one->id);
+
+        $parms = [
+            'theme' => 'ventura',
+            'categories' => [
+                [
+                    'name' => 'colours',
+                    'properties' => [
+                        [
+                            'name' => 'test_name',
+                            'type' => 'value',
+                            'value' => 'yellow_test'
+                        ]
+                    ]
+                ]
+            ],
+            'files' => []
+        ];
+
+        // Test user that does not have permission.
+        $result = $this->execute_graphql_operation('core_update_theme_settings', $parms);
+        $this->assertNotEmpty($result->errors);
+        $this->assertEquals(
+            'Sorry, but you do not currently have permissions to do that (Configure site appearance settings)',
+            $result->errors[0]->message
+        );
+
+        // Grant user permission.
+        $roles = get_archetype_roles('user');
+        $role = reset($roles);
+        assign_capability('totara/core:appearance', CAP_ALLOW, $role->id, $user_context, true);
+
+        // Test with capability.
+        $result = $this->execute_graphql_operation('core_update_theme_settings', $parms);
+        $this->assertEmpty($result->errors);
+        $this->assertNotEmpty($result->data);
+
+        // Confirm that the default categories are still correct.
+        $this->assertArrayHasKey('core_update_theme_settings', $result->data);
+        $this->assertArrayHasKey('categories', $result->data['core_update_theme_settings']);
+        $categories = $result->data['core_update_theme_settings']['categories'];
+        $this->assertIsArray($categories);
+        $this->assertEquals(3, sizeof($categories));
+        $this->validate_default_categories($categories);
+
+        // Check colours.
+        $colours = array_filter($categories, function (array $category) {
+            $this->assertArrayHasKey('name', $category);
+            return $category['name'] === 'colours';
+        });
+        $this->assertIsArray($colours);
+        $colours = array_values($colours);
+        $this->assertEquals(1, sizeof($colours));
+        $this->assertArrayHasKey('properties', $colours[0]);
+        $this->assertEquals(1, sizeof($colours[0]['properties']));
+        $property = reset($colours[0]['properties']);
+        $this->assertEquals('test_name', $property['name']);
+        $this->assertEquals('value', $property['type']);
+        $this->assertEquals('yellow_test', $property['value']);
+    }
+
+    /**
+     * Test default properties.
+     */
+    public function test_default_categories() {
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+        $output = helper::output_theme_settings($theme_settings);
+        $this->assertIsArray($output);
+        $this->assertArrayHasKey('categories', $output);
+        $this->assertIsArray($output['categories']);
+        $this->assertEquals(2, sizeof($output['categories']));
+        $this->validate_default_categories($output['categories']);
+    }
+
+    /**
+     * Test that site logo behaves as it should.
+     */
+    public function test_logo() {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+        $user_context = context_user::instance($user_one->id);
+
+        $categories = [
+            [
+                'name' => 'brand',
+                'properties' => [
+                    [
+                        'name' => 'formbrand_field_logoalttext',
+                        'type' => 'text',
+                        'value' => 'Totara Logo Updated',
+                    ],
+                ],
+            ]
+        ];
+        $files = [
+            [
+                'ui_key' => 'sitelogo',
+                'draft_id' => $this->create_image('new_site_logo', $user_context),
+            ]
+        ];
+
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+        $theme_settings->update_files($files, $user_one->id);
+
+        $output = helper::output_theme_settings($theme_settings);
+        $this->assertIsArray($output);
+
+        // Confirm brand is present and has properties.
+        $this->assertArrayHasKey('categories', $output);
+        $categories = $output['categories'];
+        $brand = array_filter($categories, function (array $category) {
+            $this->assertArrayHasKey('name', $category);
+            return $category['name'] === 'brand';
+        });
+        $this->assertIsArray($brand);
+        $brand = array_values($brand);
+        $this->assertEquals(1, sizeof($brand));
+        $this->assertArrayHasKey('properties', $brand[0]);
+        $this->assertEquals(3, sizeof($brand[0]['properties']));
+
+        // Confirm alternative text for logo is correct.
+        $logo_alt_text = array_filter($brand[0]['properties'], function (array $property) {
+            return $property['name'] === 'formbrand_field_logoalttext';
+        });
+        $this->assertIsArray($logo_alt_text);
+        $logo_alt_text = array_values($logo_alt_text);
+        $this->assertEquals(1, sizeof($logo_alt_text));
+        $this->assertEquals('Totara Logo Updated', $logo_alt_text[0]['value']);
+
+        // Confirm site logo is correct.
+        $site_logo = array_filter($brand[0]['properties'], function (array $property) {
+            return $property['name'] === 'sitelogo';
+        });
+        $this->assertIsArray($site_logo);
+        $site_logo = array_values($site_logo);
+        $this->assertEquals(1, sizeof($site_logo));
+        $this->assertEquals('file', $site_logo[0]['type']);
+
+        $logo_image = new logo_image($theme_config);
+        $url = $logo_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/logo/{$logo_image->get_item_id()}/new_site_logo.png",
+            $url
+        );
+        $alt_text = $logo_image->get_alt_text();
+        $this->assertEquals('Totara Logo Updated', $alt_text);
+        $this->assertEquals(true, $logo_image->is_available());
+    }
+
+    /**
+     * Test that favicon behaves as expected.
+     */
+    public function test_favicon() {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+        $user_context = context_user::instance($user_one->id);
+
+        $files = [
+            [
+                'ui_key' => 'sitefavicon',
+                'draft_id' => $this->create_image('new_favicon', $user_context),
+            ]
+        ];
+
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+        $theme_settings->update_files($files, $user_one->id);
+
+        $output = helper::output_theme_settings($theme_settings);
+        $this->assertIsArray($output);
+
+        // Confirm brand is present and has properties.
+        $this->assertArrayHasKey('categories', $output);
+        $categories = $output['categories'];
+        $brand = array_filter($categories, function (array $category) {
+            $this->assertArrayHasKey('name', $category);
+            return $category['name'] === 'brand';
+        });
+        $this->assertIsArray($brand);
+        $brand = array_values($brand);
+        $this->assertEquals(1, sizeof($brand));
+        $this->assertArrayHasKey('properties', $brand[0]);
+        $this->assertEquals(3, sizeof($brand[0]['properties']));
+
+        // Confirm favicon is correct.
+        $site_favicon = array_filter($brand[0]['properties'], function (array $property) {
+            return $property['name'] === 'sitefavicon';
+        });
+        $this->assertIsArray($site_favicon);
+        $site_favicon = array_values($site_favicon);
+        $this->assertEquals(1, sizeof($site_favicon));
+        $this->assertEquals('file', $site_favicon[0]['type']);
+
+        $favicon_image = new favicon_image($theme_config);
+        $url = $favicon_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/favicon/{$favicon_image->get_item_id()}/new_favicon.png",
+            $url
+        );
+    }
+
+    /**
+     * Test that:
+     *  -> colours can be updated and fetched.
+     *  -> override switch determines what colours are active.
+     */
+    public function test_colours() {
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+
+        $categories = $this->get_colours(true);
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        $output = helper::output_theme_settings($theme_settings);
+        $this->assertIsArray($output);
+        $this->assertArrayHasKey('categories', $output);
+
+        // Confirm that colours is present in the categories.
+        $colours = array_filter($output['categories'], function (array $category) {
+            $this->assertArrayHasKey('name', $category);
+            return $category['name'] === 'colours';
+        });
+        $this->assertIsArray($colours);
+        $colours = array_values($colours);
+        $this->assertArrayHasKey('properties', $colours[0]);
+        $this->assertEquals(4, sizeof($colours[0]['properties']));
+        foreach ($colours[0]['properties'] as $property) {
+            $this->assertArrayHasKey('name', $property);
+            $this->assertArrayHasKey('type', $property);
+            $this->assertArrayHasKey('value', $property);
+            switch ($property['name']) {
+                case 'formcolours_field_useoverrides':
+                    $this->assertEquals('boolean', $property['type']);
+                    $this->assertEquals(true, $property['value']);
+                    break;
+                case 'btn-prim-accent-color':
+                    $this->assertEquals('value', $property['type']);
+                    $this->assertEquals('#ff0013', $property['value']);
+                    break;
+                case 'link-color':
+                    $this->assertEquals('value', $property['type']);
+                    $this->assertEquals('#f50009', $property['value']);
+                    break;
+                case 'nav-bg-color':
+                    $this->assertEquals('value', $property['type']);
+                    $this->assertEquals('#ff0000', $property['value']);
+                    break;
+                default:
+                    $this->fail('Invalid colour property present in colour category');
+            }
+        }
+
+        // Confirm that overridden colours are present.
+        $css = $theme_settings->get_css_variables();
+        $this->assertEquals(
+            ':root{--btn-prim-accent-color: #ff0013;--link-color: #f50009;--nav-bg-color: #ff0000;}',
+            $css
+        );
+
+        $categories = $this->get_colours(false);
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        // Confirm that overridden colours are not present.
+        $css = $theme_settings->get_css_variables();
+        $this->assertEquals(
+            ':root{--nav-bg-color: #ff0000;}',
+            $css
+        );
+    }
+
+    /**
+     * @param bool $override
+     * @return array[]
+     */
+    private function get_colours(bool $override): array {
+        return [
+            [
+                'name' => 'colours',
+                'properties' => [
+                    [
+                        'name' => 'formcolours_field_useoverrides',
+                        'type' => 'boolean',
+                        'value' => $override,
+                        'selectors' => [
+                            'btn-prim-accent-color',
+                            'btn-accent-color',
+                            'link-color',
+                        ]
+                    ],
+                    [
+                        'name' => 'btn-prim-accent-color',
+                        'type' => 'value',
+                        'value' => '#ff0013',
+                    ],
+                    [
+                        'name' => 'link-color',
+                        'type' => 'value',
+                        'value' => '#f50009',
+                    ],
+                    [
+                        'name' => 'nav-bg-color',
+                        'type' => 'value',
+                        'value' => '#ff0000',
+                    ],
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Test that login image behaves as it should.
+     */
+    public function test_login_image() {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+        $user_context = context_user::instance($user_one->id);
+
+        $files = [
+            [
+                'ui_key' => 'sitelogin',
+                'draft_id' => $this->create_image('new_site_login_image', $user_context),
+            ]
+        ];
+
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+        $theme_settings->update_files($files, $user_one->id);
+
+        $output = helper::output_theme_settings($theme_settings);
+        $this->assertIsArray($output);
+
+        $login_image = new login_image($theme_config);
+        $url = $login_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/loginimage/{$login_image->get_item_id()}/new_site_login_image.png",
+            $url
+        );
+        $this->assertEquals(true, $login_image->is_available());
+        $this->assertEquals('Totara Login', $login_image->get_alt_text());
+
+        // Disable site login image and update alternative text.
+        $categories = [
+            [
+                'name' => 'images',
+                'properties' => [
+                    [
+                        'name' => 'formimages_field_displaylogin',
+                        'type' => 'boolean',
+                        'value' => 'false',
+                    ],
+                    [
+                        'name' => 'formimages_field_loginalttext',
+                        'type' => 'text',
+                        'value' => 'New alternative text',
+                    ]
+                ],
+            ]
+        ];
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+        $this->assertEquals(false, $login_image->is_available());
+        $this->assertEquals('New alternative text', $login_image->get_alt_text());
+    }
+
+    public function test_multitenant_images() {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+        $user_context = context_user::instance($user_one->id);
+        $theme_config = theme_config::load('ventura');
+
+        // Enable tenants.
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        // Create tenants.
+        $tenant_one = $tenant_generator->create_tenant();
+        $tenant_two = $tenant_generator->create_tenant();
+
+        // Confirm that logo has not been changed for tenant one.
+        $logo_image = new logo_image($theme_config);
+        $logo_image->set_tenant_id($tenant_one->id);
+        $url = $logo_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_core/1/logo",
+            $url
+        );
+        $this->assertEquals('Totara Logo', $logo_image->get_alt_text());
+
+        // Confirm that favicon has not been changed for tenant one.
+        $favicon_image = new favicon_image($theme_config);
+        $favicon_image->set_tenant_id($tenant_two->id);
+        $url = $favicon_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/theme/1/favicon",
+            $url
+        );
+
+        // Enable settings for tenant one.
+        $categories = [
+            [
+                'name' => 'brand',
+                'properties' => [
+                    [
+                        'name' => 'formbrand_field_logoalttext',
+                        'type' => 'text',
+                        'value' => 'Totara Logo Updated',
+                    ],
+                ],
+            ],
+            [
+                'name' => 'tenant',
+                'properties' => [
+                    [
+                        'name' => 'formtenant_field_tenant',
+                        'type' => 'boolean',
+                        'value' => 'true',
+                    ]
+                ],
+            ],
+        ];
+        $theme_settings = new settings($theme_config, $tenant_one->id);
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        // Update images for tenant one.
+        $files = [
+            [
+                'ui_key' => 'sitelogo',
+                'draft_id' => $this->create_image('new_site_logo', $user_context),
+            ],
+            [
+                'ui_key' => 'sitefavicon',
+                'draft_id' => $this->create_image('new_favicon', $user_context),
+            ]
+        ];
+        $theme_settings->update_files($files, $user_one->id);
+
+        // Confirm that tenant one has new logo.
+        $logo_image->set_tenant_id($tenant_one->id);
+        $url = $logo_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/logo/{$logo_image->get_item_id()}/new_site_logo.png",
+            $url
+        );
+        $this->assertEquals('Totara Logo Updated', $logo_image->get_alt_text());
+        $this->assertEquals(true, $logo_image->is_available());
+
+        // Confirm that tenant one has new favicon.
+        $favicon_image->set_tenant_id($tenant_one->id);
+        $url = $favicon_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/favicon/{$favicon_image->get_item_id()}/new_favicon.png",
+            $url
+        );
+
+        // Confirm that tenant two does not have new logo.
+        $logo_image->set_tenant_id($tenant_two->id);
+        $url = $logo_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_core/1/logo",
+            $url
+        );
+        $alt_text = $logo_image->get_alt_text();
+        $this->assertEquals('Totara Logo', $alt_text);
+        $this->assertEquals(true, $logo_image->is_available());
+
+        // Confirm that tenant two does not have new favicon.
+        $favicon_image->set_tenant_id($tenant_two->id);
+        $url = $favicon_image->get_current_or_default_url();
+        $this->assertInstanceOf(moodle_url::class, $url);
+        $url = $url->out();
+        $this->assertEquals(
+            "https://www.example.com/moodle/theme/image.php/_s/ventura/theme/1/favicon",
+            $url
+        );
+    }
+
+    /**
+     * @param string $name
+     * @param context $context
+     *
+     * @return int
+     */
+    private function create_image(string $name, context $context): int {
+        $draft_id = file_get_unused_draft_itemid();
+        $fs = get_file_storage();
+        $time = time();
+        $file_record = new stdClass();
+        $file_record->filename = "{$name}.png";
+        $file_record->contextid = $context->id;
+        $file_record->component = 'user';
+        $file_record->filearea = 'draft';
+        $file_record->filepath = '/';
+        $file_record->itemid = $draft_id;
+        $file_record->timecreated = $time;
+        $file_record->timemodified = $time;
+        $fs->create_file_from_string($file_record, $name);
+
+        return $draft_id;
+    }
+
+    public function test_custom_css() {
+        $theme_config = theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, 0);
+
+        $categories = [
+            [
+                'name' => 'custom',
+                'properties' => [
+                    [
+                        'name' => 'formcustom_field_customcss',
+                        'type' => 'text',
+                        'value' => 'body {background-color: pink;}',
+                    ]
+                ]
+            ]
+        ];
+
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        // Confirm that the custom css applied.
+        $rev = time();
+        [$css, $messages, $file] = $this->get_resolver($rev, 'p', 0);
+        $this->assertStringContainsString(
+            'body {background-color: pink;}',
+            $css
+        );
+    }
+
+    public function test_multitenant_colours() {
+        $this->skip_if_build_not_present();
+
+        $generator = $this->getDataGenerator();
+        $this->setAdminUser();
+        $theme_config = theme_config::load('ventura');
+
+        // Enable tenants.
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        // Create tenants.
+        $tenant_one = $tenant_generator->create_tenant();
+        $tenant_two = $tenant_generator->create_tenant();
+
+        // Update colours for tenant one.
+        $theme_settings = new settings($theme_config, $tenant_one->id);
+        $categories = $this->get_colours(true);
+        $categories[] = [
+            'name' => 'tenant',
+            'properties' => [
+                [
+                    'name' => 'formtenant_field_tenant',
+                    'type' => 'boolean',
+                    'value' => 'true',
+                ]
+            ]
+        ];
+        $theme_settings->validate_categories($categories);
+        $theme_settings->update_categories($categories);
+
+        $rev = time();
+
+        // Confirm that the settings applied for tenant one.
+        [$css, $messages, $file] = $this->get_resolver($rev, 'p', $tenant_one->id);
+        $this->assertStringContainsString(
+            ':root{--btn-prim-accent-color: #ff0013;--link-color: #f50009;--nav-bg-color: #ff0000;}',
+            $css
+        );
+
+        // Confirm that the settings DID NOT apply for tenant two.
+        [$css, $messages, $file] = $this->get_resolver($rev, 'p', $tenant_two->id);
+        $this->assertStringNotContainsString(
+            ':root{--btn-prim-accent-color: #ff0013;--link-color: #f50009;--nav-bg-color: #ff0000;}',
+            $css
+        );
+    }
+
+    private function skip_if_build_not_present() {
+        if (!file_exists(bundle::get_vendors_file())) {
+            $this->markTestSkipped('Tui build files must exist for this test to complete.');
+        }
+    }
+
+    private function get_resolver(int $rev, $mode = 'p', int $tenant_id = 0) {
+        global $CFG;
+        require_once($CFG->libdir . '/configonlylib.php');
+        $resolver = new styles_resolver(
+            mediator::class,
+            $rev,
+            'ventura',
+            'theme_ventura',
+            $mode,
+            $tenant_id
+        );
+
+        ob_start();
+        $resolver->resolve();
+        $css = ob_get_contents();
+        ob_end_clean();
+        $messages = $this->getDebuggingMessages();
+        $this->resetDebugging();
+
+        $prop = new ReflectionProperty(resolver::class, 'cachefile');
+        $prop->setAccessible(true);
+
+        return [$css, $messages, $prop->getValue($resolver)];
+    }
+
+}

@@ -22,6 +22,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use container_workspace\theme\file\workspace_image;
+use core\theme\settings;
+use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class container_workspace_webapi_workspace_image_testcase extends advanced_testcase {
@@ -63,7 +66,6 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
         $this->assertEmpty($result->errors);
         $this->assertNotEmpty($result->data);
         $this->assertArrayHasKey('image_url', $result->data);
-        $rev = $workspace->get_context()->id;
         $this->assertSame(
             'https://www.example.com/moodle/theme/image.php/_s/ventura/container_workspace/1/default_space',
             $result->data['image_url']
@@ -116,6 +118,28 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
             "https://www.example.com/moodle/pluginfile.php/{$rev}/container_workspace/image/0/file_1.png",
             $result->data['image_url']
         );
+    }
+
+    public function test_image_enabled() {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+        $theme_config = theme_config::load('ventura');
+
+        // Disable advanced feature.
+        advanced_feature::disable('container_workspace');
+
+        // Image should be disabled and not found in files.
+        $workspace_image = new workspace_image($theme_config);
+        $this->assertEquals(false, $workspace_image->is_enabled());
+
+        $theme_settings = new settings($theme_config, 0);
+        $files = $theme_settings->get_files($user_one->id);
+        foreach ($files as $file) {
+            if ($file instanceof workspace_image) {
+                $this->fail('Workspace image is disabled and should not be part of files');
+            }
+        }
     }
 
 }

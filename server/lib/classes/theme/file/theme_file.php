@@ -129,7 +129,7 @@ abstract class theme_file {
     public function get_item_id(?string $theme = null): int {
         global $DB;
 
-        $plugin = $theme ?? $this->theme_config->name;
+        $plugin = "theme_" . ($theme ?? $this->theme_config->name);
         $name = "tenant_{$this->tenant_id}_settings";
         if (!get_config($plugin, $name)) {
             set_config($name, '{}', $plugin);
@@ -141,7 +141,7 @@ abstract class theme_file {
             'config_plugins',
             'id',
             [
-                'plugin' => "theme_{$plugin}",
+                'plugin' => $plugin,
                 'name' => $name,
             ]
         );
@@ -362,8 +362,8 @@ abstract class theme_file {
     }
 
     /**
-     * Is this file handler enabled. This is different from is_available as this
-     * function should be used to determine if the file handler is enabled.
+     * Is this feature enabled. This is different from is_available as this
+     * function should be used to determine if the feature is enabled.
      *
      * @return bool
      */
@@ -388,7 +388,7 @@ abstract class theme_file {
      * @return bool
      */
     public function is_available(): bool {
-        return true;
+        return $this->is_enabled();
     }
 
     /**

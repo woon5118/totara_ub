@@ -3988,7 +3988,7 @@ EOD;
         // Override because rendering is not supported in template yet.
         $context->cookieshelpiconformatted = $this->help_icon('cookiesenabled');
         $context->errorformatted = $this->error_text($context->error);
-        if ($image->show_image()) {
+        if ($image->is_available()) {
             $context->hero_image = $image->get_current_or_default_url();
             $context->hero_alt = $image->get_alt_text();
         }
