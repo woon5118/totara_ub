@@ -169,7 +169,7 @@ class subject_instance_activity {
      * @return array
      */
     public function get_section_relationships_owned_by_relationship_id(int $relationship_id): array {
-        if (is_null($this->section_relationships_grouped_by_relationship_id[$relationship_id])) {
+        if (!isset($this->section_relationships_grouped_by_relationship_id[$relationship_id])) {
             $this->compute_section_relationships_owned_by_relationship_ids();
         }
 
