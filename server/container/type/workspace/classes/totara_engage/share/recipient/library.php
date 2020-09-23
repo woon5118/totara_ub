@@ -133,23 +133,32 @@ class library extends recipient {
      * @inheritDoc
      */
     public static function search(string $search, ?shareable $instance): array {
-        global $USER;
+        global $USER, $CFG;
 
         // If workspaces are disabled, search will always return nothing
         if (advanced_feature::is_disabled('container_workspace')) {
             return [];
         }
 
+        require_once("{$CFG->dirroot}/lib/enrollib.php");
+
         // Find all workspaces that this user has joined
-        $builder = builder::table('course', 'c')
-            ->select('id')
-            ->left_join(['enrol', 'e'], 'e.courseid', 'c.id')
-            ->left_join(['user_enrolments', 'ue'], 'ue.enrolid', 'e.id')
-            ->left_join(['user', 'u'], 'u.id', 'ue.userid')
-            ->where('c.category', workspace::get_default_category_id())
-            ->where('c.containertype', workspace::get_type())
+        $builder = builder::table('course')
+            ->select_raw('DISTINCT course.id')
+            ->join(['enrol', 'e'], 'id', 'courseid')
+            ->join(['user_enrolments', 'ue'], 'e.id', 'enrolid')
+            ->when(true, function (builder $builder) {
+                global $CFG, $USER;
+                require_once($CFG->dirroot . "/totara/coursecatalog/lib.php");
+
+                [$totara_visibility_sql, $totara_visibility_params] = totara_visibility_where($USER->id);
+
+                $builder->where_raw($totara_visibility_sql, $totara_visibility_params);
+            })
+            ->where('containertype', workspace::get_type())
+            ->where('ue.status', ENROL_USER_ACTIVE)
             ->where('ue.userid', $USER->id)
-            ->where('c.fullname', 'ilike', $search)
+            ->where('fullname', 'ilike', $search)
             ->limit(20);
 
         $records = $builder->fetch();

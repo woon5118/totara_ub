@@ -1,7 +1,9 @@
 <?php
 
+use container_workspace\enrol\manager;
 use container_workspace\member\member;
 use container_workspace\totara_engage\share\recipient\library;
+use totara_tenant\local\util;
 
 /**
  * This file is part of Totara Learn
@@ -33,29 +35,35 @@ class totara_engage_library_search_testcase extends advanced_testcase {
         $owner = $this->getDataGenerator()->create_user();
         $member = $this->getDataGenerator()->create_user();
 
-        /** @var container_workspace_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('container_workspace');
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $this->getDataGenerator()->get_plugin_generator('container_workspace');
 
-        $priv_workspace_member = $generator->create_private_workspace(
+        $priv_workspace_member = $workspace_generator->create_private_workspace(
             'private workspace member',
             'description',
             null,
             $owner->id
         );
-        $priv_workspace_non_member = $generator->create_private_workspace(
+        $priv_hidden_workspace_member1 = $workspace_generator->create_hidden_workspace(
+            'private hidden workspace member',
+            'description',
+            null,
+            $owner->id
+        );
+        $priv_workspace_non_member = $workspace_generator->create_private_workspace(
             'private workspace w/o member',
             'description',
             null,
             $owner->id
         );
 
-        $pub_workspace_member = $generator->create_workspace(
+        $pub_workspace_member = $workspace_generator->create_workspace(
             'public workspace member',
             'description',
             null,
             $owner->id
         );
-        $pub_workspace_non_member = $generator->create_workspace(
+        $pub_workspace_non_member = $workspace_generator->create_workspace(
             'public workspace w/o member',
             'description',
             null,
@@ -63,6 +71,7 @@ class totara_engage_library_search_testcase extends advanced_testcase {
         );
 
         member::added_to_workspace($priv_workspace_member, $member->id, false);
+        member::added_to_workspace($priv_hidden_workspace_member1, $member->id, false);
         member::added_to_workspace($pub_workspace_member, $member->id, false);
 
         // Admin user is not a member so shouldn't find anything
@@ -72,96 +81,25 @@ class totara_engage_library_search_testcase extends advanced_testcase {
         $this->setUser($member);
 
         $result = library::search('', null);
-        $this->assertCount(2, $result);
+        $this->assertCount(3, $result);
 
         $recipient_ids = [];
         foreach ($result as $recipient) {
             $recipient_ids[] = $recipient->get_id();
         }
 
-        $this->assertEqualsCanonicalizing([$priv_workspace_member->get_id(), $pub_workspace_member->get_id()], $recipient_ids);
-    }
-
-    public function test_search_workspaces_with_multi_tenancy() {
-        /** @var totara_tenant_generator $tenant_generator */
-        $tenant_generator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
-        $tenant_generator->enable_tenants();
-
-        $tenant1 = $tenant_generator->create_tenant();
-        $tenant2 = $tenant_generator->create_tenant();
-
-        $owner1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
-        $member1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
-
-        $owner2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
-        $member2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
-
-        /** @var container_workspace_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('container_workspace');
-
-        $this->setUser($owner1);
-
-        $priv_workspace_member1 = $generator->create_private_workspace(
-            'private workspace member',
-            'description',
-            null,
-            $owner1->id
-        );
-        $priv_workspace_non_member1 = $generator->create_private_workspace(
-            'private workspace w/o member',
-            'description',
-            null,
-            $owner1->id
+        $this->assertEqualsCanonicalizing(
+            [
+                $priv_workspace_member->get_id(),
+                $priv_hidden_workspace_member1->get_id(),
+                $pub_workspace_member->get_id()
+            ],
+            $recipient_ids
         );
 
-        $pub_workspace_member1 = $generator->create_workspace(
-            'public workspace member',
-            'description',
-            null,
-            $owner1->id
-        );
-        $pub_workspace_non_member1 = $generator->create_workspace(
-            'public workspace w/o member',
-            'description',
-            null,
-            $owner1->id
-        );
-
-        member::added_to_workspace($priv_workspace_member1, $member1->id, false);
-        member::added_to_workspace($pub_workspace_member1, $member1->id, false);
-
-        $this->setUser($owner2);
-
-        $priv_workspace_member2 = $generator->create_private_workspace(
-            'private workspace member',
-            'description',
-            null,
-            $owner2->id
-        );
-        $priv_workspace_non_member2 = $generator->create_private_workspace(
-            'private workspace w/o member',
-            'description',
-            null,
-            $owner2->id
-        );
-
-        $pub_workspace_member2 = $generator->create_workspace(
-            'public workspace member',
-            'description',
-            null,
-            $owner2->id
-        );
-        $pub_workspace_non_member2 = $generator->create_workspace(
-            'public workspace w/o member',
-            'description',
-            null,
-            $owner2->id
-        );
-
-        member::added_to_workspace($priv_workspace_member2, $member2->id, false);
-        member::added_to_workspace($pub_workspace_member2, $member2->id, false);
-
-        $this->setUser($member1);
+        // Now unenrol user from workspace
+        $member = member::from_user($member->id, $pub_workspace_member->get_id());
+        $member->leave();
 
         $result = library::search('', null);
         $this->assertCount(2, $result);
@@ -171,7 +109,163 @@ class totara_engage_library_search_testcase extends advanced_testcase {
             $recipient_ids[] = $recipient->get_id();
         }
 
-        $this->assertEqualsCanonicalizing([$priv_workspace_member1->get_id(), $pub_workspace_member1->get_id()], $recipient_ids);
+        $this->assertEqualsCanonicalizing(
+            [
+                $priv_workspace_member->get_id(),
+                $priv_hidden_workspace_member1->get_id(),
+            ],
+            $recipient_ids
+        );
+    }
+
+    public function test_search_workspaces_with_multi_tenancy() {
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $this->getDataGenerator()->get_plugin_generator('container_workspace');
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        $systemuser1 = $this->getDataGenerator()->create_user();
+        $systemuser2 = $this->getDataGenerator()->create_user();
+        util::add_other_participant($tenant1->id, $systemuser1->id);
+        util::add_other_participant($tenant2->id, $systemuser1->id);
+
+        $this->setAdminUser();
+
+        $system_workspace1 = $workspace_generator->create_private_workspace(
+            'system private workspace member',
+            'description',
+            null,
+            $systemuser1->id
+        );
+        $system_workspace2 = $workspace_generator->create_private_workspace(
+            'system private workspace member',
+            'description',
+            null,
+            $systemuser2->id
+        );
+        member::added_to_workspace($system_workspace2, $systemuser1->id, false);
+
+        $owner1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $member1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+
+        $owner2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $member2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+
+        $this->setUser($owner1);
+
+        $priv_workspace_member1 = $workspace_generator->create_private_workspace(
+            'private workspace member',
+            'description',
+            null,
+            $owner1->id
+        );
+        $priv_hidden_workspace_member1 = $workspace_generator->create_hidden_workspace(
+            'private hidden workspace member',
+            'description',
+            null,
+            $owner1->id
+        );
+        $priv_workspace_non_member1 = $workspace_generator->create_private_workspace(
+            'private workspace w/o member',
+            'description',
+            null,
+            $owner1->id
+        );
+
+        $pub_workspace_member1 = $workspace_generator->create_workspace(
+            'public workspace member',
+            'description',
+            null,
+            $owner1->id
+        );
+        $pub_workspace_non_member1 = $workspace_generator->create_workspace(
+            'public workspace w/o member',
+            'description',
+            null,
+            $owner1->id
+        );
+
+        member::added_to_workspace($priv_workspace_member1, $member1->id, false);
+        member::added_to_workspace($priv_hidden_workspace_member1, $member1->id, false);
+        member::added_to_workspace($pub_workspace_member1, $member1->id, false);
+        member::added_to_workspace($pub_workspace_member1, $systemuser1->id, false);
+
+        $this->setUser($owner2);
+
+        $priv_workspace_member2 = $workspace_generator->create_private_workspace(
+            'private workspace member',
+            'description',
+            null,
+            $owner2->id
+        );
+        $priv_workspace_non_member2 = $workspace_generator->create_private_workspace(
+            'private workspace w/o member',
+            'description',
+            null,
+            $owner2->id
+        );
+
+        $pub_workspace_member2 = $workspace_generator->create_workspace(
+            'public workspace member',
+            'description',
+            null,
+            $owner2->id
+        );
+        $pub_workspace_non_member2 = $workspace_generator->create_workspace(
+            'public workspace w/o member',
+            'description',
+            null,
+            $owner2->id
+        );
+
+        member::added_to_workspace($priv_workspace_member2, $systemuser1->id, false);
+        member::added_to_workspace($priv_workspace_member2, $member2->id, false);
+        member::added_to_workspace($pub_workspace_member2, $member2->id, false);
+
+        $this->setUser($member1);
+
+        $result = library::search('', null);
+        $this->assertCount(3, $result);
+
+        $recipient_ids = [];
+        foreach ($result as $recipient) {
+            $recipient_ids[] = $recipient->get_id();
+        }
+
+        $this->assertEqualsCanonicalizing(
+            [
+                $priv_hidden_workspace_member1->get_id(),
+                $priv_workspace_member1->get_id(),
+                $pub_workspace_member1->get_id()
+            ],
+            $recipient_ids
+        );
+
+        // Now as a system user
+        $this->setUser($systemuser1);
+
+        $result = library::search('', null);
+        $this->assertCount(4, $result);
+
+        $recipient_ids = [];
+        foreach ($result as $recipient) {
+            $recipient_ids[] = $recipient->get_id();
+        }
+
+        $this->assertEqualsCanonicalizing(
+            [
+                $system_workspace1->get_id(),
+                $system_workspace2->get_id(),
+                $priv_workspace_member2->get_id(),
+                $pub_workspace_member1->get_id(),
+            ],
+            $recipient_ids
+        );
     }
 
 }

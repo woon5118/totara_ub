@@ -93,6 +93,7 @@ final class shareto_recipients implements query_resolver, has_middleware {
         /** @var recipient[] $classes */
         $classes = recipient_helper::get_recipient_classes(true);
 
+        $data = [];
         // Execute search on each handler.
         foreach ($classes as $class) {
             // If search is not set, we fetch all the recipients back.
@@ -113,7 +114,6 @@ final class shareto_recipients implements query_resolver, has_middleware {
                 $already_recipients = self::get_already_recipients($itemid, $component, $recipients, $access);
             }
 
-            $data = [];
             // Setup recipient return data.
             foreach ($recipients as $recipient) {
                 // Allow only recipients that matches at least the item's access level.
