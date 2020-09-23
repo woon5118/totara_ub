@@ -32,7 +32,7 @@ describe('totara_engage/components/icons/StatIcon.vue', () => {
   });
 
   it('Checks the stat number', () => {
-    let value = wrapper.find('.tui-totaraEngage-statIcon__statNumber').text();
+    let value = wrapper.find('.tui-engageStatIcon__statNumber').text();
     expect(value).toEqual('15');
   });
 

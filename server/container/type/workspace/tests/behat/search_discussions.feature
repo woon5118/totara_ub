@@ -57,18 +57,18 @@ Feature: User search discussions
     And I wait for the next second
     And I click on "Post" "button"
     And I click on "Comment" "button"
-    And I activate the weka editor with css ".tui-commentForm__form__editor"
+    And I activate the weka editor with css ".tui-commentForm__editor"
     And I type "Discussion one comment" in the weka editor
     When I click on "Comment" "button" in the ".tui-commentForm__form" "css_element"
     And I wait for the next second
     Then I should not see "Discussion one comment" in the weka editor
     And I should see "Discussion one comment"
-    And ".tui-replyForm__form__editor" "css_element" should not exist
+    And ".tui-commentReplyForm__editor" "css_element" should not exist
     And I click on "Reply" "button"
-    And ".tui-replyForm__form__editor" "css_element" should exist
-    And I activate the weka editor with css ".tui-replyForm__form__editor"
+    And ".tui-commentReplyForm__editor" "css_element" should exist
+    And I activate the weka editor with css ".tui-commentReplyForm__editor"
     And I type " Discussion one reply" in the weka editor
-    When I click on "Reply" "button" in the ".tui-replyForm__form" "css_element"
+    When I click on "Reply" "button" in the ".tui-commentReplyForm__form" "css_element"
     Then I should see "Discussion one reply"
     And I set the field "Search discussions" to "COMMENT"
     And I should see "This is the discussion 1"

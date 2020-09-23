@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-editorWeka-filePicker">
+  <div>
     <input
       v-show="false"
       ref="fileInput"

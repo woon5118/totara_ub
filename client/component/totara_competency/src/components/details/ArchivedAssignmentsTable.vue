@@ -17,7 +17,10 @@
 -->
 
 <template>
-  <Table :data="assignments">
+  <Table
+    :data="assignments"
+    class="tui-competencyDetailArchivedAssignmentsTable"
+  >
     <template v-slot:header-row>
       <HeaderCell size="6">
         {{ $str('assignment', 'totara_competency') }}
@@ -48,13 +51,15 @@
         size="3"
         :column-header="$str('proficiency_status', 'totara_competency')"
       >
-        <div class="tui-competencyDetailArchivedAssignments__achievement">
+        <div class="tui-competencyDetailArchivedAssignmentsTable__achievement">
           <ProficientStatus :proficient-status="row.proficient" />
           <InfoIconButton
             v-if="row.legacy"
             :aria-label="$str('more_information', 'totara_competency')"
           >
-            <h4 class="tui-competencyDetailArchivedAssignments__discontinued">
+            <h4
+              class="tui-competencyDetailArchivedAssignmentsTable__discontinued"
+            >
               {{
                 $str(
                   'legacy_assignment_rating_discontinued',
@@ -107,3 +112,11 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyDetailArchivedAssignmentsTable {
+  &__achievement {
+    display: flex;
+  }
+}
+</style>

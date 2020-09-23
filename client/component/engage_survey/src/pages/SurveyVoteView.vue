@@ -16,7 +16,7 @@
   @module engage_survey
 -->
 <template>
-  <Layout class="tui-surveyVoteView">
+  <Layout class="tui-engageSurveyVoteView">
     <template v-if="backButton || navigationButtons" v-slot:header>
       <ResourceNavigationBar
         :back-button="backButton"
@@ -25,13 +25,13 @@
     </template>
     <template v-slot:column>
       <Loader :loading="$apollo.loading" :fullpage="true" />
-      <div v-if="!$apollo.loading" class="tui-surveyVoteView__layout">
-        <div class="tui-surveyVoteView__layout__content">
+      <div v-if="!$apollo.loading" class="tui-engageSurveyVoteView__layout">
+        <div class="tui-engageSurveyVoteView__content">
           <SurveyVoteTitle
             :title="firstQuestion.value"
             :bookmarked="bookmarked"
             :owned="survey.owned"
-            class="tui-surveyVoteView__layout__content__title"
+            class="tui-engageSurveyVoteView__title"
             @bookmark="updateBookmark"
           />
           <SurveyVoteContent
@@ -78,7 +78,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-surveyVoteView {
+.tui-engageSurveyVoteView {
   .tui-grid-item {
     min-height: var(--engageSurvey-min-height);
   }
@@ -90,21 +90,23 @@ export default {
 
   &__layout {
     display: flex;
-    &__content {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      width: 100%;
-      margin: 0 auto;
-      padding: 0 0 var(--gap-12) 0;
-      @media (max-width: $tui-screen-sm) {
-        width: 70vw;
-        margin-left: var(--gap-8);
-      }
-      &__title {
-        margin-bottom: var(--gap-4);
-      }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 0 var(--gap-12) 0;
+    @media (max-width: $tui-screen-sm) {
+      width: 70vw;
+      margin-left: var(--gap-8);
     }
+  }
+
+  &__title {
+    margin-bottom: var(--gap-4);
   }
 }
 </style>

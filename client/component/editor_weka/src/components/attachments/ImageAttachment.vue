@@ -18,7 +18,7 @@
 
 <template>
   <!-- A component for displaying a draft file as attachment -->
-  <div class="tui-editorWeka-imageAttachment">
+  <div>
     <AttachmentNode
       :filename="filename"
       :file-size="fileSize"

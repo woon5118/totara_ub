@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <EngageSidePanel v-if="!$apollo.loading" class="tui-articleSidePanel">
+  <EngageSidePanel v-if="!$apollo.loading" class="tui-engageArticleSidePanel">
     <MiniProfileCard
       slot="author-profile"
       :display="user.card_display"
@@ -51,7 +51,7 @@
 
     <template v-slot:overview>
       <Loader :fullpage="true" :loading="submitting" />
-      <p class="tui-articleSidePanel__timeDescription">
+      <p class="tui-engageArticleSidePanel__timeDescription">
         {{ article.timedescription }}
       </p>
       <AccessSetting
@@ -91,7 +91,7 @@
 
       <ArticlePlaylistBox
         :resource-id="resourceId"
-        class="tui-articleSidePanel__playlistBox"
+        class="tui-engageArticleSidePanel__playlistBox"
       />
     </template>
 
@@ -378,7 +378,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-articleSidePanel {
+.tui-engageArticleSidePanel {
   &__timeDescription {
     @include tui-font-body-small();
   }

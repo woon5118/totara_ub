@@ -18,7 +18,6 @@
 
 <template>
   <Adder
-    class="tui-engageAdderModal"
     :open="open"
     :title="title"
     :existing-items="existingItems"
@@ -159,21 +158,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss">
-.tui-engageAdderModal {
-  &__browseTable {
-    &__img {
-      width: 100%;
-      height: 45px;
-    }
-
-    &__title {
-      display: block;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
-}
-</style>

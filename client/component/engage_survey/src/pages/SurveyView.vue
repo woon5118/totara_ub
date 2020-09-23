@@ -16,7 +16,7 @@
   @module engage_survey
 -->
 <template>
-  <Layout class="tui-surveyView">
+  <Layout class="tui-engageSurveyView">
     <template v-if="backButton || navigationButtons" v-slot:header>
       <ResourceNavigationBar
         :back-button="backButton"
@@ -25,12 +25,12 @@
     </template>
     <template v-slot:column>
       <Loader :loading="$apollo.loading" :fullpage="true" />
-      <div v-if="!$apollo.loading" class="tui-surveyView__layout">
-        <div class="tui-surveyView__layout__content">
+      <div v-if="!$apollo.loading" class="tui-engageSurveyView__layout">
+        <div class="tui-engageSurveyView__content">
           <SurveyVoteTitle
             :title="firstQuestion.value"
             :owned="survey.owned"
-            class="tui-surveyView__layout__content__title"
+            class="tui-engageSurveyView__title"
           />
           <SurveyVoteContent
             :answer-type="firstQuestion.answertype"
@@ -76,7 +76,7 @@ export default {
   --engageSurvey-min-height: 78vh;
 }
 
-.tui-surveyView {
+.tui-engageSurveyView {
   .tui-grid-item {
     min-height: var(--engageSurvey-min-height);
   }
@@ -88,20 +88,22 @@ export default {
 
   &__layout {
     display: flex;
-    &__content {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin: 0 auto;
-      padding: 0 0 var(--gap-12) 0;
-      @media (max-width: $tui-screen-sm) {
-        width: 70vw;
-        margin-left: var(--gap-8);
-      }
-      &__title {
-        margin-bottom: var(--gap-4);
-      }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 0 0 var(--gap-12) 0;
+    @media (max-width: $tui-screen-sm) {
+      width: 70vw;
+      margin-left: var(--gap-8);
     }
+  }
+
+  &__title {
+    margin-bottom: var(--gap-4);
   }
 }
 </style>

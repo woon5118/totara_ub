@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-engageArticle-createArticle">
+  <div class="tui-engageCreateArticle">
     <ArticleForm
       v-show="stage === 0"
       :article-name="article.name"
@@ -168,7 +168,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-engageArticle-createArticle {
+.tui-engageCreateArticle {
   display: flex;
   flex: 1;
   flex-direction: column;

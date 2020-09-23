@@ -112,7 +112,7 @@ export default {
 
 <style lang="scss">
 .tui-contributionSearchResults {
-  .tui-contributionBaseContent__header__title {
+  .tui-contributionBaseContent__title {
     @include tui-font-heading-page-title;
   }
 }

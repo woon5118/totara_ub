@@ -16,9 +16,9 @@
   @module engage_survey
 -->
 <template>
-  <div class="tui-surveyVoteTitle">
-    <div class="tui-surveyVoteTitle__head">
-      <h3 class="tui-surveyVoteTitle__head__title">
+  <div class="tui-engageSurveyVoteTitle">
+    <div class="tui-engageSurveyVoteTitle__head">
+      <h3 class="tui-engageSurveyVoteTitle__title">
         {{ title }}
       </h3>
       <BookmarkButton
@@ -65,7 +65,7 @@ export default {
   --survey-header-iconBtn-height: 3.2rem;
 }
 
-.tui-surveyVoteTitle {
+.tui-engageSurveyVoteTitle {
   display: flex;
   flex-direction: column;
 
@@ -83,18 +83,18 @@ export default {
     > :last-child {
       margin-left: var(--gap-2);
     }
+  }
 
-    &__title {
-      @include tui-font-heading-medium();
-      width: 90%;
-      margin: 0;
-      -ms-word-break: break-all;
-      overflow-wrap: break-word;
-      hyphens: none;
+  &__title {
+    @include tui-font-heading-medium();
+    width: 90%;
+    margin: 0;
+    -ms-word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: none;
 
-      @media (max-width: $tui-screen-sm) {
-        width: 100%;
-      }
+    @media (max-width: $tui-screen-sm) {
+      width: 100%;
     }
   }
 }

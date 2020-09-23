@@ -18,20 +18,20 @@
 <template>
   <div class="tui-commentCard">
     <div class="tui-commentCard__comment">
-      <div class="tui-commentCard__comment__profilePicture">
+      <div class="tui-commentCard__profilePicture">
         <slot name="profile-picture" />
       </div>
 
-      <div class="tui-commentCard__comment__body">
-        <div class="tui-commentCard__comment__body__header">
+      <div class="tui-commentCard__body">
+        <div class="tui-commentCard__header">
           <slot name="body-header" />
         </div>
 
-        <div class="tui-commentCard__comment__body__content">
+        <div class="tui-commentCard__content">
           <slot name="body-content" />
         </div>
 
-        <div class="tui-commentCard__comment__body__footer">
+        <div class="tui-commentCard__footer">
           <slot name="body-footer" />
         </div>
       </div>
@@ -51,26 +51,26 @@
   &__comment {
     display: flex;
     align-items: flex-start;
+  }
 
-    &__profilePicture {
-      margin-right: var(--gap-2);
-    }
+  &__profilePicture {
+    margin-right: var(--gap-2);
+  }
 
-    &__body {
-      flex: 1 1 auto;
+  &__body {
+    flex: 1 1 auto;
+  }
 
-      &__header {
-        margin-bottom: var(--gap-2);
-      }
+  &__header {
+    margin-bottom: var(--gap-2);
+  }
 
-      &__content {
-        margin-bottom: var(--gap-2);
-        padding-right: var(--gap-2);
-        -ms-word-break: break-all;
-        overflow-wrap: break-word;
-        hyphens: none;
-      }
-    }
+  &__content {
+    margin-bottom: var(--gap-2);
+    padding-right: var(--gap-2);
+    -ms-word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: none;
   }
 }
 </style>

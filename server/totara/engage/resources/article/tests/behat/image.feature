@@ -21,13 +21,13 @@ Feature: Custom article images
     And I click on "Your Library" in the totara menu
     And I press "Contribute"
     And I set the field "Enter resource title" to "DefaultResource"
-    And I activate the weka editor with css ".tui-engageArticle-createArticle"
+    And I activate the weka editor with css ".tui-engageCreateArticle"
     And I type "No Image" in the weka editor
     And I wait for the next second
     And I press "Next"
     And I wait for pending js
     And I wait for the next second
-    And I click on "Only you" "text" in the ".tui-accessForm" "css_element"
+    And I click on "Only you" "text" in the ".tui-engageAccessForm" "css_element"
     And I press "Done"
     And I click on "Your Library" in the totara menu
 
@@ -38,7 +38,7 @@ Feature: Custom article images
     And I click on "Your Library" in the totara menu
     And I press "Contribute"
     And I set the field "Enter resource title" to "ImageResource"
-    And I activate the weka editor with css ".tui-engageArticle-createArticle"
+    And I activate the weka editor with css ".tui-engageCreateArticle"
     And I type "Test Image" in the weka editor
     And I select the text "Test Image" in the weka editor
     And I click on the "Link" toolbar button in the weka editor
@@ -49,7 +49,7 @@ Feature: Custom article images
     And I wait for the next second
     And I press "Next"
     And I wait for the next second
-    And I click on "Only you" "text" in the ".tui-accessForm" "css_element"
+    And I click on "Only you" "text" in the ".tui-engageAccessForm" "css_element"
     And I press "Done"
     And I click on "Your Library" in the totara menu
     And I wait for the next second

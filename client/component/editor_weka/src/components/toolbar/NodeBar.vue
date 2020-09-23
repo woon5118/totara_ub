@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-editorWeka-nodeBar">
+  <div class="tui-wekaNodeBar">
     <ActionDropdown position="bottom-right" :actions="actions">
       <template v-slot:trigger="{ toggle, isOpen }">
         <ButtonIcon
@@ -65,14 +65,14 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-nodeBar {
+.tui-wekaNodeBar {
   display: flex;
   justify-content: flex-end;
   visibility: hidden;
 }
 
-.tui-weka:hover .tui-editorWeka-nodeBar,
-.ProseMirror-focused .tui-editorWeka-nodeBar {
+.tui-weka:hover .tui-wekaNodeBar,
+.ProseMirror-focused .tui-wekaNodeBar {
   visibility: visible;
 }
 </style>

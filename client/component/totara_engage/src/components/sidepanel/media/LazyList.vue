@@ -16,13 +16,13 @@
   @module totara_engage
 -->
 <template>
-  <div class="tui-engage__sidepanel__media_lazylist">
+  <div class="tui-engageSidepanelLazylist">
     <template v-if="total === 0">
       {{ noItems }}
     </template>
     <Loading v-else-if="loading" />
     <template v-else>
-      <ul class="tui-engage__sidepanel__media_lazylist-list">
+      <ul class="tui-engageSidepanelLazylist__list">
         <li v-for="name in names.slice(0, 9)" :key="name">
           {{ name }}
         </li>
@@ -71,8 +71,10 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-engage__sidepanel__media_lazylist-list {
-  margin: 0;
-  list-style-type: none;
+.tui-engageSidepanelLazylist {
+  &__list {
+    margin: 0;
+    list-style-type: none;
+  }
 }
 </style>

@@ -17,12 +17,12 @@
 -->
 
 <template>
-  <div class="tui-engageSurvey-author">
+  <div class="tui-engageSurveyAuthor">
     <Avatar :src="profileImageUrl" :alt="profileImageAlt" size="xxsmall" />
 
     <a
       :href="$url('/user/profile.php', { id: userId })"
-      class="tui-engageSurvey-author__userLink"
+      class="tui-engageSurveyAuthor__userLink"
     >
       {{ fullname }}
     </a>
@@ -62,7 +62,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-engageSurvey-author {
+.tui-engageSurveyAuthor {
   display: flex;
   align-items: center;
 

@@ -32,7 +32,7 @@ Feature: Create a playlist with a banner
     When I view playlist "TestPlaylist"
     Then I press "Contribute"
     And I set the field "article-title" to "TestArticle"
-    And I activate the weka editor with css ".tui-engageArticle-createArticle"
+    And I activate the weka editor with css ".tui-engageCreateArticle"
     And I type "Test Image" in the weka editor
     And I select the text "Test Image" in the weka editor
     And I click on the "Link" toolbar button in the weka editor

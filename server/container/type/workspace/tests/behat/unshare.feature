@@ -28,7 +28,7 @@ Feature: Unshare resources from workspace
     And I click on "Contribute" "button"
     When I follow "Resource"
     And I set the field "Enter resource title" to "Test Article 1"
-    And I activate the weka editor with css ".tui-articleForm__description"
+    And I activate the weka editor with css ".tui-engageArticleForm__description"
     And I set the weka editor to "New article"
     And I wait for the next second
     And I click on "Next" "button"

@@ -2,21 +2,21 @@
 
 exports[`totara_engage/components/icons/StatIcon.vue Checks snapshot 1`] = `
 <div
-  class="tui-totaraEngage-statIcon"
+  class="tui-engageStatIcon"
 >
   <span
     aria-label="15 likes"
-    class="tui-totaraEngage-statIcon__iconContainer"
+    class="tui-engageStatIcon__iconContainer"
     role="img"
   >
     <span
-      class="tui-totaraEngage-statIcon__icon tui-totaraEngage-icon"
+      class="tui-engageStatIcon__icon"
     />
   </span>
    
   <span
     aria-hidden="true"
-    class="tui-totaraEngage-statIcon__statNumber"
+    class="tui-engageStatIcon__statNumber"
   >
     
     15

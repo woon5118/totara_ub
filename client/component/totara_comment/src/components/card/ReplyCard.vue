@@ -16,21 +16,21 @@
   @module totara_comment
 -->
 <template>
-  <div class="tui-replyCard">
-    <div class="tui-replyCard__profilePicture">
+  <div class="tui-commentReplyCard">
+    <div class="tui-commentReplyCard__profilePicture">
       <slot name="profile-picture" />
     </div>
 
-    <div class="tui-replyCard__body">
-      <div class="tui-replyCard__body__header">
+    <div class="tui-commentReplyCard__body">
+      <div class="tui-commentReplyCard__header">
         <slot name="body-header" />
       </div>
 
-      <div class="tui-replyCard__body__content">
+      <div class="tui-commentReplyCard__content">
         <slot name="body-content" />
       </div>
 
-      <div class="tui-replyCard__body__footer">
+      <div class="tui-commentReplyCard__footer">
         <slot name="body-footer" />
       </div>
     </div>
@@ -38,7 +38,7 @@
 </template>
 
 <style lang="scss">
-.tui-replyCard {
+.tui-commentReplyCard {
   display: flex;
   align-items: flex-start;
 
@@ -48,18 +48,18 @@
 
   &__body {
     flex: 1 1 auto;
+  }
 
-    &__header {
-      margin-bottom: var(--gap-2);
-    }
+  &__header {
+    margin-bottom: var(--gap-2);
+  }
 
-    &__content {
-      margin-bottom: var(--gap-2);
-      padding-right: var(--gap-2);
-      -ms-word-break: break-all;
-      overflow-wrap: break-word;
-      hyphens: none;
-    }
+  &__content {
+    margin-bottom: var(--gap-2);
+    padding-right: var(--gap-2);
+    -ms-word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: none;
   }
 }
 </style>

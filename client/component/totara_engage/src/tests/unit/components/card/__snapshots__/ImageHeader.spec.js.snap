@@ -2,7 +2,7 @@
 
 exports[`totara_engage/components/card/ImageHeader Checks snapshot 1`] = `
 <div
-  class="tui-totaraEngage-imageHeader"
+  class="tui-engageImageHeader"
 >
   <!---->
    

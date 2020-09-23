@@ -17,21 +17,21 @@
 -->
 
 <template>
-  <div class="tui-totaraEngage-cardHeader">
-    <div class="tui-totaraEngage-cardHeader__first">
+  <div class="tui-engageCardHeader">
+    <div class="tui-engageCardHeader__first">
       <slot name="first" />
     </div>
-    <div class="tui-totaraEngage-cardHeader__second">
+    <div class="tui-engageCardHeader__second">
       <slot name="second" />
     </div>
-    <div class="tui-totaraEngage-cardHeader__third">
+    <div class="tui-engageCardHeader__third">
       <slot name="third" />
     </div>
   </div>
 </template>
 
 <style lang="scss">
-.tui-totaraEngage-cardHeader {
+.tui-engageCardHeader {
   &__first {
     display: flex;
     justify-content: flex-end;

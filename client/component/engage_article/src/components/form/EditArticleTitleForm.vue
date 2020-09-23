@@ -16,7 +16,7 @@
   @module engage_article
 -->
 <template>
-  <Form class="tui-editArticleTitleForm">
+  <Form class="tui-engageEditArticleTitleForm">
     <InputText
       v-model="innerTitle"
       name="title"
@@ -24,7 +24,7 @@
       :maxlength="60"
       :placeholder="$str('entertitle', 'engage_article')"
       :aria-label="$str('articletitle', 'engage_article')"
-      class="tui-editArticleTitleForm__input"
+      class="tui-engageEditArticleTitleForm__input"
       @submit="$emit('submit', innerTitle)"
     />
 
@@ -80,7 +80,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editArticleTitleForm {
+.tui-engageEditArticleTitleForm {
   width: 100%;
 }
 </style>

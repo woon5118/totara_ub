@@ -143,7 +143,7 @@ export default {
     content: '';
   }
 
-  .tui-totaraEngage-star {
+  .tui-engageStarIcon {
     width: var(--font-size-15);
     height: var(--font-size-15);
 

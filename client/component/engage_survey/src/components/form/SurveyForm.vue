@@ -18,14 +18,14 @@
 
 <template>
   <Uniform
-    class="tui-totaraEngage-surveyForm"
+    class="tui-engageSurveyForm"
     :initial-values="initialValues"
     :vertical="true"
     input-width="full"
     @submit="submit"
     @change="change"
   >
-    <div class="tui-totaraEngage-surveyForm__title">
+    <div class="tui-engageSurveyForm__title">
       <FieldContextProvider>
         <FormText
           name="question"
@@ -48,8 +48,8 @@
           name="optionType"
           :value="singleChoice"
           :class="[
-            `tui-totaraEngage-surveyForm__optionType`,
-            `tui-totaraEngage-surveyForm__optionType--single`,
+            `tui-engageSurveyForm__optionType`,
+            `tui-engageSurveyForm__optionType--single`,
           ]"
         >
           {{ $str('optionsingle', 'engage_survey') }}
@@ -58,8 +58,8 @@
           name="optionType"
           :value="multiChoice"
           :class="[
-            `tui-totaraEngage-surveyForm__optionType`,
-            `tui-totaraEngage-surveyForm__optionType--multiple`,
+            `tui-engageSurveyForm__optionType`,
+            `tui-engageSurveyForm__optionType--multiple`,
           ]"
         >
           {{ $str('optionmultiple', 'engage_survey') }}
@@ -70,7 +70,7 @@
     <FormRow
       v-slot="{ labelId }"
       :label="$str('optionstitle', 'engage_survey')"
-      class="tui-totaraEngage-surveyForm__answerTitle"
+      class="tui-engageSurveyForm__answerTitle"
     >
       <FieldArray v-slot="{ items, push, remove }" path="options">
         <Repeater
@@ -80,13 +80,13 @@
           :disabled="submitting"
           :delete-icon="true"
           :allow-deleting-first-items="false"
-          class="tui-totaraEngage-surveyForm__repeater"
+          class="tui-engageSurveyForm__repeater"
           :aria-labelledby="labelId"
           @add="push(newOption())"
           @remove="(item, i) => remove(i)"
         >
-          <template v-slot="{ row, index }">
-            <div class="tui-totaraEngage-surveyForm__repeater__input">
+          <template v-slot="{ index }">
+            <div class="tui-engageSurveyForm__optionInput">
               <FieldContextProvider>
                 <FormText
                   :name="[index, 'text']"
@@ -102,14 +102,14 @@
     </FormRow>
 
     <ButtonGroup
-      class="tui-totaraEngage-surveyForm__buttons"
+      class="tui-engageSurveyForm__buttons"
       :class="{
-        'tui-totaraEngage-surveyForm__buttons--right': showButtonRight,
-        'tui-totaraEngage-surveyForm__buttons--left': showButtonLeft,
+        'tui-engageSurveyForm__buttons--right': showButtonRight,
+        'tui-engageSurveyForm__buttons--left': showButtonLeft,
       }"
     >
       <LoadingButton
-        class="tui-totaraEngage-surveyForm__button"
+        class="tui-engageSurveyForm__button"
         type="submit"
         :loading="submitting"
         :primary="true"
@@ -118,7 +118,7 @@
       />
       <CancelButton
         :disabled="submitting"
-        class="tui-totaraEngage-surveyForm__cancelButton"
+        class="tui-engageSurveyForm__cancelButton"
         @click="$emit('cancel')"
       />
     </ButtonGroup>
@@ -278,7 +278,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-totaraEngage-surveyForm {
+.tui-engageSurveyForm {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -317,7 +317,7 @@ export default {
 
   &__repeater {
     .tui-repeater__row {
-      .tui-totaraEngage-surveyForm__repeater__input {
+      .tui-engageSurveyForm__optionInput {
         width: 80%;
         .tui-formField {
           width: 100%;
@@ -334,7 +334,7 @@ export default {
     flex: 1;
     align-items: flex-end;
     margin-top: var(--gap-2);
-    button.tui-totaraEngage-surveyForm__cancelButton {
+    button.tui-engageSurveyForm__cancelButton {
       margin-bottom: 0;
     }
     &--left {

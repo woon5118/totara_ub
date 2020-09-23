@@ -127,9 +127,5 @@ export default {
     @include tui-font-heading-small();
     padding-top: var(--gap-2);
   }
-
-  &__achievement {
-    display: flex;
-  }
 }
 </style>

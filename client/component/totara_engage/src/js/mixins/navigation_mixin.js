@@ -45,10 +45,10 @@ export default {
      */
     getNavigationLinkClass(name, i) {
       return {
-        'tui-navigationPanel__link': true,
-        'tui-navigationPanel__link--inactive': this.selectedId !== name,
-        'tui-navigationPanel__link--active': this.selectedId === name,
-        'tui-navigationPanel__link__first': i === 0,
+        'tui-engageNavigationPanel__link': true,
+        'tui-engageNavigationPanel__link--inactive': this.selectedId !== name,
+        'tui-engageNavigationPanel__link--active': this.selectedId === name,
+        'tui-engageNavigationPanel__link--first': i === 0,
       };
     },
   },

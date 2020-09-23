@@ -39,7 +39,7 @@ Feature: Update article
     And I should see "Updated test article 1"
     And I click on "Edit Updated test article 1 content" "button" with keyboard
     And I wait for the next second
-    And I activate the weka editor with css ".tui-editArticleContentForm__editor"
+    And I activate the weka editor with css ".tui-engageEditArticleContentForm__editor"
     And I type "Edit article" in the weka editor
     And I wait for the next second
     And I click on "Done" "button"

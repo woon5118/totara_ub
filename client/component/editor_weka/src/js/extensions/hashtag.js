@@ -32,7 +32,7 @@ class HashtagExtension extends BaseExtension {
           },
           parseDOM: [
             {
-              tag: 'span.tui-editorWeka-node__hashtag',
+              tag: 'span.tui-wekaNodeHashtag',
               getAttrs(dom) {
                 try {
                   return {
@@ -48,7 +48,7 @@ class HashtagExtension extends BaseExtension {
             return [
               'span',
               {
-                class: 'tui-editorWeka-node__hashtag',
+                class: 'tui-wekaNodeHashtag',
               },
               '#' + node.attrs.text,
             ];

@@ -50,7 +50,7 @@
         :show-unhidden-check-box="isHidden && canUnhide"
         :workspace-private="isPrivate || isHidden"
         :workspace-hidden="isHidden"
-        class="tui-workspaceEditModal__content__form"
+        class="tui-workspaceEditModal__form"
         @submit="updateWorkspace"
         @cancel="$emit('request-close')"
       />
@@ -237,11 +237,11 @@ export default {
   &__content {
     display: flex;
     flex-direction: column;
+  }
 
-    &__form {
-      flex: 1;
-      height: 100%;
-    }
+  &__form {
+    flex: 1;
+    height: 100%;
   }
 }
 </style>

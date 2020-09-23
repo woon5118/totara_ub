@@ -2,14 +2,14 @@
 
 exports[`totara_engage/components/modal/NameListModal Matchs snapshot 1`] = `
 <modal-stub
-  arialabelledby="tui-engage__components__modal__namelistmodal-title"
+  arialabelledby="id-title"
   dismissable="true"
   shade="true"
   size="small"
 >
   <h2
-    class="tui-engage__components__modal__namelistmodal-title"
-    id="tui-engage__components__modal__namelistmodal-title"
+    class="tui-engageArticleNameListModal__title"
+    id="id-title"
   >
     
     You like me?
@@ -17,19 +17,19 @@ exports[`totara_engage/components/modal/NameListModal Matchs snapshot 1`] = `
   </h2>
    
   <closebutton-stub
-    class="tui-engage__components__modal__namelistmodal-close"
+    class="tui-engageArticleNameListModal__close"
     size="300"
   />
    
   <div
-    class="tui-engage__components__modal__namelistmodal-content"
+    class="tui-engageArticleNameListModal__content"
   >
     <loading-stub
       size="200"
     />
      
     <div
-      class="tui-engage__components__modal__namelistmodal-content-loadmore"
+      class="tui-engageArticleNameListModal__content-loadmore"
     >
       <loading-stub
         size="200"

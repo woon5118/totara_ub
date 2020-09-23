@@ -18,12 +18,12 @@
 
 <template>
   <Form
-    class="tui-accessForm"
+    class="tui-engageAccessForm"
     :vertical="true"
     input-width="full"
     @submit.prevent="disabled ? true : done()"
   >
-    <div :class="['tui-accessForm__options', optionsWrapperCss]">
+    <div :class="['tui-engageAccessForm__options', optionsWrapperCss]">
       <FormRow
         v-slot="{ id, labelId }"
         :label="$str('whocansee', 'totara_engage')"
@@ -43,7 +43,7 @@
         v-if="timeViewVisible"
         v-slot="{ id, labelId }"
         :label="$str('timetoread', 'totara_engage')"
-        class="tui-accessForm__time"
+        class="tui-engageAccessForm__time"
       >
         <TimeViewSelector
           :id="id"
@@ -54,10 +54,10 @@
       </FormRow>
     </div>
 
-    <div v-if="!accessPrivate" class="tui-accessForm__tagLists">
+    <div v-if="!accessPrivate" class="tui-engageAccessForm__tagLists">
       <TopicsSelector
         v-if="accessPublic"
-        class="tui-accessForm__tagList"
+        class="tui-engageAccessForm__tagList"
         :selected-topics="selectedTopics"
         @change="selectedTopics = $event"
       />
@@ -68,7 +68,7 @@
         :access="access"
         :selected-users="selectedRecipients"
         :container="container"
-        class="tui-accessForm__tagList"
+        class="tui-engageAccessForm__tagList"
         @pick-recipient="selectedRecipients.push($event)"
         @remove-recipient="removeRecipient"
       />
@@ -76,12 +76,12 @@
       <SharedBoard :receipts="sharedTo" />
     </div>
 
-    <ButtonGroup class="tui-accessForm__buttons">
+    <ButtonGroup class="tui-engageAccessForm__buttons">
       <Button
         v-show="showBack"
         :text="$str('back', 'moodle')"
         :disabled="submitting"
-        class="tui-accessForm__buttons__back"
+        class="tui-engageAccessForm__back"
         @click="$emit('back')"
       />
 
@@ -289,10 +289,10 @@ export default {
 
     optionsWrapperCss() {
       if (this.accessPrivate) {
-        return 'tui-accessForm__access--withoutTagLists';
+        return 'tui-engageAccessForm__access--withoutTagLists';
       }
 
-      return 'tui-accessForm__access--withTagLists';
+      return 'tui-engageAccessForm__access--withTagLists';
     },
 
     timeViewVisible() {
@@ -371,7 +371,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-accessForm {
+.tui-engageAccessForm {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -413,10 +413,10 @@ export default {
   &__buttons {
     display: flex;
     margin-top: var(--gap-2);
+  }
 
-    &__back {
-      margin-right: auto;
-    }
+  &__back {
+    margin-right: auto;
   }
 }
 </style>

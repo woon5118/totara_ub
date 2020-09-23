@@ -17,9 +17,9 @@ Feature: Remove resource from playlist
     And I click on "Your Library" in the totara menu
     When I follow "Playlist 101"
     Then I should see "Playlist 101"
-    When I click on "Contribute" "button" in the ".tui-totaraPlaylist-addNewPlaylistCard__card" "css_element"
+    When I click on "Contribute" "button" in the ".tui-addNewPlaylistCard__card" "css_element"
     And I set the field "Enter resource title" to "Article 1"
-    And I activate the weka editor with css ".tui-articleForm__description-formRow"
+    And I activate the weka editor with css ".tui-engageArticleForm__description-formRow"
     And I type "Create article" in the weka editor
     And I wait for the next second
     And I click on "Next" "button"

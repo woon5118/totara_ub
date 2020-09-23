@@ -2,35 +2,31 @@
 
 exports[`totara_engage/components/card/BaseCard.vue Checks snapshot 1`] = `
 <article
-  class="tui-baseCard"
+  class="tui-engageBaseCard"
 >
   <corecard-stub
-    class="tui-baseCard__card"
+    class="tui-engageBaseCard__card"
     clickable="true"
   >
     <div
-      class="tui-baseCard__headerImage"
+      class="tui-engageBaseCard__headerImage"
     />
      
     <div
-      class="tui-baseCard__description"
+      class="tui-engageBaseCard__description"
     >
-      <div
-        class="tui-baseCard__description__header"
-      >
+      <div>
         <a
-          class="tui-baseCard__link"
+          class="tui-engageBaseCard__link"
           href="#"
         />
       </div>
        
       <div
-        class="tui-baseCard__description__infoContent"
+        class="tui-engageBaseCard__infoContent"
       />
        
-      <div
-        class="tui-baseCard__description__footer"
-      />
+      <div />
     </div>
   </corecard-stub>
    

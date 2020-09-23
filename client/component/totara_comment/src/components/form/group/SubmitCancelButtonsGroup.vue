@@ -16,12 +16,12 @@
   @module totara_comment
 -->
 <template>
-  <ButtonGroup class="tui-submitCancelButtonGroup">
+  <ButtonGroup class="tui-commentSubmitCancelButtonGroup">
     <Button
       :text="submitText"
       :styleclass="{ primary: true, small: isSmall }"
       :disabled="disableSubmit"
-      class="tui-submitCancelButtonGroup__submit"
+      class="tui-commentSubmitCancelButtonGroup__submit"
       @click.prevent="$emit('click-submit')"
     />
 
@@ -29,7 +29,7 @@
       :text="$str('cancel', 'moodle')"
       :styleclass="{ small: isSmall }"
       :disabled="disableCancel"
-      class="tui-submitCancelButtonGroup__cancel"
+      class="tui-commentSubmitCancelButtonGroup__cancel"
       @click.prevent="$emit('click-cancel')"
     />
   </ButtonGroup>
@@ -91,7 +91,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-submitCancelButtonGroup {
+.tui-commentSubmitCancelButtonGroup {
   display: flex;
   justify-content: flex-end;
   margin-top: var(--gap-4);

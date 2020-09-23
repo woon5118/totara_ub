@@ -39,10 +39,10 @@ export default {
     let customClasses = [];
 
     // Pushing the default icon.
-    customClasses.push('tui-totaraEngage-restricted');
+    customClasses.push('tui-engageIconRestricted');
 
     if (props.coloring) {
-      customClasses.push('tui-totaraEngage-restricted--color');
+      customClasses.push('tui-engageIconRestricted--color');
     }
 
     let items = {
@@ -58,7 +58,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-totaraEngage-restricted {
+.tui-engageIconRestricted {
   &--color {
     color: var(--color-secondary);
   }

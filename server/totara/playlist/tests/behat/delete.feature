@@ -36,18 +36,18 @@ Feature: Delete playlist
     Given I log in as "user1"
     And I click on "Your Library" in the totara menu
     And I should see "Test Article 1"
-    And "[aria-label='Appears in 0 playlist(s)']" "css_element" should exist in the ".tui-engageArticle-articleCard" "css_element"
+    And "[aria-label='Appears in 0 playlist(s)']" "css_element" should exist in the ".tui-engageArticleCard" "css_element"
     And I click on "Test Playlist 1" "link" in the ".tui-sidePanel__content" "css_element"
-    And I click on "Contribute" "button" in the ".tui-totaraPlaylist-addNewPlaylistCard__card" "css_element"
+    And I click on "Contribute" "button" in the ".tui-addNewPlaylistCard__card" "css_element"
     And I click on "select an existing resource" "button"
     And I click the select all checkbox in the tui datatable
     And I confirm the tui confirmation modal
     And I should see "Test Article 1"
-    And "[aria-label='Appears in 1 playlist(s)']" "css_element" should exist in the ".tui-engageArticle-articleCard" "css_element"
+    And "[aria-label='Appears in 1 playlist(s)']" "css_element" should exist in the ".tui-engageArticleCard" "css_element"
     And I click on "Expand" "button"
     And I click on "Actions" "button"
     And I should see "Delete"
     And I click on "Delete" "link"
     And I press "Yes"
     And I should see "Test Article 1"
-    And "[aria-label='Appears in 0 playlist(s)']" "css_element" should exist in the ".tui-engageArticle-articleCard" "css_element"
+    And "[aria-label='Appears in 0 playlist(s)']" "css_element" should exist in the ".tui-engageArticleCard" "css_element"

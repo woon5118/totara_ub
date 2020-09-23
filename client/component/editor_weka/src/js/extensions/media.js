@@ -57,7 +57,7 @@ class MediaExtension extends BaseExtension {
 
           parseDOM: [
             {
-              tag: 'div.tui-editorWeka-imageBlock',
+              tag: 'div.tui-wekaNodeImageBlock',
               getAttrs: getJsonAttrs,
             },
             {
@@ -70,7 +70,7 @@ class MediaExtension extends BaseExtension {
             return [
               'div',
               {
-                class: 'tui-editorWeka-imageBlock',
+                class: 'tui-wekaNodeImageBlock',
                 'data-attrs': JSON.stringify({
                   filename: node.attrs.filename,
                   alttext: node.attrs.alttext,
@@ -106,7 +106,7 @@ class MediaExtension extends BaseExtension {
 
           parseDOM: [
             {
-              tag: 'div.tui-editorWeka-videoBlock',
+              tag: 'div.tui-wekaNodeVideoBlock',
               getAttrs: getJsonAttrs,
             },
             {
@@ -119,7 +119,7 @@ class MediaExtension extends BaseExtension {
             return [
               'div',
               {
-                class: 'tui-editorWeka-videoBlock',
+                class: 'tui-wekaNodeVideoBlock',
                 'data-attrs': JSON.stringify({
                   filename: node.attrs.filename,
                   url: node.attrs.url,
@@ -156,7 +156,7 @@ class MediaExtension extends BaseExtension {
 
           parseDOM: [
             {
-              tag: 'div.tui-editorWeka-audioBlock',
+              tag: 'div.tui-wekaNodeAudioBlock',
               getAttrs: getJsonAttrs,
             },
             {
@@ -169,7 +169,7 @@ class MediaExtension extends BaseExtension {
             return [
               'div',
               {
-                class: 'tui-editorWeka-audioBlock',
+                class: 'tui-wekaNodeAudioBlock',
                 'data-attrs': JSON.stringify({
                   filename: node.attrs.filename,
                   url: node.attrs.url,

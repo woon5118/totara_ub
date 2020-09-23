@@ -16,7 +16,7 @@
   @module container_workspace
 -->
 <template>
-  <div class="tui-discussionCard" :data-id="discussionId">
+  <div class="tui-workspaceDiscussionCard" :data-id="discussionId">
     <ModalPresenter :open="modal.delete" @request-close="modal.delete = false">
       <WorkspaceWarningModal
         :message-content="
@@ -28,42 +28,36 @@
       />
     </ModalPresenter>
 
-    <div v-if="pinned" class="tui-discussionCard__pinBox">
+    <div v-if="pinned" class="tui-workspaceDiscussionCard__pinBox">
       <Lozenge :text="$str('pinned_post', 'container_workspace')" type="info" />
     </div>
 
-    <div class="tui-discussionCard__card">
+    <div class="tui-workspaceDiscussionCard__card">
       <DiscussionAvatar
         :image-src="creatorImageSrc"
         :image-alt="creatorImageAlt"
         :profile-url="profileUrl"
-        class="tui-discussionCard__card__avatar"
+        class="tui-workspaceDiscussionCard__avatar"
       />
 
-      <div class="tui-discussionCard__card__content">
-        <div class="tui-discussionCard__card__content__head">
+      <div class="tui-workspaceDiscussionCard__content">
+        <div class="tui-workspaceDiscussionCard__head">
           <a :id="labelId" :href="profileUrl">
             {{ creatorFullname }}
           </a>
           <p>{{ timeDescription }}</p>
-          <p
-            v-if="edited"
-            class="tui-discussionCard__card__content__head__flag"
-          >
+          <p v-if="edited">
             {{ $str('edited', 'container_workspace') }}
           </p>
         </div>
 
-        <div
-          v-if="removed"
-          class="tui-discussionCard__card__content__body--deleted"
-        >
+        <div v-if="removed" class="tui-workspaceDiscussionCard__body--deleted">
           <p>{{ $str('removed_discussion', 'container_workspace') }}</p>
         </div>
         <div
           v-else-if="!edit"
           ref="discussion-content"
-          class="tui-discussionCard__card__content__body"
+          class="tui-workspaceDiscussionCard__body"
           v-html="discussionContent"
         />
         <EditPostDiscussionForm
@@ -74,7 +68,7 @@
           @submit="updateDiscussionContent"
         />
 
-        <div class="tui-discussionCard__card__content__buttons">
+        <div class="tui-workspaceDiscussionCard__buttons">
           <SimpleLike
             :button-aria-label="likeButtonAriaLabel"
             :total-likes="totalReactions"
@@ -84,13 +78,13 @@
             area="discussion"
             :show-text="true"
             :instance-id="discussionId"
-            class="tui-discussionCard__card__content__buttons__like"
+            class="tui-workspaceDiscussionCard__buttons-like"
             @update-like-status="updateReactStatus"
             @created-like="updateReactStatus(true)"
             @removed-like="updateReactStatus(false)"
           />
 
-          <div class="tui-discussionCard__card__content__buttons__comment">
+          <div class="tui-workspaceDiscussionCard__buttons-comment">
             <ButtonIcon
               :aria-label="$str('comment_on_discussion', 'container_workspace')"
               :text="$str('comment', 'container_workspace')"
@@ -112,10 +106,7 @@
         </div>
       </div>
 
-      <Dropdown
-        class="tui-discussionCard__card__dropDown"
-        position="bottom-right"
-      >
+      <Dropdown position="bottom-right">
         <template v-slot:trigger="{ toggle, isOpen }">
           <ButtonIcon
             :aria-expanded="isOpen"
@@ -531,7 +522,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-discussionCard {
+.tui-workspaceDiscussionCard {
   display: flex;
   flex-direction: column;
   padding-top: var(--gap-4);
@@ -553,51 +544,51 @@ export default {
     display: flex;
     padding: var(--gap-4);
     padding-top: 0;
+  }
 
-    &__avatar {
-      margin-right: var(--gap-2);
+  &__avatar {
+    margin-right: var(--gap-2);
+  }
+
+  &__content {
+    flex-grow: 1;
+    width: 100%;
+  }
+
+  &__head {
+    display: flex;
+    flex: 1;
+    align-items: flex-end;
+    margin-bottom: var(--gap-4);
+    padding-top: 2px;
+
+    a {
+      @include tui-font-body();
+      color: var(--color-state);
+      font-weight: bold;
     }
 
-    &__content {
-      flex-grow: 1;
-      width: 100%;
+    p {
+      @include tui-font-body-x-small();
+      margin: 0;
+      margin-left: var(--gap-2);
+      color: var(--color-neutral-7);
+    }
+  }
 
-      &__head {
-        display: flex;
-        flex: 1;
-        align-items: flex-end;
-        margin-bottom: var(--gap-4);
-        padding-top: 2px;
+  &__body {
+    &--deleted {
+      @include tui-font-body-small();
+      font-style: italic;
+    }
+  }
 
-        a {
-          @include tui-font-body();
-          color: var(--color-state);
-          font-weight: bold;
-        }
+  &__buttons {
+    display: flex;
 
-        p {
-          @include tui-font-body-x-small();
-          margin: 0;
-          margin-left: var(--gap-2);
-          color: var(--color-neutral-7);
-        }
-      }
-
-      &__body {
-        &--deleted {
-          @include tui-font-body-small();
-          font-style: italic;
-        }
-      }
-
-      &__buttons {
-        display: flex;
-
-        &__comment {
-          display: flex;
-          margin-left: var(--gap-4);
-        }
-      }
+    &-comment {
+      display: flex;
+      margin-left: var(--gap-4);
     }
   }
 }

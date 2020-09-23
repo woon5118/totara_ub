@@ -31,21 +31,21 @@ Feature: Bookmark article
     And I view article "Test Article 2"
     And I click on "Bookmark" "button"
     And I click on "Your Library" in the totara menu
-    And I click on "Saved resources" "link" in the ".tui-navigationPanel__menu" "css_element"
+    And I click on "Saved resources" "link" in the ".tui-engageNavigationPanel__menu" "css_element"
     Then I should see "Test Article 2" in the ".tui-contributionBaseContent__cards" "css_element"
 
   Scenario: Test bookmarking a shared article
     And I log in as "admin"
     And I click on "Your Library" in the totara menu
 
-    When I click on "Saved resources" "link" in the ".tui-navigationPanel__menu" "css_element"
+    When I click on "Saved resources" "link" in the ".tui-engageNavigationPanel__menu" "css_element"
     Then I should not see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
 
-    When I click on "Shared with you" "link" in the ".tui-navigationPanel__menu" "css_element"
-    And I click on "Bookmark" "button" in the ".tui-engageArticle-articleCard" "css_element"
-    And I click on "Saved resources" "link" in the ".tui-navigationPanel__menu" "css_element"
+    When I click on "Shared with you" "link" in the ".tui-engageNavigationPanel__menu" "css_element"
+    And I click on "Bookmark" "button" in the ".tui-engageArticleCard" "css_element"
+    And I click on "Saved resources" "link" in the ".tui-engageNavigationPanel__menu" "css_element"
     Then I should see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
 
-    When I click on "Unbookmark" "button" in the ".tui-engageArticle-articleCard" "css_element"
+    When I click on "Unbookmark" "button" in the ".tui-engageArticleCard" "css_element"
     And I wait for the next second
     Then I should not see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"

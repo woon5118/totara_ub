@@ -17,18 +17,12 @@
 -->
 
 <template>
-  <Grid :max-units="String(maxPageUnits)" class="tui-totaraEngage-baseLayout">
-    <GridItem
-      :units="parseInt(contentUnits)"
-      class="tui-totaraEngage-baseLayout__content"
-    >
+  <Grid :max-units="String(maxPageUnits)">
+    <GridItem :units="parseInt(contentUnits)">
       <slot name="content" />
     </GridItem>
 
-    <GridItem
-      :units="sidePanelUnits"
-      class="tui-totaraEngage-baseLayout__sidePanel"
-    >
+    <GridItem :units="sidePanelUnits">
       <slot name="sidepanel" />
     </GridItem>
   </Grid>

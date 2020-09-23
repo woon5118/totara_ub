@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-editorWeka-audioAttachment">
+  <div>
     <AttachmentNode
       :filename="filename"
       :file-size="fileSize"

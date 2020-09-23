@@ -59,7 +59,7 @@ function findEditorTextNode(start, text) {
 
     private const EDITOR_WEKA_NODE_HELPER = "
 function findWekaNode(type, word) {
-    return [...el.querySelectorAll('.tui-editorWeka-' + type)].find(node => {
+    return [...el.querySelectorAll('.tui-weka' + type.slice(0, 1).toUpperCase() + type.slice(1)].find(node => {
         if (type == 'linkMedia') {
             return (node.getAttribute('data-url') || '').includes(word);
         } else if (type == 'linkBlock') {
@@ -343,7 +343,7 @@ el.querySelector('.ProseMirror-selectednode').remove();
     public function i_click_on_the_block_menu_in_the_weka_editor() {
         if (!$this->current_weka) throw new coding_exception('Activate a Weka editor first.');
         \behat_hooks::set_step_readonly(false);
-        $trigger = $this->find('css', '.tui-editorWeka-toolbar__currentBlock', false, $this->current_weka);
+        $trigger = $this->find('css', '.tui-wekaToolbar__currentBlock', false, $this->current_weka);
         $trigger->click();
     }
 

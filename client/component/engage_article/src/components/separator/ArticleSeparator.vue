@@ -17,14 +17,14 @@
 -->
 
 <template>
-  <div class="tui-articleSeparator" />
+  <div class="tui-engageArticleSeparator" />
 </template>
 
 <style lang="scss">
 :root {
   --engage-article-separator-width: 40px;
 }
-.tui-articleSeparator {
+.tui-engageArticleSeparator {
   display: block;
   width: var(--engage-article-separator-width);
 

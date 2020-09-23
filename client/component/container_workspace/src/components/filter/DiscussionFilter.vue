@@ -16,14 +16,14 @@
   @module container_workspace
 -->
 <template>
-  <div class="tui-discussionFilter">
-    <div class="tui-discussionFilter__search">
+  <div class="tui-workspaceDiscussionFilter">
+    <div class="tui-workspaceDiscussionFilter__search">
       <SearchBox
         v-model="innerSearchTerm"
         :aria-label="$str('search_discussions', 'container_workspace')"
         :label-visible="false"
         :placeholder="$str('search_discussions', 'container_workspace')"
-        class="tui-discussionFilter__search__searchBox"
+        class="tui-workspaceDiscussionFilter__search-box"
         @submit="$emit('update-search-term', innerSearchTerm)"
       />
 
@@ -33,7 +33,7 @@
             id: workspaceId,
           })
         "
-        class="tui-discussionFilter__search__link"
+        class="tui-workspaceDiscussionFilter__search-filesLink"
       >
         {{ $str('browse_files', 'container_workspace') }}
       </a>
@@ -41,7 +41,7 @@
 
     <slot name="pinned-discussions" />
 
-    <div class="tui-discussionFilter__sortBox">
+    <div class="tui-workspaceDiscussionFilter__sortBox">
       <SelectFilter
         v-model="innerSort"
         :label="$str('sortby', 'moodle')"
@@ -145,17 +145,17 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-discussionFilter {
+.tui-workspaceDiscussionFilter {
   &__search {
     display: flex;
     align-items: center;
     margin-bottom: var(--gap-8);
 
-    &__searchBox {
+    &-box {
       flex-basis: 40%;
     }
 
-    &__link {
+    &-filesLink {
       margin-left: var(--gap-8);
     }
   }

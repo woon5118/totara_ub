@@ -21,32 +21,28 @@
     input-width="full"
     class="tui-workspaceTransferOwnerForm"
   >
-    <div class="tui-workspaceTransferOwnerForm__content">
+    <FormRowStack class="tui-workspaceTransferOwnerForm__content">
       <FormRow
         v-if="displayCurrentOwner"
         v-slot="{ id }"
         :label="$str('current_owner', 'container_workspace')"
         :aria-disabled="true"
-        class="tui-workspaceTransferOwnerForm__content__formRow"
       >
         <TagList
           :id="id"
           :disabled="true"
           :tags="[{ text: currentOwnerFullname }]"
-          class="tui-workspaceTransferOwnerForm__content__formRow__tagList"
         />
       </FormRow>
 
       <FormRow
         v-slot="{ id }"
         :label="$str('select_new_owner', 'container_workspace')"
-        class="tui-workspaceTransferOwnerForm__content__formRow"
       >
         <TagList
           :id="id"
           :tags="selectedUsers"
           :items="users"
-          class="tui-workspaceTransferOwnerForm__content__formRow__tagList"
           @filter="searchPattern = $event"
           @select="selectedUser = $event"
           @remove="selectedUser = null"
@@ -64,7 +60,7 @@
         </TagList>
       </FormRow>
 
-      <p class="tui-workspaceTransferOwnerForm__content__helpText">
+      <p class="tui-workspaceTransferOwnerForm__helpText">
         <template v-if="displayCurrentOwner">
           <!-- Somebody is trying to transfer the owner ship -->
           {{ $str('transfer_ownership_help_text_two', 'container_workspace') }}
@@ -75,11 +71,10 @@
           {{ $str('transfer_ownership_help_text_one', 'container_workspace') }}
         </template>
       </p>
-    </div>
+    </FormRowStack>
 
     <ButtonGroup class="tui-workspaceTransferOwnerForm__buttonGroup">
       <LoadingButton
-        class="tui-workspaceTransferOwnerForm__buttonGroup__button"
         :text="$str('confirm', 'moodle')"
         :primary="true"
         :small="true"
@@ -89,7 +84,6 @@
       />
       <!-- Separator -->
       <Button
-        class="tui-workspaceTransferOwnerForm__buttonGroup__button"
         :text="$str('cancel', 'moodle')"
         :styleclass="{ small: true }"
         @click="$emit('cancel', $event)"
@@ -101,6 +95,7 @@
 <script>
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
+import FormRowStack from 'tui/components/form/FormRowStack';
 import TagList from 'tui/components/tag/TagList';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import Button from 'tui/components/buttons/Button';
@@ -114,6 +109,7 @@ export default {
   components: {
     Form,
     FormRow,
+    FormRowStack,
     TagList,
     ButtonGroup,
     Button,
@@ -223,16 +219,12 @@ export default {
 
   &__content {
     flex-grow: 1;
+  }
 
-    &__formRow {
-      margin-bottom: var(--gap-4);
-    }
-
-    &__helpText {
-      @include tui-font-body-small();
-      margin: 0;
-      margin-bottom: var(--gap-4);
-    }
+  &__helpText {
+    @include tui-font-body-small();
+    margin: 0;
+    margin-bottom: var(--gap-4);
   }
 
   &__buttonGroup {

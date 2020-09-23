@@ -59,10 +59,10 @@
           :show-like-button-text="showLikeButtonText"
           :show-reply-button-text="showReplyButtonText"
           :inline-head="commentInlineHead"
-          class="tui-commentThread__comments__comment"
+          class="tui-commentThread__comment"
           :class="{
-            'tui-commentThread__comments__comment--large': isLarge,
-            'tui-commentThread__comments__comment--withBorderBottom': withBorder,
+            'tui-commentThread__comment--large': isLarge,
+            'tui-commentThread__comment--withBorderBottom': withBorder,
           }"
           @update-submitting="$emit('update-submitting', $event)"
           @update-comment="updateCommentsCache"
@@ -356,16 +356,14 @@ export default {
     }
   }
 
-  &__comments {
-    &__comment {
-      &--large {
-        padding: 0 var(--gap-4);
-        padding-bottom: var(--gap-4);
-      }
+  &__comment {
+    &--large {
+      padding: 0 var(--gap-4);
+      padding-bottom: var(--gap-4);
+    }
 
-      &--withBorderBottom {
-        border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
-      }
+    &--withBorderBottom {
+      border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
     }
   }
 }

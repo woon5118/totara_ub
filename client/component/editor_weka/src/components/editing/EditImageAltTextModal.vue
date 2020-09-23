@@ -17,21 +17,21 @@
 -->
 
 <template>
-  <Modal class="tui-editorWeka-editImageAltTextModal">
+  <Modal class="tui-wekaEditImageAltTextModal">
     <ModalContent
       :title="modalTitle"
-      class="tui-editorWeka-editImageAltTextModal__content"
+      class="tui-wekaEditImageAltTextModal__content"
     >
       <Form @submit.prevent="confirm">
-        <div class="tui-editorWeka-editImageAltTextModal__input">
+        <div class="tui-wekaEditImageAltTextModal__input">
           <InputText v-model="innerValue" :autofocus="true" />
 
-          <p class="tui-editorWeka-editImageAltTextModal__input__helpText">
+          <p class="tui-wekaEditImageAltTextModal__input-helpText">
             {{ $str('image_alt_help', 'editor_weka') }}
           </p>
         </div>
 
-        <ButtonGroup class="tui-editorWeka-editImageAltTextModal__buttonGroup">
+        <ButtonGroup class="tui-wekaEditImageAltTextModal__buttonGroup">
           <Button
             :styleclass="{ primary: 'true' }"
             :text="$str('done', 'editor_weka')"
@@ -108,7 +108,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-editImageAltTextModal {
+.tui-wekaEditImageAltTextModal {
   &__content {
     .tui-modalContent__title {
       padding-bottom: var(--gap-2);
@@ -120,7 +120,7 @@ export default {
     flex-direction: column;
     margin: 0;
 
-    &__helpText {
+    &-helpText {
       margin: 0;
       margin-top: var(--gap-1);
       color: var(--color-neutral-6);

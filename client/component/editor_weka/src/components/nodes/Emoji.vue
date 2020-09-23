@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <Emoji :short-code="shortCode" class="tui-editorWeka-emoji" />
+  <Emoji :short-code="shortCode" class="tui-wekaEmoji" />
 </template>
 
 <script>

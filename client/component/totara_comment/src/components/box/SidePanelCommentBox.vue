@@ -111,13 +111,10 @@ export default {
         scroll-behavior: smooth;
 
         .tui-commentThread {
-          &__comments {
-            &__comment {
-              &:not(:first-child) {
-                padding-top: var(--gap-4);
-                border-top: var(--border-width-thin) solid
-                  var(--color-neutral-5);
-              }
+          &__comment {
+            &:not(:first-child) {
+              padding-top: var(--gap-4);
+              border-top: var(--border-width-thin) solid var(--color-neutral-5);
             }
           }
         }

@@ -18,8 +18,8 @@
 <template>
   <div class="tui-workspaceControlMenu">
     <div class="tui-workspaceControlMenu__head">
-      <div class="tui-workspaceControlMenu__head__control">
-        <h2 class="tui-workspaceControlMenu__head__control__title">
+      <div class="tui-workspaceControlMenu__control">
+        <h2 class="tui-workspaceControlMenu__title">
           {{ workspaceName }}
         </h2>
 
@@ -27,7 +27,7 @@
           v-if="showNavigation"
           :aria-label="buttonMenuAriaLabel"
           :styleclass="{ transparentNoPadding: true, small: true }"
-          class="tui-workspaceControlMenu__head__control__buttonIcon"
+          class="tui-workspaceControlMenu__menuButton"
           @click.prevent="showMenu = !showMenu"
         >
           <ShowIcon />
@@ -36,7 +36,7 @@
       <WorkspaceMenu
         v-show="showMenu && showNavigation"
         :selected-workspace-id="workspaceId"
-        class="tui-workspaceControlMenu__head__menu"
+        class="tui-workspaceControlMenu__menu"
       />
     </div>
   </div>
@@ -109,27 +109,27 @@ export default {
     display: flex;
     flex-direction: column;
     width: 100%;
+  }
 
-    &__control {
-      display: flex;
-      align-items: center;
-      padding: var(--gap-4) var(--gap-4) 0 var(--gap-4);
+  &__control {
+    display: flex;
+    align-items: center;
+    padding: var(--gap-4) var(--gap-4) 0 var(--gap-4);
+  }
 
-      &__title {
-        @include tui-font-heading-small();
-        margin: 0;
-      }
+  &__title {
+    @include tui-font-heading-small();
+    margin: 0;
+  }
 
-      &__buttonIcon {
-        margin-left: var(--gap-2);
-      }
-    }
+  &__menuButton {
+    margin-left: var(--gap-2);
+  }
 
-    &__menu {
-      padding: var(--gap-8) 0;
-      background-color: var(--color-neutral-3);
-      border: var(--border-width-thin) solid var(--color-neutral-5);
-    }
+  &__menu {
+    padding: var(--gap-8) 0;
+    background-color: var(--color-neutral-3);
+    border: var(--border-width-thin) solid var(--color-neutral-5);
   }
 }
 </style>

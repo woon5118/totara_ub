@@ -35,7 +35,7 @@
       <FormRow
         v-slot="{ id }"
         :label="$str('pluginname', 'editor_weka')"
-        class="tui-wekaWithLearn__form__row"
+        class="tui-wekaWithLearn__formRow"
       >
         <Weka
           :id="id"
@@ -51,7 +51,7 @@
         v-show="false"
         v-slot="{ id }"
         :hidden="true"
-        class="tui-wekaWithLearn__form__row"
+        class="tui-wekaWithLearn__formRow"
       >
         <InputText
           :id="id"
@@ -65,12 +65,12 @@
         v-show="false"
         v-slot="{ id }"
         :hidden="true"
-        class="tui-wekaWithLearn__form__row"
+        class="tui-wekaWithLearn__formRow"
       >
         <InputText :id="id" name="item_id" :value="itemId" :hidden="true" />
       </FormRow>
 
-      <ButtonGroup class="tui-wekaWithLearn__form__buttonGroup">
+      <ButtonGroup class="tui-wekaWithLearn__buttonGroup">
         <Submit />
         <Button
           type="submit"
@@ -184,16 +184,16 @@ export default {
     display: flex;
     flex: 1;
     flex-direction: column;
+  }
 
-    &__row {
-      flex: 1;
-    }
+  &__row {
+    flex: 1;
+  }
 
-    &__buttonGroup {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: var(--gap-2);
-    }
+  &__buttonGroup {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--gap-2);
   }
 
   &__code {

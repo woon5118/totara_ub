@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-totaraEngage-buttonLabel">
+  <div class="tui-engageButtonLabel">
     <ButtonIcon
       :aria-label="ariaLabel"
       :disabled="disabled"
@@ -37,7 +37,7 @@
           href="#"
           role="button"
           :aria-label="numberAriaLabelText"
-          class="tui-totaraEngage-buttonLabel__label"
+          class="tui-engageButtonLabel__label"
           @click.prevent="$emit('click')"
         >
           {{ number }}
@@ -46,7 +46,7 @@
       <slot name="hoverContent" />
     </Popover>
     <template v-else>
-      <span class="tui-totaraEngage-buttonLabel__label" @click="$emit('open')">
+      <span class="tui-engageButtonLabel__label" @click="$emit('open')">
         {{ number }}
       </span>
     </template>
@@ -109,7 +109,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-totaraEngage-buttonLabel {
+.tui-engageButtonLabel {
   display: inline-flex;
   flex-direction: column;
   align-items: center;

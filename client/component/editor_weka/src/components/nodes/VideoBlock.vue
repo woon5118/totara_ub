@@ -17,9 +17,9 @@
 -->
 
 <template>
-  <div class="tui-editorWeka-videoBlock">
+  <div class="tui-wekaVideoBlock">
     <template v-if="!$apollo.loading">
-      <div class="tui-editorWeka-videoBlock__inner">
+      <div class="tui-wekaVideoBlock__inner">
         <CoreVideoBlock
           :mime-type="file.mime_type"
           :url="file.url"
@@ -180,7 +180,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-videoBlock {
+.tui-wekaVideoBlock {
   margin: var(--gap-8) 0;
   white-space: normal;
 

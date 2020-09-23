@@ -34,16 +34,16 @@
         :size="size"
         :profile-url="profileUrl"
         :user-full-name="userFullName"
-        class="tui-commentReplyHeader__content__link"
+        class="tui-commentReplyHeader__link"
         :class="{
-          'tui-commentReplyHeader__content__link--inline': inlineHead,
+          'tui-commentReplyHeader__link--inline': inlineHead,
         }"
       />
 
       <p
-        class="tui-commentReplyHeader__content__timeDescription"
+        class="tui-commentReplyHeader__timeDescription"
         :class="{
-          'tui-commentReplyHeader__content__timeDescription--inline': inlineHead,
+          'tui-commentReplyHeader__timeDescription--inline': inlineHead,
         }"
       >
         <span>{{ timeDescription }}</span>
@@ -165,26 +165,26 @@ export default {
       display: flex;
       align-items: flex-end;
     }
+  }
 
-    &__link {
-      margin-bottom: var(--gap-2);
+  &__link {
+    margin-bottom: var(--gap-2);
 
-      &--inline {
-        margin: 0;
-      }
+    &--inline {
+      margin: 0;
+    }
+  }
+
+  &__timeDescription {
+    margin: 0;
+    @include tui-font-body-x-small();
+
+    &--inline {
+      margin-left: var(--gap-4);
     }
 
-    &__timeDescription {
-      margin: 0;
-      @include tui-font-body-x-small();
-
-      &--inline {
-        margin-left: var(--gap-4);
-      }
-
-      span:not(:first-child) {
-        margin-left: var(--gap-4);
-      }
+    span:not(:first-child) {
+      margin-left: var(--gap-4);
     }
   }
 }

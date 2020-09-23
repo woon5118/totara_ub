@@ -210,35 +210,6 @@ export default {
     @include tui-font-heading-small();
     padding-top: var(--gap-2);
   }
-
-  &__date {
-    word-wrap: break-word;
-  }
-
-  &__description {
-    .flex-icon {
-      position: relative;
-      top: -1px;
-    }
-
-    &-rating {
-      font-weight: bold;
-    }
-
-    &-tracking {
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    &-system {
-      &::before {
-        content: '* ';
-      }
-      &::after {
-        content: ' *';
-      }
-    }
-  }
 }
 
 @media screen and (min-width: $tui-screen-xs) {

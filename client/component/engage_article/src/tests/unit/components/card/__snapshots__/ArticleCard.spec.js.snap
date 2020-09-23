@@ -2,21 +2,21 @@
 
 exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
 <basecard-stub
-  class="tui-engageArticle-articleCard"
+  class="tui-engageArticleCard"
   data-card-unique="1"
   href=""
 >
   <imageheader-stub
-    class="tui-engageArticle-articleCard__imageheader"
+    class="tui-engageArticleCard__imageheader"
   >
     <img
       alt="Hello world resource"
-      class="tui-engageArticle-articleCard__image"
+      class="tui-engageArticleCard__image"
       src="/"
     />
      
     <div
-      class="tui-engageArticle-articleCard__icons"
+      class="tui-engageArticleCard__icons"
     >
       <buttonicon-stub
         arialabel="[addtoplaylist, engage_article - undefined]"
@@ -49,17 +49,17 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
   </imageheader-stub>
    
   <cardheader-stub
-    class="tui-engageArticle-articleCard__header"
+    class="tui-engageArticleCard__header"
   >
     <bookmarkbutton-stub
-      class="tui-engageArticle-articleCard__bookmark"
+      class="tui-engageArticleCard__bookmark"
       size="300"
       small="true"
       transparent="true"
     />
      
     <h3
-      class="tui-engageArticle-articleCard__title"
+      class="tui-engageArticleCard__title"
       id="article-1"
     >
       
@@ -71,7 +71,7 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
   </cardheader-stub>
    
   <div
-    class="tui-engageArticle-articleCard__footer"
+    class="tui-engageArticleCard__footer"
   >
     <staticon-stub
       statnumber="15"
@@ -113,7 +113,7 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
     <accessicon-stub
       access="PUBLIC"
       coloring="true"
-      customclass="tui-engageArticle-articleCard__visibilityIcon"
+      customclass="tui-engageArticleCard__visibilityIcon"
       size="300"
     />
   </div>

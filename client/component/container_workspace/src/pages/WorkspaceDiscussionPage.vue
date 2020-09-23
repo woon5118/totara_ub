@@ -35,17 +35,14 @@
         :max-units="units"
         class="tui-workspaceDiscussionPage__column"
       >
-        <div
-          slot="content"
-          class="tui-workspaceDiscussionPage__column__content"
-        >
+        <div slot="content">
           <a
             :href="
               $url('/container/type/workspace/workspace.php', {
                 id: discussion.workspace_id,
               })
             "
-            class="tui-workspaceDiscussionPage__column__content__backButton"
+            class="tui-workspaceDiscussionPage__backButton"
           >
             <BackArrow size="200" />
             <span> {{ $str('discussions', 'container_workspace') }} </span>
@@ -72,13 +69,13 @@
             :discussion-content="discussion.content"
             :show-discussion-link="false"
             :edited="discussion.edited"
-            class="tui-workspaceDiscussionPage__column__content__discussion"
+            class="tui-workspaceDiscussionPage__discussion"
             @update-react-status="updateReactStatus"
             @update-discussion="updateDiscussion"
             @trigger-comment="scrollToCommentForm"
           />
 
-          <h3 class="tui-workspaceDiscussionPage__column__content__title">
+          <h3 class="tui-workspaceDiscussionPage__title">
             <span>
               {{
                 $str('comments', 'totara_comment', discussion.total_comments)
@@ -100,7 +97,7 @@
             :submitting="submitting"
             :comment-able="discussion.discussion_interactor.can_comment"
             :comment-inline-head="true"
-            class="tui-workspaceDiscussionPage__column__content__commentBox"
+            class="tui-workspaceDiscussionPage__commentBox"
             @update-submitting="submitting = $event"
             @create-comment="updateDiscussionComments"
             @form-ready="setFormElement"
@@ -285,29 +282,28 @@ export default {
 .tui-workspaceDiscussionPage {
   &__column {
     margin-top: var(--gap-4);
-    &__content {
-      &__backButton {
-        @include tui-font-link();
-        &:hover,
-        &:focus {
-          text-decoration: none;
-        }
-      }
+  }
 
-      &__discussion {
-        margin: var(--gap-8) 0;
-      }
-
-      &__title {
-        @include tui-font-heading-x-small();
-        margin: 0;
-        margin-bottom: var(--gap-4);
-      }
-
-      &__commentBox {
-        position: relative;
-      }
+  &__backButton {
+    @include tui-font-link();
+    &:hover,
+    &:focus {
+      text-decoration: none;
     }
+  }
+
+  &__discussion {
+    margin: var(--gap-8) 0;
+  }
+
+  &__title {
+    @include tui-font-heading-x-small();
+    margin: 0;
+    margin-bottom: var(--gap-4);
+  }
+
+  &__commentBox {
+    position: relative;
   }
 }
 </style>

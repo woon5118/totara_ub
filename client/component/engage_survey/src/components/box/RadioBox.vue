@@ -19,7 +19,7 @@
 <template>
   <FormRow
     v-slot="{ labelId }"
-    class="tui-engageSurvey-radioBox"
+    class="tui-engageSurveyRadioBox"
     :label="label"
     hidden
   >
@@ -30,7 +30,7 @@
         :name="'engagesurvey-radiobox'"
         :value="item.id"
         :label="item.value"
-        class="tui-engageSurvey-radioBox__radio"
+        class="tui-engageSurveyRadioBox__radio"
       >
         {{ item.value }}
       </Radio>
@@ -101,7 +101,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-engageSurvey-radioBox {
+.tui-engageSurveyRadioBox {
   .tui-radioGroup {
     padding: 0;
     overflow: auto;

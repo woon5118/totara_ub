@@ -18,7 +18,7 @@
 
 <template>
   <SearchBox
-    class="tui-navigationPanel__search"
+    class="tui-engageNavigationPanelSearchLibrary"
     :value="searchValue"
     :drop-label="true"
     :disabled="false"
@@ -77,3 +77,11 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-engageNavigationPanelSearchLibrary {
+  margin: var(--gap-4);
+  margin-right: var(--gap-1);
+  margin-bottom: var(--gap-6);
+}
+</style>

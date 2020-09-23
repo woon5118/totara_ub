@@ -17,8 +17,8 @@
 -->
 
 <template>
-  <div class="tui-editorWeka-imageBlock">
-    <div v-if="!$apollo.loading" class="tui-editorWeka-imageBlock__inner">
+  <div class="tui-wekaImageBlock">
+    <div v-if="!$apollo.loading" class="tui-wekaImageBlock__inner">
       <ModalPresenter :open="showModal" @request-close="$_hideModal">
         <EditImageAltTextModal :value="altText" @change="$_updateAltText" />
       </ModalPresenter>
@@ -31,7 +31,7 @@
     </div>
 
     <template v-else>
-      <p class="tui-editorWeka-imageBlock__text">
+      <p class="tui-wekaImageBlock__text">
         {{ $str('loadinghelp', 'moodle') }}
       </p>
     </template>
@@ -236,7 +236,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-imageBlock {
+.tui-wekaImageBlock {
   display: flex;
   min-width: 250px;
   margin: var(--gap-8) 0;

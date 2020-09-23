@@ -17,16 +17,8 @@
 -->
 <template>
   <LayoutTwoColumn class="tui-emptySpacesPage">
-    <SidePanel
-      slot="left"
-      class="tui-emptySpacesPage__sidePanel"
-      :show-button-control="false"
-      :initially-open="true"
-    >
-      <WorkspaceMenu
-        class="tui-emptySpacesPage__sidePanel__menu"
-        @create-workspace="navigateToWorkspace"
-      />
+    <SidePanel slot="left" :show-button-control="false" :initially-open="true">
+      <WorkspaceMenu @create-workspace="navigateToWorkspace" />
     </SidePanel>
 
     <div
@@ -36,18 +28,15 @@
     >
       <EmptySpacesHeader
         :can-create="canCreate"
-        class="tui-emptySpacesPage__content__header"
+        class="tui-emptySpacesPage__header"
       />
 
-      <hr
-        v-if="showRecommended"
-        class="tui-emptySpacesPage__content__horizontalLine"
-      />
+      <hr v-if="showRecommended" class="tui-emptySpacesPage__horizontalLine" />
 
       <RecommendSpaces
         v-if="showRecommended"
         :max-grid-units="units"
-        class="tui-emptySpacesPage__content__recommendedSpaces"
+        class="tui-emptySpacesPage__recommendedSpaces"
         @join-workspace="joinWorkspace"
       />
     </div>
@@ -162,19 +151,19 @@ export default {
 
   &__content {
     padding-right: var(--gap-8);
+  }
 
-    &__header {
-      margin-top: calc(var(--gap-12) * 2);
-      margin-bottom: var(--gap-12);
-    }
+  &__header {
+    margin-top: calc(var(--gap-12) * 2);
+    margin-bottom: var(--gap-12);
+  }
 
-    &__horizontalLine {
-      margin: 0;
-    }
+  &__horizontalLine {
+    margin: 0;
+  }
 
-    &__recommendedSpaces {
-      margin-top: var(--gap-8);
-    }
+  &__recommendedSpaces {
+    margin-top: var(--gap-8);
   }
 }
 </style>

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-editorWeka-suggestion__hashtag" :style="positionStyle">
+  <div class="tui-wekaHashtagSuggestions" :style="positionStyle">
     <Dropdown :separator="false" :open="showSuggestions" @dismiss="dismiss">
       <template v-slot:trigger>
         <span class="sr-only">
@@ -166,7 +166,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-suggestion__hashtag {
+.tui-wekaHashtagSuggestions {
   position: absolute;
 }
 </style>

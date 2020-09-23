@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-editorWeka-attachment">
+  <div class="tui-wekaAttachment">
     <template v-if="!$apollo.loading">
       <ImageAttachment
         v-if="isImage"
@@ -284,7 +284,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-attachment {
+.tui-wekaAttachment {
   @media (min-width: 491px) {
     flex-basis: 20%;
     min-width: 235px;

@@ -22,32 +22,30 @@
     :href="url"
     :show-footnotes="showFootnotes"
     :footnotes="footnotes"
-    class="tui-totaraPlaylist-playlistCard"
+    class="tui-playlistCard"
     @remove-resource="$emit('remove-resource', $event)"
     @mouseover="$_handleHovered(true)"
     @mouseleave="$_handleHovered(false)"
   >
     <ImageHeader slot="header-image" :show-cover="hovered">
-      <div slot="image" class="tui-totaraPlaylist-playlistCard__imageHeader">
-        <div
-          class="tui-totaraPlaylist-playlistCard__numberOfResourcesContainer"
-        >
-          <div class="tui-totaraPlaylist-playlistCard__numberOfResources">
+      <div slot="image" class="tui-playlistCard__imageHeader">
+        <div class="tui-playlistCard__numberOfResourcesContainer">
+          <div class="tui-playlistCard__numberOfResources">
             <!-- This box will be gone if the card is hovered -->
             <p>{{ extraData.resources }}</p>
           </div>
         </div>
 
-        <div class="tui-totaraPlaylist-playlistCard__imageContainer">
+        <div class="tui-playlistCard__imageContainer">
           <img
             :alt="name"
             :src="extraData.image"
-            class="tui-totaraPlaylist-playlistCard__image"
+            class="tui-playlistCard__image"
           />
         </div>
       </div>
 
-      <div slot="actions" class="tui-totaraPlaylist-playlistCard__icons">
+      <div slot="actions" class="tui-playlistCard__icons">
         <ButtonIcon
           :aria-label="$str('share', 'totara_engage')"
           :styleclass="{ primary: false, circle: true }"
@@ -67,7 +65,7 @@
       </div>
     </ImageHeader>
 
-    <CardHeader slot="header" class="tui-totaraPlaylist-playlistCard__header">
+    <CardHeader slot="header" class="tui-playlistCard__header">
       <BookmarkButton
         v-show="!owned"
         slot="first"
@@ -77,14 +75,10 @@
         :circle="false"
         :small="true"
         :transparent="true"
-        class="tui-totaraPlaylist-playlistCard__bookmark"
+        class="tui-playlistCard__bookmark"
         @click="updateBookmark"
       />
-      <h4
-        :id="labelId"
-        slot="second"
-        class="tui-totaraPlaylist-playlistCard__title"
-      >
+      <h4 :id="labelId" slot="second" class="tui-playlistCard__title">
         {{ name }}
       </h4>
     </CardHeader>
@@ -96,10 +90,10 @@
       :increment="0.1"
       :max-rating="5"
       :title="starTitle"
-      class="tui-totaraPlaylist-playlistCard__rating"
+      class="tui-playlistCard__rating"
     />
 
-    <div slot="footer" class="tui-totaraPlaylist-playlistCard__footer">
+    <div slot="footer" class="tui-playlistCard__footer">
       <StatIcon
         v-for="statIcon in statIcons"
         :key="statIcon.type"
@@ -112,7 +106,7 @@
       <AccessIcon
         :access="access"
         size="300"
-        custom-class="tui-totaraPlaylist-playlistCard__visibilityIcon"
+        custom-class="tui-playlistCard__visibilityIcon"
       />
     </div>
   </BaseCard>
@@ -276,7 +270,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-totaraPlaylist-playlistCard {
+.tui-playlistCard {
   min-height: var(--totara-engage-card-height);
 
   &__imageHeader {
@@ -363,7 +357,7 @@ export default {
     justify-content: flex-start;
     padding-bottom: 10px;
 
-    .tui-totaraEngage-star {
+    .tui-engageStarIcon {
       width: var(--font-size-14);
       height: var(--font-size-14);
 

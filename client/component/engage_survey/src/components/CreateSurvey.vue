@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-engageSurvey-createSurvey">
+  <div class="tui-engageCreateSurvey">
     <SurveyForm
       v-show="stage === 0"
       :survey="survey"
@@ -155,7 +155,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-engageSurvey-createSurvey {
+.tui-engageCreateSurvey {
   display: flex;
   flex: 1;
   flex-direction: column;

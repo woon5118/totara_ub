@@ -29,7 +29,6 @@
       <ContributeWorkspace
         v-if="canCreate"
         slot="heading-side"
-        class="tui-workspaceMenu__group__contribute"
         :disabled="$apollo.queries.workspaces.loading"
         @create-workspace="addWorkspace"
       />
@@ -45,7 +44,6 @@
           :notification-text="
             $str('workspace_updated_notification', 'container_workspace', name)
           "
-          class="tui-workspaceMenu__group__link"
         />
       </template>
     </SidePanelNavGroup>
@@ -57,7 +55,6 @@
         :id="-1"
         :url="$url('/container/type/workspace/spaces.php')"
         :text="$str('find_spaces', 'container_workspace')"
-        class="tui-workspaceMenu__group__link"
       />
     </SidePanelNavGroup>
   </SidePanelNav>

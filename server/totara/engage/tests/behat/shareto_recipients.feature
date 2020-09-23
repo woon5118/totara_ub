@@ -27,6 +27,6 @@ Feature: Share items to recipients
     Then I should see "Test Article 1"
 
     When I press "Share"
-    And I click on "Expand Tag list" "button" in the ".tui-sharedRecipientsSelector" "css_element"
+    And I click on "Expand Tag list" "button" in the ".tui-engageSharedRecipientsSelector" "css_element"
     Then I should see "User three"
     And  I should see "User two"

@@ -18,14 +18,17 @@
 
 <template>
   <div
-    :class="['tui-navigationPanel', `tui-navigationPanel__${gridDirection}`]"
+    :class="[
+      'tui-engageNavigationPanel',
+      `tui-engageNavigationPanel__${gridDirection}`,
+    ]"
   >
-    <div v-if="showMenuControl" class="tui-navigationPanel__selected">
-      <h2 class="tui-navigationPanel__header">
+    <div v-if="showMenuControl" class="tui-engageNavigationPanel__selected">
+      <h2 class="tui-engageNavigationPanel__header">
         <Button
           :text="title"
           :caret="true"
-          class="tui-navigationPanel__btn"
+          class="tui-engageNavigationPanel__btn"
           :styleclass="{ transparent: true }"
           :aria-expanded="showMenu.toString()"
           @click="toggleMenu"
@@ -35,7 +38,7 @@
     <div
       v-show="showMenu"
       ref="navigationPanelMenu"
-      class="tui-navigationPanel__menu"
+      class="tui-engageNavigationPanel__menu"
     >
       <h2 class="sr-only">{{ $str('navigation', 'totara_engage') }}</h2>
       <!-- Sections -->
@@ -164,7 +167,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-navigationPanel {
+.tui-engageNavigationPanel {
   &__selected {
     margin-top: var(--gap-6);
     margin-bottom: var(--gap-2);
@@ -173,12 +176,6 @@ export default {
   &__menu {
     height: 100%;
     overflow: auto;
-  }
-
-  &__search {
-    margin: var(--gap-4);
-    margin-right: var(--gap-1);
-    margin-bottom: var(--gap-6);
   }
 
   &__category {
@@ -197,7 +194,7 @@ export default {
     margin-top: 0;
     margin-bottom: 0;
     @include tui-font-heading-label();
-    & .tui-navigationPanel__btn {
+    & .tui-engageNavigationPanel__btn {
       @include tui-font-heading-small;
       color: var(--color-text);
       .tui-caret {
@@ -221,7 +218,7 @@ export default {
     }
 
     &--inactive {
-      .tui-navigationPanel__link__text {
+      .tui-engageNavigationPanel__link-text {
         @include tui-font-link;
         color: var(--color-state-focus);
       }
@@ -235,7 +232,7 @@ export default {
     &--active {
       background-color: var(--color-state-active);
 
-      .tui-navigationPanel__link__text {
+      .tui-engageNavigationPanel__link-text {
         @include tui-font-link;
         color: var(--color-neutral-1);
 
@@ -251,7 +248,7 @@ export default {
   &__vertical {
     border-bottom: 1px solid var(--color-neutral-5);
 
-    .tui-navigationPanel {
+    .tui-engageNavigationPanel {
       &__selected {
         padding: 0 var(--gap-4);
       }
@@ -264,7 +261,7 @@ export default {
         padding: var(--gap-2) var(--gap-4);
         border-bottom: 1px solid var(--color-neutral-4);
 
-        &__first {
+        &--first {
           border-top: 1px solid var(--color-neutral-4);
         }
       }

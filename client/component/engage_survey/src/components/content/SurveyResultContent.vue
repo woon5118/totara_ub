@@ -16,7 +16,7 @@
   @module engage_survey
 -->
 <template>
-  <div v-if="!$apollo.loading" class="tui-surveyResultContent">
+  <div v-if="!$apollo.loading" class="tui-engageSurveyResultContent">
     <SurveyQuestionResult
       v-for="({ id, votes, options, answertype }, index) in questions"
       :key="index"
@@ -27,8 +27,8 @@
       :result-content="true"
     />
     <template v-if="isMultiChoice">
-      <div class="tui-surveyResultContent__participant">
-        <span class="tui-surveyResultContent__participantnumber">
+      <div class="tui-engageSurveyResultContent__participant">
+        <span class="tui-engageSurveyResultContent__participantnumber">
           {{ showNumberOfParticipant }}
         </span>
         {{ showParticipants }}
@@ -119,7 +119,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-surveyResultContent {
+.tui-engageSurveyResultContent {
   &__participant {
     @include tui-font-body();
     @include tui-font-heavy();

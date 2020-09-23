@@ -46,7 +46,7 @@
       >
         <input v-show="false" ref="inputFile" type="file" v-on="inputEvents" />
 
-        <div class="tui-spaceImagePicker__image__loader">
+        <div class="tui-spaceImagePicker__loader">
           <PageLoader :loading="isUploadImageLoaded" />
         </div>
 
@@ -55,7 +55,7 @@
           :aria-label="$str('edit_image', 'container_workspace')"
           :text="$str('edit_image', 'container_workspace')"
           :styleclass="{ small: true }"
-          class="tui-spaceImagePicker__image__button"
+          class="tui-spaceImagePicker__editButton"
           v-on="selectEvents"
         />
       </div>
@@ -239,18 +239,17 @@ export default {
     &--progressing {
       align-items: stretch;
     }
+  }
 
-    &__loader {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      justify-content: center;
-    }
+  &__loader {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+  }
 
-    &__button,
-    &__progress {
-      margin-bottom: var(--gap-4);
-    }
+  &__editButton {
+    margin-bottom: var(--gap-4);
   }
 }
 </style>

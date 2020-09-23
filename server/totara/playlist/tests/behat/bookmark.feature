@@ -38,11 +38,11 @@ Feature: Bookmark playlist
     And I click on "Your Library" in the totara menu
     Then I should not see "Test Playlist 1" in the ".tui-playlistNavigation" "css_element"
 
-    When I click on "Shared with you" "link" in the ".tui-navigationPanel__menu" "css_element"
-    And I click on "Bookmark" "button" in the ".tui-totaraPlaylist-playlistCard__header" "css_element"
+    When I click on "Shared with you" "link" in the ".tui-engageNavigationPanel__menu" "css_element"
+    And I click on "Bookmark" "button" in the ".tui-playlistCard__header" "css_element"
     And I wait for the next second
     Then I should see "Test Playlist 1" in the ".tui-playlistNavigation" "css_element"
 
-    When I click on "Unbookmark" "button" in the ".tui-totaraPlaylist-playlistCard__header" "css_element"
+    When I click on "Unbookmark" "button" in the ".tui-playlistCard__header" "css_element"
     And I wait for the next second
     Then I should not see "Test Playlist 1" in the ".tui-playlistNavigation" "css_element"

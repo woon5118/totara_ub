@@ -2,25 +2,25 @@
 
 exports[`totara_comment/components/card/ReplyCard.vue Checks snapshot 1`] = `
 <div
-  class="tui-replyCard"
+  class="tui-commentReplyCard"
 >
   <div
-    class="tui-replyCard__profilePicture"
+    class="tui-commentReplyCard__profilePicture"
   />
    
   <div
-    class="tui-replyCard__body"
+    class="tui-commentReplyCard__body"
   >
     <div
-      class="tui-replyCard__body__header"
+      class="tui-commentReplyCard__header"
     />
      
     <div
-      class="tui-replyCard__body__content"
+      class="tui-commentReplyCard__content"
     />
      
     <div
-      class="tui-replyCard__body__footer"
+      class="tui-commentReplyCard__footer"
     />
   </div>
 </div>

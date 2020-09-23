@@ -43,15 +43,15 @@
           :workspace-access="workspace.access"
           :workspace-muted="workspace.interactor.muted"
           :show-mute-button="workspace.interactor.joined"
-          class="tui-workspacePage__mainContent__head"
+          class="tui-workspacePage__head"
           @update-mute-status="updateMuteStatus"
         />
 
-        <div class="tui-workspacePage__mainContent__primaryAction">
+        <div class="tui-workspacePage__primaryAction">
           <WorkspacePrimaryAction
             :workspace-id="workspace.id"
             :workspace-name="workspace.name"
-            class="tui-workspacePage__mainContent__primaryAction__action"
+            class="tui-workspacePage__primaryAction-action"
             @update-workspace="updateWorkspace"
             @request-to-join-workspace="reloadWorkspace"
             @cancel-request-to-join-workspace="reloadWorkspace"
@@ -64,7 +64,7 @@
         <Tabs
           v-model="innerSelectedTab"
           direction="horizontal"
-          class="tui-workspacePage__mainContent__tabs"
+          class="tui-workspacePage__tabs"
         >
           <Tab
             id="discussion"
@@ -73,7 +73,7 @@
             <WorkspaceContentLayout
               :max-units="units"
               :grid-direction="direction"
-              class="tui-workspacePage__mainContent__tabs__discussionTab"
+              class="tui-workspacePage__tabs-discussionTab"
             >
               <template v-slot:content>
                 <WorkspaceDiscussionTab
@@ -84,7 +84,7 @@
                   @add-discussion="addDiscussion"
                 />
 
-                <p v-else class="tui-workspacePage__mainContent__tabs__text">
+                <p v-else class="tui-workspacePage__tabs-text">
                   {{ $str('visibility_help', 'container_workspace') }}
                 </p>
               </template>
@@ -363,41 +363,41 @@ export default {
     @media (min-width: $tui-screen-sm) {
       margin-top: var(--gap-8);
     }
+  }
 
-    &__primaryAction {
-      display: flex;
+  &__primaryAction {
+    display: flex;
+    width: 100%;
+    margin-top: var(--gap-4);
+
+    @media (min-width: $tui-screen-sm) {
+      justify-content: flex-end;
+    }
+
+    &-action {
       width: 100%;
-      margin-top: var(--gap-4);
 
       @media (min-width: $tui-screen-sm) {
-        justify-content: flex-end;
+        width: inherit;
       }
+    }
+  }
 
-      &__action {
-        width: 100%;
-
-        @media (min-width: $tui-screen-sm) {
-          width: inherit;
-        }
+  &__tabs {
+    margin-top: var(--gap-4);
+    .tui-tabs__tabs {
+      padding-left: var(--gap-4);
+      @media (min-width: $tui-screen-sm) {
+        padding: 0;
       }
     }
 
-    &__tabs {
+    &-text {
+      @include tui-font-body();
+    }
+
+    &-discussionTab {
       margin-top: var(--gap-4);
-      .tui-tabs__tabs {
-        padding-left: var(--gap-4);
-        @media (min-width: $tui-screen-sm) {
-          padding: 0;
-        }
-      }
-
-      &__text {
-        @include tui-font-body();
-      }
-
-      &__discussionTab {
-        margin-top: var(--gap-4);
-      }
     }
   }
 }

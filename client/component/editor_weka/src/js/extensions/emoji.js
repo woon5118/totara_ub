@@ -19,7 +19,7 @@
 import BaseExtension from './Base';
 import { ToolbarItem } from '../toolbar';
 import { langString } from 'tui/i18n';
-import Emojis from 'editor_weka/components/editing/Emojis';
+import EmojiSelector from 'editor_weka/components/editing/EmojiSelector';
 import Emoji from 'editor_weka/components/nodes/Emoji';
 import EmojiIcon from 'tui/components/icons/Emoji';
 import Vue from 'vue';
@@ -61,7 +61,7 @@ class EmojiExtension extends BaseExtension {
           },
           parseDOM: [
             {
-              tag: 'span.tui-editorWeka-emoji',
+              tag: 'span.tui-wekaNodeEmoji',
               getAttrs: getJsonAttrs,
             },
           ],
@@ -69,7 +69,7 @@ class EmojiExtension extends BaseExtension {
             return [
               'span',
               {
-                class: 'tui-editorWeka-emoji',
+                class: 'tui-wekaNodeEmoji',
                 'data-attrs': JSON.stringify({
                   shortcode: node.attrs.shortcode,
                 }),
@@ -120,7 +120,7 @@ class EmojiExtension extends BaseExtension {
         },
       },
       render(h) {
-        return h(Emojis, {
+        return h(EmojiSelector, {
           props: { emojis: this.emojiData },
           on: {
             'emoji-selected': this.emojiSelected,

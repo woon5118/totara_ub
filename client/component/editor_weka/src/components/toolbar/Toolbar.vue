@@ -18,15 +18,15 @@
 
 <template>
   <div
-    class="tui-editorWeka-toolbar"
+    class="tui-wekaToolbar"
     role="toolbar"
     :aria-label="$str('label_toolbar', 'editor_weka')"
   >
-    <div class="tui-editorWeka-toolbar__group">
+    <div class="tui-wekaToolbar__group">
       <Dropdown :separator="false">
         <template v-slot:trigger="{ toggle, isOpen }">
           <ToolbarButton
-            class="tui-editorWeka-toolbar__currentBlock tui-editorWeka-toolbar__button"
+            class="tui-wekaToolbar__currentBlock tui-wekaToolbar__button"
             :text="activeBlockName"
             :aria-expanded="isOpen ? 'true' : 'false'"
             :aria-label="
@@ -53,14 +53,14 @@
     <div
       v-for="(itemGroup, groupKey) in itemGroups"
       :key="groupKey"
-      class="tui-editorWeka-toolbar__group"
+      class="tui-wekaToolbar__group"
     >
       <template v-for="(item, i) in itemGroup">
         <!-- dropdown toolbar item -->
         <Dropdown v-if="item.children" :key="i" :separator="false">
           <template v-slot:trigger="{ toggle }">
             <ToolbarButtonIcon
-              class="tui-editorWeka-toolbar__button"
+              class="tui-wekaToolbar__button"
               :text="item.label.toString()"
               :active="item.active"
               :disabled="!item.enabled"
@@ -93,7 +93,7 @@
         >
           <template v-slot:trigger="{ isOpen }">
             <ToolbarButtonIcon
-              class="tui-editorWeka-toolbar__button"
+              class="tui-wekaToolbar__button"
               :text="item.label.toString()"
               :selected="item.active"
               :disabled="!item.enabled"
@@ -115,7 +115,7 @@
         <ToolbarButtonIcon
           v-else
           :key="i"
-          class="tui-editorWeka-toolbar__button"
+          class="tui-wekaToolbar__button"
           :text="item.label.toString()"
           :selected="item.active"
           :disabled="!item.enabled"
@@ -258,7 +258,7 @@ export default {
      */
     $_getAllButtons() {
       return Array.prototype.slice.call(
-        this.$el.querySelectorAll('.tui-editorWeka-toolbar__button')
+        this.$el.querySelectorAll('.tui-wekaToolbar__button')
       );
     },
 
@@ -308,7 +308,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-toolbar {
+.tui-wekaToolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;

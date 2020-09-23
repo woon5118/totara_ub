@@ -28,9 +28,9 @@
     />
 
     <div class="tui-workspacePageHeader__content">
-      <div class="tui-workspacePageHeader__content__head">
-        <div class="tui-workspacePageHeader__content__head__title">
-          <h2 class="tui-workspacePageHeader__content__head__title__text">
+      <div class="tui-workspacePageHeader__head">
+        <div class="tui-workspacePageHeader__title">
+          <h2 class="tui-workspacePageHeader__title-text">
             {{ workspaceName }}
           </h2>
 
@@ -41,21 +41,21 @@
               small: true,
               transparentNoPadding: true,
             }"
-            class="tui-workspacePageHeader__content__head__title__buttonIcon"
+            class="tui-workspacePageHeader__title-buttonIcon"
             @click.prevent="showMenu = !showMenu"
           >
             <ShowIcon />
           </ButtonIcon>
         </div>
 
-        <div class="tui-workspacePageHeader__content__head__subTitle">
-          <p class="tui-workspacePageHeader__content__head__subTitle__text">
+        <div class="tui-workspacePageHeader__subTitle">
+          <p class="tui-workspacePageHeader__subTitle-text">
             {{ subTitle }}
           </p>
 
           <WorkspaceMuteButton
             v-if="showMuteButton"
-            class="tui-workspacePageHeader__content__head__subTitle__button"
+            class="tui-workspacePageHeader__subTitle-button"
             :muted="workspaceMuted"
             @update="updateMuteStatus"
           />
@@ -65,7 +65,7 @@
       <WorkspaceMenu
         v-if="showMenu && showNavigation"
         :selected-workspace-id="workspaceId"
-        class="tui-workspacePageHeader__content__menu"
+        class="tui-workspacePageHeader__menu"
       />
     </div>
   </div>
@@ -245,55 +245,55 @@ export default {
     display: flex;
     flex-direction: column;
     width: 100%;
+  }
 
-    &__head {
+  &__head {
+    padding: 0;
+    padding-left: var(--gap-4);
+
+    @media (min-width: $tui-screen-sm) {
       padding: 0;
-      padding-left: var(--gap-4);
+    }
+  }
 
-      @media (min-width: $tui-screen-sm) {
-        padding: 0;
-      }
+  &__title {
+    display: flex;
+    align-items: center;
 
-      &__title {
-        display: flex;
-        align-items: center;
+    &-text {
+      width: 100%;
+      margin: 0;
+      -ms-word-break: break-all;
+      word-break: break-word;
+      hyphens: none;
 
-        &__text {
-          width: 100%;
-          margin: 0;
-          -ms-word-break: break-all;
-          word-break: break-word;
-          hyphens: none;
-
-          @include tui-font-heading-page-title;
-        }
-
-        &__buttonIcon {
-          margin-left: var(--gap-2);
-        }
-      }
-
-      &__subTitle {
-        display: flex;
-        align-items: center;
-
-        &__text {
-          @include tui-font-body();
-          margin-top: var(--gap-2);
-          color: var(--color-neutral-6);
-        }
-
-        &__button {
-          margin-left: var(--gap-4);
-        }
-      }
+      @include tui-font-heading-page-title;
     }
 
-    &__menu {
-      padding: var(--gap-8) 0;
-      background-color: var(--color-neutral-3);
-      border: var(--border-width-thin) solid var(--color-neutral-5);
+    &-buttonIcon {
+      margin-left: var(--gap-2);
     }
+  }
+
+  &__subTitle {
+    display: flex;
+    align-items: center;
+
+    &-text {
+      @include tui-font-body();
+      margin-top: var(--gap-2);
+      color: var(--color-neutral-6);
+    }
+
+    &-button {
+      margin-left: var(--gap-4);
+    }
+  }
+
+  &__menu {
+    padding: var(--gap-8) 0;
+    background-color: var(--color-neutral-3);
+    border: var(--border-width-thin) solid var(--color-neutral-5);
   }
 }
 </style>

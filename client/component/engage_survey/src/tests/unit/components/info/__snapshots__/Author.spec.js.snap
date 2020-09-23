@@ -2,7 +2,7 @@
 
 exports[`engage_survey/components/info/Author.vue Checks snapshot 1`] = `
 <div
-  class="tui-engageSurvey-author"
+  class="tui-engageSurveyAuthor"
 >
   <img
     alt="Hello"
@@ -11,7 +11,7 @@ exports[`engage_survey/components/info/Author.vue Checks snapshot 1`] = `
   />
    
   <a
-    class="tui-engageSurvey-author__userLink"
+    class="tui-engageSurveyAuthor__userLink"
     href="/user/profile.php?[object Object]"
   >
     

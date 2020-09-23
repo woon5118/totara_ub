@@ -27,7 +27,7 @@
 
     <div class="tui-emptySpacesHeader__actionBox">
       <ActionLink
-        class="tui-emptySpacesHeader__actionBox__actionLink"
+        class="tui-emptySpacesHeader__actionLink"
         :href="$url('/container/type/workspace/spaces.php')"
         :text="$str('find_spaces', 'container_workspace')"
         :styleclass="{ primary: true }"
@@ -111,10 +111,6 @@ export default {
     flex-direction: column;
     align-items: center;
 
-    &__actionLink {
-      margin-bottom: var(--gap-4);
-    }
-
     p {
       @include tui-font-body();
       margin: 0;
@@ -124,6 +120,10 @@ export default {
         @include tui-font-link();
       }
     }
+  }
+
+  &__actionLink {
+    margin-bottom: var(--gap-4);
   }
 }
 </style>

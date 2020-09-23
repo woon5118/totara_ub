@@ -27,7 +27,7 @@
         v-for="({ id, url, image, name, interactor }, x) in row"
         :key="x"
         :units="workspaceUnits"
-        class="tui-spaceCardsGrid__row__card"
+        class="tui-spaceCardsGrid__card"
       >
         <OriginalSpaceCard
           :workspace-id="id"
@@ -104,10 +104,10 @@ export default {
     &.tui-grid {
       margin-bottom: var(--gap-4);
     }
+  }
 
-    &__card {
-      height: var(--totara-engage-card-height);
-    }
+  &__card {
+    height: var(--totara-engage-card-height);
   }
 }
 </style>

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <Table :data="log">
+  <Table :data="log" class="tui-competencyDetailActivityLogTable">
     <template v-slot:header-row>
       <HeaderCell size="2">
         {{ $str('date', 'moodle') }}
@@ -37,7 +37,7 @@
       <Cell size="2" :column-header="$str('date', 'moodle')">
         <Popover :triggers="['hover']">
           <template v-slot:trigger>
-            <span class="tui-competencyDetailActivityLog__date">
+            <span class="tui-competencyDetailActivityLogTable__date">
               {{ row.date }}
             </span>
           </template>
@@ -49,7 +49,7 @@
       <Cell
         size="8"
         :column-header="$str('description', 'moodle')"
-        class="tui-competencyDetailActivityLog__description"
+        class="tui-competencyDetailActivityLogTable__description"
       >
         <AddUserIcon v-if="row.assignment_action === 'assigned'" size="200" />
         <RemoveUserIcon
@@ -61,11 +61,11 @@
         />
         <span
           :class="{
-            'tui-competencyDetailActivityLog__description-rating':
+            'tui-competencyDetailActivityLogTable__description-rating':
               row.proficient_status != null,
-            'tui-competencyDetailActivityLog__description-system':
+            'tui-competencyDetailActivityLogTable__description-system':
               row.assignment && row.assignment.type === 'system',
-            'tui-competencyDetailActivityLog__description-tracking':
+            'tui-competencyDetailActivityLogTable__description-tracking':
               row.assignment_action &&
               (row.assignment_action === 'tracking_started' ||
                 row.assignment_action === 'tracking_ended'),
@@ -145,3 +145,36 @@ export default {
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-competencyDetailActivityLogTable {
+  &__date {
+    word-wrap: break-word;
+  }
+
+  &__description {
+    .flex-icon {
+      position: relative;
+      top: -1px;
+    }
+
+    &-rating {
+      font-weight: bold;
+    }
+
+    &-tracking {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    &-system {
+      &::before {
+        content: '* ';
+      }
+      &::after {
+        content: ' *';
+      }
+    }
+  }
+}
+</style>

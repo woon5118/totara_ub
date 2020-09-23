@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-postDiscussionForm">
+  <div class="tui-workspacePostDiscussionForm">
     <PostAvatar
       :profile-url="avatarImageUrl"
       :image-alt="avatarImageAlt"
@@ -27,7 +27,7 @@
     <WorkspaceDiscussionForm
       :submitting="submitting"
       :show-cancel-button="false"
-      class="tui-postDiscussionForm__form"
+      class="tui-workspacePostDiscussionForm__form"
       @submit="$emit('submit', $event)"
     />
   </div>
@@ -65,7 +65,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-postDiscussionForm {
+.tui-workspacePostDiscussionForm {
   display: flex;
   &__form {
     flex-grow: 1;

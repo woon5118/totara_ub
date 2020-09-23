@@ -16,33 +16,33 @@
   @module totara_engage
 -->
 <template>
-  <article class="tui-baseCard">
+  <article class="tui-engageBaseCard">
     <CoreCard
-      class="tui-baseCard__card"
+      class="tui-engageBaseCard__card"
       :clickable="true"
       @mouseover.native="hover(false)"
       @mouseleave.native="hover(false)"
       @click="handleClick(href)"
     >
-      <div class="tui-baseCard__headerImage">
+      <div class="tui-engageBaseCard__headerImage">
         <!-- This is where the image background going to be -->
         <slot name="header-image" />
       </div>
 
-      <div class="tui-baseCard__description">
-        <div class="tui-baseCard__description__header">
+      <div class="tui-engageBaseCard__description">
+        <div>
           <!-- This is where the title will be -->
-          <a class="tui-baseCard__link" :href="href">
+          <a class="tui-engageBaseCard__link" :href="href">
             <slot name="header" />
           </a>
         </div>
 
-        <div class="tui-baseCard__description__infoContent">
+        <div class="tui-engageBaseCard__infoContent">
           <!-- This is where the info content (author and such) of the card will be -->
           <slot name="info-content" />
         </div>
 
-        <div class="tui-baseCard__description__footer">
+        <div>
           <!-- This is where the statistic content of the card will be -->
           <slot name="footer" />
         </div>
@@ -104,7 +104,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-baseCard {
+.tui-engageBaseCard {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -144,10 +144,10 @@ export default {
     & > :last-child {
       margin-top: auto;
     }
+  }
 
-    &__infoContent {
-      margin-top: var(--gap-2);
-    }
+  &__infoContent {
+    margin-top: var(--gap-2);
   }
 }
 </style>

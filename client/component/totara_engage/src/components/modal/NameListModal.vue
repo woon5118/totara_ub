@@ -17,30 +17,18 @@
 -->
 
 <template>
-  <Modal
-    size="small"
-    aria-labelledby="tui-engage__components__modal__namelistmodal-title"
-  >
-    <h2
-      id="tui-engage__components__modal__namelistmodal-title"
-      class="tui-engage__components__modal__namelistmodal-title"
-    >
+  <Modal size="small" :aria-labelledby="$id('title')">
+    <h2 :id="$id('title')" class="tui-engageArticleNameListModal__title">
       {{ title }}
     </h2>
     <CloseButton
-      class="tui-engage__components__modal__namelistmodal-close"
+      class="tui-engageArticleNameListModal__close"
       :size="300"
       @click="$emit('dismiss')"
     />
-    <div
-      ref="watchTarget"
-      class="tui-engage__components__modal__namelistmodal-content"
-    >
+    <div ref="watchTarget" class="tui-engageArticleNameListModal__content">
       <Loading v-if="loading" />
-      <ul
-        v-else
-        class="tui-engage__components__modal__namelistmodal-content-list"
-      >
+      <ul v-else class="tui-engageArticleNameListModal__content-list">
         <li v-for="profile in profiles" :key="profile.id">
           <Avatar :src="profile.src" alt="" size="xsmall" />
           <a :href="profileUrl(profile.id)">
@@ -51,7 +39,7 @@
       <div
         v-if="!allLoaded"
         ref="loadMore"
-        class="tui-engage__components__modal__namelistmodal-content-loadmore"
+        class="tui-engageArticleNameListModal__content-loadmore"
       >
         <Loading />
         {{ $str('loading', 'core') }}
@@ -163,7 +151,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-engage__components__modal__namelistmodal {
+.tui-engageArticleNameListModal {
   &-title {
     @include tui-font-heading-x-small();
 

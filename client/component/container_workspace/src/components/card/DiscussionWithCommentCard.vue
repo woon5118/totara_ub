@@ -16,7 +16,10 @@
   @module container_workspace
 -->
 <template>
-  <article class="tui-discussionWithCommentCard" :data-id="discussionId">
+  <article
+    class="tui-workspaceDiscussionWithCommentCard"
+    :data-id="discussionId"
+  >
     <DiscussionCard
       :creator-fullname="creatorFullname"
       :creator-image-alt="creatorImageAlt || creatorFullname"
@@ -37,7 +40,7 @@
       :removed="removed"
       :edited="edited"
       :label-id="labelId"
-      class="tui-discussionWithCommentCard__discussionCard"
+      class="tui-workspaceDiscussionWithCommentCard__discussionCard"
       @trigger-comment="triggerComment"
       @update-react-status="$emit('update-discussion-react-status', $event)"
       @update-discussion="$emit('update-discussion', $event)"
@@ -59,7 +62,7 @@
       :show-comment-form="showCommentForm"
       :first-cursor="firstCommentCursor"
       :comment-inline-head="true"
-      class="tui-discussionWithCommentCard__comments"
+      class="tui-workspaceDiscussionWithCommentCard__comments"
       @form-ready="setFormElement"
       @create-comment="$emit('add-new-comment', discussionId)"
     />
@@ -218,7 +221,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-discussionWithCommentCard {
+.tui-workspaceDiscussionWithCommentCard {
   display: flex;
   flex-direction: column;
   width: 100%;

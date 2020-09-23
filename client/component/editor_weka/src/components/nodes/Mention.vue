@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <span class="tui-editorWeka-mention">
+  <span class="tui-wekaMention">
     <Mention :user-id="userId" :fullname="displayName" @click.native.prevent />
   </span>
 </template>
@@ -57,7 +57,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-editorWeka-mention {
+.tui-wekaMention {
   display: inline-block;
   white-space: normal;
 }

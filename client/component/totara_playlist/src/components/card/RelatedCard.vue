@@ -180,7 +180,7 @@ export default {
       margin-top: auto;
       margin-bottom: 0;
 
-      .tui-totaraEngage-star {
+      .tui-engageStarIcon {
         width: var(--font-size-14);
         height: var(--font-size-14);
 

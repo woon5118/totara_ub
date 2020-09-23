@@ -29,17 +29,17 @@ Feature: Vote survey
   Scenario: Edit survey
     Given I log in as "user1"
     When I click on "Your Library" in the totara menu
-    Then I should see "No results yet" in the ".tui-surveyCardBody__text" "css_element"
+    Then I should see "No results yet" in the ".tui-engageSurveyCardBody__text" "css_element"
     And I click on "Edit survey" "link"
     And I wait for the next second
     And I set the field "Enter survey question" to "Changing test Survey 1?"
-    And I click on "Single answer" "text" in the ".tui-totaraEngage-surveyForm__optionType--single" "css_element"
+    And I click on "Single answer" "text" in the ".tui-engageSurveyForm__optionType--single" "css_element"
     And I set the field "Option" to " Option 4"
     And I click on "Save" "button"
     And I should see "Changing test Survey 1?"
     And I should see "Vote" in the ".tui-formBtn" "css_element"
     And I click on "Your resources" "link"
-    And I should see "Your resources" in the ".tui-contributionBaseContent__header__title" "css_element"
+    And I should see "Your resources" in the ".tui-contributionBaseContent__title" "css_element"
 
   Scenario: Vote and bookmark survey
     Given I log in as "admin"
@@ -53,10 +53,10 @@ Feature: Vote survey
     And I click on "Vote" "button"
     And I should see "Total votes: 2"
     And I click on "Shared with you" "link"
-    And I should see "Shared with you" in the ".tui-contributionBaseContent__header__title" "css_element"
+    And I should see "Shared with you" in the ".tui-contributionBaseContent__title" "css_element"
     And I click on "Saved resources" "link"
     And I should see "Test Survey 1?"
-    And I should see "Showing 3 of 3 results" in the ".tui-surveyResultBody__text" "css_element"
+    And I should see "Showing 3 of 3 results" in the ".tui-engageSurveyResultBody__text" "css_element"
 
   Scenario: Like survey
     Given I log in as "admin"

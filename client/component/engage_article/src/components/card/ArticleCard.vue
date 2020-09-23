@@ -20,7 +20,7 @@
   <BaseCard
     :data-card-unique="instanceId"
     :href="url"
-    class="tui-engageArticle-articleCard"
+    class="tui-engageArticleCard"
     :show-footnotes="showFootnotes"
     :footnotes="footnotes"
     @mouseover="$_handleHovered(true)"
@@ -29,16 +29,16 @@
     <ImageHeader
       slot="header-image"
       :show-cover="hovered"
-      class="tui-engageArticle-articleCard__imageheader"
+      class="tui-engageArticleCard__imageheader"
     >
       <img
         slot="image"
         :alt="name"
         :src="extraData.image"
-        class="tui-engageArticle-articleCard__image"
+        class="tui-engageArticleCard__image"
       />
 
-      <div slot="actions" class="tui-engageArticle-articleCard__icons">
+      <div slot="actions" class="tui-engageArticleCard__icons">
         <ButtonIcon
           v-for="(action, i) in actions"
           :key="i"
@@ -50,7 +50,7 @@
       </div>
     </ImageHeader>
 
-    <CardHeader slot="header" class="tui-engageArticle-articleCard__header">
+    <CardHeader slot="header" class="tui-engageArticleCard__header">
       <BookmarkButton
         v-show="!owned"
         slot="first"
@@ -60,35 +60,31 @@
         :circle="false"
         :small="true"
         :transparent="true"
-        class="tui-engageArticle-articleCard__bookmark"
+        class="tui-engageArticleCard__bookmark"
         @click="updateBookmark"
       />
 
-      <h3
-        :id="labelId"
-        slot="second"
-        class="tui-engageArticle-articleCard__title"
-      >
+      <h3 :id="labelId" slot="second" class="tui-engageArticleCard__title">
         {{ name }}
       </h3>
 
       <div
         v-if="extraData.timeview"
         slot="third"
-        class="tui-engageArticle-articleCard__subTitle"
+        class="tui-engageArticleCard__subTitle"
       >
         <TimeIcon
           size="200"
           :alt="$str('time', 'totara_engage')"
           custom-class="tui-icon--dimmed"
         />
-        <span class="tui-engageArticle-articleCard__subTitle-text">{{
+        <span class="tui-engageArticleCard__subTitle-text">{{
           getTimeView
         }}</span>
       </div>
     </CardHeader>
 
-    <div slot="footer" class="tui-engageArticle-articleCard__footer">
+    <div slot="footer" class="tui-engageArticleCard__footer">
       <StatIcon
         v-for="statIcon in statIcons"
         :key="statIcon.type"
@@ -101,7 +97,7 @@
       <AccessIcon
         :access="access"
         size="300"
-        custom-class="tui-engageArticle-articleCard__visibilityIcon"
+        custom-class="tui-engageArticleCard__visibilityIcon"
       />
     </div>
   </BaseCard>
@@ -287,7 +283,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-engageArticle-articleCard {
+.tui-engageArticleCard {
   height: 100%;
   min-height: var(--totara-engage-card-height);
 

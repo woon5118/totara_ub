@@ -28,7 +28,7 @@
       </template>
 
       <div class="tui-likeRecordsModal__content">
-        <ul class="tui-likeRecordsModal__content__records">
+        <ul class="tui-likeRecordsModal__records">
           <li v-for="({ user }, index) in like.reactions" :key="index">
             <Avatar
               :src="user.profileimageurl"
@@ -133,19 +133,19 @@ export default {
   &__content {
     max-height: var(--totaraReaction-modalMaxHeight);
     overflow-y: auto;
+  }
 
-    &__records {
-      @include tui-font-body-small();
-      margin: 0;
-      color: var(--color-state);
-      list-style-type: none;
+  &__records {
+    @include tui-font-body-small();
+    margin: 0;
+    color: var(--color-state);
+    list-style-type: none;
 
-      li {
-        padding: var(--gap-2) 0;
+    li {
+      padding: var(--gap-2) 0;
 
-        + li {
-          border-top: var(--border-width-thin) solid var(--color-neutral-5);
-        }
+      + li {
+        border-top: var(--border-width-thin) solid var(--color-neutral-5);
       }
     }
   }

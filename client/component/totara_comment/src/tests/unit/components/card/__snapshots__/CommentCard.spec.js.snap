@@ -8,22 +8,22 @@ exports[`totara_comment/components/card/CommentCard.vue Checks snapshot 1`] = `
     class="tui-commentCard__comment"
   >
     <div
-      class="tui-commentCard__comment__profilePicture"
+      class="tui-commentCard__profilePicture"
     />
      
     <div
-      class="tui-commentCard__comment__body"
+      class="tui-commentCard__body"
     >
       <div
-        class="tui-commentCard__comment__body__header"
+        class="tui-commentCard__header"
       />
        
       <div
-        class="tui-commentCard__comment__body__content"
+        class="tui-commentCard__content"
       />
        
       <div
-        class="tui-commentCard__comment__body__footer"
+        class="tui-commentCard__footer"
       />
     </div>
   </div>

@@ -73,7 +73,7 @@ class LinkExtension extends BaseExtension {
           },
           parseDOM: [
             {
-              tag: '.tui-editorWeka-linkMedia',
+              tag: '.tui-wekaNodeLinkMedia',
               getAttrs: getJsonAttrs,
             },
           ],
@@ -81,7 +81,7 @@ class LinkExtension extends BaseExtension {
             return [
               'a',
               {
-                class: 'tui-editorWeka-linkMedia',
+                class: 'tui-wekaNodeLinkMedia',
                 'data-attrs': JSON.stringify(node.attrs),
                 href: node.attrs.url,
               },
@@ -113,7 +113,7 @@ class LinkExtension extends BaseExtension {
           },
           parseDOM: [
             {
-              tag: '.tui-editorWeka-linkBlock',
+              tag: '.tui-wekaNodeLinkBlock',
               getAttrs: getJsonAttrs,
             },
           ],
@@ -121,7 +121,7 @@ class LinkExtension extends BaseExtension {
             return [
               'a',
               {
-                class: 'tui-editorWeka-linkBlock',
+                class: 'tui-wekaNodeLinkBlock',
                 'data-attrs': JSON.stringify(node.attrs),
                 href: node.attrs.url,
               },
@@ -151,7 +151,7 @@ class LinkExtension extends BaseExtension {
           inclusive: false,
           parseDOM: [
             {
-              tag: 'a[href]:not([class*=tui-editorWeka])',
+              tag: 'a[href]:not([class*=tui-weka])',
               getAttrs: attrGetter(['href', 'title']),
             },
           ],

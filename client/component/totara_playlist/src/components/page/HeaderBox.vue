@@ -25,7 +25,7 @@
       class="tui-playlistPageHeaderBox__titleBox"
       @click="editing = true"
     >
-      <h1 slot="content" class="tui-playlistPageHeaderBox__titleBox__title">
+      <h1 slot="content" class="tui-playlistPageHeaderBox__title">
         {{ title }}
       </h1>
     </InlineEditing>
@@ -128,11 +128,11 @@ export default {
 .tui-playlistPageHeaderBox {
   &__titleBox {
     width: 100%;
+  }
 
-    &__title {
-      @include tui-font-heading-medium;
-      margin: 0;
-    }
+  &__title {
+    @include tui-font-heading-medium;
+    margin: 0;
   }
 }
 </style>

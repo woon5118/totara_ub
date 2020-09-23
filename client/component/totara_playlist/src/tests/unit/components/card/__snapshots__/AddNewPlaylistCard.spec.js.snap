@@ -2,10 +2,10 @@
 
 exports[`totara_playlist/components/card/AddNewPlaylistCard.spec.js Checks snapshot 1`] = `
 <div
-  class="tui-totaraPlaylist-addNewPlaylistCard"
+  class="tui-addNewPlaylistCard"
 >
   <card-stub
-    class="tui-totaraPlaylist-addNewPlaylistCard__card"
+    class="tui-addNewPlaylistCard__card"
   >
     <contribute-stub
       adder="[object Object]"

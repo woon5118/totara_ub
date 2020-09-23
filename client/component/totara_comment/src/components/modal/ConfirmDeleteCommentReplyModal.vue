@@ -37,7 +37,7 @@
           ]"
         />
 
-        <p class="tui-confirmDeleteCommentReplyModal__textBox__text">
+        <p class="tui-confirmDeleteCommentReplyModal__textBox-text">
           {{ $str('deletecommentconfirm', 'totara_comment') }}
         </p>
       </div>
@@ -117,7 +117,7 @@ export default {
     align-items: center;
     justify-content: flex-start;
 
-    &__text {
+    &-text {
       @include tui-font-body();
       margin: 0;
       margin-left: var(--gap-4);

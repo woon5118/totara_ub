@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`engage_survey/components/form/SurveyForm.vue Checks snapshot 1`] = `
-<uniform-stub initialvalues="[object Object]" validationmode="auto" vertical="true" inputwidth="full" class="tui-totaraEngage-surveyForm">
-  <div class="tui-totaraEngage-surveyForm__title">
+<uniform-stub initialvalues="[object Object]" validationmode="auto" vertical="true" inputwidth="full" class="tui-engageSurveyForm">
+  <div class="tui-engageSurveyForm__title">
     <fieldcontextprovider-stub>
       <formtext-stub placeholder="formtitle, engage_survey" maxlength="75" arialabel="formtitle, engage_survey" name="question" validations="function(v) {
                     return [v.required()]
@@ -13,18 +13,18 @@ exports[`engage_survey/components/form/SurveyForm.vue Checks snapshot 1`] = `
     <formradiogroup-stub horizontal="true" name="optionType" validations="function(v) {
                   return [v.required()]
                 }">
-      <radio-stub id="id" name="optionType" value="2" class="tui-totaraEngage-surveyForm__optionType tui-totaraEngage-surveyForm__optionType--single">
+      <radio-stub id="id" name="optionType" value="2" class="tui-engageSurveyForm__optionType tui-engageSurveyForm__optionType--single">
         optionsingle, engage_survey
       </radio-stub>
-      <radio-stub id="id" name="optionType" value="1" class="tui-totaraEngage-surveyForm__optionType tui-totaraEngage-surveyForm__optionType--multiple">
+      <radio-stub id="id" name="optionType" value="1" class="tui-engageSurveyForm__optionType tui-engageSurveyForm__optionType--multiple">
         optionmultiple, engage_survey
       </radio-stub>
     </formradiogroup-stub>
   </formrow-stub>
-  <formrow-stub label="optionstitle, engage_survey" isstacked="true" class="tui-totaraEngage-surveyForm__answerTitle"></formrow-stub>
-  <buttongroup-stub class="tui-totaraEngage-surveyForm__buttons tui-totaraEngage-surveyForm__buttons--right">
-    <loadingbutton-stub text="next, moodle" type="submit" arialabel="" primary="true" disabled="true" class="tui-totaraEngage-surveyForm__button"></loadingbutton-stub>
-    <cancelbutton-stub class="tui-totaraEngage-surveyForm__cancelButton"></cancelbutton-stub>
+  <formrow-stub label="optionstitle, engage_survey" isstacked="true" class="tui-engageSurveyForm__answerTitle"></formrow-stub>
+  <buttongroup-stub class="tui-engageSurveyForm__buttons tui-engageSurveyForm__buttons--right">
+    <loadingbutton-stub text="next, moodle" type="submit" arialabel="" primary="true" disabled="true" class="tui-engageSurveyForm__button"></loadingbutton-stub>
+    <cancelbutton-stub class="tui-engageSurveyForm__cancelButton"></cancelbutton-stub>
   </buttongroup-stub>
 </uniform-stub>
 `;

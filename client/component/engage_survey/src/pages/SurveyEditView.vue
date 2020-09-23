@@ -16,7 +16,7 @@
   @module engage_survey
 -->
 <template>
-  <Layout class="tui-surveyEditView">
+  <Layout class="tui-engageSurveyEditView">
     <template v-if="backButton || navigationButtons" v-slot:header>
       <ResourceNavigationBar
         :back-button="backButton"
@@ -25,13 +25,13 @@
     </template>
     <template v-slot:column>
       <Loader :loading="$apollo.loading" :fullpage="true" />
-      <div v-if="!$apollo.loading" class="tui-surveyEditView__layout">
+      <div v-if="!$apollo.loading" class="tui-engageSurveyEditView__layout">
         <SurveyForm
           :survey="surveyInstance"
           :button-content="$str('save', 'engage_survey')"
           :submitting="submitting"
           :show-button-right="false"
-          class="tui-surveyEditView__layout__content"
+          class="tui-engageSurveyEditView__content"
           @next="handleSave"
           @cancel="handleCancel"
         />
@@ -167,7 +167,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-surveyEditView {
+.tui-engageSurveyEditView {
   .tui-grid-item {
     min-height: var(--engageSurvey-min-height);
   }
@@ -179,16 +179,17 @@ export default {
 
   &__layout {
     display: flex;
-    &__content {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin: 0 auto;
-      padding: 0 0 var(--gap-12) 0;
-      @media (max-width: $tui-screen-sm) {
-        max-width: 80vw;
-        margin-left: var(--gap-8);
-      }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 0 0 var(--gap-12) 0;
+    @media (max-width: $tui-screen-sm) {
+      max-width: 80vw;
+      margin-left: var(--gap-8);
     }
   }
 }

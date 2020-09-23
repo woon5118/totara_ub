@@ -353,7 +353,7 @@ export default {
     align-self: center;
   }
 
-  .tui-contributionBaseContent__counterContainer__counter {
+  .tui-contributionBaseContent__counter {
     position: relative;
     top: 0;
     padding-bottom: var(--gap-2);

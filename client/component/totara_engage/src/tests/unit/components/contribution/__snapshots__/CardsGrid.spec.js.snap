@@ -2,7 +2,7 @@
 
 exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`] = `
 <div
-  class="tui-responsive tui-totaraEngage-cardsGrid"
+  class="tui-responsive tui-engageCardsGrid"
 >
   <div
     aria-busy="true"
@@ -11,10 +11,10 @@ exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`]
     style="display: block; padding: 0px 0px 0px; overflow-y: false;"
   >
     <div
-      class="tui-totaraEngage-cardsGrid__row tui-grid tui-grid--horizontal tui-grid--horizontal-gap"
+      class="tui-engageCardsGrid__row tui-grid tui-grid--horizontal tui-grid--horizontal-gap"
     >
       <div
-        class="tui-grid-item tui-totaraEngage-cardsGrid__card tui-grid-item--first"
+        class="tui-grid-item tui-engageCardsGrid__card tui-grid-item--first"
       >
         <span
           access="PRIVATE"
@@ -35,7 +35,7 @@ exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`]
         />
       </div>
       <div
-        class="tui-grid-item tui-totaraEngage-cardsGrid__card"
+        class="tui-grid-item tui-engageCardsGrid__card"
       >
         <span
           access="PRIVATE"
@@ -57,10 +57,10 @@ exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`]
       </div>
     </div>
     <div
-      class="tui-totaraEngage-cardsGrid__row tui-grid tui-grid--horizontal tui-grid--horizontal-gap"
+      class="tui-engageCardsGrid__row tui-grid tui-grid--horizontal tui-grid--horizontal-gap"
     >
       <div
-        class="tui-grid-item tui-totaraEngage-cardsGrid__card tui-grid-item--first"
+        class="tui-grid-item tui-engageCardsGrid__card tui-grid-item--first"
       >
         <span
           access="PRIVATE"
@@ -81,7 +81,7 @@ exports[`totara_engage/components/contribution/CardsGrid.vue Checks snapshot 1`]
         />
       </div>
       <div
-        class="tui-grid-item tui-totaraEngage-cardsGrid__card"
+        class="tui-grid-item tui-engageCardsGrid__card"
       >
         <span
           access="PRIVATE"

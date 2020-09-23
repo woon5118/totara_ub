@@ -18,7 +18,7 @@
 <template>
   <div class="tui-summaryPlaylistCard">
     <div class="tui-summaryPlaylistCard__top">
-      <a :href="url" class="tui-summaryPlaylistCard__top__title">
+      <a :href="url" class="tui-summaryPlaylistCard__title">
         {{ name }}
       </a>
 
@@ -28,7 +28,7 @@
         :increment="1"
         :rating="rating"
         :title="ratingTitle"
-        class="tui-summaryPlaylistCard__top__stars"
+        class="tui-summaryPlaylistCard__stars"
       />
     </div>
 
@@ -126,18 +126,8 @@ export default {
     display: flex;
     width: 100%;
 
-    &__title {
-      @include tui-font-link-small();
-      @include tui-font-heavy();
-      flex: 1;
-      margin: 0;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
     // Overriding the star rating
-    .tui-totaraEngage-star {
+    .tui-engageStarIcon {
       width: var(--font-size-15);
       height: var(--font-size-14);
 
@@ -149,6 +139,16 @@ export default {
         stop-color: var(--color-neutral-1);
       }
     }
+  }
+
+  &__title {
+    @include tui-font-link-small();
+    @include tui-font-heavy();
+    flex: 1;
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   &__author {

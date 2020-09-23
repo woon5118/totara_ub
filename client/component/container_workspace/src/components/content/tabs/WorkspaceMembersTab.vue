@@ -34,8 +34,8 @@
       v-if="!$apollo.queries.filter.loading"
       class="tui-workspaceMembersTab__content"
     >
-      <div class="tui-workspaceMembersTab__content__head">
-        <h3 class="tui-workspaceMembersTab__content__head__title">
+      <div class="tui-workspaceMembersTab__head">
+        <h3 class="tui-workspaceMembersTab__title">
           <span>{{ totalMemberText }}</span>
         </h3>
 
@@ -47,7 +47,7 @@
         />
       </div>
 
-      <div class="tui-workspaceMembersTab__content__members">
+      <div class="tui-workspaceMembersTab__members">
         <VirtualScroll
           data-key="id"
           :data-list="member.items"
@@ -63,7 +63,7 @@
               :user-card-display="item.user.card_display"
               :delete-able="item.member_interactor.can_remove"
               :workspace-id="workspaceId"
-              class="tui-workspaceMembersTab__content__members__member"
+              class="tui-workspaceMembersTab__member"
               :aria-posinset="posInSet"
               :aria-setsize="setSize"
               :aria-labelledby="$id(`item-${item.id}`)"
@@ -85,9 +85,9 @@
               member.cursor.next &&
               !$apollo.queries.member.loading
           "
-          class="tui-workspaceMembersTab__content__members__loadMoreContainer"
+          class="tui-workspaceMembersTab__loadMoreContainer"
         >
-          <div class="tui-workspaceMembersTab__content__members__viewedMembers">
+          <div class="tui-workspaceMembersTab__viewedMembers">
             <template>
               {{
                 $str('vieweditems', 'container_workspace', member.items.length)
@@ -96,7 +96,7 @@
             </template>
           </div>
           <Button
-            class="tui-workspaceMembersTab__content__members__loadMore"
+            class="tui-workspaceMembersTab__loadMore"
             :text="$str('loadmore', 'container_workspace')"
             @click="loadMore"
           />
@@ -104,7 +104,7 @@
 
         <p
           v-if="member.items.length <= 0 && !$apollo.queries.member.loading"
-          class="tui-workspaceMembersTab__content__members__message"
+          class="tui-workspaceMembersTab__message"
         >
           {{ $str('no_member_found', 'container_workspace') }}
         </p>
@@ -345,46 +345,44 @@ export default {
     @media (min-width: $tui-screen-sm) {
       padding-left: 0;
     }
+  }
 
-    &__head {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: var(--gap-4);
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--gap-4);
+  }
 
-      &__title {
-        @include tui-font-heading-x-small();
-        margin: 0;
-      }
-    }
+  &__title {
+    @include tui-font-heading-x-small();
+    margin: 0;
+  }
 
-    &__members {
-      &__member {
-        margin-bottom: var(--gap-2);
-      }
+  &__message {
+    @include tui-font-body();
+  }
 
-      &__message {
-        @include tui-font-body();
-      }
+  &__member {
+    margin-bottom: var(--gap-2);
+  }
 
-      &__loadMoreContainer {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding-top: var(--gap-6);
-        padding-bottom: var(--gap-8);
-      }
+  &__loadMoreContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: var(--gap-6);
+    padding-bottom: var(--gap-8);
+  }
 
-      &__viewedMembers {
-        display: flex;
-        align-self: center;
-        margin-bottom: var(--gap-1);
-      }
+  &__viewedMembers {
+    display: flex;
+    align-self: center;
+    margin-bottom: var(--gap-1);
+  }
 
-      &__loadMore {
-        display: flex;
-        align-self: center;
-      }
-    }
+  &__loadMore {
+    display: flex;
+    align-self: center;
   }
 }
 </style>

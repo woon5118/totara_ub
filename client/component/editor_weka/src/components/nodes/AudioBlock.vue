@@ -18,9 +18,9 @@
 
 <template>
   <!-- Vue component for displaying audio file as draft -->
-  <div class="tui-editorWeka-audioBlock">
+  <div class="tui-wekaAudioBlock">
     <template v-if="!$apollo.loading">
-      <div class="tui-editorWeka-audioBlock__inner">
+      <div class="tui-wekaAudioBlock__inner">
         <CoreAudioBlock
           :filename="filename"
           :item-id="itemId"
@@ -175,7 +175,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-audioBlock {
+.tui-wekaAudioBlock {
   margin: var(--gap-8) 0;
   white-space: normal;
 

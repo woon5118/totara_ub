@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-articleRelated">
+  <div class="tui-engageArticleRelated">
     <article
       v-for="{
         bookmarked,
@@ -123,7 +123,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-articleRelated {
+.tui-engageArticleRelated {
   & > * + * {
     margin-top: var(--gap-2);
   }

@@ -54,7 +54,7 @@ class behat_totara_playlist extends behat_base {
     public function i_rate_playlist(int $rating) {
         \behat_hooks::set_step_readonly(false);
 
-        $nodes = $this->find_all("xpath", "//div[@class='tui-popoverFrame__content']//div[@class='tui-totaraEngage-rating']//*[local-name()='svg']");
+        $nodes = $this->find_all("xpath", "//div[@class='tui-popoverFrame__content']//div[@class='tui-engageStarRating']//*[local-name()='svg']");
 
         if ($rating > 4) {
             $rating = 4;

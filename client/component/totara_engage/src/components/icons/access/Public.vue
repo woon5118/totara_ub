@@ -39,10 +39,10 @@ export default {
     let customClasses = [];
 
     // Pushing the default icon.
-    customClasses.push('tui-totaraEngage-public');
+    customClasses.push('tui-engageIconPublic');
 
     if (props.coloring) {
-      customClasses.push('tui-totaraEngage-public--color');
+      customClasses.push('tui-engageIconPublic--color');
     }
 
     let items = {
@@ -58,7 +58,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-totaraEngage-public {
+.tui-engageIconPublic {
   &--color {
     color: var(--color-prompt-success);
   }

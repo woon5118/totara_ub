@@ -2,19 +2,19 @@
 
 exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = `
 <basecard-stub
-  class="tui-totaraPlaylist-playlistCard"
+  class="tui-playlistCard"
   data-card-unique="1"
   href=""
 >
   <imageheader-stub>
     <div
-      class="tui-totaraPlaylist-playlistCard__imageHeader"
+      class="tui-playlistCard__imageHeader"
     >
       <div
-        class="tui-totaraPlaylist-playlistCard__numberOfResourcesContainer"
+        class="tui-playlistCard__numberOfResourcesContainer"
       >
         <div
-          class="tui-totaraPlaylist-playlistCard__numberOfResources"
+          class="tui-playlistCard__numberOfResources"
         >
           <p>
             0
@@ -23,17 +23,17 @@ exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = 
       </div>
        
       <div
-        class="tui-totaraPlaylist-playlistCard__imageContainer"
+        class="tui-playlistCard__imageContainer"
       >
         <img
           alt="Hello world"
-          class="tui-totaraPlaylist-playlistCard__image"
+          class="tui-playlistCard__image"
         />
       </div>
     </div>
      
     <div
-      class="tui-totaraPlaylist-playlistCard__icons"
+      class="tui-playlistCard__icons"
     >
       <buttonicon-stub
         arialabel="[share, totara_engage - undefined]"
@@ -50,17 +50,17 @@ exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = 
   </imageheader-stub>
    
   <cardheader-stub
-    class="tui-totaraPlaylist-playlistCard__header"
+    class="tui-playlistCard__header"
   >
     <bookmarkbutton-stub
-      class="tui-totaraPlaylist-playlistCard__bookmark"
+      class="tui-playlistCard__bookmark"
       size="300"
       small="true"
       transparent="true"
     />
      
     <h4
-      class="tui-totaraPlaylist-playlistCard__title"
+      class="tui-playlistCard__title"
       id=""
     >
       
@@ -70,7 +70,7 @@ exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = 
   </cardheader-stub>
    
   <starrating-stub
-    class="tui-totaraPlaylist-playlistCard__rating"
+    class="tui-playlistCard__rating"
     increment="0.1"
     maxrating="5"
     rating="0"
@@ -81,7 +81,7 @@ exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = 
   />
    
   <div
-    class="tui-totaraPlaylist-playlistCard__footer"
+    class="tui-playlistCard__footer"
   >
     <staticon-stub
       statnumber="0"
@@ -105,7 +105,7 @@ exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = 
     <accessicon-stub
       access="PUBLIC"
       coloring="true"
-      customclass="tui-totaraPlaylist-playlistCard__visibilityIcon"
+      customclass="tui-playlistCard__visibilityIcon"
       size="300"
     />
   </div>

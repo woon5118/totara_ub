@@ -2,7 +2,7 @@
 
 exports[`editor_weka/components/suggestion/User.vue Checks snapshot 1`] = `
 <div
-  class="tui-editorWeka-user"
+  class="tui-wekaUserSuggestions"
   style="left: 1px; top: 1px;"
 >
   <dropdown-stub

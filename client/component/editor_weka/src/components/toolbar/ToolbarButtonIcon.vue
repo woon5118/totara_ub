@@ -18,10 +18,10 @@
 
 <template>
   <ButtonIcon
-    class="tui-editorWeka-toolbarButton"
+    class="tui-wekaToolbarButtonIcon"
     :class="{
-      'tui-editorWeka-toolbarButton--selected': selected,
-      'tui-editorWeka-toolbarButton--iconOnly': iconOnly,
+      'tui-wekaToolbarButtonIcon--selected': selected,
+      'tui-wekaToolbarButtonIcon--iconOnly': iconOnly,
     }"
     :aria-label="text"
     :aria-pressed="ariaPressed"
@@ -70,11 +70,11 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-editorWeka-toolbarButtonIcon {
-  @extend .tui-editorWeka-toolbarButton;
+.tui-wekaToolbarButtonIcon {
+  @extend .tui-wekaToolbarButton;
 
   &--selected {
-    @extend .tui-editorWeka-toolbarButton--selected;
+    @extend .tui-wekaToolbarButton--selected;
   }
 }
 </style>

@@ -17,15 +17,15 @@
 -->
 
 <template>
-  <div class="tui-sharedRecipientsSelector">
+  <div class="tui-engageSharedRecipientsSelector">
     <Label
       :label="shareLabel"
       :for-id="generatedId"
-      class="tui-sharedRecipientsSelector__label"
+      class="tui-engageSharedRecipientsSelector__label"
     />
     <InfoIconButton
       :aria-label="$str('info', 'moodle')"
-      class="tui-sharedRecipientsSelector__icon"
+      class="tui-engageSharedRecipientsSelector__icon"
     >
       {{ shareHelpInfo }}
     </InfoIconButton>
@@ -41,7 +41,7 @@
       <template v-slot:item="{ item }">
         <div
           v-if="item.user"
-          class="tui-sharedRecipientsSelector__profileContainer"
+          class="tui-engageSharedRecipientsSelector__profileContainer"
         >
           <MiniProfileCard
             :no-border="true"
@@ -50,26 +50,26 @@
           />
           <div
             v-if="getRecipientDetails(item, 'alreadyshared')"
-            class="tui-sharedRecipientsSelector__profileContainer-badge"
+            class="tui-engageSharedRecipientsSelector__profileContainer-badge"
           >
             <CheckSuccess />
             <span>{{ $str('alreadyshared', 'totara_engage') }}</span>
           </div>
         </div>
 
-        <div v-else class="tui-sharedRecipientsSelector__recipient">
+        <div v-else class="tui-engageSharedRecipientsSelector__recipient">
           <Avatar
             :src="getRecipientDetails(item, 'src')"
             :alt="getRecipientDetails(item, 'fullname')"
             size="xsmall"
           />
-          <ul class="tui-sharedRecipientsSelector__recipient__summary">
+          <ul class="tui-engageSharedRecipientsSelector__recipient-summary">
             <li>{{ getRecipientDetails(item, 'fullname') }}</li>
             <li>{{ getRecipientDetails(item, 'summary') }}</li>
           </ul>
           <div
             v-if="getRecipientDetails(item, 'alreadyshared')"
-            class="tui-sharedRecipientsSelector__recipient__badge"
+            class="tui-engageSharedRecipientsSelector__recipient-badge"
           >
             <CheckSuccess />
             <span>{{ $str('alreadyshared', 'totara_engage') }}</span>
@@ -405,7 +405,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-sharedRecipientsSelector {
+.tui-engageSharedRecipientsSelector {
   &__label.tui-formLabel {
     @include tui-font-heading-label();
     margin-right: 0;
@@ -422,7 +422,7 @@ export default {
       margin-right: var(--gap-2);
     }
 
-    &__summary {
+    &-summary {
       margin: 0;
       list-style-type: none;
       > :first-child {
@@ -433,7 +433,7 @@ export default {
       }
     }
 
-    &__badge {
+    &-badge {
       align-self: flex-end;
       margin-left: auto;
       > :last-child {

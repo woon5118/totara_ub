@@ -18,7 +18,7 @@
 <template>
   <ActionCard class="tui-workspaceDescription">
     <div slot="card-body" class="tui-workspaceDescription__body">
-      <p class="tui-workspaceDescription__body__time">
+      <p class="tui-workspaceDescription__time">
         {{ timeDescription }}
       </p>
 
@@ -71,11 +71,9 @@ export default {
 
 <style lang="scss">
 .tui-workspaceDescription {
-  &__body {
-    &__time {
-      @include tui-font-body-small();
-      margin-bottom: var(--gap-4);
-    }
+  &__time {
+    @include tui-font-body-small();
+    margin-bottom: var(--gap-4);
   }
 }
 </style>

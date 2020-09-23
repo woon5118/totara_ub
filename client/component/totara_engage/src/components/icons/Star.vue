@@ -18,7 +18,7 @@
 <template>
   <svg
     :ref="svgId"
-    class="tui-totaraEngage-star"
+    class="tui-engageStarIcon"
     :height="getSize"
     :width="getSize"
     :viewBox="viewBox"
@@ -34,7 +34,7 @@
       :points="starPointsToString"
       :fill="getGradId"
       :stroke-width="border"
-      class="tui-totaraEngage-star__polygon"
+      class="tui-engageStarIcon__polygon"
     />
     <polygon :points="starPointsToString" :fill="getGradId" />
   </svg>
@@ -160,8 +160,8 @@ export default {
     },
     getStopClass(filled) {
       return {
-        'tui-totaraEngage-star__filled': filled,
-        'tui-totaraEngage-star__unfilled': !filled,
+        'tui-engageStarIcon__filled': filled,
+        'tui-engageStarIcon__unfilled': !filled,
       };
     },
   },
@@ -169,7 +169,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-totaraEngage-star {
+.tui-engageStarIcon {
   display: block;
   margin-right: var(--gap-1);
 

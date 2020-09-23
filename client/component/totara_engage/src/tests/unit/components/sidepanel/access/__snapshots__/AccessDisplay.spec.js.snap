@@ -2,13 +2,13 @@
 
 exports[`totara_engage/components/sidepanel/access/AccessSeting.vue Checks snapshot 1`] = `
 <div
-  class="tui-accessDisplay"
+  class="tui-engageAccessDisplay"
 >
   <div
-    class="tui-accessDisplay__accessIcon"
+    class="tui-engageAccessDisplay__accessIcon"
   >
     <div
-      class="tui-accessDisplay__accessIcon__icons"
+      class="tui-engageAccessDisplay__accessIcon-icons"
     >
       <accessicon-stub
         access="PUBLIC"
@@ -22,7 +22,7 @@ exports[`totara_engage/components/sidepanel/access/AccessSeting.vue Checks snaps
     </div>
      
     <div
-      class="tui-accessDisplay__accessIcon__shareButton"
+      class="tui-engageAccessDisplay__accessIcon-shareButton"
     >
       <button-stub
         styleclass="[object Object]"
@@ -37,10 +37,9 @@ exports[`totara_engage/components/sidepanel/access/AccessSeting.vue Checks snaps
   <!---->
    
   <div
-    class="tui-accessDisplay__editSettings"
+    class="tui-engageAccessDisplay__editSettings"
   >
     <button-stub
-      class="tui-accessDisplay__editSettings__text"
       styleclass="[object Object]"
       text="editsettings-totara_engage"
       type="button"

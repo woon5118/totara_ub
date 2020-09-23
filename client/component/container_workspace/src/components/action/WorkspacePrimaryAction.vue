@@ -82,7 +82,7 @@
       <Dropdown
         v-if="interactor.own || interactor.workspaces_admin"
         position="bottom-right"
-        class="tui-workspacePrimaryAction__dropDown"
+        class="tui-workspacePrimaryAction__dropdown"
       >
         <template v-slot:trigger="{ toggle, isOpen }">
           <Button
@@ -102,7 +102,7 @@
             "
             :aria-expanded="isOpen"
             :caret="true"
-            class="tui-workspacePrimaryAction__dropDown__button"
+            class="tui-workspacePrimaryAction__dropdown-button"
             @click.prevent="toggle"
           />
         </template>
@@ -196,7 +196,7 @@
         <Dropdown
           v-else
           position="bottom-right"
-          class="tui-workspacePrimaryAction__dropDown"
+          class="tui-workspacePrimaryAction__dropdown"
         >
           <template v-slot:trigger="{ toggle, isOpen }">
             <Button
@@ -210,7 +210,7 @@
               "
               :caret="true"
               :aria-expanded="isOpen"
-              class="tui-workspacePrimaryAction__dropDown__button"
+              class="tui-workspacePrimaryAction__dropdown-button"
               @click.prevent="toggle"
             />
           </template>
@@ -635,7 +635,7 @@ export default {
     padding: var(--gap-2);
   }
 
-  &__dropDown {
+  &__dropdown {
     width: 100%;
 
     @media (min-width: $tui-screen-sm) {
@@ -643,7 +643,7 @@ export default {
       width: auto;
     }
 
-    &__button {
+    &-button {
       width: 100%;
 
       @media (min-width: $tui-screen-sm) {

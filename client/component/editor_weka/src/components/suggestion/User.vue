@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-editorWeka-user" :style="positionStyle">
+  <div class="tui-wekaUserSuggestions" :style="positionStyle">
     <Dropdown
       :separator="true"
       :open="$apollo.loading || users.length > 0"
@@ -144,7 +144,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-user {
+.tui-wekaUserSuggestions {
   position: absolute;
   width: 32.6rem;
 }

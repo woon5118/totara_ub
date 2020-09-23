@@ -17,9 +17,9 @@
 -->
 
 <template>
-  <div ref="sharedBoard" class="tui-sharedBoard">
+  <div ref="sharedBoard" class="tui-engageSharedBoardForm">
     <div ref="sharedBoardInfo">
-      <p class="tui-sharedBoard__label">
+      <p class="tui-engageSharedBoardForm__label">
         {{ sharedWithLabel }}
       </p>
       <Button
@@ -35,12 +35,12 @@
       />
     </div>
 
-    <Card v-if="showReceipts" class="tui-sharedBoard__content">
-      <div class="tui-sharedBoard__content__container">
+    <Card v-if="showReceipts" class="tui-engageSharedBoardForm__content">
+      <div class="tui-engageSharedBoardForm__contentContainer">
         <ul
           v-for="(item, index) in computedReceipts"
           :key="`shareBoardReceipt_${index}`"
-          class="tui-sharedBoard__content__tags"
+          class="tui-engageSharedBoardForm__contentTags"
         >
           <li>
             <Tag :text="item" />
@@ -133,7 +133,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-sharedBoard {
+.tui-engageSharedBoardForm {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -144,6 +144,7 @@ export default {
     margin-top: var(--gap-2);
     @include tui-font-body-small();
   }
+
   &__content {
     flex-basis: 1px;
     flex-direction: column;
@@ -153,12 +154,12 @@ export default {
     padding-left: 0;
     overflow-y: auto;
 
-    &__container {
+    &Container {
       display: flex;
       flex-wrap: wrap;
     }
 
-    &__tags {
+    &Tags {
       margin: 0 0 var(--gap-1) var(--gap-1);
       list-style-type: none;
     }

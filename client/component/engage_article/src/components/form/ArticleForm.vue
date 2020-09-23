@@ -17,13 +17,13 @@
 -->
 
 <template>
-  <Form :vertical="true" input-width="full" class="tui-articleForm">
+  <Form :vertical="true" input-width="full" class="tui-engageArticleForm">
     <FormRow
       v-slot="{ id }"
       :hidden="true"
       :label="$str('articletitle', 'engage_article')"
       :required="true"
-      class="tui-articleForm__title"
+      class="tui-engageArticleForm__title"
     >
       <InputText
         :id="id"
@@ -36,13 +36,13 @@
       />
     </FormRow>
 
-    <div class="tui-articleForm__description">
+    <div class="tui-engageArticleForm__description">
       <FormRow
         v-slot="{ id }"
         :hidden="true"
         :label="$str('content', 'engage_article')"
         :required="true"
-        class="tui-articleForm__description-formRow"
+        class="tui-engageArticleForm__description-formRow"
         :is-stacked="false"
       >
         <UnsavedChangesWarning
@@ -60,7 +60,7 @@
         />
       </FormRow>
 
-      <div class="tui-articleForm__description-tip">
+      <div class="tui-engageArticleForm__description-tip">
         <p>{{ $str('contributetip', 'totara_engage') }}</p>
         <InfoIconButton :aria-label="$str('info', 'moodle')">
           {{ $str('contributetip_help', 'totara_engage') }}
@@ -68,7 +68,7 @@
       </div>
     </div>
 
-    <ButtonGroup class="tui-articleForm__buttons">
+    <ButtonGroup class="tui-engageArticleForm__buttons">
       <Button
         :loading="submitting"
         :styleclass="{ primary: 'true' }"
@@ -212,7 +212,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-articleForm {
+.tui-engageArticleForm {
   display: flex;
   flex: 1;
   flex-direction: column;

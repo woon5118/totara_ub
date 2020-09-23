@@ -18,7 +18,7 @@
 
 <template>
   <!-- component for displaying the draft video as attachment-->
-  <div class="tui-editorWeka-videoAttachment">
+  <div>
     <AttachmentNode
       :filename="filename"
       :file-size="fileSize"

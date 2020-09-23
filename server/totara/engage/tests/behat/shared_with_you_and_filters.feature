@@ -52,7 +52,7 @@ Feature: Shared with you and filters
   Scenario: Default filter should show all shared resources and playlists
     Given I log in as "user2"
     And I click on "Your Library" in the totara menu
-    And I click on "Shared with you" "link" in the ".tui-navigationPanel__menu" "css_element"
+    And I click on "Shared with you" "link" in the ".tui-engageNavigationPanel__menu" "css_element"
 
     # No filter
     Then I should see "Test Article 3" in the ".tui-contributionBaseContent__cards" "css_element"
@@ -68,7 +68,7 @@ Feature: Shared with you and filters
   Scenario: Filter shares by type
     Given I log in as "user2"
     And I click on "Your Library" in the totara menu
-    And I click on "Shared with you" "link" in the ".tui-navigationPanel__menu" "css_element"
+    And I click on "Shared with you" "link" in the ".tui-engageNavigationPanel__menu" "css_element"
 
     # Resource filter
     When I select "Resource" from the "filter_type" singleselect
@@ -115,7 +115,7 @@ Feature: Shared with you and filters
   Scenario: Log in as different user to confirm no shares
     Given I log in as "user3"
     And I click on "Your Library" in the totara menu
-    And I click on "Shared with you" "link" in the ".tui-navigationPanel__menu" "css_element"
+    And I click on "Shared with you" "link" in the ".tui-engageNavigationPanel__menu" "css_element"
 
     # No shares
     Then I should not see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"

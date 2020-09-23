@@ -3,12 +3,12 @@
 exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for private access 1`] = `
 <form-stub
   articlename="private access"
-  class="tui-accessForm"
+  class="tui-engageAccessForm"
   inputwidth="full"
   vertical="true"
 >
   <div
-    class="tui-accessForm__options tui-accessForm__access--withoutTagLists"
+    class="tui-engageAccessForm__options tui-engageAccessForm__access--withoutTagLists"
   >
     <formrow-stub
       isstacked="true"
@@ -21,10 +21,10 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for privat
   <!---->
    
   <buttongroup-stub
-    class="tui-accessForm__buttons"
+    class="tui-engageAccessForm__buttons"
   >
     <button-stub
-      class="tui-accessForm__buttons__back"
+      class="tui-engageAccessForm__back"
       style="display: none;"
       styleclass="[object Object]"
       text="back, moodle"
@@ -46,12 +46,12 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for privat
 exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for public access 1`] = `
 <form-stub
   articlename="public access"
-  class="tui-accessForm"
+  class="tui-engageAccessForm"
   inputwidth="full"
   vertical="true"
 >
   <div
-    class="tui-accessForm__options tui-accessForm__access--withTagLists"
+    class="tui-engageAccessForm__options tui-engageAccessForm__access--withTagLists"
   >
     <formrow-stub
       isstacked="true"
@@ -62,16 +62,16 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for public
   </div>
    
   <div
-    class="tui-accessForm__tagLists"
+    class="tui-engageAccessForm__tagLists"
   >
     <topicsselector-stub
-      class="tui-accessForm__tagList"
+      class="tui-engageAccessForm__tagList"
       selectedtopics=""
     />
      
     <recipientsselector-stub
       access="PUBLIC"
-      class="tui-accessForm__tagList"
+      class="tui-engageAccessForm__tagList"
       component="test_component"
       itemid="1"
       owned="true"
@@ -84,10 +84,10 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for public
   </div>
    
   <buttongroup-stub
-    class="tui-accessForm__buttons"
+    class="tui-engageAccessForm__buttons"
   >
     <button-stub
-      class="tui-accessForm__buttons__back"
+      class="tui-engageAccessForm__back"
       style="display: none;"
       styleclass="[object Object]"
       text="back, moodle"
@@ -110,12 +110,12 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for public
 exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for restricted access 1`] = `
 <form-stub
   articlename="restricted access"
-  class="tui-accessForm"
+  class="tui-engageAccessForm"
   inputwidth="full"
   vertical="true"
 >
   <div
-    class="tui-accessForm__options tui-accessForm__access--withTagLists"
+    class="tui-engageAccessForm__options tui-engageAccessForm__access--withTagLists"
   >
     <formrow-stub
       isstacked="true"
@@ -126,13 +126,13 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for restri
   </div>
    
   <div
-    class="tui-accessForm__tagLists"
+    class="tui-engageAccessForm__tagLists"
   >
     <!---->
      
     <recipientsselector-stub
       access="RESTRICTED"
-      class="tui-accessForm__tagList"
+      class="tui-engageAccessForm__tagList"
       component="test_component"
       itemid="1"
       owned="true"
@@ -145,10 +145,10 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for restri
   </div>
    
   <buttongroup-stub
-    class="tui-accessForm__buttons"
+    class="tui-engageAccessForm__buttons"
   >
     <button-stub
-      class="tui-accessForm__buttons__back"
+      class="tui-engageAccessForm__back"
       style="display: none;"
       styleclass="[object Object]"
       text="back, moodle"

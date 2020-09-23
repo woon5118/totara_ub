@@ -16,8 +16,8 @@
   @module totara_comment
 -->
 <template>
-  <ResponseBox class="tui-replyForm">
-    <Form class="tui-replyForm__form">
+  <ResponseBox class="tui-commentReplyForm">
+    <Form class="tui-commentReplyForm__form">
       <UnsavedChangesWarning
         v-if="!content.isEmpty && !submitting"
         :value="content"
@@ -31,7 +31,7 @@
         :placeholder="$str('enterreply', 'totara_comment')"
         :file-item-id="draftId"
         :data-file-item-id="draftId"
-        class="tui-replyForm__form__editor"
+        class="tui-commentReplyForm__editor"
         @ready="$emit('form-ready')"
       />
 
@@ -199,18 +199,18 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-replyForm {
+.tui-commentReplyForm {
   margin-top: var(--gap-4);
   padding-right: var(--gap-2);
 
   &__form {
     flex: 1;
     max-width: 100%;
+  }
 
-    &__editor {
-      flex: 1;
-      max-width: 100%;
-    }
+  &__editor {
+    flex: 1;
+    max-width: 100%;
   }
 }
 </style>

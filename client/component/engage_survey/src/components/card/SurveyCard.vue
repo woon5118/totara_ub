@@ -17,20 +17,20 @@
 -->
 
 <template>
-  <div class="tui-surveyCard">
+  <div class="tui-engageSurveyCard">
     <CoreCard
       :clickable="!editAble && voted"
-      class="tui-surveyCard__cardContent"
+      class="tui-engageSurveyCard__cardContent"
       :class="{
-        'tui-surveyCard__cardContent__calcHeight': showFootnotes,
-        'tui-surveyCard__cardContent__height': !showFootnotes,
+        'tui-engageSurveyCard__cardContent--calcHeight': showFootnotes,
+        'tui-engageSurveyCard__cardContent--height': !showFootnotes,
       }"
     >
-      <div class="tui-surveyCard__cardContent__inner">
-        <div class="tui-surveyCard__cardContent__inner__header">
-          <section class="tui-surveyCard__cardContent__inner__header__image">
+      <div class="tui-engageSurveyCard__inner">
+        <div class="tui-engageSurveyCard__header">
+          <section class="tui-engageSurveyCard__header-image">
             <img :alt="name" :src="extraData.image" />
-            <h3 class="tui-surveyCard__cardContent__inner__header__title">
+            <h3 class="tui-engageSurveyCard__header-title">
               {{ $str('survey', 'engage_survey') }}
             </h3>
           </section>
@@ -42,7 +42,7 @@
             :circle="false"
             :small="true"
             :transparent="true"
-            class="tui-surveyCard__cardContent__inner__header__bookmark"
+            class="tui-engageSurveyCard__header-bookmark"
             @click="updateBookmark"
           />
         </div>
@@ -199,7 +199,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-surveyCard {
+.tui-engageSurveyCard {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -212,57 +212,57 @@ export default {
   &__cardContent {
     width: 100%;
 
-    &__calcHeight {
+    &--calcHeight {
       height: calc(var(--totara-engage-card-height) - 22px);
     }
 
-    &__height {
+    &--height {
       height: var(--totara-engage-card-height);
     }
 
     &:hover {
       box-shadow: var(--shadow-2);
     }
+  }
 
-    &__inner {
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    border: var(--border-width-normal) solid var(--color-primary);
+    border-radius: calc(var(--card-border-radius) - 1px);
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    &-image {
       display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: 100%;
-      border: var(--border-width-normal) solid var(--color-primary);
-      border-radius: calc(var(--card-border-radius) - 1px);
+      flex-direction: row;
+      padding-top: var(--gap-2);
+      padding-left: var(--gap-4);
 
-      &__header {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-
-        &__image {
-          display: flex;
-          flex-direction: row;
-          padding-top: var(--gap-2);
-          padding-left: var(--gap-4);
-
-          img:first-child {
-            width: 40px;
-            height: 40px;
-            margin-top: var(--gap-1);
-          }
-        }
-
-        &__title {
-          @include tui-font-heading-label-small();
-          margin-left: var(--gap-2);
-          color: var(--color-neutral-6);
-          line-height: inherit;
-        }
-
-        &__bookmark {
-          align-self: flex-start;
-          // Negative margin here to neutralise the default redundant edges of icon.
-          margin-top: -2px;
-        }
+      img:first-child {
+        width: 40px;
+        height: 40px;
+        margin-top: var(--gap-1);
       }
+    }
+
+    &-title {
+      @include tui-font-heading-label-small();
+      margin-left: var(--gap-2);
+      color: var(--color-neutral-6);
+      line-height: inherit;
+    }
+
+    &-bookmark {
+      align-self: flex-start;
+      // Negative margin here to neutralise the default redundant edges of icon.
+      margin-top: -2px;
     }
   }
 }

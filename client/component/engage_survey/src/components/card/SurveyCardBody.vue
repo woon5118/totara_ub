@@ -17,15 +17,15 @@
 -->
 
 <template>
-  <div class="tui-surveyCardBody">
-    <div :id="labelId" class="tui-surveyCardBody__title">
+  <div class="tui-engageSurveyCardBody">
+    <div :id="labelId" class="tui-engageSurveyCardBody__title">
       {{ name }}
     </div>
-    <div class="tui-surveyCardBody__footer">
-      <p v-if="showEdit" class="tui-surveyCardBody__text">
+    <div class="tui-engageSurveyCardBody__footer">
+      <p v-if="showEdit" class="tui-engageSurveyCardBody__text">
         {{ $str('noresult', 'engage_survey') }}
       </p>
-      <div class="tui-surveyCardBody__container">
+      <div class="tui-engageSurveyCardBody__container">
         <ActionLink
           v-if="!voted"
           :href="
@@ -47,7 +47,7 @@
           :text="$str('editsurvey', 'engage_survey')"
           :aria-label="$str('editsurveyaccessiblename', 'engage_survey', name)"
         />
-        <div class="tui-surveyCardBody__icon">
+        <div class="tui-engageSurveyCardBody__icon">
           <AccessIcon :access="access" size="300" />
         </div>
       </div>
@@ -134,7 +134,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-surveyCardBody {
+.tui-engageSurveyCardBody {
   display: flex;
   flex: 1;
   flex-direction: column;

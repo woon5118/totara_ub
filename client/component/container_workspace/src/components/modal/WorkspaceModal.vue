@@ -28,11 +28,10 @@
     <ModalContent
       :close-button="false"
       :title="$str('create_space', 'container_workspace')"
-      :title-id="$id('create-spsace')"
-      class="tui-workspaceModal__content"
+      :title-id="$id('create-space')"
     >
       <WorkspaceForm
-        class="tui-workspaceModal__content__form"
+        class="tui-workspaceModal__form"
         :submitting="submitting"
         :can-set-public="canPublic"
         :can-set-private="canPrivate"
@@ -171,11 +170,9 @@ export default {
 
 <style lang="scss">
 .tui-workspaceModal {
-  &__content {
-    &__form {
-      flex-grow: 1;
-      height: 100%;
-    }
+  &__form {
+    flex-grow: 1;
+    height: 100%;
   }
 }
 </style>

@@ -36,7 +36,7 @@
         :display-current-owner="!workspace.interactor.own"
         :current-owner-fullname="workspaceOwnerFullname"
         :submitting="submitting"
-        class="tui-workspaceTransferOwnerModal__modalContent__form"
+        class="tui-workspaceTransferOwnerModal__form"
         @submit="updatePrimaryOwner"
         @cancel.prevent="$emit('request-close', $event)"
       />
@@ -161,10 +161,10 @@ export default {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+  }
 
-    &__form {
-      flex-grow: 1;
-    }
+  &__form {
+    flex-grow: 1;
   }
 }
 </style>

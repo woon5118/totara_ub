@@ -47,7 +47,7 @@
     <template v-slot:overview>
       <div class="tui-playlistSidePanel__overview">
         <PageLoader :fullpage="true" :loading="submitting" />
-        <p class="tui-playlistSidePanel__overview__timeDescription">
+        <p class="tui-playlistSidePanel__timeDescription">
           {{ playlist.timedescription }}
         </p>
 
@@ -73,10 +73,10 @@
           :update-able="canUpdate"
           :instance-id="playlist.id"
           :summary="playlist.summary"
-          class="tui-playlistSidePanel__overview__summary"
+          class="tui-playlistSidePanel__summary"
         />
 
-        <div class="tui-playlistSidePanel__overview__setting">
+        <div class="tui-playlistSidePanel__setting">
           <PlaylistStarRating
             v-if="!isPrivate"
             :owned="playlist.owned"
@@ -94,7 +94,7 @@
             :shared-by-count="playlist.sharedbycount"
             :show-like-button="false"
             component-name="totara_playlist"
-            class="tui-playlistSidePanel__overview__media"
+            class="tui-playlistSidePanel__media"
             @access-update="updateAccess"
             @access-modal="openModalFromButtonLabel = true"
           />
@@ -348,16 +348,16 @@ export default {
 .tui-playlistSidePanel {
   padding: var(--gap-8);
 
-  &__overview__timeDescription {
+  &__timeDescription {
     @include tui-font-body-small();
   }
 
-  &__overview__setting {
+  &__setting {
     display: flex;
     flex-direction: row;
   }
 
-  &__overview__media {
+  &__media {
     margin-top: 0;
     margin-left: var(--gap-6);
   }

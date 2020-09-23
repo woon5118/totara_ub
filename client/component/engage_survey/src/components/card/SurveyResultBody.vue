@@ -17,9 +17,13 @@
 -->
 
 <template>
-  <div class="tui-surveyResultBody" @click="navigateTo">
-    <Label :id="labelId" :label="name" class="tui-surveyResultBody__title" />
-    <div class="tui-surveyResultBody__progress">
+  <div class="tui-engageSurveyResultBody" @click="navigateTo">
+    <Label
+      :id="labelId"
+      :label="name"
+      class="tui-engageSurveyResultBody__title"
+    />
+    <div class="tui-engageSurveyResultBody__progress">
       <SurveyQuestionResult
         v-for="({ votes, id, options, answertype }, index) in questions"
         :key="index"
@@ -29,10 +33,10 @@
         :answer-type="answertype"
       />
     </div>
-    <div class="tui-surveyResultBody__footer">
-      <div class="tui-surveyResultBody__container">
-        <p class="tui-surveyResultBody__text">{{ voteMessage }}</p>
-        <div class="tui-surveyResultBody__icon">
+    <div class="tui-engageSurveyResultBody__footer">
+      <div class="tui-engageSurveyResultBody__container">
+        <p class="tui-engageSurveyResultBody__text">{{ voteMessage }}</p>
+        <div class="tui-engageSurveyResultBody__icon">
           <AccessIcon :access="access" size="300" />
         </div>
       </div>
@@ -114,7 +118,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-surveyResultBody {
+.tui-engageSurveyResultBody {
   display: flex;
   flex: 1;
   flex-direction: column;

@@ -2,17 +2,17 @@
 
 exports[`totara_comment/components/form/ReplyForm.vue Checks snapshot 1`] = `
 <responsebox-stub
-  class="tui-replyForm"
+  class="tui-commentReplyForm"
 >
   <form-stub
-    class="tui-replyForm__form"
+    class="tui-commentReplyForm__form"
     inputwidth="limited"
   >
     <!---->
      
     <weka-stub
       area="reply"
-      class="tui-replyForm__form__editor"
+      class="tui-commentReplyForm__editor"
       component="totara_comment"
       data-file-item-id="100"
       fileitemid="100"

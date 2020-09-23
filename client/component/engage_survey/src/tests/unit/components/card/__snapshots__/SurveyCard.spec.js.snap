@@ -2,26 +2,26 @@
 
 exports[`engage_survey/components/card/SurveyCard.vue Checks snapshot 1`] = `
 <div
-  class="tui-surveyCard"
+  class="tui-engageSurveyCard"
 >
   <corecard-stub
-    class="tui-surveyCard__cardContent tui-surveyCard__cardContent__height"
+    class="tui-engageSurveyCard__cardContent tui-engageSurveyCard__cardContent--height"
   >
     <div
-      class="tui-surveyCard__cardContent__inner"
+      class="tui-engageSurveyCard__inner"
     >
       <div
-        class="tui-surveyCard__cardContent__inner__header"
+        class="tui-engageSurveyCard__header"
       >
         <section
-          class="tui-surveyCard__cardContent__inner__header__image"
+          class="tui-engageSurveyCard__header-image"
         >
           <img
             alt="sss"
           />
            
           <h3
-            class="tui-surveyCard__cardContent__inner__header__title"
+            class="tui-engageSurveyCard__header-title"
           >
             
             survey, engage_survey
@@ -30,7 +30,7 @@ exports[`engage_survey/components/card/SurveyCard.vue Checks snapshot 1`] = `
         </section>
          
         <bookmarkbutton-stub
-          class="tui-surveyCard__cardContent__inner__header__bookmark"
+          class="tui-engageSurveyCard__header-bookmark"
           size="300"
           small="true"
           transparent="true"

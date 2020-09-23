@@ -17,8 +17,8 @@
 -->
 
 <template>
-  <div class="tui-totaraPlaylist-addNewPlaylistCard">
-    <Card class="tui-totaraPlaylist-addNewPlaylistCard__card">
+  <div class="tui-addNewPlaylistCard">
+    <Card class="tui-addNewPlaylistCard__card">
       <Contribute
         :adder="{
           text: $str('selectexistingresource', 'totara_playlist'),
@@ -103,7 +103,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-totaraPlaylist-addNewPlaylistCard {
+.tui-addNewPlaylistCard {
   width: 100%;
   height: calc(var(--totara-engage-card-height) + 11px);
 

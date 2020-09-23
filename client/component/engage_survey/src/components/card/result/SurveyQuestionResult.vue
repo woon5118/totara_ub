@@ -16,15 +16,15 @@
   @module engage_survey
 -->
 <template>
-  <div class="tui-surveyQuestionResult">
+  <div class="tui-engageSurveyQuestionResult">
     <div
       v-for="({ votes, value }, index) in calulatedOptions"
       :key="index"
-      class="tui-surveyQuestionResult__progressBar"
+      class="tui-engageSurveyQuestionResult__progressBar"
     >
       <template v-if="resultContent">
-        <div class="tui-surveyQuestionResult__progress">
-          <div class="tui-surveyQuestionResult__bar">
+        <div class="tui-engageSurveyQuestionResult__progress">
+          <div class="tui-engageSurveyQuestionResult__bar">
             <Progress
               :small="true"
               :hide-value="true"
@@ -34,15 +34,15 @@
               :show-empty-state="isMultiChoice"
             />
           </div>
-          <span class="tui-surveyQuestionResult__count">
+          <span class="tui-engageSurveyQuestionResult__count">
             {{ votes }}
           </span>
         </div>
       </template>
       <template v-else>
         <template v-if="isMultiChoice">
-          <div class="tui-surveyQuestionResult__cardProgress">
-            <div class="tui-surveyQuestionResult__bar">
+          <div class="tui-engageSurveyQuestionResult__cardProgress">
+            <div class="tui-engageSurveyQuestionResult__bar">
               <Progress
                 :small="true"
                 :hide-value="true"
@@ -52,7 +52,7 @@
                 :show-empty-state="isMultiChoice"
               />
             </div>
-            <span class="tui-surveyQuestionResult__count">
+            <span class="tui-engageSurveyQuestionResult__count">
               {{ votes }}
             </span>
           </div>
@@ -69,16 +69,16 @@
         </template>
       </template>
       <template v-if="isSingleChoice">
-        <span class="tui-surveyQuestionResult__percent">
+        <span class="tui-engageSurveyQuestionResult__percent">
           {{ $str('percentage', 'engage_survey', percentage(votes)) }}
         </span>
       </template>
-      <span class="tui-surveyQuestionResult__answer">
+      <span class="tui-engageSurveyQuestionResult__answer">
         {{ value }}
       </span>
     </div>
     <template v-if="resultContent">
-      <div class="tui-surveyQuestionResult__votes">
+      <div class="tui-engageSurveyQuestionResult__votes">
         <span>Total votes: {{ totalVotes }}</span>
       </div>
     </template>
@@ -207,7 +207,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-surveyQuestionResult {
+.tui-engageSurveyQuestionResult {
   &__progressBar {
     margin-bottom: var(--gap-2);
   }

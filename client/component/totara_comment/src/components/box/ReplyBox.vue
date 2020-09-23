@@ -16,21 +16,21 @@
   @module totara_comment
 -->
 <template>
-  <div class="tui-replyBox">
+  <div class="tui-commentReplyBox">
     <div
       v-if="showLoadRepliesLink || (loadRepliesStatus && hasMoreReplies)"
-      class="tui-replyBox__replyLinkBox"
+      class="tui-commentReplyBox__replyLinkBox"
       :class="{
-        'tui-replyBox__replyLinkBox--withSeparator': showLineSeparator,
-        'tui-replyBox__replyLinkBox--withoutSeparator': !showLineSeparator,
+        'tui-commentReplyBox__replyLinkBox--withSeparator': showLineSeparator,
+        'tui-commentReplyBox__replyLinkBox--withoutSeparator': !showLineSeparator,
       }"
     >
       <a
         href="#"
         role="button"
-        class="tui-replyBox__replyLinkBox__link"
+        class="tui-commentReplyBox__replyLinkBox-link"
         :class="{
-          'tui-replyBox__replyLinkBox__link--disabled':
+          'tui-commentReplyBox__replyLinkBox-link--disabled':
             $apollo.queries.replies.loading,
         }"
         @click.prevent="loadReplies"
@@ -71,9 +71,9 @@
           :show-reply-button-text="showReplyButtonText"
           :show-like-button-text="showLikeButtonText"
           :inline-head="replyHeadInline"
-          class="tui-replyBox__reply"
+          class="tui-commentReplyBox__reply"
           :class="{
-            'tui-replyBox__reply--large': isLarge,
+            'tui-commentReplyBox__reply--large': isLarge,
           }"
           @update-submitting="$emit('update-submitting', $event)"
           @update-reply="updateRepliesCache"
@@ -93,7 +93,7 @@
         :comment-id="commentId"
         :size="size"
         :reply-to="innerReplyTo"
-        class="tui-replyBox__replyForm"
+        class="tui-commentReplyBox__replyForm"
         @cancel="$emit('update-show-reply-form', false)"
         @submit="createReply"
         @form-ready="handleFormReady"
@@ -535,7 +535,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-replyBox {
+.tui-commentReplyBox {
   display: flex;
   flex-direction: column;
 
@@ -553,7 +553,7 @@ export default {
       border-top: var(--border-width-thin) solid transparent;
     }
 
-    &__link {
+    &-link {
       @include tui-font-link-small();
 
       &--disabled {
@@ -574,7 +574,7 @@ export default {
 
     &--large {
       // Override the margin-top for the reply card.
-      &.tui-reply {
+      &.tui-commentReply {
         margin-top: var(--gap-6);
       }
     }

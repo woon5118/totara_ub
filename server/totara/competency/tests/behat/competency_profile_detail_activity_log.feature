@@ -52,14 +52,14 @@ Feature: View activity logs
     And I click on "Activity log" "button"
 
     #Check if each row in the table has a Date
-    Then I should see the current date in format "j/m/Y" in the ".tui-dataTableRow:nth-of-type(1) .tui-competencyDetailActivityLog__date" "css_element"
-    And I should see the current date in format "j/m/Y" in the ".tui-dataTableRow:nth-of-type(2) .tui-competencyDetailActivityLog__date" "css_element"
-    And I should see the current date in format "j/m/Y" in the ".tui-dataTableRow:nth-of-type(3) .tui-competencyDetailActivityLog__date" "css_element"
-    And I should see the current date in format "j/m/Y" in the ".tui-dataTableRow:nth-of-type(4) .tui-competencyDetailActivityLog__date" "css_element"
-    And I should see the current date in format "j/m/Y" in the ".tui-dataTableRow:nth-of-type(5) .tui-competencyDetailActivityLog__date" "css_element"
+    Then I should see the current date in format "j/m/Y" in the ".tui-dataTableRow:nth-of-type(1) .tui-competencyDetailActivityLogTable__date" "css_element"
+    And I should see the current date in format "j/m/Y" in the ".tui-dataTableRow:nth-of-type(2) .tui-competencyDetailActivityLogTable__date" "css_element"
+    And I should see the current date in format "j/m/Y" in the ".tui-dataTableRow:nth-of-type(3) .tui-competencyDetailActivityLogTable__date" "css_element"
+    And I should see the current date in format "j/m/Y" in the ".tui-dataTableRow:nth-of-type(4) .tui-competencyDetailActivityLogTable__date" "css_element"
+    And I should see the current date in format "j/m/Y" in the ".tui-dataTableRow:nth-of-type(5) .tui-competencyDetailActivityLogTable__date" "css_element"
 
     #Check if date shows when a date is hovered
-    When I hover ".tui-dataTableRow:nth-of-type(1) .tui-competencyDetailActivityLog__date" "css_element"
+    When I hover ".tui-dataTableRow:nth-of-type(1) .tui-competencyDetailActivityLogTable__date" "css_element"
     Then I should see the current date in format "j/m/Y, H:" in the ".tui-dataTableRow:nth-of-type(1) .tui-popoverFrame__content" "css_element"
 
     #Check it shows all the items in activity log

@@ -16,9 +16,9 @@
   @module container_workspace
 -->
 <template>
-  <div class="tui-memberRequestCard">
-    <div class="tui-memberRequestCard__info">
-      <a :href="profileUrl" class="tui-memberRequestCard__avatar">
+  <div class="tui-workspaceMemberRequestCard">
+    <div class="tui-workspaceMemberRequestCard__info">
+      <a :href="profileUrl" class="tui-workspaceMemberRequestCard__avatar">
         <Avatar
           :src="userProfileImageUrl"
           :alt="userProfileImageAlt || userFullname"
@@ -26,14 +26,17 @@
         />
       </a>
 
-      <a :href="profileUrl" class="tui-memberRequestCard__info__userProfile">
+      <a
+        :href="profileUrl"
+        class="tui-workspaceMemberRequestCard__info-userProfile"
+      >
         {{ userFullname }}
       </a>
     </div>
 
     <div
       v-if="!isApproved && !isDeclined"
-      class="tui-memberRequestCard__actions"
+      class="tui-workspaceMemberRequestCard__actions"
     >
       <LoadingButton
         :loading="submitting.accept"
@@ -44,7 +47,6 @@
         :text="$str('approve', 'container_workspace')"
         :primary="true"
         :small="true"
-        class="tui-memberRequestCard__actions__accept"
         @click="acceptMemberRequest"
       />
 
@@ -56,13 +58,12 @@
         "
         :text="$str('decline', 'container_workspace')"
         :small="true"
-        class="tui-memberRequestCard__actions__decline"
         @click="declineMemberRequest"
       />
     </div>
 
-    <div v-else class="tui-memberRequestCard__label">
-      <p class="tui-memberRequestCard__label__text">
+    <div v-else>
+      <p>
         {{ decisionLabelText }}
       </p>
     </div>
@@ -219,7 +220,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-memberRequestCard {
+.tui-workspaceMemberRequestCard {
   display: flex;
   align-items: center;
 
@@ -228,7 +229,7 @@ export default {
     flex: 1;
     align-items: center;
 
-    &__userProfile {
+    &-userProfile {
       @include tui-font-link-small();
       @include tui-font-heavy();
 

@@ -18,14 +18,14 @@
 
 <template>
   <div
-    class="tui-totaraEngage-rating"
+    class="tui-engageStarRating"
     :class="ratingClasses"
     @mouseleave="resetRating"
   >
     <template v-for="n in maxRating">
       <Star
         :key="n"
-        class="tui-totaraEngage-ratingStar"
+        class="tui-engageStarRating__star"
         :class="starClasses"
         :fill="fillLevel[n - 1]"
         :star-points="starPoints"
@@ -36,7 +36,7 @@
         @star-mouse-move="setRating"
       />
     </template>
-    <span class="tui-totaraEngage-rating__srOnly">{{
+    <span class="tui-engageStarRating__srOnly">{{
       $str('ratingsforscreenreader', 'totara_engage', rating)
     }}</span>
   </div>
@@ -106,15 +106,15 @@ export default {
     ratingClasses() {
       return [
         {
-          'tui-totaraEngage-rating__rtl': this.rtl,
-          'tui-totaraEngage-star__inline': this.inline,
+          'tui-engageStarRating--rtl': this.rtl,
+          'tui-engageStarRating--inline': this.inline,
         },
       ];
     },
     starClasses() {
       return [
         {
-          'tui-totaraEngage-rating__pointer': !this.readOnly,
+          'tui-engageStarRating__star--pointer': !this.readOnly,
         },
       ];
     },
@@ -195,27 +195,27 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-totaraEngage-rating {
+.tui-engageStarRating {
   display: flex;
 
-  &__rtl {
+  &--rtl {
     direction: rtl;
   }
 
-  &__inline {
+  &--inline {
     display: inline-flex;
-  }
-
-  &__pointer {
-    cursor: pointer;
   }
 
   &__srOnly {
     @include sr-only();
   }
-}
 
-.tui-totaraEngage-ratingStar {
-  display: inline-block;
+  &__star {
+    display: inline-block;
+
+    &--pointer {
+      cursor: pointer;
+    }
+  }
 }
 </style>

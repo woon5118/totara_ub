@@ -63,9 +63,9 @@ Feature: User gets a message notification due to a configuration change in an as
     And I click on "View full notification" "link"
     And I click on "competency's activity log" "link"
     Then I should see "Activity log" in the ".tui-competencyDetailActivityLog__title" "css_element"
-    And I should see "Rating: None" in the ".tui-dataTableRow:nth-of-type(1) .tui-competencyDetailActivityLog__description" "css_element"
-    And I should see "Rating value reset" in the ".tui-dataTableRow:nth-of-type(2) .tui-competencyDetailActivityLog__description" "css_element"
-    And I should see "Criteria change" in the ".tui-dataTableRow:nth-of-type(3) .tui-competencyDetailActivityLog__description" "css_element"
+    And I should see "Rating: None" in the ".tui-dataTableRow:nth-of-type(1) .tui-competencyDetailActivityLogTable__description" "css_element"
+    And I should see "Rating value reset" in the ".tui-dataTableRow:nth-of-type(2) .tui-competencyDetailActivityLogTable__description" "css_element"
+    And I should see "Criteria change" in the ".tui-dataTableRow:nth-of-type(3) .tui-competencyDetailActivityLogTable__description" "css_element"
 
   Scenario: User gets notified of proficiency lose due to change in scale value minimum proficiency.
     When I log in as "admin"
@@ -85,6 +85,6 @@ Feature: User gets a message notification due to a configuration change in an as
     And I click on "View full notification" "link"
     And I click on "competency's activity log" "link"
     Then I should see "Activity log" in the ".tui-competencyDetailActivityLog__title" "css_element"
-    And I should see "Rating: Just Barely Competent" in the ".tui-dataTableRow:nth-of-type(1) .tui-competencyDetailActivityLog__description" "css_element"
-    And I should see "Criteria met: Course completion. Achieved 'Just Barely Competent' rating" in the ".tui-dataTableRow:nth-of-type(2) .tui-competencyDetailActivityLog__description" "css_element"
-    And I should see "Minimum required proficient value changed to 'Super Competent'" in the ".tui-dataTableRow:nth-of-type(3) .tui-competencyDetailActivityLog__description" "css_element"
+    And I should see "Rating: Just Barely Competent" in the ".tui-dataTableRow:nth-of-type(1) .tui-competencyDetailActivityLogTable__description" "css_element"
+    And I should see "Criteria met: Course completion. Achieved 'Just Barely Competent' rating" in the ".tui-dataTableRow:nth-of-type(2) .tui-competencyDetailActivityLogTable__description" "css_element"
+    And I should see "Minimum required proficient value changed to 'Super Competent'" in the ".tui-dataTableRow:nth-of-type(3) .tui-competencyDetailActivityLogTable__description" "css_element"

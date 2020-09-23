@@ -17,16 +17,16 @@
 -->
 
 <template>
-  <div class="tui-editorWeka-linkBlock" :data-url="attrs.url">
+  <div class="tui-wekaLinkBlock" :data-url="attrs.url">
     <Dropdown>
       <template v-slot:trigger="{ toggle, isOpen }">
         <div @click.capture.prevent="toggle">
           <LinkBlockInner :attrs="attrs" />
         </div>
-        <div class="tui-editorWeka-linkBlock__btn-wrapper">
+        <div class="tui-wekaLinkBlock__btn-wrapper">
           <ButtonIcon
             :styleclass="{ small: true, transparent: true }"
-            class="tui-editorWeka-linkBlock__btn"
+            class="tui-wekaLinkBlock__btn"
             :aria-expanded="isOpen.toString()"
             :aria-label="
               $str('actions_menu_for', 'editor_weka', attrs.title || attrs.url)
@@ -101,7 +101,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-linkBlock {
+.tui-wekaLinkBlock {
   max-width: 28.6rem;
   margin-bottom: var(--paragraph-gap);
   white-space: normal;

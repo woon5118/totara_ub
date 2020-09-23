@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`totara_engage/components/form/RecipientsSelector.vue matches snapshot 1`] = `
-<div class="tui-sharedRecipientsSelector" selectedrecipients=""><label for="abc123" class="tui-formLabel tui-sharedRecipientsSelector__label">
+<div class="tui-engageSharedRecipientsSelector" selectedrecipients=""><label for="abc123" class="tui-formLabel tui-engageSharedRecipientsSelector__label">
     <!---->
 
     resharetorecipients, totara_engage
     <!----></label>
-  <div class="tui-sharedRecipientsSelector__icon"><button aria-expanded="false" aria-label="info, moodle" type="button" title="info, moodle" class="tui-iconBtn tui-infoIconButton tui-iconBtn--prim tui-iconBtn--small tui-iconBtn--transparent"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><span class=""></span></span>
+  <div class="tui-engageSharedRecipientsSelector__icon"><button aria-expanded="false" aria-label="info, moodle" type="button" title="info, moodle" class="tui-iconBtn tui-infoIconButton tui-iconBtn--prim tui-iconBtn--small tui-iconBtn--transparent"><span class="tui-iconBtn__wrap"><span class="tui-iconBtn__label"><span aria-hidden="true" class="tui-iconBtn__icon"><span class=""></span></span>
       <!----></span>
       <!----></span></button>
     <div class="tui-popoverPositioner tui-popoverPositioner--transition-default" style="transform: translate3d(0px, 0px, 0); display: none;">

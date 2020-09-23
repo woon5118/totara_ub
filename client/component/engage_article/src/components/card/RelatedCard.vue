@@ -18,29 +18,32 @@
 
 <template>
   <Card
-    class="tui-articleRelatedCard"
+    class="tui-engageArticleRelatedCard"
     :clickable="true"
     @click="handleClickCard"
   >
-    <img :src="image" :alt="name" class="tui-articleRelatedCard__img" />
-    <section class="tui-articleRelatedCard__content">
+    <img :src="image" :alt="name" class="tui-engageArticleRelatedCard__img" />
+    <section class="tui-engageArticleRelatedCard__content">
       <a :href="url">
         {{ name }}
       </a>
 
       <p>
-        <span v-if="timeviewString" class="tui-articleRelatedCard__timeview">
+        <span
+          v-if="timeviewString"
+          class="tui-engageArticleRelatedCard__timeview"
+        >
           <TimeIcon
             size="200"
             :alt="$str('time', 'totara_engage')"
-            custom-class="tui-articleRelatedCard--dimmed"
+            custom-class="tui-engageArticleRelatedCard--dimmed"
           />
           {{ timeviewString }}
         </span>
         <Like
           size="200"
           :alt="$str('like', 'totara_engage')"
-          custom-class="tui-articleRelatedCard--dimmed"
+          custom-class="tui-engageArticleRelatedCard--dimmed"
         />
         <span>{{ reactions }}</span>
       </p>
@@ -52,7 +55,7 @@
       :circle="false"
       :small="true"
       :transparent="true"
-      class="tui-articleRelatedCard__bookmark"
+      class="tui-engageArticleRelatedCard__bookmark"
       @click="handleClickBookmark"
     />
   </Card>
@@ -156,7 +159,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-articleRelatedCard {
+.tui-engageArticleRelatedCard {
   display: flex;
   min-width: 120px;
   height: 82px;

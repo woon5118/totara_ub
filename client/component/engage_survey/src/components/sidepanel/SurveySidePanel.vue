@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-surveySidePanel">
+  <div class="tui-engageSurveySidePanel">
     <template v-if="!$apollo.loading">
       <ModalPresenter
         :open="openModalFromAction"
@@ -32,7 +32,7 @@
       <MiniProfileCard
         :no-border="true"
         :display="survey.resource.user.card_display"
-        class="tui-surveySidePanel__profile"
+        class="tui-engageSurveySidePanel__profile"
       >
         <template v-slot:drop-down-items>
           <DropdownItem
@@ -47,14 +47,13 @@
         </template>
       </MiniProfileCard>
 
-      <Tabs :transparent-tabs="true" class="tui-surveySidePanel__tabs">
+      <Tabs :transparent-tabs="true">
         <Tab
           id="overview"
           :name="$str('overview', 'totara_engage')"
           :disabled="true"
-          class="tui-surveySidePanel__tabs__overview"
         >
-          <p class="tui-surveySidePanel__tabs__overview__timeDescription">
+          <p class="tui-engageSurveySidePanel__timeDescription">
             {{ survey.timedescription }}
           </p>
           <AccessSetting
@@ -336,19 +335,15 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-surveySidePanel {
+.tui-engageSurveySidePanel {
   padding: var(--gap-8);
 
   &__profile {
     margin-bottom: var(--gap-8);
   }
 
-  &__tabs {
-    &__overview {
-      &__timeDescription {
-        @include tui-font-body-small();
-      }
-    }
+  &__timeDescription {
+    @include tui-font-body-small();
   }
 }
 </style>

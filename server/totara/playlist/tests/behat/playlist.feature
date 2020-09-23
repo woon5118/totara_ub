@@ -42,11 +42,11 @@ Feature: Manipulate playlist instance
     When I click on "Everyone" "text" in the ".tui-accessSelector" "css_element"
     And I click on "Expand Tag list" "button" in the ".tui-topicsSelector" "css_element"
     And I click on "Topic 1" option in the dropdown menu
-    And I click on "Expand Tag list" "button" in the ".tui-sharedRecipientsSelector" "css_element"
+    And I click on "Expand Tag list" "button" in the ".tui-engageSharedRecipientsSelector" "css_element"
     Then the "Done" "button" should be enabled
 
     When I click on "Done" "button"
-    Then I should see "Everyone can view" in the ".tui-accessDisplay__accessIcon__icons" "css_element"
+    Then I should see "Everyone can view" in the ".tui-engageAccessDisplay__accessIcon-icons" "css_element"
 
   @javascript
   Scenario: User views restricted playlist and public playlist

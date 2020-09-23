@@ -26,7 +26,7 @@
       'tui-miniProfileCard--hasShadow': hasShadow,
       'tui-miniProfileCard--no-padding': noBorder,
       'tui-miniProfileCard--no-avatar': !noBorder && !hasAvatar,
-      'tui-miniProfileCard--no-dropDown': !noBorder && !hasDropDown,
+      'tui-miniProfileCard--no-dropdown': !noBorder && !hasDropDown,
     }"
   >
     <!-- Only displaying avatar picture if there are no urls -->
@@ -54,17 +54,16 @@
         <template v-if="!!value">
           <div
             :key="index"
-            class="tui-miniProfileCard__description__row"
+            class="tui-miniProfileCard__row"
             :class="{
-              'tui-miniProfileCard__description__row--withGap': index === 1,
+              'tui-miniProfileCard__row--withGap': index === 1,
             }"
           >
             <p
               v-if="!url || readOnly"
-              class="tui-miniProfileCard__description__row__text"
+              class="tui-miniProfileCard__row-text"
               :class="{
-                'tui-miniProfileCard__description__row__text--bold':
-                  index === 0,
+                'tui-miniProfileCard__row-text--bold': index === 0,
               }"
             >
               {{ value }}
@@ -74,10 +73,9 @@
               v-else
               :id="labelId"
               :href="url"
-              class="tui-miniProfileCard__description__row__link"
+              class="tui-miniProfileCard__row-link"
               :class="{
-                'tui-miniProfileCard__description__row__link--bold':
-                  index === 0,
+                'tui-miniProfileCard__row-link--bold': index === 0,
               }"
               :aria-describedby="ariaDescribedby"
             >
@@ -255,7 +253,7 @@ export default {
     padding-left: var(--gap-4);
   }
 
-  &--no-dropDown {
+  &--no-dropdown {
     padding-right: var(--gap-4);
   }
 
@@ -287,7 +285,7 @@ export default {
       display: flex;
       align-items: center;
 
-      &__text {
+      &-text {
         @include tui-font-body-small();
         margin: 0;
         overflow: hidden;
@@ -299,7 +297,7 @@ export default {
         }
       }
 
-      &__link {
+      &-link {
         @include tui-font-link-small();
         margin: 0;
         overflow: hidden;

@@ -40,4 +40,4 @@ Feature: Unshare resource
     And I click on "Shared with you" "link"
     And I click on "Test Article 1" "link"
     When I click on "Reshare resource" "button"
-    Then I should see "Shared with 1 people and 0 workspace(s)" in the ".tui-sharedBoard__label" "css_element"
+    Then I should see "Shared with 1 people and 0 workspace(s)" in the ".tui-engageSharedBoardForm__label" "css_element"

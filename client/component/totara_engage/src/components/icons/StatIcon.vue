@@ -17,21 +17,18 @@
 -->
 
 <template>
-  <div class="tui-totaraEngage-statIcon">
+  <div class="tui-engageStatIcon">
     <span
-      class="tui-totaraEngage-statIcon__iconContainer"
+      class="tui-engageStatIcon__iconContainer"
       role="img"
       :aria-label="title"
     >
-      <span
-        class="tui-totaraEngage-statIcon__icon tui-totaraEngage-icon"
-        :class="iconCss"
-      >
+      <span class="tui-engageStatIcon__icon" :class="iconCss">
         <slot />
       </span>
     </span>
 
-    <span class="tui-totaraEngage-statIcon__statNumber" aria-hidden="true">
+    <span class="tui-engageStatIcon__statNumber" aria-hidden="true">
       {{ statNumber }}
     </span>
   </div>
@@ -58,7 +55,7 @@ export default {
   computed: {
     iconCss() {
       if (this.clickable) {
-        return 'tui-totaraEngage-icon--clickable';
+        return 'tui-engageStatIcon__icon--clickable';
       }
 
       return '';
@@ -68,7 +65,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-totaraEngage-statIcon {
+.tui-engageStatIcon {
   display: flex;
   flex-direction: column;
   align-items: center;

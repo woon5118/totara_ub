@@ -19,8 +19,10 @@
 <template>
   <section class="tui-playlistNavigation">
     <!-- Playlists -->
-    <div class="tui-navigationPanel__category tui-navigationPanel__contribute">
-      <h3 class="tui-navigationPanel__header">
+    <div
+      class="tui-engageNavigationPanel__category tui-engageNavigationPanel__contribute"
+    >
+      <h3 class="tui-engageNavigationPanel__header">
         {{ $str('yourplaylists', 'totara_playlist') }}
       </h3>
       <Contribute
@@ -41,15 +43,15 @@
         :key="`playlistLink_${i}`"
         :class="getNavigationLinkClass('playlist_' + playlist.id, i)"
       >
-        <a class="tui-navigationPanel__link__text" :href="playlist.url">
+        <a class="tui-engageNavigationPanel__link-text" :href="playlist.url">
           {{ playlist.name }}
         </a>
       </div>
     </template>
 
     <!-- Saved Playlists -->
-    <div class="tui-navigationPanel__category">
-      <h3 class="tui-navigationPanel__header">
+    <div class="tui-engageNavigationPanel__category">
+      <h3 class="tui-engageNavigationPanel__header">
         {{ $str('savedplaylists', 'totara_playlist') }}
       </h3>
     </div>
@@ -59,7 +61,7 @@
         :key="`playlistSaved_${i}`"
         :class="getNavigationLinkClass('playlist_' + playlist.id, i)"
       >
-        <a class="tui-navigationPanel__link__text" :href="playlist.url">
+        <a class="tui-engageNavigationPanel__link-text" :href="playlist.url">
           {{ playlist.name }}
         </a>
       </div>

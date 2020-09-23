@@ -18,9 +18,9 @@
 
 <template>
   <Button
-    class="tui-editorWeka-toolbarButton"
+    class="tui-wekaToolbarButton"
     :class="{
-      'tui-editorWeka-toolbarButton--selected': selected,
+      'tui-wekaToolbarButton--selected': selected,
     }"
     :aria-label="text"
     :aria-pressed="ariaPressed"
@@ -68,7 +68,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-editorWeka-toolbarButton {
+.tui-wekaToolbarButton {
   min-width: 0;
   height: var(--gap-8);
   min-height: var(--gap-6);

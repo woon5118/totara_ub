@@ -2,12 +2,12 @@
 
 exports[`engage_article/components/form/ArticleForm.vue Checks snapshot 1`] = `
 <form-stub
-  class="tui-articleForm"
+  class="tui-engageArticleForm"
   inputwidth="full"
   vertical="true"
 >
   <formrow-stub
-    class="tui-articleForm__title"
+    class="tui-engageArticleForm__title"
     hidden="true"
     isstacked="true"
     label="articletitle, engage_article"
@@ -15,17 +15,17 @@ exports[`engage_article/components/form/ArticleForm.vue Checks snapshot 1`] = `
   />
    
   <div
-    class="tui-articleForm__description"
+    class="tui-engageArticleForm__description"
   >
     <formrow-stub
-      class="tui-articleForm__description-formRow"
+      class="tui-engageArticleForm__description-formRow"
       hidden="true"
       label="content, engage_article"
       required="true"
     />
      
     <div
-      class="tui-articleForm__description-tip"
+      class="tui-engageArticleForm__description-tip"
     >
       <p>
         contributetip, totara_engage
@@ -42,7 +42,7 @@ exports[`engage_article/components/form/ArticleForm.vue Checks snapshot 1`] = `
   </div>
    
   <buttongroup-stub
-    class="tui-articleForm__buttons"
+    class="tui-engageArticleForm__buttons"
   >
     <button-stub
       aria-label="createarticleshort, engage_article"

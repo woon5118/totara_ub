@@ -36,34 +36,34 @@ Feature: Report & remove comments in workspaces
     And I activate the weka editor with css ".tui-commentForm"
     And I type "Comment 1" in the weka editor
     And I wait for the next second
-    And I click on "Comment" "button" in the ".tui-responseBox__formBox" "css_element"
+    And I click on "Comment" "button" in the ".tui-commentResponseBox__formBox" "css_element"
     Then I should see "Comment 1"
 
     # Add the reply
     When I press "Reply"
     And I wait for the next second
-    And I activate the weka editor with css ".tui-replyForm"
+    And I activate the weka editor with css ".tui-commentReplyForm"
     And I type "Reply 1" in the weka editor
     And I wait for the next second
-    And I click on "Reply" "button" in the ".tui-commentCard__replyBox .tui-responseBox__formBox" "css_element"
+    And I click on "Reply" "button" in the ".tui-commentCard__replyBox .tui-commentResponseBox__formBox" "css_element"
     Then I should see "Reply 1"
 
     # Check that none of them can be reported
     When I press "Discussion's actions"
-    Then I should see "Edit" in the ".tui-discussionCard__card" "css_element"
-    And I should not see "Report" in the ".tui-discussionCard__card" "css_element"
+    Then I should see "Edit" in the ".tui-workspaceDiscussionCard__card" "css_element"
+    And I should not see "Report" in the ".tui-workspaceDiscussionCard__card" "css_element"
 
     When I press "Discussion's actions"
     And I wait for the next second
-    And I click on "Menu trigger" "button" in the ".tui-commentCard__comment__body" "css_element"
-    Then I should see "Edit" in the ".tui-commentCard__comment__body" "css_element"
-    And I should not see "Report" in the ".tui-commentCard__comment__body" "css_element"
+    And I click on "Menu trigger" "button" in the ".tui-commentCard__body" "css_element"
+    Then I should see "Edit" in the ".tui-commentCard__body" "css_element"
+    And I should not see "Report" in the ".tui-commentCard__body" "css_element"
 
-    When I click on "Menu trigger" "button" in the ".tui-commentCard__comment__body" "css_element"
+    When I click on "Menu trigger" "button" in the ".tui-commentCard__body" "css_element"
     And I wait for the next second
-    And I click on "Menu trigger" "button" in the ".tui-replyCard__body" "css_element"
-    Then I should see "Edit" in the ".tui-replyCard__body" "css_element"
-    And I should not see "Report" in the ".tui-replyCard__body" "css_element"
+    And I click on "Menu trigger" "button" in the ".tui-commentReplyCard__body" "css_element"
+    Then I should see "Edit" in the ".tui-commentReplyCard__body" "css_element"
+    And I should not see "Report" in the ".tui-commentReplyCard__body" "css_element"
 
     # Now as user2, check they can be reported
     When I log out
@@ -74,19 +74,19 @@ Feature: Report & remove comments in workspaces
     # Discussion button
     When I press "Discussion's actions"
     And I wait for the next second
-    Then I should not see "Edit" in the ".tui-discussionCard__card .tui-dropdown" "css_element"
-    And I should see "Report" in the ".tui-discussionCard__card .tui-dropdown" "css_element"
+    Then I should not see "Edit" in the ".tui-workspaceDiscussionCard__card .tui-dropdown" "css_element"
+    And I should see "Report" in the ".tui-workspaceDiscussionCard__card .tui-dropdown" "css_element"
 
     # Comment
     When I press "Discussion's actions"
     And I wait for the next second
-    And I click on "Menu trigger" "button" in the ".tui-commentCard__comment__body" "css_element"
-    Then I should not see "Edit" in the ".tui-commentCard__comment__body" "css_element"
-    And I should see "Report" in the ".tui-commentCard__comment__body" "css_element"
+    And I click on "Menu trigger" "button" in the ".tui-commentCard__body" "css_element"
+    Then I should not see "Edit" in the ".tui-commentCard__body" "css_element"
+    And I should see "Report" in the ".tui-commentCard__body" "css_element"
 
     # Reply
     When I click on "View replies" "link"
     And I wait for the next second
-    And I click on "Menu trigger" "button" in the ".tui-replyCard__body" "css_element"
-    Then I should not see "Edit" in the ".tui-replyCard__body" "css_element"
-    And I should see "Report" in the ".tui-replyCard__body" "css_element"
+    And I click on "Menu trigger" "button" in the ".tui-commentReplyCard__body" "css_element"
+    Then I should not see "Edit" in the ".tui-commentReplyCard__body" "css_element"
+    And I should see "Report" in the ".tui-commentReplyCard__body" "css_element"

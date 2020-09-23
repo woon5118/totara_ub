@@ -2,7 +2,7 @@
 
 exports[`engage_survey/components/box/RadioBox.vue Checks snapshot 1`] = `
 <div
-  class="tui-formRow tui-engageSurvey-radioBox"
+  class="tui-formRow tui-engageSurveyRadioBox"
 >
   <div
     class="tui-formRow__inner"

@@ -16,7 +16,7 @@
   @module engage_article
 -->
 <template>
-  <div class="tui-articleContent">
+  <div class="tui-engageArticleContent">
     <InlineEditing
       v-show="!editing"
       :button-aria-label="$str('editarticlecontent', 'engage_article', title)"
@@ -28,7 +28,7 @@
       <div
         slot="content"
         ref="content"
-        class="tui-articleContent__content"
+        class="tui-engageArticleContent__content"
         v-html="content"
       />
     </InlineEditing>
@@ -160,7 +160,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-articleContent {
+.tui-engageArticleContent {
   &__content {
     flex-grow: 1;
   }

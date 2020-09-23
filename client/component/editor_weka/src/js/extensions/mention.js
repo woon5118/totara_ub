@@ -34,7 +34,7 @@ class MentionExtension extends BaseExtension {
           },
           parseDOM: [
             {
-              tag: 'span.tui-editorWeka-mention',
+              tag: 'span.tui-wekaNodeMention',
               getAttrs(dom) {
                 try {
                   return {
@@ -52,7 +52,7 @@ class MentionExtension extends BaseExtension {
             return [
               'span',
               {
-                class: 'tui-editorWeka-mention',
+                class: 'tui-wekaNodeMention',
                 'data-type': JSON.stringify(node.attrs.type),
                 'data-id': JSON.stringify(node.attrs.id),
               },

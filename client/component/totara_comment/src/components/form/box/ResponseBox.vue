@@ -16,8 +16,8 @@
   @module totara_comment
 -->
 <template>
-  <div class="tui-responseBox">
-    <div v-if="!$apollo.loading" class="tui-responseBox__profilePicture">
+  <div class="tui-commentResponseBox">
+    <div v-if="!$apollo.loading" class="tui-commentResponseBox__profilePicture">
       <Avatar
         :image-alt="user.profileimagealt || ''"
         :image-src="user.profileimageurl"
@@ -25,7 +25,7 @@
       />
     </div>
 
-    <div class="tui-responseBox__formBox">
+    <div class="tui-commentResponseBox__formBox">
       <slot />
     </div>
   </div>
@@ -57,7 +57,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-responseBox {
+.tui-commentResponseBox {
   display: flex;
   align-content: flex-start;
 

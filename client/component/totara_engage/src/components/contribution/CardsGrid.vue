@@ -19,7 +19,7 @@
 <template>
   <Responsive
     :breakpoints="breakPoints"
-    class="tui-totaraEngage-cardsGrid"
+    class="tui-engageCardsGrid"
     @responsive-resize="handleResize"
   >
     <VirtualScroll
@@ -34,13 +34,13 @@
         <CoreGrid
           :direction="gridDirection"
           :max-units="maxUnits"
-          class="tui-totaraEngage-cardsGrid__row"
+          class="tui-engageCardsGrid__row"
         >
           <GridItem
             v-for="(card, i) in row.items"
             :key="i"
             :units="cardUnits"
-            class="tui-totaraEngage-cardsGrid__card"
+            class="tui-engageCardsGrid__card"
           >
             <EngageCard
               :card-attribute="card"
@@ -165,7 +165,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-totaraEngage-cardsGrid {
+.tui-engageCardsGrid {
   &__row.tui-grid {
     margin-bottom: var(--gap-8);
   }

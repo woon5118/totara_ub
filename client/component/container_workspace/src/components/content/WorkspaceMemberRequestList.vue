@@ -34,7 +34,7 @@
           :member-request-id="id"
           :is-approved="is_accepted"
           :is-declined="is_declined"
-          class="tui-workspaceMemberRequestList__cards__card"
+          class="tui-workspaceMemberRequestList__card"
           @accept-request="acceptRequest"
           @decline-request="declineRequest"
         />
@@ -170,12 +170,12 @@ export default {
   &__cards {
     display: flex;
     flex-direction: column;
+  }
 
-    &__card {
-      padding: var(--gap-2) 0;
-      &:not(:last-child) {
-        border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
-      }
+  &__card {
+    padding: var(--gap-2) 0;
+    &:not(:last-child) {
+      border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
     }
   }
 }

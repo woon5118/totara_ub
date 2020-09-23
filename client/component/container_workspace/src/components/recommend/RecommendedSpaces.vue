@@ -18,14 +18,14 @@
 <template>
   <div class="tui-recommendedSpaces">
     <div class="tui-recommendedSpaces__head">
-      <h2 class="tui-recommendedSpaces__head__title">
+      <h2 class="tui-recommendedSpaces__title">
         <span>{{ $str('recommended_spaces', 'container_workspace') }}</span>
         <Loading v-if="$apollo.loading" />
       </h2>
 
       <a
         :href="$url('/container/type/workspace/spaces.php')"
-        class="tui-recommendedSpaces__head__link"
+        class="tui-recommendedSpaces__link"
       >
         {{ $str('view_all_spaces', 'container_workspace') }}
       </a>
@@ -102,21 +102,15 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: var(--gap-4);
-
-    &__title {
-      @include tui-font-heading-small();
-      margin: 0;
-    }
-
-    &__link {
-      @include tui-font-link();
-    }
   }
 
-  &__grid {
-    &__card {
-      height: var(--totara-engage-card-height);
-    }
+  &__title {
+    @include tui-font-heading-small();
+    margin: 0;
+  }
+
+  &__link {
+    @include tui-font-link();
   }
 }
 </style>

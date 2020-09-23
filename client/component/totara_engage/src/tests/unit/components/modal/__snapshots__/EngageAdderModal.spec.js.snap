@@ -2,7 +2,6 @@
 
 exports[`AdderModal should check snapshot 1`] = `
 <div
-  class="tui-engageAdderModal"
   griddirection="undefined"
   units="0"
 >

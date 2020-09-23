@@ -16,14 +16,14 @@
  * @module editor_weka
  */
 
-import Emojis from 'editor_weka/components/editing/Emojis.vue';
+import EmojiSelector from 'editor_weka/components/editing/EmojiSelector';
 import { shallowMount } from '@vue/test-utils';
 
-describe('editor_weka/components/editing/Emojis.vue', function() {
+describe('EmojiSelector', function() {
   let wrapper;
 
   beforeAll(() => {
-    wrapper = shallowMount(Emojis, {
+    wrapper = shallowMount(EmojiSelector, {
       propsData: {
         emojis: [
           {
@@ -35,7 +35,7 @@ describe('editor_weka/components/editing/Emojis.vue', function() {
     });
   });
 
-  it('Checks snapshot', () => {
+  it('matches snapshot', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 });

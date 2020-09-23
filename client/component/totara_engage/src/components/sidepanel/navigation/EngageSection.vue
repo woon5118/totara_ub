@@ -31,7 +31,7 @@
     <!-- SharedWithYou -->
     <div :class="getNavigationLinkClass('sharedwithyou', 1)">
       <a
-        class="tui-navigationPanel__link__text"
+        class="tui-engageNavigationPanel__link-text"
         :href="$url('/totara/engage/shared_with_you.php')"
       >
         {{ $str('sharedwithyou', 'totara_engage') }}
@@ -42,7 +42,7 @@
     <!-- SavedResources -->
     <div :class="getNavigationLinkClass('savedresources', 2)">
       <a
-        class="tui-navigationPanel__link__text"
+        class="tui-engageNavigationPanel__link-text"
         :href="$url('/totara/engage/saved_resources.php')"
       >
         {{ $str('savedresources', 'totara_engage') }}

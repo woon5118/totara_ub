@@ -2,7 +2,7 @@
 
 exports[`engage_survey/components/box/SquareBox.vue Checks snapshot 1`] = `
 <div
-  class="tui-formRow tui-engageSurvey-squareBox"
+  class="tui-formRow tui-engageSurveySquareBox"
 >
   <div
     class="tui-formRow__inner"
@@ -50,7 +50,7 @@ exports[`engage_survey/components/box/SquareBox.vue Checks snapshot 1`] = `
               class="tui-formRow__action tui-formRow__action--isStacked"
             >
               <div
-                class="tui-checkbox tui-engageSurvey-squareBox__checkbox"
+                class="tui-checkbox tui-engageSurveySquareBox__checkbox"
               >
                 <input
                   class="tui-checkbox__input"

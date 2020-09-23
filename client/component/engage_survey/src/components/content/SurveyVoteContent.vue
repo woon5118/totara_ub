@@ -16,8 +16,8 @@
   @module engage_survey
 -->
 <template>
-  <div class="tui-surveyVoteContent">
-    <Form class="tui-surveyVoteContent__form" :vertical="true">
+  <div class="tui-engageSurveyVoteContent">
+    <Form class="tui-engageSurveyVoteContent__form" :vertical="true">
       <template v-if="isSingleChoice">
         <RadioBox v-model="answer" :options="options" :label="label" />
       </template>
@@ -29,7 +29,7 @@
         :styleclass="{ primary: true }"
         :text="$str('vote', 'engage_survey')"
         :aria-label="$str('vote', 'engage_survey')"
-        class="tui-surveyVoteContent__button"
+        class="tui-engageSurveyVoteContent__button"
         @click="vote"
       />
     </Form>

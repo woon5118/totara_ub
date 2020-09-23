@@ -19,14 +19,12 @@
   <LayoutTwoColumn class="tui-workspaceFilePage">
     <template v-slot:left="{ direction }">
       <SidePanel
-        class="tui-workspaceFilePage__sidePanel"
         :show-button-control="false"
         :initially-open="true"
         :limit-height="false"
       >
         <WorkspaceMenu
           v-if="direction === 'horizontal'"
-          class="tui-workspaceFilePage__sidePanel__menu"
           :selected-workspace-id="workspaceId"
           @create-workspace="navigateToWorkspace"
         />
@@ -53,7 +51,7 @@
 
         <p
           v-if="!$apollo.loading && totalFiles === 0"
-          class="tui-workspaceFilePage__content__message"
+          class="tui-workspaceFilePage__message"
         >
           {{ $str('no_file_found', 'container_workspace') }}
         </p>
@@ -263,11 +261,11 @@ export default {
     @media (min-width: $tui-screen-sm) {
       padding: var(--gap-8);
     }
+  }
 
-    &__message {
-      @include tui-font-body();
-      margin: var(--gap-8) 0;
-    }
+  &__message {
+    @include tui-font-body();
+    margin: var(--gap-8) 0;
   }
 }
 </style>

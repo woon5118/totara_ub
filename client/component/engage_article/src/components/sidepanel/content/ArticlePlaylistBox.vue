@@ -17,9 +17,9 @@
 -->
 <!-- A box to display playlists that this article is being added into -->
 <template>
-  <div class="tui-articlePlaylistBox">
+  <div class="tui-engageArticlePlaylistBox">
     <template v-if="show">
-      <p class="tui-articlePlaylistBox__label">
+      <p class="tui-engageArticlePlaylistBox__label">
         <span>
           {{ $str('appears_in', 'engage_article') }}
         </span>
@@ -27,7 +27,7 @@
       </p>
 
       <ResourcePlaylistBox
-        class="tui-articlePlaylistBox__playlistsBox"
+        class="tui-engageArticlePlaylistBox__playlistsBox"
         :resource-id="resourceId"
         :url-source="urlSource"
         @update-has-playlists="show = $event"
@@ -79,7 +79,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-articlePlaylistBox {
+.tui-engageArticlePlaylistBox {
   &__playlistsBox {
     max-height: 300px;
     overflow-y: auto;

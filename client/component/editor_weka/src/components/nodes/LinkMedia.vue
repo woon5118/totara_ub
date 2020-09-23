@@ -18,17 +18,17 @@
 
 <template>
   <div
-    class="tui-editorWeka-linkMedia"
+    class="tui-wekaLinkMedia"
     :class="{
-      'tui-editorWeka-linkMedia--intrinsic-width': !attrs.loading && !iframeUrl,
+      'tui-wekaLinkMedia--intrinsic-width': !attrs.loading && !iframeUrl,
     }"
     :data-url="attrs.url"
   >
-    <div class="tui-editorWeka-linkMedia__inner">
+    <div class="tui-wekaLinkMedia__inner">
       <div v-if="attrs.loading">
         Loading...
       </div>
-      <div v-else-if="iframeUrl" class="tui-editorWeka-linkMedia__embed">
+      <div v-else-if="iframeUrl" class="tui-wekaLinkMedia__embed">
         <ResponsiveEmbedIframe
           :src="iframeUrl"
           :resolution="attrs.resolution"
@@ -145,7 +145,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-editorWeka-linkMedia {
+.tui-wekaLinkMedia {
   display: flex;
   flex-direction: column;
   margin-bottom: var(--paragraph-gap);
@@ -165,7 +165,7 @@ export default {
   &__inner {
     max-width: 700px;
 
-    & > .tui-editorWeka-nodeBar {
+    & > .tui-wekaNodeBar {
       margin-top: var(--gap-2);
     }
   }

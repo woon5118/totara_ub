@@ -24,17 +24,17 @@
     @click="handleClick(url)"
   >
     <div class="tui-originalSpaceCard__titleBox">
-      <h3 class="tui-originalSpaceCard__titleBox__title">
+      <h3 class="tui-originalSpaceCard__title">
         <a class="tui-originalSpaceCard__link" :href="url">
           {{ title }}
         </a>
       </h3>
     </div>
 
-    <div class="tui-originalSpaceCard__actionBox">
+    <div class="tui-originalSpaceCard__actions">
       <LoadingButton
         v-if="!joined && joinAble"
-        class="tui-originalSpaceCard__actionBox__button"
+        class="tui-originalSpaceCard__actions-button"
         :text="$str('join_me', 'container_workspace')"
         :aria-label="$str('join_space', 'container_workspace', title)"
         :loading="submitting"
@@ -44,14 +44,14 @@
       <Button
         v-else-if="!joined && hasRequestedToJoin"
         :text="$str('requested_to_join', 'container_workspace')"
-        class="tui-originalSpaceCard__actionBox__button"
+        class="tui-originalSpaceCard__actions-button"
         :disabled="true"
       />
 
       <LoadingButton
         v-else-if="!joined && requestToJoinAble"
         :text="$str('request_to_join', 'container_workspace')"
-        class="tui-originalSpaceCard__actionBox__button"
+        class="tui-originalSpaceCard__actions-button"
         :aria-label="
           $str('request_to_join_space', 'container_workspace', title)
         "
@@ -63,14 +63,13 @@
       <Dropdown
         v-else-if="joined"
         :disabled="owned"
-        class="tui-originalSpaceCard__actionBox__dropDown"
+        class="tui-originalSpaceCard__actions-dropDown"
       >
         <template v-slot:trigger="{ isOpen, toggle }">
           <Button
             :text="$str('joined', 'container_workspace')"
             :caret="!owned"
             :aria-expanded="isOpen"
-            class="tui-originalSpaceCard__actionBox__dropDown__button"
             :disabled="submitting || owned"
             @click.stop="toggle"
           />
@@ -308,11 +307,11 @@ export default {
 
     border-top-left-radius: var(--border-radius-normal);
     border-top-right-radius: var(--border-radius-normal);
+  }
 
-    &__title {
-      @include tui-font-heading-x-small();
-      margin: 0;
-    }
+  &__title {
+    @include tui-font-heading-x-small();
+    margin: 0;
   }
 
   &__link {
@@ -325,7 +324,7 @@ export default {
     }
   }
 
-  &__actionBox {
+  &__actions {
     display: flex;
     flex-basis: 50%;
     flex-direction: column;
@@ -333,8 +332,8 @@ export default {
     justify-content: flex-end;
     width: 100%;
 
-    &__button,
-    &__dropDown {
+    &-button,
+    &-dropDown {
       margin-bottom: var(--gap-4);
     }
   }

@@ -35,7 +35,7 @@
           :id="$id('lozenge')"
           :text="$str('owner', 'container_workspace')"
           type="neutral"
-          class="tui-workspaceMemberCard__profileCard__tag"
+          class="tui-workspaceMemberCard__profileCard-tag"
         />
       </template>
 
@@ -182,7 +182,7 @@ export default {
       width: 100%;
     }
 
-    &__tag {
+    &-tag {
       margin-left: var(--gap-1);
     }
   }

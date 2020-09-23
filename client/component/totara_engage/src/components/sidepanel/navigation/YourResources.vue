@@ -19,7 +19,7 @@
 <template>
   <div :class="getLinkClasses('yourresources')">
     <a
-      class="tui-navigationPanel__link__text"
+      class="tui-engageNavigationPanel__link-text"
       :href="$url('/totara/engage/your_resources.php')"
     >
       {{ $str('yourresources', 'totara_engage') }}

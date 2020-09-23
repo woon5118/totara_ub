@@ -16,7 +16,7 @@
   @module engage_article
 -->
 <template>
-  <Form class="tui-editArticleContentForm">
+  <Form class="tui-engageEditArticleContentForm">
     <!-- Loader is for preventing user from typing when the editor is being initialised -->
     <Loader :fullpage="true" :loading="!editorMounted" />
     <UnsavedChangesWarning
@@ -30,7 +30,7 @@
       area="content"
       :instance-id="resourceId"
       :file-item-id="draft.file_item_id"
-      class="tui-editArticleContentForm__editor"
+      class="tui-engageEditArticleContentForm__editor"
       @ready="editorMounted = true"
     />
 

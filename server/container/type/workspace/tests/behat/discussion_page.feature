@@ -29,7 +29,7 @@ Feature: Single discussion page
     And I should not see "Delete"
     When I follow "View full discussion"
     Then I should see "Comments (0)"
-    And I activate the weka editor with css ".tui-commentForm__form__editor"
+    And I activate the weka editor with css ".tui-commentForm__editor"
     And I type "this is reply 100" in the weka editor
     And I wait for the next second
     When I click on "Comment" "button" in the ".tui-commentForm__form" "css_element"
@@ -48,14 +48,14 @@ Feature: Single discussion page
     And I should see "Delete"
     And I click on "View full discussion" "link"
     And I click on "Discussion's actions" "button"
-    And ".tui-editPostDiscussionForm" "css_element" should not exist
-    When I click on "Edit" "link" in the ".tui-discussionCard" "css_element"
-    And ".tui-editPostDiscussionForm" "css_element" should exist
+    And ".tui-workspaceEditPostDiscussionForm" "css_element" should not exist
+    When I click on "Edit" "link" in the ".tui-workspaceDiscussionCard" "css_element"
+    And ".tui-workspaceEditPostDiscussionForm" "css_element" should exist
     And I activate the weka editor with css ".tui-workspaceDiscussionForm__editor"
     And I should see "Discussion 100" in the weka editor
     And I set the weka editor to "Discussion 101"
     And I wait for the next second
-    When I click on "Done" "button" in the ".tui-editPostDiscussionForm" "css_element"
-    Then ".tui-editPostDiscussionForm" "css_element" should not exist
+    When I click on "Done" "button" in the ".tui-workspaceEditPostDiscussionForm" "css_element"
+    Then ".tui-workspaceEditPostDiscussionForm" "css_element" should not exist
     And I should not see "Discussion 100"
     And I should see "Discussion 101"

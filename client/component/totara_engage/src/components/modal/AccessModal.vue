@@ -20,11 +20,11 @@
   <Modal
     size="normal"
     :aria-labelledby="$id('title')"
-    class="tui-totaraEngage-accessModal"
+    class="tui-engageAccessModal"
     :dismissable="{ backdropClick: false }"
   >
     <ModalContent
-      class="tui-totaraEngage-accessModal__content"
+      class="tui-engageAccessModal__content"
       :title="$str('accesssettings', 'totara_engage')"
       :title-id="$id('title')"
       :close-button="showCloseButton"
@@ -143,7 +143,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-totaraEngage-accessModal {
+.tui-engageAccessModal {
   &__content {
     .tui-modalContent__content {
       position: relative;

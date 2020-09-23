@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`engage_article/components/form/EditArticleContentForm.vue Checks snapshot 1`] = `
-<form-stub inputwidth="limited" class="tui-editArticleContentForm">
+<form-stub inputwidth="limited" class="tui-engageEditArticleContentForm">
   <loader-stub fullpage="true" loading="true"></loader-stub>
   <!---->
-  <weka-stub placeholder="" instanceid="resourceId" component="engage_article" area="content" value="[object Object]" class="tui-editArticleContentForm__editor"></weka-stub>
+  <weka-stub placeholder="" instanceid="resourceId" component="engage_article" area="content" value="[object Object]" class="tui-engageEditArticleContentForm__editor"></weka-stub>
   <donecancelgroup-stub disabled="true"></donecancelgroup-stub>
 </form-stub>
 `;

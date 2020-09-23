@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-editorWeka-emojis">
+  <div class="tui-wekaEmojiSelector">
     <ButtonIcon
       v-for="(emoji, index) in emojis"
       :key="index"
@@ -26,7 +26,7 @@
       @click.native="select(emoji)"
     >
       <Emoji
-        class="tui-editorWeka-emojis__emoji"
+        class="tui-wekaEmojiSelector__emoji"
         :short-code="emoji.shortcode"
       />
     </ButtonIcon>
@@ -64,7 +64,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-editorWeka-emojis {
+.tui-wekaEmojiSelector {
   display: flex;
   flex-wrap: wrap;
 

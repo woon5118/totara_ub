@@ -26,7 +26,7 @@
     checkbox-v-align="center"
     :select-all-enabled="true"
     :border-bottom-hidden="true"
-    class="tui-engageAdderModal__browseTable"
+    class="tui-engageAdderBrowseTable"
     :get-id="getId"
     @input="$emit('update', $event)"
   >
@@ -46,7 +46,7 @@
     <template v-slot:row="{ row }">
       <Cell size="2" column-header="Img" valign="center">
         <img
-          class="tui-engageAdderModal__browseTable__img"
+          class="tui-engageAdderBrowseTable__img"
           :src="getImage(row)"
           :alt="$str('adder_image_alt', 'totara_engage', row.name)"
         />
@@ -57,7 +57,7 @@
         :column-header="$str('title', 'totara_engage')"
         valign="center"
       >
-        <span class="tui-engageAdderModal__browseTable__title">
+        <span class="tui-engageAdderBrowseTable__title">
           {{ row.name }}
         </span>
       </Cell>
@@ -138,3 +138,19 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-engageAdderBrowseTable {
+  &__img {
+    width: 100%;
+    height: 45px;
+  }
+
+  &__title {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+</style>

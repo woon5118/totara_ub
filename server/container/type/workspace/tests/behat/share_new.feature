@@ -30,7 +30,7 @@ Feature: Contribute new resource and share with workspace
     # Create new resource.
     When I follow "Resource"
     And I set the field "Enter resource title" to "Test Article 1"
-    And I activate the weka editor with css ".tui-articleForm__description"
+    And I activate the weka editor with css ".tui-engageArticleForm__description"
     And I set the weka editor to "New article"
     And I wait for the next second
     And I click on "Next" "button"
@@ -38,7 +38,7 @@ Feature: Contribute new resource and share with workspace
 
     # Confirm that we can see the automatically added workspace recipient.
     Then I should see "Everyone"
-    And I should see "Test Workspace 1" in the ".tui-sharedRecipientsSelector" "css_element"
+    And I should see "Test Workspace 1" in the ".tui-engageSharedRecipientsSelector" "css_element"
 
     # Create the resource.
     When I click on "5 to 10 mins" "text"
@@ -54,8 +54,8 @@ Feature: Contribute new resource and share with workspace
     When I view article "Test Article 1"
     And I press "Share"
     And I wait for the next second
-    And I click on "Show" "button" in the ".tui-sharedBoard" "css_element"
-    Then I should see "Test Workspace 1" in the ".tui-sharedBoard__content" "css_element"
+    And I click on "Show" "button" in the ".tui-engageSharedBoardForm" "css_element"
+    Then I should see "Test Workspace 1" in the ".tui-engageSharedBoardForm__content" "css_element"
 
     # Create new playlist.
     When I click on "Your Workspaces" in the totara menu
@@ -85,4 +85,4 @@ Feature: Contribute new resource and share with workspace
     When I click on "Your Workspaces" in the totara menu
     And I click on "Test Workspace 1" "link" in the ".tui-workspaceMenu" "css_element"
     And I click on "Library" "link" in the ".tui-tabs__tabs" "css_element"
-    Then I should see "Playlist1" in the ".tui-totaraPlaylist-playlistCard__title" "css_element"
+    Then I should see "Playlist1" in the ".tui-playlistCard__title" "css_element"

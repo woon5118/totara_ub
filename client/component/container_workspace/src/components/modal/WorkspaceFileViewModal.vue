@@ -61,7 +61,7 @@
         </audio>
       </template>
       <div v-else class="tui-workspaceFileViewModal__area">
-        <div class="tui-workspaceFileViewModal__area__icon">
+        <div class="tui-workspaceFileViewModal__area-icon">
           <FileIcon :filename="fileName" />
         </div>
         <p>
@@ -188,7 +188,7 @@ export default {
     height: var(--workspaceFileViewModal-minHeight);
     border: 1px solid var(--filter-bar-border-color);
 
-    &__icon {
+    &-icon {
       margin-bottom: var(--gap-8);
       color: var(--color-neutral-6);
       font-size: 60px;

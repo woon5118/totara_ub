@@ -2,7 +2,6 @@
 
 exports[`totara_engage/components/page/BaseLayout Checks snapshot 1`] = `
 <grid-stub
-  class="tui-totaraEngage-baseLayout"
   direction="horizontal"
   gridtag="div"
   maxunits="undefined"
@@ -10,7 +9,6 @@ exports[`totara_engage/components/page/BaseLayout Checks snapshot 1`] = `
   useverticalgap="true"
 >
   <griditem-stub
-    class="tui-totaraEngage-baseLayout__content"
     griditemtag="div"
     hyphens="true"
     shrinks="true"
@@ -19,7 +17,6 @@ exports[`totara_engage/components/page/BaseLayout Checks snapshot 1`] = `
   />
    
   <griditem-stub
-    class="tui-totaraEngage-baseLayout__sidePanel"
     griditemtag="div"
     hyphens="true"
     shrinks="true"

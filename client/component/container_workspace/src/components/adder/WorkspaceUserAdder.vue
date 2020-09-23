@@ -38,7 +38,7 @@
       :has-top-bar="false"
       :title="$str('filter_users', 'container_workspace')"
     >
-      <template v-slot:filters-left="{ stacked }">
+      <template v-slot:filters-left>
         <SearchBox
           :value="searchTerm"
           name="user-search-input"
@@ -61,7 +61,6 @@
         :select-all-enabled="true"
         :border-bottom-hidden="true"
         :data="users.items || []"
-        class="tui-workspaceUserAdder__table"
         @input="update($event)"
       >
         <template v-slot:header-row>
@@ -85,15 +84,14 @@
             :column-header="$str('name', 'moodle')"
             valign="start"
           >
-            <div class="tui-workspaceUserAdder__table__name">
+            <div class="tui-workspaceUserAdder__name">
               <Avatar
                 v-if="card_display.profile_picture_url"
                 :src="card_display.profile_picture_url"
                 :alt="card_display.profile_picture_alt || fullname"
                 size="xsmall"
-                class="tui-workspaceUserAdder__table__name__avatar"
               />
-              <p class="tui-workspaceUserAdder__table__name__text">
+              <p class="tui-workspaceUserAdder__name-text">
                 {{ fullname }}
               </p>
             </div>
@@ -118,7 +116,6 @@
         :select-all-enabled="true"
         :border-bottom-hidden="true"
         :data="selectedUsers"
-        class="tui-workspaceUserAdder__Table"
         @input="update($event)"
       >
         <template v-slot:header-row>
@@ -141,15 +138,14 @@
             :column-header="$str('name', 'moodle')"
             valign="start"
           >
-            <div class="tui-workspaceUserAdder__table__name">
+            <div class="tui-workspaceUserAdder__name">
               <Avatar
                 v-if="card_display.profile_picture_url"
                 :src="card_display.profile_picture_url"
                 :alt="card_display.profile_picture_alt || fullname"
                 size="xsmall"
-                class="tui-workspaceUserAdder__table__name__avatar"
               />
-              <p class="tui-workspaceUserAdder__table__name__text">
+              <p class="tui-workspaceUserAdder__name-text">
                 {{ fullname }}
               </p>
             </div>
@@ -303,18 +299,16 @@ export default {
 
 <style lang="scss">
 .tui-workspaceUserAdder {
-  &__table {
-    &__name {
-      display: flex;
-      // IE support
-      flex-grow: 1;
-      align-items: center;
+  &__name {
+    display: flex;
+    // IE support
+    flex-grow: 1;
+    align-items: center;
 
-      &__text {
-        @include tui-font-body();
-        margin: 0;
-        margin-left: var(--gap-2);
-      }
+    &-text {
+      @include tui-font-body();
+      margin: 0;
+      margin-left: var(--gap-2);
     }
   }
 }

@@ -2,7 +2,7 @@
 
 exports[`totara_comment/components/reply/Reply.vue Checks snapshot 1`] = `
 <replycard-stub
-  class="tui-reply"
+  class="tui-commentReply"
   data-id="12"
 >
   <avatar-stub
@@ -29,7 +29,7 @@ exports[`totara_comment/components/reply/Reply.vue Checks snapshot 1`] = `
    
   <commentaction-stub
     area="reply"
-    class="tui-reply__footer"
+    class="tui-commentReply__footer"
     commentid="12"
     reactable="true"
     replyable="true"

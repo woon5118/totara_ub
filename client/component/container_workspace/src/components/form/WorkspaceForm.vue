@@ -22,21 +22,21 @@
 <template>
   <Form class="tui-workspaceForm" :vertical="true" input-width="full">
     <div class="tui-workspaceForm__container">
-      <div class="tui-workspaceForm__container__inputs">
+      <div class="tui-workspaceForm__inputs">
         <FormRow
           v-slot="{ id }"
           :label="$str('space_name_label', 'container_workspace')"
-          class="tui-workspaceForm__container__inputs__formRow"
+          class="tui-workspaceForm__formRow"
         >
           <InputText :id="id" v-model="name" :disabled="submitting" />
         </FormRow>
 
         <FormRow
           :label="$str('description_label', 'container_workspace')"
-          class="tui-workspaceForm__container__inputs__formRow"
+          class="tui-workspaceForm__formRow"
         >
           <template v-slot:default="{ id }">
-            <div class="tui-workspaceForm__container__inputs__formRow__editor">
+            <div class="tui-workspaceForm__editor">
               <UnsavedChangesWarning
                 v-if="!description.isEmpty && !submitting"
                 :value="description"
@@ -45,18 +45,13 @@
                 :id="id"
                 v-model="description"
                 :aria-disabled="submitting"
-                class="tui-workspaceForm__container__inputs__formRow__editor__weka"
                 component="container_workspace"
                 area="description"
                 @ready="editorReady = true"
               />
 
-              <div
-                class="tui-workspaceForm__container__inputs__formRow__editor__tip"
-              >
-                <span
-                  class="tui-workspaceForm__container__inputs__formRow__editor__text"
-                >
+              <div class="tui-workspaceForm__editor-tip">
+                <span class="tui-workspaceForm__editor-tip-text">
                   {{ $str('hashtag_tip', 'container_workspace') }}
                 </span>
                 <InfoIconButton :aria-label="$str('info', 'moodle')">
@@ -72,7 +67,7 @@
           v-slot="{ id }"
           :label="$str('workspace_type', 'container_workspace')"
           :helpmsg="$str('workspace_type_help', 'container_workspace')"
-          class="tui-workspaceForm__container__inputs__formRow"
+          class="tui-workspaceForm__formRow"
         >
           <RadioGroup
             :id="id"
@@ -100,7 +95,6 @@
           v-slot="{ id }"
           :label="$str('hidden_workspace_text', 'container_workspace')"
           :hidden="true"
-          class="tui-workspaceForm__container__inputs__checkBoxRow"
         >
           <Checkbox
             :id="id"
@@ -116,14 +110,14 @@
         <FormRow
           v-if="showUnhiddenCheckBox"
           :label="$str('unhidden_workspace_label', 'container_workspace')"
-          class="tui-workspaceForm__container__inputs__unhiddenRow"
+          class="tui-workspaceForm__unhiddenRow"
         >
           <template v-slot:default="{ id }">
             <!--
               This checkbox works completely reverse of the hidden workspace checkbox.
               Meaning that when this checkbox is ticked, the otherbox should go to untick and vice versa.
              -->
-            <div class="tui-workspaceForm__container__inputs__unhiddenRow__box">
+            <div class="tui-workspaceForm__unhiddenRow-box">
               <Checkbox
                 :id="id"
                 v-model="unhideWorkspaceValue"
@@ -132,9 +126,7 @@
                 {{ $str('unhide_workspace', 'container_workspace') }}
               </Checkbox>
 
-              <p
-                class="tui-workspaceForm__container__inputs__unhiddenRow__box__helpText"
-              >
+              <p class="tui-workspaceForm__unhiddenRow-helpText">
                 {{ $str('unhidden_workspace_help', 'container_workspace') }}
               </p>
             </div>
@@ -142,7 +134,7 @@
         </FormRow>
       </div>
 
-      <FormRow class="tui-workspaceForm__container__imagePicker">
+      <FormRow class="tui-workspaceForm__imagePicker">
         <template v-slot="{ id }">
           <SpaceImagePicker
             :id="id"
@@ -153,10 +145,7 @@
             @clear-error="error.upload = null"
           />
 
-          <FieldError
-            class="tui-workspaceForm__container__imagePicker__error"
-            :error="error.upload"
-          />
+          <FieldError :error="error.upload" />
         </template>
       </FormRow>
     </div>
@@ -413,81 +402,81 @@ export default {
   &__container {
     display: flex;
     align-items: stretch;
+  }
 
-    &__inputs {
+  &__inputs {
+    display: flex;
+    flex-direction: column;
+    width: 66%;
+  }
+
+  &__unhiddenRow {
+    margin-top: var(--gap-8);
+    &-box {
       display: flex;
       flex-direction: column;
-      width: 66%;
+      flex-grow: 1;
+      width: 100%;
+    }
 
-      &__formRow {
-        // Overriding the margin
-        &.tui-formRow {
-          margin-bottom: 0;
+    &-helpText {
+      @include tui-font-body-small();
+      margin: 0;
+      margin-top: var(--gap-2);
+    }
+  }
 
-          &:not(:first-child) {
-            margin-top: var(--gap-8);
-          }
-        }
+  &__formRow {
+    // Overriding the margin
+    &.tui-formRow {
+      margin-bottom: 0;
 
-        .tui-formRow__desc {
-          margin-bottom: var(--gap-2);
-        }
-
-        &__editor {
-          display: flex;
-          flex-direction: column;
-          flex-grow: 1;
-          width: 100%;
-
-          &__tip {
-            display: flex;
-            margin-top: var(--gap-2);
-
-            &__text {
-              @include tui-font-body-small();
-            }
-          }
-        }
-      }
-
-      &__unhiddenRow {
+      &:not(:first-child) {
         margin-top: var(--gap-8);
-        &__box {
-          display: flex;
-          flex-direction: column;
-          flex-grow: 1;
-          width: 100%;
-
-          &__helpText {
-            @include tui-font-body-small();
-            margin: 0;
-            margin-top: var(--gap-2);
-          }
-        }
       }
     }
 
-    &__imagePicker {
-      // This will let us to have our custom FORM input :)
-      width: calc(100% - (66% + var(--gap-4)));
+    .tui-formRow__desc {
+      margin-bottom: var(--gap-2);
+    }
+  }
 
-      &.tui-formRow {
-        // Reset margin
-        margin: 0;
-        margin-left: var(--gap-4);
+  &__editor {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
 
-        .tui-formRow {
-          &__desc {
-            // Hiding description part.
-            display: none;
-          }
+    &-tip {
+      display: flex;
+      margin-top: var(--gap-2);
 
-          &__action {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            height: 100%;
-          }
+      &-text {
+        @include tui-font-body-small();
+      }
+    }
+  }
+
+  &__imagePicker {
+    // This will let us to have our custom FORM input :)
+    width: calc(100% - (66% + var(--gap-4)));
+
+    &.tui-formRow {
+      // Reset margin
+      margin: 0;
+      margin-left: var(--gap-4);
+
+      .tui-formRow {
+        &__desc {
+          // Hiding description part.
+          display: none;
+        }
+
+        &__action {
+          display: flex;
+          flex-direction: column;
+          flex-grow: 1;
+          height: 100%;
         }
       }
     }

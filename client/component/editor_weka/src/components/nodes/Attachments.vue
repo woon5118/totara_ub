@@ -17,8 +17,8 @@
 -->
 
 <template>
-  <AttachmentNodeCollection class="tui-editorWeka-attachments">
-    <div ref="content" class="tui-editorWeka-attachments__content">
+  <AttachmentNodeCollection class="tui-wekaAttachments">
+    <div ref="content" class="tui-wekaAttachments__content">
       <!-- Attachments collection. A content placeholder that will hold the list of the attachments in here. -->
     </div>
   </AttachmentNodeCollection>
@@ -35,7 +35,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-editorWeka-attachments {
+.tui-wekaAttachments {
   margin: 0 0 10px;
 
   &__content {
@@ -46,7 +46,7 @@ export default {
     width: 100%;
     white-space: normal;
 
-    > .tui-editorWeka-attachment {
+    > .tui-wekaAttachment {
       // Doing the margin for the single attachment.
       margin-top: var(--gap-1);
       margin-right: var(--gap-1);

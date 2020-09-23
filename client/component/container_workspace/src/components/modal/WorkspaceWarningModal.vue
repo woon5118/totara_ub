@@ -26,13 +26,13 @@
       <div class="tui-workspaceWarningModal__container">
         <Warning size="700" custom-class="tui-icon--warning" />
 
-        <div class="tui-workspaceWarningModal__container__box">
-          <h4 class="tui-workspaceWarningModal__container__box__title">
+        <div class="tui-workspaceWarningModal__box">
+          <h4 class="tui-workspaceWarningModal__title">
             {{ title }}
           </h4>
 
           <p
-            class="tui-workspaceWarningModal__container__box__content"
+            class="tui-workspaceWarningModal__content"
             v-html="messageContent"
           />
         </div>
@@ -136,20 +136,20 @@ export default {
 
   &__container {
     display: flex;
+  }
 
-    &__box {
-      margin-left: var(--gap-4);
+  &__box {
+    margin-left: var(--gap-4);
+  }
 
-      &__title {
-        @include tui-font-heading-x-small();
-        margin-top: 0;
-        margin-bottom: var(--gap-2);
-      }
+  &__title {
+    @include tui-font-heading-x-small();
+    margin-top: 0;
+    margin-bottom: var(--gap-2);
+  }
 
-      &__content {
-        @include tui-font-body();
-      }
-    }
+  &__content {
+    @include tui-font-body();
   }
 }
 </style>

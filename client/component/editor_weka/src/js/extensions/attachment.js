@@ -60,7 +60,7 @@ class AttachmentExtension extends BaseExtension {
 
           parseDOM: [
             {
-              tag: 'div.tui-editorWeka-attachment',
+              tag: 'div.tui-wekaNodeAttachment',
               getAttrs: getJsonAttrs,
             },
           ],
@@ -69,7 +69,7 @@ class AttachmentExtension extends BaseExtension {
             return [
               'div',
               {
-                class: 'tui-editorWeka-attachment',
+                class: 'tui-wekaNodeAttachment',
                 'data-attrs': JSON.stringify({
                   filename: node.attrs.filename,
                   option: node.attrs.option,
@@ -101,12 +101,12 @@ class AttachmentExtension extends BaseExtension {
           group: 'block',
           allowGapCursor: true,
           content: 'attachment*',
-          parseDOM: [{ tag: 'div.tui-editorWeka-attachments' }],
+          parseDOM: [{ tag: 'div.tui-wekaNodeAttachments' }],
           toDOM() {
             return [
               'div',
               {
-                class: 'tui-editorWeka-attachments',
+                class: 'tui-wekaNodeAttachments',
               },
               0,
             ];

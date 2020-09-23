@@ -27,12 +27,12 @@ Feature: Delete resource from playlist
     And I view playlist "Test Playlist 1"
     And I press "Contribute"
     And I set the field "Enter resource title" to "Test Resource 1"
-    And I set the field with xpath "//*[contains(concat(' ', normalize-space(@class), ' '), ' tui-articleForm__description ')]//div[@contenteditable='true']" to "Resource 1 Content"
+    And I set the field with xpath "//*[contains(concat(' ', normalize-space(@class), ' '), ' tui-engageArticleForm__description ')]//div[@contenteditable='true']" to "Resource 1 Content"
     And I wait for the next second
     And I click on "Next" "button"
     And I wait for the next second
-    And I click on "Only you" "text" in the ".tui-accessForm" "css_element"
-    And I click on "Done" "button" in the ".tui-accessForm__buttons" "css_element"
+    And I click on "Only you" "text" in the ".tui-engageAccessForm" "css_element"
+    And I click on "Done" "button" in the ".tui-engageAccessForm__buttons" "css_element"
     And I should see "Test Resource 1"
 
     # Delete the resource

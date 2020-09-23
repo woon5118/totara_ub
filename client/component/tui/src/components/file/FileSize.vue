@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <span class="tui-totaraCore-fileSize">
+  <span class="tui-fileSize">
     {{ fileSize }}
   </span>
 </template>

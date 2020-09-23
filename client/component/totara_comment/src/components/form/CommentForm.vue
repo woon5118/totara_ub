@@ -37,17 +37,17 @@
         :file-item-id="draftId"
         :placeholder="$str('entercomment', 'totara_comment')"
         :data-file-item-id="draftId"
-        class="tui-commentForm__form__editor"
+        class="tui-commentForm__editor"
         @ready="$emit('form-ready')"
       />
 
-      <ButtonGroup class="tui-commentForm__form__buttonGroup">
+      <ButtonGroup class="tui-commentForm__buttonGroup">
         <Button
           :text="submitButtonText"
           :aria-label="submitButtonText"
           :disabled="content.isEmpty || submitting"
           :styleclass="{ primary: true, small: isSmall }"
-          class="tui-commentForm__form__buttonGroup__button"
+          class="tui-commentForm__button"
           @click="submit"
         />
       </ButtonGroup>
@@ -211,17 +211,17 @@ export default {
   &__form {
     flex: 1;
     max-width: 100%;
+  }
 
-    &__editor {
-      flex: 1;
-      max-width: 100%;
-    }
+  &__editor {
+    flex: 1;
+    max-width: 100%;
+  }
 
-    &__buttonGroup {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: var(--gap-4);
-    }
+  &__buttonGroup {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--gap-4);
   }
 }
 </style>

@@ -18,7 +18,7 @@
 
 <template>
   <svg
-    class="tui-surveyBadge"
+    class="tui-engageSurveyBadge"
     viewBox="0 0 105 40"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -26,16 +26,16 @@
   >
     <title>{{ $str('survey', 'engage_survey') }}</title>
     <desc>{{ $str('survey', 'engage_survey') }}</desc>
-    <g class="tui-surveyBadge__shapeParent">
+    <g class="tui-engageSurveyBadge__shapeParent">
       <g transform="translate(-91.000000, 0.000000)">
         <g>
           <g transform="translate(91.000000, 0.000000)">
             <path
-              class="tui-surveyBadge__shape"
+              class="tui-engageSurveyBadge__shape"
               d="M1.5,33.5 L3.71008242,33.5  L101.289918,33.5 L103.5,33.5 L103.5,6 C103.5,3.51471863 101.485281,1.5 99,1.5 L6,1.5 C3.51471863,1.5 1.5,3.51471863 1.5,6 L1.5,33.5 Z"
             />
             <g
-              class="tui-surveyBadge__text"
+              class="tui-engageSurveyBadge__text"
               transform="translate(30.500000, 7.000000)"
             >
               <g>
@@ -67,7 +67,7 @@
   --engageSurvey-badge-width: 105px;
 }
 
-.tui-surveyBadge {
+.tui-engageSurveyBadge {
   width: var(--engageSurvey-badge-width);
   height: var(--engageSurvey-badge-height);
 

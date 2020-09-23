@@ -39,9 +39,9 @@
       />
       <span
         v-if="totalReplies"
-        class="tui-commentAction__replyBox__text"
+        class="tui-commentAction__replyBox-text"
         :class="{
-          'tui-commentAction__replyBox__text--small': isSmall,
+          'tui-commentAction__replyBox-text--small': isSmall,
         }"
       >
         {{ $str('bracketnumber', 'totara_comment', totalReplies) }}
@@ -142,7 +142,7 @@ export default {
     display: flex;
     margin-left: var(--gap-4);
 
-    &__text {
+    &-text {
       &--small {
         @include tui-font-body-small();
       }

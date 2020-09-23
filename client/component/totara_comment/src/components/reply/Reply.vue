@@ -16,7 +16,7 @@
   @module totara_comment
 -->
 <template>
-  <ReplyCard :data-id="replyId" class="tui-reply">
+  <ReplyCard :data-id="replyId" class="tui-commentReply">
     <Avatar
       slot="profile-picture"
       :image-src="userProfileImageUrl"
@@ -64,7 +64,7 @@
       :show-reply-button-text="showReplyButtonText"
       :show-like-button-text="showLikeButtonText"
       area="reply"
-      class="tui-reply__footer"
+      class="tui-commentReply__footer"
       @click-reply="handleReply"
       @update-react-status="updateReactStatus"
     />
@@ -373,7 +373,7 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-reply {
+.tui-commentReply {
   margin-top: var(--gap-4);
 }
 </style>

@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`engage_article/components/form/EditArticleTitleForm.vue Checks snapshot 1`] = `
-<form-stub inputwidth="limited" class="tui-editArticleTitleForm">
-  <inputtext-stub value="ArticleTitle" placeholder="entertitle, engage_article" name="title" maxlength="60" arialabel="articletitle, engage_article" class="tui-editArticleTitleForm__input"></inputtext-stub>
+<form-stub inputwidth="limited" class="tui-engageEditArticleTitleForm">
+  <inputtext-stub value="ArticleTitle" placeholder="entertitle, engage_article" name="title" maxlength="60" arialabel="articletitle, engage_article" class="tui-engageEditArticleTitleForm__input"></inputtext-stub>
   <donecancelgroup-stub></donecancelgroup-stub>
 </form-stub>
 `;

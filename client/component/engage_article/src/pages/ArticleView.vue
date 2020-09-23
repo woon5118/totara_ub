@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <Layout class="tui-articleView">
+  <Layout class="tui-engageArticleView">
     <template v-if="backButton || navigationButtons" v-slot:header>
       <ResourceNavigationBar
         :back-button="backButton"
@@ -26,7 +26,7 @@
     </template>
     <template v-slot:column>
       <Loader :loading="$apollo.loading" :fullpage="true" />
-      <div v-if="!$apollo.loading" class="tui-articleView__layout">
+      <div v-if="!$apollo.loading" class="tui-engageArticleView__layout">
         <ArticleTitle
           :title="articleName"
           :resource-id="resourceId"
@@ -168,7 +168,7 @@ export default {
   --engageArticle-min-height: 78vh;
 }
 
-.tui-articleView {
+.tui-engageArticleView {
   .tui-grid-item {
     min-height: var(--engageArticle-min-height);
   }

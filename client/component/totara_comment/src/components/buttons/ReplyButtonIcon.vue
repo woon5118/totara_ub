@@ -21,7 +21,7 @@
     :text="buttonText"
     :styleclass="buttonStyleClass"
     :disabled="disabled"
-    class="tui-replyButtonIcon"
+    class="tui-commentReplyButtonIcon"
     @click="$emit('click', $event)"
   >
     <ReplyIcon :size="iconSize" />

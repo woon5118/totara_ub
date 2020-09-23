@@ -23,7 +23,7 @@
     :submit-button-text="$str('done', 'container_workspace')"
     :submitting="submitting"
     :discussion-id="discussionId"
-    class="tui-editPostDiscussionForm"
+    class="tui-workspaceEditPostDiscussionForm"
     @submit="submitUpdate"
     @cancel="$emit('cancel')"
   />

@@ -17,8 +17,8 @@
 -->
 
 <template>
-  <div class="tui-totaraEngage-imageHeader">
-    <div v-if="showCover" class="tui-totaraEngage-imageHeader__actionContainer">
+  <div class="tui-engageImageHeader">
+    <div v-if="showCover" class="tui-engageImageHeader__actionContainer">
       <!-- This is where the icon should be -->
       <slot name="actions" />
     </div>
@@ -39,7 +39,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-totaraEngage-imageHeader {
+.tui-engageImageHeader {
   position: relative;
   width: 100%;
   height: 100%;
