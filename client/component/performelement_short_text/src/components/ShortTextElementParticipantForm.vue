@@ -18,6 +18,7 @@
 <template>
   <FormScope :path="path" :process="process">
     <FormText
+      :disabled="disabled"
       name="answer_text"
       :validations="v => [answerRequired, maxLength]"
     />
@@ -34,9 +35,12 @@ export default {
     FormScope,
     FormText,
   },
-
   props: {
-    path: [String, Array],
+    disabled: Boolean,
+    path: {
+      type: [String, Array],
+      default: '',
+    },
     error: String,
     isDraft: Boolean,
     element: Object,

@@ -41,13 +41,6 @@
               :validations="v => [v.required(), v.maxLength(1024)]"
             />
           </FormRow>
-          <FormRow :label="$str('date', 'performelement_date_picker')">
-            <FormDateSelector
-              name="date"
-              :initial-current-date="false"
-              :disabled="true"
-            />
-          </FormRow>
           <FormRow>
             <Checkbox v-model="responseRequired" name="responseRequired">
               {{ $str('section_element_response_required', 'mod_perform') }}
@@ -69,7 +62,7 @@
 </template>
 
 <script>
-import { Uniform, FormRow, FormDateSelector } from 'tui/components/uniform';
+import { Uniform, FormRow } from 'tui/components/uniform';
 import FormText from 'tui/components/uniform/FormText';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
@@ -84,7 +77,6 @@ export default {
     Uniform,
     FormRow,
     FormText,
-    FormDateSelector,
     IdentifierInput,
     Checkbox,
   },

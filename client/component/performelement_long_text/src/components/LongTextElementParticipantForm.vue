@@ -18,6 +18,7 @@
 <template>
   <FormScope :path="path" :process="process">
     <FormTextarea
+      :disabled="disabled"
       :rows="6"
       name="answer_text"
       :validations="v => [answerRequired]"
@@ -35,7 +36,11 @@ export default {
     FormTextarea,
   },
   props: {
-    path: [String, Array],
+    disabled: Boolean,
+    path: {
+      type: [String, Array],
+      default: '',
+    },
     error: String,
     isDraft: Boolean,
     element: Object,

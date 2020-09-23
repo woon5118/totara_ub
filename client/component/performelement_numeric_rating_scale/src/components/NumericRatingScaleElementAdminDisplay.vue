@@ -31,15 +31,19 @@
   >
     <template v-slot:content>
       <FormRow>
-        <div class="tui-elementDisplayNumericRatingScale__range">
-          <Range
-            :default-value="data.defaultValue"
-            :disabled="true"
-            :show-labels="false"
-            :min="data.lowValue"
-            :max="data.highValue"
-          />
-        </div>
+        <Range
+          :default-value="data.defaultValue"
+          disabled
+          :show-labels="false"
+          :min="data.lowValue"
+          :max="data.highValue"
+        />
+      </FormRow>
+      <FormRow>
+        <InputNumber
+          class="tui-elementDisplayNumericRatingScale__input"
+          disabled
+        />
       </FormRow>
     </template>
   </ElementAdminDisplay>
@@ -49,9 +53,11 @@
 import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
 import FormRow from 'tui/components/form/FormRow';
 import Range from 'tui/components/form/Range';
+import InputNumber from 'tui/components/form/InputNumber';
 
 export default {
   components: {
+    InputNumber,
     ElementAdminDisplay,
     FormRow,
     Range,
@@ -74,8 +80,8 @@ export default {
 
 <style lang="scss">
 .tui-elementDisplayNumericRatingScale {
-  &__range {
-    margin-top: var(--gap-4);
+  &__input {
+    margin-top: var(--gap-2);
   }
 }
 </style>

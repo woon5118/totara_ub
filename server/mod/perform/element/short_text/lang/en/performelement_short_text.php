@@ -26,6 +26,5 @@ $string['error_question_length_exceed'] = 'Question text exceeds the maximum len
 $string['error_you_must_answer_this_question'] = 'You must answer this question';
 $string['pluginname'] = 'Short text element';
 $string['name'] = 'Short text';
-$string['short_text_answer_placeholder'] = 'Short text answer field';
 $string['short_text_response_no_response_submitted'] = 'No response submitted';
 $string['short_text_title'] = 'Question text';

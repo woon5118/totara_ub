@@ -41,22 +41,6 @@
               :validations="v => [v.required(), v.maxLength(1024)]"
             />
           </FormRow>
-          <FormRow
-            :label="
-              $str('short_text_answer_placeholder', 'performelement_short_text')
-            "
-            :hidden="true"
-          >
-            <Textarea
-              :disabled="true"
-              :placeholder="
-                $str(
-                  'short_text_answer_placeholder',
-                  'performelement_short_text'
-                )
-              "
-            />
-          </FormRow>
           <FormRow>
             <Checkbox v-model="responseRequired" name="responseRequired">
               {{ $str('section_element_response_required', 'mod_perform') }}
@@ -83,7 +67,6 @@ import Checkbox from 'tui/components/form/Checkbox';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import IdentifierInput from 'mod_perform/components/element/admin_form/IdentifierInput';
-import Textarea from 'tui/components/form/Textarea';
 import { Uniform, FormRow, FormText } from 'tui/components/uniform';
 
 export default {
@@ -94,7 +77,6 @@ export default {
     FormRow,
     FormText,
     IdentifierInput,
-    Textarea,
     Uniform,
   },
   mixins: [AdminFormMixin],
@@ -147,8 +129,7 @@ export default {
     "performelement_short_text": [
         "error_question_required",
         "error_question_length_exceed",
-        "short_text_title",
-        "short_text_answer_placeholder"
+        "short_text_title"
     ],
     "mod_perform": [
         "section_element_response_required"

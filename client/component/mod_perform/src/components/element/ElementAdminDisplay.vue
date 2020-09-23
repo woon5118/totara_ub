@@ -96,7 +96,6 @@ export default {
     Popover,
     ReportsIcon,
   },
-
   props: {
     title: {
       type: String,
@@ -118,13 +117,11 @@ export default {
     },
     identifier: String,
   },
-
   computed: {
     isActive() {
       return this.activityState.name === 'ACTIVE';
     },
   },
-
   methods: {
     edit() {
       this.$emit('edit');
@@ -179,8 +176,7 @@ export default {
     }
   }
   &__content {
-    display: flex;
-    flex-direction: row;
+    max-width: 300px;
   }
 
   &__info {

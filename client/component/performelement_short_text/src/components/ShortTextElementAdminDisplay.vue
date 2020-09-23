@@ -26,15 +26,25 @@
     @edit="$emit('edit')"
     @remove="$emit('remove')"
     @display-read="$emit('display-read')"
-  />
+  >
+    <template v-slot:content>
+      <Uniform>
+        <ShortTextElementParticipantForm disabled />
+      </Uniform>
+    </template>
+  </ElementAdminDisplay>
 </template>
 
 <script>
 import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
+import ShortTextElementParticipantForm from 'performelement_short_text/components/ShortTextElementParticipantForm';
+import Uniform from 'tui/components/uniform/Uniform';
 
 export default {
   components: {
     ElementAdminDisplay,
+    ShortTextElementParticipantForm,
+    Uniform,
   },
 
   props: {
