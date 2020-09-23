@@ -124,7 +124,6 @@ export default {
     font-size: var(--font-size-15);
   }
   .tui-checkbox {
-    height: 100%;
     min-height: var(--gap-4);
     overflow: auto;
     -ms-word-break: break-all;
