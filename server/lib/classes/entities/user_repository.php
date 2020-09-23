@@ -30,6 +30,7 @@ use core\orm\entity\filter\basket;
 use core\orm\entity\filter\in;
 use core\orm\entity\filter\user_name;
 use core\orm\entity\repository;
+use core\orm\query\builder;
 use core\orm\query\field;
 use core\tenant_orm_helper;
 use core_user\profile\display_setting;
@@ -87,7 +88,9 @@ class user_repository extends repository {
      * @return $this
      */
     public function filter_by_not_guest(): self {
-        $this->where('username', '!=', 'guest');
+        global $CFG;
+        $guest_id = $CFG->siteguest;
+        $this->where('id', '!=', $guest_id);
 
         return $this;
     }
@@ -118,7 +121,15 @@ class user_repository extends repository {
      * @return $this
      */
     public function filter_by_full_name(string $search_for): self {
-        $this->where_raw(...users_search_sql($search_for, $this->get_alias_sql()));
+        $this->where(function (builder $builder) use ($search_for) {
+            $db = builder::get_db();
+            $alias = $builder->get_alias_sql();
+            $sql_fullname = $db->sql_fullname("$alias.firstname", "$alias.lastname");
+            $like_sql = $db->sql_like($sql_fullname, ':fullnamesearch', false, false);
+            $like_params = ['fullnamesearch' => '%' . $db->sql_like_escape($search_for) . '%'];
+            $builder->or_where_raw($like_sql, $like_params)
+                ->or_where('lastname', 'ilike', $search_for);
+        });
 
         return $this;
     }
