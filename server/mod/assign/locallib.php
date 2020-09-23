@@ -3029,7 +3029,9 @@ class assign {
         $plugin = $this->get_submission_plugin_by_type($plugintype);
 
         $text = $plugin->get_editor_text($editor, $submissionid);
-        if ($shortentext) {
+
+        // Totara: Do not attempt to shorten JSON content
+        if (!\core\json_editor\helper\document_helper::is_valid_json_document($text) && $shortentext) {
             $text = shorten_text($text, 140);
         }
         $format = $plugin->get_editor_format($editor, $submissionid);

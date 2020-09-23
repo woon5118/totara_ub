@@ -119,9 +119,17 @@ class rb_source_assignsummary extends rb_base_source {
                 'intro',
                 get_string('assignmentintro', 'rb_source_assignsummary'),
                 'base.assignment_intro',
-                array('dbdatatype' => 'text',
-                      'outputformat' => 'text',
-                      'displayfunc' => 'format_text')
+                array(
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
+                    'displayfunc' => 'editor_textarea',
+                    'extrafields' => array(
+                        'filearea' => '\'intro\'',
+                        'component' => '\'mod_assign\'',
+                        'context' => '\'context_module\'',
+                        'recordid' => 'base.id'
+                    ),
+                )
             ),
 
             // Assignment maxgrade.

@@ -169,7 +169,13 @@ class rb_source_assign extends rb_base_source {
                     'joins' => 'assign',
                     'dbdatatype' => 'text',
                     'outputformat' => 'text',
-                    'displayfunc' => 'editor_textarea'
+                    'displayfunc' => 'editor_textarea',
+                    'extrafields' => array(
+                        'filearea' => '\'intro\'',
+                        'component' => '\'mod_assign\'',
+                        'context' => '\'context_module\'',
+                        'recordid' => 'assign.id'
+                    ),
                 )
             ),
 
