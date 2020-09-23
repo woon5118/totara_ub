@@ -87,7 +87,7 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         $this->add_core_course_category_tables($joinlist, 'course', 'category');
         $this->add_core_user_tables($joinlist, 'sessions', 'usermodified', 'modifiedby');
         $this->add_facetoface_session_roles_to_joinlist($joinlist);
-        $this->add_facetoface_currentuserstatus_to_joinlist($joinlist);
+        $this->add_facetoface_currentuserstatus_to_joinlist($joinlist, 'base', 'sessionid');
         $this->add_context_tables($joinlist, 'course', 'id', CONTEXT_COURSE, 'INNER');
 
         return $joinlist;

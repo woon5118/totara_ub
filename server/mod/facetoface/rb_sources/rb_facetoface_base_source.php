@@ -333,7 +333,7 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      * Provides 'currentuserstatus' join required for the current signed in users status
      * @param array $joinlist
      */
-    public function add_facetoface_currentuserstatus_to_joinlist(&$joinlist) {
+    public function add_facetoface_currentuserstatus_to_joinlist(&$joinlist, $join = 'base', $field = 'id') {
         global $USER;
 
         $joinlist[] = new rb_join(
@@ -345,8 +345,9 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                     ON su.id = ss.signupid
                 WHERE ss.superceded = 0
                 AND su.userid = {$USER->id})",
-            'currentuserstatus.sessionid = base.id',
-            REPORT_BUILDER_RELATION_ONE_TO_ONE
+            "currentuserstatus.sessionid = {$join}.{$field}",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            $join
         );
     }
 

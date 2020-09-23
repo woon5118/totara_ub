@@ -153,6 +153,7 @@ Note that more recent update comes to the top.
 * form\event::new_user_roles_added() has been deprecated and will be removed in Totara 14
 
 --- Update in backend code ---
+* rb_sources\rb_facetoface_base_source::add_facetoface_currentuserstatus_to_joinlist added 2nd and 3rd parameters ($join and $field)
 * seminar_event::cancel() fires event_is_being_cancelled
 * seminar_event::delete() fires event_is_being_cancelled if the event is not yet cancelled
 * seminar_event_helper::merge_sessions() fires sessions_are_being_updated and resources_are_being_updated
