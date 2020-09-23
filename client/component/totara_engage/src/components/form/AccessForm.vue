@@ -412,7 +412,6 @@ export default {
 
   &__buttons {
     display: flex;
-    justify-content: flex-end;
     margin-top: var(--gap-2);
 
     &__back {
