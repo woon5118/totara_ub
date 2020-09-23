@@ -34,10 +34,10 @@ final class module_supported {
     private static $instance;
 
     /**
-     * An array of mod names
-     * @param string[]
+     * A hash map of module's name and the availability of its in system.
+     * @var array
      */
-    private $modnames;
+    private $modules;
 
     /**
      * An array of mod names that are being supported within container
@@ -52,7 +52,7 @@ final class module_supported {
         if (null == static::$instance) {
             static::$instance = new static();
 
-            static::$instance->modnames = [];
+            static::$instance->modules = [];
             static::$instance->modsincontainer = [];
         }
 
@@ -63,39 +63,74 @@ final class module_supported {
      * Preload the modules from table {modules} and setup its name with both plural and non-plural.
      * @return void
      */
-    private function setup_modnames(): void {
+    private function setup_modules(): void {
         global $DB, $CFG;
 
-        if (empty($this->modnames)) {
-            $this->modnames = [];
+        if (empty($this->modules)) {
+            $this->modules = [];
             $allmods = $DB->get_records('modules', null, '', 'id, name, visible');
 
             foreach ($allmods as $mod) {
                 $file = "{$CFG->dirroot}/mod/{$mod->name}/lib.php";
                 if (file_exists($file)) {
-                    $this->modnames[] = $mod->name;
+                    $this->modules[$mod->name] = $mod->visible;
                 }
             }
         }
     }
 
     /**
-     * @param string $containertype
-     * @param bool   $plural
+     * Execute the hooks to load all the posible modules supported by the workspace.
+     *
+     * @param string $container_type
+     * @return void
+     */
+    private function load_modules_for_container(string $container_type): void {
+        $this->setup_modules();
+
+        if (array_key_exists($container_type, $this->modsincontainer)) {
+            return;
+        }
+
+        $module_names = array_keys($this->modules);
+
+        $hook = new module_supported_in_container($container_type, $module_names);
+        $hook->execute();
+
+        $supported_modules = $hook->get_mods();
+        $modules_in_container = [];
+
+        foreach ($supported_modules as $module_name) {
+            if (!array_key_exists($module_name, $this->modules)) {
+                debugging(
+                    "The module '{$module_name}' does not appear in the list of supported modules",
+                    DEBUG_DEVELOPER
+                );
+
+                continue;
+            }
+
+            $modules_in_container[$module_name] = $this->modules[$module_name];
+        }
+
+        $this->modsincontainer[$container_type] = $modules_in_container;
+    }
+
+    /**
+     * Returning a hashmap of module name, given the key as the actual plugin name.
+     * Note that this function will only return the list of available module - not all the available module
+     * in the system.
+     *
+     * @param string    $containertype
+     * @param bool      $plural
+     * @param bool      $include_disabled
      *
      * @return array
      */
-    public function get_for_container(string $containertype, bool $plural = false): array {
-        if (!array_key_exists($containertype, $this->modsincontainer)) {
-            $this->setup_modnames();
-
-            $hook = new module_supported_in_container($containertype, $this->modnames);
-            $hook->execute();
-
-            $this->modsincontainer[$containertype] = $hook->get_mods();
-        }
-
-        $mods = $this->modsincontainer[$containertype];
+    public function get_for_container(string $containertype, bool $plural = false,
+                                      bool $include_disabled = false): array {
+        $this->load_modules_for_container($containertype);
+        $supported_modules = $this->modsincontainer[$containertype];
 
         $identifier = "modulename";
         if ($plural) {
@@ -103,8 +138,13 @@ final class module_supported {
         }
 
         $modules = [];
-        foreach ($mods as $modname) {
-            $modules[$modname] = get_string($identifier, "mod_{$modname}");
+        foreach ($supported_modules as $module_name => $visible) {
+            if (!$visible && !$include_disabled) {
+                // Skip this module.
+                continue;
+            }
+
+            $modules[$module_name] = get_string($identifier, "mod_{$module_name}");
         }
 
         \core_collator::asort($modules);

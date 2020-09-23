@@ -390,12 +390,16 @@ abstract class container {
      * Returns the localised human-readable names of all modules that are supported for the container.
      * Returning Array<string, string>
      *
-     * @param bool $plural if true returns the plural forms of the names
+     * @param bool $plural              If true returns the plural forms of the names
+     * @param bool $include_disabled    This is to tell the loader whether we are going to included the disabled
+     *                                  module(s) in the result set or not.
+     *
      * @return string[]
      */
-    public static function get_module_types_supported(bool $plural = false): array {
+    public static function get_module_types_supported(bool $plural = false,
+                                                      bool $include_disabled = false): array {
         $modsupported = module_supported::instance();
-        return $modsupported->get_for_container(static::get_type(), $plural);
+        return $modsupported->get_for_container(static::get_type(), $plural, $include_disabled);
     }
 
     /**
@@ -405,7 +409,7 @@ abstract class container {
      * @return bool
      */
     public function is_module_allowed(string $modname): bool {
-        $moduletypes = static::get_module_types_supported();
+        $moduletypes = static::get_module_types_supported(false, true);
         return isset($moduletypes[$modname]);
     }
 
