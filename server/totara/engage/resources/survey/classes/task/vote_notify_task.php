@@ -67,7 +67,7 @@ final class vote_notify_task extends adhoc_task {
         $message->userfrom = $voter;
         $message->userto = $owner;
         $message->notification = 1;
-        $message->subject = get_string('vote_message_subject', 'engage_survey', fullname($voter));
+        $message->subject = get_string('vote_message_subject', 'engage_survey');
         $message->fullmessage = html_to_text($message_body);
         $message->fullmessageformat = FORMAT_HTML;
         $message->fullmessagehtml = $message_body;
