@@ -48,13 +48,14 @@ final class loader {
      * @return offset_cursor_paginator
      */
     public static function get_discussions(query $query): offset_cursor_paginator {
-        global $DB;
+        global $CFG;
 
         $builder = builder::table(workspace_discussion::TABLE, 'wd');
         $builder->join(['user', 'u'], 'wd.user_id', 'u.id');
 
-        $builder->select([
-            "wd.id AS discussion_id",
+        // Make sure that the discussion's id is distinct.
+        $builder->select_raw("DISTINCT wd.id AS discussion_id");
+        $builder->add_select([
             "wd.course_id AS discussion_workspace_id",
             "wd.user_id AS discussion_user_id",
             "wd.content AS discussion_content",
@@ -85,6 +86,7 @@ final class loader {
         // Check for search term.
         $search_term = $query->get_search_term();
         if (null !== $search_term && '' !== $search_term) {
+            // Where like for workspace discussion and the comment that related to the workspace.
             $builder->left_join(
                 [comment::get_entity_table(), 'tc'],
                 function (builder $join): void {
@@ -94,17 +96,15 @@ final class loader {
                 }
             );
 
-            // Where like for workspace discussion and the comment that related to the workspace.
-            $discussion_like = $DB->sql_like('wd.content_text', ':discussion_search_term', false);
-            $comment_like = $DB->sql_like('tc.contenttext', ':comment_search_term', false);
-
-            $builder->where_raw(
-                "({$discussion_like} OR {$comment_like})",
-                [
-                    'discussion_search_term' => "%{$DB->sql_like_escape($search_term)}%",
-                    'comment_search_term' => "%{$DB->sql_like_escape($search_term)}%"
-                ]
+            require_once("{$CFG->dirroot}/totara/core/searchlib.php");
+            $keywords = totara_search_parse_keywords($search_term);
+            [$search_sql, $search_params] = totara_search_get_keyword_where_clause(
+                $keywords,
+                ['wd.content_text', 'tc.contenttext'],
+                SQL_PARAMS_NAMED
             );
+
+            $builder->where_raw($search_sql, $search_params);
         }
 
         // Check for pinned discussion

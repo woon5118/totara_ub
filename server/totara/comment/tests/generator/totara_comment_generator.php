@@ -24,6 +24,7 @@
 use core\json_editor\node\paragraph;
 use totara_comment\comment;
 use totara_comment\comment_helper;
+use core\json_editor\helper\document_helper;
 
 /**
  * Generator class for totara comment
@@ -60,17 +61,11 @@ final class totara_comment_generator extends component_generator_base {
             $content = $this->random_content();
         }
 
-        if (FORMAT_JSON_EDITOR == $content_format) {
-            $result = json_decode($content_format, true);
-            if (!is_array($result) || JSON_ERROR_NONE !== json_last_error()) {
-                $content = json_encode([
-                    'type' => 'doc',
-                    'content' => [
-                        paragraph::create_json_node_from_text($content)
-                    ]
-                ]);
-            }
-
+        if (FORMAT_JSON_EDITOR == $content_format && !document_helper::looks_like_json($content)) {
+            $content = json_encode([
+                'type' => 'doc',
+                'content' => [paragraph::create_json_node_from_text($content)]
+            ]);
         }
 
         return comment_helper::create_comment(

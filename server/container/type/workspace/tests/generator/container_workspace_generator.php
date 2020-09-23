@@ -30,6 +30,7 @@ use container_workspace\totara_engage\share\recipient\library as library_recipie
 use container_workspace\workspace;
 use core\json_editor\node\attachments;
 use core\json_editor\node\paragraph;
+use core\json_editor\helper\document_helper;
 
 /**
  * Generator for container workspace
@@ -192,18 +193,14 @@ final class container_workspace_generator extends component_generator_base {
             $content = $this->random_discussion_content();
         }
 
-        if (FORMAT_JSON_EDITOR == $content_format) {
-            // Checking if the content is an actually json content.
-            json_decode($content, true);
-            if (JSON_ERROR_NONE !== json_last_error()) {
-                // $content is not a json document content.
-                $content = json_encode([
-                    'type' => 'doc',
-                    'content' => [
-                        paragraph::create_json_node_from_text($content)
-                    ],
-                ]);
-            }
+        if (FORMAT_JSON_EDITOR == $content_format && !document_helper::looks_like_json($content)) {
+            // $content is not a json document content.
+            $content = json_encode([
+                'type' => 'doc',
+                'content' => [
+                    paragraph::create_json_node_from_text($content)
+                ],
+            ]);
         }
 
         return discussion_helper::create_discussion(
