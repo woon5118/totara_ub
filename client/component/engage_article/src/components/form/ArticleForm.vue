@@ -216,7 +216,6 @@ export default {
   display: flex;
   flex: 1;
   flex-direction: column;
-  margin-top: var(--gap-4);
 
   &__title {
     &.tui-formRow {

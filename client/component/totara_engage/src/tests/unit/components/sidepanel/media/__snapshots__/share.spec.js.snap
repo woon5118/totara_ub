@@ -20,6 +20,7 @@ exports[`totara_engage/components/sidepanel/media/share matches snapshot 1`] = `
     >
       <modalcontent-stub
         closebutton="true"
+        contentpadding="true"
         title="reshare, totara_engage"
         titlevisible="true"
       >

@@ -17,7 +17,10 @@
 -->
 
 <template>
-  <div class="tui-modalContent">
+  <div
+    class="tui-modalContent"
+    :class="{ 'tui-modalContent--noContentPadding': !contentPadding }"
+  >
     <div class="tui-modalContent__header">
       <div
         :id="titleId"
@@ -75,6 +78,10 @@ export default {
       default: true,
     },
     closeButton: Boolean,
+    contentPadding: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   mounted() {
@@ -112,6 +119,10 @@ export default {
   min-height: 0;
   padding: var(--modal-content-outer-padding) 0;
 
+  &--noContentPadding {
+    padding-bottom: 0;
+  }
+
   &__header {
     display: flex;
     flex-shrink: 0;
@@ -136,11 +147,17 @@ export default {
   }
 
   &__content {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
     min-height: 0;
     margin-top: var(--modal-content-separation);
     padding: 0 var(--modal-content-outer-padding) 2px;
     overflow-y: auto;
+  }
+
+  &--noContentPadding &__content {
+    padding: 0;
   }
 
   &__footer {

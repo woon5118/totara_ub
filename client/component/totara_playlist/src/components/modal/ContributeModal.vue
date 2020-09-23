@@ -26,8 +26,9 @@
       class="tui-playlistContributeModal"
       :close-button="false"
       :title="getTitle"
+      :content-padding="false"
     >
-      <div class="tui-playlistContributeModal__componentContent">
+      <div class="tui-playlistContributeModal__content">
         <CreatePlaylist
           @cancel="$emit('request-close')"
           @change-title="stage = $event"
@@ -86,34 +87,14 @@ export default {
 <style lang="scss">
 .tui-playlistContributeModal {
   position: relative;
-  min-height: 744px;
 
-  &__componentContent {
+  &__content {
     position: relative;
     display: flex;
     flex: 1;
     flex-direction: column;
-    width: 100%;
-    height: 100%;
-    min-height: 574px;
+    min-height: 550px;
     padding: var(--gap-8);
-    padding-bottom: 0;
-  }
-
-  .tui-modalContent__title {
-    display: none;
-  }
-
-  .tui-modalContent__content {
-    display: flex;
-    flex-direction: column;
-    min-height: 574px;
-    margin-top: 0;
-    padding: 0;
-  }
-
-  .tui-modalContent__header-title {
-    margin-bottom: var(--gap-2);
   }
 }
 </style>
