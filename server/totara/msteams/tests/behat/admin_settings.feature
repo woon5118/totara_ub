@@ -23,24 +23,24 @@ Feature: Customise Teams integration settings
     And I should see "Maximum of 100 characters"
 
     And I set the field "Full name" to ""
-    When I set the field "Publisher name" to "this is a really really long name"
+    When I set the field "Publisher's name" to "this is a really really long name"
     And I press "Save changes"
     Then I should see "Some settings were not changed due to an error"
     And I should see "Maximum of 32 characters"
 
-    And I set the field "Publisher name" to "Totara"
+    And I set the field "Publisher's name" to "Totara"
     When I set the field "Microsoft Partner Network ID" to "31415926535"
     And I press "Save changes"
     Then I should see "Some settings were not changed due to an error"
     And I should see "Maximum of 10 characters"
 
     And I set the field "Microsoft Partner Network ID" to ""
-    When I set the field "Publisher website" to "kia://ora/"
+    When I set the field "Publisher's website" to "kia://ora/"
     And I press "Save changes"
     Then I should see "Some settings were not changed due to an error"
     And I should see "This value is not valid"
 
-    And I set the field "Publisher website" to ""
+    And I set the field "Publisher's website" to ""
     When I set the field "Privacy policy" to "kia://ora/"
     And I press "Save changes"
     Then I should see "Some settings were not changed due to an error"
@@ -54,13 +54,13 @@ Feature: Customise Teams integration settings
 
   Scenario: Manifest download
     When I set the following fields to these values:
-      | Short name        | Mistletoetara                        |
-      | Full name         |                                      |
-      | Manifest app ID   | 31415926-5358-9793-2384-626433832795 |
-      | Publisher name    | Totara Learn                         |
-      | Publisher website | https://example.com/                 |
-      | Privacy policy    | https://example.com/                 |
-      | Terms of use      | https://example.com/                 |
+      | Short name          | Mistletoetara                        |
+      | Full name           |                                      |
+      | Manifest app ID     | 31415926-5358-9793-2384-626433832795 |
+      | Publisher's name    | Totara Learn                         |
+      | Publisher's website | https://example.com/totara/          |
+      | Privacy policy      | https://example.com/privacy/         |
+      | Terms of use        | https://example.com/terms/           |
     And I press "Save changes"
     Then I should see "Changes saved"
     And I should not see "Some settings were not changed due to an error"
