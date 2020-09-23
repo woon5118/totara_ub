@@ -28,9 +28,13 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use Dompdf\Exception;
+use totara_engage\access\access_manager;
+use totara_engage\access\accessible;
 use totara_engage\entity\share as share_entity;
 use totara_engage\repository\share_repository;
 use totara_engage\share\helper;
+use totara_engage\share\provider as share_provider;
 
 /**
  * Resolver for querying share recipients.
@@ -48,8 +52,33 @@ final class share_recipients implements query_resolver, has_middleware {
             $ec->set_relevant_context(\context_user::instance($USER->id));
         }
 
-        $itemid = $args['itemid'];
+        if (!isset($args['itemid'])) {
+            throw new \coding_exception('ItemID is a required field.');
+        }
+
+        if (!isset($args['component'])) {
+            throw new \coding_exception('Component is a required field.');
+        }
+
         $component = $args['component'];
+        $itemid = $args['itemid'];
+
+        if (!empty($itemid)) {
+            try {
+                $item = share_provider::create($component)->get_item_instance($itemid);
+            } catch (\Exception $ex) {
+                throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, $ex->getMessage());
+            }
+
+            if ($item instanceof accessible) {
+                if (!access_manager::can_access($item, $USER->id)) {
+                    throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, 'Cannot access item ' . $item->get_id());
+                }
+            } else {
+                // Something that is shareable must be accessible. It is a one way binding.
+                throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, get_class($item));
+            }
+        }
 
         /** @var share_repository $repo */
         $repo = share_entity::repository();
