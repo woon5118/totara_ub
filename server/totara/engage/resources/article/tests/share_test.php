@@ -201,46 +201,6 @@ class engage_article_share_testcase extends advanced_testcase {
 
     /**
      * Validate the following:
-     *   1. The correct sharer information is saved and retrieved from database.
-     */
-    public function test_sharers() {
-        $gen = $this->getDataGenerator();
-        /** @var engage_article_generator $articlegen */
-        $articlegen = $gen->get_plugin_generator('engage_article');
-
-        // Create users.
-        $users = $articlegen->create_users(3);
-
-        // Create article.
-        $this->setUser($users[1]);
-        $article = $articlegen->create_article();
-
-        // Share article.
-        $this->setUser($users[0]);
-        $recipients = $articlegen->create_user_recipients([$users[2]]);
-        $shares = $articlegen->share_article($article, $recipients);
-        $this->assertNotEmpty($shares);
-        $this->assertEquals(1, sizeof($shares));
-        $share = reset($shares);
-
-        /** @var share_repository $repo */
-        $repo = share_entity::repository();
-
-        // Confirm the users.
-        $sharers = $repo->get_sharers($article->get_id(), article::get_resource_type());
-
-        // We should only have 1 sharer.
-        $this->assertEquals(1, sizeof($sharers));
-        $sharer = reset($sharers);
-
-        // Sharer should match the user details.
-        $user = \core_user::get_user($sharer->id);
-        $this->assertEquals('Some1', $user->firstname);
-        $this->assertEquals('Any1', $user->lastname);
-    }
-
-    /**
-     * Validate the following:
      *   1. The correct recipient information is saved and retrieved from database.
      */
     public function test_recipients() {

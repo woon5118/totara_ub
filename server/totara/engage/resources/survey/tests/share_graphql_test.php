@@ -232,59 +232,6 @@ class engage_survey_share_graphql_testcase extends advanced_testcase {
 
     /**
      * Validate the following:
-     *   1. We can query sharers of a specific shared item.
-     */
-    public function test_sharers() {
-        $gen = $this->getDataGenerator();
-        /** @var totara_playlist_generator $playlistgen */
-        $surveygen = $gen->get_plugin_generator('engage_survey');
-
-        // Create users.
-        $users = $surveygen->create_users(4);
-
-        // Create survey.
-        $this->setUser($users[1]);
-        $survey = $surveygen->create_survey(null, [], answer_type::MULTI_CHOICE, [
-            'access' => access::PUBLIC
-        ]);
-
-        // Set capabilities for all users.
-        foreach ($users as $user) {
-            $surveygen->set_capabilities(CAP_ALLOW, $user->id, $survey->get_context());
-        }
-
-        // Share survey - as the owner.
-        $recipients = $surveygen->create_user_recipients([$users[1]]);
-        $surveygen->share_survey($survey, $recipients);
-
-        // Share survey - as a different user.
-        $this->setUser($users[0]);
-        $recipients = $surveygen->create_user_recipients([$users[2], $users[3]]);
-        $surveygen->share_survey($survey, $recipients);
-
-        // Get sharers.
-        $ec = execution_context::create('ajax', 'totara_engage_share_sharers');
-        $parameters = [
-            'itemid' => $survey->get_id(),
-            'component' => survey::get_resource_type()
-        ];
-
-        $result = graphql::execute_operation($ec, $parameters);
-        $this->assertEmpty($result->errors, !empty($result->errors) ? $result->errors[0]->message: '');
-        $this->assertNotEmpty($result->data);
-        $this->assertArrayHasKey('sharers', $result->data);
-
-        $sharers = $result->data['sharers'];
-        $this->assertNotEmpty($sharers);
-        $this->assertEquals(1, sizeof($sharers));
-        $sharer = reset($sharers);
-
-        $this->assertArrayHasKey('fullname', $sharer);
-        $this->assertEquals('Some1 Any1', $sharer['fullname']);
-    }
-
-    /**
-     * Validate the following:
      *   1. We can query recipients of a specific shared item.
      */
     public function test_recipients() {

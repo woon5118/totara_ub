@@ -214,48 +214,6 @@ class totara_playlist_share_testcase extends advanced_testcase {
 
     /**
      * Validate the following:
-     *   1. The correct sharer information is saved and retrieved from database.
-     */
-    public function test_sharers() {
-        $gen = $this->getDataGenerator();
-        /** @var totara_playlist_generator $playlistgen */
-        $playlistgen = $gen->get_plugin_generator('totara_playlist');
-
-        // Create users.
-        $users = $playlistgen->create_users(3);
-
-        // Create playlist.
-        $this->setUser($users[1]);
-        $playlist = $playlistgen->create_playlist();
-
-        // Create recipients.
-        $recipients = $playlistgen->create_user_recipients([$users[2]]);
-
-        // Share playlist.
-        $this->setUser($users[0]);
-        $shares = $playlistgen->share_playlist($playlist, $recipients);
-
-        $this->assertNotEmpty($shares);
-        $this->assertEquals(1, sizeof($shares));
-
-        /** @var share_repository $repo */
-        $repo = share_entity::repository();
-
-        // Confirm the users.
-        $sharers = $repo->get_sharers($playlist->get_id(), playlist::get_resource_type());
-
-        // We should only have 1 sharer.
-        $this->assertEquals(1, sizeof($sharers));
-        $sharer = reset($sharers);
-
-        // Sharer should match the user details.
-        $user = \core_user::get_user($sharer->id);
-        $this->assertEquals('Some1', $user->firstname);
-        $this->assertEquals('Any1', $user->lastname);
-    }
-
-    /**
-     * Validate the following:
      *   1. The correct recipient information is saved and retrieved from database.
      */
     public function test_recipients() {

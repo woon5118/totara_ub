@@ -230,53 +230,6 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
 
     /**
      * Validate the following:
-     *   1. We can query sharers of a specific shared item.
-     */
-    public function test_sharers() {
-        $gen = $this->getDataGenerator();
-        /** @var totara_playlist_generator $playlistgen */
-        $articlegen = $gen->get_plugin_generator('engage_article');
-
-        // Create users.
-        $users = $articlegen->create_users(4);
-        $this->setUser($users[1]);
-
-        // Create article.
-        $article = $articlegen->create_article([
-            'access' => access::PUBLIC
-        ]);
-
-        // Share article - as the owner.
-        $recipients = $articlegen->create_user_recipients([$users[1]]);
-        $articlegen->share_article($article, $recipients);
-
-        // Share article - as a different user.
-        $this->setUser($users[0]);
-        $recipients = $articlegen->create_user_recipients([$users[2], $users[3]]);
-        $articlegen->share_article($article, $recipients);
-
-        // Get sharers.
-        $ec = execution_context::create('ajax', 'totara_engage_share_sharers');
-        $parameters = [
-            'itemid' => $article->get_id(),
-            'component' => article::get_resource_type()
-        ];
-
-        $result = graphql::execute_operation($ec, $parameters);
-        $this->assertEmpty($result->errors, !empty($result->errors) ? $result->errors[0]->message: '');
-        $this->assertNotEmpty($result->data);
-        $this->assertArrayHasKey('sharers', $result->data);
-
-        $sharers = $result->data['sharers'];
-        $this->assertNotEmpty($sharers);
-        $this->assertEquals(1, sizeof($sharers));
-
-        $sharer = reset($sharers);
-        $this->assertEquals('Some1 Any1', $sharer['fullname']);
-    }
-
-    /**
-     * Validate the following:
      *   1. We can query recipients of a specific shared item.
      */
     public function test_recipients() {

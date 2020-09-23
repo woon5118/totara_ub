@@ -67,14 +67,6 @@ extend type Query {
   ): totara_engage_share_totals!
 
   """
-  Get the users who shared a specific item.
-  """
-  totara_engage_share_sharers(
-    itemid: param_integer!
-    component: param_component!
-  ): [core_user!]!
-
-  """
   Get the recipients for a specific shared item.
   """
   totara_engage_share_recipients(

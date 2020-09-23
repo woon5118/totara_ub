@@ -186,60 +186,6 @@ class totara_playlist_share_graphql_testcase extends advanced_testcase {
 
     /**
      * Validate the following:
-     *   1. We can query sharers of a specific shared item.
-     */
-    public function test_sharers() {
-        $gen = $this->getDataGenerator();
-        /** @var totara_playlist_generator $playlistgen */
-        $playlistgen = $gen->get_plugin_generator('totara_playlist');
-
-        // Create users.
-        $users = $playlistgen->create_users(4);
-
-        // Create playlist.
-        $this->setUser($users[0]);
-        $playlist = $playlistgen->create_playlist([
-            'access' => access::PUBLIC
-        ]);
-
-        // Set capabilities for all users.
-        foreach ($users as $user) {
-            $playlistgen->set_capabilities(CAP_ALLOW, $user->id, $playlist->get_context());
-        }
-
-        // Share playlist - as the owner.
-        $this->setUser($users[0]);
-        $recipients = $playlistgen->create_user_recipients([$users[1]]);
-        $playlistgen->share_playlist($playlist, $recipients);
-
-        // Share playlist - as a different user.
-        $this->setUser($users[1]);
-        $recipients = $playlistgen->create_user_recipients([$users[2], $users[3]]);
-        $playlistgen->share_playlist($playlist, $recipients);
-
-        // Get sharers - this should exclude the owner.
-        $ec = execution_context::create('ajax', 'totara_engage_share_sharers');
-        $parameters = [
-            'itemid' => $playlist->get_id(),
-            'component' => $playlist::get_resource_type()
-        ];
-
-        $result = graphql::execute_operation($ec, $parameters);
-        $this->assertEmpty($result->errors, !empty($result->errors) ? $result->errors[0]->message: '');
-        $this->assertNotEmpty($result->data);
-        $this->assertArrayHasKey('sharers', $result->data);
-
-        $sharers = $result->data['sharers'];
-        $this->assertNotEmpty($sharers);
-        $this->assertEquals(1, sizeof($sharers));
-        $sharer = reset($sharers);
-
-        $this->assertArrayHasKey('fullname', $sharer);
-        $this->assertEquals('Some2 Any2', $sharer['fullname']);
-    }
-
-    /**
-     * Validate the following:
      *   1. We can query recipients of a specific shared item.
      */
     public function test_recipients() {

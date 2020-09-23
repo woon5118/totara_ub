@@ -84,37 +84,6 @@ final class share_repository extends repository {
     }
 
     /**
-     * Get all sharers of a specific share.
-     *
-     * @param int $itemid
-     * @param string $component
-     * @param int|null $visibility
-     * @return array
-     */
-    public function get_sharers(int $itemid, string $component, ?int $visibility = share_model::VISIBILITY_VISIBLE): array {
-        $builder = builder::table(share::TABLE, 's')
-            ->select('u.*')
-            ->join([share_recipient::TABLE, 'sr'], function (builder $joining) {
-                $joining
-                    ->where_raw('sr.shareid = s.id')
-                    ->where_raw('sr.sharerid != s.ownerid');
-            })
-            ->join(['user', 'u'], 'sr.sharerid', '=', 'u.id')
-            ->where('s.itemid', $itemid)
-            ->where('s.component', $component)
-            ->where('sr.visibility', $visibility)
-            ->group_by('u.id');
-
-        $sharers = [];
-        foreach ($builder->get() as $sharer) {
-            if (access_controller::for($sharer)->can_view_profile()) {
-                $sharers[] = $sharer;
-            }
-        }
-        return $sharers;
-    }
-
-    /**
      * Get the total number of recipients for this item.
      *
      * @param int $itemid
