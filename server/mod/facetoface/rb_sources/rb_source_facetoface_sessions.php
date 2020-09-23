@@ -240,6 +240,8 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 'sessions.details',
                 array(
                     'joins' => 'sessions',
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
                     'displayfunc' => 'editor_textarea',
                     'extrafields' => array(
                         'filearea' => '\'session\'',
@@ -248,8 +250,6 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                         'context' => '\'context_module\'',
                         'recordid' => 'sessions.facetoface'
                     ),
-                    'dbdatatype' => 'text',
-                    'outputformat' => 'text'
                 )
             ),
             new rb_column_option(

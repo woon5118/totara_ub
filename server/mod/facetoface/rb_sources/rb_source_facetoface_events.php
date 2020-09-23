@@ -258,7 +258,18 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
                 'details',
                 get_string('sessdetails', 'rb_source_facetoface_sessions'),
                 'base.details',
-                array('displayfunc' => 'format_string')
+                array(
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
+                    'displayfunc' => 'editor_textarea',
+                    'extrafields' => array(
+                        'filearea' => '\'session\'',
+                        'component' => '\'mod_facetoface\'',
+                        'fileid' => 'base.id',
+                        'context' => '\'context_module\'',
+                        'recordid' => 'base.facetoface'
+                    ),
+                )
             ),
             new rb_column_option(
                 'session',

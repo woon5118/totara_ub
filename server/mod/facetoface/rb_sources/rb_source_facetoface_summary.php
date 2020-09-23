@@ -277,7 +277,17 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
                 get_string('sessdetails', 'rb_source_facetoface_sessions'),
                 'sessions.details',
                 array('joins' => 'sessions',
-                      'displayfunc' => 'format_text')
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
+                    'displayfunc' => 'editor_textarea',
+                    'extrafields' => array(
+                        'filearea' => '\'session\'',
+                        'component' => '\'mod_facetoface\'',
+                        'fileid' => 'sessions.id',
+                        'context' => '\'context_module\'',
+                        'recordid' => 'sessions.facetoface'
+                    ),
+                )
             ),
             new rb_column_option(
                 'session',

@@ -143,3 +143,29 @@ Feature: Check the seminar events and sessions reports display correctly
       | Test seminar name | Course 1    | 31 December           | 10:00 PM              | Timezone: America/Toronto | 31 December            | 11:00 PM               | Timezone: America/Toronto |
     And I should see date "31 December this year 10:00PM America/Toronto" formatted "%d %B %Y, %I:%M %p"
     And I should see date "31 December this year 11:00PM America/Toronto" formatted "%d %B %Y, %I:%M %p"
+
+  Scenario: Seminar events and sessions reports should display FORMAT_JSON_EDITOR data correctly
+    Given the following "seminar events" exist in "mod_facetoface" plugin:
+      | facetoface         | details |
+      | Test seminar name  | {"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","marks":[{"type":"link","attrs":{"href":"https://www.totaralearning.com/products"}}],"text":"Test JSON"}]}]} |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | start | finish |
+      | {"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","marks":[{"type":"link","attrs":{"href":"https://www.totaralearning.com/products"}}],"text":"Test JSON"}]}]} | 3 Mar, +1 year 3am | 3 Mar, +1 year 3pm |
+    When I navigate to "Events report" node in "Site administration > Seminars"
+    And I press "Edit this report"
+    And I switch to "Columns" tab
+    And I add the "Event Details" column to the report
+    And I press "Save changes"
+    When I click on "View This Report" "link"
+    Then "Test JSON" "link" should exist
+    But I should not see "https://www.totaralearning.com/products"
+    And I should not see "paragraph"
+    And I follow "Sessions view"
+    And I press "Edit this report"
+    And I switch to "Columns" tab
+    And I add the "Event Details" column to the report
+    And I press "Save changes"
+    When I click on "View This Report" "link"
+    Then "Test JSON" "link" should exist
+    But I should not see "https://www.totaralearning.com/products"
+    And I should not see "paragraph"
