@@ -13,27 +13,26 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
   @module totara_competency
 -->
 
 <template>
-  <Loader :loading="$apollo.loading">
-    <div class="tui-competencyDetail">
-      <template v-if="data.competency">
-        <!-- User details, back link and page title -->
-        <div class="tui-competencyDetail__header">
-          <MiniProfileCard
-            v-if="user && !isMine"
-            :display="user.card_display"
-          />
-          <div>
-            <a :href="goBackLink">
-              {{ goBackText }}
-            </a>
-          </div>
-          <PageHeading :title="data.competency.fullname" />
-        </div>
+  <Layout
+    :loading="$apollo.loading"
+    :title="data.competency ? data.competency.fullname : ''"
+    class="tui-competencyDetail"
+  >
+    <template v-if="user && !isMine" v-slot:user-overview>
+      <MiniProfileCard :display="user.card_display" />
+    </template>
 
+    <template v-slot:content-nav>
+      <PageBackLink :link="goBackLink" :text="goBackText" />
+    </template>
+
+    <template v-if="data.competency" v-slot:content>
+      <div class="tui-competencyDetail__content">
         <!-- Competency description & archived / activity log button -->
         <Grid :stack-at="700">
           <GridItem :units="7">
@@ -93,8 +92,10 @@
             />
           </div>
         </div>
-      </template>
+      </div>
+    </template>
 
+    <template v-slot:modals>
       <!-- Activity log modal -->
       <ModalPresenter
         :open="activityLogModalOpen"
@@ -117,8 +118,8 @@
           />
         </Modal>
       </ModalPresenter>
-    </div>
-  </Loader>
+    </template>
+  </Layout>
 </template>
 
 <script>
@@ -130,11 +131,11 @@ import Assignment from 'totara_competency/components/details/Assignment';
 import Button from 'tui/components/buttons/Button';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
-import Loader from 'tui/components/loading/Loader';
+import Layout from 'tui/components/layouts/LayoutOneColumn';
 import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import Modal from 'tui/components/modal/Modal';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
-import PageHeading from 'tui/components/layouts/PageHeading';
+import PageBackLink from 'tui/components/layouts/PageBackLink';
 import Progress from 'totara_competency/components/details/Progress';
 import { notify } from 'tui/notifications';
 // GraphQL
@@ -150,11 +151,11 @@ export default {
     Button,
     Grid,
     GridItem,
-    Loader,
+    Layout,
     MiniProfileCard,
     Modal,
     ModalPresenter,
-    PageHeading,
+    PageBackLink,
     Progress,
   },
 
@@ -416,18 +417,13 @@ export default {
 
 <style lang="scss">
 .tui-competencyDetail {
-  & > * + * {
-    margin-top: var(--gap-2);
-  }
-
-  &__header {
+  &__content {
     & > * + * {
-      margin-top: var(--gap-2);
+      margin-top: var(--gap-6);
     }
   }
 
   &__body {
-    margin-top: var(--gap-6);
     border-top: 1px solid var(--color-neutral-5);
 
     &-title {
@@ -446,10 +442,6 @@ export default {
       margin-top: var(--gap-4);
       margin-left: var(--gap-2);
     }
-  }
-
-  &__description {
-    @include tui-font-body();
   }
 }
 
