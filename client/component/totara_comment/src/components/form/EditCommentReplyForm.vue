@@ -18,6 +18,10 @@
 <template>
   <Form class="tui-editCommentReplyForm">
     <template v-if="!$apollo.loading">
+      <UnsavedChangesWarning
+        v-if="!content.isEmpty && !submitting"
+        :value="content"
+      />
       <Weka
         v-if="!$apollo.queries.editorOption.loading"
         v-model="content"
@@ -47,6 +51,8 @@ import Form from 'tui/components/form/Form';
 import { SIZE_SMALL, isValid } from 'totara_comment/size';
 import SubmitCancelButtonsGroup from 'totara_comment/components/form/group/SubmitCancelButtonsGroup';
 
+import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
+
 // GraphQL query
 import getDraftItem from 'totara_comment/graphql/get_draft_item';
 import getEditorWeka from 'totara_comment/graphql/get_editor_weka';
@@ -56,6 +62,7 @@ export default {
     Weka,
     Form,
     SubmitCancelButtonsGroup,
+    UnsavedChangesWarning,
   },
 
   apollo: {

@@ -18,6 +18,10 @@
 <template>
   <ResponseBox class="tui-commentForm">
     <Form class="tui-commentForm__form">
+      <UnsavedChangesWarning
+        v-if="!content.isEmpty && !submitting"
+        :value="content"
+      />
       <!--
         The editor has to be constructed once the editor options have been finished fetching.
         So that it can be constructed with the provided editor options.
@@ -62,6 +66,8 @@ import { FORMAT_JSON_EDITOR } from 'tui/format';
 import { SIZE_SMALL, isValid } from 'totara_comment/size';
 import ResponseBox from 'totara_comment/components/form/box/ResponseBox';
 
+import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
+
 // GraphQL queries
 import getEditorWeka from 'totara_comment/graphql/get_editor_weka';
 import fileDraftId from 'core/graphql/file_unused_draft_item_id';
@@ -73,6 +79,7 @@ export default {
     ButtonGroup,
     Button,
     ResponseBox,
+    UnsavedChangesWarning,
   },
 
   props: {

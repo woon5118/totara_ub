@@ -19,6 +19,10 @@
   <Form class="tui-editArticleContentForm">
     <!-- Loader is for preventing user from typing when the editor is being initialised -->
     <Loader :fullpage="true" :loading="!editorMounted" />
+    <UnsavedChangesWarning
+      v-if="!content.isEmpty && !submitting"
+      :value="content"
+    />
     <Weka
       v-if="!$apollo.loading"
       v-model="content"
@@ -41,20 +45,24 @@
 
 <script>
 import Form from 'tui/components/form/Form';
+import Loader from 'tui/components/loading/Loader';
+
 import Weka from 'editor_weka/components/Weka';
 import WekaValue from 'editor_weka/WekaValue';
+
 import DoneCancelGroup from 'totara_engage/components/buttons/DoneCancelGroup';
-import Loader from 'tui/components/loading/Loader';
+import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
 
 // GraphQL queries
 import getDraftItem from 'engage_article/graphql/draft_item';
 
 export default {
   components: {
-    Form,
-    Weka,
     DoneCancelGroup,
+    Form,
     Loader,
+    UnsavedChangesWarning,
+    Weka,
   },
 
   props: {

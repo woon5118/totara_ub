@@ -8,6 +8,8 @@ exports[`totara_comment/components/form/CommentForm.vue Checks snapshot 1`] = `
     class="tui-commentForm__form"
     inputwidth="limited"
   >
+    <!---->
+     
     <weka-stub
       area="comment"
       class="tui-commentForm__form__editor"

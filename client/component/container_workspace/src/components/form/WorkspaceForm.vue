@@ -37,6 +37,10 @@
         >
           <template v-slot:default="{ id }">
             <div class="tui-workspaceForm__container__inputs__formRow__editor">
+              <UnsavedChangesWarning
+                v-if="!description.isEmpty && !submitting"
+                :value="description"
+              />
               <Weka
                 :id="id"
                 v-model="description"
@@ -184,6 +188,7 @@ import InputText from 'tui/components/form/InputText';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import Button from 'tui/components/buttons/Button';
 import LoadingButton from 'totara_engage/components/buttons/LoadingButton';
+import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
 import Weka from 'editor_weka/components/Weka';
 import WekaValue from 'editor_weka/WekaValue';
 import SpaceImagePicker from 'container_workspace/components/form/upload/SpaceImagePicker';
@@ -209,6 +214,7 @@ export default {
     Radio,
     Checkbox,
     InfoIconButton,
+    UnsavedChangesWarning,
   },
 
   props: {

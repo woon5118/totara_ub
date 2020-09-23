@@ -39,6 +39,10 @@
     </InlineEditing>
 
     <Form v-else>
+      <UnsavedChangesWarning
+        v-if="!content.isEmpty && !submitting"
+        :value="content"
+      />
       <Weka
         v-model="content"
         component="totara_playlist"
@@ -64,6 +68,7 @@ import WekaValue from 'editor_weka/WekaValue';
 
 import DoneCancelGroup from 'totara_engage/components/buttons/DoneCancelGroup';
 import InlineEditing from 'totara_engage/components/form/InlineEditing';
+import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
 import getPlaylist from 'totara_playlist/graphql/get_playlist_raw';
 import updatePlaylist from 'totara_playlist/graphql/update_playlist_summary';
 
@@ -72,6 +77,7 @@ export default {
     DoneCancelGroup,
     InlineEditing,
     Weka,
+    UnsavedChangesWarning,
   },
 
   props: {

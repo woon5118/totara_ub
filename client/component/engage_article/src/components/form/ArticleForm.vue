@@ -45,6 +45,10 @@
         class="tui-articleForm__description-formRow"
         :is-stacked="false"
       >
+        <UnsavedChangesWarning
+          v-if="!content.isEmpty && !submitting"
+          :value="content"
+        />
         <Weka
           v-if="draftId"
           :id="id"
@@ -90,6 +94,8 @@ import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
 import InfoIconButton from 'tui/components/buttons/InfoIconButton';
 
+import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
+
 // GraphQL queries
 import fileDraftId from 'core/graphql/file_unused_draft_item_id';
 
@@ -103,6 +109,7 @@ export default {
     Form,
     FormRow,
     InfoIconButton,
+    UnsavedChangesWarning,
   },
 
   props: {

@@ -82,19 +82,6 @@ export default {
       submitting: false,
     };
   },
-
-  watch: {
-    editing: {
-      handler() {
-        if (this.editing) {
-          window.addEventListener('beforeunload', this.$_unloadHandler);
-        } else {
-          window.removeEventListener('beforeunload', this.$_unloadHandler);
-        }
-      },
-    },
-  },
-
   mounted() {
     this.$_scan();
   },
@@ -104,21 +91,6 @@ export default {
   },
 
   methods: {
-    $_unloadHandler(event) {
-      // Cancel the event as stated by the standard.
-      event.preventDefault();
-
-      // For older browsers that still show custom message.
-      const discardUnsavedChanges = this.$str(
-        'unsaved_changes_warning',
-        'totara_engage'
-      );
-
-      // Chrome requires returnValue to be set.
-      event.returnValue = discardUnsavedChanges;
-
-      return discardUnsavedChanges;
-    },
     $_scan() {
       this.$nextTick().then(() => {
         let content = this.$refs.content;
@@ -172,14 +144,6 @@ export default {
   },
 };
 </script>
-
-<lang-strings>
-  {
-    "totara_engage": [
-      "unsaved_changes_warning"
-    ]
-  }
-</lang-strings>
 
 <style lang="scss">
 .tui-articleContent {

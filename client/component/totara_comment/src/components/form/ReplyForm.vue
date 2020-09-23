@@ -18,6 +18,10 @@
 <template>
   <ResponseBox class="tui-replyForm">
     <Form class="tui-replyForm__form">
+      <UnsavedChangesWarning
+        v-if="!content.isEmpty && !submitting"
+        :value="content"
+      />
       <Weka
         v-if="!$apollo.queries.editorOption.loading && draftId"
         v-model="content"
@@ -53,6 +57,8 @@ import { createMentionContent } from 'editor_weka/helpers/mention';
 import { isValid, SIZE_SMALL } from 'totara_comment/size';
 import ResponseBox from 'totara_comment/components/form/box/ResponseBox';
 
+import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
+
 // GraphQL queries
 import getEditorWeka from 'totara_comment/graphql/get_editor_weka';
 import fileDraftId from 'core/graphql/file_unused_draft_item_id';
@@ -63,6 +69,7 @@ export default {
     Form,
     SubmitCancelButtonsGroup,
     ResponseBox,
+    UnsavedChangesWarning,
   },
 
   props: {

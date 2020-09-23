@@ -23,6 +23,10 @@
       :label="$str('discussion', 'container_workspace')"
       :required="true"
     >
+      <UnsavedChangesWarning
+        v-if="!formContent.isEmpty && !submitting"
+        :value="formContent"
+      />
       <WekaEditor
         v-if="!$apollo.queries.draftId.loading"
         :id="id"
@@ -60,9 +64,13 @@ import FormRow from 'tui/components/form/FormRow';
 import Form from 'tui/components/form/Form';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import CancelButton from 'tui/components/buttons/Cancel';
+
 import LoadingButton from 'totara_engage/components/buttons/LoadingButton';
+import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
+
 import WekaEditor from 'editor_weka/components/Weka';
 import WekaValue from 'editor_weka/WekaValue';
+
 import { FORMAT_JSON_EDITOR } from 'tui/format';
 import { uniqueId } from 'tui/util';
 
@@ -76,6 +84,7 @@ export default {
     ButtonGroup,
     CancelButton,
     LoadingButton,
+    UnsavedChangesWarning,
     WekaEditor,
   },
 
