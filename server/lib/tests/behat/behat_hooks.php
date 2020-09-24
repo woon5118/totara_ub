@@ -497,6 +497,10 @@ class behat_hooks extends behat_base {
         } catch (Exception $e) {
             throw new Exception('Cannot set main window name', 0, $e);
         }
+
+        if ($this->running_javascript()) {
+            $this->getSession()->evaluateScript('function(){ localStorage.clear(); }();');
+        }
     }
 
     /**

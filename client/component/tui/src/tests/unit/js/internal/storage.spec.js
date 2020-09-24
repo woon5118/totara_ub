@@ -16,10 +16,10 @@
  * @module tui
  */
 
-import { WebStorageStore } from 'tui/internal/storage';
+import { WebStorageStore } from 'tui/storage';
 import { config } from 'tui/config';
 
-jest.unmock('tui/internal/storage');
+jest.unmock('tui/storage');
 
 let mockData = [];
 const storageMock = {

@@ -61,7 +61,7 @@
             :sticky="!onSmallScreen"
             :grow-height-on-scroll="!onSmallScreen"
             :show-button-control="true"
-            :initially-open="!onSmallScreen"
+            :initially-open="sidePanelIsOpen"
             :overflows="false"
             @sidepanel-expanding="expandRequest"
             @sidepanel-collapsing="collapseRequest"
@@ -84,6 +84,8 @@ import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import Responsive from 'tui/components/responsive/Responsive';
 import SidePanel from 'tui/components/sidepanel/SidePanel';
+import { WebStorageStore } from 'tui/storage';
+const storage = new WebStorageStore('engage', window.localStorage);
 
 export default {
   components: {
@@ -178,6 +180,19 @@ export default {
         this.currentBoundaryName === 'small'
       );
     },
+  },
+  watch: {
+    sidePanelIsOpen(val) {
+      storage.set('sidepanel', { isOpen: val });
+    },
+  },
+  mounted() {
+    let state = !this.onSmallScreen;
+    const sidePanelState = storage.get('sidepanel');
+    if (sidePanelState) {
+      state = sidePanelState.isOpen;
+    }
+    this.sidePanelIsOpen = state;
   },
   methods: {
     /**

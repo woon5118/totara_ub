@@ -17,7 +17,7 @@
  */
 
 import { config } from '../config';
-import { WebStorageStore } from './storage';
+import { WebStorageStore } from '../storage';
 
 const storage = new WebStorageStore('cache', window.localStorage, {
   rev: true,

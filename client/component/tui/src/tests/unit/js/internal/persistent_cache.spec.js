@@ -16,7 +16,7 @@
  * @module tui
  */
 
-import { WebStorageStore } from 'tui/internal/storage';
+import { WebStorageStore } from 'tui/storage';
 import { cacheGet, cacheSet, cacheDelete } from 'tui/internal/persistent_cache';
 import { config } from 'tui/config';
 

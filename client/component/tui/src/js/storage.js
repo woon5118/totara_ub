@@ -16,7 +16,7 @@
  * @module tui
  */
 
-import { config } from '../config';
+import { config } from './config';
 
 /* istanbul ignore next */
 class Store {

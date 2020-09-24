@@ -18,7 +18,7 @@
 
 import { config } from '@vue/test-utils';
 
-jest.mock('tui/internal/storage');
+jest.mock('tui/storage');
 jest.mock('tui/internal/lang_string_store');
 jest.mock('tui/config');
 jest.mock('tui/apollo_client', () => null);

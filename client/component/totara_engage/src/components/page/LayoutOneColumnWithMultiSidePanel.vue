@@ -113,7 +113,7 @@ This layout is capable of the following:
                   :sticky="rightSticky"
                   :limit-height="rightSidePanelLimitHeight"
                   :grow-height-on-scroll="rightGrowHeightOnScroll"
-                  :initially-open="rightSidePanelInitiallyOpen"
+                  :initially-open="rightSidePanelIsOpen"
                   :overflows="rightSidePanelOverflows"
                   :show-button-control="showRightSidePanelControl"
                   @sidepanel-expanding="expandRightRequest"
@@ -141,6 +141,8 @@ import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import Responsive from 'tui/components/responsive/Responsive';
 import SidePanel from 'tui/components/sidepanel/SidePanel';
+import { WebStorageStore } from 'tui/storage';
+const storage = new WebStorageStore('engage', window.localStorage);
 
 export default {
   components: {
@@ -451,8 +453,18 @@ export default {
         }
       },
     },
+    rightSidePanelIsOpen(val) {
+      storage.set('sidepanel', { isOpen: val });
+    },
   },
-
+  mounted() {
+    let state = this.rightSidePanelInitiallyOpen;
+    const sidePanelState = storage.get('sidepanel');
+    if (sidePanelState) {
+      state = sidePanelState.isOpen;
+    }
+    this.rightSidePanelIsOpen = state;
+  },
   methods: {
     /**
      * Handles responsive resizing which wraps the grid layout for this page
