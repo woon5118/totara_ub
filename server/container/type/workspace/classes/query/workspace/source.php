@@ -178,7 +178,7 @@ final class source implements option {
                 return get_string('all', 'container_workspace');
 
             case static::OWNED:
-                return get_string('owned', 'container_workspace');
+                return get_string('owner', 'container_workspace');
 
             case static::MEMBER:
                 return get_string('member', 'container_workspace');
@@ -187,7 +187,7 @@ final class source implements option {
                 return get_string('member_and_owned', 'container_workspace');
 
             case static::OTHER:
-                return get_string('other', 'container_workspace');
+                return get_string('non_member', 'container_workspace');
 
             default:
                 throw new \coding_exception("Invalid constant value '{$constant}'");
