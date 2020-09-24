@@ -27,7 +27,6 @@ use coding_exception;
 use core\performance_statistics\collector;
 use core\webapi\execution_context;
 use GraphQL\Error\Debug;
-use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\StandardServer;
@@ -116,15 +115,7 @@ class server {
                 $request = new request($this->type);
             }
 
-            // This is here to make sure there's a session initiated
-            if ($this->type !== graphql::TYPE_DEV
-                && !NO_MOODLE_COOKIES
-                && !confirm_sesskey($_SERVER['HTTP_X_TOTARA_SESSKEY'] ?? null)
-            ) {
-                $exception = new webapi_request_exception('Invalid sesskey, page reload required');
-
-                throw new client_aware_exception($exception, ['category' => 'require_login']);
-            }
+            $this->ensure_session_initiated();
 
             $request->validate();
 
@@ -157,6 +148,25 @@ class server {
         }
 
         return $result;
+    }
+
+    /**
+     * Ensures the session is initiated.
+     *
+     * @return void
+    */
+    private function ensure_session_initiated() {
+        if ($this->type !== graphql::TYPE_DEV
+            && !NO_MOODLE_COOKIES
+            && !confirm_sesskey($_SERVER['HTTP_X_TOTARA_SESSKEY'] ?? null)
+        ) {
+            $exception = new webapi_request_exception('Invalid sesskey, page reload required');
+            $category = isloggedin()
+                ? 'require_refresh'
+                : 'require_login';
+
+            throw new client_aware_exception($exception, ['category' => $category]);
+        }
     }
 
     /**

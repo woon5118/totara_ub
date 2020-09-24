@@ -16,12 +16,8 @@
  * @module tui
  */
 
-import Vue from 'vue';
-import { showModal } from './internal/modal';
+import { showErrorInfo } from './internal/error_info';
 import { langString } from './i18n';
-
-let displayedErrors = null;
-let activeModal = null;
 
 /**
  * @typedef {Object} ErrorInfo
@@ -65,6 +61,10 @@ export function vueApolloErrorHandler(error, vm, key, type, lastOptions) {
     lastOptions && lastOptions.query && getOperationName(lastOptions.query);
 
   const componentName = vm && getComponentName(vm);
+
+  if (!hasUnhandledErrors(error.graphQLErrors) && error.networkError === null) {
+    return false;
+  }
 
   const graphQLErrors = getGraphQLErrors(error);
 
@@ -121,43 +121,6 @@ export function vueApolloErrorHandler(error, vm, key, type, lastOptions) {
 }
 
 /**
- * Display the provided ErrorInfo[] to the user.
- *
- * @param {ErrorInfo[]} errors
- */
-async function showErrorInfo(errors) {
-  if (!displayedErrors) {
-    displayedErrors = Vue.observable([]);
-  }
-  errors = errors.filter(x => !displayedErrors.some(y => errorInfoEqual(x, y)));
-  if (errors.length === 0) return;
-  errors.forEach(x => displayedErrors.push(x));
-  showErrorModal();
-}
-
-/**
- * Show error modal
- */
-function showErrorModal() {
-  if (activeModal) {
-    return;
-  } else {
-    activeModal = showModal({
-      component: tui.defaultExport(
-        tui.require('tui/components/errors/ErrorModal')
-      ),
-      props: {
-        errors: displayedErrors,
-      },
-      onClose() {
-        displayedErrors = null;
-        activeModal = null;
-      },
-    });
-  }
-}
-
-/**
  * Get error info from a JS error.
  *
  * @param {Error} error
@@ -181,17 +144,6 @@ function extractErrorInfo(error, vm) {
 }
 
 /**
- * Check if two ErrorInfo object are identical.
- *
- * @param {ErrorInfo} x
- * @param {ErrorInfo} y
- * @returns {boolean}
- */
-function errorInfoEqual(x, y) {
-  return JSON.stringify(x) === JSON.stringify(y);
-}
-
-/**
  * Format a PHP stack trace from the GraphQL API for display.
  *
  * @param {Array<{ call: string, file: string, line: number}>} trace
@@ -211,7 +163,7 @@ function formatPhpStack(trace) {
  */
 function getGraphQLErrors(error) {
   if (error.graphQLErrors && error.graphQLErrors.length > 0) {
-    return error.graphQLErrors;
+    return error.graphQLErrors.filter(error => error.handled !== true);
   }
 
   // sometimes a graphql-error-like object is returned for critical server errors
@@ -252,4 +204,20 @@ function getComponentName(vm) {
     name = match && match[1];
   }
   return name ? `<${name}>` : `<Anonymous>`;
+}
+
+/**
+ * Checks if all graphql errors have been handled.
+ *
+ * @param {Array} graphQLErrors.
+ * @returns {Boolean}
+ */
+function hasUnhandledErrors(graphQLErrors) {
+  let hasUnhandledError = false;
+
+  if (graphQLErrors && graphQLErrors.length > 0) {
+    hasUnhandledError = graphQLErrors.some(error => error.handled !== true);
+  }
+
+  return hasUnhandledError;
 }

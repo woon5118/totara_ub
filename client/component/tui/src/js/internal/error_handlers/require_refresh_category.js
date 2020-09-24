@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Totara Enterprise Extensions.
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -12,17 +12,22 @@
  * LTD, you may not access, use, modify, or distribute this software.
  * Please contact [licensing@totaralearning.com] for more information.
  *
- * @author Arshad Anwer <arshad.anwer@totaralearning.com>
+ * @author Kunle Odusan <kunle.odusan@totaralearning.com>
  * @module tui
  */
 
-import { onError } from 'apollo-link-error';
-import { handleDefinedCategoryErrors } from '../error_handlers/handler';
+import { showSessionExpiredModal } from '../error_info';
 
-export const createErrorLink = () => {
-  return onError(payload => {
-    if (payload.graphQLErrors) {
-      handleDefinedCategoryErrors(payload);
+export default {
+  name: 'require_refresh',
+
+  process(graphQLErrors) {
+    let refreshCategory = graphQLErrors.find(
+      x => x.extensions && x.extensions.category === this.name
+    );
+
+    if (refreshCategory) {
+      showSessionExpiredModal(this.name);
     }
-  });
+  },
 };
