@@ -22,15 +22,15 @@
       {
         "type": "link_media",
         "attrs": {
-          "url": "https:\/\/via.placeholder.com\/350x150.png"
+          "url": "https:\/\/example.com\/second-image.png"
         }
       },
       {
         "type": "link_media",
         "attrs": {
-          "url": "https:\/\/www.youtube.com\/watch?v=1",
+          "url": "https:\/\/example.com\/watch?v=1",
           "loading": false,
-          "image": "https:\/\/i.ytimg.com\/vi\/1\/maxresdefault.jpg",
+          "image": "https:\/\/example.com\/sample-image.jpg",
           "title": "Example Video",
           "description": "An example video",
           "resolution": {
@@ -56,7 +56,7 @@
       {
         "type": "link_media",
         "attrs": {
-          "url": "https:\/\/via.placeholder.com\/350x150.png"
+          "url": "https:\/\/example.com\/second-image.png"
         }
       },
       {
@@ -70,9 +70,9 @@
       {
         "type": "link_media",
         "attrs": {
-          "url": "https:\/\/www.youtube.com\/watch?v=1",
+          "url": "https:\/\/example.com\/watch?v=1",
           "loading": false,
-          "image": "https:\/\/i.ytimg.com\/vi\/1\/maxresdefault.jpg",
+          "image": "https:\/\/example.com\/sample-image.jpg",
           "title": "Example Video",
           "description": "An example video",
           "resolution": {
@@ -98,9 +98,9 @@
       {
         "type": "link_media",
         "attrs": {
-          "url": "https:\/\/www.youtube.com\/watch?v=1",
+          "url": "https:\/\/example.com\/watch?v=1",
           "loading": false,
-          "image": "https:\/\/i.ytimg.com\/vi\/1\/maxresdefault.jpg",
+          "image": "https:\/\/example.com\/sample-image.jpg",
           "title": "Example Video",
           "description": "An example video",
           "resolution": {
@@ -112,7 +112,7 @@
       {
         "type": "link_media",
         "attrs": {
-          "url": "https:\/\/via.placeholder.com\/350x150.png"
+          "url": "https:\/\/example.com\/second-image.png"
         }
       },
       {
@@ -140,7 +140,7 @@
       {
         "type": "link_media",
         "attrs": {
-          "url": "https:\/\/www.youtube.com\/watch?v=1",
+          "url": "https:\/\/example.com\/watch?v=1",
           "loading": false,
           "image": null,
           "title": "Example Video",

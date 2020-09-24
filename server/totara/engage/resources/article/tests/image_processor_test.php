@@ -45,14 +45,14 @@ class engage_article_image_processor_testcase extends advanced_testcase {
         $first_node = $processor->find_first_valid_image_node($document);
         $this->assertInstanceOf('core\json_editor\node\link_media', $first_node);
         $info = $first_node->get_info();
-        $this->assertEquals('https://via.placeholder.com/350x150.png', $info['image']);
+        $this->assertEquals('https://example.com/second-image.png', $info['image']);
 
         // Link Media (Video)
         $document = document::create($content['case3']);
         $first_node = $processor->find_first_valid_image_node($document);
         $this->assertInstanceOf('core\json_editor\node\link_media', $first_node);
         $info = $first_node->get_info();
-        $this->assertEquals('https://i.ytimg.com/vi/1/maxresdefault.jpg', $info['image']);
+        $this->assertEquals('https://example.com/sample-image.jpg', $info['image']);
 
         // No valid image (bad video)
         $document = document::create($content['case4']);

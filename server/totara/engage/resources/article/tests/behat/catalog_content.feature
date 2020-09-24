@@ -14,10 +14,14 @@ Feature: Article catalog content
       | Details content | 0 |
     And I click on "Save" "button"
 
+    And I follow "Filters"
+    And I set the field "Add another..." to "Topics"
+    And I click on "Save" "button"
+
     And the following "users" exist:
       | username | firstname | lastname | email          |
-      | harry    | Harry     | One      | user1@test.com |
-      | sally    | Sally     | One      | user1@test.com |
+      | harry    | Harry     | One      | user1@example.com |
+      | sally    | Sally     | One      | user2@example.com |
 
     And the following "topics" exist in "totara_topic" plugin:
       | name    |
@@ -30,6 +34,7 @@ Feature: Article catalog content
       | Harry Private Article | harry    | View article 2 | PRIVATE | Topic 1 |
       | Sally Public Article  | sally    | View article 3 | PUBLIC  | Topic 1 |
       | Sally Private Article | sally    | View article 4 | PRIVATE | Topic 1 |
+      | Harry Topic Article   | harry    | View article 5 | PRIVATE | Topic 2 |
 
     And I log out
 
@@ -63,3 +68,15 @@ Feature: Article catalog content
     And I click on "Find Learning" in the totara menu
     Then I should not see "Harry Public Article"
     And I should not see "Resources" in the ".tw-catalog__aside" "css_element"
+
+  Scenario: Test article images work both directly and when a filter is applied
+    Given I log in as "harry"
+    And I click on "Find Learning" in the totara menu
+    Then I should see "Harry Topic Article"
+    And "//div[@class='tw-catalogItemNarrow__image']/div/div[contains(@style, 'engage_article') and contains(@style, 'background-image')]" "xpath_element" should exist
+
+    When I click on "Topic 2" "link" in the "section.tw-selectRegionPanel" "css_element"
+    Then I should see "Harry Topic Article"
+    And I should see "1 items"
+    And "//div[@class='tw-catalogItemNarrow__image']/div/div[contains(@style, 'engage_article') and contains(@style, 'background-image')]" "xpath_element" should exist
+
