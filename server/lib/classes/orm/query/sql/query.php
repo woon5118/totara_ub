@@ -54,14 +54,7 @@ final class query extends sql {
             throw new \coding_exception('Table name can not be empty');
         }
 
-        // Only for non grouped queries we replace select with a single count
-        // to be able to make use of the count_records_sql() method.
-        if ($count_only && empty($this->properties->group_by)) {
-            $select_sql = "COUNT(*) AS mycount";
-            $select_params = [];
-        } else {
-            [$select_sql, $select_params] = select::from_builder($this)->build();
-        }
+        [$select_sql, $select_params] = select::from_builder($this)->build();
 
         // Getting bits of the query.
         [$join_sql, $join_params] = join::from_builder($this)->build();
@@ -109,8 +102,9 @@ final class query extends sql {
 
         $sql = "SELECT {$select_sql} FROM {$first} WHERE {$second}";
 
-        // Special case for grouped queries: wrap it in a another query to get the real count
-        if ($count_only && !empty($group_by_sql)) {
+        // Special case for grouped/count distinct queries: wrap it in a another query to get the real count.
+        // We wrap the actual sql in another query because we want to also taking account of the DISTINCT query.
+        if ($count_only) {
             $sql = "SELECT COUNT(*) FROM ($sql) cnt";
         }
 

@@ -1053,7 +1053,10 @@ class core_orm_builder_sql_testcase extends orm_query_builder_base {
 
         $param_names = array_keys($params);
         $this->assertEquals(['value'], array_values($params));
-        $this->assertEquals("SELECT COUNT(*) AS mycount FROM {{$this->table_name}} \"al\" WHERE 1 = 1 AND \"al\".attr = :{$param_names[0]} HAVING avg(mycount) <> 1", $sql);
+        $this->assertEquals(
+            "SELECT COUNT(*) FROM (SELECT \"al\".whhaaaat FROM {test__qb} \"al\" WHERE 1 = 1 AND \"al\".attr = :{$param_names[0]} HAVING avg(mycount) <> 1) cnt",
+            $sql
+        );
     }
 
     public function test_it_generates_count_sql_with_group_by() {
@@ -1068,14 +1071,61 @@ class core_orm_builder_sql_testcase extends orm_query_builder_base {
 
         $param_names = array_keys($params);
         $this->assertEquals(['value'], array_values($params));
-        $this->assertEquals("SELECT COUNT(*) FROM (SELECT \"al\".whhaaaat FROM {{$this->table_name}} \"al\" WHERE 1 = 1 AND \"al\".attr = :{$param_names[0]} GROUP BY \"al\".grouped HAVING avg(\"al\".val) <> 1) cnt", $sql);
+        $this->assertEquals(
+            "SELECT COUNT(*) FROM (SELECT \"al\".whhaaaat FROM {{$this->table_name}} \"al\" WHERE 1 = 1 AND \"al\".attr = :{$param_names[0]} GROUP BY \"al\".grouped HAVING avg(\"al\".val) <> 1) cnt",
+            $sql
+        );
 
         // Reset group by
         $builder->group_by(null);
         [$sql, $params] = query::from_builder($builder)->build(true);
         $param_names = array_keys($params);
         $this->assertEquals(['value'], array_values($params));
-        $this->assertEquals("SELECT COUNT(*) AS mycount FROM {test__qb} \"al\" WHERE 1 = 1 AND \"al\".attr = :{$param_names[0]} HAVING avg(\"al\".val) <> 1", $sql);
+        $this->assertEquals("SELECT COUNT(*) FROM (SELECT \"al\".whhaaaat FROM {test__qb} \"al\" WHERE 1 = 1 AND \"al\".attr = :{$param_names[0]} HAVING avg(\"al\".val) <> 1) cnt", $sql);
+    }
+
+    public function test_it_generates_count_sql_with_distinct_keyword() {
+        $builder = $this->new_test_where_builder('al')
+            ->select_raw('DISTINCT whhaaaat')
+            ->where('attr', 'value')
+            ->order_by('col');
+
+        [$sql, $params] = query::from_builder($builder)->build(true);
+
+        $param_names = array_keys($params);
+        $this->assertEquals(['value'], array_values($params));
+        $this->assertEquals(
+            "SELECT COUNT(*) FROM (SELECT DISTINCT whhaaaat FROM {{$this->table_name}} \"al\" WHERE 1 = 1 AND \"al\".attr = :{$param_names[0]}) cnt",
+            $sql
+        );
+    }
+
+    public function test_it_generates_count_sql_with_distinct_and_space_keyword() {
+        $builder = $this->new_test_where_builder('john')
+            ->select_raw(" DISTINCT john.cena");
+
+        [$sql,] = query::from_builder($builder)->build(true);
+        $this->assertEquals(
+            "SELECT COUNT(*) FROM (SELECT  DISTINCT john.cena FROM {test__qb} \"john\" WHERE 1 = 1) cnt",
+            $sql
+        );
+    }
+
+    public function test_it_generates_count_sql_with_distinct_in_field() {
+        $builder = $this->new_test_where_builder('al')
+            ->select_raw('distinctive_mushroom')
+            ->where('attr', 'value')
+            ->order_by('col')
+            ->having('avg(val)', '<>', true);
+
+        [$sql, $params] = query::from_builder($builder)->build(true);
+
+        $param_names = array_keys($params);
+        $this->assertEquals(['value'], array_values($params));
+        $this->assertEquals(
+            "SELECT COUNT(*) FROM (SELECT distinctive_mushroom FROM {test__qb} \"al\" WHERE 1 = 1 AND \"al\".attr = :{$param_names[0]} HAVING avg(\"al\".val) <> 1) cnt",
+            $sql
+        );
     }
 
     public function test_it_throws_exception_on_bad_joins() {

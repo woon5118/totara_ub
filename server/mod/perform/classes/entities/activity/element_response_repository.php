@@ -180,7 +180,6 @@ class element_response_repository extends repository {
                 'perform_subject_instance.subject_user_id AS subject_user_id',
                 'perform_participant_instance.participant_source',
                 'perform_participant_instance.participant_id',
-                'perform_participant_instance.id AS participant_instance_id'
             ])
             ->add_select_raw('COALESCE(subject_relationship.can_view, 0) AS subject_can_view')
             ->add_select_raw('COALESCE(subject_relationship.can_answer, 0) AS subject_can_answer');

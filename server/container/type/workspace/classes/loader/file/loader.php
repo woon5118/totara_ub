@@ -163,7 +163,6 @@ final class loader {
 
         // These fields are needed for the type resolver {@see core\webapi\resolver\type\user}.
         $builder->add_select([
-            'u.id AS user_id',
             'u.email AS user_email',
             'u.imagealt AS user_imagealt',
             'u.picture AS user_picture'
