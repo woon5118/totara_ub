@@ -54,6 +54,7 @@
     * image -> alt: string, URL alt text
     * image -> url: string, URL of image
     * image_enabled: bool, image enabled
+    * objecttype: string, type of course item
     * progress_bar_enabled: bool, has progress bar
     * text_placeholders: context for text placeholders
     * text_placeholders -> data_exists: bool, has data
@@ -71,6 +72,7 @@
         "title": "v12",
         "redirecturl": "http:\/\/localhost\/course\/view.php?id=2",
         "featured": 0,
+        "objecttype": "course",
         "image_enabled": true,
         "image": {
             "url": "http:\/\/localhost\/v12\/learn\/pluginfile.php\/1\/course\/defaultimage\/244323205\/Fallout%20Shelter%20app%20logo.png",
@@ -111,6 +113,7 @@
     title="{{{title}}}"
     data-redirect-url={{redirecturl}}
     data-tw-grid-item-toggle=""
+    data-type="{{objecttype}}"
     >
 
     {{#image_enabled}}

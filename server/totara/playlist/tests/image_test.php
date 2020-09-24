@@ -178,10 +178,15 @@ class totara_playlist_image_testcase extends advanced_testcase {
      */
     private function get_rgb_at_coords($canvas, array $coords): array {
         $rgb = imagecolorat($canvas, ...$coords);
-        return [
+        $val = [
             ($rgb >> 16) & 0xFF,
             ($rgb >> 8) & 0xFF,
             $rgb & 0xFF,
         ];
+        $transparency = ($rgb & 0x7F000000) >> 24;
+        if ($transparency !== 0) {
+            $val[] = $transparency;
+        }
+        return $val;
     }
 }

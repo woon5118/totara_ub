@@ -291,6 +291,7 @@ export default {
   &__image {
     width: 100%;
     height: 100%;
+    background-color: var(--color-primary);
     background-repeat: no-repeat;
     background-size: cover;
     border-top-left-radius: calc(var(--card-border-radius) - 1px);

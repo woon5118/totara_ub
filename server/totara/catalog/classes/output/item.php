@@ -150,6 +150,7 @@ abstract class item extends template {
         $data = new \stdClass();
         $data->itemid = $object->id;
         $data->featured = !empty($object->featured);
+        $data->objecttype = $object->objecttype;
 
         $titledataholderkey = $provider->get_config('item_title');
         $titledataholders = $provider->get_dataholders(formatter::TYPE_PLACEHOLDER_TITLE);

@@ -65,6 +65,10 @@ $catalog_item_narrow-image_ratio: $catalog_item_narrow-image_height / $catalog_i
     }
   }
 
+  &[data-type=playlist] &__image_ratio_img {
+    background-color: var(--color-primary);
+  }
+
   &__noimage {
     display: block;
     margin-bottom: var(--gap-2);

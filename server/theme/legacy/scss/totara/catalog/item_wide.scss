@@ -90,6 +90,10 @@ $catalog_item_wide-image_ratio: $catalog_item_wide-image_height / $catalog_item_
     }
   }
 
+  &[data-type=playlist] &__image_ratio_img {
+    background-color: var(--color-primary);
+  }
+
   &__progress {
     height: 2rem;
     margin: var(--gap-2) 0;

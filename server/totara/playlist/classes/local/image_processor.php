@@ -41,12 +41,12 @@ final class image_processor {
     const IMAGE_BACKGROUND = [255, 255, 255];
 
     /**
-     * RGB colour code of the default squares (no image)
-     * #99AC3A
+     * RGBA colour code of the default squares (no image)
+     * Transparent
      *
      * @var array
      */
-    const IMAGE_DEFAULT = [153, 172, 58];
+    const IMAGE_DEFAULT = [0, 0, 0, 127];
 
     /**
      * Width x Height of the whole canvas
@@ -317,9 +317,11 @@ final class image_processor {
         $cell_s = static::CELL_SPACING;
 
         $canvas = imagecreatetruecolor($image_w, $image_h);
-        $colour_default = imagecolorallocate($canvas, ...static::IMAGE_DEFAULT);
+        $colour_default = imagecolorallocatealpha($canvas, ...static::IMAGE_DEFAULT);
         imagefill($canvas, 0, 0, $colour_default);
         unset($colour_default);
+
+        $colour_image_background = imagecolorallocate($canvas, ...static::IMAGE_BACKGROUND);
 
         // Process each corner
         $corner = 0;
@@ -365,6 +367,7 @@ final class image_processor {
             $y = $corner <= 1 ? 0 : $cell_h + static::CELL_SPACING;
             // Dest height gets a bit of stretching on the bottom row, to cover for a ugly blank line
             $dest_h = $cell_h + ($corner > 1 ? 1 : 0);
+            imagefilledrectangle($canvas, $x, $y, $x + $cell_w, $y + $cell_h, $colour_image_background);
             imagecopybicubic(
                 $canvas,
                 $cropped_image,
@@ -381,6 +384,8 @@ final class image_processor {
             $corner++;
         }
 
+        unset($colour_image_background);
+
         // Draw a cross over top
         // Technically we're covering a couple of pixels of content, but it hides
         // any weirdness from odd aspect ratios (no funky black lines again)
@@ -388,6 +393,8 @@ final class image_processor {
         imagefilledrectangle($canvas, $cell_w, 0, $cell_w + $cell_s, $image_h, $colour_cross);
         imagefilledrectangle($canvas, 0, $cell_h, $image_w, $cell_h + $cell_s, $colour_cross);
         unset($colour_cross);
+
+        imagesavealpha($canvas, true);
 
         // Capture the raw image content
         ob_start();

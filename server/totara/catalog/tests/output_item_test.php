@@ -114,10 +114,11 @@ class totara_catalog_output_item_testcase extends advanced_testcase {
      *
      * @return array
      */
-    private function get_default_expected_template_data(): array {
+    private function get_default_expected_template_data($providertype): array {
         return [
             'itemid' => 123,
             'featured' => false,
+            'objecttype' => $providertype,
             'title' => 'Test item 1',
             'image_enabled' => true,
             'image' =>
@@ -359,7 +360,7 @@ class totara_catalog_output_item_testcase extends advanced_testcase {
         config::instance()->update($config_changes);
 
         $item_data = $this->get_example_item_data($provider);
-        $expected = array_replace($this->get_default_expected_template_data(), $override_expected);
+        $expected = array_replace($this->get_default_expected_template_data($provider), $override_expected);
         foreach ($expected_removed as $remove_key) {
             unset($expected[$remove_key]);
         }

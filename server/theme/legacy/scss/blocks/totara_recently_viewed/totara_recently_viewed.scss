@@ -293,6 +293,13 @@
     }
   }
 
+  // Playlist specific styles
+  .block-trv-totara_playlist {
+    .block-trv-image {
+      background-color: var(--color-primary);
+    }
+  }
+
   // Title & font things
   .block-trv-title {
     font-weight: bold;
