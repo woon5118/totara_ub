@@ -61,6 +61,7 @@
           :label="$str('sortby', 'moodle')"
           :show-label="true"
           :options="options.sorts"
+          @input="filterChanged"
         />
       </div>
     </template>
