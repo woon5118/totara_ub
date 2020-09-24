@@ -17,36 +17,61 @@
 -->
 <template>
   <div class="tui-spaceCardsGrid">
-    <Grid
-      v-for="({ items: row }, i) in rows"
-      :key="i"
-      :max-units="maxGridUnits"
-      class="tui-spaceCardsGrid__row"
+    <VirtualScroll
+      data-key="index"
+      :data-list="rows"
+      :page-mode="true"
+      :aria-label="$str('workspace_cards_grid', 'container_workspace')"
+      :is-loading="isLoading"
+      @scrollbottom="onScrollToBottom"
     >
-      <GridItem
-        v-for="({ id, url, image, name, interactor }, x) in row"
-        :key="x"
-        :units="workspaceUnits"
-        class="tui-spaceCardsGrid__card"
-      >
-        <OriginalSpaceCard
-          :workspace-id="id"
-          :url="url"
-          :image="image"
-          :title="name"
-          :joined="interactor.joined"
-          :join-able="interactor.can_join"
-          :has-requested-to-join="interactor.has_requested_to_join"
-          :request-to-join-able="interactor.can_request_to_join"
-          :owned="interactor.own"
-          @request-to-join-workspace="
-            $emit('request-to-join-workspace', $event)
-          "
-          @join-workspace="$emit('join-workspace', $event)"
-          @leave-workspace="$emit('leave-workspace', $event)"
-        />
-      </GridItem>
-    </Grid>
+      <template v-slot:item="{ item: row }">
+        <Grid class="tui-spaceCardsGrid__row" :max-units="maxGridUnits">
+          <GridItem
+            v-for="({ id, url, image, name, interactor }, i) in row.items"
+            :key="i"
+            :units="workspaceUnits"
+            class="tui-spaceCardsGrid__row__card"
+          >
+            <OriginalSpaceCard
+              :workspace-id="id"
+              :url="url"
+              :image="image"
+              :title="name"
+              :joined="interactor.joined"
+              :join-able="interactor.can_join"
+              :has-requested-to-join="interactor.has_requested_to_join"
+              :request-to-join-able="interactor.can_request_to_join"
+              :owned="interactor.own"
+              @request-to-join-workspace="
+                $emit('request-to-join-workspace', $event)
+              "
+              @join-workspace="$emit('join-workspace', $event)"
+              @leave-workspace="$emit('leave-workspace', $event)"
+            />
+          </GridItem>
+        </Grid>
+      </template>
+      <template v-slot:footer>
+        <PageLoader :fullpage="false" :loading="isLoading" />
+      </template>
+    </VirtualScroll>
+    <div
+      v-if="loadMoreVisibility"
+      class="tui-spaceCardsGrid__loadMoreContainer"
+    >
+      <div class="tui-spaceCardsGrid__viewedSpaces">
+        <template>
+          {{ $str('vieweditems', 'container_workspace', workspaces.length) }}
+          {{ $str('total_space_x', 'container_workspace', cursor.total) }}
+        </template>
+      </div>
+      <Button
+        class="tui-spaceCardsGrid__loadMore"
+        :text="$str('loadmore', 'container_workspace')"
+        @click="loadMore"
+      />
+    </div>
   </div>
 </template>
 
@@ -55,12 +80,18 @@ import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import { calculateRow } from 'totara_engage/grid';
 import OriginalSpaceCard from 'container_workspace/components/card/OriginalSpaceCard';
+import VirtualScroll from 'tui/components/virtualscroll/VirtualScroll';
+import PageLoader from 'tui/components/loading/Loader';
+import Button from 'tui/components/buttons/Button';
 
 export default {
   components: {
     OriginalSpaceCard,
     Grid,
     GridItem,
+    VirtualScroll,
+    PageLoader,
+    Button,
   },
 
   props: {
@@ -78,9 +109,28 @@ export default {
       type: [Number, String],
       default: 2,
     },
+
+    isLoading: Boolean,
+
+    cursor: {
+      type: Object,
+      default() {
+        return { total: 0, next: '' };
+      },
+    },
+  },
+
+  data() {
+    return {
+      isLoadMoreVisible: false,
+    };
   },
 
   computed: {
+    loadMoreVisibility() {
+      return this.isLoadMoreVisible && this.cursor.next && !this.isLoading;
+    },
+
     rows() {
       return calculateRow(this.workspaces, this.workspacesPerRow);
     },
@@ -94,8 +144,34 @@ export default {
       return Math.floor(this.maxGridUnits / this.workspaceUnits);
     },
   },
+
+  methods: {
+    async onScrollToBottom() {
+      if (this.isLoadMoreVisible) {
+        return;
+      }
+      await this.$emit('loadmoreitems');
+      this.isLoadMoreVisible = true;
+    },
+
+    async loadMore() {
+      await this.$emit('loadmoreitems');
+      this.isLoadMoreVisible = false;
+    },
+  },
 };
 </script>
+
+<lang-strings>
+  {
+    "container_workspace": [
+      "loadmore",
+      "total_space_x",
+      "vieweditems",
+      "workspace_cards_grid"
+    ]
+  }
+</lang-strings>
 
 <style lang="scss">
 .tui-spaceCardsGrid {
@@ -108,6 +184,25 @@ export default {
 
   &__card {
     height: var(--totara-engage-card-height);
+  }
+
+  &__loadMoreContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: var(--gap-6);
+    padding-bottom: var(--gap-8);
+  }
+
+  &__viewedSpaces {
+    display: flex;
+    align-self: center;
+    margin-bottom: var(--gap-1);
+  }
+
+  &__loadMore {
+    display: flex;
+    align-self: center;
   }
 }
 </style>

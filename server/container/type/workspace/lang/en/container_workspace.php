@@ -167,6 +167,7 @@ $string['tagarea_course'] = 'Workspaces';
 $string['to_share_with_workspace'] = 'to share with this workspace';
 $string['total_discussions'] = '{$a} discussion(s)';
 $string['total_member_x'] = '{$a} members';
+$string['total_space_x'] = '{$a} workspaces';
 $string['total_files'] = '{$a} files';
 $string['transfer_ownership'] = 'Transfer ownership';
 $string['transfer_ownership_of_workspace'] = 'Transfer ownership of workspace';
@@ -209,6 +210,7 @@ Anyone can join and participate in Public workspaces.
 
 Private workspaces require approval from the owner to join and content is only visible to members. They can also be hidden from search. To become a member of a hidden workspace, the owner must directly add them.
 ';
+$string['workspace_cards_grid'] = 'Workspace cards grid';
 $string['workspace_updated'] = 'Workspace updated';
 $string['workspace_updated_notification'] = '{$a} workspace had been updated recently';
 $string['workspace_navigation'] = 'Workspace navigation';

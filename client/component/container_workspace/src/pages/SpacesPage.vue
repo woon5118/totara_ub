@@ -23,8 +23,6 @@
   >
     <PageHeading :title="$str('find_spaces', 'container_workspace')" />
 
-    <Loader :loading="$apollo.loading" :fullpage="true" />
-
     <WorkspaceFilter
       :selected-source="inner.selectedSource"
       :selected-sort="inner.selectedSort"
@@ -36,14 +34,16 @@
     />
 
     <SpaceCardsGrid
-      v-if="!$apollo.loading"
       :max-grid-units="12"
       :workspace-units="cardUnits"
       :workspaces="workspace.items"
+      :is-loading="$apollo.queries.workspace.loading"
+      :cursor="workspace.cursor"
       class="tui-spacesPage__grid"
       @join-workspace="joinWorkspace"
       @request-to-join-workspace="requestToJoinWorkspace"
       @leave-workspace="leaveWorkspace"
+      @loadmoreitems="loadMoreItems"
     />
   </Responsive>
 </template>
@@ -52,7 +52,6 @@
 import PageHeading from 'tui/components/layouts/PageHeading';
 import Responsive from 'tui/components/responsive/Responsive';
 import WorkspaceFilter from 'container_workspace/components/filter/WorkspaceFilter';
-import Loader from 'tui/components/loading/Loader';
 import SpaceCardsGrid from 'container_workspace/components/grid/SpaceCardsGrid';
 import { cardGrid } from 'container_workspace/index';
 import apolloClient from 'tui/apollo_client';
@@ -68,7 +67,6 @@ export default {
     WorkspaceFilter,
     PageHeading,
     Responsive,
-    Loader,
   },
 
   props: {
@@ -124,8 +122,11 @@ export default {
   data() {
     return {
       workspace: {
+        cursor: {
+          total: 0,
+          next: null,
+        },
         items: [],
-        cursor: null,
       },
 
       // This is to cache the props inside the page. So that we won't change the props by any accidents.
@@ -278,6 +279,32 @@ export default {
 
             return workspace;
           }),
+        },
+      });
+    },
+
+    async loadMoreItems() {
+      if (!this.workspace.cursor.next) {
+        return;
+      }
+
+      this.$apollo.queries.workspace.fetchMore({
+        variables: {
+          cursor: this.workspace.cursor.next,
+          source: this.inner.selectedSource,
+          sort: this.inner.selectedSort,
+          search_term: this.inner.searchTerm,
+          access: this.inner.selectedAccess,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const oldData = previousResult;
+          const newData = fetchMoreResult;
+          const newList = oldData.workspaces.concat(newData.workspaces);
+
+          return {
+            cursor: newData.cursor,
+            workspaces: newList,
+          };
         },
       });
     },
