@@ -710,17 +710,18 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         /** @var \mod_facetoface\room_list $room */
         $rooms = \mod_facetoface\room_list::from_session($sessiondate->id);
         if (!$rooms->is_empty()) {
-            $dataroom = [];
+            $i = 1;
             foreach ($rooms as $room) {
                 $info = customfield_get_data($room->to_record(), 'facetoface_room', 'facetofaceroom');
-                $dataroom[] = array(get_string('place', 'mod_facetoface'), $room->get_name());
+                $values = array($room->get_name());
                 foreach ($info as $name => $roomdata) {
                     if (!empty($roomdata)) {
-                        $dataroom[] = array($name, $roomdata);
+                        $values[] = $roomdata;
                     }
                 }
+                $data[] = array(get_string('roomnumber', 'mod_facetoface', $i), $values);
+                $i++;
             }
-            $data[] = $dataroom;
         } else {
             $data[] = array(get_string('place', 'mod_facetoface'), get_string('notapplicable', 'facetoface'));
         }
@@ -733,7 +734,11 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
             foreach ($data as $d) {
                 $title = new html_table_cell($d[0]);
                 $title->style = 'font-weight:bold;';
-                $table->data[] = new html_table_row(array($title, $d[1]));
+                if (is_array($d[1])) {
+                    $table->data[] = new html_table_row(array($title, implode('<br>', $d[1])));
+                } else {
+                    $table->data[] = new html_table_row(array($title, $d[1]));
+                }
             }
 
             $result = '<h1>' . get_string('sourcetitle', 'rb_source_facetoface_signin') . '</h1>';
@@ -746,7 +751,13 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
         $result[] = get_string('sourcetitle', 'rb_source_facetoface_signin');
         $result[] = '';
         foreach ($data as $d) {
-            $d[1] = html_to_text($d[1]);
+            if (is_array($d[1])) {
+                $d[1] = implode("\n", array_map(function ($d1) {
+                    return html_to_text($d1);
+                }, $d[1]));
+            } else {
+                $d[1] = html_to_text($d[1]);
+            }
             $result[] = $d;
         }
 

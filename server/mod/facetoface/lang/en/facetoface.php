@@ -1167,6 +1167,7 @@ $string['roommustbebookedtoexternalcalendar'] = 'Note: Please ensure that this r
 $string['roomname'] = 'Room name';
 $string['roomnameedit'] = 'Name';
 $string['roomnameedittoolong'] = 'Room name can only be upto {$a} characters in length';
+$string['roomnumber'] = 'Room {$a}';
 $string['rooms'] = 'Rooms';
 $string['roomshow'] = 'Show to users when choosing a room on the Add/Edit event page';
 $string['roomshown'] = 'Room shown successfully';
