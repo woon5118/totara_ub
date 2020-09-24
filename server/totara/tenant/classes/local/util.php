@@ -24,6 +24,7 @@
 namespace totara_tenant\local;
 
 use context_helper;
+use core\event\tenant_deleted;
 use core\event\user_tenant_membership_changed;
 use core\record\tenant;
 
@@ -401,9 +402,10 @@ final class util {
 
         \context_helper::build_all_paths(true, false);
 
-        \core\event\tenant_deleted::create(
-            ['objectid' => $tenant->id, 'context' => $context]
-        )->trigger();
+        /** @var tenant_deleted $event */
+        $event = tenant_deleted::create(['objectid' => $tenant->id, 'context' => $context]);
+        $event->add_record_snapshot('tenant', $tenant);
+        $event->trigger();
 
         ignore_user_abort($prevignore);
         return true;

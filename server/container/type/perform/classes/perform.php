@@ -52,6 +52,23 @@ class perform extends container implements category_name_provider {
     }
 
     /**
+     * @param int $tenant_category_id
+     * @return int|false
+     */
+    public static function get_category_id_from_tenant_category(int $tenant_category_id) {
+        global $DB;
+
+        $params = [
+            'name' => static::DEFAULT_CATEGORY_NAME,
+            'parent' => $tenant_category_id
+        ];
+
+        return $DB->get_field('course_categories', 'id', $params, IGNORE_MISSING);
+    }
+
+
+
+    /**
      * @inheritDoc
      */
     public static function can_create_instance(int $userid = null, \context_coursecat $context = null): bool {
