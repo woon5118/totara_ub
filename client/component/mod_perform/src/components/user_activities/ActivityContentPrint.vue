@@ -466,7 +466,6 @@ export default {
 
         if (this.viewOnlyReportMode || !this.participantCanAnswer) {
           this.showOtherResponse = true;
-          return;
         }
 
         result.section_element_responses
