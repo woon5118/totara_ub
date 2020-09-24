@@ -30,7 +30,7 @@ function xmldb_mod_forum_premigrate() {
 
     $version = premigrate_get_plugin_version('mod', 'forum');
 
-    if ($version > 2020061500) {
+    if ($version > 2020061501) {
         throw new coding_exception("Invalid plugin (mod_forum) version ($version) for pre-migration");
     }
 
@@ -122,6 +122,10 @@ function xmldb_mod_forum_premigrate() {
         $table = new xmldb_table('forum_posts');
         $field = new xmldb_field('privatereplyto', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'mailnow');
         if ($dbman->field_exists($table, $field)) {
+            $index = new xmldb_index('privatereplyto', XMLDB_INDEX_NOTUNIQUE, ['privatereplyto']);
+            if ($dbman->index_exists($table, $index)) {
+                $dbman->drop_index($table, $index);
+            }
             $dbman->drop_field($table, $field);
         }
 
