@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
-  @module theme_ventura
+  @module totara_engage
 -->
 
 <!--
@@ -27,7 +27,7 @@ This layout is capable of the following:
    totara/samples/tui/components/samples/totara_core/layouts/LayoutOneColumnWithMultiSidePanel.vue
 -->
 <template>
-  <div class="tui-layoutOneColumnWithMultiSidePanel">
+  <div class="tui-engagelayoutOneColumnWithMultiSidePanel">
     <Responsive
       :breakpoints="responsiveBreakpoints"
       @responsive-resize="$_resize"
@@ -46,7 +46,7 @@ This layout is capable of the following:
           <!-- LeftSidePanel -->
           <SidePanel
             ref="sidePanelLeft"
-            class="tui-layoutOneColumnWithMultiSidePanel__leftSidePanel"
+            class="tui-engagelayoutOneColumnWithMultiSidePanel__leftSidePanel"
             direction="ltr"
             :animated="leftAnimated"
             :sticky="leftSticky"
@@ -70,19 +70,19 @@ This layout is capable of the following:
 
         <!-- RightSide -->
         <GridItem
-          class="tui-layoutOneColumnWithMultiSidePanel__outerRight"
+          class="tui-engagelayoutOneColumnWithMultiSidePanel__outerRight"
           :units="gridUnitsOuterRight"
           :grows="true"
         >
           <Grid direction="horizontal">
             <!-- Column -->
             <GridItem
-              class="tui-layoutOneColumnWithMultiSidePanel__column"
+              class="tui-engagelayoutOneColumnWithMultiSidePanel__column"
               :units="gridUnitsInnerLeft"
               :grows="true"
             >
               <div
-                class="tui-layoutOneColumnWithMultiSidePanel__columnContainer"
+                class="tui-engagelayoutOneColumnWithMultiSidePanel__columnContainer"
                 :style="styleInnerLeft"
               >
                 <slot
@@ -102,12 +102,12 @@ This layout is capable of the following:
             >
               <div
                 ref="sidePanelRightContainer"
-                class="tui-layoutOneColumnWithMultiSidePanel__rightSidePanelContainer"
+                class="tui-engagelayoutOneColumnWithMultiSidePanel__rightSidePanelContainer"
                 :style="styleInnerRight"
               >
                 <SidePanel
                   ref="sidePanelRight"
-                  class="tui-layoutOneColumnWithMultiSidePanel__rightSidePanel"
+                  class="tui-engagelayoutOneColumnWithMultiSidePanel__rightSidePanel"
                   direction="rtl"
                   :animated="rightAnimated"
                   :sticky="rightSticky"
@@ -484,14 +484,14 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-layoutOneColumnWithMultiSidePanel,
+.tui-engagelayoutOneColumnWithMultiSidePanel,
 > .tui-responsive,
 > .tui-grid,
 > .tui-grid-item {
   transition: flex-basis ease-in 0.3s;
 }
 
-.tui-layoutOneColumnWithMultiSidePanel {
+.tui-engagelayoutOneColumnWithMultiSidePanel {
   &__outerRight {
     position: relative;
   }

@@ -18,7 +18,7 @@
 
 <template>
   <div class="tui-libraryView">
-    <LayoutOneColumnWithMultiSidePanel
+    <Layout
       :breakpoints="libraryBreakpoints"
       :boundaries="libraryBoundaries"
       default-boundary="l"
@@ -76,12 +76,12 @@
         />
       </template>
       <!-- /sidePanelRight -->
-    </LayoutOneColumnWithMultiSidePanel>
+    </Layout>
   </div>
 </template>
 
 <script>
-import LayoutOneColumnWithMultiSidePanel from 'tui/components/layouts/LayoutOneColumnWithMultiSidePanel';
+import Layout from 'totara_engage/components/page/LayoutOneColumnWithMultiSidePanel';
 import NavigationPanel from 'totara_engage/components/sidepanel/NavigationPanel';
 
 // Mixins
@@ -92,7 +92,7 @@ const has = Object.prototype.hasOwnProperty;
 
 export default {
   components: {
-    LayoutOneColumnWithMultiSidePanel,
+    Layout,
     NavigationPanel,
   },
 
@@ -215,7 +215,7 @@ export default {
 
   /* Vertical grid styles */
   .tui-grid--vertical {
-    .tui-layoutOneColumnWithMultiSidePanel__leftSidePanel {
+    .tui-Layout__leftSidePanel {
       .tui-sidePanel__inner {
         background-color: unset;
         border: unset;

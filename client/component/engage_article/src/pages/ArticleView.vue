@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import Layout from 'tui/components/layouts/LayoutOneColumnContentWithSidePanel';
+import Layout from 'totara_engage/components/page/LayoutOneColumnContentWithSidePanel';
 import Loader from 'tui/components/loading/Loader';
 
 import ArticleSidePanel from 'engage_article/components/sidepanel/ArticleSidePanel';

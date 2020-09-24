@@ -12,18 +12,16 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Dave Wallace <dave.wallace@totaralearning.com>
   @author Alvin Smith <alvin.smith@totaralearning.com>
-  @module totara_core
+  @module totara_engage
 -->
 
 <template>
   <div
-    class="tui-layoutOneColumnWithSidepanel"
+    class="tui-engagelayoutOneColumnContentWithSidepanel"
     :class="{
-      'tui-layoutOneColumnWithSidepanel--fullSidePanel':
+      'tui-engagelayoutOneColumnContentWithSidepanel-fullSidePanel':
         currentBoundaryName !== null && gridUnitsRight === 12,
-      'tui-layoutOneColumnWithSidepanel--onSmallScreen': onSmallScreen,
     }"
   >
     <Responsive
@@ -36,16 +34,23 @@
       ]"
       @responsive-resize="$_resize"
     >
-      <Grid v-if="currentBoundaryName !== null">
+      <Grid v-if="currentBoundaryName !== null" direction="horizontal">
         <GridItem v-show="gridUnitsLeft > 0" :units="gridUnitsLeft">
-          <div class="tui-layoutOneColumnWithSidepanel__heading">
+          <div class="tui-engagelayoutOneColumnContentWithSidepanel__heading">
             <slot name="header" />
           </div>
-          <slot
-            name="column"
-            :units="gridUnitsLeft"
-            :boundary-name="currentBoundaryName"
-          />
+          <Grid direction="horizontal">
+            <GridItem :units="gridUnitsColumn.gapLeft" />
+            <GridItem :units="gridUnitsColumn.content">
+              <slot
+                name="column"
+                :units="gridUnitsLeft"
+                :boundary-name="currentBoundaryName"
+                direction="horizontal"
+              />
+            </GridItem>
+            <GridItem :units="gridUnitsColumn.gapRight" />
+          </Grid>
         </GridItem>
 
         <GridItem :units="gridUnitsRight">
@@ -65,6 +70,7 @@
               name="sidepanel"
               :units="gridUnitsRight"
               :boundary-name="currentBoundaryName"
+              direction="horizontal"
             />
           </SidePanel>
         </GridItem>
@@ -128,6 +134,26 @@ export default {
     };
   },
   computed: {
+    gridUnitsColumn() {
+      if (this.sidePanelIsOpen) {
+        if (this.onBigScreen) return { gapLeft: 2, content: 8, gapRight: 2 };
+        if (this.currentBoundaryName === 'medium')
+          return { gapLeft: 0, content: 10, gapRight: 2 };
+        if (this.currentBoundaryName === 'small')
+          return { gapLeft: 0, content: 0, gapRight: 0 };
+        // equal to `if (this.currentBoundaryName === 'xsmall')`
+        else return { gapLeft: 0, content: 0, gapRight: 0 };
+      } else {
+        // When sidePanel is closed
+        if (this.onBigScreen) return { gapLeft: 3, content: 6, gapRight: 3 };
+        if (this.currentBoundaryName === 'medium')
+          return { gapLeft: 2, content: 8, gapRight: 2 };
+        if (this.currentBoundaryName === 'small')
+          return { gapLeft: 1, content: 10, gapRight: 1 };
+        // equal to `if (this.currentBoundaryName === 'xsmall')`
+        else return { gapLeft: 0, content: 12, gapRight: 0 };
+      }
+    },
     gridUnitsLeft() {
       let left = this.sidePanelIsOpen
         ? 'gridUnitsLeftExpanded'
@@ -139,6 +165,12 @@ export default {
         ? 'gridUnitsRightExpanded'
         : 'gridUnitsRightCollapsed';
       return this.boundaryDefaults[this.currentBoundaryName][right];
+    },
+    onBigScreen() {
+      return (
+        this.currentBoundaryName === 'xlarge' ||
+        this.currentBoundaryName === 'large'
+      );
     },
     onSmallScreen() {
       return (
@@ -168,24 +200,22 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-layoutOneColumnContentWithSidepanel {
-  &--fullSidePanel {
+.tui-engagelayoutOneColumnContentWithSidepanel
+  > .tui-responsive
+  > .tui-grid
+  > .tui-grid-item {
+  transition: flex-basis var(--transition-sidepanel-content-function)
+    var(--transition-sidepanel-content-duration);
+
+  .tui-sidePanel {
+    overflow: visible;
+  }
+}
+
+.tui-engagelayoutOneColumnContentWithSidepanel {
+  &-fullSidePanel {
     > .tui-responsive > .tui-grid > .tui-grid-item {
       border-left: none;
-    }
-  }
-
-  // Prevents the button edges from being hidden which would prevent the user from selecting the button again
-  &--onSmallScreen {
-    > .tui-responsive > .tui-grid > .tui-grid-item {
-      .tui-sidepanel {
-        overflow: visible;
-        &--closed {
-          .tui-sidepanel__inner {
-            overflow: hidden;
-          }
-        }
-      }
     }
   }
 }
