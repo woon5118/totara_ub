@@ -111,6 +111,7 @@
                     <template v-slot:content>
                       <component
                         :is="sectionElement.component"
+                        class="tui-participantContentPrint__element"
                         v-bind="loadUserSectionElementProps(sectionElement)"
                       />
                     </template>
@@ -572,6 +573,9 @@ export default {
       padding: var(--gap-6) var(--gap-4) 0;
       color: var(--color-neutral-6);
     }
+  }
+  &__element {
+    pointer-events: none;
   }
 }
 </style>
