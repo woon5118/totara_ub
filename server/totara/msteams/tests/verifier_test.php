@@ -147,14 +147,15 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
     }
 
     /**
-     * Repeat the smile faces.
+     * Repeat the crying face.
+     * The test requires the character in the supplementary planes of Unicode.
      *
-     * @param integer $count how many times to smile?
+     * @param integer $count how many times to cry?
      * @return string
      */
-    private static function smiles(int $count): string {
-        // U+1F600 aka grinning face.
-        $ch = json_decode('"\ud83d\ude00"');
+    private static function cry(int $count): string {
+        // U+1F622 aka crying face.
+        $ch = json_decode('"\ud83d\ude22"');
         return str_repeat($ch, $count);
     }
 
@@ -309,8 +310,10 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::FAILED, $check);
         set_config('manifest_app_description', 'kia ora', 'totara_msteams');
         $this->assert_check(status::PASS, $check);
-        set_config('manifest_app_description', self::smiles(mf_desc::MAX_LENGTH / 2));
+        set_config('manifest_app_description', self::cry(mf_desc::MAX_LENGTH / 2), 'totara_msteams');
         $this->assert_check(status::PASS, $check);
+        set_config('manifest_app_description', self::cry(mf_desc::MAX_LENGTH / 2 + 1), 'totara_msteams');
+        $this->assert_check(status::FAILED, $check);
     }
 
     /**
@@ -324,8 +327,10 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::FAILED, $check);
         set_config('manifest_app_fulldescription', 'kia ora', 'totara_msteams');
         $this->assert_check(status::PASS, $check);
-        set_config('manifest_app_fulldescription', self::smiles(mf_descfull::MAX_LENGTH / 2));
+        set_config('manifest_app_fulldescription', self::cry(mf_descfull::MAX_LENGTH / 2), 'totara_msteams');
         $this->assert_check(status::PASS, $check);
+        set_config('manifest_app_fulldescription', self::cry(mf_descfull::MAX_LENGTH / 2 + 1), 'totara_msteams');
+        $this->assert_check(status::FAILED, $check);
     }
 
     /**
@@ -339,8 +344,10 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::FAILED, $check);
         set_config('manifest_app_name', 'kia ora', 'totara_msteams');
         $this->assert_check(status::PASS, $check);
-        set_config('manifest_app_name', self::smiles(mf_name::MAX_LENGTH / 2));
+        set_config('manifest_app_name', self::cry(mf_name::MAX_LENGTH / 2), 'totara_msteams');
         $this->assert_check(status::PASS, $check);
+        set_config('manifest_app_name', self::cry(mf_name::MAX_LENGTH / 2 + 1), 'totara_msteams');
+        $this->assert_check(status::FAILED, $check);
     }
 
     /**
@@ -354,8 +361,10 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
         set_config('manifest_app_fullname', 'kia ora', 'totara_msteams');
         $this->assert_check(status::PASS, $check);
-        set_config('manifest_app_fullname', self::smiles(mf_name::MAX_LENGTH / 2));
+        set_config('manifest_app_fullname', self::cry(mf_namefull::MAX_LENGTH / 2), 'totara_msteams');
         $this->assert_check(status::PASS, $check);
+        set_config('manifest_app_fullname', self::cry(mf_namefull::MAX_LENGTH / 2 + 1), 'totara_msteams');
+        $this->assert_check(status::FAILED, $check);
     }
 
     /**
@@ -404,8 +413,10 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         $this->assert_check(status::PASS, $check);
         $CFG->publishername = '0';
         $this->assert_check(status::PASS, $check);
-        $CFG->publishername = self::smiles(pub_name::MAX_LENGTH / 2);
+        $CFG->publishername = self::cry(pub_name::MAX_LENGTH / 2);
         $this->assert_check(status::PASS, $check);
+        $CFG->publishername = self::cry(pub_name::MAX_LENGTH / 2 + 1);
+        $this->assert_check(status::FAILED, $check);
     }
 
     /**
