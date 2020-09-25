@@ -353,6 +353,9 @@ class rb_source_totaramessages extends rb_base_source {
                 get_string('dismissmsg', 'rb_source_totaramessages'),
                 'base.messageid',
                 array('displayfunc' => 'message_dismiss_link',
+                      'extrafields' => array(
+                          'useridto' => 'msg.useridto'
+                      ),
                       'required' => true,
                       'noexport' => true,
                       //'capability' => 'moodle/local:updatethingy',

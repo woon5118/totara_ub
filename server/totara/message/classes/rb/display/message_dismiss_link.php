@@ -43,6 +43,14 @@ class message_dismiss_link extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        global $USER;
+
+        $extrafields = self::get_extrafields_row($row, $column);
+
+        if ($extrafields->useridto != $USER->id) {
+            return '';
+        }
+
         $out = totara_message_dismiss_action($value);
         $out .= \html_writer::checkbox('totara_message_' . $value, $value, false, '', array('id' => 'totara_msgcbox_' . $value, 'class' => "selectbox"));
 
