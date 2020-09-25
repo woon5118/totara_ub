@@ -372,11 +372,11 @@ final class playlist implements accessible, shareable {
      * @return bool
      */
     public function can_user_remove_resource(int $userid, resource_item $resource): bool {
-        if (!$this->can_user_contribute($userid)) {
-            return false;
+        if (access_manager::can_manage_engage($resource->get_context(), $userid)) {
+            return true;
         }
 
-        return access_manager::can_access($resource, $userid);
+        return $this->can_user_contribute($userid);
     }
 
 
@@ -428,7 +428,7 @@ final class playlist implements accessible, shareable {
         }
 
         if (!$this->can_user_remove_resource($user_id, $resource)) {
-            throw playlist_exception::create('removeResource');
+            throw playlist_exception::create('removeresource');
         }
 
         // Remove resource.

@@ -51,10 +51,17 @@ final class remove_resource implements mutation_resolver, has_middleware {
         $playlist_id = $args['id'];
         $instance_id = $args['instanceid'];
 
-        $playlist = playlist::from_id($playlist_id);
-        $playlist->remove_resource(resource_factory::create_instance_from_id($instance_id));
+        // No exposing internal error out.
+        try {
+            $playlist = playlist::from_id($playlist_id);
+            $resource = resource_factory::create_instance_from_id($instance_id);
+        } catch (\Exception $ex) {
+            throw new \moodle_exception('error:permissiondenied', 'totara_playlist', '', null, $ex->getMessage());
+        }
 
+        $playlist->remove_resource($resource);
         $transaction->allow_commit();
+
         return true;
     }
 
