@@ -272,6 +272,7 @@ class mysqli_native_moodle_database extends moodle_database {
                 $collation = $rec['@@collation_database'];
             }
             $result->close();
+            $this->dboptions['dbcollation'] = $collation;
             return $collation;
         }
 
@@ -290,6 +291,16 @@ class mysqli_native_moodle_database extends moodle_database {
         }
         $result->close();
 
+        if (!$collation && $this->get_dbvendor() === 'mysql' && version_compare($this->get_server_info()['version'], '8.0', '>')) {
+            // Only accent and case sensitive collations are fully supported,
+            // admins do need to upgrade to MySQL 8. Really!
+            $collation = 'utf8mb4_0900_as_cs';
+        }
+
+        if (!$collation && ((defined('PHPUNIT_UTIL') && PHPUNIT_UTIL) || (defined('BEHAT_UTIL') && BEHAT_UTIL))) {
+            // Tests expect accent and case sensitive collations.
+            $collation = 'utf8mb4_bin';
+        }
 
         if (!$collation) {
             // Get the default database collation, but only if using utf8 or utf8mb4 compatible collations.

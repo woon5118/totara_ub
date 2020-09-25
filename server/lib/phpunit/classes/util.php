@@ -521,6 +521,8 @@ class phpunit_util extends testing_util {
             }
         }
 
+        self::bootstrap_moodle_info();
+
         $options = array();
         $options['adminpass'] = 'admin';
         $options['shortname'] = 'phpunit';

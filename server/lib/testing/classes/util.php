@@ -231,7 +231,7 @@ abstract class testing_util {
      * @return string The site info
      */
     public static function get_site_info() {
-        global $CFG;
+        global $CFG, $DB;
 
         $output = '';
 
@@ -250,6 +250,11 @@ abstract class testing_util {
 
         // Add database type and version.
         $output .= ", " . $env['dbtype'] . ": " . $env['dbversion'];
+
+        // Show collation to help devs identify known MySQL issues.
+        if ($DB->get_dbfamily() === 'mysql') {
+            $output .= '/' . $DB->get_dbcollation();
+        }
 
         // OS details.
         $output .= ", OS: " . $env['os'] . "\n";
