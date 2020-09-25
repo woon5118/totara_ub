@@ -28,21 +28,22 @@
 
   // Primary bar
   --nav-bg-color: var(--color-neutral-1);
+  --nav-text-color: var(--color-text);
 
   // Primary tab
   --nav-tab-bg-color: var(--color-neutral-1);
   --nav-tab-border-color: var(--nav-tab-bg-color);
-  --nav-tab-text-color: var(--color-neutral-7);
+  --nav-tab-text-color: var(--nav-text-color);
   // Primary tab hover/focus
   --nav-tab-bg-color-focus: var(--color-neutral-1);
   --nav-tab-border-color-focus: var(--nav-tab-bg-color-focus);
   --nav-tab-border-inner-color-focus: var(--color-neutral-5);
-  --nav-tab-text-color-focus: var(--color-neutral-7);
+  --nav-tab-text-color-focus: var(--nav-text-color);
   --nav-tab-mobile-bg-color-focus: var(--color-state-highlight-neutral);
   // Primary tab selected
   --nav-tab-bg-color-selected: var(--color-neutral-1);
   --nav-tab-border-inner-color-selected: var(--color-primary);
-  --nav-tab-text-color-selected: var(--color-neutral-7);
+  --nav-tab-text-color-selected: var(--nav-text-color);
 
   // Primary tab expanded menu
   --nav-tab-expand-bg-color: var(--nav-tab-bg-color);
