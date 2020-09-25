@@ -67,6 +67,9 @@ class theme_settings extends admin_controller {
     public function action(): tui_view {
         $props = [
             'theme' => $this->theme,
+            'themeName' => get_string_manager()->string_exists('pluginname', 'theme_' . $this->theme)
+                ? get_string('pluginname', 'theme_' . $this->theme)
+                : null,
         ];
 
         // If tenant is selected then get selected tenant details.

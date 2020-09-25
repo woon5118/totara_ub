@@ -25,260 +25,262 @@
     @change="handleChange"
     @submit="submit"
   >
-    <FormRow
-      :label="$str('formcolours_label_primary', 'totara_tui')"
-      :is-stacked="true"
-    >
-      <FormColor
-        :name="['color-state', 'value']"
-        :validations="v => [v.required(), v.colorValueHex()]"
-        :aria-describedby="
-          $id('formcolours-primary-details') +
-            ' ' +
-            $id('formcolours-primary-defaults')
-        "
-      />
-      <FormRowDefaults :id="$id('formcolours-primary-defaults')">
-        {{
-          theme_settings.getCSSVarDefault(
-            mergedProcessedCssVariableData,
-            'color-state'
-          )
-        }}
-      </FormRowDefaults>
-      <FormRowDetails :id="$id('formcolours-primary-details')">
-        {{ $str('formcolours_details_primary', 'totara_tui') }}
-      </FormRowDetails>
-    </FormRow>
-
-    <FormRow
-      :label="$str('formcolours_label_useoverrides', 'totara_tui')"
-      :is-stacked="true"
-    >
-      <FormToggleSwitch
-        :aria-label="$str('formcolours_label_useoverrides', 'totara_tui')"
-        :name="['formcolours_field_useoverrides', 'value']"
-        :toggle-first="true"
-        :aria-describedby="$id('formcolours-useoverrides-details')"
-      />
-      <FormRowDetails :id="$id('formcolours-useoverrides-details')">
-        {{ $str('formcolours_details_useoverrides', 'totara_tui') }}
-      </FormRowDetails>
-    </FormRow>
-
-    <FormFieldset v-if="colourOverridesEnabled">
-      <FormRowStack>
-        <FormRow
-          :label="$str('formcolours_label_primarybuttons', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <FormColor
-            :name="['btn-prim-accent-color', 'value']"
-            :validations="v => [v.required(), v.colorValueHex()]"
-            :aria-describedby="
-              $id('formcolours-primarybuttons-details') +
-                ' ' +
-                $id('formcolours-primarybuttons-defaults')
-            "
-          />
-          <FormRowDefaults :id="$id('formcolours-primarybuttons-defaults')">
-            {{
-              theme_settings.getCSSVarDefault(
-                mergedProcessedCssVariableData,
-                'btn-prim-accent-color'
-              )
-            }}
-          </FormRowDefaults>
-          <FormRowDetails :id="$id('formcolours-primarybuttons-details')">
-            {{ $str('formcolours_details_primarybuttons', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-
-        <FormRow
-          :label="$str('formcolours_label_secondarybuttons', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <FormColor
-            :name="['btn-accent-color', 'value']"
-            :validations="v => [v.required(), v.colorValueHex()]"
-            :aria-describedby="
-              $id('formcolours-secondarybuttons-details') +
-                ' ' +
-                $id('formcolours-secondarybuttons-defaults')
-            "
-          />
-          <FormRowDefaults :id="$id('formcolours-secondarybuttons-defaults')">
-            {{
-              theme_settings.getCSSVarDefault(
-                mergedProcessedCssVariableData,
-                'btn-accent-color'
-              )
-            }}
-          </FormRowDefaults>
-          <FormRowDetails :id="$id('formcolours-secondarybuttons-details')">
-            {{ $str('formcolours_details_secondarybuttons', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-
-        <FormRow
-          :label="$str('formcolours_label_links', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <FormColor
-            :name="['link-color', 'value']"
-            :validations="v => [v.required(), v.colorValueHex()]"
-            :aria-describedby="
-              $id('formcolours-links-details') +
-                ' ' +
-                $id('formcolours-links-defaults')
-            "
-          />
-          <FormRowDefaults :id="$id('formcolours-links-defaults')">
-            {{
-              theme_settings.getCSSVarDefault(
-                mergedProcessedCssVariableData,
-                'link-color'
-              )
-            }}
-          </FormRowDefaults>
-          <FormRowDetails :id="$id('formcolours-links-details')">
-            {{ $str('formcolours_details_links', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-
-        <Separator />
-      </FormRowStack>
-    </FormFieldset>
-
-    <FormRowStack>
+    <FormRowStack spacing="large">
       <FormRow
-        :label="$str('formcolours_label_accent', 'totara_tui')"
+        :label="$str('formcolours_label_primary', 'totara_tui')"
         :is-stacked="true"
       >
         <FormColor
-          :name="['color-primary', 'value']"
+          :name="['color-state', 'value']"
           :validations="v => [v.required(), v.colorValueHex()]"
           :aria-describedby="
-            $id('formcolours-accent-details') +
+            $id('formcolours-primary-details') +
               ' ' +
-              $id('formcolours-accent-defaults')
+              $id('formcolours-primary-defaults')
           "
         />
-        <FormRowDefaults :id="$id('formcolours-accent-defaults')">
+        <FormRowDefaults :id="$id('formcolours-primary-defaults')">
           {{
             theme_settings.getCSSVarDefault(
               mergedProcessedCssVariableData,
-              'color-primary'
+              'color-state'
             )
           }}
         </FormRowDefaults>
-        <FormRowDetails :id="$id('formcolours-accent-details')">
-          {{ $str('formcolours_details_accent', 'totara_tui') }}
+        <FormRowDetails :id="$id('formcolours-primary-details')">
+          {{ $str('formcolours_details_primary', 'totara_tui') }}
         </FormRowDetails>
       </FormRow>
-    </FormRowStack>
 
-    <Collapsible :label="$str('formcolours_moresettings', 'totara_tui')">
-      <FormRowStack>
+      <FormRow
+        :label="$str('formcolours_label_useoverrides', 'totara_tui')"
+        :is-stacked="true"
+      >
+        <FormToggleSwitch
+          :aria-label="$str('formcolours_label_useoverrides', 'totara_tui')"
+          :name="['formcolours_field_useoverrides', 'value']"
+          :toggle-first="true"
+          :aria-describedby="$id('formcolours-useoverrides-details')"
+        />
+        <FormRowDetails :id="$id('formcolours-useoverrides-details')">
+          {{ $str('formcolours_details_useoverrides', 'totara_tui') }}
+        </FormRowDetails>
+      </FormRow>
+
+      <FormFieldset v-if="colourOverridesEnabled">
+        <FormRowStack spacing="large">
+          <FormRow
+            :label="$str('formcolours_label_primarybuttons', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <FormColor
+              :name="['btn-prim-accent-color', 'value']"
+              :validations="v => [v.required(), v.colorValueHex()]"
+              :aria-describedby="
+                $id('formcolours-primarybuttons-details') +
+                  ' ' +
+                  $id('formcolours-primarybuttons-defaults')
+              "
+            />
+            <FormRowDefaults :id="$id('formcolours-primarybuttons-defaults')">
+              {{
+                theme_settings.getCSSVarDefault(
+                  mergedProcessedCssVariableData,
+                  'btn-prim-accent-color'
+                )
+              }}
+            </FormRowDefaults>
+            <FormRowDetails :id="$id('formcolours-primarybuttons-details')">
+              {{ $str('formcolours_details_primarybuttons', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+
+          <FormRow
+            :label="$str('formcolours_label_secondarybuttons', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <FormColor
+              :name="['btn-accent-color', 'value']"
+              :validations="v => [v.required(), v.colorValueHex()]"
+              :aria-describedby="
+                $id('formcolours-secondarybuttons-details') +
+                  ' ' +
+                  $id('formcolours-secondarybuttons-defaults')
+              "
+            />
+            <FormRowDefaults :id="$id('formcolours-secondarybuttons-defaults')">
+              {{
+                theme_settings.getCSSVarDefault(
+                  mergedProcessedCssVariableData,
+                  'btn-accent-color'
+                )
+              }}
+            </FormRowDefaults>
+            <FormRowDetails :id="$id('formcolours-secondarybuttons-details')">
+              {{ $str('formcolours_details_secondarybuttons', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+
+          <FormRow
+            :label="$str('formcolours_label_links', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <FormColor
+              :name="['link-color', 'value']"
+              :validations="v => [v.required(), v.colorValueHex()]"
+              :aria-describedby="
+                $id('formcolours-links-details') +
+                  ' ' +
+                  $id('formcolours-links-defaults')
+              "
+            />
+            <FormRowDefaults :id="$id('formcolours-links-defaults')">
+              {{
+                theme_settings.getCSSVarDefault(
+                  mergedProcessedCssVariableData,
+                  'link-color'
+                )
+              }}
+            </FormRowDefaults>
+            <FormRowDetails :id="$id('formcolours-links-details')">
+              {{ $str('formcolours_details_links', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+
+          <Separator />
+        </FormRowStack>
+      </FormFieldset>
+
+      <FormRowStack spacing="large">
         <FormRow
-          :label="$str('formcolours_label_headerbg', 'totara_tui')"
+          :label="$str('formcolours_label_accent', 'totara_tui')"
           :is-stacked="true"
         >
           <FormColor
-            :name="['nav-bg-color', 'value']"
+            :name="['color-primary', 'value']"
             :validations="v => [v.required(), v.colorValueHex()]"
             :aria-describedby="
-              $id('formcolours-headerbg-details') +
+              $id('formcolours-accent-details') +
                 ' ' +
-                $id('formcolours-headerbg-defaults')
+                $id('formcolours-accent-defaults')
             "
           />
-          <FormRowDefaults :id="$id('formcolours-headerbg-defaults')">
+          <FormRowDefaults :id="$id('formcolours-accent-defaults')">
             {{
               theme_settings.getCSSVarDefault(
                 mergedProcessedCssVariableData,
-                'nav-bg-color'
+                'color-primary'
               )
             }}
           </FormRowDefaults>
-          <FormRowDetails :id="$id('formcolours-headerbg-details')">
-            {{ $str('formcolours_details_headerbg', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-
-        <FormRow
-          :label="$str('formcolours_label_headertext', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <FormColor
-            :name="['nav-text-color', 'value']"
-            :validations="v => [v.required(), v.colorValueHex()]"
-            :aria-describedby="
-              $id('formcolours-headertext-details') +
-                ' ' +
-                $id('formcolours-headertext-defaults')
-            "
-          />
-          <FormRowDefaults :id="$id('formcolours-headertext-defaults')">
-            {{
-              theme_settings.getCSSVarDefault(
-                mergedProcessedCssVariableData,
-                'nav-text-color'
-              )
-            }}
-          </FormRowDefaults>
-          <FormRowDetails :id="$id('formcolours-headertext-details')">
-            {{ $str('formcolours_details_headertext', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-
-        <FormRow
-          :label="$str('formcolours_label_pagetext', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <FormColor
-            :name="['color-text', 'value']"
-            :validations="v => [v.required(), v.colorValueHex()]"
-            :aria-describedby="
-              $id('formcolours-pagetext-details') +
-                ' ' +
-                $id('formcolours-pagetext-defaults')
-            "
-          />
-          <FormRowDefaults :id="$id('formcolours-pagetext-defaults')">
-            {{
-              theme_settings.getCSSVarDefault(
-                mergedProcessedCssVariableData,
-                'color-text'
-              )
-            }}
-          </FormRowDefaults>
-          <FormRowDetails :id="$id('formcolours-pagetext-details')">
-            {{ $str('formcolours_details_pagetext', 'totara_tui') }}
+          <FormRowDetails :id="$id('formcolours-accent-details')">
+            {{ $str('formcolours_details_accent', 'totara_tui') }}
           </FormRowDetails>
         </FormRow>
       </FormRowStack>
-    </Collapsible>
 
-    <FormRow>
-      <ButtonGroup>
-        <Button
-          :styleclass="{ primary: 'true' }"
-          :text="$str('save', 'totara_core')"
-          :aria-label="
-            $str(
-              'saveextended',
-              'totara_core',
-              $str('tabcolours', 'totara_tui') +
-                ' ' +
-                $str('settings', 'totara_core')
-            )
-          "
-          :disabled="isSaving"
-          type="submit"
-        />
-      </ButtonGroup>
-    </FormRow>
+      <Collapsible :label="$str('formcolours_moresettings', 'totara_tui')">
+        <FormRowStack spacing="large">
+          <FormRow
+            :label="$str('formcolours_label_headerbg', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <FormColor
+              :name="['nav-bg-color', 'value']"
+              :validations="v => [v.required(), v.colorValueHex()]"
+              :aria-describedby="
+                $id('formcolours-headerbg-details') +
+                  ' ' +
+                  $id('formcolours-headerbg-defaults')
+              "
+            />
+            <FormRowDefaults :id="$id('formcolours-headerbg-defaults')">
+              {{
+                theme_settings.getCSSVarDefault(
+                  mergedProcessedCssVariableData,
+                  'nav-bg-color'
+                )
+              }}
+            </FormRowDefaults>
+            <FormRowDetails :id="$id('formcolours-headerbg-details')">
+              {{ $str('formcolours_details_headerbg', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+
+          <FormRow
+            :label="$str('formcolours_label_headertext', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <FormColor
+              :name="['nav-text-color', 'value']"
+              :validations="v => [v.required(), v.colorValueHex()]"
+              :aria-describedby="
+                $id('formcolours-headertext-details') +
+                  ' ' +
+                  $id('formcolours-headertext-defaults')
+              "
+            />
+            <FormRowDefaults :id="$id('formcolours-headertext-defaults')">
+              {{
+                theme_settings.getCSSVarDefault(
+                  mergedProcessedCssVariableData,
+                  'nav-text-color'
+                )
+              }}
+            </FormRowDefaults>
+            <FormRowDetails :id="$id('formcolours-headertext-details')">
+              {{ $str('formcolours_details_headertext', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+
+          <FormRow
+            :label="$str('formcolours_label_pagetext', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <FormColor
+              :name="['color-text', 'value']"
+              :validations="v => [v.required(), v.colorValueHex()]"
+              :aria-describedby="
+                $id('formcolours-pagetext-details') +
+                  ' ' +
+                  $id('formcolours-pagetext-defaults')
+              "
+            />
+            <FormRowDefaults :id="$id('formcolours-pagetext-defaults')">
+              {{
+                theme_settings.getCSSVarDefault(
+                  mergedProcessedCssVariableData,
+                  'color-text'
+                )
+              }}
+            </FormRowDefaults>
+            <FormRowDetails :id="$id('formcolours-pagetext-details')">
+              {{ $str('formcolours_details_pagetext', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+        </FormRowStack>
+      </Collapsible>
+
+      <FormRow>
+        <ButtonGroup>
+          <Button
+            :styleclass="{ primary: 'true' }"
+            :text="$str('save', 'totara_core')"
+            :aria-label="
+              $str(
+                'saveextended',
+                'totara_core',
+                $str('tabcolours', 'totara_tui') +
+                  ' ' +
+                  $str('settings', 'totara_core')
+              )
+            "
+            :disabled="isSaving"
+            type="submit"
+          />
+        </ButtonGroup>
+      </FormRow>
+    </FormRowStack>
   </Uniform>
 </template>
 

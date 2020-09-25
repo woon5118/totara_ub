@@ -24,47 +24,54 @@
     @change="handleChange"
     @submit="submit"
   >
-    <FormRow
-      :label="$str('formcustom_label_customcss', 'totara_tui')"
-      :is-stacked="true"
-    >
-      <FormTextarea
-        :name="['formcustom_field_customcss', 'value']"
-        spellcheck="false"
-        rows="6"
-        char-length="full"
-        :aria-describedby="$id('formcustom-customcss-details')"
-      />
-      <FormRowDetails :id="$id('formcustom-customcss-details')">
-        {{ $str('formcustom_details_customcss', 'totara_tui') }}
-      </FormRowDetails>
-    </FormRow>
-
-    <FormRow>
-      <ButtonGroup>
-        <Button
-          :styleclass="{ primary: 'true' }"
-          :text="$str('save', 'totara_core')"
-          :aria-label="
-            $str(
-              'saveextended',
-              'totara_core',
-              $str('tabcustom', 'totara_tui') +
-                ' ' +
-                $str('settings', 'totara_core')
-            )
-          "
-          :disabled="isSaving"
-          type="submit"
+    <FormRowStack spacing="large">
+      <FormRow
+        :label="$str('formcustom_label_customcss', 'totara_tui')"
+        :is-stacked="true"
+      >
+        <FormTextarea
+          :name="['formcustom_field_customcss', 'value']"
+          spellcheck="false"
+          rows="6"
+          char-length="full"
+          :aria-describedby="$id('formcustom-customcss-details')"
         />
-      </ButtonGroup>
-    </FormRow>
+        <FormRowDetails :id="$id('formcustom-customcss-details')">
+          {{ $str('formcustom_details_customcss', 'totara_tui') }}
+        </FormRowDetails>
+      </FormRow>
+
+      <FormRow>
+        <ButtonGroup>
+          <Button
+            :styleclass="{ primary: 'true' }"
+            :text="$str('save', 'totara_core')"
+            :aria-label="
+              $str(
+                'saveextended',
+                'totara_core',
+                $str('tabcustom', 'totara_tui') +
+                  ' ' +
+                  $str('settings', 'totara_core')
+              )
+            "
+            :disabled="isSaving"
+            type="submit"
+          />
+        </ButtonGroup>
+      </FormRow>
+    </FormRowStack>
   </Uniform>
 </template>
 
 <script>
 import theme_settings from 'tui/lib/theme_settings';
-import { Uniform, FormRow, FormTextarea } from 'tui/components/uniform';
+import {
+  Uniform,
+  FormRow,
+  FormRowStack,
+  FormTextarea,
+} from 'tui/components/uniform';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
 import Button from 'tui/components/buttons/Button';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
@@ -73,6 +80,7 @@ export default {
   components: {
     Uniform,
     FormRow,
+    FormRowStack,
     FormRowDetails,
     FormTextarea,
     Button,

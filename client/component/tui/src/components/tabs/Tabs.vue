@@ -19,7 +19,10 @@
 <template>
   <div
     class="tui-tabs"
-    :class="['tui-tabs--' + direction]"
+    :class="[
+      'tui-tabs--' + direction,
+      contentSpacing ? 'tui-tabs--contentSpacing-' + contentSpacing : null,
+    ]"
     :aria-orientation="direction"
   >
     <OverflowDetector v-slot="{ measuring }" @change="overflowChanged">
@@ -121,6 +124,10 @@ export default {
     },
     smallTabs: {
       type: Boolean,
+    },
+    contentSpacing: {
+      type: String,
+      validator: x => !x || x == 'large',
     },
   },
 
@@ -525,8 +532,16 @@ export default {
     padding-top: var(--gap-4);
   }
 
+  .tui-tabs--horizontal.tui-tabs--contentSpacing-large & {
+    padding-top: var(--gap-8);
+  }
+
   .tui-tabs--vertical & {
     padding-left: var(--gap-4);
+  }
+
+  .tui-tabs--vertical.tui-tabs--contentSpacing-large & {
+    padding-left: var(--gap-8);
   }
 }
 </style>

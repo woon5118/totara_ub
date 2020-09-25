@@ -85,6 +85,9 @@ class theme_tenants extends admin_controller {
         }, $tenants);
         $props = [
             'theme' => $this->theme,
+            'themeName' => get_string_manager()->string_exists('pluginname', 'theme_' . $this->theme)
+                ? get_string('pluginname', 'theme_' . $this->theme)
+                : null,
             'tenants' => $tenants
         ];
 

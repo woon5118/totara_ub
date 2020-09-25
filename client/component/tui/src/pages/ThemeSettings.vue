@@ -18,103 +18,106 @@
 -->
 
 <template>
-  <div class="tui-themesettings">
+  <div class="tui-themeSettings">
     <PageHeading :title="pageTitle" />
-    <Loader :loading="!allDataLoaded">
-      <div
-        v-if="dataIsReady && embeddedFormData.formFieldData.brand"
-        class="tui-themesettings__forms"
-      >
-        <Uniform
-          v-if="initialValues && selectedTenantId"
-          :initial-values="initialValues"
-          :errors="errorsForm"
-          :validate="validate"
-          @change="autoSubmitTenantForm"
+    <div class="tui-themeSettings__content">
+      <Loader :loading="!allDataLoaded">
+        <div
+          v-if="dataIsReady && embeddedFormData.formFieldData.brand"
+          class="tui-themeSettings__forms"
         >
-          <FormRow
-            :label="$str('formtenant_label_tenant', 'totara_tui')"
-            :is-stacked="true"
+          <Uniform
+            v-if="initialValues && selectedTenantId"
+            :initial-values="initialValues"
+            :errors="errorsForm"
+            :validate="validate"
+            @change="autoSubmitTenantForm"
           >
-            <FormToggleSwitch
-              :name="['formtenant_field_tenant', 'value']"
-              :toggle-first="true"
-            />
-            <FormRowDetails>
-              {{ $str('formtenant_details_tenant', 'totara_tui') }}
-            </FormRowDetails>
-          </FormRow>
-        </Uniform>
+            <FormRow
+              :label="$str('formtenant_label_tenant', 'totara_tui')"
+              :is-stacked="true"
+            >
+              <FormToggleSwitch
+                :name="['formtenant_field_tenant', 'value']"
+                :toggle-first="true"
+              />
+              <FormRowDetails>
+                {{ $str('formtenant_details_tenant', 'totara_tui') }}
+              </FormRowDetails>
+            </FormRow>
+          </Uniform>
 
-        <Tabs
-          v-show="
-            !selectedTenantId || (selectedTenantId && tenantOverridesEnabled)
-          "
-          selected="themesettings-tab-0"
-        >
-          <Tab
-            :id="'themesettings-tab-0'"
-            :name="$str('tabbrand', 'totara_tui')"
-            :always-render="true"
+          <Tabs
+            v-show="
+              !selectedTenantId || (selectedTenantId && tenantOverridesEnabled)
+            "
+            selected="themesettings-tab-0"
+            content-spacing="large"
           >
-            <SettingsFormBrand
-              v-if="embeddedFormData.formFieldData.brand"
-              :saved-form-field-data="embeddedFormData.formFieldData.brand"
-              :file-form-field-data="embeddedFormData.fileData"
-              :is-saving="isSaving"
-              @submit="submit"
-            />
-          </Tab>
-          <Tab
-            :id="'themesettings-tab-1'"
-            :name="$str('tabcolours', 'totara_tui')"
-            :always-render="true"
-          >
-            <SettingsFormColours
-              v-if="embeddedFormData.formFieldData.colours"
-              :saved-form-field-data="embeddedFormData.formFieldData.colours"
-              :merged-default-css-variable-data="
-                embeddedFormData.mergedDefaultCSSVariableData
-              "
-              :merged-processed-css-variable-data="
-                embeddedFormData.mergedProcessedCSSVariableData
-              "
-              :is-saving="isSaving"
-              @submit="submit"
-            />
-          </Tab>
-          <Tab
-            v-if="!selectedTenantId"
-            :id="'themesettings-tab-2'"
-            :name="$str('tabimages', 'totara_tui')"
-            :always-render="true"
-          >
-            <SettingsFormImages
-              v-if="embeddedFormData.formFieldData.images"
-              :saved-form-field-data="embeddedFormData.formFieldData.images"
-              :flavours-data="embeddedFormData.flavours"
-              :file-form-field-data="embeddedFormData.fileData"
-              :is-saving="isSaving"
-              @submit="submit"
-            />
-          </Tab>
-          <Tab
-            v-if="!selectedTenantId"
-            :id="'themesettings-tab-3'"
-            :name="$str('tabcustom', 'totara_tui')"
-            :always-render="true"
-            :disabled="!customCSSEnabled"
-          >
-            <SettingsFormCustom
-              v-if="embeddedFormData.formFieldData.custom"
-              :saved-form-field-data="embeddedFormData.formFieldData.custom"
-              :is-saving="isSaving"
-              @submit="submit"
-            />
-          </Tab>
-        </Tabs>
-      </div>
-    </Loader>
+            <Tab
+              :id="'themesettings-tab-0'"
+              :name="$str('tabbrand', 'totara_tui')"
+              :always-render="true"
+            >
+              <SettingsFormBrand
+                v-if="embeddedFormData.formFieldData.brand"
+                :saved-form-field-data="embeddedFormData.formFieldData.brand"
+                :file-form-field-data="embeddedFormData.fileData"
+                :is-saving="isSaving"
+                @submit="submit"
+              />
+            </Tab>
+            <Tab
+              :id="'themesettings-tab-1'"
+              :name="$str('tabcolours', 'totara_tui')"
+              :always-render="true"
+            >
+              <SettingsFormColours
+                v-if="embeddedFormData.formFieldData.colours"
+                :saved-form-field-data="embeddedFormData.formFieldData.colours"
+                :merged-default-css-variable-data="
+                  embeddedFormData.mergedDefaultCSSVariableData
+                "
+                :merged-processed-css-variable-data="
+                  embeddedFormData.mergedProcessedCSSVariableData
+                "
+                :is-saving="isSaving"
+                @submit="submit"
+              />
+            </Tab>
+            <Tab
+              v-if="!selectedTenantId"
+              :id="'themesettings-tab-2'"
+              :name="$str('tabimages', 'totara_tui')"
+              :always-render="true"
+            >
+              <SettingsFormImages
+                v-if="embeddedFormData.formFieldData.images"
+                :saved-form-field-data="embeddedFormData.formFieldData.images"
+                :flavours-data="embeddedFormData.flavours"
+                :file-form-field-data="embeddedFormData.fileData"
+                :is-saving="isSaving"
+                @submit="submit"
+              />
+            </Tab>
+            <Tab
+              v-if="!selectedTenantId"
+              :id="'themesettings-tab-3'"
+              :name="$str('tabcustom', 'totara_tui')"
+              :always-render="true"
+              :disabled="!customCSSEnabled"
+            >
+              <SettingsFormCustom
+                v-if="embeddedFormData.formFieldData.custom"
+                :saved-form-field-data="embeddedFormData.formFieldData.custom"
+                :is-saving="isSaving"
+                @submit="submit"
+              />
+            </Tab>
+          </Tabs>
+        </div>
+      </Loader>
+    </div>
   </div>
 </template>
 
@@ -159,10 +162,14 @@ export default {
       type: String,
       required: true,
     },
+
+    themeName: String,
+
     /**
      * Tenant ID or null if global/multi-tenancy not enabled.
      */
     selectedTenantId: Number,
+
     /**
      * Tenant Name or null if global/multi-tenancy not enabled.
      */
@@ -209,7 +216,11 @@ export default {
     pageTitle() {
       if (!this.selectedTenantName) {
         // Editing current theme
-        return this.$str('edittheme', 'totara_core', this.theme);
+        return this.$str(
+          'edittheme',
+          'totara_core',
+          this.themeName || this.theme
+        );
       } else {
         // Editing current Theme Settings, but for a Tenant
         return this.$str(
@@ -485,9 +496,13 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-themesettings {
-  & > * + * {
-    margin-top: var(--gap-2);
+.tui-themeSettings {
+  &__content {
+    margin-top: var(--gap-8);
+  }
+
+  &__forms {
+    @include tui-stack-vertical(var(--gap-8));
   }
 }
 </style>

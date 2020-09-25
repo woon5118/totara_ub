@@ -17,47 +17,57 @@
 -->
 
 <template>
-  <div>
-    <PageHeading :title="theme" />
-    <h3>{{ $str('sitebranding', 'totara_tui') }}</h3>
-    <p>{{ $str('sitebrandinginformation', 'totara_tui') }}</p>
-    <ActionLink
-      :href="configLink"
-      :text="$str('editsitebranding', 'totara_tui')"
-      :styleclass="{
-        primary: true,
-      }"
-    />
+  <div class="tui-themeTenants">
+    <PageHeading :title="themeName || theme" />
+    <div class="tui-themeTenants__content">
+      <div class="tui-themeTenants__section">
+        <h3>{{ $str('sitebranding', 'totara_tui') }}</h3>
+        <p>{{ $str('sitebrandinginformation', 'totara_tui') }}</p>
+        <ActionLink
+          :href="configLink"
+          :text="$str('editsitebranding', 'totara_tui')"
+          :styleclass="{
+            primary: true,
+          }"
+        />
+      </div>
 
-    <h3>{{ $str('tenantbranding', 'totara_tui') }}</h3>
-    <Table :data="tenants">
-      <template v-slot:header-row>
-        <HeaderCell>{{ $str('tenant', 'totara_tenant') }}</HeaderCell>
-        <HeaderCell>{{ $str('tenantidnumber', 'totara_tenant') }}</HeaderCell>
-        <HeaderCell>{{ $str('branding', 'totara_tui') }}</HeaderCell>
-        <HeaderCell>{{ $str('actions', 'core') }}</HeaderCell>
-      </template>
-      <template v-slot:row="{ row }">
-        <Cell>
-          {{ row.name }}
-        </Cell>
-        <Cell>
-          {{ row.idnumber }}
-        </Cell>
-        <Cell>
-          {{
-            row.customBranding
-              ? $str('custom', 'totara_tui')
-              : $str('site', 'totara_tui')
-          }}
-        </Cell>
-        <Cell>
-          <a :href="tenantLink(row.id)">
-            <Edit :alt="$str('edittenantsetting', 'totara_tui', row.name)" />
-          </a>
-        </Cell>
-      </template>
-    </Table>
+      <div class="tui-themeTenants__section">
+        <h3>{{ $str('tenantbranding', 'totara_tui') }}</h3>
+        <Table :data="tenants">
+          <template v-slot:header-row>
+            <HeaderCell>{{ $str('tenant', 'totara_tenant') }}</HeaderCell>
+            <HeaderCell>
+              {{ $str('tenantidnumber', 'totara_tenant') }}
+            </HeaderCell>
+            <HeaderCell>{{ $str('branding', 'totara_tui') }}</HeaderCell>
+            <HeaderCell>{{ $str('actions', 'core') }}</HeaderCell>
+          </template>
+          <template v-slot:row="{ row }">
+            <Cell>
+              {{ row.name }}
+            </Cell>
+            <Cell>
+              {{ row.idnumber }}
+            </Cell>
+            <Cell>
+              {{
+                row.customBranding
+                  ? $str('custom', 'totara_tui')
+                  : $str('site', 'totara_tui')
+              }}
+            </Cell>
+            <Cell>
+              <a :href="tenantLink(row.id)">
+                <Edit
+                  :alt="$str('edittenantsetting', 'totara_tui', row.name)"
+                />
+              </a>
+            </Cell>
+          </template>
+        </Table>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -84,6 +94,7 @@ export default {
       type: String,
       required: true,
     },
+    themeName: String,
     tenants: {
       type: Array,
       required: false,
@@ -109,6 +120,7 @@ export default {
   },
 };
 </script>
+
 <lang-strings>
 {
   "core": ["actions"],
@@ -128,3 +140,19 @@ export default {
   ]
 }
 </lang-strings>
+
+<style lang="scss">
+.tui-themeTenants {
+  &__content {
+    margin-top: var(--gap-8);
+  }
+
+  &__section + &__section {
+    margin-top: var(--gap-12);
+  }
+
+  &__section {
+    @include tui-stack-vertical(var(--gap-4));
+  }
+}
+</style>

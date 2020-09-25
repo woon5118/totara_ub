@@ -17,13 +17,33 @@
 -->
 
 <template>
-  <div class="tui-formRowStack">
+  <div
+    class="tui-formRowStack"
+    :class="spacing ? 'tui-formRowStack--spacing-' + spacing : null"
+  >
     <slot />
   </div>
 </template>
 
+<script>
+export default {
+  props: {
+    spacing: {
+      type: String,
+      validator: x => !x || x == 'large',
+    },
+  },
+};
+</script>
+
 <style lang="scss">
 .tui-formRowStack {
   @include tui-stack-vertical(var(--gap-4));
+
+  &--spacing {
+    &-large {
+      @include tui-stack-vertical(var(--gap-8));
+    }
+  }
 }
 </style>

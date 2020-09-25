@@ -155,5 +155,11 @@ export default {
       margin: auto 0 auto auto;
     }
   }
+
+  &__content {
+    & > .tui-formRowStack {
+      margin-top: var(--gap-4);
+    }
+  }
 }
 </style>

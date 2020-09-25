@@ -25,73 +25,80 @@
     @change="handleChange"
     @submit="submit"
   >
-    <FormRow
-      :label="$str('formbrand_label_logo', 'totara_tui')"
-      :is-stacked="true"
-    >
-      <ImageUploadSetting
-        :metadata="fileData.sitelogo"
-        :aria-describedby="$id('formbrand-logo-details')"
-        :aria-label-extension="$str('formbrand_label_logo', 'totara_tui')"
-      />
-      <FormRowDetails :id="$id('formbrand-logo-details')">
-        {{ $str('formbrand_details_logo', 'totara_tui') }}
-      </FormRowDetails>
-    </FormRow>
-
-    <FormRow
-      :label="$str('formbrand_label_logoalttext', 'totara_tui')"
-      :is-stacked="true"
-    >
-      <FormText
-        :name="['formbrand_field_logoalttext', 'value']"
-        :aria-describedby="$id('formbrand-logoalttext-details')"
-        required
-      />
-      <FormRowDetails :id="$id('formbrand-logoalttext-details')">
-        {{ $str('formbrand_details_logoalttext', 'totara_tui') }}
-      </FormRowDetails>
-    </FormRow>
-
-    <FormRow
-      :label="$str('formbrand_label_favicon', 'totara_tui')"
-      :is-stacked="true"
-    >
-      <ImageUploadSetting
-        :metadata="fileData.sitefavicon"
-        :aria-describedby="$id('formbrand-favicon-details')"
-        :aria-label-extension="$str('formbrand_label_favicon', 'totara_tui')"
-      />
-      <FormRowDetails :id="$id('formbrand-favicon-details')">
-        {{ $str('formbrand_details_favicon', 'totara_tui') }}
-      </FormRowDetails>
-    </FormRow>
-
-    <FormRow>
-      <ButtonGroup>
-        <Button
-          :styleclass="{ primary: 'true' }"
-          :text="$str('save', 'totara_core')"
-          :aria-label="
-            $str(
-              'saveextended',
-              'totara_core',
-              $str('tabbrand', 'totara_tui') +
-                ' ' +
-                $str('settings', 'totara_core')
-            )
-          "
-          :disabled="isSaving"
-          type="submit"
+    <FormRowStack spacing="large">
+      <FormRow
+        :label="$str('formbrand_label_logo', 'totara_tui')"
+        :is-stacked="true"
+      >
+        <ImageUploadSetting
+          :metadata="fileData.sitelogo"
+          :aria-describedby="$id('formbrand-logo-details')"
+          :aria-label-extension="$str('formbrand_label_logo', 'totara_tui')"
         />
-      </ButtonGroup>
-    </FormRow>
+        <FormRowDetails :id="$id('formbrand-logo-details')">
+          {{ $str('formbrand_details_logo', 'totara_tui') }}
+        </FormRowDetails>
+      </FormRow>
+
+      <FormRow
+        :label="$str('formbrand_label_logoalttext', 'totara_tui')"
+        :is-stacked="true"
+      >
+        <FormText
+          :name="['formbrand_field_logoalttext', 'value']"
+          :aria-describedby="$id('formbrand-logoalttext-details')"
+          required
+        />
+        <FormRowDetails :id="$id('formbrand-logoalttext-details')">
+          {{ $str('formbrand_details_logoalttext', 'totara_tui') }}
+        </FormRowDetails>
+      </FormRow>
+
+      <FormRow
+        :label="$str('formbrand_label_favicon', 'totara_tui')"
+        :is-stacked="true"
+      >
+        <ImageUploadSetting
+          :metadata="fileData.sitefavicon"
+          :aria-describedby="$id('formbrand-favicon-details')"
+          :aria-label-extension="$str('formbrand_label_favicon', 'totara_tui')"
+        />
+        <FormRowDetails :id="$id('formbrand-favicon-details')">
+          {{ $str('formbrand_details_favicon', 'totara_tui') }}
+        </FormRowDetails>
+      </FormRow>
+
+      <FormRow>
+        <ButtonGroup>
+          <Button
+            :styleclass="{ primary: 'true' }"
+            :text="$str('save', 'totara_core')"
+            :aria-label="
+              $str(
+                'saveextended',
+                'totara_core',
+                $str('tabbrand', 'totara_tui') +
+                  ' ' +
+                  $str('settings', 'totara_core')
+              )
+            "
+            :disabled="isSaving"
+            type="submit"
+          />
+        </ButtonGroup>
+      </FormRow>
+    </FormRowStack>
   </Uniform>
 </template>
 
 <script>
 import theme_settings from 'tui/lib/theme_settings';
-import { Uniform, FormRow, FormText } from 'tui/components/uniform';
+import {
+  Uniform,
+  FormRow,
+  FormRowStack,
+  FormText,
+} from 'tui/components/uniform';
 import ImageUploadSetting from 'tui/components/theme_settings/ImageUploadSetting';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
 import Button from 'tui/components/buttons/Button';
@@ -101,6 +108,7 @@ export default {
   components: {
     Uniform,
     FormRow,
+    FormRowStack,
     FormRowDetails,
     FormText,
     ImageUploadSetting,

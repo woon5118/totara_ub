@@ -24,7 +24,6 @@
 
 <style lang="scss">
 .tui-formRow__details {
-  margin-top: var(--gap-2);
   color: var(--form-details-text-color);
   @include tui-font-body-small;
 }

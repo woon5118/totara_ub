@@ -141,7 +141,7 @@ export default {
       display: block;
       flex-direction: column;
 
-      @include tui-stack-vertical(var(--gap-1));
+      @include tui-stack-vertical(var(--gap-2));
     }
   }
 }

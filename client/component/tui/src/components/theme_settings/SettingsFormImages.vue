@@ -25,198 +25,200 @@
     @change="handleChange"
     @submit="submit"
   >
-    <Collapsible
-      :label="$str('formimages_group_core', 'totara_tui')"
-      :initial-state="true"
-    >
-      <FormRowStack>
-        <FormRow
-          :label="$str('formimages_label_displaylogin', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <FormCheckbox
-            :name="['formimages_field_displaylogin', 'value']"
-            :aria-describedby="$id('formimages-displaylogin-defaults')"
-          />
-          <FormRowDefaults :id="$id('formimages-displaylogin-defaults')">{{
-            $str('enabled', 'totara_core')
-          }}</FormRowDefaults>
-        </FormRow>
+    <FormRowStack spacing="large">
+      <Collapsible
+        :label="$str('formimages_group_core', 'totara_tui')"
+        :initial-state="true"
+      >
+        <FormRowStack spacing="large">
+          <FormRow
+            :label="$str('formimages_label_displaylogin', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <FormCheckbox
+              :name="['formimages_field_displaylogin', 'value']"
+              :aria-describedby="$id('formimages-displaylogin-defaults')"
+            />
+            <FormRowDefaults :id="$id('formimages-displaylogin-defaults')">{{
+              $str('enabled', 'totara_core')
+            }}</FormRowDefaults>
+          </FormRow>
 
-        <FormRow
-          :label="$str('formimages_label_login', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <ImageUploadSetting
-            :metadata="fileData.sitelogin"
-            :aria-label-extension="
-              $str(
-                'defaultimage',
-                'totara_tui',
-                $str('formimages_label_login', 'totara_tui')
-              )
-            "
-            :aria-describedby="$id('formimages-login-details')"
-          />
-          <FormRowDetails :id="$id('formimages-login-details')">
-            {{ $str('formimages_details_login', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
+          <FormRow
+            :label="$str('formimages_label_login', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <ImageUploadSetting
+              :metadata="fileData.sitelogin"
+              :aria-label-extension="
+                $str(
+                  'defaultimage',
+                  'totara_tui',
+                  $str('formimages_label_login', 'totara_tui')
+                )
+              "
+              :aria-describedby="$id('formimages-login-details')"
+            />
+            <FormRowDetails :id="$id('formimages-login-details')">
+              {{ $str('formimages_details_login', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
 
-        <FormRow
-          :label="$str('formimages_label_loginalttext', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <FormText
-            :name="['formimages_field_loginalttext', 'value']"
-            :aria-describedby="$id('formimages-loginalttext-details')"
-          />
-          <FormRowDetails :id="$id('formimages-loginalttext-details')">
-            {{ $str('formimages_details_loginalttext', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-      </FormRowStack>
-    </Collapsible>
+          <FormRow
+            :label="$str('formimages_label_loginalttext', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <FormText
+              :name="['formimages_field_loginalttext', 'value']"
+              :aria-describedby="$id('formimages-loginalttext-details')"
+            />
+            <FormRowDetails :id="$id('formimages-loginalttext-details')">
+              {{ $str('formimages_details_loginalttext', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+        </FormRowStack>
+      </Collapsible>
 
-    <Collapsible
-      v-if="flavoursData.learn"
-      :label="$str('formimages_group_learn', 'totara_tui')"
-      :initial-state="true"
-    >
-      <FormRowStack>
-        <FormRow
-          :label="$str('formimages_label_course', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <ImageUploadSetting
-            :metadata="fileData.learncourse"
-            :aria-label-extension="
-              $str(
-                'defaultimage',
-                'totara_tui',
-                $str('formimages_label_course', 'totara_tui')
-              )
-            "
-            :aria-describedby="$id('formimages-course-details')"
-          />
-          <FormRowDetails :id="$id('formimages-course-details')">
-            {{ $str('formimages_details_course', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-        <FormRow
-          v-if="fileData.learnprogram"
-          :label="$str('formimages_label_program', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <ImageUploadSetting
-            :metadata="fileData.learnprogram"
-            :aria-label-extension="
-              $str(
-                'defaultimage',
-                'totara_tui',
-                $str('formimages_label_program', 'totara_tui')
-              )
-            "
-            :aria-describedby="$id('formimages-program-details')"
-          />
-          <FormRowDetails :id="$id('formimages-program-details')">
-            {{ $str('formimages_details_program', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-        <FormRow
-          v-if="fileData.learncert"
-          :label="$str('formimages_label_cert', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <ImageUploadSetting
-            :metadata="fileData.learncert"
-            :aria-label-extension="
-              $str(
-                'defaultimage',
-                'totara_tui',
-                $str('formimages_label_cert', 'totara_tui')
-              )
-            "
-            :aria-describedby="$id('formimages-cert-details')"
-          />
-          <FormRowDetails :id="$id('formimages-cert-details')">
-            {{ $str('formimages_details_cert', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-      </FormRowStack>
-    </Collapsible>
+      <Collapsible
+        v-if="flavoursData.learn"
+        :label="$str('formimages_group_learn', 'totara_tui')"
+        :initial-state="true"
+      >
+        <FormRowStack spacing="large">
+          <FormRow
+            :label="$str('formimages_label_course', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <ImageUploadSetting
+              :metadata="fileData.learncourse"
+              :aria-label-extension="
+                $str(
+                  'defaultimage',
+                  'totara_tui',
+                  $str('formimages_label_course', 'totara_tui')
+                )
+              "
+              :aria-describedby="$id('formimages-course-details')"
+            />
+            <FormRowDetails :id="$id('formimages-course-details')">
+              {{ $str('formimages_details_course', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+          <FormRow
+            v-if="fileData.learnprogram"
+            :label="$str('formimages_label_program', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <ImageUploadSetting
+              :metadata="fileData.learnprogram"
+              :aria-label-extension="
+                $str(
+                  'defaultimage',
+                  'totara_tui',
+                  $str('formimages_label_program', 'totara_tui')
+                )
+              "
+              :aria-describedby="$id('formimages-program-details')"
+            />
+            <FormRowDetails :id="$id('formimages-program-details')">
+              {{ $str('formimages_details_program', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+          <FormRow
+            v-if="fileData.learncert"
+            :label="$str('formimages_label_cert', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <ImageUploadSetting
+              :metadata="fileData.learncert"
+              :aria-label-extension="
+                $str(
+                  'defaultimage',
+                  'totara_tui',
+                  $str('formimages_label_cert', 'totara_tui')
+                )
+              "
+              :aria-describedby="$id('formimages-cert-details')"
+            />
+            <FormRowDetails :id="$id('formimages-cert-details')">
+              {{ $str('formimages_details_cert', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+        </FormRowStack>
+      </Collapsible>
 
-    <Collapsible
-      v-if="
-        flavoursData.engage &&
-          (fileData.engageresource || fileData.engageworkspace)
-      "
-      :label="$str('formimages_group_engage', 'totara_tui')"
-      :initial-state="true"
-    >
-      <FormRowStack>
-        <FormRow
-          v-if="fileData.engageresource"
-          :label="$str('formimages_label_resource', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <ImageUploadSetting
-            :metadata="fileData.engageresource"
-            :aria-label-extension="
-              $str(
-                'defaultimage',
-                'totara_tui',
-                $str('formimages_label_resource', 'totara_tui')
-              )
-            "
-            :aria-describedby="$id('formimages-resource-details')"
-          />
-          <FormRowDetails :id="$id('formimages-resource-details')">
-            {{ $str('formimages_details_resource', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-        <FormRow
-          v-if="fileData.engageworkspace"
-          :label="$str('formimages_label_workspace', 'totara_tui')"
-          :is-stacked="true"
-        >
-          <ImageUploadSetting
-            :metadata="fileData.engageworkspace"
-            :aria-label-extension="
-              $str(
-                'defaultimage',
-                'totara_tui',
-                $str('formimages_label_workspace', 'totara_tui')
-              )
-            "
-            :aria-describedby="$id('formimages-workspace-details')"
-          />
-          <FormRowDetails :id="$id('formimages-workspace-details')">
-            {{ $str('formimages_details_workspace', 'totara_tui') }}
-          </FormRowDetails>
-        </FormRow>
-      </FormRowStack>
-    </Collapsible>
+      <Collapsible
+        v-if="
+          flavoursData.engage &&
+            (fileData.engageresource || fileData.engageworkspace)
+        "
+        :label="$str('formimages_group_engage', 'totara_tui')"
+        :initial-state="true"
+      >
+        <FormRowStack>
+          <FormRow
+            v-if="fileData.engageresource"
+            :label="$str('formimages_label_resource', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <ImageUploadSetting
+              :metadata="fileData.engageresource"
+              :aria-label-extension="
+                $str(
+                  'defaultimage',
+                  'totara_tui',
+                  $str('formimages_label_resource', 'totara_tui')
+                )
+              "
+              :aria-describedby="$id('formimages-resource-details')"
+            />
+            <FormRowDetails :id="$id('formimages-resource-details')">
+              {{ $str('formimages_details_resource', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+          <FormRow
+            v-if="fileData.engageworkspace"
+            :label="$str('formimages_label_workspace', 'totara_tui')"
+            :is-stacked="true"
+          >
+            <ImageUploadSetting
+              :metadata="fileData.engageworkspace"
+              :aria-label-extension="
+                $str(
+                  'defaultimage',
+                  'totara_tui',
+                  $str('formimages_label_workspace', 'totara_tui')
+                )
+              "
+              :aria-describedby="$id('formimages-workspace-details')"
+            />
+            <FormRowDetails :id="$id('formimages-workspace-details')">
+              {{ $str('formimages_details_workspace', 'totara_tui') }}
+            </FormRowDetails>
+          </FormRow>
+        </FormRowStack>
+      </Collapsible>
 
-    <FormRow>
-      <ButtonGroup>
-        <Button
-          :styleclass="{ primary: 'true' }"
-          :text="$str('save', 'totara_core')"
-          :aria-label="
-            $str(
-              'saveextended',
-              'totara_core',
-              $str('tabimages', 'totara_tui') +
-                ' ' +
-                $str('settings', 'totara_core')
-            )
-          "
-          :disabled="isSaving"
-          type="submit"
-        />
-      </ButtonGroup>
-    </FormRow>
+      <FormRow>
+        <ButtonGroup>
+          <Button
+            :styleclass="{ primary: 'true' }"
+            :text="$str('save', 'totara_core')"
+            :aria-label="
+              $str(
+                'saveextended',
+                'totara_core',
+                $str('tabimages', 'totara_tui') +
+                  ' ' +
+                  $str('settings', 'totara_core')
+              )
+            "
+            :disabled="isSaving"
+            type="submit"
+          />
+        </ButtonGroup>
+      </FormRow>
+    </FormRowStack>
   </Uniform>
 </template>
 
