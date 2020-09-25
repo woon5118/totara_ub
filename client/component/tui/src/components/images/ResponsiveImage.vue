@@ -37,6 +37,7 @@ export default {
 
 <style lang="scss">
 .tui-responsiveImage {
+  display: block;
   max-width: 100%;
   height: auto;
 }

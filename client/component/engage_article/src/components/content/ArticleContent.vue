@@ -163,6 +163,7 @@ export default {
 .tui-engageArticleContent {
   &__content {
     flex-grow: 1;
+    width: 100%;
   }
 }
 </style>
