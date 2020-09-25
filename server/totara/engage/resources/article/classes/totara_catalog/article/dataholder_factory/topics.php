@@ -66,7 +66,7 @@ class topics extends dataholder_factory {
                                       FROM {tag_instance} ti
                                       JOIN {tag} t ON t.id = ti.tagid
                                       JOIN {engage_resource} er ON er.id = ti.itemid
-                                     WHERE ti.itemtype = 'engage_article'
+                                     WHERE ti.component = 'engage_article'
                                      GROUP BY er.instanceid) ftstags
                            ON ftstags.instanceid = base.id"
                 ]
@@ -83,7 +83,7 @@ class topics extends dataholder_factory {
                                       FROM {tag_instance} ti
                                       JOIN {tag} t ON t.id = ti.tagid
                                       JOIN {engage_resource} er ON er.id = ti.itemid
-                                     WHERE ti.itemtype = 'engage_article'
+                                     WHERE ti.component = 'engage_article'
                                      GROUP BY er.instanceid) tags
                            ON tags.instanceid = base.id"
                 ]

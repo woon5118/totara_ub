@@ -60,7 +60,7 @@ class topics extends filter_factory {
 
         $filters = [];
 
-        $optionsloader = function () use ($itemtype, $coll) {
+        $optionsloader = function () use ($itemtype, $component, $coll) {
             global $DB;
 
             $sql = '
@@ -69,6 +69,7 @@ class topics extends filter_factory {
                 JOIN "ttr_tag" tag
                     ON tag_instance.tagid = tag.id
                 WHERE tag_instance.itemtype = :itemtype
+                AND tag_instance.component = :component
                 AND tag.tagcollid = :collection_id
             ';
 
@@ -76,6 +77,7 @@ class topics extends filter_factory {
                 $sql,
                 [
                     'itemtype' => $itemtype,
+                    'component' => $component,
                     'collection_id' => $coll->id
                 ]
             );
@@ -101,12 +103,25 @@ class topics extends filter_factory {
         $itemtypeparamkey = 'tfip_' . $collectionid . '_type_' . $objecttype;
         $paneltablealias = 'tfip_' . $collectionid . '_' . $objecttype;
 
+        $tag_instance_select_resource_alias = 'er_' . $collectionid . '_' . $objecttype;
+        $tag_instance_select_tag_alias = 'tg_' . $collectionid . '_' . $objecttype;
+
+        // We have to filter on the tag, however the catalog knows the articleid, but the tags use the resourceid
+        // A join must take place, and since the source doesn't accept a direct join, we do it via subselect instead
+        $taginstance_select = "
+            SELECT {$tag_instance_select_resource_alias}.instanceid AS objectid, 
+                   {$tag_instance_select_tag_alias}.tagid, 
+                   {$tag_instance_select_tag_alias}.itemtype
+            FROM {tag_instance} {$tag_instance_select_tag_alias} 
+            JOIN {engage_resource} {$tag_instance_select_resource_alias} ON {$tag_instance_select_tag_alias}.itemid = {$tag_instance_select_resource_alias}.id 
+            WHERE {$tag_instance_select_resource_alias}.resourcetype = '{$component}'
+        ";
         $paneldatafilter->add_source(
             "{$paneltablealias}.tagid",
-            "{tag_instance}",
+            "({$taginstance_select})",
             $paneltablealias,
             [
-                'objectid' => $paneltablealias . '.itemid',
+                'objectid' => $paneltablealias . '.objectid',
                 'objecttype' => "'{$objecttype}'"
             ],
             "{$paneltablealias}.itemtype = :{$itemtypeparamkey}",
@@ -141,10 +156,10 @@ class topics extends filter_factory {
 
         $browsedatafilter->add_source(
             "{$browsetablealias}.tagid",
-            "{tag_instance}",
+            "({$taginstance_select})",
             $browsetablealias,
             [
-                'objectid' => $browsetablealias . '.itemid',
+                'objectid' => $browsetablealias . '.objectid',
                 'objecttype' => "'{$objecttype}'"
             ],
             "{$browsetablealias}.itemtype = :{$itemtypeparamkey}",
@@ -168,6 +183,5 @@ class topics extends filter_factory {
         );
 
         return $filters;
-
     }
 }

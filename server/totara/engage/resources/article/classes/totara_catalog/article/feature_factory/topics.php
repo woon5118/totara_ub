@@ -70,14 +70,15 @@ class topics extends feature_factory {
 
         $datafilter->add_source(
             'notused',
-            "(SELECT tag_instance.itemid, 1 AS featured
+            "(SELECT engage_resource.instanceid, 1 AS featured
                       FROM {tag_instance} tag_instance
+                      JOIN {engage_resource} engage_resource ON engage_resource.id = tag_instance.itemid
                      WHERE tag_instance.tagid = :{$tagidparamkey}
                        AND tag_instance.itemtype = :{$itemtypeparamkey})",
             $alias,
             [
                 'objecttype' => "'{$objecttype}'",
-                'objectid' => "{$alias}.itemid",
+                'objectid' => "{$alias}.instanceid",
             ],
             "",
             [

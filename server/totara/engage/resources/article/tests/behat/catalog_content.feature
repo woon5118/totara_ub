@@ -80,3 +80,17 @@ Feature: Article catalog content
     And I should see "1 items"
     And "//div[@class='tw-catalogItemNarrow__image']/div/div[contains(@style, 'engage_article') and contains(@style, 'background-image')]" "xpath_element" should exist
 
+  Scenario: Test article can be filtered by a topic
+    Given I log in as "harry"
+    And I click on "Find Learning" in the totara menu
+    Then I should see "Harry Topic Article"
+    And I should see "Harry Public Article"
+
+    When I click on "Topic 2" "link" in the "section.tw-selectRegionPanel" "css_element"
+    Then I should see "Harry Topic Article"
+    And I should not see "Harry Public Article"
+
+    When I click on "Topic 2" "link" in the "section.tw-selectRegionPanel" "css_element"
+    And I click on "Topic 1" "link" in the "section.tw-selectRegionPanel" "css_element"
+    Then I should not see "Harry Topic Article"
+    And I should see "Harry Public Article"
