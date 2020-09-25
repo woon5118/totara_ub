@@ -118,7 +118,7 @@ class favicon_image extends theme_file {
         // Fall back on global setting when tenant favicon not set.
         if ($this->tenant_id > 0) {
             $settings = new settings($this->theme_config, $this->tenant_id);
-            if (!$settings->is_enabled('tenant', 'formtenant_field_tenant', false)) {
+            if (!$settings->is_tenant_branding_enabled()) {
                 $this->tenant_id = 0;
             }
         }

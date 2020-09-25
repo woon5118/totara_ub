@@ -121,7 +121,6 @@ class core_theme_settings_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
         $this->setUser($user_one);
-        $user_context = context_user::instance($user_one->id);
 
         // Test user that does not have permission.
         $result = $this->execute_graphql_operation(
@@ -138,7 +137,7 @@ class core_theme_settings_testcase extends advanced_testcase {
         // Grant user permission.
         $roles = get_archetype_roles('user');
         $role = reset($roles);
-        assign_capability('totara/core:appearance', CAP_ALLOW, $role->id, $user_context, true);
+        assign_capability('totara/core:appearance', CAP_ALLOW, $role->id, context_system::instance(), true);
 
         // Test with capability.
         $result = $this->execute_graphql_operation(
@@ -162,9 +161,8 @@ class core_theme_settings_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
         $this->setUser($user_one);
-        $user_context = context_user::instance($user_one->id);
 
-        $parms = [
+        $params = [
             'theme' => 'ventura',
             'categories' => [
                 [
@@ -182,7 +180,7 @@ class core_theme_settings_testcase extends advanced_testcase {
         ];
 
         // Test user that does not have permission.
-        $result = $this->execute_graphql_operation('core_update_theme_settings', $parms);
+        $result = $this->execute_graphql_operation('core_update_theme_settings', $params);
         $this->assertNotEmpty($result->errors);
         $this->assertEquals(
             'Sorry, but you do not currently have permissions to do that (Configure site appearance settings)',
@@ -192,10 +190,10 @@ class core_theme_settings_testcase extends advanced_testcase {
         // Grant user permission.
         $roles = get_archetype_roles('user');
         $role = reset($roles);
-        assign_capability('totara/core:appearance', CAP_ALLOW, $role->id, $user_context, true);
+        assign_capability('totara/core:appearance', CAP_ALLOW, $role->id, context_system::instance(), true);
 
         // Test with capability.
-        $result = $this->execute_graphql_operation('core_update_theme_settings', $parms);
+        $result = $this->execute_graphql_operation('core_update_theme_settings', $params);
         $this->assertEmpty($result->errors);
         $this->assertNotEmpty($result->data);
 
@@ -204,7 +202,7 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertArrayHasKey('categories', $result->data['core_update_theme_settings']);
         $categories = $result->data['core_update_theme_settings']['categories'];
         $this->assertIsArray($categories);
-        $this->assertEquals(3, sizeof($categories));
+        $this->assertCount(3, $categories);
         $this->validate_default_categories($categories);
 
         // Check colours.
@@ -214,9 +212,9 @@ class core_theme_settings_testcase extends advanced_testcase {
         });
         $this->assertIsArray($colours);
         $colours = array_values($colours);
-        $this->assertEquals(1, sizeof($colours));
+        $this->assertCount(1, $colours);
         $this->assertArrayHasKey('properties', $colours[0]);
-        $this->assertEquals(1, sizeof($colours[0]['properties']));
+        $this->assertCount(1, $colours[0]['properties']);
         $property = reset($colours[0]['properties']);
         $this->assertEquals('test_name', $property['name']);
         $this->assertEquals('value', $property['type']);
@@ -766,6 +764,36 @@ class core_theme_settings_testcase extends advanced_testcase {
         );
     }
 
+    public function test_is_tenant_branding_enabled() {
+        $theme_config = theme_config::load('ventura');
+        $settings = new settings($theme_config, 0);
+        self::assertFalse($settings->is_tenant_branding_enabled());
+
+        $generator = self::getDataGenerator();
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        $settings = new settings($theme_config, $tenant1->id);
+        self::assertFalse($settings->is_tenant_branding_enabled());
+        $settings = new settings($theme_config, $tenant2->id);
+        self::assertFalse($settings->is_tenant_branding_enabled());
+
+        self::enable_tenant_branding($tenant1->id);
+        $settings = new settings($theme_config, $tenant1->id);
+        self::assertTrue($settings->is_tenant_branding_enabled());
+        $settings = new settings($theme_config, $tenant2->id);
+        self::assertFalse($settings->is_tenant_branding_enabled());
+
+        self::disable_tenant_branding($tenant1->id);
+        self::enable_tenant_branding($tenant2->id);
+        $settings = new settings($theme_config, $tenant1->id);
+        self::assertFalse($settings->is_tenant_branding_enabled());
+        $settings = new settings($theme_config, $tenant2->id);
+        self::assertTrue($settings->is_tenant_branding_enabled());
+    }
+
     private function skip_if_build_not_present() {
         if (!file_exists(bundle::get_vendors_file())) {
             $this->markTestSkipped('Tui build files must exist for this test to complete.');
@@ -797,4 +825,36 @@ class core_theme_settings_testcase extends advanced_testcase {
         return [$css, $messages, $prop->getValue($resolver)];
     }
 
+    /**
+     * Enable or disable tenant branding for given tenant_id.
+     *
+     * @param int $tenant_id
+     * @param bool $enable
+     */
+    private static function enable_tenant_branding(int $tenant_id, $enable = true): void {
+        $value = $enable ? 'true' : 'false';
+        $theme_config = \theme_config::load('ventura');
+        $theme_settings = new settings($theme_config, $tenant_id);
+        $theme_settings->update_categories([
+            [
+                'name' => 'tenant',
+                'properties' => [
+                    [
+                        'name' => 'formtenant_field_tenant',
+                        'type' => 'boolean',
+                        'value' => $value
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * Disable tenant branding for given id
+     *
+     * @param int $tenant_id
+     */
+    private static function disable_tenant_branding(int $tenant_id): void {
+        self::enable_tenant_branding($tenant_id, false);
+    }
 }

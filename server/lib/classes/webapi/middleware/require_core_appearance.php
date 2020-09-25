@@ -24,6 +24,7 @@
 namespace core\webapi\middleware;
 
 use Closure;
+use core\entities\tenant;
 use core\webapi\middleware;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
@@ -46,14 +47,17 @@ class require_core_appearance implements middleware {
      * @inheritDoc
      */
     public function handle(payload $payload, Closure $next): result {
-        global $USER;
+        global $CFG;
 
         // Because appearance is tenant aware we need to check the capability on tenant context level.
         $tenant_id = $payload->get_variable($this->tenant_id_argument_name);
-        if (!empty($tenant_id)) {
+        if ($CFG->tenantsenabled && !empty($tenant_id)) {
+            if (!tenant::repository()->find($tenant_id)) {
+                throw new \invalid_parameter_exception('Invalid tenant_id');
+            }
             $context = \context_tenant::instance($tenant_id);
         } else {
-            $context = \context_user::instance($USER->id);
+            $context = \context_system::instance();
         }
 
         require_capability('totara/core:appearance', $context);

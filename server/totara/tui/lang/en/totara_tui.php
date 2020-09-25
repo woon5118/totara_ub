@@ -125,5 +125,5 @@ $string['editsitebranding'] = 'Edit site brand';
 $string['edittenantsetting'] = 'Edit settings for {$a}';
 $string['site'] = 'Site';
 $string['sitebranding'] = 'Site branding';
-$string['sitebrandinginformation'] = 'Control the visual appearance of your site bran such as logos, colours, default images etc.';
+$string['sitebrandinginformation'] = 'Control the visual appearance of your site brand such as logos, colours, default images etc.';
 $string['tenantbranding'] = 'Tenant branding';

@@ -287,7 +287,7 @@ final class settings {
         // If tenant then check if tenant enabled.
         $tenant_enabled = false;
         if ($this->tenant_id > 0) {
-            $tenant_enabled = $this->is_enabled('tenant', 'formtenant_field_tenant', false);
+            $tenant_enabled = $this->is_tenant_branding_enabled();
         }
 
         $css = '';
@@ -300,7 +300,7 @@ final class settings {
                     return $property['type'] === 'boolean';
                 });
                 $css = ':root{';
-                foreach($category['properties'] as $property) {
+                foreach ($category['properties'] as $property) {
                     if ($property['type'] !== 'value') {
                         continue;
                     }
@@ -315,7 +315,7 @@ final class settings {
             // Custom CSS is just output as it is - the user will need
             // to know how to format it correctly.
             if ($category['name'] === 'custom') {
-                foreach($category['properties'] as $property) {
+                foreach ($category['properties'] as $property) {
                     $css .= "\n{$property['value']}\n";
                 }
             }
@@ -354,6 +354,15 @@ final class settings {
         return !empty($prop)
             ? filter_var($prop['value'], FILTER_VALIDATE_BOOLEAN) ?? $default
             : $default;
+    }
+
+    /**
+     * Check if tenant branding is enabled.
+     *
+     * @return bool
+     */
+    public function is_tenant_branding_enabled(): bool {
+        return $this->is_enabled('tenant', 'formtenant_field_tenant', false);
     }
 
 }

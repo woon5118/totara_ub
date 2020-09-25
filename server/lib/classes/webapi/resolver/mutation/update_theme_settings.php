@@ -48,11 +48,20 @@ final class update_theme_settings implements mutation_resolver, has_middleware {
         $categories = $args['categories'];
         $files = $args['files'];
 
+        if (!empty($tenant_id) && !$CFG->tenantsenabled) {
+            throw new \invalid_parameter_exception('Can only set tenant_id when multi-tenancy is enabled.');
+        }
+
         // Load theme config for theme.
         $theme_config = \theme_config::load($theme);
 
         // Save settings.
         $theme_settings = new theme_settings($theme_config, $tenant_id);
+
+        if (!empty($tenant_id) && !$theme_settings->is_tenant_branding_enabled()) {
+            throw new \invalid_parameter_exception('Tenant branding is not enabled for this tenant.');
+        }
+
         $theme_settings->validate_categories($categories);
         $theme_settings->update_categories($categories);
         $theme_settings->update_files($files, $USER->id);
@@ -73,5 +82,4 @@ final class update_theme_settings implements mutation_resolver, has_middleware {
             new require_core_appearance('tenant_id'),
         ];
     }
-
 }

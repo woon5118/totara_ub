@@ -80,7 +80,7 @@ class theme_tenants extends admin_controller {
         $tenants = tenant::repository()->select(['id', 'idnumber', 'name'])->get()->to_array();
         $tenants = array_map(function ($tenant) use ($theme_config) {
             $theme_settings = new \core\theme\settings($theme_config, $tenant['id']);
-            $tenant['customBranding'] = $theme_settings->is_enabled('tenant', 'formtenant_field_tenant');
+            $tenant['customBranding'] = $theme_settings->is_tenant_branding_enabled();
             return $tenant;
         }, $tenants);
         $props = [
