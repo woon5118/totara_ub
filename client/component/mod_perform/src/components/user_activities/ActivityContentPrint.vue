@@ -104,7 +104,7 @@
                   <ElementParticipantForm
                     v-if="
                       sectionElement.is_respondable &&
-                        participantCanAnswer &&
+                        sectionElement.can_answer &&
                         !viewOnlyReportMode
                     "
                   >
@@ -458,6 +458,7 @@ export default {
                 responseData: null,
               },
               sort_order: item.sort_order,
+              can_answer: this.participantCanAnswer,
               is_respondable: item.element.is_respondable,
               response_data: item.response_data,
               other_responder_groups: item.other_responder_groups,
