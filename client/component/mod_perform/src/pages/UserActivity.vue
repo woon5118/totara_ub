@@ -38,6 +38,7 @@
         :created-at="subjectInstance.created_at"
         :due-date="subjectInstance.due_date"
         :token="token"
+        :job-assignments="jobAssignments"
       />
       <ActivityContent
         v-else-if="!print && subjectInstance"

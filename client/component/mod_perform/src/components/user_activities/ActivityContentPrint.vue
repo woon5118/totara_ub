@@ -18,24 +18,13 @@
 <template>
   <Loader :loading="$apollo.loading">
     <div class="tui-participantContent">
-      <div class="tui-participantContent__user">
-        <ParticipantUserHeader
-          :user-name="subjectUser.fullname"
-          :profile-picture="subjectUser.profileimageurlsmall"
-          size="small"
-          class="tui-participantContent__user-info"
-        />
-        <div
-          v-if="!viewOnlyReportMode"
-          class="tui-participantContent__user-relationship"
-        >
-          {{ $str('user_activities_your_relationship_to_user', 'mod_perform') }}
-          <h4 class="tui-participantContent__user-relationshipValue">
-            {{ relationshipToUser }}
-          </h4>
-        </div>
-      </div>
-
+      <ParticipantGeneralInformation
+        v-if="subjectUser.card_display && !viewOnlyReportMode"
+        :subject-user="subjectUser"
+        :job-assignments="jobAssignments"
+        :current-user-is-subject="currentUserIsSubject"
+        :relationship="currentRelationship"
+      />
       <div class="tui-participantContentPrint__header">
         <h2 class="tui-participantContentPrint__header-type">
           {{ activity.type.display_name }}
@@ -154,7 +143,7 @@ import Button from 'tui/components/buttons/Button';
 import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
 import Loader from 'tui/components/loading/Loader';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
-import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
+import ParticipantGeneralInformation from 'mod_perform/components/user_activities/participant/ParticipantGeneralInformation';
 import RequiredOptionalIndicator from 'mod_perform/components/user_activities/RequiredOptionalIndicator';
 import { Uniform } from 'tui/components/uniform';
 
@@ -170,7 +159,7 @@ export default {
     ElementParticipantForm,
     Loader,
     OtherParticipantResponses,
-    ParticipantUserHeader,
+    ParticipantGeneralInformation,
     Uniform,
   },
 
@@ -237,6 +226,11 @@ export default {
     token: {
       required: false,
       type: String,
+    },
+
+    jobAssignments: {
+      type: Array,
+      required: true,
     },
   },
   data() {
@@ -379,6 +373,9 @@ export default {
       return this.answerableParticipantInstances.find(
         pi => Number(pi.id) === Number(this.answeringAsParticipantId)
       );
+    },
+    currentRelationship() {
+      return this.answeringAs ? this.answeringAs.core_relationship.name : null;
     },
   },
   apollo: {

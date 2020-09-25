@@ -1,0 +1,6 @@
+This files describes API changes in /client/component/mod_perform,
+information provided here is intended especially for developers.
+
+=== 13.1 ===
+* Updated template structure of ActivityContentPrint.vue component to display ParticipantGeneralInformation
+    * Template
