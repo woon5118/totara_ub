@@ -1,0 +1,62 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD's customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>*/
+/* @module tuickage   tui*/
+
+$tui-gap: 0.4rem;
+
+:root {
+  /* Common spacing used for margin & padding*/
+  --gap-1: ($tui-gap * 1);
+  --gap-2: ($tui-gap * 2);
+  --gap-3: ($tui-gap * 3);
+  --gap-4: ($tui-gap * 4);
+  --gap-5: ($tui-gap * 5);
+  --gap-6: ($tui-gap * 6);
+  --gap-7: ($tui-gap * 7);
+  --gap-8: ($tui-gap * 8);
+  --gap-9: ($tui-gap * 9);
+  --gap-10: ($tui-gap * 10);
+  --gap-11: ($tui-gap * 11);
+  --gap-12: ($tui-gap * 12);
+
+  /**/
+  /* Grid*/
+  /**/
+
+  /* default gutter value starts with a global gutter value, changes to other*/
+  /* global gutter values at viewport/container breakpoints*/
+  --grid-gutter: var(--gap-5);
+  /* Global default for 'how many columns are in the grid'*/
+  /* specified for use with theme.getVar('grid-maxunits') in Grid.vue*/
+  --grid-maxunits: 12;
+
+  --paragraph-gap: var(--gap-2);
+}
+
+/* Outside-in spacing: Stack*/
+/* Stacks provide spacing between their children.*/
+@mixin tui-stack-vertical($gap) {
+  & > * + * {
+    margin-top: $gap;
+  }
+}
+@mixin tui-stack-horizontal($gap) {
+  & > * + * {
+    margin-left: $gap;
+  }
+}
+
+
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9jbGllbnQvY29tcG9uZW50L3R1aS9zcmMvZ2xvYmFsX3N0eWxlcy92YXJpYWJsZXMvdHVpX3NwYWNpbmcuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBIiwiZmlsZSI6ImNsaWVudC9jb21wb25lbnQvdHVpL2J1aWxkL2dsb2JhbF9zdHlsZXMvdmFyaWFibGVzL3R1aV9zcGFjaW5nLmRldmVsb3BtZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIvKiBUaGlzIGZpbGUgaXMgcGFydCBvZiBUb3RhcmEgRW50ZXJwcmlzZSBFeHRlbnNpb25zLiovXG4vKiovXG4vKiBDb3B5cmlnaHQgKEMpIDIwMjAgb253YXJkcyBUb3RhcmEgTGVhcm5pbmcgU29sdXRpb25zIExURCovXG4vKiovXG4vKiBUb3RhcmEgRW50ZXJwcmlzZSBFeHRlbnNpb25zIGlzIHByb3ZpZGVkIG9ubHkgdG8gVG90YXJhKi9cbi8qIExlYXJuaW5nIFNvbHV0aW9ucyBMVEQncyBjdXN0b21lcnMgYW5kIHBhcnRuZXJzLCBwdXJzdWFudCB0byovXG4vKiB0aGUgdGVybXMgYW5kIGNvbmRpdGlvbnMgb2YgYSBzZXBhcmF0ZSBhZ3JlZW1lbnQgd2l0aCBUb3RhcmEqL1xuLyogTGVhcm5pbmcgU29sdXRpb25zIExURCBvciBpdHMgYWZmaWxpYXRlLiovXG4vKiovXG4vKiBJZiB5b3UgZG8gbm90IGhhdmUgYW4gYWdyZWVtZW50IHdpdGggVG90YXJhIExlYXJuaW5nIFNvbHV0aW9ucyovXG4vKiBMVEQsIHlvdSBtYXkgbm90IGFjY2VzcywgdXNlLCBtb2RpZnksIG9yIGRpc3RyaWJ1dGUgdGhpcyBzb2Z0d2FyZS4qL1xuLyogUGxlYXNlIGNvbnRhY3QgW2xpY2Vuc2luZ0B0b3RhcmFsZWFybmluZy5jb21dIGZvciBtb3JlIGluZm9ybWF0aW9uLiovXG4vKiovXG4vKiBAYXV0aG9yICAgIEtldmluIEhvdHRpbmdlciA8a2V2aW4uaG90dGluZ2VyQHRvdGFyYWxlYXJuaW5nLmNvbT4qL1xuLyogQG1vZHVsZSB0dWlja2FnZSAgIHR1aSovXG5cbiR0dWktZ2FwOiAwLjRyZW07XG5cbjpyb290IHtcbiAgLyogQ29tbW9uIHNwYWNpbmcgdXNlZCBmb3IgbWFyZ2luICYgcGFkZGluZyovXG4gIC0tZ2FwLTE6ICgkdHVpLWdhcCAqIDEpO1xuICAtLWdhcC0yOiAoJHR1aS1nYXAgKiAyKTtcbiAgLS1nYXAtMzogKCR0dWktZ2FwICogMyk7XG4gIC0tZ2FwLTQ6ICgkdHVpLWdhcCAqIDQpO1xuICAtLWdhcC01OiAoJHR1aS1nYXAgKiA1KTtcbiAgLS1nYXAtNjogKCR0dWktZ2FwICogNik7XG4gIC0tZ2FwLTc6ICgkdHVpLWdhcCAqIDcpO1xuICAtLWdhcC04OiAoJHR1aS1nYXAgKiA4KTtcbiAgLS1nYXAtOTogKCR0dWktZ2FwICogOSk7XG4gIC0tZ2FwLTEwOiAoJHR1aS1nYXAgKiAxMCk7XG4gIC0tZ2FwLTExOiAoJHR1aS1nYXAgKiAxMSk7XG4gIC0tZ2FwLTEyOiAoJHR1aS1nYXAgKiAxMik7XG5cbiAgLyoqL1xuICAvKiBHcmlkKi9cbiAgLyoqL1xuXG4gIC8qIGRlZmF1bHQgZ3V0dGVyIHZhbHVlIHN0YXJ0cyB3aXRoIGEgZ2xvYmFsIGd1dHRlciB2YWx1ZSwgY2hhbmdlcyB0byBvdGhlciovXG4gIC8qIGdsb2JhbCBndXR0ZXIgdmFsdWVzIGF0IHZpZXdwb3J0L2NvbnRhaW5lciBicmVha3BvaW50cyovXG4gIC0tZ3JpZC1ndXR0ZXI6IHZhcigtLWdhcC01KTtcbiAgLyogR2xvYmFsIGRlZmF1bHQgZm9yICdob3cgbWFueSBjb2x1bW5zIGFyZSBpbiB0aGUgZ3JpZCcqL1xuICAvKiBzcGVjaWZpZWQgZm9yIHVzZSB3aXRoIHRoZW1lLmdldFZhcignZ3JpZC1tYXh1bml0cycpIGluIEdyaWQudnVlKi9cbiAgLS1ncmlkLW1heHVuaXRzOiAxMjtcblxuICAtLXBhcmFncmFwaC1nYXA6IHZhcigtLWdhcC0yKTtcbn1cblxuLyogT3V0c2lkZS1pbiBzcGFjaW5nOiBTdGFjayovXG4vKiBTdGFja3MgcHJvdmlkZSBzcGFjaW5nIGJldHdlZW4gdGhlaXIgY2hpbGRyZW4uKi9cbkBtaXhpbiB0dWktc3RhY2stdmVydGljYWwoJGdhcCkge1xuICAmID4gKiArICoge1xuICAgIG1hcmdpbi10b3A6ICRnYXA7XG4gIH1cbn1cbkBtaXhpbiB0dWktc3RhY2staG9yaXpvbnRhbCgkZ2FwKSB7XG4gICYgPiAqICsgKiB7XG4gICAgbWFyZ2luLWxlZnQ6ICRnYXA7XG4gIH1cbn1cbiJdLCJzb3VyY2VSb290IjoiIn0=

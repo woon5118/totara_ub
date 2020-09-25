@@ -1,0 +1,15 @@
+.tui-elementEditShortText {
+  &__action-buttons {
+    display: flex;
+    align-items: end;
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
+
+.tui-shortTextElementParticipantResponse {
+  &__noResponse {
+    @include tui-font-hint();
+  }
+}
+
