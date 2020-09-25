@@ -56,7 +56,7 @@
 
       <div class="tui-playlistForm__description-tip">
         <p>{{ $str('contributetip', 'totara_engage') }}</p>
-        <InfoIconButton :aria-label="$str('info', 'moodle')">
+        <InfoIconButton :is-help-for="$str('hashtags', 'totara_engage')">
           {{ $str('contributetip_help', 'totara_engage') }}
         </InfoIconButton>
       </div>
@@ -68,7 +68,7 @@
         :styleclass="{ primary: 'true' }"
         :disabled="disabled"
         :aria-label="$str('createplaylistshort', 'totara_playlist')"
-        :text="$str('next', 'moodle')"
+        :text="$str('next', 'core')"
         @click="submit"
       />
 
@@ -143,8 +143,7 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
-      "info",
+    "core": [
       "next"
     ],
     "totara_core": [
@@ -159,7 +158,8 @@ export default {
     ],
     "totara_engage": [
       "contributetip",
-      "contributetip_help"
+      "contributetip_help",
+      "hashtags"
     ]
   }
 </lang-strings>

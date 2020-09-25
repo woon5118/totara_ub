@@ -10,8 +10,8 @@ Feature: Archive user assignments on competency details page and view archived a
       | fullname       | idnumber |
       | High Framework | HSCH1    |
     And the following "organisations" exist in "totara_hierarchy" plugin:
-      | org_framework | fullname       | shortname | idnumber |
-      | HSCH1         | High School 1  | org1      | org1     |
+      | org_framework | fullname      | shortname | idnumber |
+      | HSCH1         | High School 1 | org1      | org1     |
     And the following "position frameworks" exist in "totara_hierarchy" plugin:
       | fullname        | idnumber |
       | Position Root 1 | PFW001   |
@@ -19,26 +19,26 @@ Feature: Archive user assignments on competency details page and view archived a
       | pos_framework | fullname   | shortname | idnumber |
       | PFW001        | Position 1 | pos1      | pos1     |
     And the following job assignments exist:
-      | user    | idnumber | manager  | organisation | position |
-      | student | 1        | teacher  | org1         | pos1     |
+      | user    | idnumber | manager | organisation | position |
+      | student | 1        | teacher | org1         | pos1     |
 
     And a competency scale called "Sample scale" exists with the following values:
-      | name         | description  | idnumber     | proficient | default | sortorder |
-      | Beginner     | Start        | start        | 0          | 1       | 1         |
-      | Intermediate | Experienced  | middle       | 0          | 0       | 2         |
-      | World-class  | Veteran      | best         | 1          | 0       | 3         |
+      | name         | description | idnumber | proficient | default | sortorder |
+      | Beginner     | Start       | start    | 0          | 1       | 1         |
+      | Intermediate | Experienced | middle   | 0          | 0       | 2         |
+      | World-class  | Veteran     | best     | 1          | 0       | 3         |
     And the following "competency" frameworks exist:
-      | fullname         | idnumber | description                    | scale        |
-      | Sample framework | sam1     | Framework for Competencies     | Sample scale |
+      | fullname         | idnumber | description                | scale        |
+      | Sample framework | sam1     | Framework for Competencies | Sample scale |
     And the following hierarchy types exist:
       | hierarchy  | idnumber | fullname            |
       | competency | type1    | Competency Type One |
       | competency | type2    | Competency Type Two |
     And the following "competency" hierarchy exists:
-      | framework  | fullname  | idnumber | type  | description  | assignavailability |
-      | sam1       | Comp 1    | comp1    | type1 | Lorem        | any                |
-      | sam1       | Comp 2    | comp2    | type1 | Ipsum        | any                |
-      | sam1       | Comp 3    | comp3    | type2 | Dixon        | any                |
+      | framework | fullname | idnumber | type  | description | assignavailability |
+      | sam1      | Comp 1   | comp1    | type1 | Lorem       | any                |
+      | sam1      | Comp 2   | comp2    | type1 | Ipsum       | any                |
+      | sam1      | Comp 3   | comp3    | type2 | Dixon       | any                |
 
     And the following "courses" exist:
       | fullname | shortname | enablecompletion |
@@ -57,8 +57,8 @@ Feature: Archive user assignments on competency details page and view archived a
       | idnumber          | courses                 | number_required |
       | coursecompletion1 | course1,course2,course3 | 2               |
     And the following "criteria group pathways" exist in "totara_competency" plugin:
-      | competency  | scale_value  | criteria          | sortorder |
-      | comp2       | best         | coursecompletion1 | 1         |
+      | competency | scale_value | criteria          | sortorder |
+      | comp2      | best        | coursecompletion1 | 1         |
 
     # Expand the assignments - needed for them to be activated
     And I run the scheduled task "totara_competency\task\expand_assignments_task"
@@ -66,10 +66,10 @@ Feature: Archive user assignments on competency details page and view archived a
 
     #Assign competency to student. Self and Other assigned.
     And the following "assignments" exist in "totara_competency" plugin:
-      | competency | user_group_type | user_group   | type  |
-      | comp1      | user            | student      | other |
-      | comp1      | user            | student      | self  |
-      | comp2      | user            | student      | self  |
+      | competency | user_group_type | user_group | type  |
+      | comp1      | user            | student    | other |
+      | comp1      | user            | student    | self  |
+      | comp2      | user            | student    | self  |
     And I run the scheduled task "totara_competency\task\expand_assignments_task"
 
   Scenario: Archive self-assigned and other-assigned competency as manager
@@ -118,6 +118,6 @@ Feature: Archive user assignments on competency details page and view archived a
       | Legacy Assignment | Proficient         |
     And I should see the current date in format "j F Y" in the ".tui-competencyDetailArchivedAssignments .tui-dataTableRows > div:nth-of-type(1) > div:nth-of-type(2)" "css_element"
     And I should see the current date in format "j F Y" in the ".tui-competencyDetailArchivedAssignments .tui-dataTableRows > div:nth-of-type(2) > div:nth-of-type(2)" "css_element"
-    When I click on "More information" "button"
+    When I click on "Show help for Proficiency status" "button"
     Then I should see "This rating was determined through methods which have been discontinued." in the tui popover
     And I should see "These include learning plans, course completion, or proficiency in child competencies, in previous versions of the system." in the tui popover

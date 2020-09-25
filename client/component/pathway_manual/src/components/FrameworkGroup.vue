@@ -33,7 +33,7 @@
           <div class="tui-bulkManualRatingFrameworkGroup__headerWithHelp">
             {{ $str('new_rating', 'pathway_manual') }}
             <InfoIconButton
-              :aria-label="$str('rating_scale_help', 'totara_competency')"
+              :is-help-for="$str('rating_scale', 'totara_competency')"
               position="right"
             >
               <RatingScaleOverview :scale="group" :show-descriptions="true" />
@@ -203,7 +203,7 @@ export default {
       "rating_set_to_none"
     ],
     "totara_competency": [
-      "rating_scale_help"
+      "rating_scale"
     ],
     "totara_hierarchy": [
       "competency"

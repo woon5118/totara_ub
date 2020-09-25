@@ -735,6 +735,7 @@ $string['sharedsrcinfo'] = 'Web server document root check';
 $string['sharedsrcwarning'] = 'For security reasons only /server/ subdirectory should be accessible through the web server, it means that $CFG->wwwroot cannot end with /server.';
 $string['showfeature'] = 'Show';
 $string['show_filters'] = 'Show filters';
+$string['show_help_for_x'] = 'Show help for {$a}';
 $string['sitemanager'] = 'Site Manager';
 $string['siteregistrationemailbody'] = 'Site {$a} was not able to register itself automatically. Access to push data to our registrations site is probably blocked by a firewall.';
 $string['sitetype'] = 'Type of site';

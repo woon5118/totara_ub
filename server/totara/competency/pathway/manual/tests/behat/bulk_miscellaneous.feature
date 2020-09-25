@@ -63,7 +63,7 @@ Feature: Test miscellaneous bulk manual rating features.
     And I click on "Rate competencies" "link"
 
     Then I should see "New rating"
-    When I click on "Show information about the rating scale" "button"
+    When I click on "Show help for Rating scale" "button"
     Then I should see "Rating scale" in the ".tui-competencyRatingScaleOverview" "css_element"
     And I should see "This value is proficient." in the ".tui-competencyRatingScaleOverview" "css_element"
     And I should see "This value is not proficient." in the ".tui-competencyRatingScaleOverview" "css_element"
@@ -74,9 +74,9 @@ Feature: Test miscellaneous bulk manual rating features.
     And I click on "Rate others' competencies" "link" in the ".block_totara_user_profile_category_development" "css_element"
     Then I should not see "January 2020"
     Given the following "manual ratings" exist in "totara_competency" plugin:
-      | competency | subject_user | rater_user | role      | scale_value | date       |
-      | comp1      | user1        | user2      | manager   |             | 2020-01-02 |
-      | comp1      | user1        | user2      | manager   |             | 2020-01-01 |
+      | competency | subject_user | rater_user | role    | scale_value | date       |
+      | comp1      | user1        | user2      | manager |             | 2020-01-02 |
+      | comp1      | user1        | user2      | manager |             | 2020-01-01 |
     When I reload the page
     Then I should see "2 January 2020"
     When I click on "User One" "link"

@@ -37,6 +37,7 @@
           :desc-id="ariaDescribedbyId"
           :helpmsg="helpmsg"
           :hidden="hidden"
+          :label="label || null"
           :title="helpTitle"
         />
       </div>

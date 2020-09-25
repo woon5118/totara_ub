@@ -22,7 +22,7 @@
       <template v-slot:trigger>
         <ButtonIcon
           class="tui-formHelpIcon__icon"
-          :aria-label="$str('help', 'moodle')"
+          :aria-label="ariaLabel"
           :title="iconLabel || helpmsg"
           :styleclass="{ transparent: true }"
         >
@@ -70,14 +70,28 @@ export default {
     title: {
       type: String,
     },
+    label: String,
+  },
+
+  computed: {
+    ariaLabel() {
+      if (this.label && this.label.trim().length > 0) {
+        return this.$str('show_help_for_x', 'totara_core', this.label);
+      }
+
+      return this.$str('help', 'core');
+    },
   },
 };
 </script>
 
 <lang-strings>
 {
-  "moodle": [
+  "core": [
     "help"
+  ],
+  "totara_core": [
+    "show_help_for_x"
   ]
 }
 </lang-strings>

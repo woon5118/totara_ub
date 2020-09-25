@@ -125,6 +125,7 @@ $string['filtersearch'] = 'Search';
 $string['filtersection'] = 'Section';
 $string['foundin'] = 'Found in ';
 $string['grid'] = 'Grid';
+$string['hashtags'] = 'hashtags';
 $string['hourago'] = '{$a} hour ago';
 $string['hoursago'] = '{$a} hours ago';
 $string['itemscount'] = '{$a} items';

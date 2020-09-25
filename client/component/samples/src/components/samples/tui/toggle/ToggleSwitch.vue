@@ -38,7 +38,7 @@
         :toggle-first="toggleFirst"
       >
         <template v-slot:icon>
-          <InfoIconButton :aria-label="'Help'">
+          <InfoIconButton :aria-label="'Help for the toggle switch'">
             Some content here...
           </InfoIconButton>
         </template>

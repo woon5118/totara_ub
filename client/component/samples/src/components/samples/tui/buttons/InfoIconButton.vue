@@ -21,7 +21,10 @@
     The button icon component is used when triggering an on page action.
 
     <SamplesExample>
-      <InfoIconButton :aria-label="'Add'" :disabled="disabled">
+      <InfoIconButton
+        :is-help-for="'example control name'"
+        :disabled="disabled"
+      >
         Some content here...
       </InfoIconButton>
     </SamplesExample>
@@ -68,7 +71,7 @@ export default {
       disabled: false,
       smallStyle: false,
       text: '',
-      codeTemplate: `<InfoIconButton :aria-label="'Add'" :disabled="disabled">
+      codeTemplate: `<InfoIconButton :is-help-for="'example control name'" :disabled="disabled">
   Some content here...
 </InfoIconButton>`,
       codeScript: `import InfoIconButton from 'tui/components/buttons/InfoIconButton';

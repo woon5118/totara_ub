@@ -24,7 +24,7 @@
       class="tui-engageSharedRecipientsSelector__label"
     />
     <InfoIconButton
-      :aria-label="$str('info', 'moodle')"
+      :is-help-for="shareLabel"
       class="tui-engageSharedRecipientsSelector__icon"
     >
       {{ shareHelpInfo }}
@@ -387,9 +387,6 @@ export default {
 
 <lang-strings>
   {
-    "moodle": [
-      "info"
-    ],
     "totara_engage": [
       "alreadyshared",
       "resharetorecipients",

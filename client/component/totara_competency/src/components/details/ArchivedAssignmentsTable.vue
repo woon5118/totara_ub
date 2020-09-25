@@ -55,7 +55,7 @@
           <ProficientStatus :proficient-status="row.proficient" />
           <InfoIconButton
             v-if="row.legacy"
-            :aria-label="$str('more_information', 'totara_competency')"
+            :is-help-for="$str('proficiency_status', 'totara_competency')"
           >
             <h4
               class="tui-competencyDetailArchivedAssignmentsTable__discontinued"
@@ -107,7 +107,6 @@ export default {
       "assignment_date_archived",
       "legacy_assignment_rating_description",
       "legacy_assignment_rating_discontinued",
-      "more_information",
       "proficiency_status"
     ]
   }

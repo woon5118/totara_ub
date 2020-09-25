@@ -33,7 +33,7 @@ exports[`totara_playlist/components/form/PlaylistForm.vue Checks snapshot 1`] = 
       </p>
        
       <infoiconbutton-stub
-        arialabel="info, moodle"
+        ishelpfor="hashtags, totara_engage"
       >
         
         contributetip_help, totara_engage
@@ -49,7 +49,7 @@ exports[`totara_playlist/components/form/PlaylistForm.vue Checks snapshot 1`] = 
       aria-label="createplaylistshort, totara_playlist"
       disabled="true"
       styleclass="[object Object]"
-      text="next, moodle"
+      text="next, core"
       type="button"
     />
      

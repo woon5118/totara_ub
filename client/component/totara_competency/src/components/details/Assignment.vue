@@ -42,14 +42,6 @@
           >
             <p class="tui-competencyDetailAssignment__level-header">
               {{ $str('achievement_level', 'totara_competency') }}
-              <!--
-              This will be implemented in a later ticket, once a string has been decided on
-              <InfoIconButton
-                :aria-label="$str('more_information', 'totara_competency')"
-                :class="'tui-competencyDetailAssignment__level-infoBtn'"
-              >
-                ...
-              </InfoIconButton> -->
             </p>
             <div class="tui-competencyDetailAssignment__level-text">
               {{ selectedAssignmentProficiency.name }}

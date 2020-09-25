@@ -17,15 +17,7 @@
 -->
 
 <template>
-  <InfoIconButton
-    :aria-label="
-      $str(
-        'show_help_for_x',
-        'totara_competency',
-        $str('last_rating_given', 'pathway_manual')
-      )
-    "
-  >
+  <InfoIconButton :is-help-for="$str('last_rating_given', 'pathway_manual')">
     <template v-if="isForSelf">
       {{ $str('last_rating_given_self_tooltip', 'pathway_manual') }}
     </template>
@@ -57,9 +49,6 @@ export default {
       "last_rating_given",
       "last_rating_given_other_tooltip",
       "last_rating_given_self_tooltip"
-    ],
-    "totara_competency": [
-      "show_help_for_x"
     ]
   }
 </lang-strings>

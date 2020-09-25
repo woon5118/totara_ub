@@ -21,7 +21,7 @@
     <template v-slot:trigger="{ isOpen }">
       <ButtonIcon
         :aria-expanded="isOpen.toString()"
-        :aria-label="ariaLabel"
+        :aria-label="label"
         :disabled="disabled"
         class="tui-infoIconButton"
         :styleclass="{
@@ -50,14 +50,46 @@ export default {
   },
 
   props: {
-    ariaLabel: {
-      required: true,
-      type: String,
-    },
+    ariaLabel: String,
     disabled: Boolean,
+    /**
+     * Alternative to aria-label, you specify what the help is, e.g. "Article",
+     * and it will create a string like "Show help for Article".
+     */
+    isHelpFor: String,
+  },
+
+  computed: {
+    label() {
+      if (this.ariaLabel && this.ariaLabel.trim().length > 0) {
+        return this.ariaLabel;
+      }
+
+      return this.$str('show_help_for_x', 'totara_core', this.isHelpFor);
+    },
+  },
+
+  mounted() {
+    if (this.ariaLabel && this.ariaLabel.trim().length > 0) {
+      return;
+    }
+    if (this.isHelpFor && this.isHelpFor.trim().length > 0) {
+      return;
+    }
+    console.error(
+      '[InfoIconButton] You must pass either aria-label or is-help-for.'
+    );
   },
 };
 </script>
+
+<lang-strings>
+  {
+    "totara_core": [
+      "show_help_for_x"
+    ]
+  }
+</lang-strings>
 
 <style lang="scss">
 .tui-infoIconButton {
