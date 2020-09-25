@@ -346,7 +346,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
-        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
+        $expected_json = '<p>Check out <img src="#" alt="" class="img-responsive" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -361,7 +361,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
-        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
+        $expected_json = '<p>Check out <img src="#" alt="" class="img-responsive" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -378,7 +378,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
-        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
+        $expected_json = '<p>Check out <img src="#" alt="" class="img-responsive" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -394,7 +394,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_markdown = "<p>Check out <img src=\"#\" onerror=\"alert(1)\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" onerror="alert(1)" /></div>';
         // HTML built from JSON should never have an onerror attribute, no matter what.
-        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
+        $expected_json = '<p>Check out <img src="#" alt="" class="img-responsive" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -418,7 +418,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
-        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
+        $expected_json = '<p>Check out <img src="#" alt="" class="img-responsive" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -433,7 +433,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
-        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
+        $expected_json = '<p>Check out <img src="#" alt="" class="img-responsive" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -450,7 +450,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
-        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
+        $expected_json = '<p>Check out <img src="#" alt="" class="img-responsive" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -466,7 +466,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_markdown = "<p>Check out <img src=\"#\" onerror=\"alert(1)\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" onerror="alert(1)" /></div>';
         // HTML built from JSON should never have an onerror attribute, no matter what.
-        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
+        $expected_json = '<p>Check out <img src="#" alt="" class="img-responsive" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
@@ -483,7 +483,7 @@ class core_weblib_format_text_testcase extends advanced_testcase {
         $expected_plain = 'Check out &lt;img src=&quot;#&quot; onerror=&quot;alert(1)&quot; /&gt;';
         $expected_markdown = "<p>Check out <img src=\"#\" alt=\"#\" /></p>\n";
         $expected_moodle = '<div class="text_to_html">Check out <img src="#" alt="#" /></div>';
-        $expected_json = '<p>Check out <img src="#" alt="" /></p>';
+        $expected_json = '<p>Check out <img src="#" alt="" class="img-responsive" /></p>';
         self::assertEquals($expected_html, format_text($text, FORMAT_HTML, $options));
         self::assertEquals($expected_plain, format_text($text, FORMAT_PLAIN, $options));
         self::assertEquals($expected_markdown, format_text($text, FORMAT_MARKDOWN, $options));
