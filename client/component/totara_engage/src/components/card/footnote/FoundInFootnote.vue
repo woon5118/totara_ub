@@ -17,7 +17,10 @@
 -->
 
 <template>
-  <div v-show="containers.length > 0" class="tui-cardFoundInFootnote">
+  <div
+    :style="{ visibility: containers.length > 0 ? 'visible' : 'hidden' }"
+    class="tui-cardFoundInFootnote"
+  >
     <span class="tui-cardFoundInFootnote__text">
       {{ $str('foundin', 'totara_engage') }}
     </span>
