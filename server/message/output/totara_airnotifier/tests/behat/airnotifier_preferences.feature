@@ -24,3 +24,16 @@ Feature: Message Totara AirNotifier preferences
     When I open the notification popover
     And I follow "Notification preferences"
     Then I should see "Totara AirNotifier"
+
+  Scenario: Admin requests an appcode from Totara
+    Given I log in as "admin"
+    And I navigate to "Plugins > Message outputs > Manage message outputs" in site administration
+    Then I should see "Not configured" in the "Totara AirNotifier" "table_row"
+    When I navigate to "Plugins > Message outputs > Totara AirNotifier" in site administration
+    And I follow "Request an app code token"
+    Then I should see "App code request successful"
+    And the field "AirNotifier App Code" matches value "behat"
+    And I should not see "Request an app code token"
+    And I navigate to "Plugins > Message outputs > Manage message outputs" in site administration
+    Then I should not see "Not configured" in the "Totara AirNotifier" "table_row"
+    And I should see "Output enabled" in the "Totara AirNotifier" "table_row"

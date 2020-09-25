@@ -22,6 +22,7 @@
  */
 
 $string['config_airnotifier_appcode'] = 'The AirNotifier app code token issued for your Totara instance.';
+$string['config_airnotifier_appcode_registered'] = 'The AirNotifier app code token issued for your Totara instance.<br><a href="{$a->url}">Request an app code token from push.totaralearning.com</a>';
 $string['config_airnotifier_appname'] = 'The AirNotifier app name for the mobile app which should receive the notifications.';
 $string['config_airnotifier_host'] = 'Homepage URL of the AirNotifier server to use for sending push notifications.';
 $string['airnotifier_appcode'] = 'AirNotifier App Code';
@@ -29,3 +30,7 @@ $string['airnotifier_appname'] = 'AirNotifier App Name';
 $string['airnotifier_host'] = 'AirNotifier Server URL';
 $string['event_pushnotification_sent'] = 'Push notification sent';
 $string['pluginname'] = 'Totara AirNotifier';
+$string['request_appcode_error:notdefault'] = 'App code can only be requested with default settings';
+$string['request_appcode_error:notregistered'] = 'App code can only be requested by registered Totara sites';
+$string['request_appcode_error:requestfail'] = 'Unable to retrieve App Code from Totara registration server ({$a->error})';
+$string['request_appcode_success'] = 'App code request successful, settings have been saved';

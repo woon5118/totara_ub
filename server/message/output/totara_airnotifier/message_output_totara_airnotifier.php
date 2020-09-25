@@ -40,6 +40,8 @@ class message_output_totara_airnotifier extends message_output {
      * @return true if ok, false if error
      */
     public function send_message($eventdata) {
+        global $DB;
+
         // Skip any messaging suspended or deleted users.
         if (empty($eventdata->userto) or $eventdata->userto->auth === 'nologin' or $eventdata->userto->suspended or $eventdata->userto->deleted) {
             return true;

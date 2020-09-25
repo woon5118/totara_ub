@@ -21,10 +21,26 @@
  * @package message_totara_airnotifier
  */
 
+use message_totara_airnotifier\appcode_util;
+
 defined('MOODLE_INTERNAL') || die();
+/** @var admin_root $ADMIN */
+
+require_once("$CFG->dirroot/$CFG->admin/registerlib.php");
 
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configtext('totara_airnotifier_host', get_string('airnotifier_host', 'message_totara_airnotifier'), get_string('config_airnotifier_host', 'message_totara_airnotifier'), 'https://push.totaralearning.com', PARAM_URL));
-    $settings->add(new admin_setting_configtext('totara_airnotifier_appname', get_string('airnotifier_appname', 'message_totara_airnotifier'), get_string('config_airnotifier_appname', 'message_totara_airnotifier'), 'Totara', PARAM_RAW));
-    $settings->add(new admin_setting_configpasswordunmask('totara_airnotifier_appcode', get_string('airnotifier_appcode', 'message_totara_airnotifier'), get_string('config_airnotifier_appcode', 'message_totara_airnotifier'), ''));
+    $settings->add(new admin_setting_configtext('totara_airnotifier_host', get_string('airnotifier_host', 'message_totara_airnotifier'), get_string('config_airnotifier_host', 'message_totara_airnotifier'), appcode_util::DEFAULT_HOST, PARAM_URL));
+    $settings->add(new admin_setting_configtext('totara_airnotifier_appname', get_string('airnotifier_appname', 'message_totara_airnotifier'), get_string('config_airnotifier_appname', 'message_totara_airnotifier'), appcode_util::DEFAULT_APPNAME, PARAM_TEXT));
+    $host = get_config(null, 'totara_airnotifier_host');
+    $appname = get_config(null, 'totara_airnotifier_appname');
+    $appcode = get_config(null, 'totara_airnotifier_appcode');
+    if (appcode_util::request_available() && !is_registration_required()) {
+        $a = new \stdClass();
+        $url = new moodle_url('/message/output/totara_airnotifier/request_appcode.php');
+        $a->url = $url->out();
+        $appcode_description = get_string('config_airnotifier_appcode_registered', 'message_totara_airnotifier', $a);
+    } else {
+        $appcode_description = get_string('config_airnotifier_appcode', 'message_totara_airnotifier');
+    }
+    $settings->add(new admin_setting_configpasswordunmask('totara_airnotifier_appcode', get_string('airnotifier_appcode', 'message_totara_airnotifier'), $appcode_description, ''));
 }
