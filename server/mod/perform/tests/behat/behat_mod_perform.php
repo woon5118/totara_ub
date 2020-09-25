@@ -53,6 +53,7 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ELEMENT_QUESTION_OPTIONAL_LOCATOR = '.tui-performRequiredOptionalIndicator--optional';
     public const PERFORM_ELEMENT_QUESTION_REQUIRED_LOCATOR = '.tui-performRequiredOptionalIndicator--required';
     public const SHORT_TEXT_RESPONSE_LOCATOR = 'input';
+    public const LONG_TEXT_RESPONSE_LOCATOR = 'textarea';
     public const MULTI_CHOICE_RESPONSE_LOCATOR = 'radio';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses .tui-formLabel';
@@ -849,6 +850,7 @@ class behat_mod_perform extends behat_base {
     private function get_response_element_response_locator(string $element_type): string {
         $map = [
             'short text' => self::SHORT_TEXT_RESPONSE_LOCATOR,
+            'long text' => self::LONG_TEXT_RESPONSE_LOCATOR,
             'multi choice' => self::MULTI_CHOICE_RESPONSE_LOCATOR
         ];
 

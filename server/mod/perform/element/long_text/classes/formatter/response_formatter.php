@@ -48,7 +48,7 @@ class response_formatter extends base {
 
             // TODO: this part needs to change when this element uses an editor.
             $formatter->disabled_pluginfile_url_rewrite();
-            $formatter->set_text_format(FORMAT_PLAIN);
+            $formatter->set_text_format(FORMAT_MOODLE);
 
             $options['answer_text'] = $formatter->format($answer);
         }

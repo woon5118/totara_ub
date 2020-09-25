@@ -46,12 +46,18 @@ class element_response extends base {
 
         $default_category_context = $column->extracontext['default_category_context'];
 
+        if ($format === 'html') {
+            $output_format = format::FORMAT_HTML;
+        } else {
+            $output_format = format::FORMAT_PLAIN;
+        }
+
         // Convert response data into actual answer.
         /** @var respondable_element_plugin $element_plugin */
         $element_plugin = element_plugin::load_by_plugin($extrafields->element_type);
         if ($element_plugin instanceof respondable_element_plugin) {
             $formatter_class = element_response_formatter::for_plugin($element_plugin);
-            $formatter = new $formatter_class(format::FORMAT_PLAIN, $default_category_context);
+            $formatter = new $formatter_class($output_format, $default_category_context);
             $response_data = $formatter->format($response_data);
 
             $response = $element_plugin->decode_response($response_data, $extrafields->element_data);

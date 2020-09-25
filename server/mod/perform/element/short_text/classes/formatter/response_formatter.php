@@ -43,7 +43,7 @@ class response_formatter extends base {
 
         $answer = $options['answer_text'] ?? null;
         if ($answer) {
-            $format = format::FORMAT_PLAIN;
+            $format = $this->format ?? format::FORMAT_PLAIN;
             $formatter = new string_field_formatter($format, $this->context);
             $options['answer_text'] = $formatter->format($answer);
         }

@@ -47,7 +47,7 @@ class section_element_response implements type_resolver {
             throw new \coding_exception('Expected response section element response model');
         }
 
-        $format = $args['format'] ?? format::FORMAT_HTML;
+        $format = $args['format'] ?? null;
         $formatter = new section_element_response_formatter($section_element_response, $ec->get_relevant_context());
 
         return $formatter->format($field, $format);

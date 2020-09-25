@@ -214,6 +214,7 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
                 ],
             'sort_order' => 1,
             'response_data' => null,
+            'response_data_raw' => null,
             'validation_errors' => [],
             'other_responder_groups' => [
                 [
@@ -259,6 +260,7 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
                 ],
             'sort_order' => 2,
             'response_data' => null,
+            'response_data_raw' => null,
             'validation_errors' => [],
             'other_responder_groups' => [],
             'visible_to' => [],

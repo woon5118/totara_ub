@@ -42,20 +42,25 @@ class performelement_long_text_response_formatter_testcase extends advanced_test
         $this->assertEquals(response_formatter::class, $formatter_class);
 
         $context = context_system::instance();
-        $answer = '<h1>This is a <strong>test</strong> answer</h1>';
+        $answer = '<h1>This is a test heading</h1>With some <strong>capital</strong> text<script>alert(1);</script><&\'';
         $incoming = json_encode(['answer_text' => $answer]);
 
+        // When converted to RAW, we need to get back exactly what we put in.
         $formatter = new $formatter_class(format::FORMAT_RAW, $context);
         $expected = json_encode(['answer_text' => $answer]);
         $this->assertEquals($expected, $formatter->format($incoming), 'wrong formatting');
 
+        // When converted to PLAIN, the h1 and string cause capitalisation, and the h1 causes some line returns after it.
+        // The script and script content is removed. The symbols come out unencoded.
         $formatter = new $formatter_class(format::FORMAT_PLAIN, $context);
-        $expected = json_encode(['answer_text' => $answer]);
+        $expected = json_encode(['answer_text' => "THIS IS A TEST HEADING\n\nWith some CAPITAL text<&'"]);
         $this->assertEquals($expected, $formatter->format($incoming), 'wrong formatting');
 
         // TODO this needs to change when the element is updated to use an editor.
+        // To convert from MOODLE to HTML, the "text_to_html" div is added around the text.
+        // The script and script content is removed. The symbols come out html-encoded.
         $formatter = new $formatter_class(null, $context);
-        $expected = json_encode(['answer_text' => '&lt;h1&gt;This is a &lt;strong&gt;test&lt;/strong&gt; answer&lt;/h1&gt;']);
+        $expected = json_encode(['answer_text' => "<div class=\"text_to_html\"><h1>This is a test heading</h1>With some <strong>capital</strong> text&lt;&amp;'</div>"]);
         $this->assertEquals($expected, $formatter->format($incoming), 'wrong formatting');
     }
 

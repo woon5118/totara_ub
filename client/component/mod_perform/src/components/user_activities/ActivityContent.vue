@@ -864,7 +864,7 @@ export default {
           .forEach(item => {
             this.initialValues.sectionElements[
               item.section_element_id
-            ] = JSON.parse(item.response_data);
+            ] = JSON.parse(item.response_data_raw);
             this.hasOtherResponse = item.other_responder_groups.length > 0;
             item.other_responder_groups.forEach(group => {
               if (group.responses.length > 0 && item.response_data) {
