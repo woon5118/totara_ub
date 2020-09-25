@@ -5624,6 +5624,12 @@ function totara_appraisal_pluginfile($course, $cm, $context, $filearea, $args, $
             }
         }
     }
+
+    // Check multi tenancy
+    if ($context->is_user_access_prevented()) {
+        send_file_not_found();
+    }
+
     $filename = array_shift($args);
     $fs = get_file_storage();
     if (!$file = $fs->get_file($context->id, 'totara_appraisal', $filearea, $assignmentid, '/', $filename)) {

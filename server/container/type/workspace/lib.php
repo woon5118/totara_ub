@@ -52,13 +52,18 @@ function container_workspace_pluginfile(
 
     // If workspaces aren't enabled, don't send the file
     if (advanced_feature::is_disabled('container_workspace')) {
-        return;
+        send_file_not_found();
     }
 
     $workspace = factory::from_record($course);
     if (!$workspace->is_typeof(workspace::get_type())) {
-        debugging("Invalid container type", DEBUG_DEVELOPER);
-        return;
+        send_file_not_found();
+    }
+
+    require_login();
+
+    if ($context->is_user_access_prevented()) {
+        send_file_not_found();
     }
 
     $areas = [
@@ -68,7 +73,7 @@ function container_workspace_pluginfile(
 
     if (!in_array($file_area, $areas)) {
         // Invalid file area.
-        return;
+        send_file_not_found();
     }
 
     $relative_path = implode("/", $args);

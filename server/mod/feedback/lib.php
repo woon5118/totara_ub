@@ -247,6 +247,11 @@ function feedback_pluginfile($course, $cm, $context, $filearea, $args, $forcedow
         }
     }
 
+    // Check multi-tenancy.
+    if ($context->is_user_access_prevented()) {
+        return false;
+    }
+
     $relativepath = implode('/', $args);
     if ($filearea === 'page_after_submit') {
         $fullpath = "/{$context->id}/mod_feedback/$filearea/$relativepath";

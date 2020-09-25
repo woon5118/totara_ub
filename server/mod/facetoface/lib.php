@@ -1100,6 +1100,12 @@ function facetoface_pluginfile($course, $cm, $context, $filearea, $args, $forced
     if ($context->contextlevel == CONTEXT_SYSTEM && ($filearea === 'room' || $filearea === 'asset' ||
             $filearea === facilitatorcustomfield::get_area_name()))
     {
+
+        // Check multi-tenancy.
+        if ($context->is_user_access_prevented()) {
+            send_file_not_found();
+        }
+
         // NOTE: we do not know where is the room and asset description visible,
         //       this means we cannot do any strict access control, bad luck.
         $fs = get_file_storage();

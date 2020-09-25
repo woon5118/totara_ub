@@ -39,6 +39,13 @@ function performelement_static_content_pluginfile($course, $cm, $context, $filea
     global $CFG;
     require_once("{$CFG->dirroot}/lib/filelib.php");
 
+    // TODO: Is there further access control here?
+
+    // Check multi-tenancy.
+    if ($context->is_user_access_prevented()) {
+        send_file_not_found();
+    }
+
     // Whitelisted file areas.
     if (!in_array($filearea, ['content'])) {
         return;

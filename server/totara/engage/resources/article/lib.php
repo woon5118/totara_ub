@@ -20,6 +20,10 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package engage_article
  */
+
+use engage_article\totara_engage\resource\article;
+use totara_engage\access\access_manager;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -36,12 +40,20 @@ defined('MOODLE_INTERNAL') || die();
  * @return void
  */
 function engage_article_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $options) {
-    global $CFG;
+    global $CFG, $USER;
     require_once("{$CFG->dirroot}/lib/filelib.php");
 
     if (!in_array($filearea, ['content', 'image'])) {
         // Invalid file area.
         return;
+    }
+
+    require_login();
+
+    /** @var article $article */
+    $article = article::from_resource_id((int) $args[0]);
+    if (!access_manager::can_access($article, $USER->id)) {
+        send_file_not_found();
     }
 
     $relativepath = implode("/", $args);

@@ -21,6 +21,7 @@
  * @package totara_playlist
  */
 
+use totara_engage\access\access_manager;
 use totara_playlist\playlist;
 
 defined('MOODLE_INTERNAL') || die();
@@ -39,13 +40,22 @@ defined('MOODLE_INTERNAL') || die();
  * @return void
  */
 function totara_playlist_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $options) {
-    global $CFG;
+    global $CFG, $USER;
     require_once("{$CFG->dirroot}/lib/filelib.php");
 
     if (playlist::IMAGE_AREA !== $filearea) {
         // Invalid file area.
         return;
     }
+
+    require_login();
+
+    /** @var playlist $article */
+    $article = playlist::from_id((int) $args[0]);
+    if (!access_manager::can_access($article, $USER->id)) {
+        send_file_not_found();
+    }
+
 
     $component = playlist::get_resource_type();
     $relativepath = implode("/", $args);

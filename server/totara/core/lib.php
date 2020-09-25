@@ -323,6 +323,8 @@ function totara_core_pluginfile($course, $cm, $context, $filearea, $args, $force
         send_file_not_found();
     }
 
+    // TODO TL-27935 Potentially we need to check multi tenancy here
+
     send_stored_file($file, 60*60*24, 0, false, $options); // Enable long cache and disable forcedownload.
 }
 
