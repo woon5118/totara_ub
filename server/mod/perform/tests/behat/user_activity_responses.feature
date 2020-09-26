@@ -141,8 +141,8 @@ Feature: Viewing other responses
     Then I should see perform "Question one" question is "required"
     And I should see perform "Question two" question is "required"
     When I click on "Submit" "button"
-    Then I should see "Question one" has the validation error "You must answer this question"
-    And I should see "Question two" has the validation error "You must answer this question"
+    Then I should see "Question one" has the validation error "Required"
+    And I should see "Question two" has the validation error "Required"
 
   Scenario: I can see and submit empty optional questions
     When I log in as "harry"
