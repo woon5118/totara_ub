@@ -27,6 +27,8 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use totara_tui\local\locator\bundle;
+use totara_tui\local\mediation\helper;
 use totara_tui\local\theme_config;
 
 /**
@@ -38,14 +40,20 @@ final class themes_with_variables implements query_resolver, has_middleware {
      * @inheritDoc
      */
     public static function resolve(array $args, execution_context $ec) {
-        global $CFG;
+        if (!isset($args['theme'])) {
+            throw new \coding_exception('Missing required argument', 'theme');
+        }
 
-        $themes = theme_config::load($args['theme'])->get_tui_theme_chain();
-        $themes = array_filter($themes, function ($theme) use ($CFG) {
-            $file = "{$CFG->srcroot}/client/component/theme_{$theme}/build/css_variables.json";
-            return file_exists($file);
-        });
+        if (!helper::validate_theme_name($args['theme'])) {
+            throw new \coding_exception('Invalid theme', $args['theme']);
+        }
 
+        $themes = [];
+        foreach (theme_config::load($args['theme'])->get_tui_theme_chain() as $theme) {
+            if (bundle::get_bundle_css_json_variables_file('theme_' . $theme)) {
+                $themes[] = $theme;
+            }
+        }
         return $themes;
     }
 

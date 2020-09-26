@@ -109,6 +109,10 @@ class totara_tui_local_locator_bundle_test extends advanced_testcase {
         $method->setAccessible(true);
         $actual = $method->invoke(null, 'test');
         self::assertSamePath("$CFG->srcroot/client/component/test/build", $actual);
+
+        self::expectException(coding_exception::class);
+        self::expectExceptionMessage('Invalid bundle name provided.');
+        $method->invoke(null, 'test@example.com');
     }
 
     public function test_get_js_suffix_for_url() {
@@ -144,5 +148,22 @@ class totara_tui_local_locator_bundle_test extends advanced_testcase {
         self::assertSame(theme_get_revision(), bundle::get_css_rev());
         set_config('cache_scss', '0', 'totara_tui');
         self::assertSame(-1, bundle::get_css_rev());
+    }
+
+    public function test_get_bundle_css_json_variables_file() {
+        self::assertNotEmpty(bundle::get_bundle_css_json_variables_file('tui'));
+        self::assertEmpty(bundle::get_bundle_css_json_variables_file('totara_tui'));
+        self::assertNotEmpty(bundle::get_bundle_css_json_variables_file('totara_webapi'));
+        self::assertNotEmpty(bundle::get_bundle_css_json_variables_file('theme_ventura'));
+        self::assertEmpty(bundle::get_bundle_css_json_variables_file('theme_legacy'));
+        self::assertEmpty(bundle::get_bundle_css_json_variables_file('theme_msteams'));
+        self::assertNotEmpty(bundle::get_bundle_css_json_variables_file('samples'));
+    }
+
+    public function test_any_have_resources() {
+        self::assertFalse(bundle::any_have_resources([]));
+        self::assertTrue(bundle::any_have_resources(['tui']));
+        self::assertTrue(bundle::any_have_resources(['tui', 'samples']));
+        self::assertTrue(bundle::any_have_resources(['tui', ['samples']]));
     }
 }

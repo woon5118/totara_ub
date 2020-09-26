@@ -256,6 +256,7 @@ final class bundle {
                 return $this->map_vendors_js[$suffix];
             }
         }
+        // Presently it is not possible to get here, as the vendor file is always present.
         return null;
     }
 
@@ -415,7 +416,10 @@ final class bundle {
       */
      private static function is_javascript_development(): bool {
         if (during_initial_install()) {
+            // Impossible to get here during PHPUnit tests.
+            // @codeCoverageIgnoreStart
             return false;
+            // @codeCoverageIgnoreEnd
         }
         return (bool)get_config('totara_tui', 'development_mode');
     }
@@ -426,7 +430,10 @@ final class bundle {
       */
      private static function is_css_development(): bool {
         if (during_initial_install()) {
+            // Impossible to get here during PHPUnit tests.
+            // @codeCoverageIgnoreStart
             return false;
+            // @codeCoverageIgnoreEnd
         }
         return (bool)get_config('totara_tui', 'development_mode');
     }

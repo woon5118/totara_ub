@@ -42,6 +42,16 @@ class totara_tui_local_mediation_helper_testcase extends advanced_testcase {
         self::assertFalse(helper::validate_theme_name('foo-bar'));
     }
 
+    public function test_validate_theme_name_custom_theme_path() {
+        global $CFG;
+        $CFG->themedir = $CFG->dirroot . '/theme';
+        self::assertFalse(helper::validate_theme_name('theme_ventura'));
+        self::assertTrue(helper::validate_theme_name('ventura'));
+        self::assertFalse(helper::validate_theme_name('foobar'));
+        self::assertFalse(helper::validate_theme_name('foo.bar'));
+        self::assertFalse(helper::validate_theme_name('foo-bar'));
+    }
+
     public function test_get_args() {
         global $CFG;
         require_once($CFG->libdir . '/configonlylib.php');

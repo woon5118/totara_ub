@@ -119,7 +119,10 @@ abstract class mediator {
     protected function standard_headers() {
         if (defined('TUI_RESOLUTION_START') && (!defined('PHPUNIUT_TEST') || !PHPUNIT_TEST)) {
             // Don't prefix with X- see https://tools.ietf.org/html/rfc6648
+            // Specifically cannot get here in unit tests.
+            // @codeCoverageIgnoreStart
             self::header('Totara-Tui-resolution-time: ' . (microtime(true) - TUI_RESOLUTION_START));
+            // @codeCoverageIgnoreEnd
         }
     }
 
@@ -255,7 +258,10 @@ abstract class mediator {
             debugging('Header: ' . $content, DEBUG_DEVELOPER);
             return;
         }
+        // PHPUnit tests take the path above, enabling the testing of headers.
+        // @codeCoverageIgnoreStart
         header($content);
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -267,7 +273,10 @@ abstract class mediator {
             debugging('Exiting', DEBUG_DEVELOPER);
             return;
         }
+        // PHPUnit tests take the path above, enabling the testing of headers.
+        // @codeCoverageIgnoreStart
         exit;
+        // @codeCoverageIgnoreEnd
     }
 
     /**
