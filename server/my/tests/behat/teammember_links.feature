@@ -137,18 +137,3 @@ Feature: Show only links to member information the manager has permission to see
     And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Required" "link" should not exist in the "User 1" "table_row"
-
-  Scenario: Required link is not available if manager can't view member's required learning
-    Given I log in as "admin"
-    And the following "system role assigns" exist:
-      | user     | role         |
-      | manager1 | staffmanager |
-    And the following "permission overrides" exist:
-      | capability                        | permission | role          | contextlevel | reference |
-      | totara/program:accessanyprogram   | Prohibit   | staffmanager  | System       |           |
-      | totara/program:viewprogram        | Prohibit   | staffmanager  | System       |           |
-    And I log out
-    When I log in as "manager1"
-    And I am on "Team" page
-    Then "User 1" "link" should exist in the "team_members" "table"
-    And "Required" "link" should not exist in the "User 1" "table_row"
