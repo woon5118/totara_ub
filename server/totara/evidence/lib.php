@@ -21,11 +21,6 @@
  * @package totara_evidence
  */
 
-/**
- * "I ❤️ lib files."
- *     - Aleksandr Baishev, 2019
- */
-
 use core_user\output\myprofile;
 use totara_core\advanced_feature;
 use totara_evidence\models\evidence_type;
@@ -44,21 +39,27 @@ use totara_evidence\models\helpers\evidence_item_capability_helper;
  * @return false|void false if file not found, does not return if found - just send the file
  */
 function totara_evidence_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
-    if (!advanced_feature::is_disabled('evidence')) {
-        $file_storage = get_file_storage();
-        $file_path = "/{$context->id}/totara_evidence/{$filearea}/{$args[0]}/{$args[1]}";
-
-        $file = $file_storage->get_file_by_hash(sha1($file_path));
-        if ($file && !$file->is_directory()) {
-            if ($filearea == evidence_type::DESCRIPTION_FILEAREA) {
-                // Description for a type is needed when viewing or creating an evidence item, so doesn't need to be admin.
-                require_login();
-                send_stored_file($file, 86400, 0, true, $options);
-            }
-        }
+    if ($filearea !== evidence_type::DESCRIPTION_FILEAREA) {
+        send_file_not_found();
     }
 
-    send_file_not_found();
+    if (advanced_feature::is_disabled('evidence')) {
+        send_file_not_found();
+    }
+
+    // Description for a type is needed when viewing or creating an evidence item,
+    // so we don't require any additional capabilities other than being logged in.
+    require_login();
+
+    $file_storage = get_file_storage();
+    $file_path = "/{$context->id}/totara_evidence/{$filearea}/{$args[0]}/{$args[1]}";
+    $file = $file_storage->get_file_by_hash(sha1($file_path));
+
+    if (!$file || $file->is_directory()) {
+        send_file_not_found();
+    }
+
+    send_stored_file($file, 86400, 0, true, $options);
 }
 
 /**
