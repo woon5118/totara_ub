@@ -71,7 +71,7 @@ class element_identifier extends perform_controller {
             'element_identifier' => $element_identifier,
         ];
 
-        $report = $this->load_embedded_report('element_performance_reporting_by_reporting_id', $extra_data);
+        $report = $this->load_embedded_report('perform_response_element_by_reporting_id', $extra_data);
         $debug = $this->get_optional_param('debug', 0, PARAM_INT);
 
         $this->set_url(static::get_url($extra_data));

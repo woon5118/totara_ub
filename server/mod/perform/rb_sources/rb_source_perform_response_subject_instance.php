@@ -27,14 +27,14 @@ use mod_perform\rb\util;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/rb_source_perform_subject_instance.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_participation_subject_instance.php');
 
 /**
  * Subject instance for performance reporting.
  *
- * Class rb_source_subject_instance_performance_reporting
+ * Class rb_source_perform_response_subject_instance
  */
-class rb_source_subject_instance_performance_reporting extends rb_source_perform_subject_instance {
+class rb_source_perform_response_subject_instance extends rb_source_perform_participation_subject_instance {
 
     use course_visibility_trait;
 
@@ -48,9 +48,9 @@ class rb_source_subject_instance_performance_reporting extends rb_source_perform
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         parent::__construct($groupid, $globalrestrictionset);
 
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_subject_instance_performance_reporting');
-        $this->sourcesummary = get_string('sourcesummary', 'rb_source_subject_instance_performance_reporting');
-        $this->sourcelabel = get_string('sourcelabel', 'rb_source_subject_instance_performance_reporting');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_response_subject_instance');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_response_subject_instance');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_response_subject_instance');
 
         $this->add_course_visibility('perform');
 
@@ -96,7 +96,7 @@ class rb_source_subject_instance_performance_reporting extends rb_source_perform
         $columnoptions[] = new rb_column_option(
             'subject_instance',
             'participant_count_performance_reporting',
-            get_string('participants', 'rb_source_subject_instance_performance_reporting'),
+            get_string('participants', 'rb_source_perform_response_subject_instance'),
             "(SELECT COUNT('x')
             FROM {perform_participant_instance} ppi
             WHERE ppi.subject_instance_id = base.id)",

@@ -83,7 +83,7 @@ class export extends perform_controller {
         $extra_data = compact($activity_id, $subject_user_id, $subject_instance_id, $element_id);
 
         // This triggers the export because export and format params are set.
-        $report = $this->load_embedded_report('response_export_performance_reporting', $extra_data, true, true);
+        $report = $this->load_embedded_report('perform_response_export', $extra_data, true, true);
 
         // Comment out the next line and uncomment the block below to output to screen instead of file for debugging.
         return $this->handle_export($report, 'csv');
@@ -108,13 +108,13 @@ class export extends perform_controller {
 
         switch ($export_type) {
             case self::SHORT_NAME_ELEMENT_IDENTIFIER:
-                $source_shortname = 'element_performance_reporting_by_reporting_id';
+                $source_shortname = 'perform_response_element_by_reporting_id';
                 break;
             case self::SHORT_NAME_ELEMENT:
-                $source_shortname = 'element_performance_reporting_by_activity';
+                $source_shortname = 'perform_response_element_by_activity';
                 break;
             case self::SHORT_NAME_SUBJECT_INSTANCE:
-                $source_shortname = 'subject_instance_performance_reporting';
+                $source_shortname = 'perform_response_subject_instance';
                 break;
             default:
                 throw new moodle_exception('bulk_export_type_incorrect', 'mod_perform');
@@ -175,7 +175,7 @@ class export extends perform_controller {
                 throw new moodle_exception('bulk_export_shortname_incorrect', 'mod_perform');
         }
 
-        $report = $this->load_embedded_report('response_export_performance_reporting', $extra_data, true, true);
+        $report = $this->load_embedded_report('perform_response_export', $extra_data, true, true);
 
         // Comment out the next line and uncomment the block below to output to screen instead of file for debugging.
         return $this->handle_export($report, 'csv');

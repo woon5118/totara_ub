@@ -1,7 +1,6 @@
 <?php
-/**
- *
- * This file is part of Totara Core
+/*
+ * This file is part of Totara Perform
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -18,27 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Coggins <simon.coggins@totaralearning.com>
- * @package mod_perform
- *
+ * @author: Simon Coggins <simon.coggins@totaralearning.com>
+ * @package: mod_perform
  */
 
-$string['activity_name'] = 'Activity name';
-$string['element_response'] = 'Element response';
-$string['element_title'] = 'Element text';
-$string['participant_email'] = 'Participant email address';
-$string['participant_name'] = 'Participant name';
-$string['participant_relationship_name'] = 'Participant relationship to subject';
-$string['section_submission_date'] = 'Date of section submission';
 $string['sourcelabel'] = 'Performance Activity';
-$string['sourcesummary'] = 'Version of responses report source restricted to records where the viewing user can report on the subject\'s performance data.';
-$string['sourcetitle'] = 'Performance Reporting Responses';
-$string['subject_name'] = 'Subject name';
+$string['sourcesummary'] = 'Version of participant section report source restricted to participant sections where the viewing user can manage participation';
+$string['sourcetitle'] = 'Performance Participant Section Manage Participation';
+
+$string['actions'] = 'Actions';
+$string['close'] = 'Close';
+$string['re_open'] = 'Re-open';
+
 $string['type_activity'] = 'Performance activity';
-$string['type_element'] = 'Element';
 $string['type_participant_instance'] = 'Participant instance';
+$string['type_participant_section'] = 'Participant section';
 $string['type_participant_user'] = 'Participant user';
-$string['type_response'] = 'Response';
 $string['type_section'] = 'Section';
 $string['type_subject_instance'] = 'Subject instance';
 $string['type_subject_user'] = 'Subject user';

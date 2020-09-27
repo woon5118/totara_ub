@@ -27,16 +27,17 @@ use mod_perform\rb\util;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../../../totara/reportbuilder/rb_sources/rb_source_user.php');
+global $CFG;
+require_once($CFG->dirroot . '/totara/reportbuilder/rb_sources/rb_source_user.php');
 
 /**
  * Performance reporting user report.
  *
  * This is an extension of the rb_source_user source but with additional capability checks applied.
  *
- * Class rb_source_user_performance_reporting
+ * Class rb_source_perform_response_user
  */
-class rb_source_user_performance_reporting extends rb_source_user {
+class rb_source_perform_response_user extends rb_source_user {
 
     /**
      * Constructor.
@@ -52,9 +53,9 @@ class rb_source_user_performance_reporting extends rb_source_user {
         // This source is not available for user selection - it is used by the embedded report only.
         $this->selectable = false;
 
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_user_performance_reporting');
-        $this->sourcesummary = get_string('sourcesummary', 'rb_source_user_performance_reporting');
-        $this->sourcelabel = get_string('sourcelabel', 'rb_source_user_performance_reporting');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_response_user');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_response_user');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_response_user');
 
         $this->usedcomponents[] = 'mod_perform';
 
@@ -74,13 +75,19 @@ class rb_source_user_performance_reporting extends rb_source_user {
         $columnoptions[] = new rb_column_option(
             'user',
             'name_linked_to_performance_reporting',
-            get_string('name_linked_to_performance_reporting', 'rb_source_user_performance_reporting'),
+            get_string('name_linked_to_performance_reporting', 'rb_source_perform_response_user'),
             $DB->sql_concat_join("' '", $usednamefields),
-            array(
+            [
                 'displayfunc' => 'name_linked_to_performance_reporting',
                 'defaultheading' => get_string('userfullname', 'totara_reportbuilder'),
-                'extrafields' => array_merge(array('id' => "base.id", 'deleted' => "base.deleted"), $allnamefields),
-            )
+                'extrafields' => array_merge(
+                    [
+                        'id' => "base.id",
+                        'deleted' => "base.deleted"
+                    ],
+                    $allnamefields
+                ),
+            ]
         );
         $columnoptions[] = new rb_column_option(
             'user',

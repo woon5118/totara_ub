@@ -33,9 +33,9 @@ use totara_job\rb\source\report_trait;
 /**
  * Performance subject instance report.
  *
- * Class rb_source_perform_subject_instance
+ * Class rb_source_perform_participation_subject_instance
  */
-class rb_source_perform_subject_instance extends rb_base_source {
+class rb_source_perform_participation_subject_instance extends rb_base_source {
     use report_trait;
     use subject_instance_trait;
     use activity_trait;
@@ -57,9 +57,9 @@ class rb_source_perform_subject_instance extends rb_base_source {
         // Apply global user restrictions.
         $this->add_global_report_restriction_join('base', 'user_id');
 
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_subject_instance');
-        $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_subject_instance');
-        $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_subject_instance');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_participation_subject_instance');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_participation_subject_instance');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_participation_subject_instance');
 
         $this->base = '{perform_subject_instance}';
         $this->joinlist = $this->define_joinlist();
@@ -149,7 +149,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
             new rb_column_option(
                 'subject_instance',
                 'participant_count',
-                get_string('participant_count', 'rb_source_perform_subject_instance'),
+                get_string('participant_count', 'rb_source_perform_participation_subject_instance'),
                 "($participant_count_sql_fragment)",
                 [
                     'dbdatatype' => 'integer',
@@ -227,7 +227,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
             [
                 'type' => 'subject_user',
                 'value' => 'namelink',
-                'heading' => get_string('subject_name', 'rb_source_perform_subject_instance')
+                'heading' => get_string('subject_name', 'rb_source_perform_participation_subject_instance')
             ],
             [
                 'type' => 'activity',
@@ -257,7 +257,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
             [
                 'type' => 'subject_instance',
                 'value' => 'participant_count',
-                'heading' => get_string('participant_count', 'rb_source_perform_subject_instance')
+                'heading' => get_string('participant_count', 'rb_source_perform_participation_subject_instance')
             ],
         ];
     }
@@ -358,7 +358,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
 
         require_once($CFG->dirroot.'/lib/testing/generator/component_generator_base.php');
         require_once($CFG->dirroot.'/lib/testing/generator/data_generator.php');
-        require_once(__DIR__ . '/../tests/generator/mod_perform_generator.class.php');
+        require_once($CFG->dirroot.'/mod/perform/tests/generator/mod_perform_generator.class.php');
 
         $si = (new mod_perform_generator(new testing_data_generator()))->create_subject_instance([
             'activity_name' => 'Weekly catchup',

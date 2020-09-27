@@ -53,7 +53,7 @@ class subject_instances extends perform_controller {
 
     public function action() {
         if ($this->get_optional_param('activity_id', null, PARAM_INT)) {
-            $report = $this->load_embedded_report('perform_subject_instance', ['activity_id' => $this->get_activity()->id]);
+            $report = $this->load_embedded_report('perform_participation_subject_instance', ['activity_id' => $this->get_activity()->id]);
 
             $debug = $this->get_optional_param('debug', 0, PARAM_INT);
 

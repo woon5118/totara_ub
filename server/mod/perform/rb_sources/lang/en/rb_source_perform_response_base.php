@@ -1,6 +1,7 @@
 <?php
-/*
- * This file is part of Totara Perform
+/**
+ *
+ * This file is part of Totara Core
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -17,18 +18,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Oleg Demeshev <oleg.demeshev@totaralearning.com>
- * @package: mod_perform
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
+ * @package mod_perform
+ *
  */
 
+$string['response_data'] = 'Response data';
 $string['sourcelabel'] = 'Performance Activity';
-$string['sourcesummary'] = 'Section progress in performance activities';
-$string['sourcetitle'] = 'Participant Section';
-
+$string['sourcesummary'] = 'Response data from performance activities.';
+$string['sourcetitle'] = 'Performance Performance Responses';
 $string['type_activity'] = 'Performance activity';
+$string['type_element'] = 'Element';
 $string['type_participant_instance'] = 'Participant instance';
-$string['type_participant_section'] = 'Participant section';
 $string['type_participant_user'] = 'Participant user';
+$string['type_response'] = 'Response';
 $string['type_section'] = 'Section';
 $string['type_subject_instance'] = 'Subject instance';
 $string['type_subject_user'] = 'Subject user';

@@ -21,18 +21,15 @@
  * @package: mod_perform
  */
 
-use mod_perform\rb\util;
-
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/rb_source_perform_element.php');
+global $CFG;
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_element.php');
 
 /**
  * Report source for the element performance reporting embedded reports.
- *
- * Class rb_source_element_performance_reporting
  */
-class rb_source_element_performance_reporting extends rb_source_perform_element {
+class rb_source_perform_response_element extends rb_source_perform_element {
 
     /**
      * Constructor.
@@ -46,9 +43,9 @@ class rb_source_element_performance_reporting extends rb_source_perform_element 
 
         $this->selectable = false;
 
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_element_performance_reporting');
-        $this->sourcesummary = get_string('sourcesummary', 'rb_source_element_performance_reporting');
-        $this->sourcelabel = get_string('sourcelabel', 'rb_source_element_performance_reporting');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_response_element');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_response_element');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_response_element');
     }
 
     /**

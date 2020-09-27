@@ -334,7 +334,7 @@ class rb_source_perform_element extends rb_base_source {
 
         require_once($CFG->dirroot.'/lib/testing/generator/component_generator_base.php');
         require_once($CFG->dirroot.'/lib/testing/generator/data_generator.php');
-        require_once(__DIR__ . '/../tests/generator/mod_perform_generator.class.php');
+        require_once($CFG->dirroot.'/mod/perform/tests/generator/mod_perform_generator.class.php');
 
         // This creates a complete activity with two elements and related tables we need to test this source.
         $si = (new mod_perform_generator(new testing_data_generator()))->create_subject_instance([

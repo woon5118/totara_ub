@@ -17,22 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Simon Coggins <simon.coggins@totaralearning.com>
+ * @author: Oleg Demeshev <oleg.demeshev@totaralearning.com>
  * @package: mod_perform
  */
 
 $string['sourcelabel'] = 'Performance Activity';
-$string['sourcesummary'] = 'Version of subject instance report source restricted to subjects where the viewing user can manage participation';
-$string['sourcetitle'] = 'Subject Instance Manage Participation';
-
-$string['actions'] = 'Actions';
-$string['add_participants'] = 'Add participants';
-$string['close'] = 'Close';
-$string['participants'] = 'Participants';
-$string['re_open'] = 'Re-open';
+$string['sourcesummary'] = 'Section progress in performance activities';
+$string['sourcetitle'] = 'Performance Participant Section';
 
 $string['type_activity'] = 'Performance activity';
+$string['type_participant_instance'] = 'Participant instance';
+$string['type_participant_section'] = 'Participant section';
+$string['type_participant_user'] = 'Participant user';
+$string['type_section'] = 'Section';
 $string['type_subject_instance'] = 'Subject instance';
-$string['type_subject_user'] = 'Subject';
-$string['type_track'] = 'Track';
-
+$string['type_subject_user'] = 'Subject user';

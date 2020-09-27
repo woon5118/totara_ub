@@ -314,7 +314,7 @@ trait participant_instance_trait {
         $this->columnoptions[] = new rb_column_option(
             'participant_instance',
             'participant_source',
-            get_string('participant_source', 'rb_source_perform_participant_instance'),
+            get_string('participant_source', 'rb_source_perform_participation_participant_instance'),
             "$join.participant_source",
             [
                 'joins' => $join,
@@ -329,7 +329,7 @@ trait participant_instance_trait {
         $this->columnoptions[] = new rb_column_option(
             'participant_instance',
             'participant_name',
-            get_string('participant_name', 'rb_source_perform_participant_instance'),
+            get_string('participant_name', 'rb_source_perform_participation_participant_instance'),
             $this->get_anonymised_field_sql(
                 "CASE
                     WHEN
@@ -357,7 +357,7 @@ trait participant_instance_trait {
         $this->columnoptions[] = new rb_column_option(
             'participant_instance',
             'participant_email',
-            get_string('participant_email', 'rb_source_perform_participant_instance'),
+            get_string('participant_email', 'rb_source_perform_participation_participant_instance'),
             // use CASE to include/exclude email in SQL
             // so search won't reveal hidden results
             $this->get_anonymised_field_sql(
@@ -390,7 +390,7 @@ trait participant_instance_trait {
             $this->columnoptions[] = new \rb_column_option(
                 'participant_instance',
                 'participant_email_unobscured',
-                get_string('participant_email_unobscured', 'rb_source_perform_participant_instance'),
+                get_string('participant_email_unobscured', 'rb_source_perform_participation_participant_instance'),
                 $this->get_anonymised_field_sql(
                     "CASE
                         WHEN
@@ -486,12 +486,12 @@ trait participant_instance_trait {
         $this->filteroptions[] = new rb_filter_option(
             'participant_instance',
             'participant_source',
-            get_string('participant_source', 'rb_source_perform_participant_instance'),
+            get_string('participant_source', 'rb_source_perform_participation_participant_instance'),
             'select',
             [
                 'selectchoices' => [
-                    participant_source::EXTERNAL => get_string('participant_source_external', 'rb_source_perform_participant_instance'),
-                    participant_source::INTERNAL => get_string('participant_source_internal', 'rb_source_perform_participant_instance'),
+                    participant_source::EXTERNAL => get_string('participant_source_external', 'rb_source_perform_participation_participant_instance'),
+                    participant_source::INTERNAL => get_string('participant_source_internal', 'rb_source_perform_participation_participant_instance'),
                 ]
             ]
         );
@@ -499,14 +499,14 @@ trait participant_instance_trait {
         $this->filteroptions[] = new rb_filter_option(
             'participant_instance',
             'participant_name',
-            get_string('participant_name', 'rb_source_perform_participant_instance'),
+            get_string('participant_name', 'rb_source_perform_participation_participant_instance'),
             'text'
         );
 
         $this->filteroptions[] = new rb_filter_option(
             'participant_instance',
             'participant_email',
-            get_string('participant_email', 'rb_source_perform_participant_instance'),
+            get_string('participant_email', 'rb_source_perform_participation_participant_instance'),
             'text'
         );
 
@@ -518,7 +518,7 @@ trait participant_instance_trait {
             $this->filteroptions[] = new rb_filter_option(
                 'participant_instance',
                 'participant_email_unobscured',
-                get_string('participant_email_unobscured', 'rb_source_perform_participant_instance'),
+                get_string('participant_email_unobscured', 'rb_source_perform_participation_participant_instance'),
                 'text'
             );
         }

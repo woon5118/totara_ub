@@ -54,6 +54,70 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020090103, 'perform');
     }
 
+    if ($oldversion < 2020090104) {
+        $sql = "UPDATE {report_builder}
+            SET source = 'perform_manage_participation_participant_instance',
+                shortname = 'perform_manage_participation_participant_instance'
+            WHERE shortname = 'participant_instance_manage_participation'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+            SET source = 'perform_manage_participation_participant_section',
+                shortname = 'perform_manage_participation_participant_section'
+            WHERE shortname = 'participant_section_manage_participation'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+            SET source = 'perform_manage_participation_subject_instance',
+                shortname = 'perform_manage_participation_subject_instance'
+            WHERE shortname = 'subject_instance_manage_participation'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+            SET source = 'perform_response_element',
+                shortname = 'perform_response_element_by_activity'
+            WHERE shortname = 'element_performance_reporting_by_activity'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+            SET source = 'perform_response_element',
+                shortname = 'perform_response_element_by_reporting_id'
+            WHERE shortname = 'element_performance_reporting_by_reporting_id'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+            SET source = 'perform_participation_subject_instance',
+                shortname = 'perform_participation_subject_instance'
+            WHERE shortname = 'perform_subject_instance'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+            SET source = 'perform_participation_participant_instance',
+                shortname = 'perform_participation_participant_instance'
+            WHERE shortname = 'perform_participant_instance'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+            SET source = 'perform_response',
+                shortname = 'perform_response_export'
+            WHERE shortname = 'response_export_performance_reporting'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+            SET source = 'perform_response_subject_instance',
+                shortname = 'perform_response_subject_instance'
+            WHERE shortname = 'subject_instance_performance_reporting'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+            SET source = 'perform_response_user',
+                shortname = 'perform_response_user'
+            WHERE shortname = 'user_performance_reporting'";
+        $DB->execute($sql);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020090104, 'perform');
+    }
 
     return true;
 }

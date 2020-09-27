@@ -52,7 +52,7 @@ Feature: Test management of activity participation
     And I should see "for manager2 appraiser"
 
     When I click on "Manage participation" "link" in the tui datatable row with "3 participants" "Name"
-    Then the following should exist in the "subject_instance_manage_participation" table:
+    Then the following should exist in the "perform_manage_participation_subject_instance" table:
       | Subject name | Instance number | Participants |
       | User Four    | 3               | 3            |
       | User Four    | 2               | 3            |
@@ -69,7 +69,7 @@ Feature: Test management of activity participation
 
     When I click on "Back to all performance activities" "link"
     And I click on "Manage participation" "link" in the tui datatable row with "for manager1" "Name"
-    Then the following should exist in the "subject_instance_manage_participation" table:
+    Then the following should exist in the "perform_manage_participation_subject_instance" table:
       | Subject name | Instance number | Participants |
       | User Five    | 1               | 1            |
       | User Four    | 1               | 1            |
@@ -78,7 +78,7 @@ Feature: Test management of activity participation
 
     When I click on "Back to all performance activities" "link"
     And I click on "Manage participation" "link" in the tui datatable row with "for manager2 appraiser" "Name"
-    Then the following should exist in the "subject_instance_manage_participation" table:
+    Then the following should exist in the "perform_manage_participation_subject_instance" table:
       | Subject name | Instance number | Participants |
       | User Five    | 1               | 2            |
       | User Five    | 2               | 2            |
@@ -92,7 +92,7 @@ Feature: Test management of activity participation
       | User Two     | 2               | 2            |
     When I click on "2" "link" in the "User Three 99999997" "table_row"
     Then I should see "Participant instances: 2 records shown"
-    And the following should exist in the "participant_instance_manage_participation" table:
+    And the following should exist in the "perform_manage_participation_participant_instance" table:
       | Participant name | Subject name | Relationship name |
       | appraiser User   | User Three   | Appraiser         |
       | manager Two      | User Three   | Manager           |
@@ -104,7 +104,7 @@ Feature: Test management of activity participation
     And I click on "2" "link" in the "User Three 99999997" "table_row"
     And I click on "1" "link" in the "appraiser User User Three 99999997" "table_row"
     Then I should see "Participant sections: 1 records shown"
-    And the following should exist in the "participant_section_manage_participation" table:
+    And the following should exist in the "perform_manage_participation_participant_section" table:
       | Participant name | Section title | Subject name | Relationship name |
       | appraiser User   | Part one      | User Three   | Appraiser         |
 
@@ -115,7 +115,7 @@ Feature: Test management of activity participation
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "Manage participation" "link" in the tui datatable row with "3 participants" "Name"
-    Then the following should exist in the "subject_instance_manage_participation" table:
+    Then the following should exist in the "perform_manage_participation_subject_instance" table:
       | Subject's full name | Instance number | Participants |
       | User Four           | 1               | 3            |
       | User Four           | 2               | 3            |
@@ -163,12 +163,12 @@ Feature: Test management of activity participation
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "Manage participation" "link" in the tui datatable row with "view only appraiser" "Name"
-    Then the following should exist in the "subject_instance_manage_participation" table:
+    Then the following should exist in the "perform_manage_participation_subject_instance" table:
       | Subject's full name | Instance number | Participants |
       | User Six            | 1               | 3 instances  |
     And "Close" "button" should exist in the "User Six" "table_row"
     And I switch to "Participant instances" tab
-    Then the following should exist in the "participant_instance_manage_participation" table:
+    Then the following should exist in the "perform_manage_participation_participant_instance" table:
     | Participant's name | Subject name | Relationship name | Sections  | Progress       | Availability   |
     | appraiser User     | User Six     | Appraiser         | 1 section | Not applicable | Not applicable |
     | manager One        | User Six     | Manager           | 1 section | Not started    | Open           |
@@ -178,7 +178,7 @@ Feature: Test management of activity participation
     # Not possible to uniquely identify the subject row - so not testing the close button for the subject
 
     When I switch to "Participant sections" tab
-    Then the following should exist in the "participant_section_manage_participation" table:
+    Then the following should exist in the "perform_manage_participation_participant_section" table:
     | Participant's name | Section title | Subject name | Relationship name | Progress       | Availability   |
     | appraiser User     | Part one      | User Six     | Appraiser         | Not applicable | Not applicable |
     | manager One        | Part one      | User Six     | Manager           | Not started    | Open           |
@@ -234,7 +234,7 @@ Feature: Test management of activity participation
 
     When I click on "Continue" "link"
     Then I should see "Manage participation: “3 participants”"
-    And the following should exist in the "subject_instance_manage_participation" table:
+    And the following should exist in the "perform_manage_participation_subject_instance" table:
       | Subject name | Instance number | Participants |
       | User Four    | 3               | 3            |
       | User Four    | 2               | 3            |

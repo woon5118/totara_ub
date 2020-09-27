@@ -26,9 +26,9 @@ use mod_perform\util;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/rb_element_performance_reporting_base.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_perform_response_element_base.php');
 
-class rb_element_performance_reporting_by_activity_embedded extends rb_element_performance_reporting_base {
+class rb_perform_response_element_by_activity_embedded extends rb_perform_response_element_base {
 
     public function __construct($data) {
         if (isset($data['activity_id'])) {
@@ -117,10 +117,10 @@ class rb_element_performance_reporting_by_activity_embedded extends rb_element_p
     }
 
     protected function get_short_name(): string {
-        return 'element_performance_reporting_by_activity';
+        return 'perform_response_element_by_activity';
     }
 
     protected function get_full_name(): string {
-        return get_string('embedded_element_performance_reporting_by_activity', 'mod_perform');
+        return get_string('embedded_perform_response_element_by_activity', 'mod_perform');
     }
 }

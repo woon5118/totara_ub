@@ -25,14 +25,15 @@ use mod_perform\rb\util;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/rb_source_perform_participant_instance.php');
+global $CFG;
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_participation_participant_instance.php');
 
 /**
  * Participant instance manage participation report.
  *
- * Class rb_source_participant_instance_manage_participation
+ * Class rb_source_perform_manage_participation_participant_instance
  */
-class rb_source_participant_instance_manage_participation extends rb_source_perform_participant_instance {
+class rb_source_perform_manage_participation_participant_instance extends rb_source_perform_participation_participant_instance {
 
     /**
      * Constructor.
@@ -46,9 +47,9 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
 
         $this->selectable = false;
 
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_participant_instance_manage_participation');
-        $this->sourcesummary = get_string('sourcesummary', 'rb_source_participant_instance_manage_participation');
-        $this->sourcelabel = get_string('sourcelabel', 'rb_source_participant_instance_manage_participation');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_manage_participation_participant_instance');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_manage_participation_participant_instance');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_manage_participation_participant_instance');
     }
 
     /**
@@ -76,7 +77,7 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
         $columnoptions[] = new rb_column_option(
             'participant_instance',
             'section_count_manage_participation',
-            get_string('sections', 'rb_source_participant_instance_manage_participation'),
+            get_string('sections', 'rb_source_perform_manage_participation_participant_instance'),
             "(SELECT COUNT('x')
             FROM {perform_participant_section} pps
             WHERE pps.participant_instance_id = base.id)",
@@ -97,7 +98,7 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
         $columnoptions[] = new rb_column_option(
             'participant_instance',
             'actions',
-            get_string('actions', 'rb_source_participant_instance_manage_participation'),
+            get_string('actions', 'rb_source_perform_manage_participation_participant_instance'),
             "base.id",
             [
                 'displayfunc' => 'participant_instance_manage_participation_actions',
@@ -150,12 +151,12 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
             [
                 'type' => 'participant_instance',
                 'value' => 'participant_name',
-                'heading' => get_string('participant_name', 'rb_source_perform_participant_instance'),
+                'heading' => get_string('participant_name', 'rb_source_perform_participation_participant_instance'),
             ],
             [
                 'type' => 'subject_user',
                 'value' => 'namelink',
-                'heading' => get_string('subject_name', 'rb_source_perform_subject_instance')
+                'heading' => get_string('subject_name', 'rb_source_perform_participation_subject_instance')
             ],
             [
                 'type' => 'participant_instance',
@@ -170,7 +171,7 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
             [
                 'type' => 'participant_instance',
                 'value' => 'section_count_manage_participation',
-                'heading' => get_string('sections', 'rb_source_participant_instance_manage_participation')
+                'heading' => get_string('sections', 'rb_source_perform_manage_participation_participant_instance')
             ],
             [
                 'type' => 'participant_instance',
@@ -185,7 +186,7 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
             [
                 'type' => 'participant_instance',
                 'value' => 'actions',
-                'heading' => get_string('actions', 'rb_source_participant_instance_manage_participation')
+                'heading' => get_string('actions', 'rb_source_perform_manage_participation_participant_instance')
             ],
             [
                 'type' => 'participant_instance',

@@ -17,41 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author: Oleg Demeshev <oleg.demeshev@totaralearning.com>
  * @package: mod_perform
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_participant_section_manage_participation.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_participation_subject_instance.php');
 
-class rb_participant_section_manage_participation_embedded extends rb_base_embedded {
+use mod_perform\models\activity\activity;
+
+class rb_perform_participation_subject_instance_embedded extends rb_base_embedded {
 
     /**
      * @var string {report_builder}.defaultsortcolumn
      */
     public $defaultsortcolumn = '';
 
-    /**
-     * @param array $data
-     */
-    public function __construct(array $data) {
-        $this->url = '/mod/perform/manage/participation/participant_sections.php';
-
-        $this->source = 'participant_section_manage_participation';
-        $this->shortname = 'participant_section_manage_participation';
-        $this->fullname = get_string('embedded_participant_section_manage_participation', 'mod_perform');
+    public function __construct($data) {
+        $this->url = '/mod/perform/reporting/participation/index.php';
+        $this->source = 'perform_participation_subject_instance';
+        $this->shortname = 'perform_participation_subject_instance';
+        $this->fullname = get_string('embedded_perform_participation_subject_instance', 'mod_perform');
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
-        $this->defaultsortcolumn = 'participant_section_default_sort';
+        $this->defaultsortcolumn = 'subject_user_namelink';
 
         if (isset($data['activity_id']) && (int)$data['activity_id'] > 0) {
             $this->embeddedparams['activity_id'] = $data['activity_id'];
-        }
-
-        if (isset($data['participant_instance_id']) && (int)$data['participant_instance_id'] > 0) {
-            $this->embeddedparams['participant_instance_id'] = $data['participant_instance_id'];
         }
 
         parent::__construct();
@@ -63,7 +57,7 @@ class rb_participant_section_manage_participation_embedded extends rb_base_embed
      * @return array
      */
     protected function define_columns() {
-        return rb_source_participant_section_manage_participation::get_default_columns();
+        return \rb_source_perform_participation_subject_instance::get_default_columns();
     }
 
     /**
@@ -72,7 +66,7 @@ class rb_participant_section_manage_participation_embedded extends rb_base_embed
      * @return array
      */
     protected function define_filters() {
-        return rb_source_participant_section_manage_participation::get_default_filters();
+        return \rb_source_perform_participation_subject_instance::get_default_filters();
     }
 
     /**
@@ -102,6 +96,13 @@ class rb_participant_section_manage_participation_embedded extends rb_base_embed
      * @return boolean true if the user can access this report
      */
     public function is_capable($reportfor, $report): bool {
-        return true;
+        $activity_id = $report->get_param_value('activity_id') ?? 0;
+        try {
+            $activity = activity::load_by_id($activity_id);
+        } catch (Exception $e) {
+            throw new moodle_exception('error_activity_id_wrong', 'mod_perform', '', null, $e);
+        }
+        $context = $activity->get_context();
+        return has_capability('mod/perform:view_participation_reporting', $context, $reportfor);
     }
 }

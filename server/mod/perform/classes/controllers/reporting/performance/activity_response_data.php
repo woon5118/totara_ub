@@ -73,7 +73,7 @@ class activity_response_data extends perform_controller {
         ];
         $debug = $this->get_optional_param('debug', 0, PARAM_INT);
 
-        $report = $this->load_embedded_report('user_performance_reporting');
+        $report = $this->load_embedded_report('perform_response_user');
 
         $new_heading = get_string("subject_users_number_shown",
             'mod_perform', $report->get_filtered_count()

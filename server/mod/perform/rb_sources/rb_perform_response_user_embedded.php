@@ -26,15 +26,15 @@ use mod_perform\util;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_user_performance_reporting.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_response_user.php');
 
-class rb_user_performance_reporting_embedded extends rb_base_embedded {
+class rb_perform_response_user_embedded extends rb_base_embedded {
 
     public function __construct($data) {
         $this->url = '/mod/perform/reporting/performance/activity_responses_by_user.php';
-        $this->source = 'user_performance_reporting';
-        $this->shortname = 'user_performance_reporting';
-        $this->fullname = get_string('embedded_user_performance_reporting', 'mod_perform');
+        $this->source = 'perform_response_user';
+        $this->shortname = 'perform_response_user';
+        $this->fullname = get_string('embedded_perform_response_user', 'mod_perform');
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
         $this->defaultsortcolumn = 'user_fullname';

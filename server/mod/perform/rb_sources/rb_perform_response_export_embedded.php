@@ -17,18 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Oleg Demeshev <oleg.demeshev@totaralearning.com>
+ * @author: Simon Coggins <simon.coggins@totaralearning.com>
  * @package: mod_perform
  */
+
+use mod_perform\util;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_subject_instance.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_response.php');
 
-use mod_perform\models\activity\activity;
-
-class rb_perform_subject_instance_embedded extends rb_base_embedded {
+class rb_perform_response_export_embedded extends rb_base_embedded {
 
     /**
      * @var string {report_builder}.defaultsortcolumn
@@ -36,17 +36,29 @@ class rb_perform_subject_instance_embedded extends rb_base_embedded {
     public $defaultsortcolumn = '';
 
     public function __construct($data) {
-        $this->url = '/mod/perform/reporting/participation/index.php';
-        $this->source = 'perform_subject_instance';
-        $this->shortname = 'perform_subject_instance';
-        $this->fullname = get_string('embedded_perform_subject_instance', 'mod_perform');
+        $this->url = '/mod/perform/reporting/performance/export.php';
+        $this->source = 'perform_response';
+        $this->shortname = 'perform_response_export';
+        $this->fullname = get_string('embedded_perform_response_export', 'mod_perform');
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
-        // TODO use default_sort
-        $this->defaultsortcolumn = 'user_namelink';
+        $this->defaultsortcolumn = 'response_default_sort';
 
-        if (isset($data['activity_id']) && (int)$data['activity_id'] > 0) {
+        // Pass any restrictions applied in $data through as embedded params.
+        if (isset($data['element_id'])) {
+            $this->embeddedparams['element_id'] = $data['element_id'];
+        }
+        if (isset($data['activity_id'])) {
             $this->embeddedparams['activity_id'] = $data['activity_id'];
+        }
+        if (isset($data['subject_user_id'])) {
+            $this->embeddedparams['subject_user_id'] = $data['subject_user_id'];
+        }
+        if (isset($data['subject_instance_id'])) {
+            $this->embeddedparams['subject_instance_id'] = $data['subject_instance_id'];
+        }
+        if (isset($data['element_identifier'])) {
+            $this->embeddedparams['element_identifier'] = $data['element_identifier'];
         }
 
         parent::__construct();
@@ -58,7 +70,7 @@ class rb_perform_subject_instance_embedded extends rb_base_embedded {
      * @return array
      */
     protected function define_columns() {
-        return \rb_source_perform_subject_instance::get_default_columns();
+        return \rb_source_perform_response::get_default_columns();
     }
 
     /**
@@ -67,7 +79,7 @@ class rb_perform_subject_instance_embedded extends rb_base_embedded {
      * @return array
      */
     protected function define_filters() {
-        return \rb_source_perform_subject_instance::get_default_filters();
+        return \rb_source_perform_response::get_default_filters();
     }
 
     /**
@@ -97,13 +109,6 @@ class rb_perform_subject_instance_embedded extends rb_base_embedded {
      * @return boolean true if the user can access this report
      */
     public function is_capable($reportfor, $report): bool {
-        $activity_id = $report->get_param_value('activity_id') ?? 0;
-        try {
-            $activity = activity::load_by_id($activity_id);
-        } catch (Exception $e) {
-            throw new moodle_exception('error_activity_id_wrong', 'mod_perform', '', null, $e);
-        }
-        $context = $activity->get_context();
-        return has_capability('mod/perform:view_participation_reporting', $context, $reportfor);
+        return util::can_potentially_report_on_subjects($reportfor);
     }
 }

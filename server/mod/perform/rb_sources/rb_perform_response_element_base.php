@@ -24,13 +24,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_element.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_response_element.php');
 
-abstract class rb_element_performance_reporting_base extends rb_base_embedded {
+abstract class rb_perform_response_element_base extends rb_base_embedded {
 
     public function __construct() {
         $this->url = $this->get_url();
-        $this->source = 'element_performance_reporting';
+        $this->source = 'perform_response_element';
         $this->shortname = $this->get_short_name();
         $this->fullname = $this->get_full_name();
         $this->columns = $this->define_columns();

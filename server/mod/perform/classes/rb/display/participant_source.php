@@ -40,9 +40,9 @@ class participant_source extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         switch ($value) {
             case \mod_perform\models\activity\participant_source::EXTERNAL:
-                return get_string('participant_source_external', 'rb_source_perform_participant_instance');
+                return get_string('participant_source_external', 'rb_source_perform_participation_participant_instance');
             case \mod_perform\models\activity\participant_source::INTERNAL:
-                return get_string('participant_source_internal', 'rb_source_perform_participant_instance');
+                return get_string('participant_source_internal', 'rb_source_perform_participation_participant_instance');
             default:
                 throw new \coding_exception('Unknown participant source '. $value);
         }

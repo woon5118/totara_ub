@@ -74,7 +74,7 @@ class user extends perform_controller {
         ];
 
         // Shortname of embedded report being used to generate list of items.
-        $report_shortname = 'subject_instance_performance_reporting';
+        $report_shortname = 'perform_response_subject_instance';
 
         $report = $this->load_embedded_report($report_shortname, $extra_data);
 

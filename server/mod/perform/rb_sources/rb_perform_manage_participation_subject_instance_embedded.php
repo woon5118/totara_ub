@@ -17,48 +17,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Simon Coggins <simon.coggins@totaralearning.com>
+ * @author: Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package: mod_perform
  */
-
-use mod_perform\util;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_response_performance_reporting.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_manage_participation_subject_instance.php');
 
-class rb_response_export_performance_reporting_embedded extends rb_base_embedded {
+class rb_perform_manage_participation_subject_instance_embedded extends rb_base_embedded {
 
     /**
      * @var string {report_builder}.defaultsortcolumn
      */
     public $defaultsortcolumn = '';
 
-    public function __construct($data) {
-        $this->url = '/mod/perform/reporting/performance/export.php';
-        $this->source = 'response_performance_reporting';
-        $this->shortname = 'response_export_performance_reporting';
-        $this->fullname = get_string('embedded_response_export_performance_reporting', 'mod_perform');
+    /**
+     * @param array $data
+     */
+    public function __construct(array $data) {
+        $this->url = '/mod/perform/manage/participation/subject_instances.php';
+
+        $this->source = 'perform_manage_participation_subject_instance';
+        $this->shortname = 'perform_manage_participation_subject_instance';
+        $this->fullname = get_string('embedded_perform_manage_participation_subject_instance', 'mod_perform');
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
-        $this->defaultsortcolumn = 'response_default_sort';
+        $this->defaultsortcolumn = 'subject_instance_default_sort';
 
-        // Pass any restrictions applied in $data through as embedded params.
-        if (isset($data['element_id'])) {
-            $this->embeddedparams['element_id'] = $data['element_id'];
-        }
-        if (isset($data['activity_id'])) {
+        if (isset($data['activity_id']) && (int)$data['activity_id'] > 0) {
             $this->embeddedparams['activity_id'] = $data['activity_id'];
-        }
-        if (isset($data['subject_user_id'])) {
-            $this->embeddedparams['subject_user_id'] = $data['subject_user_id'];
-        }
-        if (isset($data['subject_instance_id'])) {
-            $this->embeddedparams['subject_instance_id'] = $data['subject_instance_id'];
-        }
-        if (isset($data['element_identifier'])) {
-            $this->embeddedparams['element_identifier'] = $data['element_identifier'];
         }
 
         parent::__construct();
@@ -70,7 +59,7 @@ class rb_response_export_performance_reporting_embedded extends rb_base_embedded
      * @return array
      */
     protected function define_columns() {
-        return \rb_source_response_performance_reporting::get_default_columns();
+        return \rb_source_perform_manage_participation_subject_instance::get_default_columns();
     }
 
     /**
@@ -79,7 +68,7 @@ class rb_response_export_performance_reporting_embedded extends rb_base_embedded
      * @return array
      */
     protected function define_filters() {
-        return \rb_source_response_performance_reporting::get_default_filters();
+        return \rb_source_perform_manage_participation_subject_instance::get_default_filters();
     }
 
     /**
@@ -109,6 +98,6 @@ class rb_response_export_performance_reporting_embedded extends rb_base_embedded
      * @return boolean true if the user can access this report
      */
     public function is_capable($reportfor, $report): bool {
-        return util::can_potentially_report_on_subjects($reportfor);
+        return true;
     }
 }

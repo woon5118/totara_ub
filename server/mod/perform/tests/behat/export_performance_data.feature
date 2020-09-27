@@ -59,7 +59,7 @@ Feature: Test exporting performance response data
     # First check the optional questions activity.
     When I navigate to the mod perform response data report for "Simple optional questions activity" activity
     Then I should see "2 records selected"
-    And the following should exist in the "element_performance_reporting_by_activity" table:
+    And the following should exist in the "perform_response_element_by_activity" table:
       | Question text | Section title | Element type | Responding relationships | Required | Reporting ID |
       | Question one  | Part one      | Short text   | 1                        | No       |              |
       | Question two  | Part one      | Short text   | 1                        | No       |              |

@@ -17,21 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Simon Coggins <simon.coggins@totaralearning.com>
+ * @author: Oleg Demeshev <oleg.demeshev@totaralearning.com>
  * @package: mod_perform
  */
 
 $string['sourcelabel'] = 'Performance Activity';
-$string['sourcesummary'] = 'Version of participant instance report source restricted to participants where the viewing user can manage participation';
-$string['sourcetitle'] = 'Participant Instance Manage Participation';
+$string['sourcesummary'] = 'Participant progress in performance activities';
+$string['sourcetitle'] = 'Performance Participant Instance';
 
-$string['actions'] = 'Actions';
-$string['close'] = 'Close';
-$string['re_open'] = 'Re-open';
-$string['sections'] = 'Sections';
+$string['participant_email'] = 'Participant\'s email';
+$string['participant_email_unobscured'] = 'Participant\'s email (ignoring user display setting)';
+$string['participant_name'] = 'Participant\'s name';
+$string['participant_source'] = 'Participant source';
+$string['participant_source_external'] = 'External';
+$string['participant_source_internal'] = 'Internal';
 
 $string['type_activity'] = 'Performance activity';
 $string['type_participant_instance'] = 'Participant instance';
 $string['type_participant_user'] = 'Participant user';
 $string['type_subject_instance'] = 'Subject instance';
 $string['type_subject_user'] = 'Subject user';
+$string['type_track'] = 'Track';

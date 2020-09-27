@@ -26,16 +26,16 @@ use mod_perform\util;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_subject_instance_performance_reporting.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_response_subject_instance.php');
 
-class rb_subject_instance_performance_reporting_embedded extends rb_base_embedded {
+class rb_perform_response_subject_instance_embedded extends rb_base_embedded {
 
     public function __construct($data) {
 
         $this->url = '/mod/perform/reporting/performance/user.php';
-        $this->source = 'subject_instance_performance_reporting';
-        $this->shortname = 'subject_instance_performance_reporting';
-        $this->fullname = get_string('embedded_subject_instance_performance_reporting', 'mod_perform');
+        $this->source = 'perform_response_subject_instance';
+        $this->shortname = 'perform_response_subject_instance';
+        $this->fullname = get_string('embedded_perform_response_subject_instance', 'mod_perform');
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
         $this->defaultsortcolumn = 'activity_name';
@@ -56,7 +56,7 @@ class rb_subject_instance_performance_reporting_embedded extends rb_base_embedde
             [
                 'type' => 'activity',
                 'value' => 'nameviewformlink',
-                'heading' => get_string('activity_name', 'rb_source_subject_instance_performance_reporting'),
+                'heading' => get_string('activity_name', 'rb_source_perform_response_subject_instance'),
             ],
             [
                 'type' => 'subject_instance',
@@ -71,12 +71,12 @@ class rb_subject_instance_performance_reporting_embedded extends rb_base_embedde
             [
                 'type' => 'subject_instance',
                 'value' => 'created_at',
-                'heading' => get_string('created_at', 'rb_source_subject_instance_performance_reporting'),
+                'heading' => get_string('created_at', 'rb_source_perform_response_subject_instance'),
             ],
             [
                 'type' => 'subject_instance',
                 'value' => 'participant_count_performance_reporting',
-                'heading' => get_string('participant_count', 'rb_source_subject_instance_performance_reporting'),
+                'heading' => get_string('participant_count', 'rb_source_perform_response_subject_instance'),
             ],
             [
                 'type' => 'subject_instance',

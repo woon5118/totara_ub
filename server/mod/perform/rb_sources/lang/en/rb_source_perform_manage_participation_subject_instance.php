@@ -22,17 +22,17 @@
  */
 
 $string['sourcelabel'] = 'Performance Activity';
-$string['sourcesummary'] = 'Version of participant section report source restricted to participant sections where the viewing user can manage participation';
-$string['sourcetitle'] = 'Participant Section Manage Participation';
+$string['sourcesummary'] = 'Version of subject instance report source restricted to subjects where the viewing user can manage participation';
+$string['sourcetitle'] = 'Performance Subject Instance Manage Participation';
 
 $string['actions'] = 'Actions';
+$string['add_participants'] = 'Add participants';
 $string['close'] = 'Close';
+$string['participants'] = 'Participants';
 $string['re_open'] = 'Re-open';
 
 $string['type_activity'] = 'Performance activity';
-$string['type_participant_instance'] = 'Participant instance';
-$string['type_participant_section'] = 'Participant section';
-$string['type_participant_user'] = 'Participant user';
-$string['type_section'] = 'Section';
 $string['type_subject_instance'] = 'Subject instance';
-$string['type_subject_user'] = 'Subject user';
+$string['type_subject_user'] = 'Subject';
+$string['type_track'] = 'Track';
+

@@ -17,16 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @author: Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package: mod_perform
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_subject_instance_manage_participation.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_manage_participation_participant_instance.php');
 
-class rb_subject_instance_manage_participation_embedded extends rb_base_embedded {
+class rb_perform_manage_participation_participant_instance_embedded extends rb_base_embedded {
 
     /**
      * @var string {report_builder}.defaultsortcolumn
@@ -37,17 +37,21 @@ class rb_subject_instance_manage_participation_embedded extends rb_base_embedded
      * @param array $data
      */
     public function __construct(array $data) {
-        $this->url = '/mod/perform/manage/participation/subject_instances.php';
+        $this->url = '/mod/perform/manage/participation/participant_instances.php';
 
-        $this->source = 'subject_instance_manage_participation';
-        $this->shortname = 'subject_instance_manage_participation';
-        $this->fullname = get_string('embedded_subject_instance_manage_participation', 'mod_perform');
+        $this->source = 'perform_manage_participation_participant_instance';
+        $this->shortname = 'perform_manage_participation_participant_instance';
+        $this->fullname = get_string('embedded_perform_manage_participation_participant_instance', 'mod_perform');
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
-        $this->defaultsortcolumn = 'subject_instance_default_sort';
+        $this->defaultsortcolumn = 'participant_instance_default_sort';
 
         if (isset($data['activity_id']) && (int)$data['activity_id'] > 0) {
             $this->embeddedparams['activity_id'] = $data['activity_id'];
+        }
+
+        if (isset($data['subject_instance_id']) && (int)$data['subject_instance_id'] > 0) {
+            $this->embeddedparams['subject_instance_id'] = $data['subject_instance_id'];
         }
 
         parent::__construct();
@@ -59,7 +63,7 @@ class rb_subject_instance_manage_participation_embedded extends rb_base_embedded
      * @return array
      */
     protected function define_columns() {
-        return \rb_source_subject_instance_manage_participation::get_default_columns();
+        return \rb_source_perform_manage_participation_participant_instance::get_default_columns();
     }
 
     /**
@@ -68,7 +72,7 @@ class rb_subject_instance_manage_participation_embedded extends rb_base_embedded
      * @return array
      */
     protected function define_filters() {
-        return \rb_source_subject_instance_manage_participation::get_default_filters();
+        return \rb_source_perform_manage_participation_participant_instance::get_default_filters();
     }
 
     /**

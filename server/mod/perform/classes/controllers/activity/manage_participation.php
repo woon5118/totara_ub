@@ -72,17 +72,17 @@ class manage_participation extends perform_controller {
 
     public function action_subjects() {
         $this->current_tab = 'subject_instances';
-        return $this->render_page('subject_instance_manage_participation');
+        return $this->render_page('perform_manage_participation_subject_instance');
     }
 
     public function action_participants() {
         $this->current_tab = 'participant_instances';
-        return $this->render_page('participant_instance_manage_participation');
+        return $this->render_page('perform_manage_participation_participant_instance');
     }
 
     public function action_sections() {
         $this->current_tab = 'participant_sections';
-        return $this->render_page('participant_section_manage_participation');
+        return $this->render_page('perform_manage_participation_participant_section');
     }
 
     public static function get_base_url(): string {

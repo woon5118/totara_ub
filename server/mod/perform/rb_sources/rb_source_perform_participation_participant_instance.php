@@ -17,33 +17,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author: Oleg Demeshev <oleg.demeshev@totaralearning.com>
  * @package: mod_perform
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 use core\entities\user;
+use mod_perform\models\activity\participant_source;
 use mod_perform\rb\traits\activity_trait;
 use mod_perform\rb\traits\participant_instance_trait;
-use mod_perform\rb\traits\participant_section_trait;
-use mod_perform\rb\traits\section_trait;
 use mod_perform\rb\traits\subject_instance_trait;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
 
 /**
- * Performance participant section report.
+ * Performance participant instance report.
  *
- * Class rb_source_perform_participant_section
+ * Class rb_source_perform_participation_participant_instance
  */
-class rb_source_perform_participant_section extends rb_base_source {
-    use activity_trait;
-    use participant_instance_trait;
-    use participant_section_trait;
+class rb_source_perform_participation_participant_instance extends rb_base_source {
     use report_trait;
-    use section_trait;
+    use participant_instance_trait;
     use subject_instance_trait;
+    use activity_trait;
 
     /**
      * Constructor.
@@ -61,28 +58,16 @@ class rb_source_perform_participant_section extends rb_base_source {
         // Apply global user restrictions.
         $this->add_global_report_restriction_join('base', 'user_id');
 
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_participant_section');
-        $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_participant_section');
-        $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_participant_section');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_participation_participant_instance');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_participation_participant_instance');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_participation_participant_instance');
 
-        $this->base = '{perform_participant_section}';
+        $this->base = '{perform_participant_instance}';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
 
-        $this->add_participant_section_to_base();
-
-        $this->add_section(
-            new rb_join(
-                'section',
-                'INNER',
-                '{perform_section}',
-                'base.section_id = section.id',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
-            )
-        );
-
-        $this->add_participant_instance();
+        $this->add_participant_instance_to_base();
         $this->add_subject_instance();
         $this->add_activity();
 
@@ -167,41 +152,47 @@ class rb_source_perform_participant_section extends rb_base_source {
             [
                 'type' => 'participant_instance',
                 'value' => 'participant_name',
-                'heading' => get_string('participant_name', 'rb_source_perform_participant_instance'),
+                'heading' => get_string('participant_name', 'rb_source_perform_participation_participant_instance'),
             ],
-            // Participant section name
+            // Performance activity name
             [
-                'type' => 'section',
-                'value' => 'title',
-                'heading' => get_string('section_title', 'mod_perform'),
+                'type' => 'activity',
+                'value' => 'name',
+                'heading' => get_string('activity_name', 'mod_perform'),
             ],
-            // Subject of the activity
+            // Activity type
             [
-                'type' => 'subject_user',
-                'value' => 'namelink',
-                'heading' => get_string('subject_name', 'rb_source_perform_subject_instance')
+                'type' => 'activity',
+                'value' => 'type',
+                'heading' => get_string('activity_type', 'mod_perform'),
             ],
-            // Participant's relationship in activity
-            [
-                'type' => 'participant_instance',
-                'value' => 'relationship_name',
-                'heading' => get_string('relationship_name', 'mod_perform'),
-            ],
-            // Participant instance date created
+            // Date instance created
             [
                 'type' => 'participant_instance',
                 'value' => 'created_at',
                 'heading' => get_string('date_created', 'mod_perform'),
             ],
-            // Progress of participant section
+            // Relationship in activity
             [
-                'type' => 'participant_section',
+                'type' => 'participant_instance',
+                'value' => 'relationship_name',
+                'heading' => get_string('relationship_name', 'mod_perform'),
+            ],
+            // Subject of the activity
+            [
+                'type' => 'subject_user',
+                'value' => 'namelink',
+                'heading' => get_string('subject_name', 'rb_source_perform_participation_subject_instance')
+            ],
+            // Progress of participant instance
+            [
+                'type' => 'participant_instance',
                 'value' => 'progress',
                 'heading' => get_string('progress', 'mod_perform'),
             ],
-            // Availability of participant section
+            // Availability of participant instance
             [
-                'type' => 'participant_section',
+                'type' => 'participant_instance',
                 'value' => 'availability',
                 'heading' => get_string('availability', 'mod_perform'),
             ],
@@ -214,37 +205,32 @@ class rb_source_perform_participant_section extends rb_base_source {
      * @return array
      */
     public static function get_default_filters() {
-        $default_filters = [
+        return [
             [
                 'type' => 'participant_instance',
                 'value' => 'participant_name',
-            ],
-            [
-                'type' => 'section',
-                'value' => 'title',
-            ],
-            [
-                'type' => 'subject_user',
-                'value' => 'fullname',
-            ],
-            [
-                'type' => 'participant_section',
-                'value' => 'progress',
-            ],
-            [
-                'type' => 'participant_section',
-                'value' => 'availability',
             ],
             [
                 'type' => 'participant_instance',
                 'value' => 'created_at',
             ],
             [
+                'type' => 'subject_user',
+                'value' => 'fullname',
+            ],
+            [
+                'type' => 'participant_instance',
+                'value' => 'progress',
+            ],
+            [
+                'type' => 'participant_instance',
+                'value' => 'availability',
+            ],
+            [
                 'type' => 'participant_instance',
                 'value' => 'relationship_id',
             ],
         ];
-        return $default_filters;
     }
 
     /**
@@ -274,9 +260,9 @@ class rb_source_perform_participant_section extends rb_base_source {
                 'track'
             ),
             new rb_param_option(
-                'participant_instance_id',
-                'base.participant_instance_id',
-                'participant_instance'
+                'subject_instance_id',
+                'base.subject_instance_id',
+                'subject_instance'
             ),
         ];
         return $paramoptions;
@@ -297,7 +283,6 @@ class rb_source_perform_participant_section extends rb_base_source {
      * @param totara_reportbuilder_column_testcase $testcase
      */
     public function phpunit_column_test_add_data(totara_reportbuilder_column_testcase $testcase) {
-        // TODO
         global $CFG;
 
         if (!PHPUNIT_TEST) {
@@ -306,9 +291,9 @@ class rb_source_perform_participant_section extends rb_base_source {
 
         require_once($CFG->dirroot.'/lib/testing/generator/component_generator_base.php');
         require_once($CFG->dirroot.'/lib/testing/generator/data_generator.php');
-        require_once(__DIR__ . '/../tests/generator/mod_perform_generator.class.php');
+        require_once($CFG->dirroot.'/mod/perform/tests/generator/mod_perform_generator.class.php');
 
-        $si = (new \mod_perform_generator(new testing_data_generator()))->create_subject_instance([
+        $si = (new mod_perform_generator(new testing_data_generator()))->create_subject_instance([
             'activity_name' => 'Weekly catchup',
             'subject_is_participating' => true,
             'subject_user_id' => user::repository()->get()->last()->id,

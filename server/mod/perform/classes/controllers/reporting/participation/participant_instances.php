@@ -53,7 +53,7 @@ class participant_instances extends perform_controller {
 
     public function action() {
         if ($this->get_optional_param('subject_instance_id', null, PARAM_INT)) {
-            $report = $this->load_embedded_report('perform_participant_instance', [
+            $report = $this->load_embedded_report('perform_participation_participant_instance', [
                 'subject_instance_id' => $this->get_subject_instance()->id,
             ]);
 

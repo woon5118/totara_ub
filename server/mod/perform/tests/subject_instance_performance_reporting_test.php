@@ -86,7 +86,7 @@ class mod_perform_subject_instance_performance_reporting_testcase extends advanc
         // Set up report.
         $config = new rb_config();
         $config->set_embeddata(['subject_user_id' => $subject_user_1_id]);
-        $report = reportbuilder::create_embedded('subject_instance_performance_reporting', $config);
+        $report = reportbuilder::create_embedded('perform_response_subject_instance', $config);
         [$sql, $sqlparams, ] = $report->build_query(false, false, false);
         $records = builder::get_db()->get_records_sql($sql, $sqlparams);
 
@@ -118,7 +118,7 @@ class mod_perform_subject_instance_performance_reporting_testcase extends advanc
         // Set up report.
         $config = new rb_config();
         $config->set_embeddata(['subject_user_id' => $subject_user_id]);
-        $report = reportbuilder::create_embedded('subject_instance_performance_reporting', $config);
+        $report = reportbuilder::create_embedded('perform_response_subject_instance', $config);
         $embedded_object = $report->embedobj;
 
         self::assertTrue($embedded_object->is_capable(get_admin()->id, $report));
