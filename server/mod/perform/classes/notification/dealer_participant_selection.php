@@ -88,8 +88,8 @@ class dealer_participant_selection extends dealer {
                 $selector_relationship = $relationships[$progress->manual_relationship_selection->selector_relationship_id] ?? false;
                 if ($selector_relationship) {
                     foreach ($progress->manual_relationship_selectors as $selector) {
-                        // Skip if notification got send already
-                        if (!$selector->notified_at) {
+                        // Only send notification if user is not deleted and notification hasn't been sent yet
+                        if (!$selector->notified_at && $selector->user->deleted == 0) {
                             $placeholders->set_participant($selector->user, $selector_relationship);
                             $mailer->post($selector->user, $selector_relationship, $placeholders);
 

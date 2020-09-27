@@ -21,10 +21,14 @@
  * @package mod_perform
  */
 
+use core\entities\user;
+use mod_perform\constants;
+use mod_perform\entities\activity\participant_instance;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use totara_core\advanced_feature;
+use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -118,6 +122,87 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $this->setUser();
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_failed($result, 'not logged in');
+    }
+
+    public function test_other_responses_if_participant_got_deleted() {
+        self::setAdminUser();
+
+        $data_generator = self::getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(1)
+            ->set_number_of_tracks_per_activity(1)
+            ->set_cohort_assignments_per_activity(1)
+            ->set_number_of_users_per_user_group_type(1)
+            ->set_number_of_elements_per_section(3)
+            ->enable_appraiser_for_each_subject_user()
+            ->enable_manager_for_each_subject_user()
+            ->set_relationships_per_section(
+                [
+                    constants::RELATIONSHIP_SUBJECT,
+                    constants::RELATIONSHIP_MANAGER,
+                    constants::RELATIONSHIP_APPRAISER
+                ]
+            );
+
+        /** @var activity $activity */
+        $perform_generator->create_full_activities($configuration)->first();
+
+        /** @var participant_section_entity $participant_section */
+        $participant_section = participant_section_entity::repository()
+            ->order_by('id', 'asc')
+            ->first();
+
+        $args = ['participant_section_id' => $participant_section->id];
+
+        $participant = $participant_section->participant_instance->participant_user;
+        $this->setUser($participant->get_record());
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
+
+        $section_element_responses = $result['section_element_responses'];
+        $this->assertCount(3, $section_element_responses);
+        foreach ($section_element_responses as $section_element_response) {
+            // Manager and appraiser both show up
+            $this->assertCount(2, $section_element_response['other_responder_groups']);
+            foreach ($section_element_response['other_responder_groups'] as $other_responder_groups) {
+                $this->assertArrayHasKey('relationship_name', $other_responder_groups);
+                $this->assertArrayHasKey('responses', $other_responder_groups);
+                $this->assertNotEmpty($other_responder_groups['responses']);
+            }
+        }
+
+        $job = job_assignment::get_first($participant->id);
+
+        /** @var user $appraiser */
+        $appraiser = user::repository()->find_or_fail($job->appraiserid);
+
+        delete_user($appraiser->get_record());
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
+        $section_element_responses = $result['section_element_responses'];
+        $this->assertCount(3, $section_element_responses);
+        foreach ($section_element_responses as $section_element_response) {
+            // Only one is left, the manager
+            $this->assertCount(2, $section_element_response['other_responder_groups']);
+            foreach ($section_element_response['other_responder_groups'] as $other_responder_groups) {
+                $this->assertArrayHasKey('relationship_name', $other_responder_groups);
+                $this->assertArrayHasKey('responses', $other_responder_groups);
+                if ($other_responder_groups['relationship_name'] == 'Manager') {
+                    $this->assertNotEmpty($other_responder_groups['responses']);
+                } else {
+                    $this->assertEmpty($other_responder_groups['responses']);
+                }
+            }
+        }
     }
 
     private function create_test_data(): array {

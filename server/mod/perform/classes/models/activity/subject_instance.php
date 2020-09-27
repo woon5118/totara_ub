@@ -465,4 +465,13 @@ class subject_instance extends model {
         return (object) $this->entity->get_attributes_raw();
     }
 
+    /**
+     * Checks whether the subject user is deleted
+     *
+     * @return bool
+     */
+    public function is_subject_user_deleted(): bool {
+        return $this->subject_user->deleted;
+    }
+
 }

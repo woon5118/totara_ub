@@ -243,12 +243,7 @@ class util {
             return true;
         }
 
-        throw new required_capability_exception(
-            context_user::instance($subject_user_id),
-            'mod/perform:manage_activity',
-            'nopermissions',
-            ''
-        );
+        throw new \coding_exception('You do not have permission to manage participation');
     }
 
     /**

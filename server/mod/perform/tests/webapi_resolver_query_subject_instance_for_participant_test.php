@@ -121,6 +121,30 @@ class mod_perform_webapi_resolver_query_subject_instance_for_participant_testcas
         self::assertEquals($expected, $this->strip_expected_dates($actual));
     }
 
+    public function test_subject_got_deleted() {
+        $subject_instance = self::$about_someone_else_and_participating;
+
+        $args = [
+            'subject_instance_id' => $subject_instance->id,
+        ];
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+        $actual = $this->get_webapi_operation_data($result);
+
+        $this->assertNotEmpty($actual);
+
+        $subject_user = $subject_instance->subject_user->get_user();
+
+        delete_user($subject_user->get_record());
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+        $actual = $this->get_webapi_operation_data($result);
+
+        $this->assertEmpty($actual);
+    }
+
     public function test_subject_static_instance_manager_is_resolved(): void {
         self::setAdminUser();
 

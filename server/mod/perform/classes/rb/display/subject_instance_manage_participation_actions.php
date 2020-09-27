@@ -67,11 +67,12 @@ class subject_instance_manage_participation_actions extends base {
             new component(
                 'mod_perform/components/report/manage_participation/Actions',
                 [
-                    'reportType'        => self::SUBJECT_INSTANCE_REPORT_TYPE,
-                    'activityId'        => $extrafields->activity_id,
-                    'id'                => $extrafields->subject_instance_id,
-                    'isOpen'            => $is_open,
-                    'showActions'       => true,
+                    'reportType'         => self::SUBJECT_INSTANCE_REPORT_TYPE,
+                    'activityId'         => $extrafields->activity_id,
+                    'id'                 => $extrafields->subject_instance_id,
+                    'isOpen'             => $is_open,
+                    'canAddParticipants' => $extrafields->deleted !== null && $extrafields->deleted == 0,
+                    'showActions'        => true,
                 ]
             )
 

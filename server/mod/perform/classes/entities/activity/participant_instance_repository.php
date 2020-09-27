@@ -109,4 +109,26 @@ class participant_instance_repository extends repository {
                 ->or_where_like_starts_with('context.path', "{$context->path}/");
         });
     }
+
+    /**
+     * Add join to filter for non-deleted participant users
+     *
+     * @param builder|repository $repository_or_builder
+     * @param string $participant_instance_alias
+     */
+    public static function add_user_not_deleted_filter($repository_or_builder, string $participant_instance_alias) {
+        $join_alias = 'pir_user_join';
+        if (!$repository_or_builder->has_join($join_alias)) {
+            $repository_or_builder->left_join(['user', $join_alias], function (builder $builder) use ($participant_instance_alias) {
+                $builder->where_field('id', $participant_instance_alias.'.participant_id')
+                    ->where($participant_instance_alias.'.participant_source', participant_source::INTERNAL);
+            })->where(
+                function (builder $builder) use ($join_alias, $participant_instance_alias) {
+                    $builder->or_where($participant_instance_alias.'.participant_source', participant_source::EXTERNAL)
+                        ->or_where($join_alias.'.deleted', 0);
+                }
+            );
+        }
+    }
+
 }

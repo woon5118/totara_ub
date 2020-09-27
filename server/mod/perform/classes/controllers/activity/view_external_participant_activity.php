@@ -29,6 +29,7 @@ use Exception;
 use invalid_parameter_exception;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\helpers\external_participant_token_validator;
+use moodle_exception;
 use totara_core\advanced_feature;
 use totara_mvc\tui_view;
 
@@ -81,6 +82,11 @@ class view_external_participant_activity extends perform_controller {
             }
 
             $participant_instance = $validator->get_participant_instance();
+
+            // Block access if subject user is deleted
+            if ($participant_instance->subject_instance->is_subject_user_deleted()) {
+                throw new moodle_exception('invalid_activity', 'mod_perform');
+            }
 
             $participant_section_id = $this->get_optional_param('participant_section_id', null, PARAM_INT);
             if ($participant_section_id > 0 && !$validator->is_valid_for_section($participant_section_id)) {

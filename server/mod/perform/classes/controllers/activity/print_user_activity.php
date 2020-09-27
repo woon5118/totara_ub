@@ -70,6 +70,11 @@ class print_user_activity extends perform_controller {
         $participant_instance_id = $this->get_participant_instance_id();
         $participant_section_id = $this->get_participant_section_id();
 
+        // Block access if the subject user or the participant got deleted
+        if ($this->participant_instance->is_subject_or_participant_deleted()) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
+
         $props = [
             'current-user-id' => user::logged_in()->id,
             'print' => true,

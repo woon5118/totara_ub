@@ -44,6 +44,7 @@ use mod_perform\notification\recipient;
 use mod_perform\notification\trigger;
 use mod_perform\notification\triggerable;
 use mod_perform\task\service\participant_instance_creation;
+use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 use totara_core\entities\relationship as relationship_entity;
 use totara_core\relationship\relationship;
@@ -270,27 +271,24 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      * @return collection<participant_instance> array of participant instance entities
      */
     public function create_participant_instances_on_track(track $track): collection {
-        $collection = track_user_assignment::repository()
-            ->filter_by_track_id($track->id)
-            ->get()
-            ->map(function ($tua) {
-                $si = new subject_instance();
-                $si->track_user_assignment_id = $tua->id;
-                $si->subject_user_id = $tua->subject_user_id;
-                $si->job_assignment_id = $tua->job_assignment_id;
-                $si->save();
-                return subject_instance_dto::create_from_entity($si);
-            });
-
         // Eat all hooks.
         $sink = $this->redirectHooks();
-        (new participant_instance_creation())->generate_instances($collection);
+        (new subject_instance_creation())->generate_instances();
+        $sink->clear();
+
+        $subject_instances = subject_instance::repository()
+            ->join([track_user_assignment::TABLE, 'tua'], 'track_user_assignment_id', 'id')
+            ->where('tua.track_id', $track->id)
+            ->get()
+            ->map(function (subject_instance $subject_instance) {
+                return subject_instance_dto::create_from_entity($subject_instance);
+            });
+
+        (new participant_instance_creation())->generate_instances($subject_instances);
         $sink->close();
 
         return participant_instance::repository()
-            ->where_in('subject_instance_id', $collection->map(function (subject_instance_dto $sid) {
-                return $sid->id;
-            })->all())
+            ->where_in('subject_instance_id', $subject_instances->pluck('id'))
             ->get();
     }
 

@@ -89,9 +89,14 @@ class manual_participant_selection_instances implements query_resolver, has_midd
         foreach ($pending_selections as $selection) {
             $id = $selection->subject_instance_id;
 
+            $subject_instance = subject_instance::load_by_entity($selection->subject_instance);
+            if ($subject_instance->is_subject_user_deleted()) {
+                continue;
+            }
+
             if (!isset($selection_instances[$id])) {
                 $selection_instances[$id] = (object) [
-                    'subject_instance' => subject_instance::load_by_entity($selection->subject_instance),
+                    'subject_instance' => $subject_instance,
                     'manual_relationships' => [],
                 ];
             }

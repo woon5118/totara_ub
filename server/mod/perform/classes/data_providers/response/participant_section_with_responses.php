@@ -24,9 +24,12 @@
 namespace mod_perform\data_providers\response;
 
 use core\collection;
+use core\orm\entity\repository;
+use core\orm\query\builder;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\participant_instance_repository;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
@@ -177,6 +180,9 @@ class participant_section_with_responses {
             ->with('participant_user') // Required for the eventual output of other responders section_element_response models.
             ->with('participant_sections')
             ->join([participant_section_entity::TABLE, 'ps'], 'id', 'participant_instance_id')
+            ->when(true, function (repository $repository) {
+                participant_instance_repository::add_user_not_deleted_filter($repository, 'pi');
+            })
             ->where('subject_instance_id', $participant_instance->subject_instance_id)
             // Guard on the actual participant_instance_id (rather than participant_user_id)
             // because we need to handle the case where the same user is both a manager and appraiser to the subject.

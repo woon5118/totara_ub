@@ -121,6 +121,8 @@ class subject_instance_for_participant extends provider {
             ->join([track_entity::TABLE, 't'], 'tua.track_id', 'id')
             ->join([activity_entity::TABLE, 'a'], 't.activity_id', 'id')
             ->join('course', 'a.course', 'id')
+            ->join(['user', 'su'], 'subject_user_id', 'id')
+            ->where('su.deleted', 0)
             ->where_raw($totara_visibility_sql, $totara_visibility_params)
             ->where_exists($this->get_target_participant_exists())
             ->where('status', active::get_code())

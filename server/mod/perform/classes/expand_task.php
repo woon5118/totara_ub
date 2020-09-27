@@ -25,6 +25,7 @@ namespace mod_perform;
 
 use context;
 use core\entities\expandable;
+use core\entities\user;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
@@ -303,6 +304,11 @@ class expand_task {
                 return [];
             }
             return $entity->expand($context);
+        } else if ($class_name === user::class) {
+            $user = $class_name::repository()->find($target_id);
+
+            // We are only interested in non-deleted users
+            return $user && !$user->deleted ? [$target_id] : [];
         }
         return [$target_id];
     }

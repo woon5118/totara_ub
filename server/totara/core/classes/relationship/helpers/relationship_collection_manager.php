@@ -99,19 +99,24 @@ class relationship_collection_manager {
             $relationship_ids = array_keys($this->relationships);
         }
 
+        // As this class deals with multiple users it tries to determine it's
+        // own contexts per relationship unless a context was provided.
+        if ($this->context) {
+            $context = $this->context;
+        } else if ($args['user_id']) {
+            $context = context_user::instance($args['user_id'], IGNORE_MISSING);
+            if (!$context) {
+                // The user might have been deleted
+                return [];
+            }
+        } else {
+            $context = context_system::instance();
+        }
+
         $users_per_relationship = [];
         foreach ($relationship_ids as $relationship_id) {
             if (!isset($this->relationships[$relationship_id])) {
                 throw new coding_exception('Relationship ID not loaded.');
-            }
-            // As this class deals with multiple users it tries to determine it's
-            // own contexts per relationship unless a context was provided.
-            if ($this->context) {
-                $context = $this->context;
-            } else {
-                $context = $args['user_id']
-                    ? context_user::instance($args['user_id'])
-                    : context_system::instance();
             }
 
             $users_per_relationship[$relationship_id] = $this->relationships[$relationship_id]->get_users(

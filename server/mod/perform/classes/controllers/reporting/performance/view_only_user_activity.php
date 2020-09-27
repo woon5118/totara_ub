@@ -54,6 +54,11 @@ class view_only_user_activity extends perform_controller {
             throw new moodle_exception('invalid_activity', 'mod_perform');
         }
 
+        // Block access if subject user is deleted
+        if ($this->subject_instance->is_subject_user_deleted()) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
+
         if (!util::can_report_on_user($this->subject_instance->subject_user_id, user::logged_in()->id)
             || $this->subject_instance->is_pending()) {
             throw new moodle_exception('invalid_activity', 'mod_perform');

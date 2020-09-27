@@ -170,15 +170,24 @@ class util {
             if ($user_context->tenantid) {
                 $tenant = tenant::repository()->find_or_fail($user_context->tenantid);
                 $tenant_sql = "
-                        SELECT userid
+                        SELECT id
                         FROM {cohort_members} tp
-                        WHERE tp.cohortid = :tp_cohort_id
+                        WHERE tp.userid = {$user_id_field} AND tp.cohortid = :tp_cohort_id
                     ";
                 $params['tp_cohort_id'] = $tenant->cohortid;
 
-                return ["{$user_id_field} IN ({$tenant_sql})", $params];
+                return ["EXISTS ({$tenant_sql})", $params];
+            } else if ($CFG->tenantsisolated) {
+                $tenant_sql = "
+                    SELECT id
+                    FROM {user} tp
+                    WHERE tp.id = {$user_id_field}
+                        AND tp.tenantid IS NULL
+                ";
+                return ["EXISTS ({$tenant_sql})", []];
             }
         }
+
         return ['1=1', []];
     }
 }

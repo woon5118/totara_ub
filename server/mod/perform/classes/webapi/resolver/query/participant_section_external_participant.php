@@ -62,6 +62,11 @@ class participant_section_external_participant extends participant_section {
             return null;
         }
 
+        // Block access if the subject user or the participant got deleted
+        if ($participant_instance->is_subject_or_participant_deleted()) {
+            return null;
+        }
+
         $participant_id = $participant_instance->participant_id;
 
         $section_provider = new participant_section_provider($participant_id, participant_source::EXTERNAL);

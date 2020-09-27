@@ -30,6 +30,7 @@ use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\activity\selectable_users as selectable_users_provider;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 /**
  * Get the users that the current user can see and can select.
@@ -44,6 +45,11 @@ class selectable_users implements query_resolver, has_middleware {
     public static function resolve(array $args, execution_context $ec) {
         $subject_instance_id = $args['subject_instance_id'];
         $subject_instance = subject_instance::load_by_id($subject_instance_id);
+
+        // Block access if subject user is deleted
+        if ($subject_instance->is_subject_user_deleted()) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
 
         return (new selectable_users_provider($subject_instance))
             ->add_filters($args['filters'] ?? [])

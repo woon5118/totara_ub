@@ -54,6 +54,7 @@ use mod_perform\state\subject_instance\not_submitted as subject_instance_not_sub
 use mod_perform\state\subject_instance\open as subject_instance_open;
 use mod_perform\task\service\subject_instance_creation;
 use totara_core\advanced_feature;
+use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
@@ -174,6 +175,127 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
 
         $this->assertCount(1, $subject["sections"], 'wrong sections count');
         $this->assertEquals($expected_section, $subject['sections'][0]);
+    }
+
+    public function test_query_with_deleted_participant(): void {
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(1)
+            ->set_number_of_tracks_per_activity(1)
+            ->set_cohort_assignments_per_activity(1)
+            ->set_number_of_users_per_user_group_type(1)
+            ->enable_appraiser_for_each_subject_user()
+            ->set_relationships_per_section(
+                [
+                    constants::RELATIONSHIP_SUBJECT,
+                    constants::RELATIONSHIP_MANAGER,
+                    constants::RELATIONSHIP_APPRAISER
+                ]
+            );
+
+        $perform_generator->create_full_activities($configuration)->first();
+
+        /** @var participant_instance_entity $participant_instance */
+        $participant_instance = participant_instance_entity::repository()
+            ->order_by('id')
+            ->get()
+            ->first();
+
+        $participant_id = $participant_instance->participant_id;
+        self::setUser($participant_id);
+
+        $args = [
+            'filters' => [
+                'about' => [subject_instances_about::VALUE_ABOUT_SELF]
+            ]
+        ];
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $actual = $this->get_webapi_operation_data($result);
+
+        // The user has two participant sections, one for the subject and one for the appraiser
+        $this->assertCount(2, $actual[0]['sections'][0]['participant_sections']);
+
+        $job = job_assignment::get_first($participant_id);
+
+        /** @var user $appraiser */
+        $appraiser = user::repository()->find_or_fail($job->appraiserid);
+
+        // Now delete the appraiser
+        delete_user($appraiser->get_record());
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $actual = $this->get_webapi_operation_data($result);
+
+        // The deleted participant is now gone from the result
+        $this->assertCount(1, $actual[0]['sections'][0]['participant_sections']);
+    }
+
+    public function test_query_with_deleted_subject(): void {
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(1)
+            ->set_number_of_tracks_per_activity(1)
+            ->set_cohort_assignments_per_activity(1)
+            ->set_number_of_users_per_user_group_type(1)
+            ->enable_appraiser_for_each_subject_user()
+            ->set_relationships_per_section(
+                [
+                    constants::RELATIONSHIP_SUBJECT,
+                    constants::RELATIONSHIP_MANAGER,
+                    constants::RELATIONSHIP_APPRAISER
+                ]
+            );
+
+        $perform_generator->create_full_activities($configuration)->first();
+
+        /** @var participant_instance_entity $participant_instance */
+        $participant_instance = participant_instance_entity::repository()
+            ->order_by('id')
+            ->get()
+            ->first();
+
+        $participant_id = $participant_instance->participant_id;
+
+        $job = job_assignment::get_first($participant_id);
+
+        /** @var user $appraiser */
+        $appraiser = user::repository()->find_or_fail($job->appraiserid);
+
+        self::setUser($appraiser->get_record());
+
+        $args = [
+            'filters' => [
+                'about' => [subject_instances_about::VALUE_ABOUT_OTHERS]
+            ]
+        ];
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $actual = $this->get_webapi_operation_data($result);
+
+        // The appraiser sees the subject users instance
+        $this->assertNotEmpty($actual);
+
+        // Now delete the appraiser
+        delete_user(user::repository()->find_or_fail($participant_id)->get_record());
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $actual = $this->get_webapi_operation_data($result);
+
+        // The instance is not visible anymore
+        $this->assertEmpty($actual);
     }
 
     public function test_query_successful_with_single_section_and_external_participant(): void {

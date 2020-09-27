@@ -121,6 +121,125 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_user_assignments($track1_id, $test_data->user2->id);
     }
 
+    public function test_deleted_users_get_unassigned_cohort(): void {
+        $test_data = $this->prepare_assignments();
+
+        $track1_id = $test_data->track1->id;
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // Add the users to the cohort
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        // This should now result in a user assignment
+        $this->get_expand_task()->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
+        // The other user is not in a cohort yet
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+
+        delete_user($test_data->user1);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
+
+        // Make sure the user does not get readded
+        $this->get_expand_task()->expand_all(true);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
+    }
+
+    public function test_deleted_users_get_unassigned_position(): void {
+        $test_data = $this->prepare_assignments();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $fw = $hierarchy_generator->create_pos_frame(['fullname' => 'FW 1']);
+        $pos = $hierarchy_generator->create_pos(['frameworkid' => $fw->id]);
+
+        $track1_id = $test_data->track1->id;
+
+        $assignment = new track_assignment([
+            'track_id' => $track1_id,
+            'type' => track_assignment_type::ADMIN,
+            'user_group_type' => grouping::POS,
+            'user_group_id' => $pos->id,
+            'created_by' => 0,
+            'expand' => true,
+        ]);
+        $assignment->save();
+
+        // Assign both users to the same job assignment
+        job_assignment::create([
+            'userid' => $test_data->user1->id,
+            'idnumber' => 'job1',
+            'positionid' => $pos->id
+        ]);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // This should now result in a user assignment
+        $this->get_expand_task()->expand_single($assignment->id);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
+        // The other user is not in a cohort yet
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+
+        delete_user($test_data->user1);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
+
+        // Make sure the user does not get readded
+        $this->get_expand_task()->expand_all(true);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
+    }
+
+    public function test_deleted_users_get_unassigned_organisation(): void {
+        $test_data = $this->prepare_assignments();
+
+        /** @var totara_hierarchy_generator $hierarchy_generator */
+        $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $fw = $hierarchy_generator->create_org_frame(['fullname' => 'FW 1']);
+        $org = $hierarchy_generator->create_org(['frameworkid' => $fw->id]);
+
+        $track1_id = $test_data->track1->id;
+
+        $assignment = new track_assignment([
+            'track_id' => $track1_id,
+            'type' => track_assignment_type::ADMIN,
+            'user_group_type' => grouping::ORG,
+            'user_group_id' => $org->id,
+            'created_by' => 0,
+            'expand' => true,
+        ]);
+        $assignment->save();
+
+        // Assign both users to the same job assignment
+        job_assignment::create([
+            'userid' => $test_data->user1->id,
+            'idnumber' => 'job1',
+            'organisationid' => $org->id
+        ]);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // This should now result in a user assignment
+        $this->get_expand_task()->expand_single($assignment->id);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
+        // The other user is not in a cohort yet
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+
+        delete_user($test_data->user1);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
+
+        // Make sure the user does not get readded
+        $this->get_expand_task()->expand_all(true);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
+    }
+
     public function test_expand_single_audience_assignment_with_multi_tenancy_enabled(): void {
         $test_data = $this->prepare_assignments_for_multi_tenancy();
 

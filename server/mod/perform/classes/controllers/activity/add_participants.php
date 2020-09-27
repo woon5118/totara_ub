@@ -28,7 +28,6 @@ use core\entities\user;
 use mod_perform\controllers\perform_controller;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\subject_instance;
-use mod_perform\state\subject_instance\pending;
 use mod_perform\util;
 use moodle_exception;
 use moodle_url;
@@ -62,6 +61,11 @@ class add_participants extends perform_controller {
     public function action(): tui_view {
         // Cannot add participants to pending subject instances
         if (!$this->subject_instance->can_add_participants()) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
+
+        // Block access if subject user is deleted
+        if ($this->subject_instance->is_subject_user_deleted()) {
             throw new moodle_exception('invalid_activity', 'mod_perform');
         }
 

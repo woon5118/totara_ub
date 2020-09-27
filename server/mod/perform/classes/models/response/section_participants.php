@@ -142,6 +142,10 @@ class section_participants {
         collection $by_sections,
         participant_instance $participant_instance
     ): collection {
+        if ($participant_instance->is_participant_deleted()) {
+            return $by_sections;
+        }
+
         foreach ($participant_instance->participant_sections as $participant_section) {
             $section = $participant_section->section;
 

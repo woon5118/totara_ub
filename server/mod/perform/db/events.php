@@ -25,6 +25,7 @@ use core\event\cohort_deleted;
 use core\event\cohort_member_added;
 use core\event\cohort_member_removed;
 use core\event\tenant_deleted;
+use core\event\user_deleted;
 use core\event\user_tenant_membership_changed;
 use hierarchy_organisation\event\organisation_deleted;
 use hierarchy_position\event\position_deleted;
@@ -39,18 +40,23 @@ use mod_perform\observers\participant_section_availability;
 use mod_perform\observers\participant_section_progress;
 use mod_perform\observers\subject_instance_availability;
 use mod_perform\observers\subject_instance_manual_status;
+use mod_perform\observers\subject_static_instance_hierarchy;
 use mod_perform\observers\tenant;
 use mod_perform\observers\tenant_membership_changed;
 use mod_perform\observers\track_assignment_user_groups;
+use mod_perform\observers\user;
 use totara_cohort\event\members_updated;
 use totara_job\event\job_assignment_created;
 use totara_job\event\job_assignment_deleted;
 use totara_job\event\job_assignment_updated;
-use mod_perform\observers\subject_static_instance_hierarchy;
 
 defined('MOODLE_INTERNAL') || die();
 
 $observers = [
+    [
+        'eventname' => user_deleted::class,
+        'callback' => user::class.'::user_deleted',
+    ],
     [
         'eventname' => members_updated::class,
         'callback' => track_assignment_user_groups::class.'::cohort_updated',

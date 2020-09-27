@@ -56,7 +56,7 @@ use totara_core\relationship\relationship as relationship_model;
  * @property-read int $core_relationship_id
  * @property-read subject_instance $subject_instance
  * @property-read int $subject_instance_id
- * @property-read user $participant
+ * @property-read participant $participant
  * @property-read collection|participant_section[] $participant_sections
  * @property-read string $progress_status internal name of current progress state
  * @property-read moodle_url $participation_url
@@ -334,4 +334,23 @@ class participant_instance extends model {
     public function get_anonymise_responses(): bool {
         return $this->subject_instance->activity->anonymous_responses;
     }
+
+    /**
+     * Checks whether the participant user of this instance is deleted
+     *
+     * @return bool
+     */
+    public function is_participant_deleted(): bool {
+        return $this->participant->is_internal() && $this->participant->get_user()->deleted;
+    }
+
+    /**
+     * Check if the subject user and the participant are not deleted
+     *
+     * @return bool
+     */
+    public function is_subject_or_participant_deleted(): bool {
+        return $this->subject_instance->is_subject_user_deleted() || $this->is_participant_deleted();
+    }
+
 }

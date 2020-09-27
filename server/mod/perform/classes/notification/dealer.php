@@ -65,9 +65,13 @@ class dealer {
             $activity = $instance->get_subject_instance()->get_activity();
 
             // Do not send any notification if the recipient is not a participant
-            // in the same tenant as the activity. They won't be able to access the activity anymore
+            // in the same tenant as the activity. They won't be able to access the activity anymore.
+            // Also skip deleted users
             if ($user->is_internal()
-                && $activity->get_context()->is_user_access_prevented($user->id)
+                && (
+                    $activity->get_context()->is_user_access_prevented($user->id)
+                    || $instance->is_subject_or_participant_deleted()
+                )
             ) {
                 continue;
             }

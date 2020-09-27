@@ -23,11 +23,12 @@
 
 namespace mod_perform\data_providers\response;
 
-use Behat\Behat\Definition\Pattern\Pattern;
 use core\collection;
+use core\orm\entity\repository;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\participant_instance_repository;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section;
 use mod_perform\entities\activity\section_element as section_element_entity;
@@ -160,6 +161,9 @@ class view_only_section_with_responses {
             ->with('participant_instance.participant_user')
             ->join([section_relationship::TABLE, 'sr'], 'sr.section_id', 'ps.section_id')
             ->join([participant_instance_entity::TABLE, 'pi'], 'pi.id', 'ps.participant_instance_id')
+            ->when(true, function (repository $repository) {
+                participant_instance_repository::add_user_not_deleted_filter($repository, 'pi');
+            })
             ->where('ps.section_id', $this->section_entity->id)
             ->where('pi.subject_instance_id', $this->subject_instance->id)
             ->where_raw('pi.core_relationship_id = sr.core_relationship_id')

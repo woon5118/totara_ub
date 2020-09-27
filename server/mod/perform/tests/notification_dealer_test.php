@@ -122,9 +122,7 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $element = $this->perfgen->create_element(['title' => 'Question one', 'plugin_name' => 'short_text']);
         $this->perfgen->create_section_element($section, $element);
 
-        expand_task::create()->expand_multiple($track->assignments->map(function ($ass) {
-            return $ass->id;
-        })->all());
+        expand_task::create()->expand_multiple($track->assignments->pluck('id'));
 
         $notif1 = $this->create_notification($activity, 'mock_one', false);
         $notif2 = $this->create_notification($activity, 'mock_two', true);
@@ -167,6 +165,17 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
             $this->fail('class_key_not_available expected');
         } catch (class_key_not_available $ex) {
         }
+
+        delete_user($user1);
+
+        // Trigger again
+        $sink->clear();
+        $entities = \mod_perform\entities\activity\participant_instance::repository()->get();
+        $dealer = factory::create_dealer_on_participant_instances($entities->all());
+        $dealer->dispatch('mock_two');
+        $this->assertEquals(0, $sink->get_by_class_key('mock_one')->count());
+        $this->assertEquals(1, $sink->get_by_class_key('mock_two')->count());
+        $this->assertEquals(0, $sink->get_by_class_key('mock_three')->count());
     }
 
     public function test_post_multi_tenancy_enabled() {

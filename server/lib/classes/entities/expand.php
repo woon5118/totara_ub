@@ -67,9 +67,13 @@ trait expand {
             throw new coding_exception('Please define the EXPAND_TABLE, EXPAND_QUERY_COLUMN and EXPAND_SELECT_COLUMN constants');
         }
 
+        $user_alias = uniqid('user');
+
         $builder = builder::table(static::EXPAND_TABLE)
             ->select(static::EXPAND_SELECT_COLUMN)
+            ->join(['user', $user_alias], static::EXPAND_SELECT_COLUMN, 'id')
             ->where_in(static::EXPAND_QUERY_COLUMN, $ids)
+            ->where("{$user_alias}.deleted", 0)
             ->group_by(static::EXPAND_SELECT_COLUMN)
             // Make sure this is multi tenancy compatible.
             ->when(!is_null($context), function (builder $builder) use ($context) {

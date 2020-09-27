@@ -34,6 +34,7 @@ use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\data_providers\response\participant_section as participant_section_provider;
 use invalid_parameter_exception;
 use mod_perform\models\activity\participant_source;
+use moodle_exception;
 
 class participant_section implements query_resolver, has_middleware {
     /**
@@ -55,7 +56,13 @@ class participant_section implements query_resolver, has_middleware {
         if (!$participant_section) {
             return null;
         }
+        $participant_instance = $participant_section->get_participant_instance();
         $ec->set_relevant_context($participant_section->get_participant_instance()->get_context());
+
+        // Block access if the subject user or the participant got deleted
+        if ($participant_instance->is_subject_or_participant_deleted()) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
 
         // When this participant section is fetched, for now we can safely assume that the participant is accessing
         // the section. In the future, this may have to move to a set_accessed mutation, e.g. if sections become

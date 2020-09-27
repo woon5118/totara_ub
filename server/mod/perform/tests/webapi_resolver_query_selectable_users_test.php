@@ -223,6 +223,34 @@ class mod_perform_webapi_resolver_query_selectable_users_testcase extends advanc
         $this->assertEquals([$user1->id], $actual_user_ids);
     }
 
+    public function test_get_users_subject_user_got_deleted() {
+        $generator = $this->getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $generator->get_plugin_generator('mod_perform');
+
+        $this->setAdminUser();
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_cohort_assignments_per_activity(1)
+            ->set_number_of_users_per_user_group_type(5);
+
+        $activities = $perform_generator->create_full_activities($configuration);
+        /** @var activity_model $activity */
+        $activity = $activities->first();
+        $subject_instance = $this->get_subject_instance($activity);
+
+        $params = ['subject_instance_id' => $subject_instance->id];
+
+        $selectable_users = $this->get_query_data($params);
+
+        $this->assertNotEmpty($selectable_users);
+
+        delete_user($subject_instance->subject_user->get_user()->get_record());
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $params);
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
+    }
+
     public function test_ajax_query_failed(): void {
         $generator = $this->getDataGenerator();
         /** @var mod_perform_generator $perform_generator */

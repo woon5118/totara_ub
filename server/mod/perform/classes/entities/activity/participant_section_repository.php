@@ -25,6 +25,7 @@ namespace mod_perform\entities\activity;
 
 use coding_exception;
 use core\orm\entity\repository;
+use core\orm\query\builder;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\participant_source;
@@ -46,11 +47,15 @@ class participant_section_repository extends repository {
         int $participant_source = participant_source::INTERNAL
     ): participant_section_entity {
         /** @var participant_section_entity $first_participant_section */
-        $first_participant_section = participant_section_entity::repository()->as('ps')
+        $first_participant_section = participant_section_entity::repository()
+            ->as('ps')
             ->join([section::TABLE, 's'], 'ps.section_id', 's.id')
             ->where('participant_instance_id', $participant_instance_id)
             ->order_by('s.sort_order', 'asc')
             ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
+            ->when(true, function (repository $repository) {
+                participant_instance_repository::add_user_not_deleted_filter($repository, 'pi');
+            })
             ->where('pi.participant_id', $participant_id)
             ->where('pi.participant_source', $participant_source)
             ->first();
@@ -83,6 +88,9 @@ class participant_section_repository extends repository {
             ->with('participant_instance.core_relationship.resolvers') // For excluding main participant in other responder groups.
             // Ensure the user we are fetching responses for is a participant for the section they belong to.
             ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
+            ->when(true, function (repository $repository) {
+                participant_instance_repository::add_user_not_deleted_filter($repository, 'pi');
+            })
             ->where('ps.id', $participant_section_id)
             ->where('pi.participant_id', $user_id)
             ->where('pi.participant_source', $participant_source)

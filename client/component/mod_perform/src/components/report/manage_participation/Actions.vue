@@ -43,7 +43,7 @@
       @modal-close="modalClose"
     />
     <a
-      v-if="isSubjectReport"
+      v-if="isSubjectReport && canAddParticipants"
       :href="participationManagementUrl"
       :title="$str('activity_participants_add', 'mod_perform')"
     >
@@ -106,6 +106,9 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    canAddParticipants: {
+      type: Boolean,
     },
   },
   data() {

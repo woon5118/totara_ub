@@ -24,6 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core\entities\user;
+use mod_perform\models\activity\participant_source;
 use mod_perform\state\subject_instance\pending;
 use mod_perform\rb\traits\activity_trait;
 use mod_perform\rb\traits\subject_instance_trait;
@@ -130,7 +131,7 @@ class rb_source_perform_participation_subject_instance extends rb_base_source {
      * @return array
      */
     protected function define_columnoptions() {
-        $global_restriction_join_su = $this->get_global_report_restriction_join('su', 'userid');
+        $global_restriction_join_su = $this->get_global_report_restriction_join('ppi', 'subject_user_id');
 
         $pending_state = pending::get_code();
         $participant_count_sql_fragment = "
@@ -139,8 +140,13 @@ class rb_source_perform_participation_subject_instance extends rb_base_source {
             ELSE (
                 SELECT COUNT('x')
                 FROM {perform_participant_instance} ppi
+                LEFT JOIN {user} ppc ON ppi.participant_id = ppc.id 
+                    AND ppi.participant_source = " . participant_source::INTERNAL . "
                 {$global_restriction_join_su}
-                WHERE ppi.subject_instance_id = base.id
+                WHERE ppi.subject_instance_id = base.id AND (
+                    ppi.participant_source = " . participant_source::EXTERNAL . " 
+                    OR ppc.deleted = 0
+                )
             )
         END
         ";
@@ -162,19 +168,6 @@ class rb_source_perform_participation_subject_instance extends rb_base_source {
                     ]
                 ]
             ),
-            // TODO: uncomment when its available
-            // new rb_column_option(
-            //     'track',
-            //     'description',
-            //     get_string('track_description', 'mod_perform'),
-            //     'track.description',
-            //     [
-            //         'joins' => ['track', 'track_user_assignment'],
-            //         'dbdatatype' => 'text',
-            //         'outputformat' => 'text',
-            //         'displayfunc' => 'format_string'
-            //     ]
-            // )
         ];
 
         return $columnoptions;
