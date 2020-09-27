@@ -192,6 +192,7 @@ class course implements type_resolver {
 
             // Return the raw course section information, let the type handle the rest.
             if ($field == 'sections') {
+                $numsections = course_get_format($course)->get_last_section_number();
                 $rawsections = $modinfo->get_section_info_all();
 
                 // The user can see everything, just return everything.
@@ -202,7 +203,7 @@ class course implements type_resolver {
                 $sections = [];
                 // Quickly loop through all the sections, and remove non-visible ones.
                 foreach ($rawsections as $key => $section) {
-                    if ($section->__get('visible')) {
+                    if ($key <= $numsections && $section->__get('visible')) {
                         $sections[$key] = $section;
                     }
                 }

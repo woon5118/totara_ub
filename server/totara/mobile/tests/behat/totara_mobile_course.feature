@@ -125,3 +125,33 @@ Feature: Test the totara_mobile_course query
     Then I should not see "Coding error detected" in the "#response2" "css_element"
     And I should see "\"fullname\": \"Course 1\"" in the "#response2" "css_element"
     And I should see "\"native\": true" in the "#response2" "css_element"
+
+  Scenario: Test the query with an orphaned category
+    Given I am on "Course 1" course homepage with editing mode on
+    And I follow "Reduce the number of sections"
+    And I follow "Reduce the number of sections"
+    And I add a "Seminar" to section "1" and I fill the form with:
+      | Name                | First seminar  |
+    And I add a "Seminar" to section "2" and I fill the form with:
+      | Name                | Second seminar |
+    And I add a "Seminar" to section "3" and I fill the form with:
+      | Name                | Third seminar  |
+    And I follow "Reduce the number of sections"
+    Then I should see "Orphaned activities"
+    And I log out
+    When I am using the mobile emulator
+    Then I should see "Device emulator loading..."
+    And I should see "Making login_setup request"
+    And I set the field "username" to "student1"
+    And I set the field "password" to "student1"
+    When I click on "Submit Credentials 1" "button"
+    Then I should see "Native login OK"
+    And I should see "Setting up new GraphQL browser"
+    When I set the field "jsondata2" to "{\"operationName\": \"totara_mobile_course\",\"variables\": {\"courseid\": 2}}"
+    And I click on "Submit Request 2" "button"
+    Then I should not see "Coding error detected" in the "#response2" "css_element"
+    And I should see "\"title\": \"General\"" in the "#response2" "css_element"
+    And I should see "\"title\": \"Topic 1\"" in the "#response2" "css_element"
+    And I should see "\"title\": \"Topic 2\"" in the "#response2" "css_element"
+    And I should not see "\"title\": \"Topic 3\"" in the "#response2" "css_element"
+    And I should not see "Orphaned" in the "#response2" "css_element"
