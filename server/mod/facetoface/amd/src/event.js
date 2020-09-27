@@ -438,7 +438,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
                     loading.innerText = strings.loading;
                 }).catch(NotificationLib.exception);
 
-                list.append(loading);
+                list.appendChild(loading);
 
                 var ResourcePromises = items.map(function(facilitatorid) {
                     return that.generateElement(facilitatorid);
@@ -447,7 +447,7 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
                 Promise.all(ResourcePromises).then(function(data) {
                     list.innerHTML = '';
                     data.forEach(function(elem) {
-                        list.append(elem);
+                        list.appendChild(elem);
                     });
                     if (that.updateCapacity) {
                         that.updateCapacity(offset);
