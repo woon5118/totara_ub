@@ -233,6 +233,11 @@ class RTLCSS {
         $property = $rule->getRule();
         $value = $rule->getValue();
 
+        // Avoid renaming CSS variable definitions.
+        if (substr($property, 0, 2) == '--') {
+            return;
+        }
+
         if (preg_match('/direction$/im', $property)) {
             $rule->setValue($this->swapLtrRtl($value));
 

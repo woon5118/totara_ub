@@ -9,3 +9,7 @@ Import procedure:
 
 - Copy all the files from the folder 'src/MoodleHQ/RTLCSS/' in this directory.
 - Copy the license file.
+- Re-apply Totara modifications
+
+Totara changes:
+  * TL-27760 - Fix CSS variables ending in left or right being renamed
