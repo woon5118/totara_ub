@@ -39,6 +39,14 @@ class rb_perform_response_user_embedded extends rb_base_embedded {
         $this->filters = $this->define_filters();
         $this->defaultsortcolumn = 'user_fullname';
 
+        $this->contentmode = REPORT_BUILDER_CONTENT_MODE_ALL;
+
+        $this->contentsettings = [
+            'user_visibility' => [
+                'enable' => 1,
+            ]
+        ];
+
         parent::__construct();
     }
 

@@ -62,7 +62,12 @@ class rb_source_perform_participation_participant_instance extends rb_base_sourc
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_participation_participant_instance');
         $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_participation_participant_instance');
 
-        $this->base = '{perform_participant_instance}';
+        $this->base = '(SELECT bpi.* 
+            FROM {perform_participant_instance} bpi
+            LEFT JOIN {user} bu ON bpi.participant_id = bu.id
+               AND bpi.participant_source = '. participant_source::INTERNAL .'
+            WHERE bpi.participant_source = '. participant_source::EXTERNAL .' OR bu.deleted = 0)
+            ';
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();

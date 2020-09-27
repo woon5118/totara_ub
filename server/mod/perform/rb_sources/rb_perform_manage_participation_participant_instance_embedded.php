@@ -54,6 +54,14 @@ class rb_perform_manage_participation_participant_instance_embedded extends rb_b
             $this->embeddedparams['subject_instance_id'] = $data['subject_instance_id'];
         }
 
+        $this->contentmode = REPORT_BUILDER_CONTENT_MODE_ALL;
+
+        $this->contentsettings = array(
+            'user_visibility' => array(
+                'enable' => 1,
+            )
+        );
+
         parent::__construct();
     }
 

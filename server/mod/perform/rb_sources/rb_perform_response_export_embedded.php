@@ -61,6 +61,14 @@ class rb_perform_response_export_embedded extends rb_base_embedded {
             $this->embeddedparams['element_identifier'] = $data['element_identifier'];
         }
 
+        $this->contentmode = REPORT_BUILDER_CONTENT_MODE_ALL;
+
+        $this->contentsettings = [
+            'user_visibility' => [
+                'enable' => 1,
+            ]
+        ];
+
         parent::__construct();
     }
 
