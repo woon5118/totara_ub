@@ -24,27 +24,28 @@ const { formatCodeWithPath } = require('../lib/prettier');
 const args = require('yargs')
   .help()
   .version(false)
-  .command('$0 <component>', false, yargs => {
+  .command('$0 <component> <vendor>', false, yargs => {
     yargs
       .positional('component', {
         describe: 'Name of client component to create',
       })
-      .describe(
-        'vendor',
-        'unique string identifying the authoring organisation'
-      )
-      .default('vendor', 'totara');
+      .positional('vendor', {
+        describe: 'Unique string identifying the authoring organisation',
+      });
   }).argv;
 
-const clientDir = 'client/component/' + args.component + '/src';
-const fullDir = path.join(rootDir, clientDir);
+const componentDir = 'client/component/' + args.component;
+const srcDir = componentDir + '/src';
+const fullComponentDir = path.join(rootDir, componentDir);
+const fullSrcDir = path.join(rootDir, srcDir);
 
-if (fs.existsSync(fullDir)) {
-  console.error(`Error: directory ${clientDir} already exists.`);
+if (fs.existsSync(fullComponentDir)) {
+  console.error(`Error: directory ${componentDir} already exists.`);
   process.exit(1);
 }
 
-fs.mkdirSync(fullDir);
+fs.mkdirSync(fullComponentDir);
+fs.mkdirSync(fullSrcDir);
 
 /**
  * Write a file if it does not exist, formatting content with prettier.
@@ -53,7 +54,7 @@ fs.mkdirSync(fullDir);
  * @param {string} content
  */
 function write(file, content) {
-  const filePath = path.join(fullDir, file);
+  const filePath = path.join(fullSrcDir, file);
   if (fs.existsSync(filePath)) {
     console.log(`${file} already exists, skipping...`);
     return;
@@ -65,17 +66,15 @@ function write(file, content) {
   fs.writeFileSync(filePath, content, 'utf8');
 }
 
-console.log(`Initializing TUI in ${clientDir}/...`);
+console.log(`Initializing TUI in ${componentDir}/...`);
 
 write('tui.json', { component: args.component, vendor: args.vendor });
 
-['js', 'pages', 'components', 'tests', 'tests/unit'].forEach(
-  subdir => {
-    const fullSubdir = path.join(fullDir, subdir);
-    if (!fs.existsSync(fullSubdir)) {
-      fs.mkdirSync(fullSubdir);
-    }
+['js', 'pages', 'components', 'tests', 'tests/unit'].forEach(subdir => {
+  const fullSubdir = path.join(fullSrcDir, subdir);
+  if (!fs.existsSync(fullSubdir)) {
+    fs.mkdirSync(fullSubdir);
   }
-);
+});
 
 console.log('Done!');
