@@ -24,12 +24,12 @@ export const config = {
     name: 'ventura',
   },
   timezone: {
-    user: 'Pacific/Auckland',
-    server: 'Pacific/Auckland',
+    user: 'Antarctica/Vostok',
+    server: 'Antarctica/Palmer',
   },
   context: null,
   locale: {
-    language: 'en',
-    country: 'NZ',
+    language: 'de',
+    country: 'CH',
   },
 };

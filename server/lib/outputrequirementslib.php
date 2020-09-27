@@ -1707,7 +1707,7 @@ require(['core/autoinitialise'], function(ai) {
 
         // JS Framework config
         $js .= js_writer::set_variable('JS_ENV', $CFG->debugdeveloper ? 'development' : 'production', false);
-        $js .= js_writer::set_variable('_pageConfig', $this->get_js_page_config($page, $renderer), false);
+        $js .= js_writer::set_variable('_pageConfig', $this->get_js_page_config($page), false);
         $js .= 'window.getPageConfig = function() { return window._pageConfig; };';
 
         // Set up global YUI3 loader object - this should contain all code needed by plugins.
@@ -1745,8 +1745,8 @@ require(['core/autoinitialise'], function(ai) {
      *
      * @return array
      */
-    public function get_js_page_config(moodle_page $page, renderer_base $renderer) {
-        global $CFG, $USER;
+    public function get_js_page_config(moodle_page $page) {
+        global $CFG;
 
         $currentlanguage = current_language();
         if (!get_string_manager()->translation_exists($currentlanguage)) {
