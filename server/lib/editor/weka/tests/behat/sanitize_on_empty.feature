@@ -1,9 +1,7 @@
-@editor @editor_weka @totara
+@totara @editor @editor_weka @totara @vuejs
 Feature: Sanitize on empty json document
   Background:
     Given I am on a totara site
-    # This is for temporary solution as editor weka will not work without theme ventura :(
-    And I set the site theme to "ventura"
     And I log in as "admin"
     And I follow "Preferences" in the user menu
     And I follow "Editor preferences"

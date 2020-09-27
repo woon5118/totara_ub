@@ -1,4 +1,4 @@
-@editor @editor_weka @weka @javascript @totara_mobile
+@totara @editor @editor_weka @weka @javascript @totara_mobile @vuejs
 Feature: Convert from HTML to Weka editor test
   As an admin
   I convert HTML to mobile-friendly JSON content in necessary places
@@ -15,7 +15,6 @@ Feature: Convert from HTML to Weka editor test
       | fullname | shortname | category | summary                                      | endnote                                            |
       | cert1    | cert1     | 0        | <p>Hello <a href="#test">World</a> Test.</p> | <p>Goodbye <a href="#test">Endnote</a>, Later.</p> |
     And I log in as "admin"
-    And I set the site theme to "ventura"
     And I click on "Find Learning" in the totara menu
     And I follow "Configure catalogue"
     And I follow "General"

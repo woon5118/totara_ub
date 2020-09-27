@@ -1,4 +1,4 @@
-@editor @editor_weka @weka @javascript @editor
+@totara @editor @editor_weka @weka @javascript @editor @vuejs
 Feature: Moodle form weka editor test
   Render the weka editor as the default editor for a user
   As an admin
@@ -7,7 +7,6 @@ Feature: Moodle form weka editor test
   Background:
     Given I am on a totara site
     And I log in as "admin"
-    And I set the site theme to "ventura"
 
   Scenario: Create course and test that plain text area is rendered
     Given I open my profile in edit mode

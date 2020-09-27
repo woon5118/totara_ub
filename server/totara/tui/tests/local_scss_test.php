@@ -121,7 +121,6 @@ class totara_tui_local_scss_testcase extends basic_testcase {
             $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();
             $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();
             $expected->imports[] = 'output_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();
-            // what about the bundle??? (ah there isn't one atm)
         }
         $result = $method->invoke($tui_scss, 'theme_ventura');
         $this->assertEquals($expected, $result);
@@ -157,7 +156,6 @@ class totara_tui_local_scss_testcase extends basic_testcase {
 
         $srcroot = (new path($CFG->srcroot));
         if (file_exists($CFG->srcroot . '/client/component/samples/build/tui_bundle.js')) {
-            /// think this is right???
             $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/tui/build/global_styles/_variables.scss')->out();
             $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/samples/build/global_styles/_variables.scss')->out();
             $expected->imports[] = 'definitions_only!internal_absolute:'.$srcroot->join('/client/component/theme_ventura/build/global_styles/_variables.scss')->out();

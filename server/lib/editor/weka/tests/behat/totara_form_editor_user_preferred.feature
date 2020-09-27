@@ -1,4 +1,4 @@
-@totara @totara_form @javascript @editor_weka @editor
+@totara @totara_form @javascript @editor_weka @editor @vuejs
 Feature: Totara form weka editor test
   Render the weka editor as the default editor for a user
   As an admin
@@ -7,7 +7,6 @@ Feature: Totara form weka editor test
   Background:
     Given I am on a totara site
     And I log in as "admin"
-    And I set the site theme to "ventura"
 
   Scenario: Test if plain text area is rendered
     Given I open my profile in edit mode

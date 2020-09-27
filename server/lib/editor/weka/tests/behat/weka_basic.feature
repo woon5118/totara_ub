@@ -1,8 +1,7 @@
-@javascript @editor @editor_weka @weka
+@totara @javascript @editor @editor_weka @weka @vuejs
 Feature: Test basic Weka functionality
   Background:
     Given I am on a totara site
-    And I set the site theme to "ventura"
     And the following "users" exist:
       | username | firstname | lastname | email           |
       | user_one | User      | One      | one@example.com |
@@ -10,7 +9,6 @@ Feature: Test basic Weka functionality
   Scenario: Create resource
     Given I am on a totara site
     And I log in as "admin"
-    And I set the site theme to "ventura"
     And I navigate to the "weka_basic" fixture in the "lib/editor/weka" plugin
     And I set the weka editor with css ".tui-fixture-wekaBasic" to "First sample content"
     And I set the weka editor with css ".tui-fixture-wekaBasic" to "Second sample content "
