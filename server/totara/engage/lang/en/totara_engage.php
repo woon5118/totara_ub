@@ -31,7 +31,6 @@ $string['accesssettings'] = 'Settings';
 $string['adder_image_alt'] = 'The image of the content {$a}';
 $string['assigntopics'] = 'Assign topic(s)';
 $string['all'] = 'All';
-$string['alllibrary'] = 'All library';
 $string['allsite'] = 'All site';
 $string['alltopics'] = 'All topics';
 $string['alltypes'] = 'All types';

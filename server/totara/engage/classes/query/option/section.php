@@ -68,7 +68,7 @@ class section implements option {
             [
                 'id' => null,
                 'value' => null,
-                'label' => get_string('alllibrary', 'totara_engage')
+                'label' => get_string('yourlibrary', 'totara_engage')
             ],
             [
                 'id' => self::YOURRESOURCES,
