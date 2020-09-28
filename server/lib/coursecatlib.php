@@ -644,6 +644,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * $id (int) - array of ids of categories that are direct children of category with id $id. If
      *   category with id $id does not exist returns false. If category has no children returns empty array
      * $id.'i' - array of ids of children categories that have visible=0
+     * $id.'s' - array of ids of system maintained children categories
      *
      * @param int|string $id
      * @return mixed
@@ -661,7 +662,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             return array();
         }
         // Re-build the tree.
-        $sql = "SELECT cc.id, cc.parent, cc.visible
+        $sql = "SELECT cc.id, cc.parent, cc.visible, cc.issystem
                 FROM {course_categories} cc
                 ORDER BY cc.sortorder";
         $rs = $DB->get_recordset_sql($sql, array());
@@ -670,16 +671,23 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         foreach ($rs as $record) {
             $all[$record->id] = array();
             $all[$record->id. 'i'] = array();
+            $all[$record->id. 's'] = array();
             if (array_key_exists($record->parent, $all)) {
                 $all[$record->parent][] = $record->id;
                 if (!$record->visible) {
                     $all[$record->parent. 'i'][] = $record->id;
+                }
+                if ($record->issystem) {
+                    $all[$record->parent . 's'][] = $record->id;
                 }
             } else {
                 // Parent not found. This is data consistency error but next fix_course_sortorder() should fix it.
                 $all[0][] = $record->id;
                 if (!$record->visible) {
                     $all['0i'][] = $record->id;
+                }
+                if ($record->issystem) {
+                    $all['0s'][] = $record->id;
                 }
             }
             $count++;
@@ -1348,7 +1356,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      * @return boolean
      */
     public function has_children() {
-        $allchildren = self::get_tree($this->id);
+        $allchildren = array_diff(self::get_tree($this->id), self::get_tree($this->id . 's'));
         return !empty($allchildren);
     }
 
@@ -1901,6 +1909,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         $deletedcertifs = array();
 
         // Get children. Note, we don't want to use cache here because it would be rebuilt too often.
+        // We want to get ALL children including categories maintained by system
         $children = $DB->get_records('course_categories', array('parent' => $this->id), 'sortorder ASC');
         foreach ($children as $record) {
             $coursecat = new coursecat($record);
@@ -1910,14 +1919,15 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $deletedcertifs = array_merge($deletedcertifs, $tempcertifs);
         }
 
-        if ($courses = $DB->get_records('course', array('category' => $this->id), 'sortorder ASC')) {
-            foreach ($courses as $course) {
-                if (!delete_course($course, false)) {
-                    throw new moodle_exception('cannotdeletecategorycourse', '', '', $course->shortname);
+        $deleted = $this->delete_courses_and_containers();
+        // We only want to report on deleted courses
+        $deletedcourses = array_merge($deletedcourses,
+            array_filter($deleted,
+                function ($container) {
+                    return $container->get_type() === \container_course\course::get_type();
                 }
-                $deletedcourses[] = $course;
-            }
-        }
+            )
+        );
 
         if ($programs = $DB->get_records('prog', array('category' => $this->id), 'sortorder ASC', 'id, shortname')) {
             require_once($CFG->dirroot . '/totara/program/lib.php');
@@ -2081,6 +2091,16 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             throw new coding_exception('Tenant category cannot be deleted');
         }
 
+        // System maintained sub-categories are fully deleted
+        // Need to do this first to prevent container courses from being moved
+        $system_children = $this->get_children(['is_system' => 1]);
+        if ($system_children) {
+            foreach ($system_children as $systemcat) {
+                $systemcat->delete_courses_and_containers();
+                $DB->delete_records('course_categories', array('id' => $systemcat->id));
+            }
+        }
+
         // Get all objects and lists because later the caches will be reset so.
         // We don't need to make extra queries.
         $newparentcat = self::get($newparentid, MUST_EXIST, true);
@@ -2182,6 +2202,27 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             set_config('defaultrequestcategory', $DB->get_field('course_categories', 'MIN(id)', array('parent' => 0)));
         }
         return true;
+    }
+
+
+    /**
+     * Delete all courses and containers in this category
+     *
+     * @return array of deleted containers
+     */
+    protected function delete_courses_and_containers(): array {
+        global $DB;
+
+        $deleted = [];
+        if ($courses_and_containers = $DB->get_records('course', array('category' => $this->id), 'sortorder ASC')) {
+            foreach ($courses_and_containers as $record) {
+                $container = \core_container\factory::from_record($record);
+                $container->delete();
+                $deleted[] = $container;
+            }
+        }
+
+        return $deleted;
     }
 
     /**

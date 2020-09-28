@@ -24,6 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 use container_course\course;
+use core_container\factory;
+use totara_tenant\local\util as tenant_util;
 
 /**
  * Tests covering multitenancy related changes in course category related code.
@@ -604,5 +606,143 @@ class totara_tenant_coursecat_testcase extends advanced_testcase {
         $default = coursecat::get_default();
         $this->assertSame($tenant2->categoryid, $default->id);
     }
+
+    public function test_delete_full_with_system_maintained() {
+        global $CFG, $DB;
+        require_once("{$CFG->dirroot}/container/tests/fixtures/core_container_mock_container.php");
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $this->setAdminUser();
+
+        $tenant1 = $tenant_generator->create_tenant(null);
+        $tenant1_user = $this->getDataGenerator()->create_user(
+            ['tenantid' => $tenant1->id, 'tenantusermanager' => $tenant1->idnumber, 'tenantdomainmanager' => $tenant1->idnumber]
+        );
+
+        // Set up mock container type, and all the hooks mapping.
+        factory::phpunit_add_mock_container_class(
+            core_container_mock_container::class,
+            core_container_mock_container::class
+        );
+
+        $misc_category_id = $DB->get_field('course_categories', 'id', ['name' => 'Miscellaneous']);
+
+        // tenant1 - for delete_full
+        $this->setUser($tenant1_user);
+
+        // Tenant categories and courses not in the system container
+        $tenant_course = $this->getDataGenerator()->create_course(['idnumber' => 'tenant_course', 'category' => $tenant1->categoryid]);
+        $parent_category = $this->getDataGenerator()->create_category(['parent' => $tenant1->categoryid, 'idnumber' => 'p']);
+        $child_category = $this->getDataGenerator()->create_category(['idnumber' => 'p-c', 'parent' => $parent_category->id]);
+        $child_course = $this->getDataGenerator()->create_course(['idnumber' => 'child_course', 'category' => $child_category->id]);
+
+        // Now the system container with its course_container
+        $container_category_id = core_container_mock_container::get_default_category_id();
+        $container_course = $this->getDataGenerator()->create_course(['idnumber' => 'container_course', 'category' => $container_category_id]);
+
+        $this->assertTrue($DB->record_exists('course_categories', ['id' => $tenant1->categoryid, 'visible' => 1]));
+        $this->assertTrue($DB->record_exists('course_categories', ['id' => $container_category_id, 'parent' => $tenant1->categoryid]));
+        $this->assertFalse($DB->record_exists('course', ['category' => $misc_category_id]));
+        $this->assertTrue($DB->record_exists('course', ['category' => $tenant1->categoryid]));
+        $this->assertTrue($DB->record_exists('course', ['category' => $container_category_id]));
+
+        $this->setAdminUser();
+
+        tenant_util::delete_tenant($tenant1->id, tenant_util::DELETE_TENANT_USER_DELETE);
+
+        $this->assertTrue($DB->record_exists('course_categories', ['id' => $tenant1->categoryid, 'visible' => 0]));
+        $this->assertTrue($DB->record_exists('course_categories', ['id' => $container_category_id, 'parent' => $tenant1->categoryid]));
+        $this->assertFalse($DB->record_exists('course', ['category' => $misc_category_id]));
+        $this->assertTrue($DB->record_exists('course', ['category' => $tenant1->categoryid]));
+        $this->assertTrue($DB->record_exists('course', ['category' => $container_category_id]));
+
+        $tenantcat = coursecat::get($tenant1->categoryid);
+        [$deleted_courses, $deleted_programs, $deleted_certifs] = $tenantcat->delete_full();
+
+        $this->assertCount(3, $deleted_courses);
+        $this->assertCount(0, $deleted_programs);
+        $this->assertCount(0, $deleted_certifs);
+
+        $expected_course_ids = [$tenant_course->id, $child_course->id, $container_course->id];
+        $actual_course_ids = array_map(
+            function ($course) {
+                return $course->id;
+            },
+            $deleted_courses
+        );
+        $this->assertEqualsCanonicalizing($expected_course_ids, $actual_course_ids);
+
+        $this->assertFalse($DB->record_exists('course_categories', ['id' => $tenant1->categoryid]));
+        $this->assertFalse($DB->record_exists('course_categories', ['id' => $container_category_id, 'parent' => $tenant1->categoryid]));
+        $this->assertFalse($DB->record_exists('course_categories', ['id' => $parent_category->id]));
+        $this->assertFalse($DB->record_exists('course_categories', ['parent' => $parent_category->id]));
+        $this->assertFalse($DB->record_exists('course', ['category' => $misc_category_id]));
+        $this->assertFalse($DB->record_exists('course', ['category' => $tenant1->categoryid]));
+        $this->assertFalse($DB->record_exists('course', ['category' => $container_category_id]));
+        $this->assertFalse($DB->record_exists('course', ['category' => $child_category->id]));
+    }
+
+    public function test_delete_move_with_system_maintained() {
+        global $CFG, $DB;
+        require_once("{$CFG->dirroot}/container/tests/fixtures/core_container_mock_container.php");
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $this->setAdminUser();
+
+        $tenant1 = $tenant_generator->create_tenant(null);
+        $tenant1_user = $this->getDataGenerator()->create_user(
+            ['tenantid' => $tenant1->id, 'tenantusermanager' => $tenant1->idnumber, 'tenantdomainmanager' => $tenant1->idnumber]
+        );
+
+        // Set up mock container type, and all the hooks mapping.
+        factory::phpunit_add_mock_container_class(
+            core_container_mock_container::class,
+            core_container_mock_container::class
+        );
+
+        $misc_category_id = $DB->get_field('course_categories', 'id', ['name' => 'Miscellaneous']);
+
+        // tenant1 - for delete_full
+        $this->setUser($tenant1_user);
+
+        // A tenant course not in the system container
+        $this->getDataGenerator()->create_course(['category' => $tenant1->categoryid]);
+
+        // Now the system container with its course_container
+        $container_category_id = core_container_mock_container::get_default_category_id();
+        $container_course = $this->getDataGenerator()->create_course(['category' => $container_category_id]);
+
+        $this->assertTrue($DB->record_exists('course_categories', ['id' => $tenant1->categoryid, 'visible' => 1]));
+        $this->assertTrue($DB->record_exists('course_categories', ['id' => $container_category_id, 'parent' => $tenant1->categoryid]));
+        $this->assertFalse($DB->record_exists('course', ['category' => $misc_category_id]));
+        $this->assertTrue($DB->record_exists('course', ['category' => $tenant1->categoryid]));
+        $this->assertTrue($DB->record_exists('course', ['category' => $container_category_id]));
+
+        $this->setAdminUser();
+
+        tenant_util::delete_tenant($tenant1->id, tenant_util::DELETE_TENANT_USER_DELETE);
+
+        $this->assertTrue($DB->record_exists('course_categories', ['id' => $tenant1->categoryid, 'visible' => 0]));
+        $this->assertTrue($DB->record_exists('course_categories', ['id' => $container_category_id, 'parent' => $tenant1->categoryid]));
+        $this->assertFalse($DB->record_exists('course', ['category' => $misc_category_id]));
+        $this->assertTrue($DB->record_exists('course', ['category' => $tenant1->categoryid]));
+        $this->assertTrue($DB->record_exists('course', ['category' => $container_category_id]));
+
+        $tenantcat = coursecat::get($tenant1->categoryid);
+        $tenantcat->delete_move($misc_category_id);
+
+        $this->assertFalse($DB->record_exists('course_categories', ['id' => $tenant1->categoryid]));
+        $this->assertFalse($DB->record_exists('course_categories', ['id' => $container_category_id, 'parent' => $tenant1->categoryid]));
+        $this->assertTrue($DB->record_exists('course', ['category' => $misc_category_id]));
+        $this->assertFalse($DB->record_exists('course', ['category' => $tenant1->categoryid]));
+        $this->assertFalse($DB->record_exists('course', ['category' => $container_category_id]));
+    }
+
 }
 
