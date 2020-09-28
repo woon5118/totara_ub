@@ -82,7 +82,7 @@ class favicon_image extends theme_file {
      * @inheritDoc
      */
     public function get_context(): ?context {
-        return \context_system::instance();
+        return $this->get_default_context($this->tenant_id);
     }
 
     /**

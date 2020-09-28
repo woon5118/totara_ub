@@ -625,7 +625,7 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertInstanceOf(moodle_url::class, $url);
         $url = $url->out();
         $this->assertEquals(
-            "https://www.example.com/moodle/pluginfile.php/1/totara_core/logo/{$logo_image->get_item_id()}/new_site_logo.png",
+            "https://www.example.com/moodle/pluginfile.php/{$logo_image->get_context()->id}/totara_core/logo/{$logo_image->get_item_id()}/new_site_logo.png",
             $url
         );
         $this->assertEquals('Totara Logo Updated', $logo_image->get_alt_text());
@@ -637,7 +637,7 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertInstanceOf(moodle_url::class, $url);
         $url = $url->out();
         $this->assertEquals(
-            "https://www.example.com/moodle/pluginfile.php/1/totara_core/favicon/{$favicon_image->get_item_id()}/new_favicon.png",
+            "https://www.example.com/moodle/pluginfile.php/{$logo_image->get_context()->id}/totara_core/favicon/{$favicon_image->get_item_id()}/new_favicon.png",
             $url
         );
 

@@ -344,7 +344,10 @@ abstract class theme_file {
             '',
             $this->get_area(),
             $this->get_item_id(),
-            ['accepted_types' => $this->get_type()->get_group()]
+            [
+                'accepted_types' => $this->get_type()->get_group(),
+                'context' => $this->get_context()
+            ]
         );
 
         // Get current file name.
@@ -355,7 +358,7 @@ abstract class theme_file {
         if ($this->clean_draft_file_area($draft_id, $current)) {
             // Write new settings.
             if ($setting->write_setting($draft_id) !== '') {
-                return; //throw new \moodle_exception('themesavefiles', 'error');
+                throw new \moodle_exception('themesavefiles', 'error');
             }
             $setting->post_write_settings($current);
         }
@@ -400,7 +403,7 @@ abstract class theme_file {
      *
      * @return context|null
      */
-    private function get_default_context(?int $tenant_id = null): ?context {
+    protected function get_default_context(?int $tenant_id = null): ?context {
         global $USER;
 
         if (!empty($tenant_id)) {
