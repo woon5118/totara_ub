@@ -33,6 +33,15 @@ export function showSessionExpiredModal(category) {
 }
 
 /**
+ * Checks if an error modal is currently being shown.
+ *
+ * @return {Boolean}
+ */
+export function isShowingErrorModal() {
+  return activeModal !== null;
+}
+
+/**
  * Display the provided ErrorInfo[] to the user.
  *
  * @param {ErrorInfo[]} errors

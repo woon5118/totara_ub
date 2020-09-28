@@ -19,6 +19,7 @@
 import tui from './tui';
 import Container from 'tui/components/notifications/ToastContainer';
 import { memoizeLoad } from './util';
+import { isShowingErrorModal } from './internal/error_info';
 
 /**
  * Get the toast container to add notifications to.
@@ -46,6 +47,9 @@ const getContainer = memoizeLoad(async () => {
  * @param {('info' | 'success' | 'warning' | 'error')} [options.type] Importance type of the notification.
  */
 export async function notify(options) {
+  if (isShowingErrorModal()) {
+    return;
+  }
   options = Object.assign(
     {
       duration: 5000,
