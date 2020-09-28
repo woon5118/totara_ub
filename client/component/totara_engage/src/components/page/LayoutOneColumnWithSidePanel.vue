@@ -168,7 +168,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-engagelayoutOneColumnContentWithSidepanel {
+.tui-engagelayoutOneColumnWithSidepanel {
   &--fullSidePanel {
     > .tui-responsive > .tui-grid > .tui-grid-item {
       border-left: none;
@@ -179,10 +179,10 @@ export default {
   // from selecting the button again
   &--onSmallScreen {
     > .tui-responsive > .tui-grid > .tui-grid-item {
-      .tui-sidepanel {
+      .tui-sidePanel {
         overflow: visible;
         &--closed {
-          .tui-sidepanel__inner {
+          .tui-sidePanel__inner {
             overflow: hidden;
           }
         }
