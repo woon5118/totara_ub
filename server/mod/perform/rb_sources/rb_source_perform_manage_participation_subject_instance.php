@@ -21,6 +21,7 @@
  * @package: mod_perform
  */
 
+use mod_perform\models\activity\participant_source;
 use mod_perform\rb\util;
 
 defined('MOODLE_INTERNAL') || die();
@@ -78,9 +79,16 @@ class rb_source_perform_manage_participation_subject_instance extends rb_source_
             'subject_instance',
             'participant_count_manage_participation',
             get_string('participants', 'rb_source_perform_manage_participation_subject_instance'),
-            "(SELECT COUNT('x')
-            FROM {perform_participant_instance} ppi
-            WHERE ppi.subject_instance_id = base.id)",
+            "(
+                SELECT COUNT('x')
+                FROM {perform_participant_instance} ppi
+                LEFT JOIN {user} ppc ON ppi.participant_id = ppc.id 
+                    AND ppi.participant_source = " . participant_source::INTERNAL . "
+                WHERE ppi.subject_instance_id = base.id AND (
+                    ppi.participant_source = " . participant_source::EXTERNAL . " 
+                    OR ppc.deleted = 0
+                )
+            )",
             [
                 'dbdatatype' => 'integer',
                 'displayfunc' => 'participant_count_manage_participation',
