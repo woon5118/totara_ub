@@ -100,6 +100,8 @@ final class builder {
      * This method will return null if an incorrect string was provided, since
      * the strings can be manipulated by a user directly.
      *
+     * Note that this function will try to invoke {@see source_generator::convert_source_to_attributes()}
+     *
      * @param string $source_string
      * @return destination_generator
      */

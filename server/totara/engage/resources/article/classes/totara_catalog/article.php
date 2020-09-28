@@ -349,9 +349,10 @@ final class article extends provider {
             ]
         );
 
-        $url = link_builder::to('engage_article', ['id' => $resourceid])
-            ->from('totara_catalog')
-            ->out();
+        $article_destination = link_builder::to('engage_article', ['id' => $resourceid]);
+        $article_destination->from('totara_catalog');
+
+        $url = $article_destination->out();
 
         $link = new \stdClass();
         $link->description = '';

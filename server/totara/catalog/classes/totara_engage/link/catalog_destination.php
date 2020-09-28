@@ -58,6 +58,21 @@ final class catalog_destination extends destination_generator {
     public function back_button_attributes(): ?array {
         $attributes = parent::back_button_attributes();
         $attributes['history'] = true;
+
+        if (!empty($this->attributes)) {
+            $url = new \moodle_url($attributes['url']);
+
+            // Add the attributes to the url.
+            foreach ($this->attributes as $k => $v) {
+                if (is_array($v)) {
+                    $v = implode(',', $v);
+                }
+
+                $url->param($k, $v);
+            }
+            $attributes['url'] = $url->out();
+        }
+
         return $attributes;
     }
 }
