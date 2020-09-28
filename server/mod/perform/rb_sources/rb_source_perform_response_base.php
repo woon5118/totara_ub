@@ -88,13 +88,19 @@ class rb_source_perform_response_base extends rb_base_source {
         $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_response_base');
 
         $this->usedcomponents[] = 'mod_perform';
-        $this->base = "(SELECT es.*
-                        FROM {perform_element_response} es
-                        JOIN {perform_section_element} se ON es.section_element_id = se.id
-                        JOIN {perform_participant_section} ps
-                            ON ps.section_id = se.section_id AND ps.participant_instance_id = es.participant_instance_id
-                                AND ps.progress = ".complete::get_code()."
-                        )";
+        $this->base = "(
+            SELECT es.*
+            FROM {perform_element_response} es
+            JOIN {perform_section_element} se ON es.section_element_id = se.id
+            JOIN {perform_participant_section} ps
+                ON ps.section_id = se.section_id AND ps.participant_instance_id = es.participant_instance_id
+                    AND ps.progress = ".complete::get_code()."
+            JOIN {perform_participant_instance} ppi ON es.participant_instance_id = ppi.id
+            LEFT JOIN {user} u ON ppi.participant_id = u.id 
+                AND ppi.participant_source = " . participant_source::INTERNAL . "
+            WHERE ppi.participant_source = " . participant_source::EXTERNAL . " 
+                OR u.deleted = 0
+        )";
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
 
