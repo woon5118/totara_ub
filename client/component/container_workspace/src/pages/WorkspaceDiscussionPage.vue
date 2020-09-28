@@ -20,7 +20,6 @@
     <template v-if="!$apollo.loading" v-slot:left="{ direction }">
       <SidePanel
         v-if="direction === 'horizontal'"
-        :limit-height="false"
         :sticky="false"
         :initially-open="true"
         :show-button-control="false"

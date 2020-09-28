@@ -24,10 +24,8 @@
   --transition-form-duration: 0s;
   --transition-modal-function: ease-out;
   --transition-modal-duration: 0.15s;
-  --transition-sidepanel-scrollsnap-function: ease-out;
-  --transition-sidepanel-scrollsnap-duration: 0.15s;
-  --transition-sidepanel-content-function: ease-in;
-  --transition-sidepanel-content-duration: 0.25s;
+  --transition-sidepanel-content-function: linear;
+  --transition-sidepanel-content-duration: 0.1s;
   --transition-progress-function: ease-out;
   --transition-progress-duration: 0.3s;
   --transition-button-function: ease;

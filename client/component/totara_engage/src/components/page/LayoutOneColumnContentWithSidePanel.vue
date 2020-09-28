@@ -59,7 +59,6 @@
             direction="rtl"
             :animated="!onSmallScreen"
             :sticky="!onSmallScreen"
-            :grow-height-on-scroll="!onSmallScreen"
             :show-button-control="true"
             :initially-open="sidePanelIsOpen"
             :overflows="false"
@@ -215,18 +214,6 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-engagelayoutOneColumnContentWithSidepanel
-  > .tui-responsive
-  > .tui-grid
-  > .tui-grid-item {
-  transition: flex-basis var(--transition-sidepanel-content-function)
-    var(--transition-sidepanel-content-duration);
-
-  .tui-sidePanel {
-    overflow: visible;
-  }
-}
-
 .tui-engagelayoutOneColumnContentWithSidepanel {
   &-fullSidePanel {
     > .tui-responsive > .tui-grid > .tui-grid-item {

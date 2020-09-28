@@ -24,7 +24,6 @@
         :show-button-control="false"
         :sticky="false"
         :initially-open="true"
-        :limit-height="false"
       >
         <WorkspaceMenu
           :selected-workspace-id="workspaceId"

@@ -95,7 +95,6 @@
           >
             <SidePanel
               :initially-open="true"
-              :limit-height="false"
               :show-button-control="false"
               :sticky="false"
             >

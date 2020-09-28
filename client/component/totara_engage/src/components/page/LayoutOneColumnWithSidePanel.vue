@@ -54,7 +54,6 @@
             direction="rtl"
             :animated="!onSmallScreen"
             :sticky="!onSmallScreen"
-            :grow-height-on-scroll="!onSmallScreen"
             :show-button-control="true"
             :initially-open="sidePanelIsOpen"
             :overflows="false"

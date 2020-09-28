@@ -22,8 +22,10 @@
     class="tui-sidePanel"
     :class="{
       'tui-sidePanel--animated': animated,
+      'tui-sidePanel--flush': flush,
       'tui-sidePanel--overflows': overflows,
       'tui-sidePanel--sticky': sticky,
+      'tui-sidePanel--hasButtonControl': showButtonControl,
       'tui-sidePanel--open': isOpen && !closing,
       'tui-sidePanel--closed': !isOpen && !opening,
       'tui-sidePanel--opening': opening,
@@ -32,7 +34,7 @@
       'tui-sidePanel--rtl': direction === 'rtl',
     }"
     :style="{
-      maxHeight: limitHeight ? maxHeight + 'px' : 'initial',
+      minHeight: minHeight ? minHeight + 'px' : 'initial',
     }"
   >
     <div
@@ -78,9 +80,6 @@ import { waitForTransitionEnd } from 'tui/dom/transitions';
 import CollapseIcon from 'tui/components/icons/Collapse';
 import ExpandIcon from 'tui/components/icons/Expand';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import { throttle } from 'tui/util';
-
-const isIE = document.body.classList.contains('ie');
 
 export default {
   components: {
@@ -135,26 +134,17 @@ export default {
     },
 
     /**
-     * Whether to set a CSS max-height value that is not `initial`
-     **/
-    limitHeight: {
-      type: Boolean,
-      default: true,
-    },
-
-    /**
      * Pixel based value that the SidePanel will respect with short viewports
      **/
     minHeight: {
-      type: Number,
-      default: 250, // assumed a px based calculation
+      type: [Number, String],
+      default: 'initial', // assumed a px based calculation
     },
 
     /**
-     * Whether the SidePanel's height should grow when scrolling, up to a max
-     * height of the current size of the viewport
+     * Whether to assume the SidePanel is flush to the page header and footer
      **/
-    growHeightOnScroll: {
+    flush: {
       type: Boolean,
       default: true,
     },
@@ -193,49 +183,15 @@ export default {
       closing: false,
 
       /**
-       * Width of the content preventing reflow of SidePanel contents during transitions
-       **/
-      contentWidth: 'auto',
-
-      /**
        * Toggle value indicating the SidePanel is currently moving between a
        * completely closed state to a completely open state
        **/
       opening: false,
 
       /**
-       * Internal data value used when the `limitHeight` prop is set to `true`
-      height: 'auto',
+       * Width of the content preventing reflow of SidePanel contents during transitions
        **/
-
-      /**
-       * Internal data value used when the `limitHeight` prop is set to `true`
-       **/
-      maxHeight: 'initial',
-
-      /**
-       * Method invoked during the window.onresize event, when the `limitHeight`
-       * prop is set to `true`, which recalculates the `height` internal data
-       * value in response to viewport resizing
-       **/
-      resizeHandler: null,
-
-      /**
-       * Let's throttle viewport resize calculations to improve performance
-       **/
-      resizeThrottleTime: 100,
-
-      /**
-       * Method invoked during the window.onscroll event, when the
-       * `growHeightOnScroll` prop is set to `true`, which recalculates the
-       * `height` internal data value
-       **/
-      scrollHandler: null,
-
-      /**
-       * Let's throttle viewport scroll calculations to improve performance
-       **/
-      scrollThrottleTime: 200,
+      contentWidth: 'auto',
     };
   },
 
@@ -254,55 +210,10 @@ export default {
       }
     },
   },
-
   mounted() {
-    if (this.$refs.sidePanel instanceof Element) {
-      // handle height calculations when we need to, or can, limit height by
-      // available space in viewport
-      if (this.limitHeight && !isIE) {
-        this.doResize();
-
-        this.resizeHandler = throttle(
-          () => {
-            this.$_resize();
-          },
-          this.resizeThrottleTime,
-          { leading: false, trailing: true }
-        );
-        window.addEventListener('resize', this.resizeHandler);
-      }
-
-      // handle height calculations more acutely when we need to have fluid
-      // height when the viewport is scrolled
-      if (this.growHeightOnScroll) {
-        this.scrollHandler = throttle(
-          () => {
-            this.$_scroll();
-          },
-          this.scrollThrottleTime,
-          { leading: false, trailing: true }
-        );
-
-        window.addEventListener('scroll', this.scrollHandler, {
-          passive: true,
-        });
-      }
-    }
-
     // expand as soon as the SidePanel mounts, if configured so
     if (this.shouldBeOpen) {
       this.expand();
-    }
-  },
-
-  beforeDestroy() {
-    // clean up event listeners
-    if (this.resizeHandler) {
-      window.removeEventListener('resize', this.resizeHandler);
-    }
-
-    if (this.scrollHandler) {
-      window.removeEventListener('scroll', this.scrollHandler);
     }
   },
 
@@ -351,75 +262,11 @@ export default {
 
     async $_animate() {
       if (this.animated) {
-        // only interested in tracking transitions on content holding containers
-        const transitionEls = [
-          this.$refs.sidePanel__inner,
-          this.$refs.sidePanel__content,
-        ].filter(Boolean);
+        // only interested in tracking transitions on content holding container
+        const transitionEls = [this.$refs.sidePanel__content].filter(Boolean);
 
         await waitForTransitionEnd(transitionEls);
       }
-    },
-
-    $_resize() {
-      this.doResize();
-      return;
-    },
-
-    $_scroll() {
-      // remove pixel calculations if we shouldn't be growing on scroll
-      if (!this.growHeightOnScroll) {
-        this.maxHeight = 'initial';
-        return;
-      }
-
-      // otherwise recalculate heights
-      this.doResize();
-    },
-
-    doResize() {
-      let rect = this.$refs.sidePanel.getBoundingClientRect(),
-        parentRect = this.$refs.sidePanel.parentNode.getBoundingClientRect(),
-        newMaxHeight,
-        positionTop,
-        positionBottom;
-
-      // is the window scrolled up to the top? if so, allow SidePanel's max
-      // height to be equal to the height of the window minus its relative top
-      // position from 0,0 coords within window
-      if (window.scrollY === 0) {
-        positionTop = true;
-        newMaxHeight = window.innerHeight - rect.top;
-      }
-
-      // is the window scrolled to the bottom? if so, allow SidePanel's max
-      // height to be equal to its current max height plus its relative top
-      // position from 0,0 coords within window
-      if (
-        !positionTop &&
-        window.innerHeight + window.scrollY >= document.body.offsetHeight
-      ) {
-        positionBottom = true;
-        newMaxHeight =
-          window.innerHeight - (window.innerHeight - parentRect.bottom);
-      }
-
-      // if the window is scrolled somewhere between the top and bottom scrollY
-      // position, determine a suitable new max height
-      if (!positionTop && !positionBottom) {
-        // start with full window height assumption
-        newMaxHeight = window.innerHeight;
-
-        // then, if the parent bottom coords have scrolled into view, remove
-        // the parent rect.bottom value from the height of the SidePanel
-        if (parentRect.bottom < window.innerHeight) {
-          newMaxHeight = parentRect.bottom;
-        }
-      }
-
-      // set the new SidePanel max height
-      this.maxHeight = newMaxHeight;
-      return;
     },
   },
 };
@@ -435,27 +282,14 @@ export default {
 </lang-strings>
 
 <style lang="scss">
+:root {
+  --tui-sidePanel-button-width: 30px;
+}
+
 .tui-sidePanel {
-  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   height: 100%;
-  overflow: hidden;
-
-  &--animated {
-    transition: max-height var(--transition-sidepanel-scrollsnap-duration)
-      var(--transition-sidepanel-scrollsnap-function);
-  }
-
-  &--sticky {
-    position: sticky;
-    top: 0;
-
-    .ie & {
-      position: relative;
-      top: auto;
-    }
-  }
 
   // inner content alignment
   &--rtl,
@@ -473,7 +307,6 @@ export default {
    **/
   @mixin attrs-from-right() {
     margin-right: -1px;
-    margin-left: 4px; /* ensure focus shadow is not cut off by container */
     border-right-width: 0;
     border-left-width: 1px;
     border-radius: var(--btn-radius) 0 0 var(--btn-radius);
@@ -493,7 +326,6 @@ export default {
     }
   }
   @mixin attrs-from-left() {
-    margin-right: 4px; /* ensure focus shadow is not cut off by container */
     margin-left: -1px;
     border-right-width: 1px;
     border-left-width: 0;
@@ -514,18 +346,25 @@ export default {
   }
 
   &__outsideClose {
+    .tui-sidePanel--sticky & {
+      position: sticky;
+      top: 50%;
+      z-index: 1;
+    }
+
     .ie & {
       // height, position and scrolling will degrade in IE11, so the toggle
       // button needs a more appropriate location than "the middle" of the
       // SidePanel, which could be very tall in IE11
+      top: auto;
       align-self: flex-start;
-      max-width: 30px;
+      max-width: var(--tui-sidePanel-button-width);
       margin-top: var(--gap-8);
     }
-
     flex-grow: 0;
-    min-width: 30px;
+    min-width: var(--tui-sidePanel-button-width);
     height: auto;
+    margin-bottom: -1px;
     padding: var(--gap-6) var(--gap-1);
     background-color: var(--color-neutral-3);
     border-color: var(--color-neutral-5);
@@ -553,9 +392,29 @@ export default {
     flex-shrink: 1;
     width: 100%;
     height: 100%;
-    max-height: 100%;
     background-color: var(--color-neutral-3);
     border: 1px solid var(--color-neutral-5);
+
+    .tui-sidePanel--flush & {
+      border-top: none;
+      border-bottom: none;
+    }
+
+    .ie & {
+      border-bottom: 1px solid var(--color-neutral-5); /* put the border back, it usually wouldn't reach the footer, only on really small resources, and would otherwise look chopped off */
+    }
+
+    .tui-sidePanel--sticky & {
+      position: sticky;
+      top: 0;
+      max-height: 100vh;
+
+      .ie & {
+        position: relative;
+        top: auto;
+        max-height: initial;
+      }
+    }
 
     .tui-sidePanel--open.tui-sidePanel--overflows & {
       overflow-y: auto;
@@ -565,6 +424,15 @@ export default {
       max-width: 1px;
       padding-right: 0;
       padding-left: 0;
+      border-left: 0;
+    }
+
+    // we have to cut off overflow during these states otherwise we'll bump
+    // page scrollbars, or a containing element scrollbars
+    .tui-sidePanel--closed &,
+    .tui-sidePanel--closing &,
+    .tui-sidePanel--opening & {
+      overflow: hidden;
     }
   }
 

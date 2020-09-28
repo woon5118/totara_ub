@@ -18,11 +18,7 @@
 <template>
   <LayoutTwoColumn class="tui-workspaceFilePage">
     <template v-slot:left="{ direction }">
-      <SidePanel
-        :show-button-control="false"
-        :initially-open="true"
-        :limit-height="false"
-      >
+      <SidePanel :show-button-control="false" :initially-open="true">
         <WorkspaceMenu
           v-if="direction === 'horizontal'"
           :selected-workspace-id="workspaceId"

@@ -23,20 +23,16 @@
       :boundaries="libraryBoundaries"
       default-boundary="l"
       :stack-at="585"
-      :show-left-side-panel="true"
       :show-right-side-panel="showRightSidePanel"
-      :right-side-panel-animated="false"
+      :right-side-panel-animated="true"
+      :right-side-panel-initially-open="false"
+      :right-side-panel-sticky="true"
+      :right-side-panel-overflows="true"
+      :show-left-side-panel="true"
       :show-left-side-panel-control="false"
       :left-side-panel-initially-open="true"
-      :right-side-panel-initially-open="false"
       :left-side-panel-sticky="false"
-      :right-side-panel-sticky="true"
       :left-side-panel-overflows="true"
-      :right-side-panel-overflows="true"
-      :left-side-panel-limit-height="false"
-      :right-side-panel-limit-height="false"
-      :left-side-panel-grow-height-on-scroll="false"
-      :right-side-panel-grow-height-on-scroll="true"
     >
       <!-- sidePanelLeft -->
       <template v-slot:sidePanelLeft="{ units, gridDirection }">
@@ -204,26 +200,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss">
-.tui-libraryView {
-  .tui-sidePanel__inner {
-    width: 100%;
-    padding: 0;
-    border-top: none;
-  }
-
-  /* Vertical grid styles */
-  .tui-grid--vertical {
-    .tui-Layout__leftSidePanel {
-      .tui-sidePanel__inner {
-        background-color: unset;
-        border: unset;
-      }
-    }
-    .tui-grid-item--wrapped {
-      margin: 0;
-    }
-  }
-}
-</style>
