@@ -111,7 +111,18 @@ class item_data extends export {
                 }
             }
 
-            // Clean up text data after prepending title as an additional sentence.
+            // Recommenders do not need any links, but they are required for text formatting (otherwise it will throw exception)
+            // Loading proper data (contextid, component, filearea) would require a lot more data to fetch for no particular
+            // purpose. So we just use mock values for now.
+            $item->content = file_rewrite_pluginfile_urls(
+                $item->content,
+                'index.php',
+                0,
+                'ml_recommenders',
+                'not_used',
+                0
+            );
+
             $item->content = html_to_text(format_text($item->content, $item->summaryformat));
             $cells[] = $this->scrubtext($item->title . ' ' . $item->content);
 

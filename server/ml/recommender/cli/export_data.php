@@ -22,8 +22,8 @@
  * @package ml_recommender
  */
 
+use ml_recommender\task\export;
 use ml_recommender\local\environment;
-use ml_recommender\local\flag;
 
 define('CLI_SCRIPT', true);
 
@@ -37,7 +37,7 @@ Export user, item and interactions data for recommendations processing.
 
 Options:
   --help, -h    Output this help
-  --force, -f   Do not bother about locks, continue anyway
+  --force, -f   Break locks and re-export
 
 Example:
     # sudo -u apache php ml/recommender/cli/export_data.php
@@ -67,10 +67,8 @@ if ($options['help']) {
 }
 
 if ($options['force']) {
-    $data_path = rtrim(environment::get_data_path(), '/\\') . '/';
-    $tmp_path =  rtrim(environment::get_data_path(), '/\\') . '_tmp/';
-    flag::clean_all($data_path);
-    flag::clean_all($tmp_path);
+    environment::enforce_data_path_sanity();
+    export::cleanup(true);
 }
 
 $task = \core\task\manager::get_scheduled_task(\ml_recommender\task\export::class);

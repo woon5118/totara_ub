@@ -22,15 +22,54 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use totara_engage\access\access;
 use ml_recommender\local\environment;
-use \ml_recommender\local\exporter;
-use \ml_recommender\local\csv\writer;
+use ml_recommender\local\exporter;
+use ml_recommender\local\csv\writer;
 
-class ml_recommender_export_import_testcase extends advanced_testcase {
+class ml_recommender_export_testcase extends advanced_testcase {
     /**
      * @return void
      */
     public function test_ml_export(): void {
+        $this->prepare();
+
+         // Set up list of exporters.
+        $data_path = self::get_data_path();
+        $exporter = new exporter($data_path);
+        $exporters = $exporter->get_exports();
+        $this->assertCount(3, $exporters);
+
+        // Run the data exports.
+        foreach ($exporters as $export) {
+            $exportname = $export->get_name();
+            // Delete old data.
+            $csv_path = $data_path . '/' . $exportname . '_0.csv';
+            @unlink($csv_path);
+
+            $writer = new writer($csv_path);
+            $export->export($writer);
+        }
+
+        $this->assert_export();
+    }
+
+    public function test_ml_export_task() {
+        $this->prepare();
+
+        ob_start();
+        \ml_recommender\task\export::cleanup(true);
+        $task = \core\task\manager::get_scheduled_task(\ml_recommender\task\export::class);
+        $task->execute();
+
+        $output = ob_get_contents();
+        $this->assertStringContainsString('Export completed', $output);
+        ob_end_clean();
+
+        $this->assert_export();
+    }
+
+    protected function prepare() {
         global $DB, $CFG;
 
         require_once($CFG->dirroot . '/enrol/self/externallib.php');
@@ -76,15 +115,17 @@ class ml_recommender_export_import_testcase extends advanced_testcase {
         $article_generator = $gen->get_plugin_generator('engage_article');
 
         $article_1 = $article_generator->create_article([
-            'access' => 1,
+            'access' => access::PUBLIC,
             'topics' => [
                 $topics[1]->get_id(),
                 $topics[2]->get_id(),
-            ]
+            ],
+            'content' => '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Content with image"}]},{"type":"image","attrs":{"filename":"image.png","url":"@@PLUGINFILE@@/image.png","alttext":""}}]}',
+            'format' => FORMAT_JSON_EDITOR,
         ]);
 
         $article_2 = $article_generator->create_article([
-            'access' => 1,
+            'access' => access::PUBLIC,
             'topics' => [
                 $topics[0]->get_id(),
                 $topics[2]->get_id(),
@@ -92,7 +133,7 @@ class ml_recommender_export_import_testcase extends advanced_testcase {
         ]);
 
         $article_3 = $article_generator->create_article([
-            'access' => 0,
+            'access' => access::PRIVATE,
             'topics' => [
                 $topics[1]->get_id(),
                 $topics[2]->get_id(),
@@ -104,24 +145,10 @@ class ml_recommender_export_import_testcase extends advanced_testcase {
         $recommendations_generator->create_recommender_interaction($user1->id, $article_1->get_id(), 'engage_article');
         $recommendations_generator->create_recommender_interaction($user2->id, $article_1->get_id(), 'engage_article');
         $recommendations_generator->create_recommender_interaction($user2->id, $article_2->get_id(), 'engage_article');
+    }
 
-        // Set up list of exporters.
+    protected function assert_export() {
         $data_path = self::get_data_path();
-        $exporter = new exporter($data_path);
-        $exporters = $exporter->get_exports();
-        $this->assertCount(3, $exporters);
-
-        // Run the data exports.
-        foreach ($exporters as $export) {
-            $exportname = $export->get_name();
-            // Delete old data.
-            $csv_path = $data_path . '/' . $exportname . '_0.csv';
-            @unlink($csv_path);
-
-            $writer = new writer($csv_path);
-            $export->export($writer);
-        }
-
         // Compare DB counts to CSV record counts.
         $csv_files = [
             'user_data' => 3, // 2 + admin
@@ -143,6 +170,7 @@ class ml_recommender_export_import_testcase extends advanced_testcase {
 
             $this->assertCount($db_count+1, $data, $csv);
         }
+
     }
 
     /**

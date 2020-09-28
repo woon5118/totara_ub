@@ -37,12 +37,12 @@ final class environment {
     /**
      * @return string
      */
-    public static function get_data_path(): string {
+    private static function get_ml_data_root_path(): string {
         global $CFG;
 
         $data_path = get_config('ml_recommender', 'data_path');
         if ($data_path == '' || $data_path === false) {
-            $data_path = "{$CFG->dataroot}/recommender/data";
+            $data_path = "{$CFG->dataroot}/recommender";
         }
 
         return $data_path;
@@ -81,12 +81,10 @@ final class environment {
      * Path to Python executable.
      *
      * @return string
-     * @throws \coding_exception
      */
     public static function get_py3path(): string {
         $py3path = get_config('ml_recommender', 'py3path');
-
-        if (false === $py3path) {
+        if (empty($py3path)) {
             $py3path = '/usr/bin/python3';
         }
 
@@ -97,12 +95,10 @@ final class environment {
      * Recommender query type.
      *
      * @return string
-     * @throws \coding_exception
      */
     public static function get_query(): string {
         $query = get_config('ml_recommender', 'query');
-
-        if (false === $query) {
+        if (empty($query)) {
             $query = 'mf';
         }
 
@@ -113,16 +109,14 @@ final class environment {
      * Number of threads/cores that recommender engine may use.
      *
      * @return int
-     * @throws \coding_exception
      */
     public static function get_threads(): int {
         $threads = get_config('ml_recommender', 'threads');
-
-        if (false === $threads) {
+        if (empty($threads)) {
             $threads = 2;
         }
 
-        return (int) $threads;
+        return (int)$threads;
     }
 
     /**
@@ -153,5 +147,50 @@ final class environment {
         }
 
         return (int) $interactions_period;
+    }
+
+    /**
+     * Get export path
+     * @return string
+     */
+    public static function get_data_path(): string {
+        return rtrim(static::get_ml_data_root_path(), '/\\') . '/data/';
+    }
+
+    /**
+     * Get temp path
+     * @return string
+     */
+    public static function get_temp_path(): string {
+        return rtrim(static::get_ml_data_root_path(), '/\\') . '/temp/';
+    }
+
+    /**
+     * Get backup path
+     * @return string
+     */
+    public static function get_backup_path(): string {
+        return rtrim(static::get_ml_data_root_path(), '/\\') . '/backup/';
+    }
+
+    /**
+     * Make sure that data path is accessible, is not empty and has no accidental dangerous misconfiguration
+     */
+    public static function enforce_data_path_sanity() {
+        global $CFG;
+        $ml_data_root = rtrim(static::get_ml_data_root_path(), '/\\');
+        if (strlen($ml_data_root) < 3) {
+            throw new \coding_exception('Recommenders data path (ml_recommender/data_path) must be 3 or more characters long');
+        }
+
+        if ($ml_data_root == $CFG->dataroot) {
+            throw new \coding_exception('Recommenders data path (ml_recommender/data_path) cannot be the same as site data root');
+        }
+
+        if (!is_dir($ml_data_root) || !is_writable($ml_data_root)) {
+            if (!mkdir($ml_data_root, $CFG->directorypermissions, true)) {
+                throw new \coding_exception('Error creating ML data root directory (ml_recommender/data_path)');
+            }
+        }
     }
 }

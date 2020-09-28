@@ -32,7 +32,9 @@ require_once($CFG->libdir . '/clilib.php');
 $py3path = realpath(environment::get_py3path());
 $pyscript_path = realpath($CFG->dirroot . '/../extensions/ml_recommender/python/ml_recommender.py');
 $query = environment::get_query();
-$data_path = realpath(environment::get_data_path());
+
+$data_path = environment::get_data_path();
+
 $user_result_count = environment::get_user_result_count();
 $item_result_count = environment::get_item_result_count();
 $threads = environment::get_threads();

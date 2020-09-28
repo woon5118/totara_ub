@@ -22,54 +22,9 @@
  * @package ml_recommender
  */
 
-use ml_recommender\local\environment;
-use ml_recommender\local\flag;
-
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
-require_once($CFG->libdir . '/clilib.php');
-
-$usage = "
-Upload bulk user and item recommendations as delivered by recommender system prediction.
-
-Options:
-  --help, -h    Output this help
-  --force, -f   Do not bother about locks, continue anyway
-
-Example:
-    # sudo -u apache php ml/recommender/cli/import_recommendations.php
-        Uploads model generated predictions from csv file.
-        Note: Needs to be run after a model predictions have been run.
-";
-
-[$options, $unrecognised] = cli_get_params(
-    [
-        'help' => false,
-        'force' => false,
-    ],
-    [
-        'h' => 'help',
-        'f' => 'force',
-    ]
-);
-
-if ($unrecognised) {
-    $unrecognised = implode(PHP_EOL.'  ', $unrecognised);
-    cli_error('Unrecognised parameter: ' .  $unrecognised);
-}
-
-if ($options['help']) {
-    cli_writeln($usage);
-    exit();
-}
-
-$data_path = rtrim(environment::get_data_path(), '/\\') . '/';
-
-if ($options['force']) {
-    $data_path = rtrim(environment::get_data_path(), '/\\') . '/';
-    flag::clean_all($data_path);
-}
 
 $task = \core\task\manager::get_scheduled_task(\ml_recommender\task\import::class);
 $task->execute();

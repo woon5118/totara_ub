@@ -27,51 +27,141 @@ namespace ml_recommender\local;
  * Class flag manage possible multi-processing conflicts
  */
 class flag {
+
+    const ML = 'ml';
+    const EXPORT = 'export';
+    const IMPORT = 'import';
+
     /**
      * Set of "lock" file names indicating various stages of workflow
      */
-    const ML_STARTED = 'ml_started';
-    const ML_COMPLETED = 'ml_completed';
-    const EXPORT_STARTED = 'export_started';
-    const EXPORT_COMPLETED = 'export_completed';
-    const IMPORT_STARTED = 'import_started';
-    const IMPORT_COMPLETED = 'import_completed';
+    private const ML_STARTED = 'ml_started';
+    private const ML_COMPLETED = 'ml_completed';
+    private const EXPORT_STARTED = 'export_started';
+    private const EXPORT_COMPLETED = 'export_completed';
+    private const IMPORT_STARTED = 'import_started';
+    private const IMPORT_COMPLETED = 'import_completed';
 
     /**
-     * Remove all "locking" flags. E.g. flags that are used to prevent parallel runs of serial processes.
-     * Use with caution and only when no parallel processes are running
-     * @param string $data_path
-     * @param bool $silent
+     * Return true if some process is started but haven't finished
+     *
+     * @param string $process name of process to check (this class constant)
+     * @param string $custom_path Use another folder to check for flags instead of data folder
+     * @return bool returns true if starting flag exists and finishing is not
      */
-    public static function clean_all(string $data_path, bool $silent = false) {
-        $flags = [
-            self::ML_STARTED,
-            self::EXPORT_STARTED,
-            self::IMPORT_STARTED,
-        ];
-        foreach ($flags as $flag) {
-            $filepath = $data_path . '/' . $flag;
-            if (file_exists($filepath)) {
-                if (!$silent) {
-                    mtrace("Found lock: $flag. Removing.");
-                }
-                unlink($filepath);
-            }
+    public static function in_progress(string $process, string $custom_path = ""): bool {
+        $path = (empty($custom_path)) ? environment::get_data_path() : $custom_path;
+        [$start, $complete] = static::get_flags($process);
+
+        return file_exists($path . $start) && !file_exists($path . $complete);
+    }
+
+    /**
+     * If process is in progress, will output error and exit
+     *
+     * @param string $process name of process to check (this class constant)
+     * @param string $custom_path Use another folder to check for flags instead of data folder
+     */
+    public static function must_not_in_progress(string $process, string $custom_path = "") {
+        if (flag::in_progress($process, $custom_path)) {
+            flag::error($process, $custom_path);
         }
     }
 
     /**
-     * Displays problem with lock, lock timestamp, and exit if it is not force
-     * @param string $message
-     * @param string $filepath
+     * Put start flag indicating start of process
+     *
+     * @param string $process name of process to check (this class constant)
+     * @param string $custom_path Use another folder to check for flags instead of data folder
+     * @return bool If flag was put successfully
      */
-    public static function problem(string $message, string $filepath) {
+    public static function start(string $process, string $custom_path = ""): bool {
+        $path = (empty($custom_path)) ? environment::get_data_path() : $custom_path;
+        [$start] = static::get_flags($process);
+
+        if (file_put_contents($path . $start, time())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Tries to put start flag and throws exception if cannot
+     *
+     * @param string $process name of process to check (this class constant)
+     * @param string $custom_path Use another folder to check for flags instead of data folder
+     */
+    public static function must_start(string $process, string $custom_path = "") {
+        if (!static::start($process, $custom_path)) {
+            throw new \coding_exception("Cannot write start flag: $process");
+        }
+    }
+
+    /**
+     * Put start flag indicating start of process and return result
+     *
+     * @param string $process name of process to check (this class constant)
+     * @param string $custom_path Use another folder to check for flags instead of data folder
+     * @return bool If flag was put successfully
+     */
+    public static function complete(string $process, string $custom_path = ""): bool {
+        $path = (empty($custom_path)) ? environment::get_data_path() : $custom_path;
+        [$start, $complete] = static::get_flags($process);
+
+        if (file_put_contents($path . $complete, time())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Tries to put complete flag and throws exception if cannot
+     *
+     * @param string $process name of process to check (this class constant)
+     * @param string $custom_path Use another folder to check for flags instead of data folder
+     */
+    public static function must_complete(string $process, string $custom_path = "") {
+        if (!static::complete($process, $custom_path)) {
+            throw new \coding_exception("Cannot write complete flag: $process");
+        }
+    }
+    /**
+     * Returns corresponding start and finish flag names
+     *
+     * @param string $process
+     * @return string[]
+     */
+    protected static function get_flags(string $process): array {
+        $map = [
+            self::ML => [self::ML_STARTED, self::ML_COMPLETED],
+            self::EXPORT => [self::EXPORT_STARTED, self::EXPORT_COMPLETED],
+            self::IMPORT => [self::IMPORT_STARTED, self::IMPORT_COMPLETED],
+        ];
+
+        if (!isset($map[$process])) {
+            throw new \coding_exception('Failed to check flag for unknown process: ' . $process);
+        }
+
+        return $map[$process];
+    }
+
+    /**
+     * Displays problem with lock, lock timestamp, and exit
+     *
+     * @param string $process name of process to check (this class constant)
+     * @param string $custom_path Use another folder to check for flags instead of data folder
+     */
+    protected static function error(string $process, string $custom_path = "") {
+        $path = (empty($custom_path)) ? environment::get_data_path() : $custom_path;
+        [$start] = static::get_flags($process);
+
         $timestamp = 0;
-        if (file_exists($filepath) && is_readable($filepath)) {
+        $filepath = $path . $start;
+        if (file_exists($path . $start) && is_readable($path . $start)) {
             $timestamp = file_get_contents($filepath);
         }
         $date = $timestamp ? date("Y-m-d H:i:s", $timestamp) : '(unknown)';
-        $fullmessage = "Lock problem: $message. Created: $date. Location: $filepath.";
-        debugging($fullmessage . ' Possibly parallel process is still running, or it was crashed. Use CLI scripts with --force to continue.');
+        $fullmessage = "$process not finished. Created: $date. Location: $filepath.";
+        throw new \coding_exception($fullmessage . ' Possibly parallel process is still running, or it was crashed. Use export CLI script with --force to restart.');
     }
 }

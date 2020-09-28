@@ -39,51 +39,23 @@ class import extends \core\task\scheduled_task {
     public function execute() {
         global $CFG, $DB;
 
-        $data_path = rtrim(environment::get_data_path(), '/\\') . '/';
+        $data_path = environment::get_data_path();
 
         mtrace("Import directory " . $data_path);
-        if (strlen(trim($data_path, '/\\')) < 3) {
-            debugging('Recommenders data path (ml_recommender/data_path) must be 3 or more characters length');
-            return;
-        }
+        environment::enforce_data_path_sanity();
 
-        if ($data_path == $CFG->dataroot) {
-            debugging('Recommenders data_path cannot be the same as site data root');
-            return;
-        }
+        flag::must_not_in_progress(flag::ML);
+        flag::must_not_in_progress(flag::IMPORT);
 
-        if (!is_dir($data_path) || !is_readable($data_path)) {
-            debugging('Cannot read directory: ' . $data_path);
-            return;
-        }
-
-        if (!file_exists($data_path . flag::ML_COMPLETED)) {
-            flag::problem(
-                'Machine Learning processing is not completed',
-                $data_path . flag::ML_COMPLETED
-            );
-            return;
-        }
-        if (file_exists($data_path . flag::IMPORT_STARTED)) {
-            flag::problem(
-                'Import is already started',
-                $data_path . flag::IMPORT_STARTED
-            );
-            return;
-        }
-
-        if (!file_put_contents($data_path . flag::IMPORT_STARTED, time())) {
-            debugging("Could not put import started lock. This can cause issues later.");
-        }
-
-        $tenants = [null];
-        if ($CFG->tenantsenabled) {
-            $tenants = $DB->get_records('tenant', ['suspended' => 0]);
-        }
+        flag::must_start(flag::IMPORT);
 
         mtrace('Starting import...');
-
         try {
+            $tenants = [null];
+            if ($CFG->tenantsenabled) {
+                $tenants = $DB->get_records('tenant', ['suspended' => 0]);
+            }
+
             $importer = new importer($data_path, time());
             $tenants_csv = $importer->load_tenants();
             foreach ($tenants as $tenant) {
@@ -100,13 +72,11 @@ class import extends \core\task\scheduled_task {
             mtrace("Cleaning up old recommendations...");
             $importer->clean();
         } catch (\Exception $e) {
-            debugging($e->getMessage());
-            return;
+            flag::complete(flag::IMPORT);
+            throw $e;
         }
 
-        if (!file_put_contents($data_path . flag::IMPORT_COMPLETED, time())) {
-            debugging("Could not put import completed lock. This might cause more issues later.");
-        }
+        flag::must_complete(flag::IMPORT);
 
         mtrace('Import completed.');
     }

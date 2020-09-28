@@ -38,112 +38,78 @@ class export extends \core\task\scheduled_task {
 
     public function execute() {
         global $CFG, $DB;
-        $data_path = rtrim(environment::get_data_path(), '/\\') . '/';
-        $tmp_path =  rtrim(environment::get_data_path(), '/\\') . '_tmp/';
-        $backup_path =  rtrim(environment::get_data_path(), '/\\') . '_deleteme/';
+
+        $data_path = environment::get_data_path();
+        $tmp_path = environment::get_temp_path();
+        $backup_path = environment::get_backup_path();
 
         mtrace("Export directory " . $data_path);
-        if (strlen(trim($data_path, '/\\')) < 3) {
-            debugging('Recommenders data path (ml_recommender/data_path) must be 3 or more characters length');
-            return;
-        }
+        environment::enforce_data_path_sanity();
 
-        if ($data_path == $CFG->dataroot) {
-            debugging('Recommenders data path (ml_recommender/data_path) cannot be the same as site data root');
-            return;
-        }
+        // All processes must not be in progress.
+        flag::must_not_in_progress(flag::ML);
+        flag::must_not_in_progress(flag::IMPORT);
+        flag::must_not_in_progress(flag::EXPORT, $tmp_path);
 
-        if (!is_dir($data_path)) {
-            if (!mkdir($data_path, $CFG->directorypermissions, true)) {
-                debugging('Error creating ML data directory: ' . $data_path);
-                return;
-            }
-        }
+        static::cleanup();
 
-        // Check that ML is not in progress
-        if (file_exists($data_path . flag::ML_STARTED) && !file_exists($data_path . flag::ML_COMPLETED)) {
-            flag::problem(
-                'Machine Learning is in progress',
-                $data_path . flag::ML_STARTED
-            );
-            return;
-        }
-
-        // Check that import is not in progress
-        if (file_exists($data_path . flag::IMPORT_STARTED) && !file_exists($data_path . flag::IMPORT_COMPLETED)) {
-            flag::problem(
-                'Import is in progress',
-                $data_path . flag::IMPORT_STARTED
-            );
-            return;
-        }
-
-        // Cleaning up and prepare working space
-        if (file_exists($tmp_path)) {
-            // Check that there is not parallel exporting process
-            if (file_exists($tmp_path . flag::EXPORT_STARTED) && !file_exists($tmp_path . flag::EXPORT_COMPLETED)) {
-                flag::problem(
-                    'Export is in progress',
-                    $data_path . flag::EXPORT_STARTED
-                );
-                return;
-            }
-
-            if (!fulldelete($tmp_path)) {
-                debugging('Could not delete temp directory ' . $tmp_path);
-                return;
-            }
-        }
         if (!mkdir($tmp_path, $CFG->directorypermissions, true)) {
-            debugging('Error creating temp directory: ' . $tmp_path);
-            return;
+            throw new \coding_exception('Error creating temp directory: ' . $tmp_path);
         }
 
-        if (!file_put_contents($tmp_path . flag::EXPORT_STARTED, time())) {
-            debugging("Could not put export started flag: " . $tmp_path . flag::EXPORT_STARTED);
-            return;
-        }
-
-        $tenants = [null];
-        if ($CFG->tenantsenabled) {
-            $tenants = $DB->get_records('tenant', ['suspended' => 0]);
-        }
+        flag::must_start(flag::EXPORT, $tmp_path);
 
         mtrace('Starting export...');
 
-        $exporter = new exporter($tmp_path);
-        foreach ($tenants as $tenant) {
-            if ($tenant) {
-                mtrace('Exporting for tenant '. $tenant->name);
-                $exporter->set_tenant($tenant);
+        try {
+            $tenants = [null];
+            if ($CFG->tenantsenabled) {
+                $tenants = $DB->get_records('tenant', ['suspended' => 0]);
             }
-            $exporter->export();
-        }
-        $exporter->export_tenants();
 
-        if (!file_put_contents($tmp_path . flag::EXPORT_COMPLETED, time())) {
-            debugging("Could not write export complete flag: " . $tmp_path . flag::EXPORT_COMPLETED);
-            return;
-        }
-
-        // Put the files in their expected location
-        if (!fulldelete($backup_path)) {
-            debugging("Could not remove previous backup of export: " . $backup_path);
-            return;
-        }
-        if (file_exists($data_path)) {
-            if (!rename($data_path, $backup_path)) {
-                debugging("Could not move previous export to backup location: " . $backup_path);
-                return;
+            $exporter = new exporter($tmp_path);
+            foreach ($tenants as $tenant) {
+                if ($tenant) {
+                    mtrace('Exporting for tenant ' . $tenant->name);
+                    $exporter->set_tenant($tenant);
+                }
+                $exporter->export();
             }
+            $exporter->export_tenants();
+        } catch (\Exception $e) {
+            flag::complete(flag::EXPORT, $tmp_path);
+            throw $e;
         }
+        flag::must_complete(flag::EXPORT, $tmp_path);
+
+        if (file_exists($data_path) && !rename($data_path, $backup_path)) {
+            throw new \coding_exception("Could not move previous export to backup location: " . $backup_path);
+        }
+
         if (!rename($tmp_path, $data_path)) {
-            debugging('Could not move current export to expected location: ' . $data_path);
-            return;
+            throw new \coding_exception('Could not move current export to expected location: ' . $data_path);
         }
 
-        fulldelete($backup_path);
+        static::cleanup();
 
         mtrace('Export completed.');
     }
+
+    /**
+     * Remove work, and backup paths
+     * @param bool $all Remove also data path files if true
+     */
+    public static function cleanup(bool $all = false) {
+        $data_path = environment::get_data_path();
+        $tmp_path = environment::get_temp_path();
+        $backup_path = environment::get_backup_path();
+
+        fulldelete($backup_path);
+        fulldelete($tmp_path);
+
+        if ($all && !fulldelete($data_path)) {
+            throw new \coding_exception('Could not cleanup data path (ml_recommender/data_path)');
+        }
+    }
+
 }
