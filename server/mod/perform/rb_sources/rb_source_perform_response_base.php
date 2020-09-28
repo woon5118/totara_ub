@@ -74,11 +74,6 @@ class rb_source_perform_response_base extends rb_base_source {
 
         // Apply global user restrictions.
         $this->add_global_report_restriction_join('subject_instance', 'subject_user_id', 'subject_instance');
-        $this->add_global_report_restriction_join(
-            'participant_instance',
-            'participant_id AND participant_instance.participant_source = ' . participant_source::INTERNAL,
-            'participant_instance'
-        );
 
         // This source is not available for user selection - it is used by the embedded report only.
         $this->selectable = false;

@@ -56,7 +56,7 @@ class rb_source_perform_participation_subject_instance extends rb_base_source {
         $this->globalrestrictionset = $globalrestrictionset;
 
         // Apply global user restrictions.
-        $this->add_global_report_restriction_join('base', 'user_id');
+        $this->add_global_report_restriction_join('base', 'subject_user_id');
 
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_participation_subject_instance');
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_participation_subject_instance');
@@ -131,8 +131,6 @@ class rb_source_perform_participation_subject_instance extends rb_base_source {
      * @return array
      */
     protected function define_columnoptions() {
-        $global_restriction_join_su = $this->get_global_report_restriction_join('ppi', 'subject_user_id');
-
         $pending_state = pending::get_code();
         $participant_count_sql_fragment = "
         CASE
@@ -142,7 +140,6 @@ class rb_source_perform_participation_subject_instance extends rb_base_source {
                 FROM {perform_participant_instance} ppi
                 LEFT JOIN {user} ppc ON ppi.participant_id = ppc.id 
                     AND ppi.participant_source = " . participant_source::INTERNAL . "
-                {$global_restriction_join_su}
                 WHERE ppi.subject_instance_id = base.id AND (
                     ppi.participant_source = " . participant_source::EXTERNAL . " 
                     OR ppc.deleted = 0

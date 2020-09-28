@@ -60,7 +60,7 @@ class rb_source_perform_participation_participant_section extends rb_base_source
         $this->globalrestrictionset = $globalrestrictionset;
 
         // Apply global user restrictions.
-        $this->add_global_report_restriction_join('base', 'user_id');
+        $this->add_global_report_restriction_join('subject_instance', 'subject_user_id', 'subject_instance');
 
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_participation_participant_section');
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_participation_participant_section');
