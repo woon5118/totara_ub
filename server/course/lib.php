@@ -907,7 +907,8 @@ function course_add_section($courseorid, int $position, bool $triggerevent = tru
     $cw->course   = $courseid;
     $cw->section  = $position;
     $cw->summary  = '';
-    $cw->summaryformat = FORMAT_HTML;
+    // Totara: use the course creator's editor format rather than hardcoded HTML
+    $cw->summaryformat = editors_get_preferred_format();
     $cw->sequence = '';
     $cw->name = null;
     $cw->visible = 1;

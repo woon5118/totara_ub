@@ -660,7 +660,7 @@ class core_course_courselib_testcase extends advanced_testcase {
     }
 
     public function test_course_add_section() {
-        global $DB;
+        global $DB, $CFG;
 
         $course = $this->getDataGenerator()->create_course(['numsections' => 0]);
 
@@ -706,6 +706,12 @@ class core_course_courselib_testcase extends advanced_testcase {
         $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
         sort($dbsections);
         $this->assertSame(['0', '2', '3'], $dbsections);
+
+        // Totara: Test summaryformat with different editor
+        $CFG->texteditors = 'textarea';
+        $section = course_add_section($course->id, 4, false);
+        $this->assertInstanceOf(stdClass::class, $section);
+        $this->assertSame((string)FORMAT_MOODLE, $section->summaryformat);
 
         try {
             course_add_section($course->id, COURSE_SECTION_HARD_LIMIT + 1);
