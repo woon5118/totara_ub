@@ -428,7 +428,14 @@ class enrol_lti_tool_provider_testcase extends advanced_testcase {
         @$tp->onLaunch();
         ob_end_clean();
 
-        $this->assertDebuggingNotCalled(); // Totara: make sure there are no problems.
+        // Totara: make sure there are no problems other than unresponsive DNS.
+        $expected = $this->assertDebuggingMayBeCalled([
+            '/cURL request for "http:\/\/test.totaralms.com\/exttests\/test\.jpg" failed with: Resolving timed out after \d+ milliseconds \(28\)/',
+            '/Error updating LTI user \'\d+\' avatar: Unknown exception related to local files \(Can not fetch file form URL\)/',
+        ]);
+        if ($expected) {
+            $this->markTestSkipped(); // Bail out if test.totaralms.com cannot be reached.
+        }
 
         $this->assertEquals($userimageurl, $tp->resourceLink->getSetting('custom_user_image'));
 

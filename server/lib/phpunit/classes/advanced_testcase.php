@@ -342,6 +342,46 @@ abstract class advanced_testcase extends base_testcase {
     }
 
     /**
+     * Call when debugging() messages may be expected.
+     *
+     * @param string|array $debugmessages
+     * @param string $message
+     * @param string $expectedmessage
+     * @return boolean true if debugging() expected.
+     */
+    public function assertDebuggingMayBeCalled($debugmessages, $message = '', $expectedmessage = '') {
+        $debugging = $this->getDebuggingMessages();
+        $debugdisplaymessage = "\n".phpunit_util::display_debugging_messages(true);
+        $this->resetDebugging();
+
+        if (!is_array($debugmessages)) {
+            $debugmessages = [$debugmessages];
+        }
+        if (count($debugging) === 0) {
+            return false;
+        }
+
+        // Remove expected messages.
+        $debuggingcalled = false;
+        foreach ($debugging as $i => $debug) {
+            foreach ($debugmessages as $expected) {
+                if (preg_match($expected, $debug->message)) {
+                    $debuggingcalled = true;
+                    unset($debugging[$i]);
+                    continue 2;
+                }
+            }
+        }
+        if ($message === '') {
+            $message = 'Expectation failed, debugging() was triggered.';
+        }
+        $this->resetDebugging();
+        $this->assertEquals(0, count($debugging), $message . $debugdisplaymessage);
+
+        return $debuggingcalled;
+    }
+
+    /**
      * Assert that an event legacy data is equal to the expected value.
      *
      * @param mixed $expected expected data.
