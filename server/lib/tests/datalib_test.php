@@ -652,4 +652,35 @@ class core_datalib_testcase extends advanced_testcase {
             $this->assertEquals('Coding error detected, it must be fixed by a programmer: Invalid modulename parameter', $e->getMessage());
         }
     }
+
+    /**
+     * Test the get_site() method works and is correctly cached.
+     *
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    public function test_get_site() {
+        global $DB, $SITE;
+
+        // Fetch and cache the site course (if it's not already).
+        $site_course = get_site(true);
+
+        $this->assertEquals($SITE->id, $site_course->id);
+        $this->assertEquals($SITE->fullname, $site_course->fullname);
+
+        // Ensure the cached version returns the same data.
+        $site_course = get_site(true);
+        $this->assertEquals($SITE->id, $site_course->id);
+        $this->assertEquals($SITE->fullname, $site_course->fullname);
+
+        // Modify the database record to check cache is working.
+        $todb = new \stdClass();
+        $todb->id = $SITE->id;
+        $todb->fullname = 'CHANGED';
+        $DB->update_record('course', $todb);
+
+        // Cached version should still have old name.
+        $cached_site_course = get_site(true);
+        $this->assertEquals($SITE->fullname, $cached_site_course->fullname);
+    }
 }

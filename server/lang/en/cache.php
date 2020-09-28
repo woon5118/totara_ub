@@ -69,6 +69,7 @@ $string['cachedef_questiondata'] = 'Question definitions';
 $string['cachedef_repositories'] = 'Repositories instances data';
 $string['cachedef_roledefs'] = 'Role definitions';
 $string['cachedef_grade_categories'] = 'Grade category queries';
+$string['cachedef_site_course'] = 'Site course cache';
 $string['cachedef_string'] = 'Language string cache';
 $string['cachedef_tags'] = 'Tags collections and areas';
 $string['cachedef_temp_tables'] = 'Temporary tables cache';

@@ -370,4 +370,12 @@ $definitions = array(
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
     ),
+
+    // Used to store a copy of the site course from the database as it is loaded in every request.
+    'site_course' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+    ),
 );

@@ -577,22 +577,38 @@ function get_users_confirmed() {
 /**
  * Returns $course object of the top-level site.
  *
+ * @param bool $usecache If true cached value will be used if available.
  * @return object A {@link $COURSE} object for the site, exception if not found
  */
-function get_site() {
+function get_site(bool $usecache = true) {
     global $SITE, $DB;
 
     if (!empty($SITE->id)) {   // We already have a global to use, so return that
         return $SITE;
     }
 
-    if ($course = $DB->get_record('course', array('category'=>0))) {
-        return $course;
-    } else {
-        // course table exists, but the site is not there,
-        // unfortunately there is no automatic way to recover
-        throw new moodle_exception('nosite', 'error');
+    $site_course = false;
+
+    if ($usecache) {
+        $cache = cache::make('core', 'site_course');
+        $site_course = $cache->get('courseobject');
     }
+
+    if ($site_course === false) {
+        if ($site_course = $DB->get_record('course', array('category' => 0))) {
+            if ($usecache) {
+                // Convert to an array so we can use simpledata in cache.
+                $cache->set('courseobject', (array)$site_course);
+            }
+        } else {
+            // course table exists, but the site is not there,
+            // unfortunately there is no automatic way to recover
+            throw new moodle_exception('nosite', 'error');
+        }
+    }
+
+    // Convert back to stdClass as we store in cache as an array.
+    return (object)$site_course;
 }
 
 /**
