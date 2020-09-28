@@ -34,7 +34,6 @@
           :workspace-id="workspaceId"
           :workspace-name="workspaceName"
           :show-navigation="true"
-          class="tui-workspacePage__head"
         />
       </SidePanel>
     </template>

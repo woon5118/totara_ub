@@ -103,7 +103,7 @@
         {{ $str('total_files', 'container_workspace', page.cursor.total) }}
       </div>
       <Button
-        class="tui-contributionBaseContent__loadMore"
+        class="tui-workspaceFileTable__loadMore"
         :text="$str('loadmore', 'container_workspace')"
         @click="loadMoreItems"
       />
