@@ -18,14 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
- * @package theme_ventura
+ * @package totara_tui
  */
 
-defined('MOODLE_INTERNAL') || die();
+/*
+ * The capabilities are loaded into the database table when the module is
+ * installed or updated. Whenever the capability definitions are updated,
+ * the module version number should be bumped up.
+ *
+ * The system has four possible values for a capability:
+ * CAP_ALLOW, CAP_PREVENT, CAP_PROHIBIT, and inherit (not set).
+*/
 
-$settings = new admin_externalpage(
-    'ventura_editor',
-    get_string('pluginname', 'theme_ventura'),
-    $CFG->wwwroot . '/theme/ventura/index.php',
-    'totara/tui:themesettings'
+$capabilities = array(
+
+    // Allows users to access appearance settings for specific tenant.
+    'totara/tui:themesettings' => array(
+        'riskbitmask' => RISK_CONFIG,
+        'captype'       => 'write',
+        'contextlevel'  => CONTEXT_COURSECAT,
+        'archetypes' => array(
+            'tenantdomainmanager' => CAP_ALLOW,
+        ),
+    ),
+
 );

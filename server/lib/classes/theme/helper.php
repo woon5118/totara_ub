@@ -87,7 +87,19 @@ final class helper {
             'categories' => $categories,
             'files' => $files,
             'flavours' => $flavours,
+            'context_id' => self::get_context()->id,
         ];
+    }
+
+    /**
+     * @return \context
+     */
+    private static function get_context(): \context {
+        global $CFG, $USER;
+        if ($CFG->tenantsenabled && $USER->tenantid) {
+            return \context_tenant::instance($USER->tenantid);
+        }
+        return \context_system::instance();
     }
 
 }

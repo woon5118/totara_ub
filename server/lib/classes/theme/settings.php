@@ -164,9 +164,9 @@ final class settings {
         foreach ($classes as $class) {
             /** @var theme_file $theme_file */
             $theme_file = new $class($this->theme_config);
+            $theme_file->set_tenant_id($this->tenant_id);
+            $theme_file->set_user_id($user_id);
             if ($theme_file->is_enabled()) {
-                $theme_file->set_tenant_id($this->tenant_id);
-                $theme_file->set_user_id($user_id);
                 $files[] = $theme_file;
             }
         }
@@ -180,6 +180,16 @@ final class settings {
         foreach ($categories as $category) {
             foreach ($category['properties'] as $property) {
                 $this->validate_property($property);
+            }
+        }
+
+        // Only brand and colours for tenants.
+        if ($this->tenant_id !== 0) {
+            $categories = array_filter($categories, function ($category) {
+                return !in_array($category['name'], ['brand', 'colours', 'tenant']);
+            });
+            if (sizeof($categories) > 0) {
+                throw new \invalid_parameter_exception('Tenants are only allowed to update brand and colours.');
             }
         }
     }
@@ -247,7 +257,9 @@ final class settings {
                 if ($instance->get_ui_key() === $file['ui_key']) {
                     $instance->set_user_id($user_id);
                     $instance->set_tenant_id($this->tenant_id);
-                    $instance->save_files($file['draft_id']);
+                    if ($instance->is_enabled()) {
+                        $instance->save_files($file['draft_id']);
+                    }
                     continue 2;
                 }
             }

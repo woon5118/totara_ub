@@ -58,6 +58,7 @@
                 )
               "
               :aria-describedby="$id('formimages-login-details')"
+              :context-id="contextId"
             />
             <FormRowDetails :id="$id('formimages-login-details')">
               {{ $str('formimages_details_login', 'totara_tui') }}
@@ -99,6 +100,7 @@
                 )
               "
               :aria-describedby="$id('formimages-course-details')"
+              :context-id="contextId"
             />
             <FormRowDetails :id="$id('formimages-course-details')">
               {{ $str('formimages_details_course', 'totara_tui') }}
@@ -119,6 +121,7 @@
                 )
               "
               :aria-describedby="$id('formimages-program-details')"
+              :context-id="contextId"
             />
             <FormRowDetails :id="$id('formimages-program-details')">
               {{ $str('formimages_details_program', 'totara_tui') }}
@@ -139,6 +142,7 @@
                 )
               "
               :aria-describedby="$id('formimages-cert-details')"
+              :context-id="contextId"
             />
             <FormRowDetails :id="$id('formimages-cert-details')">
               {{ $str('formimages_details_cert', 'totara_tui') }}
@@ -171,6 +175,7 @@
                 )
               "
               :aria-describedby="$id('formimages-resource-details')"
+              :context-id="contextId"
             />
             <FormRowDetails :id="$id('formimages-resource-details')">
               {{ $str('formimages_details_resource', 'totara_tui') }}
@@ -191,6 +196,7 @@
                 )
               "
               :aria-describedby="$id('formimages-workspace-details')"
+              :context-id="contextId"
             />
             <FormRowDetails :id="$id('formimages-workspace-details')">
               {{ $str('formimages_details_workspace', 'totara_tui') }}
@@ -288,6 +294,8 @@ export default {
         return false;
       },
     },
+    // Context ID.
+    contextId: Number,
   },
 
   data() {

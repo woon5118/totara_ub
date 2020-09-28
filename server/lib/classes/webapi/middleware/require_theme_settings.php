@@ -32,7 +32,7 @@ use core\webapi\resolver\result;
 /**
  * Interceptor to confirm if a user is site administrator.
  */
-class require_core_appearance implements middleware {
+class require_theme_settings implements middleware {
 
     protected $tenant_id_argument_name;
 
@@ -55,12 +55,13 @@ class require_core_appearance implements middleware {
             if (!tenant::repository()->find($tenant_id)) {
                 throw new \invalid_parameter_exception('Invalid tenant_id');
             }
-            $context = \context_tenant::instance($tenant_id);
+            $tenant = \core\record\tenant::fetch($tenant_id);
+            $context = \context_coursecat::instance($tenant->categoryid);
         } else {
             $context = \context_system::instance();
         }
 
-        require_capability('totara/core:appearance', $context);
+        require_capability('totara/tui:themesettings', $context);
 
         return $next($payload);
     }

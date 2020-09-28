@@ -44,6 +44,9 @@ $string['setting_development_mode'] = 'Development mode';
 $string['setting_development_mode_desc'] = 'When enabled development versions of the Tui JavaScript and SCSS will be served to pages requiring the Tui components.
 This is useful when developing components or debugging front end code at runtime.';
 
+// Capability strings.
+$string['tui:themesettings'] = 'Manage theme settings';
+
 // Theme settings.
 $string['select_tenant'] = 'Tenants';
 $string['theme_settings'] = 'Settings';

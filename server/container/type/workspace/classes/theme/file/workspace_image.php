@@ -68,7 +68,7 @@ class workspace_image extends theme_file {
      * @return bool
      */
     public function is_enabled(): bool {
-        return advanced_feature::is_enabled('container_workspace');
+        return $this->tenant_id === 0 && advanced_feature::is_enabled('container_workspace');
     }
 
     /**

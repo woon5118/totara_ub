@@ -66,6 +66,7 @@
                 :saved-form-field-data="embeddedFormData.formFieldData.brand"
                 :file-form-field-data="embeddedFormData.fileData"
                 :is-saving="isSaving"
+                :context-id="embeddedFormData.contextId"
                 @submit="submit"
               />
             </Tab>
@@ -99,6 +100,7 @@
                 :flavours-data="embeddedFormData.flavours"
                 :file-form-field-data="embeddedFormData.fileData"
                 :is-saving="isSaving"
+                :context-id="embeddedFormData.contextId"
                 @submit="submit"
               />
             </Tab>
@@ -321,6 +323,10 @@ export default {
       // from basic form field data. We'll pass this into Forms that need file
       // uploading
       this.embeddedFormData.fileData = queryData.files;
+
+      // file uploading needs to know the context of the user otherwise access
+      // will be blocked when trying to access system context when not admin.
+      this.embeddedFormData.contextId = queryData.context_id;
 
       // previously saved, non-default Form data to be used as initialValues
       // within each embedded Form

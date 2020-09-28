@@ -30,3 +30,4 @@ $string['region-main'] = 'Main';
 $string['region-side-post'] = 'Right';
 $string['region-side-pre'] = 'Left';
 $string['region-top'] = 'Top';
+$string['theme_manage'] = 'Theme management';

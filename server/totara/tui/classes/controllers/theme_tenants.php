@@ -67,17 +67,24 @@ class theme_tenants extends admin_controller {
     public function action(): tui_view {
         global $CFG;
 
-        // Get theme_config.
-        $theme_config = \theme_config::load($this->theme);
-
         // Redirect to settings if tenants disabled.
         if (empty($CFG->tenantsenabled)) {
             $settings_url = new \moodle_url("/totara/tui/theme_settings.php", ['theme' => $this->theme]);
             redirect($settings_url->out());
         }
 
+        // Get theme_config.
+        $theme_config = \theme_config::load($this->theme);
+
         // Get tenant information for the tui view.
         $tenants = tenant::repository()->select(['id', 'idnumber', 'name'])->get()->to_array();
+
+        // Only get the tenants that the user has access to.
+        $tenants = array_filter($tenants, function ($tenant) {
+            $context = \context_tenant::instance($tenant['id']);
+            return has_capability('totara/tui:themesettings', $context);
+        });
+
         $tenants = array_map(function ($tenant) use ($theme_config) {
             $theme_settings = new \core\theme\settings($theme_config, $tenant['id']);
             $tenant['customBranding'] = $theme_settings->is_tenant_branding_enabled();

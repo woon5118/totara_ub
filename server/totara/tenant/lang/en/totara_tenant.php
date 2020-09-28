@@ -31,6 +31,7 @@ $string['dashboardname'] = 'Tenant dashboard name';
 $string['domainmanagers'] = 'Domain managers';
 $string['erroridnumberexists'] = 'Tenant with the same identifier already exists';
 $string['erroridnumberinvalid'] = 'Invalid tenant identifier, use only lower case letters (a-z) and numbers';
+$string['errorinvalidtenant'] = 'Invalid tenant';
 $string['errornameexists'] = 'Tenant with the same name already exists';
 $string['errornameinvalid'] = 'Invalid tenant name';
 $string['errorcsvcolumnsmissing'] = 'Following columns must be included in the CSV file: {$a}';

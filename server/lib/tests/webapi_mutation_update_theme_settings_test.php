@@ -38,7 +38,7 @@ class core_webapi_mutation_update_theme_settings_testcase extends advanced_testc
 
         $this->assert_error(
             $params,
-            'Sorry, but you do not currently have permissions to do that (Configure site appearance settings)'
+            'Sorry, but you do not currently have permissions to do that (Manage theme settings)'
         );
     }
 
@@ -50,7 +50,7 @@ class core_webapi_mutation_update_theme_settings_testcase extends advanced_testc
 
         $this->assert_error(
             $params,
-            'Sorry, but you do not currently have permissions to do that (Configure site appearance settings)'
+            'Sorry, but you do not currently have permissions to do that (Manage theme settings)'
         );
     }
 
@@ -100,13 +100,13 @@ class core_webapi_mutation_update_theme_settings_testcase extends advanced_testc
         $params['tenant_id'] = $tenant2->id;
         $this->assert_error(
             $params,
-            'Sorry, but you do not currently have permissions to do that (Configure site appearance settings)'
+            'Sorry, but you do not currently have permissions to do that (Manage theme settings)'
         );
     }
 
     public function test_tenant_branding_not_enabled(): void {
-        [$user, $params] = self::create_test_data();
         [$tenant1, ] = self::create_tenants();
+        [$user, $params] = self::create_test_data($tenant1);
         self::assign_appearance_role($user, $tenant1->id);
 
         $params['tenant_id'] = $tenant1->id;
@@ -117,8 +117,8 @@ class core_webapi_mutation_update_theme_settings_testcase extends advanced_testc
     }
 
     public function test_same_tenant_branding_enabled(): void {
-        [$user, $params] = self::create_test_data();
         [$tenant1, ] = self::create_tenants();
+        [$user, $params] = self::create_test_data($tenant1);
         self::assign_appearance_role($user, $tenant1->id);
         self::enable_tenant_branding($tenant1->id);
 
@@ -147,7 +147,7 @@ class core_webapi_mutation_update_theme_settings_testcase extends advanced_testc
 
         $this->assert_error(
             $params,
-            'Sorry, but you do not currently have permissions to do that (Configure site appearance settings)'
+            'Sorry, but you do not currently have permissions to do that (Manage theme settings)'
         );
     }
 
@@ -225,11 +225,18 @@ class core_webapi_mutation_update_theme_settings_testcase extends advanced_testc
     }
 
     /**
+     * @param null $tenant
      * @return array
      */
-    private static function create_test_data(): array {
+    private static function create_test_data($tenant = null): array {
         $generator = self::getDataGenerator();
-        $user = $generator->create_user();
+        if (!$tenant) {
+            $user = $generator->create_user();
+        } else {
+            $user = $generator->create_user(
+                ['tenantid' => $tenant->id, 'tenantdomainmanager' => $tenant->idnumber]
+            );
+        }
         self::setUser($user);
 
         $params = [
@@ -261,6 +268,7 @@ class core_webapi_mutation_update_theme_settings_testcase extends advanced_testc
         $context = $tenant_id ? context_tenant::instance($tenant_id) : context_system::instance();
         $appearance_role = self::getDataGenerator()->create_role();
         assign_capability('totara/core:appearance', CAP_ALLOW, $appearance_role, $context);
+        assign_capability('totara/tui:themesettings', CAP_ALLOW, $appearance_role, $context);
         self::getDataGenerator()->role_assign($appearance_role, $user->id);
     }
 }

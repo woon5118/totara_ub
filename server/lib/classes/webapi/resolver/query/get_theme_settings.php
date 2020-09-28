@@ -26,7 +26,7 @@ namespace core\webapi\resolver\query;
 use core\theme\helper;
 use core\theme\settings as theme_settings;
 use core\webapi\execution_context;
-use core\webapi\middleware\require_core_appearance;
+use core\webapi\middleware\require_theme_settings;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
@@ -50,7 +50,6 @@ final class get_theme_settings implements query_resolver, has_middleware {
         // Get settings for theme.
         $theme_settings = new theme_settings($theme_config, $tenant_id);
         return helper::output_theme_settings($theme_settings);
-
     }
 
     /**
@@ -59,7 +58,7 @@ final class get_theme_settings implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
-            new require_core_appearance('tenant_id'),
+            new require_theme_settings('tenant_id'),
         ];
     }
 

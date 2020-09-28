@@ -720,6 +720,7 @@ $string['maintenancemodeisscheduled'] = 'This site will be switched to maintenan
 $string['maintenancemodeisscheduledlong'] = 'This site will be switched to maintenance mode in {$a->hour} hours {$a->min} mins {$a->sec} secs';
 $string['maintfileopenerror'] = 'Error opening maintenance files!';
 $string['maintinprogress'] = 'Maintenance is in progress...';
+$string['manageappearance'] = 'Manage appearance';
 $string['managecourses'] = 'Manage courses';
 $string['manageprograms'] = 'Manage programs';
 $string['manageformats'] = 'Manage course formats';

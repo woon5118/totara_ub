@@ -34,6 +34,7 @@
           :metadata="fileData.sitelogo"
           :aria-describedby="$id('formbrand-logo-details')"
           :aria-label-extension="$str('formbrand_label_logo', 'totara_tui')"
+          :context-id="contextId"
         />
         <FormRowDetails :id="$id('formbrand-logo-details')">
           {{ $str('formbrand_details_logo', 'totara_tui') }}
@@ -62,6 +63,7 @@
           :metadata="fileData.sitefavicon"
           :aria-describedby="$id('formbrand-favicon-details')"
           :aria-label-extension="$str('formbrand_label_favicon', 'totara_tui')"
+          :context-id="contextId"
         />
         <FormRowDetails :id="$id('formbrand-favicon-details')">
           {{ $str('formbrand_details_favicon', 'totara_tui') }}
@@ -141,6 +143,8 @@ export default {
         return false;
       },
     },
+    // Context ID.
+    contextId: Number,
   },
 
   data() {

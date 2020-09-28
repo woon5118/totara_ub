@@ -67,6 +67,14 @@ class course_image extends theme_file {
     }
 
     /**
+     * @return bool
+     */
+    public function is_enabled(): bool {
+        // Only available for site theme.
+        return $this->tenant_id === 0;
+    }
+
+    /**
      * @inheritDoc
      */
     public function get_component(): string {

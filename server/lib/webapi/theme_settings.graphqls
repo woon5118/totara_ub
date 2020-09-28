@@ -54,6 +54,7 @@ type core_theme_settings_result {
     categories: [core_theme_category!]!
     files: [core_theme_file!]!
     flavours: core_theme_flavours!
+    context_id: core_id!
 }
 
 extend type Query {

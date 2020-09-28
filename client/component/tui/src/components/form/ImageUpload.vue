@@ -31,6 +31,7 @@ av<!--
     :href="href"
     :one-file="true"
     :accepted-types="acceptedTypes"
+    :context-id="contextId"
     @load="handleFileLoaded"
     @error="handleError"
   >
@@ -121,6 +122,7 @@ export default {
     acceptedTypes: Array,
     ariaDescribedby: String,
     ariaLabelExtension: String,
+    contextId: Number,
   },
 
   data() {

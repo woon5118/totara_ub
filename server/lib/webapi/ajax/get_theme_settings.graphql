@@ -35,5 +35,6 @@ query core_get_theme_settings(
                 url
             }
         }
+        context_id
     }
 }

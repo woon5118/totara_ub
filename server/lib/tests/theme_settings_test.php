@@ -130,14 +130,14 @@ class core_theme_settings_testcase extends advanced_testcase {
         );
         $this->assertNotEmpty($result->errors);
         $this->assertEquals(
-            'Sorry, but you do not currently have permissions to do that (Configure site appearance settings)',
+            'Sorry, but you do not currently have permissions to do that (Manage theme settings)',
             $result->errors[0]->message
         );
 
         // Grant user permission.
         $roles = get_archetype_roles('user');
         $role = reset($roles);
-        assign_capability('totara/core:appearance', CAP_ALLOW, $role->id, context_system::instance(), true);
+        assign_capability('totara/tui:themesettings', CAP_ALLOW, $role->id, context_system::instance(), true);
 
         // Test with capability.
         $result = $this->execute_graphql_operation(
@@ -183,14 +183,14 @@ class core_theme_settings_testcase extends advanced_testcase {
         $result = $this->execute_graphql_operation('core_update_theme_settings', $params);
         $this->assertNotEmpty($result->errors);
         $this->assertEquals(
-            'Sorry, but you do not currently have permissions to do that (Configure site appearance settings)',
+            'Sorry, but you do not currently have permissions to do that (Manage theme settings)',
             $result->errors[0]->message
         );
 
         // Grant user permission.
         $roles = get_archetype_roles('user');
         $role = reset($roles);
-        assign_capability('totara/core:appearance', CAP_ALLOW, $role->id, context_system::instance(), true);
+        assign_capability('totara/tui:themesettings', CAP_ALLOW, $role->id, context_system::instance(), true);
 
         // Test with capability.
         $result = $this->execute_graphql_operation('core_update_theme_settings', $params);
