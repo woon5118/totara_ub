@@ -23,9 +23,12 @@
 
 namespace core_course\theme\file;
 
+use context;
+use context_system;
 use core\files\type\file_type;
 use core\files\type\web_image;
 use core\theme\file\theme_file;
+use core\theme\settings;
 use moodle_url;
 use theme_config;
 
@@ -38,8 +41,8 @@ use theme_config;
  *
  * This file handler is also used by theme settings to generate a dynamic list
  * of files that can be customised by a user.
- * @see core\theme\settings
- * @see core\theme\file\theme_file
+ * @see settings
+ * @see theme_file
  *
  * @package core_course\theme\file
  */
@@ -74,17 +77,7 @@ class course_image extends theme_file {
      * @inheritDoc
      */
     public function get_area(): string {
-        return 'defaultimage';
-    }
-
-    /**
-     * Return 0 always to keep in line with legacy course default image.
-     *
-     * @param string|null $theme
-     * @return int
-     */
-    public function get_item_id(?string $theme = null): int {
-        return 0;
+        return 'defaultcourseimage';
     }
 
     /**
@@ -111,16 +104,35 @@ class course_image extends theme_file {
     /**
      * @inheritDoc
      */
-    public function get_context(): \context {
-        return \context_system::instance();
+    public function get_default_url(): moodle_url {
+        global $OUTPUT;
+
+        $system_context = context_system::instance();
+        $fs = get_file_storage();
+        // First check whether there's a default image on the system level
+        $files = $fs->get_area_files($system_context->id, 'course', 'defaultimage', 0, "timemodified DESC", false);
+        if ($files) {
+            $file = reset($files);
+            return moodle_url::make_pluginfile_url(
+                $system_context->id,
+                'course',
+                'defaultimage',
+                theme_get_revision(),
+                '/',
+                $file->get_filename(),
+                false
+            );
+        }
+
+        return $OUTPUT->image_url('course_defaultimage', 'core');
     }
 
     /**
      * @inheritDoc
      */
-    public function get_default_url(): moodle_url {
-        global $OUTPUT;
-        return $OUTPUT->image_url('course_defaultimage', 'core', true);
+    protected function get_default_context(?int $tenant_id = null): ?context {
+        // This item is only configurable on the system level at the moment
+        return \context_system::instance();
     }
 
 }

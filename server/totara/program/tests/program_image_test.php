@@ -41,14 +41,32 @@ class totara_program_image_testcase extends advanced_testcase {
         $program_image = new program_image($theme_config);
         $this->assertEquals(true, $program_image->is_available());
         $url = $program_image->get_current_or_default_url();
-        $this->assertInstanceOf(moodle_url::class, $url);
-        $url = $url->out();
         $this->assertEquals(
             "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_program/1/defaultimage",
-            $url
+            $url->out()
         );
 
-        // Update default image.
+        // Now update the system default image for programs
+        $fs = get_file_storage();
+        $rc = [
+            'contextid' => context_system::instance()->id,
+            'component' => 'totara_core',
+            'filearea' => 'totara_program_default_image',
+            'filepath' => '/',
+            'filename' => 'hello_world.png',
+            'mimetype' => 'png',
+            'itemid' => 0,
+            'license' => 'public'
+        ];
+        $fs->create_file_from_string($rc, 'Hello World !!!');
+
+        $url = $program_image->get_current_or_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/totara_program_default_image/0/hello_world.png",
+            $url->out()
+        );
+
+        // Update default image of the theme which should now come first
         $files = [
             [
                 'ui_key' => 'learnprogram',
@@ -59,11 +77,21 @@ class totara_program_image_testcase extends advanced_testcase {
 
         // Confirm that new default image is fetched.
         $url = $program_image->get_current_or_default_url();
-        $this->assertInstanceOf(moodle_url::class, $url);
-        $url = $url->out();
         $this->assertEquals(
             "https://www.example.com/moodle/pluginfile.php/1/totara_core/defaultprogramimage/{$program_image->get_item_id()}/new_program_image.png",
-            $url
+            $url->out()
+        );
+
+        // Now remove the theme setting file. Currently, there's no function for this so we remove it manually
+        unset_config('defaultprogramimage', 'totara_core');
+        $current_file = $program_image->get_current_imagefile();
+        $current_file->delete();
+
+        // Now we are back to the system default image
+        $url = $program_image->get_current_or_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/totara_program_default_image/0/hello_world.png",
+            $url->out()
         );
     }
 

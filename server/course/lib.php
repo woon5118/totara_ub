@@ -22,6 +22,8 @@
  * @package core_course
  */
 
+use core_course\theme\file\course_image;
+
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir.'/completionlib.php');
@@ -3779,23 +3781,10 @@ function course_get_image($course) {
         $url = moodle_url::make_pluginfile_url($context->id, 'course', 'images', $course->cacherev, '/', 'image', false);
         return $url;
     }
-    if (get_config('course', 'defaultimage')) { // Setting here used for performance only.
-        $syscontext = context_system::instance();
-        $files = $fs->get_area_files($syscontext->id, 'course', 'defaultimage', 0, "timemodified DESC", false);
-        if ($files) {
-            $file = reset($files);
-            $themerev = theme_get_revision();
-            $url = moodle_url::make_pluginfile_url(
-                $syscontext->id,
-                'course',
-                'defaultimage',
-                $themerev,
-                '/',
-                $file->get_filename(),
-                false
-            );
-            return $url;
-        }
+    $course_image = new course_image();
+    $file = $course_image->get_current_or_default_url();
+    if ($file) {
+        return $file;
     }
 
     return $OUTPUT->image_url('course_defaultimage', 'moodle');

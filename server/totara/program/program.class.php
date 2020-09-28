@@ -26,8 +26,10 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
 }
 
+use totara_certification\theme\file\certification_image;
 use totara_core\advanced_feature;
-use \totara_program\exception\manager as exception_manager;
+use totara_program\exception\manager as exception_manager;
+use totara_program\theme\file\program_image;
 
 require_once($CFG->dirroot . '/totara/program/program_content.class.php');
 require_once($CFG->dirroot . '/totara/program/program_courseset.class.php');
@@ -2494,7 +2496,6 @@ class program {
      * @return string
      */
     public function get_image() {
-        global $CFG, $OUTPUT;
         $fs = get_file_storage();
         $files = array_values(
             $fs->get_area_files(
@@ -2504,45 +2505,28 @@ class program {
                 $this->id
             )
         );
-        // There has not being any files uploaded to the program so check the defaults.
-        if (empty($files)) {
-
-            $filearea = $this->is_certif() ?
-                'totara_certification_default_image' :
-                'totara_program_default_image';
-
-            $files = array_values(
-                $fs->get_area_files(
-                    context_system::instance()->id,
-                    'totara_core',
-                    $filearea,
-                    0
-                )
-            );
-        }
-        // There have not being any files uploaded so return the default default image.
-        $files = array_values(array_filter($files, function($file) {
+        $files = array_values(array_filter($files, function ($file) {
             return !$file->is_directory();
         }));
-        if (empty($files)) {
-            if ($this->is_certif()) {
-                $component = 'totara_certification';
-            } else {
-                $component = 'totara_program';
-            }
-            $url = $OUTPUT->image_url('defaultimage', $component);
-            return $url->out();
-        }
         assert(count($files) <= 1, 'There should only be one image for the program but there was ' . count($files));
-        $file = moodle_url::make_pluginfile_url(
-            $files[0]->get_contextid(),
-            $files[0]->get_component(),
-            $files[0]->get_filearea(),
-            $files[0]->get_itemid(),
-            $files[0]->get_filepath(),
-            $files[0]->get_filename()
-        );
-        return $file->out();
+
+        if (!empty($files)) {
+            $file = moodle_url::make_pluginfile_url(
+                $files[0]->get_contextid(),
+                $files[0]->get_component(),
+                $files[0]->get_filearea(),
+                $files[0]->get_itemid(),
+                $files[0]->get_filepath(),
+                $files[0]->get_filename()
+            );
+            return $file->out();
+        }
+
+        // There have not being any files uploaded so return the default image.
+        $program_image = $this->is_certif()
+            ? new certification_image()
+            : new program_image();
+        return $program_image->get_current_or_default_url()->out();
     }
 }
 

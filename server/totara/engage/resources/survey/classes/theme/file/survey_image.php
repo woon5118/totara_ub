@@ -23,6 +23,7 @@
 
 namespace engage_survey\theme\file;
 
+use context;
 use core\files\type\file_type;
 use core\files\type\web_image;
 use core\theme\file\theme_file;
@@ -38,8 +39,8 @@ use totara_core\advanced_feature;
  *
  * This file handler is also used by theme settings to generate a dynamic list
  * of files that can be customised by a user.
- * @see core\theme\settings
- * @see core\theme\file\theme_file
+ * @see settings
+ * @see theme_file
  *
  * @package engage_survey\theme\file
  */
@@ -103,6 +104,14 @@ class survey_image extends theme_file {
      */
     public function get_type(): file_type {
         return $this->type;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function get_default_context(?int $tenant_id = null): ?context {
+        // This item is only configurable on the system level at the moment
+        return \context_system::instance();
     }
 
 }

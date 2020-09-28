@@ -21,6 +21,9 @@
  * @package totara_core
  */
 
+use core\theme\settings;
+use core_course\theme\file\course_image;
+
 defined('MOODLE_INTERNAL') || die();
 
 class totara_core_get_course_image_testcase extends advanced_testcase {
@@ -29,22 +32,45 @@ class totara_core_get_course_image_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
         $this->setUser($user_one);
-        $user_context = \context_user::instance($user_one->id);
+        $user_context = context_user::instance($user_one->id);
         $theme_config = theme_config::load('ventura');
-        $theme_settings = new \core\theme\settings($theme_config, 0);
+        $theme_settings = new settings($theme_config, 0);
 
         // Get current default image.
-        $course_image = new \core_course\theme\file\course_image($theme_config);
+        $course_image = new course_image($theme_config);
         $this->assertEquals(true, $course_image->is_available());
         $url = $course_image->get_current_or_default_url();
-        $this->assertInstanceOf(moodle_url::class, $url);
-        $url = $url->out();
         $this->assertEquals(
             "https://www.example.com/moodle/theme/image.php/_s/ventura/core/1/course_defaultimage",
-            $url
+            $url->out()
         );
 
-        // Update default image.
+        // Let's set a new default file on the system level
+        $setting = new \admin_setting_configstoredfile(
+            'course/defaultimage',
+            '',
+            '',
+            'defaultimage',
+            0,
+            [
+                'accepted_types' => 'image',
+                'context' => context_system::instance()
+            ]
+        );
+
+        $draft_id = $this->create_image('new_course_image', $user_context);
+
+        // Write new settings.
+        $setting->write_setting($draft_id);
+
+        // Confirm that new system default image is fetched.
+        $url = $course_image->get_current_or_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/course/defaultimage/".theme_get_revision()."/new_course_image.png",
+            $url->out()
+        );
+
+        // Now update the theme course default image, this should override the one set above on the system level
         $files = [
             [
                 'ui_key' => 'learncourse',
@@ -55,11 +81,21 @@ class totara_core_get_course_image_testcase extends advanced_testcase {
 
         // Confirm that new default image is fetched.
         $url = $course_image->get_current_or_default_url();
-        $this->assertInstanceOf(moodle_url::class, $url);
-        $url = $url->out();
         $this->assertEquals(
-            "https://www.example.com/moodle/pluginfile.php/1/course/defaultimage/{$course_image->get_item_id()}/new_course_image.png",
-            $url
+            "https://www.example.com/moodle/pluginfile.php/1/course/defaultcourseimage/{$course_image->get_item_id()}/new_course_image.png",
+            $url->out()
+        );
+
+        // Now remove the theme setting file. Currently, there's no function for this so we remove it manually
+        unset_config('defaultcourseimage', 'course');
+        $current_file = $course_image->get_current_imagefile();
+        $current_file->delete();
+
+        // Confirm that now the system default image is fetched.
+        $url = $course_image->get_current_or_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/course/defaultimage/".theme_get_revision()."/new_course_image.png",
+            $url->out()
         );
     }
 

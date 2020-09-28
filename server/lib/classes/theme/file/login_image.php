@@ -37,8 +37,8 @@ use theme_config;
  *
  * This file handler is also used by theme settings to generate a dynamic list
  * of files that can be customised by a user.
- * @see core\theme\settings
- * @see core\theme\file\theme_file
+ * @see settings
+ * @see theme_file
  *
  * @package core\theme\file
  */

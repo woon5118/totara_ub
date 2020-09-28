@@ -4592,6 +4592,48 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $theme 
             ];
             send_stored_file($file, $lifetime, 0, $forcedownload, $options);
         }
+        // This filearea is used for the custom course image of the theme
+        // which could also be overridden by the tenant
+        if ($filearea === 'defaultcourseimage') {
+            // For all course images defined not on the system level
+            // require users to be logged in
+            if ($context->contextlevel !== CONTEXT_SYSTEM) {
+                require_login();
+
+                if ($context->is_user_access_prevented()) {
+                    send_file_not_found();
+                }
+            }
+            if (count($args) < 2) {
+                send_file_not_found();
+            }
+
+            $themerev = array_shift($args);
+            $lifetime = 60;
+            if ($themerev > 0) {
+                $lifetime = 60 * 60 * 2;
+            }
+
+            $course_image = new \core_course\theme\file\course_image();
+            $item_id = $course_image->get_item_id();
+
+            $filename = array_shift($args);
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($context->id, 'course', 'defaultcourseimage', $item_id, "timemodified DESC", false);
+            if (!$files) {
+                send_file_not_found();
+            }
+            $file = reset($files);
+
+            \core\session\manager::write_close(); // Unlock session during file serving.
+            $options = [
+                'preview' => $preview,
+                'filename' => $filename,
+                'theme' => $theme,
+                'cacheability' => 'public', // Default course images are cache-able
+            ];
+            send_stored_file($file, $lifetime, 0, $forcedownload, $options);
+        }
         // Totara: one image per course for background in grid catalogue.
         if ($filearea === 'images') {
             if ($CFG->forcelogin && empty($CFG->publishgridcatalogimage)) {

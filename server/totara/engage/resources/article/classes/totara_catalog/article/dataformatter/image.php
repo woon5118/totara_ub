@@ -94,7 +94,7 @@ class image extends formatter {
             );
         } else {
             $article_image = new article_image();
-            $image->url = $article_image->get_default_url()->out();
+            $image->url = $article_image->get_current_or_default_url()->out();
         }
 
         $image->alt = format_string($data['alt'], true, ['context' => $context]);

@@ -23,6 +23,8 @@
 
 namespace totara_certification\theme\file;
 
+use context;
+use context_system;
 use core\files\type\file_type;
 use core\files\type\web_image;
 use core\theme\file\theme_file;
@@ -39,8 +41,8 @@ use totara_core\advanced_feature;
  *
  * This file handler is also used by theme settings to generate a dynamic list
  * of files that can be customised by a user.
- * @see core\theme\settings
- * @see core\theme\file\theme_file
+ * @see settings
+ * @see theme_file
  *
  * @package totara_certification\theme\file
  */
@@ -104,6 +106,47 @@ class certification_image extends theme_file {
      */
     public function get_type(): file_type {
         return $this->type;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function get_default_context(?int $tenant_id = null): ?context {
+        // This item is only configurable on the system level at the moment
+        return \context_system::instance();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_default_url(): ?moodle_url {
+        global $OUTPUT;
+
+        $system_context = context_system::instance();
+        $fs = get_file_storage();
+
+        $files = $fs->get_area_files(
+            $system_context->id,
+            'totara_core',
+            'totara_certification_default_image',
+            0,
+            "timemodified DESC",
+            false
+        );
+        if ($files) {
+            $file = reset($files);
+            return moodle_url::make_pluginfile_url(
+                $system_context->id,
+                'totara_core',
+                'totara_certification_default_image',
+                0,
+                '/',
+                $file->get_filename(),
+                false
+            );
+        }
+
+        return $OUTPUT->image_url('defaultimage', 'totara_certification');
     }
 
 }

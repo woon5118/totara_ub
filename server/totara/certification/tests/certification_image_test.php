@@ -41,14 +41,32 @@ class totara_certification_image_testcase extends advanced_testcase {
         $certification_image = new certification_image($theme_config);
         $this->assertEquals(true, $certification_image->is_available());
         $url = $certification_image->get_current_or_default_url();
-        $this->assertInstanceOf(moodle_url::class, $url);
-        $url = $url->out();
         $this->assertEquals(
             "https://www.example.com/moodle/theme/image.php/_s/ventura/totara_certification/1/defaultimage",
-            $url
+            $url->out()
         );
 
-        // Update default image.
+        // Now update the system default image for certifications
+        $fs = get_file_storage();
+        $rc = [
+            'contextid' => context_system::instance()->id,
+            'component' => 'totara_core',
+            'filearea' => 'totara_certification_default_image',
+            'filepath' => '/',
+            'filename' => 'hello_world.png',
+            'mimetype' => 'png',
+            'itemid' => 0,
+            'license' => 'public'
+        ];
+        $fs->create_file_from_string($rc, 'Hello World !!!');
+
+        $url = $certification_image->get_current_or_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/totara_certification_default_image/0/hello_world.png",
+            $url->out()
+        );
+
+        // Update default image of the theme which should now come first
         $files = [
             [
                 'ui_key' => 'learncert',
@@ -59,11 +77,21 @@ class totara_certification_image_testcase extends advanced_testcase {
 
         // Confirm that new default image is fetched.
         $url = $certification_image->get_current_or_default_url();
-        $this->assertInstanceOf(moodle_url::class, $url);
-        $url = $url->out();
         $this->assertEquals(
             "https://www.example.com/moodle/pluginfile.php/1/totara_core/defaultcertificationimage/{$certification_image->get_item_id()}/new_certification_image.png",
-            $url
+            $url->out()
+        );
+
+        // Now remove the theme setting file. Currently, there's no function for this so we remove it manually
+        unset_config('defaultcertificationimage', 'totara_core');
+        $current_file = $certification_image->get_current_imagefile();
+        $current_file->delete();
+
+        // Now we are back to the system default image
+        $url = $certification_image->get_current_or_default_url();
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/totara_certification_default_image/0/hello_world.png",
+            $url->out()
         );
     }
 

@@ -22,6 +22,8 @@
  * @subpackage totara_core
  */
 
+use core\theme\file\theme_file;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/totara/core/totara.php');
@@ -302,20 +304,44 @@ function totara_site_version_tracking() {
 /**
  * To download the file we upload in totara_core filearea
  *
- * @param $course
- * @param $cm
- * @param $context
- * @param $filearea
- * @param $args
- * @param $forcedownload
+ * @param stdClass$course
+ * @param stdClass $cm
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool$forcedownload
  * @param array $options
  * @return void Download the file
  */
-function totara_core_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $options=array()) {
+function totara_core_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $options = []) {
     $component = 'totara_core';
     $itemid = $args[0];
     $filename = $args[1];
     $fs = get_file_storage();
+
+    $classes = \core\theme\file\helper::get_classes();
+
+    $theme_file_areas = [];
+    foreach ($classes as $class) {
+        /** @var theme_file $theme_file */
+        $theme_file = new $class();
+        if ($theme_file->get_component() !== 'totara_core') {
+            continue;
+        }
+
+        $theme_file_areas[] = $theme_file->get_area();
+    }
+
+    if (in_array($filearea, $theme_file_areas)) {
+        // If it's not defined on the system level it's not public
+        if ($context->contextlevel !== CONTEXT_SYSTEM) {
+            require_login();
+
+            if ($context->is_user_access_prevented()) {
+                send_file_not_found();
+            }
+        }
+    }
 
     $file = $fs->get_file($context->id, $component, $filearea, $itemid, '/', $filename);
 
