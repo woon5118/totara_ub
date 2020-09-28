@@ -76,7 +76,7 @@ Feature: Share existing items with workspace
     And I click on "select an existing resource" "button"
 
     # All library section should only show resources and playlists from your library
-    When I select "All library" from the "filter_section" singleselect
+    When I select "Your Library" from the "filter_section" singleselect
     And I wait for the next second
 
     Then I should see "3" rows in the tui datatable
