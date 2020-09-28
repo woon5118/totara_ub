@@ -342,12 +342,6 @@ $tui-modal-normalSize: 560px !default;
 $tui-modal-largeSize: 800px !default;
 $tui-modal-sheetBreakpoint: 768px !default;
 
-:root {
-  --modal-container-padding: var(--gap-12);
-  --modal-sheet-padding: var(--gap-12);
-  --modal-border-radius: 0;
-}
-
 .tui-modal {
   position: fixed;
   top: 0;

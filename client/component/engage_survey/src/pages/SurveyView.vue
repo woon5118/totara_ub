@@ -72,10 +72,6 @@ export default {
 </script>
 
 <style lang="scss">
-:root {
-  --engageSurvey-min-height: 78vh;
-}
-
 .tui-engageSurveyView {
   .tui-grid-item {
     min-height: var(--engageSurvey-min-height);

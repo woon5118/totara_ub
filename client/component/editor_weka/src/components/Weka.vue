@@ -287,10 +287,6 @@ export default {
 </script>
 
 <style lang="scss">
-:root {
-  --weka-select-color: #8cf;
-}
-
 .tui-weka {
   display: flex;
   flex-direction: column;
@@ -376,7 +372,7 @@ export default {
   }
 
   .ProseMirror-selectednode {
-    outline: var(--border-width-normal) solid var(--weka-select-color);
+    outline: var(--border-width-normal) solid var(--color-secondary);
   }
 
   /* Make sure li selections wrap around markers */
@@ -391,7 +387,7 @@ export default {
     right: -2px;
     bottom: -2px;
     left: -32px;
-    border: var(--border-width-normal) solid var(--weka-select-color);
+    border: var(--border-width-normal) solid var(--color-secondary);
     content: '';
     pointer-events: none;
   }

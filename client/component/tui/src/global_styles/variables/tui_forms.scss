@@ -115,4 +115,7 @@ $tui-input-no-default-size-parent-selectors: (
   --input-set-spacing: var(--gap-2);
 
   --char-length-scale: $tui-char-length-scale;
+
+  // Offset for radio label
+  --radio-label-offset: calc(var(--form-radio-size) * 1.35);
 }

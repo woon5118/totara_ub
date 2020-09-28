@@ -81,8 +81,6 @@ export default {
   --form-radio-dot-size: calc(var(--form-radio-size) / 2);
   // Offset to center dot
   --radio-dot-offset: calc(var(--form-radio-size) / 4);
-  // Offset for radio label
-  --radio-label-offset: calc(var(--form-radio-size) * 1.35);
 }
 
 .tui-radio {

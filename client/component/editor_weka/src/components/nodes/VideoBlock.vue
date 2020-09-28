@@ -189,7 +189,7 @@ export default {
   }
 
   &.ProseMirror-selectednode > &__inner > .tui-videoBlock {
-    outline: var(--border-width-normal) solid var(--weka-select-color);
+    outline: var(--border-width-normal) solid var(--color-secondary);
   }
 
   &__inner {

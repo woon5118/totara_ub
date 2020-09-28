@@ -54,10 +54,6 @@ export default {
 </script>
 
 <style lang="scss">
-:root {
-  --card-border-radius: var(--border-radius-normal);
-}
-
 .tui-card {
   display: flex;
   border: 1px solid var(--card-border-color);

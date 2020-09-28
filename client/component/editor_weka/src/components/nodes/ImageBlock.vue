@@ -248,7 +248,7 @@ export default {
 
   &.ProseMirror-selectednode > &__inner > .tui-imageBlock {
     // Set the outline for the picture only.
-    outline: var(--border-width-normal) solid var(--weka-select-color);
+    outline: var(--border-width-normal) solid var(--color-secondary);
   }
 
   &__inner {

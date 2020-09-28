@@ -111,13 +111,6 @@ export default {
 </script>
 
 <style lang="scss">
-:root {
-  // Btn shadow
-  --btn-shadow-focus: var(--shadow-2);
-  --btn-shadow-active: var(--shadow-3);
-  --btn-min-width: 72px;
-  --btn-min-height: 3.6rem;
-}
 // Reset
 .tui-toggleBtn,
 .tui-formBtn {

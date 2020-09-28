@@ -43,11 +43,6 @@ export default {
 </script>
 
 <style lang="scss">
-:root {
-  --tag-height: 24px;
-  --tag-border-radius: 12px; // --tag-height / 2 - for some reason IE calc wasn't working correctly here
-}
-
 .tui-tag {
   display: inline-flex;
   flex-shrink: 0;

@@ -58,9 +58,6 @@ export default {
 </script>
 
 <style lang="scss">
-:root {
-  --sidepanel-navigation-item-padding-left: var(--gap-8);
-}
 .tui-sidePanelNav {
   padding: var(--gap-4) 0;
   background: var(--side-panel-nav-bg-color);

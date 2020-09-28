@@ -105,12 +105,6 @@ export default {
 </script>
 
 <style lang="scss">
-:root {
-  --modal-content-separation: var(--gap-2);
-  --modal-content-separation-large: var(--gap-8);
-  --modal-content-outer-padding: var(--gap-8);
-}
-
 .tui-modalContent {
   @include tui-font-body();
   display: flex;

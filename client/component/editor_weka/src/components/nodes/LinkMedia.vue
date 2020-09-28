@@ -159,7 +159,7 @@ export default {
     outline: none;
   }
   &.ProseMirror-selectednode > &__inner {
-    outline: var(--border-width-normal) solid var(--weka-select-color);
+    outline: var(--border-width-normal) solid var(--color-secondary);
   }
 
   &__inner {
