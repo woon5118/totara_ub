@@ -123,32 +123,6 @@ class mariadb_native_moodle_database extends mysqli_native_moodle_database {
     }
 
     /**
-     * Returns database server info array
-     * @return array Array containing 'description' and 'version' info
-     */
-    public function get_server_info() {
-        if (!$this->mysqli) {
-            return null;
-        }
-
-        if (isset($this->serverinfo)) {
-            return $this->serverinfo;
-        }
-
-        $this->serverinfo = array(
-            'description' => $this->mysqli->server_info,
-            'version' => $this->mysqli->server_info,
-        );
-
-        if (preg_match('/^5\.5\.5-(10\..+)-MariaDB/i', $this->serverinfo['version'], $matches)) {
-            // Looks like MariaDB decided to use these weird version numbers for better BC with MySQL...
-            $this->serverinfo['version'] = $matches[1];
-        }
-
-        return $this->serverinfo;
-    }
-
-    /**
      * It is time to require transactions everywhere.
      *
      * MyISAM is NOT supported!
