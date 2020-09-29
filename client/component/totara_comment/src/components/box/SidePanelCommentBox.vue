@@ -100,7 +100,7 @@ export default {
   &__box {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    overflow: hidden;
 
     .tui-commentBox {
       display: flex;
@@ -109,6 +109,7 @@ export default {
 
       // Overriding the comment thread to make it fit with the sidepanel
       &__comments {
+        padding-right: var(--gap-2);
         overflow: auto;
 
         // This is not support by IE or Edge.

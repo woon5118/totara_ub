@@ -455,7 +455,7 @@ export default {
     }
 
     .tui-sidePanel--closed & {
-      visibility: hidden;
+      display: none;
     }
 
     .tui-sidePanel--open &,

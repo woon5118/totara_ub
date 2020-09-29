@@ -351,6 +351,7 @@ export default {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  height: 100%;
   padding: var(--gap-8);
 
   &__timeDescription {

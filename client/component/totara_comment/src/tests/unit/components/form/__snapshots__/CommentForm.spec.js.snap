@@ -10,16 +10,20 @@ exports[`totara_comment/components/form/CommentForm.vue Checks snapshot 1`] = `
   >
     <!---->
      
-    <weka-stub
-      area="comment"
-      class="tui-commentForm__editor"
-      component="totara_comment"
-      data-file-item-id="500"
-      data-key="totara_comment_editor_weka_1"
-      fileitemid="500"
-      placeholder="entercomment-totara_comment"
-      value="[object Object]"
-    />
+    <div
+      class="tui-commentForm__input"
+    >
+      <weka-stub
+        area="comment"
+        class="tui-commentForm__editor"
+        component="totara_comment"
+        data-file-item-id="500"
+        data-key="totara_comment_editor_weka_1"
+        fileitemid="500"
+        placeholder="entercomment-totara_comment"
+        value="[object Object]"
+      />
+    </div>
      
     <buttongroup-stub
       class="tui-commentForm__buttonGroup"

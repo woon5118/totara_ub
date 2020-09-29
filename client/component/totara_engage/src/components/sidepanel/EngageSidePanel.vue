@@ -99,15 +99,20 @@ export default {
     flex: 1 0 1px;
     flex-direction: column;
     padding-top: var(--gap-6);
-    overflow: hidden;
 
     @media (min-width: $tui-screen-sm) {
       padding-top: var(--gap-8);
+      overflow: auto;
     }
 
     .tui-tabs__panels {
-      height: 100%;
-      overflow: auto;
+      flex-basis: 0;
+      flex-grow: 1;
+      flex-shrink: 0;
+
+      @media (min-width: $tui-screen-sm) {
+        min-height: 0;
+      }
     }
 
     // Overriding the fallback select list when there isn't enough space

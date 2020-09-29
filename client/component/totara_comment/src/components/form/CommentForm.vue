@@ -26,21 +26,22 @@
         The editor has to be constructed once the editor options have been finished fetching.
         So that it can be constructed with the provided editor options.
        -->
-      <Weka
-        v-if="!$apollo.queries.editorOption.loading && draftId"
-        :key="editorKey"
-        v-model="content"
-        :data-key="editorKey"
-        area="comment"
-        component="totara_comment"
-        :options="editorOption"
-        :file-item-id="draftId"
-        :placeholder="$str('entercomment', 'totara_comment')"
-        :data-file-item-id="draftId"
-        class="tui-commentForm__editor"
-        @ready="$emit('form-ready')"
-      />
-
+      <div class="tui-commentForm__input">
+        <Weka
+          v-if="!$apollo.queries.editorOption.loading && draftId"
+          :key="editorKey"
+          v-model="content"
+          :data-key="editorKey"
+          area="comment"
+          component="totara_comment"
+          :options="editorOption"
+          :file-item-id="draftId"
+          :placeholder="$str('entercomment', 'totara_comment')"
+          :data-file-item-id="draftId"
+          class="tui-commentForm__editor"
+          @ready="$emit('form-ready')"
+        />
+      </div>
       <ButtonGroup class="tui-commentForm__buttonGroup">
         <Button
           :text="submitButtonText"
@@ -222,6 +223,11 @@ export default {
     display: flex;
     justify-content: flex-end;
     margin-top: var(--gap-4);
+  }
+
+  &__input {
+    max-height: 200px;
+    overflow: auto;
   }
 }
 </style>
