@@ -31,8 +31,7 @@ describe('editor_weka/components/suggestion/User.vue', function() {
       },
 
       propsData: {
-        x: 1,
-        y: 1,
+        location: { x: 1, y: 1 },
         pattern: 'bolobala',
       },
     });

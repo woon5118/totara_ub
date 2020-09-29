@@ -21,6 +21,7 @@
     <Dropdown
       :separator="true"
       :open="$apollo.loading || users.length > 0"
+      :inline-menu="true"
       @dismiss="$emit('dismiss')"
     >
       <span class="sr-only">
@@ -73,16 +74,9 @@ export default {
       type: String,
     },
 
-    x: {
-      // This is offset from left
+    location: {
       required: true,
-      type: [Number, String],
-    },
-
-    y: {
-      // This is offset from top.
-      required: true,
-      type: [Number, String],
+      type: Object,
     },
 
     pattern: {
@@ -115,8 +109,8 @@ export default {
   computed: {
     positionStyle() {
       return {
-        left: `${this.x}px`,
-        top: `${this.y}px`,
+        left: `${this.location.x}px`,
+        top: `${this.location.y}px`,
       };
     },
   },
@@ -145,6 +139,7 @@ export default {
 <style lang="scss">
 .tui-wekaUserSuggestions {
   position: absolute;
+  z-index: var(--zindex-popover);
   width: 32.6rem;
 }
 </style>

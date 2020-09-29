@@ -50,9 +50,9 @@ import ResizeObserver from 'tui/polyfills/ResizeObserver';
 import { throttle } from 'tui/util';
 import {
   getDocumentPosition,
-  getOffsetRect,
   getViewportRect,
   getBox,
+  getBoundingClientRect,
   getContainingBlockInfo,
 } from 'tui/dom/position';
 import { getClosestScrollable } from 'tui/dom/scroll';
@@ -210,7 +210,10 @@ export default {
           console.log('PopoverPositioner', this.$el);
           console.log('PopoverPositioner offset parent', this.$el.offsetParent);
         }
-        refRect = getOffsetRect(refEl);
+        // using offsetTop etc doesn't account for scrolling of intermediate elements
+        refRect = getBoundingClientRect(refEl).sub(
+          getBoundingClientRect(refEl.offsetParent).getPosition()
+        );
         const offsetParentPosition = getDocumentPosition(refEl.offsetParent);
         viewport = getViewportRect().sub(offsetParentPosition);
       }
@@ -274,14 +277,12 @@ export default {
     $_setupOpen() {
       this.$_closeCleanup();
       this.isFixed = this.$_useFixedPositioning();
-      if (this.isFixed) {
-        this.scrollableContainers = [];
-        let scrollable = getClosestScrollable(this.$el.parentNode);
-        while (scrollable) {
-          this.scrollableContainers.push(scrollable);
-          scrollable.addEventListener('scroll', this.handleResize);
-          scrollable = getClosestScrollable(scrollable.parentNode);
-        }
+      this.scrollableContainers = [];
+      let scrollable = getClosestScrollable(this.$el.parentNode);
+      while (scrollable) {
+        this.scrollableContainers.push(scrollable);
+        scrollable.addEventListener('scroll', this.handleResize);
+        scrollable = getClosestScrollable(scrollable.parentNode);
       }
     },
 

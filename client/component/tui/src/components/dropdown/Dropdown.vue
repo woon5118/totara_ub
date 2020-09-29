@@ -35,7 +35,8 @@
       <slot name="trigger" :toggle="toggle" :isOpen="isOpen" />
     </div>
 
-    <PopoverPositioner
+    <component
+      :is="inlineMenu ? 'passthrough' : 'PopoverPositioner'"
       v-if="!disabled && $scopedSlots.default"
       :position="position"
       :open="isOpen"
@@ -63,7 +64,7 @@
           </PropsProvider>
         </div>
       </div>
-    </PopoverPositioner>
+    </component>
   </div>
 </template>
 
@@ -115,6 +116,8 @@ export default {
     },
     open: Boolean,
     matchWidth: Boolean,
+    /** Show the menu inline (rather than as a popover/overlay) */
+    inlineMenu: Boolean,
   },
 
   data() {
@@ -237,7 +240,11 @@ export default {
         return;
       }
 
-      const contentNodeList = getTabbableElements(this.$refs.dropdownContent);
+      let contentNodeList = getTabbableElements(this.$refs.dropdownContent);
+      // filter out items that are children of other items
+      contentNodeList = contentNodeList.filter(
+        x => !contentNodeList.some(y => x != y && y.contains(x))
+      );
       const contentNodeCount = contentNodeList.length;
       switch (event.key) {
         case 'ArrowDown':

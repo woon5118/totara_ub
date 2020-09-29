@@ -18,7 +18,12 @@
 
 <template>
   <div class="tui-wekaHashtagSuggestions" :style="positionStyle">
-    <Dropdown :separator="false" :open="showSuggestions" @dismiss="dismiss">
+    <Dropdown
+      :separator="false"
+      :open="showSuggestions"
+      :inline-menu="true"
+      @dismiss="dismiss"
+    >
       <template v-slot:trigger>
         <span class="sr-only">
           {{ $str('matching_hashtags', 'editor_weka') }}:
@@ -66,16 +71,9 @@ export default {
       type: String,
     },
 
-    // Offset from left.
-    x: {
+    location: {
       required: true,
-      type: [Number, String],
-    },
-
-    // Offset from top.
-    y: {
-      required: true,
-      type: [Number, String],
+      type: Object,
     },
 
     pattern: {
@@ -112,8 +110,8 @@ export default {
 
     positionStyle() {
       return {
-        left: `${this.x}px`,
-        top: `${this.y}px`,
+        left: `${this.location.x}px`,
+        top: `${this.location.y}px`,
       };
     },
   },
@@ -168,5 +166,6 @@ export default {
 <style lang="scss">
 .tui-wekaHashtagSuggestions {
   position: absolute;
+  z-index: var(--zindex-popover);
 }
 </style>

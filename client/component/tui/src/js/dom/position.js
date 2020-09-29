@@ -133,6 +133,22 @@ export function getBox(el, { transformed = false, viewport = false } = {}) {
 }
 
 /**
+ * Get bounding client rect.
+ *
+ * @param {Element} el
+ * @returns {Rect}
+ */
+export function getBoundingClientRect(el) {
+  const clientRect = el.getBoundingClientRect();
+  return new Rect(
+    clientRect.left,
+    clientRect.top,
+    clientRect.width,
+    clientRect.height
+  );
+}
+
+/**
  * Alter Rect by adding or removing spacing on each side.
  *
  * @param {Rect} rect

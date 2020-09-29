@@ -18,8 +18,11 @@
 
 import { ResolvedPos } from 'ext_prosemirror/model';
 import Vue from 'vue';
-import { getSelectionClientRect } from 'tui/dom/position';
 import { getClosestScrollable } from 'tui/dom/scroll';
+import { position } from 'tui/lib/popover';
+import { Rect, Size } from 'tui/geometry';
+import { getBoundingClientRect } from 'tui/dom/position';
+import ResizeObserver from 'tui/polyfills/ResizeObserver';
 
 export default class Suggestion {
   /**
@@ -30,6 +33,7 @@ export default class Suggestion {
   constructor(editor) {
     this._instance = null;
     this._editor = editor;
+    this._updatePosition = this._updatePosition.bind(this);
   }
 
   /**
@@ -92,6 +96,16 @@ export default class Suggestion {
    * Destroy the instance.
    */
   destroyInstance() {
+    if (this._scrollableContainers) {
+      this._scrollableContainers.forEach(x =>
+        x.removeEventListener('scroll', this._updatePosition)
+      );
+      this._scrollableContainers = null;
+    }
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver = null;
+    }
     if (this._instance !== null) {
       this._instance.$destroy();
       this._editor.viewExtrasLiveEl.removeChild(this._instance.$el);
@@ -117,36 +131,41 @@ export default class Suggestion {
    * @param {Function} callback
    */
   showList({ view, component, state: { range, text }, callback }) {
+    if (this._instance !== null) {
+      this.destroyInstance();
+    }
+
     const element = document.createElement('span');
     this._editor.viewExtrasLiveEl.appendChild(element);
 
-    const scrollParent = getClosestScrollable(element);
-    const position = view.coordsAtPos(range.from);
-    const parentCoords = this._editor.viewExtrasLiveEl.offsetParent.getBoundingClientRect();
-    let y = position.bottom - parentCoords.top;
+    this._view = view;
+    this._range = range;
 
-    // handle the case where the top of the parent is at the top of viewBox
-    // NOTE: may be possible to use getSelectionCoords() as the primary way of determining popover positioning
-    if (scrollParent && !scrollParent.offsetParent && parentCoords.top <= 0) {
-      y = getSelectionClientRect().bottom;
-    }
-
-    // the scrollParent is not the document
-    // -> add the internal scrollTop to account for this
-    if (scrollParent && scrollParent.offsetParent) {
-      y = y + scrollParent.scrollTop;
-    }
+    this._location = Vue.observable(this._getLocation());
 
     this._instance = new (Vue.extend(component.component))({
       parent: this._editor.getParent(),
       propsData: {
-        x: position.left - parentCoords.left,
-        y,
+        location: this._location,
         pattern: text,
       },
     });
 
     this._instance.$mount(element);
+
+    this._scrollableContainers = [];
+    let scrollable = getClosestScrollable(this._editor.viewExtrasLiveEl);
+    while (scrollable) {
+      this._scrollableContainers.push(scrollable);
+      scrollable.addEventListener('scroll', this._updatePosition);
+      scrollable = getClosestScrollable(scrollable.parentNode);
+    }
+    this._scrollableContainers.push(document);
+    document.addEventListener('scroll', this._updatePosition);
+
+    this._resizeObserver = new ResizeObserver(this._updatePosition);
+    this._resizeObserver.observe(this._instance.$el);
+
     this._instance.$on('item-selected', ({ id, text }) => {
       this.destroyInstance();
 
@@ -167,6 +186,51 @@ export default class Suggestion {
       this.destroyInstance();
       this._editor.view.focus();
     });
+    Vue.nextTick(this._updatePosition);
+  }
+
+  /**
+   * Update position of suggestion menu
+   */
+  _updatePosition() {
+    Object.assign(this._location, this._getLocation());
+  }
+
+  /**
+   * Work out location to place suggestion menu
+   *
+   * @returns {{x: number, y: number}}
+   */
+  _getLocation() {
+    const html = document.documentElement;
+    const parentCoords = getBoundingClientRect(
+      this._editor.viewExtrasLiveEl.offsetParent
+    );
+    const refCoords = this._view.coordsAtPos(this._range.from);
+    const refRect = Rect.fromPositions(
+      Object.assign({}, refCoords, { right: refCoords.right + 1 })
+    ).sub(parentCoords.getPosition());
+    const viewport = new Rect(0, 0, html.clientWidth, html.clientHeight).sub(
+      parentCoords.getPosition()
+    );
+
+    const pos = position({
+      position: ['bottom', 'left'],
+      ref: refRect,
+      viewport,
+      size: this._instance
+        ? new Size(
+            this._instance.$el.offsetWidth,
+            this._instance.$el.offsetHeight
+          )
+        : new Size(50, 50),
+      padding: 0,
+    });
+
+    return {
+      x: pos.location.x,
+      y: pos.location.y,
+    };
   }
 
   /**
