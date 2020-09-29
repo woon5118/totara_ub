@@ -746,6 +746,7 @@ module.exports = function(grunt) {
             grunt.task.run('css');
             grunt.task.run('js');
             grunt.task.run('gherkinlint');
+            grunt.task.run('check-format');
         }
     };
 
