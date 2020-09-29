@@ -4,31 +4,31 @@ Represents a notification, possibly an abstract / uncreated one (id may be null)
 type mod_perform_notification {
   id: core_id
   """
-   Human readable name for this notification
+  Human readable name for this notification
   """
   name(format: core_format = PLAIN): String!
   """
-   Unqualified class name for the class that defines this notification type
+  Unqualified class name for the class that defines this notification type
   """
   class_key: String!
   """
-   True if this notification is active
+  True if this notification is active
   """
   active: Boolean!
   """
-   Defines the behaviour of the trigger for this notification (e.g. BEFORE, AFTER)
+  Defines the behaviour of the trigger for this notification (e.g. BEFORE, AFTER)
   """
   trigger_type: mod_perform_notification_trigger_type
   """
-   Human readable string representing what the trigger is relative to
+  Human readable string representing what the trigger is relative to
   """
   trigger_label(format: core_format = PLAIN): String
   """
-   List of recipients for the notification. Note recipients are defined by relationships, not specific actual users
+  List of recipients for the notification. Note recipients are defined by relationships, not specific actual users
   """
   recipients: [mod_perform_notification_recipient!]
   """
-   List of time periods (in seconds) that control when the notification is triggered (in combination with trigger_type)
+  List of time periods (in seconds) that control when the notification is triggered (in combination with trigger_type)
   """
   triggers: [Int!]
 }
@@ -38,26 +38,26 @@ Represents a notification recipient
 """
 type mod_perform_notification_recipient {
   """
-   ID of the relationship this recipient holds
+  ID of the relationship this recipient holds
   """
   relationship_id: core_id
   """
-   Human readable string describing the recipient (e.g. 'Subject', 'Manager')
+  Human readable string describing the recipient (e.g. 'Subject', 'Manager')
   """
   name(format: core_format = PLAIN): String!
   """
-   True if the recipient is set to receive the notification
+  True if the recipient is set to receive the notification
   """
   active: Boolean!
 }
 
 enum mod_perform_notification_trigger_type {
   """
-   Used to trigger notifications some time before a specific trigger
+  Used to trigger notifications some time before a specific trigger
   """
   BEFORE
   """
-   Used to trigger notifications some time after a specific trigger
+  Used to trigger notifications some time after a specific trigger
   """
   AFTER
 }

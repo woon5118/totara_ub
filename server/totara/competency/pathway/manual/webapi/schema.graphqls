@@ -3,19 +3,19 @@ A role a user might have for another user, e.g. manager
 """
 type pathway_manual_role {
   """
-   Role short name
+  Role short name
   """
   name: String!
   """
-   Human readable role label
+  Human readable role label
   """
   display_name(format: core_format = PLAIN): String!
   """
-   Numeric value for ordering this role relative to others
+  Numeric value for ordering this role relative to others
   """
   display_order: Int!
   """
-   True if the viewing user has this role
+  True if the viewing user has this role
   """
   has_role: Boolean!
 }
@@ -25,19 +25,19 @@ An individual rating for a competency made by a user for a user
 """
 type pathway_manual_rating {
   """
-   User object for the person doing the rating
+  User object for the person doing the rating
   """
   rater: core_user
   """
-   ID of scale value given during rating
+  ID of scale value given during rating
   """
   scale_value: totara_competency_scale_value
   """
-   Time the rating was made
+  Time the rating was made
   """
   timestamp(format: core_date_format = TIMESTAMP): core_date!
   """
-   Comment provided by rater
+  Comment provided by rater
   """
   comment(format: core_format = PLAIN): String
 }
@@ -47,19 +47,19 @@ A role that can rate a competency
 """
 type pathway_manual_role_rating {
   """
-   The role doing the rating
+  The role doing the rating
   """
   role: pathway_manual_role!
   """
-   Most recent rating by the role
+  Most recent rating by the role
   """
   latest_rating: pathway_manual_rating
   """
-   URL of picture to use if there is no rating
+  URL of picture to use if there is no rating
   """
   default_profile_picture: String
   """
-   Custom role name text
+  Custom role name text
   """
   role_display_name: String
 }
@@ -69,11 +69,11 @@ A competency that can be rated
 """
 type pathway_manual_rateable_competency {
   """
-   The competency object
+  The competency object
   """
   competency: totara_competency_competency!
   """
-   The most recent rating made for this competency
+  The most recent rating made for this competency
   """
   latest_rating: pathway_manual_rating
 }
@@ -83,19 +83,19 @@ A competency framework group with scale values and rateable competencies
 """
 type pathway_manual_framework_group {
   """
-   The competency framework object
+  The competency framework object
   """
   framework: totara_competency_competency_framework!
   """
-   List of values from the competency scale
+  List of values from the competency scale
   """
   values: [totara_competency_scale_value!]!
   """
-   List of rateable competencies
+  List of rateable competencies
   """
   competencies: [pathway_manual_rateable_competency]!
   """
-   Number of rateable competencies
+  Number of rateable competencies
   """
   count: Int!
 }
@@ -105,15 +105,15 @@ Information about a user that can be manually rated
 """
 type pathway_manual_rateable_user {
   """
-   User object
+  User object
   """
   user: core_user!
   """
-   Number of competencies
+  Number of competencies
   """
   competency_count: Int!
   """
-   Most recent rating
+  Most recent rating
   """
   latest_rating: pathway_manual_rating
 }
@@ -123,19 +123,19 @@ All rateable competencies for a specific user, grouped by framework
 """
 type pathway_manual_user_competencies {
   """
-   The user object for the user we are rating competencies for
+  The user object for the user we are rating competencies for
   """
   user: core_user!
   """
-   Frameworks groups (set of competencies grouped by a framework)
+  Frameworks groups (set of competencies grouped by a framework)
   """
   framework_groups: [pathway_manual_framework_group!]!
   """
-   List of things that the list can be filtered by
+  List of things that the list can be filtered by
   """
   filters: pathway_manual_user_competencies_filter_options
   """
-   The total amount of competencies available to rate
+  The total amount of competencies available to rate
   """
   count: Int!
 }
@@ -145,15 +145,15 @@ The filter options that are available to filter by.
 """
 type pathway_manual_user_competencies_filter_options {
   """
-   Filter by whether they have already been rated by the user or not
+  Filter by whether they have already been rated by the user or not
   """
   rating_history: Boolean
   """
-   Filter by competency types
+  Filter by competency types
   """
   competency_type: [totara_competency_competency_type]
   """
-   Filter by reasons for assignment
+  Filter by reasons for assignment
   """
   assignment_reason: [totara_competency_assignment_reason]
 }
@@ -163,7 +163,7 @@ Filters that have been chosen to filter by for rateable users.
 """
 input pathway_manual_rateable_users_filters {
   """
-   Text match against the user's fullname
+  Text match against the user's fullname
   """
   user_full_name: String
 }
@@ -173,15 +173,15 @@ Filters that have been chosen to filter by for rateable competencies.
 """
 input pathway_manual_user_rateable_competencies_filters {
   """
-   Filter by whether they have already been rated by the user or not
+  Filter by whether they have already been rated by the user or not
   """
   rating_history: Boolean
   """
-   Filter by competency types
+  Filter by competency types
   """
   competency_type: core_id
   """
-   Filter by reasons for assignment
+  Filter by reasons for assignment
   """
   assignment_reason: [core_id!]
 }
@@ -191,15 +191,15 @@ Input type for individual rating
 """
 input pathway_manual_rating_input {
   """
-   ID of competency being rated
+  ID of competency being rated
   """
   competency_id: core_id!
   """
-   ID of scale value given during rating
+  ID of scale value given during rating
   """
   scale_value_id: core_id
   """
-   Optional text comment about the rating
+  Optional text comment about the rating
   """
   comment: param_text
 }

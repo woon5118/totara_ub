@@ -24,11 +24,11 @@ Input type to manually set participant section availability.
 """
 input mod_perform_manually_change_participant_section_input {
   """
-   ID of the participant section to update
+  ID of the participant section to update
   """
   participant_section_id: core_id!
   """
-   New value for availability for this participant section
+  New value for availability for this participant section
   """
   availability: mod_perform_participant_section_availability_status!
 }
@@ -38,11 +38,11 @@ Input type to manually set participant instance availability.
 """
 input mod_perform_manually_change_participant_instance_input {
   """
-   ID of the participant instance to update
+  ID of the participant instance to update
   """
   participant_instance_id: core_id!
   """
-   New value for availability for this participant instance
+  New value for availability for this participant instance
   """
   availability: mod_perform_participant_instance_availability_status!
 }
@@ -52,11 +52,11 @@ Input type to manually set subject instance availability.
 """
 input mod_perform_manually_change_subject_instance_input {
   """
-   ID of the subject instance to update
+  ID of the subject instance to update
   """
   subject_instance_id: core_id!
   """
-   New value for availability for this subject instance
+  New value for availability for this subject instance
   """
   availability: mod_perform_subject_instance_availability_status!
 }

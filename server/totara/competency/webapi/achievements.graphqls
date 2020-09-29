@@ -3,11 +3,11 @@ Pathway classification indicates whether completing a pathway results in a speci
 """
 enum totara_competency_pathway_classification {
   """
-   Completing the pathway can result in any scale value
+  Completing the pathway can result in any scale value
   """
   MULTIVALUE
   """
-   Completing the pathway will result in a specific scale value
+  Completing the pathway will result in a specific scale value
   """
   SINGLEVALUE
 }
@@ -17,11 +17,11 @@ Possible pathway statuses
 """
 enum totara_competency_pathway_status {
   """
-   The pathway is in use
+  The pathway is in use
   """
   ACTIVE
   """
-   The pathway has been archived
+  The pathway has been archived
   """
   ARCHIVED
 }
@@ -31,11 +31,11 @@ Summarized pathway criteria item
 """
 type totara_competency_summarized_pathway_criterion_item {
   """
-   Human readable string describing this criterion
+  Human readable string describing this criterion
   """
   description(format: core_format = PLAIN): String
   """
-   Error string displayed if there are issues with this criterion
+  Error string displayed if there are issues with this criterion
   """
   error(format: core_format = PLAIN): String
 }
@@ -74,15 +74,15 @@ None of the strings are retrieved from user input - therefore no formatting requ
 """
 type totara_competency_overall_aggregation {
   """
-   Type of aggregation
+  Type of aggregation
   """
   aggregation_type: String!
   """
-   Human readable string describing aggregation type
+  Human readable string describing aggregation type
   """
   title: String!
   """
-   Human readable description of aggregration type
+  Human readable description of aggregration type
   """
   description: String
 }
@@ -92,15 +92,15 @@ Achievement configuration
 """
 type totara_competency_achievement_configuration {
   """
-   ID of competency being configured
+  ID of competency being configured
   """
   competency_id: core_id!
   """
-   Aggregation method used between pathways
+  Aggregation method used between pathways
   """
   overall_aggregation: totara_competency_overall_aggregation!
   """
-   List of pathways in use
+  List of pathways in use
   """
   paths: [totara_competency_pathway!]!
 }
@@ -110,15 +110,15 @@ Competency details achievement path
 """
 type totara_competency_achievement_path {
   """
-   Type of pathway classification, e.g. SINGLEVALUE, MULTIVALUE
+  Type of pathway classification, e.g. SINGLEVALUE, MULTIVALUE
   """
   class: totara_competency_pathway_classification!
   """
-   Type of achievement path, e.g. 'manual', 'learning_plan', null
+  Type of achievement path, e.g. 'manual', 'learning_plan', null
   """
   type: String
   """
-   Human readable name for the achievement path
+  Human readable name for the achievement path
   """
   name: String!
 }
@@ -151,35 +151,35 @@ A single pathway achievement for a user
 """
 type totara_competency_pathway_achievement {
   """
-   Pathway ID
+  Pathway ID
   """
   id: core_id!
   """
-   The pathway object
+  The pathway object
   """
   pathway: totara_competency_pathway!
   """
-   The user object for the user
+  The user object for the user
   """
   user: core_user!
   """
-   Scale value object
+  Scale value object
   """
   scale_value: totara_competency_scale_value
   """
-   True if there is a scale value attached to this pathway
+  True if there is a scale value attached to this pathway
   """
   has_scale_value: Boolean!
   """
-   Time the pathway was achieved
+  Time the pathway was achieved
   """
   date_achieved(format: core_date_format = TIMESTAMP): core_date!
   """
-   Time the pathway was last aggregated
+  Time the pathway was last aggregated
   """
   last_aggregated(format: core_date_format = TIMESTAMP): core_date
   """
-   Status of pathway, e.g. is it current or archived
+  Status of pathway, e.g. is it current or archived
   """
   status: totara_competency_pathway_achievement_status!
   """
@@ -194,11 +194,11 @@ Returns items for each scale value, which could be criteria groups
 """
 type totara_competency_scale_achievement {
   """
-   Specific scale value to return pathways for
+  Specific scale value to return pathways for
   """
   scale_value: totara_competency_scale_value
   """
-   List of pathways for this scale value
+  List of pathways for this scale value
   """
   items: [totara_competency_pathway_achievement]
 }

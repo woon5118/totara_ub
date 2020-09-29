@@ -7,19 +7,19 @@ totara core somewhere.
 type mod_perform_user_grouping {
   id: core_id!
   """
-   Type of assignment group. Options are 1 (audience), 2 (organisation), 3 (position) or 4 (individual)
+  Type of assignment group. Options are 1 (audience), 2 (organisation), 3 (position) or 4 (individual)
   """
   type: Int!
   """
-   Human readable label describing the group type
+  Human readable label describing the group type
   """
   type_label: String!
   """
-   Name of this specific group
+  Name of this specific group
   """
   name: String
   """
-   Number of members in this specific group
+  Number of members in this specific group
   """
   size: Int!
 }
@@ -29,11 +29,11 @@ Input for adding or removing groups to tracks
 """
 input mod_perform_user_grouping_input {
   """
-   ID identifying the group instance
+  ID identifying the group instance
   """
   id: core_id!
   """
-   String identifying which group type is being added or removed
+  String identifying which group type is being added or removed
   """
   type: String!
 }
@@ -43,11 +43,11 @@ Input for filtering what users can be selected.
 """
 input mod_perform_selectable_users_filters {
   """
-   Matches against the fullname of potential users
+  Matches against the fullname of potential users
   """
   fullname: String
   """
-   List of user ids to exclude from the results
+  List of user ids to exclude from the results
   """
   exclude_users: [core_id!]
 }
@@ -61,11 +61,11 @@ extend type Query {
   """
   mod_perform_selectable_users(
     """
-     ID of the subject instance the users are being added to
+    ID of the subject instance the users are being added to
     """
     subject_instance_id: core_id!
     """
-     Filters that can be applied to limit the results returned
+    Filters that can be applied to limit the results returned
     """
     filters: mod_perform_selectable_users_filters
   ): [core_user]!

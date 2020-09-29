@@ -36,39 +36,39 @@ type mod_perform_activity {
   description(format: core_format = PLAIN): String
   updated_at(format: core_date_format = TIMESTAMP): core_date
   """
-   Whether the current user can view the participation tracking for the activity
+  Whether the current user can view the participation tracking for the activity
   """
   can_view_participation_reporting: Boolean!
   """
-   Whether this activity could be activated due to capability checks and current status, without checking further conditions
+  Whether this activity could be activated due to capability checks and current status, without checking further conditions
   """
   can_potentially_activate: Boolean!
   """
-   Whether the current user can activate this activity, only if it satisfies all conditions
+  Whether the current user can activate this activity, only if it satisfies all conditions
   """
   can_activate: Boolean!
   """
-   Whether the current user can manage this activity
+  Whether the current user can manage this activity
   """
   can_manage: Boolean!
   """
-   Whether the current user can clone this activity
+  Whether the current user can clone this activity
   """
   can_clone: Boolean!
   sections: [mod_perform_section!]!
   """
-   Provides details (name, code and human-readable string) about the current state of the activity
+  Provides details (name, code and human-readable string) about the current state of the activity
   """
   state_details: mod_perform_activity_state!
   settings: mod_perform_activity_settings!
   visibility_condition_options: [mod_perform_visibility_condition_option!]
   """
-   If true all responses will be anonymized
+  If true all responses will be anonymized
   """
   anonymous_responses: Boolean!
   manual_relationships: [mod_perform_manual_relationship!]!
   """
-   Context ID of the course container used by this activity
+  Context ID of the course container used by this activity
   """
   context_id: core_id!
 }
@@ -80,27 +80,27 @@ type mod_perform_element_plugin {
   plugin_name: String!
   name: String!
   """
-   Name of vue component used to display the element configuration form to the activity admin
+  Name of vue component used to display the element configuration form to the activity admin
   """
   admin_form_component: String!
   """
-   Name of the vue component used to display the preview of a completed element to the activity admin
+  Name of the vue component used to display the preview of a completed element to the activity admin
   """
   admin_display_component: String!
   """
-   Name of the vue component used to display a read-only view of an element when an activity is active
+  Name of the vue component used to display a read-only view of an element when an activity is active
   """
   admin_read_only_display_component: String!
   """
-   Name of the vue component used to display the form element to the participant when they are completing the activity
+  Name of the vue component used to display the form element to the participant when they are completing the activity
   """
   participant_form_component: String!
   """
-   Name of the vue component used to display a participant's response to this element
+  Name of the vue component used to display a participant's response to this element
   """
   participant_response_component: String!
   """
-   Value indicating which group of elements this element is under (1 for question elements, 2 for other non-respondable elements)
+  Value indicating which group of elements this element is under (1 for question elements, 2 for other non-respondable elements)
   """
   group: String!
 }
@@ -111,7 +111,7 @@ An element identifier
 type mod_perform_element_identifier {
   id: core_id!
   """
-   String identifier used to associate separate elements together for reporting purposes
+  String identifier used to associate separate elements together for reporting purposes
   """
   identifier(format: core_format = PLAIN): String!
 }
@@ -123,23 +123,23 @@ type mod_perform_element {
   id: core_id!
   element_plugin: mod_perform_element_plugin!
   """
-   Element title (typically a question for respondable elements)
+  Element title (typically a question for respondable elements)
   """
   title(format: core_format = PLAIN): String!
   """
-   String identifier used to associate separate elements together for reporting purposes
+  String identifier used to associate separate elements together for reporting purposes
   """
   identifier: String
   """
-   Encoded data storing configuration information used by the element
+  Encoded data storing configuration information used by the element
   """
   data(format: core_format = PLAIN): String
   """
-   Whether a participant is required to respond to this element in order to submit a section
+  Whether a participant is required to respond to this element in order to submit a section
   """
   is_required: Boolean
   """
-   Whether this element can be responded to by a participant
+  Whether this element can be responded to by a participant
   """
   is_respondable: Boolean!
 }
@@ -149,11 +149,11 @@ A validation error
 """
 type mod_perform_validation_error {
   """
-   An error code representing this particular class of error
+  An error code representing this particular class of error
   """
   error_code: String!
   """
-   Human readable string describing the error
+  Human readable string describing the error
   """
   error_message: String!
 }
@@ -165,40 +165,40 @@ type mod_perform_subject_instance {
   id: core_id!
   activity: mod_perform_activity!
   """
-   Status representing the overall progress of the subject instance (e.g. not started, in progress, complete)
+  Status representing the overall progress of the subject instance (e.g. not started, in progress, complete)
   """
   progress_status: mod_perform_subject_instance_progress_status!
   """
-   Status representing the availability of the subject instance (e.g. open or closed)
+  Status representing the availability of the subject instance (e.g. open or closed)
   """
   availability_status: mod_perform_subject_instance_availability_status!
   created_at(format: core_date_format = DATE): core_date!
   """
-   Date the activity is expected to be completed by. Used for triggering notifications and displaying overdue notices.
+  Date the activity is expected to be completed by. Used for triggering notifications and displaying overdue notices.
   """
   due_date(format: core_date_format = DATETIME): core_date
   """
-   If true the due date has passed and the overall subject instance is not yet closed
+  If true the due date has passed and the overall subject instance is not yet closed
   """
   is_overdue: Boolean!
   """
-   Participant data on the subject of this instance
+  Participant data on the subject of this instance
   """
   subject_user: mod_perform_participant!
   """
-   List of participant instances involved in this subject instance
+  List of participant instances involved in this subject instance
   """
   participant_instances: [mod_perform_participant_instance!]!
   """
-   Optional job assignment indicating which of the subject's jobs this instance is about
+  Optional job assignment indicating which of the subject's jobs this instance is about
   """
   job_assignment: totara_job_assignment
   """
-   A numeric incrementing counter of the subject instance's associated with this particular user assignment. May be more than one when repeating is enabled.
+  A numeric incrementing counter of the subject instance's associated with this particular user assignment. May be more than one when repeating is enabled.
   """
   instance_count: Int
   """
-   Static user metadata stored at the time of subject instance creation, used to provide a permanent record of the subject's details that this activity was about
+  Static user metadata stored at the time of subject instance creation, used to provide a permanent record of the subject's details that this activity was about
   """
   static_instances: [totara_job_assignment!]!
 }
@@ -208,19 +208,19 @@ Represents an activity belonging to the current viewing user from the legacy 'Ap
 """
 type mod_perform_historic_activity {
   """
-   Name of the activity
+  Name of the activity
   """
   activity_name: String
   """
-   URL linking to the legacy activity (for appraisals) or to the My Feedback page (for feedback 360s)
+  URL linking to the legacy activity (for appraisals) or to the My Feedback page (for feedback 360s)
   """
   activity_link: String
   """
-   Human readable string describing the type of activity (Appraisal or 360 Feedback)
+  Human readable string describing the type of activity (Appraisal or 360 Feedback)
   """
   type: String
   """
-   Status of the activity for the viewing user (e.g. Active, Completed, etc)
+  Status of the activity for the viewing user (e.g. Active, Completed, etc)
   """
   status: String
 }
@@ -230,27 +230,27 @@ Represents an activity belonging to another user (not the viewing user) from the
 """
 type mod_perform_other_historic_activity {
   """
-   Name of the activity
+  Name of the activity
   """
   activity_name: String
   """
-   URL linking to the legacy activity (for appraisals) or to the My Feedback page (for feedback 360s)
+  URL linking to the legacy activity (for appraisals) or to the My Feedback page (for feedback 360s)
   """
   activity_link: String
   """
-   Human readable string describing the type of activity (Appraisal or 360 Feedback)
+  Human readable string describing the type of activity (Appraisal or 360 Feedback)
   """
   type: String
   """
-   Name of the subject of the legacy activity
+  Name of the subject of the legacy activity
   """
   subject_user: String
   """
-   String giving the relationship between the viewing user and the subject of the activity
+  String giving the relationship between the viewing user and the subject of the activity
   """
   relationship_to: String
   """
-   Status of the activity for the viewing user (e.g. Active, Completed, etc)
+  Status of the activity for the viewing user (e.g. Active, Completed, etc)
   """
   status: String
 }
@@ -261,43 +261,43 @@ Details about a participant_instance
 type mod_perform_participant_instance {
   id: core_id!
   """
-   ID from either 'user' table (internal) or 'perform_participant_external' table (external)
+  ID from either 'user' table (internal) or 'perform_participant_external' table (external)
   """
   participant_id: core_id
   """
-   True if the user requesting the participant instance record is also the participant (they are viewing their own instance)
+  True if the user requesting the participant instance record is also the participant (they are viewing their own instance)
   """
   is_for_current_user: Boolean!
   """
-   List of sections this participant is involved in. This includes sections where they are a respondant as well as view-only sections.
+  List of sections this participant is involved in. This includes sections where they are a respondant as well as view-only sections.
   """
   participant_sections: [mod_perform_participant_section!]!
   """
-   Detailed information about the participant of this instance
+  Detailed information about the participant of this instance
   """
   participant: mod_perform_participant
   """
-   Status representing this participant's progress in the subject instance (e.g. not started, in progress, complete)
+  Status representing this participant's progress in the subject instance (e.g. not started, in progress, complete)
   """
   progress_status: mod_perform_participant_instance_progress_status!
   """
-   Status representing this participant's availability for the subject instance (e.g. open or closed)
+  Status representing this participant's availability for the subject instance (e.g. open or closed)
   """
   availability_status: mod_perform_participant_instance_availability_status!
   """
-   If true the due date has passed and this specific participant instance is not yet closed
+  If true the due date has passed and this specific participant instance is not yet closed
   """
   is_overdue: Boolean!
   """
-   Represents how this participant is related to the subject (e.g. manager, appraiser, etc.)
+  Represents how this participant is related to the subject (e.g. manager, appraiser, etc.)
   """
   core_relationship: totara_core_relationship
   """
-   Identifies the subject instance this participant instance relates to.
+  Identifies the subject instance this participant instance relates to.
   """
   subject_instance: mod_perform_subject_instance
   """
-   Time of creation of the participant instance record
+  Time of creation of the participant instance record
   """
   created_at(format: core_date_format = DATE): core_date!
 }
@@ -307,11 +307,11 @@ Available sources of a participant user.
 """
 enum mod_perform_participant_source_enum {
   """
-   System user with an account (record in the user table)
+  System user with an account (record in the user table)
   """
   INTERNAL
   """
-   Represents a participant who doesn't have a system account, instead they are identified by a record in the perform_participant_external table
+  Represents a participant who doesn't have a system account, instead they are identified by a record in the perform_participant_external table
   """
   EXTERNAL
 }
@@ -321,24 +321,24 @@ Participant user.
 """
 type mod_perform_participant {
   """
-   Identifies if the user is a system user (INTERNAL) or external to the system (EXTERNAL).
+  Identifies if the user is a system user (INTERNAL) or external to the system (EXTERNAL).
   """
   source: mod_perform_participant_source_enum!
   id: core_id!
   """
-   User's fullname
+  User's fullname
   """
   fullname: String
   """
-   User's email address
+  User's email address
   """
   email: String
   """
-   URL of the user's profile image
+  URL of the user's profile image
   """
   profileimageurlsmall: String
   """
-   Metadata for the 'display user information' component
+  Metadata for the 'display user information' component
   """
   card_display: core_user_card_display
 }

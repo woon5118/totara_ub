@@ -3,15 +3,15 @@ A Learning plan pathway
 """
 type pathway_learning_plan_competency_plan {
   """
-   List of learning plans this competency is in
+  List of learning plans this competency is in
   """
   learning_plans: [totara_plan_learning_plan]
   """
-   Scale value given
+  Scale value given
   """
   scale_value: totara_competency_scale_value
   """
-   Time when the value was given
+  Time when the value was given
   """
   date_assigned(format: core_date_format = TIMESTAMP): core_date
 }
