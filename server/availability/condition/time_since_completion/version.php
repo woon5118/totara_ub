@@ -23,6 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2020090100;
+$plugin->version = 2020100100;
 $plugin->requires = 2017111309;
 $plugin->component = 'availability_time_since_completion';

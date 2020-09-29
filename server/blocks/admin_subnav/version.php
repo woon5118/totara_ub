@@ -23,6 +23,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2020090100;            // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2020100100;            // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2017111309;            // Requires this Moodle version.
 $plugin->component = 'block_admin_subnav'; // Full name of the plugin (used for diagnostics)
