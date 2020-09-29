@@ -280,38 +280,38 @@ export default {
     flex: 1;
     flex-direction: column;
     overflow: hidden;
+  }
 
-    &__row {
-      display: flex;
-      align-items: center;
+  &__row {
+    display: flex;
+    align-items: center;
 
-      &-text {
-        @include tui-font-body-small();
-        margin: 0;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+    &-text {
+      @include tui-font-body-small();
+      margin: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
 
-        &--bold {
-          @include tui-font-heavy();
-        }
+      &--bold {
+        @include tui-font-heavy();
       }
+    }
 
-      &-link {
-        @include tui-font-link-small();
-        margin: 0;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+    &-link {
+      @include tui-font-link-small();
+      margin: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
 
-        &--bold {
-          @include tui-font-heavy();
-        }
+      &--bold {
+        @include tui-font-heavy();
       }
+    }
 
-      &--withGap {
-        margin-bottom: var(--gap-1);
-      }
+    &--withGap {
+      margin-bottom: var(--gap-1);
     }
   }
 
