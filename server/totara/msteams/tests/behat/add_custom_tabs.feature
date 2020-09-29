@@ -82,7 +82,7 @@ Feature: Add a tab to Teams Channel
 
   Scenario: Check the field validation part 2
     Given I am on Microsoft Teams "config" page
-    When I set the field "Search learning catalogue" to "art"
+    When I set the field "Search learning catalogue" to "arts"
     Then I should see "Culinary arts 101"
     When I click on "Culinary arts 101" "list_item"
     Then I should not see "Name is required"
@@ -98,7 +98,7 @@ Feature: Add a tab to Teams Channel
 
   Scenario: Add a custom tab to a teams channel
     Given I am on Microsoft Teams "config" page
-    When I set the field "Search learning catalogue" to "art"
+    When I set the field "Search learning catalogue" to "arts"
     Then the field "Tab name" matches value ""
     And the save button should be "disabled" on Microsoft Teams "config" page
     And I should see "Culinary arts"
