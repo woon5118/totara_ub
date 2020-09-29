@@ -12,6 +12,8 @@ query totara_playlist_resource_playlists(
     user {
       __typename
       id
+      # Note that fullname is needed for displaying data.
+      fullname
       card_display {
         __typename
         profile_picture_alt

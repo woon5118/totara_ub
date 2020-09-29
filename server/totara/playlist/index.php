@@ -44,7 +44,6 @@ $playlist = playlist::from_id($id);
 $PAGE->set_url("/totara/playlist/index.php", ['id' => $playlist->get_id()]);
 $PAGE->set_pagelayout('legacynolayout');
 
-$back_button = nav_helper::build_back_button($playlist->get_userid(), $source);
 $tui = null;
 
 if (!$playlist->is_available()) {
@@ -65,6 +64,8 @@ if (!$playlist->is_available()) {
 
     $event = playlist_viewed::from_playlist($playlist);
     $event->trigger();
+
+    $back_button = nav_helper::build_back_button($playlist->get_userid(), $source);
 
     if ($library_view) {
         $tui = new component('totara_engage/pages/LibraryView', [

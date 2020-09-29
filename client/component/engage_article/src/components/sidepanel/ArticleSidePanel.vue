@@ -62,7 +62,7 @@
         :access-value="article.resource.access"
         :topics="article.topics"
         :submitting="false"
-        :open-modal="openModalFromButtonLabel"
+        :open-access-modal="openModalFromButtonLabel"
         :selected-time-view="article.timeview"
         :enable-time-view="true"
         @access-update="updateAccess"

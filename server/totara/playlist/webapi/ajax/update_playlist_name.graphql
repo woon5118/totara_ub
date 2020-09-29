@@ -7,6 +7,8 @@ mutation totara_playlist_update_playlist_name(
     user {
       __typename
       id
+      # Note that fullname is needed for accessibility in page
+      fullname
       card_display {
         __typename
         profile_picture_alt

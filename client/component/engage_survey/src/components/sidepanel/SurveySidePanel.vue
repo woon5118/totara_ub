@@ -64,7 +64,7 @@
             :access-value="survey.resource.access"
             :topics="survey.topics"
             :submitting="false"
-            :open-modal="openModalFromButtonLabel"
+            :open-access-modal="openModalFromButtonLabel"
             :enable-time-view="false"
             @close-modal="openModalFromButtonLabel = false"
             @access-update="updateAccess"

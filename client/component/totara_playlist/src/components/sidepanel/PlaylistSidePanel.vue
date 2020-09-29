@@ -60,7 +60,7 @@
           :access-value="playlist.access"
           :topics="playlist.topics"
           :submitting="submitting"
-          :open-modal="openModalFromButtonLabel"
+          :open-access-modal="openModalFromButtonLabel"
           @access-update="updateAccess"
           @close-modal="openModalFromButtonLabel = false"
         />
