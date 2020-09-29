@@ -67,11 +67,11 @@ Feature: Allocate spaces for team in seminar
     And I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     When I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should contain "Sam1 Student1"
+    Then the "Allocated team members" select box should contain "Sam1 Student1\, student1@example.com"
     And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     And I follow "Allocate spaces for team"
-    Then the "Available team members" select box should contain "Sam1 Student1"
+    Then the "Available team members" select box should contain "Sam1 Student1\, student1@example.com"
     And I log out
 
   Scenario: Capacity should be unaffected if removing allocation and create reservations when removing allocations is set to Yes
@@ -85,7 +85,7 @@ Feature: Allocate spaces for team in seminar
     Then I should see "1 / 3" in the "1 February" "table_row"
     And I press the "back" button in the browser
     When I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should contain "Sam1 Student1"
+    Then the "Allocated team members" select box should contain "Sam1 Student1\, student1@example.com"
     When I set the following fields to these values:
       | replaceallocations         | Yes  |
     And I set the field "Allocated team members" to "Sam1 Student1"
@@ -94,8 +94,8 @@ Feature: Allocate spaces for team in seminar
     Then I should see "1 / 3" in the "1 February" "table_row"
     And I press the "back" button in the browser
     But I follow "Allocate spaces for team"
-    And the "Allocated team members" select box should not contain "Sam1 Student1"
-    And the "Available team members" select box should contain "Sam1 Student1"
+    And the "Allocated team members" select box should not contain "Sam1 Student1\, student1@example.com"
+    And the "Available team members" select box should contain "Sam1 Student1\, student1@example.com"
     And I log out
 
   Scenario: Capacity should be affected if removing allocation and create reservations when removing allocations is set to No
@@ -109,7 +109,7 @@ Feature: Allocate spaces for team in seminar
     Then I should see "1 / 3" in the "1 February" "table_row"
     And I press the "back" button in the browser
     When I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should contain "Sam1 Student1"
+    Then the "Allocated team members" select box should contain "Sam1 Student1\, student1@example.com"
     When I set the following fields to these values:
       | replaceallocations         | No  |
     And I set the field "Allocated team members" to "Sam1 Student1"
@@ -118,7 +118,7 @@ Feature: Allocate spaces for team in seminar
     Then I should see "0 / 3" in the "1 February" "table_row"
     And I press the "back" button in the browser
     And I follow "Allocate spaces for team"
-    And the "Available team members" select box should contain "Sam1 Student1"
+    And the "Available team members" select box should contain "Sam1 Student1\, student1@example.com"
     And I log out
 
   Scenario: Manager cannot see users allocated from another managers
@@ -129,14 +129,14 @@ Feature: Allocate spaces for team in seminar
     And I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     When I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should contain "Sam1 Student1"
+    Then the "Allocated team members" select box should contain "Sam1 Student1\, student1@example.com"
     And I log out
 
     When I log in as "sitemanager2"
     And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should not contain "Sam1 Student1"
+    Then the "Allocated team members" select box should not contain "Sam1 Student1\, student1@example.com"
     And I log out
 
   Scenario: Manager cannot deallocate self booked users even if he is their manager
@@ -151,11 +151,11 @@ Feature: Allocate spaces for team in seminar
     And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should contain "Sam1 Student1 (Self booked)"
+    Then the "Allocated team members" select box should contain "Sam1 Student1\, student1@example.com (Self booked)"
     And I set the field "Allocated team members" to "Sam1 Student1"
     And I press "Remove"
     And I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should contain "Sam1 Student1 (Self booked)"
+    Then the "Allocated team members" select box should contain "Sam1 Student1\, student1@example.com (Self booked)"
     And I log out
 
   Scenario: Manager cannot deallocate users in another activity even if he is their manager and he allocated the user
@@ -166,7 +166,7 @@ Feature: Allocate spaces for team in seminar
     And I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     When I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should contain "Sam1 Student1"
+    Then the "Allocated team members" select box should contain "Sam1 Student1\, student1@example.com"
 
     When I click on "Course 1" "link"
     And I click on the link "Go to event" in row 2
@@ -186,7 +186,7 @@ Feature: Allocate spaces for team in seminar
     When I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     And I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should contain "Sam1 Student1"
+    Then the "Allocated team members" select box should contain "Sam1 Student1\, student1@example.com"
 
     When I click on "Course 1" "link"
     And I click on the link "Go to event" in row 2
@@ -194,7 +194,7 @@ Feature: Allocate spaces for team in seminar
     And I set the field "Available team members" to "Sam1 Student1"
     And I press "Add"
     And I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should contain "Sam1 Student1"
+    Then the "Allocated team members" select box should contain "Sam1 Student1\, student1@example.com"
     And I log out
 
   Scenario: Allocate and remove spaces for students when student has self-booked
@@ -209,7 +209,7 @@ Feature: Allocate spaces for team in seminar
     And I am on "Test Seminar name" seminar homepage
     And I click on the link "Go to event" in row 1
     And I follow "Allocate spaces for team"
-    Then the "Allocated team members" select box should contain "Sam1 Student1 (Self booked)"
+    Then the "Allocated team members" select box should contain "Sam1 Student1\, student1@example.com (Self booked)"
 
     When I click on "Course 1" "link"
     And I click on the link "Go to event" in row 2
@@ -218,7 +218,7 @@ Feature: Allocate spaces for team in seminar
     And I press "Add"
     And I follow "Allocate spaces for team"
     Then I should see "Sam1 Student1" in the "This event" "optgroup"
-    And I should see "Sam1 Student1 (Self booked)" in the "Other event(s) in this activity" "optgroup"
+    And I should see "Sam1 Student1, student1@example.com (Self booked)" in the "Other event(s) in this activity" "optgroup"
 
     When I click on "Course 1" "link"
     And I click on the link "Go to event" in row 2
@@ -227,7 +227,7 @@ Feature: Allocate spaces for team in seminar
     And I press "Remove"
     And I follow "Allocate spaces for team"
     Then I should not see "Sam1 Student1" in the "This event" "optgroup"
-    And I should see "Sam1 Student1 (Self booked)" in the "Other event(s) in this activity" "optgroup"
+    And I should see "Sam1 Student1, student1@example.com (Self booked)" in the "Other event(s) in this activity" "optgroup"
 
   Scenario: Cannot allocate learners in already started event.
     Given I log in as "teacher1"

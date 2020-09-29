@@ -30,10 +30,7 @@ $strsearch = get_string('search');
 $strshowall = get_string('showall', 'moodle', '');
 $strsearchresults = get_string('searchresults');
 
-// For backwards compatibility email is always shown here.
-// Otherwise those users without viewuseridentity would suddenly lose this information.
-// In 9.0 this is fixed, and only users with viewuseridentity will see the users email address.
-$extrafields = get_extra_user_fields($PAGE->context) ?? ['email'];
+$extrafields = get_extra_user_fields($PAGE->context);
 ?>
 <form id="assignform" method="post" action="<?php echo $PAGE->url; ?>">
 <div class="f2f-usersbox">

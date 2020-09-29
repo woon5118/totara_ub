@@ -269,6 +269,10 @@ class mod_facetoface_renderer extends plugin_renderer_base {
      * @return string HTML fragment to be output
      */
     public function session_user_selector(\stdClass $team, \stdClass $session, array $reserveinfo): string {
+        global $PAGE;
+
+        $extrafields = get_extra_user_fields($PAGE->context);
+
         $output = html_writer::start_tag('div', array('class' => 'row-fluid user-multiselect'));
 
         // Current allocations.
@@ -287,7 +291,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
             $opts .= html_writer::tag('option', get_string('none'), array('value' => null, 'disabled' => 'disabled'));
         } else {
             foreach ($team->current as $user) {
-                $name = fullname($user);
+                $name = mod_facetoface\attendees_list_helper::output_user_for_selection($user, $extrafields, true);
                 $attr = array('value' => $user->id);
                 if (in_array($user->id, $selected)) {
                     $attr['selected'] = 'selected';
@@ -303,7 +307,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         if (!empty($team->othersession)) {
             $opts .= html_writer::start_tag('optgroup', array('label' => get_string('othersession', 'mod_facetoface')));
             foreach ($team->othersession as $user) {
-                $name = fullname($user);
+                $name = mod_facetoface\attendees_list_helper::output_user_for_selection($user, $extrafields, true);
                 $attr = array('value' => $user->id, 'disabled' => 'disabled');
                 if (!empty($user->cannotremove)) {
                     $name .= ' (' . get_string($user->cannotremove, 'mod_facetoface') . ')';
@@ -334,7 +338,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
         $selected = optional_param_array('allocation', array(), PARAM_INT);
         $optspotential = array();
         foreach ($team->potential as $potential) {
-            $optspotential[$potential->id] = fullname($potential);
+            $optspotential[$potential->id] = mod_facetoface\attendees_list_helper::output_user_for_selection($potential, $extrafields, true);
         }
         $attr = array('multiple' => 'multiple', 'id' => 'allocation', 'size' => 20);
         if ($reserveinfo['allocate'][$session->id] == 0) {
