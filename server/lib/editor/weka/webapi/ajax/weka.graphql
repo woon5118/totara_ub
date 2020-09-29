@@ -12,14 +12,8 @@ query editor_weka_weka(
     instance_id: $instance_id
   ) {
     __typename
-    showtoolbar(
-      component: $component
-      area: $area
-    )
-    extensions(
-      component: $component
-      area: $area
-    ) {
+    showtoolbar(component: $component, area: $area)
+    extensions(component: $component, area: $area) {
       __typename
       name
       tuicomponent

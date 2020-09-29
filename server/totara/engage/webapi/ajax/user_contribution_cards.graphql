@@ -56,16 +56,12 @@ query totara_engage_user_contribution_cards(
         id
         value(format: PLAIN)
       }
-      footnotes
-      @include(if: $include_footnotes) {
+      footnotes @include(if: $include_footnotes) {
         component
         tuicomponent
         props
       }
-      url(
-        source: $source
-        search: $search
-      )
+      url(source: $source, search: $search)
     }
   }
 }

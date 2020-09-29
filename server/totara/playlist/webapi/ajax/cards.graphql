@@ -1,6 +1,6 @@
 query totara_playlist_cards(
-  $id: param_integer!,
-  $cursor: String,
+  $id: param_integer!
+  $cursor: String
   $source: String
   $include_footnotes: Boolean!
   $footnotes_type: param_text
@@ -9,7 +9,7 @@ query totara_playlist_cards(
   $footnotes_component: param_component
 ) {
   contribution: totara_playlist_cards(
-    id: $id,
+    id: $id
     cursor: $cursor
     footnotes: {
       type: $footnotes_type

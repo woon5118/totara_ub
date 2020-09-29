@@ -2,9 +2,13 @@
 A criteria group pathway
 """
 type pathway_criteria_group_achievement {
-  """ Instance of a single criteria """
+  """
+   Instance of a single criteria
+  """
   instance_id: Int!
-  """ Type of criteria, e.g. linkedcourses, childcompetency, etc. """
+  """
+   Type of criteria, e.g. linkedcourses, childcompetency, etc.
+  """
   type: String!
 }
 

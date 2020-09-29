@@ -74,10 +74,7 @@ query totara_engage_contribution_cards(
         tuicomponent
         props
       }
-      url(
-        source: $source
-        search: $search
-      )
+      url(source: $source, search: $search)
     }
   }
 }

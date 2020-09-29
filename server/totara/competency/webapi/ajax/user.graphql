@@ -1,9 +1,5 @@
-query totara_competency_user(
-  $user_id: core_id!
-) {
-  totara_competency_user(
-    user_id: $user_id
-  ) {
+query totara_competency_user($user_id: core_id!) {
+  totara_competency_user(user_id: $user_id) {
     id
     fullname
     card_display {

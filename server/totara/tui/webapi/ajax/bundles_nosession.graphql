@@ -1,4 +1,7 @@
-query totara_tui_bundles_nosession($components: [String!]!, $theme: param_theme!) {
+query totara_tui_bundles_nosession(
+  $components: [String!]!
+  $theme: param_theme!
+) {
   bundles: totara_tui_bundles(components: $components, theme: $theme) {
     id
     component

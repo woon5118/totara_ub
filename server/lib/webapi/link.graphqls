@@ -1,6 +1,6 @@
 type core_link {
   title(format: core_format!): String
-  description(format:core_format!): String
+  description(format: core_format!): String
   url: String
   image: String
   videoheight: Int

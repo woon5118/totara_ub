@@ -16,10 +16,7 @@ type editor_weka_editor {
   """
   To tell whether we are displaying toolbar or not.
   """
-  showtoolbar(
-    component: param_component
-    area: param_area
-  ): Boolean!
+  showtoolbar(component: param_component, area: param_area): Boolean!
   """
   The upload repository data
   """

@@ -1,4 +1,6 @@
-query container_workspace_workspace_category_interactor($workspace_id: param_integer) {
+query container_workspace_workspace_category_interactor(
+  $workspace_id: param_integer
+) {
   category_interactor: container_workspace_workspace_category_interactor(
     workspace_id: $workspace_id
   ) {

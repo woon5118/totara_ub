@@ -99,10 +99,7 @@ type totara_engage_card {
     area: param_text
     component: param_component
   ): [totara_engage_footnote!]
-  url(
-    source: String
-    search: param_text
-  ): String
+  url(source: String, search: param_text): String
 }
 
 type totara_engage_cards {
