@@ -210,11 +210,11 @@ export default {
     justify-content: space-between;
     margin: var(--gap-4) 0 var(--gap-12);
 
-    :not(:first-child) {
+    > :not(:first-child) {
       margin-left: var(--gap-8);
     }
 
-    :last-child {
+    > :last-child {
       align-self: center;
     }
   }
@@ -222,8 +222,7 @@ export default {
   &__title {
     @include tui-font-heading-page-title();
     flex-basis: auto;
-    flex-grow: 0;
-    flex-shrink: 1;
+    flex-grow: 1;
   }
 
   &__filter {
