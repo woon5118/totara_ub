@@ -34,12 +34,14 @@
             @change="autoSubmitTenantForm"
           >
             <FormRow
+              v-slot="{ label }"
               :label="$str('formtenant_label_tenant', 'totara_tui')"
               :is-stacked="true"
             >
               <FormToggleSwitch
                 :name="['formtenant_field_tenant', 'value']"
                 :toggle-first="true"
+                :aria-label="label"
               />
               <FormRowDetails>
                 {{ $str('formtenant_details_tenant', 'totara_tui') }}
