@@ -42,3 +42,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-playlistSidePanelContent {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+</style>

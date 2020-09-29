@@ -136,13 +136,6 @@ export default {
 
 <style lang="scss">
 .tui-playlistStarRating {
-  &:after {
-    display: flex;
-    margin-top: calc(var(--gap-10) * 4);
-    border-bottom: 1px solid var(--color-neutral-4);
-    content: '';
-  }
-
   .tui-engageStarIcon {
     width: var(--font-size-15);
     height: var(--font-size-15);

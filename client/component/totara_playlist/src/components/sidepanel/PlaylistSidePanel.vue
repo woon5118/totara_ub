@@ -347,6 +347,9 @@ export default {
 
 <style lang="scss">
 .tui-playlistSidePanel {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
   padding: var(--gap-8);
 
   &__timeDescription {

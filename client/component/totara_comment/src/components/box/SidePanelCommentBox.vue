@@ -85,7 +85,7 @@ export default {
 .tui-sidePanelCommentBox {
   display: flex;
   flex-direction: column;
-  height: calc(100% - var(--gap-12));
+  height: 100%;
 
   // Overriding the comment box to make it fit with the sidepanel.
   &__header {
@@ -98,7 +98,15 @@ export default {
   }
 
   &__box {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
     .tui-commentBox {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+
       // Overriding the comment thread to make it fit with the sidepanel
       &__comments {
         overflow: auto;

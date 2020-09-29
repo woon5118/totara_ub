@@ -87,7 +87,7 @@ export default {
 .tui-engageSidePanel {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex-grow: 1;
   padding: var(--gap-4);
 
   @media (min-width: $tui-screen-sm) {
