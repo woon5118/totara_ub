@@ -76,24 +76,28 @@
       <SharedBoard :receipts="sharedTo" />
     </div>
 
-    <ButtonGroup class="tui-engageAccessForm__buttons">
-      <Button
-        v-show="showBack"
-        :text="$str('back', 'core')"
-        :disabled="submitting"
-        class="tui-engageAccessForm__back"
-        @click="$emit('back')"
-      />
+    <div class="tui-engageAccessForm__buttons">
+      <ButtonGroup>
+        <Button
+          v-show="showBack"
+          :text="$str('back', 'core')"
+          :disabled="submitting"
+          class="tui-engageAccessForm__back"
+          @click="$emit('back')"
+        />
+      </ButtonGroup>
 
-      <LoadingButton
-        :loading="submitting"
-        :primary="true"
-        :disabled="disabled"
-        :text="doneButtonText"
-        @click="done"
-      />
-      <CancelButton :disabled="submitting" @click="$emit('cancel')" />
-    </ButtonGroup>
+      <ButtonGroup>
+        <LoadingButton
+          :loading="submitting"
+          :primary="true"
+          :disabled="disabled"
+          :text="doneButtonText"
+          @click="done"
+        />
+        <CancelButton :disabled="submitting" @click="$emit('cancel')" />
+      </ButtonGroup>
+    </div>
   </Form>
 </template>
 
@@ -412,6 +416,7 @@ export default {
 
   &__buttons {
     display: flex;
+    justify-content: space-between;
     margin-top: var(--gap-2);
   }
 

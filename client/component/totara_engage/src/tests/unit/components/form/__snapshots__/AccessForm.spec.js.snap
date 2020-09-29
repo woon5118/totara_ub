@@ -20,26 +20,30 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for privat
    
   <!---->
    
-  <buttongroup-stub
+  <div
     class="tui-engageAccessForm__buttons"
   >
-    <button-stub
-      class="tui-engageAccessForm__back"
-      style="display: none;"
-      styleclass="[object Object]"
-      text="back, core"
-      type="button"
-    />
+    <buttongroup-stub>
+      <button-stub
+        class="tui-engageAccessForm__back"
+        style="display: none;"
+        styleclass="[object Object]"
+        text="back, core"
+        type="button"
+      />
+    </buttongroup-stub>
      
-    <loadingbutton-stub
-      arialabel=""
-      primary="true"
-      text="done, totara_engage"
-      type="button"
-    />
-     
-    <cancelbutton-stub />
-  </buttongroup-stub>
+    <buttongroup-stub>
+      <loadingbutton-stub
+        arialabel=""
+        primary="true"
+        text="done, totara_engage"
+        type="button"
+      />
+       
+      <cancelbutton-stub />
+    </buttongroup-stub>
+  </div>
 </form-stub>
 `;
 
@@ -83,27 +87,31 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for public
     />
   </div>
    
-  <buttongroup-stub
+  <div
     class="tui-engageAccessForm__buttons"
   >
-    <button-stub
-      class="tui-engageAccessForm__back"
-      style="display: none;"
-      styleclass="[object Object]"
-      text="back, core"
-      type="button"
-    />
+    <buttongroup-stub>
+      <button-stub
+        class="tui-engageAccessForm__back"
+        style="display: none;"
+        styleclass="[object Object]"
+        text="back, core"
+        type="button"
+      />
+    </buttongroup-stub>
      
-    <loadingbutton-stub
-      arialabel=""
-      disabled="true"
-      primary="true"
-      text="done, totara_engage"
-      type="button"
-    />
-     
-    <cancelbutton-stub />
-  </buttongroup-stub>
+    <buttongroup-stub>
+      <loadingbutton-stub
+        arialabel=""
+        disabled="true"
+        primary="true"
+        text="done, totara_engage"
+        type="button"
+      />
+       
+      <cancelbutton-stub />
+    </buttongroup-stub>
+  </div>
 </form-stub>
 `;
 
@@ -144,26 +152,30 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for restri
     />
   </div>
    
-  <buttongroup-stub
+  <div
     class="tui-engageAccessForm__buttons"
   >
-    <button-stub
-      class="tui-engageAccessForm__back"
-      style="display: none;"
-      styleclass="[object Object]"
-      text="back, core"
-      type="button"
-    />
+    <buttongroup-stub>
+      <button-stub
+        class="tui-engageAccessForm__back"
+        style="display: none;"
+        styleclass="[object Object]"
+        text="back, core"
+        type="button"
+      />
+    </buttongroup-stub>
      
-    <loadingbutton-stub
-      arialabel=""
-      disabled="true"
-      primary="true"
-      text="done, totara_engage"
-      type="button"
-    />
-     
-    <cancelbutton-stub />
-  </buttongroup-stub>
+    <buttongroup-stub>
+      <loadingbutton-stub
+        arialabel=""
+        disabled="true"
+        primary="true"
+        text="done, totara_engage"
+        type="button"
+      />
+       
+      <cancelbutton-stub />
+    </buttongroup-stub>
+  </div>
 </form-stub>
 `;
