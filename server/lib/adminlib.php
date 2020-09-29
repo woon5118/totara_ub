@@ -4720,6 +4720,9 @@ class admin_setting_special_frontpagedesc extends admin_setting_confightmleditor
         }
         format_base::reset_course_cache($SITE->id);
 
+        // We've updated a site course setting so clear the cache.
+        cache::make('core', 'site_course')->purge();
+
         return '';
     }
 }

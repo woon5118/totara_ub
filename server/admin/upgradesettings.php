@@ -27,6 +27,9 @@ if (moodle_needs_upgrading()) {
     redirect(new moodle_url('/admin/index.php'));
 }
 
+// Don't use the cache here to avoid infinite looping.
+cache::make('core', 'site_course')->purge();
+
 // now we'll deal with the case that the admin has submitted the form with new settings
 if ($data = data_submitted() and confirm_sesskey()) {
     $count = admin_write_settings($data);
