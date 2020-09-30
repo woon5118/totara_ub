@@ -40,6 +40,8 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
         SEARCHUSERSINCOURSE: "[data-action='search-users-in-course']",
     };
 
+    var js_pending = 'message_area_search';
+
     /**
      * Search class.
      *
@@ -95,12 +97,15 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
 
         // Handle clicking on a course in the list of users.
         this.messageArea.onDelegateEvent(CustomEvents.events.activate, SELECTORS.SEARCHUSERSINCOURSE, function(e) {
+            M.util.js_pending(js_pending);
             this._setFilter($(e.currentTarget).html());
             this._setPlaceholderText('searchforuser');
             this._clearSearchArea();
             this._searchArea = this._searchAreas.USERSINCOURSE;
             this._courseid = $(e.currentTarget).data('courseid');
-            this._searchUsersInCourse();
+            this._searchUsersInCourse().then(function() {
+                M.util.js_complete(js_pending);
+            });
             this.messageArea.find(SELECTORS.SEARCHBOX).focus();
         }.bind(this));
 
@@ -138,10 +143,15 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
         ]);
         this.messageArea.onDelegateEvent(CustomEvents.events.scrollBottom, SELECTORS.SEARCHRESULTSAREA,
             function() {
+                M.util.js_pending(js_pending);
                 if (this._searchArea == this._searchAreas.MESSAGES) {
-                    this._searchMessages();
+                    this._searchMessages().then(function() {
+                        M.util.js_complete(js_pending);
+                    });
                 } else if (this._searchArea == this._searchAreas.USERSINCOURSE) {
-                    this._searchUsersInCourse();
+                    this._searchUsersInCourse().then(function() {
+                        M.util.js_complete(js_pending);
+                    });
                 }
             }.bind(this)
         );
@@ -160,6 +170,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
 
         if (this._requestTimeout) {
             clearTimeout(this._requestTimeout);
+            M.util.js_complete(js_pending);
         }
 
         if (str.trim() === '') {
@@ -181,24 +192,31 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
         this.messageArea.find(SELECTORS.CONVERSATIONS).hide();
         this.messageArea.find(SELECTORS.CONTACTS).hide();
         this.messageArea.find(SELECTORS.SEARCHRESULTSAREA).show();
+        M.util.js_pending(js_pending);
 
         if (this._searchArea == this._searchAreas.MESSAGES) {
             this._requestTimeout = setTimeout(function() {
                 this._clearSearchArea();
                 this._numMessagesDisplayed = 0;
-                this._searchMessages();
+                this._searchMessages().then(function() {
+                    M.util.js_complete(js_pending);
+                });
             }.bind(this), 300);
         } else if (this._searchArea == this._searchAreas.USERSINCOURSE) {
             this._requestTimeout = setTimeout(function() {
                 this._clearSearchArea();
                 this._numUsersDisplayed = 0;
-                this._searchUsersInCourse();
+                this._searchUsersInCourse().then(function() {
+                    M.util.js_complete(js_pending);
+                });
             }.bind(this), 300);
         } else { // Must be searching for users and courses
             this._requestTimeout = setTimeout(function() {
                 this._clearSearchArea();
                 this._numUsersDisplayed = 0;
-                this._searchUsers();
+                this._searchUsers().then(function() {
+                    M.util.js_complete(js_pending);
+                });
             }.bind(this), 300);
         }
     };
@@ -211,7 +229,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
      */
     Search.prototype._searchMessages = function() {
         if (this._isLoading) {
-            return false;
+            return Promise.resolve();
         }
 
         var str = this.messageArea.find(SELECTORS.SEARCHBOX).val();
@@ -307,7 +325,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
      */
     Search.prototype._searchUsersInCourse = function() {
         if (this._isLoading) {
-            return false;
+            return Promise.resolve();
         }
 
         var str = this.messageArea.find(SELECTORS.SEARCHBOX).val();

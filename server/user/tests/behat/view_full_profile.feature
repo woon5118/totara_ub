@@ -96,6 +96,8 @@ Feature: Access to full profiles of users
 
   @javascript
   Scenario: View full profiles of someone in the same group in a course with separate groups.
+    Given the following config values are set as admin:
+      | enableengage_resources | 0 |
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I navigate to "Edit settings" node in "Course administration"
