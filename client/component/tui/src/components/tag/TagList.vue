@@ -37,11 +37,7 @@
                   name="tag"
                   :tag="tag"
                 >
-                  <Tag
-                    :key="index"
-                    :text="tag.text"
-                    @mouseover.native="triggerTooltip"
-                  >
+                  <Tag :key="index" :text="tag.text">
                     <template v-slot:button>
                       <ButtonIcon
                         ref="tagIcon"
@@ -153,6 +149,11 @@ export default {
     itemName() {
       this.$emit('filter', this.itemName);
     },
+    filter(value) {
+      if (this.itemName != value) {
+        this.itemName = value;
+      }
+    },
   },
   methods: {
     overflowChanged({ visible }) {
@@ -169,9 +170,6 @@ export default {
     },
     dropdownItemClicked(item, index) {
       this.$emit('select', item, index);
-    },
-    triggerTooltip() {
-      console.log('hover should be added');
     },
     handleClick(toggle, isOpen) {
       // Open the dropdown when it's closed

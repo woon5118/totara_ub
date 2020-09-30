@@ -43,9 +43,10 @@
           :id="id"
           :tags="selectedUsers"
           :items="users"
-          @filter="searchPattern = $event"
-          @select="selectedUser = $event"
-          @remove="selectedUser = null"
+          :filter="searchPattern"
+          @filter="filterUsers"
+          @select="selectUser"
+          @remove="removeUser"
         >
           <template
             v-if="!$apollo.loading"
@@ -187,6 +188,19 @@ export default {
   },
 
   methods: {
+    filterUsers(query) {
+      this.searchPattern = query;
+    },
+
+    selectUser(item) {
+      this.selectedUser = item;
+      this.searchPattern = '';
+    },
+
+    removeUser() {
+      this.selectedUser = null;
+    },
+
     submitForm() {
       if (!this.selectedUser) {
         return;

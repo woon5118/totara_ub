@@ -33,7 +33,7 @@
           <span>{{ tag.text }}</span>
         </div>
       </template>
-      <template v-slot:item="{ index, item }">
+      <template v-slot:item="{ item }">
         <div>
           <Avatar :src="item.url" alt="" size="medium" />
           <p>{{ item.name }}</p>
@@ -146,6 +146,7 @@ export default {
     select(item) {
       const { name, id, url, alt } = item;
       this.tags.push({ text: name, id, url, alt });
+      this.searchItem = '';
     },
     remove(tag) {
       this.tags = this.tags.filter(t => t !== tag);

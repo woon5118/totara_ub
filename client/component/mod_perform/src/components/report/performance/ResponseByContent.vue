@@ -199,6 +199,7 @@ export default {
     select(item) {
       const { name, id } = item;
       this.tags.push({ text: name, id });
+      this.searchItem = '';
     },
     /**
      * TReporting identifiers remove

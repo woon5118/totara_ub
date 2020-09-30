@@ -20,6 +20,7 @@
   <TagList
     :tags="usersTagList"
     :items="usersDropdownList"
+    :filter="fullnameFilter"
     @select="select"
     @remove="remove"
     @filter="updateFilter"
@@ -69,6 +70,7 @@ export default {
   data() {
     return {
       fullnameFilter: '',
+      fullnameFilterDebounced: '',
       users: [],
     };
   },
@@ -80,7 +82,7 @@ export default {
         return {
           subject_instance_id: this.subjectInstanceId,
           filters: {
-            fullname: this.fullnameFilter,
+            fullname: this.fullnameFilterDebounced,
             exclude_users: this.excludeUsers,
           },
         };
@@ -124,6 +126,8 @@ export default {
      * @param {Object} selectedUser
      */
     select(selectedUser) {
+      this.fullnameFilter = '';
+      this.fullnameFilterDebounced = '';
       this.$emit('input', this.value.concat([selectedUser]));
     },
 
@@ -139,11 +143,16 @@ export default {
       );
     },
 
+    updateFilter(input) {
+      this.fullnameFilter = input;
+      this.updateFilterDebounced(input);
+    },
+
     /**
      * Update the full name filter (which re-triggers the query) if the user stopped typing >500 milliseconds ago.
      */
-    updateFilter: debounce(function(input) {
-      this.fullnameFilter = input;
+    updateFilterDebounced: debounce(function(input) {
+      this.fullnameFilterDebounced = input;
     }, 500),
   },
 };

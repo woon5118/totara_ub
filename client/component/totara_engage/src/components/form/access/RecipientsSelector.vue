@@ -31,6 +31,7 @@
     </InfoIconButton>
     <TagList
       :id="generatedId"
+      :filter="query"
       :items="items"
       :tags="tags"
       :separator="true"
