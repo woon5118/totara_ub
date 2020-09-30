@@ -1606,8 +1606,8 @@ class totara_core_ddl_testcase extends database_driver_testcase {
         // it works as expected - case and accent insensitive.
 
         $ids = [];
-        $ids[0] = $DB->insert_record($tablename, array('course' => 10, 'high' => 'Žluťoučký koníček')); // 'Green horse' in Czech.
-        $ids[1] = $DB->insert_record($tablename, array('course' => 11, 'high' => 'zlutoucky Konicek')); // 'Green horse' in Czech without accents.
+        $ids[0] = $DB->insert_record($tablename, array('course' => 10, 'high' => 'IL ÉTAIT UNE FOIS')); // 'once upon a time' in French.
+        $ids[1] = $DB->insert_record($tablename, array('course' => 11, 'high' => 'il etait une fois')); // 'once upon a time' in French without accents.
         $ids[2] = $DB->insert_record($tablename, array('course' => 12, 'high' => 'abc def'));
 
         $this->wait_for_mssql_fts_indexing($tablename);
@@ -1616,26 +1616,26 @@ class totara_core_ddl_testcase extends database_driver_testcase {
             // By default PostgreSQL is accent sensitive, you nee to create a new config to make accent insensitive searches,
             // see http://rachbelaid.com/postgres-full-text-search-is-good-enough/
 
-            $ftslanguage = $DB->get_ftslanguage();
+            $ftslanguage = "french";
             $sql = "SELECT t.id, t.course
                       FROM {{$tablename}} t
                      WHERE to_tsvector('$ftslanguage', t.high) @@ plainto_tsquery(:search)
                   ORDER BY t.id";
-            $params = array('search' => 'zLUtoucky');
+            $params = array('search' => 'ETait');
 
         } else if ($DB->get_dbfamily() === 'mysql') {
             $sql = "SELECT t.id, t.course
                       FROM {{$tablename}} t
                      WHERE MATCH (t.high) AGAINST (:search IN NATURAL LANGUAGE MODE)
                   ORDER BY t.id";
-            $params = array('search' => 'zLUtoucky');
+            $params = array('search' => 'ETait');
 
         } else if ($DB->get_dbfamily() === 'mssql') {
             $sql = "SELECT t.id, t.course
                       FROM {{$tablename}} t
                       WHERE FREETEXT(t.high, :search) 
                   ORDER BY t.id";
-            $params = array('search' => 'zLUtoucky');
+            $params = array('search' => 'ETait');
         }
 
         $result = $DB->get_records_sql($sql, $params);
