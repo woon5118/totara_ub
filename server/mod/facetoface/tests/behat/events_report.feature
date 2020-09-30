@@ -145,12 +145,10 @@ Feature: Check the seminar events and sessions reports display correctly
     And I should see date "31 December this year 11:00PM America/Toronto" formatted "%d %B %Y, %I:%M %p"
 
   Scenario: Seminar events and sessions reports should display FORMAT_JSON_EDITOR data correctly
-    Given the following "seminar events" exist in "mod_facetoface" plugin:
-      | facetoface         | details |
-      | Test seminar name  | {"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","marks":[{"type":"link","attrs":{"href":"https://www.totaralearning.com/products"}}],"text":"Test JSON"}]}]} |
-    And the following "seminar sessions" exist in "mod_facetoface" plugin:
-      | eventdetails | start | finish |
-      | {"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","marks":[{"type":"link","attrs":{"href":"https://www.totaralearning.com/products"}}],"text":"Test JSON"}]}]} | 3 Mar, +1 year 3am | 3 Mar, +1 year 3pm |
+    And I click on the seminar event action "Edit event" in row "#1"
+    And I set the following fields to these values:
+      | Details | {"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","marks":[{"type":"link","attrs":{"href":"https://www.totaralearning.com/products"}}],"text":"Test JSON"}]}]} |
+    And I press "Save changes"
     When I navigate to "Events report" node in "Site administration > Seminars"
     And I press "Edit this report"
     And I switch to "Columns" tab

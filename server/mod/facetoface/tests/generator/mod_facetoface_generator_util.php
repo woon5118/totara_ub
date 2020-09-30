@@ -58,12 +58,12 @@ final class mod_facetoface_generator_util {
 
     private static function get_event_id_from_detail(string $details): int {
         global $DB;
-        $sql = "SELECT id FROM {facetoface_sessions} WHERE {$DB->sql_compare_text('details')} = '{$details}'";
+        $sql = 'SELECT id FROM {facetoface_sessions} WHERE details = ?';
 
         // This seems to be a bad idea, but presumably that the test environment does only have one record
         // per test suite, then it is okay to do so. Just pass IGNORE_MISSING here, so that it can return false
         // when record is not found.
-        $record = $DB->get_record_sql($sql, null, IGNORE_MISSING);
+        $record = $DB->get_record_sql($sql, [$details], IGNORE_MISSING);
         if (!$record) {
             throw new coding_exception("event '{$details}' does not exist");
         }
