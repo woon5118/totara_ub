@@ -26,16 +26,20 @@
       :button-aria-label="$str('adddescription', 'totara_playlist')"
       @click="editing = true"
     >
-      <div
-        v-if="summary"
-        slot="content"
-        ref="content"
-        class="tui-playlistSummary__content"
-        v-html="summary"
-      />
-      <div v-else slot="content" class="tui-playlistSummary__placeholder">
-        {{ $str('adddescription', 'totara_playlist') }}
-      </div>
+      <template v-slot:content>
+        <div
+          v-if="summary"
+          ref="content"
+          class="tui-playlistSummary__content"
+          v-html="summary"
+        />
+        <div
+          v-else-if="!summary && updateAble"
+          class="tui-playlistSummary__placeholder"
+        >
+          {{ $str('adddescription', 'totara_playlist') }}
+        </div>
+      </template>
     </InlineEditing>
 
     <Form v-else>
