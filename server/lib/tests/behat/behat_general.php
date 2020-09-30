@@ -1051,21 +1051,7 @@ class behat_general extends behat_base {
      * @param string $postselectortype The selector type of the latest element
      */
     public function should_appear_before($preelement, $preselectortype, $postelement, $postselectortype) {
-        \behat_hooks::set_step_readonly(true);
-
-        // We allow postselectortype as a non-text based selector.
-        list($preselector, $prelocator) = $this->transform_selector($preselectortype, $preelement);
-        list($postselector, $postlocator) = $this->transform_selector($postselectortype, $postelement);
-
-        $prexpath = $this->find($preselector, $prelocator)->getXpath();
-        $postxpath = $this->find($postselector, $postlocator)->getXpath();
-
-        // Using following xpath axe to find it.
-        $msg = '"'.$preelement.'" "'.$preselectortype.'" does not appear before "'.$postelement.'" "'.$postselectortype.'"';
-        $xpath = $prexpath.'/following::*[contains(., '.$postxpath.')]';
-        if (!$this->getSession()->getDriver()->find($xpath)) {
-            throw new ExpectationException($msg, $this->getSession());
-        }
+        $this->should_appear_before_in($preelement, $preselectortype, $postelement, $postselectortype, false, false);
     }
 
     /**
@@ -1077,15 +1063,18 @@ class behat_general extends behat_base {
      * @param string $preselectortype The locator of the preceding element
      * @param string $postelement The locator of the latest element
      * @param string $postselectortype The selector type of the latest element
-     * @param string $containerelement The locator of the container element
-     * @param string $containerselectortype The selector type of the container element
+     * @param string|false $containerelement The locator of the container element
+     * @param string|false $containerselectortype The selector type of the container element
      *
      * @since Totara 12.10, Totara 13
      */
     public function should_appear_before_in($preelement, $preselectortype, $postelement, $postselectortype, $containerelement, $containerselectortype) {
         \behat_hooks::set_step_readonly(true);
 
-        $containernode = $this->get_selected_node($containerselectortype, $containerelement);
+        $containernode = false;
+        if ($containerelement !== false) {
+            $containernode = $this->get_selected_node($containerselectortype, $containerelement);
+        }
 
         // We allow postselectortype as a non-text based selector.
         list($preselector, $prelocator) = $this->transform_selector($preselectortype, $preelement);
@@ -1094,10 +1083,26 @@ class behat_general extends behat_base {
         $prexpath = $this->find($preselector, $prelocator, false, $containernode)->getXpath();
         $postxpath = $this->find($postselector, $postlocator, false, $containernode)->getXpath();
 
-        // Using following xpath axe to find it.
-        $msg = '"'.$preelement.'" "'.$preselectortype.'" does not appear before "'.$postelement.'" "'.$postselectortype.'"';
-        $xpath = $prexpath.'/following::*[contains(., '.$postxpath.')]';
-        if (!$this->getSession()->getDriver()->find($xpath)) {
+        $msg = '"' . $preelement . '" "' . $preselectortype . '" does not appear before "' . $postelement . '" "' . $postselectortype . '"';
+        if ($containernode) {
+            $msg .= ' in "' . $containerelement . '" "' . $containerselectortype . '"';
+        }
+        if ($this->running_javascript()) {
+            $init_js = 'window.behatAb = (window.behatAb || {"before": "", "after": "", "comp": false});';
+            $get_pre_js = 'window.behatAb.before = document.evaluate(' . json_encode($prexpath, JSON_UNESCAPED_SLASHES) . ', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;';
+            $annotate_pre_js = 'window.behatAb.before.setAttribute("data-totara-behat-before",1);';
+            $get_post_js = 'window.behatAb.after = document.evaluate(' . json_encode($postxpath, JSON_UNESCAPED_SLASHES) . ', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;';
+            $annotate_post_js = 'window.behatAb.after.setAttribute("data-totara-behat-after",1);';
+            $compare_js = 'var html = document.documentElement.innerHTML; var beforePos = html.indexOf("data-totara-behat-before"); if (beforePos !== -1) { window.behatAb.comp = beforePos < html.indexOf("data-totara-behat-after"); }';
+            $cleanup_js = 'html = ""; window.behatAb.before.removeAttribute("data-totara-behat-before"); window.behatAb.after.removeAttribute("data-totara-behat-after");';
+            $return_js = 'return window.behatAb.comp;';
+            $this->getSession()->executeScript($init_js . $get_pre_js . $annotate_pre_js . $get_post_js . $annotate_post_js . $compare_js . $cleanup_js);
+            $eval = $this->getSession()->evaluateScript($return_js);
+        } else {
+            $xpath = $prexpath.'/following::*[contains(., '.$postxpath.')]';
+            $eval = $this->getSession()->getDriver()->find($xpath);
+        }
+        if (!$eval) {
             throw new ExpectationException($msg, $this->getSession());
         }
     }
