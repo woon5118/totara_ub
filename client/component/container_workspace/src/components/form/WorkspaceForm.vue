@@ -404,13 +404,21 @@ export default {
 
   &__container {
     display: flex;
+    flex-direction: column-reverse;
     align-items: stretch;
+
+    @media (min-width: $tui-screen-sm) {
+      flex-direction: row;
+    }
   }
 
   &__inputs {
     display: flex;
     flex-direction: column;
-    width: 66%;
+
+    @media (min-width: $tui-screen-sm) {
+      width: 66%;
+    }
   }
 
   &__unhiddenRow {
@@ -462,12 +470,23 @@ export default {
 
   &__imagePicker {
     // This will let us to have our custom FORM input :)
-    width: calc(100% - (66% + var(--gap-4)));
+    width: 15rem;
+    height: 15rem;
+
+    @media (min-width: $tui-screen-sm) {
+      width: calc(100% - (66% + var(--gap-4)));
+      height: 30.8rem;
+    }
 
     &.tui-formRow {
       // Reset margin
-      margin: 0;
-      margin-left: var(--gap-4);
+      margin-top: var(--gap-2);
+      margin-bottom: var(--gap-8);
+
+      @media (min-width: $tui-screen-sm) {
+        margin: 0;
+        margin-left: var(--gap-4);
+      }
 
       .tui-formRow {
         &__desc {
