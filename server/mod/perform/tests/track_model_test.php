@@ -374,7 +374,26 @@ class mod_perform_track_model_testcase extends advanced_testcase {
     }
 
     public function schedule_changes_data_provider(): array {
-        function get_custom_field_source(string $option_key) {
+        // NOTE: data providers MUST NOT modify database!
+        return [
+            ['set_schedule_open_fixed'],
+            ['set_schedule_open_fixed - timezone change'],
+            ['set_schedule_closed_fixed - start change'],
+            ['set_schedule_closed_fixed - end change'],
+            ['set_schedule_closed_dynamic - from offset changes'],
+            ['set_schedule_closed_dynamic - to offset changes'],
+            ['set_schedule_closed_dynamic - unit changes'],
+            ['set_schedule_closed_dynamic - direction changes'],
+            ['set_schedule_open_dynamic - offset changes'],
+            ['set_schedule_open_dynamic - unit changes'],
+            ['set_schedule_open_dynamic - direction changes'],
+            ['open dynamic - dynamic source resolver change'],
+            ['open dynamic - dynamic source option change'],
+        ];
+    }
+
+    protected function schedule_changes_data_generator(string $type): array {
+        $get_custom_field_source = function (string $option_key) {
             builder::get_db()->insert_record(
                 'user_info_field',
                 (object)['shortname' => $option_key, 'name' => 'time-custom', 'categoryid' => 1, 'datatype' => 'datetime']
@@ -385,153 +404,166 @@ class mod_perform_track_model_testcase extends advanced_testcase {
                     return $source->get_option_key() === $option_key;
                 }
             );
+        };
+
+        $user_creation_date_source = function() {
+            return (new user_creation_date())->get_options()->first();
+        };
+
+        switch ($type) {
+            case 'set_schedule_open_fixed':
+                return [
+                    'set_schedule_open_fixed',
+                    [new date_time_setting(111)],
+                    [new date_time_setting(222)],
+                ];
+            case 'set_schedule_open_fixed - timezone change':
+                return [
+                    'set_schedule_open_fixed',
+                    [new date_time_setting(111, 'UTC')],
+                    [new date_time_setting(111, 'Pacific/Auckland')],
+                ];
+            case 'set_schedule_closed_fixed - start change':
+                return [
+                    'set_schedule_closed_fixed',
+                    [new date_time_setting(111), new date_time_setting(999)],
+                    [new date_time_setting(222), new date_time_setting(999)],
+                ];
+            case 'set_schedule_closed_fixed - end change':
+                return [
+                    'set_schedule_closed_fixed',
+                    [new date_time_setting(111), new date_time_setting(999)],
+                    [new date_time_setting(111), new date_time_setting(888)],
+                ];
+            case 'set_schedule_closed_dynamic - from offset changes':
+                return [
+                    'set_schedule_closed_dynamic',
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        $user_creation_date_source()
+                    ],
+                    [
+                        new date_offset(222, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        $user_creation_date_source()
+                    ]
+                ];
+            case 'set_schedule_closed_dynamic - to offset changes':
+                return [
+                    'set_schedule_closed_dynamic',
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        $user_creation_date_source()
+                    ],
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        new date_offset(888, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        $user_creation_date_source()
+                    ]
+                ];
+            case 'set_schedule_closed_dynamic - unit changes':
+                return [
+                    'set_schedule_closed_dynamic',
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        $user_creation_date_source()
+                    ],
+                    [
+                        new date_offset(111, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+                        new date_offset(999, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+                        $user_creation_date_source()
+                    ]
+                ];
+            case 'set_schedule_closed_dynamic - direction changes':
+                return [
+                    'set_schedule_closed_dynamic',
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        $user_creation_date_source()
+                    ],
+                    [
+                        new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                        $user_creation_date_source()
+                    ]
+                ];
+            case 'set_schedule_open_dynamic - offset changes':
+                return [
+                    'set_schedule_open_dynamic',
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                        $user_creation_date_source()
+                    ],
+                    [
+                        new date_offset(222, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                        $user_creation_date_source()
+                    ]
+                ];
+            case 'set_schedule_open_dynamic - unit changes':
+                return [
+                    'set_schedule_open_dynamic',
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                        $user_creation_date_source()
+                    ],
+                    [
+                        new date_offset(111, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
+                        $user_creation_date_source()
+                    ]
+                ];
+            case 'set_schedule_open_dynamic - direction changes':
+                return [
+                    'set_schedule_open_dynamic',
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                        $user_creation_date_source()
+                    ],
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                        $user_creation_date_source()
+                    ]
+                ];
+            case 'open dynamic - dynamic source resolver change':
+                return [
+                    'set_schedule_open_dynamic',
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                        $user_creation_date_source()
+                    ],
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                        $get_custom_field_source('time-custom')
+                    ]
+                ];
+            case 'open dynamic - dynamic source option change':
+                return [
+                    'set_schedule_open_dynamic',
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                        $get_custom_field_source('time-custom1')
+                    ],
+                    [
+                        new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                        $get_custom_field_source('time-custom2')
+                    ]
+                ];
+            default:
+                throw new coding_exception('Invalid type');
         }
-
-        $user_creation_date_source = (new user_creation_date())->get_options()->first();
-
-        return [
-            'set_schedule_open_fixed' => [
-                'set_schedule_open_fixed',
-                [new date_time_setting(111)],
-                [new date_time_setting(222)],
-            ],
-            'set_schedule_open_fixed - timezone change' => [
-                'set_schedule_open_fixed',
-                [new date_time_setting(111, 'UTC')],
-                [new date_time_setting(111, 'Pacific/Auckland')],
-            ],
-            'set_schedule_closed_fixed - start change' => [
-                'set_schedule_closed_fixed',
-                [new date_time_setting(111), new date_time_setting(999)],
-                [new date_time_setting(222), new date_time_setting(999)],
-            ],
-            'set_schedule_closed_fixed - end change' => [
-                'set_schedule_closed_fixed',
-                [new date_time_setting(111), new date_time_setting(999)],
-                [new date_time_setting(111), new date_time_setting(888)],
-            ],
-            'set_schedule_closed_dynamic - from offset changes' => [
-                'set_schedule_closed_dynamic',
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    $user_creation_date_source
-                ],
-                [
-                    new date_offset(222, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    $user_creation_date_source
-                ]
-            ],
-            'set_schedule_closed_dynamic - to offset changes' => [
-                'set_schedule_closed_dynamic',
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    $user_creation_date_source
-                ],
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    new date_offset(888, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    $user_creation_date_source
-                ]
-            ],
-            'set_schedule_closed_dynamic - unit changes' => [
-                'set_schedule_closed_dynamic',
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    $user_creation_date_source
-                ],
-                [
-                    new date_offset(111, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
-                    new date_offset(999, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
-                    $user_creation_date_source
-                ]
-            ],
-            'set_schedule_closed_dynamic - direction changes' => [
-                'set_schedule_closed_dynamic',
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    $user_creation_date_source
-                ],
-                [
-                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
-                    $user_creation_date_source
-                ]
-            ],
-            'set_schedule_open_dynamic - offset changes' => [
-                'set_schedule_open_dynamic',
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
-                    $user_creation_date_source
-                ],
-                [
-                    new date_offset(222, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
-                    $user_creation_date_source
-                ]
-            ],
-            'set_schedule_open_dynamic - unit changes' => [
-                'set_schedule_open_dynamic',
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
-                    $user_creation_date_source
-                ],
-                [
-                    new date_offset(111, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
-                    $user_creation_date_source
-                ]
-            ],
-            'set_schedule_open_dynamic - direction changes' => [
-                'set_schedule_open_dynamic',
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
-                    $user_creation_date_source
-                ],
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
-                    $user_creation_date_source
-                ]
-            ],
-            'open dynamic - dynamic source resolver change' => [
-                'set_schedule_open_dynamic',
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
-                    $user_creation_date_source
-                ],
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
-                    get_custom_field_source('time-custom')
-                ]
-            ],
-            'open dynamic - dynamic source option change' => [
-                'set_schedule_open_dynamic',
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
-                    get_custom_field_source('time-custom1')
-                ],
-                [
-                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
-                    get_custom_field_source('time-custom2')
-                ]
-            ],
-        ];
     }
 
     /**
      * @dataProvider schedule_changes_data_provider
-     * @param string $method_name
-     * @param array $setup_params
-     * @param array $changed_params
+     * @param string
      */
-    public function test_schedule_sync_is_flagged_for_update_with_actual_changes(
-        string $method_name,
-        array $setup_params,
-        array $changed_params
-    ): void {
+    public function test_schedule_sync_is_flagged_for_update_with_actual_changes(string $type) {
         $this->setAdminUser();
+
+        list($method_name, $setup_params, $changed_params) = self::schedule_changes_data_generator($type);
 
         $track = $this->create_activity_track('ACTIVE');
 

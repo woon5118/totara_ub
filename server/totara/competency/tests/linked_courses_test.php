@@ -189,10 +189,14 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
     }
 
     /**
-     * @param array $courses_to_update
-     * @dataProvider courses_data_provider
+     * @param int $numberofcourses
+     * @dataProvider courses_number_data_provider
      */
-    public function test_set_linked_courses_updates_linked_course_count_of_competency(array $courses_to_update): void {
+    public function test_set_linked_courses_updates_linked_course_count_of_competency(int $numberofcourses): void {
+        $courses_to_update = [];
+        for ($i = 0; $i < $numberofcourses; $i++) {
+            $courses_to_update[] = self::getDataGenerator()->create_course();
+        }
         /** @var totara_hierarchy_generator $hierarchy_generator */
         $hierarchy_generator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
         $compfw = $hierarchy_generator->create_comp_frame([]);
@@ -211,13 +215,11 @@ class totara_competency_linked_courses_testcase extends advanced_testcase {
         $this->assertCount($count_after, $courses_to_update);
     }
 
-    public function courses_data_provider(): array {
-        $existing_course_1 = self::getDataGenerator()->create_course();
-        $existing_course_2 = self::getDataGenerator()->create_course();
-
+    public function courses_number_data_provider(): array {
+        // NOTE: data providers MUST NOT modify database!
         return [
-            'Update all' => [[$existing_course_1, $existing_course_2]],
-            'Remove all' => [[]],
+            'Update all' => [2],
+            'Remove all' => [0],
         ];
     }
 

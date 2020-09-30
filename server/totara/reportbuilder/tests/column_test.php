@@ -845,14 +845,21 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
      * Each source is tested separately, so that one failure won't prevent the other sources from being tested.
      */
     public function data_columns_and_filters() {
-        $sources = array();
-
-        // Loop through installed sources.
-        $sourcelist = reportbuilder::get_source_list(true);
-        foreach ($sourcelist as $sourcename => $title) {
-            $sources[$sourcename] = [$sourcename, $title];
+        // NOTE: unfortunately developers sometimes do strange things
+        //       in report sources that modify database, so we cannot use
+        //       reportbuilder::get_source_list() here...
+        $sources = [];
+        foreach (reportbuilder::find_source_dirs() as $dir) {
+            if (is_dir($dir) && $dh = opendir($dir)) {
+                while(($file = readdir($dh)) !== false) {
+                    if (is_dir($file) || !preg_match('|^rb_source_(.*)\.php$|', $file, $matches)) {
+                        continue;
+                    }
+                    $sources[] = [$matches[1]];
+                }
+                closedir($dh);
+            }
         }
-
         return $sources;
     }
 
@@ -865,7 +872,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
      * @group slowtest
      * @dataProvider data_columns_and_filters
      */
-    public function test_columns_and_filters($sourcename, $title) {
+    public function test_columns_and_filters($sourcename) {
         global $SESSION, $DB;
 
         $this->setAdminUser();
@@ -878,6 +885,10 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $filtername = 'filtering_testreport';
 
         $src = reportbuilder::get_source_object($sourcename, true); // Caching here is completely fine.
+        $title = $src->sourcetitle;
+        if ($src::is_source_ignored()) {
+            $this->markTestSkipped("RB source $title ($sourcename) is ignored");
+        }
         $src->phpunit_column_test_add_data($this);
 
         // Create a report.
