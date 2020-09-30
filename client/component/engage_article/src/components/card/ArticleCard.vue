@@ -314,6 +314,7 @@ export default {
 
   &__title {
     @include tui-font-heading-x-small();
+    margin-top: var(--gap-4);
     overflow-wrap: break-word;
   }
 

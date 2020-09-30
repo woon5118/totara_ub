@@ -65,7 +65,7 @@ export const engageGrid = {
 
   small: {
     name: 'small',
-    boundaries: [481, 794],
+    boundaries: [481, 649],
     direction: 'horizontal',
     maxItemsPerRow: 2,
     cardUnits: 3,
@@ -73,7 +73,7 @@ export const engageGrid = {
 
   medium: {
     name: 'medium',
-    boundaries: [795, 1089],
+    boundaries: [650, 822],
     direction: 'horizontal',
     maxItemsPerRow: 3,
     cardUnits: 3,
@@ -81,7 +81,7 @@ export const engageGrid = {
 
   large: {
     name: 'large',
-    boundaries: [1090, 1396],
+    boundaries: [823, 1072],
     direction: 'horizontal',
     maxItemsPerRow: 4,
     cardUnits: 2,
@@ -89,7 +89,7 @@ export const engageGrid = {
 
   xlarge: {
     name: 'xlarge',
-    boundaries: [1397, 1672],
+    boundaries: [1073, 1372],
     direction: 'horizontal',
     maxItemsPerRow: 5,
     cardUnits: 2,
