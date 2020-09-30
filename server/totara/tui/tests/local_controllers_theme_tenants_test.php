@@ -137,6 +137,12 @@ class totara_tui_local_controllers_theme_tenants_testcase extends advanced_testc
 
         // User 2 should only see tenant 2.
         $this->setUser($user2);
+
+        // Make sure the admin true is reloaded as we switched user and
+        // the old category of the previous user is still used in the
+        // statically cached admin tree
+        admin_get_root(true, false);
+
         ob_start();
         (new theme_tenants())->process();
         $output = ob_get_clean();
