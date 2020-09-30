@@ -328,7 +328,7 @@ export default {
   display: flex;
   flex-direction: column;
 
-  .tui-responsive > .tui-grid > .tui-grid-item--first {
+  .tui-responsive > .tui-grid > .tui-grid-item {
     min-height: var(--playlistView-min-height);
   }
 
