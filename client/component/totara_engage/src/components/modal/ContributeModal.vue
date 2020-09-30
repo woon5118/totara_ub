@@ -275,9 +275,9 @@ export default {
 
   &__content {
     display: flex;
-    flex: 1;
     flex-direction: column;
-    min-height: 600px;
+    flex-grow: 1;
+    min-height: 60rem;
   }
 
   &__adderContainer {
@@ -316,8 +316,10 @@ export default {
   &__componentContent {
     position: relative;
     display: flex;
-    flex: 1;
+    flex-basis: 0;
     flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
     padding: var(--gap-8);
   }
 }
