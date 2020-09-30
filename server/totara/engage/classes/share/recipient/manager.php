@@ -43,7 +43,6 @@ final class manager {
      * @return recipient
      */
     public static function create(int $id, string $component, string $area): recipient {
-        $area = strtolower($area);
         $class = helper::get_recipient_class($component, $area);
 
         return new $class($id);

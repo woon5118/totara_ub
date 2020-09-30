@@ -46,6 +46,8 @@ abstract class helper {
      * @return string
      */
     public static function get_recipient_class(string $component, string $area): string {
+        $area = strtolower($area);
+        $component = strtolower($component);
         $cache = cache::make('totara_engage', 'share_recipient_class');
         $key = $component . '__' . $area;
 
@@ -58,7 +60,7 @@ abstract class helper {
         // Local handler.
         if ($component === 'totara_engage') {
             $class = "totara_engage\\share\\recipient\\{$area}";
-            if (class_exists($class)) {
+            if (class_exists($class) && is_subclass_of($class, recipient::class)) {
                 $cache->set($key, $class);
                 return $class;
             }
@@ -66,7 +68,7 @@ abstract class helper {
 
         // First check if we can instantiate the class directly.
         $class = "{$component}\\totara_engage\\share\\recipient\\{$area}";
-        if (class_exists($class)) {
+        if (class_exists($class) && is_subclass_of($class, recipient::class)) {
             $cache->set($key, $class);
             return $class;
         }
