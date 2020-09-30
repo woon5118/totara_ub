@@ -1,6 +1,7 @@
 type totara_topic_topic {
   id: core_id!
   value(format: core_format!): String!
+  catalog: String!
 }
 
 extend type Query {

@@ -6,5 +6,6 @@ query totara_topic_find_topics(
     __typename
     id
     value(format: PLAIN)
+    catalog
   }
 }

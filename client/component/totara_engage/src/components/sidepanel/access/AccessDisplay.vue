@@ -55,7 +55,7 @@
         <Tag
           :key="index"
           :text="topic.value"
-          :href="$url('/totara/catalog/index.php')"
+          :href="$url('/totara/catalog/index.php?' + topic.catalog)"
           class="tui-engageAccessDisplay__topic"
         />
       </template>

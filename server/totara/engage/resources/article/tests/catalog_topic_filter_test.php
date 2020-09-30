@@ -27,6 +27,8 @@ use totara_catalog\filter;
 use totara_catalog\provider_handler;
 use totara_engage\access\access;
 use totara_topic\topic;
+use totara_topic\formatter\topic_formatter;
+use totara_catalog\local\config;
 
 class engage_article_catalog_topic_filter_testcase extends advanced_testcase {
     /**
@@ -96,6 +98,52 @@ class engage_article_catalog_topic_filter_testcase extends advanced_testcase {
             $this->assertCount(1, $results->objects);
             $this->assertEquals($articles[$i], $results->objects[0]->objectid);
         }
+    }
+
+    public function test_topic_catalog_links() {
+        global $CFG;
+
+        /** @var filter $topic_filter */
+        /** @var topic $topics */
+        [$topics, $articles, $filters] = $this->generate();
+
+        $topic = array_shift($topics);
+        $formatter = new topic_formatter($topic);
+
+        $reflection = new ReflectionClass($formatter);
+        $method = $reflection->getMethod('topic_catalog_filter');
+        $method->setAccessible(true);
+
+        // Topic catalog filter not enabled.
+        $catalog_parameter = $method->invoke($formatter, $topic);
+        $this->assertStringContainsString('catalog_fts=topic+1', $catalog_parameter);
+
+        // Enable topic filter.
+        set_config('filters',  '{"tag_panel_' . $CFG->topic_collection_id . '":"Topics"}', 'totara_catalog');
+
+        // Topic catalog filter is enabled.
+        $catalog_parameter = $method->invoke($formatter, $topic);
+        $this->assertStringContainsString('tag_panel_' . $CFG->topic_collection_id . '%5B0%5D=' . $topic->get_id(), $catalog_parameter);
+    }
+
+    public function test_topic_catalog_filter_enabled() {
+        global $CFG;
+
+        set_config('filters',  '{"tag_panel_' . $CFG->topic_collection_id . '":"Topics"}', 'totara_catalog');
+        $store = $CFG->topic_collection_id;
+
+        $result = totara_topic\topic_helper::topic_catalog_filter_enabled();
+        $this->assertTrue($result);
+
+        set_config('filters',  '', 'totara_catalog');
+        $result = totara_topic\topic_helper::topic_catalog_filter_enabled();
+        $this->assertFalse($result);
+
+        unset($CFG->topic_collection_id);
+
+        $result = totara_topic\topic_helper::topic_catalog_filter_enabled();
+        $CFG->topic_collection_id = $store;
+        $this->assertFalse($result);
     }
 
     /**

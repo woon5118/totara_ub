@@ -25,6 +25,7 @@ namespace totara_topic\formatter;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\formatter;
 use totara_topic\topic;
+use totara_topic\topic_helper;
 
 /**
  * Formatter for the topic
@@ -43,6 +44,7 @@ final class topic_formatter extends formatter {
         $record = new \stdClass();
         $record->id = $topic->get_id();
         $record->value = $topic->get_display_name();
+        $record->catalog = $this->topic_catalog_filter($topic);
 
         parent::__construct($record, $context);
     }
@@ -53,7 +55,32 @@ final class topic_formatter extends formatter {
     protected function get_map(): array {
         return [
             'id' => null,
-            'value' => string_field_formatter::class
+            'value' => string_field_formatter::class,
+            'catalog' => null
         ];
+    }
+
+    /**
+     *
+     * @param topic $topic
+     * @return string
+     */
+    protected function topic_catalog_filter(topic $topic): string {
+        global $CFG;
+
+        // Check if topic filtering is enabled.
+        $enabled = topic_helper::topic_catalog_filter_enabled();
+
+        // Build the catalog filter link suffix for each topic (FTS if tag filter not set).
+        $filters = [];
+        if ($enabled && $CFG->topic_collection_id) {
+            // Catalog tag filter link.
+            $filters['tag_panel_' . $CFG->topic_collection_id] = [$topic->get_id()];
+        } else {
+            // Catalog FTS filter link.
+            $filters['catalog_fts'] = strtolower($topic->get_raw_name());
+        }
+
+        return http_build_query($filters);
     }
 }

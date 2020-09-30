@@ -132,4 +132,34 @@ final class topic_helper {
             $topic->get_raw_name()
         );
     }
+
+    /**
+     * Verify whether topics catalog filter is enabled.
+     *
+     * @return bool
+     */
+    public static function topic_catalog_filter_enabled(): bool {
+        global $CFG, $DB;
+
+        // Leave if no topics collection exists.
+        if (!isset($CFG->topic_collection_id)) {
+            return false;
+        }
+
+        // Get catalog config (see totara_catalog\local\config::get()).
+        $config_db = (array)get_config('totara_catalog');
+        if (empty($config_db) || !is_array($config_db)) {
+            return false;
+        }
+
+        // Check if tag collection name is a currently active filter.
+        $filters = $config_db['filters'] ?? null;
+        if ($filters) {
+            $filters = json_decode($filters, true);
+            $collection_name = $DB->get_field('tag_coll', 'name', ['id' => $CFG->topic_collection_id]);
+            return is_array($filters) && in_array($collection_name, $filters, true);
+        }
+
+        return false;
+    }
 }

@@ -94,3 +94,18 @@ Feature: Article catalog content
     And I click on "Topic 1" "link" in the "section.tw-selectRegionPanel" "css_element"
     Then I should not see "Harry Topic Article"
     And I should see "Harry Public Article"
+
+  Scenario: Test article topic link can create catalog filtered by topic
+    Given I log in as "harry"
+    And I click on "Find Learning" in the totara menu
+    Then I should see "Harry Topic Article"
+    And I should see "Harry Public Article"
+
+    When I click on "Harry Topic Article" "text"
+    Then I should see "Harry Topic Article"
+    And I wait for the next second
+
+    When I click on "Topic 2" "link"
+    Then I should see "Harry Topic Article"
+    And I should not see "Harry Public Article"
+    And I should see "Find learning"

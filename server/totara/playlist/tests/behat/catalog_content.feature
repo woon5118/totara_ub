@@ -14,10 +14,15 @@ Feature: Playlist catalog content
       | Details content | 0 |
     And I click on "Save" "button"
 
+    And I follow "Filters"
+    And I set the field "Add another..." to "Topics"
+    And I click on "Save" "button"
+
     And the following "users" exist:
       | username | firstname | lastname | email          |
       | harry    | Harry     | One      | user1@test.com |
       | sally    | Sally     | One      | user1@test.com |
+      | user1    | user      | One      | user1@test.com |
 
     And the following "topics" exist in "totara_topic" plugin:
       | name    |
@@ -30,6 +35,8 @@ Feature: Playlist catalog content
       | Harry Private Playlist | harry    | View playlist 2 | PRIVATE | Topic 1 |
       | Sally Public Playlist  | sally    | View playlist 3 | PUBLIC  | Topic 1 |
       | Sally Private Playlist | sally    | View playlist 4 | PRIVATE | Topic 1 |
+      | User public Playlist1  | user1    | View playlist 5 | PUBLIC  | Topic 2 |
+      | User public Playlist2  | user1    | View playlist 6 | PUBLIC  | Topic 2 |
 
     And I log out
 
@@ -63,3 +70,16 @@ Feature: Playlist catalog content
     And I click on "Find Learning" in the totara menu
     Then I should not see "Harry Public Playlist"
     And I should not see "Playlists" in the ".tw-catalog__aside" "css_element"
+
+  Scenario: Filter playlist catalog by topic
+    Given I log in as "user1"
+    And I click on "Your Library" in the totara menu
+    And I click on "User public Playlist1" "link" in the ".tui-sidePanel__content" "css_element"
+    And I click on "Expand" "button"
+    When I click on "Topic 2" "link"
+    Then I should see "User public Playlist1"
+    And I should see "User public Playlist2"
+    And I should not see "Harry Public Playlist"
+    And I should not see "Sally Private Playlist"
+    And I should not see "Sally Public Playlist"
+    And I should not see "Harry Private Playlist"

@@ -42,6 +42,7 @@ query engage_survey_get_survey($resourceid: param_integer!) {
       __typename
       id
       value(format: PLAIN)
+      catalog
     }
 
     questionresults {

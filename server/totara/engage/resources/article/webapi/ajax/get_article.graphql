@@ -35,6 +35,7 @@ query engage_article_get_article($id: param_integer!) {
       __typename
       id
       value(format: PLAIN)
+      catalog
     }
     timedescription
     timeview
