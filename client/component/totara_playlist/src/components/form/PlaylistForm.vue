@@ -131,7 +131,9 @@ export default {
     submit() {
       const params = {
         name: this.playlist.name,
-        summary: JSON.stringify(this.summary.getDoc()),
+        summary: this.summary.isEmpty
+          ? null
+          : JSON.stringify(this.summary.getDoc()),
         summary_format: FORMAT_JSON_EDITOR,
       };
 

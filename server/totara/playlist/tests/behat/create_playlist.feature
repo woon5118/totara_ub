@@ -43,3 +43,17 @@ Feature: Create playlist
     And the "Done" "button" should be enabled
     When I click on "Done" "button"
     Then I should see "#hashtag"
+
+  @javascript
+  Scenario: Create playlist without description should produce a add description link
+    Given I log in as "user_one"
+    And I click on "Your Library" in the totara menu
+    When I click on "Contribute playlist" "button"
+    Then the "Next" "button" should be disabled
+    And I set the field "Enter playlist title" to "Playlist1"
+    Then the "Next" "button" should be enabled
+    And I click on "Next" "button"
+    And I wait for the next second
+    And I click on "Only you" "text" in the ".tui-accessSelector" "css_element"
+    When I click on "Done" "button"
+    Then I should see "Add a description (optional)"
