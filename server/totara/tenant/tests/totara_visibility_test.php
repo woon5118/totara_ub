@@ -103,6 +103,9 @@ class totara_tenant_totara_visibility_testcase extends advanced_testcase {
     }
 
     public function test_tenant_member_with_isolation() {
+        global $CFG;
+        require_once($CFG->dirroot . '/course/renderer.php');
+
         $gen = self::getDataGenerator();
         /** @var totara_tenant_generator $multitenancy */
         $multitenancy = $gen->get_plugin_generator('totara_tenant');

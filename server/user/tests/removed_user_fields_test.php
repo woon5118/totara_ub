@@ -61,7 +61,8 @@ class core_user_removed_user_fields_testcase extends advanced_testcase {
     }
 
     public function test_user_create_user() {
-        global $DB;
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/user/lib.php');
 
         $user = $this->getDataGenerator()->create_user(['username' => 'test1']);
 
@@ -83,6 +84,9 @@ class core_user_removed_user_fields_testcase extends advanced_testcase {
     }
 
     public function test_user_update_user() {
+        global $CFG;
+        require_once("$CFG->dirroot/user/lib.php");
+
         $newuser = $this->getDataGenerator()->create_user(['username' => 'test1']);
 
         foreach (core_user::REMOVED_FIELDS as $field => $unused) {

@@ -130,7 +130,8 @@ class mod_assign_portfolio_caller_testcase extends advanced_testcase {
      * Test an assignment file is loaded for a user who is part of a group that submitted it.
      */
     public function test_group_submission_file_is_loaded() {
-        $this->resetAfterTest(true);
+        global $CFG;
+        require_once($CFG->dirroot . '/group/lib.php');
 
         $user = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
@@ -187,7 +188,8 @@ class mod_assign_portfolio_caller_testcase extends advanced_testcase {
      * Test an assignment file is not loaded for a user who is not part of a group that submitted it.
      */
     public function test_different_group_submission_file_is_not_loaded() {
-        $this->resetAfterTest(true);
+        global $CFG;
+        require_once($CFG->dirroot . '/group/lib.php');
 
         $user = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();

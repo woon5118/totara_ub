@@ -763,6 +763,9 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
     }
 
     function test_get_extra_fields() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/hierarchy/prefix/organisation/lib.php');
+
         $competency = new competency();
         $position = new position();
         $organisation = new organisation();

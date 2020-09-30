@@ -232,7 +232,8 @@ class core_user_profilelib_testcase extends advanced_testcase {
      * Sets something for multiple job assignment fields.
      */
     public function test_position_save_data_all() {
-        $this->resetAfterTest();
+        global $CFG;
+        require_once($CFG->dirroot . '/user/profile/lib.php');
 
         set_config('allowsignupposition', 1, 'totara_job');
         set_config('allowsignuporganisation', 1, 'totara_job');
@@ -282,7 +283,8 @@ class core_user_profilelib_testcase extends advanced_testcase {
      * Does not set any job assignment fields.
      */
     public function test_position_save_data_none() {
-        $this->resetAfterTest();
+        global $CFG;
+        require_once($CFG->dirroot . '/user/profile/lib.php');
 
         set_config('allowsignupposition', 1, 'totara_job');
         set_config('allowsignuporganisation', 1, 'totara_job');
@@ -330,7 +332,8 @@ class core_user_profilelib_testcase extends advanced_testcase {
      * Sets the postion field only.
      */
     public function test_position_save_data_pos_only() {
-        $this->resetAfterTest();
+        global $CFG;
+        require_once($CFG->dirroot . '/user/profile/lib.php');
 
         // Start with just position disabled.
         set_config('allowsignupposition', 0, 'totara_job');
@@ -390,7 +393,8 @@ class core_user_profilelib_testcase extends advanced_testcase {
      * Sets the organisation field only.
      */
     public function test_position_save_data_org_only() {
-        $this->resetAfterTest();
+        global $CFG;
+        require_once($CFG->dirroot . '/user/profile/lib.php');
 
         set_config('allowsignupposition', 1, 'totara_job');
         // Start with just organisation disabled.
@@ -450,7 +454,8 @@ class core_user_profilelib_testcase extends advanced_testcase {
      * Sets the manager field only.
      */
     public function test_position_save_data_manager_only() {
-        $this->resetAfterTest();
+        global $CFG;
+        require_once($CFG->dirroot . '/user/profile/lib.php');
 
         set_config('allowsignupposition', 1, 'totara_job');
         set_config('allowsignuporganisation', 1, 'totara_job');
