@@ -113,6 +113,7 @@ final class non_member_loader {
             }
         }
 
+        $builder->order_by('u.id');
         $cursor = $query->get_cursor();
         return new offset_cursor_paginator($builder, $cursor);
     }
