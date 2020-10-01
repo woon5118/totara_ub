@@ -23,6 +23,7 @@
 
 namespace totara_competency\webapi\resolver\query;
 
+use core\orm\entity\entity;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -41,7 +42,7 @@ class competency implements query_resolver, has_middleware {
      *
      * @param array $args
      * @param execution_context $ec
-     * @return competency_entity
+     * @return competency_entity|entity
      */
     public static function resolve(array $args, execution_context $ec) {
         global $USER;

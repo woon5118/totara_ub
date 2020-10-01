@@ -24,11 +24,14 @@
 namespace pathway_learning_plan\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use pathway_learning_plan\models\competency_plan;
 use totara_competency\helpers\capability_helper;
 
-class competency_plans implements query_resolver {
+class competency_plans implements query_resolver, has_middleware {
 
     /**
      * Queries learning plans and competency plan values for a given user and assignment
@@ -38,13 +41,21 @@ class competency_plans implements query_resolver {
      * @return competency_plan
      */
     public static function resolve(array $args, execution_context $ec) {
-        require_login(null, false, null, false, true);
-
         $user_id = $args['user_id'];
 
         capability_helper::require_can_view_profile($user_id);
 
         return competency_plan::for_assignment($args['assignment_id'], $user_id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
 
 }

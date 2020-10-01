@@ -25,10 +25,13 @@ namespace totara_competency\webapi\resolver\mutation;
 
 use core\entities\user;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_competency\models\assignment;
 
-class archive_user_assignment implements mutation_resolver {
+class archive_user_assignment implements mutation_resolver, has_middleware {
 
     /**
      * Archives a user assignment.
@@ -39,7 +42,7 @@ class archive_user_assignment implements mutation_resolver {
      * @return assignment
      */
     public static function resolve(array $args, execution_context $ec): assignment {
-        $user_id = self::check_and_get_loggedin_user_id();
+        $user_id = user::logged_in()->id;
         $assignment = assignment::load_by_id($args['assignment_id']);
 
         if (!$assignment->can_archive($user_id)) {
@@ -51,18 +54,13 @@ class archive_user_assignment implements mutation_resolver {
     }
 
     /**
-     * Check and get logged in user id.
-     *
-     * @return int
+     * {@inheritdoc}
      */
-    private static function check_and_get_loggedin_user_id(): int {
-        require_login(null, false, null, false, true);
-        $user = user::logged_in();
-
-        if (is_null($user)) {
-            throw new \moodle_exception('error:usernotfound', 'totara_core');
-        }
-
-        return $user->id;
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
+
 }

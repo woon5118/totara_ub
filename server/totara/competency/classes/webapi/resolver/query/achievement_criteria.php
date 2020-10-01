@@ -23,41 +23,40 @@
 
 namespace totara_competency\webapi\resolver\query;
 
-use context_system;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
+use core\webapi\middleware\require_system_capability;
+use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
-use totara_core\advanced_feature;
 
 /**
  * Query to return all achievement criteria related information for a competency
  */
-class achievement_criteria implements \core\webapi\query_resolver {
+class achievement_criteria implements query_resolver, has_middleware {
     /**
      * Returns the achivement configuration for a specific competency.
      *
      * @param array $args
      * @param execution_context $ec
-     * @return \stdClass
+     * @return achievement_configuration
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
-        self::authorize();
-
-        /** @var competency $competency */
         $competency = new competency($args['competency_id']);
         return new achievement_configuration($competency);
     }
 
     /**
-     * Checks whether the user is authenticated.
+     * {@inheritdoc}
      */
-    private static function authorize(): void {
-        // TODO: More capability checks
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
-
-        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+            new require_system_capability('totara/hierarchy:viewcompetency'),
+        ];
     }
+
 }

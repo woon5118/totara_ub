@@ -24,13 +24,16 @@
 namespace pathway_manual\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use pathway_manual\models\rating;
 
 /**
  * Mutation to create manual ratings.
  */
-class create_manual_ratings implements mutation_resolver {
+class create_manual_ratings implements mutation_resolver, has_middleware {
 
     /**
      * Creates manual ratings.
@@ -41,12 +44,21 @@ class create_manual_ratings implements mutation_resolver {
      * @return bool
      */
     public static function resolve(array $args, execution_context $ec) {
-        require_login(null, false);
-
         rating::for_user_and_role((int)$args['user_id'], $args['role'])->create_multiple(
             $args['ratings']
         );
 
         return true;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
+    }
+
 }

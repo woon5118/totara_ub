@@ -23,9 +23,13 @@
 
 namespace totara_competency\webapi\resolver\mutation;
 
+use core\entities\user;
 use core\orm\collection;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_competency\entities\assignment;
 use totara_competency\expand_task;
 use totara_competency\helpers\capability_helper;
@@ -36,7 +40,7 @@ use totara_competency\user_groups;
 /**
  * Mutation to create a job assignment.
  */
-class create_user_assignments implements mutation_resolver {
+class create_user_assignments implements mutation_resolver, has_middleware {
 
     /**
      * Creates an assignment and returns the new assignment id.
@@ -53,7 +57,7 @@ class create_user_assignments implements mutation_resolver {
         $competency_ids = $args['competency_ids'];
         $user_groups = [user_groups::USER => [$user_id]];
 
-        self::authorize($user_id);
+        capability_helper::require_can_assign($user_id);
 
         $assignments = (new assignment_actions())
             ->create_from_competencies(
@@ -75,25 +79,20 @@ class create_user_assignments implements mutation_resolver {
         return $assignments;
     }
 
-    protected static function authorize(int $user_id) {
-        require_login(null, false);
-
-        capability_helper::require_can_assign($user_id);
-    }
-
     protected static function get_type(int $user_id): string {
-        return self::is_logged_in_user($user_id)
+        return $user_id == user::logged_in()->id
             ? assignment::TYPE_SELF
             : assignment::TYPE_OTHER;
     }
 
-    protected static function is_logged_in_user(int $user_id): bool {
-        return self::get_logged_in_user_id() === $user_id;
-    }
-
-    protected static function get_logged_in_user_id(): int {
-        global $USER;
-        return (int)$USER->id;
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
 
 }

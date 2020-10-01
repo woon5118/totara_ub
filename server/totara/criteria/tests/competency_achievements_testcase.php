@@ -115,18 +115,6 @@ abstract class totara_criteria_competency_achievements_testcase extends advanced
     }
 
     /**
-     * Test requires login, otherwise throw require_login_exception.
-     */
-    public function test_it_requires_login() {
-        $this->expectException(require_login_exception::class);
-        $args = [
-            'instance_id'   => $this->data['criterion']->get_id(),
-            'user_id'       => $GLOBALS['USER']->id,
-        ];
-        $this->execute_resolver($args);
-    }
-
-    /**
      * Test throw criterion_not_found_exception if there is no criterion.
      */
     public function test_it_throws_not_found_exception_for_criterion() {

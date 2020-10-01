@@ -23,16 +23,18 @@
 
 namespace totara_competency\webapi\resolver\query;
 
-use context_system;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
+use core\webapi\middleware\require_system_capability;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_competency\models\assignment as assignment_model;
-use totara_core\advanced_feature;
 
 /**
  * Query to return a single competency.
  */
-class assignment implements query_resolver {
+class assignment implements query_resolver, has_middleware {
 
     /**
      * Returns a competency, given its ID.
@@ -42,18 +44,18 @@ class assignment implements query_resolver {
      * @return assignment_model
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
-        self::authorize();
-
         return assignment_model::load_by_id($args['assignment_id']);
     }
 
     /**
-     * Checks whether the user is authenticated.
+     * {@inheritdoc}
      */
-    private static function authorize(): void {
-        require_login(null, false, null, false, true);
-        require_capability('totara/competency:view_assignments', context_system::instance());
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+            new require_system_capability('totara/competency:view_assignments'),
+        ];
     }
+
 }

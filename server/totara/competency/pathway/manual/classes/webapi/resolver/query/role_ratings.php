@@ -25,13 +25,15 @@ namespace pathway_manual\webapi\resolver\query;
 
 use core\entities\user;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use pathway_manual\models\rateable_competency;
 use totara_competency\entities\assignment;
 use totara_competency\helpers\capability_helper;
-use totara_core\advanced_feature;
 
-class role_ratings implements query_resolver {
+class role_ratings implements query_resolver, has_middleware {
 
     /**
      * @param array $args
@@ -39,10 +41,6 @@ class role_ratings implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
-        require_login(null, false, null, false, true);
-
         $assignment_id = $args['assignment_id'];
         $user_id = $args['user_id'];
 
@@ -50,6 +48,16 @@ class role_ratings implements query_resolver {
 
         return rateable_competency::for_assignment(new assignment($assignment_id), new user($user_id))
             ->get_all_role_ratings();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
 
 }

@@ -24,18 +24,20 @@
 namespace totara_criteria\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use core_course\user_learning\item;
 use Exception;
 use totara_competency\helpers\capability_helper;
-use totara_core\advanced_feature;
 use totara_criteria\criterion;
 use totara_criteria\criterion_not_found_exception;
 
 /**
  * Fetches all achievements for the course related criteria types
  */
-abstract class course_achievements implements query_resolver {
+abstract class course_achievements implements query_resolver, has_middleware {
 
     abstract public static function get_criterion(): criterion;
 
@@ -45,12 +47,8 @@ abstract class course_achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
         global $CFG;
         require_once($CFG->dirroot . '/completion/completion_completion.php');
-
-        require_login(null, false, null, false, true);
 
         $instance_id = $args['instance_id'];
         $user_id = $args['user_id'];
@@ -94,6 +92,16 @@ abstract class course_achievements implements query_resolver {
     public static function is_for_current_user(int $user_id): bool {
         global $USER;
         return $user_id > 0 ? $user_id == $USER->id : false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
 
 }

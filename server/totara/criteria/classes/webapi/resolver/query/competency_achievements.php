@@ -28,19 +28,21 @@ namespace totara_criteria\webapi\resolver\query;
 use core\entities\user;
 use core\orm\collection;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use Exception;
 use totara_competency\entities\competency;
 use totara_competency\helpers\capability_helper;
 use totara_competency\models\assignment_user;
-use totara_core\advanced_feature;
 use totara_criteria\criterion;
 use totara_criteria\criterion_not_found_exception;
 
 /**
  * Fetches all achievements for the competency related criteria types
  */
-abstract class competency_achievements implements query_resolver {
+abstract class competency_achievements implements query_resolver, has_middleware {
 
     /**
      * get competency items
@@ -69,8 +71,6 @@ abstract class competency_achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
         $instance_id = $args['instance_id'];
         $user_id = $args['user_id'];
 
@@ -165,11 +165,19 @@ abstract class competency_achievements implements query_resolver {
      * @return bool
      */
     public static function authorize(int $user_id): bool {
-        require_login(null, false, null, false, true);
-
         capability_helper::require_can_view_profile($user_id);
 
         return capability_helper::can_assign($user_id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
 
 }

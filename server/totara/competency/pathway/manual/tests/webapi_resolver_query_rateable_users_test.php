@@ -85,21 +85,6 @@ class pathway_manual_webapi_resolver_query_rateable_users_testcase extends pathw
     }
 
     /**
-     * Make sure the user must be logged in to resolve the query.
-     */
-    public function test_capability_logged_in() {
-        $this->setUser($this->manager_user);
-
-        $this->create_manager_job_assignments();
-        rateable_users::resolve(['role' => manager::class], $this->execution_context());
-
-        $this->setUser(null);
-        $this->expectException(require_login_exception::class);
-
-        rateable_users::resolve(['role' => manager::class], $this->execution_context());
-    }
-
-    /**
      * Make sure correct capabilities are enforced when querying for another user as a manager.
      */
     public function test_capability_manager() {

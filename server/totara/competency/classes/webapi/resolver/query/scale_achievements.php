@@ -26,7 +26,10 @@ namespace totara_competency\webapi\resolver\query;
 use core\entities\user;
 use core\orm\collection;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use moodle_exception;
 use totara_competency\entities\assignment;
 use totara_competency\entities\pathway as pathway_entity;
@@ -35,12 +38,11 @@ use totara_competency\helpers\capability_helper;
 use totara_competency\models\assignment_user;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
-use totara_core\advanced_feature;
 
 /**
  * Returns items for each scale value, which could be criteria groups
  */
-class scale_achievements implements query_resolver {
+class scale_achievements implements query_resolver, has_middleware {
 
     /**
      * Returns the achievement configuration for a specific competency.
@@ -84,10 +86,6 @@ class scale_achievements implements query_resolver {
      * @param execution_context $ec
      */
     private static function authorize(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
-        require_login(null, false, null, false, true);
-
         // Check if the user exists
         if (!user::repository()->find($args['user_id'])) {
             throw new moodle_exception('invaliduser');
@@ -120,6 +118,16 @@ class scale_achievements implements query_resolver {
             ->with('competency')
             ->order_by('sortorder', 'asc')
             ->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
 
 }

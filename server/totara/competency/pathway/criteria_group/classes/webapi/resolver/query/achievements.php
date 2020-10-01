@@ -24,14 +24,16 @@
 namespace pathway_criteria_group\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
-use totara_core\advanced_feature;
 
 /**
  * Fetches all criterions within the given group
  */
-class achievements implements query_resolver {
+class achievements implements query_resolver, has_middleware {
 
     /**
      * @param array $args
@@ -39,10 +41,6 @@ class achievements implements query_resolver {
      * @return array
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('competency_assignment');
-
-        require_login(null, false, null, false, true);
-
         $instance_id = $args['instance_id'];
 
         $result = [];
@@ -61,6 +59,16 @@ class achievements implements query_resolver {
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
 
 }

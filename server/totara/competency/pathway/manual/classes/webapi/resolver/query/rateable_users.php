@@ -24,12 +24,15 @@
 namespace pathway_manual\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use pathway_manual\data_providers\rateable_users as rateable_users_provider;
 use pathway_manual\models\rateable_user;
 use pathway_manual\models\roles\role_factory;
 
-class rateable_users implements query_resolver {
+class rateable_users implements query_resolver, has_middleware {
 
     /**
      * @param array $args
@@ -37,8 +40,6 @@ class rateable_users implements query_resolver {
      * @return rateable_user[]
      */
     public static function resolve(array $args, execution_context $ec) {
-        require_login(null, false, null, false, true);
-
         $role = role_factory::create($args['role']);
         $filters = $args['filters'] ?? [];
 
@@ -46,6 +47,16 @@ class rateable_users implements query_resolver {
         return rateable_users_provider::for_role($role)
             ->add_filters($filters)
             ->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
 
 }

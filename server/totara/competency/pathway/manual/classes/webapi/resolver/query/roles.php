@@ -24,11 +24,14 @@
 namespace pathway_manual\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
-use pathway_manual\models\roles\role;
+use core\webapi\resolver\has_middleware;
 use pathway_manual\models\roles as roles_helper;
+use pathway_manual\models\roles\role;
 
-class roles implements query_resolver {
+class roles implements query_resolver, has_middleware {
 
     /**
      * @param array $args
@@ -36,13 +39,21 @@ class roles implements query_resolver {
      * @return role[]
      */
     public static function resolve(array $args, execution_context $ec) {
-        require_login(null, false, null, false, true);
-
         if (isset($args['subject_user'])) {
             return roles_helper::get_current_user_roles($args['subject_user']);
         } else {
             return roles_helper::get_current_user_roles_for_any();
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_login(),
+            new require_advanced_feature('competency_assignment'),
+        ];
     }
 
 }

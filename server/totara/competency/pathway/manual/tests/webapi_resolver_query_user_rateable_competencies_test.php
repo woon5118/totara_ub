@@ -67,26 +67,6 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
     }
 
     /**
-     * Make sure the user must be logged in to resolve the query.
-     */
-    public function test_capability_logged_in() {
-        $this->setUser($this->user1->id);
-
-        user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => self_role::class],
-            $this->execution_context()
-        );
-
-        $this->setUser(null);
-        $this->expectException(require_login_exception::class);
-
-        user_rateable_competencies::resolve(
-            ['user_id' => $this->user1->id, 'role' => self_role::class],
-            $this->execution_context()
-        );
-    }
-
-    /**
      * Make sure correct capabilities are enforced when querying for themselves.
      */
     public function test_capability_self() {
