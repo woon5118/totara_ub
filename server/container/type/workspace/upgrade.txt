@@ -1,0 +1,9 @@
+This files describes API changes in /container/type/workspace/*.
+The information here is intended only for developers.
+
+=== 13.1 ===
+
+Note that more recent update comes to the top.
+
+--- Update to database schema ---
+* Introduced new field "to_be_deleted" in table "workspace", the field indicates the workspace will be deleted later via cron.

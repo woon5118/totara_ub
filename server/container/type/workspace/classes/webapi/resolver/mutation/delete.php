@@ -22,7 +22,10 @@
  */
 namespace container_workspace\webapi\resolver\mutation;
 
-use container_workspace\local\workspace_helper;
+use container_workspace\exception\workspace_exception;
+use core\task\manager as task_manager;
+use container_workspace\interactor\workspace\interactor as workspace_interactor;
+use container_workspace\task\delete_workspace_task;
 use container_workspace\workspace;
 use core\notification;
 use core\webapi\execution_context;
@@ -30,6 +33,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
+use core_container\factory;
 
 /**
  * Resolver for deleting a workspace via graphql.
@@ -46,14 +50,26 @@ final class delete implements mutation_resolver, has_middleware {
     public static function resolve(array $args, execution_context $ec): bool {
         global $USER;
 
-        $workspace = workspace::from_id($args['workspace_id']);
+        /** @var workspace $workspace */
+        $workspace = factory::from_id($args['workspace_id']);
+
+        if (!$workspace->is_typeof(workspace::get_type())) {
+            throw new \coding_exception("Cannot delete different container from workspace's API");
+        }
 
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context($workspace->get_context());
         }
 
-        // Delete the workspace.
-        workspace_helper::delete_workspace($workspace, $USER->id);
+        $interactor = new workspace_interactor($workspace, $USER->id);
+        if (!$interactor->can_delete()) {
+            throw workspace_exception::on_delete();
+        }
+
+        $task = delete_workspace_task::from_workspace_id($workspace->get_id(), $USER->id);
+        task_manager::queue_adhoc_task($task);
+
+        $workspace->mark_to_be_deleted(true);
 
         // Add deleted workspace to notification.
         notification::success(get_string('notification_deleted', 'container_workspace', $workspace->fullname));

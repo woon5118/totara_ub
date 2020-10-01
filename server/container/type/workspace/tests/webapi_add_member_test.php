@@ -226,4 +226,34 @@ class container_workspace_webapi_add_member_testcase extends advanced_testcase {
             ]
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_add_member_to_a_deleted_workspace(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        $workspace->mark_to_be_deleted();
+
+        // Add a member to this workspace.
+        $user_two = $generator->create_user();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("The workspace is deleted");
+
+        $this->resolve_graphql_mutation(
+            'container_workspace_add_members',
+            [
+                'workspace_id' => $workspace->get_id(),
+                'user_ids' => [$user_two->id]
+            ]
+        );
+    }
 }

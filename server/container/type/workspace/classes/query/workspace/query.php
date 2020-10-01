@@ -83,6 +83,16 @@ final class query implements cursor_query {
     private $cursor;
 
     /**
+     * A flag whether to tell the loader fetching the query that is going to be deleted or not.
+     * + FALSE: Do not include the workspaces that are going to be deleted
+     * + TRUE: Include the workspaces that are going to be deleted
+     * + NULL: Include workspaces that either going to be deleted or not.
+     *
+     * @var bool|null
+     */
+    private $to_be_deleted;
+
+    /**
      * query constructor.
      * @param int       $source
      * @param int|null  $user_id    => The user's workspace that we want to fetch against of.
@@ -108,6 +118,7 @@ final class query implements cursor_query {
         $this->sort = sort::RECENT;
         $this->cursor = null;
         $this->access = null;
+        $this->to_be_deleted = false;
     }
 
     /**
@@ -277,5 +288,23 @@ final class query implements cursor_query {
      */
     public function set_actor_id(int $actor_id): void {
         $this->actor_id = $actor_id;
+    }
+
+    /**
+     * Pass NULL to this function if we want to include both to be deleted and not to be deleted
+     * workspaces in the result from loader.
+     *
+     * @param bool|null $value
+     * @return void
+     */
+    public function set_to_be_deleted(?bool $value): void {
+        $this->to_be_deleted = $value;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function get_to_be_deleted(): ?bool {
+        return $this->to_be_deleted;
     }
 }

@@ -22,6 +22,7 @@
  */
 namespace container_workspace\webapi\resolver\mutation;
 
+use container_workspace\webapi\middleware\workspace_availability_check;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -47,10 +48,6 @@ final class join implements mutation_resolver, has_middleware {
         /** @var workspace $workspace */
         $workspace = factory::from_id($args['workspace_id']);
 
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Cannot join a different container rather than workspace");
-        }
-
         if (!$ec->has_relevant_context()) {
             $context = $workspace->get_context();
             $ec->set_relevant_context($context);
@@ -72,6 +69,7 @@ final class join implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('container_workspace'),
+            new workspace_availability_check('workspace_id')
         ];
     }
 

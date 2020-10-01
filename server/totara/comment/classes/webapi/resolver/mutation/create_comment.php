@@ -29,6 +29,7 @@ use totara_comment\comment;
 use totara_comment\comment_helper;
 use core\webapi\resolver\has_middleware;
 use core\webapi\middleware\clean_editor_content;
+use totara_comment\resolver_factory;
 
 final class create_comment implements mutation_resolver, has_middleware {
     /**
@@ -39,14 +40,19 @@ final class create_comment implements mutation_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): comment {
         global $USER;
-        if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_user::instance($USER->id));
-        }
 
         $component = $args['component'];
         $area = $args['area'];
         $content = $args['content'];
         $instanceid = $args['instanceid'];
+
+        if (!$ec->has_relevant_context()) {
+            $resolver = resolver_factory::create_resolver($component);
+            $context_id = $resolver->get_context_id($instanceid, $area);
+
+            $context = \context::instance_by_id($context_id);
+            $ec->set_relevant_context($context);
+        }
 
         $format = FORMAT_JSON_EDITOR;
         if (isset($args['format'])) {

@@ -24,6 +24,7 @@ namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\local\workspace_helper;
 use container_workspace\member\member;
+use container_workspace\webapi\middleware\workspace_availability_check;
 use container_workspace\workspace;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
@@ -39,7 +40,8 @@ final class change_primary_owner implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
-            new require_advanced_feature('container_workspace')
+            new require_advanced_feature('container_workspace'),
+            new workspace_availability_check('workspace_id')
         ];
     }
 
@@ -54,9 +56,6 @@ final class change_primary_owner implements mutation_resolver, has_middleware {
 
         /** @var workspace $workspace */
         $workspace = factory::from_id($workspace_id);
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Cannot find workspace by id '{$workspace_id}'");
-        }
 
         $user_id = $args['user_id'];
         workspace_helper::update_workspace_primary_owner($workspace, $user_id);

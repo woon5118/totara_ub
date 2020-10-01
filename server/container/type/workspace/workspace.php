@@ -71,7 +71,7 @@ if ($interactor->is_joined()) {
     $PAGE->set_totara_menu_selected(find_spaces::class);
 }
 
-if ($workspace->is_visible($USER->id)) {
+if ($interactor->can_view_workspace()) {
     $PAGE->set_title(format_string($workspace->fullname));
 } else {
     $PAGE->set_title(get_string('error:view_workspace', 'container_workspace'));

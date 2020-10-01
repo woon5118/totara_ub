@@ -156,4 +156,34 @@ class container_workspace_webapi_create_member_request_testcase extends advanced
         $this->assertEmpty($result->data);
         $this->assertNotEmpty($result->errors);
     }
+
+    /**
+     * @return void
+     */
+    public function test_create_member_request_to_workspace_that_is_deleted(): void {
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_private_workspace();
+
+        // Flag the workspace for deletion.
+        $workspace->mark_to_be_deleted(true);
+
+        // Log in as second user and update the request to join the workspace.
+        $this->setUser($user_two);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("The workspace is deleted");
+
+        $this->resolve_graphql_mutation(
+            'container_workspace_create_member_request',
+            ['workspace_id' => $workspace->get_id()]
+        );
+    }
 }

@@ -42,7 +42,17 @@ class container_workspace_webapi_mutation_delete_workspace_testcase extends adva
         $workspace = $workspace_generator->create_private_workspace();
 
         $workspace_id = $workspace->get_id();
+
         $this->assertTrue($DB->record_exists('course', ['id' => $workspace_id]));
+        $this->assertTrue(
+            $DB->record_exists(
+                'workspace',
+                [
+                    'course_id' => $workspace_id,
+                    'to_be_deleted' => 0
+                ]
+            )
+        );
 
         $result = $this->resolve_graphql_mutation(
             'container_workspace_delete',
@@ -50,6 +60,27 @@ class container_workspace_webapi_mutation_delete_workspace_testcase extends adva
         );
 
         $this->assertTrue($result);
-        $this->assertFalse($DB->record_exists('course', ['id' => $workspace_id]));
+
+        // Mutation should not delete the workspace straight away but only flagging up the record to be deleted.
+        $this->assertTrue($DB->record_exists('course', ['id' => $workspace_id]));
+        $this->assertFalse(
+            $DB->record_exists(
+                'workspace',
+                [
+                    'course_id' => $workspace_id,
+                    'to_be_deleted' => 0
+                ]
+            )
+        );
+
+        $this->assertTrue(
+            $DB->record_exists(
+                'workspace',
+                [
+                    'course_id' => $workspace_id,
+                    'to_be_deleted' => 1
+                ]
+            )
+        );
     }
 }

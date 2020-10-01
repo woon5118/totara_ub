@@ -66,7 +66,8 @@ final class workspace extends container implements category_name_provider {
                 wo.user_id, 
                 wo.id AS w_id,
                 wo.private AS workspace_private,
-                wo.timestamp as timestamp
+                wo.timestamp AS timestamp,
+                wo.to_be_deleted AS to_be_deleted
             FROM "ttr_course" c
             INNER JOIN "ttr_workspace" wo ON wo.course_id = c.id
             WHERE c.id = :course_id
@@ -92,14 +93,30 @@ final class workspace extends container implements category_name_provider {
             throw new \coding_exception("No id was specified");
         }
 
-        if (!property_exists($record, 'user_id') ||
-            !property_exists($record, 'w_id') ||
-            !property_exists($record, 'workspace_private')) {
-            // Only fetch these fields if the record does not have it.
+        $workspace_fields = [
+            'user_id',
+            'w_id',
+            'workspace_private',
+            'to_be_deleted',
+            'timestamp'
+        ];
+
+        $fetch_record = false;
+        foreach ($workspace_fields as $field) {
+            if (!property_exists($record, $field)) {
+                $fetch_record = true;
+                break;
+            }
+        }
+
+        if ($fetch_record) {
+            // We will have to update the workspace extra records, as the argument $record does not
+            // have any of them.
             $workspace_record = $DB->get_record(
                 'workspace',
                 ['course_id' => $record->id],
-                'id, user_id, private'
+                '*',
+                MUST_EXIST
             );
 
             // Cloning the record so that we don't modify the original
@@ -107,6 +124,8 @@ final class workspace extends container implements category_name_provider {
             $record->w_id = $workspace_record->id;
             $record->user_id = $workspace_record->user_id;
             $record->workspace_private = $workspace_record->private;
+            $record->to_be_deleted = $workspace_record->to_be_deleted;
+            $record->timestamp = $workspace_record->timestamp;
         }
 
         $workspace = new static();
@@ -165,6 +184,7 @@ final class workspace extends container implements category_name_provider {
         $entity->course_id = $new_id;
         $entity->private = 0;
         $entity->timestamp = time();
+        $entity->to_be_deleted = false;
 
         if (isset($data->workspace_private) && $data->workspace_private) {
             $entity->private = 1;
@@ -307,6 +327,11 @@ final class workspace extends container implements category_name_provider {
         if (property_exists($record, 'timestamp')) {
             $this->entity->timestamp = $record->timestamp;
             unset($record->timestamp);
+        }
+
+        if (property_exists($record, 'to_be_deleted')) {
+            $this->entity->to_be_deleted = (bool) $record->to_be_deleted;
+            unset($record->to_be_deleted);
         }
 
         parent::map_record($record);
@@ -564,7 +589,7 @@ final class workspace extends container implements category_name_provider {
     }
 
     /**
-     * Updatee primary owner, note that this function does not check for any capabilities,
+     * Update primary owner, note that this function does not check for any capabilities,
      * as it should had been done prior to call this function.
      *
      * @param int $new_user_id
@@ -573,5 +598,26 @@ final class workspace extends container implements category_name_provider {
     public function update_user(int $new_user_id): void {
         $this->entity->user_id = $new_user_id;
         $this->entity->update();
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_to_be_deleted(): bool {
+        return $this->entity->to_be_deleted;
+    }
+
+    /**
+     * @param bool $to_be_deleted
+     * @return void
+     */
+    public function mark_to_be_deleted(bool $to_be_deleted = true): void {
+        $this->entity->to_be_deleted = $to_be_deleted;
+        $this->entity->save();
+
+        $this->reload();
+
+        // Rebuild the factory cache.
+        $this->rebuild_cache();
     }
 }

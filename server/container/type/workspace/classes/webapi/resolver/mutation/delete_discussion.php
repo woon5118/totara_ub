@@ -24,7 +24,7 @@ namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\discussion\discussion;
 use container_workspace\discussion\discussion_helper;
-use container_workspace\workspace;
+use container_workspace\local\workspace_helper;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -53,6 +53,11 @@ final class delete_discussion implements mutation_resolver, has_middleware {
         }
 
         discussion_helper::delete_discussion($discussion, $USER->id);
+
+        // Update the timestamp of the workspace.
+        $workspace = $discussion->get_workspace();
+        workspace_helper::update_workspace_timestamp($workspace, $USER->id);
+
         return true;
     }
 
@@ -62,8 +67,7 @@ final class delete_discussion implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
-            new require_advanced_feature('container_workspace'),
+            new require_advanced_feature('container_workspace')
         ];
     }
-
 }

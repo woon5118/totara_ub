@@ -64,6 +64,8 @@ class rb_source_engagedworkspace extends rb_base_source {
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_engagedworkspace');
         $this->sourcelabel = get_string('sourcelabel', 'rb_source_engagedworkspace');
 
+        $this->sourcewhere = '(base.to_be_deleted = 0)';
+
         parent::__construct();
     }
 
@@ -242,7 +244,7 @@ class rb_source_engagedworkspace extends rb_base_source {
                 'nosort' => true
             ]
         );
-        
+
         $usednamefields = totara_get_all_user_name_fields_join('auser');
         $columnoptions[] = new \rb_column_option(
             'engagedworkspace',

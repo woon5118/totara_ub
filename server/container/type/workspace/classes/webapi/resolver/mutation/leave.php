@@ -24,12 +24,12 @@ namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\member\member;
 use container_workspace\webapi\middleware\require_login_workspace;
+use container_workspace\webapi\middleware\workspace_availability_check;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
-use container_workspace\workspace;
 
 /**
  * Mutation for user to leave a workspace
@@ -45,9 +45,6 @@ final class leave implements mutation_resolver, has_middleware {
         global $USER;
 
         $workspace = factory::from_id($args['workspace_id']);
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Invalid container type");
-        }
 
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context($workspace->get_context());
@@ -66,6 +63,7 @@ final class leave implements mutation_resolver, has_middleware {
         return [
             new require_login_workspace('workspace_id'),
             new require_advanced_feature('container_workspace'),
+            new workspace_availability_check('workspace_id')
         ];
     }
 

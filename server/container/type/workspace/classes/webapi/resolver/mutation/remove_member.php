@@ -24,12 +24,12 @@ namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\member\member;
 use container_workspace\webapi\middleware\require_login_workspace;
+use container_workspace\webapi\middleware\workspace_availability_check;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use core_container\factory;
-use container_workspace\workspace;
 
 /**
  * Mutation for removing member out of a workspace
@@ -50,10 +50,6 @@ final class remove_member implements mutation_resolver, has_middleware {
             $ec->set_relevant_context($workspace->get_context());
         }
 
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Invalid workspace type");
-        }
-
         $member = member::from_user($args['user_id'], $workspace->get_id());
         $member->removed_from_workspace($USER->id);
 
@@ -67,6 +63,7 @@ final class remove_member implements mutation_resolver, has_middleware {
         return [
             new require_login_workspace('workspace_id'),
             new require_advanced_feature('container_workspace'),
+            new workspace_availability_check('workspace_id')
         ];
     }
 

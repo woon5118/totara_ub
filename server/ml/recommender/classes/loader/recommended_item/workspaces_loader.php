@@ -87,7 +87,15 @@ final class workspaces_loader extends loader {
 
         // Join against workspaces
         $builder->join(['course', 'c'], 'r.item_id', 'c.id');
-        $builder->join(['workspace', 'w'], 'w.course_id', 'c.id');
+        $builder->join(['workspace', 'w'],
+            function(builder $join): void {
+                $join->where_field('c.id', 'w.course_id');
+
+                // We are filtering out those deleted items.
+                $join->where('w.to_be_deleted', 0);
+            }
+        );
+
         $builder->select_raw('c.*, w.user_id, w.id AS w_id');
         $builder->where('r.component', 'container_workspace');
 

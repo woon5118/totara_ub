@@ -25,6 +25,7 @@ namespace container_workspace\interactor\member;
 use container_workspace\workspace;
 use core_container\factory;
 use container_workspace\member\member;
+use container_workspace\interactor\workspace\interactor as workspace_interactor;
 
 /**
  * A helper class that is constructed with {user_enrolment}'s id and the user's id, which helps to fetch
@@ -59,6 +60,9 @@ final class interactor {
     }
 
     /**
+     * Remove will suspend the enrolment of the member.
+     * This differs from the delete behaviour which actually removes records in the database.
+     *
      * @return bool
      */
     public function can_remove(): bool {
@@ -81,6 +85,24 @@ final class interactor {
 
         $context = $workspace->get_context();
         return has_capability('container/workspace:removemember', $context, $this->user_id);
+    }
+
+    /**
+     * To delete a member record, an actor must have the ability to delete a workspace.
+     *
+     * @return bool
+     */
+    public function can_delete(): bool {
+        $member_user_id = $this->member->get_user_id();
+        if ($member_user_id == $this->user_id) {
+            // Same user origin - hence we allow them to delete their own record.
+            return true;
+        }
+
+        $workspace = $this->member->get_workspace();
+        $workspace_interactor = new workspace_interactor($workspace, $this->user_id);
+
+        return $workspace_interactor->can_delete();
     }
 
     /**

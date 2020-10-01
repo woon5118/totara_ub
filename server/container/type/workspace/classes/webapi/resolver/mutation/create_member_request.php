@@ -23,6 +23,7 @@
 namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\member\member_request;
+use container_workspace\webapi\middleware\workspace_availability_check;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
@@ -47,9 +48,6 @@ final class create_member_request implements mutation_resolver, has_middleware {
 
         /** @var workspace $workspace */
         $workspace = factory::from_id($workspace_id);
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Invalid container type");
-        }
 
         if (!$ec->has_relevant_context()) {
             $context = $workspace->get_context();
@@ -65,7 +63,8 @@ final class create_member_request implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
-            new require_advanced_feature('container_workspace')
+            new require_advanced_feature('container_workspace'),
+            new workspace_availability_check('workspace_id')
         ];
     }
 }

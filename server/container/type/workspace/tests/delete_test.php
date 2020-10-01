@@ -27,6 +27,8 @@ use core\webapi\execution_context;
 use totara_core\advanced_feature;
 use totara_webapi\graphql;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+use container_workspace\event\workspace_deleted;
+use container_workspace\totara_engage\share\recipient\library;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -83,6 +85,7 @@ class container_workspace_delete_testcase extends advanced_testcase {
             SELECT 1 FROM "ttr_course" c
             INNER JOIN "ttr_workspace" wo ON wo.course_id = c.id
             WHERE c.id = :course_id
+            AND wo.to_be_deleted = 0
         ';
 
         $this->assertFalse($DB->record_exists_sql($sql, ['course_id' => $workspace->id]));
@@ -120,7 +123,81 @@ class container_workspace_delete_testcase extends advanced_testcase {
 
         $args = ['workspace_id' => $workspace->get_id()];
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'The actor cannot delete the workspace');
+        $this->assert_webapi_operation_failed($result, get_string('error:delete_workspace', 'container_workspace'));
         $this->assertEquals($workspace->id, $tracker->get_last_visit_workspace(), 'wrong visited workspace');
+    }
+
+    /**
+     * @return void
+     */
+    public function test_delete_workspace_that_trigger_event(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        $event_sink = phpunit_util::start_event_redirection();
+        self::assertEmpty($event_sink->get_events());
+
+        $workspace_id = $workspace->get_id();
+        self::assertTrue($DB->record_exists('course', ['id' => $workspace_id]));
+
+        workspace_helper::delete_workspace($workspace);
+        self::assertFalse($DB->record_exists('course', ['id' => $workspace_id]));
+
+        $events = $event_sink->get_events();
+        self::assertNotEmpty($events);
+
+        // 3 events in total - because the first 2 events are for deleting the enrol instance.
+        self::assertCount(3, $events);
+
+        // The last event is about workspace deleted event.
+        $deleted_event = end($events);
+
+        self::assertInstanceOf(workspace_deleted::class, $deleted_event);
+        self::assertEquals($user_one->id, $deleted_event->userid);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_delete_workspace_should_also_remove_the_recipient_records(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        /** @var engage_article_generator $article_generator */
+        $article_generator = $generator->get_plugin_generator('engage_article');
+        $article = $article_generator->create_public_article();
+
+        $library = new library($workspace->get_id());
+        $shares = $article_generator->share_article($article, [$library]);
+
+        self::assertNotEmpty($shares);
+        self::assertCount(1, $shares);
+
+        $share = reset($shares);
+
+        self::assertTrue($DB->record_exists('engage_share_recipient', ['id' => $share->get_recipient_id()]));
+        self::assertTrue($DB->record_exists('course', ['id' => $workspace->get_id()]));
+
+        // Delete the workspace should delete the recipient.
+        workspace_helper::delete_workspace($workspace);
+
+        self::assertFalse($DB->record_exists('engage_share_recipient', ['id' => $share->get_recipient_id()]));
+        self::assertFalse($DB->record_exists('course', ['id' => $workspace->get_id()]));
     }
 }

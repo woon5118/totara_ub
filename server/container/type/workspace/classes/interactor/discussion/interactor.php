@@ -70,6 +70,14 @@ final class interactor {
     }
 
     /**
+     * @return bool
+     */
+    private function is_workspace_deleted(): bool {
+        $workspace = $this->discussion->get_workspace();
+        return $workspace->is_to_be_deleted();
+    }
+
+    /**
      * The logics are quite simple:
      * + Site admin user is a super user
      * + If you left the workspace, then you are not eligible to update the discussion despite of yoy are the author.
@@ -78,6 +86,11 @@ final class interactor {
      * @return bool
      */
     public function can_update(): bool {
+        if ($this->is_workspace_deleted()) {
+            // Workspace has been deleted - no one can really update the discussion.
+            return false;
+        }
+
         // If you have the super capability to moderate discussions, you're able to edit regardless of status
         if ($this->can_manage()) {
             return true;
@@ -110,6 +123,9 @@ final class interactor {
      * + If you left the workspace, then you are not eligible to delete the discussion despite of you are the author.
      * + If you are still within the workspace, and you are the owner of this very discussion then you are good.
      * + If you are the owner of the workspace then you are able to delete the discussion.
+     *
+     * Note that we are not checking whether the workspace has been deleted here, because we do not
+     * want any new content to add to the workspace, but we would want it to be deleted out.
      *
      * @return bool
      */
@@ -159,6 +175,11 @@ final class interactor {
      * @return bool
      */
     public function can_comment(): bool {
+        if ($this->is_workspace_deleted()) {
+            // Workspace is deleted - hence no one can really comment on it.
+            return false;
+        }
+
         if ($this->can_manage()) {
             return true;
         }
@@ -194,6 +215,11 @@ final class interactor {
      * @return bool
      */
     public function can_react(): bool {
+        if ($this->is_workspace_deleted()) {
+            // Workspace has been deleted - no one can react to the discussion now.
+            return false;
+        }
+
         // If it's already been removed, we can't react
         if ($this->is_removed()) {
             return false;
@@ -205,8 +231,8 @@ final class interactor {
             return false;
         }
 
-        $workspace_id = $this->discussion->get_workspace_id();
-        $workspace_interactor = workspace_interactor::from_workspace_id($workspace_id, $this->actor_id);
+        $workspace = $this->discussion->get_workspace();
+        $workspace_interactor = new workspace_interactor($workspace, $this->actor_id);
 
         return $workspace_interactor->is_joined();
     }
@@ -217,6 +243,11 @@ final class interactor {
      * @return bool
      */
     public function can_pin(): bool {
+        if ($this->is_workspace_deleted()) {
+            // Workspace is deleted - no one can pin discussion now.
+            return false;
+        }
+
         // If it's already been removed, we can't pin
         if ($this->is_removed()) {
             return false;
@@ -226,9 +257,8 @@ final class interactor {
             return true;
         }
 
-        $workspace_id = $this->discussion->get_workspace_id();
-        $interactor = workspace_interactor::from_workspace_id($workspace_id, $this->actor_id);
-
+        $workspace = $this->discussion->get_workspace();
+        $interactor = new workspace_interactor($workspace, $this->actor_id);
         return $interactor->can_manage();
     }
 
@@ -238,7 +268,13 @@ final class interactor {
      * @throws \coding_exception
      */
     private function can_manage(): bool {
-        $workspace_context = $this->discussion->get_workspace()->get_context();
+        if ($this->is_workspace_deleted()) {
+            // Workspace is deleted - no one can really manage the discussion.
+            return false;
+        }
+
+        $workspace = $this->discussion->get_workspace();
+        $workspace_context = $workspace->get_context();
         return has_capability('container/workspace:discussionmanage', $workspace_context, $this->actor_id);
     }
 
@@ -248,17 +284,21 @@ final class interactor {
      * @return bool
      */
     public function can_report(): bool {
+        if ($this->is_workspace_deleted()) {
+            // Workspace has been deleted - hence no body can really report anything.
+            return false;
+        }
+
         // If it's already been removed, we can't report
         if ($this->is_removed()) {
             return false;
         }
 
         $owner_id = $this->discussion->get_user_id();
-        if ($owner_id == $this->actor_id) {
-            return false;
-        }
 
-        return true;
+        // As long as you are not an owner of this very discussion,
+        // you are able to report it.
+        return $owner_id != $this->actor_id;
     }
 
     /**

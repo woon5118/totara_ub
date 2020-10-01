@@ -27,6 +27,7 @@ use container_workspace\totara\menu\your_spaces;
 use core_container\factory;
 use totara_core\advanced_feature;
 use totara_tui\output\component;
+use container_workspace\workspace;
 
 require_once(__DIR__ . "/../../../config.php");
 global $OUTPUT, $PAGE;
@@ -39,11 +40,24 @@ $workspace_id = required_param('id', PARAM_INT);
 $sort = optional_param('source', sort::RECENT, PARAM_INT);
 $extension = optional_param('source', '', PARAM_ALPHA);
 
-$context = \context_course::instance($workspace_id);
+/** @var workspace $workspace */
 $workspace = factory::from_id($workspace_id);
 
+if (!$workspace->is_typeof(workspace::get_type())) {
+    throw new \coding_exception("Cannot view the files of non workspace container");
+}
+
+$interactor = new interactor($workspace);
+$context = $workspace->get_context();
+
 $PAGE->set_context($context);
-$PAGE->set_title(get_string('files', 'container_workspace'));
+
+if ($interactor->can_view_workspace()) {
+    $PAGE->set_title(get_string('files', 'container_workspace'));
+} else {
+    $PAGE->set_title(get_string('error:view_workspace', 'container_workspace'));
+}
+
 $PAGE->set_pagelayout('legacynolayout');
 $PAGE->set_url("/container/type/workspace/workspace_files.php", ['id' => $workspace_id]);
 $PAGE->set_totara_menu_selected(your_spaces::class);
@@ -54,8 +68,7 @@ if (!sort::is_valid($sort)) {
 
 $tui = new component('container_workspace/pages/WorkspaceEmptyPage');
 
-$interactor = new interactor($workspace);
-if ($interactor->can_view_discussions()) {
+if ($interactor->can_view_workspace()) {
     $tui = new component(
         'container_workspace/pages/WorkspaceFilePage',
         [

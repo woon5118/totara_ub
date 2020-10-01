@@ -30,6 +30,7 @@ use core\json_editor\node\audio;
 use core\json_editor\node\file\base_file;
 use core\json_editor\node\image;
 use core\json_editor\node\video;
+use core_container\factory;
 use totara_comment\loader\comment_loader;
 use totara_reaction\loader\reaction_loader;
 
@@ -479,7 +480,12 @@ final class discussion {
      */
     public function get_workspace(): workspace {
         $workspace_id = $this->entity->course_id;
-        return workspace::from_id($workspace_id);
+
+        /** @var workspace $workspace */
+        $workspace = factory::from_id($workspace_id);
+
+        // Factory will load from cache - hence this should be fast enough.
+        return $workspace;
     }
 
     /**

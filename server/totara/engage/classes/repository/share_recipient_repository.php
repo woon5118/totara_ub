@@ -24,7 +24,6 @@ namespace totara_engage\repository;
 
 use core\orm\entity\repository;
 use core\orm\query\builder;
-use totara_engage\entity\share;
 use totara_engage\entity\share_recipient;
 use totara_engage\share\share as share_model;
 
@@ -130,5 +129,22 @@ final class share_recipient_repository extends repository {
 
         /** @var share_recipient $entity */
         return $entity;
+    }
+
+    /**
+     * @param string $component
+     * @param string $area
+     * @param int $instance_id
+     *
+     * @return void
+     */
+    public function delete_recipients_by_identifier(string $component, string $area, int $instance_id): void {
+        $builder = builder::table(share_recipient::TABLE);
+
+        $builder->where('instanceid', $instance_id);
+        $builder->where('component', $component);
+        $builder->where('area', $area);
+
+        $builder->delete();
     }
 }

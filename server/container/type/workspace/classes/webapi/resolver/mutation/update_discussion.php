@@ -23,7 +23,6 @@
 namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\discussion\discussion_helper;
-use container_workspace\workspace;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;

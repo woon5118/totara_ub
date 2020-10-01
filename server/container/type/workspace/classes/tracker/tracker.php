@@ -93,6 +93,15 @@ final class tracker {
             $time = time();
         }
 
+        if ($workspace->is_to_be_deleted()) {
+            // Workspace is about to deleted. No point to update the time tracking.
+            debugging(
+                "Workspace is deleted, cannot track workspace anymore",
+                DEBUG_DEVELOPER
+            );
+            return;
+        }
+
         $workspace_id = $workspace->get_id();
         $builder = builder::table(user_last_access::TABLE);
 
@@ -125,11 +134,22 @@ final class tracker {
         global $CFG;
 
         $builder = builder::table(user_last_access::TABLE, 'ul');
+        $builder->select('ul.*');
+
         $builder->join(
             ['course', 'c'],
-            function (builder $builder): void {
-                $builder->where_field('c.id', 'ul.courseid');
-                $builder->where('c.containertype', workspace::get_type());
+            function (builder $join): void {
+                $join->where_field('c.id', 'ul.courseid');
+                $join->where('c.containertype', workspace::get_type());
+            }
+        );
+
+        // Excluding the workspaces that are flagged to be deleted.
+        $builder->join(
+            ['workspace', 'w'],
+            function (builder $join): void {
+                $join->where_field('c.id', 'w.course_id');
+                $join->where('w.to_be_deleted', 0);
             }
         );
 
@@ -171,12 +191,13 @@ final class tracker {
         $builder = builder::table(user_last_access::TABLE, 'ul');
         $builder->join(
             ['course', 'c'],
-            function (builder $builder): void {
-                $builder->where_field('c.id', 'ul.courseid');
-                $builder->where('c.containertype', workspace::get_type());
+            function (builder $join): void {
+                $join->where_field('c.id', 'ul.courseid');
+                $join->where('c.containertype', workspace::get_type());
             }
         );
 
+        $builder->select('ul.*');
         $builder->where('ul.courseid', $workspace_id);
         $builder->where('ul.userid', $this->user_id);
         $builder->map_to(user_last_access::class);

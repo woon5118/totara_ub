@@ -11,6 +11,7 @@
         <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="private" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Whether to tell the workspace is private or public"/>
         <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="A flag to keep track of whether there are any new updates happening within the workspace"/>
+        <FIELD NAME="to_be_deleted" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="A flag to tell whether the workspace will be deleted or not. As the deletion of workspace will be done by cron task. Hence the field is needed, to exclude the deletion."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

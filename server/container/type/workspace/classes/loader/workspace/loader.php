@@ -168,6 +168,14 @@ final class loader {
 
         $builder->where_raw($sql_where, $sql_params);
 
+        $to_be_deleted = $query->get_to_be_deleted();
+        $builder->when(
+            (null !== $to_be_deleted),
+            function (builder $builder) use ($to_be_deleted) {
+                $builder->where('wo.to_be_deleted', $to_be_deleted);
+            }
+        );
+
         $cursor = $query->get_cursor();
         return new offset_cursor_paginator($builder, $cursor);
     }

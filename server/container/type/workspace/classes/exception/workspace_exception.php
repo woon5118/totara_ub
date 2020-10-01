@@ -57,4 +57,11 @@ final class workspace_exception extends \moodle_exception {
     public static function on_view(): workspace_exception {
         return new static('error:view_workspace');
     }
+
+    /**
+     * @return workspace_exception
+     */
+    public static function on_delete(): workspace_exception {
+        return new static('error:delete_workspace');
+    }
 }

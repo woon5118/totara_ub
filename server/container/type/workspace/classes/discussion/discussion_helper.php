@@ -29,8 +29,13 @@ use container_workspace\event\discussion_updated;
 use container_workspace\exception\discussion_exception;
 use container_workspace\interactor\discussion\interactor as discussion_interactor;
 use container_workspace\interactor\workspace\interactor as workspace_interactor;
+use container_workspace\loader\discussion\loader as discussion_loader;
 use container_workspace\local\workspace_helper;
+use container_workspace\query\discussion\query as discussion_query;
+use container_workspace\query\discussion\sort;
 use container_workspace\workspace;
+use core\orm\query\builder;
+use core\pagination\offset_cursor;
 use totara_comment\comment_helper;
 use totara_reaction\reaction_helper;
 
@@ -102,10 +107,6 @@ final class discussion_helper {
         if (!$interactor->can_delete()) {
             throw discussion_exception::on_delete();
         }
-
-        // Update the timestamp of the workspace.
-        $workspace = $discussion->get_workspace();
-        workspace_helper::update_workspace_timestamp($workspace, $actor_id);
 
         // Trigger event before deleting first.
         $event = discussion_deleted::from_discussion($discussion, $actor_id);
@@ -236,5 +237,55 @@ final class discussion_helper {
             discussion::AREA,
             $discussion_id
         );
+    }
+
+    /**
+     * Deleting all the discussions of the workspace.
+     * This function should be used when the workspace is deleted, not when
+     * the workspace is not deleted. However, it is not responsible to check whether
+     * the workspace has been deleted or not. Its itnention is to delete the discussions only.
+     *
+     * @param workspace $workspace
+     * @param int|null  $actor_id
+     * @param int       $bach_limit     How many records do we want to delete per one batch. As the deletion is
+     *                                  being done with batch deleting.
+     *
+     * @return void
+     */
+    public static function delete_discussions_of_workspace(workspace $workspace, ?int $actor_id = null,
+                                                           int $bach_limit = 100): void {
+        global $USER;
+
+        if (empty($actor_id)) {
+            $actor_id = $USER->id;
+        }
+
+        $transaction = builder::get_db()->start_delegated_transaction();
+
+        // We are going to use this cursor thru out the whole process.
+        // It is because the loader is moving forward, hence for every single batch deleted,
+        // we will miss one page as the next cursor would be invalid after the deletion happened.
+        $cursor = new offset_cursor([
+            'limit' => $bach_limit,
+            'page' => 1
+        ]);
+
+        $query = new discussion_query($workspace->get_id());
+        $query->set_cursor($cursor);
+        $query->set_sort(sort::DATE_POSTED);
+
+        $cursor_paginator = discussion_loader::get_discussions($query);
+        $discussions = $cursor_paginator->get_items()->all();
+
+        while (!empty($discussions)) {
+            foreach ($discussions as $discussion) {
+                self::delete_discussion($discussion, $actor_id);
+            }
+
+            $cursor_paginator = discussion_loader::get_discussions($query);
+            $discussions = $cursor_paginator->get_items()->all();
+        }
+
+        $transaction->allow_commit();
     }
 }

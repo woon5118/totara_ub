@@ -233,6 +233,8 @@ class rb_source_engagedusers extends rb_base_source {
                 FROM {engage_share_recipient} r
                 INNER JOIN {engage_share} s
                 ON s.id = r.shareid
+                INNER JOIN {workspace} wo ON wo.course_id = r.instanceid
+                AND wo.to_be_deleted = 0
                 WHERE r.sharerid = base.id
                 AND (r.area = '{$area}'
                 OR r.component = '{$component}'))",
@@ -252,6 +254,7 @@ class rb_source_engagedusers extends rb_base_source {
                 "(SELECT COUNT(c.id) FROM {course} c
                 INNER JOIN {workspace} o
                 ON c.id = o.course_id
+                AND o.to_be_deleted = 0
                 WHERE o.user_id = base.id)",
                 [
                     'displayfunc' => 'plaintext',

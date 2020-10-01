@@ -43,9 +43,9 @@ final class workspace_deleted extends base {
      * @param workspace $workspace
      * @param int|null $actor_id
      *
-     * @return workspace_updated
+     * @return workspace_deleted
      */
-    public static function from_workspace(workspace $workspace, ?int $actor_id = null): workspace_updated {
+    public static function from_workspace(workspace $workspace, ?int $actor_id = null): workspace_deleted {
         global $USER;
 
         if (null === $actor_id || 0 === $actor_id) {
@@ -55,7 +55,7 @@ final class workspace_deleted extends base {
         $owner_id = $workspace->get_user_id();
         $workspace_id = $workspace->get_id();
 
-        /** @var workspace_updated $event */
+        /** @var workspace_deleted $event */
         $event = static::create([
             'courseid' => $workspace_id,
             'objectid' => $workspace_id,

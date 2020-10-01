@@ -24,6 +24,7 @@ namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\discussion\discussion;
 use container_workspace\discussion\discussion_helper;
+use container_workspace\webapi\middleware\workspace_availability_check;
 use container_workspace\workspace;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
@@ -50,10 +51,6 @@ final class create_discussion implements mutation_resolver, has_middleware {
         /** @var workspace $workspace */
         $workspace = factory::from_id($args['workspace_id']);
 
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Invalid container type");
-        }
-
         if (!$ec->has_relevant_context()) {
             $context = $workspace->get_context();
             $ec->set_relevant_context($context);
@@ -70,17 +67,13 @@ final class create_discussion implements mutation_resolver, has_middleware {
             $draft_id = (int) $args['draft_id'];
         }
 
-        $discussion = discussion_helper::create_discussion(
+        return discussion_helper::create_discussion(
             $workspace,
             $args['content'],
             $draft_id,
             $content_format,
             $USER->id
         );
-
-        // We need to update
-
-        return $discussion;
     }
 
     /**
@@ -90,7 +83,8 @@ final class create_discussion implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('container_workspace'),
-            new clean_editor_content('content', 'content_format')
+            new clean_editor_content('content', 'content_format'),
+            new workspace_availability_check('workspace_id')
         ];
     }
 }

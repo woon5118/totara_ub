@@ -20,32 +20,31 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package container_workspace
  */
-namespace container_workspace\entity;
-
-use core\orm\entity\entity;
+defined('MOODLE_INTERNAL') || die();
 
 /**
- * @property int|null   $user_id
- * @property int        $course_id
- * @property int        $id
- * @property bool       $private
- * @property int        $timestamp
- * @property bool       $to_be_deleted
+ * @param int $old_version
+ * @return bool
  */
-final class workspace extends entity {
-    /**
-     * @var string
-     */
-    public const TABLE = 'workspace';
+function xmldb_container_workspace_upgrade($old_version) {
+    global $DB, $CFG;
+    require_once("{$CFG->dirroot}/container/type/workspace/db/upgradelib.php");
 
-    /**
-     * This function is to cast any boolean-like value such as zero/one into an actual boolean.
-     * The reason why we use this is because the value we store in database is actual zero/one.
-     *
-     * @param bool $value
-     * @return bool
-     */
-    protected function get_to_be_deleted_attribute(bool $value): bool {
-        return $value;
+    $db_manager = $DB->get_manager();
+
+    if ($old_version < 2020100101) {
+        // Define field to_be_deleted to be added to workspace.
+        $table = new xmldb_table('workspace');
+        $field = new xmldb_field('to_be_deleted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'timestamp');
+
+        // Conditionally launch add field to_be_deleted.
+        if (!$db_manager->field_exists($table, $field)) {
+            $db_manager->add_field($table, $field);
+        }
+
+        // Workspace savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100101, 'container', 'workspace');
     }
+
+    return true;
 }

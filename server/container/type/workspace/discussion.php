@@ -37,16 +37,22 @@ advanced_feature::require('container_workspace');
 
 $discussion = discussion::from_id($discussion_id);
 $workspace = $discussion->get_workspace();
+
 $context = $workspace->get_context();
-
-$PAGE->set_url("/container/type/workspace/discussion.php", ['id' => $discussion_id]);
 $PAGE->set_context($context);
-$PAGE->set_totara_menu_selected(your_spaces::class);
-
-$PAGE->set_title(format_string($workspace->fullname));
-$PAGE->set_pagelayout('legacynolayout');
 
 $interactor = new interactor($workspace);
+
+if ($interactor->can_view_discussions()) {
+    $PAGE->set_title(format_string($workspace->fullname));
+} else {
+    $PAGE->set_title(get_string('error:view_workspace', 'container_workspace'));
+}
+
+$PAGE->set_url("/container/type/workspace/discussion.php", ['id' => $discussion_id]);
+$PAGE->set_totara_menu_selected(your_spaces::class);
+$PAGE->set_pagelayout('legacynolayout');
+
 $tui = new component('container_workspace/pages/WorkspaceEmptyPage');
 
 if ($interactor->can_view_discussions()) {

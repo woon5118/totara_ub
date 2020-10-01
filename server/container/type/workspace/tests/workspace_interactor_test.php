@@ -127,4 +127,152 @@ class container_workspace_workspace_interactor_testcase extends advanced_testcas
 
         $this->assertFalse($user_two_interactor->can_manage());
     }
+
+    /**
+     * @return void
+     */
+    public function test_check_against_deleted_workspace(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        $interactor = new interactor($workspace, $user_one->id);
+
+        self::assertTrue(
+            $interactor->can_view_discussions(),
+            "User should be able able to view discussions before workspace delete"
+        );
+
+        self::assertTrue(
+            $interactor->can_view_members(),
+            "User should be able to view members before workspace delete"
+        );
+
+        self::assertTrue(
+            $interactor->can_view_workspace(),
+            "User should be able to view the workspace before workspace delete"
+        );
+
+        self::assertTrue(
+            $interactor->can_view_workspace_with_tenant_check(),
+            "User should be able to the workspace before workspace delete"
+        );
+
+        self::assertTrue(
+            $interactor->can_view_library(),
+            "User should be able to view library before workspace delete"
+        );
+
+        self::assertTrue(
+            $interactor->can_manage(),
+            "User should be able to manage workspace before it get deleted"
+        );
+
+        self::assertTrue(
+            $interactor->can_update(),
+            "User should be able to update workspace before it get deleted"
+        );
+
+        self::assertTrue($interactor->can_delete(), "User should be able to delete workspace");
+        self::assertFalse($interactor->can_join(), "User should not be able to join the workspace");
+        self::assertTrue($interactor->can_remove_members(), "User should be able to remove the member of workspace");
+        self::assertFalse(
+            $interactor->can_decline_member_request(),
+            "User should not be able to decline member request because workspace is a public"
+        );
+
+        self::assertTrue(
+            $interactor->can_share_resources(),
+            "User should be able to share the resources before workspace delete"
+        );
+
+        self::assertTrue(
+            $interactor->can_unshare_resources(),
+            "User should be able to share the resources before workspace delete"
+        );
+
+        self::assertTrue(
+            $interactor->can_invite(),
+            "User should be able to invite members to workspace before deletion"
+        );
+
+        $workspace->mark_to_be_deleted();
+        $interactor->reload_workspace();
+
+        self::assertFalse(
+            $interactor->can_view_discussions(),
+            "User should not be able able to view discussions after workspace delete"
+        );
+
+        self::assertFalse(
+            $interactor->can_view_members(),
+            "User should not be able to view members after workspace delete"
+        );
+
+        self::assertFalse(
+            $interactor->can_view_workspace(),
+            "User should not be able to view the workspace after workspace delete"
+        );
+
+        self::assertFalse(
+            $interactor->can_view_workspace_with_tenant_check(),
+            "User should not be able to the workspace after workspace delete"
+        );
+
+        self::assertFalse(
+            $interactor->can_view_library(),
+            "User should not be able to view library after workspace delete"
+        );
+
+        self::assertFalse(
+            $interactor->can_manage(),
+            "User should not be able to manage workspace after it get deleted"
+        );
+
+        self::assertFalse(
+            $interactor->can_update(),
+            "User should not be able to update workspace after it get deleted"
+        );
+
+        self::assertTrue(
+            $interactor->can_delete(),
+            "User should be able to delete workspace even after it get flag to deleted"
+        );
+
+        self::assertFalse(
+            $interactor->can_join(),
+            "User should not be able to join the workspace as user is already a member of the workspace"
+        );
+
+        self::assertTrue(
+            $interactor->can_remove_members(),
+            "User should be able to remove the member of workspace, as it does not care about deleted flag"
+        );
+
+        self::assertFalse(
+            $interactor->can_decline_member_request(),
+            "User should not be able to decline member request because workspace is a public"
+        );
+
+        self::assertFalse(
+            $interactor->can_share_resources(),
+            "User should not be able to share the resources after workspace delete"
+        );
+
+        self::assertTrue(
+            $interactor->can_unshare_resources(),
+            "User should be able to unshare the resources even the workspace is deleted"
+        );
+
+        self::assertFalse(
+            $interactor->can_invite(),
+            "User should not be able to invite members to workspace after deletion"
+        );
+    }
 }

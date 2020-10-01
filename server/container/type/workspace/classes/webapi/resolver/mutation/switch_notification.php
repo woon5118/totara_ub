@@ -23,6 +23,7 @@
 namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\notification\workspace_notification;
+use container_workspace\webapi\middleware\workspace_availability_check;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
@@ -64,10 +65,6 @@ final class switch_notification implements mutation_resolver, has_middleware {
             $ec->set_relevant_context($workspace->get_context());
         }
 
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Cannot find workspace by id {$workspace_id}");
-        }
-
         $status = $args['status'];
 
         if (static::STATUS_ON === $status) {
@@ -87,7 +84,8 @@ final class switch_notification implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
-            new require_advanced_feature('container_workspace')
+            new require_advanced_feature('container_workspace'),
+            new workspace_availability_check('workspace_id')
         ];
     }
 }

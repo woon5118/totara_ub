@@ -24,8 +24,8 @@ namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\exception\workspace_exception;
 use container_workspace\interactor\workspace\interactor;
+use container_workspace\webapi\middleware\workspace_availability_check;
 use container_workspace\workspace;
-use core\json_editor\helper\document_helper;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -54,14 +54,7 @@ final class update implements mutation_resolver, has_middleware {
             $ec->set_relevant_context($workspace->get_context());
         }
 
-        $type = workspace::get_type();
-
-        if (!$workspace->is_typeof($type)) {
-            throw new \coding_exception("Cannot update different container within workspace resolver");
-        }
-
         $owner_id = $workspace->get_user_id();
-
         $interactor = new interactor($workspace, $USER->id);
 
         if ($USER->id != $owner_id && !$interactor->can_update()) {
@@ -131,7 +124,7 @@ final class update implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('container_workspace'),
+            new workspace_availability_check('id')
         ];
     }
-
 }

@@ -209,7 +209,7 @@ class container_workspace_discussion_testcase extends advanced_testcase {
 
         $ec = execution_context::create('ajax', 'container_workspace_post_discussion');
         $result = graphql::execute_operation($ec, [
-            'workspace_id' =>$workspace->get_id(),
+            'workspace_id' => $workspace->get_id(),
             'draft_id' => $draft_id,
             'content_format' => FORMAT_JSON_EDITOR,
             'content' => json_encode([

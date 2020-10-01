@@ -22,19 +22,24 @@
  */
 namespace container_workspace\local;
 
+use container_workspace\discussion\discussion_helper;
+use container_workspace\event\workspace_deleted;
 use container_workspace\exception\workspace_exception;
 use container_workspace\interactor\workspace\category_interactor;
 use container_workspace\interactor\workspace\interactor;
 use container_workspace\loader\member\loader;
 use container_workspace\member\member;
-use container_workspace\query\member\query;
+use container_workspace\member\member_handler;
 use container_workspace\task\notify_new_workspace_owner_task;
+use container_workspace\totara_engage\share\recipient\library;
 use container_workspace\tracker\tracker;
 use container_workspace\workspace;
 use core\orm\query\builder;
 use core\task\manager;
 use totara_core\content\processor\hashtag_processor;
 use totara_core\content\content;
+use totara_engage\entity\share_recipient;
+use totara_engage\repository\share_recipient_repository;
 
 /**
  * Class workspace_helper
@@ -161,28 +166,16 @@ final class workspace_helper {
 
         $interactor = new interactor($workspace, $actor_id);
         if (!$interactor->can_delete()) {
-            throw new \coding_exception("The actor cannot delete the workspace");
+            throw workspace_exception::on_delete();
         }
 
         $transaction = builder::get_db()->start_delegated_transaction();
+        $deleted_event = workspace_deleted::from_workspace($workspace, $actor_id);
 
-        $query = new query($workspace->get_id());
-        $cursor = $query->get_cursor();
+        $member_handler = new member_handler($actor_id);
+        $member_handler->delete_members_of_workspace($workspace);
 
-        while (null !== $cursor) {
-            $paginator = loader::get_members($query);
-            $members = $paginator->get_items()->all();
-
-            /** @var member $member */
-            foreach ($members as $member) {
-                $member->delete($actor_id);
-            }
-
-            $cursor = $paginator->get_next_cursor();
-            if (null !== $cursor) {
-                $query->set_cursor($cursor);
-            }
-        }
+        discussion_helper::delete_discussions_of_workspace($workspace, $actor_id);
 
         // Clear the tracker for navigating the right page.
         tracker::clear_all_for_workspace($workspace->get_id());
@@ -191,11 +184,24 @@ final class workspace_helper {
         $manager = $workspace->get_enrolment_manager();
         $manager->delete_enrol_instances($actor_id);
 
+        // Start deleting the workspace as a recipients of all the shares.
+
+        /** @var share_recipient_repository $repository */
+        $repository = share_recipient::repository();
+        $repository->delete_recipients_by_identifier(
+            workspace::get_type(),
+            library::AREA,
+            $workspace->get_id()
+        );
+
         // Then finally, deleted the workspace itself.
         $workspace->delete();
 
         // Make all the changes permanent.
         $transaction->allow_commit();
+
+        // Transaction is over - we trigger event.
+        $deleted_event->trigger();
     }
 
     /**
@@ -248,6 +254,11 @@ final class workspace_helper {
         global $USER;
         if (empty($actor_id)) {
             $actor_id = $USER->id;
+        }
+
+        if ($workspace->is_to_be_deleted()) {
+            // No point to go to the rest of the code.
+            return;
         }
 
         if (empty($time)) {

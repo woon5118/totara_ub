@@ -22,6 +22,7 @@
  */
 namespace container_workspace\webapi\resolver\mutation;
 
+use container_workspace\webapi\middleware\workspace_availability_check;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -43,11 +44,8 @@ final class add_members implements mutation_resolver, has_middleware {
 
         /** @var workspace $workspace */
         $workspace = factory::from_id($workspace_id);
-        if (!$workspace->is_typeof(workspace::get_type())) {
-            throw new \coding_exception("Cannot find workspace by id '{$workspace_id}'");
-        }
-
         $user_ids = $args['user_ids'] ?? [];
+
         if (empty($user_ids)) {
             throw new \coding_exception("Cannot run add members if the list of user ids are empty");
         }
@@ -67,7 +65,8 @@ final class add_members implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
-            new require_advanced_feature('container_workspace')
+            new require_advanced_feature('container_workspace'),
+            new workspace_availability_check('workspace_id')
         ];
     }
 }
