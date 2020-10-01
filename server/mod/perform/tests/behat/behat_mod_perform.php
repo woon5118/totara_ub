@@ -60,6 +60,7 @@ class behat_mod_perform extends behat_base {
     public const TUI_OTHER_PARTICIPANT_RESPONSES_ANONYMOUS_RESPONSE_PARTICIPANT_LOCATOR = '.tui-otherParticipantResponses__anonymousResponse-participant';
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
     public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceSingleParticipantResponse__answer';
+    public const PERFORM_ACTIVITY_PRINT_SECTION_LOCATOR = '.tui-participantContent .tui-participantContent__section .tui-participantContent__section:nth-of-type(%d)';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
     public const PERFORM_ACTIVITY_GENERAL_INFORMATION_RELATIONSHIP_LOCATOR = '.tui-participantGeneralInformation__relationship-heading';
     public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR = '.tui-participantContent__sectionHeading-otherResponseSwitch button';
@@ -444,6 +445,32 @@ class behat_mod_perform extends behat_base {
 
         $this->execute('behat_general::assert_element_contains_text',
             [$expected_relation, $locator, 'css_element']
+        );
+    }
+
+    /**
+     * @Then /^I should see perform print activity relationship to user "([^"]*)"$/
+     *
+     * @param string $expected_relation
+     * @throws ExpectationException
+     */
+    public function i_should_see_perform_print_activity_relationship_to_user(string $expected_relation): void {
+        $this->execute('behat_general::assert_element_contains_text',
+            [$expected_relation, self::PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR, 'css_element']
+        );
+    }
+
+    /**
+     * @Then /^I should (|not )see "([^"]*)" in perform activity print section "([0-9]*)"$/
+     *
+     * @param string $should_or_should_not
+     * @param string $expected_text
+     * @param string $section_number
+     */
+    public function i_should_see_in_print_section(string $should_or_should_not, string $expected_text, string $section_number): void {
+        $method = $should_or_should_not === 'not ' ? 'assert_element_not_contains_text' : 'assert_element_contains_text';
+        $this->execute('behat_general::'. $method,
+            [$expected_text, sprintf(self::PERFORM_ACTIVITY_PRINT_SECTION_LOCATOR, $section_number), 'css_element']
         );
     }
 
