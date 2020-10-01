@@ -103,6 +103,19 @@ class mod_perform_activity_data_provider_testcase extends advanced_testcase {
             ['User1 One', 'User1 Two'],
             [$activities[0]->name, $activities[1]->name]
         );
+
+        // Make sure that assigning the view participation reperting capability will result in the activity being returned
+        $role = builder::table('role')->where('shortname', 'user')->one();
+        assign_capability('mod/perform:view_participation_reporting', CAP_ALLOW, $role->id, $activity_user1_2->get_context_id());
+
+        $this->setUser($user2);
+
+        $activities = $data_provider->fetch()->get()->all();
+        $this->assertCount(2, $activities);
+        $this->assertEqualsCanonicalizing(
+            ['User2 One', 'User1 Two'],
+            [$activities[0]->name, $activities[1]->name]
+        );
     }
 
     private function create_test_data(): stdClass {

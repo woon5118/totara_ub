@@ -262,6 +262,10 @@ class track extends model {
      * @return bool
      */
     public function has_assignments(): bool {
+        if ($this->entity->relation_loaded('assignments')) {
+            return $this->entity->assignments->count() > 0;
+        }
+
         return $this->entity->assignments()->exists();
     }
 
