@@ -110,6 +110,24 @@ class rb_perform_response_export_embedded extends rb_base_embedded {
     }
 
     /**
+     * We explicitly don't allow this report to be cloned.
+     *
+     * @return bool
+     */
+    public static function is_cloning_allowed(): bool {
+        return false;
+    }
+
+    /**
+     * Message to display indicating why this report can't be cloned.
+     *
+     * @return string
+     */
+    public function get_cloning_not_allowed_message(): string {
+        return get_string('embedded_perform_response_export_cloning_not_allowed', 'mod_perform');
+    }
+
+    /**
      * Check if the user is capable of accessing this report.
      *
      * @param int $reportfor userid of the user that this report is being generated for

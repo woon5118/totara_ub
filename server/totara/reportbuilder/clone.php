@@ -45,6 +45,16 @@ $output = $PAGE->get_renderer('totara_reportbuilder');
 $config = (new rb_config())->set_nocache(true);
 $report = reportbuilder::create($id, $config, false); // No access control for managing of reports here.
 
+if ($report->embedded && !$report->embedobj::is_cloning_allowed()) {
+    echo $output->header();
+    echo $output->render_from_template('totara_reportbuilder/clone_report_not_allowed', [
+        'back_url' => (string) new moodle_url('/totara/reportbuilder/manageembeddedreports.php'),
+        'warning' => ['message' => $report->embedobj->get_cloning_not_allowed_message()],
+    ]);
+    echo $output->footer();
+    return;
+}
+
 $currentdata = [
     'id' => $id,
     'returnurl' => $returnurl,

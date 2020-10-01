@@ -1,6 +1,11 @@
 This file describes API changes in reportbuilder,
 information provided here is intended especially for developers.
 
+=== 13.1 ===
+
+* Cloning of embedded reports can be prevented by overriding \rb_base_embedded::is_cloning_allowed(), and a custom
+  message explaining why it can't be cloned can be specified with \rb_base_embedded::get_cloning_not_allowed_message()
+
 === 13.0 ===
 
 * totara report builder does not accept a seminar event role column with the hyphen

@@ -95,6 +95,24 @@ class rb_base_embedded {
     }
 
     /**
+     * Can this embedded report be cloned?
+     *
+     * @return bool
+     */
+    public static function is_cloning_allowed(): bool {
+        return true;
+    }
+
+    /**
+     * Message to display when the embedded report is not allowed to be cloned.
+     *
+     * @return string
+     */
+    public function get_cloning_not_allowed_message(): string {
+        return get_string('clone_embedded_not_allowed', 'totara_reportbuilder', $this->fullname);
+    }
+
+    /**
      * Is this embedded report usable?
      *
      * If true returned the report is not displayed in the list of all embedded reports.

@@ -165,6 +165,7 @@ $string['embedded_perform_participation_subject_instance'] = 'Performance activi
 $string['embedded_perform_response_element_by_activity'] = 'Performance activity response reporting: Elements for single activity';
 $string['embedded_perform_response_element_by_reporting_id'] = 'Performance activity response reporting: Elements for set of reporting IDs';
 $string['embedded_perform_response_export'] = 'Performance activity response export';
+$string['embedded_perform_response_export_cloning_not_allowed'] = 'This report can not be cloned because it can only be used for the exporting of activity responses.';
 $string['embedded_perform_response_subject_instance'] = 'Performance activity response reporting: Subject instances for single subject user';
 $string['embedded_perform_response_user'] = 'Performance activity response reporting: Subject users';
 $string['enable_performance_activities'] = 'Enable Performance Activities';

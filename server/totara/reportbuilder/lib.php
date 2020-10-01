@@ -194,7 +194,25 @@ class reportbuilder {
      */
     protected $pregrouped = false;
 
-    public $reportfor, $embedded, $embedobj, $toolbarsearch;
+    /**
+     * @var bool Is this report an embedded report?
+     */
+    public $embedded;
+
+    /**
+     * @var rb_base_embedded|null The embedded report object if this is an embedded report.
+     */
+    public $embedobj;
+
+    /**
+     * @var int The ID of the user this report is for.
+     */
+    public $reportfor;
+
+    /**
+     * @var bool Is toolbar search enabled?
+     */
+    public $toolbarsearch;
 
     /** @var  int The users default search */
     public $userdefaultsearch;
@@ -7249,6 +7267,10 @@ function reportbuilder_set_default_access($reportid) {
  */
 function reportbuilder_clone_report(reportbuilder $report, $clonename) {
     global $DB, $TEXTAREA_OPTIONS;
+
+    if ($report->embedded && !$report->embedobj::is_cloning_allowed()) {
+        throw new coding_exception($report->embedobj->get_cloning_not_allowed_message());
+    }
 
     $transaction = $DB->start_delegated_transaction();
     $reportid = $report->_id;
