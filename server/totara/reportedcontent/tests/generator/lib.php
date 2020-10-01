@@ -17,11 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralearning.com>
+ * @author Cody Finegan <cody.finegan@totaralearning.com>
  * @package totara_reportedcontent
  */
 defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2020100101;             // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;             // Requires this Moodle version.
-$plugin->component = 'totara_reportedcontent';     // To check on upgrade, that module sits in correct place.
+require_once('totara_reportedcontent_generator.php');

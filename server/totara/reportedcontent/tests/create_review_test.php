@@ -120,7 +120,7 @@ class totara_reportedcontent_create_review_testcase extends advanced_testcase {
     }
 
     public function test_create_review_url() {
-        global $DB, $CFG;
+        global $CFG;
 
         require_once("{$CFG->dirroot}/totara/reportedcontent/tests/fixtures/review_content_watcher.php");
 
@@ -163,7 +163,7 @@ class totara_reportedcontent_create_review_testcase extends advanced_testcase {
             '/kia/ora'
         ];
         foreach ($invalid_urls as $url) {
-            [$unused, $error] = $this->parsed_graphql_operation('totara_reportedcontent_create_review', $tpl + ['url' => $url]);
+            [, $error] = $this->parsed_graphql_operation('totara_reportedcontent_create_review', $tpl + ['url' => $url]);
             $this->assertNotEmpty($error, $url);
             $this->assertStringContainsString('url is not in a valid format', $error, $url);
         }
@@ -173,7 +173,7 @@ class totara_reportedcontent_create_review_testcase extends advanced_testcase {
             'https://example.com/totara/../kia/ora', // !?
         ];
         foreach ($valid_urls as $url) {
-            [$unused, $error] = $this->parsed_graphql_operation('totara_reportedcontent_create_review', $tpl + ['url' => $url]);
+            [, $error] = $this->parsed_graphql_operation('totara_reportedcontent_create_review', $tpl + ['url' => $url]);
             $this->assertEmpty($error, $url);
         }
     }

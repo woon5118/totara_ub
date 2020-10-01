@@ -10,7 +10,8 @@ type totara_reportedcontent_review {
   status: Int
   time_created: Int!
   time_content: Int
-  time_reviewed: Int
+  time_reviewed: Int @deprecated(reason: "Use `time_reviewed_description`.")
+  time_reviewed_description(format: core_date_format!): String
   item_id: Int!
   context_id: Int!
   component: String!

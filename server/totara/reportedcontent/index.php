@@ -34,6 +34,8 @@ if (advanced_feature::is_disabled('engage_resources')
     throw new feature_not_available_exception('engage_resources');
 }
 
+require_login();
+
 $sid = optional_param('sid', 0, PARAM_INT);
 $format = optional_param('format', '', PARAM_ALPHANUMEXT);
 $debug = optional_param('debug', 0, PARAM_INT);

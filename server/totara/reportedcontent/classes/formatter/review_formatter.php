@@ -23,6 +23,7 @@
 
 namespace totara_reportedcontent\formatter;
 
+use core\webapi\formatter\field\date_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;
 use core\webapi\formatter\formatter;
 use totara_reportedcontent\review;
@@ -60,6 +61,7 @@ class review_formatter extends formatter {
         $record->time_created = $review->get_time_created();
         $record->time_content = $review->get_time_content();
         $record->time_reviewed = $review->get_time_reviewed();
+        $record->time_reviewed_description = $review->get_time_reviewed();
         $record->item_id = $review->get_item_id();
         $record->context_id = $review->get_context_id();
         $record->component = $review->get_component();
@@ -101,7 +103,9 @@ class review_formatter extends formatter {
             },
             'time_created' => null,
             'time_content' => null,
+            // time_reviewed is deprecated, use time_reviewed_description instead
             'time_reviewed' => null,
+            'time_reviewed_description' => date_field_formatter::class,
             'item_id' => null,
             'context_id' => null,
             'component' => null,

@@ -86,6 +86,7 @@ class totara_reportedcontent_remove_review_testcase extends advanced_testcase {
 
         $this->assertNotEmpty($review['id']);
         $this->assertSame(review::DECISION_REMOVE, $review['status']);
+        $this->assertArrayHasKey('time_reviewed_description', $review);
 
         // Now check the stored review is what we expect
         $record = $DB->get_record(review_entity::TABLE, ['id' => $review['id']]);

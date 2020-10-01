@@ -32,6 +32,13 @@ define(['core/webapi', 'core/modal_factory', 'core/modal_events'], function(WebA
     document.querySelector('#reportedcontent-actions-' + report + ' .status-' + status).style.display = 'block';
   };
 
+  var setTimeReviewed = function(report, timeReviewed) {
+    var selector = document.querySelector('#reportedcontent-time-reviewed-' + report);
+    if (selector) {
+      selector.textContent = timeReviewed;
+    }
+  };
+
   var loading = function(report) {
     document.querySelector('#reportedcontent-actions-' + report + ' .loading').style.display = 'block';
     document.querySelector('#reportedcontent-actions-' + report + ' .actions').style.display = 'none';
@@ -40,7 +47,7 @@ define(['core/webapi', 'core/modal_factory', 'core/modal_events'], function(WebA
   var init = function() {
     var parent = document.querySelector('table[data-source="rb_source_reportedcontent"]');
     // If there are no results on the page, there's nothing to boot/bind.
-    if (!parent || parent === null) {
+    if (!parent) {
       return;
     }
 
@@ -54,6 +61,7 @@ define(['core/webapi', 'core/modal_factory', 'core/modal_events'], function(WebA
         },
       }).then(function(data) {
         swapForStatus(report, data.review.status);
+        setTimeReviewed(report, data.review.time_reviewed_description);
         M.util.js_complete(action);
       });
     };

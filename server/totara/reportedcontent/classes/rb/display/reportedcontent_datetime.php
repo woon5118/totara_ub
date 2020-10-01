@@ -40,7 +40,17 @@ class reportedcontent_datetime extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report): string {
-        global $USER;
+        global $USER, $OUTPUT;
+
+        if ($format === 'html' && empty($value)) {
+            return $OUTPUT->render_from_template('totara_reportedcontent/report_time_reviewed', [
+                'report_id' => $row->id,
+            ]);
+        }
+
+        if (empty($value)) {
+            return '';
+        }
 
         return userdate(
             $value,

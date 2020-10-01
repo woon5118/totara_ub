@@ -83,9 +83,11 @@ class totara_reportedcontent_approve_review_testcase extends advanced_testcase {
         $review = $result->data['review'];
         $this->assertArrayHasKey('id', $review);
         $this->assertArrayHasKey('status', $review);
+        $this->assertArrayHasKey('time_reviewed_description', $review);
 
         $this->assertNotEmpty($review['id']);
         $this->assertSame(review::DECISION_APPROVE, $review['status']);
+        $this->assertNotEmpty($review['time_reviewed_description']);
 
         // Now check the stored review is what we expect
         $record = $DB->get_record(review_entity::TABLE, ['id' => $review['id']]);

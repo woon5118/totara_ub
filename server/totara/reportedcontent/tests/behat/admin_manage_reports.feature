@@ -19,41 +19,18 @@ Feature: Admin can remove or approve comments that have been reported.
     And the following "surveys" exist in "engage_survey" plugin:
       | question | username | access | topics  |
       | Survey 1 | user1    | PUBLIC | Topic 1 |
-    And "engage_survey" "Survey 1" is shared with the following users:
-      | sharer | recipient |
-      | user1  | admin     |
-      | user1  | user2     |
     And the following "comments" exist in "totara_comment" plugin:
       | name       | username | component       | area    | content          |
       | Article 1  | user1    | engage_article  | comment | article comment  |
       | Playlist 1 | user1    | totara_playlist | comment | playlist comment |
-
-    # Create the reports
-    And I log in as "user2"
-    And I view article "Article 1"
-    And I click on "Comments" "link"
-    And I click on "Menu trigger" "button"
-    And I click on "Report" "link" in the ".tui-commentCard__comment" "css_element"
-
-    And I view playlist "Playlist 1"
-    And I click on "Comments" "link"
-    And I click on "Menu trigger" "button"
-    And I click on "Report" "link" in the ".tui-commentCard__comment" "css_element"
-
-    # Survey
-    And I click on "Your Library" in the totara menu
-    And I click on "Shared with you" "link"
-    And I click on "Vote" "link"
-    And I press "Actions"
-    And I click on "Report content" "link"
-
-    # Article
-    And I view article "Article 1"
-    And I press "Actions"
-    And I click on "Report content" "link"
-    # This step handles the toast interfering with the logout link
-    And I view article "Article 1"
-    And I log out
+    And the following "resource reviews" exist in "totara_reportedcontent" plugin:
+      | component      | name      | username |
+      | engage_article | Article 1 | user2    |
+      | engage_survey  | Survey 1  | user2    |
+    And the following "comment reviews" exist in "totara_reportedcontent" plugin:
+      | component       | area    | name       | comment          | username |
+      | totara_playlist | comment | Playlist 1 | playlist comment | user2    |
+      | engage_article  | comment | Article 1  | article comment  | user2    |
 
   Scenario: As an admin, I can choose to allow reported comments to remain.
     Given I log in as "admin"
@@ -163,18 +140,54 @@ Feature: Admin can remove or approve comments that have been reported.
     And I click on "button.tw-selectSearchText__btn" "css_element"
     And I click on "div[data-tw-grid-item-id=\"reportedcontent-source\"]" "css_element"
     And I wait for pending js
-    And I press "Create and view"
+    And I press "Create and edit"
+    And I follow "Columns"
+    And I set the field "id_newcolumns" to "Date reviewed"
+    And I press "Save changes"
+    And I follow "View This Report"
     And I set the field "reportedcontent-status_op" to "1"
     And I press "id_submitgroupstandard_addfilter"
+    Then "//table/tbody/tr[1]/td[contains(concat(' ',normalize-space(@class),' '),'reportedcontent_time_reviewed')]/div[text()]" "xpath_element" should not exist
 
     When I click on "table[data-source='rb_source_reportedcontent'] tr:nth-child(1) [data-action='remove']" "css_element"
     And I press "Confirm"
     And I wait for pending js
     Then I should see "Removed"
+    Then "//table/tbody/tr[1]/td[contains(concat(' ',normalize-space(@class),' '),'reportedcontent_time_reviewed')]/div[text()]" "xpath_element" should exist
 
     # Modal goes funky with behat, so refresh the page for the second action
     When I set the field "reportedcontent-status_op" to "1"
     And I press "id_submitgroupstandard_addfilter"
-    And I click on "table[data-source='rb_source_reportedcontent'] tr:nth-child(1) [data-action='approve']" "css_element"
+    Then "//table/tbody/tr[1]/td[contains(concat(' ',normalize-space(@class),' '),'reportedcontent_time_reviewed')]/div[text()]" "xpath_element" should not exist
+
+    When I click on "table[data-source='rb_source_reportedcontent'] tr:nth-child(1) [data-action='approve']" "css_element"
     And I wait for pending js
     Then I should see "Allowed"
+
+  Scenario: The date reviewed column is automatically updated when I approve or remove a review.
+    Given I log in as "admin"
+    And I navigate to "Manage embedded reports" node in "Site administration > Reports"
+    And I set the field "report-name" to "Inappropriate content"
+    And I press "id_submitgroupstandard_addfilter"
+    And I follow "Inappropriate content"
+    And I follow "Columns"
+    And I set the field "id_newcolumns" to "Date reviewed"
+    And I press "Save changes"
+    And I follow "View This Report"
+
+    # Column should start out empty
+    Then "//table/tbody/tr[1]/td[contains(concat(' ',normalize-space(@class),' '),'reportedcontent_time_reviewed')]/div[text()]" "xpath_element" should not exist
+
+    # When an action is taken, the field should update and no longer be empty
+    When I click on "table[data-source='rb_source_reportedcontent'] tr:nth-child(1) [data-action='approve']" "css_element"
+    And I wait for pending js
+    Then "//table/tbody/tr[1]/td[contains(concat(' ',normalize-space(@class),' '),'reportedcontent_time_reviewed')]/div[text()]" "xpath_element" should exist
+
+    # Check that the remove button also updates the column
+    When I reload the page
+    Then "//table/tbody/tr[1]/td[contains(concat(' ',normalize-space(@class),' '),'reportedcontent_time_reviewed')]/div[text()]" "xpath_element" should not exist
+
+    When I click on "table[data-source='rb_source_reportedcontent'] tr:nth-child(1) [data-action='remove']" "css_element"
+    And I press "Confirm"
+    And I wait for pending js
+    Then "//table/tbody/tr[1]/td[contains(concat(' ',normalize-space(@class),' '),'reportedcontent_time_reviewed')]/div[text()]" "xpath_element" should exist

@@ -539,6 +539,23 @@ class behat_totara_data_generators extends behat_base {
                 'required' => array('component', 'name', 'username', 'area')
             )
         ),
+        'totara_reportedcontent' => array(
+            'resource reviews' => array(
+                'plugin' => 'totara_reportedcontent',
+                'datagenerator' => 'resource_review_from_params',
+                'required' => array('component', 'name', 'username'),
+            ),
+            'discussion reviews' => array(
+                'plugin' => 'totara_reportedcontent',
+                'datagenerator' => 'discussion_review_from_params',
+                'required' => array('component', 'username', 'discussion'),
+            ),
+            'comment reviews' => array(
+                'plugin' => 'totara_reportedcontent',
+                'datagenerator' => 'comment_review_from_params',
+                'required' => array('component', 'area', 'name', 'username', 'comment'),
+            ),
+        ),
     );
 
     /**
