@@ -25,6 +25,7 @@
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\subject_instance;
+use mod_perform\models\response\participant_section as participant_section_model;
 use mod_perform\state\participant_instance\open as participant_instance_open;
 use mod_perform\state\participant_instance\closed as participant_instance_closed;
 use mod_perform\state\participant_instance\complete as participant_instance_complete;
@@ -55,18 +56,7 @@ class mod_perform_webapi_mutation_manually_change_participant_section_testcase e
     use webapi_phpunit_helper;
 
     public function test_close_and_open(): void {
-        $this->setAdminUser();
-
-        $configuration = mod_perform_activity_generator_configuration::new()
-            ->set_number_of_activities(1)
-            ->set_number_of_sections_per_activity(1)
-            ->set_relationships_per_section(['subject'])
-            ->set_number_of_users_per_user_group_type(1)
-            ->set_number_of_elements_per_section(0);
-
-        /** @var mod_perform_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $generator->create_full_activities($configuration);
+        $this->create_test_data();
 
         // Everything starts out open.
         /** @var subject_instance $subject_instance */
@@ -134,4 +124,54 @@ class mod_perform_webapi_mutation_manually_change_participant_section_testcase e
         $this->assertEquals(participant_section_open::get_code(), $participant_section->availability);
     }
 
+    public function test_can_manage_participation() {
+        // create data
+        $this->create_test_data();
+
+        $participant_section_entity = participant_section::repository()->get()->first();
+        $participant_section = participant_section_model::load_by_entity($participant_section_entity);
+        $subject_user_id = $participant_section->participant_instance->subject_instance->subject_user_id;
+        $manager = $this->getDataGenerator()->create_user();
+        $manager2 = $this->getDataGenerator()->create_user();
+
+        // 1. test user can manage participation
+        // Grant manage_subject_user_participation capability to manager in the context of the subject user.
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('mod/perform:manage_subject_user_participation', CAP_ALLOW, $roleid, context_system::instance());
+        $subject_user_context = context_user::instance($subject_user_id);
+        role_assign($roleid, $manager->id, $subject_user_context);
+        $this->setUser($manager);
+
+        $args = [
+            'input' => [
+                'participant_section_id' => $participant_section->id,
+                'availability' => 'OPEN',
+            ],
+        ];
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        // 2. test user without capability to manage participation
+        $this->setUser($manager2);
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("You do not have permission to manage participation of the subject");
+
+        $this->resolve_graphql_mutation(self::MUTATION,$args);
+    }
+
+    private function create_test_data(): void {
+        $this->setAdminUser();
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(1)
+            ->set_number_of_sections_per_activity(1)
+            ->set_relationships_per_section(['subject'])
+            ->set_number_of_users_per_user_group_type(1)
+            ->set_number_of_elements_per_section(0);
+
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $generator->create_full_activities($configuration);
+    }
 }
