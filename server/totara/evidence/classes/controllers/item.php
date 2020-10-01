@@ -30,6 +30,7 @@ use moodle_url;
 use totara_core\advanced_feature;
 use totara_evidence\models;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
+use totara_evidence\totara\menu\my_evidence;
 use totara_mvc\controller;
 
 abstract class item extends controller {
@@ -90,6 +91,7 @@ abstract class item extends controller {
             $page_title = get_string('evidence_bank_for_x', 'totara_evidence', $this->user->fullname);
         } else {
             $page_title = get_string('evidence_bank', 'totara_evidence');
+            $this->get_page()->set_totara_menu_selected(my_evidence::class);
         }
         $this->get_page()->navigation->extend_for_user((object) $this->user->to_array());
         $this->get_page()->navbar->add($page_title, new moodle_url('/totara/evidence/index.php', ['user_id' => $this->user->id]));

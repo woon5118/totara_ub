@@ -29,6 +29,7 @@ use core\entities\user;
 use moodle_exception;
 use moodle_url;
 use totara_competency\helpers\capability_helper;
+use totara_competency\totara\menu\my_competencies;
 use totara_core\advanced_feature;
 use totara_mvc\controller;
 
@@ -118,8 +119,11 @@ abstract class base extends controller {
      * @return $this
      */
     protected function add_navigation(...$pages) {
-        $this->get_page()->set_totara_menu_selected('totara_competency\totara\menu\my_competencies');
         $this->get_page()->navigation->extend_for_user((object)($this->user->to_array()));
+
+        if ($this->user->is_logged_in()) {
+            $this->get_page()->set_totara_menu_selected(my_competencies::class);
+        }
 
         if (!empty($pages)) {
             $this->get_page()->navbar->add(

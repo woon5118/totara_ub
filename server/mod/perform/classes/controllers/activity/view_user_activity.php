@@ -29,6 +29,7 @@ use invalid_parameter_exception;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\response\participant_section as participant_section_model;
+use mod_perform\totara\menu\my_activities;
 use moodle_exception;
 use totara_mvc\tui_view;
 
@@ -92,6 +93,7 @@ class view_user_activity extends perform_controller {
 
         $url = self::get_url($url_args);
         $this->set_url($url);
+        $this->get_page()->set_totara_menu_selected(my_activities::class);
 
         return self::create_tui_view('mod_perform/pages/UserActivity', $props)
             ->set_title(get_string('user_activities_page_title', 'mod_perform'));

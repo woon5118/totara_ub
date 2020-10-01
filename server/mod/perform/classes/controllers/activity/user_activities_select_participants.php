@@ -27,6 +27,7 @@ use context;
 use context_coursecat;
 use core\entities\user;
 use mod_perform\controllers\perform_controller;
+use mod_perform\totara\menu\my_activities;
 use mod_perform\util;
 use totara_mvc\tui_view;
 
@@ -48,6 +49,7 @@ class user_activities_select_participants extends perform_controller {
      */
     public function action(): tui_view {
         $this->set_url(self::get_url());
+        $this->get_page()->set_totara_menu_selected(my_activities::class);
 
         $props = [
             'current-user-id' => user::logged_in()->id,

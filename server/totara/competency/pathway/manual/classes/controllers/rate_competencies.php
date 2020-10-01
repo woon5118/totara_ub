@@ -33,6 +33,7 @@ use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\self_role;
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\helpers\capability_helper;
+use totara_competency\totara\menu\my_competencies;
 use totara_mvc\controller;
 use totara_mvc\tui_view;
 use totara_mvc\view;
@@ -158,6 +159,10 @@ class rate_competencies extends controller {
 
         if ($this->user->is_logged_in()) {
             $page_title = $parent_page_title;
+
+            if (capability_helper::can_view_profile($this->user->id, $this->context)) {
+                $this->get_page()->set_totara_menu_selected(my_competencies::class);
+            }
         } else {
             $page_title = get_string('rate_user', 'pathway_manual', $this->user->fullname);
             $this->get_page()->navbar->add($parent_page_title, $parent_page_url);
