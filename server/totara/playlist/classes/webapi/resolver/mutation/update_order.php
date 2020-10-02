@@ -53,7 +53,7 @@ final class update_order implements mutation_resolver, has_middleware {
         $actor = (int)$USER->id;
 
         // If current user is not owner of playlist and not admin, exception has to be fired.
-        if ($actor !== $playlist->get_userid() && access_manager::can_manage_engage($playlist->get_context())) {
+        if ($actor !== $playlist->get_userid() && !access_manager::can_manage_engage($playlist->get_context())) {
             throw new \coding_exception('Current user can not order cards in the playlist');
         }
 

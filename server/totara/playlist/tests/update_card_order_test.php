@@ -21,10 +21,10 @@
  * @package totara_playlist
  */
 
+use core\webapi\execution_context;
 use totara_engage\resource\resource_factory;
 use totara_playlist\exception\playlist_exception;
 use totara_playlist\local\helper;
-use core\webapi\execution_context;
 use totara_webapi\graphql;
 
 defined('MOODLE_INTERNAL') || die();
@@ -55,7 +55,7 @@ class totara_playlist_update_card_order_testcase extends advanced_testcase {
 
         $playlist->load_resources();
         foreach ($playlist->get_resources() as $resource) {
-            if ((int)$resource->resourceid === $article->get_id()) {
+            if ((int) $resource->resourceid === $article->get_id()) {
                 $this->assertEquals(1, $resource->sortorder);
             }
         }
@@ -221,11 +221,10 @@ class totara_playlist_update_card_order_testcase extends advanced_testcase {
         $result = graphql::execute_operation($ec, $parameters);
         $this->assertNotEmpty($result->errors);
 
-
         // Check order is out of boundary
         $parameters = [
             'id' => $playlist->get_id(),
-            'order' => -1 ,
+            'order' => -1,
             'instanceid' => $article->get_id()
         ];
 
@@ -236,7 +235,99 @@ class totara_playlist_update_card_order_testcase extends advanced_testcase {
         // Check order is out of boundary
         $parameters = [
             'id' => $playlist->get_id(),
-            'order' => 3 ,
+            'order' => 3,
+            'instanceid' => $article3->get_id()
+        ];
+
+        $ec = execution_context::create('ajax', 'totara_playlist_update_card_order');
+        $result = graphql::execute_operation($ec, $parameters);
+        $this->assertNotEmpty($result->errors);
+        $error = current($result->errors);
+        $this->assertEquals(get_string('error:update_order', 'totara_playlist'), $error->getMessage());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_swap_card_order_as_admin_with_graphql(): void {
+        global $DB;
+
+        $gen = $this->getDataGenerator();
+        $user1 = $gen->create_user();
+        $this->setUser($user1);
+
+        /** @var totara_playlist_generator $playlistgen */
+        $playlistgen = $gen->get_plugin_generator('totara_playlist');
+        $playlist = $playlistgen->create_playlist();
+
+        /** @var engage_article_generator $articlegen */
+        $articlegen = $gen->get_plugin_generator('engage_article');
+        $article = $articlegen->create_article();
+        $article1 = $articlegen->create_article();
+        $article2 = $articlegen->create_article();
+
+        $playlist->add_resource(resource_factory::create_instance_from_id($article->get_id()));
+        $playlist->add_resource(resource_factory::create_instance_from_id($article1->get_id()));
+        $playlist->add_resource(resource_factory::create_instance_from_id($article2->get_id()));
+
+        $this->setAdminUser();
+
+        $this->assertEquals(
+            1,
+            $DB->get_field(
+                'playlist_resource',
+                'sortorder',
+                ['resourceid' => $article->get_id(), 'playlistid' => $playlist->get_id()]
+            )
+        );
+
+        $parameters = [
+            'id' => $playlist->get_id(),
+            'order' => 2,
+            'instanceid' => $article->get_id()
+        ];
+
+        $ec = execution_context::create('ajax', 'totara_playlist_update_card_order');
+        $result = graphql::execute_operation($ec, $parameters);
+
+        $this->assertEmpty($result->errors);
+        $this->assertNotEmpty($result->data);
+        $this->assertEquals(
+            3,
+            $DB->get_field(
+                'playlist_resource',
+                'sortorder',
+                ['resourceid' => $article->get_id(), 'playlistid' => $playlist->get_id()]
+            )
+        );
+
+        // Check the resource is not in the playlist, exception will be fired.
+        $article3 = $articlegen->create_article();
+        $parameters = [
+            'id' => $playlist->get_id(),
+            'order' => 2,
+            'instanceid' => $article3->get_id()
+        ];
+
+        $ec = execution_context::create('ajax', 'totara_playlist_update_card_order');
+        $result = graphql::execute_operation($ec, $parameters);
+        $this->assertNotEmpty($result->errors);
+
+        // Check order is out of boundary
+        $parameters = [
+            'id' => $playlist->get_id(),
+            'order' => -1,
+            'instanceid' => $article->get_id()
+        ];
+
+        $ec = execution_context::create('ajax', 'totara_playlist_update_card_order');
+        $result = graphql::execute_operation($ec, $parameters);
+        $this->assertNotEmpty($result->errors);
+
+        // Check order is out of boundary
+        $parameters = [
+            'id' => $playlist->get_id(),
+            'order' => 3,
             'instanceid' => $article3->get_id()
         ];
 

@@ -547,10 +547,7 @@ final class playlist implements accessible, shareable {
         $context = $this->get_context();
 
         if (CONTEXT_USER == $context->contextlevel) {
-            // Only owner can contribute so far, if the original context is a user context.
-            if ($this->playlist->userid != $userid) {
-                return false;
-            }
+            return $this->can_update($userid);
         } else {
             if (CONTEXT_COURSE == $context->contextlevel) {
                 $container = factory::from_id($context->instanceid);

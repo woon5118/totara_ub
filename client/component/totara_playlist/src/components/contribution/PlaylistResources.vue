@@ -56,7 +56,7 @@
           :cards="contribution.cards"
           :contributable="playlist.contributable"
           :access="playlist.access"
-          :update-able="playlist.owned"
+          :update-able="playlist.updateable"
           :is-loading="$apollo.loading"
           @resource-reordered="resourceReordered"
         />
