@@ -25,7 +25,9 @@ import TotaraModuleStore from './internal/TotaraModuleStore';
 import tuiPlugin from './tui_vue_plugin';
 import i18nPlugin from './i18n_vue_plugin';
 import requirements from './internal/requirements';
+import { processComponentOverride } from './internal/overrides';
 import { memoize } from './util';
+import { vueAssign } from './vue_util';
 import apolloClient from './apollo_client';
 import theme from './theme';
 import { vueApolloErrorHandler } from './errors';
@@ -33,8 +35,6 @@ import { vueApolloErrorHandler } from './errors';
 Vue.use(tuiPlugin);
 Vue.use(VueApollo);
 Vue.use(i18nPlugin);
-
-const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 const loader = new BundleLoader();
 const modules = new TotaraModuleStore({ bundleLoader: loader });
@@ -283,86 +283,10 @@ const tui = {
    * @param {string} parent ID of parent, e.g. 'tui/components/Example'
    */
   _processOverride(component, parent) {
-    if (typeof parent == 'string') {
-      let parentName = parent;
-      if (modules.isEvaluating(parentName)) {
-        parent = modules._requirePrevious(parentName);
-        if (!parent) {
-          throw new Error(
-            'Attempting to override component that does not exist: ' +
-              parentName
-          );
-        }
-      } else {
-        parent = modules.require(parentName);
-      }
-      if (parent && parent.__esModule) {
-        parent = parent.default;
-      }
-    }
-
-    // inheritable false: the entire component will be overridden rather than
-    // inheriting
-    if (parent.inheritable === false) {
-      return;
-    }
-
-    // components defined with Vue.extend cannot be inherited from
-    // it may not be possible to support Vue.extend, as it establishes an
-    // inheritance chain
-    if (typeof parent == 'function') {
-      return;
-    }
-
-    if (!component.__hasBlocks) {
-      throw new Error(
-        'components must be processed by tui-vue-loader to be able to ' +
-          'override other components.'
-      );
-    }
-
-    // inheritance (other than style inheritance) is not allowed when a
-    // script block is specified
-    if (component.__hasBlocks.script) {
-      return;
-    }
-
-    // use Vue's built in "extends" option to implement inheritance
-    // see: https://vuejs.org/v2/api/#extends
-    if (!component.extends) {
-      component.extends = parent;
-    }
+    processComponentOverride(modules, component, parent);
   },
 
-  /**
-   * Copy the values from the provided source objects to `target` using
-   * Vue.set()
-   *
-   * @param {*} target
-   * @param {...*} constArgs
-   */
-  vueAssign(target) {
-    // based off Object.assign() polyfill from MDN:
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
-    if (!target) {
-      throw new TypeError('Cannot convert undefined or null to object');
-    }
-
-    const to = Object(target);
-
-    for (let index = 1; index < arguments.length; index++) {
-      const source = arguments[index];
-
-      if (source) {
-        for (const key in source) {
-          if (hasOwnProperty.call(source, key)) {
-            Vue.set(to, key, source[key]);
-          }
-        }
-      }
-    }
-    return to;
-  },
+  vueAssign,
 
   /**
    * Load the bundles needed for the provided Tui component.

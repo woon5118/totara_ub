@@ -202,67 +202,6 @@ describe('scan', () => {
   });
 });
 
-describe('tui._processOverride', () => {
-  it('prevents inheriting when inheritable = false', () => {
-    const comp = {};
-    tui._processOverride(comp, { inheritable: false });
-    expect(comp.extends).toEqual(undefined);
-  });
-
-  it('skips Vue.extend() parents', () => {
-    const comp = {};
-    tui._processOverride(comp, Vue.extend({}));
-    expect(comp.extends).toEqual(undefined);
-  });
-
-  it('requires component to have __hasBlocks', () => {
-    const comp = {};
-    expect(() => tui._processOverride(comp, {})).toThrow(
-      'components must be processed by tui-vue-loader'
-    );
-  });
-
-  it('skips when component has its own script block', () => {
-    const comp = { __hasBlocks: { script: true } };
-    tui._processOverride(comp, {});
-    expect(comp.extends).toEqual(undefined);
-  });
-
-  it('sets extends when everything is okay', () => {
-    const comp = { __hasBlocks: {} };
-    const parent = { foo: 5 };
-    tui._processOverride(comp, parent);
-    expect(comp.extends).toBe(parent);
-  });
-
-  it('does not set extends if it is already set', () => {
-    const oldParent = {};
-    const comp = { __hasBlocks: {}, extends: oldParent };
-    const parent = { foo: 5 };
-    tui._processOverride(comp, parent);
-    expect(comp.extends).toBe(oldParent);
-  });
-
-  it('resolves parent as a module if passed a string', () => {
-    modules.isEvaluating.mockReturnValueOnce(false);
-    tui._processOverride({ __hasBlocks: {} }, 'foo');
-    expect(modules.require).toHaveBeenCalledWith('foo');
-  });
-
-  it('calls modules._requirePrevious if evaluating the same module', () => {
-    modules.isEvaluating.mockImplementationOnce(x => x == 'bar');
-    modules._requirePrevious.mockReturnValueOnce({});
-    tui._processOverride({ __hasBlocks: {} }, 'bar');
-    expect(modules._requirePrevious).toHaveBeenCalledWith('bar');
-
-    modules.isEvaluating.mockImplementationOnce(x => x == 'baz');
-    modules._requirePrevious.mockReturnValueOnce(undefined);
-    expect(() => tui._processOverride({ __hasBlocks: {} }, 'baz')).toThrow(
-      'does not exist'
-    );
-  });
-});
-
 describe('tui.vueAssign', () => {
   const vueSet = Vue.set;
   beforeEach(() => {

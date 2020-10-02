@@ -17,8 +17,9 @@
  */
 
 import Vue from 'vue';
-
 import { baseSet } from './internal/util/object';
+
+const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 function getOptions(component) {
   return Vue.extend(component).options;
@@ -56,6 +57,36 @@ export function getModelDef(component) {
  */
 export function set(object, path, value) {
   baseSet(object, path, value, Vue.set);
+}
+
+/**
+ * Copy the values from the provided source objects to `target` using
+ * Vue.set()
+ *
+ * @param {*} target
+ * @param {...*} constArgs
+ */
+export function vueAssign(target) {
+  // based off Object.assign() polyfill from MDN:
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+  if (!target) {
+    throw new TypeError('Cannot convert undefined or null to object');
+  }
+
+  const to = Object(target);
+
+  for (let index = 1; index < arguments.length; index++) {
+    const source = arguments[index];
+
+    if (source) {
+      for (const key in source) {
+        if (hasOwnProperty.call(source, key)) {
+          Vue.set(to, key, source[key]);
+        }
+      }
+    }
+  }
+  return to;
 }
 
 const defaultPropEqual = (val, old) => val == old;

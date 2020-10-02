@@ -44,13 +44,20 @@ module.exports = function(source, map) {
 
   // if the query has a type field, this is a language block request
   if (!params.type) {
+    const scriptImport = /import script from ".*?(\?.*?)"/.exec(source);
+    const scriptQuery = scriptImport ? parseQuery(scriptImport[1]) : null;
+
     const hasBlocks = {
-      script: /import script from/.test(source),
+      script: !!scriptImport,
       template: /import { render, staticRenderFns } from/.test(source),
     };
 
     let code =
       `\ncomponent.options.__hasBlocks = ` + `${JSON.stringify(hasBlocks)};`;
+
+    if (scriptQuery && scriptQuery.extends) {
+      code += '\ncomponent.options.__extends = true;';
+    }
 
     // process theme overrides
     const themeOverrideMatch = themeOverrideRegex.exec(
