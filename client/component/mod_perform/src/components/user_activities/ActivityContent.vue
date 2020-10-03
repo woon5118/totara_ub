@@ -815,8 +815,9 @@ export default {
           result = this.isExternalParticipant
             ? data.mod_perform_participant_section_external_participant
             : data.mod_perform_participant_section;
-
-          this.selectedParticipantSectionId = result.id;
+          if (result.id != this.selectedParticipantSectionId) {
+            this.selectedParticipantSectionId = result.id;
+          }
           this.answerableParticipantInstances =
             result.answerable_participant_instances;
           this.activeParticipantSection = result;
