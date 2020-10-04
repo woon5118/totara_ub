@@ -32,6 +32,7 @@
         :star-index="n"
         :rtl="rtl"
         :size="size"
+        :read-only="readOnly"
         @star-selected="setRating($event, true)"
         @star-mouse-move="setRating"
       />
@@ -141,14 +142,18 @@ export default {
     setRating(event, persist) {
       if (this.readOnly) return;
 
-      const position = this.rtl
-        ? (100 - event.position) / 100
-        : event.position / 100;
+      if (event.position) {
+        const position = this.rtl
+          ? (100 - event.position) / 100
+          : event.position / 100;
 
-      this.currentRating = Math.min(
-        this.maxRating,
-        Number(event.index + position - 1).toFixed(2)
-      );
+        this.currentRating = Math.min(
+          this.maxRating,
+          Number(event.index + position - 1).toFixed(2)
+        );
+      } else {
+        this.currentRating = Math.min(this.maxRating, event.index);
+      }
 
       if (persist) {
         this.selectedRating = this.currentRating;

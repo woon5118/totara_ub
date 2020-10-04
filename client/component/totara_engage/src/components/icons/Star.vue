@@ -19,11 +19,17 @@
   <svg
     :ref="svgId"
     class="tui-engageStarIcon"
+    :focusable="focusable"
+    :tabindex="tabIndex"
+    :role="role"
     :height="getSize"
     :width="getSize"
     :viewBox="viewBox"
+    :aria-label="ariaLabel"
     @mousemove="mouseMoving"
     @click="selected"
+    @keyup.enter="selected"
+    @keyup.space="selected"
   >
     <linearGradient :id="grad" x1="0" x2="100%" y1="0" y2="0">
       <stop :class="getStopClass(!rtl)" :offset="getFill" />
@@ -76,6 +82,10 @@ export default {
       type: Number,
       default: 15,
     },
+    readOnly: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data() {
@@ -122,6 +132,20 @@ export default {
     svgId() {
       return this.$id('engageStarSVG');
     },
+    focusable() {
+      return this.readOnly ? 'false' : null;
+    },
+    tabIndex() {
+      return this.readOnly ? null : 0;
+    },
+    role() {
+      return this.readOnly ? null : 'button';
+    },
+    ariaLabel() {
+      return this.starIndex === 1
+        ? this.$str('rate_one_star', 'totara_engage')
+        : this.$str('rate_x_stars', 'totara_engage', this.starIndex);
+    },
   },
 
   mounted() {
@@ -139,6 +163,10 @@ export default {
       });
     },
     getPosition(event) {
+      if (!event.offsetX) {
+        return false;
+      }
+
       // Calculate position in percentage.
       const offset = this.rtl
         ? Math.min(event.offsetX, this.starSize)
@@ -167,6 +195,15 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+  {
+    "totara_engage": [
+      "rate_one_star",
+      "rate_x_stars"    
+    ]
+  }
+</lang-strings>
 
 <style lang="scss">
 .tui-engageStarIcon {
