@@ -20,7 +20,7 @@
  * @copyright 2016 onwards Totara Learning Solutions LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Joby Harding <joby.harding@totaralearning.com>
- * @package   theme_roots
+ * @package   totara_core
  */
 
 namespace totara_core\output;

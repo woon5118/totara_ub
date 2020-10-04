@@ -19,7 +19,7 @@
  *
  * @copyright 2016 onwards Totara Learning Solutions LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @package   theme_roots
+ * @package   theme_basis
  */
 
 defined('MOODLE_INTERNAL') || die();
