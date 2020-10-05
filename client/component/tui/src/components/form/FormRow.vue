@@ -122,7 +122,6 @@ export default {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    flex-wrap: wrap;
   }
 
   &__inner > &__desc {
