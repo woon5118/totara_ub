@@ -122,18 +122,18 @@ final class track_user_assignment_repository extends repository {
 
         // Add some helpful fields to the result.
         $this->add_select([
-            'si.created_at as instance_created_at',
-            'si.progress as instance_progress',
-            'si.instance_count',
-            'si.completed_at as instance_completed_at',
+            'si.instance_count as subject_instance_count',
+            'si.progress as last_instance_progress',
+            'si.created_at as last_instance_created_at',
+            'si.completed_at as last_instance_completed_at',
             // Add relevant track columns since we're already joining track table (faster than eager loading track relation).
-            'fbat.repeating_is_enabled',
-            'fbat.repeating_type',
-            'fbat.repeating_offset',
-            'fbat.due_date_is_enabled',
-            'fbat.due_date_is_fixed',
-            'fbat.due_date_fixed',
-            'fbat.due_date_offset',
+            'fbat.repeating_is_enabled as track_repeating_is_enabled',
+            'fbat.repeating_type as track_repeating_type',
+            'fbat.repeating_offset as track_repeating_offset',
+            'fbat.due_date_is_enabled as track_due_date_is_enabled',
+            'fbat.due_date_is_fixed as track_due_date_is_fixed',
+            'fbat.due_date_fixed as track_due_date_fixed',
+            'fbat.due_date_offset as track_due_date_offset',
         ]);
 
         return $this;

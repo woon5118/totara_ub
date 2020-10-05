@@ -27,8 +27,10 @@ use coding_exception;
 use core\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use core\orm\query\sql\query;
 use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\temp_track_user_assignment_queue;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\hook\subject_instances_created;
@@ -36,6 +38,7 @@ use mod_perform\state\subject_instance\active;
 use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\data\subject_instance_activity_collection;
+use xmldb_table;
 
 /**
  * This class is responsible for creating new subject instances for users who
@@ -47,16 +50,139 @@ use mod_perform\task\service\data\subject_instance_activity_collection;
  */
 class subject_instance_creation {
 
-    public function generate_instances() {
-        // Get all user assignments that potentially should have a subject instance created.
-        $user_assignments = $this->get_user_assignments_potentially_needing_instances();
+    /**
+     * Limit on number of user assignments to process per batch.
+     *
+     * @var int
+     */
+    private $limit = 10000;
+
+    /**
+     * Queues the potential track user assignments and attempts to create subject instances.
+     *
+     * @return void
+     */
+    public function generate_instances(): void {
+        $this->create_temp_table();
+        $this->queue_user_assignments_into_temp_table();
+        $last_temp_track_user_assignment_id = 0;
+
+        while (true) {
+            $user_assignments = $this->get_user_assignments_potentially_needing_instances($last_temp_track_user_assignment_id);
+            $last_temp_track_user_assignment_id = $user_assignments->last()->id ?? null;
+
+            if ($user_assignments->count() === 0) {
+                break;
+            }
+            $this->create_subject_instances($user_assignments);
+        }
+        $this->drop_temp_table();
+    }
+
+    /**
+     * Create temporary table used for queuing potential track user assignments.
+     *
+     * @return void
+     */
+    private function create_temp_table(): void {
+        $db_manager = builder::get_db()->get_manager();
+        $temp_table = new xmldb_table(temp_track_user_assignment_queue::TABLE);
+
+        if ($db_manager->table_exists($temp_table)) {
+            $db_manager->drop_table($temp_table);
+        }
+
+        foreach (temp_track_user_assignment_queue::FIELDS as $name => $field_properties) {
+            $temp_table->add_field($name, ...$field_properties);
+        }
+        $temp_table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $db_manager->create_temp_table($temp_table);
+    }
+
+    /**
+     * Queues track user assignments potentially needing instances into temporary table.
+     *
+     * We check several conditions:
+     *  - assignment, track and activity have to be active
+     *  - period settings must match
+     *  - track is not flagged for schedule synchronisation because that should happen before we create instances
+     *  - assignment either doesn't have any instances or the repeat config is such that it potentially can have more
+     *
+     * @return void
+     */
+    private function queue_user_assignments_into_temp_table(): void {
+        $tua_builder = track_user_assignment::repository()
+            ->as('tua')
+            ->add_select([
+                'tua.id as track_user_assignment_id',
+            ])
+            ->join([track::TABLE, 't'], 'track_id', 'id')
+            ->filter_by_possibly_has_subject_instances_to_create()
+            ->filter_by_active()
+            ->filter_by_active_track_and_activity()
+            ->filter_by_time_interval()
+            ->filter_by_does_not_need_schedule_sync()
+            ->order_by('t.activity_id')
+            ->order_by('id')
+            ->get_builder();
+        $tua_query = query::from_builder($tua_builder)
+            ->build();
+
+        $fields = array_filter(
+            array_keys(temp_track_user_assignment_queue::FIELDS),
+            function($field) {
+                return $field !== 'id';
+            }
+        );
+
+        $query = sprintf(
+            "INSERT INTO {%s} (%s) %s",
+            temp_track_user_assignment_queue::TABLE,
+            implode(',', $fields),
+            $tua_query[0]
+        );
+
+        builder::get_db()->execute($query, $tua_query[1]);
+    }
+
+    /**
+     * Get a chunk of user assignments that potentially need a subject instance created.
+     *
+     * @param int $cursor
+     * @return collection
+     */
+    private function get_user_assignments_potentially_needing_instances(int $cursor = 0): collection {
+        return temp_track_user_assignment_queue::repository()
+            ->as('temp_tua')
+            ->join([track_user_assignment::TABLE, 'tua'], 'track_user_assignment_id', 'id')
+            ->with([
+                'activity' => function (repository $repository) {
+                    $repository->eager_load_instance_creation_data();
+                }
+            ])
+            ->where('id', '>', $cursor)
+            ->order_by('id', 'ASC')
+            ->limit($this->limit)
+            ->select(['tua.*', 'temp_tua.*'])
+            ->get();
+    }
+
+    /**
+     * Create subject instances for the given track user assignments.
+     *
+     * @param collection $user_assignments
+     *
+     * @return void
+     */
+    private function create_subject_instances(collection $user_assignments): void {
         $dtos = new collection();
         $activity_collection = new subject_instance_activity_collection();
 
         builder::get_db()->transaction(function () use ($user_assignments, $dtos, $activity_collection) {
             $now = time();
+
             foreach ($user_assignments as $user_assignment) {
-                $activity = $user_assignment->track->activity;
+                $activity = $user_assignment->activity;
                 $activity_collection->add_activity_config($activity);
 
                 if (!$this->is_it_time_for_a_new_subject_instance($user_assignment)) {
@@ -67,7 +193,7 @@ class subject_instance_creation {
                     ? pending::get_code()
                     : active::get_code();
                 $subject_instance = new subject_instance();
-                $subject_instance->track_user_assignment_id = $user_assignment->id;
+                $subject_instance->track_user_assignment_id = $user_assignment->track_user_assignment_id;
                 $subject_instance->subject_user_id = $user_assignment->subject_user_id;
                 $subject_instance->job_assignment_id = $user_assignment->job_assignment_id;
                 $subject_instance->status = $status;
@@ -82,26 +208,29 @@ class subject_instance_creation {
                 $dtos->append(subject_instance_dto::create_from_entity($subject_instance, $track_data));
             }
 
-            $hook = new subject_instances_created($dtos, $activity_collection);
-            $hook->execute();
+            if ($dtos->count() > 0) {
+                $hook = new subject_instances_created($dtos, $activity_collection);
+                $hook->execute();
+            }
         });
     }
 
     /**
-     * @param track_user_assignment $user_assignment
+     * @param temp_track_user_assignment_queue $user_assignment
      * @param int $reference_date
+     *
      * @return int|null
      */
-    private function calculate_due_date(track_user_assignment $user_assignment, int $reference_date): ?int {
-        if (!$user_assignment->due_date_is_enabled) {
+    private function calculate_due_date(temp_track_user_assignment_queue $user_assignment, int $reference_date): ?int {
+        if (!$user_assignment->track_due_date_is_enabled) {
             return null;
         }
 
-        if ($user_assignment->due_date_is_fixed) {
-            return $user_assignment->due_date_fixed;
+        if ($user_assignment->track_due_date_is_fixed) {
+            return $user_assignment->track_due_date_fixed;
         }
 
-        $offset = date_offset::create_from_json($user_assignment->due_date_offset);
+        $offset = date_offset::create_from_json($user_assignment->track_due_date_offset);
         return $offset->apply($reference_date);
     }
 
@@ -109,76 +238,54 @@ class subject_instance_creation {
      * Check if the track user assignment should have a new subject instance created according to repeat settings.
      * Note this is not checking if the repeat limit is reached. That should be checked before calling this method.
      *
-     * @param track_user_assignment $user_assignment
+     * @param temp_track_user_assignment_queue $user_assignment
      * @return bool
      */
-    private function is_it_time_for_a_new_subject_instance(track_user_assignment $user_assignment): bool {
-        if (is_null($user_assignment->instance_count)) {
+    private function is_it_time_for_a_new_subject_instance(temp_track_user_assignment_queue $user_assignment): bool {
+        if (is_null($user_assignment->subject_instance_count)) {
             // Does not have a subject instance yet.
             return true;
         }
 
-        if (!$user_assignment->repeating_is_enabled) {
+        if ((int)$user_assignment->track_repeating_is_enabled === 0) {
             // Already has at least one subject instance and repeating is off.
             return false;
         }
 
         // Check if repeat settings require to create a new subject instance.
         $reference_date = null;
-        $is_latest_instance_complete = ((int)$user_assignment->instance_progress === complete::get_code());
-        switch ($user_assignment->repeating_type) {
+        $is_latest_instance_complete = ((int)$user_assignment->last_instance_progress === complete::get_code());
+        switch ($user_assignment->track_repeating_type) {
             case track::SCHEDULE_REPEATING_TYPE_AFTER_CREATION:
-                $reference_date = $user_assignment->instance_created_at;
+                $reference_date = $user_assignment->last_instance_created_at;
                 break;
             case track::SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE:
                 if (!$is_latest_instance_complete) {
                     return false;
                 }
-                $reference_date = $user_assignment->instance_created_at;
+                $reference_date = $user_assignment->last_instance_created_at;
                 break;
             case track::SCHEDULE_REPEATING_TYPE_AFTER_COMPLETION:
                 if (!$is_latest_instance_complete) {
                     return false;
                 }
-                $reference_date = $user_assignment->instance_completed_at;
+                $reference_date = $user_assignment->last_instance_completed_at;
                 break;
             default:
-                throw new coding_exception("Bad repeating_type: {$user_assignment->repeating_type}");
+                throw new coding_exception("Bad repeating_type: {$user_assignment->track_repeating_type}");
         }
 
-        $offset = date_offset::create_from_json($user_assignment->repeating_offset);
+        $offset = date_offset::create_from_json($user_assignment->track_repeating_offset);
         $threshold = $offset->apply($reference_date);
         return (time() > $threshold);
     }
 
     /**
-     * Get user assignments that potentially need a subject instance created.
-     * We check several conditions:
-     *  - assignment, track and activity have to be active
-     *  - period settings must match
-     *  - track is not flagged for schedule synchronisation because that should happen before we create instances
-     *  - assignment either doesn't have any instances or the repeat config is such that it potentially can have more
-     *
-     * @return collection|track_user_assignment[]
+     * Drops the temporary queue table after use.
      */
-    private function get_user_assignments_potentially_needing_instances(): collection {
-        return track_user_assignment::repository()
-            ->as('tua')
-            ->select('*')
-            ->join([track::TABLE, 't'], 'track_id', 'id')
-            ->filter_by_possibly_has_subject_instances_to_create()
-            ->filter_by_active()
-            ->filter_by_active_track_and_activity()
-            ->filter_by_time_interval()
-            ->filter_by_does_not_need_schedule_sync()
-            ->with([
-                'track.activity' => function (repository $repository) {
-                    $repository->eager_load_instance_creation_data();
-                }
-            ])
-            ->order_by('t.activity_id')
-            ->order_by('id')
-            ->get();
+    private function drop_temp_table(): void {
+        $db_manager = builder::get_db()->get_manager();
+        $temp_table = new xmldb_table(temp_track_user_assignment_queue::TABLE);
+        $db_manager->drop_table($temp_table);
     }
-
 }

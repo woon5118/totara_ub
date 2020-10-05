@@ -23,7 +23,6 @@
 
 namespace mod_perform\task\service;
 
-use coding_exception;
 use core\collection;
 use core\orm\query\builder;
 use mod_perform\entities\activity\subject_static_instance;
@@ -43,7 +42,7 @@ class subject_static_instance_creation {
     private $subject_static_instances = [];
 
     /**
-     * @var collection
+     * @var array
      */
     private $all_existing_static_instances;
 
@@ -66,25 +65,34 @@ class subject_static_instance_creation {
             function () use ($subject_instances) {
                 $subject_instance_chunks = array_chunk($subject_instances->all(), builder::get_db()->get_max_in_params());
 
-                foreach ($subject_instance_chunks as $subject_instances) {
-                    $subject_instances = new collection($subject_instances);
+                foreach ($subject_instance_chunks as $subject_instance_chunk) {
+                    $subject_instance_chunk = new collection($subject_instance_chunk);
                     $all_subject_job_assignments = job_assignment_entity::repository()
-                        ->where_in('userid', $subject_instances->pluck('subject_user_id'))
-                        ->get();
+                        ->where_in('userid', $subject_instance_chunk->pluck('subject_user_id'))
+                        ->get()
+                        ->all(true);
 
-                    $this->all_existing_static_instances = subject_static_instance::repository()
-                        ->where_in('subject_instance_id', $subject_instances->pluck('id'))
-                        ->get();
+                    $job_assignments_keyed_by_userid = [];
+                    foreach ($all_subject_job_assignments as $subject_job_assignment) {
+                        $job_assignments_keyed_by_userid[$subject_job_assignment->userid][(int)$subject_job_assignment->id] = $subject_job_assignment;
+                    }
 
-                    foreach ($subject_instances as $subject_instance) {
+                    $existing_static_instances = subject_static_instance::repository()
+                        ->where_in('subject_instance_id', $subject_instance_chunk->pluck('id'))
+                        ->get();
+                    $this->all_existing_static_instances = [];
+
+                    foreach ($existing_static_instances as $existing_static_instance) {
+                        $this->all_existing_static_instances[$existing_static_instance->subject_instance_id][$existing_static_instance->job_assignment_id] = $existing_static_instance;
+                    }
+
+                    foreach ($subject_instance_chunk as $subject_instance) {
                         // If subject instance is per job assignment then get specific job assignment.
                         // Else get all job assignments of subject.
-                        if (!empty($subject_instance->job_assignment_id)) {
-                            $job_assignments = [$all_subject_job_assignments->find('id', $subject_instance->job_assignment_id)];
+                        if (empty($subject_instance->job_assignment_id)) {
+                            $job_assignments = $job_assignments_keyed_by_userid[$subject_instance->subject_user_id] ?? [];
                         } else {
-                            $job_assignments = $all_subject_job_assignments
-                                ->filter('userid', $subject_instance->subject_user_id)
-                                ->all();
+                            $job_assignments = [$job_assignments_keyed_by_userid[$subject_instance->subject_user_id][$subject_instance->job_assignment_id]] ?? [];
                         }
 
                         foreach ($job_assignments as $job_assignment) {
@@ -116,15 +124,8 @@ class subject_static_instance_creation {
         int $subject_instance_id,
         int $job_assignment_id
     ): bool {
-        if ($this->all_existing_static_instances instanceof collection) {
-            return $this->all_existing_static_instances->has(
-                function ($existing_subject_instance) use ($subject_instance_id, $job_assignment_id) {
-                    return (int)$existing_subject_instance->subject_instance_id === $subject_instance_id &&
-                        (int)$existing_subject_instance->job_assignment_id == $job_assignment_id;
-                }
-            );
-        }
-        throw new coding_exception('Existing static subject instances not loaded.');
+        return isset($this->all_existing_static_instances[$subject_instance_id])
+            && isset($this->all_existing_static_instances[$subject_instance_id][$job_assignment_id]);
     }
 
     /**

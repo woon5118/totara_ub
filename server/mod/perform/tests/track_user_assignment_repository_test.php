@@ -81,7 +81,7 @@ class mod_perform_track_user_assignment_repository_testcase extends advanced_tes
             ->get();
         $this->assertCount(1, $track_user_assignments);
         $assignment = $track_user_assignments->find('id', $subject_instance_4->track_user_assignment_id);
-        $this->assertEquals(null, $assignment->instance_count);
+        $this->assertEquals(null, $assignment->subject_instance_count);
 
         // Turn repeating on. We expect results for all 4 assignments.
         $offset = new date_offset(
@@ -100,16 +100,16 @@ class mod_perform_track_user_assignment_repository_testcase extends advanced_tes
         $this->assertCount(4, $track_user_assignments);
 
         $assignment = $track_user_assignments->find('id', $subject_instance_1->track_user_assignment_id);
-        $this->assertEquals(1, $assignment->instance_count);
+        $this->assertEquals(1, $assignment->subject_instance_count);
 
         $assignment = $track_user_assignments->find('id', $subject_instance_2->track_user_assignment_id);
-        $this->assertEquals(2, $assignment->instance_count);
+        $this->assertEquals(2, $assignment->subject_instance_count);
 
         $assignment = $track_user_assignments->find('id', $subject_instance_3->track_user_assignment_id);
-        $this->assertEquals(3, $assignment->instance_count);
+        $this->assertEquals(3, $assignment->subject_instance_count);
 
         $assignment = $track_user_assignments->find('id', $subject_instance_4->track_user_assignment_id);
-        $this->assertEquals(null, $assignment->instance_count);
+        $this->assertEquals(null, $assignment->subject_instance_count);
 
         // Set repeat limit and check expected results.
         $offset = new date_offset(

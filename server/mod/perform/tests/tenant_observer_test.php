@@ -26,7 +26,7 @@ use totara_tenant\local\util as tenant_util;
 
 
 /**
- * @group mod_perform
+ * @group perform
  */
 class mod_perform_tenant_observer_testcase extends advanced_testcase {
 
