@@ -31,11 +31,14 @@
 use totara_tui\controllers\theme_settings;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->libdir . '/adminlib.php');
 
 class totara_tui_local_controllers_theme_settings_testcase extends advanced_testcase {
 
     public function test_happy_path() {
         $this->setAdminUser();
+        admin_get_root(true); // Fix random errors depending on test order.
 
         $controller = new theme_settings();
         $_POST['theme'] = 'ventura';
@@ -51,6 +54,7 @@ class totara_tui_local_controllers_theme_settings_testcase extends advanced_test
 
     public function test_happy_path_with_tenant() {
         $this->setAdminUser();
+        admin_get_root(true); // Fix random errors depending on test order.
 
         set_config('tenantsenabled', true);
 

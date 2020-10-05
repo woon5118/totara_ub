@@ -31,11 +31,14 @@
 use totara_tui\controllers\settings;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->libdir . '/adminlib.php');
 
 class totara_tui_local_controllers_settings_testcase extends advanced_testcase {
 
     public function test_happy_path_without_tenant() {
         $this->setAdminUser();
+        admin_get_root(true); // Fix random errors depending on test order.
 
         self::expectException(moodle_exception::class);
         self::expectExceptionMessage('Unsupported redirect detected, script execution terminated');
@@ -44,6 +47,7 @@ class totara_tui_local_controllers_settings_testcase extends advanced_testcase {
 
     public function test_happy_path_with_tenant() {
         $this->setAdminUser();
+        admin_get_root(true); // Fix random errors depending on test order.
 
         set_config('tenantsenabled', true);
 
