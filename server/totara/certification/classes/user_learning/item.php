@@ -160,6 +160,7 @@ class item extends item_base implements item_has_progress, item_has_dueinfo, ite
         $this->shortname = $data->shortname;
         $this->description = $data->summary;
         $this->description_format = FORMAT_HTML; // Certifications do not store a format we can use here.
+        $this->image = $this->get_image();
 
         $course = $this->is_single_course();
         if ($course) {
@@ -358,6 +359,15 @@ class item extends item_base implements item_has_progress, item_has_dueinfo, ite
      */
     public function get_component() {
         return 'totara_certification';
+    }
+
+    /**
+     * Returns the component name.
+     *
+     * @return string
+     */
+    public function get_component_name() : string {
+        return get_string('certification', 'totara_certification');
     }
 
     /**

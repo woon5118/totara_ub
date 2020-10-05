@@ -132,4 +132,37 @@ class totara_certification_user_learning_item_testcase extends advanced_testcase
 
         $this->assertFalse($certification_item->is_single_course());
     }
+
+    public function test_export_for_template() {
+        $progcontent = new prog_content($this->certification1->id);
+        $progcontent->add_set(CONTENTTYPE_MULTICOURSE);
+        $progcontent->add_set(CONTENTTYPE_MULTICOURSE);
+
+        $coursesets = $progcontent->get_course_sets();
+
+        $coursedata = new stdClass();
+        $coursedata->{$coursesets[0]->get_set_prefix() . 'courseid'} = $this->course1->id;
+        $progcontent->add_course(1, $coursedata);
+
+        $coursedata->{$coursesets[1]->get_set_prefix() . 'courseid'} = $this->course2->id;
+        $progcontent->add_course(2, $coursedata);
+
+        $progcontent->save_content();
+
+        // Set the operator for Set 1 to be AND.
+        $coursesets[0]->nextsetoperator = NEXTSETOPERATOR_AND;
+        $coursesets[0]->save_set();
+
+        // Assign user to the program.
+        $this->program_generator->assign_program($this->certification1->id, array($this->user1->id));
+
+        $program_item = \totara_certification\user_learning\item::one($this->user1->id, $this->certification1->id);
+
+        $info = $program_item->export_for_template();
+
+        $this->assertEquals($this->certification1->id, $info->id);
+        $this->assertEquals($this->certification1->fullname, $info->fullname);
+        $this->assertEquals('Certification', $info->component_name);
+        $this->assertEquals($this->certification1->get_image(), $info->image);
+    }
 }

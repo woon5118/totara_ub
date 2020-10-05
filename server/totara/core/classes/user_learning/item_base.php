@@ -50,6 +50,7 @@ abstract class item_base implements item, designation {
     public $fullname;
     public $description;
     public $description_format = null;
+    public $image;
 
     public $url_view;
     public $progress;
@@ -201,6 +202,7 @@ abstract class item_base implements item, designation {
 
         $record = new \stdClass;
         $record->component = $this->get_component();
+        $record->component_name = $this->get_component_name();
         $record->type = $this->get_type();
         $record->id = $this->id;
         $record->shortname = format_string($this->shortname, true, $formatoptions);
@@ -220,6 +222,7 @@ abstract class item_base implements item, designation {
                 $record->description = format_text($description, $this->description_format, $formatoptions);
             }
         }
+        $record->image = (string)$this->image;
         $record->url_view = (string)$this->url_view;
 
         if ($this instanceof item_has_progress) {

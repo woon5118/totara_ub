@@ -610,6 +610,8 @@ class totara_program_user_learning_item_testcase extends advanced_testcase {
 
         $this->assertEquals($this->program1->id, $info->id);
         $this->assertEquals($this->program1->fullname, $info->fullname);
+        $this->assertEquals('Program', $info->component_name);
+        $this->assertEquals($this->program1->get_image(), $info->image);
         $this->assertCount(2, $info->coursesets);
 
         // Test some coursesets properties.

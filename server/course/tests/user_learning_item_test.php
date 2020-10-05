@@ -198,6 +198,8 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
 
         $this->assertEquals($this->course1->id, $info->id);
         $this->assertEquals($this->course1->fullname, $info->fullname);
+        $this->assertEquals('Course', $info->component_name);
+        $this->assertEquals(course_get_image($this->course1)->out(), $info->image);
     }
 
     public function test_get_component() {

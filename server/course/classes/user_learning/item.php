@@ -152,6 +152,7 @@ class item extends item_base implements item_has_progress, item_has_image {
         if (isset($data->summaryformat)) {
             $this->description_format = $data->summaryformat;
         }
+        $this->image = $this->get_image();
 
         $this->url_view = new \moodle_url('/course/view.php', array('id' => $this->id));
     }
@@ -298,6 +299,15 @@ class item extends item_base implements item_has_progress, item_has_image {
      */
     public function get_component() {
         return 'core_course';
+    }
+
+    /**
+     * Returns the component name.
+     *
+     * @return string
+     */
+    public function get_component_name() : string {
+        return get_string('course');
     }
 
     /**
