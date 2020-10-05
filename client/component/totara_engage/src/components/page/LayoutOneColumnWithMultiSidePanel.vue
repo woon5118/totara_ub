@@ -109,7 +109,7 @@ This layout is capable of the following:
                   direction="rtl"
                   :animated="rightAnimated"
                   :sticky="rightSticky"
-                  :initially-open="rightSidePanelInitiallyOpen"
+                  :initially-open="rightSidePanelIsOpen"
                   :overflows="rightSidePanelOverflows"
                   :show-button-control="showRightSidePanelControl"
                   @sidepanel-expanding="expandRightRequest"
@@ -456,6 +456,7 @@ export default {
   mounted() {
     let state = this.rightSidePanelInitiallyOpen;
     const sidePanelState = storage.get('sidepanel');
+
     if (sidePanelState) {
       state = sidePanelState.isOpen;
     }

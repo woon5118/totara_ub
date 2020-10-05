@@ -25,7 +25,6 @@
       :stack-at="585"
       :show-right-side-panel="showRightSidePanel"
       :right-side-panel-animated="true"
-      :right-side-panel-initially-open="false"
       :right-side-panel-sticky="true"
       :right-side-panel-overflows="true"
       :show-left-side-panel="true"
@@ -179,7 +178,6 @@ export default {
       return !!this.sidePanel;
     },
   },
-
   created() {
     this.$_loadTuiComponents(this.content);
     if (this.sidePanel) {
