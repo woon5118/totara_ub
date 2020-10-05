@@ -432,4 +432,51 @@ class totara_tui_local_mediation_javascript_resolver_testcase extends advanced_t
         ], self::strip_debugging_messages($messages));
     }
 
+    public function test_theme_ventura_production() {
+        $this->skip_if_build_not_present();
+
+        $rev = time();
+        [$js, $messages, $file] = $this->get_resolver(time(), 'p', 'theme_ventura');
+        self::assertStringStartsWith("/* theme: ventura */\n!function(", $js);
+        self::assertStringNotContainsString('/*!******************************************', $js);
+        self::assertSame([
+            'Header: Etag: "'.sha1('tui ' . $rev . ' theme_ventura p').'"',
+            'Header: Content-Disposition: inline; filename="javascript.php"',
+            'Header: Date: ' . gmdate('D, d M Y', time()),
+            'Header: Last-Modified: ' . gmdate('D, d M Y', filemtime($file)),
+            'Header: Expires: ' . gmdate('D, d M Y', $this->get_lifetimestamp($rev)),
+            'Header: Pragma: ',
+            'Header: Cache-Control: public, max-age=604800, immutable',
+            'Header: Accept-Ranges: none',
+            'Header: Content-Type: application/javascript;charset=utf-8',
+            'Header: X-Content-Type-Options: nosniff',
+            'Header: Content-Length: ' . filesize($file),
+            'Header: Vary: Accept-Encoding',
+            'Exiting',
+        ], self::strip_debugging_messages($messages));
+    }
+
+    public function test_theme_ventura_development() {
+        $this->skip_if_build_not_present();
+
+        global $CFG;
+        $CFG->forced_plugin_settings['totara_tui'] = ['development_mode' => true];
+        [$js, $messages] = $this->get_resolver(-1, 'd', 'theme_ventura');
+        self::assertStringStartsWith("/* theme: ventura */\n/******/ (function(", $js);
+        self::assertStringContainsString('/*!******************************************', $js);
+        self::assertSame([
+            'Header: Etag: "'.sha1('tui -1 theme_ventura d').'"',
+            'Header: Content-Disposition: inline; filename="javascript.php"',
+            'Header: Date: ' . gmdate('D, d M Y', time()),
+            'Header: Last-Modified: ' . gmdate('D, d M Y', time()),
+            'Header: Expires: ' . gmdate('D, d M Y', time()),
+            'Header: Cache-Control: no-cache',
+            'Header: Pragma: no-cache',
+            'Header: Accept-Ranges: none',
+            'Header: Content-Type: application/javascript;charset=utf-8',
+            'Header: X-Content-Type-Options: nosniff',
+            'Exiting',
+        ], self::strip_debugging_messages($messages));
+    }
+
 }
