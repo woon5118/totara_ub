@@ -444,11 +444,14 @@ export default {
   &__profileContainer {
     position: relative;
     &-badge {
-      position: absolute;
-      right: 0;
-      bottom: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+
       > :last-child {
         @include tui-font-body-small();
+
+        padding-left: var(--gap-1);
       }
     }
   }
