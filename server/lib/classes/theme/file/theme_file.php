@@ -294,41 +294,28 @@ abstract class theme_file {
     }
 
     /**
-     * Cleans the draft area so that we only end up with the file we want.
-     *
      * @param int $draft_id
      * @param string|null $file
      *
      * @return bool
      */
-    public function clean_draft_file_area(int $draft_id, ?string $file): bool {
+    private function draft_file_exists(int $draft_id, ?string $file): bool {
         global $USER;
 
         // Initially file may be null.
-        if (empty($file)) {
+        if ((string)$file === '') {
             return true;
         }
 
-        // Get files in user draft area.
-        $file_helper = new file_helper(
-            'user',
-            'draft',
-            \context_user::instance($USER->id)
-        );
-        $file_helper->set_item_id($draft_id);
-        $files = $file_helper->get_stored_files();
+        $fs = get_file_storage();
+        $usercontext = \context_user::instance($USER->id);
 
-        // Clear out files that match the current selected file to leave us
-        // only with the new one.
-        $files = array_filter($files, function(stored_file $stored_file) use ($file) {
-            if ($file === $stored_file->get_filepath() . $stored_file->get_filename()) {
-                $stored_file->delete();
-                return false;
-            }
-            return true;
-        });
+        if (!$fs->file_exists($usercontext->id, 'user', 'draft', $draft_id, '/', '.')) {
+            // No draft files.
+            return false;
+        }
 
-        return sizeof($files) >= 1;
+        return true;
     }
 
     /**
@@ -353,9 +340,7 @@ abstract class theme_file {
         // Get current file name.
         $current = $setting->get_setting();
 
-        // If we have a new file after cleaning the draft area then
-        // we need to change the current file to the new one.
-        if ($this->clean_draft_file_area($draft_id, $current)) {
+        if ($this->draft_file_exists($draft_id, $current)) {
             // Write new settings.
             if ($setting->write_setting($draft_id) !== '') {
                 throw new \moodle_exception('themesavefiles', 'error');

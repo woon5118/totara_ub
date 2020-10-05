@@ -25,7 +25,7 @@
     :default-url="metadata.default_url"
     :accepted-types="metadata.type.valid_extensions"
     :aria-describedby="ariaDescribedby"
-    :context-id="contextId"
+    :context-id="parseInt(contextId)"
   />
 </template>
 
@@ -40,7 +40,7 @@ export default {
   props: {
     metadata: Object,
     ariaDescribedby: String,
-    contextId: Number,
+    contextId: [Number, String],
   },
 };
 </script>

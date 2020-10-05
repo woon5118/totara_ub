@@ -1,6 +1,10 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 13.1 ===
+
+* core\theme\file\theme_file::clean_draft_file_area() has been removed.
+
 === 13.0 ===
 
 * stored_file::get_imageinfo() added 1st parameter to optionally load the orientation information on a jpeg file.

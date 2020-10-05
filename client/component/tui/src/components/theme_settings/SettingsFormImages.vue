@@ -295,7 +295,7 @@ export default {
       },
     },
     // Context ID.
-    contextId: Number,
+    contextId: [Number, String],
   },
 
   data() {
