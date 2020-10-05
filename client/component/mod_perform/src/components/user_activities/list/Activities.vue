@@ -198,7 +198,7 @@
         <Button
           class="tui-performUserActivityList__button"
           :text="$str('print_activity', 'mod_perform')"
-          @click="printActivity(subjectInstance)"
+          @click.prevent="printActivity(subjectInstance)"
         />
 
         <SectionsList
@@ -228,7 +228,7 @@
         :participant-sections="selectedParticipantSections"
         :is-for-section="false"
         :subject-user="selectedSubjectUser"
-        :view-url="viewUrl"
+        :view-url="relationshipSelectorUrl"
       />
     </ModalPresenter>
   </Loader>
@@ -281,6 +281,10 @@ export default {
       type: String,
       required: true,
     },
+    printUrl: {
+      type: String,
+      required: true,
+    },
   },
 
   data() {
@@ -290,6 +294,7 @@ export default {
       selectedParticipantSections: [],
       selectedSubjectUser: {},
       singleSectionViewOnlyActivities: [],
+      relationshipSelectorUrl: '',
     };
   },
 
@@ -403,8 +408,9 @@ export default {
      * Open the relationship selector modal.
      *
      * @param {Object} selectedSubjectInstance
+     * @param {Boolean} isForPrint
      */
-    showRelationshipSelector(selectedSubjectInstance) {
+    showRelationshipSelector(selectedSubjectInstance, isForPrint) {
       this.selectedSubjectUser = selectedSubjectInstance.subject.subject_user;
       this.selectedParticipantSections = [];
       selectedSubjectInstance.sections.forEach(subjectSection => {
@@ -412,6 +418,7 @@ export default {
           this.selectedParticipantSections.push(participantSection);
         });
       });
+      this.relationshipSelectorUrl = isForPrint ? this.printUrl : this.viewUrl;
       this.isRelationshipSelectorShown = true;
     },
 
@@ -602,17 +609,27 @@ export default {
     isSingleSectionViewOnly(activityId) {
       return this.singleSectionViewOnlyActivities.includes(activityId);
     },
+
     /**
      * Open print-friendly page with activity.
      *
      * @param subjectInstance
-     * @returns {boolean}
+     * @return {undefined}
      */
     printActivity(subjectInstance) {
+      if (
+        this.currentUserHasMultipleRelationships(
+          subjectInstance.subject.participant_instances
+        )
+      ) {
+        this.showRelationshipSelector(subjectInstance, true);
+        return;
+      }
+
       const participantSection = this.getFirstSectionToParticipate(
         subjectInstance.sections
       );
-      const url = this.$url('/mod/perform/activity/print.php', {
+      const url = this.$url(this.printUrl, {
         participant_section_id: participantSection.id,
       });
       window.open(url);

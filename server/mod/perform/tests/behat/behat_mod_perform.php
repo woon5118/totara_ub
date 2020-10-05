@@ -449,18 +449,6 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Then /^I should see perform print activity relationship to user "([^"]*)"$/
-     *
-     * @param string $expected_relation
-     * @throws ExpectationException
-     */
-    public function i_should_see_perform_print_activity_relationship_to_user(string $expected_relation): void {
-        $this->execute('behat_general::assert_element_contains_text',
-            [$expected_relation, self::PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR, 'css_element']
-        );
-    }
-
-    /**
      * @Then /^I should (|not )see "([^"]*)" in perform activity print section "([0-9]*)"$/
      *
      * @param string $should_or_should_not

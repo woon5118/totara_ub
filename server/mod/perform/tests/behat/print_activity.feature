@@ -50,7 +50,7 @@ Feature: Print view of a single-section user activity
     When I log in as "david"
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "david" is the participant
     Then "Print activity" "button" should be visible
-    And I should see perform print activity relationship to user "Self"
+    And I should see perform activity relationship to user "yourself"
     And I should see "Appraisal"
     And I should see "Single section activity"
     And I should see "Question 1"
@@ -84,7 +84,7 @@ Feature: Print view of a single-section user activity
     And I log out
     And I log in as "john"
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "john" is the participant
-    Then I should see perform print activity relationship to user "Manager"
+    Then I should see perform activity relationship to user "Manager"
     And I should not see "David answer one"
     And I should see "Your response"
     # Empty form field should be displayed.
@@ -96,7 +96,7 @@ Feature: Print view of a single-section user activity
     And I log out
     And I log in as "appraiser"
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "appraiser" is the participant
-    Then I should see perform print activity relationship to user "Appraiser"
+    Then I should see perform activity relationship to user "Appraiser"
     And I should not see "Your response"
     And I should see "David answer one"
     And I should see "Manager response"
@@ -120,27 +120,26 @@ Feature: Print view of a single-section user activity
     And I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     And I toggle expanding row "1" of the tui datatable
-    # TODO: Activate/adjust the following when doing TL-28037
-#    And I click on "Print activity" "button"
-#    Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
+    And I click on "Print activity" "button"
+    Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
     # Check as manager.
-#    When I click on the "Manager (Not yet started)" tui radio
-#    And I click on "Continue" "button"
-#    Then I should see "Your response"
+    When I click on the "Manager (Not yet started)" tui radio
+    And I click on "Continue" "button"
+    Then I should see "Your response"
     # Empty form field should be displayed for logged in user when no response has been given yet.
-#    And ".tui-formField" "css_element" should exist in the ".tui-performElementResponse" "css_element"
-#    And I should not see "Subject response"
-#    And I should not see "Appraiser response"
+    And ".tui-formField" "css_element" should exist in the ".tui-performElementResponse" "css_element"
+    And I should not see "Subject response"
+    And I should not see "Appraiser response"
 
-    # Check as appraiser.
-#    When I navigate to the outstanding perform activities list page
-#    And I click on "Activities about others" "link"
-#    And I toggle expanding row "1" of the tui datatable
-#    And I click on "Print activity" "button"
-#    Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
-#    When I click on the "Appraiser (Not yet started)" tui radio
-#    And I click on "Continue" "button"
-#    Then I should not see "Your response"
-#    And I should see "Manager response"
-#    And I should see "Managerappraiser Three"
-#    And I should see "No response submitted"
+    # Check as appraiser (view-only).
+    When I navigate to the outstanding perform activities list page
+    And I click on "Activities about others" "link"
+    And I toggle expanding row "1" of the tui datatable
+    And I click on "Print activity" "button"
+    Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
+    When I click on the "Appraiser (View only)" tui radio
+    And I click on "Continue" "button"
+    Then I should not see "Your response"
+    And I should see "Manager response"
+    And I should see "Managerappraiser Three"
+    And I should see "No response submitted"
