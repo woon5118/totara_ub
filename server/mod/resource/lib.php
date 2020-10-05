@@ -363,6 +363,7 @@ function resource_pluginfile($course, $cm, $context, $filearea, $args, $forcedow
 
     // Totara: allow XSS depending on setting.
     $options['allowxss'] = get_config('resource', 'allowxss');
+    $options['allowpdfembedding'] = get_config('resource', 'allowpdfembedding');
 
     array_shift($args); // ignore revision - designed to prevent caching problems only
 

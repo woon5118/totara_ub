@@ -53,6 +53,8 @@ if ($ADMIN->fulltree) {
     if (empty($CFG->disableconsistentcleaning)) {
         $settings->add(new admin_setting_configcheckbox('resource/allowxss',
             get_string('allowxss', 'mod_resource'), get_string('allowxss_desc', 'mod_resource'), '0'));
+        $settings->add(new admin_setting_configcheckbox('resource/allowpdfembedding',
+            get_string('allowpdfembedding', 'mod_resource'), get_string('allowpdfembedding_desc', 'mod_resource'), '0'));
     }
 
     //--- modedit defaults -----------------------------------------------------------------------------------

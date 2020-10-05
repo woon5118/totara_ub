@@ -1500,12 +1500,20 @@ function totara_tweak_file_sending(&$mimetype, &$forcedownload, array &$options,
 
     // No mime guessing in IE and Chrome!
     header('X-Content-Type-Options: nosniff');
+    // Just in case something disabled default stuff.
+    header('X-XSS-Protection: 1; mode=block');
+
+    if ($mimetype === 'application/pdf' && !empty($options['allowpdfembedding'])) {
+        // Administrator enabled unsafe PDF embedding.
+        // This may theoretically cause security problems in PDF viewers
+        // that execute Javascript, such as built-in Chrome viewer.
+        return $mimetype;
+    }
+
     // Do not allow any kind of embedding in frames,
     // we do not want anybody to display these files in frames,
     // even from this site.
     header('X-Frame-Options: deny');
-    // Just in case something disabled default stuff.
-    header('X-XSS-Protection: 1; mode=block');
 
     // Intentionally break mime for dangerous stuff,
     // we do not want anything that is executed via browser plugins.

@@ -60,6 +60,7 @@ function report_security_get_issue_list() {
         'report_security_check_configrw',
         'report_security_check_riskallowxss',
         'report_security_check_resourcesallowxss',
+        'report_security_check_resourcesallowpdfembedding',
         'report_security_check_riskxss',
         'report_security_check_logincsrf',
         'report_security_check_riskadmin',
@@ -81,9 +82,13 @@ function report_security_get_issue_list() {
     if (empty($CFG->disableconsistentcleaning)) {
         unset($result['report_security_check_riskxss']);
         unset($result['report_security_check_embed']);
+        if (get_config('resource', 'allowxss')) {
+            unset($result['report_security_check_resourcesallowpdfembedding']);
+        }
     } else {
         unset($result['report_security_check_riskallowxss']);
         unset($result['report_security_check_resourcesallowxss']);
+        unset($result['report_security_check_resourcesallowpdfembedding']);
     }
     $result = array_flip($result);
 
@@ -589,7 +594,6 @@ function report_security_check_resourcesallowxss($detailed=false) {
     }
 
     if (!$dangerous) {
-        // Totara: no users means no warning, this is good for new installs.
         $result->status = REPORT_SECURITY_OK;
         $result->info = get_string('check_resourcesallowxss_ok', 'report_security');
     } else {
@@ -600,6 +604,35 @@ function report_security_check_resourcesallowxss($detailed=false) {
     return $result;
 }
 
+/**
+ * Warn if PDF embedding is enabled in mod_resourse.
+ *
+ * @since Totara 13.1
+ *
+ * @param bool $detailed
+ * @return stdClass result
+ */
+function report_security_check_resourcesallowpdfembedding($detailed = false) {
+    global $CFG;
+
+    $result = new stdClass();
+    $result->issue   = 'report_security_check_resourcesallowpdfembedding';
+    $result->name    = get_string('check_resourcesallowpdfembedding_name', 'report_security');
+    $result->info    = null;
+    $result->details = null;
+    $result->status  = REPORT_SECURITY_WARNING;
+    $result->link    = "<a href=\"$CFG->wwwroot/$CFG->admin/settings.php?section=modsettingresource\">".get_string('pluginname', 'mod_resource').'</a>';
+
+    if (get_config('resource', 'allowpdfembedding')) {
+        $result->info = get_string('check_resourcesallowpdfembedding_warning', 'report_security');
+        $result->details = get_string('check_resourcesallowpdfembedding_details', 'report_security');
+    } else {
+        $result->status = REPORT_SECURITY_OK;
+        $result->info = get_string('check_resourcesallowpdfembedding_ok', 'report_security');
+    }
+
+    return $result;
+}
 
 /**
  * Lists all users with XSS risk, it would be great to combine this with risk trusts in user table,

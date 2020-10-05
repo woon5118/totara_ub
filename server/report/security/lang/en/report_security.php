@@ -134,8 +134,12 @@ $string['check_repositoryurl_details'] = '<p>Enabling the URL downloader can all
 $string['check_repositoryurl_warning'] = 'URL downloader repository is enabled.';
 $string['check_repositoryurl_name'] = 'URL downloader repository';
 $string['check_repositoryurl_ok'] = 'URL downloader repository is disabled.';
+$string['check_resourcesallowpdfembedding_details'] = '<p>Users may upload untrusted PDF files as File resources.</p><p>It is recommended to disable "Allow PDF embedding" settings.</p>';
+$string['check_resourcesallowpdfembedding_name'] = 'Embedding of PDF files in course resources';
+$string['check_resourcesallowpdfembedding_ok'] = 'Uploaded PDF file are not opened directly in browsers.';
+$string['check_resourcesallowpdfembedding_warning'] = 'Uploaded PDF files may be opened directly in browsers.';
 $string['check_resourcesallowxss_details'] = '<p>Users that may add or update course resources must be fully trusted because they may
-use unsafe markup and files in following resource types: {$a}</p><p>It is recommended to disable all "Allow unsafe markup and files" settings.</p>';
+use unsafe markup and files in following resource types: {$a}</p><p>It is recommended to disable all "Allow unsafe markup and files" setting.</p>';
 $string['check_resourcesallowxss_name'] = 'Unsafe markup and files in course resources';
 $string['check_resourcesallowxss_ok'] = 'All "Allow unsafe markup and files" resource settings are disabled.';
 $string['check_resourcesallowxss_warning'] = 'Users editing course resources may use unsafe markup and files.';

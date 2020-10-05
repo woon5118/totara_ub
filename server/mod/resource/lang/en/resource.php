@@ -24,9 +24,13 @@
  */
 
 $string['allowxss'] = 'Allow unsafe files';
-$string['allowxss_desc'] = 'If enabled all resource files uploaded by authorised users to courses with be be allowed to execute without any security restrictions.
+$string['allowxss_desc'] = 'If enabled, files uploaded into course resources will be allowed to execute without any security restrictions.
 
 It is strongly recommended to keep this option disabled for security reasons.';
+$string['allowpdfembedding'] = 'Allow PDF embedding';
+$string['allowpdfembedding_desc'] = 'If enabled, PDF files will not be downloaded automatically.
+
+It is recommended to keep this option disabled for security reasons. This setting is ignored when Allow unsafe files is enabled.';
 $string['clicktodownload'] = 'Click {$a} link to download the file.';
 $string['clicktoopen2'] = 'Click {$a} link to view the file.';
 $string['configdisplayoptions'] = 'Select all options that should be available, existing settings are not modified. Hold CTRL key to select multiple fields.';
