@@ -207,10 +207,14 @@ export default {
 
 <style lang="scss">
 .tui-activityNotifications {
+  & > * + * {
+    margin-top: var(--gap-4);
+  }
+
   &__header {
     display: flex;
     align-items: baseline;
-    margin-top: var(--gap-2); // Check the content tab before changing this.
+    margin: 0;
   }
 
   &__title {

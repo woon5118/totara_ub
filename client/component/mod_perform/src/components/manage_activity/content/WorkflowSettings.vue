@@ -26,26 +26,21 @@
         :label="$str('workflow_automatic_closure_label', 'mod_perform')"
         :helpmsg="$str('workflow_automatic_closure_label_help', 'mod_perform')"
       >
-        <div>
-          <ToggleSwitch
-            v-model="value"
-            :disabled="isSaving"
-            :toggle-first="true"
-            :text="
-              $str('workflow_automatic_closure_on_completion', 'mod_perform')
-            "
-            @input="valueChanged"
-          />
+        <ToggleSwitch
+          v-model="value"
+          :disabled="isSaving"
+          :toggle-first="true"
+          :text="
+            $str('workflow_automatic_closure_on_completion', 'mod_perform')
+          "
+          @input="valueChanged"
+        />
 
-          <FormRowDetails :id="$id('aria-describedby')">
-            {{
-              $str(
-                'workflow_automatic_closure_on_completion_help',
-                'mod_perform'
-              )
-            }}
-          </FormRowDetails>
-        </div>
+        <FormRowDetails :id="$id('aria-describedby')">
+          {{
+            $str('workflow_automatic_closure_on_completion_help', 'mod_perform')
+          }}
+        </FormRowDetails>
       </FormRow>
 
       <FormRow>
@@ -229,6 +224,7 @@ export default {
 <style lang="scss">
 .tui-performActivityWorkflowSettings {
   &__heading {
+    margin: 0;
     @include tui-font-heading-small();
   }
   &__warning {

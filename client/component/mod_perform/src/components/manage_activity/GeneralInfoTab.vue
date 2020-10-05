@@ -17,12 +17,13 @@
 -->
 
 <template>
-  <div class="tui-performManageActivityGeneralInfo">
-    <h3 class="tui-performManageActivityGeneralInfo__heading">
-      {{ $str('activity_general_tab_heading', 'mod_perform') }}
-    </h3>
+  <Form class="tui-performManageActivityGeneralInfo">
+    <!-- General -->
+    <FormRowStack spacing="large">
+      <h3 class="tui-performManageActivityGeneralInfo__heading">
+        {{ $str('activity_general_tab_heading', 'mod_perform') }}
+      </h3>
 
-    <Form>
       <FormRow
         v-slot="{ id }"
         :label="$str('general_info_label_activity_title', 'mod_perform')"
@@ -32,6 +33,7 @@
           :id="id"
           v-model="form.name"
           :maxlength="ACTIVITY_NAME_MAX_LENGTH"
+          char-length="50"
         />
       </FormRow>
 
@@ -39,7 +41,12 @@
         v-slot="{ id }"
         :label="$str('general_info_label_activity_description', 'mod_perform')"
       >
-        <Textarea :id="id" v-model="form.description" />
+        <Textarea
+          :id="id"
+          v-model="form.description"
+          char-length="50"
+          :rows="4"
+        />
       </FormRow>
 
       <FormRow
@@ -60,141 +67,130 @@
           />
         </div>
       </FormRow>
+    </FormRowStack>
 
-      <template>
-        <h3 class="tui-performManageActivityGeneralInfo__heading">
-          {{
-            $str('activity_general_response_attribution_heading', 'mod_perform')
-          }}
-        </h3>
+    <!-- Response attribution and visibility -->
+    <FormRowStack spacing="large">
+      <h3 class="tui-performManageActivityGeneralInfo__heading">
+        {{
+          $str('activity_general_response_attribution_heading', 'mod_perform')
+        }}
+      </h3>
 
-        <FormRow
-          :label="
-            $str('activity_general_anonymous_responses_label', 'mod_perform')
-          "
-          :helpmsg="
-            $str(
-              'activity_general_anonymous_responses_label_help',
-              'mod_perform'
-            )
-          "
-        >
-          <div>
-            <span v-if="isActive">{{
-              activeToggleText(value.anonymous_responses)
-            }}</span>
-            <ToggleSwitch
-              v-else
-              v-model="form.anonymousResponse"
-              toggle-first
-              :aria-label="
-                $str(
-                  'activity_general_anonymous_responses_label',
-                  'mod_perform'
-                )
-              "
-              @input="anonymityValueChanged"
-            />
-          </div>
-        </FormRow>
+      <FormRow
+        :label="
+          $str('activity_general_anonymous_responses_label', 'mod_perform')
+        "
+        :helpmsg="
+          $str('activity_general_anonymous_responses_label_help', 'mod_perform')
+        "
+      >
+        <div>
+          <span v-if="isActive">
+            {{ activeToggleText(value.anonymous_responses) }}
+          </span>
+          <ToggleSwitch
+            v-else
+            v-model="form.anonymousResponse"
+            toggle-first
+            :aria-label="
+              $str('activity_general_anonymous_responses_label', 'mod_perform')
+            "
+            @input="anonymityValueChanged"
+          />
+        </div>
+      </FormRow>
 
-        <FormRow
-          v-slot="{ labelId }"
-          :label="$str('visibility_condition_label', 'mod_perform')"
-          :helpmsg="$str('visibility_condition_label_help', 'mod_perform')"
-        >
-          <div>
-            <RadioGroup
-              v-if="!isAnonymousResponse"
-              v-model="form.visibilityConditionValue"
-              :aria-labelledby="labelId"
+      <FormRow
+        v-slot="{ labelId }"
+        :label="$str('visibility_condition_label', 'mod_perform')"
+        :helpmsg="$str('visibility_condition_label_help', 'mod_perform')"
+      >
+        <div>
+          <RadioGroup
+            v-if="!isAnonymousResponse"
+            v-model="form.visibilityConditionValue"
+            :aria-labelledby="labelId"
+          >
+            <Radio
+              v-for="item in visibilityConditionOptions"
+              :key="item.value"
+              :value="item.value"
             >
-              <Radio
-                v-for="item in visibilityConditionOptions"
-                :key="item.value"
-                :value="item.value"
-              >
-                {{ item.name }}
-              </Radio>
-            </RadioGroup>
-            <span v-else>{{
+              {{ item.name }}
+            </Radio>
+          </RadioGroup>
+          <span v-else>
+            {{ $str('visibility_condition_all_closed', 'mod_perform') }}
+          </span>
+        </div>
+      </FormRow>
+
+      <FormRow v-if="showWarning">
+        <div class="tui-performManageActivityGeneralInfo__warning">
+          <NotificationBanner
+            type="warning"
+            :message="
               $str(
-                'visibility_condition_all_participants_closed',
+                'visibility_condition_status_mismatch_warning',
                 'mod_perform'
               )
-            }}</span>
-          </div>
-        </FormRow>
-
-        <FormRow v-if="showWarning">
-          <div class="tui-performManageActivityGeneralInfo__warning">
-            <NotificationBanner
-              type="warning"
-              :message="
-                $str(
-                  'visibility_condition_status_mismatch_warning',
-                  'mod_perform'
-                )
-              "
-            /></div
-        ></FormRow>
-      </template>
-
-      <div class="tui-performManageActivityManualRelationships">
-        <h3 class="tui-performManageActivityManualRelationships__heading">
-          {{
-            $str('general_info_participant_selection_heading', 'mod_perform')
-          }}
-        </h3>
-        <p>
-          {{
-            $str(
-              'general_info_participant_selection_description',
-              'mod_perform'
-            )
-          }}
-        </p>
-        <FormRow
-          v-for="relationship in manualRelationships"
-          :key="relationship.id"
-          v-slot="{ id }"
-          :label="relationship.name"
-        >
-          <div>
-            <span v-if="isActive">
-              {{ relationship.selector_relationship_name }}
-            </span>
-            <Select
-              v-else
-              :id="id"
-              v-model="form.manualRelationshipSelections[relationship.id]"
-              :aria-labelledby="id"
-              :aria-label="relationship.name"
-              :aria-describedby="$id('aria-describedby')"
-              :options="manualRelationshipOptions"
-            />
-          </div>
-        </FormRow>
-      </div>
-
-      <FormRow>
-        <ButtonGroup>
-          <Button
-            :styleclass="{ primary: true }"
-            :text="$str('save_changes', 'mod_perform')"
-            :disabled="isSaving || hasNoTitle"
-            type="submit"
-            @click.prevent="trySave"
+            "
           />
-          <Button
-            :disabled="isSaving"
-            :text="$str('cancel', 'core')"
-            @click="resetChanges"
-          />
-        </ButtonGroup>
+        </div>
       </FormRow>
-    </Form>
-  </div>
+    </FormRowStack>
+
+    <!-- Selection of participants -->
+    <FormRowStack spacing="large">
+      <h3 class="tui-performManageActivityGeneralInfo__heading">
+        {{ $str('general_info_participant_selection_heading', 'mod_perform') }}
+      </h3>
+      <div class="tui-performManageActivityGeneralInfo__description">
+        {{
+          $str('general_info_participant_selection_description', 'mod_perform')
+        }}
+      </div>
+      <FormRow
+        v-for="relationship in manualRelationships"
+        :key="relationship.id"
+        v-slot="{ id }"
+        :label="relationship.name"
+      >
+        <div>
+          <span v-if="isActive">
+            {{ relationship.selector_relationship_name }}
+          </span>
+          <Select
+            v-else
+            :id="id"
+            v-model="form.manualRelationshipSelections[relationship.id]"
+            :aria-labelledby="id"
+            :aria-label="relationship.name"
+            :aria-describedby="$id('aria-describedby')"
+            :options="manualRelationshipOptions"
+          />
+        </div>
+      </FormRow>
+    </FormRowStack>
+
+    <FormRow class="tui-performManageActivityGeneralInfo__buttons">
+      <ButtonGroup>
+        <Button
+          :styleclass="{ primary: true }"
+          :text="$str('save_changes', 'mod_perform')"
+          :disabled="isSaving || hasNoTitle"
+          type="submit"
+          @click.prevent="trySave"
+        />
+        <Button
+          :disabled="isSaving"
+          :text="$str('cancel', 'core')"
+          @click="resetChanges"
+        />
+      </ButtonGroup>
+    </FormRow>
+  </Form>
 </template>
 
 <script>
@@ -202,6 +198,7 @@ import Button from 'tui/components/buttons/Button';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
+import FormRowStack from 'tui/components/form/FormRowStack';
 import InputText from 'tui/components/form/InputText';
 import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import Radio from 'tui/components/form/Radio';
@@ -226,6 +223,7 @@ export default {
     ButtonGroup,
     Form,
     FormRow,
+    FormRowStack,
     InputText,
     NotificationBanner,
     Radio,
@@ -621,7 +619,7 @@ export default {
       "general_info_participant_selection_heading",
       "save_changes",
       "unsaved_changes_warning",
-      "visibility_condition_all_participants_closed",
+      "visibility_condition_all_closed",
       "visibility_condition_label",
       "visibility_condition_label_help",
       "visibility_condition_status_mismatch_warning"
@@ -634,25 +632,25 @@ export default {
 
 <style lang="scss">
 .tui-performManageActivityGeneralInfo {
-  &__heading {
-    @include tui-font-heading-small();
-
-    & > * + * {
-      margin-top: var(--gap-12);
-    }
+  & > * + * {
+    margin-top: var(--gap-12);
   }
+
+  &__buttons {
+    margin-top: var(--gap-8);
+  }
+
+  &__heading {
+    margin: 0;
+    @include tui-font-heading-small();
+  }
+
+  &__description {
+    margin-top: var(--gap-4);
+  }
+
   &__warning {
     max-width: 712px;
-  }
-}
-
-.tui-performManageActivityManualRelationships {
-  margin-top: var(--gap-6);
-  & > * + * {
-    margin-top: var(--gap-6);
-  }
-  &__heading {
-    @include tui-font-heading-small();
   }
 }
 </style>

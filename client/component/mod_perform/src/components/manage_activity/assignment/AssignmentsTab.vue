@@ -578,8 +578,8 @@ export default {
 <style lang="scss">
 .tui-performManageActivityAssignmentsForm {
   &__heading {
+    margin: 0;
     @include tui-font-heading-small();
-    margin: var(--gap-4) 0 0;
   }
 
   &__add {

@@ -51,6 +51,8 @@ export default {
 
   &__icon {
     margin-right: var(--gap-1);
+    // Negative Offset to left align arrow with page content
+    margin-left: -0.19em;
   }
 }
 </style>

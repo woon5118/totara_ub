@@ -17,18 +17,21 @@
 -->
 
 <template>
-  <div class="tui-performUserActivitiesSelectParticipants">
-    <a :href="$url(userActivitiesUrl)">
-      {{ $str('back_to_all_activities', 'mod_perform') }}
-    </a>
+  <Layout
+    :loading="$apollo.loading"
+    :title="
+      $str('user_activities_select_participants_page_title', 'mod_perform')
+    "
+    class="tui-performUserActivitiesSelectParticipants"
+  >
+    <template v-slot:content-nav>
+      <PageBackLink
+        :link="$url(userActivitiesUrl)"
+        :text="$str('back_to_all_activities', 'mod_perform')"
+      />
+    </template>
 
-    <PageHeading
-      :title="
-        $str('user_activities_select_participants_page_title', 'mod_perform')
-      "
-    />
-
-    <Loader :loading="$apollo.loading">
+    <template v-slot:content>
       <div
         v-if="$apollo.loading || participantSelectionInstances.length > 0"
         class="tui-performUserActivitiesSelectParticipants__content"
@@ -68,15 +71,15 @@
       <div v-else>
         {{ $str('user_activities_select_participants_none', 'mod_perform') }}
       </div>
-    </Loader>
-  </div>
+    </template>
+  </Layout>
 </template>
 
 <script>
 import ActivityParticipants from 'mod_perform/components/user_activities/participant_selector/ActivityParticipants';
 import JobAssignmentInformation from 'mod_perform/components/user_activities/participant/JobAssignmentInformation';
-import Loader from 'tui/components/loading/Loader';
-import PageHeading from 'tui/components/layouts/PageHeading';
+import Layout from 'tui/components/layouts/LayoutOneColumn';
+import PageBackLink from 'tui/components/layouts/PageBackLink';
 import ManualParticipantSelectionInstancesQuery from 'mod_perform/graphql/manual_participant_selection_instances';
 import SetManualParticipantsMutation from 'mod_perform/graphql/set_manual_participants';
 import { notify } from 'tui/notifications';
@@ -85,8 +88,8 @@ export default {
   components: {
     ActivityParticipants,
     JobAssignmentInformation,
-    Loader,
-    PageHeading,
+    Layout,
+    PageBackLink,
   },
 
   props: {
@@ -179,10 +182,6 @@ export default {
 
 <style lang="scss">
 .tui-performUserActivitiesSelectParticipants {
-  & > * + * {
-    margin-top: var(--gap-2);
-  }
-
   &__content {
     & > * + * {
       margin-top: var(--gap-4);

@@ -17,15 +17,20 @@
 -->
 
 <template>
-  <Loader :loading="$apollo.loading">
-    <div class="tui-performManageActivity">
-      <a :href="goBackLink">
-        {{ $str('back_to_all_activities', 'mod_perform') }}
-      </a>
+  <Layout
+    :loading="$apollo.loading"
+    :title="activity ? activity.name : ''"
+    class="tui-performManageActivity"
+  >
+    <template v-slot:content-nav>
+      <PageBackLink
+        :link="goBackLink"
+        :text="$str('back_to_all_activities', 'mod_perform')"
+      />
+    </template>
 
-      <div v-if="activity" class="tui-performManageActivity__content">
-        <PageHeading :title="activity.name" />
-
+    <template v-if="activity" v-slot:content>
+      <div class="tui-performManageActivity__content">
         <ActivityStatusBanner
           :activity="activity"
           :disabled="activateModalLoading"
@@ -35,6 +40,7 @@
         <Tabs
           :selected="currentTabId"
           :controlled="true"
+          content-spacing="large"
           @input="changeTabRequest"
         >
           <Tab
@@ -67,8 +73,8 @@
           @refetch="refetch"
         />
       </div>
-    </div>
-  </Loader>
+    </template>
+  </Layout>
 </template>
 
 <script>
@@ -77,9 +83,9 @@ import ActivityContentTab from 'mod_perform/components/manage_activity/content/A
 import ActivityStatusBanner from 'mod_perform/components/manage_activity/ActivityStatusBanner';
 import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/AssignmentsTab';
 import GeneralInfoTab from 'mod_perform/components/manage_activity/GeneralInfoTab';
-import Loader from 'tui/components/loading/Loader';
+import Layout from 'tui/components/layouts/LayoutOneColumn';
 import NotificationsTab from 'mod_perform/components/manage_activity/notification/NotificationsTab';
-import PageHeading from 'tui/components/layouts/PageHeading';
+import PageBackLink from 'tui/components/layouts/PageBackLink';
 import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
 import { notify } from 'tui/notifications';
@@ -95,9 +101,9 @@ export default {
     ActivityStatusBanner,
     AssignmentsTab,
     GeneralInfoTab,
-    Loader,
+    Layout,
     NotificationsTab,
-    PageHeading,
+    PageBackLink,
     Tab,
     Tabs,
   },
@@ -272,12 +278,6 @@ export default {
 
 <style lang="scss">
 .tui-performManageActivity {
-  @include tui-font-body();
-
-  & > * + * {
-    margin-top: var(--gap-2);
-  }
-
   &__content {
     & > * + * {
       margin-top: var(--gap-8);

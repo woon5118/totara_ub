@@ -1,0 +1,14 @@
+This files describes API changes in /client/component/mod_perform,
+information provided here is intended especially for developers.
+
+=== 13.1 ===
+* Updated manageActivity.vue page to be using a core layout
+    * Template & SCSS changes
+* Updated UserActivitiesSelectParticipants.vue page to be using a core layout
+    * Template & SCSS changes
+* Updated template structure of GeneralInfoTab.vue component to be more consistent with theme
+    * Template, SCSS & lang string changes
+* Updated template structure of WorkflowSettings.vue component to address alignment issues
+    * Template, SCSS changes
+* Updated SCSS of NotificationsTab.vue to address alignment issues
+    * SCSS changes
