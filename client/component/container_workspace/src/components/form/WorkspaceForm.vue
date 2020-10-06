@@ -28,7 +28,12 @@
           :label="$str('space_name_label', 'container_workspace')"
           class="tui-workspaceForm__formRow"
         >
-          <InputText :id="id" v-model="name" :disabled="submitting" />
+          <InputText
+            :id="id"
+            v-model="name"
+            :maxlength="75"
+            :disabled="submitting"
+          />
         </FormRow>
 
         <FormRow

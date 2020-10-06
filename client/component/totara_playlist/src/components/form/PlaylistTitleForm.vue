@@ -32,6 +32,7 @@
         v-model="innerTitle"
         :placeholder="label"
         :aria-label="label"
+        :maxlength="75"
         name="playlist title"
       />
     </FormRow>

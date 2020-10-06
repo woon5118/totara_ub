@@ -172,4 +172,39 @@ class totara_playlist_create_testcase extends advanced_testcase {
         self::assertEquals($user_one->id, $message->useridfrom);
         self::assertEquals($user_two->id, $message->useridto);
     }
+
+    /**
+     * @return void
+     */
+    public function create_playlist_with_invalid_length(): void {
+        $this->setAdminUser();
+
+        $name = 'TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax';
+        $this->assertEquals(76, strlen($name));
+        
+        $this->expectException(\totara_playlist\exception\playlist_exception::class);
+        $this->expectExceptionMessage('Cannot create playlist');
+        playlist::create($name);
+    }
+
+    /**
+     * @return void
+     */
+    public function create_playlist_with_invalid_length_via_graphql(): void {
+        $this->setAdminUser();
+        $name = 'TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax';
+        $this->assertEquals(76, strlen($name));
+
+        $parameters = [
+            'name' => $name,
+            'summary' => "This is just a summary",
+            'summary_format' => FORMAT_PLAIN,
+        ];
+
+        $ec = execution_context::create('ajax', 'totara_playlist_create_playlist');
+
+        $this->expectException(\totara_playlist\exception\playlist_exception::class);
+        $this->expectExceptionMessage('Cannot create playlist');
+        graphql::execute_operation($ec, $parameters);
+    }
 }

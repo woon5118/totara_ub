@@ -70,6 +70,10 @@ final class workspace_helper {
             throw new \coding_exception("Cannot create a workspace with empty name");
         }
 
+        if (\core_text::strlen(trim($name)) > 75) {
+            throw workspace_exception::on_create();
+        }
+
         if (null === $category_id) {
             $category_id = workspace::get_default_category_id();
         }

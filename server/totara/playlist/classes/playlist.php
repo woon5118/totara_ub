@@ -172,7 +172,9 @@ final class playlist implements accessible, shareable {
         } else if (!access::is_valid($access)) {
             debugging("Access value is invalid with value '{$access}'", DEBUG_DEVELOPER);
             $access = access::PRIVATE;
-        } else if (empty($name)) {
+        }
+
+        if (empty(trim($name)) || \core_text::strlen(trim($name)) > 75) {
             throw playlist_exception::create('create');
         }
 

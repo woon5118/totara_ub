@@ -63,7 +63,11 @@ final class container_workspace_generator extends component_generator_base {
         global $USER;
 
         if (null === $name || '' === $name) {
-            $name = $this->random_name();
+            if (core_text::strlen($this->random_name()) > 75) {
+                $name = \core_text::substr($this->random_name(), 0, 75);
+            } else {
+                $name = $this->random_name();
+            }
         }
 
         if (null === $summary_format) {

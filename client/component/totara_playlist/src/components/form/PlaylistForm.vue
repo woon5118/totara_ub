@@ -29,7 +29,7 @@
         :id="id"
         v-model="playlist.name"
         name="playlist-title"
-        :max="60"
+        :maxlength="75"
         :placeholder="$str('entertitle', 'totara_playlist')"
         :disabled="submitting"
         :required="true"

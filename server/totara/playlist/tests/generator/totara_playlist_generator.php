@@ -48,7 +48,11 @@ final class totara_playlist_generator extends component_generator_base {
         if (isset($parameters['name'])) {
             $name = $parameters['name'];
         } else {
-            $name = $this->get_random_name();
+            if (core_text::strlen($this->get_random_name()) > 75) {
+                $name = \core_text::substr($this->get_random_name(), 0, 75);
+            } else {
+                $name = $this->get_random_name();
+            }
         }
 
         $access = access::PRIVATE;

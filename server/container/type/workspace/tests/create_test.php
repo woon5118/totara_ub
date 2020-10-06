@@ -358,4 +358,22 @@ class container_workspace_create_testcase extends advanced_testcase {
         $sql_result = $DB->get_field_select('tag', 'name', $where, null, MUST_EXIST);
         $this->assertEquals('testme', $sql_result);
     }
+
+    /**
+     * @return void
+     */
+    public function test_create_workspace_with_invalid_length(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        $name = 'TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax';
+        $this->assertEquals(76, strlen($name));
+
+        $this->expectException(workspace_exception::class);
+        $this->expectExceptionMessage('Cannot create a workspace');
+        workspace_helper::create_workspace(
+            $name,
+            $user->id
+        );
+    }
 }

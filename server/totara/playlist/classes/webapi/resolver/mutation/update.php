@@ -31,6 +31,7 @@ use totara_engage\access\access;
 use totara_engage\share\manager as share_manager;
 use totara_engage\share\recipient\manager as recipient_manager;
 use totara_engage\webapi\middleware\require_valid_recipients;
+use totara_playlist\exception\playlist_exception;
 use totara_playlist\playlist;
 use core\webapi\resolver\has_middleware;
 use core\webapi\middleware\clean_editor_content;
@@ -59,6 +60,9 @@ final class update implements mutation_resolver, has_middleware {
         $summary_format = null;
 
         if (!empty($args['name'])) {
+            if (\core_text::strlen($args['name']) > 75) {
+                throw playlist_exception::create('create');
+            }
             $name = $args['name'];
         }
 
