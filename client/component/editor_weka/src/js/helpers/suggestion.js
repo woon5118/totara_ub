@@ -23,6 +23,8 @@ import { position } from 'tui/lib/popover';
 import { Rect, Size } from 'tui/geometry';
 import { getBoundingClientRect } from 'tui/dom/position';
 import ResizeObserver from 'tui/polyfills/ResizeObserver';
+import { loadStrings } from 'tui/i18n';
+import { collectStrings } from 'tui/i18n_vue_plugin';
 
 export default class Suggestion {
   /**
@@ -130,10 +132,12 @@ export default class Suggestion {
    * @param {String} text
    * @param {Function} callback
    */
-  showList({ view, component, state: { range, text }, callback }) {
+  async showList({ view, component, state: { range, text }, callback }) {
     if (this._instance !== null) {
       this.destroyInstance();
     }
+
+    await loadStrings(collectStrings(component.component));
 
     const element = document.createElement('span');
     this._editor.viewExtrasLiveEl.appendChild(element);
