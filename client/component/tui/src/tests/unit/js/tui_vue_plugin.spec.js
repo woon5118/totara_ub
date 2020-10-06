@@ -25,6 +25,7 @@ beforeEach(() => {
   Vue = jest.fn();
   Vue.directive = jest.fn();
   Vue.component = jest.fn();
+  Vue.config = {};
   tuiVuePlugin.install(Vue);
   vm = new Vue();
 });

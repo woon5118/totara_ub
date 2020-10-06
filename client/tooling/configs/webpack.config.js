@@ -156,6 +156,24 @@ function createConfig({
     ].filter(Boolean),
   });
 
+  addRule('js-all-pre', {
+    test: /\.js$/,
+    enforce: 'pre',
+    use: [
+      {
+        loader: 'source-map-loader',
+        options: {
+          filterSourceMappingUrl: (url, resourcePath) => {
+            if (/[/\\]node_modules[/\\]|[/\\]vendor[/\\]/.test(resourcePath)) {
+              return 'remove';
+            }
+            return 'consume';
+          },
+        },
+      },
+    ],
+  });
+
   addRule('vue', {
     test: /\.vue$/,
     use: [

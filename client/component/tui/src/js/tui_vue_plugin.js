@@ -22,6 +22,9 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 export default {
   install(Vue) {
+    // Remove unneccesary production mode note in console
+    Vue.config.productionTip = false;
+
     Object.defineProperties(Vue.prototype, {
       /**
        * Get a unique ID for the current component instance
