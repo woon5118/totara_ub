@@ -164,6 +164,11 @@ export default {
   &__content {
     flex-grow: 1;
     width: 100%;
+    .tui-rendered > p {
+      -ms-word-break: break-all;
+      overflow-wrap: break-word;
+      hyphens: none;
+    }
   }
 }
 </style>
