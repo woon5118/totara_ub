@@ -1,4 +1,4 @@
-a<!--
+<!--
   This file is part of Totara Enterprise Extensions.
 
   Copyright (C) 2020 onwards Totara Learning Solutions LTD
