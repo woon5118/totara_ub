@@ -102,8 +102,7 @@ export default {
   display: inline-flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin: calc(-1 * var(--gap-1));
-  padding: var(--gap-1);
+  padding: var(--gap-1) 0;
   border: 2px solid transparent;
 
   &--fullWidth {
@@ -111,7 +110,8 @@ export default {
   }
 
   &--updateAble {
-    padding-right: 2rem;
+    padding-right: var(--gap-5);
+    padding-left: var(--gap-1);
 
     &:after {
       position: absolute;
