@@ -140,16 +140,9 @@ export default {
     if (this.referenceElement) {
       this.resizeObserver.observe(this.referenceElement);
     }
-
-    window.addEventListener('resize', this.handleResizeThrottled);
-    window.addEventListener('scroll', this.handleResizeThrottled, {
-      passive: true,
-    });
   },
 
   destroyed() {
-    window.removeEventListener('resize', this.handleResizeThrottled);
-    window.removeEventListener('scroll', this.handleResizeThrottled);
     this.$_closeCleanup();
     this.resizeObserver.disconnect();
   },
@@ -197,6 +190,9 @@ export default {
           containingBlock.rect.height
         );
       } else {
+        if (!refEl.offsetParent) {
+          return;
+        }
         if (
           process.env.NODE_ENV !== 'production' &&
           this.$el.offsetParent &&
@@ -232,6 +228,9 @@ export default {
     },
 
     handleResize() {
+      if (!this.shouldBeOpen) {
+        return;
+      }
       Vue.nextTick(() => {
         this.size = new Size(this.$el.offsetWidth, this.$el.offsetHeight);
         // padding is required to be equal on all sides
@@ -276,7 +275,14 @@ export default {
 
     $_setupOpen() {
       this.$_closeCleanup();
+
+      window.addEventListener('resize', this.handleResizeThrottled);
+      window.addEventListener('scroll', this.handleResizeThrottled, {
+        passive: true,
+      });
+
       this.isFixed = this.$_useFixedPositioning();
+
       this.scrollableContainers = [];
       let scrollable = getClosestScrollable(this.$el.parentNode);
       while (scrollable) {
@@ -287,6 +293,9 @@ export default {
     },
 
     $_closeCleanup() {
+      window.removeEventListener('resize', this.handleResizeThrottled);
+      window.removeEventListener('scroll', this.handleResizeThrottled);
+
       if (this.scrollableContainers) {
         this.scrollableContainers.forEach(x =>
           x.removeEventListener('scroll', this.handleResize)
