@@ -5,6 +5,6 @@ exports[`engage_article/components/form/EditArticleContentForm.vue Checks snapsh
   <loader-stub fullpage="true" loading="true"></loader-stub>
   <!---->
   <weka-stub placeholder="" instanceid="resourceId" component="engage_article" area="content" value="[object Object]" class="tui-engageEditArticleContentForm__editor"></weka-stub>
-  <donecancelgroup-stub disabled="true"></donecancelgroup-stub>
+  <donecancelgroup-stub disabled="true" class="tui-engageEditArticleContentForm__buttons"></donecancelgroup-stub>
 </form-stub>
 `;

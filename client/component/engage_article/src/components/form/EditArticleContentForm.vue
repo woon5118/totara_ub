@@ -37,6 +37,7 @@
     <DoneCancelGroup
       :loading="submitting"
       :disabled="content.isEmpty || submitting"
+      class="tui-engageEditArticleContentForm__buttons"
       @done="submit"
       @cancel="$emit('cancel')"
     />
@@ -121,3 +122,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.tui-engageEditArticleContentForm {
+  &__buttons {
+    margin-bottom: var(--gap-12);
+  }
+}
+</style>
