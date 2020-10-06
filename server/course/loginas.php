@@ -26,6 +26,8 @@ if ($redirect) {
         $SESSION->wantsurl = "$CFG->wwwroot/";
     }
 
+    // Totara: always go to the default page after new login
+    unset($SESSION->wantsurl);
     redirect(get_login_url());
 }
 
