@@ -76,6 +76,12 @@ abstract class content_generator {
     protected $disabled = false;
 
     /**
+     * The step is a step attribute specifies the interval between legal numbers in an <input> element.
+     * @var string|null $step
+     */
+    protected $step = null;
+
+    /**
      * content_generator constructor.
      *
      * @param seminar_event        $seminarevent

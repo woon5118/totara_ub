@@ -36,10 +36,12 @@
         "disabled": false,
         "label": "Event grade",
         "placeholder": "Grade",
-        "name": "signupid_5"
+        "name": "signupid_5",
+        "type": "number",
+        "step": null,
     }
 }}
 
 <div class="mod_facetoface__grade">
-    <input type="text" min="{{min}}" max="{{max}}" value="{{value}}" placeholder="{{placeholder}}" name="{{name}}" class="mod_facetoface__grade__input" autocomplete="off" aria-label="{{label}}"{{#disabled}} disabled{{/disabled}}>
+    <input type="{{type}}" {{#step}}min="{{min}}" max="{{max}}" step="{{step}}"{{/step}} value="{{value}}" placeholder="{{placeholder}}" name="{{name}}" class="mod_facetoface__grade__input" autocomplete="off" aria-label="{{label}}"{{#disabled}} disabled{{/disabled}}>
 </div>

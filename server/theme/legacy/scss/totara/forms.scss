@@ -160,7 +160,8 @@
     @include make-md-column(8);
     select,
     input[type='text'],
-    input[type='password'] {
+    input[type='password'],
+    input[type='number'] {
       @extend .form-control;
     }
     select[size],
@@ -183,6 +184,7 @@
 form select,
 form input[type='text'],
 form input[type='password'],
+form input[type='number'],
 form.atto_form input[type='url'],
 select.singleselect {
   @extend .form-control;
@@ -277,7 +279,8 @@ select {
   .form-item .form-setting,
   .mform .fcontainer .fitem .felement {
     > input[type='text'],
-    > input[type='password'] {
+    > input[type='password'],
+    > input[type='number'] {
       width: auto;
       // Disabling min with just to try
       // min-width: 480px;
@@ -496,7 +499,8 @@ input[type='checkbox'] {
 // End of original bootstrap theme code.
 
 .mform .fitem_fgroup .felement input[type='text'],
-.mform .fitem_fgroup .felement input[type='password'] {
+.mform .fitem_fgroup .felement input[type='password'],
+.mform .fitem_fgroup .felement input[type='number'] {
   display: inline-block;
 }
 

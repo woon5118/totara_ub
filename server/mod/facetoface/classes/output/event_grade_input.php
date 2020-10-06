@@ -41,13 +41,16 @@ class event_grade_input extends \core\output\template {
      * @param event_attendee        $attendee
      * @param signup_status|null    $status
      * @param bool                  $disabled  Set false to disable the input field
+     * @param string|null           $step The step is a step attribute specifies the interval between legal numbers in an <input> element.
      *
      * @return event_grade_input
      */
     public static function create(event_attendee $attendee,
                                   signup_status $status = null,
-                                  bool $disabled = false): event_grade_input {
+                                  bool $disabled = false,
+                                  $step = null): event_grade_input {
 
+        $separator = get_string('decsep', 'langconfig');
         $value = $status !== null ? $status->get_grade() : null;
 
         $data = [
@@ -57,7 +60,9 @@ class event_grade_input extends \core\output\template {
             'label' => get_string('gradeinput_label', 'facetoface', clean_string(fullname($attendee))),
             'min' => seminar::GRADE_PASS_MINIMUM,
             'max' => seminar::GRADE_PASS_MAXIMUM,
-            'value' => grade_helper::format($value, $attendee->course)
+            'value' => grade_helper::format($value, $attendee->course),
+            'type' => $separator === '.' ? 'number' : 'text',
+            'step' => $step,
         ];
 
         return new static($data);

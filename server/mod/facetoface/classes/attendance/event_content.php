@@ -106,6 +106,7 @@ final class event_content extends content_generator {
      * @return totara_table
      */
     public function generate_allowed_action_content(array $rows, moodle_url $url, bool $disabled = false): totara_table {
+        global $CFG;
 
         $this->disabled = $disabled;
         $table = $this->do_create_table($url);
@@ -116,6 +117,14 @@ final class event_content extends content_generator {
 
         $helper = new attendance_helper();
         $stats = $helper->get_calculated_session_attendance_status($this->seminarevent->get_id());
+
+        // The step is a step attribute specifies the interval between legal numbers in an <input> element.
+        $decimals = grade_get_setting($seminar->get_course(), 'decimalpoints', $CFG->grade_decimalpoints);
+        if ((int)$decimals > 0) {
+            $separator = get_string('decsep', 'langconfig');
+            // Keep in mind localised decimal separator, russian/german <input type="number" step="0,001" .../> is not working
+            $this->step = $separator === '.' ? '0.' . str_repeat(0, (int) $decimals - 1) . '1' : null;
+        }
 
         foreach ($rows as $attendee) {
             if ($attendee === null) {
@@ -185,7 +194,7 @@ final class event_content extends content_generator {
         $disabled = $this->disabled || $attendee->is_archived();
 
         return $OUTPUT->render(
-            event_grade_input::create($attendee, $status, $disabled)
+            event_grade_input::create($attendee, $status, $disabled, $this->step)
         );
     }
 
