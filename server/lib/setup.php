@@ -237,6 +237,9 @@ if (defined('COMPONENT_CLASSLOADER')) {
 // Remember the default PHP timezone, we will need it later.
 core_date::store_default_php_timezone();
 
+// Add PHP compatibility lib files
+require_once($CFG->libdir . '/compatibility/php72lib.php'); // PHP 7.2
+
 // Load up standard libraries
 require_once($CFG->libdir .'/filterlib.php');       // Functions for filtering test as it is output
 require_once($CFG->libdir .'/ajax/ajaxlib.php');    // Functions for managing our use of JavaScript and YUI
