@@ -37,6 +37,7 @@ $string['itemduewarningperiod'] = 'Item due warning period';
 $string['itemduewarningperiod_help'] = 'When the time until an item\'s due date is less than the period given here, the item will be flagged with a warning indicating it is due soon.
 
 If the warning period is zero or the item has no due date, no warning will be shown.';
+$string['list_view'] = 'List view (default)';
 $string['multiplecompletedandmultipleoptionalcoursesets'] = '{$a->completed} completed sets and {$a->optional} optional sets';
 $string['multiplecompletedandoneoptionalcoursesets'] = '{$a} completed sets and 1 optional set';
 $string['nameatoz'] = 'Name - A to Z';
@@ -55,6 +56,8 @@ $string['searchbyname'] = 'Search by name';
 $string['thisisacourse'] = 'This is a standalone course';
 $string['thisisacertification'] = 'This is a certification';
 $string['thisisaprogram'] = 'This is a program';
+$string['tile_view'] = 'Tile view';
 $string['unavailablecoursesets'] = '1 unavailable set';
 $string['unavailablecoursesetsplural'] = '{$a} unavailable sets';
+$string['view'] = 'View';
 

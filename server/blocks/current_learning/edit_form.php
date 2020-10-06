@@ -37,6 +37,14 @@ class block_current_learning_edit_form extends block_edit_form {
         $mform->addElement('duration', 'config_alertperiod', get_string('itemduealertperiod', 'block_current_learning'));
         $mform->setDefault('config_alertperiod', block_current_learning::DEFAULT_ALERT_PERIOD);
         $mform->addHelpButton('config_alertperiod', 'itemduealertperiod', 'block_current_learning');
+
+        $viewoptions = [];
+        $viewoptions[] = $mform->createElement('radio', 'config_view', '', get_string('list_view', 'block_current_learning'), 'list');
+        $viewoptions[] = $mform->createElement('radio', 'config_view', '', get_string('tile_view', 'block_current_learning'), 'tile');
+
+
+        $mform->addGroup($viewoptions, 'config_view', get_string('view', 'block_current_learning'), ['<br>'], false);
+        $mform->setDefault('config_view', block_current_learning::DEFAULT_VIEW);
     }
 
     /**

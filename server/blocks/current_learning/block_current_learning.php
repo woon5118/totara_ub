@@ -43,6 +43,11 @@ class block_current_learning extends block_base {
     const DEFAULT_WARNING_PERIOD = 2592000; // One month. (30 * DAYSECS)
 
     /**
+     * The default view.
+     */
+    const DEFAULT_VIEW = 'list';
+
+    /**
      * The user id of the user this block is being displayed for.
      * ALWAYS the current user.
      * @var int
@@ -83,6 +88,10 @@ class block_current_learning extends block_base {
 
         if (empty($this->config->warningperiod)) {
             $this->config->warningperiod = self::DEFAULT_WARNING_PERIOD;
+        }
+
+        if (empty($this->config->view)) {
+            $this->config->view = self::DEFAULT_VIEW;
         }
     }
 
