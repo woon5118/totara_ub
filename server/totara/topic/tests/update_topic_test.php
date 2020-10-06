@@ -83,4 +83,25 @@ class totara_topic_update_topic_testcase extends advanced_testcase {
         $topic->update('Bolobala balabolo');
         $this->assertEquals('Bolobala balabolo', $DB->get_field('tag', 'rawname', ['id' => $id]));
     }
+
+    /**
+     * @return void
+     */
+    public function test_update_topic_with_case_change(): void {
+        global $DB;
+        $this->setAdminUser();
+
+        $topic = topic::create('My Topic');
+        $this->assertTrue($DB->record_exists('tag', ['id' => $topic->get_id()]));
+
+        $topic->update("My topic");
+        $this->assertSame('My topic', $DB->get_field('tag', 'rawname', ['id' => $topic->get_id()]));
+
+        $topic2 = topic::create('Another Topic');
+        $this->assertTrue($DB->record_exists('tag', ['id' => $topic2->get_id()]));
+
+        $this->expectException(topic_exception::class);
+        $this->expectExceptionMessage("The topic already exists in the system");
+        $topic2->update("My Topic");
+    }
 }

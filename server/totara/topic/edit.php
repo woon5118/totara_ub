@@ -71,8 +71,8 @@ if ($form->is_cancelled()) {
 } else if (null != $data) {
     $existing = topic_provider::find_by_name($data->value);
 
-    if (null === $existing) {
-        // Tag with that name is not existing. Therefore, we can update it.
+    if (null === $existing || $existing->get_id() == $topic->get_id()) {
+        // Tag does not exist, or it's the active tag
         $topic->update($data->value);
 
         notification::success(get_string('successupdate', 'totara_topic'));

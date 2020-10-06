@@ -230,7 +230,7 @@ final class topic {
         }
 
         $existing = \core_tag_tag::get_by_name($CFG->topic_collection_id, $value);
-        if (false !== $existing) {
+        if (false !== $existing && $existing->id != $this->tag->id) {
             throw new topic_exception("alreadyexist");
         }
 

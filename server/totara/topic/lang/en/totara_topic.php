@@ -44,7 +44,7 @@ $string['topic'] = "Topic";
 $string['total'] = "Total usage";
 $string['topicdeleted'] = "A topic has been deleted";
 $string['topicsduplicated'] = "Some topics already exist: {\$a}. Please remove duplicates before adding.";
-$string['topicexists'] = "Topic '{\$a}' is already existing in the system";
+$string['topicexists'] = "Topic '{\$a}' already exists.";
 $string['topicdeletedmessage'] = "The topic '{\$a}' had been deleted from the system. You are receiving this message because your resources had been using this topic. Below is the list of the affected resources:";
 $string['unsuccessdelete'] = "Topic '{\$a}' has been unable to be deleted";
 $string['usageoftopics'] = "Usage of topics";
@@ -62,7 +62,7 @@ $string['topic:report'] = "View topics report";
 $string['topic:update'] = "Update topic";
 
 // For error message
-$string['error:alreadyexist'] = "The topic is already existing in the system";
+$string['error:alreadyexist'] = "The topic already exists in the system";
 $string['error:nocaptodelete'] = "Cannot delete the topic due to no capability";
 $string['error:nocaptoupdate'] = "Cannot update the topic due to no capability";
 $string['error:nocaptoadd'] = "Cannot add new topic due to no capability";
