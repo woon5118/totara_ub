@@ -63,8 +63,8 @@ final class topic_provider {
         $builder = builder::table('tag');
         $builder->where('tagcollid', $CFG->topic_collection_id);
 
-        if ('' !== $name) {
-            $builder->where_like('name', $name);
+        if (!empty(trim($name))) {
+            $builder->where('name', 'ilike', $name);
         }
 
         if (!empty($exclude_ids)) {
