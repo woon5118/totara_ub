@@ -22,6 +22,7 @@
  */
 namespace core_user\profile;
 
+use core_date;
 use core_user\access_controller;
 
 /**
@@ -341,6 +342,13 @@ final class user_field_resolver {
             case 'mailtourl':
                 $email = $this->get_user_property('email');
                 return "mailto:{$email}";
+
+            case 'timezone':
+                $user_record = (object) $this->target_user_record;
+                return core_date::get_localised_timezone(core_date::get_user_timezone($user_record));
+
+            case 'country':
+                return !empty($this->target_user_record['country']) ? get_string($this->target_user_record['country'], 'countries') : null;
 
             default:
                 return $this->get_user_property($field);

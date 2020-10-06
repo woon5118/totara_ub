@@ -207,12 +207,12 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
     }
 
     public function test_resolver_country() {
-        $value = 'nz';
+        $value = 'NZ';
         $user = $this->getDataGenerator()->create_user(['country' => $value]);
         self::assertNull($this->resolve_graphql_type('core_user', 'country', $user, []));
 
         $this->setAdminUser();
-        self::assertSame($value, $this->resolve_graphql_type('core_user', 'country', $user, []));
+        self::assertSame(get_string($value, 'countries'), $this->resolve_graphql_type('core_user', 'country', $user, []));
     }
 
     public function test_resolver_lang() {
