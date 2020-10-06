@@ -110,7 +110,7 @@ class block_current_learning extends block_base {
      * @return \stdClass Object containing the block content.
      */
     public function get_content() {
-        global $USER;
+        global $USER, $CFG;
 
         if ($this->content !== null) {
             return $this->content;
@@ -212,6 +212,17 @@ class block_current_learning extends block_base {
             }
         }
 
+        // Set pagination number based on view type
+        switch ($this->config->view) {
+            case 'list':
+                $template = 'block_current_learning/block';
+                break;
+            case 'tile':
+                $template = 'block_current_learning/block_tiles';
+                $this->itemsperpage = 6;
+                break;
+        }
+
         // Create the pagination data if we have items to display.
         if (!empty($contextdata['learningitems'])) {
             $pagination = $this->pagination($contextdata['learningitems']);
@@ -232,7 +243,7 @@ class block_current_learning extends block_base {
             $contextdata['nocurrentlearning_rol_link'] = get_string('nocurrentlearning', 'block_current_learning', $contextdata['rollink']);
         }
 
-        $this->content->text = $core_renderer->render_from_template('block_current_learning/block', $contextdata);
+        $this->content->text = $core_renderer->render_from_template($template, $contextdata);
 
         return $this->content;
     }

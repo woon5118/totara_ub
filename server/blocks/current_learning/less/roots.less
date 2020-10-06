@@ -41,6 +41,11 @@
             color: @color-default;
         }
 
+
+        .current_learning-no-content a {
+            color: @link-color;
+        }
+  
         //.block_current_learning-item div:first-child {
         .block_current_learning-row-item {
             font-size: @font-size-title;
@@ -272,3 +277,154 @@
         float: none;
     }
 }
+// Tile styles
+.block_current_learning-tiles {
+    padding: @totara_style-spacing_small;
+
+    ul {
+        list-style-type: none;
+        margin: 0;
+    }
+
+    &:after {
+        clear: both;
+        content: " ";
+        display: block;
+    }
+}
+  
+.block_current_learning-tile {
+    width: calc(~'100% - ' 2 * @totara_style-spacing_small);
+    float: left;
+    margin: @totara_style-spacing_small;
+    border: 1px solid @totara_style-color_neutral_5;
+    border-radius: @totara_style-btn-radius;
+    position: relative;
+    
+    @media (min-width: @totara_style-screen_sm_min) {
+        width: calc(~'33.33% - ' 2 * @totara_style-spacing_small);
+    }
+  
+    #block-region-top &,
+    #block-region-bottom & {
+        @media (min-width: @totara_style-screen_lg_min) {
+            width: calc(~'16.66% - ' 2 * @totara_style-spacing_small);      
+        }
+    }
+  
+    #block-region-side-pre &,
+    #block-region-side-post &,
+    #dock & {
+        width: calc(~'100% - ' 2 * @totara_style-spacing_small);
+    }
+  
+    &__image {
+        padding-top: 128px;
+        position: relative;
+    
+        &_ratio {
+            bottom: 0;
+            left: 0;
+            overflow: hidden;
+            position: absolute;
+            right: 0;
+            top: 0;
+            border-top-left-radius: calc(@totara_style-btn-radius ~' - 1px');
+            border-top-right-radius: calc(@totara_style-btn-radius ~' - 1px');
+    
+            &_img {
+                background-position: 50%;
+                background-size: cover;
+                height: 100%;
+                width: 100%;
+            }
+        }
+    }
+  
+    .block .content &__link {
+        &:focus,
+        &:hover {
+            text-decoration: none;
+            outline: none;
+        }
+    
+        &_title {
+            .totara_style-heading_x_small;
+            height: 3em;
+            overflow: hidden;
+            display: block;
+            margin: @totara_style-spacing_medium @totara_style-spacing_medium 0;
+    
+            &:after {
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            position: absolute;
+            content: "";
+            }
+        }
+    }
+  
+    &__content {
+        padding: @totara_style-spacing_small @totara_style-spacing_medium @totara_style-spacing_small;
+    
+        &_progress {
+            height: 23px;
+            margin-bottom: @totara_style-spacing_small;
+            overflow: hidden;
+    
+            .progressbar_container {
+                z-index: 1;
+                position: absolute;
+                left: @totara_style-spacing_medium;
+                right: @totara_style-spacing_medium;
+        
+                h2 {
+                    display: none;
+                }
+            }
+        }
+    
+        &_duedate {
+            height: 24px;
+            margin-bottom: @totara_style-spacing_small;
+    
+            &_text {
+                .totara_style-body_x_small;
+                padding: 0 @totara_style-spacing_small;
+                border: 1px solid @totara_style-color_neutral_5;
+                border-radius: 12px;
+        
+                &-label-info {
+                    color: @totara_style-color_info;
+                }
+        
+                &-label-warning {
+                    color: @totara_style-color_warning;
+                }
+        
+                &-label-danger {
+                    color: @totara_style-color_alert;
+                }
+            }
+        }
+    
+        &_progress-no_display,
+        &_duedate-no_duedate {
+            visibility: hidden;
+        }
+    
+        &_component {
+            .totara_style-body_x_small;
+            color: @totara_style-color_neutral_6;
+        }
+    }
+  
+    &:hover,
+    &:focus-within {
+        box-shadow: @totara_style-shadow_2;
+        outline: none;
+        text-decoration: none;
+    }
+  }
