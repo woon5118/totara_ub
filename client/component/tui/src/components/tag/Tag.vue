@@ -55,7 +55,6 @@ export default {
 
   &__content {
     padding: 0 var(--gap-2);
-    color: var(--tag-active-color);
     font-size: var(--font-size-13);
 
     &--withButton {
