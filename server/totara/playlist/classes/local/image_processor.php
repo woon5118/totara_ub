@@ -30,9 +30,15 @@ use stdClass;
 use stored_file;
 use totara_engage\entity\engage_resource;
 use totara_playlist\entity\playlist_resource;
+use totara_playlist\local\image_processor\contract as image_processor_contract;
 use totara_playlist\playlist;
 
-final class image_processor {
+/**
+ * Class image_processor
+ *
+ * @package totara_playlist\local
+ */
+final class image_processor implements image_processor_contract {
     /**
      * RGB colour code of the background (stripe) of the image
      *
@@ -102,7 +108,7 @@ final class image_processor {
      * @param bool $squared If true, the square version of the image should be returned
      * @return stored_file|null
      */
-    public function get_image_for_playlist(playlist $playlist, $squared = false): ?stored_file {
+    public function get_image_for_playlist(playlist $playlist, bool $squared = false): ?stored_file {
         /** @var stored_file[] $images */
         $images = $this->get_images_for_playlist($playlist);
 
@@ -412,6 +418,7 @@ final class image_processor {
      * @param array $images
      * @param bool $square
      * @return string|null
+     * @deprecated since 13.1
      */
     public static function test_generate_image(array $images, $square = false): ?string {
         if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {

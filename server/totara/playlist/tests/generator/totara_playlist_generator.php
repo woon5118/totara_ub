@@ -23,6 +23,7 @@
 
 use totara_engage\rating\rating_manager;
 use totara_engage\share\shareable;
+use totara_playlist\local\image_processor\contract as image_processor_contract;
 use totara_playlist\playlist;
 use totara_engage\access\access;
 use totara_engage\share\manager as share_manager;
@@ -295,5 +296,15 @@ final class totara_playlist_generator extends component_generator_base {
         }
 
         $playlist->add_resource($resource, $actor_id);
+    }
+
+    /**
+     * @return image_processor_contract
+     */
+    public function get_mock_image_processor(): image_processor_contract {
+        global $CFG;
+        require_once("{$CFG->dirroot}/totara/playlist/tests/fixtures/mock_image_processor.php");
+
+        return new mock_playlist_image_processor();
     }
 }

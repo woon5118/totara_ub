@@ -22,12 +22,14 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use core\webapi\execution_context;
 use totara_engage\access\access;
 use totara_engage\resource\resource_factory;
-use totara_playlist\playlist;
-use core\webapi\execution_context;
 use totara_webapi\graphql;
 
+/**
+ * Test how the playlist reacts when a resource is removed.
+ */
 class totara_playlist_remove_resource_testcase extends advanced_testcase {
     /**
      * @return void
@@ -102,5 +104,42 @@ class totara_playlist_remove_resource_testcase extends advanced_testcase {
 
         $this->assertEquals(2, $DB->count_records('playlist_resource', ['playlistid' => $playlist->get_id()]));
         $this->assertFalse($DB->record_exists('playlist_resource', ['resourceid' => $article2->get_id()]));
+    }
+
+    /**
+     * Validate that when a resources is added or removed from
+     * a playlist, the image processor is triggered to handle
+     * images.
+     */
+    public function test_remove_resource_calls_update_image(): void {
+        $gen = $this->getDataGenerator();
+        $user_one = $gen->create_user();
+        $this->setUser($user_one);
+
+        /** @var totara_playlist_generator $playlist_gen */
+        $playlist_gen = $gen->get_plugin_generator('totara_playlist');
+        $playlist = $playlist_gen->create_playlist();
+
+        /** @var engage_article_generator $article_gen */
+        $article_gen = $gen->get_plugin_generator('engage_article');
+        $item_one = $article_gen->create_article();
+
+        // We want to mock and replace the image processor used by the playlist.
+        // The intent here is to test that when the playlist is updated without
+        // specifically running the image_processor itself (as that's handled
+        // in another group of tests). This mock object will keep count of
+        // how many times any method is called so we can check that the playlist
+        // triggered the image processor the expected number of times.
+        $mock = $playlist_gen->get_mock_image_processor();
+        $playlist->set_image_processor($mock);
+        $this->assertSame(0, $mock->count('update_playlist_images'));
+
+        // Add the resource to the playlist, check the update_playlist_images was triggered
+        $playlist->add_resource($item_one, $user_one->id);
+        $this->assertSame(1, $mock->count('update_playlist_images'));
+
+        // Remove the resource to the playlist, check the generate was triggered
+        $playlist->remove_resource($item_one);
+        $this->assertSame(2, $mock->count('update_playlist_images'));
     }
 }

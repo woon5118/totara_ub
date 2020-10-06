@@ -1,0 +1,6 @@
+This files describes API changes in /totara/totara_playlist,
+information provided here is intended especially for developers.
+
+=== 13.1 ===
+
+* image_processor::test_generate_image() has been deprecated, please use Reflection instead.

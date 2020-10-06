@@ -54,7 +54,7 @@ class totara_playlist_image_testcase extends advanced_testcase {
         $default = image_processor::IMAGE_DEFAULT;
 
         // Test - No source images, use the default colours instead
-        $image = image_processor::test_generate_image([]);
+        $image = $this->invoke_generate_image([]);
         $this->assertNotEmpty($image);
         $canvas = imagecreatefromstring($image);
         $this->assertSame($default, $this->get_rgb_at_coords($canvas, $cells[0]));
@@ -64,7 +64,7 @@ class totara_playlist_image_testcase extends advanced_testcase {
         imagedestroy($canvas);
 
         // Test - One of each
-        $image = image_processor::test_generate_image([$red, $blue, $yellow, $green]);
+        $image = $this->invoke_generate_image([$red, $blue, $yellow, $green]);
         $this->assertNotEmpty($image);
         $canvas = imagecreatefromstring($image);
         $this->assertSame($colour_red, $this->get_rgb_at_coords($canvas, $cells[0]));
@@ -74,7 +74,7 @@ class totara_playlist_image_testcase extends advanced_testcase {
         imagedestroy($canvas);
 
         // Test - One default square
-        $image = image_processor::test_generate_image([$red, $blue, $yellow]);
+        $image = $this->invoke_generate_image([$red, $blue, $yellow]);
         $this->assertNotEmpty($image);
         $canvas = imagecreatefromstring($image);
         $this->assertSame($colour_red, $this->get_rgb_at_coords($canvas, $cells[0]));
@@ -84,7 +84,7 @@ class totara_playlist_image_testcase extends advanced_testcase {
         imagedestroy($canvas);
 
         // Test - Missing image in middle, everything's shuffled up
-        $image = image_processor::test_generate_image([$red, $blue, null, $yellow]);
+        $image = $this->invoke_generate_image([$red, $blue, null, $yellow]);
         $this->assertNotEmpty($image);
         $canvas = imagecreatefromstring($image);
         $this->assertSame($colour_red, $this->get_rgb_at_coords($canvas, $cells[0]));
@@ -126,7 +126,7 @@ class totara_playlist_image_testcase extends advanced_testcase {
         $default = image_processor::IMAGE_DEFAULT;
 
         // Test - No source images, use the default colours instead
-        $image = image_processor::test_generate_image([], true);
+        $image = $this->invoke_generate_image([], true);
         $this->assertNotEmpty($image);
         $canvas = imagecreatefromstring($image);
         $this->assertSame($default, $this->get_rgb_at_coords($canvas, $cells[0]));
@@ -136,7 +136,7 @@ class totara_playlist_image_testcase extends advanced_testcase {
         imagedestroy($canvas);
 
         // Test - One of each
-        $image = image_processor::test_generate_image([$red, $blue, $yellow, $green], true);
+        $image = $this->invoke_generate_image([$red, $blue, $yellow, $green], true);
 
         $this->assertNotEmpty($image);
         $canvas = imagecreatefromstring($image);
@@ -147,7 +147,7 @@ class totara_playlist_image_testcase extends advanced_testcase {
         imagedestroy($canvas);
 
         // Test - One default square
-        $image = image_processor::test_generate_image([$red, $blue, $yellow], true);
+        $image = $this->invoke_generate_image([$red, $blue, $yellow], true);
         $this->assertNotEmpty($image);
         $canvas = imagecreatefromstring($image);
         $this->assertSame($colour_red, $this->get_rgb_at_coords($canvas, $cells[0]));
@@ -157,7 +157,7 @@ class totara_playlist_image_testcase extends advanced_testcase {
         imagedestroy($canvas);
 
         // Test - Missing image in middle, everything's shuffled up
-        $image = image_processor::test_generate_image([$red, $blue, null, $yellow], true);
+        $image = $this->invoke_generate_image([$red, $blue, null, $yellow], true);
         $this->assertNotEmpty($image);
         $canvas = imagecreatefromstring($image);
         $this->assertSame($colour_red, $this->get_rgb_at_coords($canvas, $cells[0]));
@@ -171,7 +171,21 @@ class totara_playlist_image_testcase extends advanced_testcase {
     }
 
     /**
+     * Invokes the image_processor::generate_image for testing
+     *
+     * @param array $images
+     * @param false $is_square
+     * @return string|null
+     */
+    private function invoke_generate_image(array $images, $is_square = false): ?string {
+        $process = new ReflectionMethod(image_processor::class, 'generate_image');
+        $process->setAccessible(true);
+        return $process->invoke(image_processor::make(), $images, $is_square);
+    }
+
+    /**
      * Helper to pick the rgb colour out of a spot in the image
+     *
      * @param $canvas
      * @param array $coords
      * @return array|int[]
