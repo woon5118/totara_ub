@@ -127,4 +127,25 @@ class totara_playlist_webapi_create_playlist_testcase extends advanced_testcase 
 
         self::assertTrue($DB->record_exists('playlist', ['id' => $playlist['id']]));
     }
+
+    /**
+     * @return void
+     */
+    public function test_create_playlist_with_different_format_from_json_editor(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("The format value is invalid");
+        $this->resolve_graphql_mutation(
+            'totara_playlist_create',
+            [
+                'name' => 'doctor',
+                'summary' => 'Some random text',
+                'summary_format' => FORMAT_PLAIN
+            ]
+        );
+    }
 }

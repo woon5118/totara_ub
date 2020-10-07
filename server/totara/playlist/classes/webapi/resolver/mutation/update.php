@@ -61,7 +61,7 @@ final class update implements mutation_resolver, has_middleware {
 
         if (!empty($args['name'])) {
             if (\core_text::strlen($args['name']) > 75) {
-                throw playlist_exception::create('create');
+                throw playlist_exception::create('update');
             }
             $name = $args['name'];
         }
@@ -111,7 +111,7 @@ final class update implements mutation_resolver, has_middleware {
 
             // We leave the default value to null, because we want to fallback to the current playlist
             // format if the summary format is not set.
-            new clean_content_format('summary_format')
+            new clean_content_format('summary_format', null, [FORMAT_JSON_EDITOR])
         ];
     }
 }

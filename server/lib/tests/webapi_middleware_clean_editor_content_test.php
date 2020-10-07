@@ -145,4 +145,34 @@ class core_webapi_middleware_clean_editor_content_testcase extends advanced_test
         // No content format - meaning that it should not do anything.
         $this->assertEquals($document, $data['content']);
     }
+
+    /**
+     * @return void
+     */
+    public function test_clean_invalid_json_content(): void {
+        $ec = execution_context::create('dev');
+        $payload = payload::create(
+            [
+                'content' =>  "*Italic*, **bold**, and `monospace`",
+                'content_format' => FORMAT_JSON_EDITOR
+            ],
+            $ec
+        );
+
+        $middleware = new clean_editor_content('content', 'content_format');
+
+        $middleware->handle(
+            $payload,
+            function (payload $payload): result {
+                return new result($payload->get_variables());
+            }
+        );
+
+        $messages = [
+            'There was an error on parsing json content: Syntax error',
+            'JSON document is invalid'
+        ];
+
+        $this->assertDebuggingCalledCount(2, $messages);
+    }
 }

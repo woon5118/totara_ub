@@ -25,6 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use core\json_editor\node\paragraph;
 use totara_playlist\playlist;
+use totara_playlist\exception\playlist_exception;
 
 class totara_playlist_webapi_update_playlist_testcase extends advanced_testcase {
     use webapi_phpunit_helper;
@@ -180,5 +181,94 @@ class totara_playlist_webapi_update_playlist_testcase extends advanced_testcase 
 
         $this->assertNotEquals($playlist->get_name(false), $playlist_data['name']);
         $this->assertNotEquals($playlist->get_name(true), $playlist_data['name']);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_update_playlist_from_different_format_from_json_editor(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var totara_playlist_generator $playlist_generator */
+        $playlist_generator = $generator->get_plugin_generator('totara_playlist');
+        $playlist = $playlist_generator->create_playlist();
+
+        $playlist_id = $playlist->get_id();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("The format value is invalid");
+
+        $this->resolve_graphql_mutation(
+            'totara_playlist_update',
+            [
+                'id' => $playlist_id,
+                'name' => uniqid('da'),
+                'summary' => 'd',
+                'summary_format' => FORMAT_MOODLE
+            ]
+        );
+    }
+
+    /**
+     * This is to prevent changes in the codebase. Well not really prevent changing but
+     * whoever going to change the rule will need to take care of this test.
+     *
+     * @return void
+     */
+    public function test_update_playlist_with_name_has_more_than_75_characters(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var totara_playlist_generator $playlist_generator */
+        $playlist_generator = $generator->get_plugin_generator('totara_playlist');
+        $playlist = $playlist_generator->create_playlist();
+
+        $playlist_id = $playlist->get_id();
+
+        $this->expectException(playlist_exception::class);
+        $this->expectExceptionMessage(get_string('error:update', 'totara_playlist'));
+
+        $this->resolve_graphql_mutation(
+            'totara_playlist_update',
+            [
+                'id' => $playlist_id,
+                'name' => str_repeat('dd', 100)
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_update_playlist_with_name_has_less_than_75_characters(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var totara_playlist_generator $playlist_generator */
+        $playlist_generator = $generator->get_plugin_generator('totara_playlist');
+        $playlist = $playlist_generator->create_playlist();
+
+        $playlist_id = $playlist->get_id();
+
+        /** @var playlist $updated_playlist */
+        $updated_playlist = $this->resolve_graphql_mutation(
+            'totara_playlist_update',
+            [
+                'id' => $playlist_id,
+                'name' => 'This is less than 75 chars'
+            ]
+        );
+
+        self::assertInstanceOf(playlist::class, $updated_playlist);
+        self::assertEquals($playlist_id, $updated_playlist->get_id());
+
+        self::assertEquals("This is less than 75 chars", $updated_playlist->get_name(false));
     }
 }

@@ -98,7 +98,7 @@ final class create implements mutation_resolver, has_middleware {
             new require_advanced_feature('engage_resources'),
             new require_valid_recipients('shares'),
             new clean_editor_content('summary', 'summary_format', false),
-            new clean_content_format('summary_format', FORMAT_JSON_EDITOR)
+            new clean_content_format('summary_format', FORMAT_JSON_EDITOR, [FORMAT_JSON_EDITOR])
         ];
     }
 }

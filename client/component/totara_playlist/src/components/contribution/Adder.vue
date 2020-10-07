@@ -207,7 +207,8 @@ export default {
 <lang-strings>
 {
   "totara_playlist": [
-    "selectcontent"
+    "selectcontent",
+    "privacywarningtitle"
   ]
 }
 </lang-strings>
