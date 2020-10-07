@@ -181,8 +181,11 @@ final class event_content extends content_generator {
 
         $status = signup_status::find_current($attendee->get_signupid());
 
+        // Disable it if signup is archived already.
+        $disabled = $this->disabled || $attendee->is_archived();
+
         return $OUTPUT->render(
-            event_grade_input::create($attendee, $status, $this->disabled)
+            event_grade_input::create($attendee, $status, $disabled)
         );
     }
 

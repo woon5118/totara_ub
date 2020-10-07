@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 
 use mod_facetoface\attendance\event_attendee;
 use mod_facetoface\signup_status;
+use mod_facetoface\seminar;
+use mod_facetoface\grade_helper;
 
 /**
  * An input box for event grade
@@ -53,9 +55,9 @@ class event_grade_input extends \core\output\template {
             'placeholder' => get_string('gradeinput_placeholder', 'facetoface'),
             'disabled' => $disabled,
             'label' => get_string('gradeinput_label', 'facetoface', clean_string(fullname($attendee))),
-            'min' => 0,
-            'max' => 100,
-            'value' => \mod_facetoface\grade_helper::format($value, $attendee->course)
+            'min' => seminar::GRADE_PASS_MINIMUM,
+            'max' => seminar::GRADE_PASS_MAXIMUM,
+            'value' => grade_helper::format($value, $attendee->course)
         ];
 
         return new static($data);
