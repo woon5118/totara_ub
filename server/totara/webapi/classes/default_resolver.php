@@ -106,6 +106,8 @@ class default_resolver {
         return strpos($name, '__') === 0;
     }
 
+    private static $split_type_name_cache = [];
+
     /**
      * Split type name, i.e. totara_competency_my_query_name into component (totara_competency) and the rest (my_query_name)
      *
@@ -113,8 +115,13 @@ class default_resolver {
      * @return array
      */
     private function split_type_name(string $name) {
+        if (isset(self::$split_type_name_cache[$name])) {
+            return self::$split_type_name_cache[$name];
+        }
+
         if (strpos($name, 'core_') === 0) {
-            return ['core', substr($name, 5)];
+            self::$split_type_name_cache[$name] = ['core', substr($name, 5)];
+            return self::$split_type_name_cache[$name];
         }
 
         // Build flat list out of all plugins and subplugins
@@ -141,13 +148,15 @@ class default_resolver {
             array_pop($parts);
             $component_search_name = implode('_', $parts);
             if (isset($components[$component_search_name])) {
-                return [
+                self::$split_type_name_cache[$name] = [
                     $component_search_name,
                     substr($name, strlen($component_search_name) + 1)
                 ];
+                return self::$split_type_name_cache[$name];
             }
         }
 
+        self::$split_type_name_cache[$name] = [null, null];
         return [null, null];
     }
 
