@@ -29,34 +29,38 @@ require_once($CFG->dirroot.'/user/lib.php');
 require_once('change_password_form.php');
 require_once($CFG->libdir.'/authlib.php');
 require_once($CFG->dirroot.'/webservice/lib.php');
+require_once($CFG->dirroot.'/user/editlib.php');
 
 $id     = optional_param('id', SITEID, PARAM_INT); // current course
 $return = optional_param('return', 0, PARAM_BOOL); // redirect after password change
+$returnto = optional_param('returnto', '', PARAM_ALPHANUMEXT);  // Code determining where to return to after save/cancel.
 
 $systemcontext = context_system::instance();
 
-$PAGE->set_url('/login/change_password.php', array('id'=>$id));
+$PAGE->set_url('/login/change_password.php', array('id'=>$id, 'returnto'=>$returnto));
 
 $PAGE->set_context($systemcontext);
-
-if ($return) {
-    // this redirect prevents security warning because https can not POST to http pages
-    if (empty($SESSION->wantsurl)
-            or stripos(str_replace('https://', 'http://', $SESSION->wantsurl), str_replace('https://', 'http://', $CFG->wwwroot.'/login/change_password.php')) === 0) {
-        $returnto = "$CFG->wwwroot/user/preferences.php?userid=$USER->id&course=$id";
-    } else {
-        $returnto = $SESSION->wantsurl;
-    }
-    unset($SESSION->wantsurl);
-
-    redirect($returnto);
-}
-
-$strparticipants = get_string('participants');
 
 if (!$course = $DB->get_record('course', array('id'=>$id))) {
     print_error('invalidcourseid');
 }
+
+if ($return) {
+    // this redirect prevents security warning because https can not POST to http pages
+    if ($returnto) {
+        $returntourl = useredit_get_return_url($USER, $returnto, $course);
+    } else if (empty($SESSION->wantsurl)
+            or stripos(str_replace('https://', 'http://', $SESSION->wantsurl), str_replace('https://', 'http://', $CFG->wwwroot.'/login/change_password.php')) === 0) {
+        $returntourl = "$CFG->wwwroot/user/preferences.php?userid=$USER->id&course=$id";
+    } else {
+        $returntourl = $SESSION->wantsurl;
+    }
+    unset($SESSION->wantsurl);
+
+    redirect($returntourl);
+}
+
+$strparticipants = get_string('participants');
 
 // require proper login; guest user can not change password
 if (!isloggedin() or isguestuser()) {
@@ -104,12 +108,15 @@ if ($changeurl = $userauth->change_password_url()) {
 }
 
 $mform = new login_change_password_form();
-$mform->set_data(array('id'=>$course->id));
+$mform->set_data(array('id'=>$course->id, 'returnto'=>$returnto));
 
 $navlinks = array();
 $navlinks[] = array('name' => $strparticipants, 'link' => "$CFG->wwwroot/user/index.php?id=$course->id", 'type' => 'misc');
 
 if ($mform->is_cancelled()) {
+    if ($returnto) {
+        redirect(useredit_get_return_url($USER, $returnto, $course));
+    }
     redirect($CFG->wwwroot.'/user/preferences.php?userid='.$USER->id.'&amp;course='.$course->id);
 } else if ($data = $mform->get_data()) {
 

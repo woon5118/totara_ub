@@ -71,6 +71,9 @@ class login_change_password_form extends moodleform {
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
 
+        $mform->addElement('hidden', 'returnto');
+        $mform->setType('returnto', PARAM_ALPHANUMEXT);
+
         // buttons
         if (get_user_preferences('auth_forcepasswordchange')) {
             $this->add_action_buttons(false);

@@ -199,7 +199,16 @@ class auth_plugin_connect extends auth_plugin_base {
      * @return bool
      */
     public function can_change_password() {
-        return false;
+        return true;
+    }
+
+    /**
+     * Returns the URL for changing the user's pw on the login server.
+     *
+     * @return moodle_url
+     */
+    public function change_password_url() {
+        return new \moodle_url('/auth/connect/change_password.php');
     }
 
     /**
