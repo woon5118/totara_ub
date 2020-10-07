@@ -32,6 +32,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class state_helper {
 
+    private static $get_all_cache = [];
+
     /**
      * Get all state classes for the given object type.
      *
@@ -39,11 +41,17 @@ class state_helper {
      * @return state[]
      */
     public static function get_all(string $object_type): array {
-        return \core_component::get_namespace_classes(
+        if (isset(static::$get_all_cache[$object_type])) {
+            return static::$get_all_cache[$object_type];
+        }
+
+        static::$get_all_cache[$object_type] = \core_component::get_namespace_classes(
             'state\\' . $object_type,
             'mod_perform\state\state',
             'mod_perform'
         );
+
+        return static::$get_all_cache[$object_type];
     }
 
     /**
