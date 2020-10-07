@@ -355,6 +355,10 @@ final class discussion {
         $this->entity->content_text = content_to_text($this->entity->content, $content_format);
 
         $this->entity->timestamp = time();
+
+        // This is to make sure that we update the time modified, because some part of the system
+        // set it to not update the time modified at all.
+        $this->entity->update_timestamps(true);
         $this->entity->save();
     }
 
@@ -569,6 +573,17 @@ final class discussion {
     }
 
     /**
+     * This function will bump the timestamp of the discussion, so that we can tell the recently updated.
+     * @return void
+     */
+    public function touch(): void {
+        $this->entity->timestamp = time();
+        $this->entity->do_not_update_timestamps();
+
+        $this->entity->save();
+    }
+
+    /**
      * Returning the array of stored file record, only if there are files.
      *
      * Note that this function will only return the files that are uploaded under
@@ -656,7 +671,10 @@ final class discussion {
         $this->prevent_delete_files_on_update = $prevent_delete_files_on_update;
     }
 
-    public function reload() {
+    /**
+     * @return void
+     */
+    public function reload(): void {
         $this->entity->refresh();
     }
 }

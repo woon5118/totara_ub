@@ -30,6 +30,7 @@ use container_workspace\discussion\discussion;
 use container_workspace\member\member;
 use totara_comment\comment_helper;
 use container_workspace\workspace;
+use container_workspace\query\discussion\sort as discussion_sort;
 
 class container_workspace_discussion_loader_testcase extends advanced_testcase {
     /**
@@ -172,5 +173,68 @@ class container_workspace_discussion_loader_testcase extends advanced_testcase {
 
         $this->assertEquals($special_discussion->get_id(), $discussion->get_id());
         $this->assertEquals($special_discussion->get_id(), $discussion->get_id());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_fetching_discussions_with_recent_update_sort_order(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Create two discussions, and fetch with the recently updated before adding comment to one and another.
+        $workspace_id = $workspace->get_id();
+        $discussion_one = $workspace_generator->create_discussion($workspace_id);
+
+        // Just to make sure that race condition is not happening, for the discussion two.
+        $this->waitForSecond();
+        $discussion_two = $workspace_generator->create_discussion($workspace_id);
+
+        // Load the discussion base on the recently updated which the second discussion should be there.
+        $query = new discussion_query($workspace_id);
+        $query->set_sort(discussion_sort::RECENT);
+
+        $before_result = discussion_loader::get_discussions($query);
+        self::assertEquals(2, $before_result->get_total());
+
+        $before_result_discussions = $before_result->get_items()->all();
+        self::assertCount(2, $before_result_discussions);
+
+        // The discussion two will be at the top.
+        $first_before_result_discussion = reset($before_result_discussions);
+        self::assertEquals($discussion_two->get_id(), $first_before_result_discussion->get_id());
+
+        // The discusison one will be at the bottom.
+        $second_before_result_discussion = end($before_result_discussions);
+        self::assertEquals($discussion_one->get_id(), $second_before_result_discussion->get_id());
+
+        // Add a comment to discussion one - which it will move the discussion one to the top
+        /** @var totara_comment_generator $comment_generator */
+        $comment_generator = $generator->get_plugin_generator('totara_comment');
+        $comment_generator->create_comment(
+            $discussion_one->get_id(),
+            workspace::get_type(),
+            discussion::AREA
+        );
+
+        $after_result = discussion_loader::get_discussions($query);
+        self::assertEquals(2, $after_result->get_total());
+
+        $after_result_discussions = $after_result->get_items()->all();
+        self::assertCount(2, $after_result_discussions);
+
+        // Discussion one should be at the top.
+        $first_after_result_discussion = reset($after_result_discussions);
+        self::assertEquals($discussion_one->get_id(), $first_after_result_discussion->get_id());
+
+        // Discussion two should be at the bottom - since discussion one was added with the comment.
+        $second_after_result_discussion = end($after_result_discussions);
+        self::assertEquals($discussion_two->get_id(), $second_after_result_discussion->get_id());
     }
 }

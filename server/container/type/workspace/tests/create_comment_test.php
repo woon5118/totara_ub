@@ -263,7 +263,10 @@ class container_workspace_create_comment_testcase extends advanced_testcase {
         self::assertEquals($user_two->id,$message->useridfrom);
     }
 
-    public function test_create_comment_on_discussion_not_change_discussion_modified_time() {
+    /**
+     * @return void
+     */
+    public function test_create_comment_on_discussion_not_change_discussion_modified_time(): void {
         $generator = $this->getDataGenerator();
         $user = $generator->create_user();
 
@@ -274,40 +277,19 @@ class container_workspace_create_comment_testcase extends advanced_testcase {
         $workspace = $workspace_generator->create_workspace('workspace 101');
 
         // Create a discussion in the workspace.
-        $discussion = discussion_helper::create_discussion(
-            $workspace,
-            json_encode(
-                [
-                    'type'    => 'doc',
-                    'content' => [paragraph::create_json_node_from_text("Discussion 101")],
-                ]
-            ),
+        $discussion = $workspace_generator->create_discussion(
+            $workspace->get_id(),
+            'Discussion 101',
             null,
             FORMAT_JSON_EDITOR
         );
 
-        // Create comment on discussion
-        comment_helper::create_comment(
-            workspace::get_type(),
-            discussion::AREA,
+        /** @var totara_comment_generator $comment_generator */
+        $comment_generator = $generator->get_plugin_generator('totara_comment');
+        $comment_generator->create_comment(
             $discussion->get_id(),
-            json_encode(
-                [
-                    'type'    => 'doc',
-                    'content' => [
-                        [
-                            'type'    => paragraph::get_type(),
-                            'content' => [
-                                text::create_json_node_from_text("Mention user one "),
-                                mention::create_raw_node($user->id),
-                            ],
-                        ],
-                    ],
-                ]
-            ),
-            FORMAT_JSON_EDITOR,
-            null,
-            $user->id
+            workspace::get_type(),
+            discussion::AREA
         );
 
         $discussion->reload();
