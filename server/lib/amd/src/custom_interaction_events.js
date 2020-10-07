@@ -91,7 +91,8 @@ define(['jquery', 'core/key_codes'], function($, keyCodes) {
             if (!isModifierPressed(e)) {
                 if (e.keyCode == keyCode) {
                     $(e.target).trigger(event, [{originalEvent: e}]);
-                    if (!(e.target.tagName.toLowerCase() == 'input' || e.target.tagName.toLowerCase() == 'select' || e.target.tagName.toLowerCase() == 'textarea')) {
+                    var tagName = e.target.tagName.toLowerCase();
+                    if (!(tagName === 'input' || tagName === 'select' || tagName === 'textarea' || tagName === 'a')) {
                         e.preventDefault();
                     }
                 }
@@ -115,7 +116,8 @@ define(['jquery', 'core/key_codes'], function($, keyCodes) {
             if (!isModifierPressed(e)) {
                 if (e.keyCode == keyCodes.enter || e.keyCode == keyCodes.space) {
                     $(e.target).trigger(events.activate, [{originalEvent: e}]);
-                    if (!(e.target.tagName.toLowerCase() == 'input' || e.target.tagName.toLowerCase() == 'select' || e.target.tagName.toLowerCase() == 'textarea')) {
+                    var tagName = e.target.tagName.toLowerCase();
+                    if (!(tagName === 'input' || tagName === 'select' || tagName === 'textarea' || tagName === 'a')) {
                         e.preventDefault();
                     }
                 }
@@ -136,7 +138,8 @@ define(['jquery', 'core/key_codes'], function($, keyCodes) {
             if (!isModifierPressed(e)) {
                 if (e.keyCode == keyCodes.enter || e.keyCode == keyCodes.space) {
                     $(e.target).trigger(events.keyboardActivate, [{originalEvent: e}]);
-                    if (!(e.target.tagName.toLowerCase() == 'input' || e.target.tagName.toLowerCase() == 'select' || e.target.tagName.toLowerCase() == 'textarea')) {
+                    var tagName = e.target.tagName.toLowerCase();
+                    if (!(tagName === 'input' || tagName === 'select' || tagName === 'textarea' || tagName === 'a')) {
                         e.preventDefault();
                     }
                 }
