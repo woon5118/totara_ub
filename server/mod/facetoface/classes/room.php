@@ -592,7 +592,7 @@ final class room implements seminar_iterator_item, seminar_attachment_item {
        $sql = "SELECT 'x'
              FROM {facetoface_room_dates} frd
              JOIN {facetoface_sessions_dates} fsd ON (fsd.id = frd.sessionsdateid)
-             JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid)
+             JOIN {facetoface_sessions} fs ON (fs.id = fsd.sessionid AND fs.cancelledstatus = 0)
             WHERE frd.roomid = :roomid AND fs.id <> :sessionid
                   AND :timefinish > fsd.timestart AND :timestart < fsd.timefinish";
        return !$DB->record_exists_sql($sql, $params);

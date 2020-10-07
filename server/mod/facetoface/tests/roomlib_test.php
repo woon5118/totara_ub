@@ -1529,6 +1529,46 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Test room availability for a new event with the same dates as the cancelled event
+     */
+    public function test_session_cancellation_2() {
+
+        $now = time();
+
+        $room1 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 1', 'allowconflicts' => 0, 'hidden' => 0));
+        $room2 =
+            $this->facetoface_generator->add_site_wide_room(array('name' => 'Site room 2', 'allowconflicts' => 0, 'hidden' => 0));
+
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface1 = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $timestart1 = $now + (DAYSECS * 1);
+        $timefinish1 = $now + (DAYSECS * 2);
+
+        $timestart2 = $now + (DAYSECS * 2);
+        $timefinish2 = $now + (DAYSECS * 3);
+
+        $sessiondates = array();
+        $sessiondates[] = $this->prepare_date($timestart1, $timefinish1, $room1->id);
+        $sessiondates[] = $this->prepare_date($timestart2, $timefinish2, $room2->id);
+        $sessionid_1 =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id, 'sessiondates' => $sessiondates));
+
+        $seminarevent1 = new \mod_facetoface\seminar_event($sessionid_1);
+        $seminarevent1->cancel();
+
+        $sessionid_2 = $this->facetoface_generator->add_session(array('facetoface' => $facetoface1->id));
+        $seminarevent2 = new \mod_facetoface\seminar_event($sessionid_2);
+
+        $room1 = new \mod_facetoface\room($room1->id);
+        $room2 = new \mod_facetoface\room($room2->id);
+
+        $this->assertTrue($room1->is_available($timestart1, $timefinish1, $seminarevent2));
+        $this->assertTrue($room2->is_available($timestart2, $timefinish2, $seminarevent2));
+    }
+
     protected function prepare_date($timestart, $timeend, $roomid) {
         $sessiondate = new stdClass();
         $sessiondate->timestart = (string)$timestart;
