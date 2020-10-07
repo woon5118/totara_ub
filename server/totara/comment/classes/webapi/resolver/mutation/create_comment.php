@@ -22,13 +22,16 @@
  */
 namespace totara_comment\webapi\resolver\mutation;
 
+use core\json_editor\helper\document_helper;
 use core\webapi\execution_context;
+use core\webapi\middleware\clean_content_format;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use totara_comment\comment;
 use totara_comment\comment_helper;
 use core\webapi\resolver\has_middleware;
 use core\webapi\middleware\clean_editor_content;
+use totara_comment\exception\comment_exception;
 use totara_comment\resolver_factory;
 
 final class create_comment implements mutation_resolver, has_middleware {
@@ -64,6 +67,10 @@ final class create_comment implements mutation_resolver, has_middleware {
             $draft_id = (int) $args['draft_id'];
         }
 
+        if (FORMAT_JSON_EDITOR == $format && document_helper::is_document_empty($content)) {
+            throw comment_exception::on_create("Comment content is empty");
+        }
+
         return comment_helper::create_comment(
             $component,
             $area,
@@ -81,7 +88,10 @@ final class create_comment implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
-            new clean_editor_content('content', 'format')
+            new clean_editor_content('content', 'format'),
+
+            // For now, we are only supporting FORMAT_JSON_EDITOR via graphql mutation
+            new clean_content_format('format', FORMAT_JSON_EDITOR, [FORMAT_JSON_EDITOR])
         ];
     }
 }

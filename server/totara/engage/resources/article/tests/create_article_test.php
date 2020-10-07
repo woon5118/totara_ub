@@ -113,7 +113,10 @@ class engage_article_create_article_testcase extends advanced_testcase {
         $this->setUser($user);
         $parameters = [
             'name' => '',
-            'content' => 'Wassup wasabi',
+            'content' => json_encode([
+                'type' => 'doc',
+                'content' => [paragraph::create_json_node_from_text('Wassup wasabi')]
+            ]),
             'timeview' => time_view::get_code(time_view::LESS_THAN_FIVE)
         ];
 

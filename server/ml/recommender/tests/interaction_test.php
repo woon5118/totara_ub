@@ -29,6 +29,7 @@ use totara_core\advanced_feature;
 use totara_engage\access\access;
 use totara_playlist\playlist;
 use totara_webapi\graphql;
+use core\json_editor\node\paragraph;
 
 class ml_recommender_interaction_testcase extends advanced_testcase {
     /**
@@ -289,11 +290,14 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
             }
             $ec = execution_context::create('ajax', 'totara_comment_create_comment');
             $parameters = [
-                'content' => 'My Comment',
+                'content' => json_encode([
+                    'type' => 'doc',
+                    'content' => [paragraph::create_json_node_from_text('My Comment')]
+                ]),
                 'component' => $component::get_resource_type(),
                 'area' => 'comment',
                 'instanceid' => $component->get_id(),
-                'format' => FORMAT_PLAIN,
+                'format' => FORMAT_JSON_EDITOR,
             ];
             $result = graphql::execute_operation($ec, $parameters);
             $this->assertNotNull($result->data);

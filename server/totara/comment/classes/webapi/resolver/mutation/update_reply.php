@@ -22,12 +22,17 @@
  */
 namespace totara_comment\webapi\resolver\mutation;
 
+use core\json_editor\helper\document_helper;
 use core\webapi\execution_context;
+use core\webapi\middleware\clean_content_format;
+use core\webapi\middleware\clean_editor_content;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use totara_comment\comment;
 use totara_comment\comment_helper;
+use totara_comment\exception\comment_exception;
+use totara_comment\resolver_factory;
 
 /**
  * Mutation for updating a reply
@@ -39,11 +44,6 @@ final class update_reply implements mutation_resolver, has_middleware {
      * @return comment
      */
     public static function resolve(array $args, execution_context $ec): comment {
-        global $USER;
-        if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_user::instance($USER->id));
-        }
-
         $reply_id = $args['id'];
         $reply = comment::from_id($reply_id);
 
@@ -51,15 +51,31 @@ final class update_reply implements mutation_resolver, has_middleware {
             throw new \coding_exception("Cannot update a comment via reply API");
         }
 
+        if (!$ec->has_relevant_context()) {
+            $resolver = resolver_factory::create_resolver($reply->get_component());
+            $context_id = $resolver->get_context_id(
+                $reply->get_instanceid(),
+                $reply->get_area()
+            );
+
+            $context = \context::instance_by_id($context_id);
+            $ec->set_relevant_context($context);
+        }
+
+        // Default format to the current format stored in database.
         $format = $reply->get_format();
         if (isset($args['format'])) {
             $format = $args['format'];
         }
 
         $draft_id = null;
-
         if (isset($args['draft_id'])) {
             $draft_id = (int) $args['draft_id'];
+        }
+
+        $content = $args['content'];
+        if ((FORMAT_JSON_EDITOR == $format && document_helper::is_document_empty($content)) || empty($content)) {
+            throw comment_exception::on_update("Reply content is empty");
         }
 
         return comment_helper::update_content(
@@ -76,6 +92,8 @@ final class update_reply implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
+            new clean_editor_content('content', 'format'),
+            new clean_content_format('format', null, [FORMAT_JSON_EDITOR])
         ];
     }
 

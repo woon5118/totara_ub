@@ -22,6 +22,7 @@
  */
 namespace engage_article\webapi\resolver\mutation;
 
+use core\json_editor\helper\document_helper;
 use core\webapi\execution_context;
 use core\webapi\middleware\clean_content_format;
 use core\webapi\middleware\require_advanced_feature;
@@ -29,6 +30,7 @@ use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use engage_article\totara_engage\resource\article;
 use totara_engage\access\access;
+use totara_engage\exception\resource_exception;
 use totara_engage\timeview\time_view;
 use core\webapi\resolver\has_middleware;
 use core\webapi\middleware\clean_editor_content;
@@ -50,24 +52,52 @@ final class create implements mutation_resolver, has_middleware {
             $ec->set_relevant_context(\context_user::instance($USER->id));
         }
 
+        $article_data = [
+            'name' => $args['name'],
+            'topics' => $args['topics'] ?? [],
+            'shares' => $args['shares'] ?? [],
+            'draft_id' => $args['draft_id'] ?? null
+        ];
+
         if (isset($args['access']) && !is_numeric($args['access']) && is_string($args['access'])) {
             // Format the string access into a proper value that machine can understand.
             $access = access::get_value($args['access']);
+            $article_data['access'] = $access;
             $args['access'] = $access;
         }
 
-        if (!isset($args['format'])) {
-            // By default for creation from front-end to here, it should be using JSON_EDITOR format.
-            $args['format'] = FORMAT_JSON_EDITOR;
+        // By default for creation from front-end to here, it should be using JSON_EDITOR format.
+        $article_data['format'] = FORMAT_JSON_EDITOR;
+        if (isset($args['format'])) {
+            $article_data['format'] = $args['format'];
         }
 
         if (isset($args['timeview'])) {
             $timeview = time_view::get_value($args['timeview']);
-            $args['timeview'] = $timeview;
+            $article_data['timeview'] = $timeview;
+        }
+
+        if (isset($args['content'])) {
+            $content = $args['content'];
+            $format = $article_data['format'];
+
+            // Note: We don't want to put this kind of logic check within article's lower API because
+            // we want to create an article with the very least content requirement in the lower API, so that it
+            // it is easier to set up the environment when we write test.
+            if ((FORMAT_JSON_EDITOR == $format && document_helper::is_document_empty($content)) || empty($content)) {
+                throw resource_exception::create(
+                    'create',
+                    article::get_resource_type(),
+                    null,
+                    "The resource content is empty"
+                );
+            }
+
+            $article_data['content'] = $args['content'];
         }
 
         /** @var article $resource */
-        $resource = article::create($args, $USER->id);
+        $resource = article::create($article_data, $USER->id);
         return $resource;
     }
 

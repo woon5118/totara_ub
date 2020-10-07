@@ -194,4 +194,20 @@ final class totara_comment_generator extends component_generator_base {
 
         throw new coding_exception("Component '{$component}' is not supported by the ml_recommender generator");
     }
+
+    /**
+     * @param context $context
+     * @return void
+     */
+    public function add_context_for_default_resolver(context $context): void {
+        global $CFG;
+        require_once("{$CFG->dirroot}/totara/comment/tests/fixtures/totara_comment_default_resolver.php");
+
+        totara_comment_default_resolver::add_callback(
+            'get_context_id',
+            function () use ($context): int {
+                return $context->id;
+            }
+        );
+    }
 }

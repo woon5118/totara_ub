@@ -28,6 +28,7 @@ use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use totara_comment\comment;
 use totara_comment\comment_helper;
+use totara_comment\resolver_factory;
 
 final class delete_comment implements mutation_resolver, has_middleware {
     /**
@@ -37,12 +38,19 @@ final class delete_comment implements mutation_resolver, has_middleware {
      * @return comment
      */
     public static function resolve(array $args, execution_context $ec): comment {
-        global $USER;
+        $comment = comment::from_id($args['id']);
+
         if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_user::instance($USER->id));
+            $resolver = resolver_factory::create_resolver($comment->get_component());
+            $context_id = $resolver->get_context_id(
+                $comment->get_instanceid(),
+                $comment->get_area()
+            );
+
+            $context = \context::instance_by_id($context_id);
+            $ec->set_relevant_context($context);
         }
 
-        $comment = comment::from_id($args['id']);
         if ($comment->is_reply()) {
             throw new \coding_exception("Cannot delete a reply via comment api");
         }

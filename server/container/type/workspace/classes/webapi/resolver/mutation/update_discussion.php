@@ -23,7 +23,10 @@
 namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\discussion\discussion_helper;
+use container_workspace\exception\discussion_exception;
+use core\json_editor\helper\document_helper;
 use core\webapi\execution_context;
+use core\webapi\middleware\clean_content_format;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
@@ -58,7 +61,10 @@ final class update_discussion implements mutation_resolver, has_middleware {
             $ec->set_relevant_context($context);
         }
 
-        $content_format = null;
+        // Use the current content_format of the existing record.
+        $repository = discussion::get_entity_repository();
+        $content_format = $repository->get_content_format_of_discussion($discussion_id);
+
         if (isset($args['content_format'])) {
             $content_format = $args['content_format'];
         }
@@ -66,6 +72,11 @@ final class update_discussion implements mutation_resolver, has_middleware {
         $draft_id = null;
         if (isset($args['draft_id'])) {
             $draft_id = (int) $args['draft_id'];
+        }
+
+        $content = $args['content'];
+        if (FORMAT_JSON_EDITOR == $content_format && document_helper::is_document_empty($content)) {
+            throw discussion_exception::on_update("Discussion's content is empty");
         }
 
         return discussion_helper::update_discussion_content(
@@ -84,7 +95,12 @@ final class update_discussion implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('container_workspace'),
-            new clean_editor_content('content', 'content_format')
+            new clean_editor_content('content', 'content_format'),
+
+            // Using null, here because we would want to fallback to the content format of the current discussion.
+            // Note that we are only allow FORMAT_JSON_EDITOR via graphql, as because the front-end side only support
+            // weka editor for workspace but not different editor. Lower level API is able to change the format value.
+            new clean_content_format('content_format', null, [FORMAT_JSON_EDITOR])
         ];
     }
 }

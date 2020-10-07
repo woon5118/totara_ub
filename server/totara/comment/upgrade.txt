@@ -1,0 +1,8 @@
+This files describes API changes in /totara/comment/*.
+The information here is intended only for developers.
+
+=== 13.1 ===
+
+--- Update to API ---
+* Added new parameter "$debug_info" into function totara_comment\exception\comment_exception::on_create
+* Added new parameter "$debug_info" into function totara_comment\exception\comment_exception::on_update

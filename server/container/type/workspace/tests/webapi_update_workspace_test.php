@@ -195,7 +195,9 @@ class container_workspace_webapi_update_workspace_testcase extends advanced_test
 
         $after_updated_description = $DB->get_field('course', 'summary', ['id' => $workspace_id]);
         self::assertNotEquals($original_description, $after_updated_description);
-        self::assertNull($after_updated_description);
+
+        self::assertEmpty($after_updated_description);
+        self::assertNotNull($after_updated_description);
     }
 
     /**

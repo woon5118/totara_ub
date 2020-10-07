@@ -39,17 +39,19 @@ final class comment_exception extends \moodle_exception {
     }
 
     /**
+     * @param string|null $debug_info
      * @return comment_exception
      */
-    public static function on_update(): comment_exception {
-        return new static('update');
+    public static function on_update(?string $debug_info = null): comment_exception {
+        return new static('update', null, $debug_info);
     }
 
     /**
+     * @param string|null $debug_info
      * @return comment_exception
      */
-    public static function on_create(): comment_exception {
-        return new static('create');
+    public static function on_create(?string $debug_info = null): comment_exception {
+        return new static('create', null, $debug_info);
     }
 
     /**

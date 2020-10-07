@@ -27,6 +27,7 @@ use container_workspace\discussion\discussion;
 use container_workspace\workspace;
 use totara_comment\exception\comment_exception;
 use totara_comment\comment;
+use core\json_editor\node\paragraph;
 
 class container_workspace_webapi_create_comment_testcase extends advanced_testcase {
     use webapi_phpunit_helper;
@@ -58,8 +59,11 @@ class container_workspace_webapi_create_comment_testcase extends advanced_testca
                 'instanceid' => $discussion->get_id(),
                 'component' => workspace::get_type(),
                 'area' => discussion::AREA,
-                'content' => 'woo',
-                'format' => FORMAT_PLAIN
+                'content' => json_encode([
+                    'type' => 'doc',
+                    'content' => [paragraph::create_json_node_from_text('woo')]
+                ]),
+                'format' => FORMAT_JSON_EDITOR
             ]
         );
     }
@@ -99,8 +103,11 @@ class container_workspace_webapi_create_comment_testcase extends advanced_testca
             'totara_comment_create_reply',
             [
                 'commentid' => $comment->get_id(),
-                'content' => 'wow',
-                'format' => FORMAT_PLAIN
+                'content' => json_encode([
+                    'type' => 'doc',
+                    'content' => [paragraph::create_json_node_from_text('wow')]
+                ]),
+                'format' => FORMAT_JSON_EDITOR
             ]
         );
     }
@@ -132,22 +139,25 @@ class container_workspace_webapi_create_comment_testcase extends advanced_testca
         // Flag the workspace to be deleted - then check that we are able to update the comment at all.
         // The result should allow us to update the comment - event though the workspace has been deleted.
         $workspace->mark_to_be_deleted();
-
+        $content =  json_encode([
+            'type' => 'doc',
+            'content' => [paragraph::create_json_node_from_text('new content')],
+        ]);
         /** @var comment $updated_comment */
         $updated_comment = $this->resolve_graphql_mutation(
             'totara_comment_update_comment',
             [
                 'id' => $comment->get_id(),
-                'content' => 'new content',
-                'format' => FORMAT_PLAIN
+                'content' => $content,
+                'format' => FORMAT_JSON_EDITOR
             ]
         );
 
         self::assertInstanceOf(comment::class, $updated_comment);
         self::assertEquals($comment->get_id(), $updated_comment->get_id());
 
-        self::assertEquals('new content', $updated_comment->get_content());
-        self::assertEquals(FORMAT_PLAIN, $updated_comment->get_format());
+        self::assertEquals($content, $updated_comment->get_content());
+        self::assertEquals(FORMAT_JSON_EDITOR, $updated_comment->get_format());
     }
 
     /**
@@ -179,14 +189,18 @@ class container_workspace_webapi_create_comment_testcase extends advanced_testca
         // Flag the workspace to be deleted - so that we can run the mutation to check if it
         // allows us to update the reply. As a result, it should allow us to update the reply.
         $workspace->mark_to_be_deleted();
+        $content = json_encode([
+            'type' => 'doc',
+            'content' => [paragraph::create_json_node_from_text('wow')]
+        ]);
 
         /** @var comment $updated_reply */
         $updated_reply = $this->resolve_graphql_mutation(
             'totara_comment_update_reply',
             [
                 'id' => $reply->get_id(),
-                'content' => 'wow',
-                'format' => FORMAT_PLAIN
+                'content' => $content,
+                'format' => FORMAT_JSON_EDITOR
             ]
         );
 
@@ -194,7 +208,7 @@ class container_workspace_webapi_create_comment_testcase extends advanced_testca
         self::assertTrue($updated_reply->is_reply());
 
         self::assertEquals($reply->get_id(), $updated_reply->get_id());
-        self::assertEquals('wow', $updated_reply->get_content());
-        self::assertEquals(FORMAT_PLAIN, $updated_reply->get_format());
+        self::assertEquals($content, $updated_reply->get_content());
+        self::assertEquals(FORMAT_JSON_EDITOR, $updated_reply->get_format());
     }
 }

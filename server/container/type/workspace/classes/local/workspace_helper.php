@@ -110,6 +110,9 @@ final class workspace_helper {
 
         $record = new \stdClass();
         $record->fullname = $name;
+
+        // Empty string by default, even though the table is allowing this field to be null.
+        // We are moving away from null for summary pretty much.
         $record->summary = '';
         $record->summaryformat = FORMAT_JSON_EDITOR;
         $record->user_id = $actor_id;

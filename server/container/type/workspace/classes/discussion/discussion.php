@@ -23,6 +23,7 @@
 namespace container_workspace\discussion;
 
 use container_workspace\entity\workspace_discussion;
+use container_workspace\repository\discussion_repository;
 use container_workspace\workspace;
 use core\json_editor\document;
 use core\json_editor\node\attachment;
@@ -682,5 +683,14 @@ final class discussion {
      */
     public function reload(): void {
         $this->entity->refresh();
+    }
+
+    /**
+     * Metadata function to return the repository instance of discussion's entity.
+     *
+     * @return discussion_repository
+     */
+    public static function get_entity_repository(): discussion_repository {
+        return workspace_discussion::repository();
     }
 }

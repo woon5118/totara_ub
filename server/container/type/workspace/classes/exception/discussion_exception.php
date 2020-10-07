@@ -31,10 +31,10 @@ final class discussion_exception extends \moodle_exception {
      * discussion_exception constructor.
      * @param string                $errorcode
      * @param null|array|\stdClass  $a
-     * @param null|array            $debuginfo
+     * @param null|array            $debug_info
      */
-    private function __construct(string $errorcode, $a = null, $debuginfo = null) {
-        parent::__construct($errorcode, 'container_workspace', '', $a, $debuginfo);
+    private function __construct(string $errorcode, $a = null, $debug_info = null) {
+        parent::__construct($errorcode, 'container_workspace', '', $a, $debug_info);
     }
 
     /**
@@ -45,16 +45,18 @@ final class discussion_exception extends \moodle_exception {
     }
 
     /**
+     * @param string|null $debug_info
      * @return discussion_exception
      */
-    public static function on_create(): discussion_exception {
-        return new static('error:create_discussion');
+    public static function on_create(?string $debug_info = null): discussion_exception {
+        return new static('error:create_discussion', null, $debug_info);
     }
 
     /**
+     * @param string|null $debug_info
      * @return discussion_exception
      */
-    public static function on_update(): discussion_exception {
-        return new static('error:update_discussion');
+    public static function on_update(?string $debug_info = null): discussion_exception {
+        return new static('error:update_discussion', null, $debug_info);
     }
 }

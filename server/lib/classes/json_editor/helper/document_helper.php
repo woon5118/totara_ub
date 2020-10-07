@@ -375,7 +375,7 @@ final class document_helper {
      * This is to check whether the json document has any nodes at all.
      * Note that this function does not check whether the document contain an empty string only.
      *
-     * @param string|array $json_document
+     * @param string|array $document
      * @return bool
      */
     public static function is_document_empty($document): bool {

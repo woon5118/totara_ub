@@ -8,3 +8,7 @@ The information here is intended only for developers.
 
 --- Update to graphQL ---
 * Added image_preview_mode parameter to container_workspace_contributions query
+
+--- Update to API ---
+* Added new parameter "$debug_info" into function container_workspace\exception\discussion_exception::on_create
+* Added new parameter "$debug_info" into function container_workspace\exception\discussion_exception::on_update

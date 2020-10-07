@@ -70,7 +70,7 @@ final class discussion_helper {
 
         $interactor = new workspace_interactor($workspace, $actor_id);
         if (!$interactor->can_create_discussions()) {
-            throw discussion_exception::on_create($workspace->get_name());
+            throw discussion_exception::on_create();
         }
 
         // Start creating the discussion, after that we will trigger an event for this.

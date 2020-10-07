@@ -162,4 +162,21 @@ final class discussion_repository extends repository {
 
         return $builder->count();
     }
+
+    /**
+     * This function will try to fetch for the current content_format of
+     * the given $discussion_id.
+     *
+     * @param int $discussion_id
+     * @return int
+     */
+    public function get_content_format_of_discussion(int $discussion_id): int {
+        $builder = builder::table(static::get_table());
+        $builder->where('id', $discussion_id);
+
+        $builder->select('content_format');
+        $record = $builder->one(true);
+
+        return $record->content_format;
+    }
 }

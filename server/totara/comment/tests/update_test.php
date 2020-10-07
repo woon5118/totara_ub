@@ -56,13 +56,21 @@ class totara_comment_update_testcase extends advanced_testcase {
             $DB->record_exists('totara_comment', ['id' => $comment->get_id()])
         );
 
+        $content = json_encode([
+            'type' => 'doc',
+            'content' => [paragraph::create_json_node_from_text('The markswoman of the wood.')]
+        ]);
+
+        // Add context that is different from system context.
+        $comment_generator->add_context_for_default_resolver(context_user::instance($user->id));
+
         $ec = execution_context::create('ajax', 'totara_comment_update_comment');
         $result = graphql::execute_operation(
             $ec,
             [
                 'id' => $comment->get_id(),
-                'content' => 'The markswoman of the wood.',
-                'format' => FORMAT_PLAIN
+                'content' => $content,
+                'format' => FORMAT_JSON_EDITOR
             ]
         );
 
@@ -70,7 +78,7 @@ class totara_comment_update_testcase extends advanced_testcase {
 
         // Check if the comment has actually been updated.
         $record = $DB->get_record('totara_comment', ['id' => $comment->get_id()]);
-        $this->assertEquals('The markswoman of the wood.', $record->content);
+        $this->assertEquals($content, $record->content);
     }
 
     /**
@@ -160,13 +168,20 @@ class totara_comment_update_testcase extends advanced_testcase {
             $DB->record_exists('totara_comment', ['id' => $comment->get_id()])
         );
 
+        $content =  json_encode([
+            'type' => 'doc',
+            'content' => [paragraph::create_json_node_from_text('Updated Comment')]
+        ]);
+
+        $comment_generator->add_context_for_default_resolver(context_user::instance($user->id));
+
         $ec = execution_context::create('ajax', 'totara_comment_update_comment');
         $result = graphql::execute_operation(
             $ec,
             [
                 'id' => $comment->get_id(),
-                'content' => 'Updated Comment',
-                'format' => FORMAT_PLAIN
+                'content' => $content,
+                'format' => FORMAT_JSON_EDITOR
             ]
         );
 
@@ -180,7 +195,7 @@ class totara_comment_update_testcase extends advanced_testcase {
 
         // Check if the comment has not been updated.
         $record = $DB->get_record('totara_comment', ['id' => $comment->get_id()]);
-        $this->assertNotEquals('Updated Comment', $record->content);
+        $this->assertNotEquals($content, $record->content);
         $this->assertEmpty($record->content);
     }
 
@@ -215,13 +230,19 @@ class totara_comment_update_testcase extends advanced_testcase {
             $DB->record_exists('totara_comment', ['id' => $reply->get_id()])
         );
 
+        $comment_generator->add_context_for_default_resolver(context_user::instance($user->id));
+        $content = json_encode([
+            'type' => 'doc',
+            'content' => [paragraph::create_json_node_from_text('Updated Reply')]
+        ]);
+
         $ec = execution_context::create('ajax', 'totara_comment_update_comment');
         $result = graphql::execute_operation(
             $ec,
             [
                 'id' => $reply->get_id(),
-                'content' => 'Updated Reply',
-                'format' => FORMAT_PLAIN
+                'content' => $content,
+                'format' => FORMAT_JSON_EDITOR
             ]
         );
 
@@ -235,7 +256,7 @@ class totara_comment_update_testcase extends advanced_testcase {
 
         // Check if the comment has not been updated.
         $record = $DB->get_record('totara_comment', ['id' => $reply->get_id()]);
-        $this->assertNotEquals('Updated Reply', $record->content);
+        $this->assertNotEquals($content, $record->content);
         $this->assertEmpty($record->content);
     }
 }

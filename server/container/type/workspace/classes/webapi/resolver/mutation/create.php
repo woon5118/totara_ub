@@ -23,7 +23,10 @@
 namespace container_workspace\webapi\resolver\mutation;
 
 use container_workspace\local\workspace_helper;
+use core\json_editor\helper\document_helper;
 use core\webapi\execution_context;
+use core\webapi\middleware\clean_content_format;
+use core\webapi\middleware\clean_editor_content;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
@@ -51,14 +54,20 @@ final class create implements mutation_resolver, has_middleware {
             throw new \coding_exception("Cannot create a workspace with an empty name");
         }
 
+        // Default to FORMAT_JSON_EDITOR
+        $summary_format = FORMAT_JSON_EDITOR;
+        if (isset($args['description_format'])) {
+            $summary_format = $args['description_format'];
+        }
+
         $summary = null;
         if (isset($args['description'])) {
             $summary = $args['description'];
-        }
 
-        $summary_format = null;
-        if (isset($args['description_format'])) {
-            $summary_format = $args['description_format'];
+            if (FORMAT_JSON_EDITOR == $summary_format && document_helper::is_document_empty($summary)) {
+                // Description document is empty, hence we would not want to add it.
+                $summary = null;
+            }
         }
 
         $draft_id = null;
@@ -88,6 +97,10 @@ final class create implements mutation_resolver, has_middleware {
         return [
             new require_login(),
             new require_advanced_feature('container_workspace'),
+            new clean_editor_content('description', 'description_format', false),
+
+            // For now we only support FORMAT_JSON_EDIT via graphql mutation.
+            new clean_content_format('description_format', FORMAT_JSON_EDITOR, [FORMAT_JSON_EDITOR])
         ];
     }
 

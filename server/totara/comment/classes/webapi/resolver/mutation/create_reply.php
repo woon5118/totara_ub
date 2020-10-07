@@ -22,12 +22,16 @@
  */
 namespace totara_comment\webapi\resolver\mutation;
 
+use core\json_editor\helper\document_helper;
 use core\webapi\execution_context;
+use core\webapi\middleware\clean_content_format;
+use core\webapi\middleware\clean_editor_content;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use totara_comment\comment;
 use totara_comment\comment_helper;
+use totara_comment\exception\comment_exception ;
 
 /**
  * Resolver for mutation create reply.
@@ -54,6 +58,10 @@ final class create_reply implements mutation_resolver, has_middleware {
             $format = $args['format'];
         }
 
+        if (FORMAT_JSON_EDITOR == $format && document_helper::is_document_empty($content) || empty($content)) {
+            throw comment_exception::on_create("Reply content is empty");
+        }
+
         $draft_id = null;
         if (isset($args['draft_id'])) {
             $draft_id = (int) $args['draft_id'];
@@ -74,7 +82,8 @@ final class create_reply implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
+            new clean_editor_content('content', 'format'),
+            new clean_content_format('format', FORMAT_JSON_EDITOR, [FORMAT_JSON_EDITOR])
         ];
     }
-
 }
