@@ -1,7 +1,6 @@
-@mod @mod_assign @totara @editor @editor_weka @weka @totara_reportbuilder @javascript
+@mod @mod_assign @totara @editor @editor_weka @weka @vuejs @javascript
 Feature: Assignment activity works as expected when Weka is the default editor
-
-  Scenario: JSON content is rendered correctly for assignments
+  Background:
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
@@ -13,6 +12,9 @@ Feature: Assignment activity works as expected when Weka is the default editor
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
+
+  @totara_reportbuilder
+  Scenario: JSON content is rendered correctly for assignments
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "1" and I fill the form with:
@@ -84,3 +86,41 @@ Feature: Assignment activity works as expected when Weka is the default editor
     And I should not see "paragraph"
     And "these comments" "link" should exist
     But I should not see "https://test.totaralms.com/exttests/test.jpg"
+
+  Scenario: Check word limit and word count on weka editor
+    And the following "activities" exist:
+      | activity | name        | course | idnumber |
+      | assign   | Test assign | C1     | AS516N   |
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Test assign"
+    And I navigate to "Edit settings" node in "Assignment administration"
+    And I expand all fieldsets
+    And I set the following fields to these values:
+      | File submissions | 0 |
+      | Online text      | 1 |
+      | id_assignsubmission_onlinetext_wordlimit_enabled |  1 |
+      | id_assignsubmission_onlinetext_wordlimit         | 25 |
+    And I press "Save and display"
+    And I log out
+    And I log in as "student1"
+    And I follow "Preferences" in the user menu
+    And I follow "Editor preferences"
+    And I set the field "Text editor" to "Weka editor"
+    And I press "Save changes"
+    And I am on "Course 1" course homepage
+    And I follow "Test assign"
+    And I press "Add submission"
+    When I activate the weka editor with css ".tui-weka"
+    And I type "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean tempor sed metus quis porta. Sed volutpat arcu eget nibh ultricies ultricies. Sed ac ligula enim." in the weka editor
+    And I select the text "Lorem ipsum" in the weka editor
+    And I click on the "Link" toolbar button in the weka editor
+    And I set the field "URL" to "https://help.totaralearning.com/"
+    And I click on "Done" "button" in the ".tui-modal" "css_element"
+    And I press "Save changes"
+    Then I should not see "The word limit for this assignment is 25 words"
+    And I should see "(25 words)"
+    And I should see "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean tempor sed metus quis porta. Sed volutpat arcu eget nibh ultricies ..."
+    When I click on "[title='View full']" "css_element"
+    Then I should not see "(25 words)"
+    And I should see "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean tempor sed metus quis porta. Sed volutpat arcu eget nibh ultricies ultricies. Sed ac ligula enim."

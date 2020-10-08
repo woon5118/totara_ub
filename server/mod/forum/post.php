@@ -597,6 +597,17 @@ if ($USER->id != $post->userid) {   // Not the original author, so add a message
         $data->name = '<a href="'.$CFG->wwwroot.'/user/profile.php?id='.$USER->id.'&course='.$post->course.'">'.
                        fullname($USER).'</a>';
         $post->message .= '<p><span class="edited">('.get_string('editedby', 'forum', $data).')</span></p>';
+    } else if ($post->messageformat == FORMAT_JSON_EDITOR) {
+        // Totara: Look after Weka.
+        $post->message = \core\json_editor\helper\text_helper::append_formatted_paragraph_with_link(
+            $post->message,
+            fullname($USER),
+            new moodle_url('/user/profile.php', ['id' => $USER->id, 'course' => $post->course]),
+            function (string $link_encoded) use ($data) {
+                $data->name = $link_encoded;
+                return '('.get_string('editedby', 'forum', $data).')';
+            }
+        );
     } else {
         $data->name = fullname($USER);
         $post->message .= "\n\n(".get_string('editedby', 'forum', $data).')';

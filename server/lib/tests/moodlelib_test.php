@@ -1014,6 +1014,14 @@ class core_moodlelib_testcase extends advanced_testcase {
                 shorten_text($text, 1));
     }
 
+    public function test_shorten_text_json() {
+        $this->assertSame('{"kia"...', shorten_text('{"kia":"ora"}', 9));
+        $this->assertSame('{"content":[...', shorten_text('{"content":[],"type":"doc"}', 15));
+        $this->assertDebuggingCalled('shorten_text() does not support a JSON content. Please pass it to format_text() first.');
+        $this->assertSame('{"type":"doc","content":[{"type":"para...', shorten_text('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"I\'m here"}]}]}', 41));
+        $this->assertDebuggingCalled('shorten_text() does not support a JSON content. Please pass it to format_text() first.');
+    }
+
     public function test_shorten_filename() {
         // Test filename that contains more than 100 characters.
         $filename = 'sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem';
@@ -3218,6 +3226,12 @@ class core_moodlelib_testcase extends advanced_testcase {
         $count = count_words('one.2 3,four');
         $this->assertEquals(4, $count);
 
+        $count = count_words("I'm two");
+        $this->assertEquals(2, $count);
+
+        $count = count_words(s("I'm two"));
+        $this->assertEquals(2, $count);
+
         $count = count_words('1³ £2 €3.45 $6,789');
         $this->assertEquals(4, $count);
 
@@ -3227,6 +3241,23 @@ class core_moodlelib_testcase extends advanced_testcase {
         $count = count_words('one…two ブルース … カンベッル');
         $this->assertEquals(4, $count);
     }
+
+    /**
+     * Test function count_words().
+     */
+    public function test_count_words_json() {
+        $count = count_words('{"kia":"ora"}');
+        $this->assertEquals(2, $count);
+
+        $count = count_words('{"content":[],"type":"doc"}');
+        $this->assertEquals(3, $count);
+        $this->assertDebuggingCalled('count_words() does not support a JSON content. Please pass it to format_text() first.');
+
+        $count = count_words('{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"I\'m here"}]}]}');
+        $this->assertEquals(11, $count);
+        $this->assertDebuggingCalled('count_words() does not support a JSON content. Please pass it to format_text() first.');
+    }
+
     /**
      * Tests the getremoteaddr() function.
      */

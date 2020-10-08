@@ -280,6 +280,12 @@ foreach ($posts as $post) {
         }
     }
 
+    // Totara: Look after Weka.
+    if ($post->messageformat == FORMAT_JSON_EDITOR) {
+        $modcontext = $modcontext ?? context_module::instance($cm->id);
+        $post->message = file_rewrite_pluginfile_urls($post->message, 'pluginfile.php', $modcontext->id, 'mod_forum', 'post', $post->id);
+    }
+
     // Identify search terms only found in HTML markup, and add a warning about them to
     // the start of the message text. However, do not do the highlighting here. forum_print_post
     // will do it for us later.

@@ -212,7 +212,7 @@ class assign_submission_onlinetext extends assign_submission_plugin {
                                      false);
 
         // Check word count before submitting anything.
-        $exceeded = $this->check_word_count(trim($data->onlinetext));
+        $exceeded = $this->check_word_count($data->onlinetext, $data);
         if ($exceeded) {
             $this->set_error($exceeded);
             return false;
@@ -244,7 +244,10 @@ class assign_submission_onlinetext extends assign_submission_plugin {
             $params['relateduserid'] = $submission->userid;
         }
 
-        $count = count_words($data->onlinetext);
+        // Totara: Look after Weka
+        if (($count = $this->count_words_for_weka($data)) === null) {
+            $count = count_words($data->onlinetext);
+        }
 
         // Unset the objectid and other field from params for use in submission events.
         unset($params['objectid']);
@@ -355,11 +358,24 @@ class assign_submission_onlinetext extends assign_submission_plugin {
 
             // The actual submission text.
             $onlinetext = trim($onlinetextsubmission->onlinetext);
+
+            // Totara: Look after Weka.
+            $plugin = $this->assignment->get_submission_plugin_by_type($this->get_type());
+            $format = $plugin->get_editor_format('onlinetext', $onlinetextsubmission->submission);
+            if ($format == FORMAT_JSON_EDITOR) {
+                $onlinetext = file_rewrite_pluginfile_urls(
+                    $onlinetext,
+                    'pluginfile.php',
+                    $this->assignment->get_context()->id,
+                    'assignsubmission_onlinetext',
+                    ASSIGNSUBMISSION_ONLINETEXT_FILEAREA,
+                    $submission->id);
+                $onlinetext = format_text($onlinetext, $format);
+            }
+
             // The shortened version of the submission text.
             $shorttext = shorten_text($onlinetext, 140);
 
-            $onlinetext = trim($onlinetextsubmission->onlinetext);
-            $shorttext = shorten_text($text, 140);
             $plagiarismlinks = '';
 
             if (!empty($CFG->enableplagiarism)) {
@@ -475,7 +491,8 @@ class assign_submission_onlinetext extends assign_submission_plugin {
         $onlinetextloginfo = '';
         $onlinetextloginfo .= get_string('numwordsforlog',
                                          'assignsubmission_onlinetext',
-                                         count_words($onlinetextsubmission->onlinetext));
+                                         // Totara: Look after Weka
+                                         $this->count_words_for_weka($onlinetextsubmission) ?? count_words($onlinetextsubmission->onlinetext));
 
         return $onlinetextloginfo;
     }
@@ -504,7 +521,10 @@ class assign_submission_onlinetext extends assign_submission_plugin {
         $wordcount = 0;
 
         if (isset($onlinetextsubmission->onlinetext)) {
-            $wordcount = count_words(trim($onlinetextsubmission->onlinetext));
+            // Totara: Look after Weka
+            if (($wordcount = $this->count_words_for_weka($onlinetextsubmission)) === null) {
+                $wordcount = count_words(trim($onlinetextsubmission->onlinetext));
+            }
         }
 
         return $wordcount == 0;
@@ -526,7 +546,10 @@ class assign_submission_onlinetext extends assign_submission_plugin {
         $wordcount = 0;
 
         if (isset($data->onlinetext_editor['text'])) {
-            $wordcount = count_words(trim((string)$data->onlinetext_editor['text']));
+            // Totara: Look after Weka
+            if (($wordcount = $this->count_words_for_weka($data)) === null) {
+                $wordcount = count_words(trim((string)$data->onlinetext_editor['text']));
+            }
         }
 
         return $wordcount == 0;
@@ -586,9 +609,10 @@ class assign_submission_onlinetext extends assign_submission_plugin {
      * Compare word count of onlinetext submission to word limit, and return result.
      *
      * @param string $submissiontext Onlinetext submission text from editor
+     * @param null|stdClass $submission Totara: additional submission data object
      * @return string Error message if limit is enabled and exceeded, otherwise null
      */
-    public function check_word_count($submissiontext) {
+    public function check_word_count($submissiontext, $submission = null) {
         global $OUTPUT;
 
         $wordlimitenabled = $this->get_config('wordlimitenabled');
@@ -598,8 +622,12 @@ class assign_submission_onlinetext extends assign_submission_plugin {
             return null;
         }
 
-        // Count words and compare to limit.
-        $wordcount = count_words($submissiontext);
+        // Totara: Look after Weka.
+        if ($submission === null || ($wordcount = $this->count_words_for_weka($submission)) === null) {
+            // Count words and compare to limit.
+            $wordcount = count_words($submissiontext);
+        }
+
         if ($wordcount <= $wordlimit) {
             return null;
         } else {
@@ -618,6 +646,54 @@ class assign_submission_onlinetext extends assign_submission_plugin {
     public function get_config_for_external() {
         return (array) $this->get_config();
     }
+
+    /**
+     * Wrap around count_words to deal with a json content.
+     *
+     * @param object $data submission data object
+     * @return integer|null pass through count_words() if null is returned
+     * @since Totara 13.1
+     */
+    private function count_words_for_weka($data): ?int {
+        $id = null;
+        $onlinetext = null;
+        $format = null;
+
+        if (is_object($data)) {
+            if (isset($data->onlinetext) && isset($data->onlinetextformat) && $data->onlinetextformat == FORMAT_JSON_EDITOR) {
+                // data = {id, onlinetext, onlinetextformat}
+                $id = $data->id;
+                $onlinetext = $data->onlinetext;
+                $format = $data->onlinetextformat;
+            }
+            if (isset($data->onlinetext) && isset($data->onlineformat) && $data->onlineformat == FORMAT_JSON_EDITOR) {
+                // data = {id, onlinetext, onlineformat}
+                $id = $data->id;
+                $onlinetext = $data->onlinetext;
+                $format = $data->onlineformat;
+            }
+            if (isset($data->onlinetext_editor) && is_array($data->onlinetext_editor)
+                && isset($data->onlinetext_editor['text']) && isset($data->onlinetext_editor['format'])
+                && $data->onlinetext_editor['format'] == FORMAT_JSON_EDITOR) {
+                    // data = {id, onlinetext_editor: [format, text]}
+                    $id = $data->id;
+                    $onlinetext = (string)$data->onlinetext_editor['text'];
+                    $format = $data->onlinetext_editor['format'];
+            }
+        }
+
+        if ($id !== null && $onlinetext !== null && $format !== null) {
+            $onlinetext = file_rewrite_pluginfile_urls(
+                $onlinetext,
+                'pluginfile.php',
+                $this->assignment->get_context()->id,
+                'assignsubmission_onlinetext',
+                ASSIGNSUBMISSION_ONLINETEXT_FILEAREA,
+                $id);
+            $onlinetext = format_text($onlinetext, $format);
+            return count_words(trim($onlinetext));
+        }
+
+        return null;
+    }
 }
-
-

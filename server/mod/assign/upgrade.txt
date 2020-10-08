@@ -1,6 +1,10 @@
 This files describes API changes in the assign code.
 information provided here is intended especially for developers.
 
+=== 13.1 ===
+
+* assign_submission_onlinetext::check_word_count() added 2nd parameter.
+
 === 13.0 ===
 
 * Class assign_upgrade_manager has been deprecated and should no longer be used.

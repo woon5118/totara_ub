@@ -22,9 +22,9 @@
  */
 namespace core\json_editor\helper;
 
-use core\json_editor\node\node;
 use core\json_editor\schema;
 use core\json_editor\node\abstraction\block_node;
+use core\json_editor\node\paragraph;
 
 /**
  * A helper class for document, which it can run the validation, sanitizing on the json document.
@@ -52,7 +52,7 @@ final class document_helper {
         $document = [];
 
         if (is_string($json)) {
-            $document = json_decode($json, true);
+            $document = @json_decode($json, true);
 
             if (JSON_ERROR_NONE !== json_last_error() || !is_array($document)) {
                 // Return the raw content, when there is an error.
@@ -173,8 +173,9 @@ final class document_helper {
     /**
      * @param array $document
      * @return string
+     * @internal For internal use only. Do not call this function!
      */
-    protected static function json_encode_document(array $document): string {
+    public static function json_encode_document(array $document): string {
         $json_result = json_encode(
             $document,
             JSON_PRESERVE_ZERO_FRACTION | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
@@ -350,15 +351,71 @@ final class document_helper {
      *
      * This is a very simple test. It is called often and meant to be high performance.
      * It is not expected to be a validator or sanitizer.
+     * And it does not spam debugging message
      *
      * @param null|string $document
+     * @param boolean $more_check
      * @return bool
      */
-    public static function looks_like_json(?string $document): bool {
-        $document = trim($document);
+    public static function looks_like_json($document, bool $more_check = false): bool {
+        $document = trim((string)$document);
         if (empty($document)) {
             return false;
         }
-        return (substr($document, 0, 1) == '{' && substr($document, -1) == '}');
+        if (substr($document, 0, 1) != '{' || substr($document, -1) != '}') {
+            return false;
+        }
+        if ($more_check && !preg_match('/^{\s*"(type|content)"\s*:/', $document)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * This is to check whether the json document has any nodes at all.
+     * Note that this function does not check whether the document contain an empty string only.
+     *
+     * @param string|array $json_document
+     * @return bool
+     */
+    public static function is_document_empty($document): bool {
+        if (!is_array($document)) {
+            if (!static::looks_like_json($document, true)) {
+                throw new \coding_exception("String is not a json content string");
+            }
+
+            $document = @json_decode($document, true);
+            if (null === $document || !is_array($document)) {
+                throw new \coding_exception("String is not a json content string");
+            }
+            if (empty($document)) {
+                // Might be an invalid document.
+                return true;
+            }
+            return self::is_document_empty($document);
+        }
+
+        if (!isset($document['type']) || 'doc' !== $document['type']) {
+            throw new \coding_exception("Invalid document schema");
+        }
+
+        if (!isset($document['content']) || empty($document['content'])) {
+            // It does not have any node.
+            return true;
+        }
+
+        if (1 === count($document['content'])) {
+            // Check whether the first node of content is an empty paragraph or not.
+            $first_node = reset($document['content']);
+            if (!isset($first_node['type'])) {
+                throw new \coding_exception("Invalid document schema");
+            }
+            if (paragraph::get_type() == $first_node['type']) {
+                // So our first node is a paragraph - we just need to check if this paragraph is empty or not.
+                return empty($first_node['content']);
+            }
+        }
+
+        return false;
     }
 }

@@ -3409,20 +3409,23 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     if ($shortenpost) {
         // Prepare shortened version by filtering the text then shortening it.
         $postclass    = 'shortenedpost';
-        $postcontent  = format_text($post->message, $post->messageformat, $options);
-        $postcontent  = shorten_text($postcontent, $CFG->forum_shortpost);
+        // Totara: Look after Weka.
+        $postmessage  = format_text($post->message, $post->messageformat, $options);
+        $postcontent  = shorten_text($postmessage, $CFG->forum_shortpost);
         $postcontent .= html_writer::link($discussionlink, get_string('readtherest', 'forum'));
-        $postcontent .= html_writer::tag('div', '('.get_string('numwords', 'moodle', count_words($post->message)).')',
+        $postcontent .= html_writer::tag('div', '('.get_string('numwords', 'moodle', count_words($postmessage)).')',
             array('class'=>'post-word-count'));
     } else {
         // Prepare whole post
         $postclass    = 'fullpost';
-        $postcontent  = format_text($post->message, $post->messageformat, $options, $course->id);
+        // Totara: Look after Weka.
+        $postmessage  = format_text($post->message, $post->messageformat, $options, $course->id);
+        $postcontent  = $postmessage;
         if (!empty($highlight)) {
             $postcontent = highlight($highlight, $postcontent);
         }
         if (!empty($forum->displaywordcount)) {
-            $postcontent .= html_writer::tag('div', get_string('numwords', 'moodle', count_words($post->message)),
+            $postcontent .= html_writer::tag('div', get_string('numwords', 'moodle', count_words($postmessage)),
                 array('class'=>'post-word-count'));
         }
         $postcontent .= html_writer::tag('div', $attachedimages, array('class'=>'attachedimages'));

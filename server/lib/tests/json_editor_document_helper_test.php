@@ -23,6 +23,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core\json_editor\helper\document_helper;
+use core\json_editor\helper\handler;
 use core\json_editor\node\paragraph;
 use core\json_editor\node\mention;
 use core\json_editor\node\attachments;
@@ -34,10 +35,14 @@ use core\json_editor\node\audio;
 use core\json_editor\node\bullet_list;
 use core\json_editor\node\ruler;
 use core\json_editor\node\ordered_list;
+use PHPUnit\Framework\AssertionFailedError;
 
+/**
+ * @coversDefaultClass core\json_editor\helper\document_helper
+ */
 class core_json_editor_document_helper_testcase extends advanced_testcase {
     /**
-     * @return void
+     * @covers ::is_valid_document
      */
     public function test_validate_document(): void {
         $this->assertFalse(
@@ -95,7 +100,9 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
     }
 
     /**
-     * @return void
+     * @covers ::clean_json_document
+     * @covers ::clean_json
+     * @covers ::do_clean_raw_nodes
      */
     public function test_clean_raw_node(): void {
         $proper_document = [
@@ -179,7 +186,7 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
     }
 
     /**
-     * @return void
+     * @covers ::parse_document
      */
     public function test_parse_document(): void {
         $this->assertEmpty(document_helper::parse_document(null));
@@ -199,7 +206,7 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
     }
 
     /**
-     * @return void
+     * @covers ::is_valid_document
      */
     public function test_validate_document_content_nodes(): void {
         global $CFG, $USER;
@@ -276,7 +283,8 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
     }
 
     /**
-     * @return void
+     * @covers ::sanitize_json
+     * @covers core\json_editor\helper\node_helper::sanitize_raw_nodes
      */
     public function test_sanitize_document(): void {
         $html = /** @lang text */'<img src="x" onerror="alert(\'This file failed\')"/>';
@@ -314,6 +322,10 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
         );
     }
 
+    /**
+     * @covers ::is_valid_json_document
+     * @covers ::is_valid_document_header
+     */
     public function test_is_valid_json_document(): void {
         $tests = [
             null => false,
@@ -335,13 +347,30 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
 
         foreach ($tests as $test => $expected) {
             $this->assertEquals($expected, document_helper::is_valid_json_document($test), $test);
-            // Invlid JSON triggers a debugging message in document_helper::parse_document() that we don't care about here.
+            // Invalid JSON triggers a debugging message in document_helper::parse_document() that we don't care about here.
             $this->resetDebugging();
         }
     }
 
     /**
-     * @return void
+     * @covers ::json_encode_document
+     */
+    public function test_json_encode_document(): void {
+        $tests = [
+            // slashes are preserved
+            '{"9":"3/4"}' => [9 => '3/4'],
+            // fractions are preserved
+            '{"f":2.0}' => ['f' => 2.00],
+            // multi-byte characters are preserved
+            "[\"\u{263A}\u{1F60D}\"]" => ["\u{263A}\u{1F60D}"],
+        ];
+        foreach ($tests as $expected => $input) {
+            $this->assertEquals($expected, document_helper::json_encode_document($input));
+        }
+    }
+
+    /**
+     * @covers ::looks_like_json
      */
     public function test_looks_like_json(): void {
         $tests = [
@@ -350,14 +379,71 @@ class core_json_editor_document_helper_testcase extends advanced_testcase {
             'Too many cooks spoils the broth.' => false,
             '{}' => true,
             ' {"space": "is hard"} ' => true,
+            '{"content":[],"type":"doc"}' => true,
             '' => false,
             false => false,
         ];
-        $this->assertCount(7, $tests);
         foreach ($tests as $test => $expected) {
             $this->assertEquals($expected, document_helper::looks_like_json($test), $test);
         }
         // Test null (should be same as '')
         $this->assertEquals(false, document_helper::looks_like_json(null), $test);
+
+        // Test moar
+        require_once(__DIR__ . '/fixtures/json_editor/sample_documents.php');
+        $tests = [
+            '{}' => false,
+            ' {"space": "is hard"} ' => false,
+            '{"type":"doc"}' => true,
+            '{"content":{}}' => true,
+            '{"content":[],"type":"doc"}' => true,
+        ];
+        $tests[json_encode(core_json_editor_sample_documents::sample(false), JSON_PRETTY_PRINT)] = true;
+        foreach ($tests as $test => $expected) {
+            $this->assertEquals($expected, document_helper::looks_like_json($test, true), $test);
+        }
+    }
+
+    /**
+     * @covers ::is_document_empty
+     */
+    public function test_is_document_empty() {
+        require_once(__DIR__ . '/fixtures/json_editor/sample_documents.php');
+
+        $tests = [
+            '' => 'String is not a json content string',
+            '<strong>kia kaha</strong>' => 'String is not a json content string',
+            'null' => 'String is not a json content string',
+            'false' => 'String is not a json content string',
+            'true' => 'String is not a json content string',
+            '42' => 'String is not a json content string',
+            '42.195' => 'String is not a json content string',
+            '"oioi"' => 'String is not a json content string',
+            '{}' => 'String is not a json content string',
+            '{"kia":"ora"}' => 'String is not a json content string',
+            '{"type":"Doc"}' => 'Invalid document schema',
+            '{"content":[]}' => 'Invalid document schema',
+        ];
+        foreach ($tests as $test => $expected) {
+            try {
+                document_helper::is_document_empty($test);
+                $this->fail('coding_exception expected: ' . $test);
+            } catch (coding_exception $ex) {
+                $this->assertStringContainsString($expected, $ex->getMessage(), $test);
+            }
+        }
+
+        $tests = [
+            '{"type":"doc"}' => true,
+            '{"type":"doc","content":[]}' => true,
+            '{"type":"doc","content":[{"type":"paragraph"}]}' => true,
+            '{"type":"doc","content":[{"type":"paragraph","content":[]}]}' => true,
+            '{"type":"doc","content":[{},{}]}' => false,
+        ];
+        $tests[core_json_editor_sample_documents::minimal(true)] = false;
+        $tests[core_json_editor_sample_documents::sample(true)] = false;
+        foreach ($tests as $test => $expected) {
+            $this->assertEquals($expected, document_helper::is_document_empty($test));
+        }
     }
 }

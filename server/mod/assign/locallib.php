@@ -3030,10 +3030,7 @@ class assign {
 
         $text = $plugin->get_editor_text($editor, $submissionid);
 
-        // Totara: Do not attempt to shorten JSON content
-        if (!\core\json_editor\helper\document_helper::is_valid_json_document($text) && $shortentext) {
-            $text = shorten_text($text, 140);
-        }
+        // Totara: Do not attempt to shorten JSON content here.
         $format = $plugin->get_editor_format($editor, $submissionid);
 
         $finaltext = file_rewrite_pluginfile_urls($text,
@@ -3043,7 +3040,14 @@ class assign {
                                                   $filearea,
                                                   $submissionid);
         $params = array('overflowdiv' => true, 'context' => $this->get_context());
-        $result .= format_text($finaltext, $format, $params);
+        $finaltext = format_text($finaltext, $format, $params);
+
+        // Totara: shorten_text after format_text.
+        if ($shortentext) {
+            $result .= shorten_text($finaltext, 140);
+        } else {
+            $result .= $finaltext;
+        }
 
         $submission = $DB->get_record('assign_submission', array('id' => $submissionid));
         $canexportportfolio = false;

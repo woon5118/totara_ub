@@ -8516,9 +8516,15 @@ function moodle_setlocale($locale='') {
  * @return int The count of words in the specified string
  */
 function count_words($string) {
+    // Totara: Check JSON content first.
+    if (core\json_editor\helper\document_helper::looks_like_json($string, true)) {
+        debugging(__METHOD__ . '() does not support a JSON content. Please pass it to format_text() first.', DEBUG_DEVELOPER);
+    }
     $string = strip_tags($string);
     // Decode HTML entities.
     $string = html_entity_decode($string);
+    // Totara: Decode &#039; as apostrophe, which is going to be removed.
+    $string = str_replace('&#039;', '', $string);
     // Replace underscores (which are classed as word characters) with spaces.
     $string = preg_replace('/_/u', ' ', $string);
     // Remove any characters that shouldn't be treated as word boundaries.
@@ -8539,6 +8545,10 @@ function count_words($string) {
  * @return int The count of letters in the specified text.
  */
 function count_letters($string) {
+    // Totara: Check JSON content first.
+    if (core\json_editor\helper\document_helper::looks_like_json($string, true)) {
+        debugging(__METHOD__ . '() does not support a JSON content. Please pass it to format_text() first.', DEBUG_DEVELOPER);
+    }
     $string = strip_tags($string); // Tags are out now.
     $string = preg_replace('/[[:space:]]*/', '', $string); // Whitespace are out now.
 
@@ -8644,6 +8654,10 @@ function random_bytes_emulate($length) {
  * @return string $truncate shortened string
  */
 function shorten_text($text, $ideal=30, $exact = false, $ending='...') {
+    // Totara: Check JSON content first.
+    if (core\json_editor\helper\document_helper::looks_like_json($text, true)) {
+        debugging(__METHOD__ . '() does not support a JSON content. Please pass it to format_text() first.', DEBUG_DEVELOPER);
+    }
     // If the plain text is shorter than the maximum length, return the whole text.
     if (core_text::strlen(preg_replace('/<.*?>/', '', $text)) <= $ideal) {
         return $text;

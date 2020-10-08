@@ -256,4 +256,27 @@ final class text extends node implements inline_node {
             'marks' => []
         ];
     }
+
+    /**
+     * @param string $text
+     * @param string|\moodle_url $url
+     * @return array
+     */
+    public static function create_json_node_from_link(string $text, $url): array {
+        if ($url instanceof \moodle_url) {
+            $url = $url->out(false);
+        }
+        return [
+            'type' => static::get_type(),
+            'text' => $text,
+            'marks' => [
+                [
+                    'type' => 'link',
+                    'attrs' => [
+                        'href' => (string)$url
+                    ]
+                ]
+            ]
+        ];
+    }
 }
