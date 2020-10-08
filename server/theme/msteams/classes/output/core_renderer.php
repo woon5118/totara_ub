@@ -186,6 +186,10 @@ class core_renderer extends \core_renderer {
                 ],
                 'attributes' => [
                     [
+                        'name' => 'rel',
+                        'value' => 'noopener noreferrer'
+                    ],
+                    [
                         'name' => 'target',
                         'value' => '_blank'
                     ]
