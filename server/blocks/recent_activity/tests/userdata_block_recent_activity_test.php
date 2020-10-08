@@ -73,12 +73,12 @@ class userdata_block_recent_activity_test extends advanced_testcase {
         $targetuser = new target_user($user);
 
         // prove that both users have records
-        $this->assertCount(2, $DB->get_records('block_recent_activity', ['userid' => $controluser->id]));
-        $this->assertCount(2, $DB->get_records('block_recent_activity', ['userid' => $targetuser->id]));
+        $this->assertCount(1, $DB->get_records('block_recent_activity', ['userid' => $controluser->id]));
+        $this->assertCount(1, $DB->get_records('block_recent_activity', ['userid' => $targetuser->id]));
 
         // check count
         $result = recent_activity::execute_count($targetuser, context_system::instance());
-        $this->assertEquals(2, $result);
+        $this->assertEquals(1, $result);
     }
 
     /**
@@ -117,7 +117,7 @@ class userdata_block_recent_activity_test extends advanced_testcase {
 
         // check export data for user
         $result = recent_activity::execute_export($targetuser, context_system::instance());
-        $this->assertCount(2, $result->data);
+        $this->assertCount(1, $result->data);
         $this->assertEmpty($result->files);
         foreach ($result->data as $exportitem) {
             $this->assertEquals($targetuser->id, $exportitem->userid);
@@ -145,7 +145,7 @@ class userdata_block_recent_activity_test extends advanced_testcase {
 
         // before purge
         $logcount = recent_activity::execute_count($targetactiveuser, context_system::instance());
-        $this->assertEquals(2, $logcount);
+        $this->assertEquals(1, $logcount);
 
         // purge log records
         $result = recent_activity::execute_purge($targetactiveuser, context_system::instance());
@@ -161,7 +161,7 @@ class userdata_block_recent_activity_test extends advanced_testcase {
 
         // Check suspended users not affected
         $suspendedactivitycount = recent_activity::execute_count(new target_user($suspendeduser), context_system::instance());
-        $this->assertEquals(2, $suspendedactivitycount);
+        $this->assertEquals(1, $suspendedactivitycount);
     }
 
     /**
@@ -182,7 +182,7 @@ class userdata_block_recent_activity_test extends advanced_testcase {
 
         // before purge
         $logcount = recent_activity::execute_count($targetsuspendeduser, context_system::instance());
-        $this->assertEquals(2, $logcount);
+        $this->assertEquals(1, $logcount);
 
         // purge log records
         $result = recent_activity::execute_purge($targetsuspendeduser, context_system::instance());
@@ -198,7 +198,7 @@ class userdata_block_recent_activity_test extends advanced_testcase {
 
         // Check active users not affected
         $activeactivitycount = recent_activity::execute_count(new target_user($activeuser), context_system::instance());
-        $this->assertEquals(2, $activeactivitycount);
+        $this->assertEquals(1, $activeactivitycount);
     }
 
     /**
@@ -220,7 +220,7 @@ class userdata_block_recent_activity_test extends advanced_testcase {
 
         // before purge
         $logcount = recent_activity::execute_count($targetdeleteduser, context_system::instance());
-        $this->assertEquals(2, $logcount);
+        $this->assertEquals(1, $logcount);
 
         // purge log records
         $result = recent_activity::execute_purge($targetdeleteduser, context_system::instance());
@@ -236,7 +236,7 @@ class userdata_block_recent_activity_test extends advanced_testcase {
 
         // Check active users not affected
         $activeactivitycount = recent_activity::execute_count(new target_user($activeuser), context_system::instance());
-        $this->assertEquals(2, $activeactivitycount);
+        $this->assertEquals(1, $activeactivitycount);
     }
 
     /**
