@@ -109,7 +109,8 @@ export default {
     position: sticky;
     top: var(--gap-6);
     bottom: var(--gap-6);
-    font-size: var(--font-size-18);
+    color: var(--color-neutral-6);
+    font-size: var(--font-size-15);
 
     .fa-spinner {
       position: relative;

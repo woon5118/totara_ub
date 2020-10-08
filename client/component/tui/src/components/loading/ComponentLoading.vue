@@ -46,5 +46,6 @@ export default {
   align-items: center;
   justify-content: center;
   padding: var(--gap-3);
+  color: var(--color-neutral-6);
 }
 </style>
