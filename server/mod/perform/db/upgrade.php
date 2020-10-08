@@ -119,5 +119,57 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020090104, 'perform');
     }
 
+    // Totara 13.0 release line.
+
+    if ($oldversion < 2020100101) {
+        $sql = "UPDATE {report_builder}
+                   SET source = 'perform_manage_participation_participant_instance'
+                 WHERE source = 'participant_instance_manage_participation'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+                   SET source = 'perform_manage_participation_participant_section'
+                 WHERE source = 'participant_section_manage_participation'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+                   SET source = 'perform_manage_participation_subject_instance'
+                 WHERE source = 'subject_instance_manage_participation'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+                   SET source = 'perform_participation_participant_instance'
+                 WHERE source = 'perform_participant_instance'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+                   SET source = 'perform_participation_participant_section'
+                 WHERE source = 'perform_participant_section'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+                   SET source = 'perform_participation_subject_instance'
+                 WHERE source = 'perform_subject_instance'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+                   SET source = 'perform_response_element'
+                 WHERE source = 'element_performance_reporting'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+                   SET source = 'perform_response_subject_instance'
+                 WHERE source = 'subject_instance_performance_reporting'";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {report_builder}
+                   SET source = 'perform_response_user'
+                 WHERE source = 'user_performance_reporting'";
+        $DB->execute($sql);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020100101, 'perform');
+    }
+
     return true;
 }

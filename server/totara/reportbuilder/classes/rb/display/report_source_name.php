@@ -41,8 +41,13 @@ class report_source_name extends base {
         // there is not much we can do - source title is
         // defined in the class and so we need to instantiate
         // the class to get it.
-        $src = \reportbuilder::get_source_object($value);
-        return $src->sourcetitle;
+        try {
+            $src = \reportbuilder::get_source_object($value);
+            return $src->sourcetitle;
+        } catch (\Throwable $e) {
+            // Do not throw fatal error when source is invalid.
+            return get_string('error:invalidreportsource', 'totara_reportbuilder', $value);
+        }
     }
 
     public static function is_graphable(\rb_column $column, \rb_column_option $option, \reportbuilder $report) {

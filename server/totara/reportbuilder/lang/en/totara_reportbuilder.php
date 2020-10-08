@@ -337,6 +337,7 @@ $string['error:graphisnotvalid'] = 'The report graph settings are invalid, pleas
 $string['error:invaliddate'] = 'Please enter a valid date or date range';
 $string['error:invalidreportid'] = 'Invalid report ID';
 $string['error:invalidreportscheduleid'] = 'Invalid scheduled report ID';
+$string['error:invalidreportsource'] = 'Invalid report source: {$a}';
 $string['error:invalidsavedsearchid'] = 'Invalid saved search ID';
 $string['error:invalidsourceforfilter'] = 'Filter cannot be used with report source.';
 $string['error:invaliduserid'] = 'Invalid user ID';
