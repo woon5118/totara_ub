@@ -41,7 +41,7 @@
               :profile-picture="
                 response.participant_instance.participant.profileimageurlsmall
               "
-              size="xsmall"
+              size="xxsmall"
             />
 
             <ElementParticipantResponse>
