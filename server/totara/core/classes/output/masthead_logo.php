@@ -25,6 +25,9 @@
 
 namespace totara_core\output;
 
+use core\theme\file\favicon_image;
+use core\theme\file\logo_image;
+
 defined('MOODLE_INTERNAL') || die();
 
 class masthead_logo implements \renderable, \templatable {
@@ -54,31 +57,48 @@ class masthead_logo implements \renderable, \templatable {
             $defaultpage = $CFG->wwwroot . '/totara/catalog/index.php';
         }
 
+        $logo = new logo_image();
+        $logo->set_tenant_id($USER->tenantid ?? 0);
+        $logo_url = $logo->get_current_url();
+
+        $favicon = new favicon_image();
+        $favicon->set_tenant_id($USER->tenantid ?? 0);
+        $favicon_url = $favicon->get_current_url();
+
         $templatecontext = array(
             'siteurl' => $defaultpage,
             'shortname' => $SITE->shortname,
         );
 
-        if (!empty($PAGE->theme->settings->logo)) {
-            $templatecontext['logourl'] = $PAGE->theme->setting_file_url('logo', 'logo');
-        }
+        if (empty($logo_url)) {
+            if (!empty($PAGE->theme->settings->logo)) {
+                $templatecontext['logourl'] = $PAGE->theme->setting_file_url('logo', 'logo');
+            }
 
-        if (empty($templatecontext['logourl'])) {
-            $templatecontext['logourl'] = $OUTPUT->image_url('logo', 'totara_core');
-        }
+            if (empty($templatecontext['logourl'])) {
+                $templatecontext['logourl'] = $OUTPUT->image_url('logo', 'totara_core');
+            }
 
-        if (!empty($PAGE->theme->settings->alttext)) {
-            $templatecontext['logoalt'] = format_string($PAGE->theme->settings->alttext);
+            if (!empty($PAGE->theme->settings->alttext)) {
+                $templatecontext['logoalt'] = format_string($PAGE->theme->settings->alttext);
+            }
+        } else {
+            $templatecontext['logourl'] = $logo_url->out();
+            $templatecontext['logoalt'] = $logo->get_alt_text();
         }
 
         if (empty($templatecontext['logoalt'])) {
-            $templatecontext['logoalt'] = get_string('totaralogo', 'totara_core');
+            $templatecontext['logoalt'] = $logo->get_alt_text();
         }
 
-        if (!empty($PAGE->theme->settings->favicon)) {
-            $templatecontext['faviconurl'] = $PAGE->theme->setting_file_url('favicon', 'favicon');
+        if (empty($favicon_url)) {
+            if (!empty($PAGE->theme->settings->favicon)) {
+                $templatecontext['faviconurl'] = $PAGE->theme->setting_file_url('favicon', 'favicon');
+            } else {
+                $templatecontext['faviconurl'] = $OUTPUT->favicon();
+            }
         } else {
-            $templatecontext['faviconurl'] = $OUTPUT->favicon();
+            $templatecontext['faviconurl'] = $favicon_url->out();
         }
 
         return $templatecontext;

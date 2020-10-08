@@ -239,6 +239,8 @@ class core_theme_settings_testcase extends advanced_testcase {
      * Test that site logo behaves as it should.
      */
     public function test_logo() {
+        global $OUTPUT;
+
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
         $this->setUser($user_one);
@@ -314,12 +316,23 @@ class core_theme_settings_testcase extends advanced_testcase {
         $alt_text = $logo_image->get_alt_text();
         $this->assertEquals('Totara Logo Updated', $alt_text);
         $this->assertEquals(true, $logo_image->is_available());
+
+        // Confirm that new logo and alternative text load through master header.
+        $mastheadlogo = new totara_core\output\masthead_logo();
+        $mastheaddata = $mastheadlogo->export_for_template($OUTPUT);
+        $this->assertEquals('Totara Logo Updated', $mastheaddata['logoalt']);
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/logo/{$logo_image->get_item_id()}/new_site_logo.png",
+            $mastheaddata['logourl']
+        );
     }
 
     /**
      * Test that favicon behaves as expected.
      */
     public function test_favicon() {
+        global $OUTPUT;
+
         $generator = $this->getDataGenerator();
         $user_one = $generator->create_user();
         $this->setUser($user_one);
@@ -368,6 +381,14 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertEquals(
             "https://www.example.com/moodle/pluginfile.php/1/totara_core/favicon/{$favicon_image->get_item_id()}/new_favicon.png",
             $url
+        );
+
+        // Confirm that new favicon loads through master header.
+        $mastheadlogo = new totara_core\output\masthead_logo();
+        $mastheaddata = $mastheadlogo->export_for_template($OUTPUT);
+        $this->assertEquals(
+            "https://www.example.com/moodle/pluginfile.php/1/totara_core/favicon/{$favicon_image->get_item_id()}/new_favicon.png",
+            $mastheaddata['faviconurl']
         );
     }
 
