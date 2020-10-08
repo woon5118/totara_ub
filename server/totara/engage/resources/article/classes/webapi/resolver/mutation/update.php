@@ -23,6 +23,7 @@
 namespace engage_article\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\clean_content_format;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use totara_engage\exception\resource_exception;
@@ -102,6 +103,7 @@ final class update implements mutation_resolver, has_middleware {
             new require_login(),
             new require_advanced_feature('engage_resources'),
             new require_valid_recipients('shares'),
+            new clean_content_format('format', null, [FORMAT_JSON_EDITOR])
         ];
     }
 

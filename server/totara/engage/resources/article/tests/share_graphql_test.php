@@ -29,6 +29,7 @@ use engage_article\totara_engage\resource\article;
 use core\webapi\execution_context;
 use totara_webapi\graphql;
 use totara_engage\share\recipient\helper as recipient_helper;
+use core\json_editor\node\paragraph;
 
 class engage_article_share_graphql_testcase extends advanced_testcase {
 
@@ -105,10 +106,13 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
         // Create share via graphql.
         $ec = execution_context::create('ajax', 'engage_article_create_article');
         $parameters = [
-            'content' => 'Bundles of joy',
+            'content' => json_encode([
+                'type' => 'doc',
+                'content' => [paragraph::create_json_node_from_text('Bundles of joy')]
+            ]),
             'name' => 'This are tickle',
             'access' => 'RESTRICTED',
-            'format' => FORMAT_PLAIN,
+            'format' => FORMAT_JSON_EDITOR,
             'shares' => [
                 [
                     'instanceid' => $users[1]->id,
@@ -161,7 +165,7 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
         $ec = execution_context::create('ajax', 'engage_article_update_article');
         $parameters = [
             'resourceid' => $article->get_id(),
-            'format' => FORMAT_PLAIN,
+            'format' => FORMAT_JSON_EDITOR,
             'shares' => [
                 [
                     'instanceid' => $users[1]->id,

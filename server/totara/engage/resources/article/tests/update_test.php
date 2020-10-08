@@ -141,7 +141,10 @@ class engage_article_update_testcase extends advanced_testcase {
         $article = article::create(
             [
                 'name' => "Hello world",
-                'content' => "Abcde eee",
+                'content' => json_encode([
+                    'type' => 'doc',
+                    'content' => [paragraph::create_json_node_from_text('Abcde eee')]
+                ]),
                 'timeview' => time_view::LESS_THAN_FIVE
             ]
         );
@@ -150,7 +153,7 @@ class engage_article_update_testcase extends advanced_testcase {
             'resourceid' => $article->get_id(),
             'name' => "Bolobala",
             'access' => 'PUBLIC',
-            'format' => FORMAT_PLAIN,
+            'format' => FORMAT_JSON_EDITOR,
             'topics' => $topics
         ];
 
@@ -208,7 +211,11 @@ class engage_article_update_testcase extends advanced_testcase {
         $args = [
             'resourceid' => $article->get_id(),
             'name' => "TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax",
-            'format' => FORMAT_PLAIN
+            'format' => FORMAT_JSON_EDITOR,
+            'content' => json_encode([
+                'type' => 'doc',
+                'content' => [paragraph::create_json_node_from_text('x')]
+            ])
         ];
 
         $ec = execution_context::create('ajax', 'engage_article_update_article');

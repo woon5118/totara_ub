@@ -28,6 +28,8 @@ use totara_engage\share\manager as share_manager;
 use totara_engage\share\share as share_model;
 use totara_engage\access\access;
 use totara_topic\provider\topic_provider;
+use core\json_editor\helper\document_helper;
+use core\json_editor\node\paragraph;
 
 final class engage_article_generator extends component_generator_base {
     /**
@@ -78,6 +80,18 @@ final class engage_article_generator extends component_generator_base {
         if (!isset($parameters['contextid'])) {
             $context = \context_user::instance($userid);
             $parameters['contextid'] = $context->id;
+        }
+
+        if (isset($parameters['format']) && FORMAT_JSON_EDITOR == $parameters['format']) {
+            $content = $parameters['content'];
+
+            // A helper to convert a simple text into a nice json document content.
+            if (!document_helper::looks_like_json($content)) {
+                $parameters['content'] = json_encode([
+                    'type' => 'doc',
+                    'content' => [paragraph::create_json_node_from_text($content)]
+                ]);
+            }
         }
 
         /** @var article $article */

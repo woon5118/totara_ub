@@ -27,6 +27,7 @@ use totara_engage\timeview\time_view;
 use totara_webapi\graphql;
 use engage_article\totara_engage\resource\article;
 use engage_article\event\article_created;
+use core\json_editor\node\paragraph;
 
 class engage_article_create_article_testcase extends advanced_testcase {
     /**
@@ -39,8 +40,11 @@ class engage_article_create_article_testcase extends advanced_testcase {
         $ec = execution_context::create('ajax', 'engage_article_create_article');
         $parameters = [
             'name' => "Hello world",
-            'content' => 'Wassup bolobala',
-            'format' => FORMAT_PLAIN,
+            'content' => json_encode([
+                'type' => 'doc',
+                'content' => [paragraph::create_json_node_from_text('Wassup bolobala')]
+            ]),
+            'format' => FORMAT_JSON_EDITOR,
             'timeview' => time_view::get_code(time_view::LESS_THAN_FIVE)
         ];
 
@@ -53,7 +57,14 @@ class engage_article_create_article_testcase extends advanced_testcase {
         $article = $result->data['article'];
         $this->assertArrayHasKey('resource', $article);
         $this->assertEquals($parameters['name'], $article['resource']['name']);
-        $this->assertEquals($parameters['content'], $article['content']);
+        $this->assertEquals(
+            format_text(
+                $parameters['content'],
+                FORMAT_JSON_EDITOR,
+                ['formatter' => 'totara_tui']
+            ),
+            $article['content']
+        );
     }
 
     /**
@@ -148,8 +159,11 @@ class engage_article_create_article_testcase extends advanced_testcase {
 
         $parameters = [
             'name' => 'TfIKQ8IXoycfkcbGaav6B1XVVibwtIYTlyGIOiJukJ4xVOVd4dlbDBnVioSmM5LwdJ7lEv7MCNax',
-            'content' => 'Wassup bolobala',
-            'format' => FORMAT_PLAIN,
+            'content' => json_encode([
+                'type' => 'doc',
+                'content' => [paragraph::create_json_node_from_text('Wassup bolobala')]
+            ]),
+            'format' => FORMAT_JSON_EDITOR,
             'timeview' => time_view::get_code(time_view::LESS_THAN_FIVE)
         ];
 

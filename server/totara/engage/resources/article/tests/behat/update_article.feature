@@ -14,11 +14,11 @@ Feature: Update article
       | user2    | User      | Two      | user2@example.com |
 
     And the following "articles" exist in "engage_article" plugin:
-      | name           | username | content       | format        | access     | topics  |
-      | Test Article 1 | user1    | Test Article  | FORMAT_PLAIN  | PUBLIC     | Topic 1 |
-      | Test Article 2 | user1    | Test Article2 | FORMAT_PLAIN  | PUBLIC     | Topic 1 |
-      | Test Article 3 | user1    | Test Article3 | FORMAT_PLAIN  | PRIVATE    | Topic 1 |
-      | Test Article 4 | user2    | Test Article3 | FORMAT_PLAIN  | RESTRICTED | Topic 1 |
+      | name           | username | content       | format              | access     | topics  |
+      | Test Article 1 | user1    | Test Article  | FORMAT_JSON_EDITOR  | PUBLIC     | Topic 1 |
+      | Test Article 2 | user1    | Test Article2 | FORMAT_JSON_EDITOR  | PUBLIC     | Topic 1 |
+      | Test Article 3 | user1    | Test Article3 | FORMAT_JSON_EDITOR  | PRIVATE    | Topic 1 |
+      | Test Article 4 | user2    | Test Article3 | FORMAT_JSON_EDITOR  | RESTRICTED | Topic 1 |
 
     And "engage_article" "Test Article 1" is shared with the following users:
       | sharer | recipient |
@@ -50,14 +50,16 @@ Feature: Update article
     And I view article "Test Article 1"
     And I click on "//h3[contains(text(),'Test Article 1')]/parent::*[button[contains(@title, 'Edit')]]" "xpath_element"
     And I should not see "Done"
-    And I click on "//div[contains(text(),'Test Article')]/parent::*[button[contains(@title, 'Edit')]]" "xpath_element"
+    # This is to click on the tui inline editing that content text "Test Article"
+    And I click on "div.tui-inlineEditing p" "css_element"
     And I should not see "Done"
     And I view article "Test Article 2"
     And I should see "Test Article 2"
     And I click on "//h3[contains(text(),'Test Article 2')]/parent::*[button[contains(@title, 'Edit')]]" "xpath_element"
     And I should not see "Done"
     And I should see "Test Article"
-    And I click on "//div[contains(text(),'Test Article')]/parent::*[button[contains(@title, 'Edit')]]" "xpath_element"
+    # This is to click on the tui inline editing that content text "Test Article"
+    And I click on "div.tui-inlineEditing p" "css_element"
     And I should not see "Done"
 
   @javascript
