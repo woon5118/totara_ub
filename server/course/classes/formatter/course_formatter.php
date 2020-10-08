@@ -44,7 +44,7 @@ class course_formatter extends formatter {
 
                 return $formatter
                     ->set_text_format($this->object->summaryformat)
-                    ->set_pluginfile_url_options($this->context, $component, $filearea, $itemid)
+                    ->set_pluginfile_url_options($this->context, $component, $filearea)
                     ->format($value);
             },
             'summaryformat' => null,
