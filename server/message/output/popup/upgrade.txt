@@ -1,6 +1,10 @@
 This files describes API changes in /message/output/popup message output provider.
 Information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* Add new default settings for 'popup' message output provider
+
 === 13.0 ===
 
 * Removed tabindex="0" from non-interactive elements of message_popover

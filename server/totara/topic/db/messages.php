@@ -26,8 +26,10 @@ $messageproviders = [
     // When a topic delete, notify the resource owner.
     'deletetopic' => [
         'defaults' => [
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDOFF
+            'popup' => MESSAGE_PERMITTED,
+            'email' => MESSAGE_PERMITTED,
+            'msteams' => MESSAGE_PERMITTED,
+            'totara_airnotifier' => MESSAGE_PERMITTED
         ]
     ]
 ];

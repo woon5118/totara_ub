@@ -26,30 +26,31 @@ defined('MOODLE_INTERNAL') || die();
 $messageproviders = [
     'share_notification' => [
         'defaults' => [
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF
         ]
     ],
     'comment_notification' => [
         'defaults' => [
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF
         ]
     ],
     'like_notification' => [
         'defaults' => [
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
+            'popup' => MESSAGE_PERMITTED,
             'email' => MESSAGE_PERMITTED,
-            'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN
+            'msteams' => MESSAGE_PERMITTED,
+            'totara_airnotifier' => MESSAGE_PERMITTED
         ]
     ],
     'reply_notification' => [
         'defaults' => [
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'email' => MESSAGE_PERMITTED,
-            'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF
         ]
     ],
 ];

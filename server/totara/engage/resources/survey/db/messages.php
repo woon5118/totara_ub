@@ -26,9 +26,10 @@ defined('MOODLE_INTERNAL') || die();
 $messageproviders = [
     'voting_survey_notification' => [
         'defaults' => [
-            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN,
-            'msteams' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN
+            'popup' => MESSAGE_PERMITTED,
+            'email' => MESSAGE_PERMITTED,
+            'msteams' => MESSAGE_PERMITTED,
+            'totara_airnotifier' => MESSAGE_PERMITTED
         ]
     ],
 ];

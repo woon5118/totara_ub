@@ -142,4 +142,14 @@ class message_output_popup extends message_output {
 
         return !empty($CFG->messaging);
     }
+
+    /**
+     * Returns the default message output settings for this output
+     *
+     * @return int The default settings
+     */
+    public function get_default_messaging_settings() {
+        return MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF;
+    }
+
 }

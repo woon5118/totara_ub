@@ -816,6 +816,7 @@ function tm_set_preference_defaults() {
     set_config('popup_provider_totara_message_task_permitted', 'disallowed', 'message');
     set_config('email_provider_totara_message_task_permitted', 'permitted', 'message');
     set_config('jabber_provider_totara_message_task_permitted', 'disallowed', 'message');
+    set_config('totara_airnotifier_provider_totara_message_task_permitted', 'disallowed', 'message');
     set_config('totara_task_provider_totara_message_alert_permitted', 'disallowed', 'message');
     set_config('popup_provider_totara_message_alert_permitted', 'permitted', 'message');
     set_config('email_provider_totara_message_alert_permitted', 'permitted', 'message');
