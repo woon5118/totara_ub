@@ -18,7 +18,7 @@ Feature: Contribute new resource and share with workspace
 
     And the following "workspaces" exist in "container_workspace" plugin:
       | name             | summary   | owner |
-      | Test Workspace 1 | Worskpace | user1 |
+      | Test Workspace 1 | Workspace | user1 |
 
   Scenario: Test creating new resource and automatically sharing with workspace
     Given I log in as "user1"
@@ -86,3 +86,32 @@ Feature: Contribute new resource and share with workspace
     And I click on "Test Workspace 1" "link" in the ".tui-workspaceMenu" "css_element"
     And I click on "Library" "link" in the ".tui-tabs__tabs" "css_element"
     Then I should see "Playlist1" in the ".tui-playlistCard__title" "css_element"
+
+  Scenario: Test workspace can be added again after being removed from resource share recipients
+    Given I log in as "user1"
+    And I click on "Your Workspaces" in the totara menu
+    And I click on "Test Workspace 1" "link" in the ".tui-workspaceMenu" "css_element"
+    And I click on "Library" "link" in the ".tui-tabs__tabs" "css_element"
+    And I click on "Contribute" "button"
+
+    # Create new resource.
+    When I follow "Resource"
+    And I set the field "Enter resource title" to "Test Article 1"
+    And I activate the weka editor with css ".tui-engageArticleForm__description"
+    And I set the weka editor to "New article"
+    And I wait for the next second
+    And I click on "Next" "button"
+    And I wait for the next second
+    Then I should see "Test Workspace 1" in the ".tui-engageSharedRecipientsSelector" "css_element"
+
+    # Remove the workspace from the share dialog
+    When I click on "Remove Test Workspace 1" "button" in the ".tui-engageSharedRecipientsSelector" "css_element"
+    Then I should not see "Test Workspace 1" in the ".tui-engageSharedRecipientsSelector" "css_element"
+
+    # Try adding the workspace back in again
+    When I click on "Expand Tag list" "button" in the ".tui-engageSharedRecipientsSelector" "css_element"
+    Then I should see "Test Workspace 1" in the ".tui-engageSharedRecipientsSelector__recipient-summary li" "css_element"
+
+    # We click on "Test Workspace 1 Workspace" as that's what the custom element transforms into
+    When I click on "Test Workspace 1 Workspace" option in the dropdown menu
+    Then I should see "Test Workspace 1" in the ".tui-engageSharedRecipientsSelector" "css_element"
