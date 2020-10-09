@@ -97,6 +97,16 @@ class element_data_generator {
     private function multi_choice_options(int $count = 3): string {
         $data = [
             'options' => [],
+            'settings' => [
+                [
+                    'name' => 'min',
+                    'value' => 2,
+                ],
+                [
+                    'name' => 'max',
+                    'value' => 7,
+                ],
+            ]
         ];
 
         for ($i = 0; $i < $count; $i++) {
