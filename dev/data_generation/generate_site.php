@@ -56,18 +56,18 @@ This script is designed to generate a vast amount of testing data to test perfor
 The script meant to be executed on a clean (freshly installed) site.
 
 Usage:
-    php dev/data_generation/generate_site.php --t=\"full_performance_testing\" --s=\"l\" -t=1
+    php dev/data_generation/generate_site.php -s=\"S\" -t=0
     
 Options:
     -h, --help          Print out this help
     -s, --size          XS - A tiny amount of data
-                        S - A little data
+                        S - A little data (default)
                         M - A little more data
                         L - Large amount of data
                         XL - Extra large amount of data
                         XXL - Extra-extra large amount of data
                         GOLIATH - Unnecessary large amount of data
-    -t, --transaction   Specify if you want to run data generator in transaction.
+    -t, --transaction   Specify 1 if you want to run data generator in transaction. (default = 0)
     ";
 
     return 0;
