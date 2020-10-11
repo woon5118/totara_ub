@@ -33,6 +33,12 @@ class engage_survey_webapi_update_survey_testcase extends advanced_testcase {
      * @return void
      */
     public function test_survey_answer_validation(): void {
+        $this->setAdminUser();
+        /** @var totara_topic_generator $topicgen */
+        $topicgen = $this->getDataGenerator()->get_plugin_generator('totara_topic');
+        $topics[] = $topicgen->create_topic('topic1')->get_id();
+        $topics[] = $topicgen->create_topic('topic2')->get_id();
+
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
@@ -74,6 +80,7 @@ class engage_survey_webapi_update_survey_testcase extends advanced_testcase {
                 ]
             ],
             'access' => 'PUBLIC',
+            'topics' => $topics
         ];
 
         $this->expectException('coding_exception');
@@ -88,6 +95,12 @@ class engage_survey_webapi_update_survey_testcase extends advanced_testcase {
      * @return void
      */
     public function test_survey_question_validation_via_graphql(): void {
+        $this->setAdminUser();
+        /** @var totara_topic_generator $topicgen */
+        $topicgen = $this->getDataGenerator()->get_plugin_generator('totara_topic');
+        $topics[] = $topicgen->create_topic('topic1')->get_id();
+        $topics[] = $topicgen->create_topic('topic2')->get_id();
+
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
@@ -124,6 +137,7 @@ class engage_survey_webapi_update_survey_testcase extends advanced_testcase {
                 ]
             ],
             'access' => 'PUBLIC',
+            'topics' => $topics
         ];
 
         $this->assertEquals(

@@ -25,6 +25,7 @@ namespace engage_article\webapi\resolver\mutation;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
+use totara_engage\exception\resource_exception;
 use totara_engage\webapi\middleware\require_valid_recipients;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
@@ -53,6 +54,14 @@ final class update implements mutation_resolver, has_middleware {
         if (isset($args['access']) && !is_numeric($args['access']) && is_string($args['access'])) {
             // Format the string access into a proper value that machine can understand.
             $access = access::get_value($args['access']);
+
+            if (access::is_restricted($access) && empty($args['shares'])) {
+                throw resource_exception::create('update', article::get_resource_type());
+            }
+            if (access::is_public($access) && empty($args['topics'])) {
+                throw resource_exception::create('update', article::get_resource_type());
+            }
+
             $args['access'] = $access;
         }
 

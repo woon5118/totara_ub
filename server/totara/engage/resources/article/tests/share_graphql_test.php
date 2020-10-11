@@ -133,6 +133,12 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
      *   1. We can share an article during update.
      */
     public function test_article_update() {
+        $this->setAdminUser();
+        /** @var totara_topic_generator $topicgen */
+        $topicgen = $this->getDataGenerator()->get_plugin_generator('totara_topic');
+        $topics[] = $topicgen->create_topic('topic1')->get_id();
+        $topics[] = $topicgen->create_topic('topic2')->get_id();
+
         $gen = $this->getDataGenerator();
         /** @var totara_playlist_generator $playlistgen */
         $articlegen = $gen->get_plugin_generator('engage_article');
@@ -163,7 +169,8 @@ class engage_article_share_graphql_testcase extends advanced_testcase {
                     'area' => user_recipient::AREA
                 ]
             ],
-            'access' => 'PUBLIC'
+            'access' => 'PUBLIC',
+            'topics' => $topics
         ];
 
         $result = graphql::execute_operation($ec, $parameters);

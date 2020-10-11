@@ -29,6 +29,7 @@ use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use engage_survey\totara_engage\resource\survey;
 use totara_engage\access\access;
+use totara_engage\exception\resource_exception;
 use totara_engage\share\manager as share_manager;
 use totara_engage\share\recipient\manager as recipient_manager;
 use totara_engage\webapi\middleware\require_valid_recipients;
@@ -53,7 +54,14 @@ final class update implements mutation_resolver, has_middleware {
         $survey = survey::from_resource_id($id);
 
         if (isset($args['access'])) {
-            $data['access'] = access::get_value($args['access']);
+            $value = access::get_value($args['access']);
+            if (access::is_restricted($value) && empty($args['shares'])) {
+                throw resource_exception::create('update', survey::get_resource_type());
+            }
+            if (access::is_public($value) && empty($args['topics'])) {
+                throw resource_exception::create('update', survey::get_resource_type());
+            }
+            $data['access'] = $value;
         } else {
             $data['access'] = $survey->get_access();
         }
