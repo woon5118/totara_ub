@@ -66,9 +66,6 @@ final class resolver extends \totara_tui\local\mediation\resolver {
     public function __construct(string $mediator, string $rev, string $suffix, string $component) {
         $this->suffix = $suffix;
         $this->component = $component;
-        if (substr($this->component, 0, 6) === 'theme_') {
-            $this->theme_config = theme_config::load(substr($this->component, 6));
-        }
         parent::__construct($mediator, $rev);
     }
 
@@ -107,11 +104,22 @@ final class resolver extends \totara_tui\local\mediation\resolver {
     }
 
     /**
+     * Get theme_config instance for the currently requested bundle, if it is a theme bundle.
+     * @return theme_config
+     */
+    private function get_theme_config() {
+        if ($this->theme_config === null && substr($this->component, 0, 6) === 'theme_') {
+            $this->theme_config = theme_config::load(substr($this->component, 6));
+        }
+        return $this->theme_config;
+    }
+
+    /**
      * @inheritDoc
      * @return string
      */
     protected function get_sha_for_etag_comparison(): string {
-        if ($this->theme_config) {
+        if ($this->get_theme_config()) {
             return $this->get_theme_sha_for_etag_comparison();
         }
         $file = $this->get_file();
@@ -126,7 +134,7 @@ final class resolver extends \totara_tui\local\mediation\resolver {
      * @return string
      */
     private function get_theme_sha_for_etag_comparison() {
-        $chain = $this->theme_config->get_tui_theme_chain();
+        $chain = $this->get_theme_config()->get_tui_theme_chain();
         $shas = [];
         foreach ($chain as $component) {
             $file = bundle::get_bundle_js_file($component);
@@ -145,7 +153,7 @@ final class resolver extends \totara_tui\local\mediation\resolver {
      * @return string|file
      */
     protected function get_content_to_cache() {
-        if ($this->theme_config) {
+        if ($this->get_theme_config()) {
             return $this->get_theme_content_to_cache();
         }
         $file = $this->get_file();
@@ -161,7 +169,7 @@ final class resolver extends \totara_tui\local\mediation\resolver {
      * @return string
      */
     private function get_theme_content_to_cache() {
-        $chain = $this->theme_config->get_tui_theme_chain();
+        $chain = $this->get_theme_config()->get_tui_theme_chain();
         $content = '';
         foreach ($chain as $themename) {
             $file = bundle::get_bundle_js_file('theme_'.$themename);
