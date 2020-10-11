@@ -82,8 +82,11 @@ class message_output_email extends message_output {
         $footerplain = "";
         $footerhtml = "";
         if (core_user::is_real_user($eventdata->userto->id)) {
-            $footerplain = $strmgr->get_string('alertfooter2', 'totara_message', $CFG->wwwroot . '/message/edit.php', $eventdata->userto->lang);
-            $footerhtml = str_repeat(html_writer::empty_tag('br'), 2) . html_writer::empty_tag('hr') . $strmgr->get_string('alertfooter2html', 'totara_message', $CFG->wwwroot . '/message/edit.php', $eventdata->userto->lang);
+            if (has_capability('moodle/user:editownmessageprofile', \context_user::instance($eventdata->userto->id), $eventdata->userto->id)) {
+                $preferencesurl = new moodle_url('/message/notificationpreferences.php', ['userid' => $eventdata->userto->id]);
+                $footerplain = $strmgr->get_string('alertfooter2', 'totara_message', $preferencesurl->out(false), $eventdata->userto->lang);
+                $footerhtml = str_repeat(html_writer::empty_tag('br'), 2) . html_writer::empty_tag('hr') . $strmgr->get_string('alertfooter2html', 'totara_message', $preferencesurl->out(true), $eventdata->userto->lang);
+            }
         }
 
         // Check if we have attachments to send.

@@ -776,6 +776,10 @@ class totara_appraisal_message_testcase extends appraisal_testcase {
 
         $this->assertStringContainsString('Test alert body text', $body_0);
 
+        // Remove everything after notification preferences link before comparison.
+        $body_0 = preg_replace('/notificationpreferences\.php.*/s', '', $body_0);
+        $body_1 = preg_replace('/notificationpreferences\.php.*/s', '', $body_1);
+
         // A bug (TL-20258) used to append a contexturl string for each appraisal closure message.
         // Make sure the bug is not re-introduced by checking both bodies are the same and don't contain this text.
         $this->assertSame($body_0, $body_1);
