@@ -36,7 +36,6 @@ use core\entities\user;
 use core\orm\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
-use core_text;
 use mod_perform\data_providers\activity\activity_settings;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\manual_relationship_selection;
@@ -47,6 +46,7 @@ use mod_perform\models\activity\details\notification_real;
 use mod_perform\models\activity\helpers\activity_clone;
 use mod_perform\models\activity\helpers\activity_deletion;
 use mod_perform\models\activity\helpers\activity_multisection_toggler;
+use mod_perform\models\activity\helpers\general_info_validator;
 use mod_perform\models\activity\settings\visibility_conditions\visibility_manager;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\activity_state as activity_status;
@@ -360,21 +360,19 @@ class activity extends model {
      * @return $this
      */
     public function set_general_info(string $name, ?string $description, ?int $type_id): self {
+        $validator = new general_info_validator($this, $name, $description, $type_id);
+        $errors = implode(', ', $validator->validate()->all());
+        if ($errors) {
+            throw new coding_exception("The following errors need to be fixed: '$errors'");
+        }
+
         $entity = $this->entity;
         $entity->name = $name;
         $entity->description = $description;
 
-        if (isset($type_id)) {
-            if (is_null(activity_type::load_by_id($type_id))) {
-                throw new coding_exception("Invalid activity type");
-            }
-            if (!$this->is_draft()) {
-                throw new coding_exception("Cannot change type of activity {$this->id} since it is no longer a draft");
-            }
+        if ($type_id) {
             $entity->type_id = $type_id;
         }
-
-        self::validate($entity);
 
         return $this;
     }
@@ -421,51 +419,6 @@ class activity extends model {
             $container = $this->get_container();
             $container->update((object) array_merge($to_update, ['id' => $container->id]));
         }
-    }
-
-    /**
-     * @param activity_entity $entity
-     * @return void
-     * @throws coding_exception
-     */
-    protected static function validate(activity_entity $entity): void {
-        $problems = self::get_validation_problems($entity);
-
-        if (count($problems) === 0) {
-            return;
-        }
-
-        $formatted_problems = self::format_validation_problems($problems);
-
-        throw new coding_exception('The following errors need to be fixed: ' . $formatted_problems);
-    }
-
-    /**
-     * TODO use/write a library or make this generic, or at least move this to it's own class.
-     *
-     * @param activity_entity $entity
-     * @return string[]
-     */
-    protected static function get_validation_problems(activity_entity $entity): array {
-        $problems = [];
-
-        if (empty($entity->name) || ctype_space($entity->name)) {
-            $problems[] = 'Name is required';
-        }
-
-        if (core_text::strlen($entity->name) > self::NAME_MAX_LENGTH) {
-            $problems[] = 'Name cannot be more than ' . self::NAME_MAX_LENGTH . ' characters';
-        }
-
-        return $problems;
-    }
-
-    /**
-     * @param string[] $problems
-     * @return string
-     */
-    protected static function format_validation_problems(array $problems): string {
-        return '"' . implode('", "', $problems) . '"';
     }
 
     /**

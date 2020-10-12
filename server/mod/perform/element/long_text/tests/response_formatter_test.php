@@ -56,7 +56,6 @@ class performelement_long_text_response_formatter_testcase extends advanced_test
         $expected = json_encode(['answer_text' => "THIS IS A TEST HEADING\n\nWith some CAPITAL text<&'"]);
         $this->assertEquals($expected, $formatter->format($incoming), 'wrong formatting');
 
-        // TODO this needs to change when the element is updated to use an editor.
         // To convert from MOODLE to HTML, the "text_to_html" div is added around the text.
         // The script and script content is removed. The symbols come out html-encoded.
         $formatter = new $formatter_class(null, $context);

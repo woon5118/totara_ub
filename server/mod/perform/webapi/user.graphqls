@@ -1,8 +1,5 @@
 """
 Data about a specific group assigned to an activity track
-
-TODO: this should be combined with totara_competency/user_groups and put into
-totara core somewhere.
 """
 type mod_perform_user_grouping {
   id: core_id!

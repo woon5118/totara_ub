@@ -355,7 +355,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->assertEquals($activity->type->name, $activity_type);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('The following errors need to be fixed: "Name is required"');
+        $this->expectExceptionMessage("The following errors need to be fixed: 'Name is required'");
         /** @var activity $activity */
         $activity->set_general_info('   ', null, null)->update();
     }
@@ -379,5 +379,48 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->assertEquals($updated_name, $container->fullname);
         $this->assertNotEquals($original_name, $activity->name);
         $this->assertNotEquals($original_name, $container->fullname);
+    }
+
+    public function test_update_general_info_cannot_change_in_active_state(): void {
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_activity_status(draft::get_code())
+            ->set_number_of_activities(1)
+            ->set_number_of_sections_per_activity(1)
+            ->set_number_of_elements_per_section(1)
+            ->set_number_of_users_per_user_group_type(1)
+            ->disable_user_assignments()
+            ->disable_subject_instances();
+
+        $activity = $this->perform_generator
+            ->create_full_activities($configuration)
+            ->first();
+
+        $original_type = activity_type::load_by_id($activity->type->id);
+
+        $new_type = null;
+        switch ($original_type->name) {
+            case 'appraisal':
+                $new_type = activity_type::load_by_name('feedback');
+                break;
+
+            case 'feedback':
+                $new_type = activity_type::load_by_name('check-in');
+                break;
+
+            default:
+                $new_type = activity_type::load_by_name('appraisal');
+        }
+
+        // As long as the activity is in the draft state, it is possible to change
+        // things.
+        $activity->set_general_info($activity->name, null, $new_type->id)->update();
+        $this->assertEquals($new_type->id, $activity->type->id);
+
+        // But not after it is activated.
+        $this->assertTrue($activity->activate()->is_active());
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Cannot change type of activity {$activity->id} since it is no longer a draft");
+        $activity->set_general_info($activity->name, null, $original_type->id)->update();
     }
 }

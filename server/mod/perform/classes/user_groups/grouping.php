@@ -34,9 +34,6 @@ use mod_perform\models\activity\track_assignment;
 
 /**
  * Convenience class to handle user grouping operations.
- *
- * TODO: this should be combined with totara_competency/user_groups and put into
- * totara core somewhere.
  */
 final class grouping {
     // Convenience enums.

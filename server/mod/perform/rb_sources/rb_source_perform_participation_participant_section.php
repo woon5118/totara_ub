@@ -66,7 +66,7 @@ class rb_source_perform_participation_participant_section extends rb_base_source
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_participation_participant_section');
         $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_participation_participant_section');
 
-        $this->base = '(SELECT bps.* 
+        $this->base = '(SELECT bps.*
             FROM {perform_participant_section} bps
             JOIN {perform_participant_instance} bpi ON bps.participant_instance_id = bpi.id
             LEFT JOIN {user} bu ON bpi.participant_id = bu.id
@@ -303,7 +303,6 @@ class rb_source_perform_participation_participant_section extends rb_base_source
      * @param totara_reportbuilder_column_testcase $testcase
      */
     public function phpunit_column_test_add_data(totara_reportbuilder_column_testcase $testcase) {
-        // TODO
         global $CFG;
 
         if (!PHPUNIT_TEST) {
@@ -314,7 +313,7 @@ class rb_source_perform_participation_participant_section extends rb_base_source
         require_once($CFG->dirroot.'/lib/testing/generator/data_generator.php');
         require_once($CFG->dirroot.'/mod/perform/tests/generator/mod_perform_generator.class.php');
 
-        $si = (new \mod_perform_generator(new testing_data_generator()))->create_subject_instance([
+        (new \mod_perform_generator(new testing_data_generator()))->create_subject_instance([
             'activity_name' => 'Weekly catchup',
             'subject_is_participating' => true,
             'subject_user_id' => user::repository()->get()->last()->id,

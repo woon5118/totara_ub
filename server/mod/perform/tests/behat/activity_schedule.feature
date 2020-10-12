@@ -473,9 +473,7 @@ Feature: Define track schedules to perform activities
     And I click on "Assignments" "link"
     # The radio group for repeatingType is special, it does not have a proper label
     # to identify it with.
-    # TODO: Add new custom behat step for this
     Then the following fields match these values:
-    #  | repeatingType                                 | AFTER_COMPLETION |
       | repeatingValues[repeatingOffset][completeOffset][value] | 2     |
       | repeatingValues[repeatingOffset][completeOffset][range] | weeks |
 
@@ -491,9 +489,7 @@ Feature: Define track schedules to perform activities
     And I click on "Assignments" "link"
     # The radio group for repeatingType is special, it does not have a proper label
     # to identify it with.
-    # TODO: Add new custom behat step for this
     Then the following fields match these values:
-     # | repeatingValues[repeatingIsLimited]    | true |
       | repeatingValues[repeatingLimit][value] | 4    |
 
     # Limited / Open-ended display text
@@ -603,4 +599,3 @@ Feature: Define track schedules to perform activities
     And I click on "Assignments" "link"
     Then the following fields match these values:
       | scheduleDynamic[dynamic_source]                  | Job assignment start date |
-

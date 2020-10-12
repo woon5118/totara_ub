@@ -25,7 +25,6 @@
 use core\format;
 use core\webapi\execution_context;
 use mod_perform\user_groups\grouping;
-use mod_perform\webapi\resolver\type\user_grouping;
 use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -34,9 +33,6 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
  * @coversDefaultClass \mod_perform\webapi\resolver\type\user_grouping
  *
  * @group perform
- *
- * TODO: this should be combined with totara_competency/user_groups and put into
- * totara core somewhere.
  */
 class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
 

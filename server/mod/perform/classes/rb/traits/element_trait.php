@@ -142,7 +142,6 @@ trait element_trait {
                 'joins' => [$join, $identifier_table_alias],
                 'dbdatatype' => 'text',
                 'outputformat' => 'text',
-                // TODO is this right? Not a multi-lang string but could contain chars to escape.
                 'displayfunc' => 'format_string'
             ]
         );

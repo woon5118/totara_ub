@@ -35,10 +35,6 @@ use moodle_exception;
  *
  * This requires the activity already being loaded and present in the payload.
  * The @see require_activity middleware does this so this has a dependency on it.
- *
- * TODO: We might want to rework this later and find a better way to reduce dependencies
- *
- * for authentication.
  */
 class require_manage_capability implements middleware {
 

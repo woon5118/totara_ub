@@ -39,6 +39,7 @@ use mod_perform\event\track_user_assigned_bulk;
 use mod_perform\event\track_user_unassigned;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
+use mod_perform\models\activity\track_assignment as track_assignment_model;
 use mod_perform\task\expand_task\assignment_parameters;
 use mod_perform\task\expand_task\assignment_parameters_collection;
 use mod_perform\task\service\track_schedule_sync;
@@ -178,14 +179,14 @@ class expand_task {
         // already exists.
         $existing_user_assignments = $this->load_current_entries($assignment);
 
-        $context = activity::load_by_entity($assignment->track->activity)->get_context();
-        $track = track::load_by_entity($assignment->track);
+        $assignment_model = track_assignment_model::load_by_entity($assignment);
+        $track = $assignment_model->track;
 
         // Get all users currently in the group
         $expanded_user_ids = $this->get_expanded_users(
             $assignment->user_group_type,
             $assignment->user_group_id,
-            $context
+            $track->activity->get_context()
         );
 
         // Get a collection of parameters which match the users currently in the group
@@ -238,10 +239,9 @@ class expand_task {
 
             // Trigger an event with all just newly created user assignments
             if (!empty($user_ids_assigned)) {
-                track_user_assigned_bulk::create_from_user_assignments(
-                    $assignment->track_id,
-                    $user_ids_assigned,
-                    $assignment->type
+                track_user_assigned_bulk::create_from_track_assignment(
+                    $assignment_model,
+                    $user_ids_assigned
                 )->trigger();
             }
         }
@@ -487,8 +487,8 @@ class expand_task {
             $sql = "
                 INSERT INTO {perform_track_user_assignment_via}
                     (track_assignment_id, track_user_assignment_id, created_at)
-                SELECT {$assignment->id}, id, {$this->time_for_run} 
-                FROM {perform_track_user_assignment} 
+                SELECT {$assignment->id}, id, {$this->time_for_run}
+                FROM {perform_track_user_assignment}
                 WHERE track_id = {$assignment->track_id}
                     AND subject_user_id {$user_ids_sql}
                     AND deleted = 0

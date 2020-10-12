@@ -5,3 +5,7 @@ information provided here is intended especially for developers.
 
 * activity_setting::create() function no longer checks if the current user has permission to manage the activity. The
   check should be performed before calling this function, where applicable.
+
+* Deprecated the following methods:
+    * track_user_assigned_bulk::create_from_user_assignments(); use
+      track_user_assigned_bulk::create_from_track_assignment instead.

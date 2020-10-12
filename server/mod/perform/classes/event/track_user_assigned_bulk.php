@@ -23,6 +23,8 @@
 
 namespace mod_perform\event;
 
+use mod_perform\models\activity\track_assignment;
+
 defined('MOODLE_INTERNAL') || die();
 
 class track_user_assigned_bulk extends track_user_assignment {
@@ -48,18 +50,51 @@ class track_user_assigned_bulk extends track_user_assignment {
         $this->data['objecttable'] = 'perform_track_user_assignment';
     }
 
+    /**
+     * Create an instance of this event.
+     *
+     * @param track_assignment $track_assignment track the users are assigned to.
+     * @param array $subject_user_ids users assigned to the track.
+     *
+     * @return track_user_assigned_bulk the event.
+     */
+    public static function create_from_track_assignment(
+        track_assignment $track_assignment,
+        array $subject_user_ids = []
+    ) {
+        $data = [
+            'objectid' => $track_assignment->track_id,
+            'other' => [
+                'user_ids' => $subject_user_ids,
+                'type' => $track_assignment->type,
+            ],
+            'context' => $track_assignment->track->activity->get_context()
+        ];
+
+        return static::create($data);
+    }
+
+    /**
+     * Use create_from_track_assignment() instead.
+     *
+     * @deprecated since Totara 13.1.
+     */
     public static function create_from_user_assignments(
         int $track_id,
         array $subject_user_ids = [],
         ?string $assignment_type = null
     ) {
+        debugging(
+            'track_user_assigned_bulk::create_from_user_assignments has been deprecated. Use create_from_track_assignment() instead',
+            DEBUG_DEVELOPER
+        );
+
         $data = [
             'objectid' => $track_id,
             'other' => [
                 'user_ids' => $subject_user_ids,
                 'type' => $assignment_type ?? null,
             ],
-            // TODO Should this be an activity context?
             'context' => \context_system::instance()
         ];
         return static::create($data);
@@ -71,7 +106,7 @@ class track_user_assigned_bulk extends track_user_assignment {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_track_user_assigned', 'mod_perform');
+        return get_string('event_track_users_assigned', 'mod_perform');
     }
 
     /**
@@ -80,7 +115,7 @@ class track_user_assigned_bulk extends track_user_assignment {
      * @return string
      */
     public function get_description() {
-        return 'User has been assigned to a track';
+        return 'Users have been assigned to a track';
     }
 
 }

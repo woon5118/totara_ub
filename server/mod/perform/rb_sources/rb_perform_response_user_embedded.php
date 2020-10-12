@@ -96,7 +96,6 @@ class rb_perform_response_user_embedded extends rb_base_embedded {
                 'type' => 'user',
                 'value' => 'fullname',
             ],
-            // TODO add position and org
             [
                 'type' => 'user',
                 'value' => 'user_performance_emailunobscured',

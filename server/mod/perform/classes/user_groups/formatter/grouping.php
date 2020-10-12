@@ -30,9 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Maps the grouping class into the GraphQL mod_perform_user_grouping type.
- *
- * TODO: this should be combined with totara_competency/user_groups and put into
- * totara core somewhere.
  */
 class grouping extends formatter {
     /**

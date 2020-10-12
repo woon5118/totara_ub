@@ -45,8 +45,6 @@ class response_formatter extends base {
         if ($answer) {
             $format = $this->format ?? format::FORMAT_HTML;
             $formatter = new text_field_formatter($format, $this->context);
-
-            // TODO: this part needs to change when this element uses an editor.
             $formatter->disabled_pluginfile_url_rewrite();
             $formatter->set_text_format(FORMAT_MOODLE);
 

@@ -42,9 +42,6 @@ use totara_tenant\local\util as tenant_util;
 class util {
 
     /**
-     * TODO this was largely copy/pasted from totara_tenant\local\util::check_roles_exist(). Abstract to single location?
-     * TODO if so, need to pull out enabled check and pass in specific roles to create.
-     *
      * Ensure the required performance activity roles exist in the system:
      * - performanceactivitycreator - intended for users that can create performance activities, assigned to category context.
      * - performanceactivitymanager - intended for users to manage a specific performance activity, assigned to course context typically.

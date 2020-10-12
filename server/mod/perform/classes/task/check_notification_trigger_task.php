@@ -61,7 +61,8 @@ class check_notification_trigger_task extends scheduled_task {
         $activities = activity_entity::repository()->where('status', active::get_code())->get();
         foreach ($activities as $activity_entity) {
             /** @var activity_entity $activity_entity */
-            // TODO: grab all necessities with a single giant query outside of the outer loop.
+            // TODO TO BE RESOLVED IN TL-28103:
+            // grab all necessities with a single giant query outside of the outer loop.
             $records = subject_instance_notification::load_by_activity($activity_entity);
             if (empty($records)) {
                 continue;

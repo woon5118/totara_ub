@@ -31,6 +31,8 @@ use mod_perform\entities\activity\subject_instance_manual_participant;
 use mod_perform\event\subject_instance_manual_participants_selected;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\subject_instance;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
+use mod_perform\models\activity\participant_source;
 use mod_perform\state\subject_instance\active;
 use mod_perform\state\subject_instance\pending;
 use totara_core\relationship\relationship;
@@ -153,7 +155,15 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
         $this->assertCount(1, $appraiser_participant_instances);
         $this->assertEquals($reviewer_relationship->id, $appraiser_participant_instances->first()->core_relationship_id);
 
-        // TODO: Assert external participant instances are properly created in TL-26388
+        // Assert external participant instances are properly created.
+        $actual_externals = $participants
+            ->filter('participant_source', participant_source::EXTERNAL)
+            ->map(function (participant_instance_model $participant_instance): array {
+                $participant = $participant_instance->participant;
+                return ['name' => $participant->fullname, 'email' => $participant->email];
+            })
+            ->all();
+        $this->assertEqualsCanonicalizing($external_users, $actual_externals);
 
         // Make sure participants can only be set once - next attempt gets an exception.
         $this->expectException(coding_exception::class);

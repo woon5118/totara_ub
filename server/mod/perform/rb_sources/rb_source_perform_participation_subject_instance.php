@@ -138,10 +138,10 @@ class rb_source_perform_participation_subject_instance extends rb_base_source {
             ELSE (
                 SELECT COUNT('x')
                 FROM {perform_participant_instance} ppi
-                LEFT JOIN {user} ppc ON ppi.participant_id = ppc.id 
+                LEFT JOIN {user} ppc ON ppi.participant_id = ppc.id
                     AND ppi.participant_source = " . participant_source::INTERNAL . "
                 WHERE ppi.subject_instance_id = base.id AND (
-                    ppi.participant_source = " . participant_source::EXTERNAL . " 
+                    ppi.participant_source = " . participant_source::EXTERNAL . "
                     OR ppc.deleted = 0
                 )
             )
@@ -176,17 +176,7 @@ class rb_source_perform_participation_subject_instance extends rb_base_source {
      * @return array
      */
     protected function define_filteroptions() {
-        $filteroptions = [
-            // TODO: uncomment when its available
-            // new rb_filter_option(
-            //     'track',
-            //     'description',
-            //     get_string('track_description', 'mod_perform'),
-            //     'text'
-            // ),
-        ];
-
-        return $filteroptions;
+        return [];
     }
 
     /**
@@ -263,11 +253,6 @@ class rb_source_perform_participation_subject_instance extends rb_base_source {
                 'type' => 'subject_user',
                 'value' => 'fullname',
             ],
-            // TODO: uncomment when its available
-            // [
-            //     'type' => 'track',
-            //     'value' => 'description',
-            // ],
             [
                 'type' => 'subject_instance',
                 'value' => 'created_at',

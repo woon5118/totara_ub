@@ -37,9 +37,6 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Maps the grouping class into the GraphQL mod_perform_user_grouping_cohort type.
- *
- * TODO: this should be combined with totara_competency/user_groups and put into
- * totara core somewhere.
  */
 class user_grouping implements type_resolver {
     /**

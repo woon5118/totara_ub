@@ -42,8 +42,6 @@ class multi_choice_multi extends respondable_element_plugin {
             $errors->append(new answer_required_error());
         }
 
-        // TODO: TL-25497
-
         return $errors;
     }
 
