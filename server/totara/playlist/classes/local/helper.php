@@ -132,61 +132,39 @@ final class helper {
             throw new \coding_exception("Resource with {$instanceid} is not in the playlist");
         }
 
-        //Order is index of array and start with 0 and we need start with 1, so order need to be incremented
-        $order++;
-        $source_resource = $repo->find_resource_by_sortorder($order, $playlist->get_id());
+        $resources = array_values($playlist->get_resources());
+        $source_resource = $resources[$order];
+        $source_order = (int)$source_resource->sortorder;
+        $target_order = (int)$target_resource->sortorder;
 
-        // If the result is not zero, we need to fetch resources from range to reorder them.
-        if (((int)$target_resource->sortorder - $order) !== 0) {
-
-            if ($order > (int)$target_resource->sortorder) {
-                $resources = $repo->find_resources_from_range(
-                    (int)$target_resource->sortorder,
-                    $order,
-                    $playlist->get_id()
-                );
-
-                /** @var playlist_resource $resource */
-                foreach ($resources as $resource) {
-                    if ((int)$resource->resourceid === (int)$target_resource->resourceid) {
-                        $target_resource->sortorder = $order;
-                        $target_resource->save();
-
-                    } else {
-                        $inner_order = (int)$resource->sortorder;
-                        $resource->sortorder = --$inner_order;
-                        $resource->save();
-                    }
-                }
-
-            } else {
-                $resources = $repo->find_resources_from_range(
-                    $order,
-                    (int)$target_resource->sortorder,
-                    $playlist->get_id()
-                );
-
-                /** @var playlist_resource $resource */
-                foreach ($resources as $resource) {
-                    if ((int)$resource->resourceid === (int)$target_resource->resourceid) {
-                        $target_resource->sortorder = $order;
-                        $target_resource->save();
-
-                    } else {
-                        $inner_order = (int)$resource->sortorder;
-                        $resource->sortorder = ++$inner_order;
-                        $resource->save();
-                    }
-                }
-            }
-
-        } else {
-            $target_sort_order = (int)$target_resource->sortorder;
-            $target_resource->sortorder = (int)$source_resource->sortorder;
-            $source_resource->sortorder = $target_sort_order;
+        // If the sort orders differ by one place, we can just swap them and save time.
+        if (abs($source_order - $target_order) === 1) {
+            $inner_order = $source_order;
+            $source_resource->sortorder = $target_order;
+            $target_resource->sortorder = $inner_order;
 
             $source_resource->save();
             $target_resource->save();
+
+            return;
+        }
+
+        $sort_orders = [$target_order, $source_order];
+        sort($sort_orders);
+
+        $filtered_resources = array_filter($playlist->get_resources(), function ($resource) use ($sort_orders): bool {
+            $sort_order = (int)$resource->sortorder;
+            return $sort_order >= $sort_orders[0] && $sort_order <= $sort_orders[1];
+        });
+
+        foreach ($filtered_resources as $resource) {
+            if ($resource->resourceid == $target_resource->resourceid) {
+                $target_resource->sortorder = $source_order;
+                $target_resource->save();
+            } else {
+                $resource->sortorder += ($target_order <=> $source_order);
+                $resource->save();
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 /**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author Qingyang Liu <qingyang.liu@totaralearning.com>
  * @package totara_playlist
  */
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2020100101;          // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;         // Requires this Totara version.
-$plugin->component = 'totara_playlist';
+global $CFG;
+require_once($CFG->dirroot.'/totara/playlist/db/upgradelib.php');
 
-$plugin->dependencies = [
-    'totara_engage' => 2019101201,
-    'totara_topic' => 2019112700,
-    'totara_comment' => 2019101500,
-    'editor_weka' => 2019111800
-];
+function xmldb_totara_playlist_upgrade($oldversion) {
+
+    if ($oldversion < 2020100101) {
+        totara_playlist_upgrade_fix_card_sort_order();
+
+        // Playlist savepoint reached.
+        upgrade_plugin_savepoint(true, 2020100101, 'totara', 'playlist');
+    }
+
+    return true;
+}

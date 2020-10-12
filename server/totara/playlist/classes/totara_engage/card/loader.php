@@ -134,7 +134,7 @@ class loader extends card_loader {
             }
         }
 
-        $builder->order_by('pr.sortorder', order::DIRECTION_ASC);
+        $builder->order_by('pr.sortorder', order::DIRECTION_DESC);
         $builder->results_as_arrays();
         $builder->map_to(
             function (array $row) {

@@ -25,6 +25,7 @@ namespace totara_playlist\repository;
 use core\orm\entity\entity;
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use core\orm\query\order;
 use totara_engage\access\access;
 use totara_engage\access\access_manager;
 use totara_engage\entity\engage_resource;
@@ -40,6 +41,7 @@ final class playlist_resource_repository extends repository {
         $builder->map_to(playlist_resource::class);
 
         $builder->where('playlistid', $playlistid);
+        $builder->order_by('sortorder', order::DIRECTION_DESC);
         return $builder->fetch();
     }
 
@@ -212,24 +214,6 @@ final class playlist_resource_repository extends repository {
         /** @var playlist_resource|null $entity */
         $entity = $builder->one();
         return $entity;
-    }
-
-    /**
-     * @param int $source_order
-     * @param int $target_order
-     * @param int $playlist_id
-     * @return array|playlist_resource[]
-     */
-    public function find_resources_from_range(int $source_order, int $target_order, int $playlist_id): array {
-        $builder = builder::table(static::get_table());
-        $builder->map_to(playlist_resource::class);
-        $builder->where('playlistid', $playlist_id);
-        $builder->where('sortorder', '>=', $source_order);
-        $builder->where('sortorder', '<=', $target_order);
-
-        /** @var playlist_resource[] $entities */
-        $entities = $builder->fetch();
-        return $entities;
     }
 
     /**

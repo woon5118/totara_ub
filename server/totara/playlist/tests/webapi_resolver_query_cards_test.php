@@ -56,6 +56,9 @@ class webapi_resolver_query_cards_testcase extends advanced_testcase {
         $this->assertContainsEquals($article1->get_id(), $ids);
         $this->assertContainsEquals($article2->get_id(), $ids);
         $this->assertContainsEquals($article3->get_id(), $ids);
+
+        //Article3 is newly created, so it has to the first element of the array.
+        $this->assertEquals($article3->get_id(), $ids[0]);
     }
 
     public function test_query_cards_with_different_logged_user() {
