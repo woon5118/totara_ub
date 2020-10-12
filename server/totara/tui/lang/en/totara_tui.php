@@ -74,7 +74,7 @@ $string['formbrand_details_logo'] = 'Upload a logo to be used as the site\'s log
 $string['formbrand_label_logoalttext'] = 'Logo alternative text';
 $string['formbrand_details_logoalttext'] = 'Add the name of the site, to function as a text alternative to the logo image. There\'s no need to include "logo" in this field.';
 $string['formbrand_label_favicon'] = 'Favicon';
-$string['formbrand_details_favicon'] = 'Upload your browser tab icon here and it will appear next to your site address in the browser. The format of the icon file should be in a .ico format. (Dimension: 16 x 16px)';
+$string['formbrand_details_favicon'] = 'Upload your browser tab icon here and it will appear next to your site address in the browser. The format of the icon file should be in a .ico, .png or .svg format. (Suggested dimension: 16 x 16px)';
 
 // Theme settings - Colours tab.
 $string['formcolours_label_primary'] = 'Primary brand colour';

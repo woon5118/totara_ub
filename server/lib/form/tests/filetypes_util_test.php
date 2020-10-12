@@ -296,11 +296,15 @@ class core_form_filetypes_util_testcase extends advanced_testcase {
         // All these three files are in both "image" and also "web_image"
         // groups. We display both groups.
         $data = $util->data_for_browser('jpg png gif', true, '.gif');
-        $this->assertEquals(2, count($data));
+        $this->assertEquals(3, count($data));
         $this->assertTrue($data[0]->key !== $data[1]->key);
         foreach ($data as $group) {
-            $this->assertTrue(($group->key === 'image' || $group->key === 'web_image'));
-            $this->assertEquals(3, count($group->types));
+            $this->assertTrue(($group->key === 'icon' || $group->key === 'image' || $group->key === 'web_image'));
+            if ($group->key === 'icon') {
+                $this->assertEquals(1, count($group->types));
+            } else {
+                $this->assertEquals(3, count($group->types));
+            }
             $this->assertFalse($group->selectable);
             foreach ($group->types as $ext) {
                 if ($ext->key === '.gif') {
@@ -315,7 +319,7 @@ class core_form_filetypes_util_testcase extends advanced_testcase {
         // file extensions that fall into both groups will be displayed twice.
         $data = $util->data_for_browser('web_image');
         foreach ($data as $group) {
-            $this->assertTrue(($group->key === 'image' || $group->key === 'web_image'));
+            $this->assertTrue(($group->key === 'icon' || $group->key === 'image' || $group->key === 'web_image'));
         }
 
         // Check that "All file types" are displayed first.

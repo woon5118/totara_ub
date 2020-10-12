@@ -116,8 +116,12 @@ abstract class core_filetypes {
             'html' => array('type' => 'text/html', 'icon' => 'html', 'groups' => array('web_file')),
             'xhtml' => array('type' => 'application/xhtml+xml', 'icon' => 'html', 'groups' => array('web_file')),
             'htm' => array('type' => 'text/html', 'icon' => 'html', 'groups' => array('web_file')),
-            'ico' => array('type' => 'image/vnd.microsoft.icon', 'icon' => 'image',
-                    'groups' => array('image'), 'string' => 'image'),
+            'ico' => array(
+                'type' => 'image/vnd.microsoft.icon',
+                'icon' => 'image',
+                'groups' => array('image', 'icon'),
+                'string' => 'image'
+            ),
             'ics' => array('type' => 'text/calendar', 'icon' => 'text'),
             'imscc' => array('type' => 'application/vnd.ims.imsccv1p1', 'icon' => 'archive'),
             'isf' => array('type' => 'application/inspiration', 'icon' => 'isf'),
@@ -198,7 +202,7 @@ abstract class core_filetypes {
             'php' => array('type' => 'text/plain', 'icon' => 'sourcecode'),
             'pic' => array('type' => 'image/pict', 'icon' => 'image', 'groups' => array('image'), 'string' => 'image'),
             'pict' => array('type' => 'image/pict', 'icon' => 'image', 'groups' => array('image'), 'string' => 'image'),
-            'png' => array('type' => 'image/png', 'icon' => 'png', 'groups' => array('image', 'web_image'), 'string' => 'image'),
+            'png' => array('type' => 'image/png', 'icon' => 'png', 'groups' => array('image', 'web_image', 'icon'), 'string' => 'image'),
             'pps' => array('type' => 'application/vnd.ms-powerpoint', 'icon' => 'powerpoint', 'groups' => array('presentation')),
             'ppt' => array('type' => 'application/vnd.ms-powerpoint', 'icon' => 'powerpoint', 'groups' => array('presentation')),
             'pptx' => array('type' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
@@ -242,8 +246,12 @@ abstract class core_filetypes {
             'smi' => array('type' => 'application/smil', 'icon' => 'text'),
             'smil' => array('type' => 'application/smil', 'icon' => 'text'),
             'sqt' => array('type' => 'text/xml', 'icon' => 'markup'),
-            'svg' => array('type' => 'image/svg+xml', 'icon' => 'image',
-                    'groups' => array('image', 'web_image'), 'string' => 'image'),
+            'svg' => array(
+                'type' => 'image/svg+xml',
+                'icon' => 'image',
+                'groups' => array('image', 'web_image', 'icon'),
+                'string' => 'image'
+            ),
             'svgz' => array('type' => 'image/svg+xml', 'icon' => 'image',
                     'groups' => array('image', 'web_image'), 'string' => 'image'),
             'swa' => array('type' => 'application/x-director', 'icon' => 'flash'),

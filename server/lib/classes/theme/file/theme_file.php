@@ -294,28 +294,60 @@ abstract class theme_file {
     }
 
     /**
-     * @param int $draft_id
-     * @param string|null $file
+     * Get the files in the draft area.
      *
-     * @return bool
+     * @param int $draft_id
+     *
+     * @return stored_file[]
      */
-    private function draft_file_exists(int $draft_id, ?string $file): bool {
+    protected function get_draft_files(int $draft_id): array {
         global $USER;
 
-        // Initially file may be null.
-        if ((string)$file === '') {
-            return true;
+        // Get files in user draft area.
+        $file_helper = new file_helper(
+            'user',
+            'draft',
+            \context_user::instance($USER->id)
+        );
+        $file_helper->set_item_id($draft_id);
+        $file_helper->set_sort('timecreated desc');
+        return $file_helper->get_stored_files();
+    }
+
+    /**
+     * The file area might be polluted with multiple uploaded files or the user
+     * might have uploaded a file with an incorrect extension. We need to clean
+     * the draft area to get rid of such invalid files.
+     *
+     * @param stored_file[] $files
+     *
+     * @return stored_file[]
+     */
+    protected function clean_draft_files(array $files): array {
+        // Get the list of valid file extensions for this theme file.
+        $extensions = $this->get_type()->get_valid_extensions();
+        $mimetypes = [];
+        foreach ($extensions as $extension) {
+            $mimetypes[] = mimeinfo('type', $extension);
         }
 
-        $fs = get_file_storage();
-        $usercontext = \context_user::instance($USER->id);
-
-        if (!$fs->file_exists($usercontext->id, 'user', 'draft', $draft_id, '/', '.')) {
-            // No draft files.
-            return false;
+        // The draft area might be polluted with irrelevant files. We are only interested
+        // in the most recent file uploaded with the right extension. The files should be
+        // fetched according to time created so we basically can just use the first file
+        // that is correct and remove the rest.
+        $found = false;
+        foreach ($files as $key => $file) {
+            if (!$found && in_array($file->get_mimetype(), $mimetypes)) {
+                // We found a file and it should stay in the files array.
+                $found = true;
+                continue;
+            }
+            // Delete the files that we don't want.
+            $file->delete();
+            unset($files[$key]);
         }
 
-        return true;
+        return $files;
     }
 
     /**
@@ -324,7 +356,7 @@ abstract class theme_file {
      * @param int $draft_id
      */
     public function save_files(int $draft_id): void {
-        // save new files
+        // Get the settings currently used for this theme file.
         $setting = new \admin_setting_configstoredfile(
             $this->get_name(),
             '',
@@ -340,8 +372,12 @@ abstract class theme_file {
         // Get current file name.
         $current = $setting->get_setting();
 
-        if ($this->draft_file_exists($draft_id, $current)) {
-            // Write new settings.
+        // Get and clean files in draft area.
+        $files = $this->get_draft_files($draft_id);
+        $files = $this->clean_draft_files($files);
+
+        // If we have any files left after cleaning then we need to save them.
+        if (sizeof($files) > 0) {
             if ($setting->write_setting($draft_id) !== '') {
                 throw new \moodle_exception('themesavefiles', 'error');
             }
