@@ -31,7 +31,7 @@
       component="engage_article"
       :show-back="true"
       :submitting="submitting"
-      :selected-access="containerValues.access"
+      :selected-access="containerValues.access || defaultAccess"
       :private-disabled="privateDisabled"
       :restricted-disabled="restrictedDisabled"
       :container="container"
@@ -72,6 +72,7 @@ export default {
         itemId: null,
       },
       submitting: false,
+      defaultAccess: 'PRIVATE',
     };
   },
 

@@ -30,7 +30,7 @@
       component="engage_survey"
       :show-back="true"
       :submitting="submitting"
-      :selected-access="containerValues.access"
+      :selected-access="containerValues.access || defaultAccess"
       :private-disabled="privateDisabled"
       :restricted-disabled="restrictedDisabled"
       :container="container"
@@ -68,6 +68,7 @@ export default {
         options: [],
       },
       submitting: false,
+      defaultAccess: 'PRIVATE',
     };
   },
 

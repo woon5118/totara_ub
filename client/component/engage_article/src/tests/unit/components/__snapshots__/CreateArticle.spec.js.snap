@@ -15,6 +15,7 @@ exports[`engage_article/components/CreateArticle.vue Checks snapshot 1`] = `
     donebuttontext="done, totara_engage"
     enabletimeview="true"
     itemid="0"
+    selectedaccess="PRIVATE"
     selectedoptions="[object Object]"
     showback="true"
     style="display: none;"

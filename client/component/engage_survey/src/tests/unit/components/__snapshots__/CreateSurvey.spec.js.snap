@@ -16,6 +16,7 @@ exports[`engage_survey/components/CreateSurvey.vue Checks snapshot 1`] = `
     component="engage_survey"
     donebuttontext="done, totara_engage"
     itemid="0"
+    selectedaccess="PRIVATE"
     selectedoptions="[object Object]"
     showback="true"
     style="display: none;"

@@ -19,7 +19,7 @@ Feature: Create engage resource
     And I wait for the next second
     And I click on "Next" "button"
     And I wait for the next second
-    And the "Done" "button" should be disabled
+    And the "Done" "button" should be enabled
     And I should see "Everyone"
     And I should see "Limited people"
     And I click on "Only you" "text" in the ".tui-accessSelector" "css_element"
