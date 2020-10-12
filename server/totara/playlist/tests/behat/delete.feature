@@ -44,7 +44,7 @@ Feature: Delete playlist
     And I confirm the tui confirmation modal
     And I should see "Test Article 1"
     And "[aria-label='Appears in 1 playlist(s)']" "css_element" should exist in the ".tui-engageArticleCard" "css_element"
-    And I click on "Expand" "button"
+    And I click on "Side panel" "button"
     And I click on "Actions" "button"
     And I should see "Delete"
     And I click on "Delete" "link"

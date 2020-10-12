@@ -736,6 +736,7 @@ $string['sharedsrcwarning'] = 'For security reasons only /server/ subdirectory s
 $string['showfeature'] = 'Show';
 $string['show_filters'] = 'Show filters';
 $string['show_help_for_x'] = 'Show help for {$a}';
+$string['sidepanel'] = 'Side panel';
 $string['sitemanager'] = 'Site Manager';
 $string['siteregistrationemailbody'] = 'Site {$a} was not able to register itself automatically. Access to push data to our registrations site is probably blocked by a firewall.';
 $string['sitetype'] = 'Type of site';

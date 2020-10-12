@@ -50,7 +50,7 @@
     <ButtonIcon
       v-if="showButtonControl"
       :disabled="opening || closing"
-      :aria-label="$str(isOpen ? 'collapse' : 'expand', 'core')"
+      :aria-label="$str('sidepanel', 'totara_core')"
       :aria-expanded="isOpen ? 'true' : 'false'"
       class="tui-sidePanel__outsideClose"
       @click.prevent="isOpen ? collapse() : expand()"
@@ -274,9 +274,8 @@ export default {
 
 <lang-strings>
 {
-  "core": [
-    "expand",
-    "collapse"
+  "totara_core": [
+    "sidepanel"
   ]
 }
 </lang-strings>

@@ -75,7 +75,7 @@ Feature: Playlist catalog content
     Given I log in as "user1"
     And I click on "Your Library" in the totara menu
     And I click on "User public Playlist1" "link" in the ".tui-sidePanel__content" "css_element"
-    And I click on "Expand" "button"
+    And I click on "Side panel" "button"
     When I click on "Topic 2" "link"
     Then I should see "User public Playlist1"
     And I should see "User public Playlist2"

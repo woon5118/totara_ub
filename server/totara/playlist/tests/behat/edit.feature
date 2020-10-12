@@ -29,7 +29,7 @@ Feature: Edit playlist instance
     And I click on "Your Library" in the totara menu
     When I follow "Playlist 101"
     Then I should see "Playlist 101"
-    And I click on "Expand" "button"
+    And I click on "Side panel" "button"
     And I click on "//button[@title='Add a description (optional)']/parent::*" "xpath_element"
     And I activate the weka editor with css ".tui-playlistSummary__editor"
     And I type "Best playlist ever" in the weka editor

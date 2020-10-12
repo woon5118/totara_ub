@@ -26,7 +26,7 @@ Feature: Manipulate playlist instance
     And I follow "Playlist 101"
     Then I should see "Playlist 101"
 
-    When I click on "Expand" "button"
+    When I click on "Side panel" "button"
     And I click on "//button[@title='Add a description (optional)']/parent::*" "xpath_element"
     And I activate the weka editor with css ".tui-playlistSummary__editor"
     And I type "Edit playlist summary" in the weka editor
@@ -55,13 +55,13 @@ Feature: Manipulate playlist instance
     And I click on "Your Library" in the totara menu
     And I follow "Playlist 102"
     Then I should see "Playlist 102"
-    When I click on "Expand" "button"
+    When I click on "Side panel" "button"
     Then I should not see "Reshare"
 
     # View public playlist
     When I follow "Playlist 103"
     Then I should see "Playlist 103"
-    And I click on "Expand" "button"
+    And I click on "Side panel" "button"
     And I click on "Share" "button" in the ".tui-accessSetting" "css_element"
     Then I should see "Settings" in the ".tui-modalContent__header-title" "css_element"
 
@@ -71,7 +71,7 @@ Feature: Manipulate playlist instance
     And I click on "Your Library" in the totara menu
     And I follow "Playlist 101"
     Then I should see "Playlist 101"
-    When I click on "Expand" "button"
+    When I click on "Side panel" "button"
     Then I should not see "0 rating"
 
   @javascript
@@ -80,7 +80,7 @@ Feature: Manipulate playlist instance
     And I click on "Your Library" in the totara menu
     And I follow "Playlist 102"
     Then I should see "Playlist 102"
-    When I click on "Expand" "button"
+    When I click on "Side panel" "button"
     Then I should see "rating"
 
   @javascript
@@ -89,5 +89,5 @@ Feature: Manipulate playlist instance
     And I click on "Your Library" in the totara menu
     And I follow "Playlist 103"
     Then I should see "Playlist 103"
-    When I click on "Expand" "button"
+    When I click on "Side panel" "button"
     Then I should see "rating"
