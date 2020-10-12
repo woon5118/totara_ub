@@ -1,0 +1,33 @@
+query totara_comment_get_editor_weka_from_id(
+  $id: param_integer!
+  $comment_area: param_area!
+) {
+  editor: totara_comment_editor_weka_from_id(
+    id: $id
+    comment_area: $comment_area
+  ) {
+    __typename
+    showtoolbar(component: "totara_comment", area: $comment_area)
+    extensions(component: "totara_comment", area: $comment_area) {
+      __typename
+      name
+      tuicomponent
+      options
+    }
+    context_id
+    repository_data {
+      __typename
+      repository_id
+      url
+    }
+
+    files {
+      __typename
+      file_size
+      filename
+      url(force_download: true)
+      mime_type
+      media_type
+    }
+  }
+}

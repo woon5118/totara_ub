@@ -26,6 +26,7 @@ mutation container_workspace_update_workspace(
     total_members
     total_member_requests
     total_discussions
+    context_id
     owner {
       __typename
       fullname

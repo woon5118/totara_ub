@@ -1,8 +1,16 @@
 This files describes API changes in /totara/comment/*.
 The information here is intended only for developers.
 
+=== 13.2 ===
+
+--- Update to GraphQL ---
+* Introduced new query "totara_comment_editor_weka_from_id" to fetch editor weka metadata from comment's or reply's id.
+* Deprecated parameter "id"  in query "totara_comment_editor_weka", this parameter will no longer be used.
+  Please use query "totara_comment_editor_weka_from_id" instead.
+* Added new required parameter "instance_id" in query "totara_comment_editor_weka".
+
 === 13.1 ===
 
 --- Update to API ---
-* Added new parameter "$debug_info" into function totara_comment\exception\comment_exception::on_create
-* Added new parameter "$debug_info" into function totara_comment\exception\comment_exception::on_update
+* Added new parameter "$debug_info" into function totara_comment\exception\comment_exception::on_create.
+* Added new parameter "$debug_info" into function totara_comment\exception\comment_exception::on_update.

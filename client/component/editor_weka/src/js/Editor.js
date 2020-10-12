@@ -368,4 +368,24 @@ export default class Editor {
       this.view.destroy();
     }
   }
+
+  /**
+   * Returning the instance's identifier that is set within options.
+   * Null will be returned if the fields are not present in options.
+   *
+   * @return {{
+   *   instanceId: ?Number,
+   *   area: ?String,
+   *   component: ?String,
+   *   contextId: ?Number
+   * }}
+   */
+  get identifier() {
+    return {
+      contextId: this._options.contextId || null,
+      component: this._options.component || null,
+      area: this._options.area || null,
+      instanceId: this._options.instanceId || null,
+    };
+  }
 }

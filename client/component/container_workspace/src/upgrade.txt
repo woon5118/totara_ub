@@ -1,0 +1,9 @@
+This files describes API changes in /client/component/container_workspace,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+
+* Added new optional prop "workspaceContextId" for component WorkspaceDiscussionForm.vue
+* Added new required prop "workspaceContextId" for component PostDiscussionForm.vue
+* Added new required prop "workspaceContextId" for component WorkspaceDiscussionTab.vue
+* Added new optional prop "contextId" for component WorkspaceForm.vue

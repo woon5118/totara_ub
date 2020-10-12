@@ -23,6 +23,7 @@
         :avatar-image-alt="user.profileimagealt || user.fullname"
         :avatar-image-src="user.profileimageurl"
         :submitting="submitting"
+        :workspace-context-id="workspaceContextId"
         :avatar-image-url="$url('/user/profile', { id: user.id })"
         @submit="submit"
       />
@@ -138,6 +139,11 @@ export default {
 
   props: {
     workspaceId: {
+      type: [Number, String],
+      required: true,
+    },
+
+    workspaceContextId: {
       type: [Number, String],
       required: true,
     },

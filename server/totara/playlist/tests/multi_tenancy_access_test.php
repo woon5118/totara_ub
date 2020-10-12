@@ -69,7 +69,7 @@ class totara_playlist_multi_tenancy_access_testcase extends advanced_testcase {
     /**
      * @return void
      */
-    public function test_system_level_user_cannot_access_tenant_member_playlist(): void {
+    public function test_system_level_user_access_tenant_member_playlist(): void {
         $generator = $this->getDataGenerator();
 
         $user_one = $generator->create_user();
@@ -99,7 +99,56 @@ class totara_playlist_multi_tenancy_access_testcase extends advanced_testcase {
         ]);
 
         // Login as user one to check if the user one is able to see the playlist or not.
+        // User one is a system user, and by default system user should be able to access the
+        // tenant user's resource.
         $this->setUser($user_one);
-        $this->assertFalse(access_manager::can_access($playlist));
+        $this->assertTrue(access_manager::can_access($playlist, $user_one->id));
+
+        // Set isolation mode on to see if user_one is still able to see the playlist anymore.
+        set_config('tenantsisolated', 1);
+        $this->assertFalse(access_manager::can_access($playlist, $user_one->id));
+    }
+
+    /**
+     * @return void
+     */
+    public function test_tenant_member_cannot_access_different_tenant_playlist(): void {
+        $generator = $this->getDataGenerator();
+
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $tenant_one = $tenant_generator->create_tenant();
+        $tenant_two = $tenant_generator->create_tenant();
+
+        $tenant_generator->migrate_user_to_tenant($user_one->id, $tenant_one->id);
+        $tenant_generator->migrate_user_to_tenant($user_two->id, $tenant_two->id);
+
+        // Create topics with admin.
+        $this->setAdminUser();
+
+        /** @var totara_topic_generator $topic_generator */
+        $topic_generator = $generator->get_plugin_generator('totara_topic');
+        $topic = $topic_generator->create_topic();
+
+        // Log in as user one to create a public playlist.
+        $this->setUser($user_one);
+
+        /** @var totara_playlist_generator $playlist_generator */
+        $playlist_generator = $generator->get_plugin_generator('totara_playlist');
+        $playlist = $playlist_generator->create_public_playlist([
+            'topics' => [$topic->get_id()],
+        ]);
+
+        // Log in as user two and check if user two is able to see the playlist.
+        $this->setUser($user_two);
+        self::assertFalse(access_manager::can_access($playlist, $user_two->id));
+
+        set_config('tenantsisolated', 1);
+        self::assertFalse(access_manager::can_access($playlist, $user_two->id));
     }
 }

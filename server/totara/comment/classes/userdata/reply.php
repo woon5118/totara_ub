@@ -23,7 +23,6 @@
 namespace totara_comment\userdata;
 
 use totara_comment\comment_helper;
-use totara_comment\repository\comment_repository;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
@@ -63,7 +62,6 @@ final class reply extends item {
      * @return int
      */
     protected static function count(target_user $user, \context $context): int {
-        /** @var comment_repository $repository */
         $repository = reply_entity::repository();
         return $repository->count_replies_for_user($user->id);
     }
@@ -75,7 +73,6 @@ final class reply extends item {
      * @return export
      */
     protected static function export(target_user $user, \context $context): export {
-        /** @var comment_repository $repository */
         $repository = reply_entity::repository();
         $export = new export();
 
@@ -102,7 +99,6 @@ final class reply extends item {
      * @return int
      */
     protected static function purge(target_user $user, \context $context): int {
-        /** @var comment_repository $repository */
         $repository = reply_entity::repository();
         $reply_entities = $repository->get_replies_of_user($user->id);
 

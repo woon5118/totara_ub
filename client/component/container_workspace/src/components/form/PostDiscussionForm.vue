@@ -27,6 +27,7 @@
     <WorkspaceDiscussionForm
       :submitting="submitting"
       :show-cancel-button="false"
+      :workspace-context-id="workspaceContextId"
       class="tui-workspacePostDiscussionForm__form"
       @submit="$emit('submit', $event)"
     />
@@ -56,6 +57,15 @@ export default {
 
     avatarImageSrc: {
       type: String,
+      required: true,
+    },
+
+    /**
+     * Requiring a workspace's context id when we are creating a new discussion
+     * within a workspace.
+     */
+    workspaceContextId: {
+      type: [Number, String],
       required: true,
     },
 

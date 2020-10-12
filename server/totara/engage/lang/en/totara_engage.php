@@ -257,6 +257,7 @@ $string['error:sharerestricted'] = 'Resource is not public and only the owner is
 $string['error:update'] = "Cannot update an instance of a resource '{\$a->type}'";
 $string['error:updateaccess'] = "Cannot update access of a resource '{\$a->type}'";
 $string['error:updatequestion'] = "Cannot update the question";
+$string['error:view_user_resources'] = 'Cannot view other user resources';
 
 //Capability string
 $string['engage:manage'] = 'View and manage engage resources and surveys';

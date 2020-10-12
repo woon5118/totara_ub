@@ -88,8 +88,6 @@
       <ReplyForm
         v-if="innerShowReplyForm"
         ref="reply-form"
-        :component="component"
-        :area="area"
         :comment-id="commentId"
         :size="size"
         :reply-to="innerReplyTo"

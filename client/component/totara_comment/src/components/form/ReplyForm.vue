@@ -60,7 +60,7 @@ import ResponseBox from 'totara_comment/components/form/box/ResponseBox';
 import UnsavedChangesWarning from 'totara_engage/components/form/UnsavedChangesWarning';
 
 // GraphQL queries
-import getEditorWeka from 'totara_comment/graphql/get_editor_weka';
+import getEditorWeka from 'totara_comment/graphql/get_editor_weka_from_id';
 import fileDraftId from 'core/graphql/file_unused_draft_item_id';
 
 export default {
@@ -84,15 +84,17 @@ export default {
       },
     },
 
-    component: {
-      type: String,
-      required: true,
-    },
+    /**
+     * This prop has been deprecated, please do not use.
+     * @deprecated
+     */
+    component: String,
 
-    area: {
-      type: String,
-      required: true,
-    },
+    /**
+     * This prop has been deprecated, please do not use.
+     * @deprecated
+     */
+    area: String,
 
     commentId: {
       type: [String, Number],
@@ -114,8 +116,7 @@ export default {
       query: getEditorWeka,
       variables() {
         return {
-          area: this.area,
-          component: this.component,
+          id: this.commentId,
           comment_area: 'reply',
         };
       },
@@ -160,6 +161,16 @@ export default {
 
   async mounted() {
     await this.$_loadDraftId();
+
+    if (this.component) {
+      console.warn(
+        'The prop "component" has been deprecated, please do not use.'
+      );
+    }
+
+    if (this.area) {
+      console.warn('The prop "area" has been deprecated, please do not use.');
+    }
   },
 
   methods: {

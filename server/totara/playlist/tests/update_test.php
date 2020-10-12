@@ -86,7 +86,7 @@ class totara_playlist_update_testcase extends advanced_testcase {
 
         /** @var totara_playlist_generator $playlist_generator */
         $playlist_generator = $generator->get_plugin_generator('totara_playlist');
-        $playlist = $playlist_generator->create_playlist();
+        $playlist = $playlist_generator->create_playlist(['summaryformat' => FORMAT_PLAIN]);
 
         $this->assertEquals(FORMAT_PLAIN, $playlist->get_summaryformat());
         $document = json_encode([

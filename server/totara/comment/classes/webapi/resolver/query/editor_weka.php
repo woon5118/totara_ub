@@ -26,9 +26,11 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use editor_weka\config\factory;
-use totara_comment\comment;
 use totara_comment\resolver_factory;
+use context;
+use totara_comment\webapi\editor_weka_helper;
+use totara_comment\webapi\resolver\middleware\validate_comment_area;
+use totara_core\identifier\component_area;
 
 /**
  * Query to fetch editor configuration of other component and area, but will be masked with this very component
@@ -42,45 +44,32 @@ final class editor_weka implements query_resolver, has_middleware {
      * @return \weka_texteditor
      */
     public static function resolve(array $args, execution_context $ec): \weka_texteditor {
-        global $CFG, $USER;
-        if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_user::instance($USER->id));
+        if (!empty($args['id'])) {
+            debugging(
+                "The argument 'id' has been deprecated, please do not use it",
+                DEBUG_DEVELOPER
+            );
         }
 
         $component = $args['component'];
         $area = $args['area'];
-
+        $instance_id = $args['instance_id'];
         $comment_area = strtolower($args['comment_area']);
-        if (!in_array($comment_area, [comment::COMMENT_AREA, comment::REPLY_AREA])) {
-            throw new \coding_exception("Invalid comment area: {$comment_area}");
-        }
 
-        $factory = new factory();
-        $factory->load();
-
-        $configuration = $factory->get_configuration($component, $area);
-        if (null !== $configuration) {
-            // Time to mock the configuration for the comment.
-            $factory->add_configuration('totara_comment', $comment_area, $configuration);
-        }
-
-        require_once("{$CFG->dirroot}/lib/editor/weka/lib.php");
-
-        // We want an editor of totara_comment with the area of comment.
-        $editor = new \weka_texteditor($factory);
         $resolver = resolver_factory::create_resolver($component);
+        $context_id = $resolver->get_context_id($instance_id, $area);
 
-        if (isset($args['id'])) {
-            $comment = comment::from_id($args['id']);
-
-            $context_id = $resolver->get_context_id($comment->get_instanceid(), $area);
-            $editor->set_contextid($context_id);
-        } else if ($ec->has_relevant_context()) {
-            $context = $ec->get_relevant_context();
-            $editor->set_contextid($context->id);
+        if (!$ec->has_relevant_context()) {
+            $context = context::instance_by_id($context_id);
+            $ec->set_relevant_context($context);
         }
 
-        return $editor;
+        $identifier = new component_area($component, $area);
+        return editor_weka_helper::create_mask_editor(
+            $identifier,
+            $comment_area,
+            $context_id
+        );
     }
 
     /**
@@ -89,7 +78,7 @@ final class editor_weka implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_login(),
+            new validate_comment_area('comment_area')
         ];
     }
-
 }

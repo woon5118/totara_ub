@@ -62,6 +62,10 @@ final class workspace_category_interactor implements type_resolver {
             case 'can_create':
                 return $source->can_create_public() || $source->can_create_private() || $source->can_create_hidden();
 
+            case 'context_id':
+                $context = $source->get_context();
+                return $context->id;
+
             default:
                 debugging("Invalid field '{$field}' that is not in supported yet", DEBUG_DEVELOPER);
                 return null;

@@ -152,6 +152,10 @@ export default class Suggestion {
       propsData: {
         location: this._location,
         pattern: text,
+        area: this._editor.identifier.area || undefined,
+        contextId: this._editor.identifier.contextId || undefined,
+        component: this._editor.identifier.component || undefined,
+        instanceId: this._editor.identifier.instanceId || undefined,
       },
     });
 

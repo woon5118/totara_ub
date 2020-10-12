@@ -164,16 +164,33 @@ extend type Query {
     """
     area: param_area!
     """
-    This will be set as a part of persist query. To identify whether it is for comment or reply only.
+    This is to identify whether it is for comment or reply.
     """
     comment_area: param_area!
     """
-    This is for fetching the file storage related to the comment instance. However, if it is null, then this
-    query is for fetching editor options to create new comment. Otherwise it is for updating.
-
-    It can either be a comment's id or reply's id. But eventually, same table.
+    This parameter is deprecated. Do not use this input field, use query totara_comment_editor_weka_from_id instead
+    @deprecated
     """
     id: param_integer
+    """
+    The instance's id of which that is using the comment component.
+    """
+    instance_id: param_integer!
+  ): editor_weka_editor
+
+  """
+  This query will behave similar to query totara_comment_editor_weka. However, this query is fetching based
+  on either comment's id or reply's id as they are from the same table.
+  """
+  totara_comment_editor_weka_from_id(
+    """
+    Either comment's id or reply's id.
+    """
+    id: param_integer!
+    """
+    This is to identify whether it is for comment or reply.
+    """
+    comment_area: param_area!
   ): editor_weka_editor
 }
 

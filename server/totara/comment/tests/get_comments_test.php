@@ -90,7 +90,6 @@ class totara_comment_get_comments_testcase extends advanced_testcase {
     public function test_get_comments_paginator(): void {
         $total = 50;
 
-        $resolver = resolver_factory::create_resolver('totara_comment');
         $this->create_comments(15, 'totara_comment', 'xx_xx', $total);
 
         $cursor = new cursor();

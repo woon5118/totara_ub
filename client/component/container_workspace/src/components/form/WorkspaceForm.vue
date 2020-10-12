@@ -50,6 +50,8 @@
                 :id="id"
                 v-model="description"
                 :aria-disabled="submitting"
+                :instance-id="workspaceId"
+                :context-id="contextId"
                 component="container_workspace"
                 area="description"
                 @ready="editorReady = true"
@@ -251,6 +253,12 @@ export default {
     workspacePrivate: Boolean,
     workspaceHidden: Boolean,
     workspaceId: [String, Number],
+    /**
+     * A fallback props when workspace's id is not provided.
+     * It should either be a workspace's context id or course category context's id.
+     * Do NOT pass user's context id here.
+     */
+    contextId: [String, Number],
     submitButtonLabel: {
       type: String,
       default() {

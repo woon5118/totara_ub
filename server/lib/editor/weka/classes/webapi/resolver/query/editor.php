@@ -44,18 +44,24 @@ final class editor implements query_resolver, has_middleware {
         require_once("{$CFG->dirroot}/lib/editor/weka/lib.php");
         $editor = new \weka_texteditor();
 
-        // Sometimes the editor is being used to create a whole new instance.
-        // Therefore, the instance_id might not be populated yet.
-        $instance_id = null;
+        // Start looking for the context.
+        $context = null;
+        if (!isset($args['context_id'])) {
+            // The instance_id is only provided when updating an existing instance.
+            $instance_id = null;
 
-        if (isset($args['instance_id'])) {
-            $instance_id = (int) $args['instance_id'];
+            if (isset($args['instance_id'])) {
+                $instance_id = (int) $args['instance_id'];
+            }
+
+            $hook = new find_context($args['component'], $args['area'], $instance_id);
+            $hook->execute();
+
+            $context = $hook->get_context();
+        } else {
+            $context = \context::instance_by_id($args['context_id']);
         }
 
-        $hook = new find_context($args['component'], $args['area'], $instance_id);
-        $hook->execute();
-
-        $context = $hook->get_context();
         if (null !== $context) {
             $editor->set_contextid($context->id);
 

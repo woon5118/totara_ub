@@ -1,0 +1,7 @@
+This files describes API changes in /client/component/totara_comment,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+
+* Deprecated prop "component" in ReplyForm.vue, this prop will no longer be used.
+* Deprecated prop "area" in ReplyForm.vue, this prop will no longer be used.

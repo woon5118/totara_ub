@@ -172,4 +172,8 @@ $watchers = [
         'hookname' => 'totara_reportedcontent\hook\remove_review_content',
         'callback' => ['container_workspace\watcher\reportedcontent_watcher', 'delete_discussion']
     ],
+    [
+        'hookname' => 'editor_weka\hook\search_users_by_pattern',
+        'callback' => ['container_workspace\watcher\editor_weka_watcher', 'on_search_users']
+    ]
 ];

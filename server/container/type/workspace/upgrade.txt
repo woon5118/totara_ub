@@ -4,6 +4,8 @@ The information here is intended only for developers.
 === 13.2 ===
 
 --- Update to graphQL ---
+* Added field "context_id" to type "container_workspace_workspace"
+* Added field "context_id" to type "container_workspace_workspace_category_interactor"
 * Added context_id parameter to the file_area query
 * Changed area variable type from param_text to param_area in graphql schema.
 
@@ -16,7 +18,7 @@ The information here is intended only for developers.
 * Introduced new field "to_be_deleted" in table "workspace", the field indicates the workspace will be deleted later via cron.
 
 --- Update to graphQL ---
-* Added image_preview_mode parameter to container_workspace_contributions query
+* Added "image_preview_mode" parameter to "container_workspace_contributions" query
 
 --- Update to API ---
 * Added new parameter "$debug_info" into function container_workspace\exception\discussion_exception::on_create

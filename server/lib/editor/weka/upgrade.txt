@@ -1,0 +1,8 @@
+This files describes API changes in /lib/editor/weka/*.
+The information here is intended only for developers.
+
+=== 13.2 ===
+
+--- Update to GraphQL ---
+* Added new optional parameter "instance_id" to query "editor_weka_users_by_pattern"
+* Added new optional parameter "context_id" to query "editor_weka_editor"

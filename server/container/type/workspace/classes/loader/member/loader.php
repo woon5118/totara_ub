@@ -73,11 +73,22 @@ final class loader {
         );
 
         $builder->where('e.courseid', $workspace_id);
-        $builder->map_to([member::class, 'from_record']);
+        $builder->results_as_arrays();
+        $builder->map_to([static::class, 'create_member']);
 
         $builder->select([
             "ue.*",
             new raw_field("e.courseid as workspace_id")
+        ]);
+
+
+        $user_name_fields_sql = get_all_user_name_fields(true, 'u', null, 'user_');
+        $builder->add_select_raw($user_name_fields_sql);
+        $builder->add_select([
+            'u.id AS user_id',
+            'u.email AS user_email',
+            'u.picture AS user_picture',
+            'u.imagealt AS user_image_alt'
         ]);
 
         $status = $query->get_member_status();
@@ -104,11 +115,20 @@ final class loader {
             $builder->where_raw($like_sql, $like_parameters);
         }
 
+        $builder->when(
+            (!$query->include_tenant_users() && !$query->is_workspace_in_tenant()),
+            function (builder $inner_builder): void {
+                // Only excluding the tenant users when the query is say so, and the workspace is
+                // in the system rather than in a tenant.
+                $inner_builder->where_null('u.tenantid');
+            }
+        );
+
         // By default we always include the user owner on top.
         if ($DB->get_dbfamily() == 'postgres') {
             $builder->order_by('w.user_id', order::DIRECTION_ASC);
         } else {
-            // We treat mssql differently here, and it is a really UGLY hack because
+            // We treat mssql, mysql and mariadb differently here, and it is a really UGLY hack because
             // we are at high level API and we still have to do this check.
             // However, based on https://www.sqlservertutorial.net/sql-server-basics/sql-server-order-by
             // NULL value is treated as the lowest value within MSSQL database, hence we will have to order by
@@ -168,5 +188,43 @@ final class loader {
         ]);
 
         return $builder->count();
+    }
+
+    /**
+     * @param array $row
+     * @return member
+     *
+     * @internal
+     */
+    public static function create_member(array $row): member {
+        $user_fields = get_all_user_name_fields(false, 'u', 'user_');
+        $user_fields['email'] = 'user_email';
+        $user_fields['id'] = 'user_id';
+        $user_fields['picture'] = 'user_picture';
+        $user_fields['imagealt'] = 'user_image_alt';
+
+        $enrolment_record = array_filter(
+            $row,
+            function (string $row_key) use ($user_fields): bool {
+                // As long as the keys does not exists in user fields.
+                return !in_array($row_key, $user_fields);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+
+        $member = member::from_record((object) $enrolment_record);
+
+        $user_record = [];
+        foreach ($user_fields as $field => $sql_field) {
+            if (!array_key_exists($sql_field, $row)) {
+                debugging("The array record does not have field '{$sql_field}'", DEBUG_DEVELOPER);
+                continue;
+            }
+
+            $user_record[$field] = $row[$sql_field];
+        }
+
+        $member->set_user_record((object) $user_record);
+        return $member;
     }
 }

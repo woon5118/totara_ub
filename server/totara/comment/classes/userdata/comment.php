@@ -28,7 +28,6 @@ use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 use totara_comment\comment as model_comment;
 use totara_comment\entity\comment as comment_entity;
-use totara_comment\repository\comment_repository;
 
 /**
  * User data implementation for comment. This is for record without parent's id
@@ -63,7 +62,6 @@ final class comment extends item {
      * @return int
      */
     public static function purge(target_user $user, \context $context): int {
-        /** @var comment_repository $repo */
         $repo = comment_entity::repository();
 
         $comment_entities = $repo->get_comments_of_user($user->id);
@@ -85,7 +83,6 @@ final class comment extends item {
         $export = new export();
         $export->data = [];
 
-        /** @var comment_repository $repo */
         $repo = comment_entity::repository();
         $comments = $repo->get_comments_of_user($user->id);
 
@@ -111,7 +108,6 @@ final class comment extends item {
      * @return int
      */
     public static function count(target_user $user, \context $context): int {
-        /** @var comment_repository $repo */
         $repo = comment_entity::repository();
         return $repo->count_comments_for_user($user->id);
     }

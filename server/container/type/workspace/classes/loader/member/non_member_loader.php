@@ -26,6 +26,7 @@ use container_workspace\member\status;
 use container_workspace\query\member\non_member_query;
 use core\orm\pagination\offset_cursor_paginator;
 use core\orm\query\builder;
+use core\tenant_orm_helper;
 
 /**
  * A loader classes to load users that are not a member of a workspace.
@@ -43,7 +44,7 @@ final class non_member_loader {
      * @return offset_cursor_paginator
      */
     public static function get_non_members(non_member_query $query): offset_cursor_paginator {
-        global $CFG, $DB;
+        global $CFG;
 
         $workspace_id = $query->get_workspace_id();
 
@@ -67,8 +68,7 @@ final class non_member_loader {
             [$sql_search, $parameters] = totara_search_get_keyword_where_clause(
                 $keywords,
                 ['u.firstname', 'u.lastname', 'u.email'],
-                SQL_PARAMS_NAMED,
-                "prefix_workspace"
+                SQL_PARAMS_NAMED
             );
 
             $builder->where_raw($sql_search, $parameters);
@@ -80,12 +80,12 @@ final class non_member_loader {
         $builder->where('u.suspended', 0);
 
         // ================= SQL =====================
-        // SELECT u.*
-        // FROM phpu_00user "u"
+        // SELECT DISTINCT u.*
+        // FROM phpunit_00user "u"
         // WHERE NOT EXISTS(
         //      SELECT ue.id
-        //      FROM phpu_00user_enrolments "ue"
-        //      INNER JOIN phpu_00enrol "e" ON e.id = ue.enrolid
+        //      FROM phpunit_00user_enrolments "ue"
+        //      INNER JOIN phpunit_00enrol "e" ON ue.enrolid = e.id
         //      WHERE ue.userid = u.id
         //      AND "ue".status = $1
         //      AND e.courseid = $2
@@ -93,25 +93,24 @@ final class non_member_loader {
         // AND u.id <> $3
         // AND u.deleted = $4
         // AND u.suspended = $5
+        // AND EXISTS(
+        //      SELECT "mtru5f988f6287dd1".*
+        //      FROM phpunit_00cohort_members "mtru5f988f6287dd1"
+        //      INNER JOIN phpunit_00tenant "t" ON "mtru5f988f6287dd1".cohortid = "t".cohortid
+        //      WHERE t.id = $6
+        //      AND "mtru5f988f6287dd1".userid = u.id
+        // )
+        // ORDER BY u.id ASC
         // LIMIT 20 OFFSET 0
         // =============== End Of SQL ================
 
-        if ($CFG->tenantsenabled) {
-            $context = \context_course::instance($workspace_id);
-            $tenant_id = $context->tenantid;
-
-            if (null !== $tenant_id) {
-                // This workspace exists within a tenant - hence only looking for tenants member.
-                $cohort_id = $DB->get_field('tenant', 'cohortid', ['id' =>$tenant_id], MUST_EXIST);
-
-                $builder->join(['cohort_members', 'cm'], 'u.id', 'cm.userid');
-                $builder->where('cm.cohortid', $cohort_id);
-            } else if ($CFG->tenantsisolated){
-                // Non tenant workspace - and isolation mode is on, therefore we are only looking for
-                // system users.
-                $builder->where_null('u.tenantid');
-            }
-        }
+        // Apply tenant query.
+        $context = \context_course::instance($workspace_id);
+        tenant_orm_helper::restrict_users(
+            $builder,
+            'u.id',
+            $context
+        );
 
         $builder->order_by('u.id');
         $cursor = $query->get_cursor();

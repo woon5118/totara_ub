@@ -37,5 +37,9 @@ $watchers = [
     [
         'hookname' => '\totara_topic\hook\get_deleted_topic_usages',
         'callback' => ['\engage_article\watcher\totara_topic_watcher', 'on_deleted_topic_get_usage']
+    ],
+    [
+        'hookname' => '\editor_weka\hook\search_users_by_pattern',
+        'callback' => ['\engage_article\watcher\editor_weka_watcher', 'on_search_users']
     ]
 ];

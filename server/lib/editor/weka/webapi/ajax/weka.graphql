@@ -5,11 +5,14 @@ query editor_weka_weka(
   # File item's draft id. As a rule of thumbs, before fetching the editor with files
   # all the files within file area should had been moved to a proper draft area.
   $draft_id: param_integer
+  # Optional context's id - which developer can pass instead of instance's id.
+  $context_id: param_integer
 ) {
   editor: editor_weka_editor(
     component: $component
     area: $area
     instance_id: $instance_id
+    context_id: $context_id
   ) {
     __typename
     showtoolbar(component: $component, area: $area)

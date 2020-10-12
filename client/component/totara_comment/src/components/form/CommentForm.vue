@@ -127,6 +127,7 @@ export default {
           component: this.component,
           area: this.area,
           comment_area: 'comment',
+          instance_id: this.instanceId,
         };
       },
 

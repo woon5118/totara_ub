@@ -80,6 +80,11 @@ extend type Query {
     component: param_component!
     area: param_area!
     instance_id: param_integer
+    """
+    Provide an optional context_id because sometimes instance_id is set to null, which means that the weka editor
+    can be used to create a new instance. Hence, context_id will be a fallback option.
+    """
+    context_id: param_integer
   ): editor_weka_editor
 
   """
@@ -105,5 +110,6 @@ extend type Query {
     contextid: param_integer
     component: param_component
     area: param_area
+    instance_id: param_integer
   ): [core_user!]!
 }

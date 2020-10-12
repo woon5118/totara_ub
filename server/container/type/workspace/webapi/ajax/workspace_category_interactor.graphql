@@ -9,6 +9,7 @@ query container_workspace_workspace_category_interactor(
     can_create_private
     can_create_hidden
     can_create
+    context_id
     user {
       __typename
       id

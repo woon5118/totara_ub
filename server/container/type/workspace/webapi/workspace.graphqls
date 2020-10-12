@@ -41,6 +41,10 @@ type container_workspace_workspace {
   The workspace's owner. If it is empty, meaning that there is no current user.
   """
   owner: core_user
+  """
+  Context's id associate with this workspace.
+  """
+  context_id: Int!
 }
 
 """
@@ -165,6 +169,10 @@ type container_workspace_workspace_category_interactor {
   Whether the user has the ability to create any style of workspace or not.
   """
   can_create: Boolean!
+  """
+  The context's id of workspace (course) categories.
+  """
+  context_id: Int!
 }
 
 extend type Query {

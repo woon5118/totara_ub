@@ -107,4 +107,11 @@ final class category_interactor {
     public function get_user_id(): int {
         return $this->user_id;
     }
+
+    /**
+     * @return context_coursecat
+     */
+    public function get_context(): context_coursecat {
+        return $this->category_context;
+    }
 }

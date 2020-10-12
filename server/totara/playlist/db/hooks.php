@@ -32,5 +32,13 @@ $watchers = [
     [
         'hookname' => '\totara_topic\hook\get_deleted_topic_usages',
         'callback' => ['\totara_playlist\watcher\totara_topic_watcher', 'on_deleted_topic_get_usage']
+    ],
+    [
+        'hookname' => '\editor_weka\hook\find_context',
+        'callback' => ['\totara_playlist\watcher\editor_weka_watcher', 'on_find_context']
+    ],
+    [
+        'hookname' => '\editor_weka\hook\search_users_by_pattern',
+        'callback' => ['\totara_playlist\watcher\editor_weka_watcher', 'on_search_users']
     ]
 ];

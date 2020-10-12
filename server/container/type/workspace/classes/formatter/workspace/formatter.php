@@ -39,6 +39,7 @@ final class formatter extends base_formatter {
      */
     public function __construct(workspace $workspace) {
         $record = new \stdClass();
+        $context = $workspace->get_context();
 
         $record->id = $workspace->get_id();
         $record->name = $workspace->fullname;
@@ -47,8 +48,9 @@ final class formatter extends base_formatter {
         $record->url = $workspace->get_view_url();
         $record->time_created = $workspace->timecreated;
         $record->time_modified = $workspace->timemodified;
+        $record->context_id = $context->id;
 
-        parent::__construct($record, $workspace->get_context());
+        parent::__construct($record, $context);
     }
 
     /**
@@ -86,6 +88,7 @@ final class formatter extends base_formatter {
             'url' => null,
             'description_format' => null,
             'name' => string_field_formatter::class,
+            'context_id' => null,
             'description' => function (?string $value, text_field_formatter $formatter) use ($that): ?string {
                 if (null === $value || '' === $value) {
                     return null;

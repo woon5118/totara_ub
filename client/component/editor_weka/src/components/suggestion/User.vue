@@ -62,17 +62,10 @@ export default {
   },
 
   props: {
-    contextId: {
-      type: [Number, String],
-    },
-
-    component: {
-      type: String,
-    },
-
-    area: {
-      type: String,
-    },
+    contextId: [Number, String],
+    component: String,
+    area: String,
+    instanceId: [Number, String],
 
     location: {
       required: true,
@@ -95,6 +88,7 @@ export default {
           contextid: this.contextId,
           component: this.component,
           area: this.area,
+          instance_id: this.instanceId,
         };
       },
     },

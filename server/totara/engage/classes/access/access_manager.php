@@ -22,6 +22,7 @@
  */
 namespace totara_engage\access;
 
+use totara_engage\engage_core;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\share\recipient\recipient;
 use totara_engage\share\shareable;
@@ -81,9 +82,9 @@ final class access_manager {
 
         $ownerid = $item->get_userid();
 
-        // Check to see if they're allowed to view the library
-        $context = \context_user::instance($user_id);
-        if (!has_capability('totara/engage:viewlibrary', $context, $user_id)) {
+        // Check to see if they're allowed to view the library in the actor's context.
+        $actor_context = \context_user::instance($user_id);
+        if (!has_capability('totara/engage:viewlibrary', $actor_context, $user_id)) {
             return false;
         }
 
@@ -92,7 +93,8 @@ final class access_manager {
             return true;
         }
 
-        if (self::can_manage_engage(\context_user::instance($ownerid), $user_id)) {
+        $owner_context = \context_user::instance($ownerid);
+        if (self::can_manage_engage($owner_context, $user_id)) {
             return true;
         }
 
@@ -100,53 +102,8 @@ final class access_manager {
             return false;
         }
 
-        if (!empty($CFG->tenantsenabled)) {
-            $owner_tenant_id = $DB->get_field('user', 'tenantid', ['id' => $ownerid]);
-            $actor_tenant_id = $DB->get_field('user', 'tenantid', ['id' => $user_id]);
-
-            $sql = '
-                SELECT 1 FROM "ttr_cohort_members" cm
-                INNER JOIN "ttr_tenant" t ON t.cohortid = cm.cohortid
-                WHERE cm.userid = :user_id
-                AND t.id = :tenant_id
-            ';
-
-            if (null === $owner_tenant_id && null !== $actor_tenant_id) {
-                // Actor is within a tenant, and owner is not. Therefore we have to check if these
-                // users are within the same tenant or not.
-                $in_same_tenant = $DB->record_exists_sql(
-                    $sql,
-                    [
-                        'user_id' => $ownerid,
-                        'tenant_id' => $actor_tenant_id
-                    ]
-                );
-
-                if (!$in_same_tenant && !empty($CFG->tenantsisolated)) {
-                    // Not in same tenant, and tenant isolation mode is on.
-                    // Actor cannot see.
-                    return false;
-                }
-            } else if (null !== $owner_tenant_id && null === $actor_tenant_id) {
-                // Owner is within tenant, check if user actor is within same tenant or not.
-                $in_same_tenant = $DB->record_exists_sql(
-                    $sql,
-                    [
-                        'user_id' => $user_id,
-                        'tenant_id' => $owner_tenant_id
-                    ]
-                );
-
-                if (!$in_same_tenant) {
-                    // System level user by default should not be able to see tenant's content.
-                    // Until they are participant of the tenant.
-                    return false;
-                }
-            } else if ($owner_tenant_id !== $actor_tenant_id) {
-                // Both actor and owner either can be within a tenant or within the system level,
-                // we just need to check if they are in the same tenant/system level or not.
-                return false;
-            }
+        if (!engage_core::allow_access_with_tenant_check($owner_context, $user_id)) {
+            return false;
         }
 
         if ($item->is_public()) {

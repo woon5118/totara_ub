@@ -80,6 +80,7 @@
                   :workspace-total-discussions="workspace.total_discussions"
                   :selected-sort="discussionSortOption"
                   :workspace-id="workspaceId"
+                  :workspace-context-id="workspace.context_id"
                   @add-discussion="addDiscussion"
                 />
 

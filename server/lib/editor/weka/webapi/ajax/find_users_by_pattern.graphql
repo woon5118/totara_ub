@@ -3,12 +3,14 @@ query editor_weka_find_users_by_pattern(
   $contextid: param_integer
   $component: param_component
   $area: param_area
+  $instance_id: param_integer
 ) {
   users: editor_weka_users_by_pattern(
     pattern: $pattern
     contextid: $contextid
     component: $component
     area: $area
+    instance_id: $instance_id
   ) {
     __typename
     id

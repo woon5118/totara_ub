@@ -61,8 +61,25 @@ export default {
     },
     instanceId: [Number, String],
     fileItemId: [Number, String],
+    /**
+     * Sometimes instance id might not be set, because weka editor is used to create a new instance.
+     * Therefore, this prop context id is a fallback option to replace instance's id.
+     *
+     * Note that this contextId will be the same as options.context_id. The reason that we don't
+     * pass "context_id" via "options" was because that internally weka will look up to "options"
+     * prop and decide whether to fetch from the server or not.
+     */
+    contextId: [Number, String],
     component: String,
     area: String,
+
+    /**
+     * @value {
+     *   context_id: Number
+     *   showtoolbar: Boolean,
+     *   extensions: Object[]
+     * }
+     */
     options: {
       type: Object,
       validator: prop =>
@@ -152,6 +169,7 @@ export default {
           component: this.component,
           area: this.area,
           draft_id: this.fileItemId,
+          context_id: this.contextId || undefined,
         },
       });
 
@@ -243,6 +261,10 @@ export default {
         extensions: extensions,
         fileStorage: fileStorage,
         onUpdate: this.$_onUpdate.bind(this),
+        contextId: this.finalOptions.context_id || null,
+        component: this.component || null,
+        area: this.area || null,
+        instanceId: this.instanceId || null,
         onTransaction: () => {
           this.updateToolbarThrottled();
         },

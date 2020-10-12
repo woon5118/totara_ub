@@ -35,4 +35,8 @@ $watchers = [
         'hookname' => \core_user\hook\allow_view_profile_field::class,
         'callback' => [\totara_engage\watcher\core_user::class, 'handle_allow_view_profile_field'],
     ],
+    [
+        'hookname' => \editor_weka\hook\search_users_by_pattern::class,
+        'callback' => [\totara_engage\watcher\editor_weka_watcher::class, 'on_search_users']
+    ]
 ];

@@ -253,4 +253,31 @@ trait webapi_phpunit_helper {
         $resolver = new default_resolver();
         return $resolver($source, $variables, $execution_context, $resolve_info_mock);
     }
+
+    /**
+     * Given the graphql query/mutation resolver class name, this function will
+     * compute the query/mutation name base on it.
+     *
+     * @param string $class_name
+     * @return string
+     */
+    public function get_graphql_name(string $class_name): string {
+        if (!class_exists($class_name)) {
+            throw new \coding_exception("Class '{$class_name}' does not exist");
+        }
+
+        if (false === stripos($class_name, "\\webapi\\resolver\\")) {
+            throw new \coding_exception(
+                "Your graphql resolver class '{$class_name}' must be in convention class path"
+            );
+        }
+
+        $class_name = ltrim($class_name, "\\");
+        $parts = explode("\\", $class_name);
+
+        $component = reset($parts);
+        $graphql_name = end($parts);
+
+        return "{$component}_{$graphql_name}";
+    }
 }

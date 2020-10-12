@@ -342,7 +342,7 @@ final class comment_helper {
      */
     public static function create_comment(string $component, string $area, int $instance_id, string $content,
                                           ?int $content_format = null, ?int $draft_id = null, ?int $actor_id = null): comment {
-        global $USER, $CFG;
+        global $USER;
 
         if (empty($content)) {
             throw new \coding_exception("Cannot create a comment with empty content");
@@ -764,5 +764,23 @@ final class comment_helper {
             $area,
             $comment_id
         );
+    }
+
+    /**
+     * @param string $area
+     * @return bool
+     */
+    public static function is_valid_area(string $area): bool {
+        return in_array($area, [comment::COMMENT_AREA, comment::REPLY_AREA]);
+    }
+
+    /**
+     * @param string $area
+     * @return void
+     */
+    public static function validate_comment_area(string $area): void {
+        if (!static::is_valid_area($area)) {
+            throw new \coding_exception("Invalid area '{$area}'");
+        }
     }
 }

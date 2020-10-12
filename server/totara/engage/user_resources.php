@@ -20,8 +20,9 @@
  * @author Cody Finegan <cody.finegan@totaralearning.com>
  * @package totara_engage
  */
-
 use totara_core\advanced_feature;
+use totara_engage\engage_core;
+use core\notification;
 
 require_once(__DIR__ . '/../../config.php');
 global $USER, $OUTPUT, $PAGE;
@@ -39,25 +40,37 @@ if ($user_id == $USER->id) {
 }
 
 $user = core_user::get_user($user_id, '*', MUST_EXIST);
-$title = get_string('usersresources', 'totara_engage', fullname($user));
+$user_fullname = fullname($user);
+
+$target_context = context_user::instance($user->id);
+$tui = null;
 
 // Set page properties.
-$PAGE->set_context(\context_user::instance($USER->id));
-$PAGE->set_title($title);
-$PAGE->set_pagelayout('legacynolayout');
+$PAGE->set_context($target_context);
 $PAGE->set_url(new moodle_url('/totara/engage/user_resources.php'));
+$PAGE->set_pagelayout('legacynolayout');
 
-$tui = new \totara_tui\output\component(
-    'totara_engage/pages/OtherUserLibrary',
-    [
-        'id' => 'userslibrary',
-        'name' => fullname($user),
-        'userId' => $user_id,
-        'pageId' => 'userslibrary',
-    ]
-);
-$tui->register($PAGE);
+if (engage_core::allow_access_with_tenant_check($target_context, $USER->id)) {
+    $PAGE->set_title(get_string('usersresources', 'totara_engage', $user_fullname));
+
+    $tui = new \totara_tui\output\component(
+        'totara_engage/pages/OtherUserLibrary',
+        [
+            'id' => 'userslibrary',
+            'name' => fullname($user),
+            'userId' => $user_id,
+            'pageId' => 'userslibrary',
+        ]
+    );
+    $tui->register($PAGE);
+}
 
 echo $OUTPUT->header();
-echo $OUTPUT->render($tui);
+
+if (null !== $tui) {
+    echo $OUTPUT->render($tui);
+} else {
+    notification::error(get_string('error:view_user_resources', 'totara_engage'));
+}
+
 echo $OUTPUT->footer();

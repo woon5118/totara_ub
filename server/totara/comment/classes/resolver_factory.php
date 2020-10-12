@@ -22,6 +22,8 @@
  */
 namespace totara_comment;
 
+use coding_exception;
+
 final class resolver_factory {
     /**
      * @param string $component
@@ -32,7 +34,7 @@ final class resolver_factory {
 
         $clean = clean_param($component, PARAM_COMPONENT);
         if ($clean != $component) {
-            throw new \coding_exception("Invalid component parameter '{$component}'");
+            throw new coding_exception("Invalid component parameter '{$component}'");
         }
 
         $class_name = "\\{$component}\\totara_comment\\comment_resolver";
@@ -49,6 +51,6 @@ final class resolver_factory {
             return $resolver;
         }
 
-        throw new \coding_exception("There is no such resolver for component '{$component}'");
+        throw new coding_exception("There is no such resolver for component '{$component}'");
     }
 }

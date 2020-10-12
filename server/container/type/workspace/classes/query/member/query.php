@@ -25,6 +25,7 @@ namespace container_workspace\query\member;
 use container_workspace\query\cursor_query;
 use core\pagination\base_cursor;
 use core\pagination\offset_cursor;
+use context_course;
 
 /**
  * Query for members
@@ -36,6 +37,7 @@ final class query implements cursor_query {
     public const ITEMS_PER_PAGE = 20;
 
     /**
+     * It is a course's table id. "ttr_course".id - do not miss using it with the table field "ttr_workspace".id
      * @var int
      */
     private $workspace_id;
@@ -64,6 +66,11 @@ final class query implements cursor_query {
     private $cursor;
 
     /**
+     * @var bool
+     */
+    private $include_tenant_users;
+
+    /**
      * query constructor.
      * @param int $workspace_id
      */
@@ -74,6 +81,22 @@ final class query implements cursor_query {
         $this->member_status = null;
         $this->sort = sort::NAME;
         $this->cursor = null;
+        $this->include_tenant_users = true;
+    }
+
+    /**
+     * @param bool $value
+     * @return void
+     */
+    public function set_include_tenant_users(bool $value): void {
+        $this->include_tenant_users = $value;
+    }
+
+    /**
+     * @return bool
+     */
+    public function include_tenant_users(): bool {
+        return $this->include_tenant_users;
     }
 
     /**
@@ -152,5 +175,21 @@ final class query implements cursor_query {
      */
     public function get_workspace_id(): int {
         return $this->workspace_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_worksapce_tenant_id(): ?int {
+        $context = context_course::instance($this->workspace_id);
+        return $context->tenantid;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_workspace_in_tenant(): bool {
+        $tenant_id = $this->get_worksapce_tenant_id();
+        return null !== $tenant_id;
     }
 }

@@ -36,6 +36,7 @@
         area="discussion"
         :file-item-id="draftId"
         :instance-id="discussionId"
+        :context-id="workspaceContextId"
         :placeholder="$str('start_discussion', 'container_workspace')"
         class="tui-workspaceDiscussionForm__editor"
       />
@@ -94,6 +95,10 @@ export default {
       type: [String, Number],
       default: null,
     },
+    /**
+     * A fallback option when we are creating a new discussion.
+     */
+    workspaceContextId: [Number, String],
     content: {
       type: String,
       default: null,

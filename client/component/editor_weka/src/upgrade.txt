@@ -1,0 +1,7 @@
+This files describes API changes in /client/component/editor_weka,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+
+* Added new optional prop "instanceId" for component User.vue
+* Added new optional prop "contextId" for component Weka.vue

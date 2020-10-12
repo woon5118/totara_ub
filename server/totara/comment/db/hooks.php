@@ -38,5 +38,5 @@ $watchers = [
         // Totara Comments gives users the ability to view some users profile fields
         'hookname' => \core_user\hook\allow_view_profile_field::class,
         'callback' => [\totara_comment\watcher\core_user::class, 'handle_allow_view_profile_field'],
-    ],
+    ]
 ];
