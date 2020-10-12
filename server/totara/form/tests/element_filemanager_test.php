@@ -35,7 +35,9 @@ class totara_form_element_filemanager_testcase extends advanced_testcase {
         parent::setUp();
         require_once(__DIR__  . '/fixtures/test_form.php');
         test_form::phpunit_reset();
-        $this->resetAfterTest();
+
+        // Clear the file status cache between tests to reduce interference
+        clearstatcache();
     }
 
     protected function tearDown(): void {
@@ -62,7 +64,8 @@ class totara_form_element_filemanager_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var filemanager $filemanager1 */
                 $filemanager1 = $model->add(new filemanager('somefilemanager1', 'Some filemanager 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         test_form::phpunit_set_post_data(null);
@@ -103,7 +106,8 @@ class totara_form_element_filemanager_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var filemanager $filemanager1 */
                 $filemanager1 = $model->add(new filemanager('somefilemanager1', 'Some filemanager 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -151,7 +155,8 @@ class totara_form_element_filemanager_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var filemanager $filemanager1 */
                 $filemanager1 = $model->add(new filemanager('somefilemanager1', 'Some filemanager 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -207,7 +212,8 @@ class totara_form_element_filemanager_testcase extends advanced_testcase {
                 /** @var filemanager $filemanager1 */
                 $filemanager1 = $model->add(new filemanager('somefilemanager1', 'Some filemanager 1'));
                 $filemanager1->set_frozen(true);
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(

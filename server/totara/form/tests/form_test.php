@@ -39,7 +39,9 @@ class totara_form_form_testcase extends advanced_testcase {
         parent::setUp();
         require_once(__DIR__  . '/fixtures/test_form.php');
         test_form::phpunit_reset();
-        $this->resetAfterTest();
+
+        // Clear the file status cache between tests to reduce interference
+        clearstatcache();
     }
 
     protected function tearDown(): void {
@@ -72,7 +74,8 @@ class totara_form_form_testcase extends advanced_testcase {
         $definition = new test_definition($this,
             function (model $model, advanced_testcase $testcase) {
                 debugging('defined', DEBUG_ALL);
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $this->assertDebuggingNotCalled();
@@ -119,7 +122,8 @@ class totara_form_form_testcase extends advanced_testcase {
                 /** @var buttons $actionbuttonsgroup */
                 $actionbuttonsgroup = $model->add_action_buttons();
                 $actionbuttonsgroup->add(new action_button('reloadbutton', 'Reload', action_button::TYPE_RELOAD));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         test_form::phpunit_set_post_data(array('cancelbutton' => 'xxx'));
@@ -195,7 +199,8 @@ class totara_form_form_testcase extends advanced_testcase {
                 /** @var buttons $actionbuttonsgroup */
                 $actionbuttonsgroup = $model->add_action_buttons();
                 $actionbuttonsgroup->add(new action_button('reloadbutton', 'Reload', action_button::TYPE_RELOAD));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         test_form::phpunit_set_post_data(array('reloadbutton' => 'xxx'));
@@ -266,7 +271,8 @@ class totara_form_form_testcase extends advanced_testcase {
         // Test JS reload trick.
         $definition = new test_definition($this,
             function (model $model, advanced_testcase $testcase) {
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         test_form::phpunit_set_post_data(array('___tf_reload' => '1'));
@@ -275,7 +281,6 @@ class totara_form_form_testcase extends advanced_testcase {
         $this->assertFalse($form->is_cancelled());
         $this->assertNull($form->get_data());
         $this->assertNull($form->get_files());
-
     }
 
     public function test_get_data() {
@@ -285,7 +290,8 @@ class totara_form_form_testcase extends advanced_testcase {
                 /** @var buttons $actionbuttonsgroup */
                 $actionbuttonsgroup = $model->add_action_buttons();
                 $actionbuttonsgroup->add(new action_button('reloadbutton', 'Reload', action_button::TYPE_RELOAD));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -387,7 +393,8 @@ class totara_form_form_testcase extends advanced_testcase {
         $definition = new test_definition($this,
             function (model $model, advanced_testcase $testcase) {
                 $model->add(new filepicker('somefilepicker1', 'Some filepicker 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -433,7 +440,8 @@ class totara_form_form_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var filemanager $filemanager1 */
                 $filemanager1 = $model->add(new filemanager('somefilemanager1', 'Some filemanager 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -479,7 +487,8 @@ class totara_form_form_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var filemanager $filemanager1 */
                 $filemanager1 = $model->add(new filemanager('somefilemanager1', 'Some filemanager 1', array('subdirs' => false)));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -522,7 +531,8 @@ class totara_form_form_testcase extends advanced_testcase {
         $definition = new test_definition($this,
             function (model $model, advanced_testcase $testcase) {
                 $model->add(new filepicker('somefilepicker1', 'Some filepicker 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -574,7 +584,8 @@ class totara_form_form_testcase extends advanced_testcase {
         $definition = new test_definition($this,
             function (model $model, advanced_testcase $testcase) {
                 $model->add(new filepicker('somefilepicker1', 'Some filepicker 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -610,7 +621,8 @@ class totara_form_form_testcase extends advanced_testcase {
         $definition = new test_definition($this,
             function (model $model, advanced_testcase $testcase) {
                 $model->add(new filepicker('somefilepicker1', 'Some filepicker 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -646,7 +658,8 @@ class totara_form_form_testcase extends advanced_testcase {
         $definition = new test_definition($this,
             function (model $model, advanced_testcase $testcase) {
                 $model->add(new filepicker('somefilepicker1', 'Some filepicker 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -680,7 +693,8 @@ class totara_form_form_testcase extends advanced_testcase {
         $definition = new test_definition($this,
             function (model $model, advanced_testcase $testcase) {
                 $model->add(new filepicker('somefilepicker1', 'Some filepicker 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(

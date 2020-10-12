@@ -49,7 +49,7 @@ abstract class testing_util {
      * @static
      * @return string
      */
-    protected static final function get_framework() {
+    final protected static function get_framework() {
         $classname = get_called_class();
         return substr($classname, 0, strpos($classname, '_'));
     }

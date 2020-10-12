@@ -36,7 +36,9 @@ class totara_form_element_editor_testcase extends advanced_testcase {
         parent::setUp();
         require_once(__DIR__  . '/fixtures/test_form.php');
         test_form::phpunit_reset();
-        $this->resetAfterTest();
+
+        // Clear the file status cache between tests to reduce interference
+        clearstatcache();
     }
 
     protected function tearDown(): void {
@@ -50,7 +52,8 @@ class totara_form_element_editor_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var editor $editor1 */
                 $editor1 = $model->add(new editor('someeditor1', 'Some editor 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
         test_form::phpunit_set_post_data(null);
         $currentdata = array('someeditor1' => '', 'someeditor1format' => null);
@@ -67,7 +70,8 @@ class totara_form_element_editor_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var editor $editor1 */
                 $editor = $model->add(new editor('test_editor', 'Some test editor'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $valid_data = $this->get_empty_json_submission();
@@ -101,7 +105,8 @@ class totara_form_element_editor_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var editor $editor1 */
                 $editor = $model->add(new editor('test_editor', 'Some test editor'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $valid_data = $this->get_valid_json_submission();
@@ -131,7 +136,8 @@ class totara_form_element_editor_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var editor $editor1 */
                 $editor = $model->add(new editor('test_editor', 'Some test editor'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $invalid_data = $this->get_invalid_json_submission();
@@ -162,7 +168,8 @@ class totara_form_element_editor_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var editor $editor1 */
                 $editor1 = $model->add(new editor('someeditor1', 'Some editor 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -193,7 +200,8 @@ class totara_form_element_editor_testcase extends advanced_testcase {
                 /** @var editor $editor1 */
                 $editor1 = $model->add(new editor('someeditor1', 'Some editor 1'));
                 $editor1->set_attribute('required', true);
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $postdata = array(
@@ -234,6 +242,9 @@ class totara_form_element_editor_testcase extends advanced_testcase {
     public function test_submission_files() {
         global $OUTPUT, $PAGE;
 
+        // Clear the file status cache to ensure previous tests are not interfering
+        clearstatcache();
+
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
         $usercontext = \context_user::instance($user->id);
@@ -247,7 +258,8 @@ class totara_form_element_editor_testcase extends advanced_testcase {
             function (model $model, advanced_testcase $testcase) {
                 /** @var editor $editor1 */
                 $editor1 = $model->add(new editor('someeditor1', 'Some editor 1'));
-            });
+            }
+        );
         test_form::phpunit_set_definition($definition);
 
         $currentdata = array(

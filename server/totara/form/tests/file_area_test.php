@@ -27,6 +27,13 @@ use totara_form\file_area;
  * Tests for \totara_form\file_area class.
  */
 class totara_form_file_area_testcase extends advanced_testcase {
+    protected function setUp(): void {
+        parent::setUp();
+
+        // Clear the file status cache between tests to reduce interference
+        clearstatcache();
+    }
+
     public function test_normalise_accept_attribute() {
 
         // File extensions.
