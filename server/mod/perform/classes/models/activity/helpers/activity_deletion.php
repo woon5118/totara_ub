@@ -70,19 +70,9 @@ class activity_deletion {
         builder::get_db()->transaction(function () {
             $delete_event = activity_deleted::create_from_activity($this->activity);
 
-            // Fetch the response ids and track ids in one round trip (orm doesn't support joins in deletes).
-            [
-                $response_ids,
-                $track_ids,
-                $participant_section_ids,
-                $section_relationship_ids
-            ] = $this->fetch_ids();
-
             // Must be deleted first due to foreign key constraints.
-            $this->delete_section_relationships($section_relationship_ids);
-            $this->delete_participant_sections($participant_section_ids);
-            $this->delete_responses($response_ids); // Not linked so must be manually deleted.
-            $this->delete_user_assignments($track_ids); // Must be deleted first due to foreign key constraints.
+            $this->delete_section_relationships();
+            $this->delete_user_assignments(); // Must be deleted first due to foreign key constraints.
             $this->delete_manual_relationship_selections();
 
             // Delete any elements that are directly owned by this activity (through shared context).
@@ -103,114 +93,16 @@ class activity_deletion {
     }
 
     /**
-     * Fetch ids of child records eligible for delete in one query.
-     *
-     * @return array
-     */
-    protected function fetch_ids(): array {
-        $ids = builder::create()
-            ->select(
-                [
-                    'section_element.element_id',
-                    'response.id as response_id',
-                    'track.id as track_id',
-                    'participant_section.id as participant_section_id',
-                    'section_relationship.id as section_relationship_id'
-                ]
-            )
-            ->from(activity_entity::TABLE, 'activity')
-            ->left_join([track_entity::TABLE, 'track'], 'track.activity_id', 'activity.id')
-            ->left_join([section_entity::TABLE, 'section'], 'section.activity_id', 'activity.id')
-            ->left_join([section_element_entity::TABLE, 'section_element'], 'section_element.section_id', 'section.id')
-            ->left_join([section_relationship_entity::TABLE, 'section_relationship'], 'section_relationship.section_id', 'section.id')
-            ->left_join([participant_section_entity::TABLE, 'participant_section'], 'participant_section.section_id', 'section.id')
-            ->left_join([element_entity::TABLE, 'element'], 'section_element.element_id', 'element.id')
-            ->left_join([element_response_entity::TABLE, 'response'], 'response.section_element_id', 'section_element.id')
-            ->where('activity.id', $this->activity->id)
-            ->get(true);
-
-        // Remove nulls and pluck ids.
-        $response_ids = $ids->filter('response_id', true, false)->pluck('response_id');
-        $track_ids = $ids->filter('track_id', true, false)->pluck('track_id');
-        $participant_section_ids = $ids->filter('participant_section_id', true, false)->pluck('participant_section_id');
-        $section_relationship_ids = $ids->filter('section_relationship_id', true, false)->pluck('section_relationship_id');
-
-        return [
-            array_unique($response_ids),
-            array_unique($track_ids),
-            array_unique($participant_section_ids),
-            array_unique($section_relationship_ids)
-        ];
-    }
-
-    /**
-     * Delete a list of response records records.
-     *
-     * @param array $response_ids
-     */
-    protected function delete_responses(array $response_ids): void {
-        if (count($response_ids) === 0) {
-            return;
-        }
-
-        // The orm/builder doesn't support joins in deletes,
-        // so we just pull out all the ids with a query and delete in the next.
-        builder::create()
-            ->from(element_response_entity::TABLE, 'response')
-            ->where('id', $response_ids)
-            ->delete();
-    }
-
-    /**
      * Delete a list of user assignments based on track ids.
-     *
-     * @param array $track_ids
      */
-    protected function delete_user_assignments(array $track_ids): void {
-        if (count($track_ids) === 0) {
-            return;
-        }
-
-        $this->delete_user_assignments_via($track_ids);
-
-        // The orm/builder doesn't support joins in deletes,
-        // so we just pull out all the ids with a query and delete in the next.
-        builder::create()
-            ->from(track_user_assignment::TABLE, 'track_user_assignment')
-            ->where('track_id', $track_ids)
-            ->delete();
-    }
-
-    /**
-     * Delete a list of user assignment via based on track ids.
-     *
-     * @param array $track_ids
-     */
-    protected function delete_user_assignments_via(array $track_ids): void {
-        $ids = builder::create()
-            ->select(
-                [
-                    'track_user_assignment.id as track_user_assignment_id'
-                ]
-            )
-            ->from(track_user_assignment::TABLE, 'track_user_assignment')
-            ->where('track_id', $track_ids)
-            ->get(true);
-
-        // Remove nulls and pluck ids.
-        $track_user_assignment_ids = array_unique(
-            $ids->filter('track_user_assignment_id', true, false)
-                ->pluck('track_user_assignment_id')
+    protected function delete_user_assignments(): void {
+        builder::get_db()->delete_records_select(
+            track_user_assignment::TABLE,
+            "track_id IN (
+               SELECT id FROM {perform_track} WHERE activity_id = :activity_id
+            )",
+            ['activity_id' => $this->activity->id]
         );
-        if (count($track_user_assignment_ids) === 0) {
-            return;
-        }
-        // The orm/builder doesn't support joins in deletes,
-        // so we just pull out all the ids with a query and delete in the next.
-        builder::create()
-            ->from(track_user_assignment_via::TABLE)
-            ->where('track_user_assignment_id', $track_user_assignment_ids)
-            ->delete();
     }
 
     /**
@@ -224,39 +116,16 @@ class activity_deletion {
     }
 
     /**
-     * Delete a list of participant section records.
-     *
-     * @param array $participant_section_ids
-     */
-    protected function delete_participant_sections(array $participant_section_ids): void {
-        if (count($participant_section_ids) === 0) {
-            return;
-        }
-
-        // The orm/builder doesn't support joins in deletes,
-        // so we just pull out all the ids with a query and delete in the next.
-        builder::create()
-            ->from(participant_section_entity::TABLE, 'participant_section')
-            ->where('id', $participant_section_ids)
-            ->delete();
-    }
-
-    /**
      * Delete a list of section relationship records.
-     *
-     * @param array $section_relationship_ids
      */
-    protected function delete_section_relationships(array $section_relationship_ids): void {
-        if (count($section_relationship_ids) === 0) {
-            return;
-        }
-
-        // The orm/builder doesn't support joins in deletes,
-        // so we just pull out all the ids with a query and delete in the next.
-        builder::create()
-            ->from(section_relationship_entity::TABLE, 'section_relationship')
-            ->where('id', $section_relationship_ids)
-            ->delete();
+    protected function delete_section_relationships(): void {
+        builder::get_db()->delete_records_select(
+            section_relationship_entity::TABLE,
+            "section_id IN (
+                SELECT id FROM {perform_section} WHERE activity_id = :activity_id
+            )",
+            ['activity_id' => $this->activity->id]
+        );
     }
 
     /**
