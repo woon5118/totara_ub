@@ -267,6 +267,18 @@ trait report_trait {
             )
         );
 
+        // The mobile compatibility setting column.
+        $columnoptions[] = new \rb_column_option(
+            'course',
+            'mobilecompatible',
+            get_string('coursemobilecompatible', 'totara_reportbuilder'),
+            "CASE WHEN mobile_course.id IS NULL THEN 0 ELSE 1 END",
+            array(
+                'joins' => 'mobile_course',
+                'displayfunc' => 'yes_or_no'
+            )
+        );
+
         return true;
     }
 
@@ -379,6 +391,18 @@ trait report_trait {
             get_string('coursemultiitem', 'totara_reportbuilder'),
             'course_multi'
         );
+
+        // Add a filter on whether the course is mobile compatiblie.
+        $filteroptions[] = new \rb_filter_option(
+            'course',
+            'mobilecompatible',
+            get_string('coursemobilecompatible', 'totara_reportbuilder'),
+            'select',
+            array(
+                'selectchoices' => array(0 => get_string('no'), 1 => get_string('yes')),
+                'simplemode' => true
+            )
+        );
         return true;
     }
 
@@ -403,6 +427,16 @@ trait report_trait {
             "course.id = $join.$field",
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             $join
+        );
+
+        // Note: I added this to the core function since it's basically a course property
+        $joinlist[] = new \rb_join(
+            'mobile_course',
+            'left',
+            '{totara_mobile_compatible_courses}',
+            'course.id = mobile_course.courseid',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            'course'
         );
 
         return true;

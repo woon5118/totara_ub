@@ -86,6 +86,17 @@ class rb_source_courses extends rb_base_source {
             ),
         );
 
+        // Include the mobile join from core_course_tables.
+        $joinlist[] = new \rb_join(
+            'mobile_course',
+            'left',
+            '{totara_mobile_compatible_courses}',
+            'base.id = mobile_course.courseid',
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            'base'
+        );
+
+
         // Include some standard joins.
         $this->add_context_tables($joinlist, 'base', 'id', CONTEXT_COURSE, 'INNER');
         $this->add_core_course_category_tables($joinlist,

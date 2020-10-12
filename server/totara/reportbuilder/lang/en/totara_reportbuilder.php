@@ -207,6 +207,7 @@ $string['courseicon'] = 'Course Icon';
 $string['courseid'] = 'Course ID';
 $string['courseidnumber'] = 'Course ID Number';
 $string['courselanguage'] = 'Course language';
+$string['coursemobilecompatible'] = 'Course mobile compatibility';
 $string['coursemultiitem'] = 'Course (multi-item)';
 $string['coursemultiitemchoose'] = 'Choose Courses';
 $string['coursename'] = 'Course Name';
