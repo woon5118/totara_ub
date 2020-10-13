@@ -224,27 +224,25 @@ class section extends model {
      * @return stdClass
      */
     public function get_section_elements_summary(): stdClass {
-
-        $total_count = section_element_entity::repository()
-            ->where('section_id', $this->id)
-            ->count();
-
-        $required_count = section_element_entity::repository()
-            ->join([element_entity::TABLE, 'element'], 'element_id', 'id')
-            ->where('section_id', $this->id)
-            ->where('element.is_required', 1)
-            ->count();
-
-        $optional_count = section_element_entity::repository()
-            ->join([element_entity::TABLE, 'element'], 'element_id', 'id')
-            ->where('section_id', $this->id)
-            ->where('element.is_required', 0)
-            ->count();
+        $other_element_count = 0;
+        $optional_count = 0;
+        $required_count = 0;
+        foreach ($this->entity->section_elements as $section_element) {
+            // is_required can be null for non-question elements
+            $is_required = $section_element->element->is_required;
+            if (is_null($is_required)) {
+                $other_element_count ++;
+            } else if ($is_required) {
+                $required_count ++;
+            } else {
+                $optional_count ++;
+            }
+        }
 
         return (object)[
             'required_question_count' => $required_count,
             'optional_question_count' => $optional_count,
-            'other_element_count'     => $total_count - ($required_count + $optional_count),
+            'other_element_count'     => $other_element_count,
         ];
     }
 

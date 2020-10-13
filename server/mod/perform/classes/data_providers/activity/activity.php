@@ -72,7 +72,7 @@ class activity extends provider {
             ->with('tracks')
             ->with([
                 'sections_ordered' => function (repository $repository) {
-                    $repository->with('section_relationships')
+                    $repository->with('section_relationships.core_relationship')
                         ->with('section_elements.element');
                 }
             ])
@@ -85,5 +85,13 @@ class activity extends provider {
     protected function process_fetched_items(): collection {
         return $this->items
             ->map_to(activity_model::class);
+    }
+
+    /**
+     * @param repository $repository
+     * @param int $activity_id
+     */
+    protected function filter_query_by_id(repository $repository, int $activity_id): void {
+        $repository->where('id', $activity_id);
     }
 }

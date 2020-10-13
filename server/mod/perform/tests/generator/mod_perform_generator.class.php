@@ -359,7 +359,7 @@ class mod_perform_generator extends component_generator_base {
         $element->update_details(
             $data['title'] ?? $element->title,
             $data['data'] ?? $element->data,
-            $data['is_required'] ?? $element->is_required
+            $data['is_required']
         );
     }
 

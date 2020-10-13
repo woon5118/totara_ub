@@ -118,6 +118,20 @@ class mod_perform_activity_data_provider_testcase extends advanced_testcase {
         );
     }
 
+    public function test_filter_by_id() {
+        $this->setAdminUser();
+
+        $data = $this->create_test_data();
+
+        $activities = (new activity())->add_filters(['id' => $data->activity1->id])->fetch()->get()->all();
+
+        $this->assertCount(1, $activities);
+        $this->assertEquals($data->activity1->id, $activities[0]->id);
+
+        $activities = (new activity())->add_filters(['id' => - 1])->fetch()->get()->all();
+        $this->assertCount(0, $activities);
+    }
+
     private function create_test_data(): stdClass {
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');

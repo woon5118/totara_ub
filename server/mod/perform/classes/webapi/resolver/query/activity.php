@@ -27,6 +27,7 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use mod_perform\data_providers\activity\activity as activity_data_provider;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 
@@ -35,10 +36,11 @@ class activity implements query_resolver, has_middleware {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        // The require_activity middleware loads the activity and passes it along via the args
-        $activity = $args['activity'];
-
-        return $activity;
+        return (new activity_data_provider())
+            ->add_filters(['id' => $args['activity_id']])
+            ->fetch()
+            ->get()
+            ->first();
     }
 
     /**

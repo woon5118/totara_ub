@@ -695,9 +695,11 @@ class activity extends model {
      * @return collection
      */
     public function get_manual_relationships(): collection {
-        return $this->entity->manual_relationships->map_to(activity_manual_relationship_selection::class)->sort(function($manual_selection, $manual_selection_2) {
-            return $manual_selection->manual_relationship->sort_order <=> $manual_selection_2->manual_relationship->sort_order;
-        });
+        return $this->entity->manual_relationships
+            ->map_to(activity_manual_relationship_selection::class)
+            ->sort(function ($manual_selection, $manual_selection_2) {
+                return $manual_selection->manual_relationship->sort_order <=> $manual_selection_2->manual_relationship->sort_order;
+            });
     }
 
     /**
