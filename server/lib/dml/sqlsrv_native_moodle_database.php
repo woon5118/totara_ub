@@ -1655,7 +1655,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
         }
 
         if ($length === false) {
-            return "SUBSTRING($expr, " . $this->sql_cast_char2int($start) . ", 2^31-1)";
+            return "SUBSTRING($expr, " . $this->sql_cast_char2int($start) . ", 2147483647)";
         } else {
             return "SUBSTRING($expr, " . $this->sql_cast_char2int($start) . ", " . $this->sql_cast_char2int($length) . ")";
         }
