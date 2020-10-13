@@ -32,7 +32,7 @@
         <FormTextarea
           :name="['formcustom_field_customcss', 'value']"
           spellcheck="false"
-          rows="6"
+          :rows="rows"
           char-length="full"
           :aria-describedby="$id('formcustom-customcss-details')"
         />
@@ -120,6 +120,27 @@ export default {
       valuesForm: null,
       resultForm: null,
     };
+  },
+
+  computed: {
+    rows() {
+      var text = '';
+      if (this.valuesForm && 'formcustom_field_customcss' in this.valuesForm) {
+        text = this.valuesForm.formcustom_field_customcss.value;
+      } else if (
+        this.initialValues &&
+        'formcustom_field_customcss' in this.initialValues
+      ) {
+        text = this.initialValues.formcustom_field_customcss.value;
+      }
+      var lines = (text.match(/\n/g) || []).length + 1;
+      if (lines < 6) {
+        lines = 6;
+      } else if (lines > 30) {
+        lines = 30;
+      }
+      return lines;
+    },
   },
 
   /**
