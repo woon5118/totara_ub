@@ -96,7 +96,7 @@ class user_with_components_links extends base {
         $profilestr = get_string('profile', 'rb_source_user');
         $bookingstr = get_string('bookings', 'rb_source_user');
         $appraisalstr = get_string('appraisals', 'totara_appraisal');
-        $feedback360str = get_string('feedback360', 'totara_feedback360');
+        $feedback360str = get_string('feedback360_legacy', 'totara_feedback360');
         $goalstr = get_string('goalplural', 'totara_hierarchy');
         $evidencestr = get_string('evidence', 'totara_evidence');
         $performance_data = get_string('user_components_performance_data_link', 'mod_perform');
