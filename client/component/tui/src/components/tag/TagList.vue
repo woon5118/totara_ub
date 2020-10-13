@@ -257,7 +257,11 @@ export default {
     flex-shrink: 0;
     padding-right: var(--gap-2);
     padding-left: var(--gap-1);
+    color: var(--color-state);
     white-space: nowrap;
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   &__input {
