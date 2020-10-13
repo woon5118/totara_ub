@@ -23,6 +23,8 @@
 
 namespace totara_tui\controllers;
 
+use context;
+use moodle_url;
 use totara_mvc\controller;
 use totara_mvc\tui_view;
 use totara_tenant\entity\tenant;
@@ -38,7 +40,7 @@ class theme_settings extends controller {
      * The tenant id, if one was provided.
      * @var int
      */
-    protected $tenantid;
+    protected $tenant_id;
 
     /**
      * @inheritDoc
@@ -48,7 +50,7 @@ class theme_settings extends controller {
     /**
      * @inheritDoc
      */
-    protected function setup_context(): \context {
+    protected function setup_context(): context {
         return \context_system::instance();
     }
 
@@ -60,51 +62,75 @@ class theme_settings extends controller {
 
         // Get the theme name from parameter.
         $this->theme = $this->get_required_param('theme', PARAM_COMPONENT);
-        $this->tenantid = $this->get_optional_param('tenant_id', null, PARAM_INT);
+        $this->tenant_id = $this->get_optional_param('tenant_id', null, PARAM_INT);
 
         require_login(null, false);
+        $url = new moodle_url('/totara/tui/theme_settings.php', ['theme' => $this->theme]);
+        if (!empty($this->tenant_id)) {
+            $url->param('tenant_id', $this->tenant_id);
+        }
+        $this->set_url($url);
 
-        if (!is_null($this->tenantid)) {
-            $tenant = tenant::repository()->find($this->tenantid);
+        // Redirect to the correct tenant this user belongs to.
+        if (!empty($USER->tenantid) && $USER->tenantid != $this->tenant_id) {
+            redirect(new moodle_url($url, ['tenant_id' => $USER->tenantid]));
+        }
+
+        // Request access to theme settings for tenant or site.
+        $tenant = null;
+        if (!empty($this->tenant_id)) {
+            $tenant = tenant::repository()->find($this->tenant_id);
             if (empty($tenant)) {
                 throw new \moodle_exception('errorinvalidtenant', 'totara_tenant');
             }
-            $context = \context_tenant::instance($this->tenantid);
+            $context = \context_tenant::instance($this->tenant_id);
+            $this->check_user_access($context);
+
+            // If user does not belong to the tenancy but has the required access then let the user through.
+            if (empty($USER->tenantid)) {
+                $categorycontext = \context_coursecat::instance($tenant->categoryid);
+                require_capability('totara/tui:themesettings', $categorycontext);
+                $this->get_page()->set_pagelayout('admin');
+                $this->get_page()->set_title(get_site()->shortname);
+                $this->get_page()->set_heading(get_site()->fullname);
+                parent::process($action);
+                return;
+            }
         } else {
             $context = \context_system::instance();
-        }
-        if ($context->is_user_access_prevented()) {
-            throw new \moodle_exception('accessdenied', 'admin', '', null, $context->id . ' prevented access');
+            $this->check_user_access($context);
         }
 
-        $url = new \moodle_url('/totara/tui/classes/controllers/theme_settings.php', ['theme' => $this->theme]);
-
-        if (!empty($USER->tenantid) && $USER->tenantid != $this->tenantid) {
-            redirect(new \moodle_url($url, ['tenant_id' => $USER->tenantid]));
-        }
-
-        if (!empty($this->tenantid) && empty($USER->tenantid)) {
-            $tenant = \core\record\tenant::fetch($this->tenantid);
-            $categorycontext = \context_coursecat::instance($tenant->categoryid);
-            require_capability('totara/tui:themesettings', $categorycontext);
-            $this->get_page()->set_pagelayout('admin');
-            $this->get_page()->set_title(get_site()->shortname);
-            $this->get_page()->set_heading(get_site()->fullname);
-        } else {
-            require_once($CFG->libdir.'/adminlib.php');
-            admin_externalpage_setup(
-                'ventura_editor',
-                '', // not used
-                ['theme' => $this->theme],
-                '',
-                []
-            );
-        }
-
-        $this->get_page()->set_url($url);
-        $this->set_url($url);
+        // At this point:
+        // 1. Tenant ID is not set as a parameter which means we want access to site's theme settings.
+        // 2. Tenant ID is set and user belongs to the tenancy.
+        require_once($CFG->libdir.'/adminlib.php');
+        admin_externalpage_setup(
+            'ventura_editor',
+            '', // not used
+            ['theme' => $this->theme],
+            '',
+            []
+        );
 
         parent::process($action);
+    }
+
+    /**
+     * Confirm that the user has access to this page.
+     *
+     * @param context $context
+     */
+    private function check_user_access(context $context): void {
+        if ($context->is_user_access_prevented()) {
+            throw new \moodle_exception(
+                'accessdenied',
+                'admin',
+                '',
+                null,
+                $context->id . ' prevented access'
+            );
+        }
     }
 
     /**

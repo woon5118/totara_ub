@@ -58,6 +58,7 @@ class theme_tenants extends admin_controller {
         // Get the theme name from parameter.
         $this->theme = $this->get_required_param('theme', PARAM_COMPONENT);
         $this->admin_external_page_name = "{$this->theme}_editor";
+        $this->set_url(new \moodle_url('/totara/tui/theme_tenants.php', ['theme' => $this->theme]));
         parent::process($action);
     }
 

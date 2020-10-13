@@ -151,7 +151,7 @@ class totara_tui_local_controllers_theme_settings_testcase extends advanced_test
             self::fail('Exception expected. User who is a member of tenant1 accessed theme settings for tenant2');
         } catch (moodle_exception $ex) {
             self::assertStringContainsString(
-                'Access denied',
+                'Unsupported redirect detected, script execution terminated',
                 $ex->getMessage()
             );
         }
