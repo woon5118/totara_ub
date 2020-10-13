@@ -70,7 +70,7 @@ export default {
   provide() {
     return {
       reformScope: {
-        getValue: name => get(this.values, name),
+        getValue: this.get,
         getError: name => get(this.displayedErrors, name),
         getTouched: name => !!get(this.touched, name),
         update: this.update,
@@ -191,11 +191,28 @@ export default {
      * @param {*} value
      */
     update(path, value) {
-      vueSet(this.values, path, value);
+      if (path == null) {
+        this.values = value;
+      } else {
+        vueSet(this.values, path, value);
+      }
       this.$emit('change', this.values);
       if (this.validationMode != 'submit') {
         this.$_validate(path);
       }
+    },
+
+    /**
+     * Get current value of input.
+     *
+     * @param {?(string|number|array)} path Path. Omit to return all values.
+     * @returns {*}
+     */
+    get(path) {
+      if (path == null) {
+        return this.values;
+      }
+      return get(this.values, path);
     },
 
     /**

@@ -18,6 +18,7 @@
 
 <template>
   <Reform
+    ref="reform"
     v-slot="slotProps"
     :initial-values="initialValues"
     :errors="errors"
@@ -84,6 +85,58 @@ export default {
       type: String,
       validator: x => ['full', 'limited'].includes(x),
       default: 'limited',
+    },
+  },
+
+  methods: {
+    /**
+     * Submit form.
+     *
+     * @public
+     * @returns {Promise}
+     */
+    submit() {
+      return this.$refs.reform.submit();
+    },
+
+    /**
+     * Reset form to initial state.
+     *
+     * @public
+     */
+    reset() {
+      this.$refs.reform.reset();
+    },
+
+    /**
+     * Get value of field at path.
+     *
+     * @public
+     * @param {?(string|number|array)} path Path. Omit to return all values.
+     * @returns {*}
+     */
+    get(path) {
+      return this.$refs.reform.get(path);
+    },
+
+    /**
+     * Set value of field at path.
+     *
+     * @public
+     * @param {(string|number|array)} path
+     */
+    update(path, value) {
+      this.$refs.reform.update(path, value);
+    },
+
+    /**
+     * Record that input has been touched.
+     *
+     * @public
+     * @param {(string|number|array)} path
+     */
+    touch(path) {
+      this.$refs.reform.touch(path);
     },
   },
 };
