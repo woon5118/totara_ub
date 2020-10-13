@@ -23,7 +23,7 @@
       class="tui-workspaceMembersTab__list"
     />
 
-    <div class="tui-workspaceMembersTab__head">
+    <div class="tui-workspaceMembersTab__searchHead">
       <MemberSearchBox
         :search-term="searchTerm"
         @submit="searchTerm = $event"
@@ -317,26 +317,19 @@ export default {
 </lang-strings>
 
 <style lang="scss">
+@mixin head-container {
+  display: flex;
+  margin-bottom: var(--gap-4);
+  padding-bottom: var(--gap-4);
+  padding-left: var(--gap-4);
+  border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
+}
 .tui-workspaceMembersTab {
   padding-top: var(--gap-4);
 
   &__list {
     width: 100%;
     margin-bottom: var(--gap-8);
-  }
-
-  &__head {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: var(--gap-8);
-    padding-bottom: var(--gap-4);
-    padding-left: var(--gap-4);
-    border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
-
-    @media (min-width: $tui-screen-sm) {
-      justify-content: flex-end;
-      padding-left: 0;
-    }
   }
 
   &__content {
@@ -348,9 +341,19 @@ export default {
   }
 
   &__head {
+    @include head-container;
     display: flex;
     justify-content: space-between;
     margin-bottom: var(--gap-4);
+  }
+
+  &__searchHead {
+    @include head-container;
+
+    @media (min-width: $tui-screen-sm) {
+      justify-content: flex-end;
+      padding-left: 0;
+    }
   }
 
   &__title {

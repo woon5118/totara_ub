@@ -21,6 +21,7 @@
     v-model="innerSearchTerm"
     :label-visible="false"
     :aria-label="$str('search_members', 'container_workspace')"
+    :placeholder="$str('search_members', 'container_workspace')"
     @submit="$emit('submit', innerSearchTerm)"
   />
 </template>
