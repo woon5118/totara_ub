@@ -1,0 +1,6 @@
+This file describes API changes in /client/component/tui,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Updated SidePanel.vue component to address overlapping issues
+  * SCSS changes

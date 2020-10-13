@@ -282,7 +282,9 @@ export default {
 
 <style lang="scss">
 :root {
-  --tui-sidePanel-button-width: 30px;
+  --tui-sidepanel-button-width: 30px;
+  --tui-sidepanel-button-height: 66px;
+  --tui-sidepanel-border-width: 1px;
 }
 
 .tui-sidePanel {
@@ -300,6 +302,19 @@ export default {
     justify-content: flex-start;
   }
 
+  &--sticky {
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+
+    .ie &,
+    .msedge & {
+      position: relative;
+      top: auto;
+      max-height: initial;
+    }
+  }
+
   /**
    * Close button, somewhat complicated by the SidePanel being configurably
    * bi-directional and both of those directions also requiring RTL support
@@ -307,7 +322,7 @@ export default {
   @mixin attrs-from-right() {
     margin-right: -1px;
     border-right-width: 0;
-    border-left-width: 1px;
+    border-left-width: var(--tui-sidepanel-border-width);
     border-radius: var(--btn-radius) 0 0 var(--btn-radius);
 
     &:hover,
@@ -315,7 +330,7 @@ export default {
     &:active:focus,
     &:active:hover {
       border-right-width: 0;
-      border-left-width: 1px;
+      border-left-width: var(--tui-sidepanel-border-width);
       box-shadow: -2px 1px 4px 0 rgba(0, 0, 0, 0.2);
     }
 
@@ -334,7 +349,7 @@ export default {
     &:active,
     &:active:focus,
     &:active:hover {
-      border-right-width: 1px;
+      border-right-width: var(--tui-sidepanel-border-width);
       border-left-width: 0;
       box-shadow: 2px 1px 4px 0 rgba(0, 0, 0, 0.2);
     }
@@ -347,8 +362,7 @@ export default {
   &__outsideClose {
     .tui-sidePanel--sticky & {
       position: sticky;
-      top: 50%;
-      z-index: 1;
+      top: calc(50% - (var(--tui-sidepanel-button-height) / 2));
     }
 
     .ie & {
@@ -357,12 +371,14 @@ export default {
       // SidePanel, which could be very tall in IE11
       top: auto;
       align-self: flex-start;
-      max-width: var(--tui-sidePanel-button-width);
+      max-width: var(--tui-sidepanel-button-width);
+      max-height: var(--tui-sidepanel-button-height);
       margin-top: var(--gap-8);
     }
+
     flex-grow: 0;
-    min-width: var(--tui-sidePanel-button-width);
-    height: auto;
+    min-width: var(--tui-sidepanel-button-width);
+    min-height: var(--tui-sidepanel-button-height);
     margin-bottom: -1px;
     padding: var(--gap-6) var(--gap-1);
     background-color: var(--color-neutral-3);
@@ -392,7 +408,7 @@ export default {
     width: 100%;
     height: 100%;
     background-color: var(--color-neutral-3);
-    border: 1px solid var(--color-neutral-5);
+    border: var(--tui-sidepanel-border-width) solid var(--color-neutral-5);
 
     .tui-sidePanel--flush & {
       border-top: none;
@@ -400,19 +416,9 @@ export default {
     }
 
     .ie & {
-      border-bottom: 1px solid var(--color-neutral-5); /* put the border back, it usually wouldn't reach the footer, only on really small resources, and would otherwise look chopped off */
-    }
-
-    .tui-sidePanel--sticky & {
-      position: sticky;
-      top: 0;
-      max-height: 100vh;
-
-      .ie & {
-        position: relative;
-        top: auto;
-        max-height: initial;
-      }
+      /* put the border back, it usually wouldn't reach the footer, only on really small resources, and would otherwise look chopped off */
+      border-bottom: var(--tui-sidepanel-border-width) solid
+        var(--color-neutral-5);
     }
 
     .tui-sidePanel--open.tui-sidePanel--overflows & {
