@@ -167,6 +167,10 @@
       text-align: initial;
     }
 
+    svg {
+      color: var(--color-primary);
+    }
+
     .block-trv-header {
       display: flex;
       flex-direction: row;
@@ -216,10 +220,10 @@
           align-items: center;
           justify-content: center;
           width: 80px;
-          height: 80px;
+          height: 76px;
           padding: 0;
-          min-height: 80px;
-
+          min-height: 76px;
+          min-width: 80px;
         }
         .block-trv-image-wrapper > :first-child {
           width: 40px;

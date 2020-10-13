@@ -9,5 +9,6 @@ extend type Query {
     filter: totara_engage_filter!
     footnotes: totara_engage_footnotes
     cursor: String
+    image_preview_mode: String
   ): totara_engage_cards!
 }

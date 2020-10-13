@@ -47,6 +47,7 @@ final class card_formatter extends formatter {
         $record->summary = $card->get_summary();
         $record->component = $card->get_component();
         $record->tuicomponent = $card->get_tui_component()->get_name();
+        $record->imagetuicomponent = $card->get_card_image_component()->get_name();
         $record->timecreated = $card->get_timecreated();
         $record->timemodified = $card->get_timemodified();
 
@@ -61,6 +62,7 @@ final class card_formatter extends formatter {
             'instanceid' => null,
             'component' => null,
             'tuicomponent' => null,
+            'imagetuicomponent' => null,
             'name' => string_field_formatter::class,
             'summary' => null,
             'timecreated' => function (int $value, date_field_formatter $formatter): string {

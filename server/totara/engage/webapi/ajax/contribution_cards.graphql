@@ -15,6 +15,7 @@ query totara_engage_contribution_cards(
   $footnotes_component: param_component
   $cursor: String
   $source: String
+  $image_preview_mode: String
 ) {
   contribution: totara_engage_contributions(
     component: $component
@@ -46,6 +47,8 @@ query totara_engage_contribution_cards(
       summary
       component
       tuicomponent
+      imagetuicomponent
+      image(preview_mode: $image_preview_mode)
       access
       comments
       reactions

@@ -22,6 +22,7 @@
  */
 namespace engage_survey\totara_engage\card;
 
+use moodle_url;
 use totara_engage\card\card;
 use totara_engage\link\builder;
 use totara_engage\question\question;
@@ -160,5 +161,20 @@ final class survey_card extends card {
         }
 
         return $url->out(false);
+    }
+
+    /**
+     * @param string|null $preview_mode
+     * @return moodle_url|null
+     */
+    public function get_card_image(?string $preview_mode = null): ?moodle_url {
+        return null;
+    }
+
+    /**
+     * @return component
+     */
+    public function get_card_image_component(): component {
+        return new component('engage_survey/components/card/SurveyCardImage');
     }
 }

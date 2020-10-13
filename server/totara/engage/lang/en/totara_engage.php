@@ -28,7 +28,6 @@ $string['accesslimited'] = 'Limited people';
 $string['accessprivate'] = 'Only you';
 $string['accesspublic'] = 'Everyone';
 $string['accesssettings'] = 'Settings';
-$string['adder_image_alt'] = 'The image of the content {$a}';
 $string['assigntopics'] = 'Assign topic(s)';
 $string['all'] = 'All';
 $string['allsite'] = 'All site';
@@ -270,3 +269,5 @@ $string['messageprovider:like_notification'] = "Resource 'likes'";
 $string['messageprovider:share_notification'] = "New items shared with you";
 $string['messageprovider:reply_notification'] = "Replies on your resources";
 
+// Deprecated in 13.1
+$string['adder_image_alt'] = 'The image of the content {$a}';

@@ -23,6 +23,7 @@
 namespace totara_engage\card;
 
 use core_user\totara_engage\share\recipient\user;
+use moodle_url;
 use totara_engage\entity\engage_bookmark;
 use totara_engage\entity\share;
 use totara_engage\entity\share_recipient;
@@ -507,7 +508,7 @@ abstract class card {
                 );
                 $sharer->fullname = fullname($sharer);
 
-                $url = new \moodle_url("/user/profile.php", ['id' => $recipient->sharerid]);
+                $url = new moodle_url("/user/profile.php", ['id' => $recipient->sharerid]);
                 $sharer->url = $url->out();
 
                 return [$sharer, $recipient];
@@ -531,4 +532,20 @@ abstract class card {
      * @return component
      */
     abstract public function get_tui_component(): component;
+
+    /**
+     * Return the URL of the image for this card.
+     * Return null if there is no valid image involved.
+     *
+     * @param string|null $preview_mode
+     * @return moodle_url|null
+     */
+    abstract public function get_card_image(?string $preview_mode = null): ?moodle_url;
+
+    /**
+     * Return the component used to render the card image
+     *
+     * @return component
+     */
+    abstract public function get_card_image_component(): component;
 }

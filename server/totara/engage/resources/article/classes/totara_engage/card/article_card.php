@@ -24,6 +24,7 @@ namespace engage_article\totara_engage\card;
 
 use engage_article\theme\file\article_image;
 use engage_article\totara_engage\resource\article;
+use moodle_url;
 use totara_comment\loader\comment_loader;
 use totara_engage\card\card;
 use totara_engage\timeview\time_view;
@@ -43,14 +44,8 @@ final class article_card extends card {
      * @return array
      */
     public function get_extra_data(): array {
-        global $PAGE;
-
-        // Get default image.
-        $article_image = new article_image();
-        $default_image = $article_image->get_default_url()->out();
-
         $extra_data = [
-            'image' => $default_image,
+            'image' => $this->get_card_image('engage_article_resource')->out(false),
             'usage' => article::get_resource_usage($this->instanceid),
             'timeview'=> null,
         ];
@@ -59,13 +54,6 @@ final class article_card extends card {
 
         if (isset($extra['timeview'])) {
             $extra_data['timeview'] = time_view::get_code($extra['timeview']);
-        }
-
-        if (!empty($extra['image'])) {
-            $image = new \moodle_url($extra['image'], ['preview' => 'engage_article_resource', 'theme' => $PAGE->theme->name]);
-            $extra_data['image'] = $image->out(false);
-        } else {
-            $extra_data['image'] = $default_image;
         }
 
         return $extra_data;
@@ -96,5 +84,34 @@ final class article_card extends card {
             'engage_article',
             'comment'
         );
+    }
+
+    /**
+     * @param string|null $preview_mode
+     * @return moodle_url|null
+     */
+    public function get_card_image(?string $preview_mode = null): ?moodle_url {
+        global $PAGE;
+
+        $article_image = new article_image();
+        $image = $article_image->get_default_url();
+
+        $extra = $this->get_json_decoded_extra();
+        if (!empty($extra['image'])) {
+            $image = new \moodle_url($extra['image'], ['theme' => $PAGE->theme->name]);
+        }
+
+        if ($preview_mode) {
+            $image->param('preview', $preview_mode);
+        }
+
+        return $image;
+    }
+
+    /**
+     * @return component
+     */
+    public function get_card_image_component(): component {
+        return new component('engage_article/components/card/ArticleCardImage');
     }
 }

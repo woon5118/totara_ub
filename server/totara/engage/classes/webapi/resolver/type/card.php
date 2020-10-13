@@ -87,6 +87,10 @@ final class card implements type_resolver {
             case 'url':
                 return $source->get_url($args);
 
+            case 'image':
+                $card_image = $source->get_card_image($args['preview_mode'] ?? null);
+                return $card_image ? $card_image->out(false) : null;
+
             default:
                 $format = null;
                 if (isset($args['format'])) {

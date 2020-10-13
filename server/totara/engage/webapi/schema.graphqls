@@ -84,6 +84,8 @@ type totara_engage_card {
   user: core_user!
   component: String!
   tuicomponent: String!
+  imagetuicomponent: String!
+  image(preview_mode: String): String
   access: totara_engage_access!
   timecreated: String!
   extra: String!

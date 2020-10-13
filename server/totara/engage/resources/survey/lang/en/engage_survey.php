@@ -31,6 +31,7 @@ $string['editsetting'] = "Edit settings";
 $string['editsurvey'] = "Edit survey";
 $string['editsurveyaccessiblename'] = 'Edit survey {$a}';
 $string['expiredat'] = 'Survey ends {$a}';
+$string['image_alt'] = 'The icon for the survey {$a}';
 $string['formtitle'] = 'Enter survey question';
 $string['formtypetitle'] = 'How many answers can people select?';
 $string['likesurvey'] = 'Like survey "{$a}"';

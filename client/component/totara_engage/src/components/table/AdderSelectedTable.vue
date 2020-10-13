@@ -42,10 +42,9 @@
 
     <template v-slot:row="{ row }">
       <Cell size="2" column-header="Img" valign="center">
-        <img
+        <EngageCardImage
           class="tui-engageAdderSelectedTable__img"
-          :src="getImage(row)"
-          :alt="$str('adder_image_alt', 'totara_engage', row.name)"
+          :card-attribute="row"
         />
       </Cell>
 
@@ -83,13 +82,15 @@ import SelectTable from 'tui/components/datatable/SelectTable';
 import Cell from 'tui/components/datatable/Cell';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
 import AccessIcon from 'totara_engage/components/icons/access/computed/AccessIcon';
+import EngageCardImage from 'totara_engage/components/card/compute/EngageCardImage';
 
 export default {
   components: {
+    AccessIcon,
     Cell,
+    EngageCardImage,
     HeaderCell,
     SelectTable,
-    AccessIcon,
   },
 
   props: {
@@ -106,13 +107,6 @@ export default {
       default: () => [],
     },
   },
-
-  methods: {
-    getImage(card) {
-      const extra = JSON.parse(card.extra);
-      return extra.image_rectangle || extra.image || null;
-    },
-  },
 };
 </script>
 
@@ -121,7 +115,6 @@ export default {
   "totara_engage": [
     "contributor",
     "title",
-    "adder_image_alt",
     "filteraccess"
   ]
 }
@@ -132,6 +125,7 @@ export default {
   &__img {
     width: 100%;
     height: 45px;
+    overflow: hidden;
   }
 
   &__title {

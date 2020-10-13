@@ -1,0 +1,6 @@
+This files describes API changes in /totara/engage,
+information provided here is intended especially for developers.
+
+=== 13.1 ===
+
+* Added imgetuicopmonent and image properties to graphQL type totara_engage_card

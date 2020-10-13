@@ -91,3 +91,20 @@ Feature: Add existing items to playlist
     And I should not see "Test Article 2" in the ".tui-playlistResourcesGrid__row" "css_element"
     And I should not see "Test Survey 1?" in the ".tui-playlistResourcesGrid__row" "css_element"
     And I should not see "Test Survey 2?" in the ".tui-playlistResourcesGrid__row" "css_element"
+
+  Scenario: Check that playlist adder images appear with the correct preview mode
+    Given I log in as "user1"
+    And I view playlist "Test Playlist 1"
+    And I click on "Contribute" "button" in the ".tui-addNewPlaylistCard__card" "css_element"
+    Then I should see "select an existing resource"
+
+    When I click on "select an existing resource" "button"
+    And I wait for pending js
+    And I set the field "filter_section" to "All site"
+    And I set the field "Search" to "Test Article 1"
+    And I press "Search"
+    Then ".tui-engageAdderBrowseTable img[src*='preview=totara_engage_adder_thumbnail']" "css_element" should exist
+
+    When I set the field "Search" to "Test Survey 1?"
+    And I press "Search"
+    Then ".tui-engageAdderBrowseTable .tui-engageSurveyIcon" "css_element" should exist

@@ -29,7 +29,7 @@
       <div class="tui-engageSurveyCard__inner">
         <div class="tui-engageSurveyCard__header">
           <section class="tui-engageSurveyCard__header-image">
-            <img :alt="name" :src="extraData.image" />
+            <SurveyIcon />
             <h3 class="tui-engageSurveyCard__header-title">
               {{ $str('survey', 'engage_survey') }}
             </h3>
@@ -84,6 +84,7 @@ import CoreCard from 'tui/components/card/Card';
 import { cardMixin } from 'totara_engage/index';
 import SurveyCardBody from 'engage_survey/components/card/SurveyCardBody';
 import SurveyResultBody from 'engage_survey/components/card/SurveyResultBody';
+import SurveyIcon from 'engage_survey/components/icon/SurveyIcon';
 import BookmarkButton from 'totara_engage/components/buttons/BookmarkButton';
 
 // GraphQL
@@ -96,6 +97,7 @@ export default {
     CoreCard,
     SurveyCardBody,
     SurveyResultBody,
+    SurveyIcon,
     BookmarkButton,
     Footnotes,
   },
@@ -242,21 +244,17 @@ export default {
     &-image {
       display: flex;
       flex-direction: row;
+      align-items: center;
       padding-top: var(--gap-2);
       padding-left: var(--gap-4);
-
-      img:first-child {
-        width: 40px;
-        height: 40px;
-        margin-top: var(--gap-1);
-      }
     }
 
     &-title {
       @include tui-font-heading-label-small();
+      margin-top: 0;
+      margin-bottom: 0;
       margin-left: var(--gap-2);
       color: var(--color-neutral-6);
-      line-height: inherit;
     }
 
     &-bookmark {

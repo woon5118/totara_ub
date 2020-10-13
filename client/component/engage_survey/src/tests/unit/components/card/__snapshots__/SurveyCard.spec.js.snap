@@ -16,8 +16,8 @@ exports[`engage_survey/components/card/SurveyCard.vue Checks snapshot 1`] = `
         <section
           class="tui-engageSurveyCard__header-image"
         >
-          <img
-            alt="sss"
+          <surveyicon-stub
+            imagealt="survey, engage_survey"
           />
            
           <h3

@@ -122,3 +122,26 @@ Feature: Share existing items with workspace
     And I should not see "Test Survey 3?" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should not see "Test Playlist 2" in the ".tui-contributionBaseContent__cards" "css_element"
     And I should not see "Test Playlist 3" in the ".tui-contributionBaseContent__cards" "css_element"
+
+  Scenario: Check that sharing items appear with appropriate images
+    Given I log in as "user1"
+    And I click on "Your Workspaces" in the totara menu
+    And I click on "Test Workspace 1" "link" in the ".tui-workspaceMenu" "css_element"
+    And I click on "Library" "link" in the ".tui-tabs__tabs" "css_element"
+    And I click on "Contribute" "button"
+    And I click on "select an existing resource" "button"
+    And I wait for pending js
+    And I set the field "filter_section" to "All site"
+    Then I should see "Select content to share with workspaces"
+
+    When I set the field with css ".tui-adder input[type='search']" to "Test Article 1"
+    And I click on ".tui-adder button[title='Search']" "css_element"
+    Then ".tui-engageAdderBrowseTable img[src*='preview=totara_engage_adder_thumbnail']" "css_element" should exist
+
+    When I set the field with css ".tui-adder input[type='search']" to "Test Survey 1?"
+    And I click on ".tui-adder button[title='Search']" "css_element"
+    Then ".tui-engageAdderBrowseTable .tui-engageSurveyIcon" "css_element" should exist
+
+    When I set the field with css ".tui-adder input[type='search']" to "Test Playlist 1"
+    And I click on ".tui-adder button[title='Search']" "css_element"
+    Then ".tui-engageAdderBrowseTable img[src*='preview=totara_engage_adder_thumbnail']" "css_element" should exist

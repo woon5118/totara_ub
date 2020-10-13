@@ -53,4 +53,4 @@ Feature: Custom article images
     And I press "Done"
     And I click on "Your Library" in the totara menu
     And I wait for the next second
-    Then "//img[@alt='ImageResource' and contains(@src, '_test.jpg?preview=engage_article_resource&theme=ventura')]" "xpath_element" should exist
+    Then ".tui-engageArticleCard__imageheader img[src*='_test.jpg'][src*='preview=engage_article_resource']" "css_element" should exist

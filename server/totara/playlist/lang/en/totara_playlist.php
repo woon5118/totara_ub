@@ -39,6 +39,7 @@ $string['deletewarningmsg'] = 'This action is permanent. People with access to t
 $string['deletewarningtitle'] = 'Are you sure you want to delete the playlist?';
 $string['edit_playlist_title'] = 'Edit playlist title';
 $string['entertitle'] = "Enter playlist title";
+$string['image_alt'] = 'The image for the playlist {$a}';
 $string['message_playlist'] = "playlist";
 $string['mentionbody:comment'] = '<strong>{$a->fullname}</strong> has commented on the playlist {$a->title}.';
 $string['mentionbody:playlist'] = '<strong>{$a->fullname}</strong> has mentioned you in the playlist {$a->title}.';

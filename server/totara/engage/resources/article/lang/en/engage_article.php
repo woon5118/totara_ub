@@ -42,6 +42,7 @@ $string['editarticlecontent'] = 'Edit {$a} content';
 $string['editarticletitle'] = 'Edit {$a} title';
 $string['entertitle'] = "Enter resource title";
 $string['entercontent'] = "Enter content";
+$string['image_alt'] = 'The image for the resource {$a}';
 $string['filterlabeltype'] = "Resource";
 $string['likearticle'] = 'Like resource "{$a}"';
 $string['loadmore'] = "Load more";

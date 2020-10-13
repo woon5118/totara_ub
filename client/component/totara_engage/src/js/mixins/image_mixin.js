@@ -12,25 +12,29 @@
  * LTD, you may not access, use, modify, or distribute this software.
  * Please contact [licensing@totaralearning.com] for more information.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author Cody Finegan <cody.finegan@totaralearning.com>
  * @module totara_engage
  */
 
-import cardMixin from './mixins/card_mixin';
-import imageMixin from './mixins/image_mixin';
-import AccessManager from './access_manager';
-import AnswerType from './answer_type';
-import TimeViewType from './time_view_type';
-import UrlSourceType from './url_source_type';
-import { calculateRow, engageGrid } from './grid';
+export default {
+  props: {
+    instanceId: {
+      required: true,
+      type: [String, Number],
+    },
 
-export {
-  cardMixin,
-  imageMixin,
-  AccessManager,
-  AnswerType,
-  TimeViewType,
-  UrlSourceType,
-  engageGrid,
-  calculateRow,
+    /**
+     * Card image or null if this component has no image.
+     */
+    image: {
+      type: String,
+    },
+
+    /**
+     * Name used for the alt-text
+     */
+    name: {
+      type: String,
+    },
+  },
 };

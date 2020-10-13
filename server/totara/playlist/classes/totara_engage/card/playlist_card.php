@@ -44,31 +44,14 @@ final class playlist_card extends card {
      * @return array
      */
     public function get_extra_data(): array {
-        global $OUTPUT, $USER, $PAGE;
+        global $USER;
 
         /** @var playlist_resource_repository $repo */
         $repo = playlist_resource::repository();
 
-        $playlist = playlist::from_id($this->get_instanceid());
-        $processor = image_processor::make();
-        $file_image = $processor->get_image_for_playlist($playlist);
-
-        $image = $OUTPUT->image_url("default_collection", 'totara_playlist')->out();
-        if ($file_image) {
-            $image_url = $processor->get_image_url($file_image);
-            $image = $image_url->out(
-                false,
-                [
-                    'hash' => $file_image->get_contenthash(),
-                    'theme' => $PAGE->theme->name,
-                    'preview' => 'totara_playlist_card'
-                ]
-            );
-        }
-
         $rating = rating_manager::instance($this->instanceid, 'totara_playlist', 'playlist');
         $extra = [
-            'image' => $image,
+            'image' => $this->get_card_image('totara_playlist_card')->out(false),
             // Default to false, but update this field base on the capability and access manager.
             'actions' => false,
             'resources' => $repo->get_total_of_resources($this->instanceid),
@@ -104,5 +87,39 @@ final class playlist_card extends card {
             'totara_playlist',
             'comment'
         );
+    }
+
+    /**
+     * @param string|null $preview_mode
+     * @return \moodle_url|null
+     */
+    public function get_card_image(?string $preview_mode = null): ?\moodle_url {
+        global $OUTPUT, $PAGE;
+
+        $playlist = playlist::from_id($this->get_instanceid());
+        $processor = image_processor::make();
+        $file_image = $processor->get_image_for_playlist($playlist);
+
+        $image = $OUTPUT->image_url("default_collection", 'totara_playlist');
+        if ($file_image) {
+            $image = $processor->get_image_url($file_image);
+            $image->params([
+                'hash' => $file_image->get_contenthash(),
+                'theme' => $PAGE->theme->name,
+            ]);
+        }
+
+        if ($preview_mode) {
+            $image->param('preview', $preview_mode);
+        }
+
+        return $image;
+    }
+
+    /**
+     * @return component
+     */
+    public function get_card_image_component(): component {
+        return new component('totara_playlist/components/card/PlaylistCardImage');
     }
 }
