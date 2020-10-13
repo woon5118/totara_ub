@@ -24,7 +24,9 @@ namespace core\webapi\resolver\type;
 
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
+use core\formatter\user_card_display_field_formatter;
 use core_user\profile\card_display_field;
+use core\format;
 
 /**
  * Type resolver for 'core_user_display_field'
@@ -45,22 +47,15 @@ final class user_card_display_field implements type_resolver {
             );
         }
 
-        switch ($field) {
-            case 'value':
-                return $source->get_field_value();
-
-            case 'label':
-                return $source->get_field_label();
-
-            case 'associate_url':
-                return $source->get_field_url();
-
-            case 'is_custom':
-                return $source->is_custom_field();
-
-            default:
-                debugging("Field '{$field}' is not supported yet", DEBUG_DEVELOPER);
-                return null;
+        // Fallback to context system if the execution_context does not have any relevant context.
+        // Note that we cannot go with \context_user because user can be deleted and this code still
+        // runs which it will result an empty value as expected.
+        $context = \context_system::instance();
+        if ($ec->has_relevant_context()) {
+            $context = $ec->get_relevant_context();
         }
+
+        $formatter = new user_card_display_field_formatter($source, $context);
+        return $formatter->format($field, $args['format'] ?? format::FORMAT_PLAIN);
     }
 }

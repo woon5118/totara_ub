@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.1 ===
 
+* Added format parameter to field "value" in type "core_user_card_display_field" in GraphQL
 * document_helper::looks_like_json() added 2nd parameter.
 * core\theme\file\theme_file::clean_draft_file_area() has been renamed to core\theme\file\theme_file::clean_draft_files
   and changed from public to protected.

@@ -22,6 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use core\format;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use core_user\profile\value_card_display_field;
 use core_user\profile\user_field_resolver;
@@ -48,7 +49,11 @@ class core_webapi_resolver_type_user_card_display_field_testcase extends advance
         $field_metadata = $provider->get_field_metadata('fullname');
 
         $field_display = new value_card_display_field($resolver, $field_metadata);
-        $result = $this->resolve_graphql_type('core_user_card_display_field', 'value', $field_display, []);
+        $result = $this->resolve_graphql_type(
+            'core_user_card_display_field',
+            'value', $field_display,
+            ['format' => format::FORMAT_PLAIN]
+        );
 
         $this->assertSame(fullname($user_one), $result);
     }
@@ -87,7 +92,11 @@ class core_webapi_resolver_type_user_card_display_field_testcase extends advance
 
         $this->assertEquals(
             fullname($user_one),
-            $this->resolve_graphql_type('core_user_card_display_field', 'value', $fullname_display_field, [])
+            $this->resolve_graphql_type(
+                'core_user_card_display_field',
+                'value', $fullname_display_field,
+                ['format' => format::FORMAT_PLAIN]
+            )
         );
 
         $custom_display_field = $display_fields[1];
@@ -95,7 +104,46 @@ class core_webapi_resolver_type_user_card_display_field_testcase extends advance
 
         $this->assertEquals(
             'Something worth it',
-            $this->resolve_graphql_type('core_user_card_display_field', 'value', $custom_display_field, [])
+            $this->resolve_graphql_type(
+                'core_user_card_display_field',
+                'value', $custom_display_field,
+                ['format' => format::FORMAT_PLAIN]
+            )
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_resolve_field_value_with_special_value(): void {
+        $generator = $this->getDataGenerator();
+        $record['firstname'] = "$%^$%^'@$#@~";
+        $record['lastname'] = '@!$##@test';
+        $user_one = $generator->create_user($record);
+
+        $provider = new summary_field_provider();
+
+        // Testing own user seeing self field
+        $this->setUser($user_one);
+
+        $resolver = user_field_resolver::from_record($user_one);
+        $field_metadata = $provider->get_field_metadata('fullname');
+
+        $field_display = new value_card_display_field($resolver, $field_metadata);
+        $result = $this->resolve_graphql_type(
+            'core_user_card_display_field',
+            'value', $field_display,
+            ['format' => format::FORMAT_PLAIN]
+        );
+
+        $this->assertSame("$%^$%^'@$#@~ @!$##@test", $result);
+
+        $result = $this->resolve_graphql_type(
+            'core_user_card_display_field',
+            'value', $field_display,
+            ['format' => format::FORMAT_HTML]
+        );
+
+        $this->assertSame("$%^$%^&#39;@$#@~ @!$##@test", $result);
     }
 }

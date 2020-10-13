@@ -45,7 +45,7 @@ type core_user_card_display_field {
   """
   The value of the field that we are trying to display to the viewer.
   """
-  value: String
+  value(format: core_format = PLAIN): String
   """
   Associate url field, if it is null then there is no associate url field with the value field.
   If there is then the value should be displayed as a link.
