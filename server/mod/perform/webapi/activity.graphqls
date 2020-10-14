@@ -74,23 +74,80 @@ type mod_perform_activity {
 }
 
 """
+An element plugin configuration
+"""
+type mod_perform_element_plugin_config {
+  """
+  is respondable element
+  """
+  is_respondable: Boolean!
+
+  """
+  has title required when creating or updating element
+  """
+  has_title: Boolean!
+
+  """
+  has reporting id required when creating or updating element
+  """
+  has_reporting_id: Boolean!
+
+  """
+  title text when creating or updating element
+  """
+  title_text: String!
+
+  """
+  is title required when creating or updating element
+  """
+  is_title_required: Boolean!
+
+  """
+  is response required enabled when creating or updating element
+  """
+  is_response_required_enabled: Boolean!
+}
+
+"""
 An element plugin which can be used to create an element
 """
 type mod_perform_element_plugin {
   plugin_name: String!
   name: String!
+
+  """
+  element configuration
+  """
+  plugin_config: mod_perform_element_plugin_config!
+
   """
   Name of vue component used to display the element configuration form to the activity admin
   """
   admin_form_component: String!
+    @deprecated(reason: "Use `admin_edit_form_component` instead.")
+
+  """
+  Name of vue component used to display the element configuration form to the activity admin
+  """
+  admin_edit_component: String!
   """
   Name of the vue component used to display the preview of a completed element to the activity admin
   """
   admin_display_component: String!
+    @deprecated(reason: "Use `admin_view_component` instead.")
+  """
+  Name of the vue component used to display the preview of a completed element to the activity admin
+  """
+  admin_view_component: String!
   """
   Name of the vue component used to display a read-only view of an element when an activity is active
   """
   admin_read_only_display_component: String!
+    @deprecated(reason: "Use `admin_read_only_component` instead.")
+  """
+  Name of the vue component used to display a summary view of an element when an activity is active
+  """
+  admin_summary_component: String!
   """
   Name of the vue component used to display the form element to the participant when they are completing the activity
   """

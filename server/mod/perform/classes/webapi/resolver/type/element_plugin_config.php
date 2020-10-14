@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
  * @package mod_perform
  */
 
@@ -26,10 +26,10 @@ namespace mod_perform\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use mod_perform\formatter\activity\element_plugin as element_plugin_formatter;
+use mod_perform\formatter\activity\element_plugin_config as element_plugin_config_formatter;
 use mod_perform\models\activity\element_plugin as element_plugin_model;
 
-class element_plugin implements type_resolver {
+class element_plugin_config implements type_resolver {
 
     /**
      * @param string $field
@@ -44,27 +44,9 @@ class element_plugin implements type_resolver {
             throw new \coding_exception('Expected element plugin model subclass');
         }
 
-        // deprecated admin_form_component field
-        // @deprecated since Totara 13.2
-        if ($field == 'admin_form_component') {
-            debugging('"admin_form_component" is deprecated, use "admin_edit_form_component" instead.', DEBUG_DEVELOPER);
-        }
-
-        // deprecated admin_read_only_display_component field
-        // @deprecated since Totara 13.2
-        if ($field == 'admin_display_component') {
-            debugging('"admin_display_component" is deprecated, use "admin_edit_form_component" instead.', DEBUG_DEVELOPER);
-        }
-
-        // deprecated admin_read_only_display_component field
-        // @deprecated since Totara 13.2
-        if ($field == 'admin_read_only_display_component') {
-            debugging('"admin_read_only_display_component" is deprecated, use "admin_read_only_component" instead.', DEBUG_DEVELOPER);
-        }
-
         $format = $args['format'] ?? format::FORMAT_HTML;
         $context = $ec->has_relevant_context() ? $ec->get_relevant_context() : \context_system::instance();
-        $formatter = new element_plugin_formatter($element_plugin, $context);
+        $formatter = new element_plugin_config_formatter($element_plugin, $context);
         return $formatter->format($field, $format);
     }
 }

@@ -37,9 +37,13 @@ class element_plugin extends formatter {
         return [
             'plugin_name' => null, // Not formatted, because this is an internal key.
             'name' => string_field_formatter::class,
-            'admin_form_component' => null, // not formatted, because this admin vue component name
-            'admin_display_component' => null, // not formatted, because this admin vue component name
-            'admin_read_only_display_component' => null, // not formatted, because this admin vue component name
+            'plugin_config' => null, // Not formatted, because this plugin configs
+            'admin_form_component' => null, //deprecated, not formatted, because this admin vue component name
+            'admin_edit_component' => null, // not formatted, because this admin vue component name
+            'admin_display_component' => null, // deprecated, not formatted, because this admin vue component name
+            'admin_view_component' => null, // not formatted, because this admin vue component name
+            'admin_read_only_display_component' => null, // deprecated, not formatted, because this admin vue component name
+            'admin_summary_component' => null, // not formatted, because this admin vue component name
             'participant_form_component' => null, //not formatted, because this participant form vue component name
             'participant_response_component' => null, //not formatted, because this participant response display vue component name
             'group' => null, // Not formatted, because this is an internal key
@@ -52,12 +56,20 @@ class element_plugin extends formatter {
                 return $this->object->get_plugin_name();
             case 'name':
                 return $this->object->get_name();
+            case 'plugin_config':
+                return $this->object;
             case 'admin_form_component':
                 return $this->object->get_admin_form_component();
+            case 'admin_edit_component':
+                return $this->object->get_admin_edit_component();
             case 'admin_display_component':
                 return $this->object->get_admin_display_component();
+            case 'admin_view_component':
+                return $this->object->get_admin_view_component();
             case 'admin_read_only_display_component':
                 return $this->object->get_admin_read_only_display_component();
+            case 'admin_summary_component':
+                return $this->object->get_admin_summary_component();
             case 'participant_form_component':
                 return $this->object->get_participant_form_component();
             case 'participant_response_component':
@@ -73,9 +85,13 @@ class element_plugin extends formatter {
         $fields = [
             'plugin_name',
             'name',
+            'plugin_config',
             'admin_form_component',
+            'admin_edit_component',
             'admin_display_component',
+            'admin_view_component',
             'admin_read_only_display_component',
+            'admin_summary_component',
             'participant_form_component',
             'participant_response_component',
             'group'

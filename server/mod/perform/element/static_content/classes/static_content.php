@@ -33,7 +33,7 @@ class static_content extends element_plugin {
      * @return string
      */
     public function get_participant_form_component(): string {
-        return $this->get_component_path('Participant');
+        return $this->get_component_path('ElementParticipant');
     }
 
     /**
@@ -41,7 +41,7 @@ class static_content extends element_plugin {
      * @return string
      */
     public function get_participant_response_component(): string {
-        return $this->get_component_path('Participant');
+        return $this->get_component_path('ElementParticipant');
     }
 
     /**
@@ -119,4 +119,26 @@ class static_content extends element_plugin {
         // Follow same process as post_create.
         $this->post_create($element);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function has_title(): bool {
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_title_text():string {
+        return get_string('title', 'performelement_static_content');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function is_title_required(): bool {
+        return false;
+    }
+
 }

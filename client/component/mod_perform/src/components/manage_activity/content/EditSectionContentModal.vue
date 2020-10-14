@@ -117,7 +117,10 @@
                   <render :vnode="placeholder" />
                 </div>
               </Droppable>
-              <ContentAddElementButton @add-element-item="add" />
+              <ContentAddElementButton
+                :element-plugins="elementPlugins"
+                @add-element-item="add"
+              />
             </div>
             <div v-else class="tui-performEditSectionContentModal__form">
               <component
@@ -197,6 +200,7 @@ import ModalContent from 'tui/components/modal/ModalContent';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import sectionDetailQuery from 'mod_perform/graphql/section_admin';
 import updateSectionElementMutation from 'mod_perform/graphql/update_section_elements';
+import performElementPluginsQuery from 'mod_perform/graphql/element_plugins';
 import { notify } from 'tui/notifications';
 import { pull, uniqueId } from 'tui/util';
 import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
@@ -237,6 +241,7 @@ export default {
   data() {
     return {
       isOpen: false,
+      elementPlugins: [],
       section: {
         title: '',
         section_elements: [],
@@ -270,6 +275,13 @@ export default {
       skip() {
         return this.skipQuery;
       },
+    },
+    elementPlugins: {
+      query: performElementPluginsQuery,
+      variables() {
+        return [];
+      },
+      update: data => data.mod_perform_element_plugins,
     },
   },
 
@@ -599,13 +611,18 @@ export default {
      */
     componentFor(sectionElement) {
       const { type } = sectionElement.element;
+      const elementPlugin = this.elementPlugins
+        .filter(item => item.plugin_name == type.plugin_name)
+        .shift();
       if (this.isReadOnly(sectionElement)) {
-        return tui.asyncComponent(type.admin_read_only_display_component);
+        return tui.asyncComponent(
+          elementPlugin.admin_read_only_display_component
+        );
       }
       if (this.isEditing(sectionElement)) {
-        return tui.asyncComponent(type.admin_form_component);
+        return tui.asyncComponent(elementPlugin.admin_form_component);
       }
-      return tui.asyncComponent(type.admin_display_component);
+      return tui.asyncComponent(elementPlugin.admin_display_component);
     },
 
     /**

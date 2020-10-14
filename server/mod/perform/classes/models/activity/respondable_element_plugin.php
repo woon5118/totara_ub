@@ -81,4 +81,43 @@ abstract class respondable_element_plugin extends element_plugin {
     public function get_example_response_data():string {
         return '{}';
     }
+
+    /**
+     * @inheritDoc
+     */
+    final public function has_title(): bool {
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_title_text():string {
+        return get_string('question_title', 'mod_perform');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    final public function is_title_required(): bool {
+        return true;
+    }
+
+    /**
+     * Return true if element has reporting id
+     *
+     * @return bool
+     */
+    public function has_reporting_id(): bool {
+        return true;
+    }
+
+    /**
+     * Return true if element response required enabled
+     *
+     * @return bool
+     */
+    public function is_response_required_enabled(): bool {
+        return true;
+    }
 }

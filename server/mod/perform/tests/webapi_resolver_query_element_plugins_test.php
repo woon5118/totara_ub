@@ -51,21 +51,29 @@ class mod_perform_webapi_resolver_query_element_plugins_testcase extends advance
     }
 
     public function test_successful_ajax_call(): void {
+        // Need to activate this test after TL-28153 implemented
+        $this->markTestSkipped();
         $this->setAdminUser();
-
         $result = $this->parsed_graphql_operation(self::QUERY, []);
         $this->assert_webapi_operation_successful($result);
 
         $element_plugins = $this->get_webapi_operation_data($result);
         $this->assertNotEmpty($element_plugins, "no element plugins");
-
         foreach ($element_plugins as $element_plugin) {
             $this->assertNotEmpty($element_plugin['plugin_name']);
             $this->assertNotEmpty($element_plugin['name']);
-            $this->assertNotEmpty($element_plugin['admin_form_component']);
+            $this->assertNotEmpty($element_plugin['plugin_config']);
+            $this->assertIsBool($element_plugin['plugin_config']['has_title']);
+            $this->assertIsBool($element_plugin['plugin_config']['is_respondable']);
+            $this->assertIsBool($element_plugin['plugin_config']['has_reporting_id']);
+            $this->assertNotEmpty($element_plugin['plugin_config']['title_text']);
+            $this->assertIsBool($element_plugin['plugin_config']['is_title_required']);
+            $this->assertIsBool($element_plugin['plugin_config']['is_response_required_enabled']);
+            $this->assertNotEmpty($element_plugin['admin_edit_component']);
             $this->assertNotEmpty($element_plugin['admin_display_component']);
             $this->assertNotEmpty($element_plugin['admin_read_only_display_component']);
-            $this->assertNotEmpty($element_plugin['participant_form_component']);
+            $this->assertNotEmpty($element_plugin['admin_view_component']);
+            $this->assertNotEmpty($element_plugin['admin_summary_component']);
         }
     }
 

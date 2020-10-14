@@ -11,8 +11,6 @@ mutation mod_perform_update_section_elements(
           element_plugin {
             plugin_name
             name
-            admin_form_component
-            admin_display_component
           }
           title
           raw_title: title(format: RAW)

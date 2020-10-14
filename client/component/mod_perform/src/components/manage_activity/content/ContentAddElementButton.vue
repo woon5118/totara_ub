@@ -65,7 +65,6 @@ import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownButton from 'tui/components/dropdown/DropdownButton';
 import DropdownGroup from 'tui/components/dropdown/DropdownGroup';
-import performElementPluginsQuery from 'mod_perform/graphql/element_plugins';
 
 export default {
   components: {
@@ -75,18 +74,10 @@ export default {
     DropdownButton,
     DropdownGroup,
   },
-  data() {
-    return {
-      elementPlugins: [],
-    };
-  },
-  apollo: {
+  props: {
     elementPlugins: {
-      query: performElementPluginsQuery,
-      variables() {
-        return [];
-      },
-      update: data => data.mod_perform_element_plugins,
+      type: Array,
+      required: true,
     },
   },
   computed: {

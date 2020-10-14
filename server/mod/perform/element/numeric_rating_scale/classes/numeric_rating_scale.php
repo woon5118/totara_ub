@@ -106,4 +106,11 @@ class numeric_rating_scale extends respondable_element_plugin {
     public function get_sortorder(): int {
         return 40;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function is_response_required_enabled(): bool {
+        return false;
+    }
 }

@@ -2,10 +2,21 @@ query mod_perform_element_plugins {
   mod_perform_element_plugins {
     plugin_name
     name
+    plugin_config {
+      is_respondable
+      has_title
+      has_reporting_id
+      title_text
+      is_title_required
+      is_response_required_enabled
+    }
     admin_form_component
+    admin_edit_component
     admin_display_component
+    admin_view_component
     admin_read_only_display_component
     participant_form_component
+    admin_summary_component
     group
   }
 }
