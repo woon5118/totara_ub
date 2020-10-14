@@ -1209,6 +1209,7 @@ $string['usermiddlename'] = 'User Middle Name';
 $string['username'] = 'Username';
 $string['usernamelink'] = 'User\'s Fullname (linked to profile)';
 $string['usernamelinkicon'] = 'User\'s Fullname (linked to profile with icon)';
+$string['usermobile'] = 'User\'s Mobile phone number';
 $string['userownrecords'] = 'A user\'s own records';
 $string['userphone'] = 'User\'s Phone number';
 $string['userreportheading'] = 'Browse list of users: {$a}';
