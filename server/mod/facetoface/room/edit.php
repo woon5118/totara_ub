@@ -52,7 +52,7 @@ $room = new room($id);
 if (!empty($backurl)) {
     $returnurl = new moodle_url($backurl);
 } else {
-    $returnurl = new moodle_url('/mod/facetoface/room/manage.php', $params);
+    $returnurl = new moodle_url('/mod/facetoface/room/manage.php');
 }
 
 if ($room->get_custom()) {

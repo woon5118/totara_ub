@@ -52,7 +52,7 @@ $asset = new asset($id);
 if (!empty($backurl)) {
     $returnurl = new moodle_url($backurl);
 } else {
-    $returnurl = new moodle_url('/mod/facetoface/asset/manage.php', $params);
+    $returnurl = new moodle_url('/mod/facetoface/asset/manage.php');
 }
 
 if ($asset->get_custom()) {
