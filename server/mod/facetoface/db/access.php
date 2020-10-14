@@ -143,6 +143,15 @@ $capabilities = array(
         )
     ),
 
+    // Ability to manage archived attendees from a session.
+    'mod/facetoface:managearchivedattendees' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            // No one is allowed by default.
+        )
+    ),
+
     // Ability to add, edit, copy and delete a session.
     'mod/facetoface:editevents' => array(
         'captype' => 'write',

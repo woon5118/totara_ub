@@ -1,5 +1,5 @@
 @javascript @mod @mod_facetoface @totara
-Feature: Course archive completions  for seminar sessions
+Feature: Course archive completions for seminar sessions
   In order to archive completions in a seminar session
   As a teacher
   I need to set attendance status and archive course completions for attendees

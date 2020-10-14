@@ -327,6 +327,7 @@ final class mod_facetoface_generator_util {
     public static function create_signups_for_behat(array $record): int {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/mod/facetoface/lib.php'); // for MDL_F2F_BOTH
+        require_once($CFG->libdir.'/gradelib.php'); // for grade_floatval
 
         $keys = array('user', 'eventdetails');
         foreach ($keys as $key) {
@@ -387,7 +388,11 @@ final class mod_facetoface_generator_util {
             }
         }
         if ($desiredclass) {
-            signup_status::create($signup, new $desiredclass($signup))->save();
+            $grade = null;
+            if (isset($record['grade'])) {
+                $grade = grade_floatval($record['grade']);
+            }
+            signup_status::create($signup, new $desiredclass($signup), 0, $grade)->save();
         }
 
         return $signup->get_id();

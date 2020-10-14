@@ -25,6 +25,7 @@ namespace mod_facetoface;
 
 use \stdClass;
 use \context_module;
+use core\orm\query\builder;
 use mod_facetoface\signup_status;
 use mod_facetoface\exception\signup_exception;
 use mod_facetoface\signup\state\{
@@ -745,5 +746,63 @@ final class signup_helper {
         }
 
         return true;
+    }
+
+    /**
+     * Get the array of archived sign-up records for the seminar event.
+     *
+     * @param integer $event_id seminar_event.id
+     * @return array of [signupid => [signup.id, signup.userid, signup_status.statuscode, signup_status.timecreated]]
+     */
+    public static function get_archived_signups(int $event_id): array {
+        $records = builder::table('facetoface_signups', 'su')
+            ->join(['user', 'u'], 'userid', 'id')
+            ->left_join(['facetoface_signups_status', 'sus'], 'id', 'signupid')
+            ->where(function (builder $mediator) {
+                return $mediator->where_null('sus.superceded')->or_where('sus.superceded', 0);
+            })
+            ->where('su.archived', '!=', 0)
+            ->where('su.sessionid', $event_id)
+            ->where('u.deleted', 0)
+            ->select(['su.id', 'su.userid', 'sus.timecreated'])
+            ->add_select_raw('COALESCE(sus.statuscode,:css) as statuscode', ['css' => booked::get_code()])
+            ->order_by('u.username')
+            ->get()
+            ->all(true);
+        return $records;
+    }
+
+    /**
+     * Unset the archived flag of the specific sign-up records.
+     *
+     * @param integer $event_id seminar_event.id
+     * @param array $signup_ids array of signup.id
+     * @return integer the number of sign-ups that have been un-archived
+     */
+    public static function unarchive_signups(int $event_id, array $signup_ids): int {
+        return builder::get_db()->transaction(function() use ($event_id, $signup_ids) {
+            $signup_ids_archived = array_keys(self::get_archived_signups($event_id));
+            $signup_ids_of_interest = array_intersect($signup_ids_archived, $signup_ids);
+            $time = time();
+            builder::table('facetoface_signups')
+                ->where_in('id', $signup_ids_of_interest)
+                ->update(['archived' => 0]);
+            // Reset attendance status to prevent the next cron run from completing the seminar activity of the sign-ups.
+            builder::table('facetoface_signups_status')
+                ->where_in('signupid', $signup_ids_of_interest)
+                ->update(['superceded' => 1]);
+            foreach ($signup_ids_of_interest as $signupid) {
+                builder::table('facetoface_signups_status')
+                    ->insert([
+                        'signupid' => $signupid,
+                        'statuscode' => booked::get_code(),
+                        'superceded' => 0,
+                        'grade' => null,
+                        'createdby' => 0,
+                        'timecreated' => $time
+                    ]);
+            }
+            return count($signup_ids_of_interest);
+        });
     }
 }

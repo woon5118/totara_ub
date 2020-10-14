@@ -22,6 +22,7 @@
  * @package mod_facetoface
  */
 
+use core\orm\query\builder;
 use mod_facetoface\event\booking_booked;
 use mod_facetoface\event\signup_status_updated;
 use mod_facetoface\seminar;
@@ -48,6 +49,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class mod_facetoface_signup_helper_testcase
+ * @coversDefaultClass mod_facetoface\signup_helper
  */
 class mod_facetoface_signup_helper_testcase extends advanced_testcase {
     /**
@@ -455,5 +457,96 @@ class mod_facetoface_signup_helper_testcase extends advanced_testcase {
         } catch (coding_exception $ex) {
             $this->assertSame('Coding error detected, it must be fixed by a programmer: ' . $expected_ex, $ex->getMessage());
         }
+    }
+
+    /**
+     * @covers ::get_archived_signups
+     */
+    public function test_get_archived_signups() {
+        // user   signup  archived  status     deleted  return
+        // ----   ------  --------  ------     -------  ------
+        // user1  yes     yes       fully      yes      no
+        // user2  yes     yes       partially  no       yes
+        // user3  yes     yes       not_set    no       yes
+        // user4  yes     no        unable_to  no       no
+        // user5  no      -         -          no       no
+        $gen = $this->getDataGenerator();
+        $user1 = $gen->create_user();
+        $user2 = $gen->create_user();
+        $user3 = $gen->create_user();
+        $user4 = $gen->create_user();
+        $user5 = $gen->create_user();
+        $course = $gen->create_course();
+        $seminar = new seminar();
+        $seminar->set_course($course->id)->save();
+        $event = new seminar_event();
+        $event->set_facetoface($seminar->get_id())->save();
+        $signup1 = signup::create($user1->id, $event)->save();
+        $signup2 = signup::create($user2->id, $event)->save();
+        $signup3 = signup::create($user3->id, $event)->save();
+        $signup4 = signup::create($user4->id, $event)->save();
+        signup_status::create($signup1, new fully_attended($signup1), 1111)->save();
+        signup_status::create($signup2, new partially_attended($signup2), 2222)->save();
+        signup_status::create($signup4, new unable_to_attend($signup4), 4444)->save();
+        builder::table('user')->where('id', $user1->id)->update(['deleted' => 1]);
+        builder::table('facetoface_signups')->where_in('id', [$signup1->get_id(), $signup2->get_id(), $signup3->get_id()])->update(['archived' => '1']);
+
+        $records = signup_helper::get_archived_signups($event->get_id());
+        $this->assertCount(2, $records);
+        $this->assertEquals($signup2->get_id(), $records[$signup2->get_id()]->id);
+        $this->assertEquals($user2->id, $records[$signup2->get_id()]->userid);
+        $this->assertEquals(2222, $records[$signup2->get_id()]->timecreated);
+        $this->assertEquals(partially_attended::get_code(), $records[$signup2->get_id()]->statuscode);
+        $this->assertEquals($signup3->get_id(), $records[$signup3->get_id()]->id);
+        $this->assertEquals($user3->id, $records[$signup3->get_id()]->userid);
+        $this->assertSame(null, $records[$signup3->get_id()]->timecreated);
+        $this->assertEquals(booked::get_code(), $records[$signup3->get_id()]->statuscode);
+    }
+
+    /**
+     * @covers ::unarchive_signups
+     */
+    public function test_unarchive_signups() {
+        // user   signup  archived  status     unarchive
+        // ----   ------  --------  ------     ---------
+        // user1  yes     yes       fully      yes
+        // user2  yes     yes       not_set    yes
+        // user3  yes     yes       partially  no
+        // user4  yes     no        not_set    yes
+        // user5  no      -         -          no
+        $gen = $this->getDataGenerator();
+        $user1 = $gen->create_user();
+        $user2 = $gen->create_user();
+        $user3 = $gen->create_user();
+        $user4 = $gen->create_user();
+        $user5 = $gen->create_user();
+        $course = $gen->create_course();
+        $seminar = new seminar();
+        $seminar->set_course($course->id)->save();
+        $event = new seminar_event();
+        $event->set_facetoface($seminar->get_id())->save();
+        $signup1 = signup::create($user1->id, $event)->save();
+        $signup2 = signup::create($user2->id, $event)->save();
+        $signup3 = signup::create($user3->id, $event)->save();
+        $signup4 = signup::create($user4->id, $event)->save();
+        signup_status::create($signup1, new fully_attended($signup1), 1111, 11)->save();
+        signup_status::create($signup3, new partially_attended($signup2), 3333, 33)->save();
+        builder::table('facetoface_signups')->where_in('id', [$signup1->get_id(), $signup2->get_id(), $signup3->get_id()])->update(['archived' => '1']);
+
+        $count = signup_helper::unarchive_signups($event->get_id(), [$signup1->get_id(), $signup2->get_id(), $signup4->get_id()]);
+        $this->assertEquals(2, $count);
+
+        $signup1 = new signup($signup1->get_id());
+        $this->assertInstanceOf(booked::class, $signup1->get_state());
+        $this->assertNull(signup_status::from_current($signup1)->get_grade());
+        $signup2 = new signup($signup2->get_id());
+        $this->assertInstanceOf(booked::class, $signup2->get_state());
+        $this->assertNull(signup_status::from_current($signup2)->get_grade());
+        $signup3 = new signup($signup3->get_id());
+        $this->assertInstanceOf(partially_attended::class, $signup3->get_state());
+        $this->assertEquals(33, signup_status::from_current($signup3)->get_grade());
+        $signup4 = new signup($signup4->get_id());
+        $this->assertInstanceOf(not_set::class, $signup4->get_state());
+        $this->assertNull(signup_status::find_current($signup4));
     }
 }

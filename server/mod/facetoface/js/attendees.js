@@ -339,6 +339,9 @@ M.totara_f2f_attendees = M.totara_f2f_attendees || {
                 case "remove":
                     window.location.href = M.cfg.wwwroot + '/mod/facetoface/attendees/list/remove.php?s=' + M.totara_f2f_attendees.config.sessionid;
                     break;
+                case "managearchives":
+                    window.location.href = M.cfg.wwwroot + '/mod/facetoface/attendees/list/managearchives.php?s=' + M.totara_f2f_attendees.config.sessionid;
+                    break;
             }
 
             // Process confirm/cancel(remove) waitlist attendees.

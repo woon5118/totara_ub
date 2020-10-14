@@ -119,6 +119,9 @@ if ($seminarevent->get_cancelledstatus() == 0) {
     if (has_capability('mod/facetoface:removeattendees', $context)) {
         $actions['remove'] = get_string('removeattendees', 'mod_facetoface');
     }
+    if (has_capability('mod/facetoface:managearchivedattendees', $context)) {
+        $actions['managearchives'] = get_string('managearchivedattendees', 'mod_facetoface');
+    }
     if (!empty($actions)) {
         echo $OUTPUT->container_start('actions last');
         // Action selector
