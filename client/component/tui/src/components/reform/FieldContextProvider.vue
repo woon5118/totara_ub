@@ -21,6 +21,7 @@ export default {
   props: {
     id: String,
     labelId: String,
+    ariaDescribedby: String,
   },
 
   provide() {
@@ -28,6 +29,7 @@ export default {
       reformFieldContext: {
         getId: () => this.id,
         getLabelId: () => this.labelId,
+        getAriaDescribedby: () => this.ariaDescribedby,
       },
     };
   },

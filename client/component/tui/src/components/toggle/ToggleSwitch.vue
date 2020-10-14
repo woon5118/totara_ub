@@ -27,6 +27,7 @@
       :id="id"
       type="button"
       class="tui-toggleSwitch__btn"
+      :aria-describedby="ariaDescribedby"
       :aria-label="ariaLabel"
       :aria-pressed="value"
       :disabled="disabled"
@@ -51,6 +52,7 @@
 <script>
 export default {
   props: {
+    ariaDescribedby: String,
     ariaLabel: String,
     id: {
       type: String,

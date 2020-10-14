@@ -69,7 +69,11 @@ function create({ scope, fieldContext, name, props }) {
 describe('Field', () => {
   it('provides slot props to interact with Reform state', () => {
     const scope = createMockScope();
-    const fieldContext = { getId: () => 4, getLabelId: () => 5 };
+    const fieldContext = {
+      getId: () => 4,
+      getLabelId: () => 5,
+      getAriaDescribedby: () => 6,
+    };
 
     scope.getValue.mockImplementation(path => (path == 'foo' ? 3 : null));
     scope.getError.mockImplementation(path => (path == 'foo' ? 'err' : null));
@@ -77,6 +81,8 @@ describe('Field', () => {
 
     const opt = create({ scope, fieldContext, name: 'foo' });
 
+    expect(opt.props.ariaDescribedby).toBe(6);
+    expect(opt.props.labelId).toBe(5);
     expect(opt.props.id).toBe(4);
     expect(opt.props.value).toBe(3);
     expect(opt.props.name).toBe('foo');
@@ -91,7 +97,11 @@ describe('Field', () => {
 
   it('registers validator for field', async () => {
     const scope = createMockScope();
-    const fieldContext = { getId: () => 4, getLabelId: () => 5 };
+    const fieldContext = {
+      getId: () => 4,
+      getLabelId: () => 5,
+      getAriaDescribedby: () => 6,
+    };
     const validate = jest.fn();
 
     const opt = create({

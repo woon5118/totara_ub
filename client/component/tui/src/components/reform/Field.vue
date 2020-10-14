@@ -39,7 +39,22 @@ export default {
     /**
      * HTML ID for field.
      *
-     * Used to suppot accessibility.
+     * Used to support accessibility.
+     *
+     * @returns {string}
+     */
+    ariaDescribedby() {
+      return (
+        (this.reformFieldContext &&
+          this.reformFieldContext.getAriaDescribedby()) ||
+        undefined
+      );
+    },
+
+    /**
+     * HTML ID for field.
+     *
+     * Used to support accessibility.
      *
      * @returns {string}
      */
@@ -196,6 +211,7 @@ export default {
 
   render() {
     return this.$scopedSlots.default({
+      ariaDescribedby: this.ariaDescribedby,
       id: this.id,
       labelId: this.labelId,
       value: this.value,

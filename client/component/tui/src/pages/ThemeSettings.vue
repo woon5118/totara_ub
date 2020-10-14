@@ -42,8 +42,9 @@
                 :name="['formtenant_field_tenant', 'value']"
                 :toggle-first="true"
                 :aria-label="label"
+                :aria-describedby="$id('tenant')"
               />
-              <FormRowDetails>
+              <FormRowDetails :id="$id('tenant')">
                 {{ $str('formtenant_details_tenant', 'totara_tui') }}
               </FormRowDetails>
             </FormRow>

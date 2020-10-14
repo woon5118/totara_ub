@@ -34,11 +34,9 @@
           <FormRow
             :label="$str('formimages_label_displaylogin', 'totara_tui')"
             :is-stacked="true"
+            :aria-describedby="$id('formimages-displaylogin-defaults')"
           >
-            <FormCheckbox
-              :name="['formimages_field_displaylogin', 'value']"
-              :aria-describedby="$id('formimages-displaylogin-defaults')"
-            />
+            <FormCheckbox :name="['formimages_field_displaylogin', 'value']" />
             <FormRowDefaults :id="$id('formimages-displaylogin-defaults')">{{
               $str('enabled', 'totara_core')
             }}</FormRowDefaults>

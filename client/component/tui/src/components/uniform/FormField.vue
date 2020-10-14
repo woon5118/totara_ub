@@ -64,12 +64,14 @@ export default {
   methods: {
     makeSlotProps(slotProps) {
       const errorId = this.hasError(slotProps) ? this.$id('error') : null;
+      const ariaDescribedby = slotProps.ariaDescribedby || null;
+
       return Object.assign({}, slotProps, {
         errorId,
         attrs: {
           id: slotProps.id,
           name: slotProps.inputName,
-          'aria-describedby': errorId || null,
+          'aria-describedby': [ariaDescribedby, errorId].join(' '),
           'aria-invalid': errorId ? 'true' : null,
         },
       });

@@ -26,7 +26,10 @@
           name="subjectInstanceGeneration"
           char-length="30"
         >
-          <Radio :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT">
+          <Radio
+            :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT"
+            :aria-describedby="$id('disabled')"
+          >
             {{
               $str(
                 'schedule_job_assignment_based_instances_disabled',
@@ -34,7 +37,7 @@
               )
             }}
           </Radio>
-          <FormRowDetails>
+          <FormRowDetails :id="$id('disabled')">
             <span class="tui-assignmentScheduleAdditionalSettings__description">
               {{
                 $str(
@@ -45,7 +48,10 @@
             </span>
           </FormRowDetails>
 
-          <Radio :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB">
+          <Radio
+            :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB"
+            :aria-describedby="$id('enabled')"
+          >
             {{
               $str(
                 'schedule_job_assignment_based_instances_enabled',
@@ -53,7 +59,7 @@
               )
             }}
           </Radio>
-          <FormRowDetails>
+          <FormRowDetails :id="$id('enabled')">
             <span class="tui-assignmentScheduleAdditionalSettings__description">
               {{
                 $str(

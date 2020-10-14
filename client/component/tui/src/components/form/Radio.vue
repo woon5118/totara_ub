@@ -22,6 +22,7 @@
       :id="id"
       class="tui-radio__input"
       type="radio"
+      :aria-describedby="ariaDescribedby"
       :aria-label="ariaLabel"
       :autocomplete="autocomplete"
       :autofocus="autofocus"
@@ -44,6 +45,7 @@ export default {
   props: {
     autocomplete: Boolean,
     autofocus: Boolean,
+    ariaDescribedby: String,
     ariaLabel: String,
     checked: Boolean,
     disabled: Boolean,

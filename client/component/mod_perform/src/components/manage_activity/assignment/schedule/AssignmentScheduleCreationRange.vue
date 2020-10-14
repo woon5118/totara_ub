@@ -93,11 +93,12 @@
             <FormRow
               :label="$str('schedule_range_use_anniversary', 'mod_perform')"
               :is-stacked="true"
+              :aria-describedby="$id('use-anniversary')"
             >
               <div class="tui-assignmentScheduleCreationRange__form-checkbox">
                 <FormCheckbox name="useAnniversary" />
               </div>
-              <FormRowDetails>
+              <FormRowDetails :id="$id('use-anniversary')">
                 {{ $str('schedule_use_anniversary_label', 'mod_perform') }}
               </FormRowDetails>
             </FormRow>

@@ -28,6 +28,7 @@
       >
         <ToggleSwitch
           v-model="value"
+          :aria-describedby="$id('aria-describedby')"
           :disabled="isSaving"
           :toggle-first="true"
           :text="

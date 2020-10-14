@@ -30,6 +30,7 @@ describe('FieldContextProvider', () => {
       propsData: {
         id: 'test-id',
         labelId: 'test-label-id',
+        ariaDescribedby: 'test-aria-describedby',
       },
       scopedSlots: {
         default() {
@@ -42,5 +43,8 @@ describe('FieldContextProvider', () => {
 
     expect(receiver.reformFieldContext.getId()).toBe('test-id');
     expect(receiver.reformFieldContext.getLabelId()).toBe('test-label-id');
+    expect(receiver.reformFieldContext.getAriaDescribedby()).toBe(
+      'test-aria-describedby'
+    );
   });
 });

@@ -51,16 +51,24 @@
       </FormCheckbox>
     </FormRow>
 
-    <FormRow label="Colour" :is-stacked="true">
+    <FormRow
+      label="Colour"
+      :is-stacked="true"
+      :aria-describedby="$id('colour-default') + ' ' + $id('colour-details')"
+    >
       <FormColor
         name="color"
         :validations="v => [v.required(), v.colorValueHex()]"
       />
-      <FormRowDefaults>{{ initialValues.color }}</FormRowDefaults>
-      <FormRowDetails>This field changes colour</FormRowDetails>
+      <FormRowDefaults :id="$id('colour-default')">{{
+        initialValues.color
+      }}</FormRowDefaults>
+      <FormRowDetails :id="$id('colour-details')"
+        >This field changes colour</FormRowDetails
+      >
     </FormRow>
 
-    <FormRow label="Age">
+    <FormRow label="Age" :aria-describedby="$id('age')">
       <FormNumber name="age" />
     </FormRow>
 
@@ -112,8 +120,11 @@
         name="pineapple"
         :toggle-first="true"
         aria-label="Does pineapple belong on pizza?"
+        :aria-describedby="$id('pineapple-on-pizza')"
       />
-      <FormRowDetails id="pineapple">Belongs on pizza?</FormRowDetails>
+      <FormRowDetails :id="$id('pineapple-on-pizza')"
+        >Belongs on pizza?</FormRowDetails
+      >
     </FormRow>
 
     <FormRow label="Pizza slices" required>

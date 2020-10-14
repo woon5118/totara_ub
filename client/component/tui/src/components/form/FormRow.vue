@@ -48,7 +48,11 @@
         />
       </div>
 
-      <FieldContextProvider :id="generatedId" :label-id="generatedLabelId">
+      <FieldContextProvider
+        :id="generatedId"
+        :label-id="generatedLabelId"
+        :aria-describedby="ariaDescribedbyId"
+      >
         <div
           :class="{
             'tui-formRow__action': true,
@@ -82,6 +86,7 @@ export default {
   },
 
   props: {
+    ariaDescribedby: String,
     labelLegend: Boolean,
     helpmsg: String,
     helpTitle: String,
@@ -101,7 +106,9 @@ export default {
 
   computed: {
     ariaDescribedbyId() {
-      return this.helpmsg ? this.generatedId + 'helpDesc' : null;
+      return this.helpmsg
+        ? this.generatedId + 'helpDesc ' + this.ariaDescribedby
+        : this.ariaDescribedby;
     },
     ariaLabel() {
       return this.hidden ? this.label : null;

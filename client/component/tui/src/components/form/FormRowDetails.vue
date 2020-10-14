@@ -17,10 +17,20 @@
 -->
 
 <template>
-  <div class="tui-formRow__details">
+  <div :id="id" class="tui-formRow__details">
     <slot />
   </div>
 </template>
+
+<script>
+export default {
+  props: {
+    id: {
+      type: String,
+    },
+  },
+};
+</script>
 
 <style lang="scss">
 .tui-formRow__details {
