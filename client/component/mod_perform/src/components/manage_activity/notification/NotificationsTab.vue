@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <Loader :loading="isLoading">
+  <Loader :loading="$apollo.loading || isLoading">
     <div class="tui-activityNotifications">
       <h3 class="tui-activityNotifications__header">
         <span class="tui-activityNotifications__title">{{
@@ -61,12 +61,18 @@ export default {
       type: Object,
       required: true,
     },
+    tabIsActive: {
+      type: Boolean,
+      required: true,
+    },
   },
 
   data() {
     return {
       notifications: [],
       isLoading: false,
+      activityUpdated: false,
+      skipQuery: true,
     };
   },
 
@@ -77,20 +83,33 @@ export default {
         return { activity_id: this.value.id };
       },
       update: data => data.mod_perform_notifications,
+      skip() {
+        return this.skipQuery;
+      },
     },
   },
 
   watch: {
     value() {
-      this.$apollo.queries.notifications.refetch();
+      // Queue the query to be updated again if other activity settings change
+      this.activityUpdated = true;
+    },
+    tabIsActive() {
+      this.skipQuery = false;
+      if (this.activityUpdated && this.tabIsActive) {
+        this.$apollo.queries.notifications.refetch();
+        this.activityUpdated = false;
+      }
     },
   },
 
-  beforeCreate() {
-    this.updateTriggers = debounce(
-      async (section, triggers) => {
+  methods: {
+    onUpdateTriggers: debounce(
+      async function(section, triggers) {
         const id = await this.createNotificationIfNotExists(section);
         try {
+          // We deliberately don't update the notification state with what is returned by the mutation,
+          // as otherwise it creates a weird effect because of the 500ms delay.
           await this.$apollo.mutate({
             mutation: updateNotificationTriggersMutation,
             variables: {
@@ -114,14 +133,12 @@ export default {
       },
       500,
       { leading: true, trailing: true }
-    );
-  },
+    ),
 
-  methods: {
     async onToggleNotification(section, active) {
       this.isLoading = true;
       if (section.id) {
-        await this.$apollo.mutate({
+        const { data: result } = await this.$apollo.mutate({
           mutation: toggleNotificationMutation,
           variables: {
             input: {
@@ -130,8 +147,9 @@ export default {
             },
           },
         });
+        this.updateNotification(result.mod_perform_toggle_notification);
       } else {
-        await this.$apollo.mutate({
+        const { data: result } = await this.$apollo.mutate({
           mutation: createNotificationMutation,
           variables: {
             input: {
@@ -141,39 +159,36 @@ export default {
             },
           },
         });
+        this.updateNotification(result.mod_perform_create_notification);
       }
-      await this.$apollo.queries.notifications.refetch();
       this.isLoading = false;
     },
 
     async createNotificationIfNotExists(section) {
-      let id;
-      if (!section.id) {
-        this.isLoading = true;
-        const mutationResult = await this.$apollo.mutate({
-          mutation: createNotificationMutation,
-          variables: {
-            input: {
-              activity_id: this.value.id,
-              class_key: section.class_key,
-              active: section.active,
-            },
-          },
-        });
-        id =
-          mutationResult.data.mod_perform_create_notification.notification.id;
-        await this.$apollo.queries.notifications.refetch();
-        this.isLoading = false;
-      } else {
-        id = section.id;
+      if (section.id) {
+        return section.id;
       }
-      return id;
+
+      this.isLoading = true;
+      const { data: result } = await this.$apollo.mutate({
+        mutation: createNotificationMutation,
+        variables: {
+          input: {
+            activity_id: this.value.id,
+            class_key: section.class_key,
+            active: section.active,
+          },
+        },
+      });
+      this.updateNotification(result.mod_perform_create_notification);
+      this.isLoading = false;
+      return result.mod_perform_create_notification.notification.id;
     },
 
     async onToggleRecipient(section, recipient) {
       this.isLoading = true;
       const id = await this.createNotificationIfNotExists(section);
-      await this.$apollo.mutate({
+      const { data: result } = await this.$apollo.mutate({
         mutation: toggleNotificationRecipientMutation,
         variables: {
           input: {
@@ -183,12 +198,20 @@ export default {
           },
         },
       });
-      await this.$apollo.queries.notifications.refetch();
+      this.updateNotification(result.mod_perform_toggle_notification_recipient);
       this.isLoading = false;
     },
 
-    onUpdateTriggers(section, triggers) {
-      this.updateTriggers(section, triggers);
+    updateNotification(updatedNotification) {
+      this.notifications = this.notifications.map(notification => {
+        if (
+          notification.class_key === updatedNotification.notification.class_key
+        ) {
+          return updatedNotification.notification;
+        } else {
+          return notification;
+        }
+      });
     },
   },
 };

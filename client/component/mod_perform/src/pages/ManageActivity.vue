@@ -57,6 +57,7 @@
               :activity-state="activityState"
               :activity-context-id="parseInt(activity.context_id)"
               :activity-has-unsaved-changes="unsavedChanges"
+              :tab-is-active="id === currentTabId"
               @unsaved-changes="setUnsavedChanges"
               @mutation-error="showMutationErrorNotification"
               @mutation-success="showMutationSuccessNotification"
