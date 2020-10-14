@@ -108,13 +108,36 @@ class subject_instance_for_participant extends provider {
         return subject_instance_entity::repository()
             ->as('si')
             ->with('subject_user')
-            ->with('track.activity.settings')
+            ->with([
+                'track.activity' => function (repository $repository) {
+                    $repository
+                        ->with('settings')
+                        ->with('type');
+                }
+            ])
+            ->with('job_assignment')
             ->with([
                 'participant_instances' => function (repository $repository) {
-                    $repository->with('participant_sections.section')
-                        ->with('core_relationship.resolvers')
+                    $repository
+                        ->with([
+                            'participant_sections' => function (repository $repository) {
+                                $repository
+                                    ->with('section.section_relationships.core_relationship')
+                                    ->with([
+                                        'participant_instance' => function (repository $repository) {
+                                            $repository
+                                                ->with('core_relationship')
+                                                ->with('participant_user')
+                                                ->with('external_participant')
+                                                ->with('subject_instance.track.activity');
+                                        }
+                                    ]);
+                            }
+                        ])
+                        ->with('core_relationship')
                         ->with('subject_instance.track.activity')
-                        ->with('participant_user');
+                        ->with('participant_user')
+                        ->with('external_participant');
                 }
             ])
             ->join([track_user_assignment_entity::TABLE, 'tua'], 'track_user_assignment_id', 'id')

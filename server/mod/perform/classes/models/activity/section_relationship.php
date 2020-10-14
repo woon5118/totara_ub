@@ -25,6 +25,7 @@ namespace mod_perform\models\activity;
 
 use core\orm\entity\model;
 use core\orm\query\builder;
+use mod_perform\constants;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use totara_core\relationship\relationship as core_relationship_model;
 
@@ -176,7 +177,7 @@ class section_relationship extends model {
      * @return bool
      */
     public function get_is_subject(): bool {
-        return $this->entity->core_relationship->idnumber == 'subject';
+        return $this->entity->core_relationship->idnumber === constants::RELATIONSHIP_SUBJECT;
     }
 
 }
