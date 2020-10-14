@@ -220,6 +220,14 @@ class activity extends item {
             $activity_setting->save();
         }
 
+        if (!empty($config['multisection'])) {
+            $activity_setting = new activity_setting_entity();
+            $activity_setting->activity_id = $this->data->id;
+            $activity_setting->name = 'multisection';
+            $activity_setting->value = $config['multisection'];
+            $activity_setting->save();
+        }
+
         if (!empty($config['manual_relationships'])) {
             foreach ($config['manual_relationships'] as $manual_relationship => $selector_relationship) {
                 manual_relationship_selection::repository()
@@ -244,6 +252,7 @@ class activity extends item {
         }
 
         if (!empty($config['sections'])) {
+            $this->set_general_settings(['multisection' => 1]);
             $this->create_section_details($config['sections']);
         }
     }
