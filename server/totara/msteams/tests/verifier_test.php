@@ -46,6 +46,7 @@ use totara_msteams\check\checks\sso_auth;
 use totara_msteams\check\checks\sso_id;
 use totara_msteams\check\checks\sso_scope;
 use totara_msteams\check\checks\url_common;
+use totara_msteams\check\checks\wwwroot;
 use totara_msteams\check\status;
 use totara_msteams\check\verifier;
 
@@ -97,6 +98,7 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
             sso_auth::class,
             sso_id::class,
             sso_scope::class,
+            wwwroot::class,
         ], $classes);
         // See if the first failure is caused by the first class.
         $this->assertEquals(current($results)->class->get_report(), $verifier->get_report());
@@ -589,6 +591,17 @@ class totara_msteams_verifier_testcase extends advanced_testcase {
         set_config('sso_scope', 'https://example.com/31415926-5358-9793-2384-626433832795', 'totara_msteams');
         $this->assert_check(status::FAILED, $check);
         set_config('sso_scope', 'api://example.com/31415926-5358-9793-2384-626433832795', 'totara_msteams');
+        $this->assert_check(status::PASS, $check);
+    }
+
+    public function test_check_wwwroot() {
+        global $CFG;
+        $check = new wwwroot();
+        $CFG->wwwroot = 'ftp://example.com';
+        $this->assert_check(status::FAILED, $check);
+        $CFG->wwwroot = 'http://example.com';
+        $this->assert_check(status::FAILED, $check);
+        $CFG->wwwroot = 'https://example.com';
         $this->assert_check(status::PASS, $check);
     }
 }

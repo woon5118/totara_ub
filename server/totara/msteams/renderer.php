@@ -40,6 +40,7 @@ class totara_msteams_renderer extends plugin_renderer_base {
      * @return string
      */
     public function render_manifest_download(moodle_url $downloadlink, bool $haserror, array $result): string {
+        global $CFG;
         $table = new html_table();
         $table->summary = get_string('report:summary', 'totara_msteams');
         $table->attributes['class'] = 'generaltable';
@@ -58,7 +59,7 @@ class totara_msteams_renderer extends plugin_renderer_base {
             $name = clean_string($class->get_name());
             $config = $class->get_config_name();
             if (!empty($config)) {
-                $configurl = new moodle_url('/admin/search.php', ['query' => $config]);
+                $configurl = new moodle_url("/{$CFG->admin}/search.php", ['query' => $config]);
                 $name = html_writer::link($configurl, $name);
             }
             if ($result === status::PASS) {
