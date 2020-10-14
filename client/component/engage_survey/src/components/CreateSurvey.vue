@@ -46,6 +46,7 @@ import SurveyForm from 'engage_survey/components/form/SurveyForm';
 import AccessForm from 'totara_engage/components/form/AccessForm';
 import createSurvey from 'engage_survey/graphql/create_survey';
 import { AccessManager } from 'totara_engage/index';
+import { notify } from 'tui/notifications';
 
 // Mixins
 import ContainerMixin from 'totara_engage/mixins/container_mixin';
@@ -148,12 +149,28 @@ export default {
             this.$emit('done', { resourceId: survey.resource.id });
           },
         })
-        .then(() => this.$emit('cancel'))
+        .then(({ data: { survey } }) => {
+          if (survey) {
+            notify({
+              message: this.$str('created', 'engage_survey'),
+              type: 'success',
+            });
+          }
+          this.$emit('cancel');
+        })
         .finally(() => (this.submitting = false));
     },
   },
 };
 </script>
+
+<lang-strings>
+{
+  "engage_survey": [
+    "created"
+  ]
+}
+</lang-strings>
 
 <style lang="scss">
 .tui-engageCreateSurvey {

@@ -27,6 +27,7 @@ $string['cannot_view_survey'] = "You do not have permission to view the survey."
 $string['defaultlabel'] = "Survey";
 $string['deletesurvey'] = "Delete survey";
 $string['deletewarningmsg'] = 'Are you sure you want to delete this survey?';
+$string['created'] = 'Survey successfully created';
 $string['editsetting'] = "Edit settings";
 $string['editsurvey'] = "Edit survey";
 $string['editsurveyaccessiblename'] = 'Edit survey {$a}';

@@ -36,6 +36,7 @@ $string['cachedef_catalog_visibility'] = 'Visibility of resource items in the ca
 $string['content'] = 'Resource content';
 $string['createarticle'] = 'Create a new resource resource';
 $string['createarticleshort'] = 'Create resource';
+$string['created'] = 'Resource successfully created';
 $string['deletewarningmsg'] = 'This action is permanent. People with access to this resource will no longer be able to view it.';
 $string['deletewarningtitle'] = 'Are you sure you want to delete the resource?';
 $string['editarticlecontent'] = 'Edit {$a} content';

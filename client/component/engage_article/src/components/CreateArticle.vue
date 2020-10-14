@@ -46,6 +46,7 @@
 <script>
 import ArticleForm from 'engage_article/components/form/ArticleForm';
 import AccessForm from 'totara_engage/components/form/AccessForm';
+import { notify } from 'tui/notifications';
 
 // Graphql queries
 import createArticle from 'engage_article/graphql/create_article';
@@ -157,9 +158,16 @@ export default {
             this.$emit('done', { resourceId: id });
           },
         })
-        .then(() => {
+        .then(({ data: { article } }) => {
+          if (article) {
+            notify({
+              message: this.$str('created', 'engage_article'),
+              type: 'success',
+            });
+          }
           this.$emit('cancel');
         })
+
         .finally(() => {
           this.submitting = false;
         });
@@ -167,6 +175,14 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+{
+  "engage_article": [
+    "created"
+  ]
+}
+</lang-strings>
 
 <style lang="scss">
 .tui-engageCreateArticle {
