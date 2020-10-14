@@ -138,7 +138,8 @@ class activity_settings {
     public function remove(array $names): activity_settings {
         $updated = [];
 
-        foreach ($this->get() as $setting) {
+        // Refetch the settings to make sure we have what is currently in the DB.
+        foreach ($this->fetch()->get() as $setting) {
             if (in_array($setting->name, $names)) {
                 $setting->delete();
             } else {
@@ -162,7 +163,8 @@ class activity_settings {
     public function update(array $values): activity_settings {
         $updated = [];
 
-        foreach ($this->get()->all() as $setting) {
+        // Refetch the settings to make sure we have what is currently in the DB.
+        foreach ($this->fetch()->get()->all() as $setting) {
             $name = $setting->name;
 
             $updated[$name] = array_key_exists($name, $values)
