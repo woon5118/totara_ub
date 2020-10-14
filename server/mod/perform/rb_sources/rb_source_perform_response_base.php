@@ -149,16 +149,6 @@ class rb_source_perform_response_base extends rb_base_source {
         $this->defaultcolumns = $this->define_defaultcolumns();
         $this->defaultfilters = $this->define_defaultfilters();
 
-        // TODO remove this from this source once non-respondable elements are no longer generating response records.
-        //      still used in element source.
-        $non_respondable_elements = array_keys(element_plugin::get_element_plugins(false));
-        if (!empty($non_respondable_elements)) {
-            $sql = $DB->sql_not_in($non_respondable_elements);
-            $this->sourcewhere = 'perform_element.plugin_name ' . $sql->get_sql();
-            $this->sourceparams = $sql->get_params();
-            $this->sourcejoins = ['perform_element'];
-        }
-
         parent::__construct();
     }
 
