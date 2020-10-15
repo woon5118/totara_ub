@@ -85,7 +85,8 @@ class tabexport_source extends \totara_core\tabexport_source {
      * @return string
      */
     public function get_summary() {
-        return format_string($this->report->summary);
+        // Strip any links and embedded files as they don't play nice with the PDF export
+        return format_string($this->report->description);
     }
 
     /**
