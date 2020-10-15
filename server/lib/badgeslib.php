@@ -29,6 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 /* Include required award criteria library. */
 require_once($CFG->dirroot . '/badges/criteria/award_criteria.php');
 
+use core\json_editor\helper\document_helper;
+
 /*
  * Number of records per page.
 */
@@ -171,7 +173,7 @@ function badges_notify_badge_award(badge $badge, $userid, $issued, $filepathhash
     $eventdata->notification      = 1;
     $eventdata->subject           = $badge->messagesubject;
     $eventdata->fullmessage       = $plaintext;
-    $eventdata->fullmessageformat = FORMAT_HTML;
+    $eventdata->fullmessageformat = document_helper::is_valid_json_document($badge->message) ? FORMAT_JSON_EDITOR : FORMAT_HTML;
     $eventdata->fullmessagehtml   = $message;
     $eventdata->smallmessage      = '';
 
@@ -208,7 +210,7 @@ function badges_notify_badge_award(badge $badge, $userid, $issued, $filepathhash
         $eventdata->notification      = 1;
         $eventdata->subject           = $creatorsubject;
         $eventdata->fullmessage       = html_to_text($creatormessage);
-        $eventdata->fullmessageformat = FORMAT_HTML;
+        $eventdata->fullmessageformat = document_helper::is_valid_json_document($badge->message) ? FORMAT_JSON_EDITOR : FORMAT_HTML;
         $eventdata->fullmessagehtml   = $creatormessage;
         $eventdata->smallmessage      = '';
 
