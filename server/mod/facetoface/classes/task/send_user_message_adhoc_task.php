@@ -28,6 +28,7 @@ global $CFG;
 require_once($CFG->dirroot.'/mod/facetoface/notification/lib.php');
 
 use \mod_facetoface\messaging;
+use core\json_editor\helper\document_helper;
 
 class send_user_message_adhoc_task extends \core\task\adhoc_task {
     /**
@@ -121,7 +122,7 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
 
         $messagedata->subject     = $subject;
         $messagedata->fullmessage       = $plaintext;
-        $messagedata->fullmessageformat = FORMAT_PLAIN;
+        $messagedata->fullmessageformat = document_helper::is_valid_json_document($messagedata->fullmessage) ? FORMAT_JSON_EDITOR : FORMAT_HTML;
         $messagedata->fullmessagehtml   = $body;
         $messagedata->smallmessage      = $plaintext;
 

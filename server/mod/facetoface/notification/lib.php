@@ -46,6 +46,7 @@ use mod_facetoface\query\event\filter\event_time_filter;
 use mod_facetoface\task\send_user_message_adhoc_task;
 use mod_facetoface\notification\notification_map;
 use mod_facetoface\query\event\query_notifications;
+use core\json_editor\helper\document_helper;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -1023,7 +1024,7 @@ class facetoface_notification extends data_object {
         $this->_event->roleid      = $CFG->learnerroleid;
         $this->_event->subject     = $subject;
         $this->_event->fullmessage       = $plaintext;
-        $this->_event->fullmessageformat = FORMAT_PLAIN;
+        $this->_event->fullmessageformat = document_helper::is_valid_json_document($this->_event->fullmessage) ? FORMAT_JSON_EDITOR : FORMAT_HTML;
         $this->_event->fullmessagehtml   = $body;
         $this->_event->smallmessage      = $plaintext;
 
