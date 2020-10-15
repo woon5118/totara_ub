@@ -134,10 +134,10 @@ class container_workspace_webapi_workspace_image_testcase extends advanced_testc
         $this->assertEquals(false, $workspace_image->is_enabled());
 
         $theme_settings = new settings($theme_config, 0);
-        $files = $theme_settings->get_files($user_one->id);
+        $files = $theme_settings->get_files();
         foreach ($files as $file) {
             if ($file instanceof workspace_image) {
-                $this->fail('Workspace image is disabled and should not be part of files');
+                $this->assertFalse($file->is_enabled());
             }
         }
     }

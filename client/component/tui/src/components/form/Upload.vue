@@ -34,7 +34,7 @@ export default {
       type: Number,
       required: true,
     },
-    contextId: Number,
+    contextId: [Number, String],
     acceptedTypes: Array,
 
     /**

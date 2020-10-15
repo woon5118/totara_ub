@@ -438,6 +438,7 @@ $string['nonmeaningfulcontent'] = 'Non meaningful content';
 $string['noparticipants'] = 'No participants found for this course';
 $string['noparticipatorycms'] = 'Sorry, but you have no participatory course modules to report on';
 $string['nopermissions'] = 'Sorry, but you do not currently have permissions to do that ({$a})';
+$string['nopermissionthemefile'] = 'You do not have permission to manage theme file';
 $string['nopermissiontocomment'] = 'You can\'t add comments';
 $string['nopermissiontodelentry'] = 'You can\'t delete other people\'s entries!';
 $string['nopermissiontoeditcomment'] = 'You can\'t edit other people\'s comments!';

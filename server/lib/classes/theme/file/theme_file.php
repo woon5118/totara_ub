@@ -49,9 +49,6 @@ abstract class theme_file {
     /** @var int */
     protected $tenant_id = 0;
 
-    /** @var int */
-    protected $user_id;
-
     /** @var context */
     protected $context;
 
@@ -121,16 +118,19 @@ abstract class theme_file {
     /**
      * Get item ID of the theme plugin.
      *
+     * @param int|null $tenant_id
      * @param string|null $theme
      *
      * @return int
-     *
      */
-    public function get_item_id(?string $theme = null): int {
+    public function get_item_id(?int $tenant_id = null, ?string $theme = null): int {
         global $DB;
 
+        $id = $tenant_id ?? $this->tenant_id;
         $plugin = "theme_" . ($theme ?? $this->theme_config->name);
-        $name = "tenant_{$this->tenant_id}_settings";
+        $name = "tenant_{$id}_settings";
+
+        // Always make sure that there is a record representing this config.
         if (!get_config($plugin, $name)) {
             set_config($name, '{}', $plugin);
         }
@@ -172,16 +172,19 @@ abstract class theme_file {
      * Get file currently overriding the default file.
      *
      * @param int|null $item_id
+     * @param context|null $context
      *
      * @return stored_file|null
      */
-    public function get_current_imagefile(?int $item_id = null): ?stored_file {
+    public function get_current_file(?int $item_id = null, ?context $context = null): ?stored_file {
         $item_id = $item_id ?? $this->get_item_id();
 
         // Get context.
-        $context = $this->get_context();
         if (empty($context)) {
-            return null;
+            $context = $this->get_context();
+            if (empty($context)) {
+                return null;
+            }
         }
 
         // Get files for current component and context.
@@ -193,7 +196,7 @@ abstract class theme_file {
         $file_helper->set_item_id($item_id);
         $files = $file_helper->get_stored_files();
 
-        // If no files found then return default URL.
+        // No files found.
         if (empty($files)) {
             return null;
         }
@@ -206,34 +209,35 @@ abstract class theme_file {
     }
 
     /**
-     * Get the URL to the current file.
+     * Get the URL to the current file. We first check if there is a file set
+     * for the tenant and if not then we fall back on the site file if any.
+     *
+     * @param string|null $theme
      *
      * @return moodle_url|null
      */
-    public function get_current_url(): ?moodle_url {
+    public function get_current_url(?string $theme = null): ?moodle_url {
         // If site has not yet been installed we can return null here as no
-        // image would have been overridden at this point.
+        // file would have been overridden at this point.
         if (during_initial_install()) {
             return null;
         }
 
-        $file = $this->get_current_imagefile();
-        if (empty($file)) {
-            // Check if any parent has this file.
-            $parents = $this->theme_config->parents;
-            foreach ($parents as $parent) {
-                $item_id = $this->get_item_id($parent);
-                $file = $this->get_current_imagefile($item_id);
-                if (!empty($file)) {
-                    break;
-                }
-            }
+        $file = $this->get_current_file($this->get_item_id($this->tenant_id, $theme));
+
+        // If no file found for tenant and theme check if site setting is set for theme.
+        if (empty($file) && $this->tenant_id > 0) {
+            $file = $this->get_current_file(
+                $this->get_item_id(0, $theme),
+                \context_system::instance()
+            );
         }
+
         return !empty($file) ? $this->get_url($file) : null;
     }
 
     /**
-     * Get the current URL or default as fallback.
+     * Get the current URL or theme default as fallback.
      *
      * @return moodle_url
      */
@@ -252,10 +256,10 @@ abstract class theme_file {
      */
     protected function get_url(stored_file $file): moodle_url {
         return moodle_url::make_pluginfile_url(
-            $this->get_context()->id,
-            $this->get_component(),
-            $this->get_area(),
-            $this->get_item_id(),
+            $file->get_contextid(),
+            $file->get_component(),
+            $file->get_filearea(),
+            $file->get_itemid(),
             '/',
             $file->get_filename()
         );
@@ -285,12 +289,15 @@ abstract class theme_file {
      * @return file_area
      */
     public function get_file_area(): file_area {
+        global $USER;
+
         $file_helper = new file_helper(
             $this->get_component(),
             $this->get_area(),
             $this->get_context()
         );
-        return $file_helper->create_file_area($this->user_id);
+
+        return $file_helper->create_file_area($USER->id);
     }
 
     /**
@@ -386,6 +393,16 @@ abstract class theme_file {
     }
 
     /**
+     * Delete stored file and clean up configuration.
+     */
+    public function delete(): void {
+        if ($current_file = $this->get_current_file()) {
+            unset_config($this->get_area(), $this->get_component());
+            $current_file->delete();
+        }
+    }
+
+    /**
      * Is this feature enabled. This is different from is_available as this
      * function should be used to determine if the feature is enabled.
      *
@@ -393,15 +410,6 @@ abstract class theme_file {
      */
     public function is_enabled(): bool {
         return true;
-    }
-
-    /**
-     * Get default properties.
-     *
-     * @return array
-     */
-    public function get_default_categories(): array {
-        return [];
     }
 
     /**
@@ -416,19 +424,26 @@ abstract class theme_file {
     }
 
     /**
+     * Get default properties.
+     *
+     * @return array
+     */
+    public function get_default_categories(): array {
+        return [];
+    }
+
+    /**
      * Get the default context for theme file.
      *  - Tenant context to fetch files limited to a specific tenant.
      *  - System context if we don't have tenants.
      *
-     * @param int|null $tenant_id
-     *
      * @return context|null
      */
-    protected function get_default_context(?int $tenant_id = null): ?context {
+    protected function get_default_context(): ?context {
         global $USER;
 
-        if (!empty($tenant_id)) {
-            return \context_tenant::instance($tenant_id);
+        if (!empty($this->tenant_id)) {
+            return \context_tenant::instance($this->tenant_id);
         } elseif (!empty($USER->tenantid)) {
             return \context_tenant::instance($USER->tenantid);
         }

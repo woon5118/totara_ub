@@ -122,7 +122,7 @@ export default {
     acceptedTypes: Array,
     ariaDescribedby: String,
     ariaLabelExtension: String,
-    contextId: Number,
+    contextId: [Number, String],
   },
 
   data() {

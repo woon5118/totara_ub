@@ -73,7 +73,7 @@ class totara_program_image_testcase extends advanced_testcase {
                 'draft_id' => $this->create_image('new_program_image', $user_context),
             ]
         ];
-        $theme_settings->update_files($files, $user_one->id);
+        $theme_settings->update_files($files);
 
         // Confirm that new default image is fetched.
         $url = $program_image->get_current_or_default_url();
@@ -84,7 +84,7 @@ class totara_program_image_testcase extends advanced_testcase {
 
         // Now remove the theme setting file. Currently, there's no function for this so we remove it manually
         unset_config('defaultprogramimage', 'totara_core');
-        $current_file = $program_image->get_current_imagefile();
+        $current_file = $program_image->get_current_file();
         $current_file->delete();
 
         // Now we are back to the system default image
@@ -109,10 +109,10 @@ class totara_program_image_testcase extends advanced_testcase {
         $this->assertEquals(false, $program_image->is_enabled());
 
         $theme_settings = new settings($theme_config, 0);
-        $files = $theme_settings->get_files($user_one->id);
+        $files = $theme_settings->get_files();
         foreach ($files as $file) {
             if ($file instanceof program_image) {
-                $this->fail('Program image is disabled and should not be part of files');
+                $this->assertFalse($file->is_enabled());
             }
         }
     }

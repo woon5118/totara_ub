@@ -70,7 +70,7 @@ class program_image extends theme_file {
      * @return bool
      */
     public function is_enabled(): bool {
-        return $this->tenant_id === 0 && advanced_feature::is_enabled('programs');
+        return advanced_feature::is_enabled('programs');
     }
 
     /**

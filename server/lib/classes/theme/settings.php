@@ -39,6 +39,9 @@ final class settings {
     /** @var int */
     private $tenant_id;
 
+    /** @var theme_file[] */
+    private $file_instances = [];
+
     /**
      * settings constructor.
      *
@@ -142,35 +145,20 @@ final class settings {
      */
     private function get_default_categories(): array {
         $categories = [];
-        $classes = helper::get_classes();
-        foreach ($classes as $class) {
-            /** @var theme_file $theme_file */
-            $theme_file = new $class($this->theme_config);
-            if ($theme_file->is_enabled()) {
-                $categories = array_merge($categories, $theme_file->get_default_categories());
+        $instances = $this->get_file_instances();
+        foreach ($instances as $instance) {
+            if ($instance->is_enabled() && $this->can_manage($instance)) {
+                $categories = array_merge($categories, $instance->get_default_categories());
             }
         }
         return $categories;
     }
 
     /**
-     * @param int $user_id
-     *
-     * @return array
+     * @return theme_file[]
      */
-    public function get_files(int $user_id): array {
-        $files = [];
-        $classes = helper::get_classes();
-        foreach ($classes as $class) {
-            /** @var theme_file $theme_file */
-            $theme_file = new $class($this->theme_config);
-            $theme_file->set_tenant_id($this->tenant_id);
-            $theme_file->set_user_id($user_id);
-            if ($theme_file->is_enabled()) {
-                $files[] = $theme_file;
-            }
-        }
-        return $files;
+    public function get_files(): array {
+        return $this->get_file_instances();
     }
 
     /**
@@ -209,6 +197,24 @@ final class settings {
     }
 
     /**
+     * @param array $files
+     */
+    public function validate_files(array $files): void {
+        $instances = $this->get_file_instances();
+        foreach ($files as $file) {
+            foreach ($instances as $instance) {
+                if ($instance->get_ui_key() === $file['ui_key']) {
+                    // Confirm that the user has capability to manage the file.
+                    if (!$instance->is_enabled() || !$this->can_manage($instance)) {
+                        throw new \moodle_exception('nopermissionthemefile', 'error');
+                    }
+                    continue 2;
+                }
+            }
+        }
+    }
+
+    /**
      * @param array $categories
      */
     public function update_categories(array $categories): void {
@@ -240,30 +246,35 @@ final class settings {
 
     /**
      * @param array $files
-     * @param int $user_id
      */
-    public function update_files(array $files, int $user_id): void {
-        // Get classes and instantiate them all.
-        $classes = helper::get_classes();
-        $instances = [];
-        foreach ($classes as $class) {
-            $instances[] = new $class($this->theme_config);
-        }
+    public function update_files(array $files): void {
+        $instances = $this->get_file_instances();
 
         // Update files.
         foreach ($files as $file) {
-            /** @var theme_file $instance */
             foreach ($instances as $instance) {
                 if ($instance->get_ui_key() === $file['ui_key']) {
-                    $instance->set_user_id($user_id);
-                    $instance->set_tenant_id($this->tenant_id);
-                    if ($instance->is_enabled()) {
-                        $instance->save_files($file['draft_id']);
-                    }
+                    $instance->save_files($file['draft_id']);
                     continue 2;
                 }
             }
         }
+    }
+
+    /**
+     * @return theme_file[]
+     */
+    private function get_file_instances(): array {
+        // Get classes and instantiate them all.
+        if (empty($this->file_instances)) {
+            $classes = helper::get_classes();
+            foreach ($classes as $class) {
+                $instance = new $class($this->theme_config);
+                $instance->set_tenant_id($this->tenant_id);
+                $this->file_instances[] = $instance;
+            }
+        }
+        return $this->file_instances;
     }
 
     /**
@@ -303,6 +314,7 @@ final class settings {
         }
 
         $css = '';
+        $custom_css = '';
         $categories = $this->get_categories($tenant_enabled);
         foreach ($categories as $category) {
             // Each colour property needs to be in the root element
@@ -328,11 +340,13 @@ final class settings {
             // to know how to format it correctly.
             if ($category['name'] === 'custom') {
                 foreach ($category['properties'] as $property) {
-                    $css .= "\n{$property['value']}\n";
+                    $custom_css .= "\n{$property['value']}\n";
                 }
             }
         }
-        return $css;
+
+        // Return any category css with custom css added to the end.
+        return $css . $custom_css;
     }
 
     /**
@@ -375,6 +389,22 @@ final class settings {
      */
     public function is_tenant_branding_enabled(): bool {
         return $this->is_enabled('tenant', 'formtenant_field_tenant', false);
+    }
+
+    /**
+     * Confirm if a user has the capability required to manage a theme file.
+     *
+     * @param theme_file $theme_file
+     *
+     * @return bool
+     */
+    public function can_manage(theme_file $theme_file): bool {
+        $context = $theme_file->get_context();
+        if ($context instanceof \context_tenant) {
+            $tenant = \core\record\tenant::fetch($context->tenantid);
+            $context = \context_coursecat::instance($tenant->categoryid);
+        }
+        return has_capability('totara/tui:themesettings', $context);
     }
 
 }

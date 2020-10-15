@@ -1841,7 +1841,7 @@ class theme_config {
      * @return moodle_url
      */
     public function image_url($imagename, $component) {
-        global $CFG, $USER;
+        global $CFG;
 
         $params = array('theme'=>$this->name);
         if (empty($component) or $component === 'moodle' or $component === 'core') {
@@ -1850,16 +1850,10 @@ class theme_config {
             $params['component'] = $component;
         }
 
-        // If this is a theme file then see if an overwrite exists.
-        $theme_file = \core\theme\file\helper::get_class_for_component($this, $params['component'], $imagename);
-        if (!empty($theme_file)) {
-            $theme_file->set_tenant_id(!empty($USER->tenantid) ? $USER->tenantid : 0);
-            if ($theme_file->is_available()) {
-                $url = $theme_file->get_current_url();
-                if (!empty($url)) {
-                    return $url;
-                }
-            }
+        // If this is a theme file then see if an override exists.
+        $url = $this->get_overridden_image_url($params['component'], $imagename);
+        if (!empty($url)) {
+            return $url;
         }
 
         $svg = $this->use_svg_icons();
@@ -1890,6 +1884,67 @@ class theme_config {
         }
 
         return $url;
+    }
+
+    /**
+     * Check if a file has been overridden by theme settings and return the url to that specific file location.
+     *
+     * @param string $component
+     * @param string $image_name
+     *
+     * @return moodle_url|null
+     */
+    private function get_overridden_image_url(string $component, string $image_name): ?moodle_url {
+        global $USER;
+
+        $theme_file = \core\theme\file\helper::get_class_for_component($this, $component, $image_name);
+        if (!empty($theme_file)) {
+            $theme_file->set_tenant_id(!empty($USER->tenantid) ? $USER->tenantid : 0);
+            if ($theme_file->is_available()) {
+                $themes = $this->parents;
+                array_unshift($themes, $this->name);
+
+                // For every theme in the stack we need to check if there is an overridden file
+                // or if the current theme has a default set before we can check the next theme.
+                foreach ($themes as $theme) {
+                    $url = $theme_file->get_current_url($theme);
+                    if (!empty($url)) {
+                        return $url;
+                    }
+
+                    // For current theme, if no overridden file found then check if we have a default.
+                    $dir = $this->get_theme_directory($theme);
+                    $svg = $this->use_svg_icons();
+                    $image = $this->resolve_image_location($image_name, $component, $svg, true, $dir);
+                    if (!empty($image)) {
+                        // Default image found for current theme and this image takes precedence over any overridden
+                        // or default image of the parent theme. We can in this case just return null as the right
+                        // image should get loaded by the image mediation.
+                        return null;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the theme directory.
+     *
+     * @param string|null $theme
+     *
+     * @return string
+     */
+    private function get_theme_directory(?string $theme): string {
+        if (!empty($theme)) {
+            foreach ($this->parent_configs as $config) {
+                if ($config->name === $theme) {
+                    return $config->dir;
+                }
+            }
+        }
+        return $this->dir;
     }
 
     /**
@@ -2013,11 +2068,13 @@ class theme_config {
      *
      * @param string $image name of image, may contain relative path
      * @param string $component
-     * @param bool $svg|null Should SVG images also be looked for? If null, resorts to $CFG->svgicons if that is set; falls back to
+     * @param bool|null $svg Should SVG images also be looked for? If null, resorts to $CFG->svgicons if that is set; falls back to
      * auto-detection of browser support otherwise
+     * @param bool|null $shallow If false the theme chain and data root will be searched as well
+     * @param string|null $dir
      * @return string full file path
      */
-    public function resolve_image_location($image, $component, $svg = false) {
+    public function resolve_image_location($image, $component, $svg = false, ?bool $shallow = null, ?string $dir = null) {
         global $CFG;
 
         if (!is_bool($svg)) {
@@ -2025,33 +2082,43 @@ class theme_config {
             $svg = $this->use_svg_icons();
         }
 
+        if (empty($dir)) {
+            $dir = $this->dir;
+        }
+
         if ($component === 'moodle' or $component === 'core' or empty($component)) {
-            if ($imagefile = $this->image_exists("$this->dir/pix_core/$image", $svg)) {
+            if ($imagefile = $this->image_exists("$dir/pix_core/$image", $svg)) {
                 return $imagefile;
             }
-            foreach (array_reverse($this->parent_configs) as $parent_config) { // base first, the immediate parent last
-                if ($imagefile = $this->image_exists("$parent_config->dir/pix_core/$image", $svg)) {
+
+            if (empty($shallow)) {
+                foreach (array_reverse($this->parent_configs) as $parent_config) { // base first, the immediate parent last
+                    if ($imagefile = $this->image_exists("$parent_config->dir/pix_core/$image", $svg)) {
+                        return $imagefile;
+                    }
+                }
+                if ($imagefile = $this->image_exists("$CFG->dataroot/pix/$image", $svg)) {
                     return $imagefile;
                 }
-            }
-            if ($imagefile = $this->image_exists("$CFG->dataroot/pix/$image", $svg)) {
-                return $imagefile;
-            }
-            if ($imagefile = $this->image_exists("$CFG->dirroot/pix/$image", $svg)) {
-                return $imagefile;
+                if ($imagefile = $this->image_exists("$CFG->dirroot/pix/$image", $svg)) {
+                    return $imagefile;
+                }
             }
             return null;
 
         } else if ($component === 'theme') { //exception
             if ($image === 'favicon') {
-                return "$this->dir/pix/favicon.ico";
+                return "$dir/pix/favicon.ico";
             }
-            if ($imagefile = $this->image_exists("$this->dir/pix/$image", $svg)) {
+            if ($imagefile = $this->image_exists("$dir/pix/$image", $svg)) {
                 return $imagefile;
             }
-            foreach (array_reverse($this->parent_configs) as $parent_config) { // base first, the immediate parent last
-                if ($imagefile = $this->image_exists("$parent_config->dir/pix/$image", $svg)) {
-                    return $imagefile;
+
+            if (empty($shallow)) {
+                foreach (array_reverse($this->parent_configs) as $parent_config) { // base first, the immediate parent last
+                    if ($imagefile = $this->image_exists("$parent_config->dir/pix/$image", $svg)) {
+                        return $imagefile;
+                    }
                 }
             }
             return null;
@@ -2062,20 +2129,24 @@ class theme_config {
             }
             list($type, $plugin) = explode('_', $component, 2);
 
-            if ($imagefile = $this->image_exists("$this->dir/pix_plugins/$type/$plugin/$image", $svg)) {
+            if ($imagefile = $this->image_exists("$dir/pix_plugins/$type/$plugin/$image", $svg)) {
                 return $imagefile;
             }
-            foreach (array_reverse($this->parent_configs) as $parent_config) { // base first, the immediate parent last
-                if ($imagefile = $this->image_exists("$parent_config->dir/pix_plugins/$type/$plugin/$image", $svg)) {
+
+            if (empty($shallow)) {
+                foreach (array_reverse($this->parent_configs) as $parent_config) { // base first, the immediate parent last
+                    if ($imagefile = $this->image_exists("$parent_config->dir/pix_plugins/$type/$plugin/$image", $svg)) {
+                        return $imagefile;
+                    }
+                }
+
+                if ($imagefile = $this->image_exists("$CFG->dataroot/pix_plugins/$type/$plugin/$image", $svg)) {
                     return $imagefile;
                 }
-            }
-            if ($imagefile = $this->image_exists("$CFG->dataroot/pix_plugins/$type/$plugin/$image", $svg)) {
-                return $imagefile;
-            }
-            $dir = core_component::get_plugin_directory($type, $plugin);
-            if ($imagefile = $this->image_exists("$dir/pix/$image", $svg)) {
-                return $imagefile;
+                $dir = core_component::get_plugin_directory($type, $plugin);
+                if ($imagefile = $this->image_exists("$dir/pix/$image", $svg)) {
+                    return $imagefile;
+                }
             }
             return null;
         }

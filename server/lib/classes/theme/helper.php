@@ -37,11 +37,14 @@ final class helper {
      * @return array
      */
     public static function output_theme_settings(theme_settings $theme_settings): array {
-        global $USER;
-
         // Get files and categories.
-        $files = $theme_settings->get_files($USER->id);
+        $files = $theme_settings->get_files();
         $categories = $theme_settings->get_categories();
+
+        // Remove the files that are disabled or the user does not have access to.
+        $files = array_filter($files, function ($file) use ($theme_settings) {
+            return $file->is_enabled() && $theme_settings->can_manage($file);
+        });
 
         // The FE requirement is that we map the image files to categories
         // for easy mapping between settings and files.

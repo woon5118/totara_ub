@@ -55,7 +55,7 @@ class engage_article_image_testcase extends advanced_testcase {
                 'draft_id' => $this->create_image('new_article_image', $user_context),
             ]
         ];
-        $theme_settings->update_files($files, $user_one->id);
+        $theme_settings->update_files($files);
 
         // Confirm that new default image is fetched.
         $url = $article_image->get_current_or_default_url();
@@ -81,10 +81,10 @@ class engage_article_image_testcase extends advanced_testcase {
         $this->assertEquals(false, $article_image->is_enabled());
 
         $theme_settings = new settings($theme_config, 0);
-        $files = $theme_settings->get_files($user_one->id);
+        $files = $theme_settings->get_files();
         foreach ($files as $file) {
             if ($file instanceof article_image) {
-                $this->fail('Article image is disabled and should not be part of files');
+                $this->assertFalse($file->is_enabled());
             }
         }
     }

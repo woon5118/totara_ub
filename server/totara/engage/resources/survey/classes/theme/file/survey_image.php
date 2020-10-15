@@ -68,7 +68,7 @@ class survey_image extends theme_file {
      * @return bool
      */
     public function is_enabled(): bool {
-        return $this->tenant_id === 0 && advanced_feature::is_enabled('engage_resources');
+        return advanced_feature::is_enabled('engage_resources');
     }
 
     /**

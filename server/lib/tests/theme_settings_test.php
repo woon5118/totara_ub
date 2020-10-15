@@ -134,10 +134,8 @@ class core_theme_settings_testcase extends advanced_testcase {
             $result->errors[0]->message
         );
 
-        // Grant user permission.
-        $roles = get_archetype_roles('user');
-        $role = reset($roles);
-        assign_capability('totara/tui:themesettings', CAP_ALLOW, $role->id, context_system::instance(), true);
+        // Assign capability to manage theme settings.
+        $this->assign_themesettings_capability();
 
         // Test with capability.
         $result = $this->execute_graphql_operation(
@@ -155,6 +153,49 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->assertIsArray($categories);
         $this->assertEquals(2, sizeof($categories));
         $this->validate_default_categories($categories);
+    }
+
+    public function test_webapi_get_theme_settings_tenant() {
+        $generator = self::getDataGenerator();
+
+        // Create tenants.
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        // Create users.
+        $tenant_user1 = $generator->create_user(
+            ['tenantid' => $tenant1->id, 'tenantdomainmanager' => $tenant1->idnumber]
+        );
+        $tenant_user2 = $generator->create_user(
+            ['tenantid' => $tenant2->id, 'tenantdomainmanager' => $tenant2->idnumber]
+        );
+
+        $this->setUser($tenant_user1);
+
+        // Should be able to get tenant one theme settings.
+        $result = $this->execute_graphql_operation(
+            'core_get_theme_settings', [
+                'theme' => 'ventura',
+                'tenant_id' => $tenant1->id
+            ]
+        );
+        $this->assertEmpty($result->errors);
+        $this->assertNotEmpty($result->data);
+
+        // Confirm that domain manager of tenant one can not access settings of tenant two.
+        $result = $this->execute_graphql_operation(
+            'core_get_theme_settings', [
+                'theme' => 'ventura',
+                'tenant_id' => $tenant2->id
+            ]
+        );
+        $this->assertNotEmpty($result->errors);
+        $this->assertEquals(
+            'Sorry, but you do not currently have permissions to do that (Manage theme settings)',
+            $result->errors[0]->message
+        );
     }
 
     public function test_webapi_update_theme_settings() {
@@ -187,10 +228,8 @@ class core_theme_settings_testcase extends advanced_testcase {
             $result->errors[0]->message
         );
 
-        // Grant user permission.
-        $roles = get_archetype_roles('user');
-        $role = reset($roles);
-        assign_capability('totara/tui:themesettings', CAP_ALLOW, $role->id, context_system::instance(), true);
+        // Assign capability to manage theme settings.
+        $this->assign_themesettings_capability();
 
         // Test with capability.
         $result = $this->execute_graphql_operation('core_update_theme_settings', $params);
@@ -225,6 +264,7 @@ class core_theme_settings_testcase extends advanced_testcase {
      * Test default properties.
      */
     public function test_default_categories() {
+        $this->setAdminUser();
         $theme_config = theme_config::load('ventura');
         $theme_settings = new settings($theme_config, 0);
         $output = helper::output_theme_settings($theme_settings);
@@ -245,6 +285,9 @@ class core_theme_settings_testcase extends advanced_testcase {
         $user_one = $generator->create_user();
         $this->setUser($user_one);
         $user_context = context_user::instance($user_one->id);
+
+        // Assign capability to manage theme settings.
+        $this->assign_themesettings_capability();
 
         $categories = [
             [
@@ -269,7 +312,7 @@ class core_theme_settings_testcase extends advanced_testcase {
         $theme_settings = new settings($theme_config, 0);
         $theme_settings->validate_categories($categories);
         $theme_settings->update_categories($categories);
-        $theme_settings->update_files($files, $user_one->id);
+        $theme_settings->update_files($files);
 
         $output = helper::output_theme_settings($theme_settings);
         $this->assertIsArray($output);
@@ -338,6 +381,9 @@ class core_theme_settings_testcase extends advanced_testcase {
         $this->setUser($user_one);
         $user_context = context_user::instance($user_one->id);
 
+        // Assign capability to manage theme settings.
+        $this->assign_themesettings_capability();
+
         $files = [
             [
                 'ui_key' => 'sitefavicon',
@@ -347,7 +393,7 @@ class core_theme_settings_testcase extends advanced_testcase {
 
         $theme_config = theme_config::load('ventura');
         $theme_settings = new settings($theme_config, 0);
-        $theme_settings->update_files($files, $user_one->id);
+        $theme_settings->update_files($files);
 
         $output = helper::output_theme_settings($theme_settings);
         $this->assertIsArray($output);
@@ -520,7 +566,7 @@ class core_theme_settings_testcase extends advanced_testcase {
 
         $theme_config = theme_config::load('ventura');
         $theme_settings = new settings($theme_config, 0);
-        $theme_settings->update_files($files, $user_one->id);
+        $theme_settings->update_files($files);
 
         $output = helper::output_theme_settings($theme_settings);
         $this->assertIsArray($output);
@@ -562,10 +608,6 @@ class core_theme_settings_testcase extends advanced_testcase {
 
     public function test_multitenant_images() {
         $generator = $this->getDataGenerator();
-        $user_one = $generator->create_user();
-        $this->setUser($user_one);
-        $user_context = context_user::instance($user_one->id);
-        $theme_config = theme_config::load('ventura');
 
         // Enable tenants.
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
@@ -574,6 +616,17 @@ class core_theme_settings_testcase extends advanced_testcase {
         // Create tenants.
         $tenant_one = $tenant_generator->create_tenant();
         $tenant_two = $tenant_generator->create_tenant();
+
+        // Create tenant user.
+        $tenant_user1 = $generator->create_user(
+            ['tenantid' => $tenant_one->id, 'tenantdomainmanager' => $tenant_one->idnumber]
+        );
+        $tenant_user2 = $generator->create_user(
+            ['tenantid' => $tenant_two->id]
+        );
+        $this->setUser($tenant_user1);
+
+        $theme_config = theme_config::load('ventura');
 
         // Confirm that logo has not been changed for tenant one.
         $logo_image = new logo_image($theme_config);
@@ -625,6 +678,8 @@ class core_theme_settings_testcase extends advanced_testcase {
         $theme_settings->validate_categories($categories);
         $theme_settings->update_categories($categories);
 
+        $user_context = context_user::instance($tenant_user1->id);
+
         // Update images for tenant one.
         $files = [
             [
@@ -636,7 +691,8 @@ class core_theme_settings_testcase extends advanced_testcase {
                 'draft_id' => $this->create_image('new_favicon', $user_context),
             ]
         ];
-        $theme_settings->update_files($files, $user_one->id);
+        $theme_settings->validate_files($files);
+        $theme_settings->update_files($files);
 
         // Confirm that tenant one has new logo.
         $logo_image->set_tenant_id($tenant_one->id);
@@ -660,7 +716,27 @@ class core_theme_settings_testcase extends advanced_testcase {
             $url
         );
 
+        // Confirm that tenant can not update files he/she does not have capability for.
+        $files = [
+            [
+                'ui_key' => 'sitelogin',
+                'draft_id' => $this->create_image('new_site_login_image', $user_context),
+            ],
+            [
+                'ui_key' => 'learncourse',
+                'draft_id' => $this->create_image('new_course_image', $user_context),
+            ]
+        ];
+
+        try {
+            $theme_settings->validate_files($files);
+            $this->fail('Exception expected. User does not have the required capability');
+        } catch (moodle_exception $ex) {
+            self::assertStringContainsString('You do not have permission to manage theme file', $ex->getMessage());
+        }
+
         // Confirm that tenant two does not have new logo.
+        $this->setUser($tenant_user2);
         $logo_image->set_tenant_id($tenant_two->id);
         $url = $logo_image->get_current_or_default_url();
         $this->assertInstanceOf(moodle_url::class, $url);
@@ -877,5 +953,14 @@ class core_theme_settings_testcase extends advanced_testcase {
      */
     private static function disable_tenant_branding(int $tenant_id): void {
         self::enable_tenant_branding($tenant_id, false);
+    }
+
+    /**
+     * Assign capability to all users to manage theme settings.
+     */
+    private function assign_themesettings_capability(): void {
+        $roles = get_archetype_roles('user');
+        $role = reset($roles);
+        assign_capability('totara/tui:themesettings', CAP_ALLOW, $role->id, context_system::instance(), true);
     }
 }

@@ -80,13 +80,6 @@ class logo_image extends theme_file {
     /**
      * @inheritDoc
      */
-    public function get_context(): ?context {
-        return $this->get_default_context($this->tenant_id);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function get_ui_key(): string {
         return 'sitelogo';
     }

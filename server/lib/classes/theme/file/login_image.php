@@ -23,6 +23,7 @@
 
 namespace core\theme\file;
 
+use context;
 use core\files\type\file_type;
 use core\files\type\web_image;
 use core\theme\settings;
@@ -60,14 +61,6 @@ class login_image extends theme_file {
      */
     public static function get_id(): string {
         return 'totara_core/default_login';
-    }
-
-    /**
-     * @return bool
-     */
-    public function is_enabled(): bool {
-        // Only available for site theme.
-        return $this->tenant_id === 0;
     }
 
     /**
@@ -154,6 +147,14 @@ class login_image extends theme_file {
             return $property['value'];
         }
         return get_string('totaralogin', 'totara_core');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function get_default_context(?int $tenant_id = null): ?context {
+        // This item is only configurable on the system level at the moment
+        return \context_system::instance();
     }
 
 }

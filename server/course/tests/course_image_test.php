@@ -77,7 +77,7 @@ class totara_core_get_course_image_testcase extends advanced_testcase {
                 'draft_id' => $this->create_image('new_course_image', $user_context),
             ]
         ];
-        $theme_settings->update_files($files, $user_one->id);
+        $theme_settings->update_files($files);
 
         // Confirm that new default image is fetched.
         $url = $course_image->get_current_or_default_url();
@@ -86,10 +86,8 @@ class totara_core_get_course_image_testcase extends advanced_testcase {
             $url->out()
         );
 
-        // Now remove the theme setting file. Currently, there's no function for this so we remove it manually
-        unset_config('defaultcourseimage', 'course');
-        $current_file = $course_image->get_current_imagefile();
-        $current_file->delete();
+        // Now remove the theme setting file.
+        $course_image->delete();
 
         // Confirm that now the system default image is fetched.
         $url = $course_image->get_current_or_default_url();
