@@ -242,6 +242,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'completed_at',
                 'due_date',
                 'status',
+                'task_id',
             ]
         );
 
@@ -258,6 +259,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'availability',
                 'created_at',
                 'updated_at',
+                'task_id',
             ]
         );
 

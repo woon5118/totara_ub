@@ -38,6 +38,7 @@ use mod_perform\state\subject_instance\active;
 use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\data\subject_instance_activity_collection;
+use stdClass;
 use xmldb_table;
 
 /**
@@ -58,6 +59,11 @@ class subject_instance_creation {
     private $limit = 10000;
 
     /**
+     * @var string
+     */
+    private $task_id;
+
+    /**
      * Queues the potential track user assignments and attempts to create subject instances.
      *
      * @return void
@@ -68,6 +74,9 @@ class subject_instance_creation {
         $last_temp_track_user_assignment_id = 0;
 
         while (true) {
+            // For each loop we want a new id
+            $this->task_id = uniqid();
+
             $user_assignments = $this->get_user_assignments_potentially_needing_instances($last_temp_track_user_assignment_id);
             $last_temp_track_user_assignment_id = $user_assignments->last()->id ?? null;
 
@@ -130,7 +139,7 @@ class subject_instance_creation {
 
         $fields = array_filter(
             array_keys(temp_track_user_assignment_queue::FIELDS),
-            function($field) {
+            function ($field) {
                 return $field !== 'id';
             }
         );
@@ -175,12 +184,13 @@ class subject_instance_creation {
      * @return void
      */
     private function create_subject_instances(collection $user_assignments): void {
-        $dtos = new collection();
         $activity_collection = new subject_instance_activity_collection();
 
-        builder::get_db()->transaction(function () use ($user_assignments, $dtos, $activity_collection) {
+        builder::get_db()->transaction(function () use ($user_assignments, $activity_collection) {
             $now = time();
 
+            $subject_instance_to_create = [];
+            $user_assignments_meta = [];
             foreach ($user_assignments as $user_assignment) {
                 $activity = $user_assignment->activity;
                 $activity_collection->add_activity_config($activity);
@@ -192,19 +202,54 @@ class subject_instance_creation {
                 $status = $activity_collection->get_activity_config($activity->id)->has_manual_relationship()
                     ? pending::get_code()
                     : active::get_code();
-                $subject_instance = new subject_instance();
+                $subject_instance = new stdClass();
                 $subject_instance->track_user_assignment_id = $user_assignment->track_user_assignment_id;
                 $subject_instance->subject_user_id = $user_assignment->subject_user_id;
                 $subject_instance->job_assignment_id = $user_assignment->job_assignment_id;
                 $subject_instance->status = $status;
                 $subject_instance->created_at = $now;
                 $subject_instance->due_date = $this->calculate_due_date($user_assignment, $now);
-                $subject_instance->save();
+                $subject_instance->task_id = $this->task_id;
+
+                $subject_instance_to_create[] = $subject_instance;
 
                 $track_data = [
                     'track_id' => $user_assignment->track_id,
                     'activity_id' => $activity->id,
                 ];
+                $user_assignments_meta[$user_assignment->track_user_assignment_id] = $track_data;
+            }
+
+            $this->insert_subject_instances($subject_instance_to_create, $user_assignments_meta, $activity_collection);
+        });
+    }
+
+    /**
+     * Insert the subject instances into the table and trigger hook
+     *
+     * @param array $subject_instance_to_create
+     * @param $user_assignments_meta
+     * @param subject_instance_activity_collection $activity_collection
+     */
+    private function insert_subject_instances(
+        array $subject_instance_to_create,
+        array $user_assignments_meta,
+        subject_instance_activity_collection $activity_collection
+    ): void {
+        if (!empty($subject_instance_to_create)) {
+            $dtos = new collection();
+
+            builder::get_db()->insert_records_via_batch(subject_instance::TABLE, $subject_instance_to_create);
+
+            $subject_instances = subject_instance::repository()
+                ->where('task_id', $this->task_id)
+                ->get_lazy();
+
+            foreach ($subject_instances as $subject_instance) {
+                $track_data = $user_assignments_meta[$subject_instance->track_user_assignment_id] ?? null;
+                if (!$track_data) {
+                    throw new coding_exception('Missing track meta information');
+                }
                 $dtos->append(subject_instance_dto::create_from_entity($subject_instance, $track_data));
             }
 
@@ -212,7 +257,11 @@ class subject_instance_creation {
                 $hook = new subject_instances_created($dtos, $activity_collection);
                 $hook->execute();
             }
-        });
+
+            subject_instance::repository()
+                ->where('task_id', $this->task_id)
+                ->update(['task_id' => null]);
+        }
     }
 
     /**

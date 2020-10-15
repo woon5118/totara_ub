@@ -243,6 +243,7 @@
         <FIELD NAME="completed_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Recording the time when progress status went to complete."/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="task_id" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="This field is used to support bulk creation of instance via scheduled task"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -251,6 +252,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="due_date" UNIQUE="false" FIELDS="due_date"/>
+        <INDEX NAME="task_id" UNIQUE="false" FIELDS="task_id"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="perform_subject_static_instance" COMMENT="Represents a single job assignment at the time of subject creation">
@@ -286,6 +288,7 @@
         <FIELD NAME="availability" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Availability status of the participant instance. 0 - open, 10 - closed"/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="task_id" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="This field is used to support bulk creation of instance via scheduled task"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -294,6 +297,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="participant_id" UNIQUE="false" FIELDS="participant_id"/>
+        <INDEX NAME="task_id" UNIQUE="false" FIELDS="task_id"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="perform_participant_section" COMMENT="Represents progress on a section for a single participant">

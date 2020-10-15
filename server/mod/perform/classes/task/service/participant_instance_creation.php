@@ -26,8 +26,10 @@ namespace mod_perform\task\service;
 use coding_exception;
 use core\collection;
 use core\entities\user;
+use core\orm\lazy_collection;
 use core\orm\query\builder;
 use mod_perform\constants;
+use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section;
 use mod_perform\entities\activity\section_relationship;
@@ -65,9 +67,14 @@ class participant_instance_creation {
     /**
      * List of participant instances to be created for bulk insert.
      *
-     * @var collection | array[]
+     * @var collection|array[]
      */
     private $participation_creation_list = [];
+
+    /**
+     * @var array
+     */
+    private $external_participation_creation_list = [];
 
     /**
      * Maximum number of participants aggregated before bulk insert.
@@ -109,6 +116,7 @@ class participant_instance_creation {
      * @return collection|participant_instance_model[] returns added participant instances
      */
     public function add_instances(array $subject_instance_ids, array $participant_relationship_map): collection {
+        $this->task_id = uniqid();
         $subject_instance_ids = array_map('intval', array_unique($subject_instance_ids));
 
         $activity_id = $this->validate_add_instances($subject_instance_ids, $participant_relationship_map);
@@ -117,12 +125,20 @@ class participant_instance_creation {
         $added_instances_data = builder::get_db()->transaction(
             function () use ($activity_id, $subject_instance_ids, $participant_relationship_map) {
                 $added_instance_groups = [];
-                foreach ($subject_instance_ids as $subject_instance_id) {
-                    $added_instance_groups[] = $this->add_instances_for_subject_instance(
-                        $activity_id,
-                        $subject_instance_id,
-                        $participant_relationship_map
-                    );
+
+                $subject_instance_ids_chunks = array_chunk($subject_instance_ids, builder::get_db()->get_max_in_params());
+                foreach ($subject_instance_ids_chunks as $subject_instance_ids_chunk) {
+                    $subject_instances = subject_instance::repository()
+                        ->where('id', $subject_instance_ids_chunk)
+                        ->get();
+
+                    foreach ($subject_instances as $subject_instance) {
+                        $added_instance_groups[] = $this->add_instances_for_subject_instance(
+                            $activity_id,
+                            $subject_instance,
+                            $participant_relationship_map
+                        );
+                    }
                 }
                 return array_merge([], ...$added_instance_groups);
             }
@@ -163,16 +179,17 @@ class participant_instance_creation {
 
     /**
      * @param int $activity_id
-     * @param int $subject_instance_id
+     * @param subject_instance $subject_instance_entity
      * @param array $participant_relationship_map
      * @return array
+     * @throws coding_exception
      */
     private function add_instances_for_subject_instance(
         int $activity_id,
-        int $subject_instance_id,
+        subject_instance $subject_instance_entity,
         array $participant_relationship_map
     ): array {
-        $subject_instance = subject_instance_model::load_by_id($subject_instance_id);
+        $subject_instance = subject_instance_model::load_by_entity($subject_instance_entity);
         // Skip instances which are pending
         if ($subject_instance->is_pending()) {
             return [];
@@ -183,7 +200,7 @@ class participant_instance_creation {
         foreach ($participant_relationship_map as $participant_relationship) {
             // Ignore if such a participant instance already exists.
             if ($this->participant_instance_exists(
-                $subject_instance_id,
+                $subject_instance->id,
                 $participant_relationship['core_relationship_id'],
                 $participant_relationship['participant_id'],
                 participant_source::INTERNAL
@@ -193,7 +210,7 @@ class participant_instance_creation {
 
             $subject_instance_has_new_participant_instance = true;
             $subject_instance_data = (object)[
-                'id' => $subject_instance_id,
+                'id' => $subject_instance->id,
                 'activity_id' => $activity_id,
             ];
 
@@ -212,8 +229,9 @@ class participant_instance_creation {
                 [new relationship_resolver_dto($participant_relationship['participant_id'])]
             );
             $this->save_data();
+
             $added_instances_data[] = [
-                'subject_instance_id' => $subject_instance_id,
+                'subject_instance_id' => $subject_instance->id,
                 'core_relationship_id' => $participant_relationship['core_relationship_id'],
                 'participant_id' => $participant_relationship['participant_id'],
             ];
@@ -584,27 +602,126 @@ class participant_instance_creation {
             $data['participant_data']['participant_source'] = $source;
             $data['participant_data']['participant_id'] = $user_id;
 
-            $this->participation_creation_list[] = $data;
+            // We do separate the internal from the external participants
+            // as they cannot use the same bulk insert method
+            if ($source === participant_source::EXTERNAL) {
+                $this->external_participation_creation_list[] = $data;
+                if (count($this->external_participation_creation_list) === $this->buffer_count) {
+                    $this->save_data_external();
+                }
+            } else {
+                $unique_hash = $this->create_unique_hash($data['participant_data']);
 
-            if (count($this->participation_creation_list) === $this->buffer_count) {
-                $this->save_data();
+                $this->participation_creation_list[$unique_hash] = $data;
+
+                if (count($this->participation_creation_list) === $this->buffer_count) {
+                    $this->save_data_internal();
+                }
             }
         }
     }
 
     /**
-     * Persists participant instances in database.
+     * Create a uniqe hash for the given participant instance data. For the given
+     * combination of fields there should only be one record in the database
+     *
+     * @param array $participant_instance_data
+     * @return string
+     */
+    private function create_unique_hash(array $participant_instance_data): string {
+        return md5(
+            sprintf(
+                '%s%s%s%s',
+                $participant_instance_data['core_relationship_id'],
+                $participant_instance_data['subject_instance_id'],
+                $participant_instance_data['participant_source'],
+                $participant_instance_data['participant_id']
+            )
+        );
+    }
+
+    /**
+     * Save participant instances (external and internal) in database.
+     */
+    private function save_data(): void {
+        $this->save_data_internal();
+        $this->save_data_external();
+    }
+
+    /**
+     * Persists internal participant instances in database.
      *
      * @return void
      */
-    private function save_data(): void {
+    private function save_data_internal(): void {
+        $task_id = uniqid();
+
         if (count($this->participation_creation_list) === 0) {
+            return;
+        }
+
+        builder::get_db()->transaction(function () use ($task_id) {
+            $created_participants_dtos = new collection();
+
+            // Attach the current task id to all the instances to make it possible
+            // to identify just inserted rows by this run and use bulk inserts
+            $participant_instance_to_create = array_column($this->participation_creation_list, 'participant_data');
+            $participant_instance_to_create = array_map(
+                function ($item) use ($task_id) {
+                    $item['task_id'] = $task_id;
+                    return (object) $item;
+                },
+                $participant_instance_to_create
+            );
+
+            if (!empty($participant_instance_to_create)) {
+                builder::get_db()->insert_records(participant_instance_entity::TABLE, $participant_instance_to_create);
+
+                /** @var participant_instance_entity[]|lazy_collection $participant_instances */
+                $participant_instances = participant_instance_entity::repository()
+                    ->where('task_id', $task_id)
+                    ->get_lazy();
+
+                foreach ($participant_instances as $participant_instance) {
+                    $unique_hash = $this->create_unique_hash($participant_instance->to_array());
+                    $instance_creation_data = $this->participation_creation_list[$unique_hash] ?? null;
+                    if (!$instance_creation_data) {
+                        throw new coding_exception('Data was not found in creation list for given participant instance');
+                    }
+
+                    $section_data = [];
+                    $section_data['activity_id'] = $instance_creation_data['activity_id'];
+                    $section_data['core_relationship_id'] = $instance_creation_data['participant_data']['core_relationship_id'];
+                    $section_data['id'] = $participant_instance->id;
+                    $section_data['subject_instance_id'] = $instance_creation_data['participant_data']['subject_instance_id'];
+
+                    $created_participants_dtos->append(participant_instance_dto::create_from_data($section_data));
+                }
+
+                (new participant_instances_created($created_participants_dtos, $this->activity_collection))->execute();
+
+                participant_instance_entity::repository()
+                    ->where('task_id', $task_id)
+                    ->update(['task_id' => null]);
+            }
+
+            $this->participation_creation_list = [];
+        });
+    }
+
+    /**
+     * Persists external participant instances in database.
+     *
+     * @return void
+     */
+    private function save_data_external(): void {
+        if (count($this->external_participation_creation_list) === 0) {
             return;
         }
 
         builder::get_db()->transaction(function () {
             $created_participants_dtos = new collection();
-            foreach ($this->participation_creation_list as $participant_instance) {
+            foreach ($this->external_participation_creation_list as $participant_instance) {
                 $participant_instance_id = builder::table(participant_instance_entity::TABLE)
                     ->insert($participant_instance['participant_data']);
 
@@ -614,20 +731,17 @@ class participant_instance_creation {
                 $section_data['id'] = $participant_instance_id;
                 $section_data['subject_instance_id'] = $participant_instance['participant_data']['subject_instance_id'];
 
-                if ($participant_instance['participant_data']['participant_source'] == participant_source::EXTERNAL) {
-                    external_participant::create(
-                        $participant_instance_id,
-                        $participant_instance['external']['name'],
-                        $participant_instance['external']['email']
-                    );
-                }
-
-                $created_participants_dtos->append(
-                    participant_instance_dto::create_from_data($section_data)
+                // This creates the external participant and updates the user_id of the participant instance
+                external_participant::create(
+                    $participant_instance_id,
+                    $participant_instance['external']['name'],
+                    $participant_instance['external']['email']
                 );
+
+                $created_participants_dtos->append(participant_instance_dto::create_from_data($section_data));
             }
             (new participant_instances_created($created_participants_dtos, $this->activity_collection))->execute();
-            $this->participation_creation_list = [];
+            $this->external_participation_creation_list = [];
         });
     }
 }

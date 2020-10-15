@@ -157,6 +157,7 @@ class subject_instance_activity {
         $this->section_relationships = [];
         foreach ($this->activity->sections as $section) {
             foreach ($section->section_relationships as $section_relationship) {
+                $section_relationship->relate('section', $section);
                 $this->section_relationships[] = $section_relationship;
             }
         }

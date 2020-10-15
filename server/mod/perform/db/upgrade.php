@@ -189,5 +189,43 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020100102, 'perform');
     }
 
+    if ($oldversion < 2020100103) {
+        // Define field task_id to be added to perform_subject_instance.
+        $table = new xmldb_table('perform_subject_instance');
+        $field = new xmldb_field('task_id', XMLDB_TYPE_CHAR, '32', null, null, null, null, 'updated_at');
+
+        // Conditionally launch add field task_id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('task_id', XMLDB_INDEX_NOTUNIQUE, array('task_id'));
+
+        // Conditionally launch add index task_id.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define field task_id to be added to perform_participant_instance.
+        $table = new xmldb_table('perform_participant_instance');
+        $field = new xmldb_field('task_id', XMLDB_TYPE_CHAR, '32', null, null, null, null, 'updated_at');
+
+        // Conditionally launch add field task_id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('task_id', XMLDB_INDEX_NOTUNIQUE, array('task_id'));
+
+        // Conditionally launch add index task_id.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020100103, 'perform');
+    }
+
+
     return true;
 }

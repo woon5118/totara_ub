@@ -97,7 +97,8 @@ class activity_repository extends repository {
      * @return activity_repository
      */
     public function eager_load_instance_creation_data() {
-        return $this->with('notifications.recipients')
+        return $this
+            ->with('notifications.recipients')
             ->with('sections.section_relationships.core_relationship');
     }
 }
