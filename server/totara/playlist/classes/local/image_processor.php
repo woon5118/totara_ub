@@ -411,21 +411,4 @@ final class image_processor implements image_processor_contract {
         imagedestroy($canvas);
         return $image_data;
     }
-
-    /**
-     * Helper method to test generating images. Will throw an exception if a unit test is not active.
-     *
-     * @param array $images
-     * @param bool $square
-     * @return string|null
-     * @deprecated since 13.1
-     */
-    public static function test_generate_image(array $images, $square = false): ?string {
-        if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST)) {
-            throw new \coding_exception('Cannot call test_generate_image from outside a unit test.', DEBUG_DEVELOPER);
-        }
-
-        $processor = static::make();
-        return $processor->generate_image($images, $square);
-    }
 }
