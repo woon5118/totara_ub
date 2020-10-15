@@ -69,6 +69,7 @@ $string['sessname'] = 'Event Name';
 $string['sessstartdatetime'] = 'Session Start Date/Time';
 $string['sessstartdatetimelink'] = 'Session Start Date/Time (linked to activity)';
 $string['sessstarttime'] = 'Session Start Time';
+$string['signuparchived'] = 'Archived';
 $string['signupenddate'] = 'Sign-up End Date/Time';
 $string['signupperiod'] = 'Sign-up Date/Time Period';
 $string['signupstartdate'] = 'Sign-up Start Date/Time';

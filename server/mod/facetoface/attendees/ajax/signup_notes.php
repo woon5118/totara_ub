@@ -48,12 +48,13 @@ $renderer->setcontext($context);
 $seminarevent = new \mod_facetoface\seminar_event($sessionid);
 
 // Get custom field values of the sign-up.
-$signup = \mod_facetoface\signup::create($userid, $seminarevent);
+$signup = \mod_facetoface\signup::create($userid, $seminarevent, MDL_F2F_BOTH, true);
 if (!$signup->exists()) {
     throw new coding_exception(
         "No user with ID: {$USER->id} has signed-up for the Seminar event ID: {$seminarevent->get_id()}."
     );
 }
+$archived = $signup->get_archived();
 
 $attendeenote = new \stdClass();
 $attendeenote->userid = $userid;
@@ -65,7 +66,11 @@ $customfields = customfield_get_data($attendeenote, 'facetoface_signup', 'faceto
 // Prepare output.
 $usernamefields = get_all_user_name_fields(true);
 $user = \core_user::get_user($userid, $usernamefields);
-$output = get_string('usernoteheading', 'facetoface', fullname($user));
+if ($archived) {
+    $output = get_string('usernoteheadingarchived', 'mod_facetoface', fullname($user));
+} else {
+    $output = get_string('usernoteheading', 'mod_facetoface', fullname($user));
+}
 $output .= html_writer::empty_tag('hr');
 if (!empty($customfields)) {
     foreach ($customfields as $cftitle => $cfvalue) {
@@ -75,18 +80,20 @@ if (!empty($customfields)) {
 } else {
     $output .= get_string('none');
 }
-$output .= html_writer::empty_tag('hr');
-$params = [
-    's' => $sessionid,
-    'userid'  => $userid,
-    'return'  => $return,
-    'sesskey' => sesskey()
-];
-$output .= $renderer->single_button(
-    new moodle_url('/mod/facetoface/attendees/edit_signup_notes.php', $params),
-    get_string('edit'),
-    'post'
-);
+if (!$archived) {
+    $output .= html_writer::empty_tag('hr');
+    $params = [
+        's' => $sessionid,
+        'userid'  => $userid,
+        'return'  => $return,
+        'sesskey' => sesskey()
+    ];
+    $output .= $renderer->single_button(
+        new moodle_url('/mod/facetoface/attendees/edit_signup_notes.php', $params),
+        get_string('edit'),
+        'post'
+    );
+}
 
 header('Content-type: text/html; charset=utf-8');
 echo $output;

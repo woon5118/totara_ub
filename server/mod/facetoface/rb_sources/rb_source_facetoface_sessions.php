@@ -293,6 +293,16 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             ),
             new rb_column_option(
                 'status',
+                'archived', // Sign-up Archived
+                get_string('signuparchived', 'rb_source_facetoface_sessions'),
+                'archived',
+                array(
+                    'dbdatatype' => 'text',
+                    'displayfunc' => 'yes_or_no',
+                )
+            ),
+            new rb_column_option(
+                'status',
                 'statuscode',
                 get_string('status', 'rb_source_facetoface_sessions'),
                 'status.statuscode',

@@ -2610,6 +2610,7 @@ $string['usernotsignedup'] = 'Status: not signed up';
 $string['usernote'] = 'Sign-up note';
 $string['usernoteupdated'] = 'Attendee\'s note updated';
 $string['usernoteheading'] = '{$a} - update note';
+$string['usernoteheadingarchived'] = '{$a} - view note';
 $string['usersignedup'] = 'Status: signed up';
 $string['usersignedupmultiple'] = 'User signed up on {$a} events';
 $string['usersignedupon'] = 'User signed up on {$a}';
