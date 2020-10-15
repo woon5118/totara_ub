@@ -33,14 +33,14 @@ $string['allowexternaldefaults'] = 'Allow external defaults';
 $string['allowexternaldefaults_desc'] = 'If enabled it is possible to specify sign up form defaults via page parameters, e.g. login/signup.php?organisationid=12.';
 $string['allowmanager'] = 'Allow manager selection';
 $string['allowmanagerfreetext'] = 'Allow free-text manager';
-$string['allowmanagerfreetext_desc'] = 'Allow self registering users to enter free text for the manager field. The position will be selected later during manual approval process because the selection cannot be automated.';
+$string['allowmanagerfreetext_desc'] = 'Allow self registering users to enter free text for the manager field. The manager will be selected later during manual approval process because the selection cannot be automated.';
 $string['allowmanager_desc'] = 'If enabled users will be able to select their manager in the sign up form.
 
 *Warning: this settings exposes jobs of available users to public.*';
 $string['alloworganisation'] = 'Allow organisation selection';
 $string['alloworganisationframeworks'] = 'Show organisation from selected frameworks';
 $string['alloworganisationfreetext'] = 'Allow free-text organisation';
-$string['alloworganisationfreetext_desc'] = 'Allow self registering users to enter free text for the organisation field. The position will be selected later during manual approval process because the selection cannot be automated.';
+$string['alloworganisationfreetext_desc'] = 'Allow self registering users to enter free text for the organisation field. The organisation will be selected later during manual approval process because the selection cannot be automated.';
 $string['alloworganisation_desc'] = 'If enabled users will be able to select their organisation in the sign up form.
 
 *Warning: this settings exposes the list of available organisations to public.*';
@@ -108,9 +108,9 @@ If you need help, please contact support at this address: {$a->support}
 $string['emailconfirmsent'] = 'Thank you for requesting a new user account. An email should have been sent to your address at {$a}. It contains instructions to confirm the ownership of this email address.';
 $string['domainwhitelist'] = 'Automatic approval whitelist';
 $string['domainwhitelist_desc'] = '
-A list of email domains that are approved automatically after email confirmation. Accounts cannot be approved automatically if any required data is missing or becomes invalid.
+A list of email domains (space separated, e.g. \'gmail.com hotmail.com\')  that are approved automatically after email confirmation. To allow subdomains prefix the domain with a full stop, e.g. \'.example.com\' whitelists test@test.example.com, but excludes test@example.com. 
 
-Domains are separated by spaces, e.g. \'gmail.com hotmail.com\'. To allow subdomains prefix the domain with a full stop, e.g. \'.example.com\' whitelists test@test.example.com but test@example.com is excluded.
+Accounts cannot be approved automatically if any required data is missing or becomes invalid, or when using free-text data (i.e. free-text organisation, position, or manager).
 
 <i>Warning: this filter acts AFTER the common authentication restrictions (allowemailaddresses, denyemailaddresses) are applied.</i>
 ';
@@ -144,6 +144,8 @@ $string['eventrequestadded'] = 'User added new account request';
 $string['eventrequestapproved'] = 'Account request was approved';
 $string['eventrequestconfirmed'] = 'Account request email was confirmed';
 $string['eventrequestrejected'] = 'Account request was rejected';
+$string['hashierarchyfreetexts'] = 'The following free text data will be ignored. Go to user profile if you wish to correct it manually.
+{$a}';
 $string['instructions'] = 'Sign up request form instructions';
 $string['instructions_desc'] = 'This text will be displayed at the top of the sign up form. No default text is provided because the process depends on combination of settings on this page.';
 $string['loginsteps'] = '

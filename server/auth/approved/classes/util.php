@@ -117,7 +117,7 @@ final class util {
      * @return string
      */
     public static function render_request_details_view($requestid) {
-        global $DB;
+        global $DB, $OUTPUT;
 
         $config = (new \rb_config())->set_embeddata(['requestid' => $requestid])->set_nocache(true);
         $report = \reportbuilder::create_embedded('auth_approved_request_details', $config);
@@ -135,12 +135,27 @@ final class util {
         $request = $report->src->process_data_row($record, 'html', $report);
 
         $data = array();
+        $freetext_data = array();
+        $has_provided_hierarchy_free_text = false;
+        $hierarchy_free_texts = array('organisationfreetext', 'positionfreetext', 'managerfreetext');
         foreach ($report->get_columns() as $column) {
             /** @var \rb_column $column */
             if (!$column->display_column(false)) {
                 continue;
             }
-            $data[$column->type . '-' .$column->value] = array($report->format_column_heading($column, false), array_shift($request));
+
+            $heading = $report->format_column_heading($column, false);
+            $value = array_shift($request);
+
+            // Capture hierarchy free text to display it later.
+            if (in_array($column->value, $hierarchy_free_texts)) {
+                if (!empty($value)) {
+                    $has_provided_hierarchy_free_text = true;
+                    $freetext_data[] = array($heading, $value);
+                }
+                continue;
+            }
+            $data[$column->type . '-' .$column->value] = array($heading, $value);
         }
 
         $html = '';
@@ -157,6 +172,19 @@ final class util {
             $html .= "<dd>$value</dd>";
         }
         $html .= '</dl></div>';
+
+        // Display message about hierarchy free texts so the approver can take action.
+        if ($has_provided_hierarchy_free_text) {
+            // Loop over the free text data.
+            $details = '<div class="auth_approved-request-details auth_approved-request-warning"><dl>';
+            foreach ($freetext_data as $data) {
+                list($heading, $value) = $data;
+                $details .= "<dt>$heading</dt>";
+                $details .= "<dd>$value</dd>";
+            }
+            $details .= '</dl></div>';
+            $html .= $OUTPUT->notification(get_string('hashierarchyfreetexts', 'auth_approved', $details), 'warning');
+        }
 
         return $html;
     }

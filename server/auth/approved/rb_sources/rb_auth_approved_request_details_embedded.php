@@ -38,11 +38,14 @@ class rb_auth_approved_request_details_embedded extends rb_base_embedded {
         $this->fullname = get_string('reportdetails', 'auth_approved');
 
         $this->columns = array(
-            array('type' => 'request', 'value' => 'firstname', 'heading' => null),
-            array('type' => 'request', 'value' => 'lastname', 'heading' => null),
-            array('type' => 'request', 'value' => 'username', 'heading' => null),
-            array('type' => 'request', 'value' => 'email', 'heading' => null),
+            array('type' => 'request', 'value' => 'firstname', 'heading' => get_string('firstname', 'tool_totara_sync')),
+            array('type' => 'request', 'value' => 'lastname', 'heading' => get_string('lastname', 'tool_totara_sync')),
+            array('type' => 'request', 'value' => 'username', 'heading' => get_string('username', 'moodle')),
+            array('type' => 'request', 'value' => 'email', 'heading' => get_string('email', 'moodle')),
             array('type' => 'request', 'value' => 'confirmed', 'heading' => null),
+            array('type' => 'request', 'value' => 'organisationfreetext', 'heading' => get_string('organisation', 'totara_hierarchy')),
+            array('type' => 'request', 'value' => 'positionfreetext', 'heading' => get_string('position', 'totara_hierarchy')),
+            array('type' => 'request', 'value' => 'managerfreetext', 'heading' => get_string('manager', 'totara_job')),
         );
 
         if (isset($data['requestid'])) {

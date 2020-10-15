@@ -8,16 +8,17 @@
     clear: both;
 }
 .auth_approved-request-details dt:after {
-    content: ":";
+    content: ": ";
+    white-space: pre;
 }
 .auth_approved-request-details dt {
     clear: left;
     float: left;
-    width: 320px;
-    text-align: right;
     font-weight: bold;
 }
 .auth_approved-request-details dd {
-    margin: 0 0 0 340px;
-    padding: 0 0 0.1em 0;
+    padding: 0 0 0.5em 0;
+}
+.auth_approved-request-warning {
+    margin-top: 0.5em;
 }

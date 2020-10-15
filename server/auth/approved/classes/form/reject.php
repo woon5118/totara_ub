@@ -35,7 +35,8 @@ defined('MOODLE_INTERNAL') || die();
 class reject extends \totara_form\form {
     public function definition() {
 
-        $this->model->add(new static_html('sure', '', get_string('rejectsure', 'auth_approved')));
+        $message = \html_writer::tag('h2', get_string('rejectsure', 'auth_approved'));
+        $this->model->add(new static_html('sure', '', $message));
 
         $this->model->add(new hidden('requestid', PARAM_INT));
         $this->model->add(new hidden('reportid', PARAM_INT));

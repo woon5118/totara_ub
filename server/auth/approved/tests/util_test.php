@@ -103,10 +103,10 @@ class auth_approved_util_testcase extends advanced_testcase {
             'status' => 'pending',
         ]);
         $report = \auth_approved\util::render_request_details_view($requestid);
-        $this->assertStringContainsString('<dt>User First Name</dt><dd>test1 firstname</dd>', $report);
-        $this->assertStringContainsString('<dt>User Last Name</dt><dd>test1 surname</dd>', $report);
+        $this->assertStringContainsString('<dt>First name</dt><dd>test1 firstname</dd>', $report);
+        $this->assertStringContainsString('<dt>Last name</dt><dd>test1 surname</dd>', $report);
         $this->assertStringContainsString('<dt>Username</dt><dd>test1_username</dd>', $report);
-        $this->assertStringContainsString('<dt>User&#39;s Email</dt><dd>test1@example.com</dd>', $report);
+        $this->assertStringContainsString('<dt>Email address</dt><dd>test1@example.com</dd>', $report);
         $this->assertStringContainsString('<dt>Email confirmed</dt><dd>No</dd>', $report);
         $this->assertStringNotContainsString('monkey', $report);
 
@@ -120,10 +120,10 @@ class auth_approved_util_testcase extends advanced_testcase {
             'status' => 'approved',
         ]);
         $report = \auth_approved\util::render_request_details_view($requestid);
-        $this->assertStringContainsString('<dt>User First Name</dt><dd>test2 firstname</dd>', $report);
-        $this->assertStringContainsString('<dt>User Last Name</dt><dd>test2 surname</dd>', $report);
+        $this->assertStringContainsString('<dt>First name</dt><dd>test2 firstname</dd>', $report);
+        $this->assertStringContainsString('<dt>Last name</dt><dd>test2 surname</dd>', $report);
         $this->assertStringContainsString('<dt>Username</dt><dd>test2_username</dd>', $report);
-        $this->assertStringContainsString('<dt>User&#39;s Email</dt><dd>test2@example.com</dd>', $report);
+        $this->assertStringContainsString('<dt>Email address</dt><dd>test2@example.com</dd>', $report);
         $this->assertStringContainsString('<dt>Email confirmed</dt><dd>No</dd>', $report);
         $this->assertStringNotContainsString('monkey', $report);
 
@@ -137,10 +137,10 @@ class auth_approved_util_testcase extends advanced_testcase {
             'status' => 'rejected',
         ]);
         $report = \auth_approved\util::render_request_details_view($requestid);
-        $this->assertStringContainsString('<dt>User First Name</dt><dd>test2 firstname</dd>', $report);
-        $this->assertStringContainsString('<dt>User Last Name</dt><dd>test2 surname</dd>', $report);
+        $this->assertStringContainsString('<dt>First name</dt><dd>test2 firstname</dd>', $report);
+        $this->assertStringContainsString('<dt>Last name</dt><dd>test2 surname</dd>', $report);
         $this->assertStringContainsString('<dt>Username</dt><dd>test2_username</dd>', $report);
-        $this->assertStringContainsString('<dt>User&#39;s Email</dt><dd>test2@example.com</dd>', $report);
+        $this->assertStringContainsString('<dt>Email address</dt><dd>test2@example.com</dd>', $report);
         $this->assertStringContainsString('<dt>Email confirmed</dt><dd>No</dd>', $report);
         $this->assertStringNotContainsString('monkey', $report);
     }
