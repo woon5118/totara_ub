@@ -126,6 +126,10 @@
     .pagination {
       margin: 0;
       float: right;
+
+      .disabled a {
+        color: var(--color-text-disabled);
+      }
     }
   }
 
@@ -266,9 +270,23 @@
 .block_current_learning-tiles {
   padding: var(--gap-2);
 
+  &-loading {
+    margin: 100px auto;
+    width: 100%;
+    text-align: center;
+
+    [data-loading="false"] & {
+      display: none; 
+    }
+  }
+
   ul {
     list-style-type: none;
     margin: 0;
+  }
+
+  &[data-loading="true"] ul {
+    display: none; 
   }
   
   &:after {
@@ -285,22 +303,38 @@
   border: var(--border-width-thin) solid var(--color-neutral-5);
   border-radius: var(--border-radius-normal);
   position: relative;
-  
-  @media (min-width: $screen-sm-min) {
+
+  [data-items-per-row="1"] & {
+    width: calc(100% - calc(2 * var(--gap-2)));
+    max-width: 284px;
+  }
+
+  [data-items-per-row="2"] & {
+    width: calc(50% - calc(2 * var(--gap-2)));
+  }
+
+  [data-items-per-row="3"] & {
     width: calc(33.33% - calc(2 * var(--gap-2)));
   }
 
-  #block-region-top &,
-  #block-region-bottom & {
-    @media (min-width: $screen-lg-min) {
-      width: calc(16.66% - calc(2 * var(--gap-2)));      
-    }
+  [data-items-per-row="4"] & {
+    width: calc(25% - calc(2 * var(--gap-2)));
   }
 
-  #block-region-side-pre &,
-  #block-region-side-post &,
-  #dock & {
-    width: calc(100% - calc(2 * var(--gap-2)));
+  [data-items-per-row="5"] & {
+    width: calc(20% - calc(2 * var(--gap-2)));
+  }
+
+  [data-items-per-row="6"] & {
+    width: calc(16.66% - calc(2 * var(--gap-2)));
+  }
+
+  [data-items-per-row="7"] & {
+    width: calc(14.28% - calc(2 * var(--gap-2)));
+  }
+
+  [data-items-per-row="8"] & {
+    width: calc(12.5% - calc(2 * var(--gap-2)));
   }
 
   &__image {
@@ -327,6 +361,8 @@
   }
 
   .block .content &__link {
+    color: var(--color-text);
+
     &:focus,
     &:hover {
       text-decoration: none;
@@ -412,5 +448,22 @@
     box-shadow: var(--shadow-2);
     outline: none;
     text-decoration: none;
+  }
+}
+
+.block_docked {
+  .block_current_learning-tiles {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .block_current_learning-tile {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+
+    &__image {
+      padding-top: 88px;
+    }
   }
 }

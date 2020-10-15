@@ -35,19 +35,22 @@
     {
     }
 }}
-<div class="block_current_learning-tiles">
+<div class="block_current_learning-tiles" data-loading="true">
   {{# haslearningitems }}
-    <ul>
+    <div class="block_current_learning-tiles-loading">
+      {{#flex_icon}}loading, loading, core{{/flex_icon}}
+    </div>
+    <ul data-items-per-row="3">
   {{/ haslearningitems }}
   {{# learningitems }}
       {{> block_current_learning/tile }}
   {{/ learningitems }}
   {{# haslearningitems }}
-    <ul>
+    </ul>
   {{/ haslearningitems }}
-  {{^ learningitems }}
+  {{^ haslearningitems }}
     <p class="current_learning-no-content">{{{ nocurrentlearning_rol_link }}}</p>
-  {{/ learningitems }}
+  {{/ haslearningitems }}
 </div>
 {{> block_current_learning/paging}}
 {{#js}}

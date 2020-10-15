@@ -281,9 +281,23 @@
 .block_current_learning-tiles {
     padding: @totara_style-spacing_small;
 
+    &-loading {
+        margin: 100px auto;
+        width: 100%;
+        text-align: center;
+    
+        [data-loading="false"] & {
+            display: none; 
+        }
+    }
+
     ul {
         list-style-type: none;
         margin: 0;
+    }
+
+    &[data-loading="true"] ul {
+        display: none; 
     }
 
     &:after {
@@ -300,24 +314,40 @@
     border: 1px solid @totara_style-color_neutral_5;
     border-radius: @totara_style-btn-radius;
     position: relative;
+
+    [data-items-per-row="1"] & {
+        width: calc(~'100% - 'calc(~'2 * ' @totara_style-spacing_small));
+        max-width: 284px;
+    }
     
-    @media (min-width: @totara_style-screen_sm_min) {
-        width: calc(~'33.33% - ' 2 * @totara_style-spacing_small);
+    [data-items-per-row="2"] & {
+        width: calc(~'50% - 'calc(~'2 * ' @totara_style-spacing_small));
     }
-  
-    #block-region-top &,
-    #block-region-bottom & {
-        @media (min-width: @totara_style-screen_lg_min) {
-            width: calc(~'16.66% - ' 2 * @totara_style-spacing_small);      
-        }
+    
+    [data-items-per-row="3"] & {
+        width: calc(~'33.33% - 'calc(~'2 * ' @totara_style-spacing_small));
     }
-  
-    #block-region-side-pre &,
-    #block-region-side-post &,
-    #dock & {
-        width: calc(~'100% - ' 2 * @totara_style-spacing_small);
+    
+    [data-items-per-row="4"] & {
+        width: calc(~'25% - 'calc(~'2 * ' @totara_style-spacing_small));
     }
-  
+    
+    [data-items-per-row="5"] & {
+        width: calc(~'20% - 'calc(~'2 * ' @totara_style-spacing_small));
+    }
+    
+    [data-items-per-row="6"] & {
+        width: calc(~'16.66% - 'calc(~'2 * ' @totara_style-spacing_small));
+    }
+    
+    [data-items-per-row="7"] & {
+        width: calc(~'14.28% - 'calc(~'2 * ' @totara_style-spacing_small));
+    }
+    
+    [data-items-per-row="8"] & {
+        width: calc(~'12.5% - 'calc(~'2 * ' @totara_style-spacing_small));
+    }
+    
     &__image {
         padding-top: 128px;
         position: relative;
@@ -342,6 +372,8 @@
     }
   
     .block .content &__link {
+        color: @text-color;
+        
         &:focus,
         &:hover {
             text-decoration: none;
@@ -426,5 +458,23 @@
         box-shadow: @totara_style-shadow_2;
         outline: none;
         text-decoration: none;
+    }
+  }
+
+.block_docked {
+    .block_current_learning-tiles {
+        padding-left: 0;
+        padding-right: 0;
+    }
+  
+    .block_current_learning-tile {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+
+
+        &__image {
+            padding-top: 88px;
+        }
     }
   }

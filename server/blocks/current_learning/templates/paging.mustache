@@ -68,14 +68,14 @@
             <ul class="pagination">
                 <li class="{{previousclass}}">
                     <a data-page="prev" href="#" aria-label="{{#str}}previous, block_current_learning{{/str}}">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
                 </li>
-                {{#pages}}<li class={{active}}><a data-page="{{page}}" href="{{link}}">{{page}}</a></li>{{/pages}}
+                {{#pages}}<li class="{{active}}"><a data-page="{{page}}" href="{{link}}">{{page}}</a></li>{{/pages}}
                 <li class="{{nextclass}}">
                     <a data-page="next" href="#" aria-label="{{#str}}next, block_current_learning{{/str}}">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
                 </li>
             </ul>
         </nav>{{/onepage}}
