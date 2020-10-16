@@ -17,20 +17,31 @@
 -->
 
 <template>
-  <Hashtag
-    :url="url"
-    :text="$str('hashtag', 'editor_weka', text)"
-    @click.native.prevent
-  />
+  <Dropdown class="tui-wekaHashtag">
+    <template v-slot:trigger="{ toggle, isOpen }">
+      <Hashtag
+        :url="url"
+        :text="$str('hashtag', 'editor_weka', text)"
+        @click.native.capture.prevent="toggle"
+      />
+    </template>
+    <DropdownButton @click="open(url)">
+      {{ $str('view_search_results', 'editor_weka') }}
+    </DropdownButton>
+  </Dropdown>
 </template>
 
 <script>
 import BaseNode from 'editor_weka/components/nodes/BaseNode';
 import Hashtag from 'tui/components/json_editor/nodes/Hashtag';
+import Dropdown from 'tui/components/dropdown/Dropdown';
+import DropdownButton from 'tui/components/dropdown/DropdownButton';
 
 export default {
   components: {
     Hashtag,
+    Dropdown,
+    DropdownButton,
   },
 
   extends: BaseNode,
@@ -46,13 +57,41 @@ export default {
       });
     },
   },
+
+  methods: {
+    open(url) {
+      window.open(url);
+    },
+  },
 };
 </script>
 
 <lang-strings>
   {
     "editor_weka": [
+      "actions_menu_for",
+      "view_search_results",
       "hashtag"
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-wekaHashtag {
+  display: inline-block;
+  white-space: normal;
+
+  &__text {
+    color: var(--color-state);
+
+    &:hover {
+      // Hover state, for now we keep the same color.
+      color: var(--color-state);
+    }
+  }
+
+  .tui-dropdown__menu {
+    width: auto;
+  }
+}
+</style>

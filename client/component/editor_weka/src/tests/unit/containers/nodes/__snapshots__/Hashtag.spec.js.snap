@@ -1,8 +1,22 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`editor_weka/components/nodes/Hashtag.vue Checks snapshot 1`] = `
-<hashtag-stub
-  text="hashtag-editor_weka"
-  url="/totara/catalog/index.php?[object Object]"
-/>
+<dropdown-stub
+  animation="default"
+  canclose="true"
+  class="tui-wekaHashtag"
+  closeonclick="true"
+  position="bottom-left"
+  role="menu"
+  separator="true"
+>
+   
+  <dropdownbutton-stub
+    role="menuitem"
+  >
+    
+    view_search_results-editor_weka
+  
+  </dropdownbutton-stub>
+</dropdown-stub>
 `;

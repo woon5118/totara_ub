@@ -56,3 +56,4 @@ $string['matching_users'] = 'Matching users';
 $string['more_items'] = 'More';
 $string['pluginname'] = 'Weka editor';
 $string['unknown_attachment'] = 'Unknown attachment';
+$string['view_search_results'] = 'View search results';

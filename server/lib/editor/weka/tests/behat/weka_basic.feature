@@ -48,3 +48,9 @@ Feature: Test basic Weka functionality
     And I should see "test.jpg" "linkMedia" in the weka editor
     And I should not see "foo.jpg" "linkMedia" in the weka editor
     And I should see "User One" "mention" in the weka editor
+    And I press enter in the weka editor
+    And I type "Give me a #hashtag" in the weka editor
+    And I press enter in the weka editor
+    And I click on "#hashtag" "link"
+    Then I should see "View search results"
+    And "a[href$='index.php?catalog_fts=hashtag']" "css_element" should exist
