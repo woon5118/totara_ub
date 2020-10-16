@@ -173,7 +173,6 @@ final class document_helper {
     /**
      * @param array $document
      * @return string
-     * @internal For internal use only. Do not call this function!
      */
     public static function json_encode_document(array $document): string {
         $json_result = json_encode(

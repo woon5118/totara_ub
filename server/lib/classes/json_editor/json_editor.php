@@ -94,7 +94,7 @@ final class json_editor {
             return '';
         }
 
-        $json_text = json_encode($document);
+        $json_text = document_helper::json_encode_document($document);
 
         $manager = \filter_manager::instance();
         return $manager->filter_json($json_text, $context);
