@@ -792,12 +792,7 @@ require(['core/autoinitialise'], function(ai) {
             if (debugging()) {
                 // Check file existence only when in debug mode.
                 if (!file_exists($CFG->dirroot . strtok($url, '?'))) {
-                    $found = false;
-                    foreach ($this->frameworks as $framework) {
-
-                    }
-                    debug([$url, $CFG->dirroot . strtok($url, '?')]);
-                    //throw new coding_exception('Attempt to require a JavaScript file that does not exist.', $CFG->dirroot . strtok($url, '?'));
+                    throw new coding_exception('Attempt to require a JavaScript file that does not exist.', $CFG->dirroot . strtok($url, '?'));
                 }
             }
             if (substr($url, -3) === '.js') {
