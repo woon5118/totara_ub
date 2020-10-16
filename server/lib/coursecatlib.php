@@ -432,7 +432,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         $newcategory->sortorder = 0;
         $newcategory->timemodified = time();
 
-        // Totara: Add ability define the course_categories
+        // Totara: Add the ability to create system-managed categories.
         $newcategory->issystem = 0;
         if (isset($data->issystem)) {
             $newcategory->issystem = $data->issystem;
@@ -636,14 +636,17 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
     /**
      * Returns the entry from categories tree and makes sure the application-level tree cache is built
      *
+     * Totara: system categories are treated as invisible, and also tracked on their own
+     *
      * The following keys can be requested:
      *
      * 'countall' - total number of categories in the system (always present)
+     * 'countsystem' - number of system-managed categories in the system (always present)
      * 0 - array of ids of top-level categories (always present)
-     * '0i' - array of ids of top-level categories that have visible=0 (always present but may be empty array)
+     * '0i' - array of ids of top-level categories that have visible=0 or issystem=1 (always present but may be empty array)
      * $id (int) - array of ids of categories that are direct children of category with id $id. If
      *   category with id $id does not exist returns false. If category has no children returns empty array
-     * $id.'i' - array of ids of children categories that have visible=0
+     * $id.'i' - array of ids of children categories that have visible=0 or issystem=1
      * $id.'s' - array of ids of system maintained children categories
      *
      * @param int|string $id
@@ -668,26 +671,31 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         $rs = $DB->get_recordset_sql($sql, array());
         $all = array(0 => array(), '0i' => array());
         $count = 0;
+        $system_count = 0;
         foreach ($rs as $record) {
             $all[$record->id] = array();
             $all[$record->id. 'i'] = array();
             $all[$record->id. 's'] = array();
             if (array_key_exists($record->parent, $all)) {
                 $all[$record->parent][] = $record->id;
-                if (!$record->visible) {
+                if (!$record->visible && !$record->issystem) {
                     $all[$record->parent. 'i'][] = $record->id;
                 }
-                if ($record->issystem) {
+                else if ($record->issystem) {
+                    $all[$record->parent. 'i'][] = $record->id;
                     $all[$record->parent . 's'][] = $record->id;
+                    $system_count++;
                 }
             } else {
                 // Parent not found. This is data consistency error but next fix_course_sortorder() should fix it.
                 $all[0][] = $record->id;
-                if (!$record->visible) {
+                if (!$record->visible && !$record->issystem) {
                     $all['0i'][] = $record->id;
                 }
-                if ($record->issystem) {
+                else if ($record->issystem) {
+                    $all['0i'][] = $record->id;
                     $all['0s'][] = $record->id;
+                    $system_count++;
                 }
             }
             $count++;
@@ -703,8 +711,9 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             $all[$defcoursecat->id] = array();
             $count++;
         }
-        // We must add countall to all in case it was the requested ID.
+        // We must add countall (Totara: and countsystem) to all in case it was the requested ID.
         $all['countall'] = $count;
+        $all['countsystem'] = $system_count;
         // Totara: Set the chunk of the tree because cache::set_many() is slow.
         $coursecattreecache->set('all', $all);
         if (array_key_exists($id, $all)) {
@@ -717,11 +726,12 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
     /**
      * Returns number of ALL categories in the system regardless if
      * they are visible to current user or not
+     * Totara: but not system categories
      *
      * @return int
      */
     public static function count_all() {
-        return self::get_tree('countall');
+        return (self::get_tree('countall') - self::get_tree('countsystem'));
     }
 
     /**
@@ -1067,7 +1077,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
     }
 
     /**
-     * Returns array of ids of children categories that current user can not see
+     * Returns array of ids of children categories that current user can not see.
      *
      * This data is cached in user session cache
      *
@@ -1076,10 +1086,12 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
     protected function get_not_visible_children_ids() {
         global $DB, $CFG, $USER;
         $coursecatcache = cache::make('core', 'coursecat');
-        if (($invisibleids = $coursecatcache->get('ic'. $this->id)) === false) {
+        $cache_key = 'ic'. $this->id;
+        if (($invisibleids = $coursecatcache->get($cache_key)) === false) {
             // We never checked visible children before.
             $hidden = self::get_tree($this->id.'i');
-            $invisibleids = array();
+            // Totara: system categories are considered invisible also.
+            $invisibleids = self::get_tree($this->id . 's');
             if ($hidden) {
                 // Preload categories contexts.
                 list($sql, $params) = $DB->get_in_or_equal($hidden, SQL_PARAMS_NAMED, 'id');
@@ -1097,6 +1109,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                     }
                 }
             }
+            $invisibleids = array_unique($invisibleids);
             if (!empty($CFG->tenantsenabled)) {
                 if ($this->id == 0) {
                     // Top category is special, we need to apply tenant restrictions there.
@@ -1126,7 +1139,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                     }
                 }
             }
-            $coursecatcache->set('ic'. $this->id, $invisibleids);
+            $coursecatcache->set($cache_key, $invisibleids);
         }
         return $invisibleids;
     }
@@ -1180,9 +1193,9 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      *             Only cached fields may be used for sorting!
      *    - offset
      *    - limit - maximum number of children to return, 0 or null for no limit
-     *    - is_system - Whether we are fetching the category that is maintain by the system or not.
-     *                  By default, it is fetching the categories that is maintain-able by the user.
-     *                  The value for this flag is either TRUE or FALSE.
+     *    - is_system - Whether we are fetching categories that are maintained by the system or not.
+     *                  By default, it is fetching the categories that are maintainable by the user.
+     *                  The value for this flag is boolean, default false.
      * @return coursecat[] Array of coursecat objects indexed by category id
      */
     public function get_children($options = array()) {
@@ -1215,14 +1228,26 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
 
         // First retrieve list of user-visible and sorted children ids from cache.
-        $sortedids = $coursecatcache->get('c'. $this->id. ':'.  serialize($sortfields));
+        $cache_key = 'c'. $this->id. ':'.  serialize($sortfields) . ':' . $where_system_param['is_system'];
+        $sortedids = $coursecatcache->get($cache_key);
         if ($sortedids === false) {
             $sortfieldskeys = array_keys($sortfields);
+            // Totara: we are only concerned with filtering out not visible children if not loooking for system categories.
+            if (empty($where_system_param['is_system'])) {
+                $invisibleids = $this->get_not_visible_children_ids();
+            } else {
+                $invisibleids = array();
+            }
             if ($sortfieldskeys[0] === 'sortorder') {
                 // No DB requests required to build the list of ids sorted by sortorder.
                 // We can easily ignore other sort fields because sortorder is always different.
-                $sortedids = self::get_tree($this->id);
-                if ($sortedids && ($invisibleids = $this->get_not_visible_children_ids())) {
+                // Totara: getting system categories via get_tree requires a suffix
+                $treeid = $this->id;
+                if (!empty($where_system_param['is_system'])) {
+                    $treeid .= 's';
+                }
+                $sortedids = self::get_tree($treeid);
+                if ($sortedids && count($invisibleids)) {
                     $sortedids = array_diff($sortedids, $invisibleids);
                     if ($sortfields['sortorder'] == -1) {
                         $sortedids = array_reverse($sortedids, true);
@@ -1230,7 +1255,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                 }
             } else {
                 // We need to retrieve and sort all children. Good thing that it is done only on first request.
-                if ($invisibleids = $this->get_not_visible_children_ids()) {
+                if (count($invisibleids)) {
                     list($sql, $params) = $DB->get_in_or_equal($invisibleids, SQL_PARAMS_NAMED, 'id', false);
                     // Totara: Added support for course categories type.
                     $records = self::get_records('cc.parent = :parent AND cc.id '. $sql . " AND " . $where_system,
@@ -1242,7 +1267,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                 self::sort_records($records, $sortfields);
                 $sortedids = array_keys($records);
             }
-            $coursecatcache->set('c'. $this->id. ':'.serialize($sortfields), $sortedids);
+            $coursecatcache->set($cache_key, $sortedids);
         }
 
         if (empty($sortedids)) {
@@ -1352,6 +1377,8 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
 
     /**
      * Returns true if the category has ANY children, including those not visible to the user
+     *
+     * Totara: does not include any system children.
      *
      * @return boolean
      */
@@ -1909,7 +1936,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         $deletedcertifs = array();
 
         // Get children. Note, we don't want to use cache here because it would be rebuilt too often.
-        // We want to get ALL children including categories maintained by system
+        // Totara: We want to get ALL children including categories maintained by system
         $children = $DB->get_records('course_categories', array('parent' => $this->id), 'sortorder ASC');
         foreach ($children as $record) {
             $coursecat = new coursecat($record);
@@ -2091,7 +2118,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
             throw new coding_exception('Tenant category cannot be deleted');
         }
 
-        // System maintained sub-categories are fully deleted
+        // Totara: System-maintained sub-categories and their contents are fully deleted, not moved.
         // Need to do this first to prevent container courses from being moved
         $system_children = $this->get_children(['is_system' => 1]);
         if ($system_children) {
@@ -2567,8 +2594,8 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      *
      * See also {@link make_categories_options()}
      *
-     * Totara: Note that this function only fetch all the categories that are available to be maintain
-     * by the user only.
+     * Totara: Note that this function only fetch all the categories that are available to be maintained
+     * by the user only -- no system categories in this list, ever.
      *
      * @param string/array $requiredcapability if given, only categories where the current
      *      user has this capability will be returned. Can also be an array of capabilities,

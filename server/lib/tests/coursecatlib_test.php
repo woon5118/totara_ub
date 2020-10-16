@@ -45,6 +45,8 @@ class core_coursecatlib_testcase extends advanced_testcase {
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
+        // Totara: Create a system category before every test to see if it throws anything off.
+        $pre_existing_system_category = coursecat::create(array('name' => 'Pre-Existing', 'issystem' => 1));
     }
 
     protected function get_roleid($context = null) {
@@ -292,9 +294,16 @@ class core_coursecatlib_testcase extends advanced_testcase {
         $course3 = $this->getDataGenerator()->create_course(array('category' => $category4->id));
         $course4 = $this->getDataGenerator()->create_course(array('category' => $category1->id));
 
+        // Totara: add system category and course
+        $categorysys = coursecat::create(array('name' => 'CatSys', 'parent' => $category2->id, 'issystem' => 1));
+        $coursesys = $this->getDataGenerator()->create_course(array('category' => $categorysys->id));
+        $this->assertEquals(array($categorysys->id), array_keys($category2->get_children(['is_system' => true])));
+
         // Now we have
         // $category1
         //   $category2
+        //      $categorysys
+        //        $coursesys
         //      $category4
         //        $course2
         //        $course3
@@ -306,7 +315,7 @@ class core_coursecatlib_testcase extends advanced_testcase {
         // Login as another user to test course:delete capability (user who created course can delete it within 24h even without cap).
         $this->setUser($this->getDataGenerator()->create_user());
 
-        // Delete category 2 and move content to category 3.
+        // Delete category 2 and move content to category 3 (this should delete the system category and its course)
         $this->assertFalse($category2->can_move_content_to($category3->id)); // No luck!
         // Add necessary capabilities.
         $this->assign_capability('moodle/course:create', CAP_ALLOW, context_coursecat::instance($category3->id));
@@ -330,6 +339,13 @@ class core_coursecatlib_testcase extends advanced_testcase {
         $this->assertEquals($category4->id, $DB->get_field('course', 'category', array('id' => $course2->id)));
         $this->assertEquals($category4->id, $DB->get_field('course', 'category', array('id' => $course3->id)));
         $this->assertEquals($category3->id, $DB->get_field('course', 'category', array('id' => $course1->id)));
+        // Totara: ensure system category was deleted.
+        $this->assertNull(coursecat::get($categorysys->id, IGNORE_MISSING, true));
+
+        // Totara: re-add system category and course
+        $categorysys2 = coursecat::create(array('name' => 'CatSys2', 'parent' => $category3->id, 'issystem' => 1));
+        $coursesys = $this->getDataGenerator()->create_course(array('category' => $categorysys2->id));
+        $this->assertEquals(array($categorysys2->id), array_keys($category3->get_children(['is_system' => true])));
 
         // Delete category 3 completely.
         $this->assertFalse($category3->can_delete_full()); // No luck!
@@ -359,6 +375,9 @@ class core_coursecatlib_testcase extends advanced_testcase {
         $category5 = coursecat::create(array('name' => 'Cat5', 'idnumber' => '11', 'parent' => $category1->id, 'visible' => 0));
         $category6 = coursecat::create(array('name' => 'Cat6', 'idnumber' => '10', 'parent' => $category1->id));
         $category7 = coursecat::create(array('name' => 'Cat0', 'parent' => $category1->id));
+        // Totara: include a system category
+        $categorysys1 = coursecat::create(array('name' => 'CatSys1', 'parent' => $category1->id, 'issystem' => 1));
+        $categorysys2 = coursecat::create(array('name' => 'CatSys2', 'parent' => $category1->id, 'issystem' => 1, 'visible' => 0));
 
         $children = $category1->get_children();
         // User does not have the capability to view hidden categories, so the list should be
@@ -384,11 +403,18 @@ class core_coursecatlib_testcase extends advanced_testcase {
         // Must be 2, 7, 6, 4.
         $this->assertEquals(array($category2->id, $category7->id, $category6->id, $category4->id), array_keys($children));
 
+        // Totara: test system categories.
+        $system_children = $category1->get_children(['is_system' => 1]);
+        $this->assertEquals(array($categorysys1->id, $categorysys2->id), array_keys($system_children));
+
         // Check that everything is all right after purging the caches.
         cache_helper::purge_by_event('changesincoursecat');
         $children = $category1->get_children();
         $this->assertEquals(array($category2->id, $category4->id, $category6->id, $category7->id), array_keys($children));
         $this->assertEquals(4, $category1->get_children_count());
+        // Totara: check system categories too.
+        $system_children = $category1->get_children(['is_system' => 1]);
+        $this->assertEquals(array($categorysys1->id, $categorysys2->id), array_keys($system_children));
     }
 
     /**
@@ -397,12 +423,15 @@ class core_coursecatlib_testcase extends advanced_testcase {
     public function test_count_all() {
         global $DB;
         // Dont assume there is just one. An add-on might create a category as part of the install.
-        $numcategories = $DB->count_records('course_categories');
+        $numcategories = $DB->count_records('course_categories', ['issystem' => 0]);
         $this->assertEquals($numcategories, coursecat::count_all());
         $category1 = coursecat::create(array('name' => 'Cat1'));
         $category2 = coursecat::create(array('name' => 'Cat2', 'parent' => $category1->id));
         $category3 = coursecat::create(array('name' => 'Cat3', 'parent' => $category2->id, 'visible' => 0));
-        // Now we've got three more.
+        // Totara: include system categories
+        $categorysys1 = coursecat::create(array('name' => 'CatSys1', 'issystem' => 1));
+        $categorysys1 = coursecat::create(array('name' => 'CatSys2', 'parent' => $category2->id, 'issystem' => 1));
+        // Now we've got only three more.
         $this->assertEquals($numcategories + 3, coursecat::count_all());
         cache_helper::purge_by_event('changesincoursecat');
         // We should still have 4.
