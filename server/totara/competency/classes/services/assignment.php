@@ -464,11 +464,7 @@ class assignment extends \external_api {
         ];
 
         $formatter = new string_field_formatter(format::FORMAT_HTML, context_system::instance());
-
-        // TODO Previously we showed the competency name only in certain conditions, this will likely be replaced by GrpahQL
         $response['competency_name'] = $formatter->format($assignment->get_competency()->display_name);
-
-        // TODO Previously we showed the user group name only in certain conditions, this will likely be replaced by GrpahQL
         $response['user_group_name'] = $formatter->format($assignment->get_user_group_name());
 
         return $response;

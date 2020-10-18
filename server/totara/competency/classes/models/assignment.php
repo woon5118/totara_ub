@@ -244,7 +244,7 @@ class assignment {
         $repo = $repo = $class::repository()
             ->where('id', $user_group_id);
 
-        // TODO: Cover the following condition with tests
+        // TODO TO BE RESOLVED IN TL-28207: Cover the following condition with tests
         if ($class == user::class) {
             $repo->filter_by_not_deleted();
         } else if (is_subclass_of($class, hierarchy_item::class)) {
@@ -369,8 +369,6 @@ class assignment {
 
     /**
      * Returns the associated competency entity
-     *
-     * TODO return model instead of entity?
      *
      * @return competency
      */
@@ -617,7 +615,6 @@ class assignment {
 
     /**
      * Convert model to array, this currently converts only an entity to array
-     * TODO consider wrapping it into whatever that might want to convert it to array differently.
      *
      * @return array
      */

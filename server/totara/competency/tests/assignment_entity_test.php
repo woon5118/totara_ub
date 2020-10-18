@@ -121,24 +121,10 @@ class totara_competency_assignment_entity_testcase extends advanced_testcase {
             'idnumber' => 'accc2',
             'typeid' => $type,
         ]);
-        // TODODO: Use assignment generator
-        $assignment1 = new assignment();
-        $assignment1->competency_id = $comp1->id;
-        $assignment1->type = assignment::TYPE_ADMIN;
-        $assignment1->user_group_type = \totara_competency\user_groups::USER;
-        $assignment1->user_group_id = 1;
-        $assignment1->status = assignment::STATUS_DRAFT;
-        $assignment1->created_by = 0;
-        $assignment1->save();
 
-        $assignment2 = new assignment();
-        $assignment2->competency_id = $comp2->id;
-        $assignment2->type = assignment::TYPE_ADMIN;
-        $assignment2->user_group_type = \totara_competency\user_groups::ORGANISATION;
-        $assignment2->user_group_id = 2;
-        $assignment2->status = assignment::STATUS_DRAFT;
-        $assignment2->created_by = 0;
-        $assignment2->save();
+        $assignment_generator = $generator->assignment_generator();
+        $assignment_generator->create_user_assignment($comp1->id, 1);
+        $assignment_generator->create_organisation_assignment($comp2->id, 2);
 
         $assignments = assignment::repository()
             ->filter_by_user_group_type(\totara_competency\user_groups::USER)

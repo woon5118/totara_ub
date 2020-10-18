@@ -30,7 +30,6 @@ use xmldb_table;
 
 /**
  * Class containing information on the table and columns to use to obtain the users to perform achievement aggregation for
- * TODO - naming of the class
  */
 class aggregation_users_table {
 
@@ -527,7 +526,7 @@ class aggregation_users_table {
             $process_key_wh = " AND {$this->process_key_column} IS NULL";
         }
 
-        $wh = "{$this->user_id_column} = :qfa_userid 
+        $wh = "{$this->user_id_column} = :qfa_userid
                 AND {$this->competency_id_column} = :qfa_competencyid
                 {$process_key_wh}";
         $params = [
@@ -649,8 +648,8 @@ class aggregation_users_table {
             $update_wh = "((" . implode(') OR (', $wh_parts) . "))";
 
             $DB->execute(
-                "UPDATE {{$this->table_name}} 
-                         SET {$this->has_changed_column} = :haschanged 
+                "UPDATE {{$this->table_name}}
+                         SET {$this->has_changed_column} = :haschanged
                        WHERE {$update_wh} {$process_key_wh}",
                 $params
             );

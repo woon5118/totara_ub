@@ -380,7 +380,6 @@ function(str, notification, templates, Loader) {
                 'singleuse': !!+criterionSingleUse,
             };
 
-            // TODO: For now singleuse is used to determine whether there are detail - may need to expand later
             this.criteria[criterionKey].expandable = !this.criteria[criterionKey].singleuse;
             if (this.criteriaLength > 0) {
                 this.criteria[criterionKey].showand = true;

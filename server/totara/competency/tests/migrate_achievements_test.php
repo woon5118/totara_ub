@@ -140,7 +140,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(2, $assignment->status); // Assignment archived
         $this->assertEquals($comp_record_history->competencyid, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
-        $this->assertEquals(0, $assignment->created_by); // TODO this should be null
+        $this->assertEquals(0, $assignment->created_by);
         $this->assertEquals($comp_record_history->timemodified, $assignment->created_at);
         $this->assertEquals($comp_record_history->timemodified, $assignment->updated_at);
     }
@@ -179,7 +179,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(2, $assignment->status); // Assignment archived
         $this->assertEquals($comp_record_history->competencyid, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
-        $this->assertEquals(0, $assignment->created_by); // TODO this should be null
+        $this->assertEquals(0, $assignment->created_by);
         $this->assertEquals($comp_record_history->timemodified, $assignment->created_at);
         $this->assertEquals($comp_record_history->timemodified, $assignment->updated_at);
     }
@@ -260,7 +260,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(2, $assignment->status); // Assignment archived
         $this->assertEquals($comp_record_history1->competencyid, $assignment->competency_id);
         $this->assertEquals($achievement1->assignment_id, $assignment->id);
-        $this->assertEquals(0, $assignment->created_by); // TODO this should be null
+        $this->assertEquals(0, $assignment->created_by);
         $this->assertEquals($comp_record_history1->timemodified, $assignment->created_at);
         $this->assertEquals($comp_record_history1->timemodified, $assignment->updated_at);
     }
@@ -352,7 +352,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(2, $assignment->status); // Assignment archived
         $this->assertEquals($achievement->competency_id, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
-        $this->assertEquals(0, $assignment->created_by); // TODO this should be null
+        $this->assertEquals(0, $assignment->created_by);
         $this->assertEquals($achievement->time_created, $assignment->created_at);
         $this->assertEquals($achievement->time_created, $assignment->updated_at);
 
@@ -392,7 +392,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(2, $assignment->status); // Assignment archived
         $this->assertEquals($achievement->competency_id, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
-        $this->assertEquals(0, $assignment->created_by); // TODO this should be null
+        $this->assertEquals(0, $assignment->created_by);
         $this->assertEquals($achievement->time_created, $assignment->created_at);
         $this->assertEquals($achievement->time_created, $assignment->updated_at);
 
@@ -416,7 +416,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(2, $assignment->status); // Assignment archived
         $this->assertEquals($achievement->competency_id, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
-        $this->assertEquals(0, $assignment->created_by); // TODO this should be null
+        $this->assertEquals(0, $assignment->created_by);
         $this->assertEquals($achievement->time_created, $assignment->created_at);
         $this->assertEquals($achievement->time_created, $assignment->updated_at);
 
@@ -447,7 +447,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(2, $assignment->status); // Assignment archived
         $this->assertEquals($achievement->competency_id, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
-        $this->assertEquals(0, $assignment->created_by); // TODO this should be null
+        $this->assertEquals(0, $assignment->created_by);
         $this->assertEquals($achievement->time_created, $assignment->created_at);
         $this->assertEquals($achievement->time_created, $assignment->updated_at);
 
@@ -487,7 +487,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(2, $assignment->status); // Assignment archived
         $this->assertEquals($achievement->competency_id, $assignment->competency_id);
         $this->assertEquals($achievement->assignment_id, $assignment->id);
-        $this->assertEquals(0, $assignment->created_by); // TODO this should be null
+        $this->assertEquals(0, $assignment->created_by);
         $this->assertEquals($achievement->time_created, $assignment->created_at);
         $this->assertEquals($achievement->time_created, $assignment->updated_at);
     }
@@ -577,7 +577,7 @@ class totara_competency_migrate_achievements_testcase extends advanced_testcase 
         $this->assertEquals(2, $assignment->status); // Assignment archived
         $this->assertEquals($comp_record_history1->competencyid, $assignment->competency_id);
         $this->assertEquals($achievement1->assignment_id, $assignment->id);
-        $this->assertEquals(0, $assignment->created_by); // TODO this should be null
+        $this->assertEquals(0, $assignment->created_by);
         $this->assertEquals($comp_record_history1->timemodified, $assignment->created_at);
         $this->assertEquals($comp_record_history1->timemodified, $assignment->updated_at);
     }

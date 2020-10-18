@@ -201,7 +201,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str, Loader) 
             window.addEventListener('beforeunload', function(e) {
                 if (that.dirty) {
                     e.preventDefault();
-                    // TODO: Test in IE
                     e.returnValue = '';
                     return '';
                 }
@@ -254,7 +253,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str, Loader) 
                 that.pathways[key].detail = pw;
 
                 // Reset busyAddPw to allow adding of another pw
-                // TODO: May want to check the current value against the update value. Just make sure it works during init
                 that.unsetBusyAddPathway();
             });
 
@@ -541,7 +539,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str, Loader) 
                 return criterion.type === criterionType;
             });
             criterion.key = criterionKey;
-            // TODO: For now singleuse is used to determine whether there are detail - may need to expand later
             criterion.expandable = !criterion.singleuse;
 
             pw = {
@@ -668,7 +665,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str, Loader) 
 
             if (promiseArr.length > 0) {
                 Promise.all(promiseArr).then(function() {
-                    // TODO: For now simply reloading all pathways. Try to find a way to update ids for keys
                     that.updatePage().then(function() {
                         that.showNotification('success', 'apply_success', 'totara_competency', {});
                         that.loader.hide();

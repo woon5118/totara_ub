@@ -42,12 +42,6 @@ class assignment {
      * @return bool true on success
      */
     public static function archived(assignment_archived $event) {
-        $data = $event->get_data();
-        $assignment_id = $data['objectid'];
-        $type = $data['other']['type'] ?? null;
-
-        // TODO delete users here or in the archive action?
-
         return true;
     }
 
@@ -62,8 +56,6 @@ class assignment {
         $assignment_id = $data['objectid'];
 
         // trigger expand task for the activated assignment
-        // TODO performance - only schedule ad hoc task for non-user assignments,
-        //      otherwise directly create the proper record
         expand_assignment_task::schedule_for_assignment($assignment_id);
 
         return true;
@@ -76,11 +68,6 @@ class assignment {
      * @return bool true on success
      */
     public static function deleted(assignment_deleted $event) {
-        $data = $event->get_data();
-        $assignment_id = $data['objectid'];
-
-        // TODO delete users here or in the delete action?
-
         return true;
     }
 

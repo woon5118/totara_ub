@@ -265,7 +265,6 @@ abstract class totara_competency_testcase extends advanced_testcase {
         // This function is intended to be used standalone (with no other data created prior to this function execution).
         // We should be ok to just take all assignment user records,
         // order by id and then replace timestamps with incremental values.
-        // TODO, TBD users will work, but what to do with archived ones :(
 
         // We've created achievements record, including competent and not competent at the same time for the first competency
         // This is in particular to test proficient filter which should match a competency that has at least one proficient
@@ -281,12 +280,6 @@ abstract class totara_competency_testcase extends advanced_testcase {
 
     /**
      * Create competency achievement record
-     *
-     * TODO this is a 'bad' function that doesn't use proper API for several reasons:
-     * TODO 1. The API isn't there yet
-     * TODO 2. The overhead is quite significant while we actually just need to have this record
-     * TODO    and we aren't concerned how this record appeared in the achievements table
-     * TODO Maybe we should reconsider, maybe not. Please remove the TODO once decided.
      *
      * @param assignment $assignment Assignment entity
      * @param user $user User entity

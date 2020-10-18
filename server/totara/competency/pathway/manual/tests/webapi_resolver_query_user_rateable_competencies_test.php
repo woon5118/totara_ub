@@ -114,7 +114,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
         );
     }
 
-    // TODO: Test that Appraisers can execute the query with correct permissions handling in TL-23002
+    // TODO TO BE RESOLVED IN TL-28284: Test that Appraisers can execute the query with correct permissions handling in TL-23002
 
     /**
      * Sanity check to make sure the count can be resolved.

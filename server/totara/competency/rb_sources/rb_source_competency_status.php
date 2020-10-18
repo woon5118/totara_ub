@@ -632,14 +632,8 @@ class rb_source_competency_status extends rb_base_source {
             throw new coding_exception('phpunit_column_test_expected_count() cannot be used outside of unit tests');
         }
 
-        // TODO: This needs to be fixed during implementation of TL_19974
-        //       The problem is that during testing of the other reports users are assigned to competencies
-        //       This results in additional records in totara_competency_achievements - the number can not be predicted.
-        //       Therefore retrieving the number here
-
         global $DB;
         return $DB->count_records('totara_competency_achievement');
     }
 
 }
-

@@ -59,14 +59,12 @@ class learning_plan_evaluator_user_source extends pathway_evaluator_user_source 
             $temp_wh = "{$temp_wh} AND ";
         }
 
-        // TODO: These are good queries to use for creation of indexes / other performance enhancement options
-
         // Using 2 queries for clarify. Might consider joining them in future if it is more performant
         // First query - Mark all users with one or more rating since the last achievement aggregation or
         // who has a rating without an achievement record yet
         $sql = "
             UPDATE {{$temp_table_name}}
-            SET {$temp_set_sql} 
+            SET {$temp_set_sql}
             WHERE {$temp_wh}
                 {$temp_user_id_column} IN (
                     SELECT dplan.user_id
@@ -94,7 +92,7 @@ class learning_plan_evaluator_user_source extends pathway_evaluator_user_source 
         // Second query - user has no rating and no achievement record
         $sql = "
             UPDATE {{$temp_table_name}}
-            SET {$temp_set_sql} 
+            SET {$temp_set_sql}
             WHERE {$temp_wh}
                 {$temp_user_id_column} NOT IN (
                     SELECT dplan.user_id

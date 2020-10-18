@@ -99,8 +99,6 @@ class assignment_user extends item {
                 ->delete();
         });
 
-        // TODO Do we need to purge connected data, like comp_records, etc. as well?
-
         return self::RESULT_STATUS_SUCCESS;
     }
 

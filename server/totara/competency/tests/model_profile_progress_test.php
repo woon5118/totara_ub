@@ -71,9 +71,9 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
         $this->assertGreaterThan(0, count($progress->items));
 
         $progress->items->map(function (item $item) {
+            // TODO TO BE RESOLVED IN TL-28156
             // Well having type-hint will already assert that the item is of the correct type
-
-            // TODO Let's quickly assert items for the correct structure and content
+            // Let's quickly assert items for the correct structure and content
         });
 
         // Filters

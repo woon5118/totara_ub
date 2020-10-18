@@ -95,11 +95,11 @@ class totara_competency_competency_entity_testcase extends \advanced_testcase {
     }
 
     public function test_it_has_custom_fields_attribute() {
-        $this->markTestSkipped('TODO'); // TODO add test for custom fields attribute
+        $this->markTestSkipped('TODO TO RESOLVE IN TL-28158 add test for custom fields attribute');
     }
 
     public function test_it_can_preload_assigned_user_groups() {
-        $this->markTestSkipped('TODO'); // TODO add test for custom fields attribute
+        $this->markTestSkipped('TODO TO RESOLVE IN TL-28158 add test for custom fields attribute');
     }
 
     /**

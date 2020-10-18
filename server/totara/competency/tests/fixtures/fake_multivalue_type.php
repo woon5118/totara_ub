@@ -37,7 +37,7 @@ class fake_multivalue_type extends pathway {
      * Load the data specific to the type of pathway.
      */
     protected function fetch_configuration(): void {
-        // TODO: Implement fetch_configuration() method.
+        // Nothing to do.
     }
 
     /**
@@ -46,21 +46,21 @@ class fake_multivalue_type extends pathway {
      * @return bool
      */
     protected function configuration_is_dirty(): bool {
-        // TODO: Implement configuration_is_dirty() method.
+        return false;
     }
 
     /**
      * Save the pathway specific configuration
      */
     protected function save_configuration() {
-        // TODO: Implement save_configuration() method.
+        // Nothing to do.
     }
 
     /**
      * Delete the pathway specific detail
      */
     protected function delete_configuration(): void {
-        // TODO: Implement delete_configuration() method.
+        // Nothing to do.
     }
 
     /**
@@ -74,7 +74,11 @@ class fake_multivalue_type extends pathway {
      * @return base_achievement_detail as implemented by the pathway plugin in question
      */
     public function aggregate_current_value(int $user_id): base_achievement_detail {
-        // TODO: Implement aggregate_current_value() method.
+        return new class extends base_achievement_detail {
+            public function get_achieved_via_strings(): array {
+                return [];
+            }
+        };
     }
 
     /**

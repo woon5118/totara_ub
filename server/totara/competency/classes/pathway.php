@@ -165,8 +165,6 @@ abstract class pathway {
                       FROM {totara_competency_pathway}
                      WHERE competency_id = :competency_id
                        AND status = :active";
-            // Todo: Once we're properly implementing sortorder, we'll need to consider whether draft should be
-            // included as well or instead of.
             $highest_current = $DB->get_field_sql(
                 $sql,
                 ['competency_id' => $this->get_competency()->id, 'active' => static::PATHWAY_STATUS_ACTIVE]

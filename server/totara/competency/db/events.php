@@ -91,8 +91,6 @@ $observers = [
         'callback'  => assignment_observer::class.'::deleted'
     ],
     [
-        // TODO if you are introducing another observer for this event, please consider moving logging there
-        // to avoid clashes
         'eventname' => assignment_user_assigned::class,
         'callback'  => user_log_observer::class.'::log'
     ],
@@ -101,8 +99,6 @@ $observers = [
         'callback'  => user_log_observer::class.'::log'
     ],
     [
-        // TODO if you are introducing another observer for this event, please consider moving logging there
-        // to avoid clashes
         'eventname' => assignment_user_archived::class,
         'callback'  => user_log_observer::class.'::log'
     ],

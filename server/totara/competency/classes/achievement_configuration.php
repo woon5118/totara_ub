@@ -141,10 +141,6 @@ class achievement_configuration {
 
         $transaction = $DB->start_delegated_transaction();
 
-        // TODO: For now using the action_time to ensure change log and history is only created once per user action.
-        //       A set of changes should ideally be initiated together with logging and history created before making
-        //       all the individual pathway and aggregation changes.
-        //       Will sort it out when the graphQL queries and mutators for the UI is finalised
         $this->save_configuration_history($action_time);
 
         $pathway_ids = [];
@@ -195,10 +191,6 @@ class achievement_configuration {
                 return;
             }
 
-            // TODO: For now using the action_time to ensure change log and history is only created once per user action.
-            //       A set of changes should ideally be initiated together with logging and history created before making
-            //       all the individual patway and aggregation changes.
-            //       Will sort it out when the graphQL queries and mutators for the UI is finalised
             $this->save_configuration_history($action_time);
 
             $aggregation->type = $type;

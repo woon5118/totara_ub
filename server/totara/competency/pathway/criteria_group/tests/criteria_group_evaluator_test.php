@@ -96,7 +96,6 @@ class pathway_criteria_group_evaluator_testcase extends \advanced_testcase {
      * Data provider for test_aggregate
      */
     public function data_provider_test_aggregate() {
-        // TODO: More combinations
         return [
             // 1 criterion. 1 user. Criterion_met didn't change. No change in achievement
             [
@@ -505,7 +504,7 @@ class test_cge_criterion_evaluator extends item_evaluator {
 
         $sql =
             "UPDATE {" . $temp_table_name . "}
-                SET {$temp_set_sql} 
+                SET {$temp_set_sql}
               WHERE {$temp_wh}
                     {$temp_user_id_column} {$users_in_sql}";
 

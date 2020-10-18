@@ -49,8 +49,6 @@ class overall_aggregation implements type_resolver {
             throw new \coding_exception('Only \totara_competency\overall_aggregation objects are accepted: ' . gettype($aggregation));
         }
 
-        // TODO: capability checks
-
         // Using string_field_formatter as these values are not retrieved from user input
         switch ($field) {
             case 'aggregation_type':

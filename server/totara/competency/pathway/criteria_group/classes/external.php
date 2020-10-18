@@ -75,7 +75,6 @@ class external extends \external_api {
         );
     }
 
-    // TODO: Make this part of the graphQL configuration mutators
     public static function create(int $competency_id, int $sortorder, int $scalevalue, array $criteria, int $action_time) {
         advanced_feature::require('competency_assignment');
         require_capability('totara/hierarchy:updatecompetency', context_system::instance());
@@ -193,13 +192,9 @@ class external extends \external_api {
         // Save history before making any changes - for now the action_time is used to ensure we do this only once per user 'Apply changes' action
         $config->save_configuration_history($action_time);
 
-        // TODO: Should this maybe be moved to the pathway / criteria_group instance
-        // If there are no criteria linked to this pathway anymore, delete the pathway
         if (empty($criteria)) {
             $pathway->delete();
 
-            // TODO: This is now needed as we have no endpoint resulting in a call to pathway_delete.
-            //       Ultimately we want all logging and history dumping to happen only in achievement_configuration
             configuration_change::add_competency_entry(
                 $config->get_competency()->id,
                 configuration_change::CHANGED_CRITERIA,

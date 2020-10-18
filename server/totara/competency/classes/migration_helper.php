@@ -64,22 +64,22 @@ class migration_helper {
         // If there's no comp_record, then we'll just be making a history record the most recent timestamp the current one.
 
         $histories = $DB->get_recordset_sql("
-            SELECT 
-                crh.id, 
-                crh.competencyid, 
-                crh.userid, 
-                crh.proficiency, 
-                crh.timemodified, 
-                crh.timeproficient, 
+            SELECT
+                crh.id,
+                crh.competencyid,
+                crh.userid,
+                crh.proficiency,
+                crh.timemodified,
+                crh.timeproficient,
                 COALESCE (cr.id, 0) AS comp_record_id
             FROM {comp_record_history} crh
-            LEFT JOIN {comp_record} cr 
+            LEFT JOIN {comp_record} cr
                 ON crh.competencyid = cr.competencyid
                     AND crh.userid = cr.userid
                     AND (crh.proficiency = cr.proficiency OR crh.proficiency IS NULL AND cr.proficiency IS NULL)
-            ORDER BY crh.competencyid, 
-                crh.userid, 
-                comp_record_id DESC, 
+            ORDER BY crh.competencyid,
+                crh.userid,
+                comp_record_id DESC,
                 crh.timemodified DESC
         ");
 
@@ -112,7 +112,7 @@ class migration_helper {
                     'user_group_id' => $history->userid,
                     'optional' => 0,
                     'status' => 2,
-                    'created_by' => 0, // TODO we should make it nullable
+                    'created_by' => 0,
                     'created_at' => $history->timemodified,
                     'updated_at' => $history->timemodified,
                     'archived_at' => $now,

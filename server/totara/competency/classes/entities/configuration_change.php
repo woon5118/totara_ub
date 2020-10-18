@@ -70,7 +70,7 @@ class configuration_change extends entity {
         }
 
         // In some cases we want to do special queueing outside of this function,
-        // TODO Move this somewehere else, it should not be in the entity
+        // TODO TO BE RESOLVED IN TL-28190: Move this somewehere else, it should not be in the entity
         if ($queue) {
             // Adding each assigned user to the aggregation queue
             (new aggregation_users_table())->queue_all_assigned_users_for_aggregation($competency_id);

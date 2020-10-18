@@ -36,7 +36,6 @@ class rb_competency_assignment_users_embedded extends rb_base_embedded {
 
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
 
-        // TODO sort out default sorting?
         $this->defaultsortcolumn = 'id';
         $this->defaultsortorder = SORT_ASC;
 

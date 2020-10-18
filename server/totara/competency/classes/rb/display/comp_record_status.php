@@ -27,20 +27,20 @@ use rb_column;
 use reportbuilder;
 use stdClass;
 use totara_reportbuilder\rb\display\base;
+use totara_competency\entities\competency_achievement;
 
 class comp_record_status extends base {
 
     public static function display($value, $format, stdClass $row, rb_column $column, reportbuilder $report) {
-        // Todo: constants.
         switch ($value) {
-            case 0:
+            case competency_achievement::ACTIVE_ASSIGNMENT:
                 $string = get_string('active', 'totara_competency');
                 break;
-            case 1:
+            case competency_achievement::ARCHIVED_ASSIGNMENT:
                 $string = get_string('archived', 'totara_competency');
                 break;
-            case 2:
-                $string = 'History (superseded by another record)';
+            case competency_achievement::SUPERSEDED:
+                $string = get_string('superseded', 'totara_competency');
                 break;
             default:
                 $string = '';
@@ -51,7 +51,6 @@ class comp_record_status extends base {
     }
 
     /**
-     * Todo: Okay, maybe it is, but yet to make sure.
      * Is this column graphable?
      *
      * @param rb_column $column

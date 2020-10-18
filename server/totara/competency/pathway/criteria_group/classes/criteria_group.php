@@ -220,7 +220,6 @@ class criteria_group extends pathway {
         }
 
         // Delete removed criteria
-        // TODO: Whenever criteria are used in other modules, we should no longer delete the actual criteria, just the pathway_criteria_group_criterion
         if (!empty($critrows)) {
             foreach ($critrows as $id => $type) {
                 $criterion = criterion_factory::fetch($type, $id);
@@ -417,8 +416,6 @@ class criteria_group extends pathway {
      * @return array
      */
     public static function export_criteria_types(): array {
-        // TODO: Get a more generic way of ordering
-        // For now hardcoding the order or known plugins.
         $display_order = array_flip(['onactivate', 'linkedcourses', 'coursecompletion', 'childcompetency', 'othercompetency']);
 
         $types = plugin_types::get_enabled_plugins('criteria', 'totara_criteria');

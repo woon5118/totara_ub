@@ -123,9 +123,6 @@ class competency extends external_api {
         }
 
         $order_dir = (strtolower($order_dir) == 'asc') ? 'ASC' : 'DESC';
-        // TODO $order_by is not validated against list of columns,
-        // TODO Shall we allow it to fail with an exception? Param alpha num text should remove any SQL nasty stuff
-
         $repository = entities\competency::repository();
         $competencies = $repository
             ->select('*')

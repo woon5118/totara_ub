@@ -87,7 +87,7 @@ class external extends \external_api {
     }
 
     public static function get_categories_returns() {
-        // Todo: define return structure.
+        // TODO TO BE RESOLVED IN TL-28189: define return structure.
         return null;
     }
 
@@ -173,7 +173,6 @@ class external extends \external_api {
         }
         $data['items'] = $items;
 
-        // Todo: Don't want to change javascript yet, so keeping the old name of this value:
         $data['items_per_page'] = $data['per_page'];
 
         return $data;
@@ -231,9 +230,6 @@ class external extends \external_api {
 
         $linked_courses = [];
         foreach ($linked_courses_records as $linked_courses_record) {
-            // Todo: permission checks. Can see courses.
-            // If in admin context, may still return, but with hidden.
-
             $linked_courses[] = [
                 'id' => $linked_courses_record->id,
                 'mandatory' => ($linked_courses_record->linktype == linked_courses::LINKTYPE_MANDATORY),
@@ -281,7 +277,7 @@ class external extends \external_api {
         advanced_feature::require('competencies');
         require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
-        // Todo: permission checks on courses being visible.
+        // TODO TO BE RESOLVED IN TL-28189: permission checks on courses being visible.
         linked_courses::set_linked_courses($competency_id, $courses);
     }
 

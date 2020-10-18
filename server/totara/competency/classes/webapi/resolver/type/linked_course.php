@@ -31,8 +31,6 @@ use core\webapi\formatter\field\string_field_formatter;
 class linked_course implements type_resolver {
 
     public static function resolve(string $field, $linked_course, array $args, execution_context $ec) {
-        // TODO: capability checks
-
         switch ($field) {
             case 'course_id':
                 return $linked_course->id;

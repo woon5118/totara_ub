@@ -50,8 +50,6 @@ class achievement_configuration implements type_resolver {
             throw new \coding_exception('Only \totara_competency\achievement_configuration objects are accepted: ' . gettype($configuration));
         }
 
-        // TODO: capability checks
-
         switch ($field) {
             case 'competency_id':
                 return $configuration->get_competency()->id;

@@ -132,6 +132,9 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
         $pw = $competency_generator->create_criteria_group($data->comp, $cc, $data->scalevalues[2]->id, null, null, 2);
         $pathways[$pw->get_id()] = $pw;
 
+        $pw = $competency_generator->create_learning_plan_pathway($data->comp);
+        $pathways[$pw->get_id()] = $pw;
+
         $operationname = 'totara_competency_achievement_criteria';
 
         // Without summary_criteria
@@ -170,6 +173,4 @@ class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testc
             unset($pathways[$path['id']]);
         }
     }
-
-    // TODO: Other pathway types
 }
