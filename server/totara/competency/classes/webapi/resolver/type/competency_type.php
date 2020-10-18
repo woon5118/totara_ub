@@ -23,10 +23,10 @@
 
 namespace totara_competency\webapi\resolver\type;
 
+use coding_exception;
 use context_system;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use totara_competency\entity\competency as competency_entity;
 use totara_competency\entity\competency_type as competency_type_entity;
 use totara_competency\formatter;
 
@@ -41,14 +41,14 @@ class competency_type implements type_resolver {
      * Resolves fields for an organisation
      *
      * @param string $field
-     * @param competency_entity $competency_type
+     * @param competency_type_entity $competency_type
      * @param array $args
      * @param execution_context $ec
      * @return mixed
      */
     public static function resolve(string $field, $competency_type, array $args, execution_context $ec) {
         if (!$competency_type instanceof competency_type_entity) {
-            throw new \coding_exception('Accepting only entities.');
+            throw new coding_exception('Accepting only competency type entities.');
         }
 
         $formatter = new formatter\competency_type($competency_type, context_system::instance());

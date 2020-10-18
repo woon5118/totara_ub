@@ -59,9 +59,10 @@ class totara_competency_webapi_resolver_type_scale_value_testcase extends advanc
      *
      * @param string $field
      * @param array $format
-     * @return string
+     * @return mixed
+     * @throws coding_exception
      */
-    private function resolve_field(string $field, array $format): string {
+    private function resolve_field(string $field, array $format) {
         return scale_value_type::resolve(
             $field,
             $this->scale_value,
@@ -85,10 +86,33 @@ class totara_competency_webapi_resolver_type_scale_value_testcase extends advanc
         $this->scale_value->description = $multilang_string;
         $this->scale_value->save();
 
+        $user = $this->getDataGenerator()->create_user();
+        $this->assign_cap('totara/hierarchy:viewcompetencyscale', $user->id);
+
+        // resolve name
         $this->assertEquals('English', $this->resolve_field('name', ['format' => format::FORMAT_HTML]));
         $this->assertEquals('English', $this->resolve_field('name', ['format' => format::FORMAT_PLAIN]));
+        // without capability
+        $this->assertEquals(null, $this->resolve_field('name', ['format' => format::FORMAT_RAW]));
+        // with capability
+        $this->setUser($user);
+        $this->assertEquals(
+            '<span lang="en" class="multilang">English</span><span lang="es" class="multilang">Spanish</span>',
+            $this->resolve_field('name', ['format' => format::FORMAT_RAW])
+        );
+
+        // resolve description
         $this->assertEquals('English', $this->resolve_field('description', ['format' => format::FORMAT_HTML]));
         $this->assertEquals('English', $this->resolve_field('description', ['format' => format::FORMAT_PLAIN]));
+        // without capability
+        $this->setUser(null);
+        $this->assertEquals(null, $this->resolve_field('description', ['format' => format::FORMAT_RAW]));
+        // with capability
+        $this->setUser($user);
+        $this->assertEquals(
+            '<span lang="en" class="multilang">English</span><span lang="es" class="multilang">Spanish</span>',
+            $this->resolve_field('description', ['format' => format::FORMAT_RAW])
+        );
     }
 
     /**
@@ -123,4 +147,23 @@ class totara_competency_webapi_resolver_type_scale_value_testcase extends advanc
         $this->assertStringNotContainsString($xss_string, $resolved_description);
     }
 
+    /**
+     * assign capability to user
+     *
+     * @param string $capability
+     * @param int $user_id
+     * @param bool|null $unassign
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    private function assign_cap(string $capability, int $user_id, ?bool $unassign = false) {
+        $roleid = $this->getDataGenerator()->create_role();
+        $syscontext = context_system::instance();
+        if ($unassign) {
+            unassign_capability($capability, $roleid, $syscontext);
+        } else {
+            assign_capability($capability, CAP_ALLOW, $roleid, $syscontext);
+        }
+        role_assign($roleid, $user_id, $syscontext);
+    }
 }

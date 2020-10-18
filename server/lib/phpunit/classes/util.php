@@ -194,6 +194,7 @@ class phpunit_util extends testing_util {
         get_message_processors(false, true, true);
         filter_manager::reset_caches();
         core_filetypes::reset_caches();
+        \core\orm\entity\buffer::clear();
         \core_useragent::phpunit_reset(); // Totara: Make sure useragent tests are properly isolated.
         if (class_exists('prog_messages_manager', false)) {
             // Program messages exists, reset its caches just in case they have been used.

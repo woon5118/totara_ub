@@ -23,11 +23,11 @@
 
 namespace totara_competency\webapi\resolver\type;
 
+use coding_exception;
 use context_system;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use totara_competency\entity\competency as competency_entity;
 use totara_competency\entity\competency_framework as competency_framework_entity;
 use totara_competency\formatter;
 
@@ -42,14 +42,14 @@ class competency_framework implements type_resolver {
      * Resolves fields for an organisation
      *
      * @param string $field
-     * @param competency_entity $competency_framework
+     * @param competency_framework_entity $competency_framework
      * @param array $args
      * @param execution_context $ec
      * @return mixed
      */
     public static function resolve(string $field, $competency_framework, array $args, execution_context $ec) {
         if (!$competency_framework instanceof competency_framework_entity) {
-            throw new \coding_exception('Accepting only entities.');
+            throw new coding_exception('Accept competency framework entity only.');
         }
 
         $format = $args['format'] ?? null;
@@ -71,15 +71,15 @@ class competency_framework implements type_resolver {
      * @return bool
      */
     public static function authorize(string $field, ?string $format) {
-        $context = \context_system::instance();
+        $context = context_system::instance();
 
         // Some fields need an extra capability check when format is RAW
         if (in_array($field, ['shortname', 'fullname']) && $format == format::FORMAT_RAW) {
-            return has_capability('totara/hierarchy:updatecompetencyframework', $context);
+            return has_capability('totara/hierarchy:updatecompetencyframeworks', $context);
         }
 
         if ($field === 'description' && $format == format::FORMAT_RAW) {
-            return has_capability('totara/hierarchy:updatecompetencyframework', $context);
+            return has_capability('totara/hierarchy:updatecompetencyframeworks', $context);
         }
 
         return true;
