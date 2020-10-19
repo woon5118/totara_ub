@@ -302,7 +302,7 @@ class assign_events_testcase extends advanced_testcase {
         global $PAGE;
         $this->resetAfterTest();
 
-        // Trigger the creation of the default perform category. Will be fixed by TL-27080
+        // Trigger the creation of the default perform category. Will be fixed by TL-28015
         \mod_perform\util::get_default_category_id();
         $course = $this->getDataGenerator()->create_course();
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
@@ -752,6 +752,9 @@ class assign_events_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
+        // Trigger the creation of the default perform category. Will be fixed by TL-28015
+        \mod_perform\util::get_default_category_id();
+
         $course = $this->getDataGenerator()->create_course();
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher');
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
@@ -799,6 +802,9 @@ class assign_events_testcase extends advanced_testcase {
         global $DB, $PAGE;
 
         $this->resetAfterTest();
+
+        // Trigger the creation of the default perform category. Will be fixed by TL-28015
+        \mod_perform\util::get_default_category_id();
 
         $course = $this->getDataGenerator()->create_course();
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher');
@@ -855,6 +861,9 @@ class assign_events_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
+        // Trigger the creation of the default perform category. Will be fixed by TL-28015
+        \mod_perform\util::get_default_category_id();
+
         $course = $this->getDataGenerator()->create_course();
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher');
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
@@ -901,6 +910,9 @@ class assign_events_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
+        // Trigger the creation of the default perform category. Will be fixed by TL-28015
+        \mod_perform\util::get_default_category_id();
+
         $course = $this->getDataGenerator()->create_course();
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher');
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
@@ -946,6 +958,9 @@ class assign_events_testcase extends advanced_testcase {
 
         $this->resetAfterTest();
 
+        // Trigger the creation of the default perform category. Will be fixed by TL-28015
+        \mod_perform\util::get_default_category_id();
+
         $course = $this->getDataGenerator()->create_course();
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
@@ -985,6 +1000,9 @@ class assign_events_testcase extends advanced_testcase {
         global $PAGE;
 
         $this->resetAfterTest();
+
+        // Trigger the creation of the default perform category. Will be fixed by TL-28015
+        \mod_perform\util::get_default_category_id();
 
         $course = $this->getDataGenerator()->create_course();
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
