@@ -29,7 +29,7 @@ require_once(realpath(__DIR__ . "/../../../config.php"));
 require_once($CFG->libdir . '/clilib.php');
 
 // Retrieve cli call arguments.
-$py3path = realpath(environment::get_py3path());
+$py3path = environment::get_py3path();
 $pyscript_path = realpath($CFG->dirroot . '/../extensions/ml_recommender/python/ml_recommender.py');
 $query = environment::get_query();
 
