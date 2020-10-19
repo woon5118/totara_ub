@@ -796,6 +796,7 @@ export default {
           token: this.token,
         };
       },
+      fetchPolicy: 'network-only',
       update(data) {
         if (this.viewOnlyReportMode) {
           return data.mod_perform_view_only_section_responses.section;
