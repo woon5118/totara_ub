@@ -1,0 +1,6 @@
+This files describes API changes in /client/component/engage_article,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Updated ArticleCard.vue to use a link here instead of in totara_engage BaseCard
+    * Template & SCSS changes

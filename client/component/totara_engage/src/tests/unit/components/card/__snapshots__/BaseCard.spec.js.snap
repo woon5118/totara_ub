@@ -15,12 +15,7 @@ exports[`totara_engage/components/card/BaseCard.vue Checks snapshot 1`] = `
     <div
       class="tui-engageBaseCard__description"
     >
-      <div>
-        <a
-          class="tui-engageBaseCard__link"
-          href="#"
-        />
-      </div>
+      <div />
        
       <div
         class="tui-engageBaseCard__infoContent"

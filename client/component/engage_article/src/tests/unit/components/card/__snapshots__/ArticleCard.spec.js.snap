@@ -58,14 +58,19 @@ exports[`engage_article/components/card/ArticleCard.vue Checks snapshot 1`] = `
       transparent="true"
     />
      
-    <h3
-      class="tui-engageArticleCard__title"
-      id="article-1"
+    <a
+      class="tui-engageArticleCard__link"
+      href=""
     >
+      <h3
+        class="tui-engageArticleCard__title"
+        id="article-1"
+      >
+        
+        Hello world resource
       
-      Hello world resource
-    
-    </h3>
+      </h3>
+    </a>
      
     <!---->
   </cardheader-stub>

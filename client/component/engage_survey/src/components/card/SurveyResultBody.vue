@@ -18,11 +18,12 @@
 
 <template>
   <div class="tui-engageSurveyResultBody" @click="navigateTo">
-    <Label
+    <a
       :id="labelId"
-      :label="name"
+      :href="voteUrl"
       class="tui-engageSurveyResultBody__title"
-    />
+      >{{ name }}</a
+    >
     <div class="tui-engageSurveyResultBody__progress">
       <SurveyQuestionResult
         v-for="({ votes, id, options, answertype }, index) in questions"
@@ -45,14 +46,12 @@
 </template>
 
 <script>
-import Label from 'tui/components/form/Label';
 import AccessIcon from 'totara_engage/components/icons/access/computed/AccessIcon';
 import SurveyQuestionResult from 'engage_survey/components/card/result/SurveyQuestionResult';
 
 export default {
   components: {
     AccessIcon,
-    Label,
     SurveyQuestionResult,
   },
 
@@ -98,12 +97,16 @@ export default {
         questions: questions.options.length,
       });
     },
+
+    voteUrl() {
+      return this.$url(this.url, {
+        page: 'vote',
+      });
+    },
   },
   methods: {
     navigateTo() {
-      window.location.href = this.$url(this.url, {
-        page: 'vote',
-      });
+      window.location.href = this.voteUrl;
     },
   },
 };
@@ -125,11 +128,10 @@ export default {
   width: 100%;
   padding: var(--gap-2) var(--gap-4);
 
-  &__title.tui-formLabel {
-    @include tui-font-heading-label;
-    width: 100%;
-    margin-right: 0;
+  &__title {
+    @include tui-font-heading-x-small();
     margin-bottom: var(--gap-6);
+    color: var(--color-text);
     -ms-word-break: break-all;
     overflow-wrap: break-word;
     hyphens: none;

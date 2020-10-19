@@ -78,9 +78,11 @@
         class="tui-playlistCard__bookmark"
         @click="updateBookmark"
       />
-      <h4 :id="labelId" slot="second" class="tui-playlistCard__title">
-        {{ name }}
-      </h4>
+      <a slot="second" class="tui-playlistCard__link" :href="url">
+        <h4 :id="labelId" class="tui-playlistCard__title">
+          {{ name }}
+        </h4>
+      </a>
     </CardHeader>
 
     <StarRating
@@ -296,6 +298,16 @@ export default {
     background-size: cover;
     border-top-left-radius: calc(var(--card-border-radius) - 1px);
     border-top-right-radius: calc(var(--card-border-radius) - 1px);
+  }
+
+  &__link {
+    color: var(--color-neutral-7);
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      color: var(--color-neutral-7);
+    }
   }
 
   &__numberOfResourcesContainer {

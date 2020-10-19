@@ -1,0 +1,6 @@
+This files describes API changes in /client/component/engage_survey,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Updated SurveyResultBody.vue page to use a link instead of Label component
+    * Template & SCSS changes

@@ -1,6 +1,11 @@
 This files describes API changes in /client/component/totara_engage,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* Updated BaseCard.vue by removing link and adding it in specific cards instead
+    * Template & SCSS changes
+
 === 13.1 ===
 
 * Removed getImage method from AdderBrowseAllTable.vue component, functionality is moved to EngageCardImage.vue component

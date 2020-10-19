@@ -1,0 +1,6 @@
+This files describes API changes in /client/component/totara_playlist,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Updated PlaylistCard.vue page to use a link here instead of in totara_engage BaseCard
+    * Template & SCSS changes

@@ -32,9 +32,7 @@
       <div class="tui-engageBaseCard__description">
         <div>
           <!-- This is where the title will be -->
-          <a class="tui-engageBaseCard__link" :href="href">
-            <slot name="header" />
-          </a>
+          <slot name="header" />
         </div>
 
         <div class="tui-engageBaseCard__infoContent">
@@ -109,18 +107,6 @@ export default {
   flex-direction: column;
   width: 100%;
   height: 100%;
-
-  &__link {
-    color: var(--color-neutral-7);
-    text-decoration: none;
-
-    &:hover,
-    &:focus {
-      color: var(--color-neutral-7);
-      text-decoration: none;
-      outline: none;
-    }
-  }
 
   &__card {
     display: flex;

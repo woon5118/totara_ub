@@ -59,14 +59,19 @@ exports[`totara_playlist/components/card/PlaylistCard.vue Checks snapshot 1`] = 
       transparent="true"
     />
      
-    <h4
-      class="tui-playlistCard__title"
-      id=""
+    <a
+      class="tui-playlistCard__link"
+      href=""
     >
+      <h4
+        class="tui-playlistCard__title"
+        id=""
+      >
+        
+        Hello world
       
-      Hello world
-    
-    </h4>
+      </h4>
+    </a>
   </cardheader-stub>
    
   <starrating-stub
