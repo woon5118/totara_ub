@@ -28,6 +28,7 @@ global $PAGE, $OUTPUT, $DB, $CFG;
 require_login();
 
 $sid = optional_param('sid', 0, PARAM_INT);
+$format = optional_param('format', '', PARAM_ALPHANUMEXT);
 $debug = optional_param('debug', 0, PARAM_INT);
 
 $url = new moodle_url(
@@ -54,6 +55,11 @@ $config->set_sid($sid);
 $config->set_global_restriction_set($grr);
 
 $report = reportbuilder::create_embedded($shortname, $config);
+if (!empty($format)) {
+    $report->export_data($format);
+    die;
+}
+
 $report->include_js();
 $PAGE->set_button($report->edit_button() . $PAGE->button);
 
