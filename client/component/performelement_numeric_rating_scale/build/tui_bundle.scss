@@ -1,0 +1,23 @@
+.tui-elementDisplayNumericRatingScale {
+  &__input {
+    margin-top: var(--gap-2);
+  }
+}
+
+.tui-elementEditNumericRatingScale {
+  &__values {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+.tui-elementEditNumericRatingScaleParticipantForm {
+  display: flex;
+  flex-direction: column-reverse;
+
+  &__input {
+    margin-top: var(--gap-2);
+  }
+}
+

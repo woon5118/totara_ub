@@ -1,0 +1,15 @@
+.tui-elementEditLongText {
+  &__action-buttons {
+    display: flex;
+    align-items: end;
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
+
+.tui-longTextElementParticipantResponse {
+  &__noResponse {
+    @include tui-font-hint();
+  }
+}
+

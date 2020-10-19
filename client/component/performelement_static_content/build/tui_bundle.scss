@@ -1,0 +1,15 @@
+.tui-staticContentElementAdminDisplay {
+  .tui-responsiveImage {
+    max-height: 10rem;
+  }
+}
+
+.tui-elementEditStaticContent {
+  &__weka {
+    &-invalid {
+      border-color: var(--form-input-border-color-invalid);
+      box-shadow: var(--form-input-shadow-invalid);
+    }
+  }
+}
+
