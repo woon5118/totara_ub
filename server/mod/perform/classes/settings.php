@@ -81,27 +81,10 @@ class settings {
         // Save $USER->access as the subsequent has_capability() trashes it.
         // This is necessary for the guest enrolment plugin that loads a temp role to $USER->access.
         $user_access = $USER->access ?? null;
-        $context = null;
-        $system_context = \context_system::instance();
-        // If the user has the capability on the system level he should be able to access the pages
-        // otherwise we need to check the capability on the category level.
-        // We check the system context first as to avoid unintentionally creating the default category.
-        // TODO Technically this is not the right way of doing it as there could be an override in the category,
-        //      see TL-24324 for more details what happens if the category is
-        //      automatically created by util::get_default_category_id();
-        //      Find a better solution to have the default category not auto created.
-        if (has_capability('mod/perform:view_manage_activities', $system_context)) {
-            $context = $system_context;
-        } else {
-            $category_id = util::get_default_category_id();
-            $category_context = context_coursecat::instance($category_id);
 
-            if (has_capability('mod/perform:view_manage_activities', $category_context)) {
-                $context = $category_context;
-            }
-        }
-
-        if ($context) {
+        $category_id = util::get_default_category_id();
+        $category_context = context_coursecat::instance($category_id);
+        if (has_capability('mod/perform:view_manage_activities', $category_context)) {
             $admin_root->add(
                 'performactivities',
                 new admin_externalpage(
@@ -110,10 +93,11 @@ class settings {
                     new moodle_url(manage_activities::URL),
                     'mod/perform:view_manage_activities',
                     false,
-                    $context
+                    $category_context
                 )
             );
         }
+
         // Restore $USER->access.
         if ($user_access) {
             $USER->access = $user_access;
