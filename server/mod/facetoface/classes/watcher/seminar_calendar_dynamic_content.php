@@ -55,6 +55,16 @@ class seminar_calendar_dynamic_content {
         $seminarevent = seminar_event::seek($hook->event->uuid);
         if (!$seminarevent->exists()) {
             debugging("Seminar event with id {$hook->event->uuid} is missing for calendar event", DEBUG_DEVELOPER);
+            return;
+        }
+
+        $seminar = $seminarevent->get_seminar();
+        if (!$seminar->exists()) {
+            return;
+        }
+
+        if (!totara_course_is_viewable($seminar->get_course(), $USER->id)) {
+            return;
         }
 
         $content = '';
@@ -66,7 +76,6 @@ class seminar_calendar_dynamic_content {
             $class .= ' text-uppercase label label-default';
             $content = $signup->get_state()->get_string();
         } else if (signup_helper::can_signup($signup)) {
-            $seminar = $seminarevent->get_seminar();
             if (!$seminar->has_unarchived_signups() || $seminar->get_multiplesessions()) {
 
                 $content = \html_writer::link(

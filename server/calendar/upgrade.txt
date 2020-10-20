@@ -1,6 +1,10 @@
 This files describes API changes in /calendar/* ,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* core_calendar_renderer::event changed do not display events from courses that are not visible to the user.
+
 === 13 ===
 
 * facetoface_print_calendar_session() now shows only the session matching the event date if possible

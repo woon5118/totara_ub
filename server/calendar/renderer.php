@@ -219,9 +219,12 @@ class core_calendar_renderer extends plugin_renderer_base {
     public function event(calendar_event $event, $showactions=true) {
         global $CFG;
 
-        $event = calendar_add_event_metadata($event);
-        $context = $event->context;
         $output = '';
+        $event = calendar_add_event_metadata($event);
+        if ((int)$event->visible == 0) {
+            return $output;
+        }
+        $context = $event->context;
 
         $output .= $this->output->box_start('card-header clearfix');
         if (calendar_edit_event_allowed($event) && $showactions) {
@@ -695,6 +698,10 @@ class core_calendar_renderer extends plugin_renderer_base {
 
         $seminarevent = new \mod_facetoface\seminar_event($event->uuid);
         $seminar = new \mod_facetoface\seminar($seminarevent->get_facetoface());
+
+        if (!totara_course_is_viewable($seminar->get_course(), $USER->id)) {
+            return '';
+        }
 
         if (empty($seminar->get_showoncalendar()) && empty($seminar->get_usercalentry()) && $event->eventtype != 'facetofacefacilitato') {
             return '';

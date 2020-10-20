@@ -669,7 +669,7 @@ function calendar_get_courselink($courseid) {
  * @return stdClass $event metadata
  */
 function calendar_add_event_metadata($event) {
-    global $CFG, $OUTPUT;
+    global $CFG, $OUTPUT, $USER;
 
     //Support multilang in event->name
     $event->name = format_string($event->name,true);
@@ -694,6 +694,7 @@ function calendar_add_event_metadata($event) {
 
         $event->icon = $OUTPUT->flex_icon('mod_' . $event->modulename . '|icon', array('alt' => $eventtype));
         $event->referer = '<a href="'.$CFG->wwwroot.'/mod/'.$event->modulename.'/view.php?id='.$module->id.'">'.$event->name.'</a>';
+        $event->courseid = $module->course;
         $event->courselink = calendar_get_courselink($module->course);
         $event->cmid = $module->id;
 
@@ -716,6 +717,11 @@ function calendar_add_event_metadata($event) {
     } else if($event->userid) {                                      // User event
         $event->icon = $OUTPUT->flex_icon('event-user', array('alt' => get_string('userevent', 'calendar')));
         $event->cssclass = 'calendar_event_user';
+    }
+    if ((int)$event->courseid > 0) {
+        if (!totara_course_is_viewable($event->courseid, $USER->id)) {
+            $event->visible = '0';
+        }
     }
     return $event;
 }
@@ -1551,10 +1557,12 @@ function calendar_set_filters(array $courseeventsfrom, $ignorefilters = false) {
     // For backwards compatability we have to check whether the courses array contains
     // just id's in which case we need to load course objects.
     $coursestoload = array();
-    foreach ($courseeventsfrom as $id => $something) {
-        if (!is_object($something)) {
-            $coursestoload[] = $id;
-            unset($courseeventsfrom[$id]);
+    foreach ($courseeventsfrom as $courseid => $course) {
+        if (!is_object($course)) {
+            $coursestoload[] = $courseid;
+            unset($courseeventsfrom[$courseid]);
+        } else if (!totara_course_is_viewable($course, $USER->id)) {
+            unset($courseeventsfrom[$courseid]);
         }
     }
     if (!empty($coursestoload)) {
@@ -2980,11 +2988,6 @@ class calendar_information {
      * @param string|null $view preference view options (eg: day, month, upcoming)
      */
     public function add_sidecalendar_blocks(core_calendar_renderer $renderer, $showfilters=false, $view=null) {
-        global $PAGE;
-
-        if (!has_capability('moodle/block:view', $PAGE->context) ) {
-            return;
-        }
         if ($showfilters) {
             $filters = new block_contents();
             $filters->content = $renderer->fake_block_filters($this->courseid, 0, 0, 0, $view, $this->courses);
@@ -3153,7 +3156,7 @@ class calendar_information {
                 // This setting is not available via the interface and must be set via config.php.
                 // Higher limits may impact performance, while lower limits may mean some events aren't
                 // shown to admins when they view all courses in the calendar.
-                // See config.example.php for more information.
+                // See config-dist.php for more information.
                 $limit = $CFG->calendar_adminallcourseslimit;
             } else {
                 // We need to limit the number of records fetched here in some way, as there's potential
