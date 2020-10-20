@@ -53,6 +53,7 @@
 import Delete from 'tui/components/icons/Delete';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Loading from 'tui/components/icons/Loading';
+import { notify } from 'tui/notifications';
 
 //graphQL
 import unShare from 'totara_engage/graphql/unshare';
@@ -90,6 +91,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
   },
 
   data() {
@@ -105,15 +110,29 @@ export default {
       }
 
       let refetchQueries = ['totara_engage_contribution_cards'];
+      let message = this.$str(
+        'removefromsharedlibrary',
+        'totara_engage',
+        this.name
+      );
+
       if (this.area !== 'USER') {
         refetchQueries = [
           'container_workspace_contribution_cards',
           'container_workspace_shared_cards',
         ];
+
+        message = this.$str(
+          'removefromyourworkspace',
+          'totara_engage',
+          this.name
+        );
       }
 
       try {
-        await this.$apollo.mutate({
+        let {
+          data: { result },
+        } = await this.$apollo.mutate({
           mutation: unShare,
           refetchQueries,
           variables: {
@@ -122,6 +141,13 @@ export default {
             item_id: this.instanceId,
           },
         });
+
+        if (result) {
+          await notify({
+            message,
+            type: 'success',
+          });
+        }
       } finally {
         this.loading = false;
       }
@@ -137,7 +163,9 @@ export default {
   ],
   "totara_engage": [
     "removefromlibary",
-    "removefromsharedwithyou"
+    "removefromsharedlibrary",
+    "removefromsharedwithyou",
+    "removefromyourworkspace"
   ]
 }
 </lang-strings>

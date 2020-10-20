@@ -181,19 +181,22 @@ final class share_repository extends repository {
      * @param int $recipient_instance_id
      * @param string $recipient_area
      * @param string $recipient_component
-     * @param int|null $visibility
+     * @param int|null $unused
      * @return bool
      */
     public function is_recipient(int $itemid, string $component, int $recipient_instance_id,
-        string $recipient_area, string $recipient_component,  ?int $visibility = share_model::VISIBILITY_VISIBLE
+        string $recipient_area, string $recipient_component, ?int $unused = null
     ): bool {
+        if ($unused !== null) {
+            debugging('The is_recipient() six argument is no longer used, please review your code', DEBUG_DEVELOPER);
+        }
+
         $builder = builder::table(share_recipient::TABLE, 'sr')
             ->join([share::TABLE, 's'], 'shareid', '=', 'id')
             ->where('s.itemid', $itemid)
             ->where('s.component', $component)
             ->where('sr.instanceid', $recipient_instance_id)
             ->where('sr.area', $recipient_area)
-            ->where('sr.visibility', $visibility)
             ->where('sr.component', $recipient_component);
 
         return $builder->exists();

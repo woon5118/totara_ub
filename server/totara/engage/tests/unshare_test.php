@@ -23,11 +23,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 use totara_engage\access\access;
+use totara_engage\bookmark\bookmark;
 use totara_engage\share\manager as share_manager;
 use core\webapi\execution_context;
 use totara_webapi\graphql;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class totara_engage_unshare_testcase extends advanced_testcase {
+    use webapi_phpunit_helper;
+
     /**
      *  @return void
      */
@@ -119,5 +123,47 @@ class totara_engage_unshare_testcase extends advanced_testcase {
 
         $this->assertTrue($DB->record_exists('engage_share', ['id' => $share->get_id()]));
         $this->assertEquals(0, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $share->get_recipient_id()]));
+    }
+
+    public function test_unshare_before_bookmark_item(): void {
+        global $DB;
+
+        $gen = $this->getDataGenerator();
+
+        /** @var engage_article_generator $article_gen */
+        $article_gen = $gen->get_plugin_generator('engage_article');
+
+        // Create users.
+        $users = $article_gen->create_users(2);
+        $this->setUser($users[0]);
+        // Create items to share.
+        $article = $article_gen->create_article(['access' => access::RESTRICTED]);
+
+        // Setup recipients.
+        $recipients = $article_gen->create_user_recipients([$users[1]]);
+
+        // Get shares.
+        $article_shares = $article_gen->share_article($article, $recipients);
+
+        $article_share = reset($article_shares);
+        $this->assertTrue($DB->record_exists('engage_share', ['id' => $article_share->get_id()]));
+
+        // Bookmark shared resource.
+        $this->setUser($users[1]);
+        $bookmark = new bookmark($users[1]->id, $article->get_id(), $article::get_resource_type());
+        $bookmark->add_bookmark();
+        $this->assertTrue($DB->record_exists('engage_bookmark', ['itemid' => $bookmark->get_itemid()]));
+
+        // Unshare the resource.
+        share_manager::unshare($article_share->get_recipient_id(), $article);
+        $this->assertEquals(0, $DB->get_field('engage_share_recipient', 'visibility', ['id' => $article_share->get_recipient_id()]));
+
+        // User still has permission to visit the shared resource.
+        $result = $this->resolve_graphql_query(
+            'engage_article_get_article',
+            ['id' => $article->get_id()]
+        );
+        
+        self::assertEquals($article->get_id(), $result->get_id());
     }
 }

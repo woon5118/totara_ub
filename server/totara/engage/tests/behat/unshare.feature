@@ -41,3 +41,17 @@ Feature: Unshare resource
     And I click on "Test Article 1" "link"
     When I click on "Reshare resource" "button"
     Then I should see "Shared with 1 people and 0 workspace(s)" in the ".tui-engageSharedBoardForm__label" "css_element"
+
+  Scenario: I still can visit bookmarked resource even if unlinking the resource
+    Given I log in as "user2"
+    And I view article "Test Article 1"
+    And I click on "Bookmark" "button"
+    And I click on "Your Library" in the totara menu
+    And I click on "Shared with you" "link"
+    Then I should see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
+    When I click on "Remove from Shared with you" "button"
+    Then I should not see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
+    When I click on "Saved resources" "link"
+    Then I should see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
+    When I view article "Test Article 1"
+    Then I should see "Test Article 1"

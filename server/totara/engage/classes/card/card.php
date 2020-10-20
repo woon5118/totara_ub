@@ -385,23 +385,25 @@ abstract class card {
                     list($sharer, $recipient) = $info;
 
                     if ($recipient->area !== user::AREA) {
-                        $library = \totara_engage\share\recipient\helper::get_recipient_class($recipient->component, $recipient->area );
+                        $library = \totara_engage\share\recipient\helper::get_recipient_class($recipient->component, $recipient->area);
                         $library = new $library($recipient->instanceid);
                         $data = $library->get_data();
                         $has_capability = $data['unshare'];
                     }
                 }
 
+                $component = $this->get_component();
                 $footnotes[] = [
                     'component' => 'CardSharedByFootnote',
                     'tuicomponent' => 'totara_engage/components/card/footnote/SharedByFootnote',
                     'props' => json_encode([
                         'instanceId' => $this->get_instanceid(),
-                        'component' => $this->get_component(),
+                        'component' => $component,
                         'sharer' => $sharer,
                         'recipientId' => (int)$recipient->id ?? null,
                         'area' => $recipient->area ?? null,
-                        'showButton' => $has_capability ?? true
+                        'showButton' => $has_capability ?? true,
+                        'name' => $this->get_name()
                     ]),
                 ];
             } else if ($args['type'] === 'playlist') {
@@ -411,7 +413,7 @@ abstract class card {
                     'tuicomponent' => 'totara_playlist/components/card/PlaylistFootnote',
                     'props' => json_encode([
                         'instanceId' => $this->get_instanceid(),
-                        'playlistId' => $args['item_id']
+                        'playlistId' => $args['item_id'],
                     ]),
                 ];
             }
