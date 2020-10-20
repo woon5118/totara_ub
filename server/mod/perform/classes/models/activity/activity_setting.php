@@ -116,10 +116,6 @@ class activity_setting extends model {
         string $name,
         $value
     ): activity_setting {
-        if (!$parent->can_manage()) {
-            throw new moodle_exception('nopermissions', '', '', 'create setting');
-        }
-
         $allowed = [
             self::CLOSE_ON_COMPLETION,
             self::MULTISECTION,

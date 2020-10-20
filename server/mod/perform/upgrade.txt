@@ -1,0 +1,7 @@
+This files describes API changes in /mod/perform/*,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+
+* activity_setting::create() function no longer checks if the current user has permission to manage the activity. The
+  check should be performed before calling this function, where applicable.

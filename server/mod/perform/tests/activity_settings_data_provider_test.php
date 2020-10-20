@@ -113,18 +113,6 @@ class mod_perform_activity_settings_data_provider_testcase extends advanced_test
     }
 
     /**
-     * Test access control.
-     */
-    public function test_no_permission(): void {
-        $settings = $this->create_test_data();
-
-        $this->setGuestUser();
-
-        $this->expectExceptionMessageMatches("/permission/");
-        $settings->update([activity_setting::MULTISECTION => true]);
-    }
-
-    /**
      * Convenience function check the expected setting values against the actual
      * ones.
      *
