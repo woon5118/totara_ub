@@ -70,15 +70,14 @@ Feature: Perform activity notifications - manual relationships
     And I close the tui notification toast
 
     And I switch to "Notifications" tui tab
-    And I toggle the "Participant selection" tui collapsible
-    And I click on "Participant selection notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_switch" in the "Participant selection" tui "collapsible"
-    And I click on "Appraiser" tui "toggle_switch" in the "Participant selection" tui "collapsible"
-    And I click on "Manager" tui "toggle_switch" in the "Participant selection" tui "collapsible"
-    # Also activate the instance creation notification.
-    And I toggle the "Participant instance creation" tui collapsible
-    And I click on "Participant instance creation notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
+
+    # By default participant selection & instance creation is enabled.
+    # For participant selection, the selector recipients are enabled (i.e Subject, Manager, Manager's manager, Appraiser)
+    Then the "Subject" tui "toggle_switch" should be on in the "Participant selection" tui "collapsible"
+    And the "Manager" tui "toggle_switch" should be on in the "Participant selection" tui "collapsible"
+    And the "Appraiser" tui "toggle_switch" should be on in the "Participant selection" tui "collapsible"
+    # Activate the instance creation notifications.
+    When I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
     And I click on "Appraiser" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
     And I click on "Peer" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
     And I click on "Mentor" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
@@ -166,14 +165,16 @@ Feature: Perform activity notifications - manual relationships
     And I close the tui notification toast
 
     And I switch to "Notifications" tui tab
-    And I toggle the "Participant instance creation" tui collapsible
-    And I click on "Participant instance creation notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
-    And I click on "External respondent" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
-    # Let's turn on the participant selection notification also.
-    And I toggle the "Participant selection" tui collapsible
-    And I click on "Participant selection notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_switch" in the "Participant selection" tui "collapsible"
+
+    # By default participant selection & instance creation is enabled.
+    # For participant selection, the selector recipients are enabled (i.e Subject, Manager, Manager's manager, Appraiser)
+    # For participant instance creation, the external respondent recipient is enabled by default.
+    # So we just need to enable the subject recipient for instance creation, because that is not enabled by default.
+    Then the "Subject" tui "toggle_switch" should be on in the "Participant selection" tui "collapsible"
+    And the "Manager" tui "toggle_switch" should be on in the "Participant selection" tui "collapsible"
+    And the "Manager's manager" tui "toggle_switch" should be on in the "Participant selection" tui "collapsible"
+    And the "Appraiser" tui "toggle_switch" should be on in the "Participant selection" tui "collapsible"
+    When I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
 
     And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal

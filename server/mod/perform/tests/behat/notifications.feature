@@ -65,9 +65,20 @@ Feature: Perform activity notifications - core relationships
     And I switch to "Notifications" tui tab
 
   Scenario: mod_perform_notification_101: Instance creation notification
-    And I toggle the "Participant instance creation" tui collapsible
-    And I click on "Participant instance creation notification" tui "toggle_switch"
-    And I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
+    # By default instance creation is enabled
+    # External respondent is also active as a recipient, but only shown if they are a participant for a section.
+    Given I should not see "External respondent" in the "Participant instance creation" tui "collapsible"
+    When I switch to "Content" tui tab
+    And I click the add responding participant button
+    And I select "External respondent" in the responding participants popover
+    And I switch to "Notifications" tui tab
+    Then the "External respondent" tui "toggle_switch" should be on in the "Participant instance creation" tui "collapsible"
+    And I switch to "Content" tui tab
+    And I remove "External respondent" as a perform activity participant
+    And I switch to "Notifications" tui tab
+
+    # Add the other recipients
+    When I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
     And I click on "Appraiser" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
     And I click on "Activate" tui "button" in the "draft state" tui "action_card"
     And I confirm the tui confirmation modal

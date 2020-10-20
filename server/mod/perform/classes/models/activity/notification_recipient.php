@@ -103,17 +103,34 @@ class notification_recipient extends model {
      *
      * @param notification $parent
      * @param relationship $relationship
-     * @param boolean $active
+     * @param boolean $active If not specified, defaults to the default value.
      * @return self
      */
-    public static function create(notification $parent, relationship $relationship, bool $active = false): self {
+    public static function create(notification $parent, relationship $relationship, bool $active = null): self {
         $entity = new notification_recipient_entity();
         $entity->notification_id = $parent->id;
         $entity->core_relationship_id = $relationship->get_id();
-        $entity->active = $active;
+        $entity->active = $active ?? self::is_active_for_relationship_by_default($parent->class_key, $relationship);
         $entity->save();
 
         return new self($entity);
+    }
+
+    /**
+     * Is this notification recipient active for the given relationship by default?
+     *
+     * @param string $class_key
+     * @param relationship $relationship
+     * @return bool
+     */
+    private static function is_active_for_relationship_by_default(string $class_key, relationship $relationship): bool {
+        $active_for_recipients = factory::create_loader()->get_default_active_recipients_of($class_key);
+
+        if ($active_for_recipients === null) {
+            return false;
+        }
+
+        return recipient::is_available($active_for_recipients, $relationship);
     }
 
     /**

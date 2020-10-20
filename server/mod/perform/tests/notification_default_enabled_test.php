@@ -23,6 +23,7 @@
 
 use container_perform\perform;
 use core\collection;
+use mod_perform\constants;
 use mod_perform\entities\activity\notification as notification_entity;
 use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
 use mod_perform\models\activity\activity;
@@ -58,6 +59,14 @@ class mod_perform_notification_default_enabled_testcase extends mod_perform_noti
 
         // Test the notifications that aren't active by default.
         foreach (loader::create()->get_class_keys() as $class_key) {
+            if (in_array($class_key, [
+                'participant_selection',
+                'instance_created',
+            ])) {
+                // We test the active notifications later on.
+                continue;
+            }
+
             $notification = notification::load_by_activity_and_class_key($activity, $class_key);
             $this->assertFalse($notification->active);
             $all_recipient_relationships = relationship_entity::repository()
@@ -73,6 +82,40 @@ class mod_perform_notification_default_enabled_testcase extends mod_perform_noti
                 ->count()
             );
         }
+
+        // participant_selection is active by default
+        $participant_selection_notification = notification::load_by_activity_and_class_key($activity, 'participant_selection');
+        $this->assertTrue($participant_selection_notification->active);
+        $this->assertEquals($perform_relationships->count(),
+            notification_recipient_entity::repository()->where('notification_id', $participant_selection_notification->id)->count()
+        );
+        $this->assertEqualsCanonicalizing(
+            $perform_relationships->filter('type', relationship_entity::TYPE_STANDARD)->pluck('id'),
+            relationship_entity::repository()
+                ->join([notification_recipient_entity::TABLE, 'nr'], 'id', 'core_relationship_id')
+                ->join([notification_entity::TABLE, 'n'], 'nr.notification_id', 'id')
+                ->where('n.id', $participant_selection_notification->id)
+                ->where('nr.active', 1)
+                ->get()
+                ->pluck('id')
+        );
+
+        // instance_created is active by default
+        $instance_created_notification = notification::load_by_activity_and_class_key($activity, 'instance_created');
+        $this->assertTrue($instance_created_notification->active);
+        $this->assertEquals($perform_relationships->count(),
+            notification_recipient_entity::repository()->where('notification_id', $instance_created_notification->id)->count()
+        );
+        $this->assertEqualsCanonicalizing(
+            $perform_relationships->filter('idnumber', constants::RELATIONSHIP_EXTERNAL)->pluck('id'),
+            relationship_entity::repository()
+                ->join([notification_recipient_entity::TABLE, 'nr'], 'id', 'core_relationship_id')
+                ->join([notification_entity::TABLE, 'n'], 'nr.notification_id', 'id')
+                ->where('n.id', $instance_created_notification->id)
+                ->where('nr.active', 1)
+                ->get()
+                ->pluck('id')
+        );
     }
 
     /**

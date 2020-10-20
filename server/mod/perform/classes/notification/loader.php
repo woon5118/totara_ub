@@ -241,6 +241,28 @@ class loader {
     }
 
     /**
+     * Should the notification be active when the activity is created?
+     *
+     * @param string $class_key
+     * @return bool
+     */
+    public function is_active_by_default(string $class_key): bool {
+        $info = $this->get_information($class_key);
+        return $info['active_by_default'] ?? false;
+    }
+
+    /**
+     * The recipients that should be enabled by default.
+     *
+     * @param string $class_key
+     * @return int|null Returns null if there are no recipients
+     */
+    public function get_default_active_recipients_of(string $class_key): ?int {
+        $info = $this->get_information($class_key);
+        return $info['active_for_recipients'] ?? null;
+    }
+
+    /**
      * Throw an exception if the class key is not available.
      *
      * @param string $class_key

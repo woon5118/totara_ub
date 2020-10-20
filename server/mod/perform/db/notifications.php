@@ -33,12 +33,16 @@ $notifications = [
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
         'recipients' => \mod_perform\notification\recipient::STANDARD,
         'all_possible_recipients' => true,
+        'active_by_default' => true,
+        'active_for_recipients' => \mod_perform\notification\recipient::STANDARD,
     ],
     'instance_created' => [ // 18
         'name' => ['notification_broker_instance_created', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\instance_created::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
         'recipients' => \mod_perform\notification\recipient::ALL,
+        'active_by_default' => true,
+        'active_for_recipients' => \mod_perform\notification\recipient::EXTERNAL,
     ],
     'instance_created_reminder' => [ // 19
         'name' => ['notification_broker_instance_created_reminder', 'mod_perform'],

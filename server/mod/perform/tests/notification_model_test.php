@@ -56,7 +56,7 @@ class mod_perform_notification_model_testcase extends mod_perform_notification_t
         $this->assertEquals($activity->id, $notification->activity->get_id());
         $this->assertEquals($name_expected, $notification->name);
         $this->assertEquals(trigger::TYPE_ONCE, $notification->trigger_type);
-        $this->assertFalse($notification->active);
+        $this->assertTrue($notification->active);
         $this->assertEmpty($notification->triggers);
 
         $entity = new notification_entity($notification->id);

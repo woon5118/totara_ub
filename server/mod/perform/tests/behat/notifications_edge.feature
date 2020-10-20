@@ -60,8 +60,7 @@ Feature: Perform activity notifications - edge cases
 
   Scenario: mod_perform_notification_901: Recipient settings are preserved
     And I switch to "Notifications" tui tab
-    And I toggle the "Participant instance creation" tui collapsible
-    And I click on "Participant instance creation notification" tui "toggle_switch"
+    # Participant instance creation notification is on, but only for the external participant recipient
     And I click on "Subject" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
     And I click on "Manager's manager" tui "toggle_switch" in the "Participant instance creation" tui "collapsible"
     When I switch to "Content" tui tab

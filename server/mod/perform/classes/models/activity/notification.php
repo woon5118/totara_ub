@@ -79,10 +79,10 @@ class notification extends model {
      *
      * @param activity|activity_entity|int $parent_activity
      * @param string $class_key
-     * @param boolean $active
+     * @param boolean $active If not specified, defaults to the default value.
      * @return self
      */
-    public static function create($parent_activity, string $class_key, bool $active = false): self {
+    public static function create($parent_activity, string $class_key, bool $active = null): self {
         if (is_object($parent_activity)) {
             $parent_activity = $parent_activity->id;
         }
@@ -91,7 +91,7 @@ class notification extends model {
         $entity = new notification_entity();
         $entity->activity_id = $parent_activity;
         $entity->class_key = $class_key;
-        $entity->active = $active;
+        $entity->active = $active ?? factory::create_loader()->is_active_by_default($class_key);
         $entity->triggers = json_encode($broker->get_default_triggers(), JSON_UNESCAPED_SLASHES);
         $entity->save();
         return new self($entity);
