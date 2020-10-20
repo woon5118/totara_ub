@@ -68,8 +68,8 @@ export function hasString(key, component) {
 /**
  * Filter specified language strings to those which are not loaded.
  *
- * @param {array} requests Array of format [{ component: 'foo', key: 'bar' }]
- * @return {array}
+ * @param {Array<{key: string, component: string}>} requests
+ * @return {Array<{key: string, component: string}>}
  */
 export function unloadedStrings(requests) {
   return requests.filter(req => !hasString(req.key, req.component));
@@ -78,7 +78,7 @@ export function unloadedStrings(requests) {
 /**
  * Load all of the specified strings so that they are available to use.
  *
- * @param {array} requests Array of format [{ component: 'foo', key: 'bar' }]
+ * @param {Array<{key: string, component: string}>} requests
  */
 export async function loadStrings(requests) {
   if (requests.length === 0) {
@@ -193,7 +193,7 @@ export async function loadLangStrings(strings) {
 /**
  * Convert language string request to vue requirements format.
  *
- * @param {Array<{ component: 'foo', key: 'bar' }|LangString>} strings
+ * @param {Array<{ component: string, key: string }|LangString>} strings
  * @returns {object}
  */
 export function toVueRequirements(strings) {

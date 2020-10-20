@@ -29,3 +29,16 @@ export function plainWrapperArray(wrapperArray) {
   }
   return arr;
 }
+
+/**
+ * Return a thenable resolving when all microtasks have been flushed.
+ *
+ * @returns {PromiseLike}
+ */
+export function flushMicrotasks() {
+  return {
+    then(resolve) {
+      require('timers').setImmediate(resolve);
+    },
+  };
+}

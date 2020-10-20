@@ -98,13 +98,17 @@ import {
 } from 'tui/date';
 import { getTimeZoneKeyStrings } from 'tui/time';
 import { config } from 'tui/config';
-import { loadLangStrings } from 'tui/i18n';
+import { loadLangStrings, toVueRequirements } from 'tui/i18n';
+
+const optionsMonths = getMonthStringsSelectArray();
 
 export default {
   components: {
     Label,
     Select,
   },
+
+  langStrings: toVueRequirements(optionsMonths.map(x => x.label)),
 
   props: {
     initialCurrentDate: Boolean,
@@ -234,13 +238,9 @@ export default {
   methods: {
     /**
      * Get month keys & strings array for select options
-     *
      */
-    async getMonths() {
-      let months = getMonthStringsSelectArray();
-      await loadLangStrings(months.map(x => x.label));
-      months.map(x => x.label.toString());
-      this.optionsMonths = months;
+    getMonths() {
+      this.optionsMonths = optionsMonths;
     },
 
     /**
@@ -257,18 +257,16 @@ export default {
      *
      */
     async getTimezones() {
-      let zones = getTimeZoneKeyStrings();
-      let that = this;
-      const serverTimeZone = config.timezone.server;
-
+      const zones = getTimeZoneKeyStrings();
+      const serverTimezone = config.timezone.server;
       await loadLangStrings(zones.map(x => x.label));
-      zones.map(function(zone) {
+      this.optionsTimezones = zones.map(zone => {
         let label = zone.label.toString();
-        zone.label =
-          label === serverTimeZone ? that.getServerTimezone(label) : label;
-        return zone;
+        return Object.assign({}, zone, {
+          label:
+            label === serverTimezone ? this.getServerTimezone(label) : label,
+        });
       });
-      this.optionsTimezones = zones;
     },
 
     /**

@@ -23,22 +23,27 @@ const STATE_WAITING = 1;
 const STATE_EXECUTING = 2;
 
 /**
- * Queue requests to be loaded, but only execute one batch at once
- * (next batch must wait until the first has completed).
+ * Queue requests to be loaded.
+ *
+ * Pass the "serial" flag to only execute one batch at a time
+ * (next batch must wait until the previous has completed).
  *
  * @internal
  */
-export default class BatchingSerialLoadQueue {
+export default class BatchingQueue {
   /**
    * @param {object} options
-   * @param {function} options.handler
+   * @param {(queue: any[]) => Promise} options.handler Load items.
    * @param {number} [options.wait=0]
    * @param {function} [options.equals]
+   * @param {boolean} [options.serial] Wait until the previous batch has
+   *   completed before executing the next.
    */
-  constructor({ handler, wait = 0, equals }) {
+  constructor({ handler, wait = 0, equals, serial = false }) {
     this._handler = handler;
     this._wait = wait;
-    this._equals = equals || ((a, b) => a == b);
+    this._equals = equals || ((a, b) => a === b);
+    this._serial = serial;
 
     // requests in queue
     this._queuedRequests = [];
@@ -54,20 +59,25 @@ export default class BatchingSerialLoadQueue {
    * @param {array} requests
    * @returns {Promise}
    */
-  enqueue(requests) {
+  enqueueMany(requests) {
+    if (!Array.isArray(requests)) {
+      throw new TypeError('requests');
+    }
     return new Promise((resolve, reject) => {
-      if (Array.isArray(requests)) {
-        requests.forEach(x => {
-          if (!this.contains(x)) {
-            this._queuedRequests.push(x);
-          }
-        });
-      }
+      requests.forEach(x => {
+        if (!this.contains(x)) {
+          this._queuedRequests.push(x);
+        }
+      });
 
       this._queuedCallbacks.push([resolve, reject]);
 
       this._checkRunner();
     });
+  }
+
+  enqueue(request) {
+    return this.enqueueMany([request]);
   }
 
   /**
@@ -98,19 +108,46 @@ export default class BatchingSerialLoadQueue {
    * Drain and process queue.
    */
   _runQueue() {
-    this.state = STATE_EXECUTING;
+    if (this._serial) {
+      this.state = STATE_EXECUTING;
+    } else {
+      this.state = STATE_IDLE;
+    }
     const queue = this._queuedRequests;
     this._queuedRequests = [];
     const callbacks = this._queuedCallbacks;
     this._queuedCallbacks = [];
-    Promise.resolve(this._handler(queue))
+
+    this._executeHandler(queue)
       .then(
         r => callbacks.forEach(x => x[0](r)),
         r => callbacks.forEach(x => x[1](r))
       )
       .then(() => {
-        this.state = STATE_IDLE;
+        if (this._serial) {
+          this.state = STATE_IDLE;
+        }
         this._checkRunner();
       });
+  }
+
+  /**
+   * Execute handler with queued items.
+   *
+   * Handler will return a promise that resolves when the data has been loaded.
+   *
+   * Exactly how this happens is up to the handler, but all waiting requests will recieve the same data.
+   *
+   * @param {array} queue
+   * @returns {Promise}
+   */
+  _executeHandler(queue) {
+    // Use a try-catch here rather than `new Promise` so that handler is called immediately.
+    // (makes unit tests simpler)
+    try {
+      return Promise.resolve(this._handler(queue));
+    } catch (e) {
+      return Promise.reject(e);
+    }
   }
 }

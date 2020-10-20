@@ -20,6 +20,7 @@ import { cacheGet, cacheSet } from './persistent_cache';
 import apollo from '../apollo_client';
 import langStringQuery from 'core/graphql/lang_strings_nosession';
 import { config } from '../config';
+import BatchingLoadQueue from './BatchingLoadQueue';
 
 const loadedStrings = {};
 const loadingPromises = {};
@@ -62,9 +63,41 @@ function setString(key, comp, value) {
 }
 
 /**
+ * Load language strings from server.
+ *
+ * @param {Array<{key: string, component: string}>} needed
+ */
+function loadStringsFromServer(needed) {
+  const lang = config.locale.language;
+
+  return apollo
+    .query({
+      query: langStringQuery,
+      variables: {
+        lang,
+        ids: needed.map(x => `${x.key}, ${x.component}`),
+      },
+      fetchPolicy: 'no-cache',
+    })
+    .then(result => {
+      result.data.lang_strings.forEach(item => {
+        setString(item.identifier, item.component, item.string);
+      });
+    });
+}
+
+const serverQueue = new BatchingLoadQueue({
+  wait: 10,
+  equals: (a, b) => a === b || (a.component == b.component && a.key == b.key),
+  handler: reqs => loadStringsFromServer(reqs),
+});
+
+/**
  * Load all of the specified strings so that they are available to use.
  *
- * @param {array} requests Array of format [{ component: 'foo', key: 'bar' }]
+ * They will be loaded either from the cache or from the server.
+ *
+ * @param {Array<{key: string, component: string}>} reqs
  */
 export function loadStrings(reqs) {
   const waitingFor = [];
@@ -93,21 +126,7 @@ export function loadStrings(reqs) {
   });
 
   if (needed.length > 0) {
-    const promise = apollo
-      .query({
-        query: langStringQuery,
-        variables: {
-          lang,
-          ids: needed.map(x => `${x.key}, ${x.component}`),
-        },
-        fetchPolicy: 'no-cache',
-      })
-      .then(result => {
-        result.data.lang_strings.forEach(item => {
-          setString(item.identifier, item.component, item.string);
-        });
-      });
-    waitingFor.push(promise);
+    waitingFor.push(serverQueue.enqueueMany(needed));
   }
 
   return Promise.all(waitingFor);

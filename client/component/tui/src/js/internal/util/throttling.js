@@ -45,7 +45,6 @@ import ArrayKeyedMap from './ArrayKeyedMap';
  * more visual explanation of leading and trailing calls and the difference
  * between debouncing and throttling.
  *
- * @private
  * @param {function} fn Function to call.
  * @param {number} wait Miliseconds to wait.
  * @param {object} [options]
@@ -91,7 +90,6 @@ export function throttle(fn, wait, options) {
  * more visual explanation of leading and trailing calls and the difference
  * between debouncing and throttling.
  *
- * @private
  * @param {function} fn Function to call.
  * @param {number} wait Miliseconds to wait.
  * @param {object} [options]

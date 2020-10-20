@@ -20,7 +20,7 @@ import apollo from '../apollo_client';
 import bundleQuery from 'totara_tui/graphql/bundles_nosession';
 import { config } from '../config';
 import pending from '../pending';
-import BatchingSerialLoadQueue from './BatchingSerialLoadQueue';
+import BatchingLoadQueue from './BatchingLoadQueue';
 
 /**
  * Possible states for a bundle
@@ -44,9 +44,10 @@ const BundleStatus = {
 export default class BundleLoader {
   constructor() {
     this._componentBundleStatus = {};
-    this._queue = new BatchingSerialLoadQueue({
+    this._queue = new BatchingLoadQueue({
       handler: this._loadBundles.bind(this),
       wait: 10,
+      serial: true,
     });
   }
 
@@ -99,7 +100,7 @@ export default class BundleLoader {
     if (tuiComponents.every(x => this.isComponentLoaded(x))) {
       return Promise.resolve();
     }
-    const result = await this._queue.enqueue(tuiComponents);
+    const result = await this._queue.enqueueMany(tuiComponents);
 
     result.forEach(bundleResult => {
       if (

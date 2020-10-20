@@ -30,7 +30,7 @@ import { set as vueSet } from 'tui/vue_util';
 import { isLangString, loadLangStrings, isRtl } from 'tui/i18n';
 import { getDocumentPosition } from 'tui/dom/position';
 import { getTabbableElements } from 'tui/dom/focus';
-import BatchingSerialLoadQueue from '../../js/internal/BatchingSerialLoadQueue';
+import BatchingLoadQueue from '../../js/internal/BatchingLoadQueue';
 
 /**
  * Check if two arrays are shallowly == (all of their items are ==)
@@ -175,10 +175,11 @@ export default {
   },
 
   created() {
-    this.validationQueue = new BatchingSerialLoadQueue({
+    this.validationQueue = new BatchingLoadQueue({
       handler: this.$_validateInternal,
       wait: 10,
       equal: arrayEqual,
+      serial: true,
     });
   },
 
@@ -498,7 +499,7 @@ export default {
      * @returns {Promise}
      */
     $_validate(path = null) {
-      return this.validationQueue.enqueue([path]);
+      return this.validationQueue.enqueue(path);
     },
 
     /**
