@@ -32,9 +32,10 @@ const props = {
   currentUserId: 111,
   about: 'self',
   viewUrl: 'some string',
+  printUrl: 'some other string',
 };
 
-describe('components/user_activities/list/Activities.vue', () => {
+describe('Activities', () => {
   it('Checks status aggregation for multiple participant instances in getYourProgressText method', () => {
     const wrapper = shallowMount(component, {
       mocks: mocks,

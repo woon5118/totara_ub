@@ -16,4 +16,12 @@
  * @module tui
  */
 
-export default {};
+export default {
+  asyncComponent() {
+    return () => ({
+      component: Promise.resolve({
+        render: h => h('div', {}, 'async'),
+      }),
+    });
+  },
+};

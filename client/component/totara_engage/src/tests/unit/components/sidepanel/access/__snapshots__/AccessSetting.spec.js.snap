@@ -1,27 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`totara_engage/components/sidepanel/access/AccessSeting.vue Checks snapshot 1`] = `
+exports[`AccessSetting Checks snapshot 1`] = `
 <div
   class="tui-accessSetting"
 >
-  <modalpresenter-stub>
-    <accessmodal-stub
-      component="test_component"
-      itemid="1"
-      privatedisabled="true"
-      restricteddisabled="true"
-      selectedaccess="PUBLIC"
-      selectedoptions="[object Object]"
-    />
-  </modalpresenter-stub>
+  <!---->
    
-  <modalpresenter-stub>
-    <engageprivacywarningmodal-stub
-      closebutton="true"
-      size="normal"
-      title="privacywarningtitle-totara_playlist"
-    />
-  </modalpresenter-stub>
+  <!---->
    
   <accessdisplay-stub
     accessvalue="PUBLIC"

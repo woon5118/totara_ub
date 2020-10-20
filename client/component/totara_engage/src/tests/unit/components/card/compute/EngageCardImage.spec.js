@@ -19,7 +19,7 @@
 import { shallowMount } from '@vue/test-utils';
 import EngageCardImage from 'totara_engage/components/card/compute/EngageCardImage';
 
-describe('totara_engage/components/card/compute/EngageCardImage.vue', () => {
+describe('EngageCardImage', () => {
   let wrapper = null;
 
   beforeAll(() => {

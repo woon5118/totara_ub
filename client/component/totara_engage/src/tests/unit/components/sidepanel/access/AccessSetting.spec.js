@@ -20,7 +20,7 @@ import AccessSetting from 'totara_engage/components/sidepanel/access/AccessSetti
 import { shallowMount } from '@vue/test-utils';
 import { AccessManager } from 'totara_engage/index';
 
-describe('totara_engage/components/sidepanel/access/AccessSeting.vue', () => {
+describe('AccessSetting', () => {
   let wrapper;
 
   beforeAll(() => {
@@ -34,10 +34,8 @@ describe('totara_engage/components/sidepanel/access/AccessSeting.vue', () => {
         timeView: null,
       },
 
-      mocks: {
-        $str(x, y) {
-          return `${x}-${y}`;
-        },
+      stubs: {
+        ModalPresenter: { render: () => null },
       },
     });
   });
