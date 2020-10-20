@@ -100,6 +100,8 @@ final class update implements mutation_resolver, has_middleware {
                     "Article content is empty"
                 );
             }
+
+            $article_data['content'] = $content;
         }
 
         $article->update($article_data, $USER->id);
