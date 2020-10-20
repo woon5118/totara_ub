@@ -208,7 +208,7 @@ final class manager {
             // Not an actor, time to check for capability.
             $context = $this->workspace->get_context();
 
-            if (!has_capability('container/workspace:invite', $context, $actor_id)) {
+            if (!has_capability('container/workspace:addmember', $context, $actor_id)) {
                 throw enrol_exception::on_manual_enrol();
             }
         }

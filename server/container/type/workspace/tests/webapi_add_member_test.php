@@ -22,6 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use container_workspace\exception\enrol_exception;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use container_workspace\member\member;
 
@@ -253,6 +254,36 @@ class container_workspace_webapi_add_member_testcase extends advanced_testcase {
             [
                 'workspace_id' => $workspace->get_id(),
                 'user_ids' => [$user_two->id]
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_add_member_by_non_owner(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        // Add a member to this workspace.
+        $user_two = $generator->create_user();
+        member::added_to_workspace($workspace, $user_two->id);
+
+        $this->setUser($user_two);
+        $this->expectException(enrol_exception::class);
+
+        $user_three = $generator->create_user();
+        $this->resolve_graphql_mutation(
+            'container_workspace_add_members',
+            [
+                'workspace_id' => $workspace->get_id(),
+                'user_ids' => [$user_three->id]
             ]
         );
     }
