@@ -42,32 +42,28 @@
       <!-- /small -->
       <div v-if="slotProps.currentBoundaryName === 'medium'">
         <Grid direction="horizontal">
-          <GridItem :units="9" :order="2">
+          <GridItem :units="3">
+            <slot name="left" :units="3" :direction="'horizontal'" />
+          </GridItem>
+          <GridItem :units="9">
             <h3 class="tui-layoutTwoColumn__heading">
               <slot name="page-title" />
             </h3>
-            <!-- first in DOM order for screenreaders, re-ordered visually to be
-                in the center with flexbox order -->
             <slot name="right" :units="9" :direction="'horizontal'" />
-          </GridItem>
-          <GridItem :units="3" :order="1">
-            <slot name="left" :units="3" :direction="'horizontal'" />
           </GridItem>
         </Grid>
       </div>
       <!-- /medium -->
       <div v-if="slotProps.currentBoundaryName === 'large'">
         <Grid direction="horizontal">
-          <GridItem :units="10" :order="2">
+          <GridItem :units="2">
+            <slot name="left" :units="2" :direction="'horizontal'" />
+          </GridItem>
+          <GridItem :units="10">
             <h3 class="tui-layoutTwoColumn__heading">
               <slot name="page-title" />
             </h3>
-            <!-- first in DOM order for screenreaders, re-ordered visually to be
-                in the center with flexbox order -->
             <slot name="right" :units="10" :direction="'horizontal'" />
-          </GridItem>
-          <GridItem :units="2" :order="1">
-            <slot name="left" :units="2" :direction="'horizontal'" />
           </GridItem>
         </Grid>
       </div>
