@@ -340,6 +340,47 @@ class behat_totara_form extends behat_base {
     }
 
     /**
+     * Waits for the form field with the given label to exist.
+     *
+     * This is a workaround that should only be necessary on pages where we cannot rely on pending_js.
+     *
+     * @When /^I wait for "([^"]+)" Totara form field to be ready$/
+     * @param string $label_text
+     * @return void
+     */
+    public function i_wait_for_totara_form_field_to_be_ready(string $label_text): void {
+        behat_hooks::set_step_readonly(true);
+        $this->execute(
+            'behat_general::wait_until_exists',
+            [$this->get_field_xpath_for_label($label_text), 'xpath_element']
+        );
+    }
+
+    /**
+     * Assert that a form field doesn't exist. Waits for it to disappear if it's still there.
+     *
+     * @Then /^"([^"]+)" Totara form field should not exist$/
+     * @param string $label_text
+     * @return void
+     */
+    public function totara_form_field_should_not_exist(string $label_text): void {
+        behat_hooks::set_step_readonly(true);
+        $this->execute(
+            'behat_general::wait_until_does_not_exists',
+            [$this->get_field_xpath_for_label($label_text), 'xpath_element']
+        );
+    }
+
+    /**
+     * @param string $label_text
+     * @return string
+     */
+    protected function get_field_xpath_for_label(string $label_text): string {
+        return "//form[@data-totara-form]"
+            . "//*[label[text()='{$label_text}' and contains(concat(' ', normalize-space(@class), ' '), ' legend ')]]";
+    }
+
+    /**
      * Exposes the running_javascript method.
      *
      * @return bool

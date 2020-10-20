@@ -55,7 +55,7 @@ Feature: Completion reaggregation in course completion editor
     When I switch to "Criteria and Activities" tab
     And I click on "Edit" "link" in the "Test assignment" "table_row"
     And I set the field "Activity status" to "Completed (achieved pass grade)"
-    And I wait for Activity time completed form field to be ready
+    And I wait for "Activity time completed" Totara form field to be ready
     And I set the "Activity time completed" Totara form field to "2001-02-03 04:05"
     And I set the field "View" to "1"
     And I press "Save changes"
@@ -75,7 +75,7 @@ Feature: Completion reaggregation in course completion editor
     When I switch to "Criteria and Activities" tab
     And I click on "Edit" "link" in the "Test assignment 1-A" "table_row"
     And I set the field "Activity status" to "Completed (achieved pass grade)"
-    And I wait for Activity time completed form field to be ready
+    And I wait for "Activity time completed" Totara form field to be ready
     And I set the "Activity time completed" Totara form field to "2001-02-03 04:05"
     And I set the field "View" to "1"
     And I press "Save changes"
@@ -94,7 +94,7 @@ Feature: Completion reaggregation in course completion editor
     When I switch to "Criteria and Activities" tab
     And I click on "Edit" "link" in the "Test assignment 1-B" "table_row"
     And I set the field "Activity status" to "Completed (achieved pass grade)"
-    And I wait for Activity time completed form field to be ready
+    And I wait for "Activity time completed" Totara form field to be ready
     And I set the "Activity time completed" Totara form field to "2009-08-07 06:05"
     And I set the field "View" to "1"
     And I press "Save changes"
@@ -113,7 +113,7 @@ Feature: Completion reaggregation in course completion editor
     When I switch to "Criteria and Activities" tab
     And I click on "Edit" "link" in the "Test assignment 1-C" "table_row"
     And I set the field "Activity status" to "Completed"
-    And I wait for Activity time completed form field to be ready
+    And I wait for "Activity time completed" Totara form field to be ready
     And I set the "Activity time completed" Totara form field to "2012-03-04 05:06"
     And I set the field "View" to "1"
     And I press "Save changes"

@@ -29,7 +29,7 @@ Feature: The current course completion record can be edited
     And the field "Course completion status" matches value "Not yet started"
     And "Time started" "field" should not exist
     And "Time completed" "field" should not exist
-    And "RPL" "field" should not exist
+    And "RPL" Totara form field should not exist
     And "RPL Grade" "field" should not exist
     And the "Course completion status" "field" should be disabled
     And I should see "Course completion criteria"
@@ -46,7 +46,7 @@ Feature: The current course completion record can be edited
     Then the field "Course completion status" matches value "Not yet started"
     And "Time started" "field" should not exist
     And "Time completed" "field" should not exist
-    And "RPL" "field" should not exist
+    And "RPL" Totara form field should not exist
     And "RPL Grade" "field" should not exist
 
     # Cancel editing current completion..
@@ -61,7 +61,7 @@ Feature: The current course completion record can be edited
     Then the field "Course completion status" matches value "Not yet started"
     And "Time started" "field" should not exist
     And "Time completed" "field" should not exist
-    And "RPL" "field" should not exist
+    And "RPL" Totara form field should not exist
     And "RPL Grade" "field" should not exist
 
     # Save "Complete via rpl" (sets data in all fields).
@@ -96,6 +96,7 @@ Feature: The current course completion record can be edited
 
     # Save "Complete" (removes the two RPL fields).
     And I set the "Course completion status" Totara form field to "Complete"
+    And I wait for "Time completed" Totara form field to be ready
     And I set the following Totara form fields to these values:
       | Time started   |                  |
       | Time completed | 2022-01-02 01:23 |
@@ -106,7 +107,7 @@ Feature: The current course completion record can be edited
     And the field "Course completion status" matches value "Complete"
     And the field "Time started" matches value ""
     And the field "Time completed" matches value "2022-01-02T01:23:00"
-    And "RPL" "field" should not exist
+    And "RPL" Totara form field should not exist
     And "RPL Grade (%)" "field" should not exist
     And the "Course completion status" "field" should be disabled
     And the "Time started" "field" should be disabled
@@ -115,7 +116,7 @@ Feature: The current course completion record can be edited
     Then the field "Course completion status" matches value "Complete"
     And the field "Time started" matches value ""
     And the field "Time completed" matches value "2022-01-02T01:23:00"
-    And "RPL" "field" should not exist
+    And "RPL" Totara form field should not exist
     And "RPL Grade (%)" "field" should not exist
 
     # Save "In progress" (removes the time completed field).
@@ -129,7 +130,7 @@ Feature: The current course completion record can be edited
     And the field "Course completion status" matches value "In progress"
     And the field "Time started" matches value "2012-05-06T07:19:00"
     And "Time completed" "field" should not exist
-    And "RPL" "field" should not exist
+    And "RPL" Totara form field should not exist
     And "RPL Grade (%)" "field" should not exist
     And the "Course completion status" "field" should be disabled
     And the "Time started" "field" should be disabled
@@ -137,7 +138,7 @@ Feature: The current course completion record can be edited
     And the field "Course completion status" matches value "In progress"
     And the field "Time started" matches value "2012-05-06T07:19:00"
     And "Time completed" "field" should not exist
-    And "RPL" "field" should not exist
+    And "RPL" Totara form field should not exist
     And "RPL Grade (%)" "field" should not exist
 
     # Save "Not yet started" (removes the time started field).
@@ -149,14 +150,14 @@ Feature: The current course completion record can be edited
     And the field "Course completion status" matches value "Not yet started"
     And "Time started" "field" should not exist
     And "Time completed" "field" should not exist
-    And "RPL" "field" should not exist
+    And "RPL" Totara form field should not exist
     And "RPL Grade (%)" "field" should not exist
     And the "Course completion status" "field" should be disabled
     When I switch to "Current completion" tab
     Then the field "Course completion status" matches value "Not yet started"
     And "Time started" "field" should not exist
     And "Time completed" "field" should not exist
-    And "RPL" "field" should not exist
+    And "RPL" Totara form field should not exist
     And "RPL Grade (%)" "field" should not exist
 
   Scenario: The current course completion record cannot be edited when the user is not assigned

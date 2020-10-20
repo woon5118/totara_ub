@@ -325,6 +325,34 @@ class behat_deprecated extends behat_base {
     }
 
     /**
+     * Waits for the "Activity time completed" form field to exist.
+     *
+     * @When /^I wait for Activity time completed form field to be ready$/
+     * @deprecated since Totara 13.8
+     * @return void
+     */
+    public function i_wait_for_activity_time_completed_form_field_to_be_ready(): void {
+        $alternative = 'I wait for "Activity time completed" Totara form field to be ready';
+        $this->deprecated_message($alternative);
+
+        $this->execute("behat_totara_form::i_wait_for_totara_form_field_to_be_ready", 'Activity time completed');
+    }
+
+    /**
+     * Waits for the "Activity time completed" form field to disappear.
+     *
+     * @Then /^Activity time completed field should not exist$/
+     * @deprecated since Totara 13.8
+     * @return void
+     */
+    public function activity_time_completed_field_should_not_exist(): void {
+        $alternative = '"Activity time completed" Totara form field should not exist';
+        $this->deprecated_message($alternative);
+
+        $this->execute("behat_totara_form::totara_form_field_should_not_exist", 'Activity time completed');
+    }
+
+    /**
      * Throws an exception if $CFG->behat_usedeprecated is not allowed.
      *
      * @throws Exception

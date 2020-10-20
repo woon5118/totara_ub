@@ -51,12 +51,12 @@ Feature: Activity completion records can be edited
     When I follow "Edit"
     Then the field "Viewed" matches value "0"
     And the field "Activity status" matches value "Not completed"
-    And Activity time completed field should not exist
+    And "Activity time completed" Totara form field should not exist
 
     # Create course_modules_completion record.
     When I set the field "Viewed" to "1"
     And I set the "Activity status" Totara form field to "Completed"
-    And I wait for Activity time completed form field to be ready
+    And I wait for "Activity time completed" Totara form field to be ready
     And I set the "Activity time completed" Totara form field to "2011-02-03 04:56"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -94,7 +94,7 @@ Feature: Activity completion records can be edited
     # Update course_modules_completion record.
     When I set the field "Viewed" to "0"
     And I set the "Activity status" Totara form field to "Completed (did not achieve pass grade)"
-    And I wait for Activity time completed form field to be ready
+    And I wait for "Activity time completed" Totara form field to be ready
     And I set the "Activity time completed" Totara form field to "2027-07-08 16:34"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -139,12 +139,12 @@ Feature: Activity completion records can be edited
     When I follow "Edit"
     Then the field "Viewed" matches value "0"
     And the field "Activity status" matches value "Not completed"
-    And Activity time completed field should not exist
+    And "Activity time completed" Totara form field should not exist
 
     # Create course_modules_completion record.
     When I set the field "Viewed" to "1"
     And I set the "Activity status" Totara form field to "Completed (achieved pass grade)"
-    And I wait for Activity time completed form field to be ready
+    And I wait for "Activity time completed" Totara form field to be ready
     And I set the "Activity time completed" Totara form field to "2011-02-03 04:56"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -164,7 +164,7 @@ Feature: Activity completion records can be edited
     # Edit course_modules_completion record.
     When I set the field "Viewed" to "0"
     And I set the "Activity status" Totara form field to "Completed (did not achieve pass grade)"
-    And I wait for Activity time completed form field to be ready
+    And I wait for "Activity time completed" Totara form field to be ready
     And I set the "Activity time completed" Totara form field to "2027-07-08 16:34"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -202,12 +202,12 @@ Feature: Activity completion records can be edited
     When I follow "Edit"
     Then the field "Viewed" matches value "0"
     And the field "Activity status" matches value "Not completed"
-    And Activity time completed field should not exist
+    And "Activity time completed" Totara form field should not exist
 
     # Create course_modules_completion record.
     When I set the field "Viewed" to "1"
     When I set the "Activity status" Totara form field to "Completed"
-    And I wait for Activity time completed form field to be ready
+    And I wait for "Activity time completed" Totara form field to be ready
     And I set the "Activity time completed" Totara form field to "2011-02-03 04:56"
     And I press "Save changes"
     Then I should see "Changing the completion record may lead to changes in course completions"
@@ -241,4 +241,4 @@ Feature: Activity completion records can be edited
     And I follow "Edit"
     Then the field "Viewed" matches value "0"
     And the field "Activity status" matches value "Not completed"
-    And Activity time completed field should not exist
+    And "Activity time completed" Totara form field should not exist
