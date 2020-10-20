@@ -37,3 +37,15 @@ config.mocks.$str = (key, comp, a) =>
 
 config.mocks.uid = 'id';
 config.mocks.$id = x => (x ? 'id-' + x : 'id');
+
+const upperFirst = str => str.slice(0, 1).toUpperCase() + str.slice(1);
+
+// throw an error if output is printed to the console
+['log', 'warn', 'error'].forEach(method => {
+  const original = global.console[method];
+  global.console['debug' + upperFirst(method)] = original;
+  global.console[method] = (...args) => {
+    original(...args);
+    throw new Error('Console output triggered');
+  };
+});

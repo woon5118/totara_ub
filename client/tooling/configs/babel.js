@@ -16,6 +16,8 @@
  * @module totara_core
  */
 
+require('../lib/environment_patch');
+
 module.exports = {
   legacy: {
     presets: ['@babel/preset-env'],
