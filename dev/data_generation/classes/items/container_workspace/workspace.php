@@ -35,7 +35,7 @@ final class workspace extends item {
         $faker = App::faker();
 
         return [
-            'name' => $faker->sentence(7),
+            'name' => $faker->text(60),
             'description' => json_encode([
                 'type' => 'doc',
                 'content' => [
