@@ -24,15 +24,11 @@
 namespace mod_perform\notification;
 
 use coding_exception;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\models\activity\activity as activity_model;
-use mod_perform\models\activity\participant_instance as participant_instance_model;
-use mod_perform\models\activity\details\subject_instance_notification;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\notification\internals\sink;
-use mod_perform\task\service\participant_instance_dto;
 
 /**
  * factory class
@@ -67,7 +63,7 @@ abstract class factory {
      * @return trigger
      */
     public static function create_trigger(notification_model $notification): trigger {
-        return new trigger($notification->get_class_key());
+        return new trigger($notification->class_key);
     }
 
     /**
@@ -78,7 +74,7 @@ abstract class factory {
      * @throws coding_exception
      */
     public static function create_condition(notification_model $notification): condition {
-        $class_key = $notification->get_class_key();
+        $class_key = $notification->class_key;
         $condition_class = self::create_loader()->get_condition_class_of($class_key);
         if ($condition_class === null) {
             throw new coding_exception('condition is not supported for '. $class_key);

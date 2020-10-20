@@ -25,6 +25,7 @@
 use mod_perform\constants;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
+use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
@@ -36,76 +37,110 @@ class mod_perform_notification_recipient_model_testcase extends mod_perform_noti
     public function test_create_standard() {
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
-        $notification = notification::create($activity, 'instance_created');
+        $notification = notification::load_by_activity_and_class_key($activity, 'instance_created');
         $relationships = $this->create_section_relationships($section);
-        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_SUBJECT], false);
-        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_APPRAISER], true);
-        $this->assertFalse($notification->recipients->find('relationship_id', $relationships[constants::RELATIONSHIP_SUBJECT]->id)->active);
-        $this->assertTrue($notification->recipients->find('relationship_id', $relationships[constants::RELATIONSHIP_APPRAISER]->id)->active);
-        $this->assertFalse($notification->recipients->find('relationship_id', $relationships[constants::RELATIONSHIP_MANAGER]->id)->active);
+        $this->assertFalse(
+            $notification->recipients->find('core_relationship_id', $relationships[constants::RELATIONSHIP_SUBJECT]->id)->active
+        );
+        $this->assertFalse(
+            $notification->recipients->find('core_relationship_id', $relationships[constants::RELATIONSHIP_APPRAISER]->id)->active
+        );
+        $this->assertFalse(
+            $notification->recipients->find('core_relationship_id', $relationships[constants::RELATIONSHIP_MANAGER]->id)->active
+        );
     }
 
     public function test_create_manual() {
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
-        $notification = notification::create($activity, 'participant_selection');
+        $notification = notification::load_by_activity_and_class_key($activity, 'participant_selection');
         $manuals = [constants::RELATIONSHIP_PEER, constants::RELATIONSHIP_MENTOR, constants::RELATIONSHIP_REVIEWER];
         $relationships = $this->create_section_relationships($section, array_merge($manuals, $this->get_default_relationships_for_testing()));
-        foreach ($manuals as $idnumber) {
-            try {
-                notification_recipient::create($notification, $relationships[$idnumber]);
-                $this->fail('invalid_parameter_exception expected');
-            } catch (invalid_parameter_exception $ex) {
-                $this->assertStringContainsString($idnumber . ' is unavailable', $ex->getMessage());
-            }
-        }
 
-        $notification = notification::create($activity, 'instance_created_reminder');
+        $notification = notification::load_by_activity_and_class_key($activity, 'instance_created_reminder');
         $manuals = [constants::RELATIONSHIP_PEER, constants::RELATIONSHIP_MENTOR, constants::RELATIONSHIP_REVIEWER];
         $relationships = $this->create_section_relationships($section, array_merge($manuals, $this->get_default_relationships_for_testing()));
-        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_PEER]);
-        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_MENTOR], true);
-        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_REVIEWER], false);
-        $this->assertFalse($notification->recipients->find('relationship_id', $relationships[constants::RELATIONSHIP_PEER]->id)->active);
-        $this->assertTrue($notification->recipients->find('relationship_id', $relationships[constants::RELATIONSHIP_MENTOR]->id)->active);
-        $this->assertFalse($notification->recipients->find('relationship_id', $relationships[constants::RELATIONSHIP_REVIEWER]->id)->active);
+        $this->assertFalse(
+            $notification->recipients->find('core_relationship_id', $relationships[constants::RELATIONSHIP_PEER]->id)->active
+        );
+        $this->assertFalse(
+            $notification->recipients->find('core_relationship_id', $relationships[constants::RELATIONSHIP_MENTOR]->id)->active
+        );
+        $this->assertFalse(
+            $notification->recipients->find('core_relationship_id', $relationships[constants::RELATIONSHIP_REVIEWER]->id)->active
+        );
     }
 
     public function test_load_by_notification_full() {
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
-        $notification = notification::create($activity, 'participant_selection');
+        $notification = notification::load_by_activity_and_class_key($activity, 'due_date');
         $manuals = [constants::RELATIONSHIP_PEER, constants::RELATIONSHIP_MENTOR, constants::RELATIONSHIP_REVIEWER];
         $relationships = $this->create_section_relationships($section, array_merge($manuals, $this->get_default_relationships_for_testing()));
-        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_SUBJECT], false);
-        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_APPRAISER], true);
 
-        $this->assertCount(4, notification_recipient::load_by_notification($notification, false));
+        $notification->recipients->find('core_relationship_id', $relationships[constants::RELATIONSHIP_APPRAISER]->id)->activate();
+
+        $this->assertCount(7, notification_recipient::load_by_notification($notification, false));
         $this->assertCount(1, notification_recipient::load_by_notification($notification, true));
     }
 
     public function test_load_by_notification_partial() {
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
-        $notification = notification::create($activity, 'participant_selection');
+        $notification = notification::load_by_activity_and_class_key($activity, 'due_date');
         $relationships = $this->create_section_relationships(
             $section,
-            [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER, constants::RELATIONSHIP_PEER]
+            [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_PEER]
         );
-        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_SUBJECT], false);
-        notification_recipient::create($notification, $this->get_core_relationship(constants::RELATIONSHIP_MANAGER), true);
-        $this->assertCount(4, notification_recipient::load_by_notification($notification, false));
+        $notification->recipients->find('core_relationship_id', $relationships[constants::RELATIONSHIP_MANAGER]->id)->activate();
+        $this->assertCount(3, notification_recipient::load_by_notification($notification, false));
         $this->assertCount(1, notification_recipient::load_by_notification($notification, true));
 
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
-        $notification = notification::create($activity, 'completion');
-        $relationships = $this->create_section_relationships(
+        $this->create_section_relationships(
             $section,
             [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_EXTERNAL]
         );
-        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_SUBJECT], false);
+        $notification = notification::load_by_activity_and_class_key($activity, 'completion');
         $this->assertCount(1, notification_recipient::load_by_notification($notification, false));
         $this->assertCount(0, notification_recipient::load_by_notification($notification, true));
     }
+
+    public function test_toggle(): void {
+        $activity = $this->create_activity();
+        $section = $this->create_section($activity);
+        $this->create_section_relationships($section, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER]);
+
+        $parent_notification = notification::load_by_activity_and_class_key($activity, 'due_date');
+        /** @var notification_recipient_model $recipient */
+        $recipient = $parent_notification->recipients->first();
+        /** @var notification_recipient_model $other_recipient */
+        $other_recipient = $parent_notification->recipients->last();
+
+        $this->assertFalse($recipient->active);
+        $this->assertFalse($other_recipient->active);
+        $this->assertFalse($parent_notification->active);
+
+        $recipient->toggle(true);
+        $this->assertTrue($recipient->refresh()->active);
+        $this->assertFalse($other_recipient->refresh()->active);
+        $this->assertFalse($parent_notification->refresh()->active);
+
+        $recipient->toggle(false);
+        $this->assertFalse($recipient->refresh()->active);
+        $this->assertFalse($other_recipient->refresh()->active);
+        $this->assertFalse($parent_notification->refresh()->active);
+
+        $recipient->activate();
+        $this->assertTrue($recipient->refresh()->active);
+        $this->assertFalse($other_recipient->refresh()->active);
+        $this->assertFalse($parent_notification->refresh()->active);
+
+        $recipient->deactivate();
+        $this->assertFalse($recipient->refresh()->active);
+        $this->assertFalse($other_recipient->refresh()->active);
+        $this->assertFalse($parent_notification->refresh()->active);
+    }
+
 }

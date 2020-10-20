@@ -36,6 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 
 function xmldb_perform_upgrade($oldversion) {
     global $DB, $CFG;
+    require_once(__DIR__ . '/upgradelib.php');
 
     $dbman = $DB->get_manager();
 
@@ -169,6 +170,23 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020100101, 'perform');
+    }
+
+    if ($oldversion < 2020100102) {
+        // Create records for existing activities that do not already have records for the following notifications:
+        mod_perform_upgrade_create_missing_notification_records([
+            'completion' => [],
+            'due_date' => [],
+            'due_date_reminder' => [86400], // Trigger: 1 day (in seconds)
+            'instance_created' => [],
+            'instance_created_reminder' => [86400], // Trigger: 1 day (in seconds)
+            'overdue_reminder' => [86400], // Trigger: 1 day (in seconds)
+            'participant_selection' => [],
+            'reopened' => [],
+        ]);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020100102, 'perform');
     }
 
     return true;

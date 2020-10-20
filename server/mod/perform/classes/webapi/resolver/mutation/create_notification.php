@@ -36,12 +36,21 @@ use mod_perform\models\activity\notification as notification_model;
 
 /**
  * Handles the "mod_perform_create_notification" GraphQL mutation.
+ *
+ * @deprecated since Totara 13.2
  */
 class create_notification implements mutation_resolver, has_middleware {
     /**
      * {@inheritdoc}
+     * @deprecated since Totara 13.2
      */
     public static function resolve(array $args, execution_context $ec) {
+        debugging(
+            'The GraphQL mutation mod_perform_create_notification is deprecated and should no longer be used. ' .
+            'Notification records are no longer dynamically created and are now created upon the creation of the activity.',
+            DEBUG_DEVELOPER
+        );
+
         // Activity id is verified, and activity is loaded, by middleware.
         /** @var activity $activity */
         $activity = $args['activity'];
@@ -57,9 +66,8 @@ class create_notification implements mutation_resolver, has_middleware {
             throw new \invalid_parameter_exception('class_key not set as part of input');
         }
 
-        // Create notification.
-        $active = $input['active'] ?? false;
-        $notification = notification_model::create($activity, $class_key, $active);
+        // Load the notification - all notifications are created automatically, so creating it here would create an error.
+        $notification = notification_model::load_by_activity_and_class_key($activity, $class_key);
 
         // Build and return result object.
         $result = new \stdClass();
@@ -70,6 +78,7 @@ class create_notification implements mutation_resolver, has_middleware {
 
     /**
      * {@inheritdoc}
+     * @deprecated since Totara 13.2
      */
     public static function get_middleware(): array {
         return [

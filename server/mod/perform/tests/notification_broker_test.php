@@ -23,6 +23,7 @@
  */
 
 use mod_perform\models\activity\details\subject_instance_notification;
+use mod_perform\models\activity\notification;
 use mod_perform\notification\broker;
 use mod_perform\notification\brokers\due_date;
 use mod_perform\notification\brokers\due_date_reminder;
@@ -116,8 +117,8 @@ class mod_perform_notification_broker_testcase extends mod_perform_notification_
         ]);
 
         $activity = $this->create_activity();
-        $notification1 = $this->create_notification($activity, 'mock_no_triggerable', true);
-        $notification2 = $this->create_notification($activity, 'mock_triggerable', true);
+        $notification1 = notification::load_by_activity_and_class_key($activity, 'mock_no_triggerable')->activate();
+        $notification2 = notification::load_by_activity_and_class_key($activity, 'mock_triggerable')->activate();
         $this->assertEquals([3, 1, 4], $notification1->get_triggers());
         $this->assertEquals([259200, 86400, 345600], $notification1->get_triggers_in_seconds());
         $this->assertEquals([2, 7, 1], $notification2->get_triggers());

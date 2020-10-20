@@ -41,8 +41,8 @@ use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
+use mod_perform\event\activity_created;
 use mod_perform\event\activity_deleted;
-use mod_perform\models\activity\details\notification_real;
 use mod_perform\models\activity\helpers\activity_clone;
 use mod_perform\models\activity\helpers\activity_deletion;
 use mod_perform\models\activity\helpers\activity_multisection_toggler;
@@ -273,6 +273,9 @@ class activity extends model {
 
             $activity = self::load_by_entity($entity);
             $activity->create_default_manual_relationships();
+
+            $created_event = activity_created::create_from_activity($activity);
+            $created_event->trigger();
 
             return $activity;
         });
@@ -743,10 +746,10 @@ class activity extends model {
     /**
      * Get the notifications for this activity.
      *
-     * @return collection|notification_real[]
+     * @return collection|notification[]
      */
     public function get_notifications(): collection {
-        return $this->entity->notifications->map_to(notification_real::class);
+        return $this->entity->notifications->map_to(notification::class);
     }
 
     /**

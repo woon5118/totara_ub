@@ -45,7 +45,7 @@ class mod_perform_webapi_resolver_mutation_toggle_notification_testcase extends 
 
         /** @var activity_model $activity */
         $activity = $perform_generator->create_activity_in_container([]);
-        return notification_model::create($activity, 'instance_created', false);
+        return notification_model::load_by_activity_and_class_key($activity, 'instance_created');
     }
 
     public function data_true_false(): array {

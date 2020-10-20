@@ -77,7 +77,7 @@ class dealer_participant_selection extends dealer {
             /** @var relationship[] $relationships */
             $relationships = [];
             foreach ($recipients as $recipient) {
-                $relationships[$recipient->relationship_id] = $recipient->relationship;
+                $relationships[$recipient->core_relationship_id] = $recipient->relationship;
             }
             foreach ($instance->manual_relationship_selection_progress as $progress) {
                 // Don't send out notification for users who already selected

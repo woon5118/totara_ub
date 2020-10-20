@@ -25,119 +25,59 @@ namespace mod_perform\models\activity;
 
 use coding_exception;
 use core\orm\collection;
+use core\orm\entity\model;
 use core\orm\query\builder;
-use invalid_parameter_exception;
+use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
-use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
 use mod_perform\notification\factory;
 use mod_perform\notification\recipient;
-use stdClass;
 use totara_core\entities\relationship as relationship_entity;
 use totara_core\relationship\relationship;
 
 /**
  * Represents a notification setting recipient.
  *
- * @property integer $id
- * @property integer $relationship_id
- * @property integer $notification_id
- * @property integer|null $recipient_id
- * @property relationship $relationship
- * @property string $name
- * @property boolean $active is active?
+ * @property-read integer $id
+ * @property-read boolean $active is active?
+ * @property-read integer $core_relationship_id
+ * @property-read integer $notification_id
+ * @property-read relationship $relationship
+ * @property-read notification $notification
  */
-class notification_recipient {
-    /** @var integer */
-    private $relationship_id;
-
-    /** @var integer|null */
-    private $notification_id;
-
-    /** @var integer|null */
-    private $recipient_id;
-
-    /** @var boolean */
-    private $active;
+class notification_recipient extends model {
 
     /**
-     * @param notification_recipient_entity|stdClass $object
+     * @var notification_recipient_entity
      */
-    public function __construct($object) {
-        if ($object instanceof notification_recipient_entity) {
-            $this->relationship_id = $object->core_relationship_id;
-            $this->notification_id = $object->notification_id;
-            $this->recipient_id = $object->id;
-            $this->active = $object->active;
-        } else {
-            $this->relationship_id = $object->relationship_id;
-            $this->notification_id = $object->notification_id;
-            $this->recipient_id = $object->recipient_id;
-            $this->active = !empty($object->active);
-        }
-    }
+    protected $entity;
 
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    public function __get(string $name) {
-        $methodname = 'get_'.$name;
-        if (!method_exists($this, $methodname)) {
-            throw new coding_exception('unknown property: '.$name);
-        }
-        return $this->{$methodname}();
-    }
+    protected $entity_attribute_whitelist = [
+        'id',
+        'active',
+        'core_relationship_id',
+        'notification_id',
+    ];
 
-    /**
-     * @param string $name
-     * @return boolean
-     */
-    public function has_attribute(string $name): bool {
-        $methodname = 'get_'.$name;
-        return method_exists($this, $methodname);
-    }
-
-    /**
-     * @return integer
-     */
-    public function get_id(): int {
-        return $this->relationship_id;
-    }
+    protected $model_accessor_whitelist = [
+        'relationship',
+        'notification',
+        'relationship_id',
+        'name',
+    ];
 
     /**
      * @return relationship
      */
     public function get_relationship(): relationship {
-        return relationship::load_by_id($this->relationship_id);
+        return relationship::load_by_entity($this->entity->relationship);
     }
 
     /**
-     * @return integer
+     * @return notification
      */
-    public function get_relationship_id(): int {
-        return $this->relationship_id;
-    }
-
-    /**
-     * @return integer
-     */
-    public function get_notification_id(): int {
-        return $this->notification_id;
-    }
-
-    /**
-     * @return integer|null
-     */
-    public function get_recipient_id(): ?int {
-        return $this->recipient_id;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function get_active(): bool {
-        return $this->active;
+    public function get_notification(): notification {
+        return notification::load_by_entity($this->entity->notification);
     }
 
     /**
@@ -146,7 +86,16 @@ class notification_recipient {
      * @return string
      */
     public function get_name(): string {
-        return $this->get_relationship()->get_name();
+        return $this->relationship->name;
+    }
+
+    /**
+     * Get the ID of the relationship.
+     *
+     * @return string
+     */
+    public function get_relationship_id(): string {
+        return $this->core_relationship_id;
     }
 
     /**
@@ -158,34 +107,51 @@ class notification_recipient {
      * @return self
      */
     public static function create(notification $parent, relationship $relationship, bool $active = false): self {
-        if (!$parent->exists()) {
-            throw new coding_exception('parent record does not exist');
-        }
-        $loader = factory::create_loader();
-        if (!recipient::is_available($loader->get_possible_recipients_of($parent->class_key), $relationship)) {
-            throw new invalid_parameter_exception("{$relationship->idnumber} is unavailable");
-        }
         $entity = new notification_recipient_entity();
-        $entity->notification_id = $parent->get_id();
+        $entity->notification_id = $parent->id;
         $entity->core_relationship_id = $relationship->get_id();
         $entity->active = $active;
         $entity->save();
-        $inst = new self($entity);
-        return $inst;
+
+        return new self($entity);
     }
 
     /**
+     * Toggle the state for this notification recipient.
+     *
      * @param boolean $active
      * @return self
      */
-    public function activate(bool $active): self {
-        if (!$this->recipient_id) {
-            throw new coding_exception('not available; call create() instead');
-        }
-        $entity = notification_recipient_entity::repository()->find_or_fail($this->recipient_id);
-        $entity->active = $active;
-        $entity->save();
+    public function toggle(bool $active): self {
+        $this->entity->active = $active;
+        $this->entity->save();
         return $this;
+    }
+
+    /**
+     * Activate this notification recipient.
+     *
+     * @param boolean $active Deprecated & Unused.
+     * @return static
+     */
+    public function activate(bool $active = true): self {
+        if (!empty(func_get_args())) {
+            debugging(
+                'The $active argument for the function \mod_perform\models\activity\notification_recipient::activate()' .
+                ' is deprecated, please use toggle(), activate() or deactivate() instead.',
+                DEBUG_DEVELOPER
+            );
+        }
+        return $this->toggle($active ?? true);
+    }
+
+    /**
+     * Deactivate this notification recipient.
+     *
+     * @return static
+     */
+    public function deactivate(): self {
+        return $this->toggle(false);
     }
 
     /**
@@ -193,31 +159,89 @@ class notification_recipient {
      *
      * @param notification $parent
      * @param boolean $active_only get only active recipients
-     * @return collection<integer, notification_recipient>
+     * @return collection|notification_recipient[]
      */
     public static function load_by_notification(notification $parent, bool $active_only = false): collection {
-        $loader = factory::create_loader();
-        if ($loader->are_all_possible_recipients($parent->class_key)) {
-            $builder = builder::table(relationship_entity::TABLE, 'r');
-        } else {
-            $builder = builder::table(section_entity::TABLE, 's')
-                ->join([section_relationship_entity::TABLE, 'sr'], 's.id', 'sr.section_id')
-                ->join([relationship_entity::TABLE, 'r'], 'r.id', 'sr.core_relationship_id')
-                ->where('s.activity_id', $parent->activity->id);
-        }
-        $builder
-            ->select(['r.id as relationship_id', 'r.sort_order'])
+        $builder = builder::table(relationship_entity::TABLE)
+            ->as('r')
+            ->select('r.id as core_relationship_id')
             ->group_by(['r.id', 'r.sort_order'])
-            ->order_by('r.sort_order')
-            ->map_to(function ($source) use ($parent) {
-                $source->notification_id = $parent->id;
-                if (empty($source->recipient_id)) {
-                    $source->recipient_id = null;
-                }
-                return new self($source);
-            });
-        recipient::where_available($loader->get_possible_recipients_of($parent->class_key), $builder, 'r');
+            ->order_by('r.sort_order');
+
+        if (!factory::create_loader()->are_all_possible_recipients($parent->class_key)) {
+            $builder
+                ->join([section_relationship_entity::TABLE, 'sr'], 'id', 'core_relationship_id')
+                ->join([section_entity::TABLE, 's'], 'sr.section_id', 'id')
+                ->where('s.activity_id', $parent->activity_id);
+        }
+
+        recipient::where_available(factory::create_loader()->get_possible_recipients_of($parent->class_key), $builder);
         $parent->recipients_builder($builder, $active_only);
-        return $builder->get();
+
+        return $builder
+            ->map_to(notification_recipient_entity::class)
+            ->get()
+            ->map_to(static::class);
     }
+
+    /**
+     * Reload the internal bookkeeping.
+     *
+     * @return static
+     */
+    public function refresh(): self {
+        $this->entity->refresh();
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function get_entity_class(): string {
+        return notification_recipient_entity::class;
+    }
+
+
+
+    /*
+     * Deprecated Methods
+     */
+
+    /**
+     * @param notification_recipient_entity|object $entity
+     */
+    public function __construct($entity) {
+        if (!$entity instanceof notification_recipient_entity) {
+            debugging('A notification_recipient entity must be specified to notification_recipient::__construct', DEBUG_DEVELOPER);
+            $entity = new notification_recipient_entity($entity);
+        }
+        parent::__construct($entity);
+    }
+
+    /**
+     * @return integer
+     * @deprecated since Totara 13.2
+     */
+    public function get_notification_id(): int {
+        debugging(
+            '\mod_perform\models\activity\notification_recipient::get_notification_id()' .
+            ' is deprecated and should no longer be used, please use $notification_recipient->notification_id directly.',
+            DEBUG_DEVELOPER
+        );
+        return $this->notification_id;
+    }
+
+    /**
+     * @return boolean
+     * @deprecated since Totara 13.2
+     */
+    public function get_active(): bool {
+        debugging(
+            '\mod_perform\models\activity\notification_recipient::get_active()' .
+            ' is deprecated and should no longer be used, please use $notification_recipient->active directly.',
+            DEBUG_DEVELOPER
+        );
+        return $this->active;
+    }
+
 }

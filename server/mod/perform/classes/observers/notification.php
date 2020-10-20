@@ -25,10 +25,22 @@ namespace mod_perform\observers;
 
 use core\event\base;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\event\activity_created;
+use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\notification\factory;
 
 class notification {
+
+    /**
+     * Create the default set of notifications for an activity.
+     *
+     * @param activity_created|base $event
+     */
+    public static function create_notifications(base $event): void {
+        notification_model::create_all_for_activity($event->objectid);
+    }
+
     /**
      * @param base $event
      * @return void

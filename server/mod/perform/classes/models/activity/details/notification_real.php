@@ -34,35 +34,54 @@ use mod_perform\models\activity\activity;
 use mod_perform\notification\factory;
 
 /**
- * The internal implementation that represents an existing performance notification setting.
+ * @deprecated since Totara 13.2
  */
 class notification_real extends model implements notification_interface {
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function get_activity(): activity {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.'
+        );
         return activity::load_by_id($this->entity->activity_id);
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function get_class_key(): string {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         return $this->entity->class_key;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function get_active(): bool {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         return $this->entity->active;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function recipients_builder(builder $builder, bool $active_only = false): void {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         $builder
             ->left_join([notification_recipient_entity::TABLE, 'nr'], function (builder $joining) {
                 $joining->where_field('r.id', 'nr.core_relationship_id')
@@ -76,9 +95,14 @@ class notification_real extends model implements notification_interface {
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function get_triggers(): array {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         $triggers = json_decode($this->entity->triggers);
         if (!is_array($triggers)) {
             $triggers = [];
@@ -89,24 +113,38 @@ class notification_real extends model implements notification_interface {
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function get_last_run_at(): int {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         return $this->entity->last_run_at ?? 0;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function exists(): bool {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         return $this->entity->exists();
     }
 
     /**
-     * @param string $name
-     * @return mixed
+     * @deprecated since Totara 13.2
      */
     public function __get(string $name) {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         $methodname = 'get_'.$name;
         if (method_exists($this, $methodname)) {
             return $this->{$methodname}();
@@ -115,10 +153,14 @@ class notification_real extends model implements notification_interface {
     }
 
     /**
-     * @param string $name
-     * @return boolean
+     * @deprecated since Totara 13.2
      */
     public function has_attribute(string $name): bool {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         $methodname = 'get_'.$name;
         if (method_exists($this, $methodname)) {
             return true;
@@ -127,12 +169,14 @@ class notification_real extends model implements notification_interface {
     }
 
     /**
-     * Retrieves notifications by their parent activity.
-     *
-     * @param activity $parent parent activity
-     * @return collection retrieved notifications
+     * @deprecated since Totara 13.2
      */
     public static function load_by_activity(activity $parent): collection {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         return notification_entity::repository()
             ->where('activity_id', $parent->get_id())
             ->get()
@@ -142,14 +186,14 @@ class notification_real extends model implements notification_interface {
     }
 
     /**
-     * Retrieves notifications by their parent activity.
-     *
-     * @param activity $parent parent activity
-     * @param string $class_key
-     * @param boolean $strict set true to throw an exception
-     * @return self|null
+     * @deprecated since Totara 13.2
      */
     public static function load_by_activity_and_class_key(activity $parent, string $class_key, bool $strict = false): ?self {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         $entity = notification_entity::repository()
             ->where('activity_id', $parent->get_id())
             ->where('class_key', $class_key)
@@ -162,27 +206,28 @@ class notification_real extends model implements notification_interface {
     }
 
     /**
-     * Instantiate a class based on an existing notification setting.
-     *
-     * @param integer $notification_id
-     * @return self
-     * @throws record_not_found_exception
+     * @deprecated since Totara 13.2
      */
     public static function load_by_id(int $notification_id): self {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         /** @var notification_entity $entity */
         $entity = notification_entity::repository()->find_or_fail($notification_id);
         return new self($entity);
     }
 
     /**
-     * Create a new notification setting.
-     *
-     * @param activity $parent
-     * @param string $class_key
-     * @param boolean $active
-     * @return self
+     * @deprecated since Totara 13.2
      */
     public static function create(activity $parent, string $class_key, bool $active): self {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         $broker = factory::create_broker($class_key);
         $entity = new notification_entity();
         $entity->activity_id = $parent->get_id();
@@ -195,9 +240,14 @@ class notification_real extends model implements notification_interface {
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function activate(bool $active = true): notification_interface {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         if (!$this->entity->exists()) {
             throw new coding_exception('activate() is called after the entity is deleted');
         }
@@ -207,44 +257,69 @@ class notification_real extends model implements notification_interface {
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function set_triggers(array $values): notification_interface {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         $this->entity->triggers = json_encode($values, JSON_UNESCAPED_SLASHES);
         $this->entity->save();
         return $this;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function set_last_run_at(int $time): notification_interface {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         $this->entity->last_run_at = $time;
         $this->entity->save();
         return $this;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function delete(): notification_interface {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         $inst = new notification_sparse($this->get_activity(), $this->entity->class_key);
         $this->entity->delete();
         return $inst;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function refresh(): notification_interface {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         $this->entity->refresh();
         return $this;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     protected static function get_entity_class(): string {
+        debugging(
+            '\mod_perform\models\activity\details\notification_real is deprecated and should no longer be used.'
+            . ' Please use \mod_perform\models\activity\notification instead.',
+            DEBUG_DEVELOPER
+        );
         return notification_entity::class;
     }
 }

@@ -5,7 +5,26 @@ information provided here is intended especially for developers.
 
 * activity_setting::create() function no longer checks if the current user has permission to manage the activity. The
   check should be performed before calling this function, where applicable.
-
 * Deprecated the following methods:
     * track_user_assigned_bulk::create_from_user_assignments(); use
       track_user_assigned_bulk::create_from_track_assignment instead.
+* Notification settings are no longer lazy-loaded, and instead notification records are created upon the creation of
+  the activity itself. There is now no longer a distinction between 'real' and 'sparse' notifications.
+  The following have been deprecated as part of this change:
+  * GraphQL query mod_perform_create_notification has been deprecated, please update all calls to mod_perform_toggle_notification
+  * GraphQL type mod_perform_create_notification_result has been deprecated, please update all calls to mod_perform_toggle_notification_result
+  * GraphQL input mod_perform_create_notification_input has been deprecated, please update all calls to mod_perform_toggle_notification_input
+  * \mod_perform\webapi\resolver\mutation\create_notification - use \mod_perform\webapi\resolver\mutation\toggle_notification instead.
+  * \mod_perform\models\activity\details\notification_sparse - notifications are no longer lazy loaded, please use
+    \mod_perform\models\activity\notification instead.
+  * \mod_perform\models\activity\details\notification_real - all functionality has been moved into
+    \mod_perform\models\activity\notification so use that instead.
+  * \mod_perform\models\activity\details\notification_interface - interface is no longer necessary
+  * \mod_perform\models\activity\notification::__construct() - no longer needs to inherit it's parent constructor.
+  * \mod_perform\models\activity\notification::get_class_key() - reference the class_key property directly instead.
+  * \mod_perform\models\activity\notification::get_active() - reference the active property directly instead.
+  * \mod_perform\models\activity\notification::delete() - notification records should not be manually deleted.
+  * \mod_perform\models\activity\notification::exists() - redundant as notifications will always exist.
+  * \mod_perform\models\activity\notification_recipient::__construct() - no longer needs to inherit it's parent constructor.
+  * \mod_perform\models\activity\notification_recipient::get_notification_id() - reference the core_notification_id property directly instead.
+  * \mod_perform\models\activity\notification_recipient::get_active() - reference the active property directly instead.

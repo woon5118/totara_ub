@@ -26,6 +26,7 @@ use core\entities\user as user_entity;
 use mod_perform\constants;
 use mod_perform\entities\activity\external_participant as external_participant_entity;
 use mod_perform\models\activity\external_participant as external_participant_model;
+use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 use mod_perform\models\activity\participant as participant_model;
 use mod_perform\models\activity\participant_source as participant_source_model;
@@ -71,7 +72,7 @@ class mod_perform_notification_mailer_testcase extends mod_perform_notification_
         $element = $this->perfgen->create_element();
         section_element_model::create($section, $element, 1);
         $track = $this->perfgen->create_activity_tracks($activity, 1)->first(true);
-        $notification = $this->create_notification($activity, 'instance_created', true);
+        $notification = notification::load_by_activity_and_class_key($activity, 'instance_created')->activate();
         $relationships = $this->create_section_relationships($section, [
             constants::RELATIONSHIP_SUBJECT,
             constants::RELATIONSHIP_APPRAISER,
@@ -224,7 +225,7 @@ class mod_perform_notification_mailer_testcase extends mod_perform_notification_
         $element = $this->perfgen->create_element();
         section_element_model::create($section, $element, 1);
         $track = $this->perfgen->create_activity_tracks($activity, 1)->first(true);
-        $notification = $this->create_notification($activity, 'instance_created', true);
+        $notification = notification::load_by_activity_and_class_key($activity, 'instance_created')->activate();
         $relationships = $this->create_section_relationships($section, [
             constants::RELATIONSHIP_EXTERNAL,
         ]);

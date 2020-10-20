@@ -25,7 +25,7 @@ namespace mod_perform\entities\activity;
 
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
-use totara_core\relationship\relationship;
+use totara_core\entities\relationship;
 
 /**
  * Notification recipient entity
@@ -62,4 +62,14 @@ class notification_recipient extends entity {
     public function relationship(): belongs_to {
         return $this->belongs_to(relationship::class, 'core_relationship_id');
     }
+
+    /**
+     * Cast value to boolean.
+     *
+     * @return bool
+     */
+    protected function get_active_attribute(): bool {
+        return (bool) $this->get_attributes_raw()['active'];
+    }
+
 }

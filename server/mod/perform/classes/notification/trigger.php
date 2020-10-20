@@ -24,7 +24,6 @@
 namespace mod_perform\notification;
 
 use invalid_parameter_exception;
-use mod_perform\models\activity\details\notification_interface;
 
 /**
  * The trigger types and helper functions.
@@ -49,7 +48,6 @@ final class trigger {
     /**
      * Wrapper around loader::support_triggers.
      *
-     * @param notification_interface $notification
      * @return boolean
      */
     public function are_triggers_available(): bool {

@@ -49,6 +49,10 @@ type mod_perform_notification_recipient {
   True if the recipient is set to receive the notification
   """
   active: Boolean!
+  """
+  The relationship this recipient holds
+  """
+  relationship: totara_core_relationship
 }
 
 enum mod_perform_notification_trigger_type {
@@ -70,14 +74,16 @@ extend type Query {
 }
 
 """
-Result type for creating a notification or managing its settings
+Deprecated since Totara 13.2
+Use mod_perform_toggle_notification_result instead
 """
 type mod_perform_create_notification_result {
   notification: mod_perform_notification!
 }
 
 """
-Input type for creating a notification
+Deprecated since Totara 13.2
+Use mod_perform_toggle_notification_input instead
 """
 input mod_perform_create_notification_input {
   activity_id: core_id!
@@ -112,7 +118,8 @@ input mod_perform_update_notification_triggers_input {
 
 extend type Mutation {
   """
-  Create a notification object
+  Deprecated since Totara 13.2
+  Use mod_perform_toggle_notification instead
   """
   mod_perform_create_notification(
     input: mod_perform_create_notification_input!

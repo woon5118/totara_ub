@@ -71,4 +71,14 @@ class notification extends entity {
     public function recipients(): has_many {
         return $this->has_many(notification_recipient::class, 'notification_id');
     }
+
+    /**
+     * Cast value to boolean.
+     *
+     * @return bool
+     */
+    protected function get_active_attribute(): bool {
+        return (bool) $this->get_attributes_raw()['active'];
+    }
+
 }

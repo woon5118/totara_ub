@@ -52,31 +52,28 @@ class toggle_notification_recipient implements mutation_resolver, has_middleware
         }
         $notification = notification_model::load_by_id($notification_id);
 
-        $relationship_id = $input['relationship_id'] ?? 0;
-        if (!$relationship_id) {
-            throw new \invalid_parameter_exception('relationship_id not set as part of input');
-        }
-        $relationship = relationship::load_by_id($relationship_id);
-
         // Set activation.
         if (!isset($input['active'])) {
             throw new \invalid_parameter_exception('active not set as part of input');
         }
         $active = $input['active'] ?? false;
-        $recipient = $notification->get_recipients()->find('relationship_id', $relationship_id);
-        /** @var notification_recipient_model|null $recipient */
-        if ($recipient->recipient_id) {
-            $recipient->activate($active);
-        } else {
-            notification_recipient_model::create($notification, $relationship, $active);
+
+        $relationship_id = $input['relationship_id'] ?? 0;
+        /** @var notification_recipient_model $recipient */
+        $recipient = $notification->get_recipients()->find('core_relationship_id', $relationship_id);
+        if (!$recipient) {
+            throw new \invalid_parameter_exception(
+                'Invalid relationship_id specified or recipient record for relationship with ID '
+                . $relationship_id . ' does not exist'
+            );
         }
+
+        $recipient->toggle($active);
         $notification->refresh();
 
-        // Build and return result object.
-        $result = new \stdClass();
-        $result->notification = $notification;
-
-        return $result;
+        return (object) [
+            'notification' => $notification,
+        ];
     }
 
     /**

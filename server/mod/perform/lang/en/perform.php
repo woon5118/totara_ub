@@ -185,6 +185,7 @@ $string['error_subject_instance_id_wrong'] = 'Wrong subject instance id';
 $string['error_updating_activity_manual_relationships'] = 'Can not update selecting relationships, activity is active';
 $string['error_user_unavailable'] = 'You cannot report on this subject user because you do not have permission';
 $string['event_activity_activated'] = 'Performance activity activated';
+$string['event_activity_created'] = 'Performance activity created';
 $string['event_activity_deleted'] = 'Performance activity deleted';
 $string['event_participant_instance_availability_closed'] = 'Performance activity participant instance closed';
 $string['event_participant_instance_availability_opened'] = 'Performance activity participant instance opened';

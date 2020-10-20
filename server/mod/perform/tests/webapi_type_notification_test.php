@@ -81,7 +81,7 @@ class mod_perform_webapi_type_notification_testcase extends advanced_testcase {
     public function test_invalid_field(string $class_key): void {
         [$activity, $context] = $this->create_test_data();
 
-        $notification = notification_model::create($activity, $class_key);
+        $notification = notification_model::load_by_activity_and_class_key($activity, $class_key);
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
@@ -101,7 +101,7 @@ class mod_perform_webapi_type_notification_testcase extends advanced_testcase {
         // and yet unborn tests do not start in a clean state!
         [$activity, $context] = $this->create_test_data();
 
-        $notification = notification_model::create($activity, $class_key);
+        $notification = notification_model::load_by_activity_and_class_key($activity, $class_key);
 
         $testcases = [
             'id' => ['id', null, $notification->id],

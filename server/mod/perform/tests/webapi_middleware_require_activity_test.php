@@ -28,8 +28,8 @@ use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
 use mod_perform\activity_access_denied_exception;
 use mod_perform\entities\activity\subject_instance;
-use mod_perform\webapi\middleware\require_activity;
 use mod_perform\models\activity\notification as notification_model;
+use mod_perform\webapi\middleware\require_activity;
 
 /**
  * @coversDefaultClass \mod_perform\webapi\middleware\require_activity
@@ -232,7 +232,7 @@ class mod_perform_webapi_middleware_require_activity_testcase extends advanced_t
     public function test_require_by_notification_id(): void {
         $expected = 34324;
         [$activity, $context, $next] = $this->create_test_data($expected);
-        $notification = notification_model::create($activity, 'instance_created');
+        $notification = notification_model::load_by_activity_and_class_key($activity, 'instance_created');
 
         $id_key = 'abc';
         $single_key_args = [$id_key => $notification->id];

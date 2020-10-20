@@ -28,10 +28,10 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use mod_perform\models\activity\helpers\relationship_helper;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 use totara_core\relationship\relationship;
-use totara_core\relationship\relationship_provider;
 
 /**
  * Query to return relationships that can be used in for performance activities.
@@ -46,9 +46,7 @@ class relationships implements query_resolver, has_middleware {
      * @return relationship[]
      */
     public static function resolve(array $args, execution_context $ec) {
-        return (new relationship_provider())
-            ->filter_by_component('mod_perform', true)
-            ->get_compatible_relationships(['user_id']);
+        return relationship_helper::get_supported_perform_relationships();
     }
 
     /**

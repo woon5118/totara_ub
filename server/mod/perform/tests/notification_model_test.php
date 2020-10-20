@@ -25,6 +25,7 @@
 use mod_perform\constants;
 use mod_perform\entities\activity\notification as notification_entity;
 use mod_perform\models\activity\notification;
+use mod_perform\models\activity\notification_recipient;
 use mod_perform\notification\trigger;
 
 require_once(__DIR__ . '/notification_testcase.php');
@@ -51,14 +52,14 @@ class mod_perform_notification_model_testcase extends mod_perform_notification_t
     public function test_create_success(string $class_key, string $name_expected) {
         $activity = $this->create_activity();
         $time = time();
-        $notification = notification::create($activity, $class_key);
+        $notification = notification::load_by_activity_and_class_key($activity, $class_key);
         $this->assertEquals($activity->id, $notification->activity->get_id());
         $this->assertEquals($name_expected, $notification->name);
         $this->assertEquals(trigger::TYPE_ONCE, $notification->trigger_type);
         $this->assertFalse($notification->active);
         $this->assertEmpty($notification->triggers);
 
-        $entity = new notification_entity($notification->get_id());
+        $entity = new notification_entity($notification->id);
         $this->assertEquals($class_key, $entity->class_key);
         $this->assertEqualsWithDelta($time, $entity->created_at, 2);
         $this->assertEqualsWithDelta($time, $entity->updated_at, 2);
@@ -73,19 +74,10 @@ class mod_perform_notification_model_testcase extends mod_perform_notification_t
         }
     }
 
-    public function test_delete() {
-        $activity = $this->create_activity();
-        $notification = notification::create($activity, 'instance_created');
-        $notification->delete();
-        $this->assertFalse($notification->exists());
-        $notification->delete();
-        $this->assertFalse($notification->exists());
-    }
-
     public function test_recipients() {
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
-        $notification = notification::create($activity, 'instance_created');
+        $notification = notification::load_by_activity_and_class_key($activity, 'instance_created');
         $this->assertCount(0, $notification->recipients);
         $this->create_section_relationships($section, [constants::RELATIONSHIP_APPRAISER]);
         $this->assertCount(1, $notification->recipients);
@@ -106,13 +98,13 @@ class mod_perform_notification_model_testcase extends mod_perform_notification_t
 
     public function test_triggers() {
         $activity = $this->create_activity();
-        $notification = notification::create($activity, 'instance_created_reminder');
+        $notification = notification::load_by_activity_and_class_key($activity, 'instance_created_reminder');
         $this->assertEquals(trigger::TYPE_AFTER, $notification->trigger_type);
         $this->assertEquals([1], $notification->triggers);
         $notification->set_triggers([3, 1, 4]);
         $this->assertEquals([1, 3, 4], $notification->triggers);
 
-        $notification = notification::create($activity, 'instance_created');
+        $notification = notification::load_by_activity_and_class_key($activity, 'instance_created');
         $this->assertEquals(trigger::TYPE_ONCE, $notification->trigger_type);
         $this->assertEquals([], $notification->triggers);
         try {
@@ -123,39 +115,31 @@ class mod_perform_notification_model_testcase extends mod_perform_notification_t
         $this->assertEquals([], $notification->triggers);
     }
 
-    public function test_activate() {
+    public function test_toggle(): void {
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
         $this->create_section_relationships($section, [constants::RELATIONSHIP_APPRAISER]);
-        $notification = notification::create($activity, 'instance_created');
+
+        $notification = notification::load_by_activity_and_class_key($activity, 'due_date');
+        /** @var notification_recipient $recipient */
+        $recipient = $notification->recipients->first();
+
         $this->assertFalse($notification->active);
-        foreach ($notification->recipients as $recipient) {
-            $this->assertFalse($recipient->active);
-        }
+        $this->assertFalse($recipient->active);
+
+        $notification->toggle(true);
+        $this->assertTrue($notification->refresh()->active);
+        $this->assertFalse($recipient->refresh()->active);
+
+        $notification->toggle(false);
+        $this->assertFalse($notification->refresh()->active);
+        $this->assertFalse($recipient->refresh()->active);
         $notification->activate();
-        $this->assertTrue($notification->active);
-        foreach ($notification->recipients as $recipient) {
-            $this->assertFalse($recipient->active);
-        }
-        $notification->activate(false);
-        $this->assertFalse($notification->active);
-        foreach ($notification->recipients as $recipient) {
-            $this->assertFalse($recipient->active);
-        }
-        $notification->activate(true);
-        $this->assertTrue($notification->active);
-        foreach ($notification->recipients as $recipient) {
-            $this->assertFalse($recipient->active);
-        }
-        $notification->delete(); // extermination
-        $this->assertFalse($notification->exists());
-        foreach ($notification->recipients as $recipient) {
-            $this->assertFalse($recipient->active);
-        }
-        $notification->activate(); // reincarnation
-        $this->assertTrue($notification->exists());
-        foreach ($notification->recipients as $recipient) {
-            $this->assertFalse($recipient->active);
-        }
+        $this->assertTrue($notification->refresh()->active);
+        $this->assertFalse($recipient->refresh()->active);
+
+        $notification->deactivate();
+        $this->assertFalse($notification->refresh()->active);
+        $this->assertFalse($recipient->refresh()->active);
     }
 }

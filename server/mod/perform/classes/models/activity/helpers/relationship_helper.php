@@ -15,32 +15,29 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Chris Snyder <chris.snyder@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\formatter\activity;
+namespace mod_perform\models\activity\helpers;
 
-use core\orm\formatter\entity_model_formatter;
-use core\webapi\formatter\field\string_field_formatter;
+use core\collection;
+use totara_core\relationship\relationship;
+use totara_core\relationship\relationship_provider;
 
-defined('MOODLE_INTERNAL') || die();
+class relationship_helper {
 
-/**
- * Maps the notification_recipient model class into a GraphQL mod_perform_notification_recipient.
- */
-class notification_recipient extends entity_model_formatter {
     /**
-     * {@inheritdoc}
+     * Get the relationships that can be used for the performance activities feature.
+     *
+     * @return collection|relationship[]
      */
-    protected function get_map(): array {
-        return [
-            'relationship' => null,
-            'active' => null,
-            'relationship_id' => null,
-            'name' => string_field_formatter::class,
-        ];
+    public static function get_supported_perform_relationships(): collection {
+        return (new relationship_provider())
+            ->filter_by_component('mod_perform', true)
+            ->get_compatible_relationships(['user_id']);
     }
+
 }

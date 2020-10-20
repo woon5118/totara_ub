@@ -44,7 +44,6 @@ import { notify } from 'tui/notifications';
 import Loader from 'tui/components/loading/Loader';
 import NotificationSection from 'mod_perform/components/manage_activity/notification/NotificationSection';
 import notificationsQuery from 'mod_perform/graphql/notifications';
-import createNotificationMutation from 'mod_perform/graphql/create_notification';
 import toggleNotificationMutation from 'mod_perform/graphql/toggle_notification';
 import toggleNotificationRecipientMutation from 'mod_perform/graphql/toggle_notification_recipient';
 import updateNotificationTriggersMutation from 'mod_perform/graphql/update_notification_triggers';
@@ -96,6 +95,7 @@ export default {
     },
     tabIsActive() {
       this.skipQuery = false;
+      // We only refetch the notification data if the activity has changed, and this tab is selected again.
       if (this.activityUpdated && this.tabIsActive) {
         this.$apollo.queries.notifications.refetch();
         this.activityUpdated = false;
@@ -106,7 +106,6 @@ export default {
   methods: {
     onUpdateTriggers: debounce(
       async function(section, triggers) {
-        const id = await this.createNotificationIfNotExists(section);
         try {
           // We deliberately don't update the notification state with what is returned by the mutation,
           // as otherwise it creates a weird effect because of the 500ms delay.
@@ -114,7 +113,7 @@ export default {
             mutation: updateNotificationTriggersMutation,
             variables: {
               input: {
-                notification_id: id,
+                notification_id: section.id,
                 values: triggers,
               },
             },
@@ -137,62 +136,37 @@ export default {
 
     async onToggleNotification(section, active) {
       this.isLoading = true;
-      if (section.id) {
-        const { data: result } = await this.$apollo.mutate({
-          mutation: toggleNotificationMutation,
-          variables: {
-            input: {
-              notification_id: section.id,
-              active,
-            },
-          },
-        });
-        this.updateNotification(result.mod_perform_toggle_notification);
-      } else {
-        const { data: result } = await this.$apollo.mutate({
-          mutation: createNotificationMutation,
-          variables: {
-            input: {
-              activity_id: this.value.id,
-              class_key: section.class_key,
-              active,
-            },
-          },
-        });
-        this.updateNotification(result.mod_perform_create_notification);
-      }
-      this.isLoading = false;
-    },
-
-    async createNotificationIfNotExists(section) {
-      if (section.id) {
-        return section.id;
-      }
-
-      this.isLoading = true;
       const { data: result } = await this.$apollo.mutate({
-        mutation: createNotificationMutation,
+        mutation: toggleNotificationMutation,
         variables: {
           input: {
-            activity_id: this.value.id,
-            class_key: section.class_key,
-            active: section.active,
+            notification_id: section.id,
+            active,
           },
         },
       });
-      this.updateNotification(result.mod_perform_create_notification);
+      this.updateNotification(result.mod_perform_toggle_notification);
       this.isLoading = false;
-      return result.mod_perform_create_notification.notification.id;
+    },
+
+    /**
+     * @deprecated since Totara 13.2
+     */
+    async createNotificationIfNotExists(section) {
+      console.warn(
+        '[NotificationsTab] createNotificationIfNotExists() is deprecated and should not be used.\n' +
+          'Notifications now always exist, so this will always return the ID of the notification.'
+      );
+      return section.id;
     },
 
     async onToggleRecipient(section, recipient) {
       this.isLoading = true;
-      const id = await this.createNotificationIfNotExists(section);
       const { data: result } = await this.$apollo.mutate({
         mutation: toggleNotificationRecipientMutation,
         variables: {
           input: {
-            notification_id: id,
+            notification_id: section.id,
             relationship_id: recipient.id,
             active: recipient.active,
           },

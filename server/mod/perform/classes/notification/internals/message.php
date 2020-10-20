@@ -57,7 +57,7 @@ final class message {
      */
     public function __construct(notification_recipient_model $recipient, string $class_key, int $time) {
         $this->notification_id = $recipient->notification_id;
-        $this->relationship_id = $recipient->relationship_id;
+        $this->relationship_id = $recipient->core_relationship_id;
         $this->class_key = $class_key;
         $this->sent_at = $time;
     }

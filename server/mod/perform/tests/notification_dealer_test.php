@@ -27,6 +27,7 @@ use mod_perform\constants;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\expand_task;
+use mod_perform\models\activity\notification;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\notification\dealer;
 use mod_perform\notification\exceptions\class_key_not_available;
@@ -124,8 +125,8 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
 
         expand_task::create()->expand_multiple($track->assignments->pluck('id'));
 
-        $notif1 = $this->create_notification($activity, 'mock_one', false);
-        $notif2 = $this->create_notification($activity, 'mock_two', true);
+        $notif1 = notification::load_by_activity_and_class_key($activity, 'mock_one');
+        $notif2 = notification::load_by_activity_and_class_key($activity, 'mock_two')->activate();
         $this->toggle_recipients($notif1, [constants::RELATIONSHIP_SUBJECT => true]);
         $this->toggle_recipients($notif2, [constants::RELATIONSHIP_SUBJECT => true, constants::RELATIONSHIP_APPRAISER => true]);
 
@@ -162,8 +163,9 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
 
         try {
             $dealer->dispatch('mock_zero');
-            $this->fail('class_key_not_available expected');
-        } catch (class_key_not_available $ex) {
+            $this->fail('record_not_found_exception expected');
+        } catch (\core\orm\query\exceptions\record_not_found_exception $ex) {
+            // Mock class doesn't exist so it won't be in the db
         }
 
         delete_user($user1);
@@ -225,8 +227,8 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
 
         expand_task::create()->expand_all();
 
-        $notif11 = $this->create_notification($activity1, 'mock_one', false);
-        $notif12 = $this->create_notification($activity1, 'mock_two', true);
+        $notif11 = notification::load_by_activity_and_class_key($activity1, 'mock_one');
+        $notif12 = notification::load_by_activity_and_class_key($activity1, 'mock_two')->activate();
         $this->toggle_recipients($notif11, [constants::RELATIONSHIP_SUBJECT => true]);
         $this->toggle_recipients($notif12, [constants::RELATIONSHIP_SUBJECT => true, constants::RELATIONSHIP_APPRAISER => true]);
 
@@ -246,8 +248,8 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
 
         expand_task::create()->expand_all();
 
-        $notif21 = $this->create_notification($activity2, 'mock_one', false);
-        $notif22 = $this->create_notification($activity2, 'mock_two', true);
+        $notif21 = notification::load_by_activity_and_class_key($activity2, 'mock_one');
+        $notif22 = notification::load_by_activity_and_class_key($activity2, 'mock_two')->activate();
         $this->toggle_recipients($notif21, [constants::RELATIONSHIP_SUBJECT => true]);
         $this->toggle_recipients($notif22, [constants::RELATIONSHIP_SUBJECT => true, constants::RELATIONSHIP_APPRAISER => true]);
 

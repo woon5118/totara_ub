@@ -30,64 +30,89 @@ use mod_perform\notification\factory;
 use mod_perform\models\activity\activity;
 
 /**
- * The internal implementation that represents a non-existent performance notification setting.
+ * @deprecated since Totara 13.2
  */
 class notification_sparse implements notification_interface {
-    /** @var string */
+    /** @deprecated since Totara 13.2 */
     protected $class_key;
 
-    /** @var activity */
+    /** @deprecated since Totara 13.2 */
     protected $activity;
 
-    /** @var broker */
+    /** @deprecated since Totara 13.2 */
     protected $broker;
 
     /**
-     * @param activity $activity
-     * @param string $class_key
+     * @deprecated since Totara 13.2
      */
     public function __construct(activity $activity, string $class_key) {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         $this->activity = $activity;
         $this->class_key = $class_key;
         $this->broker = factory::create_broker($class_key);
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function get_activity(): activity {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         return $this->activity;
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * NOTE: the function always returns null.
+     * @deprecated since Totara 13.2
      */
     public function get_id(): ?int {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         return null;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function get_class_key(): string {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         return $this->class_key;
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * NOTE: the function just returns false.
+     * @deprecated since Totara 13.2
      */
     public function get_active(): bool {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         return false;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function recipients_builder(builder $builder, bool $active_only = false): void {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         if ($active_only) {
             $builder->where_raw('1 != 1');
         }
@@ -95,69 +120,99 @@ class notification_sparse implements notification_interface {
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function get_triggers(): array {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         return $this->broker->get_default_triggers();
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * NOTE: the function just throws a coding_exception.
+     * @deprecated since Totara 13.2
      */
     public function get_last_run_at(): int {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         throw new coding_exception('not available');
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * NOTE: the function just returns false.
+     * @deprecated since Totara 13.2
      */
     public function exists(): bool {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         return false;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function activate(bool $active = true): notification_interface {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         $inst = notification_real::create($this->activity, $this->class_key, $active);
         return $inst;
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * NOTE: the function just throws a coding_exception.
+     * @deprecated since Totara 13.2
      */
     public function set_triggers(array $values): notification_interface {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         throw new coding_exception('not available');
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * NOTE: the function just throws a coding_exception.
+     * @deprecated since Totara 13.2
      */
     public function set_last_run_at(int $time): notification_interface {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         throw new coding_exception('not available');
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * NOTE: the function does nothing.
+     * @deprecated since Totara 13.2
      */
     public function delete(): notification_interface {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         return $this;
     }
 
     /**
-     * @inheritDoc
+     * @deprecated since Totara 13.2
      */
     public function refresh(): notification_interface {
+        debugging(
+            '\mod_perform\models\activity\details\notification_sparse is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
         $this->activity->refresh();
         return $this;
     }

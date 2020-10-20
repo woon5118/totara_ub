@@ -55,7 +55,7 @@ class toggle_notification implements mutation_resolver, has_middleware {
             throw new \invalid_parameter_exception('active not set as part of input');
         }
         $active = $input['active'];
-        $notification->activate($active);
+        $notification->toggle($active);
 
         // Build and return result object.
         $result = new \stdClass();

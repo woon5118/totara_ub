@@ -24,9 +24,11 @@
 
 use core\format;
 use mod_perform\constants;
+use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_recipient as recipient_model;
 use mod_perform\models\activity\section_relationship;
+use totara_core\relationship\relationship;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -59,7 +61,7 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
         $section_relationship = section_relationship::create($section->get_id(), $subject_id, true);
         $core_relationship = $section_relationship->core_relationship;
 
-        $notification = notification_model::create($activity, 'instance_created');
+        $notification = notification_model::load_by_activity_and_class_key($activity, 'instance_created');
         return [$notification, $core_relationship, $context];
     }
 
@@ -79,7 +81,7 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
      */
     public function test_invalid_field(): void {
         [$notification, $core_relationship, $context] = $this->create_test_data();
-        $recipient = recipient_model::create($notification, $core_relationship);
+        $recipient = $this->load_recipient($notification, $core_relationship);
 
         $field = 'unknown';
 
@@ -99,10 +101,10 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
         // and yet unborn tests do not start in a clean state!
         [$notification, $core_relationship, $context] = $this->create_test_data();
 
-        $recipient = recipient_model::create($notification, $core_relationship);
+        $recipient = $this->load_recipient($notification, $core_relationship);
 
         $testcases = [
-            'name' => ['name', format::FORMAT_PLAIN, $recipient->name],
+            'relationship' => ['relationship', null, $recipient->relationship],
             'active' => ['active', null, $recipient->active],
         ];
 
@@ -114,4 +116,18 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
             $this->assertEquals($expected, $value, "[$id] wrong value");
         }
     }
+
+    /**
+     * @param notification_model $notification
+     * @param relationship $relationship
+     * @return recipient_model
+     */
+    private function load_recipient(notification_model $notification, relationship $relationship): recipient_model {
+        $entity = notification_recipient_entity::repository()
+            ->where('notification_id', $notification->id)
+            ->where('core_relationship_id', $relationship->id)
+            ->one(true);
+        return recipient_model::load_by_entity($entity);
+    }
+
 }

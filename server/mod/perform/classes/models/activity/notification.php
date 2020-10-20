@@ -25,229 +25,270 @@ namespace mod_perform\models\activity;
 
 use coding_exception;
 use core\orm\collection;
+use core\orm\entity\model;
 use core\orm\query\builder;
-use core\orm\query\exceptions\record_not_found_exception;
+use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\notification as notification_entity;
+use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
+use mod_perform\models\activity\helpers\relationship_helper;
+use mod_perform\models\activity\notification as notification_model;
 use mod_perform\notification\factory;
-use mod_perform\models\activity\details\notification_interface as notification_interface;
-use mod_perform\models\activity\details\notification_real;
-use mod_perform\models\activity\details\notification_sparse;
 
 /**
- * A proxy class that represents a single performance notification setting.
+ * Represents a single performance notification setting.
  *
- * @property-read integer|null $id ID
- * @property string $name
- * @property string $class_key
- * @property boolean $active is active?
- * @property string|null $trigger_label
- * @property integer $trigger_type
- * @property integer $last_run_at
+ * @property-read integer $id ID
+ * @property-read string $name
+ * @property-read string $class_key
+ * @property-read int $activity_id
+ * @property-read boolean $active is active?
+ * @property-read string|null $trigger_label
+ * @property-read integer $trigger_type
+ * @property-read integer $last_run_at
  *
  * @property-read activity $activity
  * @property-read collection|notification_recipient[] $recipients
  * @property-read integer[] $triggers
  */
-final class notification implements notification_interface {
-    /** @var notification_interface */
-    private $current;
+class notification extends model {
 
     /**
-     * Private constructor.
-     *
-     * @param notification_interface $input
+     * @var notification_entity
      */
-    private function __construct(notification_interface $input) {
-        if (!($input instanceof notification_real || $input instanceof notification_sparse)) {
-            throw new coding_exception('invalid instance passed');
-        }
-        $this->current = $input;
-    }
+    protected $entity;
+
+    protected $entity_attribute_whitelist = [
+        'id',
+        'activity_id',
+        'class_key',
+        'active',
+    ];
+
+    protected $model_accessor_whitelist = [
+        'name',
+        'activity',
+        'last_run_at',
+        'recipients',
+        'trigger_label',
+        'trigger_type',
+        'triggers',
+    ];
 
     /**
-     * Create a new notification setting in the database.
+     * Create a new notification setting.
      *
-     * @param activity $parent
+     * @param activity|activity_entity|int $parent_activity
      * @param string $class_key
      * @param boolean $active
      * @return self
      */
-    public static function create(activity $parent, string $class_key, bool $active = false): self {
-        return new self(notification_real::create($parent, $class_key, $active));
-    }
-
-    /**
-     * Load all notifications by the activity.
-     *
-     * @param activity $activity
-     * @return collection|notification[]
-     */
-    public static function load_all_by_activity(activity $activity): collection {
-        $loader = factory::create_loader();
-        $classes = $loader->get_classes();
-        $models = notification_real::load_by_activity($activity);
-        $results = new collection();
-        foreach ($classes as $class_key => $unused) {
-            $model = $models->find('class_key', $class_key)
-                   ?? new notification_sparse($activity, $class_key);
-            $results->append(new self($model));
+    public static function create($parent_activity, string $class_key, bool $active = false): self {
+        if (is_object($parent_activity)) {
+            $parent_activity = $parent_activity->id;
         }
-        return $results;
+
+        $broker = factory::create_broker($class_key);
+        $entity = new notification_entity();
+        $entity->activity_id = $parent_activity;
+        $entity->class_key = $class_key;
+        $entity->active = $active;
+        $entity->triggers = json_encode($broker->get_default_triggers(), JSON_UNESCAPED_SLASHES);
+        $entity->save();
+        return new self($entity);
     }
 
     /**
-     * Load an instance by the activity and the class key.
+     * Create the default set of notifications for an activity.
      *
-     * @param activity $activity
+     * @param $parent_activity
+     * @return collection|notification_model[]
+     */
+    public static function create_all_for_activity($parent_activity): collection {
+        $relationships = relationship_helper::get_supported_perform_relationships();
+        $class_keys = factory::create_loader()->get_class_keys();
+
+        return collection::new($class_keys)->map(static function (string $class_key) use ($parent_activity, $relationships) {
+            $notification = notification_model::create($parent_activity, $class_key);
+
+            foreach ($relationships as $relationship) {
+                notification_recipient::create($notification, $relationship);
+            }
+
+            return $notification;
+        });
+    }
+
+    /**
+     * Retrieves notifications by their parent activity.
+     *
+     * @param activity $parent parent activity
+     * @return collection|static[] retrieved notifications
+     */
+    public static function load_all_by_activity(activity $parent): collection {
+        $class_keys_order = array_flip(factory::create_loader()->get_class_keys());
+
+        return notification_entity::repository()
+            ->where('activity_id', $parent->get_id())
+            ->get()
+            ->map_to(static::class)
+            ->sort(static function (self $a, self $b) use ($class_keys_order) {
+                // Order the notifications by how they are defined in mod/perform/db/notifications.php to be consistent.
+                return $class_keys_order[$a->class_key] <=> $class_keys_order[$b->class_key];
+            });
+    }
+
+    /**
+     * Retrieves notifications by their parent activity.
+     *
+     * @param activity $parent parent activity
      * @param string $class_key
-     * @return self
+     * @return static
      */
-    public static function load_by_activity_and_class_key(activity $activity, string $class_key): self {
-        $model = notification_real::load_by_activity_and_class_key($activity, $class_key, false);
-        if ($model === null) {
-            $model = new notification_sparse($activity, $class_key);
-        }
-        return new self($model);
-    }
+    public static function load_by_activity_and_class_key(activity $parent, string $class_key): self {
+        $entity = notification_entity::repository()
+            ->where('activity_id', $parent->id)
+            ->where('class_key', $class_key)
+            ->one(true);
 
-    /**
-     * Load an instance by the notification id.
-     *
-     * @param integer $id
-     * @return self
-     * @throws record_not_found_exception
-     */
-    public static function load_by_id(int $id): self {
-        return new self(notification_real::load_by_id($id));
-    }
-
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    public function __get(string $name) {
-        $methodname = 'get_'.$name;
-        if (!method_exists($this, $methodname)) {
-            throw new coding_exception('unknown property: '.$name);
-        }
-        return $this->{$methodname}();
-    }
-
-    /**
-     * @param string $name
-     * @return boolean
-     */
-    public function has_attribute(string $name): bool {
-        $methodname = 'get_'.$name;
-        return method_exists($this, $methodname);
+        return new static($entity);
     }
 
     /**
      * Get all recipients.
      *
      * @param boolean $active_only get only active recipients
-     * @return collection<integer, notification_recipient>
+     * @return collection|notification_recipient[] Notification recipients, keyed by ID
      */
     public function get_recipients(bool $active_only = false): collection {
         return notification_recipient::load_by_notification($this, $active_only);
     }
 
     /**
-     * @inheritDoc
+     * Modify the builder to obtain associated recipients.
+     * *Do not call this function directly!!*
+     *
+     * @param builder $builder a partially set up builder: see notification_recipient::load_by_notification()
+     *                         * {perform_section} s
+     *                         * {perform_section_relationship} sr
+     *                         * {totara_core_relationship} r
+     * @param boolean $active_only get only active recipients
      */
     public function recipients_builder(builder $builder, bool $active_only = false): void {
-        $this->current->recipients_builder($builder, $active_only);
+        $builder
+            ->left_join([notification_recipient_entity::TABLE, 'nr'], function (builder $joining) {
+                $joining->where_field('r.id', 'nr.core_relationship_id')
+                    ->where('nr.notification_id', '=', $this->entity->id);
+            })
+            ->add_select(['nr.id', 'nr.active'])
+            ->group_by(['nr.id', 'nr.active', 'nr.notification_id']);
+        if ($active_only) {
+            $builder->where('nr.active', '<>', 0);
+        }
     }
 
     /**
-     * @inheritDoc
+     * Return the parent activity.
+     *
+     * @return activity
      */
     public function get_activity(): activity {
-        return $this->current->get_activity();
+        return activity::load_by_id($this->entity->activity_id);
     }
 
     /**
-     * @inheritDoc
-     */
-    public function get_id(): ?int {
-        $current = $this->current; // suppress warning.
-        /** @var notification_sparse|notification_real $current */
-        return $current->get_id();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function get_class_key(): string {
-        return $this->current->get_class_key();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function get_active(): bool {
-        return $this->current->get_active();
-    }
-
-    /**
-     * @inheritDoc
+     * Return the array of trigger values.
+     *
+     * @return integer[]
      */
     public function get_triggers(): array {
-        $trigger = factory::create_trigger($this);
-        return $trigger->translate_outgoing($this->current->get_triggers());
+        $triggers = json_decode($this->entity->triggers);
+
+        if (!is_array($triggers)) {
+            return [];
+        }
+
+        return factory::create_trigger($this)->translate_outgoing($triggers);
     }
 
     /**
-     * @inheritDoc
+     * Return the last run time.
+     *
+     * @return integer
      */
     public function get_last_run_at(): int {
-        return $this->current->get_last_run_at();
+        return $this->entity->last_run_at ?? 0;
     }
 
     /**
-     * @inheritDoc
+     * Toggle the state for this notification recipient.
+     *
+     * @param boolean $active
+     * @return static
      */
-    public function exists(): bool {
-        return !empty($this->get_id());
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function activate(bool $active = true): notification_interface {
-        $this->current = $this->current->activate($active);
+    public function toggle(bool $active): self {
+        $this->entity->active = $active;
+        $this->entity->save();
         return $this;
     }
 
     /**
-     * @inheritDoc
+     * Activate this notification.
+     *
+     * @param boolean $active Deprecated & Unused.
+     * @return static
      */
-    public function set_triggers(array $triggers): notification_interface {
-        $trigger = factory::create_trigger($this);
-        $triggers = $trigger->translate_incoming($triggers);
-        $this->current = $this->current->set_triggers($triggers);
+    public function activate(bool $active = true): self {
+        if (!empty(func_get_args())) {
+            debugging(
+                'The $active argument for the function \mod_perform\models\activity\notification::activate()' .
+                ' is deprecated, please use toggle(), activate() or deactivate() instead.',
+                DEBUG_DEVELOPER
+            );
+        }
+        return $this->toggle($active ?? true);
+    }
+
+    /**
+     * Deactivate this notification.
+     *
+     * @return static
+     */
+    public function deactivate(): self {
+        return $this->toggle(false);
+    }
+
+    /**
+     * Update event trigger values.
+     *
+     * @param array $triggers
+     * @return static
+     */
+    public function set_triggers(array $triggers): self {
+        $values = factory::create_trigger($this)->translate_incoming($triggers);
+        $this->entity->triggers = json_encode($values, JSON_UNESCAPED_SLASHES);
+        $this->entity->save();
         return $this;
     }
 
     /**
-     * @inheritDoc
+     * Update the last run time.
+     *
+     * @param integer $time
+     * @return static
      */
-    public function set_last_run_at(int $time): notification_interface {
-        return $this->current->set_last_run_at($time);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function delete(): notification_interface {
-        $this->current = $this->current->delete();
+    public function set_last_run_at(int $time): self {
+        $this->entity->last_run_at = $time;
+        $this->entity->save();
         return $this;
     }
 
     /**
-     * @inheritDoc
+     * Reload the internal bookkeeping.
+     *
+     * @return static
      */
-    public function refresh(): notification_interface {
-        $this->current = $this->current->refresh();
+    public function refresh(): self {
+        $this->entity->refresh();
         return $this;
     }
 
@@ -257,7 +298,7 @@ final class notification implements notification_interface {
      * @return string
      */
     public function get_name(): string {
-        return factory::create_loader()->get_name_of($this->get_class_key());
+        return factory::create_loader()->get_name_of($this->class_key);
     }
 
     /**
@@ -266,8 +307,7 @@ final class notification implements notification_interface {
      * @return integer one of trigger_type constants
      */
     public function get_trigger_type(): int {
-        $loader = factory::create_loader();
-        return $loader->get_trigger_type_of($this->current->get_class_key());
+        return factory::create_loader()->get_trigger_type_of($this->class_key);
     }
 
     /**
@@ -276,8 +316,7 @@ final class notification implements notification_interface {
      * @return string|null localised label text or null if triggers are not supported
      */
     public function get_trigger_label(): ?string {
-        $loader = factory::create_loader();
-        return $loader->get_trigger_label_of($this->current->get_class_key());
+        return factory::create_loader()->get_trigger_label_of($this->class_key);
     }
 
     /**
@@ -299,4 +338,76 @@ final class notification implements notification_interface {
             return $trigger * DAYSECS;
         }, $this->get_triggers());
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function get_entity_class(): string {
+        return notification_entity::class;
+    }
+
+
+    /*
+     * Deprecated Methods
+     */
+
+    /**
+     * @param notification_entity|object $entity
+     */
+    public function __construct($entity) {
+        if (!$entity instanceof notification_entity) {
+            debugging('A notification entity must be specified to notification::__construct()', DEBUG_DEVELOPER);
+            $entity = new notification_entity($entity);
+        }
+        parent::__construct($entity);
+    }
+
+    /**
+     * @deprecated since Totara 13.2
+     */
+    public function get_class_key(): string {
+        debugging(
+            '\mod_perform\models\activity\notification::get_class_key() is deprecated and should no longer be used,' .
+            ' please use $notification->class_key directly.',
+            DEBUG_DEVELOPER
+        );
+        return $this->class_key;
+    }
+
+    /**
+     * @deprecated since Totara 13.2
+     */
+    public function get_active(): string {
+        debugging(
+            '\mod_perform\models\activity\notification::get_active() is deprecated and should no longer be used,' .
+            ' please use $notification->active directly.',
+            DEBUG_DEVELOPER
+        );
+        return $this->active;
+    }
+
+    /**
+     * @deprecated since Totara 13.2
+     */
+    public function delete(): self {
+        debugging(
+            '\mod_perform\models\activity\notification::delete() is deprecated and should no longer be used, '
+            . 'do not delete notification records manually.',
+            DEBUG_DEVELOPER
+        );
+        return $this;
+    }
+
+    /**
+     * @deprecated since Totara 13.2
+     */
+    public function exists(): bool {
+        debugging(
+            '\mod_perform\models\activity\notification::get_active() is deprecated and should no longer be used,'
+            . ' as the return value will always be true.',
+            DEBUG_DEVELOPER
+        );
+        return $this->entity->exists();
+    }
+
 }

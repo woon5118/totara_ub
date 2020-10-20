@@ -29,6 +29,7 @@ use core\event\user_deleted;
 use core\event\user_tenant_membership_changed;
 use hierarchy_organisation\event\organisation_deleted;
 use hierarchy_position\event\position_deleted;
+use mod_perform\event\activity_created;
 use mod_perform\event\participant_instance_progress_updated;
 use mod_perform\event\participant_section_progress_updated;
 use mod_perform\event\subject_instance_activated;
@@ -116,6 +117,10 @@ $observers = [
     [
         'eventname' => job_assignment_deleted::class,
         'callback' => track_assignment_user_groups::class.'::job_assignment_updated',
+    ],
+    [
+        'eventname' => activity_created::class,
+        'callback' => notification::class.'::create_notifications',
     ],
     [
         'eventname' => subject_instance_progress_updated::class,

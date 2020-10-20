@@ -24,12 +24,12 @@
 namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
+use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use mod_perform\models\activity\notification as notification_model;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
-use mod_perform\models\activity\notification as notification_model;
 
 class notifications implements query_resolver, has_middleware {
     /**

@@ -32,8 +32,7 @@ use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\activity as activity_model;
-use mod_perform\models\activity\element_plugin;
-use mod_perform\models\activity\notification as notification_model;
+use mod_perform\models\activity\notification;
 use mod_perform\models\activity\section_element as section_element_model;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\models\response\participant_section;
@@ -186,9 +185,9 @@ class mod_perform_notification_check_trigger_task_testcase extends mod_perform_n
         section_element_model::create($section, $element, 1);
         $track = $this->perfgen->create_activity_tracks($activity, 1)->first(true);
         $this->perfgen->create_track_assignments_with_existing_groups($track, [$this->cohort->id]);
-        $notifications = [];
+
         foreach (factory::create_loader()->get_class_keys() as $class_key) {
-            $notifications[$class_key] = $notification = notification_model::create($activity, $class_key, true);
+            $notification = notification::load_by_activity_and_class_key($activity, $class_key)->activate();
             $this->perfgen->create_notification_recipient($notification, ['idnumber' => constants::RELATIONSHIP_SUBJECT], true);
             $this->perfgen->create_notification_recipient($notification, ['idnumber' => constants::RELATIONSHIP_MANAGER], true);
             $this->perfgen->create_notification_recipient($notification, ['idnumber' => constants::RELATIONSHIP_MANAGERS_MANAGER], true);

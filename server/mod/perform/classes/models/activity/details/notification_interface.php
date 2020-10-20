@@ -27,98 +27,66 @@ use core\orm\query\builder;
 use mod_perform\models\activity\activity;
 
 /**
- * notification interface
+ * @deprecated since Totara 13.2
  */
 interface notification_interface {
     /**
-     * Return the parent activity.
-     *
-     * @return activity
+     * @deprecated since Totara 13.2
      */
     public function get_activity(): activity;
 
     /**
-     * Returns the registered class key.
-     *
-     * @return string
+     * @deprecated since Totara 13.2
      */
     public function get_class_key(): string;
 
     /**
-     * Return the active state.
-     *
-     * @return boolean
+     * @deprecated since Totara 13.2
      */
     public function get_active(): bool;
 
     /**
-     * Modify the builder to obtain associated recipients.
-     * *Do not call this function directly!!*
-     *
-     * @param builder $builder a partially set up builder: see notification_recipient::load_by_notification()
-     *                         * {perform_section} s
-     *                         * {perform_section_relationship} sr
-     *                         * {totara_core_relationship} r
-     * @param boolean $active_only get only active recipients
+     * @deprecated since Totara 13.2
      */
     public function recipients_builder(builder $builder, bool $active_only = false): void;
 
     /**
-     * Return the array of trigger values.
-     *
-     * @return integer[]
+     * @deprecated since Totara 13.2
      */
     public function get_triggers(): array;
 
     /**
-     * Return the last run time.
-     *
-     * @return integer
+     * @deprecated since Totara 13.2
      */
     public function get_last_run_at(): int;
 
     /**
-     * Return true if the underlying record exists in the database.
-     *
-     * @return boolean
+     * @deprecated since Totara 13.2
      */
     public function exists(): bool;
 
     /**
-     * Activate this notification setting.
-     *
-     * @param boolean $active
-     * @return notification_interface
+     * @deprecated since Totara 13.2
      */
     public function activate(bool $active = true): notification_interface;
 
     /**
-     * Update event trigger values.
-     *
-     * @param array $values
-     * @return notification_interface
+     * @deprecated since Totara 13.2
      */
     public function set_triggers(array $values): notification_interface;
 
     /**
-     * Update the last run time.
-     *
-     * @param integer $time
-     * @return notification_interface
+     * @deprecated since Totara 13.2
      */
     public function set_last_run_at(int $time): notification_interface;
 
     /**
-     * Delete the current notification setting.
-     *
-     * @return notification_interface
+     * @deprecated since Totara 13.2
      */
     public function delete(): notification_interface;
 
     /**
-     * Reload the internal bookkeeping.
-     *
-     * @return notification_interface
+     * @deprecated since Totara 13.2
      */
     public function refresh(): notification_interface;
 }

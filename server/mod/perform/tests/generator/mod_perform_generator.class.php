@@ -28,7 +28,6 @@ use core\entities\cohort;
 use core\entities\user;
 use core\orm\query\builder;
 use core\session\manager;
-use core_container\container_category_helper;
 use core_container\module\module;
 use hierarchy_organisation\entities\organisation;
 use hierarchy_position\entities\position;
@@ -433,9 +432,29 @@ class mod_perform_generator extends component_generator_base {
         return core_relationship::load_by_idnumber($idnumber);
     }
 
-    public function create_notification_recipient(notification $notification, array $data, bool $active = true): notification_recipient {
-        $core_relationship = $this->get_core_relationship($data['idnumber']);
-        return notification_recipient::create($notification, $core_relationship, $active);
+    /**
+     * Get the notification recipient model instance for the specified notification.
+     *
+     * @param notification $notification
+     * @param array $data Relationship data, e.g. ['idnumber' => relationship idnumber]
+     * @param bool $active Should the recipient be active?
+     * @return notification_recipient
+     */
+    public function create_notification_recipient(
+        notification $notification,
+        array $data,
+        bool $active = true
+    ): notification_recipient {
+        $entity = \mod_perform\entities\activity\notification_recipient::repository()
+            ->join([relationship::TABLE, 'relationship'], 'core_relationship_id', 'id')
+            ->where('notification_id', $notification->id)
+            ->where('relationship.idnumber', $data['idnumber'])
+            ->one(true);
+        $model = notification_recipient::load_by_entity($entity);
+        if ($active != $model->active) {
+            $model->toggle($active);
+        }
+        return $model;
     }
 
     /**
@@ -616,7 +635,7 @@ class mod_perform_generator extends component_generator_base {
 
             // Create all notifications.
             $notifications = array_map(function ($class_key) use ($activity) {
-                return notification::create($activity, $class_key, true);
+                return notification::load_by_activity_and_class_key($activity, $class_key)->activate();
             }, factory::create_loader()->get_class_keys());
 
             if ($configuration->get_number_of_sections_per_activity() > 1) {

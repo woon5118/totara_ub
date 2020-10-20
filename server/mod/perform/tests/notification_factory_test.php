@@ -64,9 +64,9 @@ class mod_perform_notification_factory_testcase extends mod_perform_notification
      */
     public function test_create_condition() {
         $activity = $this->create_activity();
-        $notification1 = notification_model::create($activity, 'mock_one', true);
-        $notification2 = notification_model::create($activity, 'mock_two', true);
-        $notification3 = notification_model::create($activity, 'mock_three', true);
+        $notification1 = notification_model::load_by_activity_and_class_key($activity, 'mock_one')->activate();
+        $notification2 = notification_model::load_by_activity_and_class_key($activity, 'mock_two')->activate();
+        $notification3 = notification_model::load_by_activity_and_class_key($activity, 'mock_three')->activate();
         try {
             factory::create_condition($notification1);
             $this->fail('coding_exception expected');

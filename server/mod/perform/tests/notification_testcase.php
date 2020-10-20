@@ -202,18 +202,6 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
     }
 
     /**
-     * Create a notification for testing.
-     *
-     * @param activity $activity
-     * @param string $class_key
-     * @param boolean $active
-     * @return notification
-     */
-    protected function create_notification(activity $activity, string $class_key, bool $active = false): notification {
-        return notification::create($activity, $class_key, $active);
-    }
-
-    /**
      * Return subject, appraiser and manager.
      *
      * @return string[]
@@ -308,7 +296,11 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      * @return array<string, relationship>
      */
     protected function get_all_relationships(): array {
-        return relationship_entity::repository()->select('idnumber, *')->order_by('sort_order')->get()->map_to(relationship::class)->all();
+        return relationship_entity::repository()
+            ->order_by('sort_order')
+            ->get()
+            ->map_to(relationship::class)
+            ->all();
     }
 
     /**
@@ -322,10 +314,10 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
         foreach ($relationships as $idnumber => $active) {
             $relationship = $this->perfgen->get_core_relationship($idnumber);
             $rel_id = $relationship->id;
-            $recipient = $recipients->find('relationship_id', $rel_id);
+            $recipient = $recipients->find('core_relationship_id', $rel_id);
             /** @var notification_recipient $recipient */
-            if ($recipient->get_recipient_id()) {
-                $recipient->activate($active);
+            if ($recipient) {
+                $recipient->toggle($active);
             } else {
                 notification_recipient::create($notification, $relationship, $active);
             }

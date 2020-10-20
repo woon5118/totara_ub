@@ -26,10 +26,8 @@ use mod_perform\constants;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\section_relationship;
-use mod_perform\webapi\resolver\mutation\toggle_notification_recipient;
 use totara_core\advanced_feature;
 use totara_core\relationship\relationship;
-use totara_core\relationship\resolvers\subject;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -51,7 +49,7 @@ class mod_perform_webapi_resolver_mutation_toggle_notification_recipient_testcas
 
         /** @var activity_model $activity */
         $activity = $perform_generator->create_activity_in_container([]);
-        return notification_model::create($activity, 'instance_created', false);
+        return notification_model::load_by_activity_and_class_key($activity, 'instance_created');
     }
 
     public function create_test_relationship(notification_model $notification): relationship {
@@ -92,8 +90,8 @@ class mod_perform_webapi_resolver_mutation_toggle_notification_recipient_testcas
         $this->assertNotEmpty($notification->id);
         $this->assertCount(1, $notification->recipients);
         $recipient = $notification->recipients->shift();
-        $this->assertNotEmpty($recipient->relationship_id);
-        $this->assertSame(get_string('relationship_name_subject', 'totara_core'), $recipient->name);
+        $this->assertNotEmpty($recipient->core_relationship_id);
+        $this->assertSame(get_string('relationship_name_subject', 'totara_core'), $recipient->relationship->name);
         $this->assertEquals($active, $recipient->active);
     }
 
@@ -185,12 +183,9 @@ class mod_perform_webapi_resolver_mutation_toggle_notification_recipient_testcas
             ]
         ];
 
-        try {
-            $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
-            $this->fail('invalid_parameter_exception expected');
-        } catch (invalid_parameter_exception $ex) {
-            $this->assertStringContainsString('Invalid parameter value detected (relationship_id not set as part of input)', $ex->getMessage());
-        }
+        $this->expectException(invalid_parameter_exception::class);
+        $this->expectExceptionMessageMatches('/Invalid relationship_id specified or recipient record for relationship with ID/');
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_toggle_notification_recipient_with_invalid_relationship_id(): void {
@@ -198,16 +193,13 @@ class mod_perform_webapi_resolver_mutation_toggle_notification_recipient_testcas
         $args = [
             'input' => [
                 'notification_id' => $notification->id,
-                'relationship_id' => 1138,
+                'relationship_id' => -1,
                 'active' => true
             ]
         ];
 
-        try {
-            $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
-            $this->fail('invalid_parameter_exception expected');
-        } catch (record_not_found_exception $ex) {
-        }
+        $this->expectException(invalid_parameter_exception::class);
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_toggle_notification_with_missing_active(): void {
@@ -260,7 +252,7 @@ class mod_perform_webapi_resolver_mutation_toggle_notification_recipient_testcas
         // Check your work.
         $actual_notification = notification_model::load_by_id($notification['id']);
         $actual_recipient = $actual_notification->recipients->shift();
-        $this->assertEquals($actual_recipient->relationship_id, $notification['recipients'][0]['relationship_id']);
+        $this->assertEquals($actual_recipient->core_relationship_id, $notification['recipients'][0]['relationship_id']);
         $this->assertSame($active, $notification['recipients'][0]['active']);
     }
 

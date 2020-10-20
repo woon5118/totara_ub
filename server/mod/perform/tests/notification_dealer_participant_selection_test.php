@@ -22,6 +22,7 @@
  * @category test
  */
 
+use core\orm\query\exceptions\record_not_found_exception;
 use mod_perform\constants;
 use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\manual_relationship_selection_progress as manual_relationship_selection_progress_entity;
@@ -29,11 +30,11 @@ use mod_perform\entities\activity\manual_relationship_selector as manual_relatio
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
+use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 use mod_perform\models\activity\section_element as section_element_model;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\notification\dealer_participant_selection;
-use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\notification\factory;
 use mod_perform\notification\recipient;
 use mod_perform\notification\trigger;
@@ -141,7 +142,7 @@ class mod_perform_notification_dealer_participant_selection_testcase extends mod
         $element = $this->perfgen->create_element();
         section_element_model::create($section, $element, 1);
         $track = $this->perfgen->create_activity_tracks($activity, 1)->first(true);
-        $notification = $this->create_notification($activity, 'kia_ora_koutou_katoa', true);
+        $notification = notification::load_by_activity_and_class_key($activity, 'kia_ora_koutou_katoa')->activate();
         $this->create_section_relationships($section, [
             constants::RELATIONSHIP_PEER,
             constants::RELATIONSHIP_REVIEWER,
@@ -226,12 +227,12 @@ class mod_perform_notification_dealer_participant_selection_testcase extends mod
         $this->assertCount(0, $sink->get_by_relationship(constants::RELATIONSHIP_MENTOR));
         $this->assertCount(0, $sink->get_by_relationship(constants::RELATIONSHIP_EXTERNAL));
 
-        $notification->activate(false);
+        $notification->deactivate();
         $sink->clear();
         $dealer->dispatch('kia_ora_koutou_katoa');
         $this->assertCount(0, $sink->get_all());
 
-        $notification->activate(true);
+        $notification->activate();
         $this->toggle_recipients($notification, [
             constants::RELATIONSHIP_SUBJECT => false,
             constants::RELATIONSHIP_APPRAISER => false,
@@ -242,10 +243,7 @@ class mod_perform_notification_dealer_participant_selection_testcase extends mod
         $dealer->dispatch('kia_ora_koutou_katoa');
         $this->assertCount(0, $sink->get_all());
 
-        try {
-            $dealer->dispatch('i_do_not_exist');
-            $this->fail('class_key_not_available expected');
-        } catch (class_key_not_available $ex) {
-        }
+        $this->expectException(record_not_found_exception::class);
+        $dealer->dispatch('i_do_not_exist');
     }
 }

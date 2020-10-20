@@ -45,7 +45,7 @@ class mod_perform_webapi_resolver_update_notification_triggers extends advanced_
 
         /** @var activity_model $activity */
         $activity = $perform_generator->create_activity_in_container([]);
-        return notification_model::create($activity, 'overdue_reminder', false);
+        return notification_model::load_by_activity_and_class_key($activity, 'overdue_reminder');
     }
 
     public function data_triggers(): array {

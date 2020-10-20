@@ -23,6 +23,7 @@
 
 namespace mod_perform\formatter\activity;
 
+use core\orm\formatter\entity_model_formatter;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\formatter;
 use mod_perform\notification\trigger;
@@ -32,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Maps the notification model class into a GraphQL mod_perform_notification.
  */
-class notification extends formatter {
+class notification extends entity_model_formatter {
     private const TRIGGER_TYPES = [
         trigger::TYPE_BEFORE => 'BEFORE',
         trigger::TYPE_AFTER => 'AFTER'
@@ -61,12 +62,5 @@ class notification extends formatter {
      */
     protected function format_trigger_type(): ?string {
         return self::TRIGGER_TYPES[$this->object->trigger_type] ?? null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function has_field(string $field): bool {
-        return $this->object->has_attribute($field);
     }
 }
