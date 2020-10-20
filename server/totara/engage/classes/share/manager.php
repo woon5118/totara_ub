@@ -303,6 +303,17 @@ final class manager {
             throw new \coding_exception("No recipient with {$recipient_id} is found");
         }
 
+        if ($recipient->area !== user::AREA) {
+            $library = \totara_engage\share\recipient\helper::get_recipient_class($recipient->component, $recipient->area);
+            $library = new $library($recipient->instanceid);
+            $data = $library->get_data();
+            $has_capability = $data['unshare'];
+
+            if (!$has_capability) {
+                throw new share_exception('error:sharecapability', $instance::get_resource_type());
+            }
+        }
+
         if (!$instance->can_unshare($recipient->instanceid, $recipient->area !== user::AREA)) {
             throw new share_exception('error:sharecapability', $instance::get_resource_type());
         }

@@ -363,7 +363,6 @@ abstract class card {
      * @return array
      */
     public function get_footnotes(array $args): array {
-        global $USER;
         $footnotes = [];
 
         // What type of footnotes are we looking for.
@@ -390,13 +389,7 @@ abstract class card {
                         $library = new $library($recipient->instanceid);
                         $data = $library->get_data();
                         $has_capability = $data['unshare'];
-
-                        // If current user is sharer, we still need to allow sharer to unshare resource.
-                        if ($USER->id == $recipient->sharerid) {
-                            $has_capability = true;
-                        }
                     }
-
                 }
 
                 $footnotes[] = [

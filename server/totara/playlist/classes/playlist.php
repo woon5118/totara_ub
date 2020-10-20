@@ -880,7 +880,7 @@ final class playlist implements accessible, shareable {
         }
 
         $context = \context_user::instance($sharer_id);
-        return has_capability('engage/article:unshare', $context, $sharer_id);
+        return has_capability('totara/playlist:unshare', $context, $sharer_id);
     }
 
     /**

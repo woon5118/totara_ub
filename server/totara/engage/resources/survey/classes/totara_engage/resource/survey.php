@@ -617,6 +617,6 @@ final class survey extends resource_item {
         }
 
         $context = \context_user::instance($sharer_id);
-        return has_capability('engage/article:unshare', $context, $sharer_id);
+        return has_capability('engage/survey:unshare', $context, $sharer_id);
     }
 }
