@@ -152,6 +152,13 @@ extend type Query {
   ): mod_perform_participant_section
 
   """
+  All participant sections in a participant instance
+  """
+  mod_perform_participant_sections(
+    participant_instance_id: core_id
+  ): [mod_perform_participant_section]
+
+  """
   A section of elements for an external user to respond to
   """
   mod_perform_participant_section_external_participant(

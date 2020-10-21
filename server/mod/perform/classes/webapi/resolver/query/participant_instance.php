@@ -41,16 +41,24 @@ class participant_instance implements query_resolver, has_middleware {
 
         $participant_instance = participant_instance_model::load_by_id($participant_instance_id);
 
-        if (!util::can_manage_participation(
-            user::logged_in()->id,
-            $participant_instance->get_subject_instance()->subject_user_id
-        )) {
+        if (!self::can_view($participant_instance)) {
             return null;
         }
 
         $ec->set_relevant_context($participant_instance->get_subject_instance()->get_context());
 
         return $participant_instance;
+    }
+
+    private static function can_view(participant_instance_model $participant_instance): bool {
+        if ($participant_instance->get_is_for_current_user()) {
+            return true;
+        }
+
+        return util::can_manage_participation(
+            user::logged_in()->id,
+            $participant_instance->get_subject_instance()->subject_user_id
+        );
     }
 
     /**

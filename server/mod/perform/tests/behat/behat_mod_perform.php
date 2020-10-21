@@ -35,6 +35,7 @@ use mod_perform\controllers\activity\print_user_activity;
 use mod_perform\controllers\activity\user_activities;
 use mod_perform\controllers\activity\view_external_participant_activity;
 use mod_perform\controllers\activity\view_user_activity;
+use mod_perform\controllers\perform_controller;
 use mod_perform\controllers\reporting\performance\view_only_user_activity;
 use mod_perform\entities\activity\activity;
 use mod_perform\entities\activity\external_participant;
@@ -60,8 +61,8 @@ class behat_mod_perform extends behat_base {
     public const TUI_OTHER_PARTICIPANT_RESPONSES_ANONYMOUS_RESPONSE_PARTICIPANT_LOCATOR = '.tui-otherParticipantResponses__anonymousResponse-participant';
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
     public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceSingleParticipantResponse__answer';
-    public const PERFORM_ACTIVITY_PRINT_SECTION_LOCATOR = '.tui-participantContent .tui-participantContent__section .tui-participantContent__section:nth-of-type(%d)';
-    public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
+    public const PERFORM_ACTIVITY_PRINT_SECTION_LOCATOR = '.tui-participantContentPrint .tui-participantContentPrint__section .tui-participantContentPrint__section:nth-of-type(%d)';
+    public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_VALUE_EXTERNAL = '.tui-participantContent__user-relationshipValue';
     public const PERFORM_ACTIVITY_GENERAL_INFORMATION_RELATIONSHIP_LOCATOR = '.tui-participantGeneralInformation__relationship-heading';
     public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR = '.tui-participantContent__sectionHeading-otherResponseSwitch button';
     public const MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR = '.tui-performActivitySectionRelationship__item-name';
@@ -436,12 +437,11 @@ class behat_mod_perform extends behat_base {
      *
      * @param string $expected_relation
      * @param string $participant_source
-     * @throws ExpectationException
      */
     public function i_should_see_perform_activity_relationship_to_user(string $expected_relation, string $participant_source = 'internal'): void {
         $locator = $participant_source === 'internal'
             ? self::PERFORM_ACTIVITY_GENERAL_INFORMATION_RELATIONSHIP_LOCATOR
-            : self::PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR;
+            : self::PERFORM_ACTIVITY_YOUR_RELATIONSHIP_VALUE_EXTERNAL;
 
         $this->execute('behat_general::assert_element_contains_text',
             [$expected_relation, $locator, 'css_element']
@@ -1538,8 +1538,16 @@ class behat_mod_perform extends behat_base {
             $activity_name, $subject_user_name, $participant_user_name
         );
 
-        $controller_class = $page_type === 'view' ? view_user_activity::class : print_user_activity::class;
-        $this->navigate_to_page($controller_class::get_url(['participant_instance_id' => $participant_instance->id]));
+        /** @var perform_controller $controller_class */
+        if ($page_type === 'print') {
+            $controller_class = print_user_activity::class;
+            $params = ['participant_section_id' => $participant_instance->participant_sections->first()->id];
+        } else {
+            $controller_class = view_user_activity::class;
+            $params = ['participant_instance_id' => $participant_instance->id];
+        }
+
+        $this->navigate_to_page($controller_class::get_url($params));
     }
 
     private function get_user_by_username(string $user_name): entity {
@@ -1564,7 +1572,7 @@ class behat_mod_perform extends behat_base {
         string $activity_name,
         string $subject_user_name,
         string $participant_user_name
-    ): entity {
+    ): participant_instance {
         return participant_instance::repository()
             ->as('pi')
             ->join([user::TABLE, 'pu'], 'pu.id', 'pi.participant_id')

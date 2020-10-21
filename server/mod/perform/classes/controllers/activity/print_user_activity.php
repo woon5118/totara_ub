@@ -48,13 +48,12 @@ class print_user_activity extends perform_controller {
      * @inheritDoc
      */
     protected function setup_context(): context {
-        $participant_instance_id = $this->get_participant_instance_id();
+        // The reason this controller uses participant_section rather than participant_instance_id is
+        // to keep the RelationshipSelector front-end component simple for both print and regular form use cases.
         $participant_section_id = $this->get_participant_section_id();
 
-        $this->check_required_params($participant_instance_id, $participant_section_id);
-
         try {
-            $this->participant_instance = $this->get_participant_instance($participant_instance_id, $participant_section_id);
+            $this->participant_instance = participant_section_model::load_by_id($participant_section_id)->get_participant_instance();
         } catch (\Exception $exception) {
             throw new moodle_exception('invalid_activity', 'mod_perform');
         }
@@ -64,44 +63,31 @@ class print_user_activity extends perform_controller {
 
     /**
      * @return tui_view
-     * @throws invalid_parameter_exception
      */
     public function action(): tui_view {
-        $participant_instance_id = $this->get_participant_instance_id();
         $participant_section_id = $this->get_participant_section_id();
 
         // Block access if the subject user or the participant got deleted
-        if ($this->participant_instance->is_subject_or_participant_deleted()) {
+        // or if the logged in user isn't the participant.
+        if ($this->participant_instance->is_subject_or_participant_deleted()
+            || $this->participant_instance->participant->id != user::logged_in()->id) {
             throw new moodle_exception('invalid_activity', 'mod_perform');
         }
 
+        $this->set_url(self::get_url(['participant_section_id' => $participant_section_id]));
+
         $props = [
             'current-user-id' => user::logged_in()->id,
+            'participant-instance-id' => (int)$this->participant_instance->id,
+            'participant-section-id' => $participant_section_id,
             'print' => true,
+            'subject-instance-id' => (int)$this->participant_instance->subject_instance_id,
         ];
-        $url_args = [];
 
-        if ($this->participant_instance->participant->id == user::logged_in()->id) {
-            $props['subject-instance-id'] = (int)$this->participant_instance->subject_instance_id;
-            $props['participant-instance-id'] = (int)$this->participant_instance->id;
-            $props['name'] = (string)$this->participant_instance->subject_instance->activity->name;
-
-            if ($participant_section_id > 0) {
-                $props['participant-section-id'] = (int)$participant_section_id;
-            }
-        }
-
-        if ($participant_section_id > 0) {
-            $url_args['participant_section_id'] = $participant_section_id;
-        } else if ($participant_instance_id > 0) {
-            $url_args['participant_instance_id'] = $participant_instance_id;
-        }
-
-        $url = self::get_url($url_args);
-        $this->set_url($url);
+        $activity_name = (string)$this->participant_instance->subject_instance->activity->name;
 
         return self::create_tui_view('mod_perform/pages/UserActivity', $props)
-            ->set_title(($props['name'] ?? '') . ' ' . get_string('user_activities_page_print', 'mod_perform'));
+            ->set_title(get_string('user_activities_page_print', 'mod_perform', $activity_name));
     }
 
     /**
@@ -114,46 +100,8 @@ class print_user_activity extends perform_controller {
     /**
      * @return int
      */
-    protected function get_participant_instance_id(): int {
-        return $this->get_optional_param('participant_instance_id', 0, PARAM_INT);
-    }
-
-    /**
-     * @return int
-     */
     protected function get_participant_section_id(): int {
-        return $this->get_optional_param('participant_section_id', 0, PARAM_INT);
-    }
-
-    /**
-     * Returns the participant instance for this controller
-     *
-     * @param int $participant_instance_id
-     * @param int $participant_section_id
-     * @return participant_instance_model
-     */
-    private function get_participant_instance(
-        int $participant_instance_id,
-        int $participant_section_id
-    ): participant_instance_model {
-        return $participant_section_id
-            ? participant_section_model::load_by_id($participant_section_id)->get_participant_instance()
-            : participant_instance_model::load_by_id($participant_instance_id);
-    }
-
-    /**
-     * check if participant_instance_id and participant_section_id are both provided or no one is provided
-     *
-     * @param int $participant_instance_id
-     * @param int $participant_section_id
-     * @throws invalid_parameter_exception
-     */
-    private function check_required_params(int $participant_instance_id, int $participant_section_id): void {
-        if (!$participant_instance_id && !$participant_section_id) {
-            throw new invalid_parameter_exception(
-                'At least one parameter is required, either participant_instance_id or participant_section_id'
-            );
-        }
+        return $this->get_required_param('participant_section_id', PARAM_INT);
     }
 
 }

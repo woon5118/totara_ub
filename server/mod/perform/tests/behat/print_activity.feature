@@ -49,7 +49,7 @@ Feature: Print view of a single-section user activity
     # Check without any response.
     When I log in as "david"
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "david" is the participant
-    Then "Print activity" "button" should be visible
+    Then "Print" "button" should be visible
     And I should see perform activity relationship to user "yourself"
     And I should see "Appraisal"
     And I should see "Single section activity"

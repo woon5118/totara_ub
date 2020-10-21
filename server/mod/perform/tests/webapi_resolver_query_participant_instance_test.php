@@ -101,6 +101,24 @@ class mod_perform_webapi_resolver_query_participant_instance_testcase extends mo
         $this->assertEquals($subject_participant_instance->id, $returned_participant_instance->id);
     }
 
+    public function test_get_as_participant(): void {
+        /** @var participant_instance $subject_participant_instance */
+        $subject_participant_instance = self::$about_user_and_participating->participant_instances->find(
+            function (participant_instance $pi) {
+                return (int) $pi->participant_id === (int) self::$about_user_and_participating->subject_user->id;
+            }
+        );
+
+        $args = [
+            'participant_instance_id' => $subject_participant_instance->get_id()
+        ];
+
+        self::setUser($subject_participant_instance->participant_id);
+
+        $returned_participant_instance = $this->resolve_graphql_query(self::QUERY, $args);
+        $this->assertEquals($subject_participant_instance->id, $returned_participant_instance->id);
+    }
+
     public function test_failed_ajax_query(): void {
         /** @var participant_instance $subject_participant_instance */
         $subject_participant_instance = self::$about_user_and_participating->participant_instances->find(

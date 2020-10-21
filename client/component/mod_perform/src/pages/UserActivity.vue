@@ -30,14 +30,11 @@
       />
       <ActivityContentPrint
         v-else-if="print && subjectInstance"
-        :current-user-id="currentUserId"
         :activity="subjectInstance.activity"
         :participant-instance-id="participantInstanceId"
-        :participant-section-id="participantSectionId"
         :subject-user="subjectInstance.subject_user"
         :created-at="subjectInstance.created_at"
         :due-date="subjectInstance.due_date"
-        :token="token"
         :job-assignments="jobAssignments"
       />
       <ActivityContent

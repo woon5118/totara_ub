@@ -24,6 +24,7 @@
 namespace mod_perform\entities\activity;
 
 use coding_exception;
+use core\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
@@ -95,5 +96,33 @@ class participant_section_repository extends repository {
             ->where('pi.participant_id', $user_id)
             ->where('pi.participant_source', $participant_source)
             ->one(false);
+    }
+
+    /**
+     * Gets all participant sections relating to particular participant instance.
+     *
+     * @param int $participant_instance_id
+     * @param int $user_id Returned participant sections will be restricted to this user
+     * @param int $participant_source
+     * @return participant_section_entity[]|collection
+     */
+    public static function get_all_for_participant_instance(
+        int $participant_instance_id,
+        int $user_id,
+        int $participant_source = participant_source::INTERNAL
+    ): collection {
+        return participant_section_entity::repository()->as('ps')
+            ->with('participant_instance')
+            // Ensure the user we are fetching responses for is a participant for the section they belong to.
+            ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
+            ->join([section::TABLE, 's'], 'ps.section_id', 's.id')
+            ->when(true, function (repository $repository) {
+                participant_instance_repository::add_user_not_deleted_filter($repository, 'pi');
+            })
+            ->where('pi.id', $participant_instance_id)
+            ->where('pi.participant_id', $user_id)
+            ->where('pi.participant_source', $participant_source)
+            ->order_by('s.sort_order', 'asc')
+            ->get();
     }
 }

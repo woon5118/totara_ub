@@ -1,0 +1,55 @@
+query mod_perform_participant_sections_for_print(
+  $participant_instance_id: core_id!
+) {
+  mod_perform_participant_instance(
+    participant_instance_id: $participant_instance_id
+  ) {
+    core_relationship {
+      idnumber
+      name
+    }
+  }
+  mod_perform_participant_sections(
+    participant_instance_id: $participant_instance_id
+  ) {
+    id
+    progress_status
+    availability_status
+    can_answer
+    section {
+      display_title
+    }
+    section_element_responses {
+      section_element_id
+      element {
+        element_plugin {
+          participant_form_component
+          participant_response_component
+        }
+        title
+        data
+        is_required
+        is_respondable
+      }
+      sort_order
+      response_data
+      response_data_raw: response_data(format: RAW)
+      other_responder_groups {
+        relationship_name
+        responses {
+          participant_instance {
+            participant {
+              fullname
+              profileimageurlsmall
+            }
+          }
+          response_data
+        }
+      }
+    }
+    responses_are_visible_to {
+      name_plural
+      idnumber
+    }
+  }
+}

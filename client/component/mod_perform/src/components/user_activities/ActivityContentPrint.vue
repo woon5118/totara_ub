@@ -16,21 +16,21 @@
   @module mod_perform
 -->
 <template>
-  <Loader :loading="$apollo.loading">
-    <div class="tui-participantContent">
+  <div class="tui-participantContentPrint">
+    <Loader :loading="$apollo.loading">
       <ParticipantGeneralInformation
-        v-if="subjectUser.card_display && !viewOnlyReportMode"
+        v-if="subjectUser.card_display"
         :subject-user="subjectUser"
         :job-assignments="jobAssignments"
         :current-user-is-subject="currentUserIsSubject"
-        :relationship="currentRelationship"
+        :relationship="relationshipToUser"
       />
       <div class="tui-participantContentPrint__header">
-        <h2 class="tui-participantContentPrint__header-type">
+        <h2>
           {{ activity.type.display_name }}
         </h2>
 
-        <h1 class="tui-participantContentPrint__header-name">
+        <h1>
           {{ activity.name }}
         </h1>
 
@@ -43,95 +43,106 @@
           </span>
         </p>
       </div>
-      <div class="tui-participantContent__section-required-container">
-        <span
-          class="tui-participantContent__section-response-required"
-          v-text="'*'"
-        />
+      <div>
+        <RequiredOptionalIndicator is-required />
         {{ $str('section_element_response_required', 'mod_perform') }}
       </div>
 
-      <div class="tui-participantContent__section">
+      <div class="tui-participantContentPrint__section">
         <div
-          v-for="participantSection in participantSections"
-          :key="participantSection.id"
-          class="tui-participantContent__section"
+          v-for="sectionResponse in participantSectionResponses"
+          :key="sectionResponse.id"
+          class="tui-participantContentPrint__section"
         >
           <Uniform
-            v-if="participantSection.id in initialValues"
-            :initial-values="initialValues[participantSection.id]"
+            v-if="sectionResponse.id in initialUniformValues"
+            :initial-values="initialUniformValues[sectionResponse.id]"
           >
-            <div class="tui-participantContent__sectionHeading">
+            <div class="tui-participantContentPrint__sectionHeading">
               <h3
                 v-if="activity.settings.multisection"
-                class="tui-participantContent__sectionHeading-title"
+                class="tui-participantContentPrint__sectionHeading-title"
               >
-                {{ participantSection.section.display_title }}
+                {{ sectionResponse.section.display_title }}
               </h3>
             </div>
 
             <div
-              v-for="sectionElement in sectionElements[participantSection.id]"
-              :key="sectionElement.id"
-              class="tui-participantContent__sectionItem"
+              v-for="elementResponse in elementsResponsesBySection[
+                sectionResponse.id
+              ]"
+              :key="elementResponse.id"
+              class="tui-participantContentPrint__sectionItem"
             >
-              <div v-if="sectionElements[participantSection.id]">
-                <h3
-                  v-if="sectionElement.element.title"
-                  :id="$id('title')"
-                  class="tui-participantContent__sectionItem-contentHeader"
+              <h3
+                v-if="elementResponse.element.title"
+                :id="$id('title')"
+                class="tui-participantContentPrint__sectionItem-contentHeader"
+              >
+                {{ elementResponse.element.title }}
+              </h3>
+
+              <RequiredOptionalIndicator
+                v-if="elementResponse.is_respondable"
+                :is-required="elementResponse.element.is_required"
+              />
+
+              <div class="tui-participantContentPrint__sectionItem-content">
+                <ElementParticipantForm
+                  v-if="
+                    elementResponse.is_respondable && sectionResponse.can_answer
+                  "
                 >
-                  {{ sectionElement.element.title }}
-                </h3>
-
-                <RequiredOptionalIndicator
-                  v-if="sectionElement.is_respondable"
-                  :is-required="sectionElement.element.is_required"
-                />
-
-                <div class="tui-participantContent__sectionItem-content">
-                  <ElementParticipantForm
-                    v-if="
-                      sectionElement.is_respondable &&
-                        sectionElement.can_answer &&
-                        !viewOnlyReportMode
-                    "
-                  >
-                    <template v-slot:content>
-                      <component
-                        :is="sectionElement.component"
-                        class="tui-participantContentPrint__element"
-                        v-bind="loadUserSectionElementProps(sectionElement)"
-                      />
-                    </template>
-                  </ElementParticipantForm>
-                  <div
-                    v-else-if="!sectionElement.is_respondable"
-                    class="tui-participantContent__staticElement"
-                  >
+                  <template v-slot:content>
                     <component
-                      :is="sectionElement.component"
-                      v-bind="loadUserSectionElementProps(sectionElement)"
+                      :is="elementResponse.responseComponent"
+                      v-if="sectionResponse.availability_status === 'CLOSED'"
+                      class="tui-participantContentPrint__element tui-participantContentPrint__element--readOnly"
+                      :element="elementResponse.element"
+                      :data="JSON.parse(elementResponse.response_data)"
                     />
-                  </div>
-                  <OtherParticipantResponses
-                    :view-only="viewOnlyReportMode"
-                    :section-element="sectionElement"
-                    :anonymous-responses="activity.anonymous_responses"
+                    <component
+                      :is="elementResponse.formComponent"
+                      v-else
+                      class="tui-participantContentPrint__element"
+                      :element="elementResponse.element"
+                      :path="['sectionElements', elementResponse.id]"
+                    />
+                  </template>
+                </ElementParticipantForm>
+                <template v-else-if="!elementResponse.is_respondable">
+                  <component
+                    :is="elementResponse.responseComponent"
+                    v-if="sectionResponse.availability_status === 'CLOSED'"
+                    :element="elementResponse.element"
+                    :data="JSON.parse(elementResponse.response_data)"
                   />
-                </div>
+                  <component
+                    :is="elementResponse.formComponent"
+                    v-else
+                    :element="elementResponse.element"
+                    :path="['sectionElements', elementResponse.id]"
+                  />
+                </template>
+                <OtherParticipantResponses
+                  :view-only="false"
+                  :section-element="elementResponse"
+                  :anonymous-responses="activity.anonymous_responses"
+                />
               </div>
             </div>
           </Uniform>
         </div>
       </div>
-      <Button
-        class="tui-performUserActivityList__action-button"
-        :text="$str('print_activity', 'mod_perform')"
-        @click="printActivity()"
-      />
-    </div>
-  </Loader>
+
+      <div
+        v-if="!$apollo.loading"
+        class="tui-participantContentPrint__actionButtons"
+      >
+        <Button :text="$str('print', 'mod_perform')" @click="printActivity" />
+      </div>
+    </Loader>
+  </div>
 </template>
 
 <script>
@@ -148,9 +159,7 @@ import RequiredOptionalIndicator from 'mod_perform/components/user_activities/Re
 import { Uniform } from 'tui/components/uniform';
 
 // graphQL
-import SectionResponsesQuery from 'mod_perform/graphql/participant_section';
-import viewOnlyReportModeSectionResponsesQuery from 'mod_perform/graphql/view_only_section_responses';
-import SectionResponsesQueryExternal from 'mod_perform/graphql/participant_section_external_participant_nosession';
+import participantSectionsForPrintQuery from 'mod_perform/graphql/participant_sections_for_print';
 
 export default {
   components: {
@@ -168,14 +177,17 @@ export default {
      * The abstract perform activity this is an instance of.
      */
     activity: {
-      required: true,
       type: Object,
+      required: true,
     },
 
     /**
      * Created day of activity.
      */
-    createdAt: String,
+    createdAt: {
+      type: String,
+      required: true,
+    },
 
     /**
      * Due day of activity.
@@ -186,8 +198,8 @@ export default {
      * The user this activity is about.
      */
     subjectUser: {
-      required: true,
       type: Object,
+      required: true,
       validator(value) {
         return ['id', 'profileimageurlsmall', 'fullname'].every(
           Object.prototype.hasOwnProperty.bind(value)
@@ -196,38 +208,16 @@ export default {
     },
 
     /**
-     * The id of the logged in user.
+     * The participant instance id used to fetch the participant sections.
      */
-    currentUserId: Number,
-
-    /**
-     * A participant instance id, to look the section up with (used by participant mode).
-     */
-    participantInstanceId: Number,
-
-    /**
-     * participant section id (used by participant mode).
-     */
-    participantSectionId: Number,
-
-    /**
-     * subject instance id (used by view-only mode).
-     */
-    subjectInstanceId: Number,
-
-    /**
-     * section id (used by view-only mode).
-     */
-    sectionId: Number,
-
-    /**
-     * Optional token if this is an external participant (used by participant mode).
-     */
-    token: {
-      required: false,
-      type: String,
+    participantInstanceId: {
+      type: Number,
+      required: true,
     },
 
+    /**
+     * The subjects job assignments.
+     */
     jobAssignments: {
       type: Array,
       required: true,
@@ -235,301 +225,127 @@ export default {
   },
   data() {
     return {
-      answerableParticipantInstances: null,
-      answeringAsParticipantId: this.participantInstanceId,
-      activeParticipantSection: {},
+      participantInstance: null,
+      participantSectionResponses: [],
       errors: null,
-      hasOtherResponse: false,
-      initialValues: {},
-      section: {
-        title: '',
-        section_elements: [],
-      },
-      sectionElements: [],
-      progressStatus: null,
-      showOtherResponse: false,
-      formValues: {},
-      participantSections: [],
-      responsesAreVisibleTo: [],
-      selectedParticipantSectionId: this.participantSectionId,
-      selectedSectionId: this.selectedSectionId || null,
       isDraft: false,
     };
   },
   computed: {
     /**
-     * Are we showing view-only (report) version,
-     * this is the form not from perspective of any one participant, but as someone reviewing all other responses.
-     *
-     * View only mode requires the subjectInstanceId prop (sectionId is optional)
-     * Participant mode requires the participantInstanceId prop (participantSectionId is optional)
+     * Element responses keyed by participant section id.
      */
-    viewOnlyReportMode() {
-      return Boolean(this.subjectInstanceId);
-    },
+    elementsResponsesBySection() {
+      const elementResponsesBySection = {};
 
-    participantCanAnswer() {
-      return this.activeParticipantSection.can_answer;
+      this.participantSectionResponses.forEach(sectionResponse => {
+        elementResponsesBySection[
+          sectionResponse.id
+        ] = sectionResponse.section_element_responses.map(
+          sectionElementResponse => {
+            return {
+              id: sectionElementResponse.section_element_id,
+              clientId: uniqueId(),
+              formComponent: tui.asyncComponent(
+                sectionElementResponse.element.element_plugin
+                  .participant_form_component
+              ),
+              responseComponent: tui.asyncComponent(
+                sectionElementResponse.element.element_plugin
+                  .participant_response_component
+              ),
+              element: {
+                type: sectionElementResponse.element.element_plugin,
+                title: sectionElementResponse.element.title,
+                data: JSON.parse(sectionElementResponse.element.data),
+                is_required: sectionElementResponse.element.is_required,
+              },
+              sort_order: sectionElementResponse.sort_order,
+              is_respondable: sectionElementResponse.element.is_respondable,
+              response_data: sectionElementResponse.response_data,
+              response_data_raw: sectionElementResponse.response_data_raw,
+              other_responder_groups:
+                sectionElementResponse.other_responder_groups,
+            };
+          }
+        );
+      });
+
+      return elementResponsesBySection;
     },
 
     /**
-     * Get and set the section navigation model,
-     * for the view-only (report) version this is a section_id,
-     * for participant mode this is a participant_section_id.
+     * Keyed by participant section id
      */
-    navModel: {
-      get() {
-        if (this.viewOnlyReportMode) {
-          const firstSiblingSection = this.siblingSections[0] || {};
-
-          return this.selectedSectionId
-            ? this.selectedSectionId
-            : firstSiblingSection.id;
-        }
-
-        return this.selectedParticipantSectionId;
-      },
-      set(value) {
-        if (this.viewOnlyReportMode) {
-          this.selectedSectionId = value;
-        } else {
-          this.selectedParticipantSectionId = value;
-        }
-      },
-    },
-
-    /**
-     * Returns true if the current user is an external participant,
-     * means the token is set
-     * @return {Boolean}
-     */
-    isExternalParticipant() {
-      if (this.viewOnlyReportMode) {
-        return false;
+    initialUniformValues() {
+      if (this.participantSectionResponses === []) {
+        return {};
       }
 
-      return this.token !== null && this.token.length > 0;
+      const initialUniformValues = {};
+
+      this.participantSectionResponses.forEach(sectionResponse => {
+        initialUniformValues[sectionResponse.id] = { sectionElements: {} };
+
+        this.elementsResponsesBySection[sectionResponse.id]
+          .filter(elementResponse => elementResponse.is_respondable)
+          .forEach(elementResponse => {
+            initialUniformValues[sectionResponse.id].sectionElements[
+              elementResponse.id
+            ] = JSON.parse(elementResponse.response_data_raw);
+          });
+      });
+
+      return initialUniformValues;
     },
 
+    /**
+     * The current users relationship to the subject of the activity.
+     * @return {string|null}
+     */
     relationshipToUser() {
+      if (this.participantInstance === null) {
+        return null;
+      }
+
       if (this.currentUserIsSubject) {
         return this.$str('relation_to_subject_self', 'mod_perform');
       }
 
-      return this.answeringAs ? this.answeringAs.core_relationship.name : null;
+      return this.participantInstance.core_relationship.name;
     },
 
     /**
-     * Is the participant answering as the subject relationship?
+     * Is the current user the subject on this activity.
      */
     currentUserIsSubject() {
-      return (
-        !this.isExternalParticipant &&
-        this.answeringAs != null &&
-        this.answeringAs.core_relationship.idnumber === RELATIONSHIP_SUBJECT
-      );
-    },
-
-    /**
-     * Checks if active participant section is closed.
-     *
-     * @return {Boolean}
-     */
-    activeSectionIsClosed() {
-      return (
-        this.activeParticipantSection &&
-        this.activeParticipantSection.availability_status === 'CLOSED'
-      );
-    },
-
-    navModelIndex() {
-      const sections = this.navModelSections;
-
-      return sections.findIndex(section => section.id == this.navModel);
-    },
-
-    nextNavSectionModel() {
-      const next = this.navModelSections[this.navModelIndex + 1];
-      return next ? next.id : null;
-    },
-
-    navModelSections() {
-      return this.viewOnlyReportMode
-        ? this.siblingSections
-        : this.participantSections;
-    },
-
-    /*
-     * Get the participant instance we are currently answering as.
-     */
-    answeringAs() {
-      if (
-        this.viewOnlyReportMode ||
-        this.answerableParticipantInstances === null
-      ) {
+      if (this.participantInstance === null) {
         return null;
       }
 
-      return this.answerableParticipantInstances.find(
-        pi => Number(pi.id) === Number(this.answeringAsParticipantId)
+      return (
+        this.participantInstance.core_relationship.idnumber ===
+        RELATIONSHIP_SUBJECT
       );
-    },
-    currentRelationship() {
-      return this.answeringAs ? this.answeringAs.core_relationship.name : null;
     },
   },
   apollo: {
-    section: {
-      query() {
-        if (this.viewOnlyReportMode) {
-          return viewOnlyReportModeSectionResponsesQuery;
-        }
-
-        return this.isExternalParticipant
-          ? SectionResponsesQueryExternal
-          : SectionResponsesQuery;
-      },
+    participantSectionResponses: {
+      query: participantSectionsForPrintQuery,
       variables() {
-        if (this.viewOnlyReportMode) {
-          return {
-            subject_instance_id: this.subjectInstanceId,
-            section_id: this.selectedSectionId,
-          };
-        }
-
         return {
-          participant_instance_id: this.answeringAsParticipantId,
-          participant_section_id: this.selectedParticipantSectionId,
-          token: this.token,
+          participant_instance_id: this.participantInstanceId,
         };
       },
-      update(data) {
-        if (this.viewOnlyReportMode) {
-          return data.mod_perform_view_only_section_responses.section;
-        }
-
-        return this.isExternalParticipant
-          ? data.mod_perform_participant_section_external_participant.section
-          : data.mod_perform_participant_section.section;
-      },
+      update: data => data['mod_perform_participant_sections'],
       result({ data }) {
-        let result;
-
-        if (this.viewOnlyReportMode) {
-          result = data.mod_perform_view_only_section_responses;
-          this.siblingSections = result.siblings;
-        } else {
-          result = this.isExternalParticipant
-            ? data.mod_perform_participant_section_external_participant
-            : data.mod_perform_participant_section;
-
-          this.selectedParticipantSectionId = result.id;
-          this.answerableParticipantInstances =
-            result.answerable_participant_instances;
-          this.activeParticipantSection = result;
-          this.participantSections =
-            result.participant_instance.participant_sections;
-          this.progressStatus = result.progress_status;
-          this.responsesAreVisibleTo = result.responses_are_visible_to;
-        }
-
-        this.formValues = {};
-        this.initialValues[result.id] = {
-          sectionElements: {},
-        };
-        this.sectionElements[result.id] = result.section_element_responses.map(
-          item => {
-            let component = this.activeSectionIsClosed
-              ? item.element.element_plugin.participant_response_component
-              : item.element.element_plugin.participant_form_component;
-            return {
-              id: item.section_element_id,
-              clientId: uniqueId(),
-              component: tui.asyncComponent(component),
-              element: {
-                type: item.element.element_plugin,
-                title: item.element.title,
-                identifier: item.element.identifier,
-                data: JSON.parse(item.element.data),
-                is_required: item.element.is_required,
-                responseData: null,
-              },
-              sort_order: item.sort_order,
-              can_answer: this.participantCanAnswer,
-              is_respondable: item.element.is_respondable,
-              response_data: item.response_data,
-              other_responder_groups: item.other_responder_groups,
-            };
-          }
-        );
-
-        if (this.viewOnlyReportMode || !this.participantCanAnswer) {
-          this.showOtherResponse = true;
-        }
-
-        result.section_element_responses
-          .filter(item => item.element.is_respondable)
-          .forEach(item => {
-            this.initialValues[result.id].sectionElements[
-              item.section_element_id
-            ] = JSON.parse(item.response_data);
-            this.hasOtherResponse = item.other_responder_groups.length > 0;
-            item.other_responder_groups.forEach(group => {
-              if (group.responses.length > 0 && item.response_data) {
-                this.showOtherResponse = true;
-              }
-            });
-          });
-
-        setTimeout(() => {
-          if (this.navModelSections[this.navModelIndex + 1]) {
-            this.changeSection(this.nextNavSectionModel);
-          }
-        }, 0);
+        this.participantInstance = data['mod_perform_participant_instance'];
       },
     },
   },
   methods: {
     /**
-     * Creates user section element component props
-     *
-     * @param {Object} sectionElement
-     * @return {Object}
-     */
-    loadUserSectionElementProps(sectionElement) {
-      let props = {
-        element: sectionElement.element,
-      };
-      if (this.activeSectionIsClosed) {
-        props.data = JSON.parse(sectionElement.response_data);
-        props.class = 'tui-participantContent__readonly';
-      } else {
-        props.isDraft = this.isDraft;
-        props.path = ['sectionElements', sectionElement.id];
-        props.error = this.errors && this.errors[sectionElement.id];
-      }
-
-      return props;
-    },
-
-    /**
-     * Loads the view-only section as active section.
-     */
-    async reloadData() {
-      await this.$apollo.queries.section.refetch();
-    },
-
-    /**
-     * Change the url and data to a new (participant) section.
-     * @param newNavModel {Number}
-     */
-    changeSection(newNavModel) {
-      this.navModel = newNavModel;
-      this.reloadData();
-    },
-
-    /**
-     * Print activity.
+     * Open the print dialog.
      */
     printActivity() {
       window.print();
@@ -540,7 +356,7 @@ export default {
 <lang-strings>
 {
   "mod_perform": [
-    "print_activity",
+    "print",
     "relation_to_subject_self",
     "section_element_response_optional",
     "section_element_response_required",
@@ -556,12 +372,30 @@ export default {
 .tui-participantContentPrint {
   @include tui-font-body();
 
+  @media screen {
+    padding: var(--gap-10);
+  }
+
+  &__user {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: var(--gap-2) var(--gap-4);
+    border: var(--border-width-thin) solid var(--color-border);
+    border-radius: var(--border-radius-normal);
+
+    &-relationshipValue {
+      display: block;
+      margin: var(--gap-1) 0 0;
+    }
+  }
+
   &__header {
     @include tui-font-heading-medium();
     margin: var(--gap-12) 0 var(--gap-4) 0;
     padding: var(--gap-2) var(--gap-4);
     text-align: center;
-    border: var(--border-width-thin) solid var(--color-prompt-success);
+    border: var(--border-width-thin) solid var(--color-primary);
 
     &-date {
       @include tui-font-body-small();
@@ -569,8 +403,59 @@ export default {
       color: var(--color-neutral-6);
     }
   }
+
+  &__section {
+    &-requiredContainer {
+      margin-top: var(--gap-2);
+    }
+
+    &-responseRequired {
+      display: inline-flex;
+      @include tui-font-heading-label();
+      color: var(--color-primary);
+    }
+  }
+
   &__element {
     pointer-events: none;
+
+    &--readOnly {
+      padding-top: var(--gap-1);
+    }
+  }
+
+  &__sectionItem {
+    &-content {
+      & > * {
+        margin-top: var(--gap-4);
+      }
+    }
+
+    &-contentHeader {
+      display: inline-flex;
+      @include tui-font-heading-x-small();
+      margin-left: 0;
+    }
+  }
+
+  &__actionButtons {
+    display: flex;
+    justify-content: center;
+    padding-bottom: var(--gap-12);
+
+    & > * + * {
+      margin-left: var(--gap-4);
+    }
+  }
+
+  @media print {
+    &__actionButtons {
+      display: none;
+    }
+
+    &__sectionItem {
+      break-inside: avoid;
+    }
   }
 }
 </style>

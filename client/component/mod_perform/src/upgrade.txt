@@ -12,3 +12,5 @@ information provided here is intended especially for developers.
     * Template, SCSS changes
 * Updated SCSS of NotificationsTab.vue to address alignment issues
     * SCSS changes
+* Update template structure of ActivityContentPrint.vue including updating class names to be more consistent with conventions
+    * Template, SCSS changes
