@@ -43,7 +43,13 @@ final class instance implements query_resolver, has_middleware {
             $ec->set_relevant_context(\context_user::instance($USER->id));
         }
 
-        $playlist = playlist::from_id($args['id']);
+        // Do not expose internal exception.
+        try {
+            $playlist = playlist::from_id($args['id']);
+        } catch (\dml_exception $e) {
+            throw new \coding_exception('No playlist found');
+        }
+
         if (!access_manager::can_access($playlist, $USER->id)) {
             throw new \coding_exception("Cannot access to the playlist by the user with id '{$USER->id}'");
         }

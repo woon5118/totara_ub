@@ -43,8 +43,12 @@ final class get_article implements query_resolver, has_middleware {
             $ec->set_relevant_context(\context_user::instance($USER->id));
         }
 
-        /** @var article $article */
-        $article = article::from_resource_id($args['id']);
+        try {
+            /** @var article $article */
+            $article = article::from_resource_id($args['id']);
+        } catch (\dml_exception $e) {
+            throw new \coding_exception("No article found");
+        }
 
         if (!access_manager::can_access($article, $USER->id)) {
             throw new \coding_exception("User with id '{$USER->id}' does not have access to this article");

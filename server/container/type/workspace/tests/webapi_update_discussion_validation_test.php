@@ -23,6 +23,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use container_workspace\exception\discussion_exception;
+use container_workspace\member\member;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use core\json_editor\node\paragraph;
 
@@ -47,8 +48,7 @@ class container_workspace_webapi_update_discussion_validation_testcase extends a
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage("The format value is invalid");
 
-        $this->resolve_graphql_mutation(
-            'container_workspace_update_discussion',
+        $this->execute_mutation(
             [
                 'id' => $discussion->get_id(),
                 'content' => 'wooo',
@@ -80,8 +80,7 @@ class container_workspace_webapi_update_discussion_validation_testcase extends a
         $this->expectException(discussion_exception::class);
         $this->expectExceptionMessage(get_string('error:update_discussion', 'container_workspace'));
 
-        $this->resolve_graphql_mutation(
-            'container_workspace_update_discussion',
+        $this->execute_mutation(
             [
                 'id' => $discussion->get_id(),
                 'content' => json_encode([
@@ -110,8 +109,7 @@ class container_workspace_webapi_update_discussion_validation_testcase extends a
         $this->expectException(discussion_exception::class);
         $this->expectExceptionMessage(get_string('error:update_discussion', 'container_workspace'));
 
-        $this->resolve_graphql_mutation(
-            'container_workspace_update_discussion',
+        $this->execute_mutation(
             [
                 'id' => $discussion->get_id(),
                 'content_format' => FORMAT_JSON_EDITOR,
@@ -126,6 +124,108 @@ class container_workspace_webapi_update_discussion_validation_testcase extends a
                 ])
             ]
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_update_discussion_by_member_of_workspace(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+        $discussion = $workspace_generator->create_discussion($workspace->get_id());
+        member::added_to_workspace($workspace, $user_two->id);
+
+        $this->expectException(discussion_exception::class);
+        $this->expectExceptionMessage(get_string('error:update_discussion', 'container_workspace'));
+
+        $this->setUser($user_two);
+        $this->execute_mutation(
+            [
+                'id' => $discussion->get_id(),
+                'content_format' => FORMAT_JSON_EDITOR,
+                'content' => json_encode([
+                    'type' => 'doc',
+                    'content' => [paragraph::create_json_node_from_text('xxxooo')]
+                ])
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_update_discussion_by_admin(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+        $discussion = $workspace_generator->create_discussion($workspace->get_id());
+
+        $this->setAdminUser();
+        $result = $this->execute_mutation(
+            [
+                'id' => $discussion->get_id(),
+                'content_format' => FORMAT_JSON_EDITOR,
+                'content' => json_encode([
+                    'type' => 'doc',
+                    'content' => [paragraph::create_json_node_from_text('new content')]
+                ])
+            ]
+        );
+
+        $this->assertNotEmpty($result);
+        self::assertEquals('new content', $result->get_content_text());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_update_discussion_by_discussion_owner(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+        $user_two = $generator->create_user();
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        member::added_to_workspace($workspace, $user_two->id);
+        $discussion = $workspace_generator->create_discussion(
+            $workspace->get_id(),
+            null,
+            null,
+            null,
+            $user_two->id
+        );
+
+        $result = $this->execute_mutation(
+            [
+                'id' => $discussion->get_id(),
+                'content_format' => FORMAT_JSON_EDITOR,
+                'content' => json_encode([
+                    'type' => 'doc',
+                    'content' => [paragraph::create_json_node_from_text('new content')]
+                ])
+            ]
+        );
+
+        $this->assertNotEmpty($result);
+        self::assertEquals('new content', $result->get_content_text());
+    }
+
+    private function execute_mutation(array $args) {
+        return $this->resolve_graphql_mutation('container_workspace_update_discussion', $args);
     }
 
 }

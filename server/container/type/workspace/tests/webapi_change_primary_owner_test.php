@@ -94,4 +94,32 @@ class container_workspace_webapi_change_primary_owner_testcase extends advanced_
             ]
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_change_primary_owner_by_random_user(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $this->setUser($user_one);
+
+        /** @var container_workspace_generator $workspace_generator */
+        $workspace_generator = $generator->get_plugin_generator('container_workspace');
+        $workspace = $workspace_generator->create_workspace();
+
+        $user_two = $generator->create_user();
+        $user_three = $generator->create_user();
+
+        $this->setUser($user_three);
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Coding error detected, it must be fixed by a programmer: Actor does not have ability to update workspace owner');
+        $this->resolve_graphql_mutation(
+            'container_workspace_change_primary_owner',
+            [
+                'workspace_id' => $workspace->get_id(),
+                'user_id' => $user_two->id
+            ]
+        );
+    }
 }

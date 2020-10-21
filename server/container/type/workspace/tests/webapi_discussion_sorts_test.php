@@ -17,30 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
- * @package engage_article
+ * @author Qingyang Liu <qingyang.liu@totaralearning.com>
+ * @package container_workspace
  */
 defined('MOODLE_INTERNAL') || die();
 
-use totara_webapi\graphql;
-use core\webapi\execution_context;
+use container_workspace\query\discussion\sort;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
-class totara_engage_get_article_testcase extends advanced_testcase {
+class container_workspace_webapi_discussion_sorts_testcase extends advanced_testcase {
+    use webapi_phpunit_helper;
 
     /**
      * @return void
      */
-    public function test_get_article_from_graphql(): void {
-        $this->setAdminUser();
-
-        /** @var engage_article_generator $articlegen */
-        $articlegen = $this->getDataGenerator()->get_plugin_generator('engage_article');
-        $article = $articlegen->create_article();
-
-        $ec = execution_context::create('ajax', 'engage_article_get_article');
-        $result = graphql::execute_operation($ec, ['id' => $article->get_id()]);
-
-        $this->assertEmpty($result->errors);
-        $this->assertNotEmpty($result->data);
+    public function test_discussion_sorts(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+        $result = $this->resolve_graphql_query('container_workspace_discussion_sorts');
+        self::assertIsArray($result);
+        self::assertEquals(
+            [
+                sort::RECENT,
+                sort::DATE_POSTED
+            ],
+            $result
+        );
     }
 }
