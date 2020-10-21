@@ -302,6 +302,26 @@ function resize_image($filepath, $width, $height, $forcecanvas = false) {
 }
 
 /**
+ * Create a transparent image with the specific dimensions.
+ *
+ * @param integer $width
+ * @param integer $height
+ * @return resource|false an image resource on success, false on failure
+ * @since Totara 13.1
+ */
+function imagecreatetransparent($width, $height) {
+    if (($image = imagecreatetruecolor($width, $height)) !== false) {
+        if (imagealphablending($image, false) && imagesavealpha($image, true)) {
+            if (($transparent = imagecolorallocatealpha($image, 0, 0, 0, 127)) !== false) {
+                imagefilledrectangle($image, 0, 0, $width, $height, $transparent);
+                imagecolordeallocate($image, $transparent);
+            }
+        }
+    }
+    return $image;
+}
+
+/**
  * Resize an image from an image object.
  *
  * @param resource $original The image to work on. The resource will be imagedestroyed when the function succeeds.
@@ -316,7 +336,7 @@ function resize_image_from_image($original, $imageinfo, $width, $height, $forcec
     global $CFG;
 
     if (empty($width) && empty($height) || ($forcecanvas && (empty($width) || empty($height)))) {
-        // We need do not have the required ddimensions to work with.
+        // We need do not have the required dimensions to work with.
         return false;
     }
 
@@ -385,11 +405,10 @@ function resize_image_from_image($original, $imageinfo, $width, $height, $forcec
     }
 
     if (function_exists('imagecreatetruecolor')) {
-        $newimage = imagecreatetruecolor($canvaswidth, $canvasheight);
         if ($imagefnc === 'imagepng') {
-            imagealphablending($newimage, false);
-            imagefill($newimage, 0, 0, imagecolorallocatealpha($newimage, 0, 0, 0, 127));
-            imagesavealpha($newimage, true);
+            $newimage = imagecreatetransparent($canvaswidth, $canvasheight);
+        } else {
+            $newimage = imagecreatetruecolor($canvaswidth, $canvasheight);
         }
     } else {
         $newimage = imagecreate($canvaswidth, $canvasheight);
@@ -492,7 +511,7 @@ function generate_image_thumbnail_from_string($filedata, $width, $height) {
  * is the content of a transparent PNG file containing the thumbnail. Otherwise, the function
  * returns contents of a JPEG file with black background containing the thumbnail.
  *
- * @param   resource $original The image to work on.
+ * @param   resource $original The image to work on. NOTE: this function will deallocate the image.
  * @param   array $imageinfo Contains [0] => originalwidth, [1] => originalheight.
  * @param   int $width The width of the requested thumbnail.
  * @param   int $height The height of the requested thumbnail.
@@ -505,7 +524,7 @@ function generate_image_thumbnail_from_image($original, $imageinfo, $width, $hei
 /**
  * Crop and Resize an image from the centre of an image object.
  *
- * @param resource $original The image to work on.
+ * @param resource $original The image to work on. NOTE: this function will deallocate the image.
  * @param array $imageinfo Contains ['width' => originalwidth, 'height' => originalheight, 'orientation' => orientation].
  * @param int|null $width The max width of the resized image
  * @param int|null $height The max height of the resized image
@@ -541,12 +560,27 @@ function crop_resize_image_from_image($original, array $imageinfo, int $width, i
     }
 
     // Crop proportional area.
-    $original = imagecrop($original, [
-        'x' => $crop_x,
-        'y' => $crop_y,
-        'width' => $crop_width,
-        'height' => $crop_height
-    ]);
+    if ($crop_x == 0 && $crop_y == 0 && $crop_width == $original_width && $crop_height == $original_height) {
+        // Nothing to crop.
+        $tempimage = null;
+    } else if (function_exists('imagecreatetruecolor')) {
+        // Crop image while keeping its transparency.
+        $tempimage = imagecreatetransparent($crop_width, $crop_height);
+        if ($tempimage) {
+            imagecopy($tempimage, $original, 0, 0, $crop_x, $crop_y, $crop_width, $crop_height);
+        }
+    } else {
+        $tempimage = imagecrop($original, [
+            'x' => $crop_x,
+            'y' => $crop_y,
+            'width' => $crop_width,
+            'height' => $crop_height
+        ]);
+    }
+    if ($tempimage) {
+        imagedestroy($original);
+        $original = $tempimage;
+    }
 
     $imageinfo['width'] = $crop_width;
     $imageinfo['height'] = $crop_height;

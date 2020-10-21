@@ -322,10 +322,10 @@ final class image_processor implements image_processor_contract {
         [$cell_w, $cell_h] = $is_square ? static::CELL_SQUARE_SIZE : static::CELL_SIZE;
         $cell_s = static::CELL_SPACING;
 
-        $canvas = imagecreatetruecolor($image_w, $image_h);
+        $canvas = imagecreatetransparent($image_w, $image_h);
         $colour_default = imagecolorallocatealpha($canvas, ...static::IMAGE_DEFAULT);
-        imagefill($canvas, 0, 0, $colour_default);
-        unset($colour_default);
+        imagefilledrectangle($canvas, 0, 0, $image_w, $image_h, $colour_default);
+        imagecolordeallocate($canvas, $colour_default);
 
         $colour_image_background = imagecolorallocate($canvas, ...static::IMAGE_BACKGROUND);
 
@@ -363,7 +363,6 @@ final class image_processor implements image_processor_contract {
                 $cell_w + static::CELL_SPACING,
                 $cell_h + static::CELL_SPACING
             );
-            imagedestroy($source_image);
             $cropped_image = imagecreatefromstring($cropped_image);
 
             // X/Y starts at the top-left corner of the canvas
@@ -390,7 +389,7 @@ final class image_processor implements image_processor_contract {
             $corner++;
         }
 
-        unset($colour_image_background);
+        imagecolordeallocate($canvas, $colour_image_background);
 
         // Draw a cross over top
         // Technically we're covering a couple of pixels of content, but it hides
@@ -398,7 +397,7 @@ final class image_processor implements image_processor_contract {
         $colour_cross = imagecolorallocate($canvas, ...static::IMAGE_BACKGROUND);
         imagefilledrectangle($canvas, $cell_w, 0, $cell_w + $cell_s, $image_h, $colour_cross);
         imagefilledrectangle($canvas, 0, $cell_h, $image_w, $cell_h + $cell_s, $colour_cross);
-        unset($colour_cross);
+        imagecolordeallocate($canvas, $colour_cross);
 
         imagesavealpha($canvas, true);
 
