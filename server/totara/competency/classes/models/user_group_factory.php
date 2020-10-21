@@ -23,7 +23,8 @@
 
 namespace totara_competency\models;
 
-use totara_competency\entities\assignment as assignment_entity;
+use coding_exception;
+use core\collection;
 
 /**
  * Factory to return an instance of a specific user group model identified by a type
@@ -31,18 +32,45 @@ use totara_competency\entities\assignment as assignment_entity;
 class user_group_factory {
 
     /**
-     * @param assignment_entity $assignment
+     * @param assignment $assignment
      * @return user_group
-     * @throws \coding_exception
+     * @throws coding_exception
      */
-    public static function create(assignment_entity $assignment): user_group {
+    public static function create(assignment $assignment): user_group {
         /** @var user_group $class_name */
         $class_name = "\\totara_competency\\models\\user_group\\{$assignment->user_group_type}";
         if (class_exists($class_name) && is_subclass_of($class_name, user_group::class)) {
-            return $class_name::load_by_id($assignment->user_group_id);
+            return $assignment->get_user_group_entity() === null
+                ? $class_name::load_by_id($assignment->user_group_id)
+                : $class_name::load_by_entity($assignment->get_user_group_entity());
         }
 
-        throw new \coding_exception('Unknown user group given!');
+        throw new coding_exception('Unknown user group given!');
+    }
+
+    /**
+     * Batch query user groups by group type to reduce the number of queries for user groups
+     *
+     * @param collection $assignments
+     * @return array
+     */
+    public static function load_user_groups(collection $assignments): array {
+        $user_group_collection = [];
+        $user_group_entities = [];
+
+        foreach ($assignments as $assignment) {
+            $user_group_collection[$assignment->user_group_type]['ids'][$assignment->user_group_id] = $assignment->user_group_id;
+        }
+
+        /** @var user_group $class_name */
+        foreach ($user_group_collection as $user_group_type => $data) {
+            $class_name = "\\totara_competency\\models\\user_group\\{$user_group_type}";
+            if (class_exists($class_name) && is_subclass_of($class_name, user_group::class)) {
+                $user_group_entities[$user_group_type] = $class_name::load_user_groups($data['ids'])->all(true);
+            }
+        }
+
+        return $user_group_entities;
     }
 
 }

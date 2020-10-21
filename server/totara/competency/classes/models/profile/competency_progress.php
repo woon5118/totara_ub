@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
@@ -23,15 +23,17 @@
 
 namespace totara_competency\models\profile;
 
+use coding_exception;
+use core\entities\user;
 use core\orm\collection;
 use stdClass;
-use totara_competency\models\assignment as assignment_model;
-use core\entities\user;
 use totara_competency\data_providers\assignments;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\scale_value;
+use totara_competency\models\assignment as assignment_model;
+use totara_competency\models\user_group_factory;
 
 /**
  * This is a profile progress item model scaffolding, it has the following properties available:
@@ -83,13 +85,13 @@ class competency_progress {
     /**
      * competency_progress constructor.
      *
-     * @param assignment $assignment Assignment entity
+     * @param assignment_model $assignment Assignment
      */
-    public function __construct(assignment $assignment) {
+    public function __construct(assignment_model $assignment) {
         $this->competency = $assignment->competency;
         $this->achievement = $assignment->current_achievement;
         $this->my_value = $assignment->current_achievement->value ?? null;
-        $this->assignments = new collection([assignment_model::load_by_entity($assignment)]);
+        $this->assignments = new collection([$assignment]);
     }
 
     /**
@@ -109,14 +111,24 @@ class competency_progress {
      */
     public static function build_from_assignments(collection $assignments): collection {
         $progress = new collection();
+        $user_group_entities = user_group_factory::load_user_groups($assignments);
 
+        /** @var assignment $assignment */
         foreach ($assignments as $assignment) {
+            $assignment_model = assignment_model::load_by_entity($assignment);
+
+            $user_group = $user_group_entities[$assignment->user_group_type][$assignment->user_group_id] ?? null;
+
+            if ($user_group) {
+                $assignment_model->set_user_group_entity($user_group);
+            }
+
             if (!$progress->item($assignment->competency_id)) {
-                $progress->set(new static($assignment), $assignment->competency_id);
+                $progress->set(new static($assignment_model), $assignment->competency_id);
             } else {
                 /** @var self $item */
                 $item = $progress->item($assignment->competency_id);
-                $item->append_assignment($assignment);
+                $item->append_assignment($assignment_model);
             }
         }
 
@@ -186,11 +198,11 @@ class competency_progress {
      * Only adds the assignment to the collection if there's none with the same
      * user_group_type and user_group_id to not show duplicates.
      *
-     * @param assignment $assignment
+     * @param assignment_model $assignment
      * @return $this
      */
-    protected function append_assignment(assignment $assignment) {
-            $this->assignments->append(assignment_model::load_by_entity($assignment));
+    protected function append_assignment(assignment_model $assignment) {
+            $this->assignments->append($assignment);
 
         return $this;
     }

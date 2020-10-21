@@ -58,6 +58,13 @@ class assignment {
      */
     private $competency;
 
+    /**
+     * User group entity.
+     *
+     * @var entity
+     */
+    private $user_group_entity;
+
     private function __construct(assignment_entity $entity) {
         $this->entity = $entity;
     }
@@ -433,7 +440,25 @@ class assignment {
      * @return user_group
      */
     public function get_user_group(): user_group {
-        return user_group_factory::create($this->entity);
+        return user_group_factory::create($this);
+    }
+
+    /**
+     * Set user group entity
+     *
+     * @param entity $user_group
+     */
+    public function set_user_group_entity(entity $user_group): void {
+        $this->user_group_entity = $user_group;
+    }
+
+    /**
+     * Return user group entity (An abstract of user groups entities, i.e. position, cohort, user, organization)
+     *
+     * @return entity|null
+     */
+    public function get_user_group_entity(): ?entity {
+        return $this->user_group_entity;
     }
 
     /**
@@ -648,7 +673,7 @@ class assignment {
         }
 
         if (!class_exists($class_name)) {
-            throw new \coding_exception('Invalid entity found!');
+            throw new coding_exception('Invalid entity found!');
         }
 
         return $class_name;

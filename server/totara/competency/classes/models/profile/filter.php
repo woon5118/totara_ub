@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
@@ -23,11 +23,14 @@
 
 namespace totara_competency\models\profile;
 
+use coding_exception;
 use core\collection;
 use totara_competency\data_providers\assignments;
+use totara_competency\models\assignment;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\entities\assignment as assignment_entity;
 use totara_competency\models\profile\traits\assignment_key;
+use totara_competency\models\user_group_factory;
 
 /**
  * Class filter
@@ -58,16 +61,13 @@ class filter {
     /**
      * Create filter from assignment and key
      *
-     * @param assignment_entity $assignment Assignment entity
+     * @param assignment $assignment Assignment
      * @param string $key Key
      */
-    public function __construct(assignment_entity $assignment, string $key) {
-
-        $model = assignment_model::load_by_entity($assignment);
-
+    public function __construct(assignment $assignment, string $key) {
         $this->attributes = [
-            'name' => $model->get_progress_name(),
-            'status_name' => $this->get_human_status($model),
+            'name' => $assignment->get_progress_name(),
+            'status_name' => $this->get_human_status($assignment),
             'status' => $assignment->status,
             'user_group_type' => $assignment->user_group_type,
             'user_group_id' => $assignment->user_group_id,
@@ -88,11 +88,20 @@ class filter {
      */
     public static function build_from_assignments(collection $assignments) {
         $filters = [];
+        $user_group_entities = user_group_factory::load_user_groups($assignments);
 
-        $assignments->map(function (assignment_entity $assignment) use (&$filters) {
+        $assignments->map(function (assignment_entity $assignment) use (&$filters, $user_group_entities) {
+            $assignment_model = assignment_model::load_by_entity($assignment);
+
+            $user_group = $user_group_entities[$assignment->user_group_type][$assignment->user_group_id] ?? null;
+
+            if ($user_group) {
+                $assignment_model->set_user_group_entity($user_group);
+            }
+
             $key = static::build_key($assignment, true);
             if (!isset($filters[$key])) {
-                $filters[$key] = new static($assignment, $key);
+                $filters[$key] = new static($assignment_model, $key);
             }
         });
 

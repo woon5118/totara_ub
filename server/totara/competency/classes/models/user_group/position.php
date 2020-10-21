@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2018 onwards Totara Learning Solutions LTD
@@ -23,30 +23,58 @@
 
 namespace totara_competency\models\user_group;
 
-use totara_competency\models\user_group;
+use context_system;
+use core\orm\collection;
+use core\orm\entity\entity;
 use hierarchy_position\entities\position as position_entity;
+use totara_competency\models\user_group;
 use totara_competency\user_groups;
 
 class position extends user_group {
 
+    /**
+     * {@inheritdoc}
+     */
     public static function load_by_id(int $id): user_group {
         /** @var position_entity $position */
         $position = position_entity::repository()->find($id);
+        return self::load_by_entity($position);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function load_by_entity(?entity $position): user_group {
         if ($position) {
             $is_deleted = false;
             $name = $position->display_name;
+            $id = $position->id;
         } else {
             $is_deleted = true;
             $name = get_string('deleted_audience', 'totara_competency');
+            $id = 0;
         }
         return new static($id, $name, $is_deleted);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function load_user_groups(array $ids): collection {
+        return position_entity::repository()->where_in('id', $ids)->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function can_view(): bool {
-        $systemcontext = \context_system::instance();
+        $systemcontext = context_system::instance();
         return has_capability('totara/hierarchy:viewposition', $systemcontext);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function get_type(): string {
         return user_groups::POSITION;
     }

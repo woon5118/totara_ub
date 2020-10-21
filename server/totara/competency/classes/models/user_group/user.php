@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2018 onwards Totara Learning Solutions LTD
@@ -23,29 +23,61 @@
 
 namespace totara_competency\models\user_group;
 
-use totara_competency\models\user_group;
+use context_user;
+use core\orm\collection;
 use core\entities\user as user_entity;
+use core\orm\entity\entity;
+use totara_competency\models\user_group;
 use totara_competency\user_groups;
 
 class user extends user_group {
 
+    /**
+     * {@inheritdoc}
+     */
     public static function load_by_id(int $id): user_group {
         /** @var user_entity $user */
         $user = new user_entity($id);
-        if (!$user->deleted) {
-            $name = fullname((object)$user->to_array());
-        } else {
-            $name = get_string('deleted_user', 'totara_competency');
-        }
-        return new static($id, $name, $user->deleted);
+        return self::load_by_entity($user);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function load_by_entity(?entity $user): user_group {
+        if ($user) {
+            $is_deleted = false;
+            $name = fullname((object)$user->to_array());
+            $id = $user->id;
+        } else {
+            $is_deleted = true;
+            $name = get_string('deleted_user', 'totara_competency');
+            $id = 0;
+        }
+
+        return new static($id, $name, $is_deleted);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function load_user_groups(array $ids): collection {
+        return user_entity::repository()->where_in('id', $ids)->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function can_view(): bool {
-        $usercontext = \context_user::instance($this->id);
+        $usercontext = context_user::instance($this->id);
         return has_capability('moodle/user:viewdetails', $usercontext);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function get_type(): string {
         return user_groups::USER;
     }
-}
+
+};

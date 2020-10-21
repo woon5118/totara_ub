@@ -22,6 +22,7 @@
  * @category test
  */
 
+use core\entities\user as user_entity;
 use totara_competency\entities\assignment as assignment_entity;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency_assignment_user;
@@ -118,6 +119,23 @@ class totara_competency_assignment_model_testcase extends assignment_model_base_
         $this->assertFalse($user_group->is_deleted());
 
         $this->assertEquals($user_group->get_name(), $assignment->get_user_group_name());
+    }
+
+    public function test_user_group_entity() {
+        $data = $this->create_data();
+        $this->setUser($data->user1->id);
+
+        $assignment = $this->create_active_user_assignment($data->comp1->id, $data->user1->id);
+
+        $user_group = $assignment->get_user_group();
+
+        $user_entity = new user_entity($user_group->get_id());
+
+        $assignment->set_user_group_entity($user_entity);
+
+        $entity = $assignment->get_user_group_entity();
+
+        $this->assertEquals($user_entity->id, $entity->id);
     }
 
     public function test_statuses() {

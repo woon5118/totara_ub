@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
@@ -23,11 +23,13 @@
 
 namespace totara_competency\models\profile;
 
+use coding_exception;
 use core\orm\collection;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\data_providers\assignments;
 use totara_competency\entities\assignment;
 use totara_competency\models\profile\traits\assignment_key;
+use totara_competency\models\user_group_factory;
 
 /**
  * This is a profile progress item model scaffolding, it has the following properties available:
@@ -149,16 +151,24 @@ class item {
      */
     public static function build_from_assignments(collection $assignments) {
         $progress = new collection();
+        $user_group_entities = user_group_factory::load_user_groups($assignments);
 
-        $assignments->map(function (assignment $assignment) use ($progress) {
-            $model = assignment_model::load_by_entity($assignment);
+        $assignments->map(function (assignment $assignment) use ($progress, $user_group_entities) {
+            $assignment_model = assignment_model::load_by_entity($assignment);
+
+            $user_group = $user_group_entities[$assignment->user_group_type][$assignment->user_group_id] ?? null;
+
+            if ($user_group) {
+                $assignment_model->set_user_group_entity($user_group);
+            }
+
             if (!$progress->item($key = static::build_key($assignment))) {
-                $progress->set(new static($key, $model->get_progress_name()), $key);
+                $progress->set(new static($key, $assignment_model->get_progress_name()), $key);
             }
 
             /** @var self $item */
             $item = $progress->item($key);
-            $item->append_assignment($model);
+            $item->append_assignment($assignment_model);
         });
 
         $progress->map(function (self $item) {

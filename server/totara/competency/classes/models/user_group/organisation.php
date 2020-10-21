@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2018 onwards Totara Learning Solutions LTD
@@ -23,30 +23,58 @@
 
 namespace totara_competency\models\user_group;
 
-use totara_competency\models\user_group;
+use context_system;
+use core\orm\collection;
+use core\orm\entity\entity;
 use hierarchy_organisation\entities\organisation as organisation_entity;
+use totara_competency\models\user_group;
 use totara_competency\user_groups;
 
 class organisation extends user_group {
 
+    /**
+     * {@inheritdoc}
+     */
     public static function load_by_id(int $id): user_group {
         /** @var organisation_entity $position */
-        $position = organisation_entity::repository()->find($id);
-        if ($position) {
+        $org = organisation_entity::repository()->find($id);
+        return self::load_by_entity($org);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function load_by_entity(?entity $org): user_group {
+        if ($org) {
             $is_deleted = false;
-            $name = $position->display_name;
+            $name = $org->display_name;
+            $id = $org->id;
         } else {
             $is_deleted = true;
             $name = get_string('deleted_organisation', 'totara_competency');
+            $id = 0;
         }
         return new static($id, $name, $is_deleted);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function load_user_groups(array $ids): collection {
+        return organisation_entity::repository()->where_in('id', $ids)->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function can_view(): bool {
-        $systemcontext = \context_system::instance();
+        $systemcontext = context_system::instance();
         return has_capability('totara/hierarchy:vieworganisation', $systemcontext);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function get_type(): string {
         return user_groups::ORGANISATION;
     }

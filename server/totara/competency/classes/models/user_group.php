@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2018 onwards Totara Learning Solutions LTD
@@ -22,6 +22,9 @@
  */
 
 namespace totara_competency\models;
+
+use core\orm\collection;
+use core\orm\entity\entity;
 
 /**
  * Abstract model for an assignment user group.
@@ -65,6 +68,22 @@ abstract class user_group {
      * @return user_group
      */
     abstract public static function load_by_id(int $id): self;
+
+    /**
+     * Static factory method returning a new instance
+     *
+     * @param entity $entity
+     * @return user_group
+     */
+    abstract public static function load_by_entity(?entity $entity): self;
+
+    /**
+     * Return a collection of user group entities (i.e. position, cohort, user, organization)
+     *
+     * @param array $ids
+     * @return collection
+     */
+    abstract public static function load_user_groups(array $ids): collection;
 
     public function get_id(): string {
         return $this->id;
