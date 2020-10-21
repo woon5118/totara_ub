@@ -1,0 +1,8 @@
+This file describes API changes in /client/component/performelement_short_text,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Replaced several components to centralise common functionality improving consistency and reducing duplication
+    * ShortTextElementAdminDisplay.vue replaced with ShortTextAdminView.vue
+    * ShortTextElementAdminForm.vue replaced with ShortTextAdminEdit.vue
+    * ShortTextElementAdminReadOnlyDisplay.vue replaced with ShortTextAdminSummary.vue

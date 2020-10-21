@@ -238,6 +238,7 @@ $string['general_info_participant_selection_heading'] = 'Selection of participan
 $string['general_info_select_activity_type'] = 'Select a type';
 $string['get_started'] = 'Get started';
 $string['hidden_anonymised'] = 'Hidden (anonymised)';
+$string['html_content_title'] = 'Content';
 $string['in_team'] = '{$a}\'s team';
 $string['instance_info_card_creation_date'] = 'Creation date';
 $string['instance_info_card_show_all_button'] = 'Show all';

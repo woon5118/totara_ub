@@ -12,39 +12,37 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @module performelement_short_text
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @module performelement_date_picker
 -->
+
 <template>
-  <ElementAdminReadOnlyDisplay
-    :type="type"
-    :title="title"
-    :identifier="identifier"
-    :is-required="isRequired"
-    :activity-state="activityState"
-    @display="$emit('display')"
-  />
+  <div class="tui-datePickerAdminSummary">
+    <PerformAdminCustomElementSummary
+      :identifier="identifier"
+      :is-required="isRequired"
+      :settings="settings"
+      :title="title"
+      @display="$emit('display')"
+    />
+  </div>
 </template>
 
 <script>
-import ElementAdminReadOnlyDisplay from 'mod_perform/components/element/ElementAdminReadOnlyDisplay';
+import PerformAdminCustomElementSummary from 'mod_perform/components/element/PerformAdminCustomElementSummary';
 
 export default {
   components: {
-    ElementAdminReadOnlyDisplay,
+    PerformAdminCustomElementSummary,
   },
 
+  inheritAttrs: false,
+
   props: {
-    title: String,
     identifier: String,
-    type: Object,
-    data: Object,
     isRequired: Boolean,
-    activityState: {
-      type: Object,
-      required: true,
-    },
-    error: String,
+    settings: Object,
+    title: String,
   },
 };
 </script>

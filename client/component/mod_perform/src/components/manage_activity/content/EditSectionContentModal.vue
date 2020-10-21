@@ -606,12 +606,12 @@ export default {
       if (this.isReadOnly(sectionElement)) {
         subComponent.type = 'readOnly';
         subComponent.component = tui.asyncComponent(
-          elementPlugin.admin_read_only_display_component
+          elementPlugin.admin_summary_component
         );
       } else if (this.isEditing(sectionElement)) {
         subComponent.type = 'editing';
         subComponent.component = tui.asyncComponent(
-          elementPlugin.admin_edit_form_component
+          elementPlugin.admin_edit_component
         );
       } else {
         subComponent.type = 'view';

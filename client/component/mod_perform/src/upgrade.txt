@@ -1,5 +1,21 @@
-This files describes API changes in /client/component/mod_perform,
+This file describes API changes in /client/component/mod_perform,
 information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Reworked several components to centralise common functionality improving consistency and reducing duplication
+    * Added a new wrapper component for all custom elements
+        * PerformAdminCustomElement.vue
+    * Added a new wrapper component for edit forms of custom elements
+        * PerformAdminCustomElementEdit.vue
+    * Removed the following 
+        * ElementAdminDisplay.vue
+        * ElementAdminForm.vue
+        * admin_form/ActionButtons.vue
+        * admin_form/AdminFormMixin.js
+    * Replaced the following
+        * ElementAdminReadOnlyDisplay.vue with PerformAdminCustomElementSummary.vue
+* Deprecated the method createNotificationIfNotExists() from NotificationsTab.vue as notifications now always exist.
+  See server/mod/perform/upgrade.txt for more detail.
 
 === 13.1 ===
 * Updated manageActivity.vue page to be using a core layout

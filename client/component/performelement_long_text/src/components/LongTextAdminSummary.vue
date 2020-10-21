@@ -12,41 +12,37 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @module performelement_date_picker
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @module performelement_long_text
 -->
+
 <template>
-  <ElementAdminReadOnlyDisplay
-    :type="type"
-    :title="title"
-    :error="error"
-    :identifier="identifier"
-    :is-required="isRequired"
-    :activity-state="activityState"
-    @edit="$emit('edit')"
-    @remove="$emit('remove')"
-    @display="$emit('display')"
-  />
+  <div class="tui-longTextAdminSummary">
+    <PerformAdminCustomElementSummary
+      :identifier="identifier"
+      :is-required="isRequired"
+      :settings="settings"
+      :title="title"
+      @display="$emit('display')"
+    />
+  </div>
 </template>
 
 <script>
-import ElementAdminReadOnlyDisplay from 'mod_perform/components/element/ElementAdminReadOnlyDisplay';
+import PerformAdminCustomElementSummary from 'mod_perform/components/element/PerformAdminCustomElementSummary';
 
 export default {
   components: {
-    ElementAdminReadOnlyDisplay,
+    PerformAdminCustomElementSummary,
   },
 
+  inheritAttrs: false,
+
   props: {
-    title: String,
     identifier: String,
-    type: Object,
     isRequired: Boolean,
-    error: String,
-    activityState: {
-      type: Object,
-      required: true,
-    },
+    settings: Object,
+    title: String,
   },
 };
 </script>

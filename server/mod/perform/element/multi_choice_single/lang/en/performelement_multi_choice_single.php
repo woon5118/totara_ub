@@ -27,6 +27,7 @@ $string['error_you_must_answer_this_question'] = 'Required';
 $string['name'] = 'Multiple choice: single-select';
 $string['no_response_submitted'] = 'No response submitted';
 $string['option_required_error'] = 'Option field cannot be left blank';
+$string['options'] = 'Options';
 $string['pluginname'] = 'Multiple choice single select element';
 $string['single_select_options'] = 'Single-select options';
 

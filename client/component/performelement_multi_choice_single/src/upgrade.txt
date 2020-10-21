@@ -1,0 +1,8 @@
+This file describes API changes in /client/component/performelement_multi_choice_single,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Replaced several components to centralise common functionality improving consistency and reducing duplication
+    * MultiChoiceSingleElementAdminDisplay.vue replaced with MultiChoiceSingleAdminView.vue
+    * MultiChoiceSingleElementAdminForm.vue replaced with MultiChoiceSingleAdminEdit.vue
+    * MultiChoiceSingleElementAdminReadOnlyDisplay.vue replaced with MultiChoiceSingleAdminSummary.vue

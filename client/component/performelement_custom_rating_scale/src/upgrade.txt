@@ -1,0 +1,9 @@
+This file describes API changes in /client/component/performelement_custom_rating_scale,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Replaced several components to centralise common functionality improving consistency and reducing duplication
+    * CustomRatingScaleElementAdminDisplay.vue replaced with CustomRatingScaleAdminView.vue
+    * CustomRatingScaleElementAdminForm.vue replaced with CustomRatingScaleAdminEdit.vue
+    * CustomRatingScaleElementAdminReadOnlyDisplay.vue replaced with CustomRatingScaleAdminSummary.vue
+

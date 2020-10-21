@@ -116,9 +116,7 @@
 
     <div class="tui-performAdminCustomElement__content">
       <h3
-        v-if="
-          sectionComponent.type !== 'editing' && sectionElement.element.title
-        "
+        v-if="sectionComponent.type == 'view' && sectionElement.element.title"
         class="tui-performAdminCustomElement__content-title"
       >
         <span
@@ -265,7 +263,7 @@ export default {
     margin-top: var(--gap-1);
 
     & > * + * {
-      margin-top: var(--gap-2);
+      margin-top: var(--gap-4);
     }
 
     &-accessibleTitle {

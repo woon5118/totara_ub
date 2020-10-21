@@ -1,0 +1,9 @@
+This file describes API changes in /client/component/performelement_date_picker,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Replaced several components to centralise common functionality improving consistency and reducing duplication
+    * DatePickerElementAdminDisplay.vue replaced with DatePickerAdminView.vue
+    * DatePickerElementAdminForm.vue replaced with DatePickerAdminEdit.vue
+    * DatePickerElementAdminReadOnlyDisplay.vue replaced with DatePickerAdminSummary.vue
+

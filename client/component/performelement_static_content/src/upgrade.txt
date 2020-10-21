@@ -1,0 +1,8 @@
+This file describes API changes in /client/component/performelement_static_content,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Replaced several components to centralise common functionality improving consistency and reducing duplication
+    * StaticContentElementAdminDisplay.vue replaced with StaticContentAdminView.vue
+    * StaticContentElementAdminForm.vue replaced with StaticContentAdminEdit.vue
+    * StaticContentElementAdminReadOnlyDisplay.vue replaced with StaticContentAdminSummary.vue

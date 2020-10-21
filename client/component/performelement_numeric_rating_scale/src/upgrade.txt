@@ -1,0 +1,8 @@
+This file describes API changes in /client/component/performelement_numeric_rating_scale,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+* Replaced several components to centralise common functionality improving consistency and reducing duplication
+    * NumericRatingScaleElementAdminDisplay.vue replaced with NumericRatingScaleAdminView.vue
+    * NumericRatingScaleElementAdminForm.vue replaced with NumericRatingScaleAdminEdit.vue
+    * NumericRatingScaleElementAdminReadOnlyDisplay.vue replaced with NumericRatingScaleAdminSummary.vue
