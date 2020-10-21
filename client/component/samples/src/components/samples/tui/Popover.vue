@@ -230,6 +230,36 @@
     </div>
 
     <div class="tui-samplePopover__collection">
+      <h4>Without the close button</h4>
+      <div class="tui-samplePopover__buttonrow">
+        <Popover :triggers="['hover']" :closeable="false">
+          <template v-slot:trigger>
+            <Button text="Hover" />
+          </template>
+          Content. Popovers have optional titles and form fields/action buttons.
+          Action buttons should be small. Use popovers for supporting contextual
+          information.
+        </Popover>
+        <Popover :triggers="['click']" :closeable="false">
+          <template v-slot:trigger>
+            <Button text="Click" />
+          </template>
+          Content. Popovers have optional titles and form fields/action buttons.
+          Action buttons should be small. Use popovers for supporting contextual
+          information.
+        </Popover>
+        <Popover :triggers="['focus']" :closeable="false">
+          <template v-slot:trigger>
+            <Button text="Focus" />
+          </template>
+          Content. Popovers have optional titles and form fields/action buttons.
+          Action buttons should be small. Use popovers for supporting contextual
+          information.
+        </Popover>
+      </div>
+    </div>
+
+    <div class="tui-samplePopover__collection">
       <h4>Inside a modal</h4>
       <div class="tui-samplePopover__buttonrow">
         <Button text="Show" @click="showModal" />

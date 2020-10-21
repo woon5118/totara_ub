@@ -23,6 +23,7 @@
         :label-aria-label="labelAriaLabel"
         :label-text="count"
         :disabled="disabled"
+        :closeable-popover="false"
         @popover-open-changed="showPopover = $event"
         @open="showModal = true"
         @click="like"

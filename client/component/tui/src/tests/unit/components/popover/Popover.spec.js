@@ -16,12 +16,32 @@
  * @module tui
  */
 
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import Popover from 'tui/components/popover/Popover';
 
 describe('Popover', () => {
   it('matches snapshot', () => {
     const wrapper = shallowMount(Popover, {
+      scopedSlots: {
+        trigger() {
+          return this.$createElement('button');
+        },
+        default() {
+          return this.$createElement('div', {}, ['hello']);
+        },
+      },
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('matches snapshot when non-closeable', () => {
+    const wrapper = mount(Popover, {
+      stubs: {
+        PopoverTrigger: true,
+      },
+      propsData: {
+        closeable: false,
+      },
       scopedSlots: {
         trigger() {
           return this.$createElement('button');

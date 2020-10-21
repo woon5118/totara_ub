@@ -30,6 +30,7 @@
     <Popover
       v-if="$scopedSlots['hover-label-content']"
       :triggers="['focus', 'hover']"
+      :closeable="closeablePopover"
       @open-changed="$emit('popover-open-changed', $event)"
     >
       <template v-slot:trigger="{ isOpen }">
@@ -91,6 +92,10 @@ export default {
     labelAriaLabel: {
       type: String,
       default: '',
+    },
+    closeablePopover: {
+      type: Boolean,
+      default: true,
     },
   },
 

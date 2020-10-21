@@ -30,4 +30,19 @@ describe('PopoverFrame', () => {
     });
     expect(wrapper.element).toMatchSnapshot();
   });
+
+  it('matches snapshot when non-closeable', () => {
+    const wrapper = shallowMount(PopoverFrame, {
+      propsData: {
+        side: 'sunny',
+        closeable: false,
+      },
+      scopedSlots: {
+        default() {
+          return this.$createElement('div', {}, ['hello']);
+        },
+      },
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
 });

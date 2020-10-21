@@ -1,0 +1,6 @@
+This files describes API changes in /client/component/totara_reaction,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+
+* Removed the close button in the popover from SidePanelLike.vue component

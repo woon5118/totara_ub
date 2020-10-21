@@ -2,6 +2,7 @@
 
 exports[`components/RatingPopover.vue Checks snapshot 1`] = `
 <popover-stub
+  closeable="true"
   position="bottom-right"
   triggers="click"
 >

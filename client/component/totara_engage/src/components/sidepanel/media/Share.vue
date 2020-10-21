@@ -18,22 +18,24 @@
 
 <template>
   <div class="tui-shareSetting">
-    <ButtonLabel
-      :number="sharedByCountDisplay"
-      :number-aria-label="sharedByCountAriaLabel"
-      :aria-label="buttonAriaLabel"
+    <ButtonIconWithLabel
+      :label-text="sharedByCountDisplay"
+      :label-aria-label="sharedByCountAriaLabel"
+      :button-aria-label="buttonAriaLabel"
+      :closeable-popover="false"
       class="tui-shareSetting__buttonLabel"
+      @open="showReciptsModal"
       @click="showReciptsModal"
     >
       <template v-slot:icon>
         <Share />
       </template>
-      <template v-slot:hoverContent>
+      <template v-slot:hover-label-content>
         <div class="tui-shareSetting__buttonLabel-hoverContent">
           {{ sharedByCountAriaLabel }}
         </div>
       </template>
-    </ButtonLabel>
+    </ButtonIconWithLabel>
     <ModalPresenter
       v-if="!owned"
       :open="reciptsModalOpen"
@@ -73,7 +75,7 @@ import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import Share from 'tui/components/icons/Share';
 
 import { AccessManager } from 'totara_engage/index';
-import ButtonLabel from 'totara_engage/components/buttons/ButtonLabel';
+import ButtonIconWithLabel from 'tui/components/buttons/LabelledButtonTrigger';
 import DoneCancelGroup from 'totara_engage/components/buttons/DoneCancelGroup';
 import RecipientsSelector from 'totara_engage/components/form/access/RecipientsSelector';
 import SharedBoard from 'totara_engage/components/form/SharedBoard';
@@ -84,7 +86,7 @@ import shareWith from 'totara_engage/graphql/share';
 
 export default {
   components: {
-    ButtonLabel,
+    ButtonIconWithLabel,
     DoneCancelGroup,
     Modal,
     ModalContent,

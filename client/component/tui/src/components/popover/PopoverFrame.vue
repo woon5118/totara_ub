@@ -17,13 +17,25 @@
 -->
 
 <template>
-  <div class="tui-popoverFrame" :class="['tui-popoverFrame--' + side]">
+  <div
+    class="tui-popoverFrame"
+    :class="[side ? 'tui-popoverFrame--' + side : null]"
+  >
     <Arrow :relative-side="arrowSide" :distance="arrowDistance" />
-    <CloseButton class="tui-popoverFrame__close" @click="$emit('close')" />
+    <CloseButton
+      v-if="closeable"
+      class="tui-popoverFrame__close"
+      @click="$emit('close')"
+    />
     <div v-if="title" class="tui-popoverFrame__title">
       {{ title }}
     </div>
-    <div class="tui-popoverFrame__content">
+    <div
+      :class="{
+        'tui-popoverFrame__content': true,
+        'tui-popoverFrame__content--nonClosable': !closeable,
+      }"
+    >
       <slot />
     </div>
     <div v-if="$scopedSlots.buttons" class="tui-popoverFrame__buttons">
@@ -47,6 +59,10 @@ export default {
     title: String,
     side: String,
     arrowDistance: Number,
+    closeable: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   computed: {
@@ -88,7 +104,8 @@ export default {
     padding: var(--gap-2) var(--gap-4) var(--gap-2) 0;
   }
 
-  &__title + &__content {
+  &__title + &__content,
+  &__content--nonClosable {
     padding-right: 0;
   }
 

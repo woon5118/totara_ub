@@ -2,7 +2,7 @@
 
 exports[`PopoverFrame matches snapshot 1`] = `
 <div
-  class="tui-popoverFrame tui-popoverFrame--undefined"
+  class="tui-popoverFrame"
 >
   <arrow-stub
     size="normal"
@@ -17,6 +17,31 @@ exports[`PopoverFrame matches snapshot 1`] = `
    
   <div
     class="tui-popoverFrame__content"
+  >
+    <div>
+      hello
+    </div>
+  </div>
+   
+  <!---->
+</div>
+`;
+
+exports[`PopoverFrame matches snapshot when non-closeable 1`] = `
+<div
+  class="tui-popoverFrame tui-popoverFrame--sunny"
+>
+  <arrow-stub
+    relativeside="sunny"
+    size="normal"
+  />
+   
+  <!---->
+   
+  <!---->
+   
+  <div
+    class="tui-popoverFrame__content tui-popoverFrame__content--nonClosable"
   >
     <div>
       hello

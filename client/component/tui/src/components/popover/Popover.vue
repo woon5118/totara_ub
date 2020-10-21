@@ -39,6 +39,7 @@
         :title="title"
         :side="side"
         :arrow-distance="arrowDistance"
+        :closeable="closeable"
         @close="handleClose"
       >
         <slot :close="handleClose" />
@@ -82,6 +83,10 @@ export default {
       validator: x => x.split('-', 2).every(y => validPositions.includes(y)),
     },
     open: Boolean,
+    closeable: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data() {
