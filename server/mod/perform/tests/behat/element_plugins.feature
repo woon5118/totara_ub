@@ -30,7 +30,7 @@ Feature: I can create and use performance activities with any and every custom e
 
   Scenario: Save empty draft responses for required questions
     And I add one of every element type in the mod perform form builder and make them required
-    And I close the tui modal
+    And I follow "Content (One of every element)"
 
     And I click on "Assignments" "link"
     And I click on "Add group" "button"
@@ -57,7 +57,7 @@ Feature: I can create and use performance activities with any and every custom e
 
   Scenario: Submit empty responses for optional questions
     And I add one of every element type in the mod perform form builder
-    And I close the tui modal
+    And I follow "Content (One of every element)"
 
     And I click on "Assignments" "link"
     And I click on "Add group" "button"

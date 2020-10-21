@@ -195,29 +195,19 @@
         </GridItem>
         <GridItem grows :units="3">
           <div class="tui-performActivitySection__content-buttons">
-            <EditSectionContentModal
-              :section-id="section.id"
-              :title="
-                multipleSectionsEnabled
-                  ? savedSection.display_title
-                  : activityName
+            <ActionLink
+              :href="
+                $url('/mod/perform/manage/activity/section.php', {
+                  section_id: section.id,
+                })
               "
-              :activity-state="activityState"
-              :required-text="true"
-              @update-summary="updateSection"
-            >
-              <template v-slot:trigger="{ open }">
-                <Button
-                  :styleclass="{ small: true }"
-                  :text="
-                    isDraft
-                      ? $str('edit_content_elements', 'mod_perform')
-                      : $str('view_content_elements', 'mod_perform')
-                  "
-                  @click="open"
-                />
-              </template>
-            </EditSectionContentModal>
+              :text="
+                isDraft
+                  ? $str('edit_content_elements', 'mod_perform')
+                  : $str('view_content_elements', 'mod_perform')
+              "
+              :styleclass="{ small: true }"
+            />
           </div>
         </GridItem>
       </Grid>
@@ -249,7 +239,6 @@ import DeleteSectionMutation from 'mod_perform/graphql/delete_section';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import EditIcon from 'tui/components/buttons/EditIcon';
-import EditSectionContentModal from 'mod_perform/components/manage_activity/content/EditSectionContentModal';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 import InputText from 'tui/components/form/InputText';
@@ -257,6 +246,7 @@ import MoreButton from 'tui/components/buttons/MoreIcon';
 import ParticipantsPopover from 'mod_perform/components/manage_activity/content/ParticipantsPopover';
 import UpdateSectionSettingsMutation from 'mod_perform/graphql/update_section_settings';
 import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
+import ActionLink from 'tui/components/links/ActionLink';
 
 /**
  * Reflects the maximum length of the field in the database.
@@ -266,6 +256,7 @@ const TITLE_INPUT_MAX_LENGTH = 1024;
 
 export default {
   components: {
+    ActionLink,
     ActivitySectionElementSummary,
     ActivitySectionRelationship,
     Button,
@@ -275,7 +266,6 @@ export default {
     Dropdown,
     DropdownItem,
     EditIcon,
-    EditSectionContentModal,
     Grid,
     GridItem,
     InputText,

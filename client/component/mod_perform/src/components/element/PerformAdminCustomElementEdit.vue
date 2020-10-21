@@ -69,7 +69,7 @@
           <Button
             class="tui-performAdminCustomElementEdit__submit"
             :styleclass="{ primary: true, small: true }"
-            :text="$str('button_done', 'mod_perform')"
+            :text="$str('button_save', 'mod_perform')"
             type="submit"
           />
           <Button
@@ -145,7 +145,7 @@ export default {
   {
     "mod_perform": [
       "button_cancel",
-      "button_done",
+      "button_save",
       "question_title",
       "reporting_id_help_text",
       "reporting_identifier",

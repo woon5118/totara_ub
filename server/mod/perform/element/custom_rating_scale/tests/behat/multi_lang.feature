@@ -33,8 +33,8 @@ Feature: Custom rating scale element supports multi-lang filters in titles and o
     Then the following fields match these values:
       | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
     When I cancel saving the activity content element
-    And I close the tui modal
-    And I click on "Edit content elements" "button"
+    And I follow "Content (Add Element Activity)"
+    And I click on "Edit content elements" "link_or_button"
     Then "rawTitle" "field" should not be visible
     And I should see "it's an English question"
     And I should not see "deutsche Frage"
@@ -60,8 +60,8 @@ Feature: Custom rating scale element supports multi-lang filters in titles and o
     Then the following fields match these values:
       | rawTitle | <span lang="en" class="multilang">changed & updated</span><span lang="de" class="multilang">geaendert & gespeichert</span> |
     When I cancel saving the activity content element
-    And I close the tui modal
-    And I click on "Edit content elements" "button"
+    And I follow "Content (Add Element Activity)"
+    And I click on "Edit content elements" "link_or_button"
     Then I should see "changed & updated"
     And I should not see "geaendert & gespeichert"
     And I should see "it's the first changed option (score: 1)"
@@ -69,8 +69,8 @@ Feature: Custom rating scale element supports multi-lang filters in titles and o
     And I should see "it's the second changed option (score: 2)"
     And I should not see "zweite geaenderte Option (score: 2)"
     # Going back to edit mode and saving without changes should not change anything
-    And I close the tui modal
-    And I click on "Edit content elements" "button"
+    And I follow "Content (Add Element Activity)"
+    And I click on "Edit content elements" "link_or_button"
     Then I should see "changed & updated"
     And I should not see "geaendert & gespeichert (score: 1)"
     And I should see "it's the first changed option (score: 1)"
@@ -78,4 +78,4 @@ Feature: Custom rating scale element supports multi-lang filters in titles and o
     And I should see "it's the second changed option (score: 2)"
     And I should not see "zweite geaenderte Option (score: 2)"
     And I should not see "geaendert & gespeichert (score: 2)"
-    And I close the tui modal
+    And I follow "Content (Add Element Activity)"

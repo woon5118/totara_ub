@@ -13,7 +13,7 @@ Feature: Adding, Updating, Removing activity elements.
     # Add multiple elements
     When I click on "Add Element Activity" "link"
     And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
-    And I click on "Edit content elements" "button"
+    And I click on "Edit content elements" "link_or_button"
     And I add a "Short text" activity content element
     Then the focused element is "[name=rawTitle]" "css_element"
 
@@ -38,8 +38,8 @@ Feature: Adding, Updating, Removing activity elements.
     And I save the activity content element
     Then I should see "Element saved." in the tui success notification toast
     When I close the tui notification toast
-    And I close the tui modal
-    And I click on "Edit content elements" "button"
+    And I follow "Content (Add Element Activity)"
+    And I click on "Edit content elements" "link_or_button"
     Then I should see "Question 1"
     And I should see "Question 2"
     And I should see "Question 3"
@@ -74,8 +74,8 @@ Feature: Adding, Updating, Removing activity elements.
       | identifier | Identifier C |
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
-    And I click on "Edit content elements" "button"
+    And I follow "Content (Add Element Activity)"
+    And I click on "Edit content elements" "link_or_button"
     Then I should see "Test 1"
     And I should see "Test 2"
     And I should see "Test 3"
@@ -96,8 +96,8 @@ Feature: Adding, Updating, Removing activity elements.
     And I close the tui notification toast
 
     # Unsaved changes dialog should not be triggered
-    And I close the tui modal
-    And I click on "Edit content elements" "button"
+    And I follow "Content (Add Element Activity)"
+    And I click on "Edit content elements" "link_or_button"
     Then I should not see "Test 1"
     And I should see "Test 2"
     And I should see "Test 3"
@@ -115,19 +115,9 @@ Feature: Adding, Updating, Removing activity elements.
     And I should not see "Test 1"
     And I should not see "Test 2"
 
-    # Confirmation should be shown when closing whilst still editing
-    When I click on the Edit element action for question "Test 3"
-    And I close the tui modal
-    Then I should see "Unsaved changes will be lost" in the tui modal
-    And I should see "You currently have unsaved changes that will be lost if you close this content editor. Cancel to go back and save individual content elements. Close to discard the changes." in the tui modal
-    When I close the tui modal
-    Then I should see "Add element"
-    When I close the tui modal
-    And I confirm the tui confirmation modal
-    Then I should not see "Add element"
-
     # Changes should be permanent
-    And I click on "Edit content elements" "button"
+    When I follow "Content (Add Element Activity)"
+    And I click on "Edit content elements" "link_or_button"
     Then I should see "Test 3"
     And I should not see "Test 1"
     And I should not see "Test 2"
@@ -139,7 +129,7 @@ Feature: Adding, Updating, Removing activity elements.
     # Add multiple elements
     When I click on "Add Element Activity" "link"
     And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
-    And I click on "Edit content elements" "button"
+    And I click on "Edit content elements" "link_or_button"
     And I add a "Short text" activity content element
     Then the focused element is "[name=rawTitle]" "css_element"
     When I set the following fields to these values:

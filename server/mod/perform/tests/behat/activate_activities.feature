@@ -117,8 +117,8 @@ Feature: Activation of activities
     Then I should see "Multiple sections"
     Then "Edit section" "button" in the "1" activity section should exist
     And "Section dropdown menu" "button" in the "1" activity section should exist
-    And "Edit content elements" "button" in the "1" activity section should exist
-    And "View content elements" "button" in the "1" activity section should not exist
+    And "Edit content elements" "link_or_button" in the "1" activity section should exist
+    And "View content elements" "link_or_button" in the "1" activity section should not exist
 
     When I click on the "On completion" tui toggle button
     Then I should see "Activity saved" in the tui success notification toast
@@ -132,8 +132,8 @@ Feature: Activation of activities
     Then I should not see "Multiple sections"
     And "Edit section" "button" in the "1" activity section should not exist
     And "Section dropdown menu" "button" in the "1" activity section should not exist
-    And "Edit content elements" "button" in the "1" activity section should not exist
-    And "View content elements" "button" in the "1" activity section should exist
+    And "Edit content elements" "link_or_button" in the "1" activity section should not exist
+    And "View content elements" "link_or_button" in the "1" activity section should exist
     And I should see "Subject" in the "1" activity section
 
     # On completion setting has a confirm modal when in archived state

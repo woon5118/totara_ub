@@ -36,7 +36,7 @@ Feature: Interact with the date picker in the participant form
       | rawTitle | Opt date picker |
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Date pickers)"
 
     And I click the add responding participant button
     And I select "Subject" in the responding participants popover

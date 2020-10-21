@@ -78,7 +78,7 @@ Feature: Managing an activity with multiple sections
       | rawTitle | S1Q1 |
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Participant set up test)"
     Then I should see "0" in the "required" element summary of "1" activity section
     And I should see "1" in the "optional" element summary of "1" activity section
     And I should see "Subject"
@@ -96,7 +96,7 @@ Feature: Managing an activity with multiple sections
       | rawTitle | S2Q1 |
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Participant set up test)"
     Then I should see "0" in the "required" element summary of "1" activity section
     And I should see "1" in the "optional" element summary of "1" activity section
     And I should see "Section #2"
@@ -124,7 +124,7 @@ Feature: Managing an activity with multiple sections
 
     # Renable multi-section; test can save a section title without changing the title
     # for the first section to be created.
-    When I close the tui modal
+    When I follow "Content (Participant set up test)"
     And I click on the "Multiple sections" tui toggle button
     And I confirm the tui confirmation modal
     And I close the tui notification toast

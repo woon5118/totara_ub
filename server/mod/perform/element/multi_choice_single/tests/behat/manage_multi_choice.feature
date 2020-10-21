@@ -33,7 +33,7 @@ Feature: Manage performance activity multiple choice elements
       | options[1][value] | Option six  |
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     When I navigate to manage perform activity content page
     Then I should see perform multi choice single question "Question 1" is saved with options "Option one,Option two"
     And I should see perform multi choice single question "Question 2" is saved with options "Option three,Option four"
@@ -57,7 +57,7 @@ Feature: Manage performance activity multiple choice elements
       |options[2][value]        | Option three |
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     And I navigate to manage perform activity content page
     Then I should see perform multi choice single question "Question 1" is saved with options "Option one,Option two,Option three"
 
@@ -78,7 +78,7 @@ Feature: Manage performance activity multiple choice elements
     And I delete multi choice single question option
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     And I navigate to manage perform activity content page
     Then I should see perform multi choice single question "Question 1" is saved with options "Option one,Option two"
 
@@ -118,7 +118,7 @@ Feature: Manage performance activity multiple choice elements
       | options[1][value] | Option two |
     And I save the activity content element
     When I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     Then I should see "1" in the "required" element summary of the activity section
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section

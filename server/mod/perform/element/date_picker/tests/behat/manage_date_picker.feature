@@ -23,7 +23,7 @@ Feature: Manage performance activity date picker elements
       | rawTitle   | Question 2   |
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     When I navigate to manage perform activity content page
     When I click on the Reporting ID action for question "Question 1"
     Then I should see "Identifier 1"
@@ -48,7 +48,7 @@ Feature: Manage performance activity date picker elements
       | rawTitle   | Question 2 |
     And I save the activity content element
     When I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     Then I should see "1" in the "required" element summary of the activity section
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section

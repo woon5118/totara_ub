@@ -82,7 +82,7 @@ class behat_mod_perform extends behat_base {
 
     public const QUESTION_DISPLAY_LOCATOR = '.tui-performAdminCustomElement';
     public const EDIT_QUESTION_DISPLAY_TITLE_LOCATOR = '.tui-performAdminCustomElement__content-titleText';
-    public const QUESTION_DRAG_ITEM_LOCATOR = '.tui-performEditSectionContentModal__draggableItem';
+    public const QUESTION_DRAG_ITEM_LOCATOR = '.tui-performSectionContent__draggableItem';
     public const QUESTION_DRAG_MOVE_ICON_LOCATOR = '.tui-performAdminCustomElement__moveIcon';
     public const RESPONSE_VISIBILITY_DESCRIPTION_LOCATOR = '.tui-participantContent__sectionHeadingOtherResponsesDescription';
 
@@ -745,11 +745,11 @@ class behat_mod_perform extends behat_base {
     public function i_save_the_custom_element_settings(string $is_saving): void {
         behat_hooks::set_step_readonly(false);
 
-        $button_text = $is_saving === 'save' ? 'Done' : 'Cancel';
+        $button_text = $is_saving === 'save' ? 'Save' : 'Cancel';
 
         /** @var behat_general $behat_general */
         $behat_general = behat_context_helper::get('behat_general');
-        $behat_general->i_click_on_in_the($button_text, 'button', '.tui-performEditSectionContentModal__form', 'css_element');
+        $behat_general->i_click_on_in_the($button_text, 'button', '.tui-performSectionContent__form', 'css_element');
     }
 
     /**
@@ -906,7 +906,7 @@ class behat_mod_perform extends behat_base {
         $this->wait_for_pending_js();
 
         $section_node = $this->get_section_node($section_number);
-        $element_node = $this->find_element_in_container($section_node, "Edit content elements", "button");
+        $element_node = $this->find_element_in_container($section_node, "Edit content elements", "link_or_button");
         $element_node->click();
     }
 

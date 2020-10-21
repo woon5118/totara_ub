@@ -37,7 +37,7 @@ Feature: Numeric rating scale response validation
       | defaultValue | 2                    |
       | highValue    | 3                    |
     And I save the activity content element
-    And I close the tui modal
+    And I follow "Content (Activity One)"
 
     And I click on "Activate" "button"
     And I confirm the tui confirmation modal

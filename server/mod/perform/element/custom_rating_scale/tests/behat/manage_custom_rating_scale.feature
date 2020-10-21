@@ -39,7 +39,7 @@ Feature: Manage performance activity custom rating scale elements
       | options[1][value][score] | 6           |
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     When I navigate to manage perform activity content page
     Then I should see perform custom rating scale question "Question 1" is saved with options "Option one (score: 1),Option two (score: 2)"
     And I should see perform custom rating scale question "Question 2" is saved with options "Option three (score: 3),Option four (score: 4)"
@@ -66,7 +66,7 @@ Feature: Manage performance activity custom rating scale elements
       | options[2][value][score] | 3            |
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     And I navigate to manage perform activity content page
     Then I should see perform custom rating scale question "Question 1" is saved with options "Option one (score: 1),Option two (score: 2),Option three (score: 3)"
 
@@ -90,7 +90,7 @@ Feature: Manage performance activity custom rating scale elements
     And I delete custom rating scale question option
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     And I navigate to manage perform activity content page
     Then I should see perform custom rating scale question "Question 1" is saved with options "Option one (score: 1),Option two (score: 2)"
 
@@ -134,7 +134,7 @@ Feature: Manage performance activity custom rating scale elements
       | options[1][value][score] | 2          |
     And I save the activity content element
     When I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     Then I should see "1" in the "required" element summary of the activity section
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section

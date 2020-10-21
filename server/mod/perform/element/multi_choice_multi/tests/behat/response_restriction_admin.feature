@@ -56,6 +56,6 @@ Feature: Manage performance activity multiple choice-answers elements with admin
       | max | 4 |
     And I save the activity content element
     And I close the tui notification toast
-    And I close the tui modal
+    And I follow "Content (Activity one)"
     When I navigate to manage perform activity content page
     Then I should see perform "checkbox" question "Question 1" is saved with options "Option one,Option two,Option three,Option four,Option five"

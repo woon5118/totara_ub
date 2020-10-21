@@ -13,112 +13,69 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Simon Chester <simon.chester@totaralearning.com>
+  @author Matthias Bonk <matthias.bonk@totaralearning.com>
   @module mod_perform
 -->
 
 <template>
-  <span>
-    <slot name="trigger" :open="openThis" />
+  <Layout :loading="isLoading" :title="title" class="tui-performSectionContent">
+    <template v-slot:content-nav>
+      <PageBackLink :link="goBackLink.url" :text="goBackLink.text" />
+    </template>
 
-    <ModalPresenter :open="isOpen" @request-close="tryCloseThis">
-      <Modal
-        size="sheet"
-        :aria-labelledby="$id('title')"
-        :dismissable="{ backdropClick: false }"
-      >
-        <ModalContent>
-          <template v-slot:title>
-            <h2 class="tui-performEditSectionContentModal__title">
-              {{ title }}
-            </h2>
+    <template v-slot:content>
+      <div aria-hidden="true" class="tui-performSectionContent__title-required">
+        <span class="tui-performSectionContent__title-requiredStar">
+          *
+        </span>
+        {{ $str('required_fields', 'mod_perform') }}
+      </div>
 
-            <div
-              v-if="requiredText"
-              aria-hidden="true"
-              class="tui-performEditSectionContentModal__title-required"
+      <div v-if="isDraft" class="tui-performSectionContent__form">
+        <Droppable
+          v-slot="{
+            attrs,
+            events,
+            dropTarget,
+            placeholder,
+          }"
+          :source-id="$id('element-list')"
+          source-name="Element List"
+          :accept-drop="validateDropElement"
+          :reorder-only="true"
+          @drop="handleDropElement"
+        >
+          <div
+            class="tui-performSectionContent__dragList"
+            v-bind="attrs"
+            v-on="events"
+          >
+            <render :vnode="dropTarget" />
+            <Draggable
+              v-for="(sectionElement, index) in sectionElements"
+              :key="sectionElement.id"
+              v-slot="{ dragging, attrs, events, moveMenu, anyDragging }"
+              :index="index"
+              :value="sectionElement.id"
+              type="element"
+              :disabled="!validDragElement(sectionElement)"
             >
-              <span
-                class="tui-performEditSectionContentModal__title-requiredStar"
+              <div
+                class="tui-performSectionContent__draggableItem"
+                v-bind="attrs"
+                v-on="events"
               >
-                *
-              </span>
-              {{ $str('required_fields', 'mod_perform') }}
-            </div>
-          </template>
+                <render :vnode="moveMenu" />
 
-          <Loader :loading="isLoading">
-            <div
-              v-if="isDraft"
-              class="tui-performEditSectionContentModal__form"
-            >
-              <Droppable
-                v-slot="{
-                  attrs,
-                  events,
-                  dropTarget,
-                  placeholder,
-                }"
-                :source-id="$id('element-list')"
-                source-name="Element List"
-                :accept-drop="validateDropElement"
-                :reorder-only="true"
-                @drop="handleDropElement"
-              >
-                <div
-                  class="tui-performEditSectionContentModal__dragList"
-                  v-bind="attrs"
-                  v-on="events"
-                >
-                  <render :vnode="dropTarget" />
-                  <Draggable
-                    v-for="(sectionElement, index) in sectionElements"
-                    :key="sectionElement.id"
-                    v-slot="{ dragging, attrs, events, moveMenu, anyDragging }"
-                    :index="index"
-                    :value="sectionElement.id"
-                    type="element"
-                    :disabled="!validDragElement(sectionElement)"
-                  >
-                    <div
-                      class="tui-performEditSectionContentModal__draggableItem"
-                      v-bind="attrs"
-                      v-on="events"
-                    >
-                      <render :vnode="moveMenu" />
-
-                      <PerformAdminCustomElement
-                        :activity-state="activityState"
-                        :draggable="
-                          (!anyDragging || dragging) &&
-                            validDragElement(sectionElement) &&
-                            !$apollo.loading
-                        "
-                        :dragging="dragging"
-                        :section-component="getSectionComponent(sectionElement)"
-                        :section-element="sectionElement"
-                        :section-id="sectionId"
-                        @update="update(sectionElement, $event, index)"
-                        @edit="edit(sectionElement)"
-                        @display="display(sectionElement)"
-                        @display-read="displayReadOnly(sectionElement)"
-                        @remove="tryDelete(sectionElement, index)"
-                      />
-                    </div>
-                  </Draggable>
-                  <render :vnode="placeholder" />
-                </div>
-              </Droppable>
-              <ContentAddElementButton
-                :element-plugins="elementPlugins"
-                @add-element-item="add"
-              />
-            </div>
-
-            <div v-else class="tui-performEditSectionContentModal__form">
-              <template v-for="(sectionElement, index) in sectionElements">
                 <PerformAdminCustomElement
-                  :key="sectionElement.id"
+                  v-if="elementPlugins.length"
                   :activity-state="activityState"
+                  :draggable="
+                    (!anyDragging || dragging) &&
+                      validDragElement(sectionElement) &&
+                      !$apollo.loading
+                  "
+                  :dragging="dragging"
                   :section-component="getSectionComponent(sectionElement)"
                   :section-element="sectionElement"
                   :section-id="sectionId"
@@ -128,73 +85,74 @@
                   @display-read="displayReadOnly(sectionElement)"
                   @remove="tryDelete(sectionElement, index)"
                 />
-              </template>
-            </div>
-          </Loader>
+              </div>
+            </Draggable>
+            <render :vnode="placeholder" />
+          </div>
+        </Droppable>
+        <ContentAddElementButton
+          :element-plugins="elementPlugins"
+          @add-element-item="add"
+        />
+      </div>
 
-          <template v-slot:buttons>
-            <Button
-              :id="$id('edit-content-close')"
-              :text="$str('button_close', 'mod_perform')"
-              @click="tryCloseThis"
-            />
-          </template>
-        </ModalContent>
-      </Modal>
-    </ModalPresenter>
+      <div v-else class="tui-performSectionContent__form">
+        <template v-for="(sectionElement, index) in sectionElements">
+          <PerformAdminCustomElement
+            v-if="elementPlugins.length"
+            :key="sectionElement.id"
+            :activity-state="activityState"
+            :section-component="getSectionComponent(sectionElement)"
+            :section-element="sectionElement"
+            :section-id="sectionId"
+            @update="update(sectionElement, $event, index)"
+            @edit="edit(sectionElement)"
+            @display="display(sectionElement)"
+            @display-read="displayReadOnly(sectionElement)"
+            @remove="tryDelete(sectionElement, index)"
+          />
+        </template>
+      </div>
+    </template>
 
-    <ConfirmationModal
-      :open="deleteModalOpen"
-      :title="$str('modal_element_delete_title', 'mod_perform')"
-      :confirm-button-text="$str('delete', 'core')"
-      :loading="isSaving"
-      @confirm="deleteSelectedElement"
-      @cancel="closeDeleteModal"
-    >
-      <p>{{ $str('modal_element_delete_message', 'mod_perform') }}</p>
-    </ConfirmationModal>
-
-    <ConfirmationModal
-      :open="unsavedChangesModalOpen"
-      :title="$str('modal_element_unsaved_changes_title', 'mod_perform')"
-      :confirm-button-text="$str('button_close', 'mod_perform')"
-      @confirm="closeThis"
-      @cancel="unsavedChangesModalOpen = false"
-    >
-      <p>{{ $str('modal_element_unsaved_changes_message', 'mod_perform') }}</p>
-    </ConfirmationModal>
-  </span>
+    <template v-slot:modals>
+      <ConfirmationModal
+        :open="deleteModalOpen"
+        :title="$str('modal_element_delete_title', 'mod_perform')"
+        :confirm-button-text="$str('delete', 'core')"
+        :loading="isSaving"
+        @confirm="deleteSelectedElement"
+        @cancel="closeDeleteModal"
+      >
+        <p>{{ $str('modal_element_delete_message', 'mod_perform') }}</p>
+      </ConfirmationModal>
+    </template>
+  </Layout>
 </template>
 
 <script>
-import Button from 'tui/components/buttons/Button';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ContentAddElementButton from 'mod_perform/components/manage_activity/content/ContentAddElementButton';
 import Draggable from 'tui/components/drag_drop/Draggable';
 import Droppable from 'tui/components/drag_drop/Droppable';
-import Loader from 'tui/components/loading/Loader';
-import Modal from 'tui/components/modal/Modal';
-import ModalContent from 'tui/components/modal/ModalContent';
-import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import Layout from 'tui/components/layouts/LayoutOneColumn';
+import PageBackLink from 'tui/components/layouts/PageBackLink';
 import PerformAdminCustomElement from 'mod_perform/components/element/PerformAdminCustomElement';
+import performElementPluginsQuery from 'mod_perform/graphql/element_plugins';
 import sectionDetailQuery from 'mod_perform/graphql/section_admin';
 import updateSectionElementMutation from 'mod_perform/graphql/update_section_elements';
-import performElementPluginsQuery from 'mod_perform/graphql/element_plugins';
+import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
 import { notify } from 'tui/notifications';
 import { pull, uniqueId } from 'tui/util';
-import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
 
 export default {
   components: {
-    Button,
     ConfirmationModal,
     ContentAddElementButton,
     Draggable,
     Droppable,
-    Loader,
-    Modal,
-    ModalContent,
-    ModalPresenter,
+    Layout,
+    PageBackLink,
     PerformAdminCustomElement,
   },
 
@@ -211,12 +169,14 @@ export default {
       type: String,
       required: true,
     },
-    requiredText: Boolean,
+    goBackLink: {
+      type: Object,
+      required: true,
+    },
   },
 
   data() {
     return {
-      isOpen: false,
       elementPlugins: [],
       section: {
         title: '',
@@ -230,8 +190,6 @@ export default {
       isSaving: false,
       deleteModalOpen: false,
       elementToDelete: null,
-      unsavedChangesModalOpen: false,
-      skipQuery: true,
       type: null,
     };
   },
@@ -248,9 +206,6 @@ export default {
         this.updateSectionElementData(
           data.mod_perform_section_admin.section_elements
         );
-      },
-      skip() {
-        return this.skipQuery;
       },
     },
     elementPlugins: {
@@ -302,40 +257,6 @@ export default {
   },
 
   methods: {
-    /**
-     * Open this modal.
-     */
-    openThis() {
-      // Manually execute the query so data is refreshed every time the modal is opened.
-      this.skipQuery = false;
-      this.$apollo.queries.section.refresh();
-      this.isOpen = true;
-    },
-
-    /**
-     * Attempt to close this modal.
-     * Ask the user to confirm if there are elements still being edited.
-     */
-    tryCloseThis() {
-      if (this.hasUnsavedChanges) {
-        this.unsavedChangesModalOpen = true;
-      } else {
-        this.closeThis();
-      }
-    },
-
-    /**
-     * Close this modal.
-     */
-    closeThis() {
-      // Prevent query from running when modal is closed.
-      this.skipQuery = true;
-      this.editingIds = [];
-      this.sectionElements = [];
-      this.unsavedChangesModalOpen = false;
-      this.isOpen = false;
-    },
-
     /**
      * Add new plugin element.
      */
@@ -584,7 +505,7 @@ export default {
     },
 
     /**
-     * Get the component type (view/editing/readonly), component and it's settings for the current section
+     * Get the component type (view/editing/readonly), component and its settings for the current section
      *
      * @param {Object} sectionElement Current section content
      * @return {Object}
@@ -624,8 +545,8 @@ export default {
     },
 
     /**
-     * Try to persist the activity elements to the back end
-     * Shows toasts and emits events on success/failure.
+     * Try to persist the activity elements to the back end.
+     * Shows toasts on success/failure.
      *
      * @param {Object} variables
      * @param {String} [saveNotificationMessage] Override text that is shown in the success notification.
@@ -645,7 +566,6 @@ export default {
         });
         const section = result.mod_perform_update_section_elements.section;
         this.updateSectionElementData(section.section_elements);
-        this.$emit('update-summary', section);
         if (saveNotificationMessage) {
           this.showSuccessNotification(saveNotificationMessage);
         }
@@ -801,11 +721,8 @@ export default {
     "delete"
   ],
   "mod_perform": [
-    "button_close",
     "modal_element_delete_message",
     "modal_element_delete_title",
-    "modal_element_unsaved_changes_message",
-    "modal_element_unsaved_changes_title",
     "required_fields",
     "toast_error_generic_update",
     "toast_success_delete_element",
@@ -816,14 +733,10 @@ export default {
 </lang-strings>
 
 <style lang="scss">
-.tui-performEditSectionContentModal {
+.tui-performSectionContent {
   &__title {
-    margin: 0;
-    @include tui-font-heading-medium;
-
     &-required {
       @include tui-font-body;
-      margin-top: var(--gap-2);
     }
 
     &-requiredStar {

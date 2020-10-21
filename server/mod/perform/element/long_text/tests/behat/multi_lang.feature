@@ -28,8 +28,8 @@ Feature: Long text element supports multi-lang filters in titles
     Then the following fields match these values:
       | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
     When I cancel saving the activity content element
-    And I close the tui modal
-    And I click on "Edit content elements" "button"
+    And I follow "Content (Add Element Activity)"
+    And I click on "Edit content elements" "link_or_button"
     Then "rawTitle" "field" should not be visible
     And I should see "it's an English question"
     And I should not see "deutsche Frage"
@@ -47,14 +47,14 @@ Feature: Long text element supports multi-lang filters in titles
     Then the following fields match these values:
       | rawTitle | <span lang="en" class="multilang">changed & updated</span><span lang="de" class="multilang">geaendert & gespeichert</span> |
     When I cancel saving the activity content element
-    And I close the tui modal
-    And I click on "Edit content elements" "button"
+    And I follow "Content (Add Element Activity)"
+    And I click on "Edit content elements" "link_or_button"
     Then I should see "changed & updated"
-    When I close the tui modal
+    And I follow "Content (Add Element Activity)"
     # Going back to edit mode and saving without changes should not change anything
-    And I click on "Edit content elements" "button"
-    When I close the tui modal
-    And I click on "Edit content elements" "button"
+    And I click on "Edit content elements" "link_or_button"
+    And I follow "Content (Add Element Activity)"
+    And I click on "Edit content elements" "link_or_button"
     Then I should see "changed & updated"
     And I should not see "geaendert & gespeichert"
-    And I close the tui modal
+    And I follow "Content (Add Element Activity)"

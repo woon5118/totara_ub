@@ -59,13 +59,12 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I click on ".tui-performActivitySectionRelationship:nth-of-type(2) .tui-checkbox__label" "css_element"
     Then I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
-    And I click on "Edit content elements" "button"
+    And I click on "Edit content elements" "link_or_button"
     And I add a "Short text" activity content element
     When I set the following fields to these values:
       | rawTitle   | Question 1   |
     And I save the activity content element
-    And I close the tui modal
-    And I close the tui notification toast
+    And I follow "Content (Act1)"
     And I click on "Assignments" "link"
     And I click on "Add group" "button"
     And I click on "Audience" "link" in the ".tui-dropdown__menu" "css_element"
