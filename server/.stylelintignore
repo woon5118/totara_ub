@@ -19,8 +19,9 @@ enrol/lti/ims-blti/
 filter/algebra/AlgParser.pm
 filter/tex/mimetex.*
 lib/editor/atto/yui/src/rangy/js/*.*
-lib/editor/weka/tui/js/lib/prosemirror_utils
-lib/editor/weka/tui/js/lib/prosemirror_schema_list
+lib/editor/atto/yui/src/dompurify/js/*.*
+lib/editor/weka/client/component/editor_weka/src/js/lib/prosemirror_utils
+lib/editor/weka/client/component/editor_weka/src/js/lib/prosemirror_schema_list
 lib/adodb/
 lib/bennu/
 lib/evalmath/
@@ -77,19 +78,20 @@ theme/base/less/fa
 theme/base/fonts/totara_font.json.zip
 theme/legacy/tui/styles/bootstrap3
 theme/legacy/amd/src/bootstrap.js
-theme/legacy/tui/styles/totara_featured_links/slick/slick
+theme/legacy/server/theme/legacy/scss/blocks/totara_featured_links/slick
 theme/legacy/tui/styles/fa
+theme/legacy/scss/totara/form/date_polyfill.scss
 theme/roots/less/bootstrap3/
 theme/roots/amd/src/bootstrap.js
 totara/appraisal/dompdf/
 totara/core/lib/SVGGraph/
 totara/core/lib/phpseclib/
 totara/core/js/lib/jquery-ui-1.10.4.custom.min.js
-totara/core/js/lib/src/jquery.placeholder.js
 totara/core/js/lib/src/jquery.treeview.js
 totara/core/js/lib/i18n/
 totara/core/amd/src/jquery.dataTables-lazy.js
-totara/tui/tui/build
+totara/tui/client/component/tui/build
+totara/tui/client/tooling/configs/stylelint_order.js
 # Custom theme ignores
 theme/base/scss/*
 theme/base/style/*

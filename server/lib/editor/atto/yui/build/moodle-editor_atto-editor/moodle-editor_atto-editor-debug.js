@@ -1419,6 +1419,17 @@ Y.Base.mix(Y.M.editor_atto.Editor, [EditorAutosaveIo]);
 function EditorClean() {}
 
 EditorClean.ATTRS = {
+    /**
+     * Enable/Disable anti-XSS sanitization for this instance.
+     *
+     * @attribute sanitize
+     * @type Boolean
+     * @writeOnce
+     */
+    sanitize: {
+        value: true,
+        writeOnce: true
+    },
 };
 
 EditorClean.prototype = {
@@ -1489,7 +1500,13 @@ EditorClean.prototype = {
             {regex: /<\/?(?:title|meta|style|st\d|head|font|html|body|link)[^>]*?>/gi, replace: ""}
         ];
 
-        return this._filterContentWithRules(content, rules);
+        content = this._filterContentWithRules(content, rules);
+
+        if (this.get('sanitize') !== false) {
+            content = Y.DOMPurify.sanitize(content);
+        }
+
+        return content;
     },
 
     /**
@@ -2976,6 +2993,7 @@ Y.Base.mix(Y.M.editor_atto.Editor, [EditorFilepicker]);
         "moodle-core-notification-dialogue",
         "moodle-core-notification-confirm",
         "moodle-editor_atto-rangy",
+        "moodle-editor_atto-dompurify",
         "handlebars",
         "timers",
         "querystring-stringify"

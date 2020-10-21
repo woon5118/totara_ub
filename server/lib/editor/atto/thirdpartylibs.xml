@@ -7,4 +7,11 @@
     <version>1.3.0</version>
     <licenseversion></licenseversion>
   </library>
+  <library>
+    <location>yui/src/dompurify/js/*.*</location>
+    <name>DOMPurify</name>
+    <license>Apache</license>
+    <version>2.1.1</version>
+    <licenseversion>2.0</licenseversion>
+  </library>
 </libraries>

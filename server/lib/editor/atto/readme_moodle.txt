@@ -22,3 +22,14 @@ Description of the import of libraries associated with the Atto editor.
       on initialisation, and manipulates the dom, causing any focused input to lose focus -> TL-19787
 
 
+2)  DOMPurify (version 2.1.1)
+    * Download the standard (purify.js) build of the latest stable release
+    * Delete all files in yui/src/dompurify/js
+    * Copy purify.js as dompurify.js into the above folder
+    * Replace the UMD snippet at the top with a YUI integration:
+
+(function (global, factory) {
+  Y.DOMPurify = factory();
+}(this, function () { 'use strict';
+
+    * Run shifter against yui/src/dompurify

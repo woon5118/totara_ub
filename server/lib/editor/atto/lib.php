@@ -67,6 +67,26 @@ class atto_texteditor extends texteditor {
     }
 
     /**
+     * Should we be sanitizing the output of the editor?
+     * @return bool
+     */
+    protected function get_should_sanitize($options) {
+        global $CFG;
+
+        if (!empty($options['allowxss'])) {
+            return false;
+        } else {
+            $noclean = (!empty($options['noclean']));
+            $trusted = (!empty($options['trusttext']) && !empty($options['trusted']));
+            if (($noclean || $trusted) and !empty($CFG->disableconsistentcleaning)) {
+                // No clean is true, and consisten cleaning has been disabled, legacy mode active! Don't clean.
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Use this editor for given element.
      *
      * Available Atto-specific options:
@@ -84,20 +104,10 @@ class atto_texteditor extends texteditor {
      * @param null $fpoptions
      */
     public function use_editor($elementid, array $options=null, $fpoptions=null) {
-        global $PAGE, $CFG;
+        global $PAGE;
 
         // Totara: enforce sanitization of text unless whitelisted as needing JS.
-        $cleantext = true;
-        if (!empty($options['alowxss'])) {
-            $cleantext = false;
-        } else {
-            $noclean = (!empty($options['noclean']));
-            $trusted = (!empty($options['trusttext']) && !empty($options['trusted']));
-            if (($noclean || $trusted) and !empty($CFG->disableconsistentcleaning)) {
-                // No clean is true, and consisten cleaning has been disabled, legacy mode active! Don't clean.
-                $cleantext = false;
-            }
-        }
+        $cleantext = $this->get_should_sanitize($options);
 
         if ($cleantext) {
             $this->text = clean_text($this->text, PARAM_CLEANHTML);
@@ -216,6 +226,7 @@ class atto_texteditor extends texteditor {
             'filepickeroptions' => array(),
             'plugins' => $plugins,
             'pageHash' => $pagehash,
+            'sanitize' => $this->get_should_sanitize($options),
         );
         if ($fpoptions) {
             $params['filepickeroptions'] = $fpoptions;

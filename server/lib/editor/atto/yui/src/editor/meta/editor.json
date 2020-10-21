@@ -15,6 +15,7 @@
             "moodle-core-notification-dialogue",
             "moodle-core-notification-confirm",
             "moodle-editor_atto-rangy",
+            "moodle-editor_atto-dompurify",
             "handlebars",
             "timers",
             "querystring-stringify"
