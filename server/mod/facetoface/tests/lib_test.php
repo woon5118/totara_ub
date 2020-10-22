@@ -3893,13 +3893,10 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         );
         $facetoface = $facetofacegenerator->create_instance($f2fdata, $f2foptions);
 
-        $sessiondate1 = (object)($this->facetoface_sessions_dates_data);
         $sessiondata1 = array(
             'facetoface' => $facetoface->id,
             'capacity' => 10,
-            'sessiondates' => array($sessiondate1),
         );
-        $this->markTestSkipped('FIXME: $sessiondata1 containing invalid format');
         $sessionid1 = $facetofacegenerator->add_session($sessiondata1);
         $sessiondata1['datetimeknown'] = '1';
 
