@@ -331,7 +331,7 @@ export default {
   }
 
   &__buttons {
-    flex: 1;
+    flex-grow: 1;
     align-items: flex-end;
     margin-top: var(--gap-2);
     button.tui-engageSurveyForm__cancelButton {
