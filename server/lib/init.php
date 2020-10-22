@@ -30,7 +30,6 @@ namespace core\internal {
     final class config {
 
         private static $init_log = [];
-        private static $moved_to_current_script_dir = false;
 
         public const INITIALISED = 'TOTARA_READY_FOR_SETUP';
 
@@ -368,19 +367,6 @@ namespace core\internal {
 
             // Servers should define a default timezone in php.ini, but if they don't then make sure no errors are shown.
             date_default_timezone_set(@date_default_timezone_get());
-
-            // The current directory in PHP version 4.3.0 and above isn't necessarily the
-            // directory of the script when run from the command line. The require_once()
-            // would fail, so we'll have to chdir()
-            if (!self::$moved_to_current_script_dir && !isset($_SERVER['REMOTE_ADDR']) && isset($_SERVER['argv'][0])) {
-                // do it only once - skip the second time when continuing after prevous abort
-                if (!defined('ABORT_AFTER_CONFIG') and !defined('ABORT_AFTER_CONFIG_CANCEL')) {
-                    chdir(dirname($_SERVER['argv'][0]));
-                    // We need to ensure that we only change directory once, the chdir is relative :( so it will only
-                    // work a single time.
-                    self::$moved_to_current_script_dir = true;
-                }
-            }
         }
 
         /**
