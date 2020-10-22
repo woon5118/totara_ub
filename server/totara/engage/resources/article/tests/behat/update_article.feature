@@ -33,16 +33,18 @@ Feature: Update article
     Given I log in as "user1"
     And I view article "Test Article 1"
     And I click on "Edit Test Article 1 title" "button" with keyboard
-    And I set the field "Enter resource title" to "Updated test article 1"
+    And I set the field "Enter resource title" to "Updated article title"
     And I should see "Done"
     And I press "Done"
-    And I should see "Updated test article 1"
-    And I click on "Edit Updated test article 1 content" "button" with keyboard
+    And I should see "Updated article title"
+    And I click on "Edit Updated article title content" "button" with keyboard
     And I wait for the next second
     And I activate the weka editor with css ".tui-engageEditArticleContentForm__editor"
-    And I type "Edit article" in the weka editor
+    And I set the weka editor to "Edited article contents"
     And I wait for the next second
-    And I click on "Done" "button"
+    When I click on "Done" "button"
+    Then I should see "Edited article contents"
+    And I should not see "Test Article"
 
   @javascript
   Scenario: Update resource without permission
