@@ -1,6 +1,12 @@
 This file describes API changes in reportbuilder,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* template_helper::get_template_groups() now by default excludes groups which only contain templates belonging
+  to sources that are disabled or non-selectable. Groups containing only non-selectable sources can be included
+  by specifying the new optional parameter includenonselectable.
+
 === 13.1 ===
 
 * Cloning of embedded reports can be prevented by overriding \rb_base_embedded::is_cloning_allowed(), and a custom

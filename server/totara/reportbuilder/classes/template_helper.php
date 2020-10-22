@@ -23,53 +23,66 @@
 
 namespace totara_reportbuilder;
 
+use totara_reportbuilder\rb\template\base as template_base;
+
 final class template_helper {
+
+    private static $groups;
+    private static $templates;
 
     /**
      * Get all templates.
      *
+     * This includes templates for is_source_ignored and non-selectable sources. It should probably be
+     * changed to match get_source_list.
+     *
      * @return string[]
      */
     public static function get_templates() : array {
-        static $templates;
-
-        if ($templates === null) {
-            $templates = \core_component::get_namespace_classes('rb\template', 'totara_reportbuilder\rb\template\base');
+        if (self::$templates === null) {
+            self::$templates = \core_component::get_namespace_classes('rb\template', 'totara_reportbuilder\rb\template\base');
         }
 
-        return $templates;
+        return self::$templates;
     }
 
     /**
      * Get template groups
      *
-     * @return array
+     * @param bool $includenonselectable
+     * @return template_base[][] first keyed by group label, then keyed by class name
      */
-    public static function get_template_groups() : array {
-        static $groups;
-
-        if (isset($groups)) {
-            return $groups;
+    public static function get_template_groups($includenonselectable = false) : array {
+        if (isset(self::$groups[$includenonselectable])) {
+            return self::$groups[$includenonselectable];
         }
 
-        $groups = [];
+        $working = [];
         foreach (self::get_templates() as $classname) {
             $template = self::get_template_object($classname);
+            $src = \reportbuilder::get_source_object($template->source);
 
-            if (!isset($groups[$template->label])) {
-                $groups[$template->label] = [];
+            if ($src->is_source_ignored()) {
+                continue;
             }
-            $groups[$template->label][$classname] = $template;
+
+            if ($src->selectable || $includenonselectable) {
+                if (!isset($working[$template->label])) {
+                    $working[$template->label] = [];
+                }
+                $working[$template->label][$classname] = $template;
+            }
         }
 
-        return $groups;
+        self::$groups[$includenonselectable] = $working;
+        return self::$groups[$includenonselectable];
     }
 
     /**
      * Get template class object
      *
      * @param string $template The template class
-     * @return object|false
+     * @return template_base|object|false
      */
     public static function get_template_object(string $template) : ?object {
         // $template is the full namespaced classname.
@@ -78,7 +91,7 @@ final class template_helper {
         }
 
         // $template just the name of the class without namespace.
-        foreach (\totara_reportbuilder\template_helper::get_templates() as $class) {
+        foreach (self::get_templates() as $class) {
             $classname = explode("\\", $class);
             if (end($classname) == $template) {
                 return new $class();
@@ -219,5 +232,10 @@ final class template_helper {
         }
 
         return $reportid;
+    }
+
+    public static function reset_caches(): void {
+        self::$groups = null;
+        self::$templates = null;
     }
 }

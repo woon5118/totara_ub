@@ -42,23 +42,23 @@ class create_report extends template {
     public static function create() {
         // Unfortunately, we need to fetch everything to make sure that we have a complete view of the possible
         // filter options
-        $groups = reportbuilder::get_source_groups();
-        $templates = template_helper::get_template_groups();
+        $source_groups = reportbuilder::get_source_groups();
+        $template_groups = template_helper::get_template_groups();
 
-        $display_group = [];
-        foreach ($groups as $key => $sources) {
-            $display_group[$key] = $key;
+        $display_source_groups = [];
+        foreach ($source_groups as $key => $sources) {
+            $display_source_groups[$key] = $key;
         }
 
-        $display_templates = [];
-        foreach ($templates as $key => $template) {
-            $display_templates[$key] = $key;
+        $display_template_groups = [];
+        foreach ($template_groups as $key => $template) {
+            $display_template_groups[$key] = $key;
         }
 
         $select_panel = select_region_panel::create(get_string('filters', 'totara_reportbuilder'), [
             select_search_text::create('search', get_string('search', 'core'), true),
-            select_multi::create('template', get_string('templates', 'totara_reportbuilder'), true, $display_templates, []),
-            select_multi::create('source', get_string('reportsources', 'totara_reportbuilder'), true, $display_group, [])
+            select_multi::create('template', get_string('templates', 'totara_reportbuilder'), true, $display_template_groups, []),
+            select_multi::create('source', get_string('reportsources', 'totara_reportbuilder'), true, $display_source_groups, [])
         ], true, true, true);
 
         $data = [

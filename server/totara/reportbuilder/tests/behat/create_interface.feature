@@ -12,6 +12,12 @@ Feature: Test the create report interface
     And I click on "Create" "button"
     Then I should see "Learner goal status overview"
 
+  Scenario: Create report interface excludes sources and templates from disabled features
+    When I disable the "goals" advanced feature
+    And I set the field "search_input" to "goal"
+    And I click on "Search" "button" in the ".tw-selectRegionPanel__content" "css_element"
+    And I should see "0 records shown"
+
   Scenario: Search text filtering works on the create report page
     When I set the field "search_input" to "Manager"
     And I click on "Search" "button" in the ".tw-selectRegionPanel__content" "css_element"

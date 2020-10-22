@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_response_element.php');
 
+use totara_core\advanced_feature;
+
 abstract class rb_perform_response_element_base extends rb_base_embedded {
 
     public function __construct() {
@@ -88,6 +90,14 @@ abstract class rb_perform_response_element_base extends rb_base_embedded {
      */
     public static function is_search_saving_allowed(): bool {
         return false;
+    }
+
+    /**
+     * Hide this source if feature disabled or hidden.
+     * @return bool
+     */
+    public static function is_source_ignored() {
+        return advanced_feature::is_disabled('performance_activities');
     }
 
 }

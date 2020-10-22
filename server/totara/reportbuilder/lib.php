@@ -1295,6 +1295,7 @@ class reportbuilder {
                     if (is_dir($file) || !preg_match('|^rb_source_(.*)\.php$|', $file, $matches)) {
                         continue;
                     }
+                    require_once($dir . $file);
                     $source = $matches[1];
                     $classname = 'rb_source_' . $source;
                     if (class_exists($classname) && $classname::is_source_ignored()) {

@@ -21,6 +21,8 @@
  * @package totara_reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -72,6 +74,14 @@ class rb_source_program_membership extends rb_base_source {
                          SELECT pch.userid, pch.programid
                            FROM {prog_completion_history} pch
                           WHERE pch.coursesetid = 0) pcall)";
+    }
+
+    /**
+     * Hide this source if feature disabled or hidden.
+     * @return bool
+     */
+    public static function is_source_ignored() {
+        return !advanced_feature::is_enabled('programs');
     }
 
     /**

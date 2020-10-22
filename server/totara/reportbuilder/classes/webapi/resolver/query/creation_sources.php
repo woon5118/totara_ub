@@ -64,8 +64,13 @@ class creation_sources implements query_resolver, has_middleware {
         $templates = [];
         foreach (template_helper::get_templates() as $classname) {
             $template = template_helper::get_template_object($classname);
+            $src = \reportbuilder::get_source_object($template->source);
 
             // Do the filtering.
+            if ($src->is_source_ignored() || !$src->selectable) {
+                continue;
+            }
+
             if ($label && !in_array($template->label, $label)) {
                 continue;
             }

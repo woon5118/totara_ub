@@ -30,6 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/totara/reportbuilder/rb_sources/rb_source_user.php');
 
+use totara_core\advanced_feature;
+
 /**
  * Performance reporting user report.
  *
@@ -131,5 +133,13 @@ class rb_source_perform_response_user extends rb_source_user {
     public function post_config(reportbuilder $report) {
         $restrictions = util::get_report_on_subjects_sql($report->reportfor, "base.id");
         $report->set_post_config_restrictions($restrictions);
+    }
+
+    /**
+     * Hide this source if feature disabled or hidden.
+     * @return bool
+     */
+    public static function is_source_ignored() {
+        return advanced_feature::is_disabled('performance_activities');
     }
 }

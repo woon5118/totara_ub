@@ -22,6 +22,8 @@
  * @subpackage reportbuilder
  */
 
+use totara_core\advanced_feature;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -79,6 +81,14 @@ class rb_source_certification_membership extends rb_base_source {
                          SELECT cch.userid, cch.certifid
                            FROM {certif_completion_history} cch) ccall
                    JOIN {prog} prog ON ccall.certifid = prog.certifid)";
+    }
+
+    /**
+     * Hide this source if feature disabled or hidden.
+     * @return bool
+     */
+    public static function is_source_ignored() {
+        return !advanced_feature::is_enabled('certifications');
     }
 
     /**
