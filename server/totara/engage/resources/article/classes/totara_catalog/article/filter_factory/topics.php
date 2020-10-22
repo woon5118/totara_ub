@@ -132,7 +132,7 @@ class topics extends filter_factory {
 
         $panelselector = new multi(
             $tagpanelkey,
-            $displayname
+            new \lang_string('tagscollectionx', 'tag', $displayname)
         );
         $panelselector->add_options_loader($optionsloader);
 
@@ -170,7 +170,7 @@ class topics extends filter_factory {
 
         $browseselector = new single(
             $tagbrowsekey,
-            $displayname
+            new \lang_string('tagscollectionx', 'tag', $displayname)
         );
         $browseselector->add_all_option();
         $browseselector->add_options_loader($optionsloader);

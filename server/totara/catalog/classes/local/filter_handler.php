@@ -156,7 +156,7 @@ class filter_handler {
             $existingfilter = $this->allfilters[$filter->key];
 
             if (!$existingfilter->can_merge($filter)) {
-                throw new \coding_exception('Tried to define two catalog filters with the same key but which cannot be merged');
+                throw new \coding_exception("Tried to define two catalog filters with the same key but which cannot be merged, tag key: $existingfilter->key in region: $existingfilter->region");
             }
 
             $existingfilter->merge($filter);

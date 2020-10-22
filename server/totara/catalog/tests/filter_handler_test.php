@@ -175,4 +175,40 @@ class totara_catalog_filter_handler_testcase extends advanced_testcase {
         $this->assertSame('catalog_learning_type_panel', $learning_type_filter[0]->key);
         $this->assertSame('catalog_learning_type_browse', $learning_type_filter[1]->key);
     }
+
+    public function test_register_filters() {
+        $article_filters = \engage_article\totara_catalog\article\filter_factory\topics::get_filters();
+        $playlist_filters = \totara_playlist\totara_catalog\playlist\filter_factory\topics::get_filters();
+
+        $filter_handler = \totara_catalog\local\filter_handler::instance();
+        $register_method = new ReflectionMethod('\totara_catalog\local\filter_handler', 'register_filter');
+        $register_method->setAccessible(true);
+
+        $reflection_class = new ReflectionClass('\totara_catalog\local\filter_handler');
+        $allfilters_property = $reflection_class->getProperty('allfilters');
+        $allfilters_property->setAccessible(true);
+
+        $this->assertNull($allfilters_property->getValue($filter_handler));
+
+        foreach ($article_filters as $filter) {
+            $register_method->invokeArgs($filter_handler, [$filter]);
+        }
+
+        $this->assertCount(2, $allfilters_property->getValue($filter_handler));
+
+        foreach ($playlist_filters as $filter) {
+            $register_method->invokeArgs($filter_handler, [$filter]);
+        }
+
+        // Playlist filters have the same keys as articles so we merge them (still only 2)
+        $this->assertCount(2, $allfilters_property->getValue($filter_handler));
+
+        $course_format_filters = core_course\totara_catalog\course\filter_factory\format::get_filters();
+        foreach ($course_format_filters as $filter) {
+            $register_method->invokeArgs($filter_handler, [$filter]);
+        }
+
+        // Course format adds 2 extra filters so we should have 4 now
+        $this->assertCount(4, $allfilters_property->getValue($filter_handler));
+    }
 }
