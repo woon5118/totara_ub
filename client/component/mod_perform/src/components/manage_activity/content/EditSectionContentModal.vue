@@ -839,7 +839,7 @@ export default {
 
   &__dragList {
     & > * + * {
-      margin-top: var(--gap-4);
+      margin-top: var(--gap-2);
     }
   }
 

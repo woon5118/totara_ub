@@ -13,40 +13,45 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module performelement_numeric_rating_scale
+  @module performelement_short_text
 -->
 
 <template>
-  <div class="tui-numericRatingScaleAdminView">
-    <Form input-width="full" :vertical="true">
-      <FormRow>
-        <Range
-          :char-length="30"
-          :default-value="data.defaultValue"
-          :disabled="true"
-          :max="data.highValue"
-          :min="data.lowValue"
-          :show-labels="false"
-        />
-      </FormRow>
-    </Form>
+  <div class="tui-shortTextAdminEdit">
+    <PerformAdminCustomElementEdit
+      :initial-values="initialValues"
+      :settings="settings"
+      @cancel="$emit('display')"
+      @update="$emit('update', $event)"
+    />
   </div>
 </template>
 
 <script>
-import Form from 'tui/components/form/Form';
-import FormRow from 'tui/components/form/FormRow';
-import Range from 'tui/components/form/Range';
+import PerformAdminCustomElementEdit from 'mod_perform/components/element/PerformAdminCustomElementEdit';
 
 export default {
   components: {
-    Form,
-    FormRow,
-    Range,
+    PerformAdminCustomElementEdit,
   },
 
+  inheritAttrs: false,
+
   props: {
-    data: Object,
+    identifier: String,
+    isRequired: Boolean,
+    rawTitle: String,
+    settings: Object,
+  },
+
+  data() {
+    return {
+      initialValues: {
+        rawTitle: this.rawTitle,
+        identifier: this.identifier,
+        responseRequired: this.isRequired,
+      },
+    };
   },
 };
 </script>
