@@ -613,6 +613,9 @@ class auth extends \auth_plugin_base {
         $user = (object) $userinfo;
         complete_user_login($user);
         $this->update_picture($user);
+
+        // Redirect to home page if PARAM_LOCALURL validation on wantsurl failed.
+        $redirecturl = ($redirecturl == '') ? $CFG->wwwroot : $redirecturl;
         redirect($redirecturl);
     }
 
