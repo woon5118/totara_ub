@@ -937,5 +937,13 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020061700, 'facetoface');
     }
 
+    if ($oldversion < 2020100101) {
+        // Fixed the orphaned records with statuscode 50 as we deprecated "Approved" status.
+        facetoface_upgradelib_approval_to_declined_status();
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2020100101, 'facetoface');
+    }
+
     return true;
 }

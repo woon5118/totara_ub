@@ -308,3 +308,39 @@ function facetoface_upgradelib_add_new_template(string $reference, string $title
         $DB->insert_record('facetoface_notification', $notification);
     }
 }
+
+/**
+ * Fixed the orphaned records with statuscode 50 as we deprecated "Approved" status.
+ */
+function facetoface_upgradelib_approval_to_declined_status() {
+    global $DB;
+
+    $superceded = 0;
+    $statuscode = 50;
+    $statuses = $DB->get_records_sql(
+        'SELECT fss.*, u.id AS userid, f.id AS facetofaceid
+           FROM {facetoface_signups_status} fss
+           JOIN {facetoface_signups} fs ON fs.id = fss.signupid
+           JOIN {facetoface_sessions} s ON s.id = fs.sessionid
+           JOIN {facetoface} f ON f.id = s.facetoface
+           JOIN {user} u ON u.id = fs.userid
+          WHERE superceded = :superceded AND statuscode = :statuscode',
+        ['superceded' => $superceded, 'statuscode' => $statuscode]
+    );
+    /** @see \mod_facetoface\signup\state\declined::get_code() */
+    $declined_status = 30;
+    $upgrade_log_notice = defined('UPGRADE_LOG_NOTICE') ? UPGRADE_LOG_NOTICE : 1;
+    $trans = $DB->start_delegated_transaction();
+    foreach ($statuses as $status) {
+        // Update the record.
+        $DB->set_field('facetoface_signups_status', 'statuscode', $declined_status, ['id' => $status->id]);
+
+        // Add a log message.
+        upgrade_log(
+            $upgrade_log_notice,
+            'mod_facetoface',
+            'Invalid user signup cancelled: userid ' . $status->userid . ', facetofaceid ' . $status->facetofaceid
+        );
+    }
+    $trans->allow_commit();
+}
