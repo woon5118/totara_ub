@@ -23,6 +23,7 @@
  */
 
 use core\orm\entity\entity;
+use core\orm\entity\relations\has_one;
 use core\orm\query\exceptions\record_not_found_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -250,7 +251,7 @@ class core_orm_entity_testcase extends orm_entity_testcase {
         $entity = new sample_entity([
             'name' => 'Jane Doe',
         ], false, true);
-        
+
         $this->assertTrue($entity->exists());
 
         // Explicitly say entity does not exist
@@ -258,7 +259,7 @@ class core_orm_entity_testcase extends orm_entity_testcase {
             'name' => 'Jane Doe',
             'id' => 96,
         ], false, false);
-        
+
         $this->assertFalse($entity->exists());
     }
 
@@ -1040,6 +1041,19 @@ class core_orm_entity_testcase extends orm_entity_testcase {
         $this->assertDebuggingCalled("Unknown attribute 'foodoesnotexist' of entity ".sample_entity::class);
     }
 
+    public function test_relate_throws_exception_when_not_defined_on_entity() {
+        $entity = new extended_sample_entity_defined_relations();
+        $related_entity = new sample_entity();
+        $this->expectException(coding_exception::class);
+        $entity->relate('random_relation', $related_entity);
+    }
+
+    public function test_relate_works_when_defined_on_entity() {
+        $entity = new extended_sample_entity_defined_relations();
+        $related_entity = new sample_entity();
+        $entity->relate('sample_relation', $related_entity);
+        $this->assertInstanceOf(sample_entity::class, $entity->sample_relation);
+    }
 }
 
 /**
@@ -1107,4 +1121,15 @@ class extended_sample_entity_updated_at_when_created extends sample_entity {
     public const CREATED_TIMESTAMP = '';
     public const UPDATED_TIMESTAMP = 'updated_at';
     public const SET_UPDATED_WHEN_CREATED = true;
+}
+
+/**
+ * Class extended_sample_entity_defined_relations used for testing
+ * managing relation on entity.
+ */
+class extended_sample_entity_defined_relations extends sample_entity {
+
+    public function sample_relation(): has_one {
+        return $this->has_one(sample_entity::class, 'sample_id');
+    }
 }

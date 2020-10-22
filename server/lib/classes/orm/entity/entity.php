@@ -31,6 +31,8 @@ use core\orm\entity\relations\has_many_through;
 use core\orm\entity\relations\has_one;
 use core\orm\entity\relations\has_one_through;
 use core\orm\query\builder;
+use core_component;
+use JsonSerializable;
 use stdClass;
 
 /**
@@ -38,7 +40,7 @@ use stdClass;
  *
  * @property int $id
  */
-abstract class entity implements \JsonSerializable {
+abstract class entity implements JsonSerializable {
 
     /**
      * entity table
@@ -169,7 +171,6 @@ abstract class entity implements \JsonSerializable {
                 break;
             default:
                 throw new coding_exception("Invalid param '{\$id}' for entity " . static::class);
-                break;
         }
 
         // Set and validate attributes
@@ -280,7 +281,7 @@ abstract class entity implements \JsonSerializable {
         // Checking if the repository class exists using class_exists() with autoloading will have a
         // performance impact as it always checks the PSR classes. Therefore we use our own class_exists
         // method which will have less of an impact in this case
-        if (!\core_component::class_exists($repository_name, false) && !class_exists($repository_name, false)) {
+        if (!core_component::class_exists($repository_name, false) && !class_exists($repository_name, false)) {
             $repository_name = repository::class;
         } else if (!is_subclass_of($repository_name, repository::class)) {
             throw new coding_exception('Custom repositories must extend the repository class.');
@@ -352,6 +353,9 @@ abstract class entity implements \JsonSerializable {
      * @return $this
      */
     public function relate(string $name, $result) {
+        if (!$this->relation_exists($name)) {
+            throw new coding_exception('relation does not exist in entity');
+        }
         $this->relations[$name] = $result;
 
         return $this;
