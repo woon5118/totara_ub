@@ -52,7 +52,7 @@ export default {
       },
     },
     required: Boolean,
-    value: [Array, Boolean, Number, String],
+    value: [Array, Boolean, Number, Object, String],
   },
 
   methods: {

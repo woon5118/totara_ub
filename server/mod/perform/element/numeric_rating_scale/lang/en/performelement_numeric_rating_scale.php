@@ -29,26 +29,30 @@ $string['low_value_label'] = 'Minimum numeric value';
 $string['name'] = 'Numeric rating scale';
 $string['no_response_submitted'] = 'No response submitted';
 $string['pluginname'] = 'Rating scale element';
-$string['preview'] = 'Preview';
-$string['question_label'] = 'Question';
-$string['question_placeholder'] = 'Type a question that prompts a numerical rating';
 $string['scale_numeric_values'] = 'Numeric values';
 
 // Help messages
+$string['numeric_max_value_help'] = "Use whole numbers. The scale steps in intervals of 1, with a minimum of 3 steps. For example, from 1 to 3.";
+$string['default_value_help_text'] = "Default value is a whole number between the numeric values.";
+
+// Errors
+$string['error:answer_invalid'] = 'Answer is not valid';
+$string['error:answer_required'] = 'Answer is required';
+
+// Deprecated in 13
+$string['default_value_help'] = "Default value is a whole number between the numeric values. It is automatically set in proximity to the scale numeric median.
+For example, on a scale of 0 - 21 the default value is 10.
+
+Use this setting to customise default value.";
+$string['error:question_length_exceeded'] = 'Question text is too long';
+$string['error:question_required'] = 'Question is required';
 $string['numeric_values_help'] = "Enter minimum and maximum numeric values.
 
 Use whole numbers.
 
 The scale steps in intervals of 1, with a minimum of 3 steps. For example, from 1 to 3.";
+$string['preview'] = 'Preview';
 $string['preview_help'] = "The slider position represents the default value, a whole number in proximity to the scale numeric values median. For example, on a scale of 0 - 21 the default value is 10.";
-$string['default_value_help'] = "Default value is a whole number between the numeric values. It is automatically set in proximity to the scale numeric median.
-For example, on a scale of 0 - 21 the default value is 10.
-
-Use this setting to customise default value.";
+$string['question_label'] = 'Question';
+$string['question_placeholder'] = 'Type a question that prompts a numerical rating';
 $string['response_required_help'] = "Rating scale questions always require an answer.";
-
-// Errors
-$string['error:answer_invalid'] = 'Answer is not valid';
-$string['error:answer_required'] = 'Answer is required';
-$string['error:question_required'] = 'Question is required';
-$string['error:question_length_exceeded'] = 'Question text is too long';

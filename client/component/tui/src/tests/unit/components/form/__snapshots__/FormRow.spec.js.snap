@@ -2,7 +2,7 @@
 
 exports[`presentation/form/FormRow.vue Checks snapshot 1`] = `
 <div
-  class="tui-formRow"
+  class="tui-formRow tui-formRow--emptyDesc"
 >
   <div
     class="tui-formRow__inner"

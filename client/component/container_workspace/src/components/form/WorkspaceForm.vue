@@ -459,10 +459,6 @@ export default {
         margin-top: var(--gap-8);
       }
     }
-
-    .tui-formRow__desc {
-      margin-bottom: var(--gap-2);
-    }
   }
 
   &__editor {

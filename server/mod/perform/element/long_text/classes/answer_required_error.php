@@ -31,7 +31,7 @@ class answer_required_error extends element_validation_error {
 
     public function __construct() {
         $error_code = self::ANSWER_REQUIRED;
-        $error_message = get_string('error_question_required', 'performelement_long_text');
+        $error_message = get_string('error_question_required', 'mod_perform');
 
         parent::__construct($error_code, $error_message);
     }

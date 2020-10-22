@@ -17,7 +17,13 @@
 -->
 
 <template>
-  <div class="tui-formRow" :class="{ 'tui-formRow--vertical': vertical }">
+  <div
+    class="tui-formRow"
+    :class="{
+      'tui-formRow--vertical': vertical,
+      'tui-formRow--emptyDesc': hidden || (!label && !helpmsg),
+    }"
+  >
     <div class="tui-formRow__inner">
       <div class="tui-formRow__desc">
         <Label
@@ -126,16 +132,30 @@ export default {
 
   &__inner > &__desc {
     min-width: 0;
-    margin-bottom: var(--gap-1);
     padding-top: var(--gap-1);
     padding-right: var(--gap-2);
     text-align: left;
     overflow-wrap: break-word;
+
+    .tui-form--vertical &,
+    .tui-formRow--vertical &,
+    .tui-formRow--emptyDesc & {
+      padding: 0;
+    }
   }
 
   &__inner > &__action {
     display: flex;
     max-width: 71.2rem;
+
+    .tui-form--vertical &,
+    .tui-formRow--vertical & {
+      margin-top: var(--gap-2);
+    }
+
+    .tui-formRow--emptyDesc & {
+      margin-top: 0;
+    }
 
     &--isStacked {
       display: block;

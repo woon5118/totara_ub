@@ -19,52 +19,6 @@
   <div class="tui-performElementEditDisplay">
     <div v-if="error">{{ error }}</div>
 
-    <div class="tui-performElementEditDisplay__action">
-      <Popover
-        v-if="identifier && !isActive"
-        class="tui-performElementEditDisplay__reportingId"
-      >
-        <h2 class="tui-performElementEditDisplay__reportingId-header">
-          {{ $str('reporting_identifier', 'mod_perform') }}
-        </h2>
-        <div class="tui-performElementEditDisplay__reportingId-content">
-          {{ identifier }}
-        </div>
-        <template v-slot:trigger>
-          <ButtonIcon
-            :aria-label="$str('reporting_identifier', 'mod_perform')"
-            :styleclass="{ transparentNoPadding: true }"
-          >
-            <template>
-              <ReportsIcon
-                :alt="$str('reporting_identifier', 'mod_perform')"
-                :title="$str('reporting_identifier', 'mod_perform')"
-                size="200"
-              />
-            </template>
-          </ButtonIcon>
-        </template>
-      </Popover>
-      <EditIcon
-        v-if="!isActive"
-        :aria-label="$str('edit_element', 'mod_perform')"
-        @click="edit"
-      />
-      <DeleteIcon
-        v-if="!isActive"
-        :aria-label="$str('delete_element', 'mod_perform')"
-        @click="remove"
-      />
-      <ButtonIcon
-        v-if="isActive"
-        :aria-label="$str('setting_element', 'mod_perform')"
-        :styleclass="{ transparentNoPadding: true }"
-        class="tui-performElementEditDisplay__action-settings"
-        @click.prevent="displayRead()"
-      >
-        <SettingsIcon size="200" />
-      </ButtonIcon>
-    </div>
     <div v-if="title" class="tui-performElementEditDisplay__title">
       {{ title }}
 
@@ -81,21 +35,7 @@
 </template>
 
 <script>
-import EditIcon from 'tui/components/buttons/EditIcon';
-import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import SettingsIcon from 'tui/components/icons/Settings';
-import Popover from 'tui/components/popover/Popover';
-import ReportsIcon from 'tui/components/icons/Reports';
-import DeleteIcon from 'tui/components/buttons/DeleteIcon';
 export default {
-  components: {
-    ButtonIcon,
-    DeleteIcon,
-    EditIcon,
-    SettingsIcon,
-    Popover,
-    ReportsIcon,
-  },
   props: {
     title: {
       type: String,
@@ -122,17 +62,6 @@ export default {
       return this.activityState.name === 'ACTIVE';
     },
   },
-  methods: {
-    edit() {
-      this.$emit('edit');
-    },
-    remove() {
-      this.$emit('remove');
-    },
-    displayRead() {
-      this.$emit('display-read');
-    },
-  },
 };
 </script>
 
@@ -151,13 +80,6 @@ export default {
 
 <style lang="scss">
 .tui-performElementEditDisplay {
-  display: flex;
-  flex-direction: column;
-  padding: var(--gap-2) var(--gap-3);
-  background: var(--color-neutral-2);
-  border: var(--border-width-thin) solid var(--color-neutral-5);
-  border-radius: var(--border-radius-normal);
-
   &__action {
     display: flex;
     flex-direction: row;

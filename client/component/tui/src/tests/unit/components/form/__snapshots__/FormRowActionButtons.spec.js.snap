@@ -2,7 +2,7 @@
 
 exports[`presentation/form/FormRowActionButtons.vue Checks snapshot 1`] = `
 <div
-  class="tui-formRow"
+  class="tui-formRow tui-formRow--emptyDesc"
   id="example"
 >
   <div

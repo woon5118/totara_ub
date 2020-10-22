@@ -2,7 +2,7 @@
 
 exports[`engage_survey/components/box/SquareBox.vue Checks snapshot 1`] = `
 <div
-  class="tui-formRow tui-engageSurveySquareBox"
+  class="tui-formRow tui-engageSurveySquareBox tui-formRow--emptyDesc"
 >
   <div
     class="tui-formRow__inner"
@@ -34,7 +34,7 @@ exports[`engage_survey/components/box/SquareBox.vue Checks snapshot 1`] = `
         role="group"
       >
         <div
-          class="tui-formRow"
+          class="tui-formRow tui-formRow--emptyDesc"
         >
           <div
             class="tui-formRow__inner"

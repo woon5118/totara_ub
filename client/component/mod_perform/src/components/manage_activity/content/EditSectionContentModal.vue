@@ -31,12 +31,20 @@
             <h2 class="tui-performEditSectionContentModal__title">
               {{ title }}
             </h2>
-          </template>
 
-          <p v-if="requiredText" aria-hidden="true">
-            <span class="tui-performEditSectionContentModal__required">*</span>
-            {{ $str('required_fields', 'mod_perform') }}
-          </p>
+            <div
+              v-if="requiredText"
+              aria-hidden="true"
+              class="tui-performEditSectionContentModal__title-required"
+            >
+              <span
+                class="tui-performEditSectionContentModal__title-requiredStar"
+              >
+                *
+              </span>
+              {{ $str('required_fields', 'mod_perform') }}
+            </div>
+          </template>
 
           <Loader :loading="isLoading">
             <div
@@ -47,8 +55,6 @@
                 v-slot="{
                   attrs,
                   events,
-                  isActive,
-                  isDropValid,
                   dropTarget,
                   placeholder,
                 }"
@@ -75,37 +81,22 @@
                   >
                     <div
                       class="tui-performEditSectionContentModal__draggableItem"
-                      :class="{
-                        'tui-performEditSectionContentModal__draggableItem--dragging': dragging,
-                      }"
                       v-bind="attrs"
                       v-on="events"
                     >
-                      <div
-                        v-if="
-                          (!anyDragging || dragging) &&
-                            validDragElement(sectionElement)
-                        "
-                        class="tui-performEditSectionContentModal__draggableItem-moveIcon"
-                      >
-                        <DragHandleIcon />
-                      </div>
                       <render :vnode="moveMenu" />
-                      <component
-                        :is="componentFor(sectionElement)"
-                        ref="sectionElements"
-                        :key="sectionElement.id"
-                        :section-id="sectionId"
-                        :element-id="sectionElement.element.id"
-                        :data="sectionElement.element.data"
-                        :raw-data="sectionElement.element.raw_data"
-                        :title="sectionElement.element.title"
-                        :raw-title="sectionElement.element.raw_title"
-                        :identifier="sectionElement.element.identifier"
-                        :is-required="sectionElement.element.is_required"
-                        :type="sectionElement.element.type"
-                        :error="errors[sectionElement.id]"
+
+                      <PerformAdminCustomElement
                         :activity-state="activityState"
+                        :draggable="
+                          (!anyDragging || dragging) &&
+                            validDragElement(sectionElement) &&
+                            !$apollo.loading
+                        "
+                        :dragging="dragging"
+                        :section-component="getSectionComponent(sectionElement)"
+                        :section-element="sectionElement"
+                        :section-id="sectionId"
                         @update="update(sectionElement, $event, index)"
                         @edit="edit(sectionElement)"
                         @display="display(sectionElement)"
@@ -122,31 +113,22 @@
                 @add-element-item="add"
               />
             </div>
+
             <div v-else class="tui-performEditSectionContentModal__form">
-              <component
-                :is="componentFor(sectionElement)"
-                v-for="(sectionElement, index) in sectionElements"
-                ref="sectionElements"
-                :key="sectionElement.id"
-                :data="sectionElement.element.data"
-                :raw-data="sectionElement.element.raw_data"
-                :title="sectionElement.element.title"
-                :raw-title="sectionElement.element.raw_title"
-                :identifier="
-                  normaliseIdentifierForElements(
-                    sectionElement.element.identifier
-                  )
-                "
-                :is-required="sectionElement.element.is_required"
-                :type="sectionElement.element.type"
-                :error="errors[sectionElement.id]"
-                :activity-state="activityState"
-                @update="update(sectionElement, $event, index)"
-                @edit="edit(sectionElement)"
-                @display="display(sectionElement)"
-                @display-read="displayReadOnly(sectionElement)"
-                @remove="tryDelete(sectionElement, index)"
-              />
+              <template v-for="(sectionElement, index) in sectionElements">
+                <PerformAdminCustomElement
+                  :key="sectionElement.id"
+                  :activity-state="activityState"
+                  :section-component="getSectionComponent(sectionElement)"
+                  :section-element="sectionElement"
+                  :section-id="sectionId"
+                  @update="update(sectionElement, $event, index)"
+                  @edit="edit(sectionElement)"
+                  @display="display(sectionElement)"
+                  @display-read="displayReadOnly(sectionElement)"
+                  @remove="tryDelete(sectionElement, index)"
+                />
+              </template>
             </div>
           </Loader>
 
@@ -186,18 +168,15 @@
 
 <script>
 import Button from 'tui/components/buttons/Button';
-import ButtonCancel from 'tui/components/buttons/Cancel';
-import ButtonGroup from 'tui/components/buttons/ButtonGroup';
-import ButtonSubmit from 'tui/components/buttons/Submit';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ContentAddElementButton from 'mod_perform/components/manage_activity/content/ContentAddElementButton';
 import Draggable from 'tui/components/drag_drop/Draggable';
 import Droppable from 'tui/components/drag_drop/Droppable';
-import DragHandleIcon from 'tui/components/icons/DragHandle';
 import Loader from 'tui/components/loading/Loader';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import PerformAdminCustomElement from 'mod_perform/components/element/PerformAdminCustomElement';
 import sectionDetailQuery from 'mod_perform/graphql/section_admin';
 import updateSectionElementMutation from 'mod_perform/graphql/update_section_elements';
 import performElementPluginsQuery from 'mod_perform/graphql/element_plugins';
@@ -208,18 +187,15 @@ import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
 export default {
   components: {
     Button,
-    ButtonCancel,
-    ButtonGroup,
-    ButtonSubmit,
     ConfirmationModal,
     ContentAddElementButton,
     Draggable,
     Droppable,
-    DragHandleIcon,
     Loader,
     Modal,
     ModalContent,
     ModalPresenter,
+    PerformAdminCustomElement,
   },
 
   props: {
@@ -256,6 +232,7 @@ export default {
       elementToDelete: null,
       unsavedChangesModalOpen: false,
       skipQuery: true,
+      type: null,
     };
   },
 
@@ -607,22 +584,43 @@ export default {
     },
 
     /**
-     * if the element is editing shows the Form component else shows element display component
+     * Get the component type (view/editing/readonly), component and it's settings for the current section
+     *
+     * @param {Object} sectionElement Current section content
+     * @return {Object}
      */
-    componentFor(sectionElement) {
+    getSectionComponent(sectionElement) {
+      let subComponent = {
+        component: '',
+        settings: '',
+        type: '',
+      };
+
       const { type } = sectionElement.element;
       const elementPlugin = this.elementPlugins
         .filter(item => item.plugin_name == type.plugin_name)
         .shift();
+
+      subComponent.settings = elementPlugin.plugin_config;
+
       if (this.isReadOnly(sectionElement)) {
-        return tui.asyncComponent(
+        subComponent.type = 'readOnly';
+        subComponent.component = tui.asyncComponent(
           elementPlugin.admin_read_only_display_component
         );
+      } else if (this.isEditing(sectionElement)) {
+        subComponent.type = 'editing';
+        subComponent.component = tui.asyncComponent(
+          elementPlugin.admin_edit_form_component
+        );
+      } else {
+        subComponent.type = 'view';
+        subComponent.component = tui.asyncComponent(
+          elementPlugin.admin_view_component
+        );
       }
-      if (this.isEditing(sectionElement)) {
-        return tui.asyncComponent(elementPlugin.admin_form_component);
-      }
-      return tui.asyncComponent(elementPlugin.admin_display_component);
+
+      return subComponent;
     },
 
     /**
@@ -822,10 +820,15 @@ export default {
   &__title {
     margin: 0;
     @include tui-font-heading-medium;
-  }
 
-  &__required {
-    color: var(--color-prompt-alert);
+    &-required {
+      @include tui-font-body;
+      margin-top: var(--gap-2);
+    }
+
+    &-requiredStar {
+      color: var(--color-prompt-alert);
+    }
   }
 
   &__form {
@@ -835,27 +838,14 @@ export default {
   }
 
   &__dragList {
-    > [data-tui-draggable-placeholder] {
-      margin-top: var(--gap-3);
+    & > * + * {
+      margin-top: var(--gap-4);
     }
   }
 
   &__draggableItem {
     position: relative;
-    margin-top: var(--gap-3);
     user-select: none;
-
-    &-moveIcon {
-      position: absolute;
-      top: var(--gap-1);
-      left: var(--gap-2);
-      display: none;
-    }
-
-    &:hover &-moveIcon,
-    &--dragging &-moveIcon {
-      display: block;
-    }
   }
 }
 </style>

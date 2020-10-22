@@ -30,7 +30,6 @@ $string['custom_rating_options'] = 'Custom rating options';
 $string['name'] = 'Custom rating scale';
 $string['no_response_submitted'] = 'No response submitted';
 $string['pluginname'] = 'Custom rating scale element';
-$string['question_title'] = 'Question';
 $string['required'] = 'Required';
 $string['score'] = 'Score';
 $string['text'] = 'Text';
@@ -41,3 +40,6 @@ $string['custom_values_help'] = 'Enter the custom text label and the correspondi
 // Errors
 $string['error:answer_required'] = 'Answer is required';
 $string['error:question_required'] = 'Question is required';
+
+// Deprecated in 13
+$string['question_title'] = 'Question';

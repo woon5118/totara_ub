@@ -301,20 +301,6 @@ export default {
     }
   }
 
-  // Overiding css.
-  .tui-formRow__desc {
-    margin-bottom: 0;
-  }
-
-  &__answerTitle {
-    // Overiding css.
-    .tui-formRow {
-      .tui-formRow__desc {
-        margin-bottom: var(--gap-2);
-      }
-    }
-  }
-
   &__repeater {
     .tui-repeater__row {
       .tui-engageSurveyForm__optionInput {

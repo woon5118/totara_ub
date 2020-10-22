@@ -172,18 +172,6 @@ export default {
   flex: 1;
   flex-direction: column;
 
-  &__title {
-    // Reset margin of form row.
-    &.tui-formRow {
-      margin-bottom: 0;
-    }
-
-    .tui-formRow__desc {
-      // No description/label for this form row, so we just make its margin to be zero, save some spaces.
-      margin: 0;
-    }
-  }
-
   &__description {
     display: flex;
     flex: 2;
@@ -201,11 +189,6 @@ export default {
       flex: 1;
 
       .tui-formRow {
-        &__desc {
-          // Save some space here, as there are no description/label.
-          margin: 0;
-        }
-
         &__action {
           display: flex;
           flex: 1;

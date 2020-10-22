@@ -15,46 +15,22 @@
   @author Angela Kuznetsova <angela.kuznetsova@totaralearning.com>
   @module performelement_static_content
 -->
+
 <template>
-  <ElementAdminDisplay
-    :type="type"
-    :title="title"
-    :error="error"
-    :activity-state="activityState"
-    @edit="$emit('edit')"
-    @remove="$emit('remove')"
-    @display-read="$emit('display-read')"
-  >
-    <template v-slot:content>
-      <div
-        ref="content"
-        class="tui-staticContentElementAdminDisplay"
-        v-html="data.content"
-      />
-    </template>
-  </ElementAdminDisplay>
+  <div class="tui-staticContentAdminView">
+    <div ref="content" v-html="data.content" />
+  </div>
 </template>
 
 <script>
-import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
-
 // Utils
 import tui from 'tui/tui';
 
 export default {
-  components: {
-    ElementAdminDisplay,
-  },
+  inheritAttrs: false,
 
   props: {
-    title: String,
-    type: Object,
     data: Object,
-    error: String,
-    activityState: {
-      type: Object,
-      required: true,
-    },
   },
 
   mounted() {
@@ -81,7 +57,7 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-staticContentElementAdminDisplay {
+.tui-staticContentAdminView {
   .tui-responsiveImage {
     max-height: 10rem;
   }

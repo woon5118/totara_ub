@@ -312,6 +312,7 @@ export default {
 
     handleMouseDown(e) {
       if (e.button !== 0) return;
+      if (e.target.tagName === 'SELECT') return;
       if (this.dragging) {
         this.defaultDragDropManager.endDrag(this.dragId);
       }

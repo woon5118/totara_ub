@@ -21,10 +21,12 @@
  * @package performelement_short_text
  */
 
-$string['error_question_required'] = 'Question is required';
 $string['error_question_length_exceed'] = 'Question text exceeds the maximum length';
 $string['error_you_must_answer_this_question'] = 'Required';
 $string['pluginname'] = 'Short text element';
 $string['name'] = 'Short text';
 $string['short_text_response_no_response_submitted'] = 'No response submitted';
+
+// Deprecated in 13
+$string['error_question_required'] = 'Question is required';
 $string['short_text_title'] = 'Question text';
