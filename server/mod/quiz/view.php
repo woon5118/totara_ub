@@ -248,8 +248,11 @@ if (!$viewobj->quizhasquestions) {
     }
 }
 
-$viewobj->showbacktocourse = ($viewobj->buttontext === '' &&
-        course_get_format($course)->has_view_page());
+$viewobj->showbacktocourse = (
+    $viewobj->buttontext === '' &&
+    course_get_format($course)->has_view_page() &&
+    $PAGE->pagelayout != 'webview' // Don't show this for mobile views.
+);
 
 echo $OUTPUT->header();
 
