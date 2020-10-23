@@ -64,7 +64,7 @@ class export extends \core\task\scheduled_task {
         try {
             $tenants = [null];
             if ($CFG->tenantsenabled) {
-                $tenants = $DB->get_records('tenant', ['suspended' => 0]);
+                $tenants = array_merge($tenants, $DB->get_records('tenant', ['suspended' => 0]));
             }
 
             $exporter = new exporter($tmp_path);

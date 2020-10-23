@@ -69,6 +69,55 @@ class ml_recommender_export_testcase extends advanced_testcase {
         $this->assert_export();
     }
 
+    public function test_ml_export_task_tenant() {
+        $this->prepare();
+
+        $generator = $this->getDataGenerator();
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        // Create an additional user within a tenant (users 1 & 2 created in prepare()).
+        $this->setAdminUser();
+        $tenant1 = $tenant_generator->create_tenant();
+        $user3 = $this->getDataGenerator()->create_user();
+        $tenant_generator->migrate_user_to_tenant($user3->id, $tenant1->id);
+
+        // Engage topics.
+        $mytopics = ['T1topic1', 'T1topic2', 'T1topic3'];
+        foreach ($mytopics as $key => $topic) {
+            $topics[$key] = \totara_topic\topic::create($topic);
+        }
+
+        // Create content within tenant.
+        $this->setUser($user3->id);
+        $article_generator = $generator->get_plugin_generator('engage_article');
+        $article_4 = $article_generator->create_article([
+            'access' => access::PUBLIC,
+            'topics' => [
+                $topics[1]->get_id(),
+                $topics[2]->get_id(),
+            ],
+            'content' => '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Content with image"}]},{"type":"image","attrs":{"filename":"image.png","url":"@@PLUGINFILE@@/image.png","alttext":""}}]}',
+            'format' => FORMAT_JSON_EDITOR,
+        ]);
+
+        // Interactions.
+        $recommendations_generator = $generator->get_plugin_generator('ml_recommender');
+        $recommendations_generator->create_recommender_interaction(2, $article_4->get_id(), 'engage_article');
+        $recommendations_generator->create_recommender_interaction($user3->id, $article_4->get_id(), 'engage_article');
+
+        ob_start();
+        \ml_recommender\task\export::cleanup(true);
+        $task = \core\task\manager::get_scheduled_task(\ml_recommender\task\export::class);
+        $task->execute();
+
+        $output = ob_get_contents();
+        $this->assertStringContainsString('Export completed', $output);
+        ob_end_clean();
+
+        $this->assert_export_tenant($tenant1->id);
+    }
+
     protected function prepare() {
         global $DB, $CFG;
 
@@ -171,6 +220,50 @@ class ml_recommender_export_testcase extends advanced_testcase {
             $this->assertCount($db_count+1, $data, $csv);
         }
 
+    }
+
+    /**
+     * When multinenancy is configured, check that exports split content by tenant.
+     *
+     * The tenant user is a participant, thus is expected in both exports.
+     * No other users should be in tenant export.
+     */
+    protected function assert_export_tenant($tenant) {
+        $data_path = self::get_data_path();
+
+        // Compare DB counts to CSV record counts.
+        $tenants = [];
+
+        // Tenant 0 (i.e. users not assigned to any tenant).
+        $tenants[0] = [
+            'user_data' => 4, // 2 + admin + tenant user
+            'item_data' => 4, // 2 articles + course + extra article
+            'user_interactions' => 6 // 3 + enrolment + 2 on extra article
+        ];
+
+        // Tenant 1.
+        $tenants[$tenant] = [
+            'user_data' => 1, // tenant user
+            'item_data' => 2, // new article + self-enrol course
+            'user_interactions' => 2
+        ];
+
+        foreach ($tenants as $tenant_id => $csv_files) {
+            foreach ($csv_files as $csv => $db_count) {
+                $data = [];
+                $path = "{$data_path}/{$csv}_" . $tenant_id . ".csv";
+                $file = fopen($path,'r');
+                while (!feof($file)) {
+                    $row = fgetcsv($file);
+                    if (!empty($row)) {
+                        $data[] = $row;
+                    }
+                }
+                fclose($file);
+
+                $this->assertCount($db_count + 1, $data, $csv);
+            }
+        }
     }
 
     /**
