@@ -124,12 +124,13 @@ $strexit = get_string('exitactivity', 'scorm');
 
 $coursecontext = context_course::instance($course->id);
 
+$shortname = format_string($course->shortname, true, array('context' => $coursecontext));
+$pagetitle = strip_tags("$shortname: ".format_string($scorm->name));
+$PAGE->set_title($pagetitle);
+
 if ($displaymode == 'popup') {
     $PAGE->set_pagelayout('embedded');
 } else {
-    $shortname = format_string($course->shortname, true, array('context' => $coursecontext));
-    $pagetitle = strip_tags("$shortname: ".format_string($scorm->name));
-    $PAGE->set_title($pagetitle);
     $PAGE->set_heading($course->fullname);
 }
 if (!$cm->visible and !has_capability('moodle/course:viewhiddenactivities', context_module::instance($cm->id))) {

@@ -98,7 +98,7 @@ Feature: Navigate a learning item in a static tab
     And I log out
     And I log in as "user1"
 
-  Scenario: Navigate the find learning tab
+  Scenario: msteams201: Navigate the find learning tab
     Given I am on Microsoft Teams "catalog" page
     Then I should see "Catalogue" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
@@ -141,7 +141,7 @@ Feature: Navigate a learning item in a static tab
     Then I should see "Catalogue" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
-  Scenario: Sign up a seminar from the find learning tab
+  Scenario: msteams202: Sign up a seminar from the find learning tab
     Given I am on Microsoft Teams "catalog" page
 
     When I click on "Culinary arts 101" "text"
@@ -163,7 +163,7 @@ Feature: Navigate a learning item in a static tab
     Then I should see "Catalogue" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
-  Scenario: Navigate the current learning tab
+  Scenario: msteams203: Navigate the current learning tab
     Given I am on Microsoft Teams "mylearning" page
     Then I should see "Current learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
@@ -179,7 +179,7 @@ Feature: Navigate a learning item in a static tab
     Then I should see "Current learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
-  Scenario: Sign up a seminar from the current learning tab
+  Scenario: msteams204: Sign up a seminar from the current learning tab
     Given I am on Microsoft Teams "mylearning" page
 
     When I toggle "Mastering arts" in the current learning block
@@ -202,7 +202,7 @@ Feature: Navigate a learning item in a static tab
     Then I should see "Current learning" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
-  Scenario: Navigate the library tab
+  Scenario: msteams205: Navigate the library tab
     Given I am on Microsoft Teams "library" page
     Then I should see "Your resources" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
@@ -212,7 +212,7 @@ Feature: Navigate a learning item in a static tab
     Then I should see "Your resources" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
-  Scenario Outline: Navigate activities in a static tab
+  Scenario Outline: msteams211: Navigate activities in a static tab
     Given I am on Microsoft Teams "<tab>" page
     And I click on "Activity test course" "text"
     Then I should see "Course: Activity test course" in the page title

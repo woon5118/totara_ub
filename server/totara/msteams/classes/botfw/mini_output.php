@@ -66,7 +66,7 @@ class mini_output extends renderer_base {
      */
     private static function include_auth_js(): string {
         // Borrow the cache in theme_msteams.
-        return \theme_msteams\output\core_renderer::load_script_internal(self::AUTH_JS_CACHE_KEY, '/totara/msteams/js/auth.js');
+        return \theme_msteams\loader::load_script_internal(self::AUTH_JS_CACHE_KEY, '/totara/msteams/js/auth.js');
     }
 
     /**

@@ -118,6 +118,12 @@ if ($canlaunch && $scorm->popup == 1) {
     $PAGE->requires->string_for_js('popuplaunched', 'scorm');
     $PAGE->requires->js('/mod/scorm/view.js', true);
 }
+// Totara: Fix up new window (simple) for MS Teams.
+if ($canlaunch && $scorm->popup == 2) {
+    if (class_exists(\theme_msteams\loader::class)) {
+        \theme_msteams\loader::load_shim_js('scorm_fixup');
+    }
+}
 
 if (isset($SESSION->scorm)) {
     unset($SESSION->scorm);

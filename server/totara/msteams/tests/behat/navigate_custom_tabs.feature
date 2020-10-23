@@ -98,7 +98,7 @@ Feature: Navigate a learning item in a custom tab
     And I log out
     And I log in as "user1"
 
-  Scenario: Navigate a course in a custom tab
+  Scenario: msteams301: Navigate a course in a custom tab
     Given I am on "Culinary arts 101" "course" custom tab in Microsoft Teams
     Then I should see "Course: Culinary arts 101" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
@@ -114,14 +114,14 @@ Feature: Navigate a learning item in a custom tab
     Then I should see "Course: Culinary arts 101" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
-  Scenario: Navigate an unenrollable course in a custom tab
+  Scenario: msteams302: Navigate an unenrollable course in a custom tab
     Given I am on "Machine learning 101" "course" custom tab in Microsoft Teams
     Then I should see "MLN101" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
     And I should see "You can not enrol yourself in this course"
     But "Continue" "button" should not be visible
 
-  Scenario: Sign up a seminar from a custom tab
+  Scenario: msteams303: Sign up a seminar from a custom tab
     Given I am on "Culinary arts 101" "course" custom tab in Microsoft Teams
 
     When I click on "Go to event" "link_or_button" in the "Upcoming" "table_row"
@@ -144,7 +144,7 @@ Feature: Navigate a learning item in a custom tab
     Then I should see "Course: Culinary arts 101" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
-  Scenario: Navigate a program in a custom tab
+  Scenario: msteams304: Navigate a program in a custom tab
     Given I am on "Mastering arts" "program" custom tab in Microsoft Teams
     Then I should see "Program: Mastering arts" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
@@ -159,22 +159,22 @@ Feature: Navigate a learning item in a custom tab
     And I click on "Back" "link" in the ".totara_msteams__navigation" "css_element"
     Then I should see "Program: Mastering arts" in the page title
 
-  Scenario: Navigate a certification in a custom tab
+  Scenario: msteams305: Navigate a certification in a custom tab
     Given I am on "Junior chef" "certification" custom tab in Microsoft Teams
     Then I should see "Program: Junior chef" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
-  Scenario: Navigate an article in a custom tab
+  Scenario: msteams306: Navigate an article in a custom tab
     Given I am on "10 apps to boost your productivity" "article" custom tab in Microsoft Teams
     Then I should see "10 apps to boost your productivity" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
-  Scenario: Navigate a playlist in a custom tab
+  Scenario: msteams307: Navigate a playlist in a custom tab
     Given I am on "Cool playlist" "playlist" custom tab in Microsoft Teams
     Then I should see "Cool playlist" in the page title
     And ".totara_msteams__navigation" "css_element" should not exist
 
-  Scenario: Navigate activities in a custom tab
+  Scenario: msteams308: Navigate activities in a custom tab
     Given I am on "Activity test course" "course" custom tab in Microsoft Teams
     Then I should see "Course: Activity test course" in the page title
 

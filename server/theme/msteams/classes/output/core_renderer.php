@@ -25,13 +25,12 @@ namespace theme_msteams\output;
 
 defined('MOODLE_INTERNAL') || die();
 
-use cache;
 use context_system;
-use core_minify;
 use html_writer;
 use moodle_url;
 use single_button;
 use theme_msteams\hook\get_page_navigation_hook;
+use theme_msteams\loader;
 use theme_msteams\session;
 
 /**
@@ -41,7 +40,7 @@ class core_renderer extends \core_renderer {
     /**
      * The URL to the Microsoft Teams SDK.
      */
-    const MSTEAMS_SDK_URL = 'https://statics.teams.cdn.office.net/sdk/v1.6.0/js/MicrosoftTeams.min.js';
+    const MSTEAMS_SDK_URL = 'https://statics.teams.cdn.office.net/sdk/v1.8.0/js/MicrosoftTeams.min.js';
 
     private const THEME_CSS_CACHE_KEY = 'css_theme_custom';
     private const MSSTUB_JS_CACHE_KEY = 'js_theme_msteams_stub';
@@ -66,7 +65,7 @@ class core_renderer extends \core_renderer {
     public static function include_msteams_sdk(): string {
         // Do not load the real SDK on behat tests.
         if (defined('BEHAT_UTIL') || defined('BEHAT_TEST') || defined('BEHAT_SITE_RUNNING')) {
-            return self::load_script_internal(self::MSSTUB_JS_CACHE_KEY, '/theme/msteams/script/sdk_stub.js');
+            return loader::load_script_internal(self::MSSTUB_JS_CACHE_KEY, '/theme/msteams/script/sdk_stub.js');
         }
         return html_writer::script('', (new moodle_url(self::MSTEAMS_SDK_URL))->out(false));
     }
@@ -77,7 +76,7 @@ class core_renderer extends \core_renderer {
      * @return string
      */
     public static function include_helper_js(): string {
-        return self::load_script_internal(self::HELPER_JS_CACHE_KEY, '/theme/msteams/script/teams.js');
+        return loader::load_script_internal(self::HELPER_JS_CACHE_KEY, '/theme/msteams/script/teams.js');
     }
 
     /**
@@ -86,7 +85,7 @@ class core_renderer extends \core_renderer {
      * @return string
      */
     public static function include_iframe_js(): string {
-        return self::load_script_internal(self::IFRAME_JS_CACHE_KEY, '/theme/msteams/script/iframe.js');
+        return loader::load_script_internal(self::IFRAME_JS_CACHE_KEY, '/theme/msteams/script/iframe.js');
     }
 
     /**
@@ -96,7 +95,7 @@ class core_renderer extends \core_renderer {
      */
     public static function include_theme_css(): string {
         // Always serve the LTR version. The layout of the minimal HTML should be language neutral.
-        return self::load_css_internal(self::THEME_CSS_CACHE_KEY, '/theme/msteams/style/custom.css');
+        return loader::load_css_internal(self::THEME_CSS_CACHE_KEY, '/theme/msteams/style/custom.css');
     }
 
     /**
@@ -105,16 +104,12 @@ class core_renderer extends \core_renderer {
      * @param string $key cache key
      * @param string $relpath relative path from $CFG->dirroot, starting with '/'
      * @return string <script> containing minified code
+     * @internal Do not use this function
+     * @deprecated since Totara 13.2
      */
     public static function load_script_internal(string $key, string $relpath): string {
-        global $CFG;
-        $cache = cache::make('theme_msteams', 'postprocessedcode');
-        $js = $cache->get($key);
-        if ($js === false) {
-            $js = core_minify::js_files([$CFG->dirroot.$relpath]);
-            $cache->set($key, $js);
-        }
-        return html_writer::script($js);
+        debugging(__METHOD__ . '() is deprecated, and is not to be consumed by external code in the first place.', DEBUG_DEVELOPER);
+        return loader::load_script_internal($key, $relpath);
     }
 
     /**
@@ -123,16 +118,12 @@ class core_renderer extends \core_renderer {
      * @param string $key cache key
      * @param string $relpath relative path from $CFG->dirroot, starting with '/'
      * @return string <style> containing minified css
+     * @internal Do not use this function
+     * @deprecated since Totara 13.2
      */
     public static function load_css_internal(string $key, string $relpath): string {
-        global $CFG;
-        $cache = cache::make('theme_msteams', 'postprocessedcode');
-        $css = $cache->get($key);
-        if ($css === false) {
-            $css = core_minify::css_files([$CFG->dirroot.$relpath]);
-            $cache->set($key, $css);
-        }
-        return html_writer::tag('style', $css);
+        debugging(__METHOD__ . '() is deprecated, and is not to be consumed by external code in the first place.', DEBUG_DEVELOPER);
+        return loader::load_css_internal($key, $relpath);
     }
 
     /**

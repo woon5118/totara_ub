@@ -10,7 +10,7 @@ Feature: Microsoft Teams settings pages will not show if the feature is disabled
       | user1    | User      | One      | user1@example.com |
       | user2    | User      | Two      | user1@example.com |
 
-  Scenario: Disabling the workspace feature will remove/hide the message output option
+  Scenario: msteams111: Disabling the workspace feature will remove/hide the message output option
     Given I log in as "admin"
 
     # Feature on

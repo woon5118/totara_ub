@@ -27,6 +27,7 @@ use context_module;
 use core\orm\query\builder;
 use core\output\flex_icon;
 use engage_article\totara_engage\resource\article;
+use stdClass;
 use theme_msteams\hook\get_page_navigation_hook;
 use totara_playlist\totara_engage\link\nav_helper;
 
@@ -104,7 +105,8 @@ final class watchers {
         $context = $hook->get_context();
         if ($context instanceof context_module) {
             $coursecontext = $context->get_course_context(false);
-            $mod = builder::table('course_modules', 'cm')->join(['modules', 'm'], 'module', 'id')->where('cm.id', $context->instanceid)->select('m.name')->order_by('cm.id')->first();
+            $cm = builder::table('course_modules', 'cm')->join(['modules', 'm'], 'module', 'id')->where('cm.id', $context->instanceid)->select_raw('cm.instance, m.name AS modname')->order_by('cm.id')->first();
+            /** @var stdClass|null $cm */
             if ($coursecontext) {
                 $hook->navigation = array_merge($hook->navigation ?: [], [[
                     'href' => $coursecontext->get_url(),
@@ -112,12 +114,31 @@ final class watchers {
                     'icon' => new flex_icon('theme_msteams|navigation-back')
                 ]]);
             }
-            if (!empty($mod) && in_array($mod->name, self::MODULES_BREAKAWAY)) {
+            if (!empty($cm) && (in_array($cm->modname, self::MODULES_BREAKAWAY) || self::is_incompatible_scorm($cm))) {
                 if (empty($hook->alert)) {
                     $hook->alert = get_string('alert:opennew', 'totara_msteams');
                 }
             }
         }
+    }
+
+    /**
+     * Return true if the current module is a scorm with any 'new window' setting.
+     *
+     * @param stdClass $cm
+     * @return boolean
+     */
+    private static function is_incompatible_scorm(stdClass $cm): bool {
+        if ($cm->modname != 'scorm') {
+            return false;
+        }
+        $scorm = builder::table('scorm')->where('id', $cm->instance)->select('popup')->one();
+        /** @var stdClass|null $scorm */
+        if (!$scorm) {
+            return false;
+        }
+        // All 'new window' options are not very compatible at the moment.
+        return !empty($scorm->popup);
     }
 
     /**

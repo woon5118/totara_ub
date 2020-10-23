@@ -10,7 +10,7 @@ Feature: Customise Teams integration settings
     And I am on homepage
     And I navigate to "Microsoft Teams integration" node in "Site administration > Microsoft Teams"
 
-  Scenario: Check front-end validation on the site admin page
+  Scenario: msteams101: Check front-end validation on the site admin page
     When I set the field "Short name" to "it's a very long short app name"
     And I press "Save changes"
     Then I should see "Some settings were not changed due to an error"
@@ -52,7 +52,7 @@ Feature: Customise Teams integration settings
     Then I should see "Some settings were not changed due to an error"
     And I should see "This value is not valid"
 
-  Scenario: Manifest download
+  Scenario: msteams102: Manifest download
     When I set the following fields to these values:
       | Short name          | Mistletoetara                        |
       | Full name           |                                      |

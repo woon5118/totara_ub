@@ -47,7 +47,7 @@ Feature: Add a tab to Teams Channel
       | Cool playlist | user1    | PUBLIC | Topic 1 |
     And I log in as "user1"
 
-  Scenario: Search for non-existent learning catalogue
+  Scenario: msteams401: Search for non-existent learning catalogue
     Given I am on Microsoft Teams "config" page
     Then the field "Tab name" matches value ""
     And the save button should be "disabled" on Microsoft Teams "config" page
@@ -69,7 +69,7 @@ Feature: Add a tab to Teams Channel
     And I should not see "Resource"
     And I should not see "Playlist"
 
-  Scenario: Check the field validation part 1
+  Scenario: msteams402: Check the field validation part 1
     Given I am on Microsoft Teams "config" page
     Then I should not see "Name is required"
     And the save button should be "disabled" on Microsoft Teams "config" page
@@ -80,7 +80,7 @@ Feature: Add a tab to Teams Channel
 
     # Split a scenario here to prevent the 'take focus off' step from messing up with further testing.
 
-  Scenario: Check the field validation part 2
+  Scenario: msteams403: Check the field validation part 2
     Given I am on Microsoft Teams "config" page
     When I set the field "Search learning catalogue" to "arts"
     Then I should see "Culinary arts 101"
@@ -96,7 +96,7 @@ Feature: Add a tab to Teams Channel
     Then I should not see "Name is required"
     And the save button should be "enabled" on Microsoft Teams "config" page
 
-  Scenario: Add a custom tab to a teams channel
+  Scenario: msteams404: Add a custom tab to a teams channel
     Given I am on Microsoft Teams "config" page
     When I set the field "Search learning catalogue" to "arts"
     Then the field "Tab name" matches value ""
