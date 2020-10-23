@@ -76,7 +76,7 @@ if (!empty($SITE->fullname) and !empty($SITE->shortname)) {
     echo $OUTPUT->box(get_string('upgradesettingsintro','admin'), 'generalbox');
 }
 
-echo '<form action="upgradesettings.php" method="post" id="adminsettings">';
+echo '<form action="upgradesettings.php" method="post" id="adminsettings" autocomplete="off">';
 echo '<div>';
 echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
 echo '<input type="hidden" name="return" value="'.$return.'" />';

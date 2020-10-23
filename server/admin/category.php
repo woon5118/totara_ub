@@ -166,7 +166,7 @@ if ($errormsg !== '') {
 
 echo $OUTPUT->heading(get_string('admincategory', 'admin', $settingspage->visiblename), 2);
 
-echo html_writer::start_tag('form', array('action' => '', 'method' => 'post', 'id' => 'adminsettings'));
+echo html_writer::start_tag('form', array('action' => '', 'method' => 'post', 'id' => 'adminsettings', 'autocomplete' => 'off'));
 echo html_writer::start_tag('div');
 echo html_writer::input_hidden_params(new moodle_url($PAGE->url, array('sesskey' => sesskey(), 'return' => $return)));
 echo html_writer::end_tag('div');
