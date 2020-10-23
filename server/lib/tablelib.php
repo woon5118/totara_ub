@@ -1193,7 +1193,7 @@ class flexible_table {
             // This is done so the header aria-controls attributes do not point to
             // non existant elements.
             $emptyrow = array_fill(0, count($this->columns), '');
-            while ($this->currentrow < $this->pagesize) {
+            while ($this->currentrow < min($this->pagesize, $this->totalrows)) {
                 $this->print_row($emptyrow, 'emptyrow');
             }
 
@@ -1228,7 +1228,7 @@ class flexible_table {
         // strip tags.
 
         $ariacontrols = '';
-        for ($i = 0; $i < $this->pagesize; $i++) {
+        for ($i = 0; $i < min($this->pagesize, $this->totalrows); $i++) {
             $ariacontrols .= $this->uniqueid . '_r' . $i . '_c' . $index . ' ';
         }
 

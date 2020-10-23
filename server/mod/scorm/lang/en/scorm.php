@@ -322,7 +322,12 @@ $string['organization'] = 'Organisation';
 $string['organizations'] = 'Organisations';
 $string['othersettings'] = 'Additional settings';
 $string['page-mod-scorm-x'] = 'Any SCORM module page';
-$string['pagesize'] = 'Page size';
+$string['pagesize'] = 'Number of records per page';
+$string['pagesize_help'] = '**Number of records per page** allows you define how many records display on each page.
+
+The maximum number of records that can be displayed on a page is 9999. The more records set to display on a page the longer the report pages take to display.
+
+Recommendation is to **limit the number of records per page to 20**.';
 $string['package'] = 'Package file';
 $string['package_help'] = 'The package file is a ZIP (or pif) file containing SCORM/AICC course definition files.';
 $string['packagecontenthash'] = 'Package content hash';

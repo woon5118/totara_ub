@@ -57,14 +57,15 @@ class report extends \mod_scorm\report {
         $mform = new \mod_scorm_report_settings($PAGE->url, compact('currentgroup'));
         if ($fromform = $mform->get_data()) {
             $detailedrep = $fromform->detailedrep;
-            $pagesize = $fromform->pagesize;
+            // ensure we show between 1 and 9999 records
+            $pagesize = min(9999, max(1, (int) $fromform->pagesize));
             set_user_preference('scorm_report_detailed', $detailedrep);
             set_user_preference('scorm_report_pagesize', $pagesize);
         } else {
             $detailedrep = get_user_preferences('scorm_report_detailed', false);
-            $pagesize = get_user_preferences('scorm_report_pagesize', 0);
+            $pagesize = get_user_preferences('scorm_report_pagesize', SCORM_REPORT_DEFAULT_PAGE_SIZE);
         }
-        if ($pagesize < 1) {
+        if ($pagesize < 1 || $pagesize > 9999) {
             $pagesize = SCORM_REPORT_DEFAULT_PAGE_SIZE;
         }
 
