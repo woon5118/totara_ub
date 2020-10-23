@@ -43,6 +43,7 @@ if ($course->id == SITEID) {
 $PAGE->set_url('/mod/feedback/view.php', array('id' => $cm->id));
 $PAGE->set_title($feedback->name);
 $PAGE->set_heading($course->fullname);
+$iswebview = $PAGE->pagelayout == 'webview';
 
 // Check access to the given courseid.
 if ($courseid AND $courseid != SITEID) {
@@ -130,7 +131,9 @@ if ($feedbackcompletion->can_complete()) {
     if (!$feedbackcompletion->is_open()) {
         // Feedback is not yet open or is already closed.
         echo $OUTPUT->notification(get_string('feedback_is_not_open', 'feedback'));
-        echo $OUTPUT->continue_button(course_get_url($courseid ?: $course->id));
+        if (!$iswebview) { // Hide this button on webviews.
+            echo $OUTPUT->continue_button(course_get_url($courseid ?: $course->id));
+        }
     } else if ($feedbackcompletion->can_submit()) {
         // Display a link to complete feedback or resume.
         $completeurl = new moodle_url('/mod/feedback/complete.php',
@@ -145,7 +148,9 @@ if ($feedbackcompletion->can_complete()) {
     } else {
         // Feedback was already submitted.
         echo $OUTPUT->notification(get_string('this_feedback_is_already_submitted', 'feedback'));
-        $OUTPUT->continue_button(course_get_url($courseid ?: $course->id));
+        if (!$iswebview) { // Hide this button on webviews.
+            $OUTPUT->continue_button(course_get_url($courseid ?: $course->id));
+        }
     }
     echo $OUTPUT->box_end();
 }

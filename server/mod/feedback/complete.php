@@ -68,6 +68,7 @@ $PAGE->navbar->add(get_string('feedback:complete', 'feedback'));
 $PAGE->set_heading($course->fullname);
 $PAGE->set_title($feedback->name);
 $PAGE->set_pagelayout('incourse');
+$iswebview = $PAGE->pagelayout == 'webview';
 
 // Check if the feedback is open (timeopen, timeclose).
 if (!$feedbackcompletion->is_open()) {
@@ -75,7 +76,9 @@ if (!$feedbackcompletion->is_open()) {
     echo $OUTPUT->heading(format_string($feedback->name));
     echo $OUTPUT->box_start('generalbox boxaligncenter');
     echo $OUTPUT->notification(get_string('feedback_is_not_open', 'feedback'));
-    echo $OUTPUT->continue_button(course_get_url($courseid ?: $feedback->course));
+    if (!$iswebview) { // Hide this button on webviews.
+        echo $OUTPUT->continue_button(course_get_url($courseid ?: $feedback->course));
+    }
     echo $OUTPUT->box_end();
     echo $OUTPUT->footer();
     exit;
@@ -128,7 +131,9 @@ if ($feedbackcompletion->is_empty()) {
         } else {
             $url = course_get_url($courseid ?: $course->id);
         }
-        echo $OUTPUT->continue_button($url);
+        if (!$iswebview) { // Hide this button on webviews.
+            echo $OUTPUT->continue_button($url);
+        }
     } else {
         // Display the form with the questions.
         echo $feedbackcompletion->render_items();
@@ -136,7 +141,9 @@ if ($feedbackcompletion->is_empty()) {
 } else {
     echo $OUTPUT->box_start('generalbox boxaligncenter');
     echo $OUTPUT->notification(get_string('this_feedback_is_already_submitted', 'feedback'));
-    echo $OUTPUT->continue_button(course_get_url($courseid ?: $course->id));
+    if (!$iswebview) { // Hide this button on webviews.
+        echo $OUTPUT->continue_button(course_get_url($courseid ?: $course->id));
+    }
     echo $OUTPUT->box_end();
 }
 
