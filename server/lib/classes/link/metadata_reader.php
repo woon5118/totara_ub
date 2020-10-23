@@ -53,12 +53,21 @@ final class metadata_reader {
         if (empty($url)) {
             throw new \coding_exception("Cannot get metadata info of empty url");
         }
-
-        if ($url instanceof \moodle_url) {
-            $url = $url->out();
+        $url = clean_param((string) $url, PARAM_URL);
+        if (!$url) {
+            return null;
         }
 
-        $response = request::get($url);
+        $url_to_validate = new \moodle_url($url);
+
+        $validator = new url_validator($url_to_validate);
+        $ip_address = $validator->get_validated_ip();
+        if (!$ip_address) {
+            return null;
+        }
+
+        // To prevent DNS rebinding attacks we use the validated IP address to resolve the request
+        $response = request::get($url, 0, $url_to_validate->get_host(), $ip_address);
         if (!$response->is_ok() || !$response->is_html()) {
             return null;
         }
@@ -131,4 +140,5 @@ final class metadata_reader {
 
         return $info;
     }
+
 }

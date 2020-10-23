@@ -43,11 +43,13 @@ final class request {
     }
 
     /**
-     * @param string    $url
-     * @param int       $maxredirect
+     * @param string $url
+     * @param int $maxredirect
+     * @param string|null $host optional, if IP is passed too it will use it for DNS resolving
+     * @param string|null $ip option, if host is passed too it will use it for DNS resolving
      * @return response
      */
-    public static function get(string $url, int $maxredirect = 3): response {
+    public static function get(string $url, int $maxredirect = 3, string $host = null, string $ip = null): response {
         if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
             $response = static::phpunit_get($url);
             if (null !== $response) {
@@ -64,8 +66,13 @@ final class request {
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+        if (!empty($host) && !empty($ip)) {
+            curl_setopt($ch, CURLOPT_RESOLVE, ["{$host}:{$ip}"]);
+        }
 
-        if (0 < $maxredirect) {
+        if ($maxredirect > 0) {
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
             curl_setopt($ch, CURLOPT_MAXREDIRS, $maxredirect);
         }

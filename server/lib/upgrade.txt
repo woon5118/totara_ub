@@ -1,6 +1,10 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+* Introduced new config variables $CFG->link_parser_allowed_hosts and $CFG->link_parser_blocked_hosts to be able to explicitly allow or block hosts
+  to be parsed by the get_linkmetadata GraphQL query.
+
 === 13.1 ===
 
 * Added format parameter to field "value" in type "core_user_card_display_field" in GraphQL

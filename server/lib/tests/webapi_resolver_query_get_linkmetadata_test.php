@@ -22,20 +22,23 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use core\webapi\execution_context;
-use totara_webapi\phpunit\webapi_phpunit_helper;
 use core\link\metadata_info;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class core_webapi_resolver_query_get_linkmetadata_testcase extends advanced_testcase {
     use webapi_phpunit_helper;
 
-    /**
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
-     */
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return execution_context::create($type, $operation);
+    protected function setUp(): void {
+        global $CFG;
+        require_once("{$CFG->dirroot}/lib/tests/fixtures/link/http_mock_request.php");
+
+        // Clear core_link mock url
+        \http_mock_request::clear();
+    }
+
+    protected function tearDown(): void {
+        // Clear core_link mock url
+        \http_mock_request::clear();
     }
 
     /**
@@ -53,10 +56,12 @@ class core_webapi_resolver_query_get_linkmetadata_testcase extends advanced_test
      */
     public function test_query_get_linkmetadata(): void {
         global $CFG;
-        require_once("{$CFG->dirroot}/lib/tests/fixtures/link/http_mock_request.php");
 
         $this->setAdminUser();
-        $mock_url = 'http://example.com';
+
+        // We need to use an existing IP for now as
+        // internally the code would do a DNS lookup on a host
+        $mock_url = 'https://8.8.8.8';
 
         http_mock_request::add_url(
             $mock_url,
@@ -70,8 +75,8 @@ class core_webapi_resolver_query_get_linkmetadata_testcase extends advanced_test
         $this->assertSame('Sample page', $metadata_info->get_title());
         $this->assertSame('Page sample', $metadata_info->get_description());
 
-        $this->assertSame('http://example.com', $metadata_info->get_url()->out());
-        $this->assertSame('http://example.com', $metadata_info->get_image()->out());
+        $this->assertSame('https://example.com', $metadata_info->get_url()->out());
+        $this->assertSame('https://example.com', $metadata_info->get_image()->out());
 
         $this->assertSame(111, $metadata_info->get_video_height());
         $this->assertSame(222, $metadata_info->get_video_width());
@@ -82,10 +87,9 @@ class core_webapi_resolver_query_get_linkmetadata_testcase extends advanced_test
      */
     public function test_query_get_invalid_link_metadata(): void {
         global $CFG;
-        require_once("{$CFG->dirroot}/lib/tests/fixtures/link/http_mock_request.php");
 
         $this->setAdminUser();
-        $mock_url = 'http://example.com';
+        $mock_url = 'https://example.com';
 
         http_mock_request::add_url(
             $mock_url,
@@ -103,4 +107,5 @@ class core_webapi_resolver_query_get_linkmetadata_testcase extends advanced_test
         $this->assertNull($metadata_info->get_video_width());
         $this->assertNull($metadata_info->get_video_height());
     }
+
 }

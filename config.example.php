@@ -780,6 +780,12 @@ Advanced settings
 // set to the directory that the completion files exist within. Sub directories can be used to further organise.
 // $CFG->completionimportdir = '';
 //
+// The following two settings can be used to explicitly allow or block urls
+// for our link parser. The link parser is used to get meta information about links
+// added to the Weka editor and which can be shown either as card or embedded version (Youtube, etc.).
+// The hostnames / IP addresses must be specified as a comma delimited string, i.e. 'www.example.com,123.34.12.1'
+// $CFG->link_parser_allowed_hosts = '';
+// $CFG->link_parser_blocked_hosts = '';
 
 /***********************************************************************************************************************
 Experimental settings

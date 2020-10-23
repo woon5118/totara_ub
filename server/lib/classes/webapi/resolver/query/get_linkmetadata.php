@@ -24,11 +24,19 @@ namespace core\webapi\resolver\query;
 
 use core\link\metadata_reader;
 use core\webapi\execution_context;
+use core\webapi\middleware\rate_limiter;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 
 final class get_linkmetadata implements query_resolver, has_middleware {
+
+    /**
+     * Limited to 20 request per minute
+     */
+    public const RATE_LIMIT = 20;
+    public const LIMIT_TIME = 60;
+
     /**
      * @param array $args
      * @param execution_context $ec
@@ -53,7 +61,8 @@ final class get_linkmetadata implements query_resolver, has_middleware {
      */
     public static function get_middleware(): array {
         return [
-            new require_login()
+            new require_login(),
+            new rate_limiter(self::RATE_LIMIT, self::LIMIT_TIME, false)
         ];
     }
 }
