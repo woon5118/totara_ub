@@ -13,32 +13,34 @@ Feature: Manage performance activity multiple choice-answers elements
     #Add multiple elements
     And I click on "Activity one" "link"
     And I navigate to manage perform activity content page
-    And I click multiple answers question element
+    And I add a "Multiple choice: multi-select" activity content element
     And I set the following fields to these values:
       | rawTitle   | Question 1   |
-      | answers[0] | Option one   |
-      | answers[1] | Option two   |
+      | options[0][value] | Option one   |
+      | options[1][value] | Option two   |
       | identifier | Identifier 1 |
-    And I save multiple answers question element data
-    And I click multiple answers question element
+    And I save the activity content element
+    And I add a "Multiple choice: multi-select" activity content element
     And I set the following fields to these values:
       | rawTitle   | Question 2   |
-      | answers[0] | Option three |
-      | answers[1] | Option four  |
-    And I save multiple answers question element data
-    And I click multiple answers question element
+      | options[0][value] | Option three |
+      | options[1][value] | Option four  |
+    And I save the activity content element
+    And I wait "5" seconds
+    And I add a "Multiple choice: multi-select" activity content element
+    And I wait "5" seconds
     And I set the following fields to these values:
       | rawTitle   | Question 3  |
-      | answers[0] | Option five |
-      | answers[1] | Option six  |
-    And I save multiple answers question element data
+      | options[0][value] | Option five |
+      | options[1][value] | Option six  |
+    And I save the activity content element
     When I close the tui notification toast
     And I close the tui modal
     When I navigate to manage perform activity content page
     Then I should see perform multiple answers question "Question 1" is saved with options "Option one,Option two"
     And I should see perform multiple answers question "Question 2" is saved with options "Option three,Option four"
     And I should see perform multiple answers question "Question 3" is saved with options "Option five,Option six"
-    When I click on identifier icon for question "Question 1"
+    When I click on the Reporting ID action for question "Question 1"
     Then I should see "Identifier 1"
 
   Scenario: Save multiple choice multiple answers elements with more options
@@ -47,15 +49,15 @@ Feature: Manage performance activity multiple choice-answers elements
 
     And I click on "Activity one" "link"
     And I navigate to manage perform activity content page
-    And I click multiple answers question element
+    And I add a "Multiple choice: multi-select" activity content element
     And I set the following fields to these values:
       | rawTitle   | Question 1 |
-      | answers[0] | Option one |
-      | answers[1] | Option two |
+      | options[0][value] | Option one |
+      | options[1][value] | Option two |
     And I click multiple answers question add new option
     And I set the following fields to these values:
-      |answers[2]        | Option three |
-    And I save multiple answers question element data
+      |options[2][value]        | Option three |
+    And I save the activity content element
     And I close the tui notification toast
     And I close the tui modal
     And I navigate to manage perform activity content page
@@ -67,16 +69,16 @@ Feature: Manage performance activity multiple choice-answers elements
 
     And I click on "Activity one" "link"
     And I navigate to manage perform activity content page
-    And I click multiple answers question element
+    And I add a "Multiple choice: multi-select" activity content element
     And I set the following fields to these values:
       | rawTitle   | Question 1 |
-      | answers[0] | Option one |
-      | answers[1] | Option two |
+      | options[0][value] | Option one |
+      | options[1][value] | Option two |
     And I click multiple answers question add new option
     And I set the following fields to these values:
-      | answers[2] | Option three |
+      | options[2][value] | Option three |
     And I delete multiple answers question option
-    And I save multiple answers question element data
+    And I save the activity content element
     And I close the tui notification toast
     And I close the tui modal
     And I navigate to manage perform activity content page
@@ -88,10 +90,10 @@ Feature: Manage performance activity multiple choice-answers elements
 
     And I click on "Activity one" "link"
     And I navigate to manage perform activity content page
-    And I click multiple answers question element
+    And I add a "Multiple choice: multi-select" activity content element
     And I set the following fields to these values:
       | rawTitle | Question 1 |
-    And I save multiple answers question element data
+    And I save the activity content element
     And I should see "Required"
 
   Scenario: Save required and optional multiple answers elements
@@ -103,20 +105,20 @@ Feature: Manage performance activity multiple choice-answers elements
     And I should see "0" in the "other" element summary of the activity section
     # Add multiple elements
     And I navigate to manage perform activity content page
-    And I click multiple answers question element
+    And I add a "Multiple choice: multi-select" activity content element
     When I set the following fields to these values:
       | rawTitle   | Question 1 |
-      | answers[0] | Option one |
-      | answers[1] | Option two |
+      | options[0][value] | Option one |
+      | options[1][value] | Option two |
     And I click on the "responseRequired" tui checkbox
-    And I save multiple answers question element data
+    And I save the activity content element
     Then I should see "Required"
-    And I click multiple answers question element
+    And I add a "Multiple choice: multi-select" activity content element
     When I set the following fields to these values:
       | rawTitle   | Question 2 |
-      | answers[0] | Option one |
-      | answers[1] | Option two |
-    And I save multiple answers question element data
+      | options[0][value] | Option one |
+      | options[1][value] | Option two |
+    And I save the activity content element
     When I close the tui notification toast
     And I close the tui modal
     Then I should see "1" in the "required" element summary of the activity section

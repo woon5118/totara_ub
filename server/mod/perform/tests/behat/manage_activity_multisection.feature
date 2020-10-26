@@ -73,11 +73,10 @@ Feature: Managing an activity with multiple sections
     And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
     And I close the tui notification toast
     And I navigate to manage perform activity content page of "1" activity section
-    And I click on "Add element" "button"
-    And I click on "Short text" "button"
+    And I add a "Short text" activity content element
     And I set the following fields to these values:
       | rawTitle | S1Q1 |
-    And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    And I save the activity content element
     And I close the tui notification toast
     And I close the tui modal
     Then I should see "0" in the "required" element summary of "1" activity section
@@ -92,11 +91,10 @@ Feature: Managing an activity with multiple sections
     And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
     And I close the tui notification toast
     And I navigate to manage perform activity content page of "1" activity section
-    And I click on "Add element" "button"
-    And I click on "Short text" "button"
+    And I add a "Short text" activity content element
     And I set the following fields to these values:
       | rawTitle | S2Q1 |
-    And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    And I save the activity content element
     And I close the tui notification toast
     And I close the tui modal
     Then I should see "0" in the "required" element summary of "1" activity section

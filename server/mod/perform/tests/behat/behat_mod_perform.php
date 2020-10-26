@@ -80,17 +80,11 @@ class behat_mod_perform extends behat_base {
 
     public const TUI_TRASH_ICON_BUTTON = "button[aria-label='Delete %s']";
 
-    public const EDIT_QUESTION_DISPLAY_TITLE_LOCATOR = '.tui-performElementEditDisplay__title';
+    public const QUESTION_DISPLAY_LOCATOR = '.tui-performAdminCustomElement';
+    public const EDIT_QUESTION_DISPLAY_TITLE_LOCATOR = '.tui-performAdminCustomElement__content-titleText';
     public const QUESTION_DRAG_ITEM_LOCATOR = '.tui-performEditSectionContentModal__draggableItem';
-    public const QUESTION_DRAG_MOVE_ICON_LOCATOR = '.tui-performEditSectionContentModal__draggableItem-moveIcon';
+    public const QUESTION_DRAG_MOVE_ICON_LOCATOR = '.tui-performAdminCustomElement__moveIcon';
     public const RESPONSE_VISIBILITY_DESCRIPTION_LOCATOR = '.tui-participantContent__sectionHeadingOtherResponsesDescription';
-
-    public const ADMIN_FORM_RESPONSE_REQUIRED = 'input[name="responseRequired"]';
-    public const ADMIN_FORM_TITLE_INPUT = 'input[name=rawTitle]';
-    public const ADMIN_FORM_DONE_BUTTON = '.tui-elementAdminFormActionButtons__done';
-    public const ADMIN_FORM = '.tui-performElementAdminForm';
-    public const ADMIN_FORM_STATIC_CONTENT_WEKA = '.tui-elementEditStaticContent';
-    public const FORM_BUILDER_ADD_ELEMENT_BUTTONS = '.tui-dropdownButton';
 
     /**
      * Navigate to the specified page and wait for JS.
@@ -315,6 +309,32 @@ class behat_mod_perform extends behat_base {
         }
 
         $editing_node->find('css', 'input')->setValue($section_title);
+    }
+
+    /**
+     * @Given /^I should see perform "([^"]*)" question "([^"]*)" is saved with options "([^"]*)"$/
+     * @param $question_text
+     * @param $question_options
+     *
+     * @throws ExpectationException
+     */
+    public function i_should_see_multiple_answers_question_is_saved_with_options(
+        string $type,
+        string $question_text,
+        string $question_options
+    ): void {
+        /** @var behat_mod_perform $behat_mod_perform */
+        $locator = ($type == 'checkbox') ? '.tui-checkbox__label' : '.tui-radio__label';
+        $question = $this->find_admin_question_from_text($question_text);
+        $options = $question->findAll('css', $locator);
+        $expected_options = explode(",", $question_options);
+        $actual_options = [];
+        foreach ($options as $option) {
+            $actual_options[] = trim($option->getText());
+        }
+        if ($expected_options != $actual_options) {
+            throw new ExpectationException("Question {$question_text} not found with options {$question_options}", $this->getSession());
+        }
     }
 
     /**
@@ -695,49 +715,100 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @When /^I click on delete icon for question "([^"]*)"$/
-     * @param string $question_text
+     * @When /^I add a "([^"]*)" activity content element$/
+     * @param string $element_name
      */
-    public function i_click_on_delete_icon_for_question(string $question_text) {
+    public function i_add_a_custom_element(string $element_name): void {
         behat_hooks::set_step_readonly(false);
 
-        $question = $this->find_edit_display_question_from_text($question_text);
-        $question->find('xpath', "//button[@title='Delete element']/*")->click();
+        /** @var behat_general $behat_general */
+        $behat_general = behat_context_helper::get('behat_general');
+        $behat_general->i_click_on("Add element","button");
+
+        /** @var behat_totara_tui $behat_totara_tui */
+        $behat_totara_tui = behat_context_helper::get('behat_totara_tui');
+        $behat_totara_tui->i_click_on_dropdown_option($element_name);
     }
 
     /**
-     * @When /^I click on edit icon for question "([^"]*)"$/
-     * @param string $question_text
+     * @When /^I (save|cancel saving) the activity content element$/
+     * @param string $is_saving
      */
-    public function i_click_on_edit_icon_for_question(string $question_text) {
+    public function i_save_the_custom_element_settings(string $is_saving): void {
         behat_hooks::set_step_readonly(false);
 
-        $question = $this->find_edit_display_question_from_text($question_text);
-        $question->find('xpath', "//button[@title='Edit element']/*")->click();
+        $button_text = $is_saving === 'save' ? 'Done' : 'Cancel';
+
+        /** @var behat_general $behat_general */
+        $behat_general = behat_context_helper::get('behat_general');
+        $behat_general->i_click_on_in_the($button_text, 'button', '.tui-performEditSectionContentModal__form', 'css_element');
     }
 
     /**
-     * @When /^I click on identifier icon for question "([^"]*)"$/
+     * @param string $action_type
      * @param string $question_text
+     * @return NodeElement|null
      */
-    public function i_click_on_identifier_icon_for_question(string $question_text) {
-        behat_hooks::set_step_readonly(false);
+    private function find_action_for_question(string $action_type, string $question_text): ?NodeElement {
+        /** @var NodeElement[] $questions */
+        $questions = $this->find_all('css', self::QUESTION_DISPLAY_LOCATOR);
 
-        $this->close_all_popovers();
-        $question = $this->find_edit_display_question_from_text($question_text);
-        $question->find('xpath', "//button[@title='Reporting ID']/*")->click();
+        foreach ($questions as $question) {
+            $title = $question->find('css', self::EDIT_QUESTION_DISPLAY_TITLE_LOCATOR);
+            $actual_title = trim(str_replace('*','', $title->getText()));
+
+            if ($actual_title == $question_text) {
+                $action_button = $question
+                    ->find('css', self::QUESTION_DISPLAY_LOCATOR)
+                    ->find('css', 'button[title*="' . $action_type . '"]');
+                if ($action_button) {
+                    return $action_button;
+                }
+            }
+        }
+        return null;
     }
 
     /**
-     * @Then /^I should not see identifier icon for question "([^"]*)"$/
+     * @When /^I click on the (Reporting ID|Edit element|Delete element) action for question "([^"]*)"$/
      * @param string $question_text
      */
-    public function i_should_not_see_identifier_icon_for_question(string $question_text) {
-        $question = $this->find_edit_display_question_from_text($question_text);
-        $element_found = $question->find('xpath', "//button[@title='Reporting ID']/*");
-        if ($element_found !== null) {
+    public function i_click_on_the_action_for_question(string $action_type, string $question_text): void {
+        behat_hooks::set_step_readonly(false);
+
+        $action = $this->find_action_for_question($action_type, $question_text);
+
+        if (!$action) {
             throw new ExpectationException(
-                "Identifier icon for question '{$question_text}' should not exist but was found.",
+                "Action {$action_type} for question with text {$question_text} not found", $this->getSession()
+            );
+        }
+
+        $action->click();
+    }
+
+    /**
+     * @Then /^I (should|should not) see the (Reporting ID|Edit element|Delete element) action for question "([^"]*)"$/
+     * @param string $should_or_not
+     * @param string $action_type
+     * @param string $question_text
+     * @throws ExpectationException
+     */
+    public function i_should_see_action_for_question(string $should_or_not, string $action_type, string $question_text): void {
+        behat_hooks::set_step_readonly(true);
+
+        $should_be_visible = $should_or_not === 'should';
+        $action = $this->find_action_for_question($action_type, $question_text);
+
+        if ($should_be_visible && !$action) {
+            throw new ExpectationException(
+                "Action {$action_type} for question with text {$question_text} not found", $this->getSession()
+            );
+        }
+
+        if (!$should_be_visible && $action) {
+            throw new ExpectationException(
+                "Action {$action_type} for question with text {$question_text} was visible when it shouldn't have",
                 $this->getSession()
             );
         }
@@ -897,9 +968,9 @@ class behat_mod_perform extends behat_base {
         throw new ExpectationException("Question not found with text {$question_text}", $this->getSession());
     }
 
-    public function find_edit_display_question_from_text(string $question_text): NodeElement {
+    public function find_admin_question_from_text(string $question_text): NodeElement {
         /** @var NodeElement[] $questions */
-        $questions = $this->find_all('css', '.tui-performElementEditDisplay');
+        $questions = $this->find_all('css', self::QUESTION_DISPLAY_LOCATOR);
 
         foreach ($questions as $question) {
             $question_title = $question->find('css', self::EDIT_QUESTION_DISPLAY_TITLE_LOCATOR);
@@ -1330,113 +1401,6 @@ class behat_mod_perform extends behat_base {
         $today_date_formatted = (new DateTime())->format('j F Y');
 
         $this->i_should_see_in_the_line_of_the_perform_activities_instance_info_card($today_date_formatted, $label_text);
-    }
-
-    /**
-     * @Given /^I add one of every element type in the mod perform form builder (and make them required)$/
-     * @Given /^I add one of every element type in the mod perform form builder$/
-     * @param bool $required
-     */
-    public function i_add_one_of_every_element_type_in_the_mod_perform_form_builder(bool $required = false): void {
-        foreach ($this->get_form_builder_element_add_buttons() as $i => $element_add_button) {
-            $this->execute('behat_general::i_click_on', ['Add element', 'link_or_button']);
-
-            if (!$element_add_button->isVisible()) {
-                $element_add_button->focus(); // Ensure we scroll the element option into view.
-            }
-
-            $element_add_button->click();
-
-            $this->wait_for_pending_js();
-
-            $this->fill_last_element_settings_in_form_builder(trim($element_add_button->getHtml()), $required);
-
-            $this->wait_for_pending_js();
-        }
-    }
-
-    /**
-     * @return NodeElement[]
-     */
-    private function get_form_builder_element_add_buttons(): array {
-        $this->execute('behat_general::i_click_on', ['Add element', 'link_or_button']);
-        $element_add_buttons = $this->find_all('css', self::FORM_BUILDER_ADD_ELEMENT_BUTTONS);
-        $this->execute('behat_general::i_click_on', ['Add element', 'link_or_button']);
-
-        return $element_add_buttons;
-    }
-
-    private function fill_last_element_settings_in_form_builder(string $title, bool $required): void {
-        $element_setting_containers = $this->find_all('css', self::ADMIN_FORM);
-
-        /** @var NodeElement $element_setting_container */
-        $element_setting_container = end($element_setting_containers);
-
-        switch ($title) {
-            case 'Multiple choice: multi-select':
-                $this->fill_multi_choice_multi_admin_form_settings($element_setting_container);
-                break;
-            case 'Numeric rating scale':
-                $this->fill_numeric_rating_scale_admin_form_settings($element_setting_container);
-                break;
-            case 'Static content':
-                $this->fill_static_content_admin_form_settings();
-                break;
-            default:
-                $this->fill_element_admin_form_settings($element_setting_container);
-        }
-
-        $element_title = $element_setting_container->find('css', self::ADMIN_FORM_TITLE_INPUT);
-        $element_title->setValue($title);
-
-        if ($required && $title !== 'Static content') {
-            $response_required_input = $element_setting_container->find('css', self::ADMIN_FORM_RESPONSE_REQUIRED);
-            $response_required_input->getParent()->find('css', 'label')->click();
-        }
-
-        $element_setting_container->find('css', self::ADMIN_FORM_DONE_BUTTON)->click();
-    }
-
-    private function fill_element_admin_form_settings(NodeElement $element_setting_container): void {
-        $inputs = $element_setting_container->findAll('css', 'input');
-
-        /** @var NodeElement $input */
-        foreach ($inputs as $i => $input) {
-            $type = $input->getAttribute('type');
-
-            if (in_array($type, ['text', 'number'], true)) {
-                $input->focus();
-                $input->setValue($i + 1);
-            }
-        }
-    }
-
-    private function fill_multi_choice_multi_admin_form_settings(NodeElement $settings_container): void {
-        $answer_0 = $settings_container->find('css', 'input[name="answers[0]"]');
-        $answer_0->focus();
-        $answer_0->setValue('Choice 0');
-
-        $answer_1 = $settings_container->find('css', 'input[name="answers[1]"]');
-        $answer_1->focus();
-        $answer_1->setValue('Choice 1');
-    }
-
-    private function fill_numeric_rating_scale_admin_form_settings(NodeElement $settings_container): void {
-        $low_value = $settings_container->find('css', 'input[name=lowValue]');
-        $low_value->focus();
-        $low_value->setValue('1');
-
-        $high_value = $settings_container->find('css', 'input[name=highValue]');
-        $high_value->focus();
-        $high_value->setValue('3');
-
-        $default_value = $settings_container->find('css', 'input[name=defaultValue]');
-        $default_value->focus();
-        $default_value->setValue('2');
-    }
-
-    private function fill_static_content_admin_form_settings(): void {
-        $this->execute('behat_weka::i_set_the_weka_editor_with_css_to', [self::ADMIN_FORM_STATIC_CONTENT_WEKA, 'static content']);
     }
 
     /**

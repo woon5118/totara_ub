@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara Perform
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -17,13 +17,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
+ * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
  * @package performelement_multi_choice_multi
+ */
+
+
+/**
+ * Database upgrade script
+ *
+ * @param integer $oldversion Current (pre-upgrade) local db version timestamp
+ *
+ * @return bool
+ *
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2020100101;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;       // Requires this Moodle version.
-$plugin->component = 'performelement_multi_choice_multi'; // To check on upgrade, that module sits in correct place
-$plugin->maturity  = MATURITY_STABLE;
+function xmldb_performelement_multi_choice_multi_upgrade($oldversion) {
+    require_once(__DIR__ . '/upgradelib.php');
+
+    if ($oldversion < 2020100101) {
+        performelement_multi_choice_multi_change_data();
+
+        upgrade_plugin_savepoint(true, 2020100101, 'performelement', 'multi_choice_multi');
+    }
+
+    return true;
+}

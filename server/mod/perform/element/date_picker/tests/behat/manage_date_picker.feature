@@ -13,19 +13,19 @@ Feature: Manage performance activity date picker elements
     #Add multiple elements
     And I click on "Activity one" "link"
     And I navigate to manage perform activity content page
-    And I click date picker question element
+    And I add a "Date picker" activity content element
     And I set the following fields to these values:
       | rawTitle   | Question 1   |
       | identifier | Identifier 1 |
-    And I save date picker question element data
-    And I click date picker question element
+    And I save the activity content element
+    And I add a "Date picker" activity content element
     And I set the following fields to these values:
       | rawTitle   | Question 2   |
-    And I save date picker question element data
+    And I save the activity content element
     And I close the tui notification toast
     And I close the tui modal
     When I navigate to manage perform activity content page
-    When I click on identifier icon for question "Question 1"
+    When I click on the Reporting ID action for question "Question 1"
     Then I should see "Identifier 1"
 
   Scenario: Save required and optional date picker elements
@@ -37,16 +37,16 @@ Feature: Manage performance activity date picker elements
     And I should see "0" in the "other" element summary of the activity section
     # Add multiple elements
     And I navigate to manage perform activity content page
-    And I click date picker question element
+    And I add a "Date picker" activity content element
     When I set the following fields to these values:
       | rawTitle   | Question 1 |
     And I click on the "responseRequired" tui checkbox
-    And I save date picker question element data
+    And I save the activity content element
     Then I should see "Required"
-    And I click date picker question element
+    And I add a "Date picker" activity content element
     When I set the following fields to these values:
       | rawTitle   | Question 2 |
-    And I save date picker question element data
+    And I save the activity content element
     When I close the tui notification toast
     And I close the tui modal
     Then I should see "1" in the "required" element summary of the activity section

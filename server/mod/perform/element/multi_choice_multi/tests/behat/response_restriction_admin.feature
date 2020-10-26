@@ -13,53 +13,49 @@ Feature: Manage performance activity multiple choice-answers elements with admin
     #Add multiple elements
     And I click on "Activity one" "link"
     And I navigate to manage perform activity content page
-    And I click multiple answers question element
+    And I add a "Multiple choice: multi-select" activity content element
     And I set the following fields to these values:
       | rawTitle   | Question 1   |
-      | answers[0] | Option one   |
-      | answers[1] | Option two   |
+      | options[0][value] | Option one   |
+      | options[1][value] | Option two   |
     And I click multiple answers question add new option
     And I set the following fields to these values:
-      |answers[2]        | Option three |
+      |options[2][value]        | Option three |
     And I click multiple answers question add new option
     And I set the following fields to these values:
-      |answers[3]        | Option four |
+      |options[3][value]        | Option four |
     And I click multiple answers question add new option
     And I set the following fields to these values:
-      |answers[4]        | Option five |
+      |options[4][value]        | Option five |
     When I set the following fields to these values:
       | min | 6 |
-    And I save multiple answers question element data
-    Then I should see "Invalid. Restriction must not exceed total number of options"
-    When I set the following fields to these values:
-      | min | 0 |
-    And I save multiple answers question element data
-    Then I should see "Invalid. Restriction must be bigger then 0"
+    And I save the activity content element
+    Then I should see "Number must be 5 or less"
     When I set the following fields to these values:
       | min | -2 |
-    And I save multiple answers question element data
-    Then I should see "Invalid. Restriction must be bigger then 0"
+    And I save the activity content element
+    Then I should see "Number must be 0 or more"
     When I set the following fields to these values:
       | min | 3 |
       | max | 6 |
-    And I save multiple answers question element data
-    Then I should see "Invalid. Restriction must not exceed total number of options"
+    And I save the activity content element
+    Then I should see "Number must be 5 or less"
     When I set the following fields to these values:
       | max | 0 |
-    And I save multiple answers question element data
-    Then I should see "Invalid. Maximum cannot be smaller than minimum number"
+    And I save the activity content element
+    Then I should see "Number must be 0 or less"
     When I set the following fields to these values:
       | max | -2 |
-    And I save multiple answers question element data
-    Then I should see "Invalid. Maximum cannot be smaller than minimum number"
+    And I save the activity content element
+    Then I should see "Number must be 0 or more"
     When I set the following fields to these values:
       | max | 2 |
-    And I save multiple answers question element data
-    Then I should see "Invalid. Maximum cannot be smaller than minimum number"
+    And I save the activity content element
+    Then I should see "Number must be 2 or less"
     When I set the following fields to these values:
       | max | 4 |
-    And I save multiple answers question element data
+    And I save the activity content element
     And I close the tui notification toast
     And I close the tui modal
     When I navigate to manage perform activity content page
-    Then I should see perform multiple answers question "Question 1" is saved with options "Option one,Option two,Option three,Option four,Option five"
+    Then I should see perform "checkbox" question "Question 1" is saved with options "Option one,Option two,Option three,Option four,Option five"

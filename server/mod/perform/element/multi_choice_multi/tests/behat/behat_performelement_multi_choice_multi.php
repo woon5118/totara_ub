@@ -25,30 +25,9 @@ use Behat\Mink\Exception\ExpectationException;
 
 class behat_performelement_multi_choice_multi extends behat_base {
 
-    public const DONE_BUTTON_LOCATOR  = '.tui-elementAdminFormActionButtons__done';
-    public const EDIT_ELEMENT_LOCATOR = '.tui-elementEditMultiChoiceMulti';
-    public const ADD_OPTION_LOCATOR   = '.tui-elementEditMultiChoiceMulti__addOption';
+    public const EDIT_ELEMENT_LOCATOR = '.tui-multiChoiceMultiAdminEdit';
+    public const ADD_OPTION_LOCATOR   = '.tui-multiChoiceMultiAdminEdit__addOption';
     public const QUESTION_DISPLAY_OPTIONS_LOCATOR = '.tui-checkbox__label';
-
-    /**
-     * @When /^I click multiple answers question element$/
-     */
-    public function i_click_multiple_answers_question_element(): void {
-        $behat_general = behat_context_helper::get('behat_general');
-
-        $behat_general->i_click_on("Add element", "button");
-        $behat_general->i_click_on("Multiple choice: multi-select", "button");
-    }
-
-    /**
-     * @When /^I save multiple answers question element data$/
-     */
-    public function i_save_multiple_answers_question_element_data(): void {
-        behat_hooks::set_step_readonly(false);
-
-        $done_button = $this->find('css', self::DONE_BUTTON_LOCATOR);
-        $done_button->click();
-    }
 
     /**
      * @When /^I click multiple answers question add new option$/
@@ -77,7 +56,7 @@ class behat_performelement_multi_choice_multi extends behat_base {
     ): void {
         /** @var behat_mod_perform $behat_mod_perform */
         $behat_mod_perform = behat_context_helper::get('behat_mod_perform');
-        $question = $behat_mod_perform->find_edit_display_question_from_text($question_text);
+        $question = $behat_mod_perform->find_admin_question_from_text($question_text);
         $options = $question->findAll('css', self::QUESTION_DISPLAY_OPTIONS_LOCATOR);
         $expected_options = explode(",", $question_options);
         $actual_options = [];
@@ -97,7 +76,7 @@ class behat_performelement_multi_choice_multi extends behat_base {
     public function i_delete_multiple_answers_question_option(): void {
         behat_hooks::set_step_readonly(false);
 
-        $delete_button = $this->find('css', '.tui-elementEditMultiChoiceMulti .tui-repeater__delete:not([disabled])');
+        $delete_button = $this->find('css', '.tui-multiChoiceMultiAdminEdit .tui-repeater__delete:not([disabled])');
         $delete_button->click();
     }
 }

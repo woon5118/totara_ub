@@ -60,11 +60,10 @@ Feature: Allow users to select manual (internal and external) participants for a
     Then I should see "Activity saved" in the tui success notification toast
     And I close the tui notification toast
     And I click on "Edit content elements" "button"
-    And I click on "Add element" "button"
-    And I click on "Short text" "button"
+    And I add a "Short text" activity content element
     When I set the following fields to these values:
       | rawTitle   | Question 1   |
-    And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    And I save the activity content element
     And I close the tui modal
     And I close the tui notification toast
     And I click on "Assignments" "link"

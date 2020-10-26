@@ -230,17 +230,19 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $element1 = $perform_generator->create_element(['title' => 'element one', 'is_required' => true]);
         $element2 = $perform_generator->create_element(['title' => 'element two', 'is_required' => true]);
         $element3 = $perform_generator->create_element(['title' => 'element three']);
+        $element4 = $perform_generator->create_element(['title' => 'element three', 'plugin_name' => 'static_content']);
 
         section_element::create($section1, $element1, 1);
         section_element::create($section1, $element2, 2);
         section_element::create($section1, $element3, 3);
+        section_element::create($section1, $element4, 4);
 
         //check element counts after create
         $result = $section1->get_section_elements_summary();
         $expected = (object)[
             'required_question_count' => 2,
             'optional_question_count' => 1,
-            'other_element_count' => 0
+            'other_element_count' => 1
         ];
         $this->assertEquals($expected, $result);
 
@@ -254,20 +256,10 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $expected = (object)[
             'required_question_count' => 0,
             'optional_question_count' => 3,
-            'other_element_count' => 0
-        ];
-        $this->assertEquals($expected, $result);
-
-        // Check null value
-        $perform_generator->update_element($element1, ['is_required' => null]);
-        $section1 = section::load_by_id($section1->id);
-        $result = $section1->get_section_elements_summary();
-        $expected = (object)[
-            'required_question_count' => 0,
-            'optional_question_count' => 2,
             'other_element_count' => 1
         ];
         $this->assertEquals($expected, $result);
+
 
         //check other section element counts
         $result = $section2->get_section_elements_summary();

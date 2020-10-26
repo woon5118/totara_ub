@@ -20,54 +20,49 @@
     <div>
       <div
         v-if="
-          element.data.settings[0].value !== '' &&
-            element.data.settings[1].value !== '' &&
-            element.data.settings[0].value === element.data.settings[1].value
+          element.data.min !== '' &&
+            element.data.max !== '' &&
+            element.data.min === element.data.max
         "
       >
         {{
           $str(
             'participant_restriction_min_max',
             'performelement_multi_choice_multi',
-            element.data.settings[0].value
+            element.data.min
           )
         }}
       </div>
-      <div
-        v-else-if="
-          element.data.settings[0].value !== '' &&
-            element.data.settings[1].value !== ''
-        "
-      >
+      <div v-else-if="element.data.min !== '' && element.data.max !== ''">
         {{
           $str(
             'participant_restriction_min',
             'performelement_multi_choice_multi',
-            element.data.settings[0].value
+            element.data.min
           )
         }}<br />{{
           $str(
             'participant_restriction_max',
             'performelement_multi_choice_multi',
-            element.data.settings[1].value
+            element.data.max
           )
         }}
       </div>
-      <div v-else-if="element.data.settings[0].value !== ''">
+      <div v-else-if="element.data.min !== ''">
         {{
           $str(
             'participant_restriction_min',
             'performelement_multi_choice_multi',
-            element.data.settings[0].value
+            element.data.min
           )
         }}
       </div>
-      <div v-else-if="element.data.settings[1].value !== ''">
+      <div v-else-if="element.data.max !== ''">
         {{
           $str(
             'participant_restriction_max',
             'performelement_multi_choice_multi',
-            element.data.settings[1].value
+            element.data.max
           )
         }}
       </div>
@@ -115,9 +110,7 @@ export default {
         }
         const requiredValidation = validation.required();
         if (requiredValidation.validate(val)) {
-          if (typeof this.element.data.settings !== 'undefined') {
-            return this.valid_for_restriction(val, this.element.data.settings);
-          }
+          return this.valid_for_restriction(val, this.element.data);
           return null;
         }
         return this.$str(
@@ -127,17 +120,15 @@ export default {
       } else {
         // if it isn't required, but participant try submit the data and we have the restrictions.
         if (val !== null && val.length > 0) {
-          if (typeof this.element.data.settings !== 'undefined') {
-            return this.valid_for_restriction(val, this.element.data.settings);
-          }
+          return this.valid_for_restriction(val, this.element.data);
         }
         return null;
       }
     },
 
-    valid_for_restriction(val, settings) {
-      let min = settings[0].value;
-      let max = settings[1].value;
+    valid_for_restriction(val, data) {
+      let min = data.min;
+      let max = data.max;
       if (min !== '' && max !== '') {
         if (min === max && (val.length < min || val.length > max)) {
           return this.$str(

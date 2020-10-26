@@ -31,6 +31,7 @@ use mod_perform\entities\activity\element as element_entity;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\models\response\participant_section;
+use  mod_perform\models\activity\element as model_element;
 use stdClass;
 
 /**
@@ -228,14 +229,16 @@ class section extends model {
         $optional_count = 0;
         $required_count = 0;
         foreach ($this->entity->section_elements as $section_element) {
-            // is_required can be null for non-question elements
             $is_required = $section_element->element->is_required;
-            if (is_null($is_required)) {
+            $element = model_element::load_by_entity($section_element->element);
+            if (!$element->is_respondable) {
                 $other_element_count ++;
-            } else if ($is_required) {
-                $required_count ++;
             } else {
-                $optional_count ++;
+                if ($is_required) {
+                    $required_count++;
+                } else {
+                    $optional_count++;
+                }
             }
         }
 

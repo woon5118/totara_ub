@@ -341,6 +341,7 @@ class behat_totara_tui extends behat_base {
     private function get_dropdown_menu_option(string $option_text): ?NodeElement {
         $menu = $this->find_visible_dropdown();
         $menu_options = $menu->findAll('css', '.tui-dropdownItem');
+        $menu_options = array_merge($menu_options, $menu->findAll('css', '.tui-dropdownButton'));
         foreach ($menu_options as $menu_option) {
             if (strtolower($menu_option->getText()) === strtolower($option_text)) {
                 return $menu_option;

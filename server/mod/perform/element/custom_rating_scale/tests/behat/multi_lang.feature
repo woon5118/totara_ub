@@ -17,22 +17,22 @@ Feature: Custom rating scale element supports multi-lang filters in titles and o
 
     # Adding a new item
     And I navigate to manage perform activity content page
-    And I click custom rating scale question element
+    And I add a "Custom rating scale" activity content element
     Then "rawTitle" "field" should be visible
     When I set the following fields to these values:
-      | rawTitle   | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
-      | answers[0][text] | <span lang="en" class="multilang">it's the first option</span><span lang="de" class="multilang">erste Option</span>      |
-      | answers[0][score]|   1                                                                                                                      |
-      | answers[1][text] | <span lang="en" class="multilang">it's the second option</span><span lang="de" class="multilang">zweite Option</span>    |
-      | answers[1][score]|   2                                                                                                                     |
+      | rawTitle                 | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
+      | options[0][value][text]  | <span lang="en" class="multilang">it's the first option</span><span lang="de" class="multilang">erste Option</span>      |
+      | options[0][value][score] |   1                                                                                                                      |
+      | options[1][value][text]  | <span lang="en" class="multilang">it's the second option</span><span lang="de" class="multilang">zweite Option</span>    |
+      | options[1][value][score] |   2                                                                                                                     |
     # Currently a changed text won't be filtered until saved
-    And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    And I save the activity content element
     And I close the tui notification toast
     Then I should see "it's an English question"
-    When I click on edit icon for question "it's an English question"
+    When I click on the Edit element action for question "it's an English question"
     Then the following fields match these values:
       | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
-    When I click on "Cancel" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    When I cancel saving the activity content element
     And I close the tui modal
     And I click on "Edit content elements" "button"
     Then "rawTitle" "field" should not be visible
@@ -42,24 +42,24 @@ Feature: Custom rating scale element supports multi-lang filters in titles and o
     And I should not see "erste Option (score: 1)"
     And I should see "it's the second option (score: 2)"
     And I should not see "zweite Option (score: 2)"
-    When I click on edit icon for question "it's an English question"
+    When I click on the Edit element action for question "it's an English question"
     Then "rawTitle" "field" should be visible
     And the following fields match these values:
       | rawTitle   | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
-      | answers[0][text] | <span lang="en" class="multilang">it's the first option</span><span lang="de" class="multilang">erste Option</span>                 |
-      | answers[1][text] | <span lang="en" class="multilang">it's the second option</span><span lang="de" class="multilang">zweite Option</span>               |
+      | options[0][value][text] | <span lang="en" class="multilang">it's the first option</span><span lang="de" class="multilang">erste Option</span>                 |
+      | options[1][value][text] | <span lang="en" class="multilang">it's the second option</span><span lang="de" class="multilang">zweite Option</span>               |
     When I set the following fields to these values:
       | rawTitle   | <span lang="en" class="multilang">changed & updated</span><span lang="de" class="multilang">geaendert & gespeichert</span>               |
-      | answers[0][text] | <span lang="en" class="multilang">it's the first changed option</span><span lang="de" class="multilang">erste geaenderte Option</span>   |
-      | answers[1][text] | <span lang="en" class="multilang">it's the second changed option</span><span lang="de" class="multilang">zweite geaenderte Option</span> |
+      | options[0][value][text] | <span lang="en" class="multilang">it's the first changed option</span><span lang="de" class="multilang">erste geaenderte Option</span>   |
+      | options[1][value][text] | <span lang="en" class="multilang">it's the second changed option</span><span lang="de" class="multilang">zweite geaenderte Option</span> |
     # Currently a changed text won't be filtered until saved
-    And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    And I save the activity content element
     And I close the tui notification toast
     Then I should see "changed & updated"
-    When I click on edit icon for question "changed & updated"
+    When I click on the Edit element action for question "changed & updated"
     Then the following fields match these values:
       | rawTitle | <span lang="en" class="multilang">changed & updated</span><span lang="de" class="multilang">geaendert & gespeichert</span> |
-    When I click on "Cancel" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    When I cancel saving the activity content element
     And I close the tui modal
     And I click on "Edit content elements" "button"
     Then I should see "changed & updated"
