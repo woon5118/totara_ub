@@ -139,7 +139,7 @@ final class topic_helper {
      * @return bool
      */
     public static function topic_catalog_filter_enabled(): bool {
-        global $CFG, $DB;
+        global $CFG;
 
         // Leave if no topics collection exists.
         if (!isset($CFG->topic_collection_id)) {
@@ -152,12 +152,11 @@ final class topic_helper {
             return false;
         }
 
-        // Check if tag collection name is a currently active filter.
+        // Check if the tag collection id is used in a currently active filter.
         $filters = $config_db['filters'] ?? null;
         if ($filters) {
             $filters = json_decode($filters, true);
-            $collection_name = $DB->get_field('tag_coll', 'name', ['id' => $CFG->topic_collection_id]);
-            return is_array($filters) && in_array($collection_name, $filters, true);
+            return !empty($filters['tag_panel_' . $CFG->topic_collection_id]);
         }
 
         return false;

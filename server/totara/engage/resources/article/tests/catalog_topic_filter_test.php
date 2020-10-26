@@ -129,9 +129,13 @@ class engage_article_catalog_topic_filter_testcase extends advanced_testcase {
     public function test_topic_catalog_filter_enabled() {
         global $CFG;
 
-        set_config('filters',  '{"tag_panel_' . $CFG->topic_collection_id . '":"Topics"}', 'totara_catalog');
         $store = $CFG->topic_collection_id;
 
+        set_config('filters',  '{"tag_panel_' . $CFG->topic_collection_id . '":"Topics"}', 'totara_catalog');
+        $result = totara_topic\topic_helper::topic_catalog_filter_enabled();
+        $this->assertTrue($result);
+
+        set_config('filters',  '{"tag_panel_' . $CFG->topic_collection_id . '":"Another Topic Label"}', 'totara_catalog');
         $result = totara_topic\topic_helper::topic_catalog_filter_enabled();
         $this->assertTrue($result);
 
