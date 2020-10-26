@@ -52,8 +52,8 @@ if (!isset($_POST)) {
     util::send_error('Invalid login registration', 400);
 }
 
-// Note: This currently only works with manual auth, so if that isn't enabled... throw an error.
-if (!is_enabled_auth('manual')) {
+// Check that native authentication is allowed generally.
+if (!util::native_auth_allowed()) {
     util::send_error('invalid login request', 400);
 }
 

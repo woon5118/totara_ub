@@ -62,6 +62,36 @@ final class util {
     }
 
     /**
+     * Is the mobile plugin allowed to use native authentication?
+     *
+     * Checks system settings generally, and also considers user auth setting if available.
+     * @param \stdClass|null $user
+     * @return bool
+     */
+    public static function native_auth_allowed(?\stdClass $user = null): bool {
+        $allowed = [];
+        // We currently allow manual and ldap
+        if (is_enabled_auth('manual')) {
+            $allowed['manual'] = 'manual';
+        }
+        if (is_enabled_auth('ldap')) {
+            // LDAP is allowed, but not the NTLM SSO flavour, which requires a browser.
+            $ntlm_sso = get_config('auth_ldap', 'ntlmsso_enabled');
+            if(!$ntlm_sso) {
+                $allowed['ldap'] = 'ldap';
+            }
+        }
+        // Now compare with user if provided.
+        if ($user) {
+            // User's authentication method is not allowed.
+            if (!in_array($user->auth, $allowed)) {
+                return false;
+            }
+        }
+        return (bool) count($allowed);
+    }
+
+    /**
      * If the app banner should be shown, return a url with setup secret to use for the button.
      *
      * @return bool|\moodle_url

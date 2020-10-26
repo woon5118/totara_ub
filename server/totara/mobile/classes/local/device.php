@@ -231,14 +231,16 @@ final class device {
         // Use only once!
         $DB->delete_records('totara_mobile_tokens', ['id' => $request->id]);
 
-        // Check the users auth setting is set to something that will work here.
+        // Check the user's auth setting is set to something that will work here.
         $user = $DB->get_record('user', ['username' => $username], '*');
         if (empty($user)) {
             // The user MUST exist
             return null;
         }
         $user->auth = empty($user->auth) ? 'manual' : $user->auth;
-        if ($user->auth != 'manual') {
+
+        // Check that native authentication is allowed for this user.
+        if (!util::native_auth_allowed($user)) {
             return null;
         }
 
