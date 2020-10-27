@@ -3803,7 +3803,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $sessiondata1 = array(
             'facetoface' => $facetoface->id,
             'capacity' => 10,
-            'sessiondates' => [(object) ['timestart' => $now + 1000, 'timefinish' => $now - 1200]],
+            'sessiondates' => [(object) ['timestart' => $now + 1000, 'timefinish' => $now + 1200]],
         );
         $sessionid1 = $facetofacegenerator->add_session($sessiondata1);
         $sessiondata1['datetimeknown'] = '1';
@@ -3831,8 +3831,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             array('coursemoduleid' => $cminfo->id, 'userid' => $this->user1->id)));
 
         // We can't process attendance for future sessions, so move it to the past.
-        $DB->execute('UPDATE {facetoface_sessions_dates} SET timestart = 1000 WHERE sessionid = :sid', ['sid' => $seminarevent->get_id()]);
-        $DB->execute('UPDATE {facetoface_sessions_dates} SET timefinish = 1200 WHERE sessionid = :sid', ['sid' => $seminarevent->get_id()]);
+        $seminarevent->get_sessions(true)->current()->set_timestart(1000)->set_timefinish(1200)->save();
 
         // Check the signup can transition as expected.
         $this->assertTrue($signup11->can_switch(fully_attended::class));
@@ -3893,9 +3892,11 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         );
         $facetoface = $facetofacegenerator->create_instance($f2fdata, $f2foptions);
 
+        $now = time();
         $sessiondata1 = array(
             'facetoface' => $facetoface->id,
             'capacity' => 10,
+            'sessiondates' => [(object) ['timestart' => $now + 1000, 'timefinish' => $now + 1200]],
         );
         $sessionid1 = $facetofacegenerator->add_session($sessiondata1);
         $sessiondata1['datetimeknown'] = '1';
