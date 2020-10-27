@@ -118,6 +118,8 @@ export default {
       required: true,
       type: String,
     },
+    activityClonedSuccess: Boolean,
+    clonedActivityName: String,
   },
 
   data() {
@@ -165,6 +167,19 @@ export default {
       this.showMutationSuccessNotification,
       500
     );
+  },
+
+  mounted() {
+    if (this.activityClonedSuccess) {
+      notify({
+        message: this.$str(
+          'toast_success_activity_cloned',
+          'mod_perform',
+          this.clonedActivityName
+        ),
+        type: 'success',
+      });
+    }
   },
 
   apollo: {
@@ -272,6 +287,7 @@ export default {
       "manage_activities_tabs_general",
       "manage_activities_tabs_notifications",
       "toast_error_generic_update",
+      "toast_success_activity_cloned",
       "toast_success_activity_update"
     ]
   }

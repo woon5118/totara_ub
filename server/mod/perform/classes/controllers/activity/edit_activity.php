@@ -23,9 +23,11 @@
 
 namespace mod_perform\controllers\activity;
 
+use coding_exception;
 use context;
 use mod_perform\controllers\perform_controller;
 use mod_perform\controllers\requires_activity;
+use mod_perform\models\activity\activity;
 use moodle_url;
 use totara_mvc\tui_view;
 
@@ -51,9 +53,34 @@ class edit_activity extends perform_controller {
             'activity-id' => $this->get_activity_id_param(),
             'go-back-link' => (string) new moodle_url(manage_activities::URL),
         ];
+        $activity_was_cloned = (bool) $this->get_optional_param('activity_cloned', false, PARAM_BOOL);
+
+        if ($activity_was_cloned) {
+            $props = $this->include_cloned_props($props);
+        }
 
         return self::create_tui_view('mod_perform/pages/ManageActivity', $props)
             ->set_title(get_string('manage_activity_for_page_title', 'mod_perform', $this->get_activity_from_param()->name));
+    }
+
+    /**
+     * Include activity cloned properties.
+     *
+     * @param $props
+     * @return array
+     */
+    private function include_cloned_props($props): array {
+        $cloned_activity_id = $this->get_optional_param('cloned_activity_id', false, PARAM_INT) ?? null;
+
+        if (empty($cloned_activity_id)) {
+            throw new coding_exception('Missing activity this activity was cloned from.');
+        }
+        $cloned_activity = activity::load_by_id($cloned_activity_id);
+
+        $props['activity-cloned-success'] = true;
+        $props['cloned-activity-name'] = $cloned_activity->name;
+
+        return $props;
     }
 
     public static function get_base_url(): string {

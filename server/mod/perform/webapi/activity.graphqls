@@ -457,11 +457,62 @@ enum mod_perform_subject_instance_about_filter {
   OTHERS
 }
 
+"""
+Paginated list of activities.
+"""
+type mod_perform_activity_page implements core_pageable_result {
+  """
+  List of manageable activities.
+  """
+  items: [mod_perform_activity!]!
+
+  """
+  Total number of activities.
+  """
+  total: Int!
+
+  """
+  Cursor to request the next set of results for this query
+  """
+  next_cursor: String!
+}
+
+"""
+Input type for pagination and filtering the activity list page.
+"""
+input mod_perform_activity_page_input {
+  """
+  Pagination input
+  """
+  pagination: mod_perform_activity_pagination_input!
+}
+
+"""
+Pagination input for paginated activity list.
+"""
+input mod_perform_activity_pagination_input {
+  """
+  Opaque cursor
+  """
+  cursor: String
+  """
+  Number of activities to fetch
+  """
+  limit: param_integer
+}
+
 extend type Query {
   """
   A list of all performance activities that the current user can administer
   """
   mod_perform_activities: [mod_perform_activity!]!
+
+  """
+  A paginated list of performance activities that the current user can administer
+  """
+  mod_perform_paginated_activities(
+    query_options: mod_perform_activity_page_input!
+  ): mod_perform_activity_page!
 
   """
   A list of all performance activities that the current user can manage participants on

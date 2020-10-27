@@ -197,7 +197,7 @@ export default {
      */
     async cloneActivity() {
       try {
-        await this.$apollo.mutate({
+        const clonedActivity = await this.$apollo.mutate({
           mutation: activateCloneMutation,
           variables: {
             input: {
@@ -205,11 +205,14 @@ export default {
             },
           },
         });
-        this.showCloneSuccessNotification();
+
+        this.$emit('activity-cloned', {
+          clone: clonedActivity.data.mod_perform_clone_activity.activity,
+          id: this.activity.id,
+        });
       } catch (e) {
         this.showErrorNotification();
       }
-      this.$emit('refetch');
     },
 
     /**
@@ -243,17 +246,6 @@ export default {
 
       this.$emit('refetch');
       this.closeDeleteModal();
-    },
-
-    showCloneSuccessNotification() {
-      notify({
-        message: this.$str(
-          'toast_success_activity_cloned',
-          'mod_perform',
-          this.activity.name
-        ),
-        type: 'success',
-      });
     },
 
     /**
@@ -312,7 +304,6 @@ export default {
       "modal_delete_title",
       "participation_reporting",
       "toast_error_generic_update",
-      "toast_success_activity_cloned",
       "toast_success_activity_deleted",
       "toast_success_draft_activity_deleted"
     ],

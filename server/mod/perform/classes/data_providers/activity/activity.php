@@ -26,6 +26,9 @@ namespace mod_perform\data_providers\activity;
 use core\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use core\pagination\base_paginator;
+use core\pagination\cursor;
+use mod_perform\data_providers\cursor_paginator_trait;
 use mod_perform\data_providers\provider;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\activity as activity_model;
@@ -39,6 +42,8 @@ use totara_core\access;
  * @method collection|activity_model[] get
  */
 class activity extends provider {
+
+    use cursor_paginator_trait;
 
     /**
      * @inheritDoc
@@ -93,5 +98,26 @@ class activity extends provider {
      */
     protected function filter_query_by_id(repository $repository, int $activity_id): void {
         $repository->where('id', $activity_id);
+    }
+
+    /**
+     * Paginate list of activities.
+     *
+     * @param string|null $cursor
+     * @param int $limit Number of items to fetch.
+     *
+     * @return array
+     */
+    public function get_activities_page(?string $cursor = null, int $limit = base_paginator::DEFAULT_ITEMS_PER_PAGE): array {
+        $page_cursor = $cursor !== null
+            ? cursor::decode($cursor)
+            : cursor::create()->set_limit($limit);
+
+        $paginated_results = $this->get_next($page_cursor, true)->get();
+        $paginated_results['items'] = array_map(function ($activity_entity) {
+            return new activity_model($activity_entity);
+        }, $paginated_results['items']);
+
+        return $paginated_results;
     }
 }

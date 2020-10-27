@@ -20,26 +20,38 @@
   <div class="tui-performManageActivityList">
     <PageHeading :title="$str('perform:manage_activity', 'mod_perform')" />
 
-    <div class="tui-performManageActivityList__add">
-      <Button
-        v-if="canAdd"
-        :styleclass="{ primary: true }"
-        :disabled="$apollo.loading"
-        :text="$str('add_activity', 'mod_perform')"
-        @click="showCreateModal()"
-      />
+    <div class="tui-performManageActivityList__wrapper">
+      <div
+        v-if="paginatedActivities.total"
+        class="tui-performManageActivityList__total"
+      >
+        {{
+          $str('showing_activities', 'mod_perform', {
+            number: paginatedActivities.items.length,
+            total: paginatedActivities.total,
+          })
+        }}
+      </div>
+      <div class="tui-performManageActivityList__add">
+        <Button
+          v-if="canAdd"
+          :styleclass="{ primary: true }"
+          :disabled="$apollo.loading"
+          :text="$str('add_activity', 'mod_perform')"
+          @click="showCreateModal()"
+        />
+      </div>
     </div>
     <ModalPresenter :open="modalOpen" @request-close="modalRequestClose">
       <CreateActivityForm
-        @mutation-success="redirectToManageActivity"
+        @mutation-success="activityCreated"
         @mutation-error="creationError"
       />
     </ModalPresenter>
 
     <loader :loading="$apollo.loading">
       <Table
-        v-if="!$apollo.loading"
-        :data="activities"
+        :data="paginatedActivities.items"
         class="tui-performManageActivityList__table"
       >
         <template v-slot:header-row>
@@ -68,10 +80,20 @@
             {{ row.state_details.display_name }}
           </Cell>
           <Cell size="1" :column-header="$str('view_actions', 'mod_perform')">
-            <ActivityActions :activity="row" @refetch="refetchActivities" />
+            <ActivityActions
+              :activity="row"
+              @refetch="refetchActivities"
+              @activity-cloned="activityCloned"
+            />
           </Cell>
         </template>
       </Table>
+      <div
+        v-if="!$apollo.loading && hasMoreActivities"
+        class="tui-performManageActivityList__loadMore"
+      >
+        <Button :text="$str('loadmore', 'totara_core')" @click="loadMore" />
+      </div>
     </loader>
   </div>
 </template>
@@ -87,8 +109,10 @@ import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import PageHeading from 'tui/components/layouts/PageHeading';
 import Table from 'tui/components/datatable/Table';
 import { notify } from 'tui/notifications';
+import { redirectWithPost } from 'mod_perform/redirect';
+import { DEFAULT_ITEMS_PER_PAGE } from 'mod_perform/constants';
 // Query
-import performActivitiesQuery from 'mod_perform/graphql/activities';
+import performActivitiesQuery from 'mod_perform/graphql/paginated_activities';
 
 export default {
   components: {
@@ -114,9 +138,22 @@ export default {
   },
   data() {
     return {
-      activities: [],
+      paginatedActivities: {
+        items: [],
+        total: null,
+        next_cursor: null,
+      },
+      pageCount: 0,
       modalOpen: false,
     };
+  },
+  computed: {
+    hasMoreActivities() {
+      return (
+        this.paginatedActivities.next_cursor !== null &&
+        this.paginatedActivities.next_cursor.length > 0
+      );
+    },
   },
   methods: {
     /**
@@ -145,14 +182,40 @@ export default {
     },
 
     /**
-     * Full page redirect to the management screen for a specific perform activity.
+     * Activity created observer.
+     * @param {Object} activity
      */
-    redirectToManageActivity({ id }) {
-      window.location = this.getEditActivityUrl(id);
+    activityCreated(activity) {
+      this.redirectToManageActivity(activity.id);
+    },
+
+    /**
+     * Activity cloned observer.
+     * @param {Object} clone
+     * @param {Number} id
+     */
+    activityCloned({ clone, id }) {
+      this.redirectToManageActivity(clone.id, {
+        activity_cloned: true,
+        cloned_activity_id: id,
+      });
+    },
+
+    /**
+     * Full page redirect to the management screen for a specific perform activity.
+     * @param {Number} activityId
+     * @param {Object} postParameters
+     */
+    redirectToManageActivity(activityId, postParameters) {
+      const activityUrl = this.getEditActivityUrl(activityId);
+      postParameters
+        ? redirectWithPost(activityUrl, postParameters)
+        : (window.location = activityUrl);
     },
 
     /**
      * Get the url to manage a specific perform activity.
+     * @param {Number} activityId
      */
     getEditActivityUrl(activityId) {
       return this.$url(this.editUrl, { activity_id: activityId });
@@ -162,13 +225,74 @@ export default {
      * Reload the activities list.
      */
     refetchActivities() {
-      this.$apollo.queries.activities.refetch();
+      let queryVariables = this.getPaginationOption({
+        limit: this.pageCount * DEFAULT_ITEMS_PER_PAGE,
+      });
+      let pageCount = this.pageCount;
+      this.$apollo.queries.paginatedActivities
+        .refetch(queryVariables)
+        .then(() => {
+          this.pageCount = pageCount;
+        });
+    },
+
+    /**
+     * Gets pagination options.
+     * @param {Number} limit
+     * @param {String|NULL} cursor
+     */
+    getPaginationOption({ limit, cursor }) {
+      if (!cursor) {
+        cursor = null;
+      }
+
+      let paginationOptions = {
+        cursor,
+      };
+
+      if (limit) {
+        paginationOptions.limit = limit;
+      }
+
+      return {
+        query_options_input: {
+          pagination: paginationOptions,
+        },
+      };
+    },
+
+    /**
+     * Load more items to activities list.
+     */
+    loadMore() {
+      this.$apollo.queries.paginatedActivities.fetchMore({
+        variables: this.getPaginationOption({
+          cursor: this.paginatedActivities.next_cursor,
+        }),
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          fetchMoreResult.mod_perform_paginated_activities.items.unshift(
+            ...this.paginatedActivities.items
+          );
+
+          return fetchMoreResult;
+        },
+      });
     },
   },
+
   apollo: {
-    activities: {
+    paginatedActivities: {
       query: performActivitiesQuery,
-      update: data => data.mod_perform_activities,
+      variables() {
+        return this.getPaginationOption({
+          cursor: null,
+        });
+      },
+      update(data) {
+        this.pageCount++;
+
+        return data.mod_perform_paginated_activities;
+      },
     },
   },
 };
@@ -178,11 +302,15 @@ export default {
     "mod_perform": [
       "add_activity",
       "perform:manage_activity",
+      "showing_activities",
       "toast_error_create_activity",
       "view_actions",
       "view_name",
       "view_status",
       "view_type"
+    ],
+    "totara_core": [
+      "loadmore"
     ]
   }
 </lang-strings>
@@ -193,8 +321,22 @@ export default {
     margin-top: var(--gap-4);
   }
 
+  &__wrapper {
+    display: flex;
+  }
+
+  &__total {
+    display: flex;
+    align-items: center;
+  }
+
   &__add {
-    text-align: right;
+    margin-left: auto;
+  }
+
+  &__loadMore {
+    margin-top: var(--gap-2);
+    text-align: center;
   }
 }
 

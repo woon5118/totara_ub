@@ -522,6 +522,7 @@ $string['select_relationship_to_respond_as_option'] = '{$a->relationship_name} (
 $string['select_relationship_to_respond_as_title'] = 'Select relationship to continue';
 $string['setting_element'] = "Element setting";
 $string['short_text'] = 'Short text';
+$string['showing_activities'] = 'Showing {$a->number} of {$a->total} activities.';
 $string['subject_availability'] = 'Availability';
 $string['subject_instance_status'] = 'Status of subject instance';
 $string['showhistoricactivities'] = 'Show historic activities';

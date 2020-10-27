@@ -112,7 +112,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     # Subject makes selection (appraiser user for the peer relationship)
     When I log in as "subject"
     And I navigate to the outstanding perform activities list page
-    Then I should see "You must select participants to take part in performance activities. Note: activities cannot start until this is done" in the ".tui-actionCard" "css_element"
+    Then I should see "There are activities awaiting participant selection. Please select people to participate so that those activities can start." in the ".tui-actionCard" "css_element"
     When I click on "Select participants" "link" in the ".tui-actionCard" "css_element"
     Then I should see "Select participants"
     And I should see "Note: None of these activities can start until participants are selected."
