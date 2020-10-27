@@ -20,15 +20,16 @@
  * @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
  * @package totara_engage
  */
-
 namespace core_user\totara_engage\share\recipient;
 
 use context_user;
-use core\entities\user_repository;
-use core_user\access_controller;
+use core_user;
 use totara_engage\access\access;
+use totara_engage\engage_core;
 use totara_engage\entity\share as share_entity;
 use totara_engage\exception\share_exception;
+use totara_engage\loader\user_loader;
+use totara_engage\query\user_query;
 use totara_engage\repository\share_repository;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\share\recipient\recipient;
@@ -46,13 +47,38 @@ class user extends recipient {
      * @inheritDoc
      */
     public function validate(): void {
-        $target_user_record = \core_user::get_user($this->instanceid, '*');
-        if (empty($target_user_record->id)) {
+        global $DB;
+
+        $user_record = $DB->get_record('user', ['id' => $this->instanceid]);
+        if (!$user_record || ($user_record->deleted || $user_record->suspended || !$user_record->confirmed)) {
             throw new share_exception('error:invalid_recipient', 'totara_engage');
         }
-        $controller = access_controller::for($target_user_record);
-        if (!$controller->can_view_profile()) {
-            // This is not a user that can be resolved by the current user.
+    }
+
+    /**
+     * @param shareable $item
+     * @return void
+     */
+    public function validate_against_share_item(shareable $item): void {
+        $context = $item->get_context();
+        if (!engage_core::allow_access_with_tenant_check($context, $this->instanceid)) {
+            throw new share_exception('error:invalid_recipient', 'totara_engage');
+        }
+    }
+
+    /**
+     * @param int $actor_id
+     * @return void
+     */
+    public function validate_against_actor(int $actor_id): void {
+        if ($actor_id == $this->instanceid) {
+            // Actor happens to be the same as the recipient - skip the rest.
+            return;
+        }
+
+        if (!engage_core::can_interact_with_user_in_tenancy_check($actor_id, $this->instanceid)) {
+            // The user actor cannot access to the recipient context.
+            // Hence this user actor should not be able to share the content to the recipient.
             throw new share_exception('error:invalid_recipient', 'totara_engage');
         }
     }
@@ -88,22 +114,45 @@ class user extends recipient {
 
     /**
      * @inheritDoc
+     * @return user[]
      */
     public static function search(string $search, ?shareable $instance): array {
         global $USER;
 
-        $context = context_user::instance($USER->id);
-        $user_ids = user_repository::search($context, $search, 20)->pluck('id');
+        $actor_context = context_user::instance($USER->id);
+        $context_id = $actor_context->id;
+
+        if (null !== $instance) {
+            // Start looking for the instance context.
+            $context = $instance->get_context();
+            $context_id = $context->id;
+
+            if (empty($context->tenantid)) {
+                // The context that we are trying to search for user is in the system context.
+                // Hence we can fallback to the actor's context, if the user context of actor
+                // is within a tenant.
+                // This happens because we would want to filtering out all the other tenant's members when actor
+                // is trying to search for a user within a context system.
+                if (!empty($actor_context->tenantid)) {
+                    $context_id = $actor_context->id;
+                }
+            }
+        }
+
+        $query = user_query::create_with_exclude_guest_user($context_id);
+        $query->set_search_term($search);
+
+        if (null !== $instance) {
+            // Exclude the shareable item owner.
+            $owner_id = $instance->get_userid();
+            $query->exclude_user($owner_id);
+        }
+
+        $result_paginator = user_loader::get_users($query);
+        $user_ids = $result_paginator->get_items()->pluck('id');
 
         $recipients = [];
         foreach ($user_ids as $user_id) {
-            // Exclude the shareable item owner.
-            if (!empty($instance)) {
-                if ((int)$user_id === $instance->get_userid()) {
-                    continue;
-                }
-            }
-
             $recipients[] = new self($user_id);
         }
 

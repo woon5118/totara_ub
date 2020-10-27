@@ -692,6 +692,14 @@ final class playlist implements accessible, shareable {
     }
 
     /**
+     * @return string
+     */
+    public function get_access_code(): string {
+        $access_value = $this->get_access();
+        return access::get_code($access_value);
+    }
+
+    /**
      * @return int
      */
     public function get_summaryformat(): int {

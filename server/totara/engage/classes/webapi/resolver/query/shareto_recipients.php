@@ -20,7 +20,6 @@
  * @author  Johannes Cilliers <johannes.cilliers@totaralearning.com>
  * @package totara_engage
  */
-
 namespace totara_engage\webapi\resolver\query;
 
 use core\orm\query\builder;
@@ -35,6 +34,10 @@ use totara_engage\access\accessible;
 use totara_engage\share\provider as share_provider;
 use totara_engage\share\recipient\helper as recipient_helper;
 use totara_engage\share\recipient\recipient;
+use coding_exception;
+use moodle_exception;
+use dml_exception;
+use context_user;
 
 /**
  * Resolver for finding destinations to where a user can share to.
@@ -48,21 +51,17 @@ final class shareto_recipients implements query_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): array {
         global $USER;
-        if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_user::instance($USER->id));
-        }
-
 
         if (!isset($args['itemid'])) {
-            throw new \coding_exception('ItemID is a required field.');
+            throw new coding_exception('ItemID is a required field.');
         }
 
         if (!isset($args['component'])) {
-            throw new \coding_exception('Component is a required field.');
+            throw new coding_exception('Component is a required field.');
         }
 
         if (!isset($args['access'])) {
-            throw new \coding_exception('Access is a required field.');
+            throw new coding_exception('Access is a required field.');
         }
 
         $itemid = $args['itemid'];
@@ -75,19 +74,29 @@ final class shareto_recipients implements query_resolver, has_middleware {
             try {
                 $provider = share_provider::create($component);
                 $instance = $provider->get_item_instance($itemid);
-            } catch (\dml_exception $ex) {
+            } catch (dml_exception $ex) {
                 // Don't expose internal exceptions!
-                throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, $ex->getMessage());
+                throw new moodle_exception('error:permissiondenied', 'totara_engage', '', null, $ex->getMessage());
             }
 
             if ($instance instanceof accessible) {
                 if (!access_manager::can_access($instance, $USER->id)) {
-                    throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, 'Cannot access item ' . $instance->get_id());
+                    throw new moodle_exception('error:permissiondenied', 'totara_engage', '', null, 'Cannot access item ' . $instance->get_id());
                 }
             } else {
                 // Something that is shareable must be accessible. It is a one way binding.
-                throw new \moodle_exception('error:permissiondenied', 'totara_engage', '', null, get_class($instance));
+                throw new moodle_exception('error:permissiondenied', 'totara_engage', '', null, get_class($instance));
             }
+        }
+
+        if (!$ec->has_relevant_context()) {
+            // Default to the current user's context of whoever executing this query.
+            $context = context_user::instance($USER->id);
+            if (null !== $instance) {
+                $context = $instance->get_context();
+            }
+
+            $ec->set_relevant_context($context);
         }
 
         /** @var recipient[] $classes */

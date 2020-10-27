@@ -46,10 +46,6 @@ final class share implements mutation_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec): array {
         global $DB, $USER;
-        if (!$ec->has_relevant_context()) {
-            $ec->set_relevant_context(\context_user::instance($USER->id));
-        }
-
         $transaction = $DB->start_delegated_transaction();
 
         $itemid = $args['itemid'];
@@ -60,8 +56,13 @@ final class share implements mutation_resolver, has_middleware {
         $provider = share_provider::create($component);
         $instance = $provider->get_item_instance($itemid);
 
+        if (!$ec->has_relevant_context()) {
+            $context = $instance->get_context();
+            $ec->set_relevant_context($context);
+        }
+
         // Share the item.
-        share_manager::share($instance, $component, $recipients);
+        share_manager::share($instance, $component, $recipients, $USER->id);
 
         /** @var share_repository $repo */
         $repo = share_entity::repository();

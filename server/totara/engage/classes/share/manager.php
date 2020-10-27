@@ -98,6 +98,8 @@ final class manager {
         // Validate recipients
         foreach ($recipients as $recipient) {
             $recipient->validate();
+            $recipient->validate_against_share_item($instance);
+            $recipient->validate_against_actor($actor_id);
         }
 
         // Get context in which instance is being shared.

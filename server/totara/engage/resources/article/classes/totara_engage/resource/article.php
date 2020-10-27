@@ -447,7 +447,7 @@ final class article extends resource_item implements time_viewable {
      */
     public function can_share(int $userid): bool {
         // Check if user is allowed to share articles.
-        $context = \context_user::instance($userid);
+        $context = $this->get_context();
         if (!has_capability('engage/article:share', $context, $userid)) {
             return false;
         }

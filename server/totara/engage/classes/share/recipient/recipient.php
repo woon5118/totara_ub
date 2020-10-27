@@ -71,9 +71,30 @@ abstract class recipient {
     }
 
     /**
-     * Validate the recipient.
+     * Validate the self recipient. For example, it is to check whether the recipient
+     * as user is still existing in the system or not.
+     *
+     * Note that this is to not checking whether
      */
     abstract public function validate(): void;
+
+    /**
+     * Checking whether the target recipient is able to see the share-able item or not.
+     *
+     * @param shareable $item
+     * @return void
+     */
+    public function validate_against_share_item(shareable $item): void {
+    }
+
+    /**
+     * Checking whether the actor is able to share the content to target recipient or not.
+     *
+     * @param int $actor_id
+     * @return void
+     */
+    public function validate_against_actor(int $actor_id): void {
+    }
 
     /**
      * User space label for this recipient.

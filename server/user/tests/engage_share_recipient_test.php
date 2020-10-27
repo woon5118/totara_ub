@@ -23,16 +23,41 @@
 
 use core_user\totara_engage\share\recipient\user;
 use totara_engage\share\recipient\recipient;
-use totara_engage\share\shareable;
 
 class core_user_engage_share_recipient_testcase extends advanced_testcase {
 
     public function test_search_user() {
+        global $CFG;
         $this->setAdminUser();
+        $admin_id = (int) get_admin()->id;
 
-        $user1 = $this->getDataGenerator()->create_user(['firstname' => 'Bonny', 'lastname' => 'Driver']);
-        $user2 = $this->getDataGenerator()->create_user(['firstname' => 'Adam', 'lastname' => 'Trip']);
-        $user3 = $this->getDataGenerator()->create_user(['firstname' => 'Xavier', 'lastname' => 'Bornham']);
+        $user1 = $this->getDataGenerator()->create_user([
+            'firstname' => 'Bonny',
+            'lastname' => 'Driver',
+            'middlename' => 'user_one',
+            'firstnamephonetic' => 'user_one',
+            'lastnamephonetic' => 'user_one',
+            'alternatename' => 'user_one'
+        ]);
+
+        $user2 = $this->getDataGenerator()->create_user([
+            'firstname' => 'Adam',
+            'lastname' => 'Trip',
+            'middlename' => 'user_two',
+            'firstnamephonetic' => 'user_two',
+            'lastnamephonetic' => 'user_two',
+            'alternatename' => 'user_two'
+        ]);
+
+        $user3 = $this->getDataGenerator()->create_user([
+            'firstname' => 'Xavier',
+            'lastname' => 'Bornham',
+            'middlename' => 'user_three',
+            'firstnamephonetic' => 'user_three',
+            'lastnamephonetic' => 'user_three',
+            'alternatename' => 'user_three'
+        ]);
+
         $user4 = $this->getDataGenerator()->create_user(['firstname' => 'Adele', 'lastname' => 'Wert', 'deleted' => 1]);
         $user5 = $this->getDataGenerator()->create_user(['firstname' => 'Clyde', 'lastname' => 'Vera', 'confirmed' => 0]);
 
@@ -40,36 +65,50 @@ class core_user_engage_share_recipient_testcase extends advanced_testcase {
         $this->assertCount(4, $users);
 
         $recipient_ids = $this->get_recipient_ids($users);
-        $this->assertEquals([$user2->id, get_admin()->id, $user1->id, $user3->id], $recipient_ids);
+        $expected_ids = [
+            $user2->id,
+            $admin_id,
+            $user1->id,
+            $user3->id
+        ];
+
+        sort($expected_ids);
+        $this->assertEquals($expected_ids, $recipient_ids);
 
         // Now search for user fullname
         $users = user::search('Ad', null);
         $this->assertCount(2, $users);
 
         $recipient_ids = $this->get_recipient_ids($users);
-        $this->assertEquals([$user2->id, get_admin()->id], $recipient_ids);
+        $this->assertEquals([$admin_id, $user2->id], $recipient_ids);
 
         // Also case insensitive
         $users = user::search('ad', null);
         $this->assertCount(2, $users);
 
         $recipient_ids = $this->get_recipient_ids($users);
-        $this->assertEquals([$user2->id, get_admin()->id], $recipient_ids);
+        $this->assertEquals([$admin_id, $user2->id], $recipient_ids);
 
-        // Now pass a shareable instance
-        $instance = $this->getMockBuilder(shareable::class)
-            ->getMock();
-
-        // The recipient with the same id should be excluded
-        $instance->expects($this->any())
-            ->method('get_userid')
-            ->willReturn((int) $user2->id);
+        require_once("{$CFG->dirroot}/totara/engage/tests/fixtures/totara_engage_mock_shareable.php");
+        $instance = new totara_engage_mock_shareable(
+            42,
+            context_user::instance($user2->id)->id,
+            $user2->id
+        );
 
         $users = user::search('', $instance);
+        $recipient_ids = $this->get_recipient_ids($users);
+
         $this->assertCount(3, $users);
 
-        $recipient_ids = $this->get_recipient_ids($users);
-        $this->assertEquals([get_admin()->id, $user1->id, $user3->id], $recipient_ids);
+        $expected_ids = [
+            (int) $user1->id,
+            (int) $user3->id,
+            $admin_id
+        ];
+
+        sort($expected_ids);
+        $this->assertEquals($expected_ids, $recipient_ids);
     }
 
     /**
@@ -82,7 +121,7 @@ class core_user_engage_share_recipient_testcase extends advanced_testcase {
             $recipient_ids[] = $user->get_id();
         }
 
+        sort($recipient_ids);
         return $recipient_ids;
     }
-
 }

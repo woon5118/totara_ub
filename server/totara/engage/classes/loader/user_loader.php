@@ -146,6 +146,7 @@ class user_loader {
 
         $builder->where('u.deleted', $query->is_including_deleted());
         $builder->where('u.suspended', $query->is_including_suspended());
+        $builder->where('u.confirmed', $query->is_including_confirmed());
 
         $exclude_users = $query->get_exclude_users();
         $builder->when(

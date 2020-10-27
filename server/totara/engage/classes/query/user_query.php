@@ -46,6 +46,12 @@ class user_query {
     private $include_deleted;
 
     /**
+     * To tell the loader whether we should include the confirmed users.
+     * @var bool
+     */
+    private $include_confirmed;
+
+    /**
      * @var bool
      */
     private $include_suspended;
@@ -75,6 +81,8 @@ class user_query {
 
         $this->include_deleted = false;
         $this->include_suspended = false;
+        $this->include_confirmed = true;
+
         $this->cursor = null;
         $this->tenant_query = $tenant_query;
         $this->exclude_users = [];
@@ -192,6 +200,14 @@ class user_query {
     }
 
     /**
+     * @param bool $value
+     * @return void
+     */
+    public function include_confirmed(bool $value): void {
+        $this->include_confirmed = $value;
+    }
+
+    /**
      * @return bool
      */
     public function is_including_deleted(): bool {
@@ -203,6 +219,13 @@ class user_query {
      */
     public function is_including_suspended(): bool {
         return $this->include_suspended;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_including_confirmed(): bool {
+        return $this->include_confirmed;
     }
 
     /**
