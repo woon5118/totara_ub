@@ -34,6 +34,12 @@ class totara_certification_certification_fixes_testcase extends advanced_testcas
     private $numtestcerts = 7;
     private $numtestprogs = 8;
 
+    public function tearDown(): void {
+        $this->numtestusers = null;
+        $this->numtestcerts = null;
+        $this->numtestprogs = null;
+    }
+
     /**
      * Set up users, programs, certifications and assignments.
      */
@@ -259,5 +265,97 @@ class totara_certification_certification_fixes_testcase extends advanced_testcas
 
         list($fulllist, $aggregatelist, $totalcount) = certif_get_all_completions_with_errors();
         $this->assertCount(0, $fulllist);
+    }
+
+    public function test_certif_fix_completion_copy_from_history() {
+        global $DB;
+
+        $target_problem_key = 'error:stateassigned-progstatusincorrect|error:stateassigned-progtimecompletednotempty';
+
+        $this->numtestprogs = 2;
+        $this->numtestcerts = 2;
+        $this->numtestusers = 2;
+        $data = $this->setup_completions();
+
+        // Set up test and control completion data.
+        foreach ($data->certifications as $certification) {
+            foreach ($data->users as $user) {
+                list($certif_completion, $prog_completion) = certif_load_completion($certification->id, $user->id);
+
+                // Mark the program completion complete, while leaving the certif_completion newly assigned.
+                $prog_completion->status = STATUS_PROGRAM_COMPLETE;
+                $prog_completion->timecompleted = 123;
+                $prog_completion->timedue = 345;
+                certif_write_completion(
+                    $certif_completion,
+                    $prog_completion,
+                    'Test put data into invalid state',
+                    $target_problem_key
+                );
+
+                // Create an unassigned history certif completion which is certified.
+                unset($certif_completion->id);
+                $certif_completion->certifpath = CERTIFPATH_RECERT;
+                $certif_completion->status = CERTIFSTATUS_COMPLETED;
+                $certif_completion->renewalstatus = CERTIFRENEWALSTATUS_NOTDUE;
+                $certif_completion->timecompleted = 123;
+                $certif_completion->timewindowopens = 234;
+                $certif_completion->timeexpires = 345;
+                $certif_completion->baselinetimeexpires = 456;
+                $certif_completion->unassigned = 1;
+                certif_write_completion_history(
+                    $certif_completion,
+                    'Test create history',
+                    'error:invalidunassignedhist'
+                );
+            }
+        }
+
+        $target_user = reset($data->users);
+        $target_cert = reset($data->certifications);
+
+        $before_certif_completions = $DB->get_records('certif_completion', [], 'id');
+        $before_prog_completions = $DB->get_records('prog_completion', [], 'id');
+
+        certif_fix_completions('fixrestorefromhistory', $target_cert->id, $target_user->id);
+
+        // Test that only the expected record was repaired.
+        foreach ($data->certifications as $certification) {
+            foreach ($data->users as $user) {
+                list($certif_completion, $prog_completion) = certif_load_completion($certification->id, $user->id);
+
+                $errors = certif_get_completion_errors($certif_completion, $prog_completion);
+
+                if ($certification->id == $target_cert->id && $user->id == $target_user->id) {
+                    $this->assertEmpty($errors);
+                    $this->assertEquals(CERTIFPATH_RECERT, $certif_completion->certifpath);
+                    $this->assertEquals(CERTIFSTATUS_COMPLETED, $certif_completion->status);
+                    $this->assertEquals(CERTIFRENEWALSTATUS_NOTDUE, $certif_completion->renewalstatus);
+                    $this->assertEquals(123, $certif_completion->timecompleted);
+                    $this->assertEquals(234, $certif_completion->timewindowopens);
+                    $this->assertEquals(345, $certif_completion->timeexpires);
+                    $this->assertEquals(456, $certif_completion->baselinetimeexpires);
+                    $this->assertEquals(STATUS_PROGRAM_COMPLETE, $prog_completion->status);
+                    $this->assertEquals(123, $prog_completion->timecompleted);
+                    $this->assertEquals(345, $prog_completion->timedue);
+                } else {
+                    $problemkey = certif_get_completion_error_problemkey($errors);
+                    $this->assertEquals($target_problem_key, $problemkey);
+                    $this->assertEquals($before_certif_completions[$certif_completion->id], $certif_completion);
+                    $this->assertEquals($before_prog_completions[$prog_completion->id], $prog_completion);
+                }
+            }
+        }
+
+        // Check that only the expected history record was deleted.
+        $certif_completion_histories = $DB->get_records('certif_completion_history', [], 'certifid, userid');
+        $this->assertCount(3, $certif_completion_histories);
+
+        $certif_completion_histories = $DB->get_records(
+            'certif_completion_history',
+            ['certifid' => $target_cert->id, 'userid' => $target_user->id],
+            'certifid, userid'
+        );
+        $this->assertCount(0, $certif_completion_histories);
     }
 }

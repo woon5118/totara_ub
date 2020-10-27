@@ -1,6 +1,10 @@
 This file describes API changes in Totara Certification,
 information provided here is intended for developers.
 
+=== 13.2 ===
+
+* Added optional param $ignoreproblemkey to certif_write_completion_history to make it consistent with certif_write_completion
+
 === 13.0 ===
 
 * Refactored several core program and certification functions. Most program and certification functions are now

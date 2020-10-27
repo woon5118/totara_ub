@@ -2811,10 +2811,15 @@ function certif_get_completion_error_solution($problemkey, $programid = 0, $user
                 html_writer::link($url2, get_string('clicktofixcompletions', 'totara_program'));
             break;
         case 'error:stateassigned-progstatusincorrect|error:stateassigned-progtimecompletednotempty':
-            $url = clone($baseurl);
-            $url->param('fixkey', 'fixprogincomplete');
-            $html = get_string('error:info_fixprogincomplete', 'totara_certification') . '<br>' .
-                html_writer::link($url, get_string('clicktofixcompletions', 'totara_program'));
+            $html = get_string('error:info_fixprogincompletecause', 'totara_certification');
+            $url1 = clone($baseurl);
+            $url1->param('fixkey', 'fixrestorefromhistory');
+            $html .= '<br>' . get_string('error:info_fixprogincompletewithhistory', 'totara_certification') . '<br>' .
+                html_writer::link($url1, get_string('clicktofixcompletions', 'totara_program'));
+            $url2 = clone($baseurl);
+            $url2->param('fixkey', 'fixprogincomplete');
+            $html .= '<br>' . get_string('error:info_fixprogincompletenohistory', 'totara_certification') . '<br>' .
+                html_writer::link($url2, get_string('clicktofixcompletions', 'totara_program'));
             break;
         case 'error:stateexpired-timedueempty':
             $url = clone($baseurl);
@@ -2978,6 +2983,11 @@ function certif_fix_completions($fixkey, $programid = 0, $userid = 0) {
                     $result = certif_fix_completion_prog_status_reset($certcompletion, $progcompletion);
                 }
                 break;
+            case 'fixrestorefromhistory':
+                if ($problemkey == 'error:stateassigned-progstatusincorrect|error:stateassigned-progtimecompletednotempty') {
+                    $result = certif_fix_completion_copy_from_history($certcompletion, $progcompletion);
+                }
+                break;
             case 'fixcert001mismatchexpiry':
                 if ($problemkey == 'error:statewindowopen-progstatusincorrect|error:statewindowopen-progtimecompletednotempty|error:statewindowopen-timeexpirestimeduedifferent') {
                     $result = certif_fix_extension_didnt_update_due_date($certcompletion, $progcompletion);
@@ -3092,7 +3102,7 @@ function certif_fix_unassigned_certif_completions($programid = 0, $userid = 0) {
  * @param stdClass $progcompletion A prog_completion record to be saved, including 'id' if this is an update.
  * @param string $message If provided, will override the default program completion log message.
  * @param mixed $ignoreproblemkey String returned by certif_get_completion_error_problemkey which can be ignored.
- * @return True if the records were successfully created or updated.
+ * @return bool True if the records were successfully created or updated.
  */
 function certif_write_completion($certcompletion, $progcompletion, $message = '', $ignoreproblemkey = false) {
     global $DB;
@@ -3184,9 +3194,10 @@ function certif_write_completion($certcompletion, $progcompletion, $message = ''
  *
  * @param stdClass $certcomplhistory A certif_completion_history record to be saved, including 'id' if this is an update.
  * @param string $message If provided, will override the default program completion log message.
- * @return True if the records were successfully created or updated.
+ * @param mixed $ignoreproblemkey String returned by certif_get_completion_error_problemkey which can be ignored.
+ * @return bool True if the records were successfully created or updated.
  */
-function certif_write_completion_history($certcomplhistory, $message = '') {
+function certif_write_completion_history($certcomplhistory, $message = '', $ignoreproblemkey = false) {
     global $DB;
 
     // Decide if this is an insert or update.
@@ -3226,7 +3237,13 @@ function certif_write_completion_history($certcomplhistory, $message = '') {
     $state = certif_get_completion_state($certcomplhistory);
     $errors = certif_get_completion_errors($certcomplhistory, null);
 
-    if (empty($errors) && $state != CERTIFCOMPLETIONSTATE_INVALID) {
+    if (!empty($errors)) {
+        $problemkey = certif_get_completion_error_problemkey($errors);
+    } else {
+        $problemkey = "noproblems";
+    }
+
+    if (empty($errors) && $state != CERTIFCOMPLETIONSTATE_INVALID || $problemkey === $ignoreproblemkey) {
         if ($isinsert) {
             $newchid = $DB->insert_record('certif_completion_history', $certcomplhistory);
 
@@ -3330,6 +3347,83 @@ function certif_fix_completion_prog_status_reset(&$certcompletion, &$progcomplet
     return 'Automated fix \'certif_fix_completion_prog_status_reset\' was applied<br>' .
         '<ul><li>\'Program status\' was set to \'Program incomplete\'</li>
         <li>\'Program completion date\' was set to ' . prog_format_log_date($progcompletion->timecompleted) . '</li></ul>';
+}
+
+/**
+ * Fixes certification completion records that have not been restored from history.
+ *
+ * In the past, history was not restored correctly. If a site is affected by this problem then they can find
+ * that the program completion record appears complete, but the certif_completion record is newly assigned, and
+ * a history record marked 'unassigned'.
+ *
+ * This fix copys the history data into the current completion and deletes the history record. It does the whole
+ * process, including writing the updated certification completion record, in order to do everything within a
+ * transaction.
+ *
+ * @param stdClass $certcompletion a record from certif_completion to be fixed
+ * @param stdClass $progcompletion a corresponding record from prog_completion to be fixed
+ * @return string message for transaction log
+ */
+function certif_fix_completion_copy_from_history(stdClass $certcompletion, stdClass $progcompletion) {
+    global $DB;
+
+    $history_sql = "SELECT *
+              FROM {certif_completion_history}
+             WHERE certifid = :certifid
+               AND userid = :userid
+               AND certifpath = :recertificationpath
+               AND renewalstatus = :notdueforrenewal
+               AND timecompleted = :progtimecompleted
+               AND timeexpires = :progtimedue
+               AND unassigned = 1
+          ORDER BY timeexpires DESC";
+    $params = [
+        'certifid' => $certcompletion->certifid,
+        'userid' => $certcompletion->userid,
+        'recertificationpath' => CERTIFPATH_RECERT,
+        'notdueforrenewal' => CERTIFRENEWALSTATUS_NOTDUE,
+        'progtimecompleted' => $progcompletion->timecompleted,
+        'progtimedue' => $progcompletion->timedue,
+    ];
+    $histories = $DB->get_records_sql($history_sql, $params); // Just the latest.
+
+    if (count($histories) !== 1) {
+        $message = 'Automated fix \'certif_fix_completion_copy_from_history\' was NOT applied due to ' .
+            'incorrect number of history records - requires exactly one with matching expiry date, ' .
+            '\'Unassigned\' and \'Certified, before window opens\'.';
+        prog_log_completion($progcompletion->programid, $certcompletion->userid, $message);
+        return null;
+    }
+
+    $history = reset($histories);
+
+    $DB->transaction(function () use ($certcompletion, $progcompletion, $history) {
+        $certcompletion->certifpath = $history->certifpath;
+        $certcompletion->status = $history->status;
+        $certcompletion->renewalstatus = $history->renewalstatus;
+        $certcompletion->timecompleted = $history->timecompleted;
+        $certcompletion->timewindowopens = $history->timewindowopens;
+        $certcompletion->timeexpires = $history->timeexpires;
+        $certcompletion->baselinetimeexpires = $history->baselinetimeexpires;
+
+        $message = 'Automated fix \'certif_fix_completion_copy_from_history\' was applied<br><ul>' .
+            '<li>\'Certif certifpath\' was set to \'History certifpath\'</li>' .
+            '<li>\'Certif status\' was set to \'History status\'</li>' .
+            '<li>\'Certif renewalstatus\' was set to \'History renewalstatus\'</li>' .
+            '<li>\'Certif timecompleted \' was set to \'History timecompleted\'</li>' .
+            '<li>\'Certif timewindowopens \' was set to \'History timewindowopens\'</li>' .
+            '<li>\'Certif timeexpires \' was set to \'History timeexpires\'</li>' .
+            '<li>\'Certif baselinetimeexpires \' was set to \'History baselinetimeexpires\'</li>' .
+            '</ul>';
+
+        if (certif_write_completion($certcompletion, $progcompletion, $message)) {
+            $message = 'Automated fix \'certif_fix_completion_copy_from_history\' deleted history record which was restored';
+            certif_delete_completion_history($history->id, $message);
+        }
+    });
+
+    // This fix handles saving itself.
+    return null;
 }
 
 /**
