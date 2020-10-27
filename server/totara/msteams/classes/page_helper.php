@@ -27,11 +27,16 @@ defined('MOODLE_INTERNAL') || die;
 
 use coding_exception;
 use context_system;
+use context_tenant;
+use context_user;
+use core\orm\query\builder;
+use core\orm\query\order;
 use core_plugin_manager;
 use core_user;
 use html_writer;
 use moodle_exception;
 use moodle_url;
+use stdClass;
 use theme_msteams\session;
 use totara_core\advanced_feature;
 use totara_msteams\botfw\mini_output;
@@ -48,7 +53,7 @@ final class page_helper {
      * Generate the html for the config page.
      * This function modifies $USER and $SESSION, and **never returns**.
      *
-     * @throws moodle_exception
+     * @codeCoverageIgnore
      */
     public static function config_page(): void {
         global $PAGE, $USER, $OUTPUT, $DB, $SESSION;
@@ -107,7 +112,7 @@ final class page_helper {
      * This function modifies $USER and $SESSION, and **never returns**.
      *
      * @param string $id
-     * @throws moodle_exception
+     * @codeCoverageIgnore
      */
     public static function tab_page(string $id): void {
         global $USER, $SESSION, $CFG;
@@ -136,6 +141,8 @@ final class page_helper {
 
     /**
      * Redirect to the URL in the configurable tab.
+     *
+     * @codeCoverageIgnore
      */
     public static function custom_tab_page(): void {
         global $USER, $SESSION;
@@ -166,7 +173,7 @@ final class page_helper {
      *
      * @param moodle_url $returnurl
      * @param boolean $debug
-     * @throws moodle_exception
+     * @codeCoverageIgnore
      */
     private static function require_sso_login(moodle_url $returnurl, bool $debug = false): void {
         global $USER, $PAGE, $SESSION;
@@ -299,5 +306,43 @@ final class page_helper {
             }
         }
         force_current_language($lang);
+    }
+
+    /**
+     * Look up the most appropriate block setting for a user.
+     *
+     * @param string $blockname the name of the block
+     * @param stdClass|null $user the user record or null on the current user
+     * @return stdClass|null
+     */
+    public static function find_block_instance(string $blockname, stdClass $user = null): ?stdClass {
+        global $USER;
+        $user = $user ?? $USER;
+
+        /** @var integer[] */
+        $contextids = [];
+
+        $contextids[] = context_user::instance($user->id)->id;
+        if (!empty($user->tenantid)) {
+            $contextids[] = context_tenant::instance($user->tenantid)->id;
+        }
+        $contextids[] = context_system::instance()->id;
+
+        /** @var stdClass|null */
+        $instance = builder::table('block_instances', 'b')
+            ->join(['context', 'c'], 'parentcontextid', 'id')
+            ->where_in('b.parentcontextid', $contextids)
+            ->where('b.blockname', $blockname)
+            // Sort instances in the order of user, tenant and system context.
+            ->order_by('c.contextlevel', order::DIRECTION_DESC)
+            // If both are in the same context, pick the newer one.
+            ->order_by('b.timemodified', order::DIRECTION_DESC)
+            ->select('b.*')
+            ->first();
+        if (empty($instance)) {
+            return null;
+        }
+
+        return $instance;
     }
 }

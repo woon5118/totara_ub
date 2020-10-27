@@ -1,0 +1,8 @@
+This files describes API changes in /totara/msteams,
+information provided here is intended especially for developers.
+
+=== 13.2 ===
+
+* totara_msteams_renderer::render_my_learning() updated to load user's block settings
+* IE11 support has been removed from Microsoft Teams integration as it is no longer supported
+  https://docs.microsoft.com/en-us/microsoftteams/unsupported-browsers

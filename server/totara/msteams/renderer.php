@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 use totara_msteams\check\checkable;
 use totara_msteams\check\status;
 use totara_msteams\output\manifest_download;
+use totara_msteams\page_helper;
 
 /**
  * totara_msteams_renderer class
@@ -175,15 +176,26 @@ class totara_msteams_renderer extends plugin_renderer_base {
         global $CFG, $PAGE;
         require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
         require_once($CFG->dirroot . '/blocks/current_learning/block_current_learning.php');
-        $block = new block_current_learning();
 
-        $block->page = $PAGE;
-        $block->instance = new \stdClass();
-        $block->instance->id = 1; // Add instance id so the get_content call doesn't error.
+        $instance = page_helper::find_block_instance('current_learning');
 
+        $block = block_instance('current_learning', $instance, $PAGE);
+        /** @var block_current_learning $block */
+
+        if (!$instance) {
+            $block->page = $PAGE;
+            $block->instance = new stdClass();
+            $block->instance->id = 0; // Add instance id so the get_content call doesn't error.
+        }
         $content = $block->get_content();
 
+        if ($instance) {
+            // The tile view requires the id attribute.
+            $attrs = ['id' => 'inst' . $instance->id];
+        } else {
+            $attrs = null;
+        }
         // Put the content into two divs to make stylesheets happy.
-        return html_writer::div(html_writer::div($content->text, 'content'), 'block block_current_learning');
+        return html_writer::div(html_writer::div($content->text, 'content'), 'block block_current_learning', $attrs);
     }
 }
