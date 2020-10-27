@@ -35,6 +35,8 @@ use totara_job\job_assignment;
  * created on all levels
  *
  * Test descriptions are defined in https://docs.google.com/spreadsheets/d/1rjnFZtI-ZJZCE8AmJjmiXtmU9S1_uIld_swteRyIKgA/edit#gid=0
+ *
+ * @group totara_competency
  */
 class totara_competency_integration_aggregation extends advanced_testcase {
 

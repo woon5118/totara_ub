@@ -34,6 +34,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the query to get learning plans that a competency is linked to and its rating scale value
+ *
+ * @group totara_competency
  */
 class totara_competency_webapi_resolver_query_competency_plans_testcase extends advanced_testcase {
 

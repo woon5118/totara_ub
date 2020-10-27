@@ -28,6 +28,9 @@ use totara_competency\entities\competency as competency_entity;
 use pathway_criteria_group\criteria_group;
 use totara_criteria\criterion;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_generator_testcase extends \advanced_testcase {
 
     private function setup_data() {

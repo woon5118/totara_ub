@@ -25,6 +25,9 @@ use totara_competency\entities\competency_achievement;
 use totara_competency\migration_helper;
 use totara_core\advanced_feature;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_migrate_achievements_testcase extends advanced_testcase {
 
     public function setUp(): void {

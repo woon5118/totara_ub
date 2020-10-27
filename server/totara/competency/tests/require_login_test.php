@@ -25,6 +25,9 @@ use core\webapi\mutation_resolver;
 use core\webapi\query_resolver;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_require_login_testcase extends advanced_testcase {
 
     use webapi_phpunit_helper;

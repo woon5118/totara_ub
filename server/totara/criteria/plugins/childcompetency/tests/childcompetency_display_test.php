@@ -24,6 +24,9 @@
 use criteria_childcompetency\childcompetency_display;
 use totara_criteria\criterion;
 
+/**
+ * @group totara_competency
+ */
 class criteria_childcompetency_display_testcase extends advanced_testcase {
 
      /**

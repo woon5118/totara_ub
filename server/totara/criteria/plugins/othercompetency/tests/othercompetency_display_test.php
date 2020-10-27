@@ -24,6 +24,9 @@
 use criteria_othercompetency\othercompetency_display;
 use totara_criteria\criterion;
 
+/**
+ * @group totara_competency
+ */
 class criteria_othercompetency_display_testcase extends advanced_testcase {
 
     private function setup_data() {

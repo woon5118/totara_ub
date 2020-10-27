@@ -37,6 +37,8 @@ use totara_criteria\entities\criteria_metadata as metadata_entity;
  * The tests are very similar to the ones defined in items_processor_test.php, but here we don't sink the events.
  * We basically test that by relying on the observers we get the same results as we got when calling the item_processor
  * manually
+ *
+ * @group totara_competency
  */
 class criteria_linkedcourses_linked_courses_observer_testcase extends advanced_testcase {
 

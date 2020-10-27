@@ -23,6 +23,9 @@
 
 use criteria_onactivate\onactivate_display;
 
+/**
+ * @group totara_competency
+ */
 class criteria_onactivate_display_testcase extends advanced_testcase {
 
      /**

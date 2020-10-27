@@ -38,6 +38,8 @@ require_once $CFG->dirroot . '/totara/criteria/tests/competency_achievements_tes
 
 /**
  * Tests the query to fetch data for child competency achievements
+ *
+ * @group totara_competency
  */
 class criteria_childcompetency_webapi_query_achievements_testcase extends totara_criteria_competency_achievements_testcase {
     /**

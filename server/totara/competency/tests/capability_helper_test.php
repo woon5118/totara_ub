@@ -28,6 +28,9 @@ use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_capability_helper_testcase extends advanced_testcase {
 
     public function can_view_and_assign_self_data_provider() {

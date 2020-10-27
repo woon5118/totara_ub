@@ -34,6 +34,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/assignment_actions_testcase.php');
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_user_log_testcase extends totara_competency_assignment_actions_testcase {
 
     public function test_action_name() {

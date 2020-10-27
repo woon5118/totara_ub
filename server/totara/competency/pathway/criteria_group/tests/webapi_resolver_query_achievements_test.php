@@ -34,6 +34,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the query to fetch all criterions within a criteria group
+ *
+ * @group totara_competency
  */
 class pathway_criteria_group_webapi_resolver_query_achievements_testcase extends advanced_testcase {
 

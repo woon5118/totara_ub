@@ -33,6 +33,8 @@ use totara_core\advanced_feature;
  * Class totara_competency_model_scale_testcase
  *
  * @coversDefaultClass \totara_competency\models\scale
+ *
+ * @group totara_competency
  */
 class totara_competency_model_scale_testcase extends advanced_testcase {
 

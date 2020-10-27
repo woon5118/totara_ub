@@ -39,6 +39,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the mutation to create assignments for self or other
+ *
+ * @group totara_competency
  */
 class totara_competency_webapi_resolver_mutation_create_user_assignments_testcase extends advanced_testcase {
 

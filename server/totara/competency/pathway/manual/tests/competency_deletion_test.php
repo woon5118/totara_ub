@@ -29,6 +29,9 @@ use totara_competency\entities\pathway;
 global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
 
+/**
+ * @group totara_competency
+ */
 class pathway_manual_competency_deletion_testcase extends advanced_testcase {
 
     /**

@@ -26,6 +26,9 @@ use totara_competency\aggregation_users_table;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\competency;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_pathway_evaluator_user_source_testcase extends advanced_testcase {
 
     private function setup_data() {

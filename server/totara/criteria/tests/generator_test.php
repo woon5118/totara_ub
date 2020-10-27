@@ -30,6 +30,9 @@ use criteria_othercompetency\othercompetency;
 use totara_competency\linked_courses;
 use totara_criteria\criterion;
 
+/**
+ * @group totara_competency
+ */
 class totara_criteria_generator_testcase extends advanced_testcase {
 
     private function setup_data() {

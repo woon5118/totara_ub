@@ -23,6 +23,9 @@
 
 use totara_criteria\validators\course_item_validator;
 
+/**
+ * @group totara_competency
+ */
 class totara_criteria_course_item_validator_testcase extends advanced_testcase {
 
     /**

@@ -26,6 +26,9 @@ use pathway_criteria_group\criteria_group;
 use totara_competency\hook\competency_configuration_changed;
 use totara_criteria\criterion;
 
+/**
+ * @group totara_competency
+ */
 class criteria_childcompetency_testcase extends advanced_testcase {
 
     private function setup_data() {

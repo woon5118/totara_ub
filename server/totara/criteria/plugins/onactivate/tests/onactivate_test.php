@@ -26,6 +26,9 @@ use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
 use totara_criteria\criterion;
 
+/**
+ * @group totara_competency
+ */
 class criteria_onactivate_testcase extends advanced_testcase {
 
     private function setup_data() {

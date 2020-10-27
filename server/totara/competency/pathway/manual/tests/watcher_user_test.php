@@ -29,6 +29,9 @@ use totara_competency\watcher\core_user;
 use totara_core\hook\manager as hook_manager;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
+/**
+ * @group totara_competency
+ */
 class pathway_manual_watcher_user_testcase extends advanced_testcase {
 
     use webapi_phpunit_helper;

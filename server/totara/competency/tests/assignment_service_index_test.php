@@ -27,6 +27,9 @@ use totara_competency\user_groups;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_assignment_index_service_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;

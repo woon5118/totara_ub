@@ -24,6 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_competency
+ */
 abstract class totara_competency_assignment_actions_testcase extends advanced_testcase {
 
     protected function setUp(): void {

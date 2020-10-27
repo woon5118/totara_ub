@@ -31,6 +31,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the query to fetch all self assignable competencies
+ *
+ * @group totara_competency
  */
 class totara_competency_webapi_resolver_query_user_assignable_competencies_testcase extends advanced_testcase {
 

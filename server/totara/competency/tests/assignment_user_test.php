@@ -29,6 +29,9 @@ use totara_competency\models\assignment_user;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_assignment_user_testcase extends advanced_testcase {
 
     protected function setUp(): void {

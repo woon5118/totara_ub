@@ -36,6 +36,9 @@ use totara_job\job_assignment;
 
 require_once(__DIR__ . '/pathway_manual_base_testcase.php');
 
+/**
+ * @group totara_competency
+ */
 class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase extends pathway_manual_base_testcase {
 
     /**

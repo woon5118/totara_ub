@@ -34,6 +34,8 @@ require_once $CFG->dirroot.'/totara/criteria/tests/course_achievements_testcase.
 
 /**
  * Tests the query to fetch data for a linkedcourse criteria
+ *
+ * @group totara_competency
  */
 class criteria_linkedcourses_webapi_query_achievements_testcase extends totara_criteria_course_achievements_testcase {
 

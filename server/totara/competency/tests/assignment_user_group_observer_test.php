@@ -30,6 +30,8 @@ use totara_job\job_assignment;
 
 /**
  * Tests covering the user group observer making sure the events do the right thing
+ *
+ * @group totara_competency
  */
 class totara_competency_assignment_user_group_observer_testcase extends advanced_testcase {
 

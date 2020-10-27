@@ -34,6 +34,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the query to fetch data for a coursecompletion criteria
+ *
+ * @group totara_competency
  */
 abstract class totara_criteria_course_achievements_testcase extends advanced_testcase {
 

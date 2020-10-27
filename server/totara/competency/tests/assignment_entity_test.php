@@ -26,7 +26,9 @@ use totara_competency\entities\assignment;
 
 defined('MOODLE_INTERNAL') || die();
 
-
+/**
+ * @group totara_competency
+ */
 class totara_competency_assignment_entity_testcase extends advanced_testcase {
 
     public function test_filters() {

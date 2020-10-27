@@ -33,6 +33,9 @@ use totara_criteria\entities\criteria_metadata as metadata_entity;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 
+/**
+ * @group totara_competency
+ */
 class totara_criteria_competency_item_helper_testcase extends advanced_testcase {
 
     public function test_achievement_updated() {

@@ -26,6 +26,9 @@ use totara_criteria\criterion;
 use \totara_webapi\graphql;
 use core\webapi\execution_context;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testcase extends advanced_testcase {
 
     private function setup_data() {

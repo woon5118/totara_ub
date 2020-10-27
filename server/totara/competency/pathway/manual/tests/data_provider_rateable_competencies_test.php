@@ -34,6 +34,9 @@ use totara_competency\user_groups;
 
 require_once(__DIR__ . '/pathway_manual_base_testcase.php');
 
+/**
+ * @group totara_competency
+ */
 class pathway_manual_data_provider_user_rateable_competencies_testcase extends pathway_manual_base_testcase {
 
     protected function setUp(): void {

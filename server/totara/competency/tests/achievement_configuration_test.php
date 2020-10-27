@@ -29,6 +29,9 @@ use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_criteria\criterion;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_achievement_configuration_testcase extends advanced_testcase {
 
     private function setup_data() {

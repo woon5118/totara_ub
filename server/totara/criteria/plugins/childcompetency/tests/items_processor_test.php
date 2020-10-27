@@ -32,6 +32,9 @@ use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criteria_item_record as item_record_entity;
 use totara_criteria\entities\criteria_metadata as metadata_entity;
 
+/**
+ * @group totara_competency
+ */
 class criteria_childcompetency_items_processor_testcase extends advanced_testcase {
 
     private function setup_data() {

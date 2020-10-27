@@ -24,6 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_user_service_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;

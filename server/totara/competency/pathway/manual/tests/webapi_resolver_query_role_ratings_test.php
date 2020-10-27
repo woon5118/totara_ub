@@ -37,6 +37,8 @@ require_once(__DIR__ . '/pathway_manual_base_testcase.php');
 
 /**
  * Tests the query to fetch all roles and their latest ratings for a given user and competency
+ *
+ * @group totara_competency
  */
 class pathway_manual_webapi_resolver_query_role_ratings_testcase extends pathway_manual_base_testcase {
 

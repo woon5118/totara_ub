@@ -24,6 +24,9 @@
 
 use totara_competency\overall_aggregation;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_overall_aggregation_testcase extends advanced_testcase {
 
     public function test_set_pathways_can_be_set_once_with_valid_values() {

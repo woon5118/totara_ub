@@ -38,6 +38,8 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
 
 /**
  * Tests that deleting a competency from the hierarchy deletes all child data.
+ *
+ * @group totara_competency
  */
 class totara_competency_competency_deletion_testcase extends advanced_testcase {
 

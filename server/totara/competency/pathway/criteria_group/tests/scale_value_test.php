@@ -25,6 +25,9 @@ use \totara_criteria\criterion;
 use \pathway_criteria_group\criteria_group;
 use \hierarchy_competency\event\scale_value_deleted;
 
+/**
+ * @group totara_competency
+ */
 class scale_value_test extends \advanced_testcase {
 
     /**

@@ -24,6 +24,9 @@
 use pathway_criteria_group\achievement_detail;
 use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @group totara_competency
+ */
 class pathway_criteria_group_achievement_detail_testcase extends advanced_testcase {
 
     public function test_get_achieved_via_strings_empty() {

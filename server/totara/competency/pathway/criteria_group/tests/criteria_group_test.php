@@ -30,6 +30,9 @@ use totara_competency\entities\competency;
 use totara_competency\entities\scale;
 use totara_criteria\criterion;
 
+/**
+ * @group totara_competency
+ */
 class pathway_criteria_group_testcase extends \advanced_testcase {
 
     private function setup_data() {

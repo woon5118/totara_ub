@@ -31,6 +31,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_continuous_tracking_testcase extends advanced_testcase {
 
     protected function setUp(): void {

@@ -30,6 +30,9 @@ use totara_competency\entities\competency;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
 
+/**
+ * @group totara_competency
+ */
 class pathway_learning_plan_evaluator_testcase extends advanced_testcase {
 
     private function setup_data() {

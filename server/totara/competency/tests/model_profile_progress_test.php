@@ -34,6 +34,9 @@ use totara_competency\models\profile\unassigned_competency_progress;
 
 global $CFG;
 
+/**
+ * @group totara_competency
+ */
 require_once($CFG->dirroot . '/totara/competency/tests/totara_competency_testcase.php');
 
 /**

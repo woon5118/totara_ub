@@ -28,6 +28,8 @@ use core\orm\query\builder;
 
 /**
  * Class notify_users_of_proficiency_change_test
+ *
+ * @group totara_competency
  */
 class totara_competency_notify_users_of_proficiency_change_test extends advanced_testcase {
 

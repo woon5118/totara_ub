@@ -25,6 +25,9 @@ use totara_competency\plugin_types;
 use totara_criteria\criterion;
 use totara_criteria\criterion_factory;
 
+/**
+ * @group totara_competency
+ */
 class totara_criteria_criterion_factory_testcase extends advanced_testcase {
 
     /**

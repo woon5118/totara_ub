@@ -27,6 +27,9 @@ use totara_competency\linked_courses;
 use totara_criteria\criterion;
 use totara_criteria\entities\criterion as criterion_entity;
 
+/**
+ * @group totara_competency
+ */
 class criteria_linkedcourses_testcase extends advanced_testcase {
 
     private function setup_data() {

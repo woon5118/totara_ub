@@ -33,6 +33,9 @@ use totara_criteria\entities\criterion as criterion_entity;
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
 
+/**
+ * @group totara_competency
+ */
 class pathway_criteria_group_external_testcase extends \advanced_testcase {
 
     private function setup_data() {

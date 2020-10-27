@@ -24,6 +24,9 @@
 use pathway_manual\models\roles\manager;
 use totara_criteria\validators\competency_item_validator;
 
+/**
+ * @group totara_competency
+ */
 class totara_criteria_competency_item_validator_testcase extends advanced_testcase {
 
     /**

@@ -48,6 +48,7 @@ use totara_competency\user_groups;
  * Class totara_competency_achievement_aggregator_testcase
  *
  * Tests behaviour of the competency_achievement_aggregator class.
+ * @group totara_competency
  */
 class totara_competency_achievement_aggregator_testcase extends advanced_testcase {
 

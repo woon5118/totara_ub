@@ -40,6 +40,8 @@ use totara_criteria\hook\criteria_validity_changed;
 
 /**
  * Test hooks in this plugin
+ *
+ * @group totara_competency
  */
 class criteria_childcompetency_watchers_testcase extends advanced_testcase {
 

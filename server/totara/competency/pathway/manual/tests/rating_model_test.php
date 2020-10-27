@@ -33,6 +33,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/pathway_manual_base_testcase.php');
 
+/**
+ * @group totara_competency
+ */
 class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase {
 
     public function test_create_with_missing_capability_rating_self() {

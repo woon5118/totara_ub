@@ -31,6 +31,9 @@ use totara_criteria\entities\criterion;
 global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
 
+/**
+ * @group totara_competency
+ */
 class totara_criteria_competency_deletion_testcase extends advanced_testcase {
 
     /**

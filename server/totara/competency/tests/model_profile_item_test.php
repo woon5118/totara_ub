@@ -31,6 +31,9 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/competency/tests/totara_competency_testcase.php');
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_model_profile_item_testcase extends totara_competency_testcase {
 
     use assignment_key;

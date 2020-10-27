@@ -29,6 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once __DIR__.'/expanded_users_testcase.php';
 
+/**
+ * @group totara_competency
+ */
 class core_expanded_users_testcase extends expanded_users_testcase {
 
     /**

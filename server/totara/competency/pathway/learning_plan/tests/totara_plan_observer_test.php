@@ -32,6 +32,9 @@ use totara_competency\expand_task;
 use totara_competency\hook\competency_configuration_changed;
 use totara_core\advanced_feature;
 
+/**
+ * @group totara_competency
+ */
 class pathway_learning_plan_totara_plan_observer_testcase extends advanced_testcase {
 
     public function test_event_for_competency_with_lp_pathway() {

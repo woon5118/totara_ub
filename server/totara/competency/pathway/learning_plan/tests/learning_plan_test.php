@@ -36,6 +36,9 @@ use pathway_learning_plan\learning_plan;
 use totara_competency\entities\competency;
 use totara_core\advanced_feature;
 
+/**
+ * @group totara_competency
+ */
 class pathway_learning_plan_learning_plan_testcase extends advanced_testcase {
 
     /**

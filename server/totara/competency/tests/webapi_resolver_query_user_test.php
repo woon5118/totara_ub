@@ -28,6 +28,9 @@ use totara_core\feature_not_available_exception;
 use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_webapi_resolver_query_user_testcase extends advanced_testcase {
 
     use webapi_phpunit_helper;

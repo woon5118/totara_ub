@@ -42,6 +42,9 @@ use totara_core\advanced_feature;
 use totara_criteria\criterion;
 use totara_criteria\entities\criterion as criterion_entity;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
 
     public static function setUpBeforeClass(): void {

@@ -23,6 +23,9 @@
 
 use totara_competency\controllers\profile\base as base_controller;
 
+/**
+ * @group totara_competency
+ */
 class competency_controllers_profile_base_testcase extends advanced_testcase {
 
     /**

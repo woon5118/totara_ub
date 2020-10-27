@@ -26,6 +26,9 @@ use totara_competency\user_groups;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_assignment_generator_testcase extends advanced_testcase {
 
     /**

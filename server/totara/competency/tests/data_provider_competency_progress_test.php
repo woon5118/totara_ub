@@ -32,6 +32,9 @@ use totara_competency\models\profile\competency_progress as cp;
 
 require_once($CFG->dirroot . '/totara/competency/tests/totara_competency_testcase.php');
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_data_provider_competency_progress_testcase extends totara_competency_testcase {
 
     /**

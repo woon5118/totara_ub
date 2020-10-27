@@ -34,6 +34,9 @@ use totara_competency\settings;
 use totara_competency\task\competency_aggregation_all;
 use totara_job\job_assignment;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_user_unassigned_testcase extends advanced_testcase {
 
     /**

@@ -27,6 +27,8 @@ use totara_criteria\entities\criterion as criterion_entity;
 
 /**
  * Test concrete criterion methods
+ *
+ * @group totara_competency
  */
 class totara_criteria_criterion_testcase extends advanced_testcase {
 

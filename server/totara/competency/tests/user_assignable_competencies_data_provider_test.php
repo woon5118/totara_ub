@@ -38,6 +38,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the data provider
+ *
+ * @group totara_competency
  */
 class totara_competency_user_assignable_competencies_data_provider_testcase extends advanced_testcase {
 

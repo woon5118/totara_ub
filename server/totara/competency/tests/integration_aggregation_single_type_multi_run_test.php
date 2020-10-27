@@ -37,6 +37,8 @@ require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.p
 /**
  * This class contains integration tests with all pathways of the same type with multiple runs
  * Integration test file is split because of the sheer size of the file if all integration tests were to be placed in the same file
+ *
+ * @group totara_competency
  */
 class totara_competency_integration_aggregation_single_type_multi_run_testcase extends totara_competency_integration_aggregation {
 

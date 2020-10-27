@@ -32,6 +32,9 @@ use totara_criteria\entities\criteria_item_record;
 use totara_criteria\entities\criterion;
 use totara_userdata\userdata\target_user;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_userdata_testcase extends advanced_testcase {
 
     /**

@@ -29,6 +29,9 @@ use totara_competency\entities\competency;
 use totara_competency\entities\scale_value;
 use totara_userdata\userdata\target_user;
 
+/**
+ * @group totara_competency
+ */
 class pathway_manual_userdata_testcase extends advanced_testcase {
 
     /**

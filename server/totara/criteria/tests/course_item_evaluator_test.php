@@ -26,6 +26,9 @@ use totara_competency\aggregation_users_table;
 use totara_criteria\evaluators\course_item_evaluator;
 use totara_criteria\evaluators\item_evaluator_user_source;
 
+/**
+ * @group totara_competency
+ */
 class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
     public static function setUpBeforeClass(): void {

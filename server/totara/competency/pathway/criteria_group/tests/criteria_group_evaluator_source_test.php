@@ -31,6 +31,9 @@ use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale;
 use totara_criteria\criterion;
 
+/**
+ * @group totara_competency
+ */
 class pathway_criteria_group_evaluator_source_testcase extends \advanced_testcase {
 
     /**
@@ -82,7 +85,7 @@ class pathway_criteria_group_evaluator_source_testcase extends \advanced_testcas
             'scale_value_id' => null
         ];
         $this->assertEquals($expected, reset($actual_users));
-        
+
         $achievement = pathway_achievement::get_current($pathway, $user->id);
 
         $actual_users = $source->get_users_to_reaggregate($pathway);

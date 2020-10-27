@@ -24,6 +24,9 @@
 
 use totara_competency\entities\pathway_achievement;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_pathway_achievement_testcase extends advanced_testcase {
 
     public function test_get_current_when_none_exist() {

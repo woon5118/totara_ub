@@ -39,6 +39,9 @@ use totara_competency\competency_achievement_aggregator;
 use totara_competency\base_achievement_detail;
 use totara_competency\pathway_evaluator_user_source;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_data_provider_activity_log_testcase extends advanced_testcase {
 
     public function test_with_nothing_to_fetch() {

@@ -24,6 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_crumbtrail_testcase extends advanced_testcase {
 
     /**

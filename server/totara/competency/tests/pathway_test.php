@@ -26,6 +26,9 @@ use totara_competency\entities\scale_value;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_pathway_testcase extends \advanced_testcase {
 
     /**

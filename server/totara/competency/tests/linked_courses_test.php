@@ -26,6 +26,9 @@ use hierarchy_competency\event\evidence_deleted;
 use totara_competency\event\linked_courses_updated;
 use totara_competency\linked_courses;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_linked_courses_testcase extends advanced_testcase {
 
     public function test_get_linked_courses_none() {

@@ -29,6 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the query resolver for competency assignment (singular), this service only returns one assignment by id.
+ *
+ * @group totara_competency
  */
 class totara_competency_webapi_resolver_query_assignment_testcase extends advanced_testcase {
 

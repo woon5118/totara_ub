@@ -33,6 +33,8 @@ use totara_core\advanced_feature;
 
 /**
  * Tests covering the competency scale observer making sure the events do the right thing
+ *
+ * @group totara_competency
  */
 class totara_competency_scale_observer_testcase extends advanced_testcase {
 

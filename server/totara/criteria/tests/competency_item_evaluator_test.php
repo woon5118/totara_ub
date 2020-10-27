@@ -28,6 +28,9 @@ use totara_criteria\criterion;
 use totara_criteria\evaluators\competency_item_evaluator;
 use totara_criteria\evaluators\item_evaluator_user_source;
 
+/**
+ * @group totara_competency
+ */
 class totara_criteria_competency_item_evaluator_testcase extends advanced_testcase {
 
     private function setup_data() {

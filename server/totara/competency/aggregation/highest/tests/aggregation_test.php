@@ -31,6 +31,9 @@ use totara_competency\pathway;
 use totara_competency\pathway_evaluator;
 use totara_competency\pathway_evaluator_user_source;
 
+/**
+ * @group totara_competency
+ */
 class aggregation_highest_aggregation_testcase extends advanced_testcase {
 
     public function test_aggregation_type() {

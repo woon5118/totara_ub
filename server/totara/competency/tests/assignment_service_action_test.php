@@ -26,6 +26,9 @@ use totara_competency\entities;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_assignment_action_service_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;

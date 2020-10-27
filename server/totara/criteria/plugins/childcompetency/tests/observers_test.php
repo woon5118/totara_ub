@@ -38,6 +38,8 @@ use totara_criteria\entities\criterion as criterion_entity;
  * manually
  *
  * We also include tests for all observers here to avoid duplicating of validation functions
+ *
+ * @group totara_competency
  */
 class criteria_childcompetency_observers_testcase extends advanced_testcase {
 

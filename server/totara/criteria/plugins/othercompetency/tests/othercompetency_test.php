@@ -25,6 +25,9 @@ use criteria_othercompetency\othercompetency;
 use pathway_manual\models\roles\manager;
 use totara_competency\hook\competency_configuration_changed;
 
+/**
+ * @group totara_competency
+ */
 class criteria_othercompetency_testcase extends advanced_testcase {
 
     private function setup_data() {

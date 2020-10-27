@@ -26,6 +26,9 @@ use core\webapi\execution_context;
 use totara_competency\entities\scale_value;
 use totara_competency\webapi\resolver\type\scale_value as scale_value_type;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_webapi_resolver_type_scale_value_testcase extends advanced_testcase {
 
     /** @var scale_value $scale_value */

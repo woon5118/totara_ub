@@ -21,7 +21,6 @@
  * @package pathway_manual
  */
 
-
 use pathway_manual\manual;
 use pathway_manual\manual_evaluator_user_source;
 use pathway_manual\models\roles\appraiser;
@@ -33,6 +32,9 @@ use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
 use totara_job\job_assignment;
 
+/**
+ * @group totara_competency
+ */
 class pathway_manual_evaluator_testcase extends advanced_testcase {
 
     private function setup_data() {

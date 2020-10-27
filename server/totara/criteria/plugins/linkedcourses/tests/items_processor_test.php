@@ -31,6 +31,9 @@ use criteria_linkedcourses\linkedcourses;
 use totara_competency\linked_courses;
 use totara_core\advanced_feature;
 
+/**
+ * @group totara_competency
+ */
 class criteria_linkedcourses_items_processor_testcase extends advanced_testcase {
 
     public static function setUpBeforeClass(): void {

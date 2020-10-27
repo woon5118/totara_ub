@@ -31,6 +31,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the query to fetch competency data for the competency overview page
+ *
+ * @group totara_competency
  */
 class totara_competency_webapi_resolver_query_competency_overview_testcase extends advanced_testcase {
 

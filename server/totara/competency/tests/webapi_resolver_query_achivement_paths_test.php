@@ -35,6 +35,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the query to fetch all available achievement paths (grouped by pathway types and in specific order)
+ *
+ * @group totara_competency
  */
 class totara_competency_webapi_resolver_query_achievement_paths_testcase extends advanced_testcase {
 

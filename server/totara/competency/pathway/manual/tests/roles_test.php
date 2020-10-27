@@ -30,6 +30,9 @@ use pathway_manual\models\roles\role_factory;
 use pathway_manual\models\roles\self_role;
 use totara_job\job_assignment;
 
+/**
+ * @group totara_competency
+ */
 class pathway_manual_roles_testcase extends advanced_testcase {
 
     /**

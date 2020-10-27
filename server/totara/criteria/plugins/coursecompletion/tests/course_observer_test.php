@@ -33,6 +33,9 @@ use totara_criteria\entities\criterion_item;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 
+/**
+ * @group totara_competency
+ */
 class criteria_coursecompletion_course_observer_testcase extends advanced_testcase {
 
     const NUM_USERS = 5;

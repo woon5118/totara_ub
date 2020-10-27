@@ -23,6 +23,9 @@
 
 use totara_competency\plugin_types;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_plugin_types_testcase extends \advanced_testcase {
 
     /**

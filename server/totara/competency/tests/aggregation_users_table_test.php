@@ -27,6 +27,9 @@ use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
 use totara_core\advanced_feature;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_aggregation_users_table_testcase extends \advanced_testcase {
 
     private function setup_data() {

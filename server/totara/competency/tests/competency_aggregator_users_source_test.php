@@ -32,6 +32,9 @@ use totara_competency\entities\scale_value;
 use totara_competency\expand_task;
 use totara_competency\linked_courses;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_competency_aggregator_users_source_testcase extends \advanced_testcase {
 
     public function test_get_users_to_reaggregate_perform() {

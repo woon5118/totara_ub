@@ -29,6 +29,9 @@ use totara_competency\entities\course as course_entity;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 
+/**
+ * @group totara_competency
+ */
 class course_item_helper_testcase extends advanced_testcase {
 
     const NUM_USERS = 5;

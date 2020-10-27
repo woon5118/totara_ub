@@ -39,6 +39,8 @@ require_once($CFG->dirroot . '/totara/competency/tests/integration_aggregation.p
 /**
  * This class contains the simple integration test cases
  * Integration test file is split because of the sheer size of the file if all integration tests were to be placed in the same file
+ *
+ * @group totara_competency
  */
 class totara_competency_integration_aggregation_simple_testcase extends totara_competency_integration_aggregation {
 

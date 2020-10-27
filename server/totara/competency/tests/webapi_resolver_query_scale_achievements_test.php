@@ -38,6 +38,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the query to fetch all scales and their items for single value pathways
+ *
+ * @group totara_competency
  */
 class totara_competency_webapi_resolver_query_scale_achievements_testcase extends advanced_testcase {
 

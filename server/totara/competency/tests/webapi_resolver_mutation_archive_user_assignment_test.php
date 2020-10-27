@@ -36,6 +36,8 @@ use \totara_competency\helpers\capability_helper;
 
 /**
  * Class webapi_resolver_mutation_archive_user_assignment_test
+ *
+ * @group totara_competency
  */
 class webapi_resolver_mutation_archive_user_assignment_test extends advanced_testcase {
 

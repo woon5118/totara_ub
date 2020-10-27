@@ -28,6 +28,9 @@ use totara_competency\aggregation_users_table;
 use criteria_coursecompletion\coursecompletion;
 use totara_competency\achievement_configuration;
 
+/**
+ * @group totara_competency
+ */
 class pathway_criteria_group_course_completion_integration_testcase extends advanced_testcase {
 
     public function test_course_completion_leads_to_comp_achievement_via_cron() {

@@ -28,6 +28,9 @@ use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\self_role;
 use totara_competency\pathway;
 
+/**
+ * @group totara_competency
+ */
 class pathway_manual_configuration_testcase extends advanced_testcase {
 
     private function setup_data() {

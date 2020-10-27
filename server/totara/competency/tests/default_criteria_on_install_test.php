@@ -34,6 +34,9 @@ use totara_criteria\criterion;
 use totara_competency\task\default_criteria_on_install;
 use totara_core\advanced_feature;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_default_criteria_on_install_testcase extends advanced_testcase {
 
     /**

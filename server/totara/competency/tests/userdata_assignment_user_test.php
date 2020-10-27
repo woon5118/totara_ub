@@ -33,6 +33,9 @@ use totara_job\job_assignment;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_userdata_assignment_user_testcase extends advanced_testcase {
 
     protected function setUp(): void {

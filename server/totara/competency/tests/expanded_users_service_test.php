@@ -30,6 +30,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once __DIR__.'/expanded_users_testcase.php';
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_expanded_users_service_testcase extends expanded_users_testcase {
 
     use webservice_utils;

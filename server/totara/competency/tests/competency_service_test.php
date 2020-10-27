@@ -30,6 +30,9 @@ use totara_core\basket\session_basket;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_competency_service_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;

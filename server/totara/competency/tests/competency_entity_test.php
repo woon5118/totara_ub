@@ -26,6 +26,9 @@ use totara_competency\entities\competency;
 use totara_competency\entities\competency_framework;
 use totara_competency\entities\scale;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_competency_entity_testcase extends \advanced_testcase {
 
     /**

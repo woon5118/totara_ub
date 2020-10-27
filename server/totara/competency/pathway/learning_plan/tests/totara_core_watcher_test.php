@@ -28,6 +28,9 @@ use totara_core\advanced_feature;
 global $CFG;
 require_once($CFG->dirroot.'/lib/adminlib.php');
 
+/**
+ * @group totara_competency
+ */
 class pathway_learning_plan_totara_core_watcher_testcase extends advanced_testcase {
 
     public function test_learning_plans_enabled() {

@@ -32,6 +32,9 @@ use totara_core\feature_not_available_exception;
 use totara_mvc\admin_controller;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_advanced_feature_disable_testcase extends advanced_testcase {
 
     use webapi_phpunit_helper;

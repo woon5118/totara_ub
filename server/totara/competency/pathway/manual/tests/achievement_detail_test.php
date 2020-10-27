@@ -34,6 +34,9 @@ use totara_userdata\userdata\target_user;
 
 require_once(__DIR__ . '/pathway_manual_base_testcase.php');
 
+/**
+ * @group totara_competency
+ */
 class pathway_manual_achievement_detail_testcase extends pathway_manual_base_testcase {
 
     private $manual;

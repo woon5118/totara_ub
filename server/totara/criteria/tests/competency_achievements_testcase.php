@@ -34,6 +34,8 @@ use totara_criteria\criterion_not_found_exception;
 
 /**
  * Tests the query to fetch data for competency achievements
+ *
+ * @group totara_competency
  */
 abstract class totara_criteria_competency_achievements_testcase extends advanced_testcase {
 

@@ -31,6 +31,9 @@ use totara_competency\expand_task;
 use totara_competency\linked_courses;
 use totara_core\advanced_feature;
 
+/**
+ * @group totara_competency
+ */
 class pathway_criteria_group_aggregation_helper_testcase extends advanced_testcase {
 
     /**

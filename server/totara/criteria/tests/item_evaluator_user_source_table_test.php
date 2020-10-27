@@ -25,6 +25,9 @@ use totara_competency\aggregation_users_table;
 use totara_criteria\criterion;
 use totara_criteria\evaluators\item_evaluator_user_source;
 
+/**
+ * @group totara_competency
+ */
 class totara_criteria_item_evaluator_user_source_testcase extends advanced_testcase {
 
     private $process_key = 'the_process_key';

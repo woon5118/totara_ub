@@ -31,6 +31,9 @@ use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_competency
+ */
 class totara_competency_expand_task_testcase extends advanced_testcase {
 
     /**
