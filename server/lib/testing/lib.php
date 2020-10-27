@@ -264,12 +264,12 @@ function testing_update_composer_dependencies(string $framework = '') {
     exec("{$composercmd} validate -q", $output, $code);
     if ($code == 2) {
         // Most likely requirements changed or dev switched branch.
-        passthru("{$composercmd} update --no-suggest", $code);
+        passthru("{$composercmd} update", $code);
     } else {
-        passthru("{$composercmd} install --no-suggest", $code);
+        passthru("{$composercmd} install", $code);
         if ($code == 2) {
             // Switched php version most likely.
-            passthru("{$composercmd} update --no-suggest", $code);
+            passthru("{$composercmd} update", $code);
         }
     }
     if ($code != 0) {
