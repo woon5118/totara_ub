@@ -47,6 +47,11 @@ def run_modelling_process():
     item_result_count = args.result_count_item
 
     # ------------------------------------------------------
+    # Minimum number of users for whom to run the recommendation engine in a tenant
+    min_users = 10
+    # Minimum number of items for which to run the recommendation engine in a tenant
+    min_items = 10
+    # -------------------------------------------------------
     # Set path for the natural language processing libraries
     nl_libs = os.path.join(os.path.dirname(__file__), 'totara')
     # Get list of the tenants
@@ -68,87 +73,98 @@ def run_modelling_process():
     # -------------------------------------------------------
     # Loop through the list of tenants
     for tenant in tenants:
+        i2i_file_path = os.path.join(data_home, f'i2i_{tenant}.csv')
+        i2u_file_path = os.path.join(data_home, f'i2u_{tenant}.csv')
         # Process the tenant's data from data_home directory and read into the memory
         d_loader = DataLoader(data_home=data_home, nl_libs=nl_libs, query=query, tenant=tenant)
         t1 = time.time()
         processed_data = d_loader.load_data()
         print(f'The data loading/processing took {(time.time() - t1)/60: .2f} minutes.\n')
+        if processed_data['interactions'].shape[0] < min_users or processed_data['interactions'].shape[1] < min_items:
+            print(
+                "The number of users or items is too small to run the recommendation engine."
+                f" Skipping tenant {tenant}."
+            )
 
-        # The item features' matrix being very sparse, does not need significant penalty
-        if query in ['hybrid', 'partial']:
-            item_alpha = 1e-6
+            with open(file=i2i_file_path, mode='w') as f:
+                f.write("target_iid,similar_iid,ranking")
+
+            with open(file=i2u_file_path, mode='w') as f:
+                f.write("uid,iid,ranking")
+
         else:
-            item_alpha = 0.0
-        # --------------------------------------------------
-        # We will optimize the 'epochs' and the latent dimension of the user-item interaction
-        # matrix called the 'no_components'
-        opt_obj = OptimizeHyperparams(
-            interactions=processed_data['interactions'],
-            item_features=processed_data['item_features'],
-            weights=processed_data['weights'],
-            num_threads=num_threads,
-            item_alpha=item_alpha
-        )
-        t2 = time.time()
-        epochs, comps, scores = opt_obj.run_optimization(lr=10)
-        print(scores)
-        print(epochs)
-        print(comps)
-        print(f'The hyper-parameters optimization took {(time.time() - t2) / 60: .2f} minutes to converge.\n')
-        print(
-            f'The best hyper-parameters found:\n   epochs: {epochs[-1]}\n'
-            f'   n_components: {comps[-1]}\nThe best score: {scores[-1]: .3f}\n'
-        )
-        # --------------------------------------------------
-        # Train the final model with the optimum number of 'epochs' and the 'no_components'
-        print('Training final model.\n')
-        model_obj = BuildModel(
-            interactions=processed_data['interactions'],
-            weights=processed_data['weights'],
-            item_features=processed_data['item_features'],
-            num_threads=num_threads,
-            optimized_hparams={
-                'epochs': epochs[-1],
-                'no_components': comps[-1]
-            },
-            item_alpha=item_alpha
-        )
-        final_model = model_obj.build_model()
-        # --------------------------------------------------
-        # Items to item (I2I) recommendations.
-        print('Making I2I recommendations')
-        item_representations = final_model.get_item_representations(features=processed_data['item_features'])[1]
-        similar_items = SimilarItems(
-            mapping=processed_data['mapping'][2],
-            item_representations=item_representations,
-            num_items=item_result_count
-        ).all_items()
-        i2i_file_path = os.path.join(data_home, f'i2i_{tenant}.csv')
-        similar_items.to_csv(
-            path_or_buf=i2i_file_path,
-            sep=',',
-            float_format='%.12f',
-            index=False
-        )
+            # The item features' matrix being very sparse, does not need significant penalty
+            if query in ['hybrid', 'partial']:
+                item_alpha = 1e-6
+            else:
+                item_alpha = 0.0
+            # --------------------------------------------------
+            # We will optimize the 'epochs' and the latent dimension of the user-item interaction
+            # matrix called the 'no_components'
+            opt_obj = OptimizeHyperparams(
+                interactions=processed_data['interactions'],
+                item_features=processed_data['item_features'],
+                weights=processed_data['weights'],
+                num_threads=num_threads,
+                item_alpha=item_alpha
+            )
+            t2 = time.time()
+            epochs, comps, scores = opt_obj.run_optimization(lr=10)
 
-        print('Making I2U recommendations')
-        # -----------------------------------------------------
-        # Items to user (I2U) recommendations.
-        might_like_items = UserToItems(
-            u_mapping=processed_data['mapping'][0],
-            i_mapping=processed_data['mapping'][2],
-            item_features=processed_data['item_features'],
-            model=final_model,
-            num_items=user_result_count,
-            num_threads=num_threads
-        ).all_items()
-        i2u_file_path = os.path.join(data_home, f'i2u_{tenant}.csv')
-        might_like_items.to_csv(
-            path_or_buf=i2u_file_path,
-            sep=',',
-            float_format='%.12f',
-            index=False
-        )
+            print(f'The hyper-parameters optimization took {(time.time() - t2) / 60: .2f} minutes to converge.\n')
+            print(
+                f'The best hyper-parameters found:\n   epochs: {epochs[-1]}\n'
+                f'   n_components: {comps[-1]}\nThe best score: {scores[-1]: .3f}\n'
+            )
+            # --------------------------------------------------
+            # Train the final model with the optimum number of 'epochs' and the 'no_components'
+            print('Training final model.\n')
+            model_obj = BuildModel(
+                interactions=processed_data['interactions'],
+                weights=processed_data['weights'],
+                item_features=processed_data['item_features'],
+                num_threads=num_threads,
+                optimized_hparams={
+                    'epochs': epochs[-1],
+                    'no_components': comps[-1]
+                },
+                item_alpha=item_alpha
+            )
+            final_model = model_obj.build_model()
+            # --------------------------------------------------
+            # Items to item (I2I) recommendations.
+            print('Making I2I recommendations')
+            item_representations = final_model.get_item_representations(features=processed_data['item_features'])[1]
+            similar_items = SimilarItems(
+                mapping=processed_data['mapping'][2],
+                item_representations=item_representations,
+                num_items=item_result_count
+            ).all_items()
+            similar_items.to_csv(
+                path_or_buf=i2i_file_path,
+                sep=',',
+                float_format='%.12f',
+                index=False
+            )
+
+            print('Making I2U recommendations')
+            # -----------------------------------------------------
+            # Items to user (I2U) recommendations.
+            might_like_items = UserToItems(
+                u_mapping=processed_data['mapping'][0],
+                i_mapping=processed_data['mapping'][2],
+                item_features=processed_data['item_features'],
+                model=final_model,
+                num_items=user_result_count,
+                num_threads=num_threads
+            ).all_items()
+
+            might_like_items.to_csv(
+                path_or_buf=i2u_file_path,
+                sep=',',
+                float_format='%.12f',
+                index=False
+            )
     # --------------------------------------------------------
     # Write the process control file 'ml_completed'
     with open(file=os.path.join(data_home, 'ml_completed'), mode='w') as writer:

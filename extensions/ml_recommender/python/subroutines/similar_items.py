@@ -18,6 +18,7 @@ Please contact [licensing@totaralearning.com] for more information.
 
 import numpy as np
 import pandas as pd
+from operator import itemgetter
 
 
 class SimilarItems:
@@ -53,8 +54,8 @@ class SimilarItems:
         item_norms = np.linalg.norm(self.item_representations, axis=1)
         scores /= item_norms
 
-        best = np.argpartition(scores, -(self.num_items + 1))[-(self.num_items + 1):]
-        sorted_best = sorted(zip(best, scores[best] / item_norms[internal_idx]), key=lambda x: -x[1])
+        best = [item[0] for item in sorted(enumerate(scores), key=itemgetter(1), reverse=True)[:self.num_items]]
+        sorted_best = zip(best, scores[best] / item_norms[internal_idx])
 
         sorted_best = [(item[0], item[1]) for item in sorted_best if item[0] != internal_idx]
         return sorted_best
