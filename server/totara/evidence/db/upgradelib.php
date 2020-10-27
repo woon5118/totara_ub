@@ -365,15 +365,12 @@ function totara_evidence_migrate_files($component, $filearea, $itemid, $new_reco
 
     foreach ($file_records as $file_record) {
         $file = $fs->get_file_instance($file_record);
-        $file_content = $file->get_content();
+        $new_file_record = array_merge((array) $file_record, $new_record_data);
+
+        $fs->create_file_from_storedfile($new_file_record, $file);
         if ($delete_old) {
             $file->delete();
         }
-
-        foreach ($new_record_data as $key => $value) {
-            $file_record->$key = $value;
-        }
-        $fs->create_file_from_string($file_record, $file_content);
     }
 
     $file_records->close();
@@ -908,10 +905,21 @@ function totara_evidence_migrate() {
             $this->total_count = $DB->count_records('dp_plan_evidence');
         }
 
-        public function increment(): void {
+        private function initialise(): void {
             if (!isset($this->progress_bar)) {
                 $this->progress_bar = new progress_bar('totara_evidence_upgrade', 500, true);
             }
+        }
+
+        public function show_starting(): void {
+            if ($this->total_count > 0) {
+                $this->initialise();
+                $this->progress_bar->update(0, $this->total_count, get_string('upgrading_evidence_starting', 'totara_evidence'));
+            }
+        }
+
+        public function increment(): void {
+            $this->initialise();
 
             $this->current_count++;
             $this->progress_bar->update($this->current_count, $this->total_count, get_string(
@@ -920,7 +928,25 @@ function totara_evidence_migrate() {
                 ['current' => $this->current_count, 'total' => $this->total_count]
             ));
         }
+
+        public function show_finishing(): void {
+            if ($this->total_count > 0) {
+                $this->progress_bar->update($this->total_count, $this->total_count, get_string(
+                    'upgrading_evidence_finishing', 'totara_evidence', $this->total_count
+                ));
+            }
+        }
+
+        public function show_finished(): void {
+            if ($this->total_count > 0) {
+                $this->progress_bar->update($this->total_count, $this->total_count, get_string(
+                    'upgrading_evidence_finished', 'totara_evidence', $this->total_count
+                ));
+            }
+        }
     };
+
+    $progress_bar->show_starting();
 
     totara_evidence_migrate_move_files_to_temp_area();
 
@@ -928,9 +954,13 @@ function totara_evidence_migrate() {
 
     totara_evidence_migrate_manually_created_evidence($time, $admin_userid, $progress_bar);
 
+    $progress_bar->show_finishing();
+
     totara_evidence_migrate_remove_temporary_files();
 
     totara_evidence_migrate_reports();
+
+    $progress_bar->show_finished();
 
     return true;
 }
