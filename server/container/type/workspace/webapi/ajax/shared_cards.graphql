@@ -1,6 +1,6 @@
 query container_workspace_shared_cards(
-  $workspace_id: param_integer!
-  $area: param_text!
+  $workspace_id: core_id!
+  $area: param_area!
   $access: totara_engage_access
   $type: param_component
   $topic: param_integer
@@ -13,7 +13,7 @@ query container_workspace_shared_cards(
   $include_footnotes: Boolean!
   $footnotes_type: param_text
   $footnotes_item_id: core_id
-  $footnotes_area: param_text
+  $footnotes_area: param_area
   $footnotes_component: param_component
   $source: String
   $cursor: String

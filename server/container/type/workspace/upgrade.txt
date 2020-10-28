@@ -1,6 +1,11 @@
 This files describes API changes in /container/type/workspace/*.
 The information here is intended only for developers.
 
+=== 13.2 ===
+
+--- Update to graphQL ---
+* Changed area variable type from param_text to param_area in graphql schema.
+
 === 13.1 ===
 
 --- Update to database schema ---

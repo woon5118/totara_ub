@@ -1,6 +1,6 @@
 query totara_playlist_resources(
   $playlist_id: param_integer!
-  $area: param_text!
+  $area: param_area!
   $access: totara_engage_access
   $type: param_component
   $topic: param_integer
@@ -10,7 +10,7 @@ query totara_playlist_resources(
   $include_footnotes: Boolean!
   $footnotes_type: param_text
   $footnotes_item_id: core_id
-  $footnotes_area: param_text
+  $footnotes_area: param_area
   $footnotes_component: param_component
   $cursor: String
   $image_preview_mode: String

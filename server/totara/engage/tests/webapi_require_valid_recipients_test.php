@@ -61,7 +61,7 @@ class totara_engage_webapi_middleware_require_valid_recipients_testcase extends 
         $shares_key = 'abc';
         [$context, $next] = $this->create_test_data($expected);
 
-        $single_key_args = [$shares_key => ['instanceid' => $this->data['validuser']->id, 'component' => 'core_user', 'area' => 'USER']];
+        $single_key_args = [$shares_key => ['instanceid' => $this->data['validuser']->id, 'component' => 'core_user', 'area' => 'user']];
         $single_key_payload = payload::create($single_key_args, $context);
 
         // Wrong key here:
@@ -81,7 +81,7 @@ class totara_engage_webapi_middleware_require_valid_recipients_testcase extends 
         $shares_key = 'abc';
         [$context, $next] = $this->create_test_data($expected);
 
-        $single_key_args = [$shares_key => ['instanceid' => $this->data['testuser']->id, 'component' => 'core_user', 'area' => 'USER']];
+        $single_key_args = [$shares_key => ['instanceid' => $this->data['testuser']->id, 'component' => 'core_user', 'area' => 'user']];
         $single_key_payload = payload::create($single_key_args, $context);
 
         $require_valid = new require_valid_recipients($shares_key);
@@ -99,7 +99,7 @@ class totara_engage_webapi_middleware_require_valid_recipients_testcase extends 
         $shares_key = 'abc';
         [$context, $next] = $this->create_test_data($expected);
 
-        $single_key_args = [$shares_key => ['instanceid' => $this->data['validuser']->id, 'component' => 'core_user', 'area' => 'USER']];
+        $single_key_args = [$shares_key => ['instanceid' => $this->data['validuser']->id, 'component' => 'core_user', 'area' => 'user']];
         $single_key_payload = payload::create($single_key_args, $context);
 
         $require_valid = new require_valid_recipients($shares_key);
@@ -117,7 +117,7 @@ class totara_engage_webapi_middleware_require_valid_recipients_testcase extends 
         $shares_key = 'abc';
         [$context, $next] = $this->create_test_data($expected);
 
-        $single_key_args = [$shares_key => ['instanceid' => $this->data['deleteduser']->id, 'component' => 'core_user', 'area' => 'USER']];
+        $single_key_args = [$shares_key => ['instanceid' => $this->data['deleteduser']->id, 'component' => 'core_user', 'area' => 'user']];
         $single_key_payload = payload::create($single_key_args, $context);
 
         $this->expectException(share_exception::class);
@@ -134,7 +134,7 @@ class totara_engage_webapi_middleware_require_valid_recipients_testcase extends 
         $shares_key = 'abc';
         [$context, $next] = $this->create_test_data($expected);
 
-        $single_key_args = [$shares_key => ['instanceid' => $this->data['notuser']->id, 'component' => 'core_user', 'area' => 'USER']];
+        $single_key_args = [$shares_key => ['instanceid' => $this->data['notuser']->id, 'component' => 'core_user', 'area' => 'user']];
         $single_key_payload = payload::create($single_key_args, $context);
 
         $this->expectException(share_exception::class);
@@ -151,7 +151,7 @@ class totara_engage_webapi_middleware_require_valid_recipients_testcase extends 
         $shares_key = 'abc';
         [$context, $next] = $this->create_test_data($expected);
 
-        $single_key_args = [$shares_key => ['instanceid' => $this->data['validworkspace']->id, 'component' => 'container_workspace', 'area' => 'LIBRARY']];
+        $single_key_args = [$shares_key => ['instanceid' => $this->data['validworkspace']->id, 'component' => 'container_workspace', 'area' => 'library']];
         $single_key_payload = payload::create($single_key_args, $context);
 
         $require_valid = new require_valid_recipients($shares_key);
@@ -168,7 +168,7 @@ class totara_engage_webapi_middleware_require_valid_recipients_testcase extends 
         $shares_key = 'abc';
         [$context, $next] = $this->create_test_data($expected);
 
-        $single_key_args = [$shares_key => ['instanceid' => $this->data['invalidworkspace']->id, 'component' => 'container_workspace', 'area' => 'LIBRARY']];
+        $single_key_args = [$shares_key => ['instanceid' => $this->data['invalidworkspace']->id, 'component' => 'container_workspace', 'area' => 'library']];
         $single_key_payload = payload::create($single_key_args, $context);
 
         $this->expectException(share_exception::class);
@@ -185,7 +185,7 @@ class totara_engage_webapi_middleware_require_valid_recipients_testcase extends 
         $shares_key = 'abc';
         [$context, $next] = $this->create_test_data($expected);
 
-        $single_key_args = [$shares_key => ['instanceid' => $this->data['notworkspace']->id, 'component' => 'container_workspace', 'area' => 'LIBRARY']];
+        $single_key_args = [$shares_key => ['instanceid' => $this->data['notworkspace']->id, 'component' => 'container_workspace', 'area' => 'library']];
         $single_key_payload = payload::create($single_key_args, $context);
 
         $this->expectException(\coding_exception::class);
@@ -202,7 +202,7 @@ class totara_engage_webapi_middleware_require_valid_recipients_testcase extends 
         $shares_key = 'abc';
         [$context, $next] = $this->create_test_data($expected);
 
-        $single_key_args = [$shares_key => ['instanceid' => $this->data['course']->id, 'component' => 'container_workspace', 'area' => 'LIBRARY']];
+        $single_key_args = [$shares_key => ['instanceid' => $this->data['course']->id, 'component' => 'container_workspace', 'area' => 'library']];
         $single_key_payload = payload::create($single_key_args, $context);
 
         $this->expectException(coding_exception::class);
@@ -241,7 +241,7 @@ class totara_engage_webapi_middleware_require_valid_recipients_testcase extends 
         // Create a course, which is kind of like a workspace
         $this->data['course'] = $this->getDataGenerator()->create_course();
     }
-    
+
     /**
      * Generates individual test data.
      *

@@ -1,6 +1,6 @@
 query totara_engage_contribution_cards(
   $component: param_component!
-  $area: param_text!
+  $area: param_area!
   $page: param_integer
   $access: totara_engage_access
   $type: param_component
@@ -11,7 +11,7 @@ query totara_engage_contribution_cards(
   $include_footnotes: Boolean!
   $footnotes_type: param_text
   $footnotes_item_id: core_id
-  $footnotes_area: param_text
+  $footnotes_area: param_area
   $footnotes_component: param_component
   $cursor: String
   $source: String

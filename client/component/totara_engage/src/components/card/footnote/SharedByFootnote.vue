@@ -31,7 +31,7 @@
       class="tui-cardSharedByFootnote__deleteButton"
       :aria-label="
         $str(
-          area === 'USER' ? 'removefromsharedwithyou' : 'removefromlibary',
+          area === 'user' ? 'removefromsharedwithyou' : 'removefromlibary',
           'totara_engage'
         )
       "
@@ -116,7 +116,7 @@ export default {
         this.name
       );
 
-      if (this.area !== 'USER') {
+      if (this.area !== 'user') {
         refetchQueries = [
           'container_workspace_contribution_cards',
           'container_workspace_shared_cards',

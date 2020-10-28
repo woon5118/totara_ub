@@ -103,7 +103,7 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
                 'totalrecipients' => 1,
                 'recipients' => [
                     [
-                        'area' => 'USER',
+                        'area' => 'user',
                         'label' => 'Users',
                         'total' => 1
                     ]
@@ -131,7 +131,7 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
                 'totalrecipients' => 2,
                 'recipients' => [
                     [
-                        'area' => 'USER',
+                        'area' => 'user',
                         'label' => 'Users',
                         'total' => 2
                     ]
@@ -157,7 +157,7 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
                 'totalrecipients' => 1,
                 'recipients' => [
                     [
-                        'area' => 'LIBRARY',
+                        'area' => 'library',
                         'label' => 'Workspaces',
                         'total' => 1
                     ]
@@ -186,7 +186,7 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
                 'totalrecipients' => 2,
                 'recipients' => [
                     [
-                        'area' => 'LIBRARY',
+                        'area' => 'library',
                         'label' => 'Workspaces',
                         'total' => 2
                     ]
@@ -218,12 +218,12 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
                 'totalrecipients' => 4,
                 'recipients' => [
                     [
-                        'area' => 'LIBRARY',
+                        'area' => 'library',
                         'label' => 'Workspaces',
                         'total' => 2
                     ],
                     [
-                        'area' => 'USER',
+                        'area' => 'user',
                         'label' => 'Users',
                         'total' => 2
                     ]
@@ -285,12 +285,12 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
                 'totalrecipients' => 4,
                 'recipients' => [
                     [
-                        'area' => 'LIBRARY',
+                        'area' => 'library',
                         'label' => 'Workspaces',
                         'total' => 2
                     ],
                     [
-                        'area' => 'USER',
+                        'area' => 'user',
                         'label' => 'Users',
                         'total' => 2
                     ]
@@ -376,7 +376,7 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
                 'totalrecipients' => 1,
                 'recipients' => [
                     [
-                        'area' => 'USER',
+                        'area' => 'user',
                         'label' => 'Users',
                         'total' => 1
                     ]
@@ -392,7 +392,7 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
                 'totalrecipients' => 1,
                 'recipients' => [
                     [
-                        'area' => 'USER',
+                        'area' => 'user',
                         'label' => 'Users',
                         'total' => 1
                     ]
@@ -428,7 +428,7 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
                 'totalrecipients' => 1,
                 'recipients' => [
                     [
-                        'area' => 'USER',
+                        'area' => 'user',
                         'label' => 'Users',
                         'total' => 1
                     ]

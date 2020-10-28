@@ -48,7 +48,7 @@ describe('totara_engage/components/form/RecipientsSelector.vue', () => {
 
   it('selecting a user works as expected', () => {
     let item = {
-      area: 'USER',
+      area: 'user',
       alreadyshared: false,
       user: {
         card_display: {
@@ -66,7 +66,7 @@ describe('totara_engage/components/form/RecipientsSelector.vue', () => {
 
     // If a user is already selected then they should not be selected again
     let item2 = {
-      area: 'USER',
+      area: 'user',
       alreadyshared: true,
       user: {
         card_display: {
@@ -84,7 +84,7 @@ describe('totara_engage/components/form/RecipientsSelector.vue', () => {
 
     // Test other recipient.
     let item3 = {
-      area: 'OTHER',
+      area: 'other',
       alreadyshared: false,
       other: {
         fullname: 'Other 1',

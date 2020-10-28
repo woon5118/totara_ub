@@ -40,7 +40,7 @@ class user extends recipient {
     /**
      * Area identifying this recipient.
      */
-    public const AREA = 'USER';
+    public const AREA = 'user';
 
     /**
      * @inheritDoc

@@ -1,7 +1,7 @@
 query totara_engage_user_contribution_cards(
   $user_id: core_id!
   $component: param_component!
-  $area: param_text!
+  $area: param_area!
   $page: param_integer
   $access: totara_engage_access
   $type: param_component

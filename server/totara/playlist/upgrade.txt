@@ -1,6 +1,10 @@
 This files describes API changes in /totara/totara_playlist,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* Changed area variable type from param_text to param_area in graphql schema.
+
 === 13.1 ===
 
 * playlist\local\image_processor::test_generate_image() has been removed.

@@ -1904,7 +1904,7 @@ class performance_testing extends App {
                     foreach ($random_resources as $random_resource) {
                         [$resource_id, $context_id, $owner_id] = $random_resource;
                         $share = $this->share_or_new($owner_id, $resource_id, 'engage_article', $context_id);
-                        $bulk[] = $share->add_recipient($workspace_id, 'container_workspace', 'LIBRARY', $owner_id);
+                        $bulk[] = $share->add_recipient($workspace_id, 'container_workspace', 'library', $owner_id);
                         $bulk = $do_bulk($bulk, $done);
                     }
                 }
@@ -1914,7 +1914,7 @@ class performance_testing extends App {
                     foreach ($random_surveys as $random_survey) {
                         [$survey_id, $context_id, $owner_id] = $random_survey;
                         $share = $this->share_or_new($owner_id, $survey_id, 'engage_survey', $context_id);
-                        $bulk[] = $share->add_recipient($workspace_id, 'container_workspace', 'LIBRARY', $owner_id);
+                        $bulk[] = $share->add_recipient($workspace_id, 'container_workspace', 'library', $owner_id);
                         $bulk = $do_bulk($bulk, $done);
                     }
                 }
@@ -1927,7 +1927,7 @@ class performance_testing extends App {
                     foreach ($random_playlists as $random_playlist) {
                         [$playlist_id, $access, $context_id, $owner_id] = $random_playlist;
                         $share = $this->share_or_new($owner_id, $playlist_id, 'totara_playlist', $context_id);
-                        $bulk[] = $share->add_recipient($workspace_id, 'container_workspace', 'LIBRARY', $owner_id);
+                        $bulk[] = $share->add_recipient($workspace_id, 'container_workspace', 'library', $owner_id);
                         $bulk = $do_bulk($bulk, $done);
                     }
                 }
@@ -1975,7 +1975,7 @@ class performance_testing extends App {
                     [$resource_id, $resource_context_id, $owner_id] = $resource;
                     $share = $this->share_or_new($owner_id, $resource_id, 'engage_article', $resource_context_id);
                     foreach ($random_users as $user_id) {
-                        $bulk[] = $share->add_recipient($user_id, 'core_user', 'USER', $owner_id);
+                        $bulk[] = $share->add_recipient($user_id, 'core_user', 'user', $owner_id);
                         $bulk = $do_bulk($bulk, $done);
                     }
                 }
@@ -1987,7 +1987,7 @@ class performance_testing extends App {
                     [$survey_id, $resource_context_id, $owner_id] = $survey;
                     $share = $this->share_or_new($owner_id, $survey_id, 'engage_survey', $resource_context_id);
                     foreach ($random_users as $user_id) {
-                        $bulk[] = $share->add_recipient($user_id, 'core_user', 'USER', $owner_id);
+                        $bulk[] = $share->add_recipient($user_id, 'core_user', 'user', $owner_id);
                         $bulk = $do_bulk($bulk, $done);
                     }
                 }
@@ -1998,7 +1998,7 @@ class performance_testing extends App {
                 foreach ($this->playlists as $playlist) {
                     $share = $this->share_or_new($playlist[3], $playlist[0], 'totara_playlist', $playlist[2]);
                     foreach ($random_users as $user_id) {
-                        $bulk[] = $share->add_recipient($user_id, 'core_user', 'USER', $playlist[3]);
+                        $bulk[] = $share->add_recipient($user_id, 'core_user', 'user', $playlist[3]);
                         $bulk = $do_bulk($bulk, $done);
                     }
                 }

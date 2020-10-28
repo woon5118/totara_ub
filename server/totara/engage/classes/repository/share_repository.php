@@ -151,7 +151,7 @@ final class share_repository extends repository {
                 function ($recipient) {
                     global $DB;
 
-                    if ('core_user' !== $recipient['component'] && $recipient['area'] !== 'USER') {
+                    if ('core_user' !== $recipient['component'] && $recipient['area'] !== 'user') {
                         return true;
                     }
 

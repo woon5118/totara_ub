@@ -172,7 +172,7 @@ export default {
 
         // Filter the null value users
         tmp_recipients = tmp_recipients.filter(recipient => {
-          if (recipient.area === 'USER') {
+          if (recipient.area === 'user') {
             return recipient.user.card_display.display_fields.some(
               field => field.value != null
             );
@@ -339,8 +339,8 @@ export default {
           return recipient.summary;
       }
 
-      // User specific. equal to recipient.area === 'USER' && type === 'fullname'
-      if (recipient.area === 'USER') {
+      // User specific. equal to recipient.area === 'user' && type === 'fullname'
+      if (recipient.area === 'user') {
         const displayField =
           recipient.user.card_display.display_fields.find(
             field => field.label === 'Full name'

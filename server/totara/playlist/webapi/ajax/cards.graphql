@@ -5,7 +5,7 @@ query totara_playlist_cards(
   $include_footnotes: Boolean!
   $footnotes_type: param_text
   $footnotes_item_id: core_id
-  $footnotes_area: param_text
+  $footnotes_area: param_area
   $footnotes_component: param_component
 ) {
   contribution: totara_playlist_cards(

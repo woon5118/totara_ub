@@ -93,7 +93,7 @@ export default {
         component: 'container_workspace',
         access: this.accessStatus,
         autoShareRecipient: true,
-        area: 'LIBRARY',
+        area: 'library',
         name: this.workspace.name,
         showModal: true,
       };

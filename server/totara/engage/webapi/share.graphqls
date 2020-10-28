@@ -44,7 +44,7 @@ input totara_engage_share_item {
 input totara_engage_recipient_in {
   instanceid: param_integer!
   component: param_component!
-  area: param_alpha!
+  area: param_area!
 }
 
 extend type Query {

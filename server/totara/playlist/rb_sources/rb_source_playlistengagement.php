@@ -210,7 +210,7 @@ class rb_source_playlistengagement extends rb_base_source {
         );
 
         if (advanced_feature::is_enabled('container_workspace')) {
-            $area = 'LIBRARY';
+            $area = 'library';
             $component = 'container_workspace';
             $columnoptions[] = new rb_column_option(
                 'playlistengagement',

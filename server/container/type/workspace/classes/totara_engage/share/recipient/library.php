@@ -40,7 +40,7 @@ class library extends recipient {
     /**
      * Area identifying this recipient.
      */
-    public const AREA = 'LIBRARY';
+    public const AREA = 'library';
 
     /**
      * @inheritDoc
@@ -54,6 +54,7 @@ class library extends recipient {
             throw new \coding_exception("Invalid workspace with ID {$this->instanceid}");
         }
 
+        /** @var workspace $workspace */
         $workspace = factory::from_id($this->instanceid);
         $type = workspace::get_type();
         if (!$workspace->is_typeof($type)) {

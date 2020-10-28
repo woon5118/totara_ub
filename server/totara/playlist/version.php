@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2020100101;          // The current module version (Date: YYYYMMDDXX).
+$plugin->version = 2020100102;          // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2017111309;         // Requires this Totara version.
 $plugin->component = 'totara_playlist';
 

@@ -16,7 +16,7 @@ Feature: Unshare resource
       | username | firstname | lastname | email             |
       | user1    | User      | One      | user1@example.com |
       | user2    | User      | Two      | user2@example.com |
-      | user3    | User      | Three      | user3@example.com |
+      | user3    | User      | Three    | user3@example.com |
 
     And the following "articles" exist in "engage_article" plugin:
       | name           | username | content       | format       | access | topics  |
@@ -29,17 +29,20 @@ Feature: Unshare resource
 
   Scenario: I unlink article from share with me page
     Given I log in as "user2"
-    And I click on "Your Library" in the totara menu
+
+    When I view article "Test Article 1"
+    And I click on "Reshare resource" "button"
+    Then I should see "Shared with 2 people and 0 workspace(s)" in the ".tui-engageSharedBoardForm__label" "css_element"
+
+    When I click on "Your Library" in the totara menu
     And I click on "Shared with you" "link"
     Then I should see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
+
     When I click on "Remove from Shared with you" "button"
     Then I should not see "Test Article 1" in the ".tui-contributionBaseContent__cards" "css_element"
-    And I log out
-    And I log in as "user3"
-    And I click on "Your Library" in the totara menu
-    And I click on "Shared with you" "link"
-    And I click on "Test Article 1" "link"
-    When I click on "Reshare resource" "button"
+
+    When I view article "Test Article 1"
+    And I click on "Reshare resource" "button"
     Then I should see "Shared with 1 people and 0 workspace(s)" in the ".tui-engageSharedBoardForm__label" "css_element"
 
   Scenario: I still can visit bookmarked resource even if unlinking the resource

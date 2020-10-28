@@ -98,7 +98,7 @@ type totara_engage_card {
   footnotes(
     type: param_text
     item_id: core_id
-    area: param_text
+    area: param_area
     component: param_component
   ): [totara_engage_footnote!]
   url(source: String, search: param_text): String
@@ -148,7 +148,7 @@ input totara_engage_filter {
 input totara_engage_footnotes {
   type: param_text
   item_id: core_id
-  area: param_text
+  area: param_area
   component: param_component
 }
 
@@ -156,12 +156,12 @@ extend type Query {
   totara_engage_filter_options(
     filtertype: totara_engage_filter_type!
     component: param_component
-    area: param_text
+    area: param_area
   ): totara_engage_filter_option_map!
 
   totara_engage_contributions(
     component: param_component!
-    area: param_text!
+    area: param_area!
     filter: totara_engage_filter!
     footnotes: totara_engage_footnotes
     cursor: String
@@ -174,7 +174,7 @@ extend type Query {
   totara_engage_user_contributions(
     user_id: core_id!
     component: param_component!
-    area: param_text!
+    area: param_area!
     filter: totara_engage_filter!
     footnotes: totara_engage_footnotes
     cursor: String

@@ -17,11 +17,11 @@ extend type Query {
     """
     ID of the workspace.
     """
-    workspace_id: param_integer!
+    workspace_id: core_id!
     """
     Area within workspace.
     """
-    area: param_text!
+    area: param_area!
     """
     Options to filter the shared cards.
     """

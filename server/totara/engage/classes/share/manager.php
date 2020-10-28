@@ -107,7 +107,7 @@ final class manager {
         $shares = self::create($instance->get_id(), $instance->get_userid(), $component, $recipients, $context->id);
 
         foreach ($shares as $share) {
-            if ($share->get_recipient_component() === 'core_user' && $share->get_recipient_area() === 'USER') {
+            if ($share->get_recipient_component() === 'core_user' && $share->get_recipient_area() === 'user') {
                 $task = new share_notify_task();
                 $task->set_component('totara_engage');
                 $task->set_custom_data(

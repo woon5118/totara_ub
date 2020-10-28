@@ -7,7 +7,7 @@ query container_workspace_check_share_access_for_library(
     workspace: {
       instanceid: $workspace_id
       component: "container_workspace"
-      area: "LIBRARY"
+      area: "library"
     }
   ) {
     __typename

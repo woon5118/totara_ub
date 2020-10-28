@@ -182,7 +182,7 @@ export default {
             recipient: {
               instanceid: this.workspaceId,
               component: 'container_workspace',
-              area: 'LIBRARY',
+              area: 'library',
             },
           },
         });

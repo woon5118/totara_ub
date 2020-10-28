@@ -391,7 +391,7 @@ class ml_recommender_interaction_testcase extends advanced_testcase {
         $recipient = [
             'instanceid' => (int) $user3->id,
             'component' => 'core_user',
-            'area' => 'USER',
+            'area' => 'user',
         ];
 
         foreach ([$article, $playlist, $survey, $article2, $playlist2, $survey2] as $i => $component) {
