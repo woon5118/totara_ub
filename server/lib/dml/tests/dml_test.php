@@ -4160,27 +4160,27 @@ class core_dml_testcase extends database_driver_testcase {
         // We're not testing ROUND(nn.5, 0) because it can be rounded up or down, depending on the system.
         // See IEEE 754 "Round to nearest, ties to even" for details.
         $sql = "SELECT " . $DB->sql_round(12.511, 0) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("13", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(13, $DB->get_field_sql($sql), 0.0001);
         $sql = "SELECT " . $DB->sql_round(12.499, 0) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("12", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(12, $DB->get_field_sql($sql), 0.0001);
         $sql = "SELECT " . $DB->sql_round(11.511, 0) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("12", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(12, $DB->get_field_sql($sql), 0.0001);
         $sql = "SELECT " . $DB->sql_round(11.499, 0) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("11", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(11, $DB->get_field_sql($sql), 0.0001);
         $sql = "SELECT " . $DB->sql_round(11.511, 2) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("11.51", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(11.51, $DB->get_field_sql($sql), 0.0001);
         $sql = "SELECT " . $DB->sql_round(11.499, 2) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("11.50", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(11.5, $DB->get_field_sql($sql), 0.0001);
         $sql = "SELECT " . $DB->sql_round(11.500, 2) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("11.50", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(11.5, $DB->get_field_sql($sql), 0.0001);
         $sql = "SELECT " . $DB->sql_round(666.666) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("667", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(667, $DB->get_field_sql($sql), 0.0001);
         $sql = "SELECT " . $DB->sql_round(666.666, -2) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("700", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(700, $DB->get_field_sql($sql), 0.0001);
         $sql = "SELECT " . $DB->sql_round(666.666, -3) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("1000", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(1000, $DB->get_field_sql($sql), 0.0001);
         $sql = "SELECT " . $DB->sql_round(666.666, -4) . " AS res " . $DB->sql_null_from_clause();
-        $this->assertEquals("0", $DB->get_field_sql($sql));
+        $this->assertEqualsWithDelta(0, $DB->get_field_sql($sql), 0.0001);
     }
 
     public function test_cast_char2int() {
