@@ -153,13 +153,13 @@ if (empty($action)) { // Not displaying PDF
 
     if ($certificate->delivery == 0) {
         // Open in browser.
-        send_file($filecontents, $filename, 0, 0, true, false, 'application/pdf');
+        send_file($filecontents, $filename, 0, 0, true, false, 'application/pdf', false, ['allowpdfembedding' => true]);
     } elseif ($certificate->delivery == 1) {
         // Force download.
         send_file($filecontents, $filename, 0, 0, true, true, 'application/pdf');
     } elseif ($certificate->delivery == 2) {
         certificate_email_student($course, $certificate, $certrecord, $context, $filecontents, $filename);
         // Open in browser after sending email.
-        send_file($filecontents, $filename, 0, 0, true, false, 'application/pdf');
+        send_file($filecontents, $filename, 0, 0, true, false, 'application/pdf', false, ['allowpdfembedding' => true]);
     }
 }
