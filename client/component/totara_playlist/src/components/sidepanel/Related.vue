@@ -86,6 +86,13 @@ export default {
           },
         })
         .then(({ data }) => {
+          if (data.playlists.length <= 0) {
+            return;
+          }
+
+          // Trigger to show related tab on sidepanel only when there are items.
+          this.$emit('show-related');
+
           this.playlists = data.playlists.map(item => {
             const { bookmarked, extra, name, instanceid, user, url } = item;
             const { image, rating, resources } = JSON.parse(extra);

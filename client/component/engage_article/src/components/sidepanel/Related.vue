@@ -84,6 +84,13 @@ export default {
           },
         })
         .then(({ data }) => {
+          if (data.articles.length <= 0) {
+            return;
+          }
+
+          // Trigger to show related tab on sidepanel only when there are items.
+          this.$emit('show-related');
+
           this.articles = data.articles.map(item => {
             const {
               bookmarked,

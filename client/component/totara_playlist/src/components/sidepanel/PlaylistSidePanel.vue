@@ -112,11 +112,15 @@
         class="tui-playlistSidePanel__commentBox"
       />
     </template>
-    <template v-if="featureRecommenders" v-slot:related>
+    <template
+      v-if="featureRecommenders"
+      v-slot:related="{ triggerShowRelated }"
+    >
       <Related
         component="totara_playlist"
         area="related"
         :playlist-id="playlist.id"
+        @show-related="triggerShowRelated()"
       />
     </template>
   </EngageSidePanel>

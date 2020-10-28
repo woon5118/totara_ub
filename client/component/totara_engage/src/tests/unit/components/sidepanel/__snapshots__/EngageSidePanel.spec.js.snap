@@ -27,7 +27,13 @@ exports[`totara_engage/components/sidepanel/EngageSidePanel.vue Checks snapshot 
       name="comments-totara_engage"
     />
      
-    <!---->
+    <tab-stub
+      alwaysrender="true"
+      class="tui-engageSidePanel__related"
+      hidden="true"
+      id="related"
+      name="related-totara_engage"
+    />
   </tabs-stub>
 </div>
 `;

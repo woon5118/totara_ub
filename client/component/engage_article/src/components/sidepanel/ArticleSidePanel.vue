@@ -104,11 +104,15 @@
       />
     </template>
 
-    <template v-if="featureRecommenders" v-slot:related>
+    <template
+      v-if="featureRecommenders"
+      v-slot:related="{ triggerShowRelated }"
+    >
       <Related
         component="engage_article"
         area="related"
         :resource-id="resourceId"
+        @show-related="triggerShowRelated()"
       />
     </template>
   </EngageSidePanel>

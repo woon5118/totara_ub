@@ -35,7 +35,7 @@
             'tui-tabs__tab--active': tab.active,
             'tui-tabs__tab--disabled': tab.disabled,
             'tui-tabs__tab--small': smallTabs,
-            'tui-tabs__tab--hidden': overflowing && !measuring,
+            'tui-tabs__tab--hidden': tab.hidden || (overflowing && !measuring),
           }"
           role="presentation"
         >

@@ -38,6 +38,7 @@ export default {
     },
     disabled: Boolean,
     active: Boolean,
+    hidden: Boolean,
     name: {
       type: String,
       required: true,

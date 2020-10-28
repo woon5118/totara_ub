@@ -44,12 +44,13 @@
       </Tab>
 
       <Tab
-        v-if="$slots.related"
         id="related"
+        :always-render="true"
+        :hidden="!showRelated"
         class="tui-engageSidePanel__related"
         :name="$str('related', 'totara_engage')"
       >
-        <slot name="related" />
+        <slot name="related" :triggerShowRelated="() => (showRelated = true)" />
       </Tab>
     </Tabs>
   </div>
@@ -68,6 +69,7 @@ export default {
   data() {
     return {
       selectedTab: 'overview',
+      showRelated: false,
     };
   },
 };
