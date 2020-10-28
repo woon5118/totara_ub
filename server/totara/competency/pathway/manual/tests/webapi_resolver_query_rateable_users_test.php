@@ -23,6 +23,7 @@
 
 use core\orm\query\builder;
 use core\webapi\execution_context;
+use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;
 use pathway_manual\webapi\resolver\query\rateable_users;
 use pathway_manual\webapi\resolver\type\rateable_user;
@@ -43,18 +44,25 @@ class pathway_manual_webapi_resolver_query_rateable_users_testcase extends pathw
     private $manager_user;
 
     /**
+     * @var stdClass
+     */
+    private $appraiser_user;
+
+    /**
      * Assign user to competency.
      */
     protected function setUp(): void {
         parent::setUp();
 
         $this->manager_user = $this->getDataGenerator()->create_user();
+        $this->appraiser_user = $this->getDataGenerator()->create_user();
 
         // The order that users are returned in is in order of their name, so set it here to be consistent.
         $this->user1->set_attribute('firstname', 'A')->save();
         $this->user2->set_attribute('firstname', 'B')->save();
 
         $this->generator->create_manual($this->competency1, [manager::class]);
+        $this->generator->create_manual($this->competency1, [appraiser::class]);
 
         $this->generator->assignment_generator()->create_assignment([
             'user_group_type' => user_groups::USER,
@@ -72,6 +80,7 @@ class pathway_manual_webapi_resolver_query_rateable_users_testcase extends pathw
     protected function tearDown(): void {
         parent::tearDown();
         $this->manager_user = null;
+        $this->appraiser_user = null;
     }
 
     /**
@@ -85,6 +94,19 @@ class pathway_manual_webapi_resolver_query_rateable_users_testcase extends pathw
         $manager_ja = job_assignment::create_default($this->manager_user->id);
         job_assignment::create(['userid' => $this->user1->id, 'managerjaid' => $manager_ja->id, 'idnumber' => 1]);
         job_assignment::create(['userid' => $this->user2->id, 'managerjaid' => $manager_ja->id, 'idnumber' => 2]);
+    }
+
+    /**
+     * Create appraiser job assignments
+     *
+     * @return array
+     * @throws coding_exception
+     */
+    private function create_appraiser_job_assignments() {
+        $appraiser_ja1 = job_assignment::create_default($this->user1->id, ['appraiserid' => $this->appraiser_user->id]);
+        $appraiser_ja2 = job_assignment::create_default($this->user2->id, ['appraiserid' => $this->appraiser_user->id]);
+
+        return [$appraiser_ja1, $appraiser_ja2];
     }
 
     /**
@@ -108,7 +130,22 @@ class pathway_manual_webapi_resolver_query_rateable_users_testcase extends pathw
         $this->assertEmpty($no_users);
     }
 
-    // TODO TO BE RESOLVED IN TL-28284: Test that Appraisers can execute the query with correct permissions handling in TL-23002
+    public function test_appraiser_can_resolve() {
+        $this->setUser($this->appraiser_user);
+
+        [$appraiser_ja1, $appraiser_ja2] = $this->create_appraiser_job_assignments();
+        $users_can_view = rateable_users::resolve(['role' => appraiser::class], $this->execution_context());
+
+        $this->assertCount(2, $users_can_view);
+
+        job_assignment::delete($appraiser_ja1);
+        job_assignment::delete($appraiser_ja2);
+
+        $no_users = rateable_users::resolve(['role' => appraiser::class], $this->execution_context());
+
+        // We no longer have the capability to rate the users, so they shouldn't show up.
+        $this->assertEmpty($no_users);
+    }
 
     /**
      * Sanity check to make sure the count can be resolved.
