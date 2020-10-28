@@ -184,6 +184,43 @@ class core_message_externallib_testcase extends externallib_advanced_testcase {
     }
 
     /**
+     * Basic verification that filtering contactable users is in place when calling 'create_contacts'.
+     * More elaborate test of filtering is done in core_message_api_testcase::test_filter_to_contactable_users().
+     */
+    public function test_create_contacts_filters_forbidden_contacts() {
+        global $DB;
+
+        $generator = self::getDataGenerator();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $tenant1 = $tenant_generator->create_tenant();
+        $tenant2 = $tenant_generator->create_tenant();
+
+        $user11 = $generator->create_user(['tenantid' => $tenant1->id]);
+        $user12 = $generator->create_user(['tenantid' => $tenant1->id]);
+
+        $user21 = $generator->create_user(['tenantid' => $tenant2->id]);
+
+        $this->setUser($user11);
+
+        self::assertEquals(0, $DB->count_records('message_contacts', ['userid' => $user11->id]));
+
+        // Try to add two contacts: one from own tenant (allowed), one from other tenant (forbidden).
+        $return = core_message_external::create_contacts([$user12->id, $user21->id]);
+        $return = external_api::clean_returnvalue(core_message_external::create_contacts_returns(), $return);
+        $this->assertCount(1, $return);
+        $return = array_pop($return);
+        $this->assertEquals($return['warningcode'], 'contactnotcreated');
+        $this->assertEquals($return['itemid'], $user21->id);
+
+        self::assertEquals(1, $DB->count_records('message_contacts', ['userid' => $user11->id]));
+        self::assertEquals(1, $DB->count_records('message_contacts', ['userid' => $user11->id, 'contactid' => $user12->id]));
+    }
+
+    /**
      * Test delete_contacts.
      */
     public function test_delete_contacts() {

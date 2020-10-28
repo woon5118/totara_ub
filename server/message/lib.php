@@ -436,6 +436,8 @@ function message_format_message_text($message, $forcetexttohtml = false) {
 /**
  * Add the selected user as a contact for the current user
  *
+ * This does not check any rules about adding contacts (e.g. cross-tenancy). Those must be considered before calling this.
+ *
  * @param int $contactid the ID of the user to add as a contact
  * @param int $blocked 1 if you wish to block the contact
  * @param int $userid the user ID of the user we want to add the contact for, defaults to current user if not specified.

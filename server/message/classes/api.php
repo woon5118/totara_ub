@@ -169,45 +169,12 @@ class api {
 
         require_once($CFG->dirroot . '/lib/coursecatlib.php');
 
-        // Used to search for contacts.
-        $fullname = $DB->sql_fullname();
         $ufields = \user_picture::fields('u', array('lastaccess'));
-
-        // Users not to include.
-        $excludeusers = array($userid, $CFG->siteguest);
-        list($exclude, $excludeparams) = $DB->get_in_or_equal($excludeusers, SQL_PARAMS_NAMED, 'param', false);
-
-        // Totara: enforce tenant restrictions.
-        $usercontext = \context_user::instance($userid);
-        $tenantjoin = "";
-        $tenantvisible = "";
-        if ($CFG->tenantsenabled) {
-            if ($usercontext->tenantid) {
-                $tenant = \core\record\tenant::fetch($usercontext->tenantid);
-                $tenantjoin = 'JOIN "ttr_cohort_members" tcm ON tcm.userid = u.id AND tcm.cohortid = ' . $tenant->cohortid;
-            } else {
-                if (!empty($CFG->tenantsisolated)) {
-                    $tenantvisible = 'AND u.tenantid IS NULL';
-                }
-            }
-        }
 
         // Ok, let's search for contacts first.
         $contacts = array();
-        $sql = "SELECT $ufields, mc.blocked
-                  FROM {user} u
-                  JOIN {message_contacts} mc
-                    ON u.id = mc.contactid
-           $tenantjoin
-                 WHERE mc.userid = :userid
-                   $tenantvisible
-                   AND u.deleted = 0
-                   AND u.confirmed = 1
-                   AND " . $DB->sql_like($fullname, ':search', false) . "
-                   AND u.id $exclude
-              ORDER BY " . $DB->sql_fullname();
-        if ($users = $DB->get_records_sql($sql, array('userid' => $userid, 'search' => '%' . $search . '%') + $excludeparams,
-            0, $limitnum)) {
+        [$sql, $params] = self::get_contacts_sql((int)$userid, $ufields, $search);
+        if ($users = $DB->get_records_sql($sql, $params, 0, $limitnum)) {
             foreach ($users as $user) {
                 $contacts[] = helper::create_contact($user);
             }
@@ -230,30 +197,156 @@ class api {
             }
         }
 
-        // Let's get those non-contacts. Toast them gears boi.
+        // Let's get those non-contacts.
         // Note - you can only block contacts, so these users will not be blocked, so no need to get that
         // extra detail from the database.
         $noncontacts = array();
-        $sql = "SELECT $ufields
-                  FROM {user} u
-           $tenantjoin
-                 WHERE u.deleted = 0
-                   $tenantvisible
-                   AND u.confirmed = 1
-                   AND " . $DB->sql_like($fullname, ':search', false) . "
-                   AND u.id $exclude
-                   AND u.id NOT IN (SELECT contactid
-                                      FROM {message_contacts}
-                                     WHERE userid = :userid)
-              ORDER BY " . $DB->sql_fullname();
-        if ($users = $DB->get_records_sql($sql,  array('userid' => $userid, 'search' => '%' . $search . '%') + $excludeparams,
-            0, $limitnum)) {
+        [$sql, $params] = self::get_noncontacts_sql((int)$userid, $ufields, $search);
+        if ($users = $DB->get_records_sql($sql, $params, 0, $limitnum)) {
             foreach ($users as $user) {
                 $noncontacts[] = helper::create_contact($user);
             }
         }
 
         return array($contacts, $courses, $noncontacts);
+    }
+
+    /**
+     * Narrow the given array of user_ids down to those that the user is allowed to contact, meaning only those that
+     * would also appear in the contact search.
+     *
+     * @param int $for_user_id
+     * @param array $contact_user_ids
+     * @return array
+     */
+    public static function filter_to_contactable_users(int $for_user_id, array $contact_user_ids): array {
+        global $DB;
+
+        if (count($contact_user_ids) === 0) {
+            return [];
+        }
+
+        [$sql, $params] = self::get_contacts_sql($for_user_id, 'u.id', '', $contact_user_ids);
+        $users = $DB->get_records_sql($sql, $params);
+        $get_ids = static function (\stdClass $user) { return $user->id; };
+        $contact_ids = array_map($get_ids, $users);
+
+        [$sql, $params] = self::get_noncontacts_sql($for_user_id, 'u.id', '', $contact_user_ids);
+        $users = $DB->get_records_sql($sql, $params);
+        $noncontact_ids = array_map($get_ids, $users);
+
+        return array_merge($contact_ids, $noncontact_ids);
+    }
+
+    /**
+     * Get sql for fetching contacts that are visible to the given user.
+     *
+     * @param int $user_id
+     * @param string $fields
+     * @param string $search
+     * @param array $only_user_ids
+     * @return array
+     */
+    private static function get_contacts_sql(int $user_id, string $fields, string $search, array $only_user_ids = []): array {
+        return self::build_contacts_sql($user_id, $fields, $search, $only_user_ids, true);
+    }
+
+    /**
+     * Get sql for fetching non-contacts that are visible to the given user.
+     *
+     * @param int $user_id
+     * @param string $fields
+     * @param string $search
+     * @param array $only_user_ids
+     * @return array
+     */
+    private static function get_noncontacts_sql(int $user_id, string $fields, string $search, array $only_user_ids = []): array {
+        return self::build_contacts_sql($user_id, $fields, $search, $only_user_ids, false);
+    }
+
+    /**
+     * Build sql for fetching either contacts or non-contacts.
+     *
+     * @param int $user_id
+     * @param string $fields
+     * @param string $search
+     * @param bool $build_for_contacts Build for contacts when true, otherwise for non-contacts.
+     * @param array $include_user_ids Only these user_ids may be included in the result. Empty array means no restriction.
+     * @return array
+     */
+    private static function build_contacts_sql(
+        int $user_id,
+        string $fields,
+        string $search,
+        array $include_user_ids = [],
+        bool $build_for_contacts = true
+    ): array {
+        global $DB, $CFG;
+
+        // Tenant restrictions.
+        $user_context = \context_user::instance($user_id);
+        $tenant_join = "";
+        $tenant_visible = "";
+        if ($CFG->tenantsenabled) {
+            if ($user_context->tenantid) {
+                $tenant = \core\record\tenant::fetch($user_context->tenantid);
+                $tenant_join = 'JOIN "ttr_cohort_members" tcm ON tcm.userid = u.id AND tcm.cohortid = ' . $tenant->cohortid;
+            } else {
+                if (!empty($CFG->tenantsisolated)) {
+                    $tenant_visible = 'AND u.tenantid IS NULL';
+                }
+            }
+        }
+
+        // Exclude self and siteguest.
+        [$exclude_sql, $exclude_params] = $DB->get_in_or_equal([$user_id, $CFG->siteguest], SQL_PARAMS_NAMED, 'param', false);
+        $exclude_sql = 'AND u.id ' . $exclude_sql;
+
+        // Restrict to list of user_ids when given.
+        $include_sql = '';
+        $include_params = [];
+        if (count($include_user_ids) > 0) {
+            [$include_sql, $include_params] = $DB->get_in_or_equal($include_user_ids, SQL_PARAMS_NAMED, 'param', true);
+            $include_sql = 'AND u.id ' . $include_sql;
+        }
+
+        // Add search filter when given.
+        $full_name = $DB->sql_fullname();
+        $search_sql = empty($search) ? '' : "AND " . $DB->sql_like($full_name, ':search', false);
+        $search_param = empty($search_sql) ? [] : ['search' => '%' . $search . '%'];
+
+        // Build query.
+        $common_sql = "
+                 $tenant_join
+                 WHERE u.deleted = 0
+                   AND u.confirmed = 1
+                   $tenant_visible
+                   $search_sql
+                   $exclude_sql
+                   $include_sql
+        ";
+        if ($build_for_contacts) {
+            $sql = "
+                SELECT $fields, mc.blocked
+                  FROM {user} u
+                  JOIN {message_contacts} mc
+                    ON u.id = mc.contactid
+                   $common_sql
+                   AND mc.userid = :userid
+              ORDER BY " . $full_name;
+        } else {
+            $sql = "
+                SELECT $fields
+                  FROM {user} u
+                  $common_sql
+                  AND u.id NOT IN (SELECT contactid
+                                     FROM {message_contacts}
+                                    WHERE userid = :userid)
+              ORDER BY " . $full_name;
+        }
+        $params = ['userid' => $user_id] + $search_param + $exclude_params + $include_params;
+
+        return [$sql, $params];
     }
 
     /**

@@ -247,9 +247,12 @@ class core_message_external extends external_api {
         $params = array('userids' => $userids, 'userid' => $userid);
         $params = self::validate_parameters(self::create_contacts_parameters(), $params);
 
+        // Remove users that can't be added as contacts.
+        $filtered_userids = \core_message\api::filter_to_contactable_users($userid, $userids);
+
         $warnings = array();
         foreach ($params['userids'] as $id) {
-            if (!message_add_contact($id, 0, $userid)) {
+            if (!in_array($id, $filtered_userids, false) || !message_add_contact($id, 0, $userid)) {
                 $warnings[] = array(
                     'item' => 'user',
                     'itemid' => $id,

@@ -287,8 +287,9 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $this->assertEquals($user5->id, $noncontacts[0]->userid);
     }
 
-    public function test_search_users_with_multi_tenancy() {
-        $generator = $this->getDataGenerator();
+    private function create_multi_tenancy_contacts() {
+        $generator = self::getDataGenerator();
+        $data = new stdClass();
 
         /** @var totara_tenant_generator $tenant_generator */
         $tenant_generator = $generator->get_plugin_generator('totara_tenant');
@@ -297,86 +298,93 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         $tenant1 = $tenant_generator->create_tenant();
         $tenant2 = $tenant_generator->create_tenant();
 
-        $tenant_category1 = builder::table('course_categories')->find_or_fail($tenant1->categoryid);
-        $tenant_category2 = builder::table('course_categories')->find_or_fail($tenant2->categoryid);
+        $data->tenant_category1 = builder::table('course_categories')->find_or_fail($tenant1->categoryid);
+        $data->tenant_category2 = builder::table('course_categories')->find_or_fail($tenant2->categoryid);
 
-        $sytemusers1 = $generator->create_user();
-        $sytemusers2 = $generator->create_user();
+        $data->systemusers1 = $generator->create_user();
+        $data->systemusers2 = $generator->create_user();
 
         // Make this user a participant
-        util::add_other_participant($tenant1->id, $sytemusers2->id);
+        util::add_other_participant($tenant1->id, $data->systemusers2->id);
 
-        $user11 = $generator->create_user(['tenantid' => $tenant1->id]);
-        $user12 = $generator->create_user(['tenantid' => $tenant1->id]);
-        $user13 = $generator->create_user(['tenantid' => $tenant1->id]);
-        $user14 = $generator->create_user(['tenantid' => $tenant1->id]);
+        $data->user11 = $generator->create_user(['tenantid' => $tenant1->id]);
+        $data->user12 = $generator->create_user(['tenantid' => $tenant1->id]);
+        $data->user13 = $generator->create_user(['tenantid' => $tenant1->id]);
+        $data->user14 = $generator->create_user(['tenantid' => $tenant1->id]);
 
-        $user21 = $generator->create_user(['tenantid' => $tenant2->id]);
-        $user22 = $generator->create_user(['tenantid' => $tenant2->id]);
-        $user23 = $generator->create_user(['tenantid' => $tenant2->id]);
+        $data->user21 = $generator->create_user(['tenantid' => $tenant2->id]);
+        $data->user22 = $generator->create_user(['tenantid' => $tenant2->id]);
+        $data->user23 = $generator->create_user(['tenantid' => $tenant2->id]);
 
-        $course11 = $generator->create_course(['category' => $tenant_category1->id]);
-        $course12 = $generator->create_course(['category' => $tenant_category1->id]);
-        $course13 = $generator->create_course(['category' => $tenant_category1->id]);
+        $data->course11 = $generator->create_course(['category' => $data->tenant_category1->id]);
+        $data->course12 = $generator->create_course(['category' => $data->tenant_category1->id]);
+        $data->course13 = $generator->create_course(['category' => $data->tenant_category1->id]);
 
-        $course21 = $generator->create_course(['category' => $tenant_category2->id]);
-        $course22 = $generator->create_course(['category' => $tenant_category2->id]);
-        $course23 = $generator->create_course(['category' => $tenant_category2->id]);
+        $data->course21 = $generator->create_course(['category' => $data->tenant_category2->id]);
+        $data->course22 = $generator->create_course(['category' => $data->tenant_category2->id]);
+        $data->course23 = $generator->create_course(['category' => $data->tenant_category2->id]);
 
         // Add some users as contacts.
-        message_add_contact($user12->id, 0, $user11->id);
-        message_add_contact($user13->id, 0, $user11->id);
+        message_add_contact($data->user12->id, 0, $data->user11->id);
+        message_add_contact($data->user13->id, 0, $data->user11->id);
         // Now this is a special case where a user from another tenant is a contact.
         // This is an edge case which could occur when a user got moved from one tenant to another.
-        // At the moment we would still exclude the user.
-        message_add_contact($user22->id, 0, $user11->id);
+        // At the moment we would still exclude the user from search results.
+        message_add_contact($data->user22->id, 0, $data->user11->id);
 
+        return $data;
+    }
+
+    public function test_search_users_with_multi_tenancy() {
+        $generator = self::getDataGenerator();
+        $data = $this->create_multi_tenancy_contacts();
+        
         $role = builder::table('role')->where('shortname', 'student')->one();
-        $generator->enrol_user($user11->id, $course11->id, $role->id);
-        $generator->enrol_user($user11->id, $course12->id, $role->id);
-        $generator->enrol_user($user11->id, $course13->id, $role->id);
+        $generator->enrol_user($data->user11->id, $data->course11->id, $role->id);
+        $generator->enrol_user($data->user11->id, $data->course12->id, $role->id);
+        $generator->enrol_user($data->user11->id, $data->course13->id, $role->id);
         // Now this is a special case where a user is enrolled in a course from another tenant.
         // This is an edge case which could occur when a user got moved from one tenant to another.
         // At the moment we would still exclude the course.
-        $generator->enrol_user($user11->id, $course21->id, $role->id);
+        $generator->enrol_user($data->user11->id, $data->course21->id, $role->id);
 
         // Set as the user performing the search.
-        $this->setUser($user11);
+        $this->setUser($data->user11);
 
         // Perform a search.
-        [$contacts, $courses, $noncontacts] = \core_message\api::search_users($user11->id, '');
+        [$contacts, $data->courses, $noncontacts] = \core_message\api::search_users($data->user11->id, '');
 
         $this->assertCount(2, $contacts);
-        $this->assertEqualsCanonicalizing([$user12->id, $user13->id], array_column($contacts, 'userid'));
+        $this->assertEqualsCanonicalizing([$data->user12->id, $data->user13->id], array_column($contacts, 'userid'));
 
         $this->assertCount(2, $noncontacts);
-        $this->assertEqualsCanonicalizing([$user14->id, $sytemusers2->id], array_column($noncontacts, 'userid'));
+        $this->assertEqualsCanonicalizing([$data->user14->id, $data->systemusers2->id], array_column($noncontacts, 'userid'));
 
-        $this->assertCount(3, $courses);
-        $this->assertEqualsCanonicalizing([$course11->id, $course12->id, $course13->id], array_column($courses, 'id'));
+        $this->assertCount(3, $data->courses);
+        $this->assertEqualsCanonicalizing([$data->course11->id, $data->course12->id, $data->course13->id], array_column($data->courses, 'id'));
 
         // Set as the user performing the search.
-        $this->setUser($sytemusers1);
+        $this->setUser($data->systemusers1);
 
         // Perform a search.
-        [$contacts, $courses, $noncontacts] = \core_message\api::search_users($sytemusers1->id, '');
+        [$contacts, $data->courses, $noncontacts] = \core_message\api::search_users($data->systemusers1->id, '');
 
         // This user has no contacts or is enrolled in any courses
         $this->assertCount(0, $contacts);
-        $this->assertCount(0, $courses);
+        $this->assertCount(0, $data->courses);
 
         $this->assertCount(9, $noncontacts);
         $this->assertEqualsCanonicalizing(
             [
                 get_admin()->id,
-                $sytemusers2->id,
-                $user11->id,
-                $user12->id,
-                $user13->id,
-                $user14->id,
-                $user21->id,
-                $user22->id,
-                $user23->id,
+                $data->systemusers2->id,
+                $data->user11->id,
+                $data->user12->id,
+                $data->user13->id,
+                $data->user14->id,
+                $data->user21->id,
+                $data->user22->id,
+                $data->user23->id,
             ],
             array_column($noncontacts, 'userid')
         );
@@ -385,20 +393,78 @@ class core_message_api_testcase extends core_message_messagelib_testcase {
         set_config('tenantsisolated', 1);
 
         // Perform a search.
-        [$contacts, $courses, $noncontacts] = \core_message\api::search_users($sytemusers1->id, '');
+        [$contacts, $data->courses, $noncontacts] = \core_message\api::search_users($data->systemusers1->id, '');
 
         // This user has no contacts or is enrolled in any courses
         $this->assertCount(0, $contacts);
-        $this->assertCount(0, $courses);
+        $this->assertCount(0, $data->courses);
 
         $this->assertCount(2, $noncontacts);
         $this->assertEqualsCanonicalizing(
             [
                 get_admin()->id,
-                $sytemusers2->id,
+                $data->systemusers2->id,
             ],
             array_column($noncontacts, 'userid')
         );
+    }
+
+    public function test_filter_to_contactable_users() {
+        $data = $this->create_multi_tenancy_contacts();
+
+        $contactable = \core_message\api::filter_to_contactable_users($data->user11->id, [$data->user12->id]);
+        $this->assertEquals([$data->user12->id], $contactable);
+
+        $contactable = \core_message\api::filter_to_contactable_users($data->user11->id, [-1, $data->user12->id]);
+        $this->assertEquals([$data->user12->id], $contactable);
+
+        $contactable = \core_message\api::filter_to_contactable_users($data->user11->id, [-1]);
+        $this->assertEquals([], $contactable);
+
+        $contactable = \core_message\api::filter_to_contactable_users($data->user11->id, []);
+        $this->assertEquals([], $contactable);
+
+        $all_user_ids = [
+            get_admin()->id,
+            $data->systemusers1->id,
+            $data->systemusers2->id,
+            $data->user11->id,
+            $data->user12->id,
+            $data->user13->id,
+            $data->user14->id,
+            $data->user21->id,
+            $data->user22->id,
+            $data->user23->id,
+        ];
+
+        $contactable = \core_message\api::filter_to_contactable_users($data->user11->id, $all_user_ids);
+        $this->assertEqualsCanonicalizing([
+            $data->user12->id,
+            $data->user13->id,
+            $data->user14->id,
+            $data->systemusers2->id,
+        ], $contactable);
+
+        $contactable = \core_message\api::filter_to_contactable_users($data->systemusers1->id, $all_user_ids);
+        $this->assertEqualsCanonicalizing([
+            get_admin()->id,
+            $data->systemusers2->id,
+            $data->user11->id,
+            $data->user12->id,
+            $data->user13->id,
+            $data->user14->id,
+            $data->user21->id,
+            $data->user22->id,
+            $data->user23->id,
+        ], $contactable);
+
+        // Now with isolation on
+        set_config('tenantsisolated', 1);
+        $contactable = \core_message\api::filter_to_contactable_users($data->systemusers1->id, $all_user_ids);
+        $this->assertEqualsCanonicalizing([
+            get_admin()->id,
+            $data->systemusers2->id,
+        ], $contactable);
     }
 
     /**
