@@ -189,4 +189,66 @@ class engage_article_create_reaction_testcase extends advanced_testcase {
             $user1->id
         );
     }
+
+    /**
+     * @return void
+     */
+    public function test_create_reaction_for_private_resource(): void {
+        $gen = $this->getDataGenerator();
+        $user_one = $gen->create_user();
+
+        /** @var engage_article_generator $articlegen */
+        $articlegen = $gen->get_plugin_generator('engage_article');
+        $article = $articlegen->create_article(['userid' => $user_one->id]);
+
+        $instance_id = $article->get_id();
+        $area = $article::REACTION_AREA;
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Cannot create the reaction for instance '{$instance_id}' within area '{$area}'");
+        reaction_helper::create_reaction(
+            $instance_id,
+            $article::get_resource_type(),
+            $area,
+            $user_one->id
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_reaction_for_restricted_and_public_resource(): void {
+        $gen = $this->getDataGenerator();
+        $user_one = $gen->create_user();
+
+        /** @var engage_article_generator $articlegen */
+        $articlegen = $gen->get_plugin_generator('engage_article');
+        $article = $articlegen->create_article(['userid' => $user_one->id, 'access' => access::RESTRICTED]);
+
+        $reaction = reaction_helper::create_reaction(
+            $article->get_id(),
+            $article::get_resource_type(),
+            $article::REACTION_AREA,
+            $user_one->id
+        );
+
+        self::assertNotEmpty($reaction);
+        self::assertEquals($reaction->get_instanceid(), $article->get_id());
+        self::assertEquals($reaction->get_component(), $article::get_resource_type());
+        self::assertEquals($reaction->get_area(), $article::REACTION_AREA);
+        self::assertEquals($reaction->get_userid(), $user_one->id);
+
+        $article = $articlegen->create_article(['userid' => $user_one->id, 'access' => access::PUBLIC]);
+        $reaction = reaction_helper::create_reaction(
+            $article->get_id(),
+            $article::get_resource_type(),
+            $article::REACTION_AREA,
+            $user_one->id
+        );
+
+        self::assertNotEmpty($reaction);
+        self::assertEquals($reaction->get_instanceid(), $article->get_id());
+        self::assertEquals($reaction->get_component(), $article::get_resource_type());
+        self::assertEquals($reaction->get_area(), $article::REACTION_AREA);
+        self::assertEquals($reaction->get_userid(), $user_one->id);
+    }
 }

@@ -29,8 +29,10 @@ use totara_engage\answer\answer_type;
 use totara_reaction\reaction_helper;
 use totara_reaction\resolver\resolver_factory;
 use totara_webapi\graphql;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class engage_survey_create_reaction_testcase extends advanced_testcase {
+    use webapi_phpunit_helper;
 
     /**
      * @return void
@@ -190,6 +192,140 @@ class engage_survey_create_reaction_testcase extends advanced_testcase {
             'meeeedddia',
             $user1->id
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_reaction_for_private_survey(): void {
+        $gen = $this->getDataGenerator();
+        $user_one = $gen->create_user();
+
+        /** @var engage_survey_generator $surveygen */
+        $surveygen = $gen->get_plugin_generator('engage_survey');
+        $this->setUser($user_one);
+        $survey = $surveygen->create_survey();
+
+        $instance_id = $survey->get_id();
+        $area = $survey::REACTION_AREA;
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Cannot create the reaction for instance '{$instance_id}' within area '{$area}'");
+        reaction_helper::create_reaction(
+            $instance_id,
+            $survey::get_resource_type(),
+            $area,
+            $user_one->id
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_reaction_for_private_survey_via_graphql(): void {
+        $gen = $this->getDataGenerator();
+        $user_one = $gen->create_user();
+
+        /** @var engage_survey_generator $surveygen */
+        $surveygen = $gen->get_plugin_generator('engage_survey');
+        $this->setUser($user_one);
+        $survey = $surveygen->create_survey();
+
+        $instance_id = $survey->get_id();
+        $area = $survey::REACTION_AREA;
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Cannot create the reaction for instance '{$instance_id}' within area '{$area}'");
+        $this->resolve_graphql_mutation(
+            'totara_reaction_create',
+            [
+                'component' => $survey->get_resourcetype(),
+                'instanceid' => $survey->get_id(),
+                'area' => 'media'
+            ]
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_reaction_for_restricted_and_public_survey(): void {
+        $gen = $this->getDataGenerator();
+        $user_one = $gen->create_user();
+
+        /** @var engage_survey_generator $surveygen */
+        $surveygen = $gen->get_plugin_generator('engage_survey');
+        $this->setUser($user_one);
+        $survey = $surveygen->create_restricted_survey();
+
+        $reaction = reaction_helper::create_reaction(
+            $survey->get_id(),
+            $survey::get_resource_type(),
+            $survey::REACTION_AREA,
+            $user_one->id
+        );
+
+        self::assertNotEmpty($reaction);
+        self::assertEquals($reaction->get_instanceid(), $survey->get_id());
+        self::assertEquals($reaction->get_component(), $survey::get_resource_type());
+        self::assertEquals($reaction->get_area(), $survey::REACTION_AREA);
+        self::assertEquals($reaction->get_userid(), $user_one->id);
+
+        $survey = $surveygen->create_public_survey();
+        $reaction = reaction_helper::create_reaction(
+            $survey->get_id(),
+            $survey::get_resource_type(),
+            $survey::REACTION_AREA,
+            $user_one->id
+        );
+
+        self::assertNotEmpty($reaction);
+        self::assertEquals($reaction->get_instanceid(), $survey->get_id());
+        self::assertEquals($reaction->get_component(), $survey::get_resource_type());
+        self::assertEquals($reaction->get_area(), $survey::REACTION_AREA);
+        self::assertEquals($reaction->get_userid(), $user_one->id);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_create_reaction_for_restricted_and_public_survey_via_graphql(): void {
+        $gen = $this->getDataGenerator();
+        $user_one = $gen->create_user();
+
+        /** @var engage_survey_generator $surveygen */
+        $surveygen = $gen->get_plugin_generator('engage_survey');
+        $this->setUser($user_one);
+        $survey = $surveygen->create_restricted_survey();
+
+        $reaction = $this->resolve_graphql_mutation(
+            'totara_reaction_create',
+            [
+                'component' => $survey->get_resourcetype(),
+                'instanceid' => $survey->get_id(),
+                'area' => 'media'
+            ]
+        );
+
+        self::assertNotEmpty($reaction);
+        self::assertEquals($reaction->get_instanceid(), $survey->get_id());
+        self::assertEquals($reaction->get_component(), $survey::get_resource_type());
+        self::assertEquals($reaction->get_area(), $survey::REACTION_AREA);
+        self::assertEquals($reaction->get_userid(), $user_one->id);
+
+        $survey = $surveygen->create_public_survey();
+        $reaction = $this->resolve_graphql_mutation(
+            'totara_reaction_create',
+            [
+                'component' => $survey->get_resourcetype(),
+                'instanceid' => $survey->get_id(),
+                'area' => 'media'
+            ]
+        );
+
+        self::assertNotEmpty($reaction);
+        self::assertEquals($reaction->get_instanceid(), $survey->get_id());
+        self::assertEquals($reaction->get_component(), $survey::get_resource_type());
+        self::assertEquals($reaction->get_area(), $survey::REACTION_AREA);
+        self::assertEquals($reaction->get_userid(), $user_one->id);
     }
 
 }

@@ -46,6 +46,10 @@ final class survey_reaction_resolver extends base_resolver {
         }
 
         $survey = survey::from_resource_id($resourceid);
+
+        if ($survey->is_private()) {
+            return false;
+        }
         return access_manager::can_access($survey, $userid);
     }
 

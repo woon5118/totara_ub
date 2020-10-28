@@ -23,7 +23,6 @@
       :instance-id="instanceId"
       :component="componentName"
       :button-aria-label="likeButtonAriaLabel"
-      :disabled="owned"
       :liked="liked"
       area="media"
       @created-like="$emit('update-like-status', true)"

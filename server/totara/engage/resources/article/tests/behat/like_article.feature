@@ -14,23 +14,66 @@ Feature: Like article
       | user2    | User      | Two      | user2@example.com |
 
     And the following "articles" exist in "engage_article" plugin:
-      | name           | username | content       | format       | access | topics  |
-      | Test Article 1 | user1    | Test Aticle 1 | FORMAT_PLAIN | PUBLIC | Topic 1 |
+      | name           | username | content       | format       | access     | topics  |
+      | Test Article 1 | user1    | Test Aticle 1 | FORMAT_PLAIN | PUBLIC     | Topic 1 |
+      | Test Article 2 | user1    | Test Aticle 2 | FORMAT_PLAIN | RESTRICTED | Topic 1 |
+      | Test Article 3 | user1    | Test Aticle 3 | FORMAT_PLAIN | PRIVATE    | Topic 1 |
 
     And "engage_article" "Test Article 1" is shared with the following users:
       | sharer | recipient |
       | user1  | user2     |
 
-  Scenario: Owner can not like article
+    And "engage_article" "Test Article 2" is shared with the following users:
+      | sharer | recipient |
+      | user1  | user2     |
+
+  Scenario: Owner can like public resource
     Given I log in as "user1"
     And I view article "Test Article 1"
-    And I click on "Like" "button"
-    And I should see "0"
+    When I click on "Like" "button"
+    Then I should see "1"
+    When I click on "Remove like" "button"
+    Then I should see "0"
 
-  Scenario: Recipient can like and remove the like
+  Scenario: Recipient can like and remove the like for public resource
     Given I log in as "user2"
     And I view article "Test Article 1"
+    When I click on "Like" "button"
+    Then I should see "1"
+    When I click on "Remove like" "button"
+    Then I should see "0"
+
+  Scenario: Owner can like restricted resource
+    Given I log in as "user1"
+    And I view article "Test Article 2"
+    When I click on "Like" "button"
+    Then I should see "1"
+    When I click on "Remove like" "button"
+    Then I should see "0"
+
+  Scenario: Recipient can like and remove the like for restricted resource
+    Given I log in as "user2"
+    And I view article "Test Article 1"
+    When I click on "Like" "button"
+    Then I should see "1"
+    When I click on "Remove like" "button"
+    Then I should see "0"
+
+  Scenario: Owner can not like private resource
+    Given I log in as "user1"
+    And I view article "Test Article 3"
+    Then I should not see "0"
+
+  Scenario: Admin can like public and restricted resource
+    Given I log in as "admin"
+    And I view article "Test Article 1"
+    When I click on "Like" "button"
+    Then I should see "1"
+    When I click on "Remove like" "button"
+    Then I should see "0"
+
+    When I view article "Test Article 2"
     And I click on "Like" "button"
-    And I should see "1"
-    And I click on "Remove like" "button"
-    And I should see "0"
+    Then I should see "1"
+    When I click on "Remove like" "button"
+    Then I should see "0"

@@ -83,6 +83,7 @@
             :shared-by-count="survey.sharedbycount"
             :like-button-aria-label="likeButtonLabel"
             :liked="survey.reacted"
+            :show-like-button="!isPrivateResource"
             component-name="engage_survey"
             @access-update="updateAccess"
             @access-modal="openModalFromButtonLabel = true"
@@ -106,6 +107,7 @@ import Tabs from 'tui/components/tabs/Tabs';
 import Tab from 'tui/components/tabs/Tab';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import { notify } from 'tui/notifications';
+import { AccessManager } from 'totara_engage/index';
 
 // GraphQL
 import getSurvey from 'engage_survey/graphql/get_survey';
@@ -189,6 +191,10 @@ export default {
         'engage_survey',
         this.survey.resource.name
       );
+    },
+
+    isPrivateResource() {
+      return AccessManager.isPrivate(this.survey.resource.access);
     },
   },
 

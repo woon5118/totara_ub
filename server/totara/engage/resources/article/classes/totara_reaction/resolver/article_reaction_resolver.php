@@ -46,6 +46,11 @@ final class article_reaction_resolver extends base_resolver {
         }
 
         $article = article::from_resource_id($resourceid);
+
+        if ($article->is_private()) {
+            return false;
+        }
+
         return access_manager::can_access($article, $userid);
     }
 
