@@ -25,7 +25,6 @@ namespace mod_perform\data_providers\response;
 
 use core\collection;
 use core\orm\entity\repository;
-use core\orm\query\builder;
 use mod_perform\entity\activity\element_response as element_response_entity;
 use mod_perform\entity\activity\participant_instance;
 use mod_perform\entity\activity\participant_instance as participant_instance_entity;

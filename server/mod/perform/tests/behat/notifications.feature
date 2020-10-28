@@ -93,6 +93,7 @@ Feature: Perform activity notifications - core relationships
     # user1 should receive a notification
     When I log in as "user1"
     And I open the notification popover
+    And I wait for pending js
     Then I should see "New activity notice" exactly "1" times
     When I follow "View full notification"
     Then I should see "Hi User One"
@@ -118,12 +119,14 @@ Feature: Perform activity notifications - core relationships
     # user2 should not receive any notifications
     When I log in as "user2"
     And I open the notification popover
+    And I wait for pending js
     Then I should see "You have no notifications"
     And I log out
 
     # manager should not receive any notifications
     When I log in as "manager"
     And I open the notification popover
+    And I wait for pending js
     Then I should see "You have no notifications"
 
   Scenario: mod_perform_notification_102: Instance creation reminder
@@ -151,18 +154,21 @@ Feature: Perform activity notifications - core relationships
     # 0 day 0 hour
     When I log in as "user1"
     And I open the notification popover
+    And I wait for pending js
     Then I should see "You have no notifications"
 
     # 0 day 23 hour
     Given I time travel to "23 hours future" for perform activity notification
     And I reload the page
     And I open the notification popover
+    And I wait for pending js
     Then I should see "You have no notifications"
 
     # 1 day 1 hour
     Given I time travel to "2 hours future" for perform activity notification
     And I reload the page
     And I open the notification popover
+    And I wait for pending js
     Then I should see "Te manatu mō te whakarite" exactly "1" times
     And I am on site homepage
 
@@ -170,36 +176,42 @@ Feature: Perform activity notifications - core relationships
     Given I time travel to "22 hours future" for perform activity notification
     And I reload the page
     And I open the notification popover
+    And I wait for pending js
     Then I should see "Te manatu mō te whakarite" exactly "1" times
 
     # 2 day 1 hour
     Given I time travel to "2 hours future" for perform activity notification
     And I reload the page
     And I open the notification popover
+    And I wait for pending js
     Then I should see "Te manatu mō te whakarite" exactly "2" times
 
     # 2 day 23 hour
     Given I time travel to "22 hours future" for perform activity notification
     And I reload the page
     And I open the notification popover
+    And I wait for pending js
     Then I should see "Te manatu mō te whakarite" exactly "2" times
 
     # 3 day 23 hour
     Given I time travel to "1 day future" for perform activity notification
     And I reload the page
     And I open the notification popover
+    And I wait for pending js
     Then I should see "Te manatu mō te whakarite" exactly "2" times
 
     # 5 day 1 hour (notification is not sent on day 4 because cron is not run)
     Given I time travel to "26 hours future" for perform activity notification
     And I reload the page
     And I open the notification popover
+    And I wait for pending js
     Then I should see "Te manatu mō te whakarite" exactly "2" times
 
     # 6 day 1 hour
     Given I time travel to "1 day future" for perform activity notification
     And I reload the page
     And I open the notification popover
+    And I wait for pending js
     Then I should see "Te manatu mō te whakarite" exactly "3" times
     When I follow "View full notification"
     Then I should see "Hi User One"
@@ -212,18 +224,21 @@ Feature: Perform activity notifications - core relationships
     # appraiser should receive as many notifications as user1 does
     When I log in as "appraiser"
     And I open the notification popover
+    And I wait for pending js
     Then I should see "Herinnering aan activiteit" exactly "3" times
     And I log out
 
     # user2 should not receive any notifications
     When I log in as "user2"
     And I open the notification popover
+    And I wait for pending js
     Then I should see "You have no notifications"
     And I log out
 
     # manager should not receive any notifications
     When I log in as "manager"
     And I open the notification popover
+    And I wait for pending js
     Then I should see "You have no notifications"
 
   Scenario: mod_perform_notification_103: Due date approaching reminder
@@ -257,18 +272,21 @@ Feature: Perform activity notifications - core relationships
     Given I time travel to "1 hour future" for perform activity notification
     When I log in as "user1"
     And I open the notification popover
+    And I wait for pending js
     Then I should see "You have no notifications"
 
     # day 5
     Given I time travel to "5 days future" for perform activity notification
     And I reload the page
     And I open the notification popover
+    And I wait for pending js
     Then I should see "You have no notifications"
 
     # day 7
     Given I time travel to "2 days future" for perform activity notification
     And I reload the page
     And I open the notification popover
+    And I wait for pending js
     Then I should see "You have no notifications"
 
     # day 8 (6 days before due)

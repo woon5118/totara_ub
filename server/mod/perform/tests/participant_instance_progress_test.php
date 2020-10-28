@@ -255,7 +255,7 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
 
     public function test_get_all_translated() {
         $this->assertEqualsCanonicalizing([
-            70 => 'Not applicable',
+            70 => 'n/a (view only)',
             50 => 'Not submitted',
             20 => 'Complete',
             10 => 'In progress',

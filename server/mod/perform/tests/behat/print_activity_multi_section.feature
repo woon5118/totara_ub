@@ -130,7 +130,7 @@ Feature: Print view of a multi-section user activity
     # Add a response as the manager.
     When I click on "Multi section activity" "button" in the ".tui-dataTableCell__content" "css_element"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
-    When I click on the "Manager (Not yet started)" tui radio
+    When I click on the "Manager (Not started)" tui radio
     And I click on "Continue" "button"
     And I click on "Next section" "button"
     And I wait until ".tui-performElementResponse .tui-formField" "css_element" exists

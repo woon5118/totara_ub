@@ -134,7 +134,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     And I should see "You have no remaining participants to select."
     When I click on "Back to all performance activities" "link"
     Then I should not see "Select participants"
-    And I should see "No items to display"
+    And I should see "There are no activities assigned to you yet"
     And I should not see "Act1"
     And I log out
 
@@ -182,7 +182,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     When I click on "Back to all performance activities" "link"
     Then I should see "Select participants"
     When I click on "Activities about others" "link"
-    And I should see "No items to display"
+    And I should see "You have not been added as a participant in someone else's activity yet"
     And I should not see "Act1"
     And I log out
 
@@ -204,20 +204,20 @@ Feature: Allow users to select manual (internal and external) participants for a
 
     # Appraiser was the last person that needed to make a selection, so participant instances should exist now
     When I click on "Activities about others" "link"
-    And I should not see "No items to display"
+    And I should not see "There are no activities assigned to you yet"
     When I click on "Act1" "button" in the ".tui-dataTableCell__content" "css_element"
     Then I should see "Select relationship to continue"
-    And I should see "Appraiser (Not yet started)"
-    And I should see "Peer (Not yet started)"
+    And I should see "Appraiser (Not started)"
+    And I should see "Peer (Not started)"
     And I should not see "Mentor"
     And I should not see "Reviewer"
-    And the "Appraiser (Not yet started)" radio button is selected
+    And the "Appraiser (Not started)" radio button is selected
     When I click on "Continue" "button"
     Then I should see perform activity relationship to user "Appraiser"
     When I press the "back" button in the browser
     And I click on "Activities about others" "link"
     And I click on "Act1" "button" in the ".tui-dataTableCell__content" "css_element"
-    And I click on the "Peer (Not yet started)" tui radio
+    And I click on the "Peer (Not started)" tui radio
     And I click on "Continue" "button"
     Then I should see perform activity relationship to user "Peer"
     And I log out
@@ -225,7 +225,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     # Subject views activity
     When I log in as "subject"
     And I navigate to the outstanding perform activities list page
-    And I should not see "No items to display"
+    And I should not see "There are no activities assigned to you yet"
     When I click on "Act1" "link"
     Then I should see perform activity relationship to user "yourself"
     And I log out
@@ -234,7 +234,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     When I log in as "colleague"
     And I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
-    And I should not see "No items to display"
+    And I should not see "There are no activities assigned to you yet"
     When I click on "Act1" "link"
     Then I should see perform activity relationship to user "Mentor"
     And I log out
@@ -243,20 +243,20 @@ Feature: Allow users to select manual (internal and external) participants for a
     When I log in as "manager"
     And I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
-    And I should not see "No items to display"
+    And I should not see "You have not been added as a participant in someone else's activity yet"
     When I click on "Act1" "button" in the ".tui-dataTableCell__content" "css_element"
     Then I should see "Select relationship to continue"
-    And I should see "Manager (Not yet started)"
-    And I should see "Reviewer (Not yet started)"
+    And I should see "Manager (Not started)"
+    And I should see "Reviewer (Not started)"
     And I should not see "Mentor"
     And I should not see "Peer"
-    And the "Manager (Not yet started)" radio button is selected
+    And the "Manager (Not started)" radio button is selected
     When I click on "Continue" "button"
     Then I should see perform activity relationship to user "Manager"
     When I press the "back" button in the browser
     And I click on "Activities about others" "link"
     And I click on "Act1" "button" in the ".tui-dataTableCell__content" "css_element"
-    And I click on the "Reviewer (Not yet started)" tui radio
+    And I click on the "Reviewer (Not started)" tui radio
     And I click on "Continue" "button"
     Then I should see perform activity relationship to user "Reviewer"
     When I log out
@@ -347,7 +347,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     # Complete as subject
     When I log in as "subject"
     And I navigate to the outstanding perform activities list page
-    And I should not see "No items to display"
+    And I should not see "There are no activities assigned to you yet"
     When I click on "Act1" "link"
     Then I should see perform activity relationship to user "yourself"
     When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
@@ -361,7 +361,7 @@ Feature: Allow users to select manual (internal and external) participants for a
     When I log in as "colleague"
     And I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
-    And I should not see "No items to display"
+    And I should not see "You have not been added as a participant in someone else's activity yet"
     When I click on "Act1" "link"
     Then I should see perform activity relationship to user "Mentor"
     When I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
@@ -375,8 +375,8 @@ Feature: Allow users to select manual (internal and external) participants for a
     When I log in as "manager"
     And I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
-    And I should not see "No items to display"
-    And I click on "Act1" "button" in the ".tui-dataTableCell__content" "css_element"
+    And I should not see "You have not been added as a participant in someone else's activity yet"
+    When I click on "Act1" "button" in the ".tui-dataTableCell__content" "css_element"
     Then I should see "Select relationship to continue"
     And I should see "Manager (Complete)"
     And I should see "Reviewer (In progress)"

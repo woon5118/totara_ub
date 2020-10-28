@@ -49,7 +49,7 @@ Feature: I can create and use performance activities with any and every custom e
     And I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
       | Activity title                          | Type     | Overall progress | Your progress   |
-      | One of every element (##today##j F Y##) | Check-in | Not yet started  | Not yet started |
+      | One of every element (##today##j F Y##) | Check-in | Not started      | Not started     |
 
     When I click on "One of every element" "link"
     And I click on "Save as draft" "button"
@@ -76,7 +76,7 @@ Feature: I can create and use performance activities with any and every custom e
     And I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
       | Activity title                          | Type     | Overall progress | Your progress   |
-      | One of every element (##today##j F Y##) | Check-in | Not yet started  | Not yet started |
+      | One of every element (##today##j F Y##) | Check-in | Not started      | Not started     |
 
     When I click on "One of every element" "link"
     And I click on "Save as draft" "button"

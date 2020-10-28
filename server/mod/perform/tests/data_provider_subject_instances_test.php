@@ -25,11 +25,17 @@ use core\orm\query\builder;
 use core\pagination\cursor;
 use mod_perform\data_providers\activity\subject_instance_for_participant;
 use mod_perform\entity\activity\filters\subject_instances_about;
-use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\activity_type as activity_type_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
-use mod_perform\models\activity\subject_instance;
-
+use mod_perform\state\participant_instance\complete as participant_instance_complete;
+use mod_perform\state\participant_instance\in_progress as participant_instance_in_progress;
+use mod_perform\state\participant_instance\not_started as participant_instance_not_started;
+use mod_perform\state\subject_instance\complete as subject_instance_complete;
+use mod_perform\state\subject_instance\in_progress as subject_instance_in_progress;
+use mod_perform\state\subject_instance\not_started as subject_instance_not_started;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
 
@@ -158,7 +164,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
         $returned_subject_instance = $returned_subject_instances->first();
 
         // Verify that there are two participant_instances for this subject_instance.
-        $participant_instances = participant_instance::repository()
+        $participant_instances = participant_instance_entity::repository()
             ->where('subject_instance_id', $returned_subject_instance->get_id())
             ->get();
         $this->assertCount(2, $participant_instances);
@@ -230,4 +236,279 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
         ];
     }
 
+    public function test_get_by_activity_type(): void {
+        $activity_types = activity_type_entity::repository()
+            ->order_by('name')
+            ->get();
+        $activity_types = array_combine($activity_types->pluck('name'), $activity_types->pluck('id'));
+
+        // Create a set for each activity type
+        $instances = self::create_activities_for_all_types($activity_types);
+
+        // Now filter on each type
+        foreach ($activity_types as $type => $id) {
+            $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
+                ->add_filters(['activity_type' => $id])
+                ->fetch()
+                ->get();
+
+            self::assertCount(2, $returned_subject_instances);
+            self::assert_same_subject_instance(
+                $instances[$type]['about_someone_else_and_participating'], $returned_subject_instances->first()
+            );
+            self::assert_same_subject_instance(
+                $instances[$type]['about_user_and_participating'], $returned_subject_instances->last()
+            );
+        }
+    }
+
+    public function test_get_by_own_progress(): void {
+        // Create a set for each activity type
+        $activity_types = activity_type_entity::repository()
+            ->order_by('name')
+            ->get();
+        $activity_types = array_combine($activity_types->pluck('name'), $activity_types->pluck('id'));
+        $instances = self::create_activities_for_all_types($activity_types);
+
+        // Progress some instances
+        self::set_participant_instance_progress($instances['appraisal']['about_user_and_participating'], participant_instance_not_started::get_code());
+        self::set_participant_instance_progress($instances['appraisal']['about_someone_else_and_participating'], participant_instance_in_progress::get_code());
+        self::set_participant_instance_progress($instances['check-in']['about_user_and_participating'], participant_instance_in_progress::get_code());
+        self::set_participant_instance_progress($instances['check-in']['about_someone_else_and_participating'], participant_instance_complete::get_code());
+        self::set_participant_instance_progress($instances['feedback']['about_user_and_participating'], participant_instance_complete::get_code());
+        self::set_participant_instance_progress($instances['feedback']['about_someone_else_and_participating'], participant_instance_complete::get_code());
+
+        // Now test filter
+        // Ordered descending ...
+        $to_test = [
+            participant_instance_not_started::get_name() => [
+                $instances['appraisal']['about_user_and_participating'],
+            ],
+            participant_instance_in_progress::get_name() => [
+                $instances['check-in']['about_user_and_participating'],
+                $instances['appraisal']['about_someone_else_and_participating'],
+            ],
+            participant_instance_complete::get_name() => [
+                $instances['feedback']['about_someone_else_and_participating'],
+                $instances['feedback']['about_user_and_participating'],
+                $instances['check-in']['about_someone_else_and_participating'],
+            ],
+        ];
+
+        foreach ($to_test as $progress_value => $expected_results) {
+            $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
+                ->add_filters(['participant_progress' => $progress_value])
+                ->fetch()
+                ->get();
+
+            self::assertCount(count($expected_results), $returned_subject_instances);
+            foreach ($expected_results as $expected_si) {
+                self::assert_same_subject_instance($expected_si, $returned_subject_instances->shift());
+            }
+        }
+    }
+
+    public function test_get_by_overdue(): void {
+        $activity_types = activity_type_entity::repository()
+            ->order_by('name')
+            ->get();
+        $activity_types = array_combine($activity_types->pluck('name'), $activity_types->pluck('id'));
+
+        // Create a set for each activity type
+        $instances = self::create_activities_for_all_types($activity_types);
+
+        // Set overdue and progress some instances
+        self::set_subject_instance_progress($instances['appraisal']['about_user_and_participating'], subject_instance_not_started::get_code());
+        self::set_participant_instance_progress($instances['appraisal']['about_user_and_participating'], participant_instance_not_started::get_code());
+
+        self::set_subject_instance_progress($instances['appraisal']['about_someone_else_and_participating'], subject_instance_in_progress::get_code());
+        self::set_participant_instance_progress($instances['appraisal']['about_someone_else_and_participating'], participant_instance_complete::get_code());
+
+        self::set_subject_instance_progress($instances['check-in']['about_user_and_participating'], subject_instance_in_progress::get_code());
+        self::set_subject_instance_due_date($instances['check-in']['about_user_and_participating'], strtotime("-1 day"));
+        self::set_participant_instance_progress($instances['check-in']['about_user_and_participating'], participant_instance_in_progress::get_code());
+
+        self::set_subject_instance_progress($instances['check-in']['about_someone_else_and_participating'], subject_instance_complete::get_code());
+        self::set_subject_instance_due_date($instances['check-in']['about_someone_else_and_participating'], strtotime("-1 day"));
+        self::set_participant_instance_progress($instances['check-in']['about_someone_else_and_participating'], participant_instance_complete::get_code());
+
+        self::set_subject_instance_progress($instances['feedback']['about_user_and_participating'], subject_instance_not_started::get_code());
+        self::set_subject_instance_due_date($instances['feedback']['about_user_and_participating'], strtotime("+1 day"));
+        self::set_participant_instance_progress($instances['feedback']['about_user_and_participating'], participant_instance_not_started::get_code());
+
+        self::set_subject_instance_progress($instances['feedback']['about_someone_else_and_participating'], subject_instance_in_progress::get_code());
+        self::set_subject_instance_due_date($instances['feedback']['about_someone_else_and_participating'], strtotime("+1 day"));
+        self::set_participant_instance_progress($instances['feedback']['about_someone_else_and_participating'], participant_instance_not_started::get_code());
+
+        // Now test filters
+        // Ordered descending ...
+        $to_test = [
+            [
+                'filters' => [
+                    'activity_type' => $activity_types['check-in'],
+                    'participant_progress' => participant_instance_complete::get_name(),
+                ],
+                'expected' => [
+                    $instances['check-in']['about_someone_else_and_participating'],
+                ],
+            ],
+            [
+                'filters' => [
+                    'activity_type' => $activity_types['check-in'],
+                    'participant_progress' => participant_instance_complete::get_name(),
+                    'overdue' => 1,
+                ],
+                'expected' => [],
+            ],
+            [
+                'filters' => [
+                    'activity_type' => $activity_types['check-in'],
+                    'participant_progress' => participant_instance_complete::get_name(),
+                    'overdue' => 0,
+                ],
+                'expected' => [
+                    $instances['check-in']['about_someone_else_and_participating'],
+                ],
+            ],
+            [
+                'filters' => [
+                    'participant_progress' => participant_instance_not_started::get_name(),
+                    'overdue' => 0,
+                ],
+                'expected' => [
+                    $instances['feedback']['about_someone_else_and_participating'],
+                    $instances['feedback']['about_user_and_participating'],
+                    $instances['appraisal']['about_user_and_participating'],
+                ],
+            ],
+        ];
+
+        foreach ($to_test as $data) {
+            $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
+                ->add_filters($data['filters'])
+                ->fetch()
+                ->get();
+            self::assertCount(count($data['expected']), $returned_subject_instances);
+            foreach ($data['expected'] as $expected_si) {
+                self::assert_same_subject_instance($expected_si, $returned_subject_instances->shift());
+            }
+        }
+    }
+
+    public function test_combined_filters(): void {
+        $activity_types = activity_type_entity::repository()
+            ->order_by('name')
+            ->get();
+        $activity_types = array_combine($activity_types->pluck('name'), $activity_types->pluck('id'));
+
+        // Create a set for each activity type
+        $instances = self::create_activities_for_all_types($activity_types);
+
+        // Set overdue and progress some instances
+        self::set_subject_instance_progress($instances['appraisal']['about_user_and_participating'], subject_instance_not_started::get_code());
+        self::set_subject_instance_progress($instances['appraisal']['about_someone_else_and_participating'], subject_instance_in_progress::get_code());
+
+        self::set_subject_instance_progress($instances['check-in']['about_user_and_participating'], subject_instance_in_progress::get_code());
+        self::set_subject_instance_due_date($instances['check-in']['about_user_and_participating'], strtotime("-1 day"));
+        self::set_subject_instance_progress($instances['check-in']['about_someone_else_and_participating'], subject_instance_complete::get_code());
+        self::set_subject_instance_due_date($instances['check-in']['about_someone_else_and_participating'], strtotime("-1 day"));
+
+        self::set_subject_instance_progress($instances['feedback']['about_user_and_participating'], subject_instance_not_started::get_code());
+        self::set_subject_instance_due_date($instances['feedback']['about_user_and_participating'], strtotime("+1 day"));
+        self::set_subject_instance_progress($instances['feedback']['about_someone_else_and_participating'], subject_instance_in_progress::get_code());
+        self::set_subject_instance_due_date($instances['feedback']['about_someone_else_and_participating'], strtotime("+1 day"));
+
+        // Now test filter
+        // Ordered descending ...
+        $to_test = [
+            1 => [
+                $instances['check-in']['about_user_and_participating'],
+            ],
+            0 => [
+                $instances['feedback']['about_someone_else_and_participating'],
+                $instances['feedback']['about_user_and_participating'],
+                $instances['check-in']['about_someone_else_and_participating'],
+                $instances['appraisal']['about_someone_else_and_participating'],
+                $instances['appraisal']['about_user_and_participating'],
+            ],
+        ];
+
+        foreach ($to_test as $is_overdue => $expected_results) {
+            $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
+                ->add_filters(['overdue' => $is_overdue])
+                ->fetch()
+                ->get();
+            self::assertCount(count($expected_results), $returned_subject_instances);
+            foreach ($expected_results as $expected_si) {
+                self::assert_same_subject_instance($expected_si, $returned_subject_instances->shift());
+            }
+        }
+    }
+
+    /**
+     * @param array $activity_types
+     * @return array
+     * @throws coding_exception
+     */
+    protected static function create_activities_for_all_types(array $activity_types): array {
+        // Create a set for each activity type
+        // Initial instances are all 'appraisals'
+        $instances = ['appraisal' =>
+            [
+                'about_user_and_participating' => self::$about_user_and_participating,
+                'about_someone_else_and_participating' => self::$about_someone_else_and_participating,
+                'about_user_but_not_participating' => self::$about_user_but_not_participating,
+                'non_existing' => self::$non_existing,
+            ]
+        ];
+
+        foreach ($activity_types as $type => $id) {
+            if ($type === 'appraisal') {
+                continue;
+            }
+
+            self::create_user_activities(self::$user, $type);
+            $instances[$type] = [
+                'about_user_and_participating' => self::$about_user_and_participating,
+                'about_someone_else_and_participating' => self::$about_someone_else_and_participating,
+                'about_user_but_not_participating' => self::$about_user_but_not_participating,
+                'non_existing' => self::$non_existing,
+            ];
+        }
+        return $instances;
+    }
+
+    /**
+     * @param subject_instance_model $si
+     * @param int $progress
+     */
+    protected static function set_participant_instance_progress(subject_instance_model $si, int $progress): void {
+        $pi = participant_instance_entity::repository()
+            ->where('subject_instance_id', $si->get_id())
+            ->where('participant_id', self::$user->id)
+            ->order_by('id')
+            ->first();
+        $pi->progress = $progress;
+        $pi->save();
+    }
+
+    /**
+     * @param subject_instance_model $si
+     * @param int $progress
+     */
+    protected static function set_subject_instance_progress(subject_instance_model $si, int $progress): void {
+        $si = new subject_instance_entity($si->get_id());
+        $si->progress = $progress;
+        $si->save();
+    }
+
+    /**
+     * @param subject_instance_model $si
+     * @param int $due_date
+     */
+    protected static function set_subject_instance_due_date(subject_instance_model $si, int $due_date): void {
+        $si = new subject_instance_entity($si->get_id());
+        $si->due_date = $due_date;
+        $si->save();
+    }
 }

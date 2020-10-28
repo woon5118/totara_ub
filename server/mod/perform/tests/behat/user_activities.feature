@@ -22,8 +22,8 @@ Feature: Viewing and responding to perform activities
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
       | Activity title                                   | Type      | Overall progress | Your progress   |
-      | single user manager-appraiser (##today##j F Y##) | Appraisal | Not yet started  | Not yet started |
-      | John is participating subject (##today##j F Y##) | Appraisal | Not yet started  | Not yet started |
+      | single user manager-appraiser (##today##j F Y##) | Appraisal | Not started      | Not started     |
+      | John is participating subject (##today##j F Y##) | Appraisal | Not started      | Not started     |
 
     When I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
@@ -45,7 +45,7 @@ Feature: Viewing and responding to perform activities
     And I should see "Section submitted" in the tui success notification toast
     And I should see the tui datatable contains:
       | Activity title                                   | Type      | Overall progress | Your progress   |
-      | single user manager-appraiser (##today##j F Y##) | Appraisal | Not yet started  | Not yet started |
+      | single user manager-appraiser (##today##j F Y##) | Appraisal | Not started      | Not started     |
       | John is participating subject (##today##j F Y##) | Appraisal | In progress      | Complete        |
 
   Scenario: Can view and and respond to activities I am a participant in but are not about me
@@ -54,7 +54,7 @@ Feature: Viewing and responding to perform activities
     And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
       | Activity title                      | Type      | User      | Overall progress | Your progress   |
-      | David is subject (##today##j F Y##) | Appraisal | David Two | Not yet started  | Not yet started |
+      | David is subject (##today##j F Y##) | Appraisal | David Two | Not started      | Not started     |
 
     When I click on "David is subject" "link"
     Then I should see "David is subject" in the ".tui-pageHeading__title" "css_element"
@@ -81,13 +81,13 @@ Feature: Viewing and responding to perform activities
     When I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
-      | Activity title                                   | Type      | User     | Relationship to user | Overall progress | Your progress   |
-      | single user manager-appraiser (##today##j F Y##) | Appraisal | John One | Manager, Appraiser   | Not yet started  | Not yet started |
+      | Activity title                                   | Type      | User     | Relationship to user | Overall progress | Your progress            |
+      | single user manager-appraiser (##today##j F Y##) | Appraisal | John One | Manager, Appraiser   | Not started      | Not started, Not started |
 
     When I click on "single user manager-appraiser" "button" in the ".tui-dataTableCell__content" "css_element"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
-    And the "Manager (Not yet started)" radio button is selected
-    And the "Appraiser (Not yet started)" radio button is not selected
+    And the "Manager (Not started)" radio button is selected
+    And the "Appraiser (Not started)" radio button is not selected
 
     When I click on "Continue" "button"
     Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
@@ -104,9 +104,9 @@ Feature: Viewing and responding to perform activities
     When I click on "single user manager-appraiser" "button" in the ".tui-dataTableCell__content" "css_element"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
     And the "Manager (Complete)" radio button is selected
-    And the "Appraiser (Not yet started)" radio button is not selected
+    And the "Appraiser (Not started)" radio button is not selected
 
-    When I click on the "Appraiser (Not yet started)" tui radio
+    When I click on the "Appraiser (Not started)" tui radio
     And I click on "Continue" "button"
     Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
     And I should see perform activity relationship to user "Appraiser"
@@ -136,8 +136,8 @@ Feature: Viewing and responding to perform activities
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
       | Activity title                                   | Type      | Overall progress | Your progress   |
-      | single user manager-appraiser (##today##j F Y##) | Appraisal | Not yet started  | Not yet started |
-      | John is participating subject (##today##j F Y##) | Appraisal | Not yet started  | Not yet started |
+      | single user manager-appraiser (##today##j F Y##) | Appraisal | Not started      | Not started     |
+      | John is participating subject (##today##j F Y##) | Appraisal | Not started      | Not started     |
 
     When I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-pageHeading__title" "css_element"
@@ -145,7 +145,7 @@ Feature: Viewing and responding to perform activities
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
       | Activity title                                   | Type      | Overall progress | Your progress   |
-      | single user manager-appraiser (##today##j F Y##) | Appraisal | Not yet started  | Not yet started |
+      | single user manager-appraiser (##today##j F Y##) | Appraisal | Not started      | Not started     |
       | John is participating subject (##today##j F Y##) | Appraisal | In progress      | In progress     |
 
   Scenario: Managing participation

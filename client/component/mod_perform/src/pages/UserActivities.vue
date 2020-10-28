@@ -42,6 +42,7 @@
             :current-user-id="currentUserId"
             :view-url="viewActivityUrl"
             :print-url="printActivityUrl"
+            :filter-options="filterOptions"
           />
         </Tab>
         <Tab
@@ -55,6 +56,7 @@
             :current-user-id="currentUserId"
             :view-url="viewActivityUrl"
             :print-url="printActivityUrl"
+            :filter-options="filterOptions"
           />
         </Tab>
         <Tab
@@ -140,6 +142,7 @@ export default {
       required: true,
       type: Boolean,
     },
+    filterOptions: Object,
   },
   data() {
     return {

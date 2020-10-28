@@ -33,6 +33,9 @@ use mod_perform\data_providers\provider;
 use mod_perform\entity\activity\activity as activity_entity;
 use mod_perform\entity\activity\filters\subject_instance_id;
 use mod_perform\entity\activity\filters\subject_instances_about;
+use mod_perform\entity\activity\filters\subject_instances_activity_type;
+use mod_perform\entity\activity\filters\subject_instances_overdue;
+use mod_perform\entity\activity\filters\subject_instances_participant_progress;
 use mod_perform\entity\activity\participant_instance;
 use mod_perform\entity\activity\subject_instance;
 use mod_perform\entity\activity\subject_instance as subject_instance_entity;
@@ -41,6 +44,8 @@ use mod_perform\entity\activity\track as track_entity;
 use mod_perform\entity\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\models\response\subject_sections;
+use mod_perform\state\participant_instance\participant_instance_progress;
+use mod_perform\state\state_helper;
 use mod_perform\state\subject_instance\active;
 
 /**
@@ -95,6 +100,55 @@ class subject_instance_for_participant extends provider {
 
         $repository->set_filter(
             (new subject_instance_id('si'))->set_value($subject_instance_ids)
+        );
+    }
+
+    /**
+     * @param subject_instance_repository|repository $repository
+     * @param int|int[] $activity_types Activity type ID(s)
+     */
+    protected function filter_query_by_activity_type(repository $repository, $activity_types): void {
+        if (!is_array($activity_types)) {
+            $activity_types = [$activity_types];
+        }
+
+        $repository->set_filter(
+            (new subject_instances_activity_type('a'))->set_value($activity_types)
+        );
+    }
+
+    /**
+     * @param subject_instance_repository|repository $repository
+     * @param string|string[] $progress_values Progress state names(s)
+     */
+    protected function filter_query_by_participant_progress(repository $repository, $progress_values): void {
+        if (!is_array($progress_values)) {
+            $progress_values = [$progress_values];
+        }
+
+        $all_progress_names = state_helper::get_all_names('participant_instance', participant_instance_progress::get_type());
+        $all_progress_names = array_flip($all_progress_names);
+        
+        $progress_values = array_map(function ($progress) use ($all_progress_names) {
+            if (!isset($all_progress_names[$progress])) {
+                throw new \coding_exception("{progress} is not a valid participant progress type");
+            }
+            return $all_progress_names[$progress];
+        }, $progress_values);
+        
+        $repository->set_filter(
+            (new subject_instances_participant_progress($this->participant_id, 'target_participant'))
+                ->set_value($progress_values)
+        );
+    }
+
+    /**
+     * @param subject_instance_repository|repository $repository
+     * @param int $is_overdue Show only overdue | not overdue
+     */
+    protected function filter_query_by_overdue(repository $repository, int $is_overdue): void {
+        $repository->set_filter(
+            (new subject_instances_overdue('si'))->set_value($is_overdue)
         );
     }
 

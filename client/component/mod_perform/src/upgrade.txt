@@ -4,6 +4,8 @@ information provided here is intended especially for developers.
 === 13.3 ===
 * Updated the template structure of ActivityContentPrint.vue to add new icons, add new pieces of information, and improve element spacing and font sizes
     * Template, SCSS changes & lang string changes
+* Updated Activities.vue page for filtering and pagination.
+    * Template
 
 === 13.2 ===
 * Reworked several components to centralise common functionality improving consistency and reducing duplication
@@ -19,7 +21,7 @@ information provided here is intended especially for developers.
     * Replaced the following
         * ElementAdminReadOnlyDisplay.vue with PerformAdminCustomElementSummary.vue
     * Updated the template structure of ActivityContent.vue and ActivityContentPrint.vue to drive view only responses off new generic
-      view only response components (ResponseDisplay.vue and HtmlResponseDisplay.vue), removed unused css classes. Also refactored 
+      view only response components (ResponseDisplay.vue and HtmlResponseDisplay.vue), removed unused css classes. Also refactored
       the existing layout approach and standardised the page margins with other Tui pages.
         * Template & SCSS changes
 * Deprecated the method createNotificationIfNotExists() from NotificationsTab.vue as notifications now always exist.

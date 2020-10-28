@@ -69,9 +69,10 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
 
     /**
      * @param $target_user
+     * @param string $activity_type
      * @throws coding_exception
      */
-    protected static function create_user_activities($target_user): void {
+    protected static function create_user_activities($target_user, string $activity_type = 'appraisal'): void {
         // Change to the Admin user for creating the perform activity container.
         self::setAdminUser();
 
@@ -79,7 +80,8 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
         $other_participant = self::getDataGenerator()->create_user();
 
         self::$about_user_and_participating = subject_instance::load_by_entity( self::perform_generator()->create_subject_instance([
-            'activity_name' => 'activity_about_target_user',
+            'activity_name' => $activity_type . '_activity_about_target_user',
+            'activity_type' => $activity_type,
             'subject_user_id' => $target_user->id,
             'other_participant_id' => $other_participant->id,
             'subject_is_participating' => true,
@@ -87,7 +89,8 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
 
         self::$about_user_but_not_participating = subject_instance::load_by_entity(
             self::perform_generator()->create_subject_instance([
-                'activity_name' => 'activity_target_user_is_not_participating_in',
+                'activity_name' => $activity_type . '_activity_target_user_is_not_participating_in',
+                'activity_type' => $activity_type,
                 'subject_user_id' => $target_user->id,
                 'other_participant_id' => $other_participant->id,
                 'subject_is_participating' => false,
@@ -96,7 +99,8 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
 
         self::$about_someone_else_and_participating = subject_instance::load_by_entity(
             self::perform_generator()->create_subject_instance([
-                'activity_name' => 'activity_about_someone_else',
+                'activity_name' => $activity_type . '_activity_about_someone_else',
+                'activity_type' => $activity_type,
                 'subject_user_id' => $other_subject->id,
                 'other_participant_id' => $target_user->id,
                 'subject_is_participating' => false,
@@ -105,7 +109,8 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
 
         self::$non_existing = subject_instance::load_by_entity(
             self::perform_generator()->create_subject_instance([
-                'activity_name' => 'subject_instance_will_be_deleted',
+                'activity_name' => $activity_type . '_subject_instance_will_be_deleted',
+                'activity_type' => $activity_type,
                 'subject_user_id' => $other_subject->id,
                 'other_participant_id' => $target_user->id,
                 'subject_is_participating' => false,

@@ -27,7 +27,11 @@ use context;
 use context_coursecat;
 use core\entity\user;
 use mod_perform\controllers\perform_controller;
+use mod_perform\data_providers\activity\activity_type;
 use mod_perform\models\activity\helpers\manual_participant_helper;
+use mod_perform\state\participant_instance\participant_instance_progress;
+use mod_perform\state\state_helper;
+use mod_perform\state\subject_instance\subject_instance_progress;
 use mod_perform\util;
 use totara_mvc\tui_view;
 
@@ -63,6 +67,7 @@ class user_activities extends perform_controller {
                 ->has_pending_selections(),
             'can-potentially-manage-participants' => util::can_potentially_manage_participants($current_user_id),
             'is-historic-activities-enabled' => util::is_historic_activities_enabled(),
+            'filter-options' => $this->get_filter_options(),
         ];
 
         return self::create_tui_view('mod_perform/pages/UserActivities', $props)
@@ -74,6 +79,30 @@ class user_activities extends perform_controller {
      */
     public static function get_base_url(): string {
         return '/mod/perform/activity/index.php';
+    }
+    
+    /**
+     * @return array
+     */
+    private function get_filter_options(): array {
+        $activity_types = [];
+        foreach ((new activity_type())->get() as $type) {
+            $activity_types[$type->id] = $type->display_name;
+        }
+
+        /** @var array $progress_options */
+        // Order by code
+        $progress_names = state_helper::get_all_names('participant_instance', participant_instance_progress::get_type());
+        ksort($progress_names);
+
+        $progress_display_names = state_helper::get_all_display_names('participant_instance', subject_instance_progress::get_type());
+        ksort($progress_display_names);
+        $progress_options = array_combine($progress_names, $progress_display_names);
+
+        return [
+            'activityTypes' => $activity_types,
+            'progressOptions' => $progress_options,
+        ];
     }
 
 }

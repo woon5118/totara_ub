@@ -66,8 +66,8 @@ Feature: Print view of a single-section user activity
       | Printed on | ##today##j F Y## |
     And the ".tui-participantContentPrint__instanceDetails" "css_element" should contain the following sentence:
       | Created on | ##today##j F Y## |
-    And I should see "Overall progress: Not yet started" in the ".tui-participantContentPrint__instanceDetails" "css_element"
-    And I should see "Your progress: Not yet started" in the ".tui-participantContentPrint__instanceDetails" "css_element"
+    And I should see "Overall progress: Not started" in the ".tui-participantContentPrint__instanceDetails" "css_element"
+    And I should see "Your progress: Not started" in the ".tui-participantContentPrint__instanceDetails" "css_element"
     And the ".tui-participantContentPrint__instanceDetails" "css_element" should contain the following sentence:
       | Due date: | ##tomorrow##j F Y## |
 
@@ -227,7 +227,7 @@ Feature: Print view of a single-section user activity
     And I click on "Print activity" "button"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
     # Check as manager.
-    When I click on the "Manager (Not yet started)" tui radio
+    When I click on the "Manager (Not started)" tui radio
     And I click on "Continue" "button"
     Then I should see "Your response"
 

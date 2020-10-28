@@ -43,128 +43,83 @@ describe('Activities', () => {
     });
 
     const expectedTextNotApplicable =
-      'mock translated: user_activities_status_not_applicable,mod_perform';
+      'mock translated: participant_instance_status_progress_not_applicable,mod_perform';
     const expectedTextComplete =
-      'mock translated: user_activities_status_complete,mod_perform';
+      'mock translated: participant_instance_status_complete,mod_perform';
     const expectedTextNotStarted =
-      'mock translated: user_activities_status_not_started,mod_perform';
+      'mock translated: participant_instance_status_not_started,mod_perform';
     const expectedTextInProgress =
-      'mock translated: user_activities_status_in_progress,mod_perform';
+      'mock translated: participant_instance_status_in_progress,mod_perform';
     const expectedTextNotSubmitted =
-      'mock translated: user_activities_status_not_submitted,mod_perform';
+      'mock translated: participant_instance_status_not_submitted,mod_perform';
 
     const dataProvider = [
       {
-        expected: expectedTextComplete,
+        expected: [expectedTextComplete],
         combinations: [
-          [{ is_for_current_user: true, progress_status: 'COMPLETE' }],
-          [
-            { is_for_current_user: false, progress_status: 'NOT_STARTED' },
-            { is_for_current_user: true, progress_status: 'COMPLETE' },
-            { is_for_current_user: true, progress_status: 'COMPLETE' },
-            {
-              is_for_current_user: true,
-              progress_status: 'PROGRESS_NOT_APPLICABLE',
-            },
-            {
-              is_for_current_user: true,
-              progress_status: 'NOT_SUBMITTED',
-            },
-          ],
+          { is_for_current_user: true, progress_status: 'COMPLETE' },
         ],
       },
       {
-        expected: expectedTextNotStarted,
+        expected: [
+          expectedTextComplete,
+          expectedTextComplete,
+          expectedTextNotApplicable,
+          expectedTextNotSubmitted,
+        ],
         combinations: [
-          [{ is_for_current_user: true, progress_status: 'NOT_STARTED' }],
-          [
-            {
-              is_for_current_user: true,
-              progress_status: 'PROGRESS_NOT_APPLICABLE',
-            },
-            {
-              is_for_current_user: true,
-              progress_status: 'NOT_SUBMITTED',
-            },
-            { is_for_current_user: true, progress_status: 'NOT_STARTED' },
-            { is_for_current_user: true, progress_status: 'NOT_STARTED' },
-            { is_for_current_user: false, progress_status: 'COMPLETE' },
-          ],
+          { is_for_current_user: false, progress_status: 'NOT_STARTED' },
+          { is_for_current_user: true, progress_status: 'COMPLETE' },
+          { is_for_current_user: true, progress_status: 'COMPLETE' },
+          {
+            is_for_current_user: true,
+            progress_status: 'PROGRESS_NOT_APPLICABLE',
+          },
+          {
+            is_for_current_user: true,
+            progress_status: 'NOT_SUBMITTED',
+          },
         ],
       },
       {
-        expected: expectedTextInProgress,
+        expected: [expectedTextNotStarted],
         combinations: [
-          [{ is_for_current_user: true, progress_status: 'IN_PROGRESS' }],
-          [
-            {
-              is_for_current_user: true,
-              progress_status: 'PROGRESS_NOT_APPLICABLE',
-            },
-            {
-              is_for_current_user: true,
-              progress_status: 'NOT_SUBMITTED',
-            },
-            { is_for_current_user: true, progress_status: 'NOT_STARTED' },
-            { is_for_current_user: true, progress_status: 'COMPLETE' },
-          ],
-          [
-            { is_for_current_user: true, progress_status: 'IN_PROGRESS' },
-            { is_for_current_user: true, progress_status: 'COMPLETE' },
-          ],
+          { is_for_current_user: true, progress_status: 'NOT_STARTED' },
         ],
       },
       {
-        expected: expectedTextNotApplicable,
+        expected: [
+          expectedTextNotApplicable,
+          expectedTextNotSubmitted,
+          expectedTextNotStarted,
+          expectedTextNotStarted,
+        ],
         combinations: [
-          [], // This case should not happen in real life, but to make it complete we also expect n/a here.
-          [
-            {
-              is_for_current_user: true,
-              progress_status: 'PROGRESS_NOT_APPLICABLE',
-            },
-          ],
-          [
-            {
-              is_for_current_user: true,
-              progress_status: 'PROGRESS_NOT_APPLICABLE',
-            },
-            {
-              is_for_current_user: true,
-              progress_status: 'PROGRESS_NOT_APPLICABLE',
-            },
-            { is_for_current_user: false, progress_status: 'COMPLETE' },
-          ],
+          {
+            is_for_current_user: true,
+            progress_status: 'PROGRESS_NOT_APPLICABLE',
+          },
+          {
+            is_for_current_user: true,
+            progress_status: 'NOT_SUBMITTED',
+          },
+          { is_for_current_user: true, progress_status: 'NOT_STARTED' },
+          { is_for_current_user: true, progress_status: 'NOT_STARTED' },
+          { is_for_current_user: false, progress_status: 'COMPLETE' },
         ],
       },
       {
-        expected: expectedTextNotSubmitted,
+        expected: [expectedTextInProgress],
         combinations: [
-          [
-            {
-              is_for_current_user: true,
-              progress_status: 'NOT_SUBMITTED',
-            },
-          ],
-          [
-            {
-              is_for_current_user: true,
-              progress_status: 'PROGRESS_NOT_APPLICABLE',
-            },
-            {
-              is_for_current_user: true,
-              progress_status: 'NOT_SUBMITTED',
-            },
-          ],
+          { is_for_current_user: true, progress_status: 'IN_PROGRESS' },
         ],
       },
     ];
 
     dataProvider.forEach(dataSet => {
-      dataSet.combinations.forEach(participantInstances => {
-        let actualText = wrapper.vm.getYourProgressText(participantInstances);
-        expect(actualText).toBe(dataSet.expected);
-      });
+      let expectedText = dataSet.expected.join(', ');
+      let actualText = wrapper.vm.getYourProgressText(dataSet.combinations);
+      expect(actualText).toBe(expectedText);
     });
   });
 });

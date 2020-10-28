@@ -186,6 +186,7 @@ Feature: Manage performance activity page
     Given I log in as "admin"
     When I navigate to the manage perform activities page
     And I set the field "Sort by" to "Name"
+    And I wait for pending js
     Then I should see "Perform activity 010"
     And I should not see "Perform activity 190"
     When I open the dropdown menu in the tui datatable row with "Perform activity 010" "Name"

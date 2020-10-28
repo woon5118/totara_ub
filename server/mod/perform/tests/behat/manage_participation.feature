@@ -169,10 +169,10 @@ Feature: Test management of activity participation
     And "Close" "button" should exist in the "User Six" "table_row"
     And I switch to "Participant instances" tab
     Then the following should exist in the "perform_manage_participation_participant_instance" table:
-    | Participant's name | Subject name | Relationship name | Sections  | Progress       | Availability   |
-    | appraiser User     | User Six     | Appraiser         | 1 section | Not applicable | Not applicable |
-    | manager One        | User Six     | Manager           | 1 section | Not started    | Open           |
-    | User Six           | User Six     | Subject           | 1 section | Not started    | Open           |
+    | Participant's name | Subject name | Relationship name | Sections  | Progress        | Availability   |
+    | appraiser User     | User Six     | Appraiser         | 1 section | n/a (view only) | Not applicable |
+    | manager One        | User Six     | Manager           | 1 section | Not started     | Open           |
+    | User Six           | User Six     | Subject           | 1 section | Not started     | Open           |
     And "Close" "button" should not exist in the "appraiser User" "table_row"
     And "Close" "button" should exist in the "manager One" "table_row"
     # Not possible to uniquely identify the subject row - so not testing the close button for the subject

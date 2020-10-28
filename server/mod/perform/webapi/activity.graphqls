@@ -516,6 +516,9 @@ Activity subject instance filters
 """
 input mod_perform_subject_instance_filters {
   about: [mod_perform_subject_instance_about_filter!]!
+  activity_type: [core_id!]
+  participant_progress: [mod_perform_participant_instance_progress_status!]
+  overdue: param_boolean
 }
 
 """
@@ -554,7 +557,7 @@ input mod_perform_activity_page_input {
   """
   Pagination input
   """
-  pagination: mod_perform_activity_pagination_input!
+  pagination: core_pagination_input!
   """
   Filters input
   """
@@ -563,20 +566,6 @@ input mod_perform_activity_page_input {
   Sort by input
   """
   sort_by: String
-}
-
-"""
-Pagination input for paginated activity list.
-"""
-input mod_perform_activity_pagination_input {
-  """
-  Opaque cursor
-  """
-  cursor: String
-  """
-  Number of activities to fetch
-  """
-  limit: param_integer
 }
 
 """
@@ -654,7 +643,7 @@ extend type Query {
   """
   mod_perform_my_subject_instances(
     filters: mod_perform_subject_instance_filters
-    cursor: String
+    pagination: core_pagination_input
   ): mod_perform_subject_sections_page!
 
   """
