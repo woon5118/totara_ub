@@ -59,10 +59,6 @@
       width: auto;
       padding: var(--gap-2);
       line-height: 1.5;
-
-      &:hover {
-        color: var(--nav-side-text-color-focus)
-      }
     }
 
     .popover-region-container {
@@ -103,10 +99,6 @@
       padding: var(--gap-1);
       color: var(--nav-side-text-color);
       text-decoration: none;
-
-      &:hover {
-        color: var(--nav-side-text-color-focus);
-      }
     }
 
     .userbutton {
@@ -125,6 +117,14 @@
     .usertext {
       display: none;
       vertical-align: unset;
+    }
+
+    .moodle-actionmenu .menu li a.menu-action {
+      color: var(--nav-side-popover-text-color);
+
+      &:hover {
+        color: var(--nav-side-popover-text-color);
+      }
     }
   }
 }
