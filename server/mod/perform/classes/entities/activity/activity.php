@@ -27,6 +27,9 @@ use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one;
+use core\orm\query\builder;
+use mod_perform\notification\factory;
+use mod_perform\notification\loader;
 
 /**
  * Activity entity
@@ -43,6 +46,8 @@ use core\orm\entity\relations\has_one;
  * @property int $updated_at
  *
  * Relationships:
+ * @property-read collection|notification[] $notifications
+ * @property-read collection|notification[] $active_notifications
  * @property-read collection|section[] $sections
  * @property-read collection|section[] $sections_ordered
  * @property-read collection|track[] $tracks
@@ -123,6 +128,26 @@ class activity extends entity {
      */
     public function notifications(): has_many {
         return $this->has_many(notification::class, 'activity_id');
+    }
+
+    /**
+     * Get the active notifications for this activity.
+     *
+     * @return has_many
+     */
+    public function active_notifications(): has_many {
+        $loader = factory::create_loader();
+        $class_keys = $loader->get_class_keys(loader::HAS_CONDITION);
+
+        return $this->notifications()
+            ->as('n')
+            ->where_exists(
+                builder::table(notification_recipient::TABLE)
+                    ->where_field('notification_id', 'n.id')
+                    ->where('active', true)
+            )
+            ->where('active', true)
+            ->where('class_key', $class_keys);
     }
 
     /**

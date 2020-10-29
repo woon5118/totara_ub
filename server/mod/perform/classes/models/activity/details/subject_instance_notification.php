@@ -29,7 +29,6 @@ use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\models\activity\activity as activity_model;
 use stdClass;
 
 /**
@@ -91,8 +90,15 @@ class subject_instance_notification {
      *
      * @param activity_entity $activity
      * @return subject_instance_notification[]
+     *
+     * @deprecated since Totara 13.2.
      */
     public static function load_by_activity(activity_entity $activity): array {
+        debugging(
+            'subject_instance_notification::load_by_activity has been deprecated. Use load_by_subject_instance() instead',
+            DEBUG_DEVELOPER
+        );
+
         return builder::table(subject_instance_entity::TABLE, 'si')
             ->join([track_user_assignment_entity::TABLE, 'tua'], 'si.track_user_assignment_id', 'tua.id')
             ->join([track_entity::TABLE, 't'], 'tua.track_id', 't.id')
@@ -106,5 +112,24 @@ class subject_instance_notification {
             })
             ->get()
             ->all(false);
+    }
+
+
+    /**
+     * Creates an instance of this object from the incoming subject instance.
+     *
+     * @param subject_instance_entity $subject_instance the reference object.
+     *
+     * @return subject_instance_notification an instance of this class.
+     */
+    public static function load_by_subject_instance(subject_instance_entity $subject_instance): self {
+        $record = new stdClass();
+        $record->id = $subject_instance->id;
+        $record->subject_user_id = $subject_instance->subject_user_id;
+        $record->job_assignment_id = $subject_instance->user_assignment->job_assignment_id;
+        $record->due_date = $subject_instance->due_date;
+        $record->instance_created_at = $subject_instance->created_at;
+
+        return new self($record);
     }
 }

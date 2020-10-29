@@ -23,13 +23,11 @@
 
 namespace mod_perform\task;
 
-use core\orm\query\builder;
 use core\task\scheduled_task;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\details\subject_instance_notification;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
@@ -37,7 +35,6 @@ use mod_perform\notification\factory;
 use mod_perform\notification\loader;
 use mod_perform\notification\triggerable;
 use mod_perform\state\activity\active;
-use totara_core\entities\relationship as relationship_entity;
 
 /**
  * Periodically check notification event triggers.
@@ -57,44 +54,66 @@ class check_notification_trigger_task extends scheduled_task {
         $loader = factory::create_loader();
         $class_keys = $loader->get_class_keys(loader::HAS_CONDITION);
 
-        $clock = factory::create_clock();
-        $activities = activity_entity::repository()->where('status', active::get_code())->get();
-        foreach ($activities as $activity_entity) {
-            /** @var activity_entity $activity_entity */
-            // TODO TO BE RESOLVED IN TL-28103:
-            // grab all necessities with a single giant query outside of the outer loop.
-            $records = subject_instance_notification::load_by_activity($activity_entity);
-            if (empty($records)) {
-                continue;
+        // Filter out invalid brokers
+        $brokers = [];
+        foreach ($class_keys as $class_key) {
+            $broker = factory::create_broker($class_key);
+            if ($broker instanceof triggerable) {
+                $brokers[$class_key] = $broker;
+            } else {
+                debugging(get_class($broker) . ' does not implement triggerable', DEBUG_DEVELOPER);
             }
-            foreach ($class_keys as $class_key) {
-                $broker = factory::create_broker($class_key);
-                if (!($broker instanceof triggerable)) {
-                    debugging(get_class($broker) . ' does not implement triggerable', DEBUG_DEVELOPER);
-                    continue;
-                }
-                $activity = activity_model::load_by_entity($activity_entity);
-                $notification = notification_model::load_by_activity_and_class_key($activity, $class_key);
-                if (!$notification->active) {
-                    continue;
-                }
-                $condition = factory::create_condition($notification);
-                $recipients = notification_recipient_model::load_by_notification($notification, true);
-                if (!$recipients->count()) {
-                    continue;
-                }
-                foreach ($records as $record) {
-                    /** @var triggerable $broker */
+        }
+
+        $clock = factory::create_clock();
+
+        $page = 1;
+        do {
+            $paginator = subject_instance_entity::repository()
+                ->as('si')
+                ->join([track_user_assignment_entity::TABLE, 'tua'], 'si.track_user_assignment_id', 'tua.id')
+                ->join([track_entity::TABLE, 't'], 'tua.track_id', 't.id')
+                ->join([activity_entity::TABLE, 'a'], 't.activity_id', 'a.id')
+                ->where('a.status', active::get_code())
+                ->where_null('si.completed_at')
+                ->where('tua.deleted', false)
+                ->filter_by_active_notifications($class_keys)
+                ->with('user_assignment')
+                ->with('track.activity.active_notifications')
+                ->with('participant_instances')
+                ->paginate($page, 10000);
+
+            foreach ($paginator->get_items() as $subject_instance) {
+                foreach ($brokers as $class_key => $broker) {
+                    $notification_entity = $subject_instance
+                        ->activity()
+                        ->active_notifications
+                        ->find('class_key', $class_key);
+                    // We can ignore this as there's no active one
+                    if (!$notification_entity) {
+                        continue;
+                    }
+
+                    $notification = notification_model::load_by_entity($notification_entity);
+                    $condition = factory::create_condition($notification);
+                    $recipients = notification_recipient_model::load_by_notification($notification, true);
+                    if (!$recipients->count()) {
+                        continue;
+                    }
+
+                    $record = subject_instance_notification::load_by_subject_instance($subject_instance);
                     if (!$broker->is_triggerable_now($condition, $record)) {
                         continue;
                     }
-                    $entity = subject_instance_entity::repository()->find($record->id);
-                    /** @var subject_instance_entity $entity */
-                    $dealer = factory::create_dealer_on_participant_instances($entity->participant_instances->all());
+
+                    $dealer = factory::create_dealer_on_participant_instances($subject_instance->participant_instances->all());
                     $dealer->dispatch($class_key);
+
+                    $notification->set_last_run_at($clock->get_time());
                 }
-                $notification->set_last_run_at($clock->get_time());
             }
-        }
+
+            $page++;
+        } while ($paginator->get_next() !== null);
     }
 }

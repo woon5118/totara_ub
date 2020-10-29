@@ -25,6 +25,7 @@ namespace mod_perform\entities\activity;
 
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use core\orm\query\field;
 
 class subject_instance_repository extends repository {
 
@@ -80,5 +81,29 @@ class subject_instance_repository extends repository {
             $builder->where('context.id', $context->id)
             ->or_where_like_starts_with('context.path', "{$context->path}/");
         });
+    }
+
+    /**
+     * Only load subject_instance for activities with active notifications
+     * which have active recipients
+     *
+     * @param array $class_keys
+     * @param string $parent_activity_id_col
+     *
+     * @return subject_instance_repository
+     */
+    public function filter_by_active_notifications(array $class_keys = [], string $parent_activity_id_col = 'a.id'): self {
+        $this->where_exists(
+            builder::table(notification::TABLE)
+                ->join([notification_recipient::TABLE, 'nr'], 'id', 'notification_id')
+                ->where_field('activity_id', $parent_activity_id_col)
+                ->where('active', true)
+                ->when(!empty($class_keys), function (builder $builder) use ($class_keys) {
+                    $builder->where('class_key', $class_keys);
+                })
+                ->where('nr.active', true)
+        );
+
+        return $this;
     }
 }

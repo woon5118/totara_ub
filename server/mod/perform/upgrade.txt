@@ -31,3 +31,5 @@ information provided here is intended especially for developers.
 * GraphQL type mod_perform_my_subject_instance now support pagination. Actual results are returned in items.
 * GraphQL query mod_perform_my_subject_instances now return mod_perform_subject_sections_page which include items as well as pagination information
 * \mod_perform\classes\models\activity\element_plugin::get_participant_response_component() - should only be used on respondable_element_plugin and classes extending it.
+* \mod_perform\models\activity\details\subject_instance_notification::load_by_activity() is deprecated; instead load
+  subject instances using the subject instance repository, then subject_instance_notification::load_by_subject_instance().
