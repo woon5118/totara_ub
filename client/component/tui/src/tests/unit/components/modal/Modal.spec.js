@@ -62,4 +62,17 @@ describe('Modal', () => {
     });
     expect(results).toHaveNoViolations();
   });
+
+  it('Escape key should dismiss modal', async () => {
+    wrapper.setProps({ open: true });
+    await Vue.nextTick();
+    wrapper.find('.tui-modal__inner').trigger('keydown', { key: 'Escape' });
+    expect(wrapper.emitted('close')).toHaveLength(1);
+
+    wrapper.setProps({ open: true });
+    await Vue.nextTick();
+    // IE11 sends "Esc" instead of "Escape"
+    wrapper.find('.tui-modal__inner').trigger('keydown', { key: 'Esc' });
+    expect(wrapper.emitted('close')).toHaveLength(2);
+  });
 });

@@ -295,6 +295,7 @@ export default {
 
       switch (e.key) {
         case 'Escape':
+        case 'Esc': // for IE11
           if (this.dismissableSources.esc) {
             this.dismiss();
           }
