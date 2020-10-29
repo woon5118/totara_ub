@@ -28,3 +28,5 @@ information provided here is intended especially for developers.
   * \mod_perform\models\activity\notification_recipient::__construct() - no longer needs to inherit it's parent constructor.
   * \mod_perform\models\activity\notification_recipient::get_notification_id() - reference the core_notification_id property directly instead.
   * \mod_perform\models\activity\notification_recipient::get_active() - reference the active property directly instead.
+* GraphQL type mod_perform_my_subject_instance now support pagination. Actual results are returned in items. 
+* GraphQL query mod_perform_my_subject_instances now return mod_perform_subject_sections_page which include items as well as pagination information 

@@ -1,72 +1,77 @@
 query mod_perform_my_subject_instances(
   $filters: mod_perform_subject_instance_filters!
+  $cursor: String
 ) {
-  mod_perform_my_subject_instances(filters: $filters) {
-    subject {
-      id
-      progress_status
-      availability_status
-      created_at
-      due_date
-      is_overdue
-      job_assignment {
-        idnumber
-        fullname
-      }
-      activity {
+  mod_perform_my_subject_instances(filters: $filters, cursor: $cursor) {
+    items {
+      subject {
         id
-        name
-        type {
-          display_name
-        }
-        settings {
-          multisection
-        }
-        anonymous_responses
-      }
-      subject_user {
-        fullname
-      }
-      participant_instances {
-        id
-        participant_id
         progress_status
         availability_status
+        created_at
+        due_date
         is_overdue
-        is_for_current_user
-        core_relationship {
+        job_assignment {
+          idnumber
+          fullname
+        }
+        activity {
           id
           name
-        }
-      }
-    }
-    sections {
-      can_participate
-      section {
-        id
-        display_title
-        sort_order
-      }
-      participant_sections {
-        id
-        progress_status
-        availability_status
-        is_overdue
-        can_answer
-        participant_instance {
-          progress_status
-          participant_id
-          participant {
-            fullname
-            profileimageurlsmall
+          type {
+            display_name
           }
+          settings {
+            multisection
+          }
+          anonymous_responses
+        }
+        subject_user {
+          fullname
+        }
+        participant_instances {
+          id
+          participant_id
+          progress_status
+          availability_status
+          is_overdue
+          is_for_current_user
           core_relationship {
             id
             name
           }
-          is_for_current_user
+        }
+      }
+      sections {
+        can_participate
+        section {
+          id
+          display_title
+          sort_order
+        }
+        participant_sections {
+          id
+          progress_status
+          availability_status
+          is_overdue
+          can_answer
+          participant_instance {
+            progress_status
+            participant_id
+            participant {
+              fullname
+              profileimageurlsmall
+            }
+            core_relationship {
+              id
+              name
+            }
+            is_for_current_user
+          }
         }
       }
     }
+    total
+    next_cursor
   }
 }

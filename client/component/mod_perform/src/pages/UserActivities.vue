@@ -41,6 +41,7 @@
             about="self"
             :current-user-id="currentUserId"
             :view-url="viewActivityUrl"
+            :print-url="printActivityUrl"
           />
         </Tab>
         <Tab

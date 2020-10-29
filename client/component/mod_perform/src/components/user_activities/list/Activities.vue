@@ -217,6 +217,9 @@
         />
       </template>
     </Table>
+    <div v-if="showLoadMore" class="tui-performUserActivityList__loadMore">
+      <Button :text="$str('loadmore', 'totara_core')" @click="loadMore" />
+    </div>
 
     <ModalPresenter
       :open="isRelationshipSelectorShown"
@@ -295,6 +298,7 @@ export default {
       selectedSubjectUser: {},
       singleSectionViewOnlyActivities: [],
       relationshipSelectorUrl: '',
+      nextCursor: '',
     };
   },
 
@@ -319,6 +323,9 @@ export default {
         );
       });
     },
+    showLoadMore() {
+      return this.subjectInstances.length > 0 && this.nextCursor !== '';
+    },
   },
 
   apollo: {
@@ -332,7 +339,11 @@ export default {
           },
         };
       },
-      update: data => data['mod_perform_my_subject_instances'],
+      update: data => data['mod_perform_my_subject_instances'].items,
+      result({ data }) {
+        this.nextCursor =
+          data['mod_perform_my_subject_instances'].next_cursor || '';
+      },
     },
   },
 
@@ -634,6 +645,36 @@ export default {
       });
       window.open(url);
     },
+
+    /**
+     * Load the next 'page' of results
+     */
+    loadMore() {
+      this.$apollo.queries.subjectInstances.fetchMore({
+        variables: {
+          filters: {
+            about: this.aboutFilter,
+          },
+          cursor: this.nextCursor,
+        },
+
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const previousInstances =
+            previousResult.mod_perform_my_subject_instances.items;
+          const newInstances =
+            fetchMoreResult.mod_perform_my_subject_instances.items;
+          const nextCursor =
+            fetchMoreResult.mod_perform_my_subject_instances.next_cursor || '';
+          return {
+            mod_perform_my_subject_instances: {
+              items: [...previousInstances, ...newInstances],
+              total: fetchMoreResult.mod_perform_my_subject_instances.items,
+              next_cursor: nextCursor,
+            },
+          };
+        },
+      });
+    },
   },
 };
 </script>
@@ -661,6 +702,18 @@ export default {
       "user_activities_subject_header",
       "user_activities_title_header",
       "user_activities_type_header"
+    ],
+    "totara_core": [
+      "loadmore"
     ]
   }
 </lang-strings>
+
+<style lang="scss">
+.tui-performUserActivityList {
+  &__loadMore {
+    margin-top: var(--gap-2);
+    text-align: center;
+  }
+}
+</style>

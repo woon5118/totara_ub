@@ -26,6 +26,9 @@ namespace mod_perform\data_providers\activity;
 use core\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use core\pagination\cursor;
+use core\pagination\cursor_paginator;
+use mod_perform\data_providers\cursor_paginator_trait;
 use mod_perform\data_providers\provider;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\filters\subject_instance_id;
@@ -48,6 +51,7 @@ use mod_perform\state\subject_instance\active;
  * @method collection|subject_instance_model[] get
  */
 class subject_instance_for_participant extends provider {
+    use cursor_paginator_trait;
 
     /**
      * @var int
@@ -149,10 +153,11 @@ class subject_instance_for_participant extends provider {
             ->where_raw($totara_visibility_sql, $totara_visibility_params)
             ->where_exists($this->get_target_participant_exists())
             ->where('status', active::get_code())
+            // Cursors don't work when aliases are included in the order by
             // Newest subject instances at the top of the list
-            ->order_by('si.created_at', 'desc')
+            ->order_by('created_at', 'desc')
             // Order by id as well is so that tests wont fail if two rows are inserted within the same second
-            ->order_by('si.id', 'desc');
+            ->order_by('id', 'desc');
     }
 
     /**
@@ -182,6 +187,27 @@ class subject_instance_for_participant extends provider {
     public function get_subject_sections(): collection {
         $subject_instances = $this->get();
         return subject_sections::create_from_subject_instances($subject_instances);
+    }
+
+    /**
+     * Returns next page of sections and their participants related to the current set of
+     * subject instances.
+     *
+     * @param string $cursor
+     * @param int $page_size
+     * @return \stdClass
+     */
+    public function get_subject_sections_page(string $cursor = '', int $page_size = cursor_paginator::DEFAULT_ITEMS_PER_PAGE): \stdClass {
+        $cursor = !empty($cursor) ? cursor::decode($cursor) : cursor::create()->set_limit($page_size);
+        $paginator = $this->get_next($cursor, true);
+        $items = $paginator->get_items()->map_to(subject_instance_model::class);
+
+        $next_cursor = $paginator->get_next_cursor();
+        return (object)[
+            'items' => subject_sections::create_from_subject_instances($items),
+            'total' => $paginator->get_total(),
+            'next_cursor' => $next_cursor === null ? '' : $next_cursor->encode(),
+        ];
     }
 
     /**

@@ -40,20 +40,20 @@ class my_subject_instances implements query_resolver, has_middleware {
     public static function resolve(array $args, execution_context $ec) {
         $participant_id = user::logged_in()->id;
 
-        $subject_sections = (new subject_instance_data_provider($participant_id, participant_source::INTERNAL))
+        $results = (new subject_instance_data_provider($participant_id, participant_source::INTERNAL))
             ->add_filters($args['filters'] ?? [])
-            ->get_subject_sections();
+            ->get_subject_sections_page($args['cursor'] ?? '');
 
         // This is a workaround for making sure the correct access control checks
         // for users are triggered. It needs a course context to determine this.
         // If we enrol users into an activity we can remove this workaround
-        $first_section = $subject_sections->first();
+        $first_section = $results->items->first();
         $context = $first_section
             ? $first_section->get_subject_instance()->get_context()
             : util::get_default_context();
         $ec->set_relevant_context($context);
 
-        return $subject_sections;
+        return $results;
     }
 
     /**

@@ -94,7 +94,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
         $this->assertCount(1, $actual, 'wrong subject count');
 
         $subject = $actual[0];
@@ -215,7 +215,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
 
         // The user has two participant sections, one for the subject and one for the appraiser
         $this->assertCount(2, $actual[0]['sections'][0]['participant_sections']);
@@ -231,7 +231,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
 
         // The deleted participant is now gone from the result
         $this->assertCount(1, $actual[0]['sections'][0]['participant_sections']);
@@ -281,7 +281,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
 
         // The appraiser sees the subject users instance
         $this->assertNotEmpty($actual);
@@ -292,7 +292,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
 
         // The instance is not visible anymore
         $this->assertEmpty($actual);
@@ -340,7 +340,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
         $this->assertCount(1, $actual, 'wrong subject count');
 
         $subject = $actual[0];
@@ -509,7 +509,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
         $this->assertCount(1, $actual, 'wrong subject count');
 
         $subject = $actual[0];
@@ -736,7 +736,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
         $this->assertCount(1, $actual, 'wrong subject count');
 
         $subject = $actual[0];
@@ -935,7 +935,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
         $this->assertEmpty($actual, 'wrong subject count');
 
         // Now as the manager look at what I get back for others
@@ -951,7 +951,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
         $this->assertCount(1, $actual, 'wrong subject count');
 
         $subject = $actual[0];
@@ -1109,7 +1109,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $this->assert_webapi_operation_successful($result);
 
         // Check the progress status of the subject instance.
-        $actual = $this->get_webapi_operation_data($result);
+        $actual = ($this->get_webapi_operation_data($result))['items'];
 
         // Subject instance progress.
         $this->assertEquals(

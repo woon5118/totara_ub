@@ -22,11 +22,14 @@
  */
 
 use core\orm\query\builder;
+use core\pagination\cursor;
 use mod_perform\data_providers\activity\subject_instance_for_participant;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
+use mod_perform\models\activity\subject_instance;
+
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
 
@@ -167,4 +170,64 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
         $this->assertCount(2, $returned_participant_instances);
         $this->assertContains($subject_participant_instances->first()->id, $returned_participant_instances->pluck('id'));
     }
+    
+    /**
+     * @dataProvider cursor_size_provider
+     * @param int $page_size
+     * @param array $item_counts
+     */
+    public function test_with_pagination(int $page_size, array $item_counts): void {
+        // Create activities
+        $all_subject_instances = [self::$about_user_and_participating->id];
+
+        // Remember we already have 1 - thus <
+        for ($i = 1; $i < 4; $i++) {
+            $si = self::perform_generator()->create_subject_instance([
+                'activity_name' => "activity{$i}",
+                'subject_user_id' => self::$user->id,
+                'subject_is_participating' => true,
+            ]);
+            $all_subject_instances[] = $si->id;
+        }
+
+        // We order by created_at desc, id
+        $expected_subject_instances = array_chunk(
+            array_reverse($all_subject_instances),
+            $page_size
+        );
+        // Just verifying test parameters here ...
+        $this->assertSame(count($expected_subject_instances), count($item_counts));
+        
+        $cursor = cursor::create()->set_limit($page_size);
+        
+        for ($i = 0; $i < count($item_counts); $i++) {
+            $paginator = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
+                ->add_filters(['about' => [subject_instances_about::VALUE_ABOUT_SELF]])
+                ->get_next($cursor);
+    
+            $items = $paginator->get_items();
+            $this->assertCount($item_counts[$i], $items);
+            $actual_ids = $items->pluck('id');
+            // Order should be the same
+            $this->assertSame($expected_subject_instances[$i], $actual_ids);
+    
+            $cursor = $paginator->get_next_cursor();
+        }
+        
+        $this->assertNull($cursor);
+    }
+    
+    /**
+     * Data provider for cursor sizes
+     */
+    public function cursor_size_provider() {
+        return [
+            ['page_size' => 1, 'item_counts' => [1, 1, 1, 1]],
+            ['page_size' => 2, 'item_counts' => [2, 2]],
+            ['page_size' => 3, 'item_counts' => [3, 1]],
+            ['page_size' => 4, 'item_counts' => [4]],
+            ['page_size' => 5, 'item_counts' => [4]],
+        ];
+    }
+    
 }

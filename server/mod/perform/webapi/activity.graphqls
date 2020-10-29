@@ -351,6 +351,24 @@ type mod_perform_subject_sections {
   subject: mod_perform_subject_instance!
   sections: [mod_perform_section_participants!]!
 }
+"""
+Paginated details about perform activity that a user is involved with associated activity
+sections.
+"""
+type mod_perform_subject_sections_page implements core_pageable_result {
+  """
+  List of subjects sections
+  """
+  items: [mod_perform_subject_sections!]!
+  """
+  Total number of subject sections
+  """
+  total: Int!
+  """
+  Cursor to request the next set of results for this query
+  """
+  next_cursor: String!
+}
 
 """
 Details about an activity section and their participants
@@ -489,7 +507,8 @@ extend type Query {
   """
   mod_perform_my_subject_instances(
     filters: mod_perform_subject_instance_filters
-  ): [mod_perform_subject_sections!]!
+    cursor: String
+  ): mod_perform_subject_sections_page!
 
   """
   A specific performance activity (perform_subject_instance) a user is participating in
