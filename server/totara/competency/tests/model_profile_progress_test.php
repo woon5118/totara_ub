@@ -25,11 +25,12 @@
 use core\collection;
 use core\entities\user;
 use totara_competency\entities\assignment;
+use totara_competency\entities\competency_achievement;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\profile\competency_progress;
 use totara_competency\models\profile\filter;
-use totara_competency\models\profile\item;
 use totara_competency\models\profile\progress;
+use totara_competency\models\profile\traits\assignment_key;
 use totara_competency\models\profile\unassigned_competency_progress;
 
 global $CFG;
@@ -45,6 +46,8 @@ require_once($CFG->dirroot . '/totara/competency/tests/totara_competency_testcas
  * @coversDefaultClass \totara_competency\models\scale
  */
 class totara_competency_model_profile_progress_testcase extends totara_competency_testcase {
+
+    use assignment_key;
 
     /**
      * @covers ::load_by_id_with_values
@@ -73,11 +76,31 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
 
         $this->assertGreaterThan(0, count($progress->items));
 
-        $progress->items->map(function (item $item) {
-            // TODO TO BE RESOLVED IN TL-28156
-            // Well having type-hint will already assert that the item is of the correct type
-            // Let's quickly assert items for the correct structure and content
-        });
+        $assignments = $data['assignments'];
+
+        foreach ($progress->items as $key => $item) {
+            // assert correct assignments
+            $user_group_id = $item->assignments->pluck('user_group_id')[0];
+            $filtered_ass = $assignments->filter('user_group_id', $user_group_id);
+            $this->assertEqualsCanonicalizing($filtered_ass->pluck('id'), $item->assignments->pluck('id'));
+
+            // assert correct overall_progress
+            $this->assertNotNull($item->overall_progress);
+
+            $expected_proficient = $this->get_expected_proficient_value($user, $filtered_ass->first()->id);
+            $this->assertEquals($expected_proficient, $item->overall_progress);
+
+            // assert correct user group name
+            $assignment_id = $filtered_ass->first()->id;
+            $expected_assignment = assignment_model::load_by_id($assignment_id);
+            $this->assertEquals($expected_assignment->get_progress_name(), $item->name);
+
+            // assert correct graph
+            $this->assertIsArray($item->graph);
+
+            // assert correct key
+            $this->assertEquals(self::build_key($expected_assignment->get_entity()), $key);
+        }
 
         // Filters
         $this->assertIsArray($progress->filters);
@@ -179,6 +202,29 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
         self::assertInstanceOf(unassigned_competency_progress::class, $progress);
         self::assertCount(0, $progress->assignments);
         self::assertEquals($competency->id, $progress->competency->id);
+    }
+
+    /**
+     * Get proficient value for a specific assignment
+     *
+     * we calculate overall progress in the real world,
+     * in this test we only set one active assignment per group,
+     * so its proficient value represents the overall proficient value
+     * @see item::calculate_overall_progress()
+     *
+     * @param user $user
+     * @param int $assignment_id
+     * @return int
+     */
+    private function get_expected_proficient_value(user $user, int $assignment_id): int {
+        $proficient = competency_achievement::repository()
+                ->where('user_id', $user->id)
+                ->where('assignment_id', $assignment_id)
+                ->where('status', 0)
+                ->get()
+                ->first()->proficient ?? 0;
+
+        return $proficient * 100;
     }
 
 }
