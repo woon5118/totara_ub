@@ -179,6 +179,7 @@
 
   .loginerrors {
     @include form-error();
+    margin-bottom: var(--gap-2);
   }
 
   .desc {
