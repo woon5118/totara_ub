@@ -24,6 +24,7 @@
 use core\entities\user;
 use mod_perform\constants;
 use mod_perform\entities\activity\participant_instance;
+use mod_perform\entities\activity\subject_instance;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
@@ -147,13 +148,19 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                 ]
             );
 
-        /** @var activity $activity */
         $perform_generator->create_full_activities($configuration)->first();
 
+        // Find the participant_section for the subject user.
+        /** @var subject_instance $subject_instance */
+        $subject_instance = subject_instance::repository()->one();
+        /** @var participant_instance $participant_instance */
+        $participant_instance = participant_instance::repository()
+            ->where('participant_id', $subject_instance->subject_user_id)
+            ->one();
         /** @var participant_section_entity $participant_section */
         $participant_section = participant_section_entity::repository()
-            ->order_by('id', 'asc')
-            ->first();
+            ->where('participant_instance_id', $participant_instance->id)
+            ->one();
 
         $args = ['participant_section_id' => $participant_section->id];
 
