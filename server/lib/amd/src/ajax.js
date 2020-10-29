@@ -181,7 +181,10 @@ define(['jquery', 'core/config', 'core/log', 'core/notification'], function($, c
                 dataType: 'json',
                 processData: false,
                 async: async,
-                contentType: "application/json"
+                contentType: "application/json",
+                headers: {
+                    'x-totara-sesskey': config.sesskey
+                }
             };
 
             var script = 'service.php';
@@ -189,7 +192,7 @@ define(['jquery', 'core/config', 'core/log', 'core/notification'], function($, c
                 script = 'service-nologin.php';
             }
             var url = config.wwwroot + '/lib/ajax/' + script +
-                    '?sesskey=' + config.sesskey + '&info=' + requestInfo;
+                    '?info=' + requestInfo;
 
             // Jquery deprecated done and fail with async=false so we need to do this 2 ways.
             if (async) {

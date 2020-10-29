@@ -70,7 +70,15 @@ function confirm_sesskey($sesskey=NULL) {
     }
 
     if (empty($sesskey)) {
-        $sesskey = required_param('sesskey', PARAM_RAW);  // Check script parameters
+        // Check for HTTP header, similar to totara/webapi/classes/server
+        if (!empty($_SERVER['HTTP_X_TOTARA_SESSKEY'])) {
+            $sesskey = $_SERVER['HTTP_X_TOTARA_SESSKEY'];
+            if (!empty($_GET['sesskey'])) {
+                debugging('Sesskey should not be sent as a URL parameter, it is already being sent as an HTTP header.', DEBUG_DEVELOPER);
+            }
+        } else {
+            $sesskey = required_param('sesskey', PARAM_RAW);  // Check script parameters
+        }
     }
 
     // Totara: Using a timing-attack-safe function to compare the hashes.

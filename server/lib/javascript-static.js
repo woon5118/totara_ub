@@ -209,13 +209,13 @@ M.util.CollapsibleRegion.prototype.icon = null;
  */
 M.util.set_user_preference = function(name, value) {
     YUI().use('io', function(Y) {
-        var url = M.cfg.wwwroot + '/lib/ajax/setuserpref.php?sesskey=' +
-                M.cfg.sesskey + '&pref=' + encodeURI(name) + '&value=' + encodeURI(value);
+        var url = M.cfg.wwwroot + '/lib/ajax/setuserpref.php?pref=' + encodeURI(name) + '&value=' + encodeURI(value);
 
         // If we are a developer, ensure that failures are reported.
         var cfg = {
                 method: 'get',
-                on: {}
+                on: {},
+                headers: { 'x-totara-sesskey': M.cfg.sesskey }
             };
         if (M.cfg.developerdebug) {
             cfg.on.failure = function(id, o, args) {
