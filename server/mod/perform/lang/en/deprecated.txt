@@ -1,0 +1,1 @@
+user_activities_require_manual_participant_selection_text,mod_perform

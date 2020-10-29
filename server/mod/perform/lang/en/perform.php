@@ -1200,7 +1200,7 @@ $string['user_activities_other_response_show'] = "Show others' responses";
 $string['user_activities_page_title'] = 'Performance activities';
 $string['user_activities_page_print'] = '{$a} (performance activity)';
 $string['user_activities_require_manual_participant_selection_link'] = 'Select participants';
-$string['user_activities_require_manual_participant_selection_text'] = 'You must select participants to take part in performance activities. Note: activities cannot start until this is done';
+$string['user_activities_require_manual_participant_selection_header_text'] = 'There are activities awaiting participant selection. Please select people to participate so that those activities can start.';
 $string['user_activities_section_view_only'] = '(view only)';
 $string['user_activities_select_participants_none'] = 'You have no remaining participants to select.';
 $string['user_activities_select_participants_note'] = 'Note: None of these activities can start until participants are selected.';
@@ -1296,3 +1296,8 @@ $string['x_record_selected'] = '<strong>{$a}</strong> record selected';
 $string['x_records_selected'] = '<strong>{$a}</strong> records selected';
 $string['you_can_add_this_later'] = 'You can add this later.';
 $string['your_response'] = 'Your response';
+
+
+// Deprecated since 13.2
+
+$string['user_activities_require_manual_participant_selection_text'] = 'You must select participants to take part in performance activities. Note: activities cannot start until this is done';

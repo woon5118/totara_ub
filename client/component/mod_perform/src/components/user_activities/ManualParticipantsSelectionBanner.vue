@@ -22,7 +22,7 @@
       <template v-slot:card-body>
         <span>{{
           $str(
-            'user_activities_require_manual_participant_selection_text',
+            'user_activities_require_manual_participant_selection_header_text',
             'mod_perform'
           )
         }}</span>
@@ -67,7 +67,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "user_activities_require_manual_participant_selection_text",
+      "user_activities_require_manual_participant_selection_header_text",
       "user_activities_require_manual_participant_selection_link"
     ]
   }
