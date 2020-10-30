@@ -21,6 +21,7 @@
       <ResourceNavigationBar
         :back-button="backButton"
         :navigation-buttons="navigationButtons"
+        class="tui-engageSurveyView__backButton"
       />
     </template>
     <template v-slot:column>
@@ -75,6 +76,11 @@ export default {
 .tui-engageSurveyView {
   .tui-grid-item {
     min-height: var(--engageSurvey-min-height);
+  }
+
+  &__backButton {
+    margin-bottom: var(--gap-12);
+    padding: var(--gap-4) var(--gap-8);
   }
 
   &__navBar {

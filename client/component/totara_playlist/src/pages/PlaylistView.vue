@@ -328,6 +328,16 @@ export default {
   display: flex;
   flex-direction: column;
 
+  .tui-resourceNavigationBar {
+    @media (max-width: $tui-screen-sm) {
+      padding: var(--gap-4) 0;
+    }
+  }
+
+  .tui-contributionBaseContent__header {
+    margin-top: var(--gap-2);
+  }
+
   .tui-responsive > .tui-grid > .tui-grid-item {
     min-height: var(--playlistView-min-height);
   }
@@ -361,7 +371,7 @@ export default {
   .tui-contributionBaseContent__counter {
     position: relative;
     top: 0;
-    padding-bottom: var(--gap-2);
+    padding: 0 0 var(--gap-8) var(--gap-1);
   }
 }
 </style>

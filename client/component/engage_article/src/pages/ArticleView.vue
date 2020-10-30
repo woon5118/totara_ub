@@ -22,6 +22,7 @@
       <ResourceNavigationBar
         :back-button="backButton"
         :navigation-buttons="navigationButtons"
+        class="tui-engageArticleView__backButton"
       />
     </template>
     <template v-slot:column>
@@ -171,6 +172,10 @@ export default {
 .tui-engageArticleView {
   .tui-grid-item {
     min-height: var(--engageArticle-min-height);
+  }
+  &__backButton {
+    margin-bottom: var(--gap-12);
+    padding: var(--gap-4) var(--gap-8);
   }
 }
 </style>

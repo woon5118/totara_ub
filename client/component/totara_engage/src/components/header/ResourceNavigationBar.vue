@@ -118,8 +118,6 @@ export default {
 <style lang="scss">
 .tui-resourceNavigationBar {
   display: flex;
-  margin-bottom: var(--gap-12);
-  padding: var(--gap-4) var(--gap-8);
 
   @media (max-width: $tui-screen-sm) {
     padding: var(--gap-4);
