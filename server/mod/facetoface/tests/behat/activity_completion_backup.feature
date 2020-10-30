@@ -78,7 +78,7 @@ Feature: Backup and restore seminar activity completion
     # Restore
     And I click on "Restore" "button" in the "backup" "table"
     And I click on "Next" "button"
-    And I click on "Miscellaneous" "text"
+    And I click on "Miscellaneous" "text" in the "#region-main" "css_element"
     And I click on "Next" "button"
     And I click on "Next" "button"
     And I set the following fields to these values:
