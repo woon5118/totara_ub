@@ -244,7 +244,6 @@ class assignment {
         $repo = $repo = $class::repository()
             ->where('id', $user_group_id);
 
-        // TODO TO BE RESOLVED IN TL-28207: Cover the following condition with tests
         if ($class == user::class) {
             $repo->filter_by_not_deleted();
         } else if (is_subclass_of($class, hierarchy_item::class)) {
