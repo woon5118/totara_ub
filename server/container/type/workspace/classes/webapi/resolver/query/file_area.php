@@ -98,7 +98,8 @@ final class file_area implements mutation_resolver, has_middleware {
             'item_id' => $draft_id,
             'repository_id' => (int) $repository->id,
             'url' => $url->out(),
-            'accept_types' => file_get_typegroup('extension', ['web_image'])
+            'accept_types' => file_get_typegroup('extension', ['web_image']),
+            'context_id' => $context->id,
         ];
     }
 

@@ -11,6 +11,7 @@ query container_workspace_upload_metadata(
     repository_id
     url
     accept_types
+    context_id
   }
 
   image_url: container_workspace_workspace_image(workspace_id: $workspace_id)

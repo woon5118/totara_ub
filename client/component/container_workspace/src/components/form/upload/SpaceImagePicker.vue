@@ -32,6 +32,7 @@
       :accepted-types="metadata.acceptTypes"
       :overwrite="true"
       :one-file="true"
+      :context-id="metadata.contextId"
       @load="handleFileLoaded"
       @error="handleError"
       @progress="progressing"
@@ -114,7 +115,7 @@ export default {
       },
 
       update({
-        file_area: { item_id, repository_id, url, accept_types },
+        file_area: { item_id, repository_id, url, accept_types, context_id },
         image_url,
       }) {
         let parameter = {
@@ -123,6 +124,7 @@ export default {
           acceptTypes: accept_types,
           url: url,
           image: image_url,
+          contextId: context_id,
 
           // Need to cache this field as well.
           workspaceId: this.workspaceId,

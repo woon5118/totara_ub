@@ -3,6 +3,7 @@ type container_workspace_file_area {
   item_id: Int!
   url: String!
   accept_types: [String!]!
+  context_id: Int!
 }
 
 enum container_workspace_file_type {

@@ -5,6 +5,7 @@ The information here is intended only for developers.
 
 --- Update to graphQL ---
 * Changed area variable type from param_text to param_area in graphql schema.
+* Added context_id parameter to the file_area query
 
 === 13.1 ===
 
