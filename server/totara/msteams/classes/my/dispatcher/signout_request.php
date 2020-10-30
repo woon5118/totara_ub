@@ -23,6 +23,7 @@
 
 namespace totara_msteams\my\dispatcher;
 
+use core\session\manager;
 use lang_string;
 use totara_msteams\botfw\activity;
 use totara_msteams\botfw\bot;
@@ -64,6 +65,7 @@ class signout_request implements dispatchable, describable {
             $msuser = $bot->get_authoriser()->get_user($activity, $activity->from);
             $name = user_helper::get_friendly_name($msuser);
             $bot->get_authoriser()->delete_user($msuser);
+            manager::kill_user_sessions($msuser->userid);
             $bot->reply_text_to($activity, get_string('botfw:msg_signout_done', 'totara_msteams', $name));
         } catch (auth_required_exception $ex) {
             $bot->reply_text_to($activity, get_string('botfw:msg_signout_already', 'totara_msteams'));
