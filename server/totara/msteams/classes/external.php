@@ -83,6 +83,7 @@ class external extends external_api {
             $item = [
                 'title' => $object->name,
                 'subtitle' => $object->type,
+                'type' => $object->objecttype,
                 'text' => strip_tags($object->summary, '<u><s><b><i><strong><em><strike><br>'),
                 'url' => $object->link->url
             ];

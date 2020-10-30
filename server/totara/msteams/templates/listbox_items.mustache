@@ -40,6 +40,7 @@
             {
                 "title": "Course 1",
                 "subtitle": "Courses",
+                "type": "course",
                 "text": "This is a course",
                 "url": "...",
                 "image": {
@@ -50,6 +51,7 @@
             {
                 "title": "Program 101",
                 "subtitle": "Programs",
+                "type": "program",
                 "text": "This is a program",
                 "url": "...",
                 "image": {
@@ -64,7 +66,7 @@
 {{#items}}
     <li role="option" class="totara_msteams_form__list__item" data-url="{{url}}" data-title="{{title}}">
         {{#image}}
-            <div class="totara_msteams_form__list__item__thumbnail" role="presentation"><div class="totara_msteams_form__list__item__thumbnail__image" style='background-image: url("{{src}}")'></div></div>
+            <div class="totara_msteams_form__list__item__thumbnail" role="presentation"><img class="totara_msteams_form__list__item__thumbnail__image" src="{{src}}" data-type="{{type}}" alt=""></div>
         {{/image}}
         <div class="totara_msteams_form__list__item__content" role="none">
             <div class="totara_msteams_form__list__item__title">{{title}}</div>

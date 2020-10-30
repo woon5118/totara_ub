@@ -422,10 +422,13 @@ html.theme_msteams__iframe .totara_msteams__alert {
 }
 
 .totara_msteams_form__list__item__thumbnail__image {
-    background-repeat: no-repeat;
-    background-size: contain;
-    height: 100%;
+    -o-object-fit: contain;
+    object-fit: contain; /* not supported on IE11 */
     width: 100%;
+}
+
+.totara_msteams_form__list__item__thumbnail__image[data-type="playlist"] {
+    background: var(--color-primary);
 }
 
 .totara_msteams_form__list__item__content {

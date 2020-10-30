@@ -155,7 +155,7 @@ final class catalog_helper {
                     $image = (object)$data['image'];
                 }
             }
-            return (object)['name' => $name, 'type' => $type, 'category' => $category, 'summary' => $summary, 'image' => $image, 'link' => $link];
+            return (object)['name' => $name, 'type' => $type, 'objecttype' => $object->objecttype, 'category' => $category, 'summary' => $summary, 'image' => $image, 'link' => $link];
         }, $formattedobjects);
     }
 }
