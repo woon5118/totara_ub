@@ -52,9 +52,9 @@ final class course_form_watcher {
         $choices = array();
         $choices['1'] = get_string('yes');
         $choices['0'] = get_string('no');
-        $ele = $form->createElement('select', 'totara_mobile_coursecompat', get_string('coursecompat', 'totara_mobile'), $choices);
+        $ele = $form->createElement('select', 'totara_mobile_coursecompat', get_string('coursecompatible', 'totara_mobile'), $choices);
         $form->insertElementBefore($ele, 'descriptionhdr');
-        $form->addHelpButton('totara_mobile_coursecompat', 'coursecompat', 'totara_mobile');
+        $form->addHelpButton('totara_mobile_coursecompat', 'coursecompatible', 'totara_mobile');
 
         // If there is a course, see if it is compatible or not...
         $default = '';
