@@ -184,7 +184,7 @@ input mod_perform_delete_section_element_input {
 }
 
 """
-Move an existing section element
+Move an existing section element within the current section
 """
 input mod_perform_move_section_element_input {
   section_element_id: core_id!
@@ -257,6 +257,38 @@ type mod_perform_add_section_result {
 }
 
 """
+Input type for moving an element to another section
+"""
+input mod_perform_move_element_to_section_input {
+  """
+  The element to move
+  """
+  element_id: core_id!
+  """
+  ID of the section where the element is being moved from
+  """
+  source_section_id: core_id!
+  """
+  ID of the section where the element is being moved to
+  """
+  target_section_id: core_id!
+}
+
+"""
+Mutation return type when moving an element to another section
+"""
+type mod_perform_move_element_to_section_result {
+  """
+  The updated source section elements, with the moved element removed.
+  """
+  source_section_elements: [mod_perform_section_element!]!
+  """
+  The updated source section elements, with the moved element removed.
+  """
+  target_section_elements: [mod_perform_section_element!]!
+}
+
+"""
 Input type for deleting a section
 """
 input mod_perform_delete_section_input {
@@ -294,6 +326,15 @@ extend type Mutation {
   mod_perform_add_section(
     input: mod_perform_add_section_input!
   ): mod_perform_add_section_result!
+
+  """
+  Move an element to a different section
+  Currently, the target section must belong to the same activity as the source section. In future, this
+  criteria could be relaxed.
+  """
+  mod_perform_move_element_to_section(
+    input: mod_perform_move_element_to_section_input!
+  ): mod_perform_move_element_to_section_result!
 
   """
   Delete a section

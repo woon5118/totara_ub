@@ -234,6 +234,7 @@ class element extends model {
     }
 
     /**
+     * @deprecated since 14.0 - elements are designed to be reused more than once
      * @return section_element_entity
      */
     public function get_section_element(): section_element_entity {

@@ -32,6 +32,9 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/static_content_testcase.php');
 
+/**
+ * @group perform
+ */
 class performelement_static_content_draft_area_testcase extends performelement_static_content_testcase {
 
     use webapi_phpunit_helper;

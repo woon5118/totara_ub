@@ -106,6 +106,18 @@ trait webapi_phpunit_helper {
     }
 
     /**
+     * Given a result from a parsed_graphql_operation() call, gets the errors returned by the call.
+     *
+     * @param array $result_from_parsed_graphql_operation the result from the call.
+     *
+     * @return mixed the execution errors.
+     */
+    protected function get_webapi_operation_errors(array $result_from_parsed_graphql_operation) {
+        [, $errors] = $result_from_parsed_graphql_operation;
+        return $errors;
+    }
+
+    /**
      * Given a result from a parsed_graphql_operation() call, validates the call
      * executed "successfully". Throws a PHPUnit assertion error otherwise.
      *

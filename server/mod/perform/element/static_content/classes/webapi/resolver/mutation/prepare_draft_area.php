@@ -28,6 +28,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
+use mod_perform\entities\activity\section_element;
 use mod_perform\models\activity\element;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
@@ -41,22 +42,26 @@ class prepare_draft_area implements mutation_resolver, has_middleware {
         $element_id = $args['element_id'];
         $section_id = $args['section_id'];
 
-        $model = element::load_by_id($element_id);
-        $element_section = $model->get_section_element();
+        /** @var section_element $section_element_entity */
+        $section_element_entity = section_element::repository()
+            ->where('element_id', $element_id)
+            ->where('section_id', $section_id)
+            ->with('element')
+            ->one(true);
 
         // We've confirmed that the user has manage_capability on the
         // activity but we need to make sure that the element belongs
         // to the right activity.
-        if ($section_id !== (int) $element_section->section_id) {
+        if (empty($section_element_entity)) {
             throw new \coding_exception('Invalid element for section');
         }
 
-        $data = $model->data;
+        $data = $section_element_entity->element->data;
         $data = json_decode($data, true);
         $draft_id = null;
         $data['wekaDoc'] = file_prepare_draft_area(
             $draft_id,
-            $model->context_id,
+            $section_element_entity->element->context_id,
             'performelement_static_content',
             'content',
             $element_id,
