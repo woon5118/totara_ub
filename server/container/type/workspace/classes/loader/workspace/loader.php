@@ -28,6 +28,7 @@ use container_workspace\query\workspace\sort;
 use container_workspace\query\workspace\query;
 use container_workspace\query\workspace\source;
 use container_workspace\workspace;
+use context_system;
 use core\orm\pagination\offset_cursor_paginator;
 use core\orm\query\builder;
 use core\orm\query\table;
@@ -49,7 +50,7 @@ final class loader {
      * @return offset_cursor_paginator
      */
     public static function get_workspaces(query $query): offset_cursor_paginator {
-        global $CFG;
+        global $CFG, $DB;
 
         $builder = builder::table('course', 'c');
         $builder->join(['workspace', 'wo'], 'c.id', 'wo.course_id');
@@ -149,21 +150,76 @@ final class loader {
         // Hence we will have to filter out all the workspaces that the actor user cannot see against the
         // target user that is being fetched.
         require_once("{$CFG->dirroot}/totara/coursecatalog/lib.php");
+        $actor_id = $query->get_actor_id();
+
+        // Joining the context for tenancy support
+        $actor_tenant_id = $DB->get_field('user', 'tenantid', ['id' => $actor_id], MUST_EXIST);
+        $context_system = context_system::instance();
+
+        if ($CFG->tenantsenabled && !has_capability('totara/tenant:config', $context_system, $actor_id)) {
+            // Tenant is enabled and user does not have ability to manage tenant, hence they will fall to this path.
+            if (!empty($CFG->tenantsisolated) && !empty($actor_tenant_id)) {
+                $builder->left_join(
+                    ['context', 'ctx'],
+                    function (builder $join) use ($actor_tenant_id) {
+                        $join->where_field('c.id', 'ctx.instanceid');
+                        $join->where('ctx.contextlevel', CONTEXT_COURSE);
+                        $join->where('ctx.tenantid', $actor_tenant_id);
+                    }
+                );
+            } else if (empty($actor_tenant_id)) {
+                // If we are here, meaning that our user is a system user.
+
+                // --- SQL for context builder ---
+                //
+                // SELECT inner_ctx.* FROM "ttr_context" inner_ctx
+                // LEFT JOIN "ttr_tenant" tenant ON inner_ctx.tenantid = tenant.id
+                // LEFT JOIN "ttr_cohort_members" tcm ON tenant.cohortid = tcm.cohortid
+                // WHERE inner_ctx.contextlevel = CONTEXT_COURSE
+                // AND (inner_ctx.tenantid IS NULL OR tcm.id IS NOT NULL)
+                //
+                // --- END OF SQL ---
+                $context_builder = builder::table('context', 'inner_ctx');
+                $context_builder->select('inner_ctx.*');
+
+                $context_builder->left_join(['tenant', 'tenant'], 'inner_ctx.tenantid', 'tenant.id');
+                $context_builder->left_join(
+                    ['cohort_members', 'tcm'],
+                    function (builder $cohort_member_join) use ($actor_id): void {
+                        $cohort_member_join->where_field('tenant.cohortid', 'tcm.cohortid');
+                        $cohort_member_join->where('tcm.userid', $actor_id);
+                    }
+                );
+
+                $context_builder->where('inner_ctx.contextlevel', CONTEXT_COURSE);
+                $context_builder->where(
+                    function (builder $inner_context_builder): void {
+                        // Either we are looking for the context that is within a system
+                        // or the context that this user is a participant of.
+                        $inner_context_builder->where_null('inner_ctx.tenantid');
+                        $inner_context_builder->where_not_null('tcm.id', true);
+                    }
+                );
+
+                $builder->join([$context_builder, 'ctx'], 'c.id', 'ctx.instanceid');
+            }
+        } else {
+            $builder->left_join(
+                ['context', 'ctx'],
+                function (builder $join): void {
+                    $join->where_field('c.id', 'ctx.instanceid');
+                    $join->where('ctx.contextlevel', CONTEXT_COURSE);
+                }
+            );
+        }
+
         [$sql_where, $sql_params] = totara_visibility_where(
-            $query->get_actor_id(),
+            $actor_id,
             'c.id',
             'c.visible',
             'c.audiencevisible',
             'c',
             'course'
-        );
-
-        $builder->left_join(
-            ['context', 'ctx'],
-            function (builder $builder): void {
-                $builder->where_field('c.id', 'ctx.instanceid');
-                $builder->where('ctx.contextlevel', CONTEXT_COURSE);
-            }
         );
 
         $builder->where_raw($sql_where, $sql_params);

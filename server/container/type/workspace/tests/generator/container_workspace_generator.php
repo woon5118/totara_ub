@@ -31,6 +31,7 @@ use container_workspace\workspace;
 use core\json_editor\node\attachments;
 use core\json_editor\node\paragraph;
 use core\json_editor\helper\document_helper;
+use core_container\container_category_helper;
 
 /**
  * Generator for container workspace
@@ -362,11 +363,70 @@ final class container_workspace_generator extends component_generator_base {
 
     /**
      * @param workspace $workspace
-     * @param int $user_id
-     * @param int $actor_id
+     * @param int       $target_user_id
+     * @param int|null  $actor_id
      * @return member
      */
-    public function add_member(workspace $workspace, int $member_id, ?int $actor_id = null): member {
-        return member::added_to_workspace($workspace, $member_id, false, $actor_id);
+    public function add_member(workspace $workspace, int $target_user_id, ?int $actor_id = null): member {
+        return member::added_to_workspace($workspace, $target_user_id, false, $actor_id);
+    }
+
+    /**
+     * @param array $parameters
+     * @return coursecat
+     */
+    public function create_category(array $parameters = []): coursecat {
+        global $DB;
+
+        $parent_category_id = 0;
+        if (isset($parameters['tenant_id'])) {
+            $parent_category_id = $DB->get_field(
+                'tenant',
+                'categoryid',
+                ['id' => $parameters['tenant_id']]
+            );
+        }
+
+        return container_category_helper::create_container_category(
+            workspace::get_type(),
+            $parent_category_id,
+            $parameters['id_number'] ?? uniqid('id_number_'),
+            $parameters['name'] ?? null
+        );
+    }
+
+    /**
+     * By default, we don't allow workspace to be moved around the category.
+     * This generator helper function is to help us by pass those logic rules from workspace's API,
+     * so that we can test different scenarios. And this helper function should only be used in
+     * PHPUNIT environment.
+     *
+     * @param workspace $workspace
+     * @param int       $category_id
+     *
+     * @return void
+     */
+    public function move_workspace_to_category(workspace $workspace, int $category_id): void {
+        global $DB;
+
+        if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
+            throw new coding_exception("Cannot move the workspace category outside of phpunit environment");
+        }
+
+        // Update the course's record manually.
+        $course_record = new stdClass();
+        $course_record->id = $workspace->id;
+        $course_record->category = $category_id;
+
+        $DB->update_record('course', $course_record);
+
+        // Update the move of workspace's category context
+        $new_parent = context_coursecat::instance($category_id);
+        $workspace_context = $workspace->get_context();
+
+        $workspace_context->update_moved($new_parent);
+
+        cache_helper::purge_by_event('changesincoursecat');
+        $workspace->rebuild_cache(true);
     }
 }

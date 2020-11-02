@@ -28,6 +28,7 @@ use container_workspace\notification\workspace_notification;
 use container_workspace\tracker\tracker;
 use container_workspace\workspace;
 use core_container\factory;
+use totara_engage\engage_core;
 
 /**
  * A helper class that is constructed with workspace's id and the user's id, which helps to fetch
@@ -356,7 +357,7 @@ final class interactor {
      * @return bool
      */
     public function can_view_workspace_with_tenant_check(): bool {
-        global $CFG, $DB;
+        global $CFG;
         if ($this->workspace->is_to_be_deleted()) {
             // Workspace has been flagged to be deleted - hence all the user should not be able
             // to see this workspace at all.
@@ -376,42 +377,16 @@ final class interactor {
             return false;
         }
 
-        // Workspace extended logic rule.
-        $tenant_id = $context->tenantid;
-
-        if (null !== $tenant_id) {
-            // Check if the user is in the same tenant with the workspace or not.
-            $check_sql = '
-                    SELECT 1 FROM "ttr_cohort_members" cm
-                    INNER JOIN "ttr_tenant" t ON t.cohortid = cm.cohortid
-                    WHERE t.id = :tenant_id
-                    AND cm.userid = :user_id
-                ';
-
-            $result = $DB->record_exists_sql(
-                $check_sql,
-                [
-                    'tenant_id' => $tenant_id,
-                    'user_id' => $this->user_id
-                ]
-            );
-
-            if (!$result) {
-                return false;
-            }
-        } else if ($CFG->tenantsisolated) {
-            // Isolation mode is on - we just need to check if user is a part of tenant or not.
-            $result = $DB->record_exists_sql(
-                'SELECT 1 FROM "ttr_user" WHERE id = :user_id AND tenantid IS NOT NULL',
-                ['user_id' => $this->user_id]
-            );
-
-            if ($result) {
-                // This user is within a tenant - hence false to be returned.
-                return false;
-            }
+        // Workspace extended logic rule. The rule is simple, we prevent any access from
+        // system user to tenant workspace. But we do not prevent any access
+        // from tenant user to system workspace.
+        if (!empty($context->tenantid)) {
+            // Target context is within tenant. Hence check for whether the user actor is
+            // able to access to this tenant, despite of isolation mode is on/off.
+            return engage_core::is_user_part_of_tenant($context->tenantid, $this->user_id);
         }
 
+        // Yes. You are allow to see the workspace.
         return true;
     }
 
@@ -516,8 +491,10 @@ final class interactor {
      * @return bool
      */
     public function can_share_resources(): bool {
-        if ($this->workspace->is_to_be_deleted()) {
-            // Workspace has been deleted - hence no one can share the resources.
+        if (!$this->can_view_workspace()) {
+            // Either workspace has been deleted, or user has been moved to different tenant.
+            // Hence this user cannot see the workspace, and it means that the user cannot
+            // share the resources to library.
             return false;
         }
 

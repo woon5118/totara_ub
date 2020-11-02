@@ -597,9 +597,15 @@ final class member {
 
     /**
      * @return int
+     * @deprecated Since Totara 13.2
      */
     public function get_member_id(): int {
-        return $this->user_enrolment->id;
+        debugging(
+            "Function 'get_member_id' had been deprecated, please use 'get_id' instead",
+            DEBUG_DEVELOPER
+        );
+
+        return $this->get_id();
     }
 
     /**

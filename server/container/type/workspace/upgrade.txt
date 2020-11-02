@@ -13,6 +13,7 @@ The information here is intended only for developers.
 * Changed area variable type from param_text to param_area in graphql schema.
 
 --- Update to API ---
+* Function container_workspace\member\member::get_member_id had been deprecated, please use container_workspace\member\member::get_id instead.
 * Removed unused class container_workspace\webapi\resolver\query\count_members
 
 === 13.1 ===
