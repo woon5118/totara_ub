@@ -116,7 +116,8 @@ final class rb_source_topic extends rb_base_source {
                     'nosort' => true,
                     'joins' => ['topic_usage'],
                     'extrafields' => [
-                        'totalusage' => 'topic_usage.totalusage'
+                        'totalusage' => 'topic_usage.totalusage',
+                        'topic_value' => 'base.rawname'
                     ]
                 ]
             )

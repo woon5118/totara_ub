@@ -29,23 +29,14 @@ global $PAGE, $OUTPUT;
 
 $back = optional_param('back', null, PARAM_URL);
 $id = required_param('id', PARAM_INT);
-$sesskey = required_param('sesskey', PARAM_RAW);
 
 // We are trying to fetch the topic first, just in case if it is not existing in the system.
 $topic = topic::from_id($id);
-$url = new moodle_url(
-    "/totara/topic/delete.php",
-    [
-        'id' => $id,
-        'back' => $back,
-        'sesskey' => $sesskey
-    ]
-);
 
-if (null != $back) {
-    $back = new moodle_url($url);
-} else {
+if (null == $back) {
     $back = new moodle_url("/totara/topic/index.php");
+} else {
+    $back = new moodle_url($back);
 }
 
 require_login();
@@ -57,7 +48,7 @@ $heading = get_string('deletetopic', 'totara_topic');
 require_capability('totara/topic:delete', $context);
 
 $PAGE->set_context($context);
-$PAGE->set_url($url);
+$PAGE->set_url("/totara/topic/delete.php", ['id' => $id]);
 $PAGE->set_title($heading);
 $PAGE->set_heading($heading);
 

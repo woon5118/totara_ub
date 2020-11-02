@@ -43,12 +43,14 @@ define(['core/modal_factory', 'core/modal_events'], function (ModalFactory, Moda
 
         /**
          * @param {String} iconClassName
+         * @param {String} formClassName
          */
-        listenToDelete: function(iconClassName) {
+        listenToDelete: function(iconClassName, formClassName) {
             var icon = this.moduleElement.querySelector(iconClassName),
+                form = this.moduleElement.querySelector(formClassName),
                 that = this;
 
-            if (!icon) {
+            if (!icon || !form) {
                 return;
             }
 
@@ -57,32 +59,47 @@ define(['core/modal_factory', 'core/modal_events'], function (ModalFactory, Moda
                 function(event) {
                     var hasUsage = that.moduleElement.getAttribute('data-has-usage');
 
-                    if (1 == hasUsage || true == hasUsage) {
-                        // Preventing the url to continue, so that we can popup the dialog modal.
-                        event.preventDefault();
-                        ModalFactory.create(
-                            {
-                                type: ModalFactory.types.CONFIRM,
-                                title: that.moduleElement.getAttribute('data-modal-title'),
-                                body: that.moduleElement.getAttribute('data-confirm-message'),
-                            },
-                            undefined,
-                            {
-                                yesstr: that.moduleElement.getAttribute('data-yes-string'),
-                                nostr: that.moduleElement.getAttribute('data-no-string')
-                            }
-                        ).done(
-                            function (modal) {
-                                var root = modal.getRoot();
+                    // Preventing the url to continue.
+                    event.preventDefault();
 
-                                root.on(ModalEvent.yes, function () {
-                                    window.location.href = icon.getAttribute('href');
-                                });
-
-                                modal.show();
+                    var promise = new Promise(
+                        function(resolve) {
+                            if (0 == hasUsage || false == hasUsage) {
+                                resolve();
+                                return;
                             }
-                        );
-                    }
+
+                            // There are usage, pop up the dialog now.
+                            ModalFactory.create(
+                                {
+                                    type: ModalFactory.types.CONFIRM,
+                                    title: that.moduleElement.getAttribute('data-modal-title'),
+                                    body: that.moduleElement.getAttribute('data-confirm-message'),
+                                },
+                                undefined,
+                                {
+                                    yesstr: that.moduleElement.getAttribute('data-yes-string'),
+                                    nostr: that.moduleElement.getAttribute('data-no-string')
+                                }
+                            ).done(
+                                function(modal) {
+                                    var root = modal.getRoot();
+
+                                    root.on(ModalEvent.yes, function() {
+                                        modal.hide();
+                                        resolve();
+                                    });
+
+                                    modal.show();
+                                }
+                            );
+                        }
+                    );
+
+                    // It is even worst that you cannot use any sort of ES7
+                    promise.then(function() {
+                        form.submit();
+                    });
                 }
             );
         }
@@ -96,9 +113,12 @@ define(['core/modal_factory', 'core/modal_events'], function (ModalFactory, Moda
          *
          * @param {HTMLDivElement} element
          */
-        init: function (element) {
+        init: function(element) {
             var component = new ReportActions(element);
-            component.listenToDelete('.tw-reportActions__deleteIcon');
+            component.listenToDelete(
+                '.tw-reportActions__deleteIcon',
+                '.tw-reportActions__deleteForm'
+            );
         }
     };
 });

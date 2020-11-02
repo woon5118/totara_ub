@@ -24,26 +24,34 @@ namespace totara_topic\rb\display;
 
 use totara_reportbuilder\rb\display\base;
 use totara_topic\output\report_actions;
+use stdClass;
+use rb_column;
+use reportbuilder;
+use moodle_url;
 
 final class actions extends base {
     /**
-     * @param int|string     $id
-     * @param string         $format
-     * @param \stdClass      $row
-     * @param \rb_column     $column
-     * @param \reportbuilder $report
+     * @param int|string    $id
+     * @param string        $format
+     * @param stdClass      $row
+     * @param rb_column     $column
+     * @param reportbuilder $report
      *
      * @return string
      */
-    public static function display($id, $format, \stdClass $row, \rb_column $column, \reportbuilder $report): string {
+    public static function display($id, $format, stdClass $row, rb_column $column, reportbuilder $report): string {
         global $OUTPUT, $PAGE;
 
         // Using global $CONTEXT for now.
         $context = $PAGE->context;
         $extra = self::get_extrafields_row($row, $column);
 
-        $updateurl = null;
-        $deleteurl = null;
+        $usage = 0;
+        if (null != $extra->totalusage) {
+            $usage = $extra->totalusage;
+        }
+
+        $widget = report_actions::create(null, null, $usage);
 
         if (has_capability('totara/topic:update', $context)) {
             // Crafting the update url, if user has the capability
@@ -51,28 +59,31 @@ final class actions extends base {
             if (!$report->embedded) {
                 $updateurl->param('back', $report->report_url(true));
             }
+
+            $widget->set_update_url($updateurl);
+
+            if ($extra->topic_value) {
+                $update_title = get_string('update_topic_name', 'totara_topic', $extra->topic_value);
+                $widget->set_update_url_title($update_title);
+            }
         }
 
         if (has_capability('totara/topic:delete', $context)) {
             // Crafting the delete icon if the user has any capability
-            $params = [
-                'id' => $id,
-                'sesskey' => sesskey()
-            ];
+            $delete_url = new moodle_url("/totara/topic/delete.php", ['id' => $id]);
 
             if (!$report->embedded) {
-                $params['back'] = $report->report_url(true);
+                $delete_url->param('back', $report->report_url());
             }
 
-            $deleteurl = new \moodle_url("/totara/topic/delete.php", $params);
+            $widget->set_delete_url($delete_url);
+
+            if ($extra->topic_value) {
+                $delete_title = get_string('delete_topic_name', 'totara_topic', $extra->topic_value);
+                $widget->set_delete_url_title($delete_title);
+            }
         }
 
-        $usage = 0;
-        if (null != $extra->totalusage) {
-            $usage = $extra->totalusage;
-        }
-
-        $widget = report_actions::create($deleteurl, $updateurl, $usage);
         return $OUTPUT->render($widget);
     }
 }

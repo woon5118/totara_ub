@@ -23,6 +23,7 @@
 namespace totara_topic\output;
 
 use core\output\template;
+use moodle_url;
 
 /**
  * This output componen is used for rendering a box of action icons within a column
@@ -30,38 +31,79 @@ use core\output\template;
  */
 final class report_actions extends template {
     /**
-     * @param \moodle_url|null $deleteurl
-     * @param \moodle_url|null $updateurl
-     * @param int              $totalusage
+     * @param moodle_url|null $deleteurl
+     * @param moodle_url|null $updateurl
+     * @param int             $totalusage
      *
      * @return report_actions
      */
     public static function create(
-        ?\moodle_url $deleteurl,
-        ?\moodle_url $updateurl,
+        ?moodle_url $deleteurl,
+        ?moodle_url $updateurl,
         int $totalusage = 0
     ): report_actions {
         $data = [
             'deleteurl' => null,
             'updateurl' => null,
+            'delete_url_title' => null,
+            'update_url_title' => null,
             'hasusage' => false,
-            'message' => null
+            'message' => null,
+            'sesskey' => sesskey()
         ];
-
-        if (null != $deleteurl) {
-            // Please do not escape these url
-            $data['deleteurl'] = $deleteurl->out(false);
-        }
-
-        if (null != $updateurl) {
-            $data['updateurl'] = $updateurl->out(false);
-        }
 
         if (0 < $totalusage) {
             $data['hasusage'] = true;
             $data['message'] = get_string('confirmdeletewithusage', 'totara_topic', $totalusage);
         }
 
-        return new static($data);
+        $widget = new static($data);
+
+        $widget->set_delete_url($deleteurl);
+        $widget->set_update_url($updateurl);
+
+        return $widget;
+    }
+
+    /**
+     * @param moodle_url|null $delete_url
+     * @return void
+     */
+    public function set_delete_url(?moodle_url $delete_url): void {
+        if (null === $delete_url) {
+            $this->data['deleteurl'] = null;
+            return;
+        }
+
+        $this->data['deleteurl'] = $delete_url->out(false);
+    }
+
+    /**
+     * @param moodle_url|null $update_url
+     * @return void
+     */
+    public function set_update_url(?moodle_url $update_url): void {
+        if (null === $update_url) {
+            $this->data['updateurl'] = null;
+            return;
+        }
+
+        $this->data['updateurl'] = $update_url->out(false);
+    }
+
+    /**
+     * @param string $title
+     * @return void
+     */
+    public function set_delete_url_title(string $title): void {
+        $this->data['delete_url_title'] = $title;
+    }
+
+    /**
+     * @param string $title
+     * @return void
+     */
+    public function set_update_url_title(string $title): void {
+        $this->data['update_url_title'] = $title;
     }
 }

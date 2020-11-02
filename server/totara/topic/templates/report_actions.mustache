@@ -26,12 +26,16 @@
 
     Classes requried for JS:
     * tw-reportActions__deleteIcon
+    * tw-reportActions__deleteForm
 
     Context variables required for this template:
     * message: The deletion confirming message
     * deleteurl: The url for deleting this topic
     * hasusage: Boolean to check whether this topic has a usage or not
     * updateurl: The url for redirect to the form that update usage.
+    * sesskey: The sesskey data for deleting topic
+    * delete_url_title: Screen reader text for link icon delete topic
+    * update_url_title: Screen reader text for link icon update topic
 
     Example context (json):
         There is no example for this template
@@ -51,15 +55,29 @@
            title="{{#str}}edit, moodle{{/str}}"
         >
             {{#flex_icon}}edit{{/flex_icon}}
+            {{#update_url_title}}
+              <span class="sr-only">{{update_url_title}}</span>
+            {{/update_url_title}}
         </a>
     {{/updateurl}}
 
     {{#deleteurl}}
-        <a href="{{deleteurl}}"
+        <a href="#"
            class="action-icon tw-reportActions__deleteIcon"
            title="{{#str}}delete, moodle{{/str}}"
         >
             {{#flex_icon}}trash{{/flex_icon}}
+            {{#delete_url_title}}
+              <span class="sr-only">{{delete_url_title}}</span>
+            {{/delete_url_title}}
         </a>
+
+        <form class="tw-reportActions__deleteForm hidden" method="POST" action="{{deleteurl}}">
+          {{!
+            Form to handle POST to delete a topic. Not a greate solution,
+            but at least with this we can pass sesskey via POST
+          }}
+          <input type="hidden" name="sesskey" value="{{sesskey}}"/>
+        </form>
     {{/deleteurl}}
 </div>

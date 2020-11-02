@@ -31,6 +31,7 @@ $string['confirmdelete'] = "Are you sure to delete this topic";
 $string['confirmdeletewithusage'] = "Deleting this topic will remove it from '{\$a}' content items that have been assigned it. All content creators will be notified. Are you sure you want to continue?";
 $string['deleteconfirm'] = "Confirm deleting";
 $string['deletetopic'] = "Delete topic";
+$string['delete_topic_name'] = "Delete topic {\$a}";
 $string['entertopics'] = "Enter topic values (one per line)";
 $string['edittopic'] = "Edit topic";
 $string['managetopics'] = "Manage topics";
@@ -48,6 +49,7 @@ $string['topicexists'] = "Topic '{\$a}' already exists.";
 $string['topicdeletedmessage'] = "The topic '{\$a}' had been deleted from the system. You are receiving this message because your resources had been using this topic. Below is the list of the affected resources:";
 $string['unsuccessdelete'] = "Topic '{\$a}' has been unable to be deleted";
 $string['usageoftopics'] = "Usage of topics";
+$string['update_topic_name'] = "Update topic {\$a}";
 $string['value'] = "Value";
 $string['yescontinue'] = "Yes, continue";
 
