@@ -86,7 +86,7 @@ final class factory {
      * this includes site.
      *
      * @param string|null $container_type
-     * @return string
+     * @return string|container Container class name
      */
     public static function get_container_class(?string $container_type): string {
         if (null == $container_type) {
@@ -253,7 +253,7 @@ final class factory {
     /**
      * Returning all the container classes.
      *
-     * @return array
+     * @return string[]|container[] Array of [container type name => container class name]
      */
     public static function get_container_classes(): array {
         static::init();

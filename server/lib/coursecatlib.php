@@ -1137,6 +1137,10 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                     }
                 }
             }
+
+            // We don't care about container categories.
+            $invisibleids = array_diff($invisibleids, \core_container\container_category_helper::get_container_category_ids());
+
             $coursecatcache->set($cache_key, $invisibleids);
         }
         return $invisibleids;
@@ -2235,7 +2239,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
      *
      * @return array of deleted containers
      */
-    protected function delete_courses_and_containers(): array {
+    public function delete_courses_and_containers(): array {
         global $DB;
 
         $deleted = [];

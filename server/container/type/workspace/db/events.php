@@ -22,19 +22,21 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use container_workspace\event\discussion_created;
+use container_workspace\event\discussion_updated;
+use container_workspace\observer\comment_observer;
+use container_workspace\observer\discussion_observer;
+use container_workspace\observer\share_observer;
+use container_workspace\observer\tenant_observer;
+use container_workspace\observer\user_observer;
+use core\event\tenant_created;
+use core\event\user_deleted;
 use totara_comment\event\comment_created;
+use totara_comment\event\comment_soft_deleted;
 use totara_comment\event\comment_updated;
 use totara_comment\event\reply_created;
 use totara_comment\event\reply_soft_deleted;
-use totara_comment\event\comment_soft_deleted;
-use container_workspace\observer\comment_observer;
-use container_workspace\observer\discussion_observer;
 use totara_engage\event\share_created;
-use container_workspace\observer\share_observer;
-use container_workspace\event\discussion_created;
-use container_workspace\event\discussion_updated;
-use core\event\user_deleted;
-use container_workspace\observer\user_observer;
 
 $observers = [
     [
@@ -72,5 +74,9 @@ $observers = [
     [
         'eventname' => user_deleted::class,
         'callback' => [user_observer::class, 'on_user_deleted']
+    ],
+    [
+        'eventname' => tenant_created::class,
+        'callback' => [tenant_observer::class, 'tenant_created'],
     ],
 ];

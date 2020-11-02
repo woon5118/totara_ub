@@ -48,6 +48,6 @@ Feature: Find learning course category management
     And I should not see "c1bc1"
     And I should not see "c1bc2"
 
-    When I click on "[data-categoryid=3] .categoryname" "css_element"
+    When I click on "Category 1a" "link"
     Then I should see "c1ac1"
     And I should not see "c1bc2"

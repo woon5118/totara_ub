@@ -28,4 +28,6 @@ function xmldb_container_workspace_install() {
     require_once $CFG->dirroot . '/container/type/workspace/db/upgradelib.php';
 
     container_workspace_add_missing_roles();
+
+    \container_workspace\workspace::create_categories();
 }

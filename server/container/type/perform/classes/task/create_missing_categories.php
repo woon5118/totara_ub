@@ -15,29 +15,28 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package container_perform
  */
 
+namespace container_perform\task;
+
+use container_perform\perform;
+use core\task\adhoc_task;
+
 /**
- * Local database upgrade script
- *
- * @param   integer $oldversion Current (pre-upgrade) local db version timestamp
- * @return  boolean $result
+ * Class create_missing_categories
+ * @package container_perform\task
  */
-function xmldb_container_perform_upgrade($oldversion) {
-    global $CFG, $DB;
+final class create_missing_categories extends adhoc_task {
 
-    $dbman = $DB->get_manager();
-
-    if ($oldversion < 2020100101) {
-        // Queue the creation of missing container records for the perform container.
-        \core\task\manager::queue_adhoc_task(new \container_perform\task\create_missing_categories());
-
-        upgrade_plugin_savepoint(true, 2020100101, 'container', 'perform');
+    public function execute() {
+        perform::create_categories();
+        if (!PHPUNIT_TEST) {
+            mtrace('Created missing perform container categories');
+        }
     }
 
-    return true;
 }

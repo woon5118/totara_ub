@@ -25,38 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 use core_container\container_category_helper;
 
 class core_container_category_helper_testcase extends advanced_testcase {
-    /**
-     * @return void
-     */
-    public function test_get_default_category(): void {
-        global $DB;
-
-        $generator = $this->getDataGenerator();
-        $user = $generator->create_user();
-
-        $category_id = container_category_helper::get_default_category_id(
-            'container_course',
-            true,
-            null,
-            $user->id
-        );
-
-        $this->assertNotEmpty($category_id);
-        $this->assertTrue(
-            $DB->record_exists('course_categories', ['id' => $category_id])
-        );
-
-        // The first run is where the creation happen if the record is not found.
-        // However check if the api is returning the same result if there is actual record.
-        $second_category_id = container_category_helper::get_default_category_id(
-            'container_course',
-            false,
-            null,
-            $user->id
-        );
-
-        $this->assertEquals($category_id, $second_category_id);
-    }
 
     /**
      * @return void

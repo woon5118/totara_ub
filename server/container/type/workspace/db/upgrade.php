@@ -46,5 +46,12 @@ function xmldb_container_workspace_upgrade($old_version) {
         upgrade_plugin_savepoint(true, 2020100101, 'container', 'workspace');
     }
 
+    if ($old_version < 2020100105) {
+        // Queue the creation of missing container records for the workspace container.
+        \core\task\manager::queue_adhoc_task(new \container_workspace\task\create_missing_categories());
+
+        upgrade_plugin_savepoint(true, 2020100105, 'container', 'workspace');
+    }
+
     return true;
 }

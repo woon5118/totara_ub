@@ -49,7 +49,8 @@ final class perform_helper {
 
         builder::get_db()->transaction(function () use ($coursecats) {
             foreach ($coursecats as $coursecat) {
-                $coursecat->delete_full();
+                // We don't delete the categories themselves since we may need them again if mod_perform is reinstalled.
+                $coursecat->delete_courses_and_containers();
             }
         });
     }

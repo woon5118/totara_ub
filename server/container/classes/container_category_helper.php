@@ -24,6 +24,7 @@ namespace core_container;
 
 use core_container\facade\category_id_number_provider;
 use core_container\facade\category_name_provider;
+use coursecat;
 
 /**
  * A helper to help on creating a default course category.
@@ -39,7 +40,47 @@ final class container_category_helper {
      * @return string
      */
     private static function build_id_number(string $container_type, int $category_id): string {
+        /** @var container|string $container_class */
+        $container_class = factory::get_container_class($container_type);
+        if (is_subclass_of($container_class, category_id_number_provider::class)) {
+            return $container_class::get_container_category_id_number();
+        }
+
         return "{$container_type}-{$category_id}";
+    }
+
+    /**
+     * Get the tenant category ID from the specified tenant ID or the specified user's tenant.
+     *
+     * @param int|null $tenant_id
+     * @param int|null $user_id
+     * @return int
+     */
+    private static function get_tenant_category_id(?int $tenant_id, ?int $user_id): int {
+        global $DB, $USER;
+
+        $top_level_id = 0;
+
+        if (empty($user_id)) {
+            $user_id = $USER->id;
+        }
+
+        if (empty($tenant_id)) {
+            if ($user_id == $USER->id && !empty($USER->tenantid)) {
+                $tenant_id = $USER->tenantid;
+            } else {
+                $tenant_id = $DB->get_field('user', 'tenantid', ['id' => $user_id]);
+            }
+        }
+
+        $tenant_category_id = $DB->get_field('tenant', 'categoryid', ['id' => $tenant_id]);
+
+        if (!$tenant_category_id) {
+            // If no tenant category ID could be resolved, then fallback to this.
+            return $top_level_id;
+        }
+
+        return $tenant_category_id;
     }
 
     /**
@@ -56,62 +97,40 @@ final class container_category_helper {
      *                                          {@see category_id_number_provider::get_container_category_id_number()}
      *
      * @param int|null      $user_id            If it is not provided, user in session will be used.
+     *                                          The tenant_id param overrides the user's tenant ID.
+     *
+     * @param int|null      $tenant_id          If it is not provided, it will be ignored.
      *
      * @return int|null
      */
     public static function get_default_category_id(string $container_type, bool $create_on_missing = true,
-                                                    ?string $id_number = null, ?int $user_id = null): ?int {
-        global $USER, $CFG, $DB;
-
-        if (null === $user_id || 0 === $user_id) {
-            $user_id = $USER->id;
-        }
+                                                    ?string $id_number = null, ?int $user_id = null, ?int $tenant_id = null): ?int {
+        global $CFG, $DB;
 
         // This is the very top level of course categories.
         $parent_id = 0;
 
-        // Multi-tenancy compatible.
         if (!empty($CFG->tenantsenabled)) {
-            // Search for $tenant_id.
-            if ($user_id == $USER->id && !empty($USER->tenantid)) {
-                $tenant_id = $USER->tenantid;
-            } else {
-                $tenant_id = $DB->get_field('user', 'tenantid', ['id' => $user_id]);
-            }
-
-            if (!empty($tenant_id)) {
-                $parent_id = $DB->get_field('tenant', 'categoryid', ['id' => $tenant_id]);
-            }
+            // Multi-tenancy compatible.
+            $parent_id = static::get_tenant_category_id($tenant_id, $user_id);
         }
 
-        $class_name = factory::get_container_class($container_type);
-        $interfaces = class_implements($class_name);
-
-        if (null === $id_number || '' === $id_number) {
+        if ($id_number === null || $id_number === '') {
             // Generate the default unique id number for category, based on the category's parent id.
             // And this category should be the one where container is belong to
             $id_number = static::build_id_number($container_type, $parent_id);
-
-            if (in_array(category_id_number_provider::class, $interfaces)) {
-                // If the container is implementing interface provide_category_id_number, then it will try to
-                // call to the provided API.
-                $id_number = call_user_func([$class_name, 'get_container_category_id_number']);
-            }
         }
 
-        $params = [
+        $category_id = $DB->get_field('course_categories', 'id', [
             'idnumber' => $id_number,
             'parent' => $parent_id
-        ];
-
-        $category_id = $DB->get_field('course_categories', 'id', $params);
-        if (!empty($category_id)) {
+        ]);
+        if ($category_id) {
             return $category_id;
         }
 
         if ($create_on_missing) {
-            $new_category = static::create_container_category($container_type, $parent_id, $id_number);
-            return $new_category->id;
+            return static::create_container_category($container_type, $parent_id)->id;
         }
 
         return null;
@@ -133,17 +152,16 @@ final class container_category_helper {
      * @param string|null   $id_number
      * @param string|null   $name
      *
-     * @return \coursecat
+     * @return coursecat
      */
     public static function create_container_category(string $container_type, int $parent_category_id,
-                                                     string $id_number = null, ?string $name = null): \coursecat {
-        $class_name = factory::get_container_class($container_type);
-        $interfaces = class_implements($class_name);
+                                                     string $id_number = null, ?string $name = null): coursecat {
+        $container_class = factory::get_container_class($container_type);
 
         // Finding the name for the category.
         if (null === $name || '' === $name) {
-            if (in_array(category_name_provider::class, $interfaces)) {
-                $name = call_user_func([$class_name, 'get_container_category_name']);
+            if (is_subclass_of($container_class, category_name_provider::class)) {
+                $name = $container_class::get_container_category_name();
             } else {
                 // Otheriwse just use the default language string for the name.
                 $name = get_string('default_category', 'core_container');
@@ -153,21 +171,63 @@ final class container_category_helper {
         // Find the id number for the category.
         if (null === $id_number || '' === $id_number) {
             $id_number = static::build_id_number($container_type, $parent_category_id);
-
-            if (in_array(category_id_number_provider::class, $interfaces)) {
-                $id_number = call_user_func([$class_name, 'get_container_category_id_number']);
-            }
         }
-
-        $is_system = call_user_func([$class_name, 'is_using_system_category']);
 
         $record = new \stdClass();
         $record->name = $name;
         $record->idnumber = $id_number;
         $record->parent = $parent_category_id;
         $record->timemodified = time();
-        $record->issystem = $is_system ? 1 : 0;
+        $record->issystem = (int) $container_class::is_using_system_category();
 
-        return \coursecat::create($record);
+        return coursecat::create($record);
     }
+
+    /**
+     * @param string $container_type
+     */
+    public static function create_container_categories(string $container_type): void {
+        global $CFG, $DB;
+
+        if (!empty($CFG->tenantsenabled)) {
+            $tenant_ids = $DB->get_fieldset_select('tenant', 'id', "1 = 1");
+            foreach ($tenant_ids as $tenant_id) {
+                static::get_default_category_id($container_type, true, null, null, $tenant_id);
+            }
+        }
+
+        static::get_default_category_id($container_type);
+    }
+
+    /**
+     * Get the IDs of system created container categories.
+     * This does not include the miscellaneous system course category, since that is not created via the containers API.
+     *
+     * @return int[]
+     */
+    public static function get_container_category_ids(): array {
+        global $CFG, $DB;
+
+        if (!empty($CFG->tenantsenabled)) {
+            $tenant_ids = $DB->get_fieldset_select('tenant', 'id', "1 = 1");
+        } else {
+            $tenant_ids = [];
+        }
+
+        $category_ids = [];
+
+        foreach (factory::get_container_classes() as $container_class) {
+            $category_id = static::get_default_category_id($container_class::get_type(), false);
+            if ($category_id !== null) {
+                $category_ids[] = $category_id;
+            }
+
+            foreach ($tenant_ids as $tenant_id) {
+                $category_ids[] = static::get_default_category_id($container_class::get_type(), false, null, null, $tenant_id);
+            }
+        }
+
+        return $category_ids;
+    }
+
 }

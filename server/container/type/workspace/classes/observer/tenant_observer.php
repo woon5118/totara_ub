@@ -17,22 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package container_workspace
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace container_workspace\observer;
 
-/* NOTE: the following version number must be bumped during each major or minor Totara release. */
+use container_workspace\workspace;
+use core\event\tenant_created;
+use core_container\container_category_helper;
 
-$plugin->version  = 2020100105;                 // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;                 // Requires this Moodle version.
-$plugin->component = 'container_workspace';          // To check on upgrade, that module sits in correct place
+final class tenant_observer {
 
-$plugin->dependencies = [
-    'totara_engage' => 2019101202,
-    'editor_weka' => 2019111800,
-    'totara_comment' => 2019101500,
-    'enrol_self' => 2017111300,
-    'enrol_manual' => 2017111300
-];
+    /**
+     * Create categories for the workspace container.
+     *
+     * @param tenant_created $event
+     */
+    public static function tenant_created(tenant_created $event): void {
+        /** @var \core\entities\tenant $tenant */
+        $tenant = $event->get_record_snapshot('tenant', $event->objectid);
+        container_category_helper::create_container_category(workspace::get_type(), $tenant->categoryid);
+    }
+
+}

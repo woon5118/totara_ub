@@ -843,8 +843,13 @@ class core_course_management_helper_test extends advanced_testcase {
         \core_course\management\helper::action_category_resort_subcategories($topcat, 'name');
         $categories = $topcat->get_children();
         $this->assertIsArray($categories);
+
         $dbcategories = $DB->get_records('course_categories', array('parent' => '0'), 'sortorder');
-        $this->assertEquals(array_keys($dbcategories), array_keys($categories));
+        $container_categories = \core_container\container_category_helper::get_container_category_ids();
+        $this->assertNotEmpty($container_categories);
+        $dbcategories = array_diff(array_keys($dbcategories), $container_categories);
+
+        $this->assertEquals($dbcategories, array_keys($categories));
 
         // Prohibit resorting.
         $caps->assign(CAP_PROHIBIT);

@@ -15,29 +15,29 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package container_perform
  */
 
-/**
- * Local database upgrade script
- *
- * @param   integer $oldversion Current (pre-upgrade) local db version timestamp
- * @return  boolean $result
- */
-function xmldb_container_perform_upgrade($oldversion) {
-    global $CFG, $DB;
+namespace container_perform\observer;
 
-    $dbman = $DB->get_manager();
+use container_perform\perform;
+use core\event\tenant_created;
+use core_container\container_category_helper;
 
-    if ($oldversion < 2020100101) {
-        // Queue the creation of missing container records for the perform container.
-        \core\task\manager::queue_adhoc_task(new \container_perform\task\create_missing_categories());
+final class tenant_observer {
 
-        upgrade_plugin_savepoint(true, 2020100101, 'container', 'perform');
+    /**
+     * Create categories for the perform container.
+     *
+     * @param tenant_created $event
+     */
+    public static function tenant_created(tenant_created $event): void {
+        /** @var \core\entities\tenant $tenant */
+        $tenant = $event->get_record_snapshot('tenant', $event->objectid);
+        container_category_helper::create_container_category(perform::get_type(), $tenant->categoryid);
     }
 
-    return true;
 }

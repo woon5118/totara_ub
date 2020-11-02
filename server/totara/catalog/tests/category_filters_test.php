@@ -64,7 +64,7 @@ class totara_catalog_category_filters_testcase extends advanced_testcase {
         $filter_selector->add_all_option($all_option, $all_option);
 
         $filter_categories = $filter_selector->get_options();
-        $this->assertGreaterThanOrEqual(
+        $this->assertLessThanOrEqual(
             count($all_categories),
             count($filter_categories),
             "$filter_type: wrong category count"

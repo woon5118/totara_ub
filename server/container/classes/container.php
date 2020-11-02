@@ -819,6 +819,14 @@ abstract class container {
     }
 
     /**
+     * Create the default course categories for this container type.
+     */
+    public static function create_categories(): void {
+        $container_type = static::get_type();
+        container_category_helper::create_container_categories($container_type);
+    }
+
+    /**
      * Returning the view url of the container.
      * @return \moodle_url
      */

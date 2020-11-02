@@ -18,47 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
- * @package core_container
+ * @package container_perform
  */
 defined('MOODLE_INTERNAL') || die();
 
+use container_perform\perform;
 use core_container\container_category_helper;
 
-class core_container_category_restore_component_testcase extends advanced_testcase {
-    /**
-     * @return void
-     */
-    public function test_fetch_categories_without_workspace_category(): void {
-        global $DB, $CFG;
+class container_peform_category_restore_component_testcase extends advanced_testcase {
 
-        // Create a workspace category.
-        $workspace_category = container_category_helper::create_container_category('container_workspace', 0);
-        self::assertTrue($DB->record_exists('course_categories', ['id' => $workspace_category->id]));
-
-        $this->setAdminUser();
-
-        require_once("{$CFG->dirroot}/backup/util/ui/restore_ui_components.php");
-        $category_search = new restore_category_search();
-
-        $categories = $category_search->get_results();
-
-        self::assertIsArray($categories);
-        self::assertNotEmpty($categories);
-        self::assertCount(1, $categories);
-
-        $miscellanous_category = reset($categories);
-        self::assertNotEquals($workspace_category->id, $miscellanous_category);
-    }
-
-    /**
-     * @return void
-     */
     public function test_fetch_categories_without_perform_category(): void {
-        global $DB, $CFG;
+        global $CFG;
 
-        // Create a workspace category.
-        $perform_category = container_category_helper::create_container_category('container_perform', 0);
-        self::assertTrue($DB->record_exists('course_categories', ['id' => $perform_category->id]));
+        // Get the perform category.
+        $perform_category_id = container_category_helper::get_default_category_id('container_perform');
 
         $this->setAdminUser();
 
@@ -72,6 +45,6 @@ class core_container_category_restore_component_testcase extends advanced_testca
         self::assertCount(1, $categories);
 
         $miscellanous_category = reset($categories);
-        self::assertNotEquals($perform_category->id, $miscellanous_category);
+        self::assertNotEquals($perform_category_id, $miscellanous_category);
     }
 }

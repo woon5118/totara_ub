@@ -464,6 +464,13 @@ class course extends container {
     }
 
     /**
+     * Courses don't sit inside any sub-categories by default, so no need to create them here.
+     */
+    public static function create_categories(): void {
+        // Do nothing.
+    }
+
+    /**
      * Let the children, which is Site to extend this function on creating an instance of its own module object.
      *
      * @param \stdClass $newcm

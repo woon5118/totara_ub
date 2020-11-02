@@ -20,19 +20,31 @@
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package container_workspace
  */
-
 defined('MOODLE_INTERNAL') || die();
 
-/* NOTE: the following version number must be bumped during each major or minor Totara release. */
+use core_container\container_category_helper;
 
-$plugin->version  = 2020100105;                 // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;                 // Requires this Moodle version.
-$plugin->component = 'container_workspace';          // To check on upgrade, that module sits in correct place
+class container_workspace_category_restore_component_testcase extends advanced_testcase {
 
-$plugin->dependencies = [
-    'totara_engage' => 2019101202,
-    'editor_weka' => 2019111800,
-    'totara_comment' => 2019101500,
-    'enrol_self' => 2017111300,
-    'enrol_manual' => 2017111300
-];
+    public function test_fetch_categories_without_workspace_category(): void {
+        global $CFG;
+
+        // Get the workspace category.
+        $workspace_category_id = container_category_helper::get_default_category_id('container_workspace');
+
+        self::setAdminUser();
+
+        require_once("{$CFG->dirroot}/backup/util/ui/restore_ui_components.php");
+        $category_search = new restore_category_search();
+
+        $categories = $category_search->get_results();
+
+        self::assertIsArray($categories);
+        self::assertNotEmpty($categories);
+        self::assertCount(1, $categories);
+
+        $miscellanous_category = reset($categories);
+        self::assertNotEquals($workspace_category_id, $miscellanous_category);
+    }
+
+}

@@ -208,12 +208,15 @@ final class util {
 
         $trans->allow_commit();
 
+        $event = \core\event\tenant_created::create(
+            ['objectid' => $tenant->id, 'context' => \context_tenant::instance($tenant->id)]
+        );
+        $event->add_record_snapshot('tenant', $tenant);
+
         tenant::reset_caches($tenant->id);
         $tenant = tenant::fetch($tenant->id);
 
-        \core\event\tenant_created::create(
-            ['objectid' => $tenant->id, 'context' => \context_tenant::instance($tenant->id)]
-        )->trigger();
+        $event->trigger();
 
         return $tenant;
     }

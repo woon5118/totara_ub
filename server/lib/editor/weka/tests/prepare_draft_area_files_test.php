@@ -24,6 +24,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use core\json_editor\document;
 use core\json_editor\node\attachment;
+use core\orm\query\builder;
 
 class editor_weka_prepare_draft_area_files_testcase extends advanced_testcase {
     /**
@@ -59,7 +60,7 @@ class editor_weka_prepare_draft_area_files_testcase extends advanced_testcase {
             ];
         }
 
-        $category = $DB->get_record('course_categories', []);
+        $category = builder::table('course_categories')->order_by('id')->first();
 
         $courserecord = new \stdClass();
         $courserecord->fullname = 'Hello 101';

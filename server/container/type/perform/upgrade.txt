@@ -1,0 +1,6 @@
+This files describes API changes in /container/type/perform/*.
+The information here is intended only for developers.
+
+=== 13.2 ===
+
+* Perform container categories are now created upon installation, instead of created on-demand

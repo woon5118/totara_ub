@@ -4,6 +4,7 @@ information provided here is intended especially for developers.
 === 13.2 ===
 * Introduced new config variables $CFG->link_parser_allowed_hosts and $CFG->link_parser_blocked_hosts to be able to explicitly allow or block hosts
   to be parsed by the get_linkmetadata GraphQL query.
+* \coursecat::delete_courses_and_containers() is now publicly accessible.
 
 === 13.1 ===
 

@@ -106,14 +106,13 @@ class container_perform_perform_helper_testcase extends advanced_testcase {
         // Now for the test
         $this->setAdminUser();
         perform_helper::delete_all();
-        $this->assertEquals($default_counts['categories'] + count($categories) - $activity_counts['categories'],
+        // No categories should've been deleted
+        $this->assertEquals($default_counts['categories'] + count($categories),
             $DB->count_records('course_categories')
         );
         $this->assertEquals($default_counts['courses'] + count($courses) - $activity_counts['courses'],
             $DB->count_records('course')
         );
-
-        $this->assertEquals(0, $DB->count_records('course_categories', ['name' => perform_container::DEFAULT_CATEGORY_NAME]));
     }
 
     public function test_delete_all_permission(): void {

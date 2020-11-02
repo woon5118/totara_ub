@@ -3,6 +3,9 @@ The information here is intended only for developers.
 
 === 13.2 ===
 
+--- Update to general functionality ---
+* Workspace container categories are now created upon installation, instead of created on-demand
+
 --- Update to graphQL ---
 * Added field "context_id" to type "container_workspace_workspace"
 * Added field "context_id" to type "container_workspace_workspace_category_interactor"

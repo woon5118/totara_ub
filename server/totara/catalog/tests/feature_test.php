@@ -194,7 +194,13 @@ class totara_catalog_feature_testcase extends advanced_testcase {
 
         // Check get_options() method.
         $options = $feature->get_options();
-        $this->assertCount($DB->count_records('course_categories'), $options);
+        $category_count = \core\orm\query\builder::table('course_categories')
+            ->where_not_in('name', [
+                \container_perform\perform::get_container_category_name(),
+                \container_workspace\workspace::get_container_category_name()
+            ])
+            ->count();
+        $this->assertCount($category_count, $options);
 
         $misc_default_cat = $DB->get_record('course_categories', ['id' => course::get_default_category_id()]);
         $context_misc = context_coursecat::instance($misc_default_cat->id);

@@ -47,6 +47,6 @@ Feature: Find learning program category management
     And I should not see "c1bp1"
     And I should not see "c1bp2"
 
-    When I click on "[data-categoryid=3] .categoryname" "css_element"
+    When I click on "Category 1a" "link"
     Then I should see "c1ap1"
     And I should not see "c1bp2"
