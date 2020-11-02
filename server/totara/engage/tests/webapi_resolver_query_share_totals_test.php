@@ -213,7 +213,7 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
                 new \core_user\totara_engage\share\recipient\user($user3->id),
             ]
         );
-        self::assertSame(
+        self::assertEqualsCanonicalizing(
             [
                 'totalrecipients' => 4,
                 'recipients' => [
@@ -280,7 +280,7 @@ class totara_engage_webapi_resolver_query_share_totals_testcase extends advanced
         assign_capability($cap, CAP_ALLOW, get_guest_role()->id, $context);
         self::assertTrue(has_capability($cap, $context, guest_user()->id));
 
-        self::assertSame(
+        self::assertEqualsCanonicalizing(
             [
                 'totalrecipients' => 4,
                 'recipients' => [
