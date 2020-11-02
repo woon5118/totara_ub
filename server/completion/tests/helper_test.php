@@ -683,6 +683,12 @@ class core_completion_helper_testcase extends advanced_testcase {
         $log = reset($logs);
         $this->assertEquals(789, $log->changeuserid);
         $this->assertStringContainsString('Another message', $log->description);
+
+
+        // Make sure there is no log record if data does not change.
+        $coursecompletion = $DB->get_record('course_completions', ['course' => $courseid, 'userid' => $userid]);
+        helper::log_course_completion($courseid, $userid, '', null, $coursecompletion, $coursecompletion);
+        $this->assertEquals(2, $DB->count_records('course_completion_log'));
     }
 
     public function test_get_course_completion_log_description() {

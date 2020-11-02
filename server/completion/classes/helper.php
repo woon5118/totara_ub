@@ -360,12 +360,42 @@ final class helper {
      * @param int $userid
      * @param string $message If provided, will be added at the start of the log message (instead of "Current completion record logged")
      * @param int|null $changeuserid ID of the user who triggered the event, or 0 to indicate cron or no user, assumes $USER->id if null.
+     * @param \stdClass|null $coursecompletion course_completions record after update/insert
+     * @param \stdClass|null $prevcoursecompletion course_completions record before update
      */
-    public static function log_course_completion($courseid, $userid, $message = '', $changeuserid = null) {
+    public static function log_course_completion($courseid, $userid, $message = '', $changeuserid = null, \stdClass $coursecompletion = null, \stdClass $prevcoursecompletion = null) {
         global $DB;
 
-        $coursecompletion = $DB->get_record('course_completions',
-            array('course' => $courseid, 'userid' => $userid), '*', MUST_EXIST);
+        if ($coursecompletion === null) {
+            // Do not throw fatal errors if developers call this method when completion does not exist.
+            $coursecompletion = $DB->get_record('course_completions', ['course' => $courseid, 'userid' => $userid]);
+            if (!$coursecompletion) {
+                debugging('Invalid call to \core_completion\helper::log_course_completion(), course completion record does not exist.', DEBUG_DEVELOPER);
+                return;
+            }
+        } else {
+            if ($courseid != $coursecompletion->course || $userid != $coursecompletion->userid) {
+                throw new \coding_exception('Invalid course completion record supplied for logging');
+            }
+        }
+
+        if ($prevcoursecompletion !== null) {
+            if ($courseid != $prevcoursecompletion->course || $userid != $prevcoursecompletion->userid) {
+                throw new \coding_exception('Invalid previous course completion record supplied for logging');
+            }
+            // NOTE: following hack needs to match logic in self::get_course_completion_log_description() method,
+            //       with the exception of $message and $changeuserid because they are not part of the course completion change.
+            if ($coursecompletion->status === $prevcoursecompletion->status
+                && $coursecompletion->rpl === $prevcoursecompletion->rpl
+                && $coursecompletion->rplgrade === $prevcoursecompletion->rplgrade
+                && $coursecompletion->timeenrolled === $prevcoursecompletion->timeenrolled
+                && $coursecompletion->timestarted === $prevcoursecompletion->timestarted
+                && $coursecompletion->timecompleted === $prevcoursecompletion->timecompleted
+                && $coursecompletion->reaggregate === $prevcoursecompletion->reaggregate
+            ) {
+                return;
+            }
+        }
 
         $description = self::get_course_completion_log_description($coursecompletion, $message);
 

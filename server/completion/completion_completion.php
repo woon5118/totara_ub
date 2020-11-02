@@ -495,17 +495,17 @@ class completion_completion extends data_object {
         // Save record
         if ($this->id) {
             $transaction = $DB->start_delegated_transaction();
-            $result = $this->update();
-            if ($result) {
-                // Totara: we need to check if the record still exists, something might have deleted it in the meantime, we do not want to store wrong data in caches.
-                if (!$DB->record_exists($this->table, ['id' => $this->id])) {
-                    $result = false;
-                    \core_completion\helper::log_course_completion($this->course, $this->userid, "Deleted completion update failed in completion_completion->_save");
-                } else {
-                    \core_completion\helper::log_course_completion($this->course, $this->userid, "Updated current completion in completion_completion->_save");
+            $previous = $DB->get_record($this->table, ['id' => $this->id]);
+            if ($previous) {
+                if ($this->update()) {
+                    // Totara: we need to check if the record still exists, something might have deleted it in the meantime, we do not want to store wrong data in caches.
+                    $new = $DB->get_record($this->table, ['id' => $this->id]);
+                    if ($new) {
+                        $result = true;
+                        // If update failed there is nothing to be logged in the course completions.
+                        \core_completion\helper::log_course_completion($this->course, $this->userid, "Updated current completion in completion_completion->_save", null, $new, $previous);
+                    }
                 }
-            } else {
-                \core_completion\helper::log_course_completion($this->course, $this->userid, "Current completion update failed in completion_completion->_save");
             }
             $transaction->allow_commit();
         } else {
@@ -570,9 +570,9 @@ class completion_completion extends data_object {
             $transaction = $DB->start_delegated_transaction();
             $result = $this->insert();
             if ($result) {
+                // Log only success, errors should not be logged in the course completion log table,
+                // duplicate record would throw an exception anyway!
                 \core_completion\helper::log_course_completion($this->course, $this->userid, "Created current completion in completion_completion->_save");
-            } else {
-                \core_completion\helper::log_course_completion($this->course, $this->userid, "Current completion creation failed in completion_completion->_save");
             }
             $transaction->allow_commit();
         }
