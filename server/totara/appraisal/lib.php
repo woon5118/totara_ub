@@ -5337,6 +5337,12 @@ class appraisal_message {
         if ($this->stageid) {
             $data['[currentstagename]'] = format_string($stage->name);
             $data['[expectedstagecompletiondate]'] = userdate($stage->timedue, get_string('strfdateshortmonth', 'langconfig'));
+        } else {
+            $stages = appraisal_stage::get_stages($appraisal->id);
+            if ($stages) {
+                $data['[currentstagename]'] = format_string(current($stages)->name);
+                $data['[expectedstagecompletiondate]'] = userdate(current($stages)->timedue, get_string('strfdateshortmonth', 'langconfig'));
+            }
         }
 
         // All stages.
