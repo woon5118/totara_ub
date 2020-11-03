@@ -440,7 +440,7 @@ if ($canmanage) {
     // Print button to update this category.
     if ($id) {
         $url = new moodle_url('/course/editcategory.php', array('id' => $id, 'type' => $viewtype));
-        echo $OUTPUT->single_button($url, get_string('editcategorythis'), 'get');
+        echo $OUTPUT->single_button($url, get_string('editcategorythis'), 'get', ['class' => 'totara_program__category_button-primary singlebutton']);
     }
 
     // Print button for creating new categories.
@@ -450,7 +450,7 @@ if ($canmanage) {
     } else {
         $title = get_string('addnewcategory');
     }
-    echo $OUTPUT->single_button($url, $title, 'get');
+    echo $OUTPUT->single_button($url, $title, 'get', ['class' => 'totara_program__category_button-primary singlebutton']);
 
     // Print button for switching to courses management.
     $url = new moodle_url('/course/management.php', array('categoryid' => $id));
@@ -458,7 +458,7 @@ if ($canmanage) {
     if (has_any_capability($coursecaps, $context)) {
         $title = get_string('managecoursesinthiscat', 'totara_program');
     }
-    echo $OUTPUT->single_button($url, $title, 'get');
+    echo $OUTPUT->single_button($url, $title, 'get', ['class' => 'totara_program__category_button-primary singlebutton']);
     if ($viewtype == 'program') {
         // Print button for switching to certification management.
         if (advanced_feature::is_enabled('certifications')) {
@@ -469,7 +469,7 @@ if ($canmanage) {
             if (has_any_capability($programcaps, $context)) {
                 $title = get_string('managecertifsinthiscat', 'totara_certification');
             }
-            echo $OUTPUT->single_button($url, $title, 'get');
+            echo $OUTPUT->single_button($url, $title, 'get', ['class' => 'totara_program__category_button-primary singlebutton']);
         }
     } else {
         // Print button for switching to program management.
@@ -481,7 +481,7 @@ if ($canmanage) {
             if (has_any_capability($programcaps, $context)) {
                 $title = get_string('manageprogramsinthiscat', 'totara_program');
             }
-            echo $OUTPUT->single_button($url, $title, 'get');
+            echo $OUTPUT->single_button($url, $title, 'get', ['class' => 'totara_program__category_button-primary singlebutton']);
         }
     }
     echo $OUTPUT->container_end();
@@ -516,15 +516,8 @@ if (!empty($searchcriteria)) {
     $subcategories = $DB->get_recordset_sql($sql, array('parentid' => $coursecat->id, 'contextlevel' => CONTEXT_COURSECAT));
 
     // Prepare a table to display the sub categories.
-    $table = new html_table;
-    $table->attributes = array(
-                    'border' => '0',
-                    'cellspacing' => '2',
-                    'cellpadding' => '4',
-                    'class' => 'generalbox boxaligncenter category_subcategories'
-        );
-    $table->head = array(new lang_string('subcategories'));
-    $table->data = array();
+    $subcategories_heading = $OUTPUT->heading(get_string('subcategories'), 3);
+    $subcategory_content = [];
 
     $baseurl = new moodle_url('/totara/program/manage.php', array('viewtype' => $viewtype));
     foreach ($subcategories as $subcategory) {
@@ -539,12 +532,12 @@ if (!empty($searchcriteria)) {
         $text = format_string($subcategory->name, true, array('context' => $context));
         // Add the subcategory to the table.
         $baseurl->param('categoryid', $subcategory->id);
-        $table->data[] = array(html_writer::link($baseurl, $text, $attributes));
+        $subcategory_content[] = html_writer::link($baseurl, $text, $attributes);
     }
 
-    $subcategorieswereshown = (count($table->data) > 0);
+    $subcategorieswereshown = (count($subcategory_content) > 0);
     if ($subcategorieswereshown) {
-        echo html_writer::table($table);
+        echo $subcategories_heading . html_writer::alist($subcategory_content, ['class' => 'totara_program__category_subcategories']);
     }
 
     $programs = prog_get_programs_page($coursecat->id, 'p.sortorder ASC',
@@ -737,7 +730,7 @@ if (empty($searchcriteria)) {
         } else {
             $url->params(array('category' => $CFG->defaultrequestcategory));
         }
-        echo $OUTPUT->single_button($url, get_string('addnewprogram', 'totara_program'), 'get');
+        echo $OUTPUT->single_button($url, get_string('addnewprogram', 'totara_program'), 'get', ['class' => 'totara_program__category_button-primary singlebutton']);
     } else if ($viewtype == 'certification' && $cancreatecert) {
         // Print button to create a new certification.
         $url = new moodle_url('/totara/certification/add.php');
@@ -746,7 +739,7 @@ if (empty($searchcriteria)) {
         } else {
             $url->params(array('category' => $CFG->defaultrequestcategory));
         }
-        echo $OUTPUT->single_button($url, get_string('addnewcertification', 'totara_certification'), 'get');
+        echo $OUTPUT->single_button($url, get_string('addnewcertification', 'totara_certification'), 'get',  ['class' => 'totara_program__category_button-primary singlebutton']);
     }
 }
 

@@ -562,6 +562,33 @@ div.nextsetoperator-group-and {
   margin-right: $padding-small-horizontal;
 }
 
+.totara_program__category_subcategories {
+  list-style-type: none;
+  margin-left: var(--gap-2);
+}
+
+.totara_program__category_button-primary {
+  // Extra tag to overwrite ".singlebutton div"
+  form div {
+    margin-left: 0;
+  }
+  
+  input[type="submit"] { 
+    color: var(--btn-prim-text-color);
+    background-color: var(--btn-prim-bg-color);
+    border-color: var(--btn-prim-border-color);
+    margin-left: 0;
+
+    &:hover,
+    &:focus {
+      color: var(--btn-prim-text-color-focus);
+      background-color: var(--btn-prim-bg-color-focus);
+      border-color: var(--btn-prim-border-color-focus);
+      box-shadow: var(--btn-shadow-focus);
+    }
+  }
+}
+
 // This selector is to ensure the changes are limited
 // to the programs and certifications section of Totara.
 .path-totara-program {
