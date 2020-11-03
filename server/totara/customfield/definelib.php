@@ -138,11 +138,6 @@ class customfield_define_base {
             }
         }
 
-        // Prevent custom fields being both required and locked.
-        if (!empty($data->required) && !empty($data->locked) ) {
-            $err['required'] = get_string('requiredandlockednotallowed', 'totara_customfield');
-        }
-
         /// No further checks necessary as the form class will take care of it
         return $err;
     }
@@ -164,13 +159,6 @@ class customfield_define_base {
      */
     function define_after_data(&$form) {
         /// do nothing - override if necessary
-        // Prevent custom fields being both required and locked.
-        $locked = $form->getElementValue('locked');
-        $required = $form->getElementValue('required');
-        if ($required[0] != "1" || $locked[0] != "1") {
-            $form->disabledIf('required', 'locked', 'eq', 1);
-            $form->disabledIf('locked', 'required', 'eq', 1);
-        }
     }
 
     /**

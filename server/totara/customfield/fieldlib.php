@@ -260,6 +260,12 @@ class customfield_base {
      * @param   object   instance of the moodleform class
      */
     function edit_field_set_required(&$mform) {
+        // Prevent error if element not present (this occurs for some field types
+        // if the field is also locked)
+        if (!$mform->elementExists($this->inputname)) {
+            return;
+        }
+
         if ($this->is_required()) {
             $mform->addRule($this->inputname, get_string('customfieldrequired', 'totara_customfield'), 'required', null, 'client');
         }

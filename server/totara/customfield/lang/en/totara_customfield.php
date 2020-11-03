@@ -202,7 +202,6 @@ $string['regexpatternmessage'] = 'Description of regular expression validation f
 $string['regexpatternmessage_help'] = 'Add description message explaining required format to users.';
 $string['regexpatterndelimitererror'] = 'A delimiter or modifier was used that is not permitted. Permitted delimiters: forward slash (/) only. Permitted modifiers: PCRE_CASELESS (i) only.';
 $string['regexvalidationfailed'] = 'The value you have entered for {$a} does not match the required format.';
-$string['requiredandlockednotallowed'] = 'The combination of required and locked is not allowed. Please, change one of them';
 $string['returntoframework'] = 'Return to Framework';
 $string['shortname'] = 'Short name (must be unique)';
 $string['shortnamereserved'] = 'Short name (reserved)';
@@ -213,3 +212,7 @@ $string['startyearafterend'] = 'The start year can\'t occur after the end year';
 $string['undelete'] = 'Undelete';
 $string['visible'] = 'Hidden on the settings page?';
 $string['wanttime'] = 'Include time?';
+
+# Deprecated since Totara 12
+
+$string['requiredandlockednotallowed'] = 'The combination of required and locked is not allowed. Please, change one of them';

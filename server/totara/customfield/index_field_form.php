@@ -99,15 +99,6 @@ class field_form extends moodleform {
         if (($field->datatype == 'file' || $field->datatype == 'url') && $field->forceunique == 1) {
             $field->forceunique = 0;
         }
-        // If the field is locked then it cannot be required and vice versa.
-        $values = $this->_form->getSubmitValues();
-        if (!empty($values)) {
-            if (isset($values['locked']) && !isset($values['required'])) {
-                $field->required = 0;
-            } else if (isset($values['required']) && !isset($values['locked'])){
-                $field->locked = 0;
-            }
-        }
         parent::set_data($field);
 
         $hook = new \totara_customfield\hook\field_form_set_data($this, $this->_customdata);
