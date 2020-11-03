@@ -721,7 +721,7 @@ function get_docs_url($path = null) {
         $totaraversion = 'latest';
     }
     if (preg_match('#^(\d+)#', $totaraversion, $matches)) {
-        $totaraversion = 'TL' . $matches[1];
+        $totaraversion = 'TH' . $matches[1];
     }
 
     /****

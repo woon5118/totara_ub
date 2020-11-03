@@ -44,7 +44,7 @@ class core_setuplib_testcase extends advanced_testcase {
         } else {
             $docroot = $CFG->docroot;
         }
-        $this->assertRegExp('~^' . preg_quote($docroot, '') . '/display/(TL\d{2}|latest)/course/editing$~',
+        $this->assertRegExp('~^' . preg_quote($docroot, '') . '/display/(TH\d{2}|latest)/course/editing$~',
                 get_docs_url('course/editing'));
     }
 
