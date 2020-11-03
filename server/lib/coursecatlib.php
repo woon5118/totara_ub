@@ -1090,8 +1090,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         if (($invisibleids = $coursecatcache->get($cache_key)) === false) {
             // We never checked visible children before.
             $hidden = self::get_tree($this->id.'i');
-            // Totara: system categories are considered invisible also.
-            $invisibleids = self::get_tree($this->id . 's');
+            $invisibleids = array();
             if ($hidden) {
                 // Preload categories contexts.
                 list($sql, $params) = $DB->get_in_or_equal($hidden, SQL_PARAMS_NAMED, 'id');
@@ -1109,7 +1108,6 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
                     }
                 }
             }
-            $invisibleids = array_unique($invisibleids);
             if (!empty($CFG->tenantsenabled)) {
                 if ($this->id == 0) {
                     // Top category is special, we need to apply tenant restrictions there.
@@ -1228,7 +1226,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         }
 
         // First retrieve list of user-visible and sorted children ids from cache.
-        $cache_key = 'c'. $this->id. ':'.  serialize($sortfields) . ':' . $where_system_param['is_system'];
+        $cache_key = 'c'. $this->id. ':' .  serialize($sortfields) . ':' . $where_system_param['is_system'];
         $sortedids = $coursecatcache->get($cache_key);
         if ($sortedids === false) {
             $sortfieldskeys = array_keys($sortfields);

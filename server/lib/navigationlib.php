@@ -1508,7 +1508,7 @@ class global_navigation extends navigation_node {
             $show = false;
             if ($this->page->context->contextlevel == CONTEXT_COURSECAT) {
                 $show = true;
-            } else if (!empty($CFG->navshowcategories) && $DB->count_records('course_categories') > 1) {
+            } else if (!empty($CFG->navshowcategories) && $DB->count_records('course_categories', ['issystem' => 0]) > 1) {
                 $show = true;
             }
             $this->showcategories = $show;
