@@ -5,6 +5,7 @@ information provided here is intended especially for developers.
 
 * Deprecated $visibility parameter in share_repository::is_recipient
 * Changed area variable type from param_text to param_area in graphql schema.
+* Removed unused class totara_engage\generator\engage_generator
 
 === 13.1 ===
 

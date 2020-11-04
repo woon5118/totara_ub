@@ -4,8 +4,11 @@ The information here is intended only for developers.
 === 13.2 ===
 
 --- Update to graphQL ---
-* Changed area variable type from param_text to param_area in graphql schema.
 * Added context_id parameter to the file_area query
+* Changed area variable type from param_text to param_area in graphql schema.
+
+--- Update to API ---
+* Removed unused class container_workspace\webapi\resolver\query\count_members
 
 === 13.1 ===
 
