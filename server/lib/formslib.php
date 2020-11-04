@@ -2306,7 +2306,7 @@ require(["core/event", "jquery"], function(Event, $) {
                     errorSpan.id = \'id_error_\' + escapedName;
                     errorSpan.className = "error";
                     element.parentNode.insertBefore(errorSpan, element.parentNode.firstChild);
-                    document.getElementById(errorSpan.id).setAttribute(\'TabIndex\', \'0\');
+                    document.getElementById(element.id).setAttribute(\'aria-describedby\', errorSpan.id);
                     document.getElementById(errorSpan.id).focus();
                 }
 
@@ -2842,15 +2842,15 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
         // switch next two lines for ol li containers for form items.
         //        $this->_elementTemplates=array('default'=>"\n\t\t".'<li class="fitem"><label>{label}{help}<!-- BEGIN required -->{req}<!-- END required --></label><div class="qfelement<!-- BEGIN error --> error<!-- END error --> {typeclass}"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div></li>');
         $this->_elementTemplates = array(
-        'default'=>"\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{typeclass} {emptylabel} {class}" {aria-live}><div class="fitemtitle">{labeltemplate}{help}</div><div class="felement {typeclass}<!-- BEGIN error --> error<!-- END error -->" data-fieldtype="{type}"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
+        'default'=>"\n\t\t".'<div id="{id}" class="fitem {advanced}<!-- BEGIN required --> required<!-- END required --> fitem_{typeclass} {emptylabel} {class}" {aria-live}><div class="fitemtitle">{labeltemplate}{help}</div><div class="felement {typeclass}<!-- BEGIN error --> error<!-- END error -->" data-fieldtype="{type}"><!-- BEGIN error --><span id="id_error_{name}" class="error">{error}</span><br /><!-- END error -->{element}</div></div>',
         'labeltemplate' => '<label>{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} </label>',
 
         'actionbuttons'=>"\n\t\t".'<div id="{id}" class="fitem fitem_actionbuttons fitem_{typeclass} {class}"><div class="felement {typeclass}" data-fieldtype="{type}">{element}</div></div>',
 
-        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{typeclass} {emptylabel}"><fieldset class="{typeclass} {class}<!-- BEGIN error --> error<!-- END error -->" data-fieldtype="{type}">{legendtemplate}<div class="felement"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><!-- END error -->{element}</div></fieldset></div>',
+        'fieldset'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {class}<!-- BEGIN required --> required<!-- END required --> fitem_{typeclass} {emptylabel}"><fieldset class="{typeclass} {class}<!-- BEGIN error --> error<!-- END error -->" data-fieldtype="{type}">{legendtemplate}<div class="felement"><!-- BEGIN error --><span id="id_error_{name}" class="error">{error}</span><!-- END error -->{element}</div></fieldset></div>',
         'legendtemplate' => '<legend><span class="legend">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</span></legend>',
 
-        'static'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel} {class}"><div class="fitemtitle"><div class="fstaticlabel">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</div></div><div class="felement fstatic <!-- BEGIN error --> error<!-- END error -->" data-fieldtype="static"><!-- BEGIN error --><span class="error" tabindex="0">{error}</span><br /><!-- END error -->{element}</div></div>',
+        'static'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel} {class}"><div class="fitemtitle"><div class="fstaticlabel">{label}<!-- BEGIN required -->{req}<!-- END required -->{advancedimg} {help}</div></div><div class="felement fstatic <!-- BEGIN error --> error<!-- END error -->" data-fieldtype="static"><!-- BEGIN error --><span id="id_error_{name}" class="error">{error}</span><br /><!-- END error -->{element}</div></div>',
 
         'warning'=>"\n\t\t".'<div id="{id}" class="fitem {advanced} {emptylabel} {class}">{element}</div>',
 
@@ -3071,6 +3071,12 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
             $this->_groupElementTemplate = $html;
         } else if (!isset($this->_templates[$element->getName()])) {
             $this->_templates[$element->getName()] = $html;
+        }
+
+        if (!empty($error)) {
+            $attributes = $element->getAttributes();
+            $attributes['aria-describedby'] = 'id_error_' . $element->getName();
+            $element->updateAttributes($attributes);
         }
 
         if (!$fromtemplate) {
