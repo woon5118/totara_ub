@@ -75,50 +75,27 @@ export default {
 
   computed: {
     hasAttachmentNode() {
-      if (!this.context.hasAttachmentNode) {
-        return false;
-      }
-
       return this.context.hasAttachmentNode();
     },
 
     actions() {
-      let rtn = [];
-
-      if (this.hasAttachmentNode) {
-        rtn.push({
+      return [
+        this.hasAttachmentNode && {
           label: this.$str('display_as_attachment', 'editor_weka'),
-          action: () => {
-            this.$_toAttachment();
-          },
-        });
-      }
-
-      rtn = rtn.concat([
+          action: this.$_toAttachment,
+        },
         {
           label: this.$str('remove', 'core'),
-          action: () => {
-            this.$_removeNode();
-          },
+          action: this.$_removeNode,
         },
-      ]);
-
-      if (this.downloadUrl) {
-        rtn.push({
+        {
           label: this.$str('download', 'core'),
-          action: () => {
-            window.document.location.href = this.downloadUrl;
-          },
-        });
-      }
-
-      return rtn;
+          action: this.$_download,
+        },
+      ].filter(Boolean);
     },
-    itemId() {
-      if (!this.context.getItemId) {
-        throw new Error("No function 'getItemId' was found from extension");
-      }
 
+    itemId() {
       return this.context.getItemId();
     },
 
@@ -128,14 +105,6 @@ export default {
       }
 
       return this.attrs.filename;
-    },
-
-    downloadUrl() {
-      if (!this.context.getFileUrl) {
-        return null;
-      }
-
-      return this.context.getFileUrl(this.filename);
     },
   },
 
@@ -159,6 +128,10 @@ export default {
       }
 
       this.context.removeNode(this.getRange);
+    },
+
+    async $_download() {
+      window.open(await this.context.getDownloadUrl(this.filename));
     },
   },
 };

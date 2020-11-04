@@ -93,7 +93,7 @@ final class editor implements query_resolver, has_middleware {
             $instance_id = null;
 
             if (isset($usage_identifier['instance_id'])) {
-                $instance_id = (int) $args['instance_id'];
+                $instance_id = (int) $usage_identifier['instance_id'];
             }
 
             $hook = new find_context($usage_identifier['component'], $usage_identifier['area'], $instance_id);

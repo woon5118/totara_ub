@@ -16,14 +16,13 @@
  * @module editor_weka
  */
 
-import { prepareDraftFileArea } from '../api';
+import { getDraftFile, getRepositoryData } from '../api';
 import { upload, parseFiles } from '../utils/upload';
 import { langString, loadLangStrings } from 'tui/i18n';
 import { notify } from 'tui/notifications';
 
-const has = Object.prototype.hasOwnProperty;
-const MaxFileSize = 60; // Max size of upload file is 60MB
-const MegaToByte = 1024 * 1024;
+const MAX_FILE_SIZE = 60; // Max size of upload file is 60MB
+const BYTES_IN_MEGABYTE = 1024 * 1024;
 
 /**
  * File manager for weka editor. This file storage should only support multiple extensions per editor only.
@@ -40,6 +39,10 @@ export default class FileStorage {
    */
   constructor({ contextId, itemId }) {
     this.repositoryData = null;
+
+    /**
+     * @deprecated since Totara 13.3
+     */
     this.files = {};
 
     this.itemId = null;
@@ -54,11 +57,13 @@ export default class FileStorage {
    * @returns {boolean}
    */
   get enabled() {
+    // both item id and context id are needed for file uploads
+    // item id because we need a place to store the files
+    // context id for fetching upload configuration
     return !!this.itemId;
   }
 
   /**
-   *
    * @param {Number} value
    */
   updateFileItemId(value) {
@@ -66,7 +71,6 @@ export default class FileStorage {
   }
 
   /**
-   *
    * @return {Number|null}
    */
   getContextId() {
@@ -74,7 +78,6 @@ export default class FileStorage {
   }
 
   /**
-   *
    * @param {Number}  repository_id
    * @param {String}  url
    */
@@ -90,33 +93,20 @@ export default class FileStorage {
   }
 
   /**
-   *
    * @return {Promise<void>}
    * @private
    */
   async _fetchRepositoryData() {
-    return new Promise(resolve => {
-      if (this.repositoryData) {
-        resolve('done');
-        return;
-      }
+    if (this.repositoryData) {
+      return;
+    }
 
-      prepareDraftFileArea(this.contextId).then(
-        /**
-         *
-         * @param {Number} repository_id
-         * @param {String} url
-         */
-        ({ repository_id, url }) => {
-          this.setRepositoryData({ repository_id, url });
-          resolve('done');
-        }
-      );
-    });
+    const { repository_id, url } = await getRepositoryData(this.contextId);
+    this.setRepositoryData({ repository_id, url });
   }
 
   /**
-   *
+   * @deprecated since Totara 13.3 - unused
    * @return {?{
    *   repositoryId: Number,
    *   url: String
@@ -134,41 +124,35 @@ export default class FileStorage {
   }
 
   /**
-   *
-   * @param {String}        file
-   * @param {Number|null}   size
-   * @param {String|null}   url
+   * @deprecated since Totara 13.3
    */
-  addFile({ file, size, url }) {
-    if (has.call(this.files, file)) {
-      return;
-    }
-
-    this.files[file] = { file, size, url };
+  addFile() {
+    console.warn(
+      '[editor_weka] FileStorage.addFile had been deprecated and no longer used.'
+    );
   }
 
   /**
    * Finding the file object within the file storage base on the filezname. Since it is
    * already had been stored with the filename as a key.
-   * @param {String} filename
-   * @return {{
-   *   file: String,
-   *   size: Number,
-   *   url: String
-   * }|null}
+   *
+   * @deprecated since Totara 13.3
+   * @return null
    */
-  getFile(filename) {
-    if (!has.call(this.files, filename)) {
-      return null;
-    }
+  async getFile() {
+    console.warn(
+      '[editor_weka] FileStorage.getFile had been deprecated ',
+      'please use FileStorage.getFileInfo instead'
+    );
 
-    return this.files[filename];
+    return null;
   }
 
   /**
-   *
    * @param {File} rawFile
    * @param {Array} acceptTypes
+   *
+   * @return {Object}
    */
   async uploadFile(rawFile, acceptTypes) {
     await this._fetchRepositoryData();
@@ -184,29 +168,13 @@ export default class FileStorage {
     });
 
     if (result.id && result.file) {
-      let newFile = Object.assign({}, result);
-      newFile.size = rawFile.size;
-
-      this.addFile(newFile);
-      return newFile;
+      return await this.getFileInfo(result.file);
     } else if (result.event === 'fileexists') {
       const {
-        existingfile: { filename: existingFileName },
-        newfile: { filename, url },
+        newfile: { filename },
       } = result;
 
-      if (has.call(this.files, existingFileName)) {
-        const { size } = this.files[existingFileName];
-        const newFile = {
-          id: this.itemId,
-          url: url,
-          file: filename,
-          size: size,
-        };
-
-        this.addFile(newFile);
-        return newFile;
-      }
+      return await this.getFileInfo(filename);
     }
 
     let message = langString('invalid_response', 'editor_weka');
@@ -216,40 +184,48 @@ export default class FileStorage {
   }
 
   /**
-   *
    * @param {FileList|Array}  files
    * @param {Array}           acceptTypes
-   * @return {Promise<void>}
+   *
+   * @return {Array}
    */
   async uploadFiles(files, acceptTypes) {
     files = parseFiles(files);
 
-    return new Promise((resolve, reject) => {
-      if (files.length === 0) {
-        resolve([]);
-        return;
-      }
+    if (files.length === 0) {
+      return [];
+    }
 
-      if (this.checkFilesSizeExceed(files)) {
-        const str = langString('file_size_exceed', 'editor_weka', MaxFileSize);
-        loadLangStrings([str]).then(() =>
-          notify({ type: 'error', message: str.toString() })
-        );
-        return;
-      }
+    if (this.checkFilesSizeExceed(files)) {
+      const str = langString('file_size_exceed', 'editor_weka', MAX_FILE_SIZE);
+      loadLangStrings([str]).then(() =>
+        notify({ type: 'error', message: str.toString() })
+      );
 
-      Promise.all(files.map(rawFile => this.uploadFile(rawFile, acceptTypes)))
-        .then(submitFiles => {
-          resolve(submitFiles);
-        })
-        .catch(e => {
-          reject(e);
-        });
-    });
+      return [];
+    }
+
+    return Promise.all(
+      files.map(rawFile => this.uploadFile(rawFile, acceptTypes))
+    );
   }
 
+  /**
+   *
+   * @param {Array|FileList} files
+   * @return {Boolean}
+   */
   checkFilesSizeExceed(files) {
-    const exceedBytes = MaxFileSize * MegaToByte;
+    const exceedBytes = MAX_FILE_SIZE * BYTES_IN_MEGABYTE;
     return files.some(file => file.size > exceedBytes);
+  }
+
+  /**
+   *
+   * @param {String} filename
+   * @return {Promise<DraftFile>}
+   */
+  async getFileInfo(filename) {
+    return getDraftFile({ itemId: this.itemId, filename });
   }
 }

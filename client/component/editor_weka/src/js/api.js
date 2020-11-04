@@ -17,9 +17,18 @@
  */
 
 import apollo from 'tui/apollo_client';
-import getRepositoryData from 'editor_weka/graphql/get_repository_data';
+import repositoryDataQuery from 'editor_weka/graphql/get_repository_data';
 import linkMetadataQuery from 'core/graphql/get_linkmetadata';
-import getMediaTypeQuery from 'editor_weka/graphql/media_type_of_draft_file';
+import draftFileQuery from 'editor_weka/graphql/get_draft_file';
+
+/**
+ * @typedef {Object} DraftFile
+ * @property {number} file_size
+ * @property {string} mime_type
+ * @property {string} url
+ * @property {string} download_url
+ * @property {?string} media_type
+ */
 
 /**
  * Get Open Graph metadata for the provided URL.
@@ -36,16 +45,14 @@ export async function getLinkMetadata(url) {
 }
 
 /**
- *
  * @param {Number|null} contextId
- *
  * @return {Promise<any>}
  */
-export async function prepareDraftFileArea(contextId = null) {
+export async function getRepositoryData(contextId) {
   const {
     data: { repository_data },
   } = await apollo.query({
-    query: getRepositoryData,
+    query: repositoryDataQuery,
     variables: { context_id: contextId },
     fetchPolicy: 'no-cache',
   });
@@ -54,27 +61,57 @@ export async function prepareDraftFileArea(contextId = null) {
 }
 
 /**
+ * @deprecated since Totara 13.3, use getRepositoryData() instead.
+ * @param {Number|null} contextId
+ * @return {Promise<any>}
+ */
+export async function prepareDraftFileArea(contextId = null) {
+  console.warn(
+    '[editor_weka] The function prepareDraftFileArea had been deprecated, ',
+    'please use getRepositoryData instead'
+  );
+
+  return getRepositoryData(contextId);
+}
+
+/**
+ * Get media type information.
  *
- * @param {Number}  itemId
- * @param {String}  filename
+ * @param {object} opts
+ * @param {number} opts.itemId
+ * @param {string} opts.filename
+ * @return {object}
  *
- * @return {Promise}
+ * @deprecated since Totara 13.3
  */
 export async function getMediaType({ itemId, filename }) {
-  const {
-    data: {
-      file: { media_type, mime_type },
-    },
-  } = await apollo.query({
-    query: getMediaTypeQuery,
-    variables: {
-      item_id: itemId,
-      filename: filename,
-    },
-  });
+  console.warn(
+    '[editor_weka] getMediaType had been deprecated, please use getDraftFile instead'
+  );
 
+  const { media_type, mime_type } = await getDraftFile({ itemId, filename });
   return {
     mediaType: media_type,
     mimeType: mime_type,
   };
+}
+
+/**
+ *
+ * @param {object} opts
+ * @returns {Promise<DraftFile>}
+ */
+export async function getDraftFile({ itemId, filename }) {
+  const {
+    data: { file },
+  } = await apollo.query({
+    query: draftFileQuery,
+    variables: {
+      item_id: itemId,
+      filename,
+    },
+    batch: true,
+  });
+
+  return file;
 }

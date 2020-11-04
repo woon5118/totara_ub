@@ -65,6 +65,7 @@ export default {
           item_id: this.itemId,
         };
       },
+      batch: true,
     },
   },
 
@@ -77,50 +78,28 @@ export default {
 
   computed: {
     hasAttachmentNode() {
-      if (!this.context.hasAttachmentNode) {
-        return false;
-      }
-
       return this.context.hasAttachmentNode();
     },
 
     actions() {
-      let rtn = [];
-
-      if (this.hasAttachmentNode) {
-        rtn.push({
+      return [
+        this.hasAttachmentNode && {
           label: this.$str('display_as_attachment', 'editor_weka'),
-          action: () => {
-            this.$_toAttachment();
-          },
-        });
-      }
-
-      rtn = rtn.concat([
+          action: this.$_toAttachment,
+        },
         {
           label: this.altTextLabel,
-          action: () => {
-            this.$_showModal();
-          },
+          action: this.$_showModal,
         },
         {
           label: this.$str('remove', 'core'),
-          action: () => {
-            this.$_removeNode();
-          },
+          action: this.$_removeNode,
         },
-      ]);
-
-      if (this.downloadUrl) {
-        rtn.push({
+        {
           label: this.$str('download', 'core'),
-          action: () => {
-            window.document.location.href = this.downloadUrl;
-          },
-        });
-      }
-
-      return rtn;
+          action: this.$_download,
+        },
+      ].filter(Boolean);
     },
 
     altTextLabel() {
@@ -148,19 +127,7 @@ export default {
     },
 
     itemId() {
-      if (!this.context.getItemId) {
-        throw new Error("No function 'getItemId' for extension media");
-      }
-
       return this.context.getItemId();
-    },
-
-    downloadUrl() {
-      if (!this.context.getFileUrl) {
-        return null;
-      }
-
-      return this.context.getFileUrl(this.filename);
     },
   },
 
@@ -195,10 +162,6 @@ export default {
     $_updateAltText(newValue) {
       this.$_hideModal();
 
-      if (!this.context.updateImage) {
-        return;
-      }
-
       const params = {
         filename: this.filename,
         alttext: newValue,
@@ -208,11 +171,11 @@ export default {
     },
 
     $_removeNode() {
-      if (!this.context.removeNode) {
-        return;
-      }
-
       return this.context.removeNode(this.getRange);
+    },
+
+    async $_download() {
+      window.open(await this.context.getDownloadUrl(this.filename));
     },
   },
 };

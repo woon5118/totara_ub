@@ -17,23 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package editor_weka
  */
 namespace editor_weka\webapi\resolver\type;
 
+use coding_exception;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use editor_weka\local\media;
+use moodle_url;
+use stored_file;
 
 /**
  * Type resolver for editor's files.
  */
 final class file implements type_resolver {
     /**
-     * @param string $field
-     * @param \stored_file $source
-     * @param array $args
+     * @param string            $field
+     * @param stored_file      $source
+     * @param array             $args
      * @param execution_context $ec
      * @return mixed|void
      */
@@ -41,8 +44,8 @@ final class file implements type_resolver {
         global $CFG;
         require_once("{$CFG->dirroot}/lib/filelib.php");
 
-        if (!($source) instanceof \stored_file) {
-            throw new \coding_exception("Invalid stored file");
+        if (!($source) instanceof stored_file) {
+            throw new coding_exception("Invalid stored file");
         }
 
         switch ($field) {
@@ -66,7 +69,7 @@ final class file implements type_resolver {
 
                 if ('user' === $component && 'draft' === $area) {
                     // Draft area files. Time to give draft url.
-                    $moodle_url = \moodle_url::make_draftfile_url(
+                    $moodle_url = moodle_url::make_draftfile_url(
                         $source->get_itemid(),
                         '/',
                         $source->get_filename(),
@@ -76,7 +79,7 @@ final class file implements type_resolver {
                     return $moodle_url->out();
                 }
 
-                $moodle_url = \moodle_url::make_pluginfile_url(
+                $moodle_url = moodle_url::make_pluginfile_url(
                     $source->get_contextid(),
                     $component,
                     $area,
@@ -91,6 +94,9 @@ final class file implements type_resolver {
             case 'media_type':
                 $mime_type = $source->get_mimetype();
                 return media::get_media_type($mime_type);
+
+            case 'item_id':
+                return $source->get_itemid();
 
             default:
                 debugging("The field '{$field}' is not yet supported", DEBUG_DEVELOPER);

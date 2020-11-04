@@ -26,7 +26,7 @@
         :filename="filename"
         :alt-text="option.alttext || null"
         :enable-convert="hasImageNode"
-        :has-download-url="!!downloadUrl"
+        :has-download-url="true"
         @convert-to-embedded-media="toImage"
         @update-alt-text="updateAltText"
         @delete="removeNode"
@@ -39,7 +39,7 @@
         :draft-id="itemId"
         :filename="filename"
         :enable-convert="hasVideoNode"
-        :has-download-url="!!downloadUrl"
+        :has-download-url="true"
         @convert-to-embedded-media="toVideo"
         @delete="removeNode"
         @download="download"
@@ -51,7 +51,7 @@
         :draft-id="itemId"
         :filename="filename"
         :enable-convert="hasAudioNode"
-        :has-download-url="!!downloadUrl"
+        :has-download-url="true"
         @convert-to-embedded-media="toAudio"
         @delete="removeNode"
         @download="download"
@@ -62,7 +62,7 @@
         :file-size="file ? file.file_size : 0"
         :filename="filename"
         :draft-id="itemId"
-        :has-download-url="!!downloadUrl"
+        :has-download-url="true"
         @delete="removeNode"
         @download="download"
       />
@@ -123,10 +123,6 @@ export default {
      * @return {Number}
      */
     itemId() {
-      if (!this.context.getItemId) {
-        throw new Error("There is no function 'getItemId'");
-      }
-
       return this.context.getItemId();
     },
 
@@ -141,58 +137,29 @@ export default {
     },
 
     option() {
-      if (!this.attrs.option) {
-        return {};
-      }
-
       return this.attrs.option;
     },
 
     hasImageNode() {
-      if (!this.context.hasImageNode) {
-        return false;
-      }
-
       return this.context.hasImageNode();
     },
 
     hasVideoNode() {
-      if (!this.context.hasVideoNode) {
-        return false;
-      }
-
       return this.context.hasVideoNode();
     },
 
     hasAudioNode() {
-      if (!this.context.hasAudioNode) {
-        return false;
-      }
-
       return this.context.hasAudioNode();
     },
 
+    /** @deprecated since Totara 13.3 */
     downloadUrl() {
-      if (!this.context.getFileUrl) {
-        return null;
-      }
-
-      let result = this.context.getFileUrl(this.filename);
-      if (!result) {
-        return null;
-      }
-
-      return this.$url(result);
+      return null;
     },
   },
 
   methods: {
     toImage() {
-      if (!this.context.convertToImage) {
-        // No function
-        return;
-      }
-
       const params = {
         filename: this.filename,
         alttext: this.option.alttext || null,
@@ -220,20 +187,10 @@ export default {
      * @param {Object} params
      */
     $_updateNode(params) {
-      if (!this.context.updateNode) {
-        // No function
-        return;
-      }
-
       this.context.updateNode(this.getRange, params);
     },
 
     toVideo() {
-      if (!this.context.convertToVideo) {
-        // No function !
-        return;
-      }
-
       const params = {
         filename: this.filename,
         mimeType: this.file.mime_type,
@@ -243,10 +200,6 @@ export default {
     },
 
     toAudio() {
-      if (!this.context.convertToAudio) {
-        return;
-      }
-
       const params = {
         filename: this.filename,
         mimeType: this.file.mime_type,
@@ -256,20 +209,13 @@ export default {
     },
 
     removeNode() {
-      if (!this.context.removeNode) {
-        return;
-      }
-
       this.context.removeNode(this.getRange);
     },
 
-    download() {
-      let url = this.downloadUrl;
-      if (!url) {
-        return;
-      }
-
-      window.document.location.href = url;
+    async download() {
+      // Use window.open instead of setting window.location to avoid triggering
+      // unsaved changes prompt
+      window.open(await this.context.getDownloadUrl(this.filename));
     },
   },
 };

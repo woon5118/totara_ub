@@ -30,12 +30,11 @@ import { notify } from 'tui/notifications';
 
 class AttachmentExtension extends BaseExtension {
   constructor(opt) {
-    super(opt);
-
     if (typeof opt === 'undefined') {
       opt = {};
     }
 
+    super(opt);
     this.acceptTypes = opt.accepttypes || [];
   }
 
@@ -90,8 +89,8 @@ class AttachmentExtension extends BaseExtension {
           hasVideoNode: this._hasVideoNode.bind(this),
           removeNode: this.removeNode.bind(this),
           hasAudioNode: this._hasAudioNode.bind(this),
-          getFileUrl: this._getFileUrl.bind(this),
           getItemId: this._getItemId.bind(this),
+          getDownloadUrl: this._getDownloadUrl.bind(this),
         },
       },
 
@@ -209,11 +208,11 @@ class AttachmentExtension extends BaseExtension {
       // Uploading one by one files, but the place holder will be hold on to the screen
       // as long as all the files are completely finished.
 
-      const attachments = submitFiles.map(({ file, url, size }) => {
+      const attachments = submitFiles.map(({ filename, url, file_size }) => {
         return schema.node('attachment', {
-          filename: file,
+          filename: filename,
           url: url,
-          size: size,
+          size: file_size,
           option: {},
         });
       });
@@ -315,11 +314,13 @@ class AttachmentExtension extends BaseExtension {
    * @param {String}    alttext
    * @private
    */
-  _convertToImage(getRange, { filename, alttext }) {
+  async _convertToImage(getRange, { filename, alttext }) {
+    const info = await this._getFileInfo(filename);
+
     this.editor.execute((state, dispatch) => {
       const image = state.schema.node('image', {
         filename: filename,
-        url: this._getFileUrl(filename),
+        url: info.url,
         alttext: alttext,
       });
 
@@ -334,11 +335,13 @@ class AttachmentExtension extends BaseExtension {
    * @param {String}    mimeType
    * @private
    */
-  _convertToVideo(getRange, { filename, mimeType }) {
+  async _convertToVideo(getRange, { filename, mimeType }) {
+    const info = await this._getFileInfo(filename);
+
     this.editor.execute((state, dispatch) => {
       const video = state.schema.node('video', {
         filename: filename,
-        url: this._getFileUrl(filename),
+        url: info.url,
         mime_type: mimeType,
       });
 
@@ -355,7 +358,9 @@ class AttachmentExtension extends BaseExtension {
    *
    * @private
    */
-  _updateNode(getRange, { filename, option, size }) {
+  async _updateNode(getRange, { filename, option, size }) {
+    const info = await this._getFileInfo(filename);
+
     this.editor.execute((state, dispatch) => {
       const transaction = state.tr,
         range = getRange();
@@ -366,7 +371,7 @@ class AttachmentExtension extends BaseExtension {
           range.to,
           state.schema.node('attachment', {
             filename: filename,
-            url: this._getFileUrl(filename),
+            url: info.url,
             option: option,
             size: size,
           })
@@ -417,11 +422,13 @@ class AttachmentExtension extends BaseExtension {
    * @param {String}    mimeType
    * @private
    */
-  _convertToAudio(getRange, { filename, mimeType }) {
+  async _convertToAudio(getRange, { filename, mimeType }) {
+    const info = await this._getFileInfo(filename);
+
     this.editor.execute((state, dispatch) => {
       const node = state.schema.node('audio', {
         filename: filename,
-        url: this._getFileUrl(filename),
+        url: info.url,
         mime_type: mimeType,
       });
 
@@ -459,19 +466,20 @@ class AttachmentExtension extends BaseExtension {
   }
 
   /**
-   * Given the fileName as string, this function will try to look up into the file storage to fetch the download url.
-   * @param {String} filename
-   * @return {String}
-   *
    * @private
+   * @param {string} filename
    */
-  _getFileUrl(filename) {
-    let file = this.editor.fileStorage.getFile(filename);
-    if (file === null) {
-      return null;
-    }
+  async _getFileInfo(filename) {
+    return this.editor.fileStorage.getFileInfo(filename);
+  }
 
-    return file.url;
+  /**
+   * @private
+   * @param {string} filename
+   */
+  async _getDownloadUrl(filename) {
+    const info = await this._getFileInfo(filename);
+    return info.download_url;
   }
 
   /**

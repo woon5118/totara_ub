@@ -11,6 +11,10 @@ information provided here is intended especially for developers.
   * Added new optional prop "usageIdentifier"
   * Added new optional prop "variantName"
   * Data attribute "toolbarEnabled" had been deprecated in favour of prop "compact"
+  * The function getCurrentFiles had been deprecated and no longer used.
+    The behaviour of this function had also been changed. Please updated all calls.
+  * The function getRepositoryData had been deprecated and no longer used.
+    The behaviour of this function had also been changed. Please update all calls.
 
 === 13.2 ===
 

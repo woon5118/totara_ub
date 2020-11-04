@@ -48,6 +48,9 @@ type editor_weka_editor {
   The upload repository data
   """
   repository_data: editor_weka_repository_data!
+    @deprecated(
+      reason: "The repository_data is now fetched from different query"
+    )
   """
   The context's id where the editor is being used. This has to be done as part of constructing
   editor, most likely it can be context_system, if the component that is using editor is not providing one.
@@ -72,9 +75,7 @@ type editor_weka_editor {
     """
     item_id: param_integer
   ): [editor_weka_file!]!
-    @deprecated(
-      reason: "The files field got deprecated in favour of draft_files"
-    )
+    @deprecated(reason: "The files field got deprecated and longer used.")
 
   """
   The current draft files within weka editor. If there are any.
@@ -85,6 +86,9 @@ type editor_weka_editor {
     """
     draft_item_id: param_integer
   ): [editor_weka_file!]!
+    @deprecated(
+      reason: "The draft file's metadata is now fetched from the runtime"
+    )
 }
 
 type editor_weka_file {
@@ -96,6 +100,7 @@ type editor_weka_file {
   If media_type is null, then this file is not a part of any embbedded-able media files.
   """
   media_type: editor_weka_media_type
+  item_id: Int!
 }
 
 type editor_weka_repository_data {
@@ -135,8 +140,7 @@ extend type Query {
     """
     usage_identifier: core_editor_usage_identifier
     """
-    Provide an optional context_id because sometimes instance_id is set to null, which means that the weka editor
-    can be used to create a new instance. Hence, context_id will be a fallback option.
+    Providing context_id so that the editor configuration can figure out where the editor is used.
     """
     context_id: param_integer
   ): editor_weka_editor

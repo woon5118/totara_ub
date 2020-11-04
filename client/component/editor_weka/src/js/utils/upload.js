@@ -72,7 +72,9 @@ export async function upload({
     data.append('sesskey', config.sesskey);
     data.append('repo_id', String(repositoryId));
     data.append('itemid', String(itemId));
-    data.append('ctx_id', String(contextId));
+    if (contextId != null) {
+      data.append('ctx_id', String(contextId));
+    }
 
     acceptTypes.forEach(type => data.append('accepted_types[]', type));
 

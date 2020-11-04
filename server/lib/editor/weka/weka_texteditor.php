@@ -332,9 +332,17 @@ final class weka_texteditor extends texteditor implements context_aware_editor {
      * @param int      $draft_item_id
      * @param int|null $user_id
      * @return stored_file[]
+     *
+     * @deprecated since Totara 13.3
      */
     public function get_draft_files(int $draft_item_id, ?int $user_id = null): array {
         global $USER, $CFG;
+        debugging(
+            "The function \\weka_texteditor::get_draft_files had been deprecated. " .
+            "Please use \\file_storage::get_area_files instead",
+            DEBUG_DEVELOPER
+        );
+
         if (empty($user_id)) {
             $user_id = $USER->id;
         }
@@ -407,27 +415,6 @@ final class weka_texteditor extends texteditor implements context_aware_editor {
                 // editor's extension type in graphql
                 'options' => $json,
             ];
-        }
-
-        // Get current files from draft item id.
-        if (isset($params['file_item_id'])) {
-            // Note: if the draft files do not exist - then something went wrong at the start of the page
-            // where developer may have forgotten to move the area files to draft. Or the files never existed at all.
-            $draft_files = $this->get_draft_files($params['file_item_id']);
-            $params['files'] = array_map(
-                function (stored_file $file): array {
-                    return [
-                        'filename' => $file->get_filename(),
-                        'file_size' => $file->get_filesize(),
-                        'url' => moodle_url::make_draftfile_url(
-                            $file->get_itemid(),
-                            $file->get_filepath(),
-                            $file->get_filename()
-                        )->out(false),
-                    ];
-                },
-                $draft_files
-            );
         }
 
         return $params;

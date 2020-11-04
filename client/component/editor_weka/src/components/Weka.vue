@@ -219,7 +219,6 @@ export default {
           instance_id: this.usageIdentifier.instanceId,
           component: this.usageIdentifier.component,
           area: this.usageIdentifier.area,
-          draft_id: this.fileItemId,
           context_id: this.contextId || undefined,
           variant_name:
             this.variant ||
@@ -260,23 +259,31 @@ export default {
     },
 
     /**
-     * @return {Promise<{
-     *   item_id: {Number},
-     *   repository_id: {Number},
-     *   url: {String}
-     * }|null>}
+     * This function had been deprecated and no longer used.
+     *
+     * @return {Promise}
+     * @deprecated since Totara 13.3
      */
     async getRepositoryData() {
-      await this.setupOptions();
-      return this.finalOptions.repository_data || null;
+      console.warn(
+        '[editor_weka] The function getRepositoryData had been deprecated and no longer used.'
+      );
+
+      return Promise.resolve(null);
     },
 
     /**
+     * This function had been deprecated and no longer used.
+     *
      * @return {Promise}
+     * @deprecated since Totara 13.3
      */
-    async getCurrentDraftFiles() {
-      await this.setupOptions();
-      return this.finalOptions.draft_files || [];
+    async getCurrentFiles() {
+      console.warn(
+        '[editor_weka] The function getCurrentFiles had been deprecated and no longer used.'
+      );
+
+      return Promise.resolve([]);
     },
 
     async createEditor() {
@@ -284,25 +291,11 @@ export default {
         return;
       }
 
-      const extensions = await this.getExtensions(),
-        repositoryData = await this.getRepositoryData();
+      const extensions = await this.getExtensions();
 
       let fileStorage = new FileStorage({
         itemId: this.fileItemId,
         contextId: this.finalOptions.context_id || null,
-      });
-
-      if (repositoryData !== null) {
-        fileStorage.setRepositoryData(repositoryData);
-      }
-
-      let files = await this.getCurrentDraftFiles();
-      Array.prototype.forEach.call(files, ({ filename, url, file_size }) => {
-        fileStorage.addFile({
-          file: filename,
-          url: url,
-          size: file_size,
-        });
       });
 
       this.editor = new Editor({

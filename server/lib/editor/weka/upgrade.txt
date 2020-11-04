@@ -4,6 +4,7 @@ The information here is intended only for developers.
 === 13.3 ===
 
 --- Update to API ---
+* weka_texteditor::get_draft_files() had been deprecated, please use file_storage::get_area_files instead.
 * editor_weka\extension\extension::get_extension_name had been changed to a static function, please update all calls.
 * editor_weka\config\factory had been deprecated, please use editor_weka\variant instead.
 * editor_weka\config\config_item had been deprecated, please use editor_weka\variant instead.
@@ -21,6 +22,8 @@ The information here is intended only for developers.
 * weka_texteditor::get_files() has been deprecated, please use file_storage::get_area_files() instead.
 
 --- Update to GraphQl ---
+* Field "repository_data" of type "editor_weka_editor" had been deperecated, please use query editor_weka_repository_data instead.
+* Field "draft_files" of type "editor_weka_editor" had been deprecated and no longer used.
 * Field "showtoolbar" of type "editor_weka_editor" had been deprecated, and no longer used. Please update all calls.
 * Argument "component" to resolve field "extensions" of type "editor_weka_editor" had been deprecated in favour of "usage_identifier"
 * Argument "area" to resolve field "extensions" of type "editor_weka_editor" had been deprecated in favour of "usage_identifier"

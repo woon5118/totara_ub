@@ -70,43 +70,23 @@ export default {
 
   computed: {
     actions() {
-      let rtn = [];
-
-      if (this.hasAttachmentNode) {
-        rtn.push({
+      return [
+        this.hasAttachmentNode && {
           label: this.$str('display_as_attachment', 'editor_weka'),
-          action: () => {
-            this.$_toAttachment();
-          },
-        });
-      }
-
-      rtn = rtn.concat([
+          action: this.$_toAttachment,
+        },
         {
           label: this.$str('remove', 'core'),
-          action: () => {
-            this.$_removeNode();
-          },
+          action: () => this.$_removeNode,
         },
-      ]);
-
-      if (this.downloadUrl) {
-        rtn.push({
+        {
           label: this.$str('download', 'core'),
-          action: () => {
-            window.document.location.href = this.downloadUrl;
-          },
-        });
-      }
-
-      return rtn;
+          action: this.$_download,
+        },
+      ].filter(Boolean);
     },
 
     itemId() {
-      if (!this.context.getItemId) {
-        throw new Error('No function "getItemId" found for extension media');
-      }
-
       return this.context.getItemId();
     },
 
@@ -119,42 +99,26 @@ export default {
     },
 
     hasAttachmentNode() {
-      if (!this.context.hasAttachmentNode) {
-        return false;
-      }
-
       return this.context.hasAttachmentNode();
-    },
-
-    downloadUrl() {
-      if (!this.context.getFileUrl) {
-        return null;
-      }
-
-      return this.context.getFileUrl(this.filename);
     },
   },
 
   methods: {
     $_removeNode() {
-      if (!this.context.removeNode) {
-        return;
-      }
-
       return this.context.removeNode(this.getRange);
     },
 
     $_toAttachment() {
-      if (!this.context.replaceWithAttachment) {
-        return;
-      }
-
       const params = {
         filename: this.filename,
         size: this.file.file_size,
       };
 
       this.context.replaceWithAttachment(this.getRange, params);
+    },
+
+    async $_download() {
+      window.open(await this.context.getDownloadUrl(this.filename));
     },
   },
 };

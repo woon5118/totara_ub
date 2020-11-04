@@ -22,6 +22,7 @@
  */
 namespace editor_weka\factory;
 
+use core\editor\variant_name;
 use editor_weka\extension\attachment;
 use editor_weka\extension\hashtag;
 use editor_weka\extension\mention;
@@ -61,10 +62,9 @@ class extension_loader {
         ];
 
         if (!array_key_exists($name, $definitions)) {
-            debugging("The variant name= '{$name}' is not supported", DEBUG_DEVELOPER);
-            $metadata['extensions'] = static::get_all_extension_classes();
-
-            return $metadata;
+            debugging("The variant name '{$name}' is not supported", DEBUG_DEVELOPER);
+            // Use the default standard variant.
+            $name = variant_name::STANDARD;
         }
 
         $definition = $definitions[$name];

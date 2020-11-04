@@ -24,6 +24,7 @@ namespace editor_weka\webapi\resolver\type;
 
 use coding_exception;
 use context_system;
+use context_user;
 use core\editor\variant_name;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
@@ -45,7 +46,7 @@ final class editor implements type_resolver {
      * @return mixed|void
      */
     public static function resolve(string $field, $source, array $args, execution_context $ec) {
-        global $CFG;
+        global $CFG, $USER;
         require_once("{$CFG->dirroot}/lib/editor/weka/lib.php");
 
         if (!($source instanceof weka_texteditor)) {
@@ -122,7 +123,20 @@ final class editor implements type_resolver {
                     return [];
                 }
 
-                return $source->get_draft_files($item_id);
+                require_once("{$CFG->dirroot}/lib/filelib.php");
+                $fs = get_file_storage();
+
+                $user_context = context_user::instance($USER->id);
+                return array_values(
+                    $fs->get_area_files(
+                        $user_context->id,
+                        'user',
+                        'draft',
+                        $item_id,
+                        'itemid, filepath, filename',
+                        false
+                    )
+                );
 
             case 'repository_data':
                 $context_id = $source->get_context_id();

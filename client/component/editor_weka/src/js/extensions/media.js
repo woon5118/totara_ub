@@ -24,7 +24,6 @@ import ImageBlock from 'editor_weka/components/nodes/ImageBlock';
 import VideoBlock from 'editor_weka/components/nodes/VideoBlock';
 import AudioBlock from 'editor_weka/components/nodes/AudioBlock';
 import ImageIcon from 'tui/components/icons/Image';
-import { getMediaType } from '../api';
 import { IMAGE, VIDEO } from '../helpers/media';
 import { getJsonAttrs } from './util';
 import { notify } from 'tui/notifications';
@@ -86,8 +85,8 @@ class MediaExtension extends BaseExtension {
           updateImage: this._updateImage.bind(this),
           hasAttachmentNode: this._hasAttachmentsNode.bind(this),
           removeNode: this.removeNode.bind(this),
-          getFileUrl: this._getFileUrl.bind(this),
           getItemId: this._getItemId.bind(this),
+          getDownloadUrl: this._getDownloadUrl.bind(this),
         },
       },
 
@@ -134,8 +133,10 @@ class MediaExtension extends BaseExtension {
           replaceWithAttachment: this._replaceVideoWithAttachment.bind(this),
           hasAttachmentNode: this._hasAttachmentNode.bind(this),
           removeNode: this.removeNode.bind(this),
-          getFileUrl: this._getFileUrl.bind(this),
+          /** @deprecated since Totara 13.3 */
+          getFileUrl: () => null,
           getItemId: this._getItemId.bind(this),
+          getDownloadUrl: this._getDownloadUrl.bind(this),
         },
       },
 
@@ -185,8 +186,10 @@ class MediaExtension extends BaseExtension {
           hasAttachmentNode: this._hasAttachmentNode.bind(this),
           replaceWithAttachment: this._replaceAudioWithAttachment.bind(this),
           removeNode: this.removeNode.bind(this),
-          getFileUrl: this._getFileUrl.bind(this),
+          /** @deprecated since Totara 13.3 */
+          getFileUrl: () => null,
           getItemId: this._getItemId.bind(this),
+          getDownloadUrl: this._getDownloadUrl.bind(this),
         },
       },
     };
@@ -236,39 +239,26 @@ class MediaExtension extends BaseExtension {
 
       const schema = this.editor.state.schema;
       const images = await Promise.all(
-        submitFiles.map(({ file, id, url }) => {
-          return getMediaType({
-            filename: file,
-            itemId: id,
-          }).then(
-            /**
-             *
-             * @param {String} mediaType
-             * @param {String} mimeType
-             * @return {*}
-             */
-            ({ mediaType, mimeType }) => {
-              if (IMAGE === mediaType) {
-                return schema.node('image', {
-                  filename: file,
-                  alttext: '',
-                  url: url,
-                });
-              } else if (VIDEO === mediaType) {
-                return schema.node('video', {
-                  filename: file,
-                  url: url,
-                  mime_type: mimeType,
-                });
-              } else {
-                return schema.node('audio', {
-                  url: url,
-                  filename: file,
-                  mime_type: mimeType,
-                });
-              }
-            }
-          );
+        submitFiles.map(({ filename, url, media_type, mime_type }) => {
+          if (IMAGE === media_type) {
+            return schema.node('image', {
+              filename: filename,
+              alttext: '',
+              url: url,
+            });
+          } else if (VIDEO === media_type) {
+            return schema.node('video', {
+              filename: filename,
+              url: url,
+              mime_type: mime_type,
+            });
+          } else {
+            return schema.node('audio', {
+              url: url,
+              filename: filename,
+              mime_type: mime_type,
+            });
+          }
         })
       );
 
@@ -332,14 +322,16 @@ class MediaExtension extends BaseExtension {
    *
    * @private
    */
-  _replaceImageWithAttachment(getRange, { filename, alttext, size }) {
+  async _replaceImageWithAttachment(getRange, { filename, alttext, size }) {
+    const info = await this._getFileInfo(filename);
+
     this.editor.execute((state, dispatch) => {
       const transaction = state.tr,
         range = getRange();
 
       let attachment = state.schema.node('attachment', {
         filename: filename,
-        url: this._getFileUrl(filename),
+        url: info.url,
         size: size,
         option: {
           alttext: alttext,
@@ -363,14 +355,16 @@ class MediaExtension extends BaseExtension {
    * @param {Number}  size
    * @private
    */
-  _replaceVideoWithAttachment(getRange, { filename, size }) {
+  async _replaceVideoWithAttachment(getRange, { filename, size }) {
+    const info = await this._getFileInfo(filename);
+
     this.editor.execute((state, dispatch) => {
       const transaction = state.tr,
         range = getRange();
 
       let attachment = state.schema.node('attachment', {
         filename: filename,
-        url: this._getFileUrl(filename),
+        url: info.url,
         size: size,
         option: {},
       });
@@ -392,14 +386,16 @@ class MediaExtension extends BaseExtension {
    *
    * @private
    */
-  _updateImage(getRange, { filename, alttext }) {
+  async _updateImage(getRange, { filename, alttext }) {
+    const info = await this._getFileInfo(filename);
+
     this.editor.execute((state, dispatch) => {
       const transaction = state.tr,
         range = getRange();
 
       let node = state.schema.node('image', {
         filename: filename,
-        url: this._getFileUrl(filename),
+        url: info.filename,
         alttext: alttext,
       });
 
@@ -415,14 +411,16 @@ class MediaExtension extends BaseExtension {
    * @param {Number}    size
    * @private
    */
-  _replaceAudioWithAttachment(getRange, { filename, size }) {
+  async _replaceAudioWithAttachment(getRange, { filename, size }) {
+    const info = await this._getFileInfo(filename);
+
     this.editor.execute((state, dispatch) => {
       const transaction = state.tr,
         range = getRange();
 
       let attachment = state.schema.node('attachment', {
         filename: filename,
-        url: this._getFileUrl(filename),
+        url: info.url,
         size: size,
         option: {},
       });
@@ -446,20 +444,20 @@ class MediaExtension extends BaseExtension {
   }
 
   /**
-   * Given the filename, then this API can return the url for the filename in the file storage.
-   *
-   * @param {String} filename
-   * @return {String|Null}
-   *
    * @private
+   * @param {string} filename
    */
-  _getFileUrl(filename) {
-    let file = this.editor.fileStorage.getFile(filename);
-    if (!file) {
-      return null;
-    }
+  async _getFileInfo(filename) {
+    return this.editor.fileStorage.getFileInfo(filename);
+  }
 
-    return file.url;
+  /**
+   * @private
+   * @param {string} filename
+   */
+  async _getDownloadUrl(filename) {
+    const info = await this._getFileInfo(filename);
+    return info.download_url;
   }
 
   /**
