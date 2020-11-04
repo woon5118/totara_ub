@@ -34,17 +34,23 @@ if ($hassiteconfig) {
 
     /** @var admin_settingpage $adv_features_perform */
     $adv_features_perform = $ADMIN->locate('advancedfeatures_perform');
-    if ($adv_features_perform) {
+    if (!$adv_features_perform) {
+        return;
+    }
 
-        $adv_features_perform->add(
-            new totara_core_admin_setting_feature_checkbox(
-                'enablegoals',
-                new lang_string('enablegoals', 'totara_hierarchy'),
-                new lang_string('configenablegoals', 'totara_hierarchy'),
-                advanced_feature::DISABLED
-            )
-        );
+    // When the mod_perform plugin is uninstalled, then it can't initialise it's settings as the lang strings are no longer there.
+    $mod_perform_installed = core_component::get_component_directory('mod_perform') !== null;
 
+    $adv_features_perform->add(
+        new totara_core_admin_setting_feature_checkbox(
+            'enablegoals',
+            new lang_string('enablegoals', 'totara_hierarchy'),
+            new lang_string('configenablegoals', 'totara_hierarchy'),
+            advanced_feature::DISABLED
+        )
+    );
+
+    if ($mod_perform_installed) {
         $adv_features_perform->add(
             new totara_core_admin_setting_feature_checkbox(
                 'enableperformance_activities',
@@ -53,43 +59,45 @@ if ($hassiteconfig) {
                 advanced_feature::DISABLED
             )
         );
+    }
 
-        $adv_features_perform->add(
-            new totara_core_admin_setting_feature_checkbox(
-                'enablecompetency_assignment',
-                new lang_string('enablecompetency_assignment', 'totara_competency'),
-                new lang_string('enablecompetency_assignment_desc', 'totara_competency'),
-                advanced_feature::DISABLED
-            )
-        );
+    $adv_features_perform->add(
+        new totara_core_admin_setting_feature_checkbox(
+            'enablecompetency_assignment',
+            new lang_string('enablecompetency_assignment', 'totara_competency'),
+            new lang_string('enablecompetency_assignment_desc', 'totara_competency'),
+            advanced_feature::DISABLED
+        )
+    );
 
-        $adv_features_perform->add(
-            new admin_setting_configcheckbox(
-                'dynamicappraisals',
-                new lang_string('dynamicappraisals', 'totara_core'),
-                new lang_string('configdynamicappraisals', 'totara_core'),
-                1
-            )
-        );
+    $adv_features_perform->add(
+        new admin_setting_configcheckbox(
+            'dynamicappraisals',
+            new lang_string('dynamicappraisals', 'totara_core'),
+            new lang_string('configdynamicappraisals', 'totara_core'),
+            1
+        )
+    );
 
-        $adv_features_perform->add(
-            new admin_setting_configcheckbox(
-                'dynamicappraisalsautoprogress',
-                new lang_string('dynamicappraisalsautoprogress', 'totara_core'),
-                new lang_string('configdynamicappraisalsautoprogress', 'totara_core'),
-                1
-            )
-        );
+    $adv_features_perform->add(
+        new admin_setting_configcheckbox(
+            'dynamicappraisalsautoprogress',
+            new lang_string('dynamicappraisalsautoprogress', 'totara_core'),
+            new lang_string('configdynamicappraisalsautoprogress', 'totara_core'),
+            1
+        )
+    );
 
-        $adv_features_perform->add(
-            new totara_core_admin_setting_feature_checkbox(
-                'enableappraisals',
-                new lang_string('enablelegacyappraisals', 'totara_appraisal'),
-                new lang_string('configenablelegacyappraisals', 'totara_appraisal'),
-                advanced_feature::DISABLED
-            )
-        );
+    $adv_features_perform->add(
+        new totara_core_admin_setting_feature_checkbox(
+            'enableappraisals',
+            new lang_string('enablelegacyappraisals', 'totara_appraisal'),
+            new lang_string('configenablelegacyappraisals', 'totara_appraisal'),
+            advanced_feature::DISABLED
+        )
+    );
 
+    if ($mod_perform_installed) {
         $adv_features_perform->add(
             new admin_setting_configcheckbox(
                 'showhistoricactivities',
@@ -98,15 +106,14 @@ if ($hassiteconfig) {
                 '0'
             )
         );
-
-        $adv_features_perform->add(
-            new totara_core_admin_setting_feature_checkbox(
-                'enablefeedback360',
-                new lang_string('enablelegacyfeedback360', 'totara_feedback360'),
-                new lang_string('configenablelegacyfeedback360', 'totara_feedback360'),
-                advanced_feature::DISABLED
-            )
-        );
-
     }
+
+    $adv_features_perform->add(
+        new totara_core_admin_setting_feature_checkbox(
+            'enablefeedback360',
+            new lang_string('enablelegacyfeedback360', 'totara_feedback360'),
+            new lang_string('configenablelegacyfeedback360', 'totara_feedback360'),
+            advanced_feature::DISABLED
+        )
+    );
 }
