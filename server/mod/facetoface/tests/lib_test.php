@@ -2544,6 +2544,14 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
             // up those times within alldates.
             $noticebody .= $key.' '.$field . ' ';
         }
+        $noticebody .= "<a href='https://docs.google.com/a/example.com/forms/d/e/2GRStFENt3YkpRvng/viewform?entry.345654021=[seminarname]'>Give a feedback</a>";
+
+        $context = context_system::instance();
+        $editoroptions = ['context'  => $context];
+        $data = (object)['noticebody' => $noticebody, 'noticebodyformat' => FORMAT_HTML];
+        $data = file_prepare_standard_editor($data, 'noticebody', $editoroptions, $context, 'mod_facetoface', 'notification');
+
+        $this->assertStringContainsString("<a href=\"https://docs.google.com/a/example.com/forms/d/e/2GRStFENt3YkpRvng/viewform?entry.345654021=%5Bseminarname%5D\">Give a feedback</a>", $data->noticebody);
 
         // Translation problems hack.
         $strmanager = get_string_manager();
@@ -2567,7 +2575,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $notification->ccmanager = 0;
         $notification->status = 1;
         $notification->title = 'Confirmation';
-        $notification->body = $noticebody;
+        $notification->body = $data->noticebody;
         $notification->managerprefix = '';
         $notification->type = MDL_F2F_NOTIFICATION_MANUAL;
         $notification->save();
@@ -2607,6 +2615,10 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertStringContainsString('lastname '.$user1->lastname, $fullmessagehtml);
         $this->assertStringContainsString('cost '.$seminarevent->get_normalcost(), $fullmessage);
         $this->assertStringContainsString('cost '.$seminarevent->get_normalcost(), $fullmessagehtml);
+        $this->assertStringContainsString(
+            '<a href="https://docs.google.com/a/example.com/forms/d/e/2GRStFENt3YkpRvng/viewform?entry.345654021='.$facetoface->name.'">Give a feedback</a>',
+            $fullmessagehtml
+        );
 
         $assertions = function ($sessiondate, $session, $duration) use ($fullmessage, $fullmessagehtml) {
             $timestart = $session->get_timestart();

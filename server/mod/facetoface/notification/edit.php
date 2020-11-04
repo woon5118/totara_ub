@@ -64,16 +64,13 @@ if ($notification->is_frozen()) {
 $formurl = new moodle_url('/mod/facetoface/notification/edit.php', array('f' => $f, 'id' => $id));
 // Setup editors
 $editoroptions = array(
-    'trusttext'=> 1,
     'maxfiles' => EDITOR_UNLIMITED_FILES,
     'maxbytes' => $CFG->maxbytes,
     'context'  => $context,
 );
 
 $notification->bodyformat = FORMAT_HTML;
-$notification->bodytrust  = 1;
 $notification->managerprefixformat = FORMAT_HTML;
-$notification->managerprefixtrust  = 1;
 $notification = file_prepare_standard_editor($notification, 'body', $editoroptions, $context, 'mod_facetoface', 'notification', $id);
 $notification = file_prepare_standard_editor($notification, 'managerprefix', $editoroptions, $context, 'mod_facetoface', 'notification', $id);
 

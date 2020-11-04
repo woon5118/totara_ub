@@ -41,8 +41,8 @@ $redirectto = new moodle_url('/mod/facetoface/notification/template/index.php', 
 
 // Setup editors.
 $editoroptions = array(
-    'trusttext'=> 1,
-    'maxfiles' => 0, // Files were never working here.
+    'maxfiles' => EDITOR_UNLIMITED_FILES,
+    'maxbytes' => $CFG->maxbytes,
     'context'  => $contextsystem,
 );
 
@@ -62,9 +62,7 @@ if ($id == 0) {
     }
 }
 $template->bodyformat = FORMAT_HTML;
-$template->bodytrust  = 1;
 $template->managerprefixformat = FORMAT_HTML;
-$template->managerprefixtrust  = 1;
 $template->page = $page;
 $template = file_prepare_standard_editor($template, 'body', $editoroptions, $contextsystem, null, null, $id);
 $template = file_prepare_standard_editor($template, 'managerprefix', $editoroptions, $contextsystem, null, null, $id);

@@ -1695,6 +1695,10 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
         $rolename = $rolenames[$approvalrole]->localname;
     }
     // Replace.
+    // This fix HTML body where an url use the square brackets
+    // from <a href="example.com/a.php?s=%5Bseminarname%5D">click here</a>
+    // to <a href="example.com/a.php?s=[seminarname]">click here</a>
+    $msg = preg_replace(['/%5B/', '/%5D/'], ['[', ']'], $msg);
     $msg = str_replace('[sessionrole]', $rolename, $msg);
     // Legacy.
     $msg = str_replace(get_string('placeholder:sessionrole', 'facetoface'), $rolename, $msg);
