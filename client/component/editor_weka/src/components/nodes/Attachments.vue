@@ -39,7 +39,6 @@ export default {
   margin: 0 0 10px;
 
   &__content {
-    position: relative;
     display: flex;
     flex-wrap: wrap;
     align-items: center;

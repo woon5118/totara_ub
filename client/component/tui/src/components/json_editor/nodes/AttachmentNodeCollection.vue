@@ -84,7 +84,6 @@ export default {
 
 <style lang="scss">
 .tui-attachmentNodeCollection {
-  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;

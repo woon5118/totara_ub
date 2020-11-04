@@ -353,6 +353,7 @@ export default {
 
 <style lang="scss">
 .tui-weka {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -389,7 +390,6 @@ export default {
   }
 
   .ProseMirror {
-    position: relative;
     padding: var(--gap-4);
     white-space: pre-wrap;
     white-space: break-spaces;
