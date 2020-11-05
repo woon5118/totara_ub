@@ -32,7 +32,7 @@
           :href="$url('/mod/perform/activity/select-participants.php')"
           :text="
             $str(
-              'user_activities_require_manual_participant_selection_link',
+              'user_activities_require_manual_participant_selection_link_text',
               'mod_perform'
             )
           "
@@ -68,7 +68,7 @@ export default {
   {
     "mod_perform": [
       "user_activities_require_manual_participant_selection_header_text",
-      "user_activities_require_manual_participant_selection_link"
+      "user_activities_require_manual_participant_selection_link_text"
     ]
   }
 </lang-strings>

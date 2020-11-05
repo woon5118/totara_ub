@@ -27,7 +27,9 @@
     </div>
     <div v-if="!isClosed">
       <a :href="reviewUrl">
-        {{ $str('external_participation_success_review_link', 'mod_perform') }}
+        {{
+          $str('external_participation_success_review_link_text', 'mod_perform')
+        }}
       </a>
     </div>
     <div v-else>
@@ -63,7 +65,7 @@ export default {
       "external_participation_success_heading",
       "external_participation_success_message",
       "external_participation_success_message_closed",
-      "external_participation_success_review_link"
+      "external_participation_success_review_link_text"
     ]
   }
 </lang-strings>

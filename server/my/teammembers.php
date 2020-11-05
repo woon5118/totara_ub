@@ -124,7 +124,7 @@ $team_member_text = get_string('teammembers_text', 'totara_core');
 if (advanced_feature::is_enabled('performance_activities') &&
     class_exists(\mod_perform\util::class) &&
     \mod_perform\util::can_potentially_report_on_subjects($USER->id)) {
-    $perform_report_link_text = get_string('teams_page_response_report_link', 'mod_perform');
+    $perform_report_link_text = get_string('teams_page_response_report_link_text', 'mod_perform');
     $perform_report_link_href = new moodle_url('/mod/perform/reporting/performance/index.php');
 
     $link_html = html_writer::tag('a', $perform_report_link_text, ['href' => $perform_report_link_href]);

@@ -567,8 +567,6 @@ export default {
       "user_group_assignment_no_users",
       "user_group_assignment_title",
       "user_group_assignment_type",
-      "user_group_assignment_unique_user_count_title",
-      "user_group_assignment_unique_user_count_link",
       "user_group_assignment_usercount",
       "view_actions"
     ]

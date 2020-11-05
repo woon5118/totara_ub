@@ -64,7 +64,7 @@ function mod_perform_myprofile_navigation(tree $tree, $user, $is_current_user) {
                 new node(
                     'development',
                     'performance_activities_response_data_report_export',
-                    get_string('response_data_report_export_link', 'mod_perform'),
+                    get_string('response_data_report_export_link_text', 'mod_perform'),
                     null,
                     activity_response_data::get_url()
                 )

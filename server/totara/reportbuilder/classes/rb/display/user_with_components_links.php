@@ -99,7 +99,7 @@ class user_with_components_links extends base {
         $feedback360str = get_string('feedback360_legacy', 'totara_feedback360');
         $goalstr = get_string('goalplural', 'totara_hierarchy');
         $evidencestr = get_string('evidence', 'totara_evidence');
-        $performance_data = get_string('user_components_performance_data_link', 'mod_perform');
+        $performance_data = get_string('user_components_performance_data', 'mod_perform');
 
         $rol_link = \html_writer::link("{$CFG->wwwroot}/totara/plan/record/index.php?userid={$userid}", $recordstr);
         $required_link = \html_writer::link(new \moodle_url('/totara/program/required.php',
