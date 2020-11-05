@@ -1701,21 +1701,13 @@ function totara_program_pluginfile($course, $cm, $context, $filearea, $args, $fo
     $filename = $args[1];
 
     // Only grid catalogue images can be bypassed.
+    $loginrequired = $filearea !== 'images' || empty($CFG->publishgridcatalogimage);
 
-    // filearea  publish  guest  loginrequired
-    // --------  -------  -----  -------------
-    // images    true     *      false
-    // images    false    true   false
-    // images    false    false  true
-    // any       *        *      true
-
-    $loginrequired = $filearea !== 'images' || (empty($CFG->publishgridcatalogimage) && !isguestuser());
-
-    if ($loginrequired && !isloggedin()) {
+    if ($loginrequired && (!isloggedin() && !isguestuser())) {
         send_file_not_found();
     }
 
-    if ($loginrequired && !has_capability("totara/program:viewprogram", $context)) {
+    if ($loginrequired && !has_capability("totara/program:viewprogram", $context) && $filearea !== 'images') {
         send_file_not_found();
     }
 
