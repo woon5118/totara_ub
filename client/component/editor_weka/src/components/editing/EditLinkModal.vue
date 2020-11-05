@@ -21,8 +21,8 @@
     <ModalContent
       :title="
         isNew
-          ? $str('insert_link', 'editor_weka')
-          : $str('edit_link', 'editor_weka')
+          ? $str('insert_link_label', 'editor_weka')
+          : $str('edit_link_label', 'editor_weka')
       "
       :title-id="$id('title')"
       :close-button="true"
@@ -184,8 +184,8 @@ export default {
     "done",
     "displayas",
     "display_text",
-    "edit_link",
-    "insert_link",
+    "edit_link_label",
+    "insert_link_label",
     "error_no_url_info"
   ]
 }

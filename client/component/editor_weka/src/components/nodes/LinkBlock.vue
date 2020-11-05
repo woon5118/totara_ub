@@ -38,7 +38,7 @@
         </div>
       </template>
       <DropdownButton @click="open">
-        {{ $str('go_to_link', 'editor_weka') }}
+        {{ $str('go_to_link_label', 'editor_weka') }}
       </DropdownButton>
       <DropdownButton @click="edit">
         {{ $str('edit', 'core') }}
@@ -102,7 +102,7 @@ export default {
   "editor_weka": [
     "actions_menu_for",
     "display_as_text",
-    "go_to_link"
+    "go_to_link_label"
   ]
 }
 </lang-strings>

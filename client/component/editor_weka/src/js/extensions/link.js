@@ -306,7 +306,7 @@ class LinkExtension extends BaseExtension {
     return this.showActionDropdown(getRange().from, {
       actions: [
         {
-          label: langString('go_to_link', 'editor_weka'),
+          label: langString('go_to_link_label', 'editor_weka'),
           action: () => this._openLinkMarkAt(getRange),
         },
         {

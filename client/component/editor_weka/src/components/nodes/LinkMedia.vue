@@ -89,7 +89,7 @@ export default {
     actions() {
       return [
         {
-          label: this.$str('go_to_link', 'editor_weka'),
+          label: this.$str('go_to_link_label', 'editor_weka'),
           action: () => this.open(),
         },
         { label: this.$str('edit', 'core'), action: () => this.edit() },
@@ -146,7 +146,7 @@ export default {
   "editor_weka": [
     "actions_menu_for",
     "display_as_text",
-    "go_to_link"
+    "go_to_link_label"
   ]
 }
 </lang-strings>
