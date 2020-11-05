@@ -30,12 +30,6 @@ $instancetype = required_param('instancetype', PARAM_INT);
 $instanceid   = required_param('instanceid', PARAM_INT);
 
 require_login();
-try {
-    require_sesskey();
-} catch (moodle_exception $e) {
-    echo html_writer::tag('div', $e->getMessage(), array('class' => 'notifyproblem'));
-    die();
-}
 
 // This dialog is used from many places, the permissions checks need to be a bit relaxed.
 $capable = false;

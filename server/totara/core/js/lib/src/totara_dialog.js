@@ -620,6 +620,26 @@ totaraDialog_handler.prototype._save = function(url) {
 }
 
 /**
+ * Serialize dropped items and send to url, update table with result.
+ * Supports specifying post data in the request.
+ *
+ * @param {String} url URL to send dropped items to
+ * @param {Object} data Data to send in the request body
+ * @return void
+ */
+totaraDialog_handler.prototype._save_with_data = function(url, data) {
+    // Serialize data
+    var elements = $('.selected > div > span', this._container);
+    var selected_str = this._get_ids(elements).join(',');
+
+    // Add to url
+    url = url + selected_str;
+
+    // Send to server
+    this._dialog._request(url, {object: this, method: '_update'}, 'POST', data);
+}
+
+/**
  * Handle a 'cancel' request, by just closing the dialog
  *
  * @return void

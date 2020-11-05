@@ -1,6 +1,10 @@
 List of upgrade and API changes in Totara core,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* Added a new method _update_with_data() to totara_dialog.js for sending post requests with body data
+
 === 13.0 ===
 
 * Added aria-label to sub nav to make the landmark distinguishable.

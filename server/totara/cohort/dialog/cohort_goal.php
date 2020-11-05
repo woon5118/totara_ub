@@ -29,12 +29,6 @@ require_once($CFG->dirroot .'/cohort/lib.php');
 $selected = optional_param('selected', array(), PARAM_SEQUENCE);
 
 require_login();
-try {
-    require_sesskey();
-} catch (moodle_exception $e) {
-    echo html_writer::tag('div', $e->getMessage(), array('class' => 'notifyproblem'));
-    die();
-}
 
 // Check user capabilities.
 $contextsystem = context_system::instance();

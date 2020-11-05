@@ -1,6 +1,19 @@
 This files describes API changes for code that uses the audience API,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* The following ajax endpoints no longer require a sesskey:
+  * dialog/cohort.php
+  * dialog/cohort_goal.php
+  * dialog/cohort_item.php
+* Removed sesskey from GET params and moved it to POST body data where appropriate in the following files:
+  * dialog/coursecohort.js
+  * dialog/goalcohort.js
+  * dialog/learningitem.js
+  * dialog/programcompletion.js
+  * dialog/visiblecohort.js
+
 === 13.0 ===
 
 * cohort_rule_sqlhandler_hasreports{} class has been deprecated, please use cohort_rule_sqlhandler_has_direct_reports{}

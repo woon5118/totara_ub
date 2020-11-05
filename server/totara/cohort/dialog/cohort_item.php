@@ -28,12 +28,6 @@ require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot .'/cohort/lib.php');
 
 require_login();
-try {
-    require_sesskey();
-} catch (moodle_exception $e) {
-    $error = array('error' => $e->getMessage());
-    die(json_encode($error));
-}
 
 $instancetype = required_param('instancetype', PARAM_INT);
 $instanceid = required_param('instanceid', PARAM_INT);
