@@ -151,6 +151,9 @@ final class messaging {
                         if (!empty($room->get_name())) {
                             $location[] = $room->get_name();
                         }
+                        if (!empty($room->get_url())) {
+                            $location[] = $room->get_url();
+                        }
                         if (!empty($roomcf['building'])) {
                             $location[] = $roomcf['building'];
                         }
@@ -164,6 +167,9 @@ final class messaging {
                             $roomcf = $room->get_customfield_array();
                             if (!empty($room->get_name())) {
                                 $place[] = $room->get_name();
+                            }
+                            if (!empty($room->get_url())) {
+                                $place[] = $room->get_url();
                             }
                             if (!empty($roomcf['building'])) {
                                 $place[] = $roomcf['building'];

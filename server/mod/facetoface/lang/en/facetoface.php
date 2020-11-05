@@ -1174,7 +1174,6 @@ $string['roomshown'] = 'Room shown successfully';
 $string['roomtype'] = 'Room type';
 $string['roomtype_help'] = 'If checked, allows the room to be booked for different events that are running at the same time.';
 $string['roomupdatesuccess'] = 'Successfully updated room';
-$string['roomurl'] = 'Room link';
 $string['placeholder:coursename'] = '[coursename]';
 $string['placeholder:facetofacename'] = '[facetofacename]';
 $string['placeholder:seminarname'] = '[seminarname]';
@@ -1346,6 +1345,7 @@ $string['viewallassets'] = 'Manage assets';
 $string['viewallfacilitators'] = 'Manage facilitators';
 $string['viewallrooms'] = 'Manage rooms';
 $string['viewfacilitator'] = 'View facilitator';
+$string['virtualroomurl'] = 'Virtual room link';
 $string['visible'] = 'Visible';
 $string['attendancetrackingheader'] = 'Attendance tracking and grading';
 $string['attendancetracking:open'] = 'Take attendance';
@@ -3003,3 +3003,7 @@ $string['placeholder:aim'] = '[aim]';
 $string['error:idnumbernotfound'] = 'No users were added because no users match the following user ID numbers: {$a}. Please remove invalid numbers and try again';
 $string['error:emailnotfound'] = 'No users were found with the following emails: {$a}';
 $string['error:usernamenotfound'] = 'No users were found with the following usernames: {$a}';
+/**
+ * @deprecated since Totara 13.2
+ */
+$string['roomurl'] = 'Room link';

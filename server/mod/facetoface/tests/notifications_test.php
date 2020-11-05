@@ -438,7 +438,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             $errors['uids_match']);
 
         // Location matches the generated room location.
-        $this->assertEquals('Site x 1\, Address,Test,Test2', $icals['original'][0]->location[0],
+        $this->assertEquals('Site x 1\, https://example.com/channel/id/12345\, Address,Test,Test2', $icals['original'][0]->location[0],
             $errors['location_doesnt_match']);
 
         // Need to cancel seminar date, in the middle!
@@ -532,7 +532,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             $icals['session_date_removed'][0]->uid[0], $errors['uids_dont_match']);
 
         // Location matches the generated room location.
-        $this->assertEquals('Site x 1\, Address,Test,Test2',
+        $this->assertEquals('Site x 1\, https://example.com/channel/id/12345\, Address,Test,Test2',
             $icals['session_date_removed_and_added'][0]->location[2], $errors['location_doesnt_match']);
 
         // User 1 cancelled.
@@ -1159,6 +1159,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // Create a room with building and location.
         $room1 = new stdClass();
         $room1->name = 'Room One';
+        $room1->url = 'https://example.com/virtual/room/1';
         $room1->capacity = 20;
         $room1->timemodified = time();
         $room1->timecreated = $room1->timemodified;
@@ -1170,6 +1171,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // Create another room with building only.
         $room2 = new stdClass();
         $room2->name = 'Room Two';
+        $room2->url = 'https://example.com/virtual/room/2';
         $room2->capacity = 40;
         $room2->timemodified = time();
         $room2->timecreated = $room2->timemodified;
@@ -1180,6 +1182,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // Create a third room with location only.
         $room3 = new stdClass();
         $room3->name = 'Room Three';
+        $room3->url = 'https://example.com/virtual/room/3';
         $room3->capacity = 40;
         $room3->timemodified = time();
         $room3->timecreated = $room3->timemodified;
@@ -1340,10 +1343,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $expectedmsg = "The details for each session:\n";
         $expectedmsg .= "\nRoom: ";
-        $expectedmsg .= "Room One\n Catalyst House\n 150 Willis Street\n";
+        $expectedmsg .= "Room One\n Virtual room link\n Catalyst House\n 150 Willis Street\n";
         $expectedmsg .= "\nRooms:\n";
-        $expectedmsg .= "Room Three\n 186 Willis Street\n";
-        $expectedmsg .= "Room Two\n South Campus\n";
+        $expectedmsg .= "Room Three\n Virtual room link\n 186 Willis Street\n";
+        $expectedmsg .= "Room Two\n Virtual room link\n South Campus\n";
         $expectedmsg .= "\nThose are all the details.";
 
         $this->assertEquals($expectedmsg, $replacedmsg);
