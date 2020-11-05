@@ -292,10 +292,15 @@ function completion_module_rpl_enabled($module) {
  * @return string HTML of the self completion form
  */
 function self_completion_form($cmorid, $course = null) {
-    global $OUTPUT;
+    global $OUTPUT, $PAGE;
 
     if (!isloggedin() || isguestuser()) {
         // You must be logged in, and you cannot be the guest user.
+        return '';
+    }
+
+    // Do not show the selfcompletion form in the mobile app webviews.
+    if ($PAGE->pagelayout == 'webview') {
         return '';
     }
 
