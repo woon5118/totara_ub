@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <span class="tui-hashtag" :data-attrs="attributes">
+  <span class="tui-hashtag">
     <a :href="url" class="tui-hashtag__text">
       {{ text }}
     </a>
@@ -39,9 +39,8 @@ export default {
   },
 
   computed: {
-    attributes() {
-      return JSON.stringify({ text: this.text });
-    },
+    /** @deprecated since 13.3 */
+    attributes: () => null,
   },
 };
 </script>

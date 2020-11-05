@@ -53,7 +53,7 @@ export default class WekaValue {
   /**
    * Create a WekaValue from a serialized document.
    *
-   * @param {string} doc
+   * @param {object} doc
    */
   static fromDoc(doc) {
     const ws = new WekaValue();

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-imageBlock" :data-attrs="attributes">
+  <div class="tui-imageBlock">
     <ResponsiveImage :src="url" :alt="altText" />
   </div>
 </template>
@@ -50,13 +50,8 @@ export default {
   },
 
   computed: {
-    attributes() {
-      return JSON.stringify({
-        url: this.url,
-        filename: this.filename,
-        alttext: this.altText,
-      });
-    },
+    /** @deprecated since 13.3 */
+    attributes: () => null,
   },
 };
 </script>

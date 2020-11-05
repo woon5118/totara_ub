@@ -37,6 +37,10 @@ jest.mock('tui/tui', function() {
       }
     },
 
+    defaultExport(x) {
+      return x.default || x;
+    },
+
     loadRequirements: () => new Promise(resolve => resolve()),
   };
 });

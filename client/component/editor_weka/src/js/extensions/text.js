@@ -179,7 +179,7 @@ class TextExtension extends BaseExtension {
     ];
   }
 
-  keymap(bind, { isMac }) {
+  keymap(bind) {
     const {
       paragraph,
       blockquote,
@@ -201,9 +201,7 @@ class TextExtension extends BaseExtension {
       );
       return true;
     };
-    bind('Mod-Enter', breakCmd);
     bind('Shift-Enter', breakCmd);
-    if (isMac) bind('Ctrl-Enter', breakCmd);
 
     bind('Mod-b', toggleMark(strong));
     bind('Mod-B', toggleMark(strong));

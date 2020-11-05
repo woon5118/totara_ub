@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-videoBlock" :data-attrs="attributes">
+  <div class="tui-videoBlock">
     <video ref="videojs" class="video-js">
       <source :src="url" :type="mimeType" />
     </video>
@@ -46,13 +46,8 @@ export default {
   },
 
   computed: {
-    attributes() {
-      return JSON.stringify({
-        mime_type: this.mimeType,
-        filename: this.filename,
-        url: this.url,
-      });
-    },
+    /** @deprecated since 13.3 */
+    attributes: () => null,
 
     config() {
       return {

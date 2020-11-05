@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="tui-audioBlock" :data-attrs="attributes">
+  <div class="tui-audioBlock">
     <audio controls>
       <source :src="url" :type="mimeType" />
       {{ $str('audionotsupported', 'totara_core') }}
@@ -47,15 +47,8 @@ export default {
   },
 
   computed: {
-    attributes() {
-      return JSON.stringify({
-        itemid: this.itemId,
-        url: this.url,
-        filename: this.filename,
-        area: this.area,
-        component: this.component,
-      });
-    },
+    /** @deprecated since 13.3 */
+    attributes: () => null,
   },
 };
 </script>

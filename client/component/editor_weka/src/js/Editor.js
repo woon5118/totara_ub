@@ -16,7 +16,8 @@
  * @module editor_weka
  */
 
-import { EditorState } from 'ext_prosemirror/state';
+// eslint-disable-next-line no-unused-vars
+import { EditorState, Transaction } from 'ext_prosemirror/state';
 import { EditorView } from 'ext_prosemirror/view';
 import { keymap } from 'ext_prosemirror/keymap';
 import { history } from 'ext_prosemirror/history';
@@ -34,6 +35,8 @@ import WekaValue from './WekaValue';
 import { uniqueId } from 'tui/util';
 import { notify } from 'tui/notifications';
 import { langString, loadLangStrings } from 'tui/i18n';
+// eslint-disable-next-line no-unused-vars
+import FileStorage from './helpers/file';
 
 export default class Editor {
   /**
@@ -57,6 +60,7 @@ export default class Editor {
 
     this._extensions = options.extensions || [];
 
+    /** @type {FileStorage} */
     this.fileStorage = options.fileStorage;
     this._extensions.forEach(ext => ext.setEditor(this));
 
@@ -288,7 +292,7 @@ export default class Editor {
   /**
    * Returning the file storage item's id that are holding all the files.
    *
-   * @return {Number | null}
+   * @return {?number}
    */
   getFileStorageItemId() {
     return this.fileStorage.getFileStorageItemId();
@@ -325,7 +329,7 @@ export default class Editor {
   /**
    * Execute a command.
    *
-   * @param {function} command
+   * @param {(state: EditorState, dispatch: (tr: Transaction) => {}, view: EditorView) => any} command
    */
   execute(command) {
     try {
@@ -344,7 +348,7 @@ export default class Editor {
   /**
    * Check if a command can be executed.
    *
-   * @param {function} command
+   * @param {(state: EditorState, dispatch: (tr: Transaction) => {}, view: EditorView) => any} command
    */
   canExecute(command) {
     return command(this.state, null, null);

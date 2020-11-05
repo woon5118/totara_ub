@@ -18,7 +18,6 @@
 
 <template>
   <div
-    :data-attrs="attributes"
     class="tui-attachmentNode"
     :class="{
       'tui-attachmentNode--downloadable': !!downloadUrl,
@@ -95,13 +94,8 @@ export default {
   },
 
   computed: {
-    attributes() {
-      return JSON.stringify({
-        url: this.url,
-        filename: this.filename,
-        option: this.option,
-      });
-    },
+    /** @deprecated since 13.3 */
+    attributes: () => null,
 
     fileExtension() {
       const separator = '.';

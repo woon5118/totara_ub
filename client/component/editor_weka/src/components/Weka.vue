@@ -156,7 +156,9 @@ export default {
      * @param {Number|String} value
      */
     fileItemId(value) {
-      this.editor.updateFileItemId(value);
+      if (this.editor) {
+        this.editor.updateFileItemId(value);
+      }
     },
   },
 
@@ -247,7 +249,7 @@ export default {
 
             return tui
               .import(tuicomponent)
-              .then(component => component.default(opt));
+              .then(ext => tui.defaultExport(ext)(opt));
           })
         );
       }

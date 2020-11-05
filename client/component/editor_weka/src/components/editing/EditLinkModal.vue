@@ -27,7 +27,7 @@
       :title-id="$id('title')"
       :close-button="true"
     >
-      <Form @submit.prevent="confirm">
+      <Form input-width="full" @submit.prevent="confirm">
         <p v-if="error">{{ error }}</p>
         <FormRow v-slot="{ id }" :label="$str('linkurl', 'editor')">
           <InputText :id="id" ref="url" v-model="url" :autofocus="true" />

@@ -22,7 +22,7 @@
       :title="modalTitle"
       class="tui-wekaEditImageAltTextModal__content"
     >
-      <Form @submit.prevent="confirm">
+      <Form input-width="full" @submit.prevent="confirm">
         <div class="tui-wekaEditImageAltTextModal__input">
           <InputText v-model="innerValue" :autofocus="true" />
 

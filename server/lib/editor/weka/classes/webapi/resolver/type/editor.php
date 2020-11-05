@@ -70,7 +70,7 @@ final class editor implements type_resolver {
                     );
                 }
 
-                $variant_name = $args['variant'] ?? variant_name::STANDARD;
+                $variant_name = $args['variant_name'] ?? variant_name::STANDARD;
                 $context_id = $source->get_context_id();
 
                 if (empty($context_id)) {
