@@ -18,7 +18,7 @@
 <template>
   <Card
     class="tui-performAdminCustomElement"
-    :clickable="!isActive"
+    :has-hover-shadow="!isActive"
     :class="{
       'tui-performAdminCustomElement--dragging': dragging,
     }"

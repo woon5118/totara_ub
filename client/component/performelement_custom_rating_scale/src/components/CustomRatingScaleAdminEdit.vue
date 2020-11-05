@@ -203,6 +203,10 @@ export default {
     "custom_values_help",
     "score",
     "text"
+  ],
+
+  "core": [
+    "add"
   ]
 }
 </lang-strings>

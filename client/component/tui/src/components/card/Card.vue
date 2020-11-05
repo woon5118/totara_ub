@@ -23,6 +23,7 @@
     :class="[
       clickable && 'tui-card--clickable',
       noBorder && 'tui-card--noBorder',
+      hasHoverShadow && 'tui-card--hasHoverShadow',
       hasShadow && 'tui-card--hasShadow',
     ]"
     @click="clickCard"
@@ -35,6 +36,9 @@
 export default {
   props: {
     clickable: {
+      type: Boolean,
+    },
+    hasHoverShadow: {
       type: Boolean,
     },
     hasShadow: {
@@ -66,6 +70,11 @@ export default {
     &:hover {
       border: none;
     }
+  }
+
+  &--hasHoverShadow:focus,
+  &--hasHoverShadow:hover {
+    box-shadow: var(--shadow-2);
   }
 
   &--hasShadow {

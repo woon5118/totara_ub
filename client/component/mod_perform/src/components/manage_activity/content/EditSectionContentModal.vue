@@ -832,6 +832,7 @@ export default {
   }
 
   &__form {
+    min-height: 2rem;
     & > * + * {
       margin-top: var(--gap-4);
     }
