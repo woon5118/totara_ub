@@ -60,7 +60,11 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*='id_booked_type'] {
   color: inherit;
 }
 
-.path-calendar .maincalendar .eventlist .event .mod_facetoface__calendar-event.description {
+.path-calendar
+  .maincalendar
+  .eventlist
+  .event
+  .mod_facetoface__calendar-event.description {
   background-color: transparent;
 }
 
@@ -81,17 +85,29 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*='id_booked_type'] {
 
 /** Firefox requires a different hack **/
 .gecko .reportbuilder-table[data-source='rb_source_facetoface_summary'] tr,
-.gecko .reportbuilder-table[data-source='rb_source_facetoface_room_assignments'] tr,
-.gecko .reportbuilder-table[data-source='rb_source_facetoface_asset_assignments'] tr,
-.gecko .reportbuilder-table[data-source='rb_source_facetoface_facilitator_assignments'] tr {
+.gecko
+  .reportbuilder-table[data-source='rb_source_facetoface_room_assignments']
+  tr,
+.gecko
+  .reportbuilder-table[data-source='rb_source_facetoface_asset_assignments']
+  tr,
+.gecko
+  .reportbuilder-table[data-source='rb_source_facetoface_facilitator_assignments']
+  tr {
   height: 100%;
 }
 
 /** IE requires quite a bit more hacking! **/
 .ie .reportbuilder-table[data-source='rb_source_facetoface_summary'] tr,
-.ie .reportbuilder-table[data-source='rb_source_facetoface_room_assignments'] tr,
-.ie .reportbuilder-table[data-source='rb_source_facetoface_asset_assignments'] tr,
-.ie .reportbuilder-table[data-source='rb_source_facetoface_facilitator_assignments'] tr {
+.ie
+  .reportbuilder-table[data-source='rb_source_facetoface_room_assignments']
+  tr,
+.ie
+  .reportbuilder-table[data-source='rb_source_facetoface_asset_assignments']
+  tr,
+.ie
+  .reportbuilder-table[data-source='rb_source_facetoface_facilitator_assignments']
+  tr {
   height: 100%;
 }
 
@@ -146,7 +162,7 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*='id_booked_type'] {
 
 .reportbuilder-table .session_bookingstatus .fullybooked,
 .reportbuilder-table .session_overallstatus .started {
-    background-color: $facetoface-session-bg-color-full;
+  background-color: $facetoface-session-bg-color-full;
 }
 
 .mform > #fitem_id_cancelinstruction {
@@ -272,7 +288,8 @@ select.menuf2f-select {
   }
 
   @mixin no-list-style() {
-    &, & > li {
+    &,
+    & > li {
       list-style: none;
       margin: 0;
       padding: 0;
@@ -539,7 +556,7 @@ select.menuf2f-select {
         > .flex-icon {
           font-size: 111%;
           // This hackery disables font hinting and grid fitting to get a better rendering result of the '...' button.
-          transform: rotate(.001deg);
+          transform: rotate(0.001deg);
         }
 
         // Override Bootstrap.
@@ -551,7 +568,8 @@ select.menuf2f-select {
 
           > li > a {
             color: var(--dropdown-item-text-color);
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               color: var(--dropdown-item-text-color-hover);
               text-decoration: none;
               background-color: var(--dropdown-item-bg-color-hover);
@@ -579,7 +597,8 @@ select.menuf2f-select {
       &--open,
       &--saved {
         &__icon,
-        &__icon[class] { // override fontawesome
+        &__icon[class] {
+          // override fontawesome
           vertical-align: baseline;
         }
       }
@@ -730,8 +749,9 @@ select.menuf2f-select {
 
   // +++ Navigation bar +++ //
   &__navigation {
-    margin: var(--gap-4) (0px - floor(($grid-gutter-width / 2))) var(--gap-4) 0px - ceil(($grid-gutter-width / 2));
-    padding-left:  ceil(($grid-gutter-width / 2));
+    margin: var(--gap-4) (0px - floor(($grid-gutter-width / 2))) var(--gap-4)
+      0px - ceil(($grid-gutter-width / 2));
+    padding-left: ceil(($grid-gutter-width / 2));
     padding-right: floor(($grid-gutter-width / 2));
     position: relative;
 
@@ -787,7 +807,6 @@ select.menuf2f-select {
       flex: 1;
       order: 0;
 
-
       @mixin divider() {
         border-bottom: 1px solid $facetoface-border-color;
       }
@@ -806,7 +825,7 @@ select.menuf2f-select {
 
         &__item {
           list-style: none;
-          margin: .15rem;
+          margin: 0.15rem;
           padding: 0;
         }
       }
@@ -829,7 +848,9 @@ select.menuf2f-select {
           margin-bottom: 0;
 
           > a {
-            &, &:hover, &:focus {
+            &,
+            &:hover,
+            &:focus {
               color: inherit;
             }
 
@@ -857,6 +878,10 @@ select.menuf2f-select {
 
         &__section {
           @include section_divider;
+
+          &.nodivider {
+            border-bottom-style: none;
+          }
 
           &:last-child {
             border-bottom: none;
@@ -903,13 +928,13 @@ select.menuf2f-select {
         @include sidebar-panel-open;
 
         border-radius: $border-radius-base;
-        box-shadow: 0 1px 5px rgba(0,0,0,.5);
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
         display: flex;
         flex-direction: column;
         justify-content: center;
         margin: 0;
         position: relative;
-        transition: transform .4s;
+        transition: transform 0.4s;
         transform-origin: top center;
         width: 100%;
 
@@ -926,7 +951,8 @@ select.menuf2f-select {
           .fitem {
             margin-bottom: 1em;
 
-            .fitemtitle, .felement {
+            .fitemtitle,
+            .felement {
               float: none;
               width: auto;
             }
@@ -980,8 +1006,7 @@ select.menuf2f-select {
         text-align: center;
 
         h3 {
-          line-height: 3em;
-          margin: 0;
+          margin: 1.5em 0;
           padding: 0;
         }
       }
@@ -1000,7 +1025,8 @@ select.menuf2f-select {
         background: var(--color-neutral-2);
       }
 
-      &__cancellation-cancellation {  // NOTE: this is not a typo.
+      &__cancellation-cancellation {
+        // NOTE: this is not a typo.
         @include force-link-style();
         color: var(--color-state);
 
@@ -1050,6 +1076,21 @@ select.menuf2f-select {
 
   .eventlist &__eventinfo {
     display: block;
+  }
+
+  &__resource-card {
+    &--simple {
+      text-align: center;
+
+      > h3 {
+        margin-bottom: var(--gap-6);
+        line-height: 1.5;
+      }
+    }
+
+    &--inactive {
+      background: var(--color-neutral-2);
+    }
   }
 }
 
@@ -1192,7 +1233,12 @@ select.menuf2f-select {
         &__cell {
           width: calc(100% - 8em);
 
-          &--status, &--date, &--rooms, &--facilitators, &--assets, &--actions {
+          &--status,
+          &--date,
+          &--rooms,
+          &--facilitators,
+          &--assets,
+          &--actions {
             flex: auto;
           }
         }
@@ -1200,7 +1246,7 @@ select.menuf2f-select {
     }
 
     &__navigation {
-      padding-left:  ceil(($grid-gutter-width / 3));
+      padding-left: ceil(($grid-gutter-width / 3));
       padding-right: floor(($grid-gutter-width / 3));
     }
 
@@ -1255,7 +1301,7 @@ select.menuf2f-select {
 .f2f-attendees-table {
   margin-bottom: $form-group-margin-bottom;
 
-  input[name=saveattendance] {
+  input[name='saveattendance'] {
     @extend .btn-primary;
   }
 
@@ -1427,8 +1473,7 @@ a.mod_facetoface__action_goback {
             color: $gray-light;
             background-color: $nav-tabs-active-link-hover-bg;
             border-top-color: $facetoface-dialog-tab-top-shadow;
-            box-shadow:
-              0 -2px $facetoface-dialog-tab-top-shadow,
+            box-shadow: 0 -2px $facetoface-dialog-tab-top-shadow,
               -3px 0 $facetoface-dialog-tab-top-shadow-secondary;
           }
         }
@@ -1453,7 +1498,7 @@ a.mod_facetoface__action_goback {
           display: none;
         }
         .felement {
-          padding-right:var(--gap-1) ;
+          padding-right: var(--gap-1);
         }
       }
       #search-tab {
@@ -1491,9 +1536,10 @@ a.mod_facetoface__action_goback {
       // Taken from theme/basis/less
       div:hover span.deletebutton,
       .deletebutton {
-        background: transparent url([[pix:totara_core|jquery_ui_dialog/ui-icons_cd0a0a_256x240]]) no-repeat -80px -128px;
+        background: transparent
+          url([[pix:totara_core|jquery_ui_dialog/ui-icons_cd0a0a_256x240]])
+          no-repeat -80px -128px;
       }
-
     }
   }
   .ui-dialog-content .mform {
@@ -1532,15 +1578,15 @@ a.mod_facetoface__action_goback {
 
 .path-mod-facetoface-notification {
   form.facetoface_notification_form {
-      div#fgroup_id_recipients {
-          fieldset.fgroup {
-              div.fitem {
-                  margin-bottom: var(--gap-2);
-                  span.recipients_status {
-                      font-weight: bold;
-                  }
-              }
+    div#fgroup_id_recipients {
+      fieldset.fgroup {
+        div.fitem {
+          margin-bottom: var(--gap-2);
+          span.recipients_status {
+            font-weight: bold;
           }
+        }
       }
+    }
   }
 }

@@ -23,7 +23,10 @@
 
 namespace mod_facetoface;
 
+use coding_exception;
 use context_course;
+use context_module;
+use core\orm\query\builder;
 
 /**
  * Additional room functionality.
@@ -146,6 +149,43 @@ final class room_helper {
     }
 
     /**
+     * Is the current user capable to access the virtual room at any time?
+     *
+     * @param seminar_session $session
+     * @return boolean
+     */
+    public static function has_access_at_any_time(seminar_session $session): bool {
+        if (self::has_join_room_capability($session->get_sessionid())) {
+            return true;
+        }
+        if (self::is_user_facilitator($session)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Can we display a virtual room link?
+     * @param seminar_event $seminarevent
+     * @param seminar_session $session
+     * @param signup|null $signup signup instance or null to use the signup of the current user
+     * @return bool
+     */
+    public static function show_room_link(seminar_session $session, ?signup $signup = null): bool {
+        global $USER;
+        if (is_null($signup)) {
+            $signup = signup::create($USER->id, $session->get_seminar_event());
+        }
+        if ($signup->get_sessionid() != $session->get_sessionid()) {
+            throw new coding_exception('foreign $signup is not allowed');
+        }
+        if (signup_helper::is_booked($signup, false)) {
+            return true;
+        }
+        return self::has_access_at_any_time($session);
+    }
+
+    /**
      * Can we display 'Join now' link button?
      * @param seminar_event $seminarevent
      * @param seminar_session $session
@@ -154,34 +194,35 @@ final class room_helper {
      * @return bool
      */
     public static function show_joinnow(seminar_event $seminarevent, seminar_session $session, ?signup $signup = null, int $time = 0): bool {
-        global $USER;
-        if (is_null($signup)) {
-            $signup = signup::create($USER->id, $seminarevent);
+        if ($seminarevent->get_id() != $session->get_sessionid()) {
+            throw new coding_exception('$session does not belong to the $seminarevent');
         }
-        return self::has_time_come($session, $time)
-            &&
-            (
-                signup_helper::is_booked($signup, false)
-                ||
-                self::has_join_room_capability($seminarevent)
-                ||
-                self::is_user_facilitator($session)
-            );
+        if ($signup && $signup->get_sessionid() != $session->get_sessionid()) {
+            throw new coding_exception('foreign $signup is not allowed');
+        }
+        return self::has_time_come($seminarevent, $session, $time) && self::show_room_link($session, $signup);
     }
 
     /**
      * room::show_joinnow(html button)::has_time_come(to display 'Join now' button)?
      * Has time come to display the 'Join now' link button
      * from 15 minutes prior to the session start time, until the session end time
+     * @param seminar_event $seminarevent
      * @param seminar_session $session
      * @param int $time time stamp or 0 to use the current time
      * @return bool
      */
-    private static function has_time_come(seminar_session $session, int $time = 0): bool {
+    public static function has_time_come(seminar_event $seminarevent, seminar_session $session, int $time = 0): bool {
+        if ($seminarevent->get_id() != $session->get_sessionid()) {
+            throw new coding_exception('$session does not belong to the $seminarevent');
+        }
+        if ($seminarevent->get_cancelledstatus()) {
+            return false;
+        }
         if ($time <= 0) {
             $time = time();
         }
-        if (($session->get_timestart() - self::JOIN_NOW_TIME) < $time && $time < $session->get_timefinish()) {
+        if ($session->is_start($time + self::JOIN_NOW_TIME) && !$session->is_over($time)) {
             return true;
         }
         return false;
@@ -189,27 +230,31 @@ final class room_helper {
 
     /**
      * Check if a user has the joinanyvirtualroom capability
-     * @param seminar_event $seminarevent
+     * @param integer $eventid
      * @return bool
      */
-    private static function has_join_room_capability(seminar_event $seminarevent): bool {
+    private static function has_join_room_capability(int $eventid): bool {
         global $USER;
         // Private cache;
         static $usercapabilitylist = [];
-        if (isset($usercapabilitylist[$seminarevent->get_id()][$USER->id])) {
-            return $usercapabilitylist[$seminarevent->get_id()][$USER->id];
+        if (isset($usercapabilitylist[$eventid][$USER->id])) {
+            return $usercapabilitylist[$eventid][$USER->id];
         }
 
-        $seminar = $seminarevent->get_seminar();
-        $cm = $seminar->get_coursemodule();
-        $context = $seminar->get_contextmodule($cm->id);
+        $cm = builder::table('course_modules', 'cm')
+            ->join(['modules', 'md'], 'module', 'id')
+            ->join(['facetoface', 'f'], 'instance', 'id')
+            ->join(['facetoface_sessions', 's'], 'f.id', 'facetoface')
+            ->where('s.id', $eventid)
+            ->where('md.name', 'facetoface')
+            ->where_field('cm.course', 'f.course')
+            ->select('cm.id')
+            ->one(true);
+        $context = context_module::instance($cm->id);
 
-        $usercapabilitylist[$seminarevent->get_id()][$USER->id] = has_capability(
-            'mod/facetoface:joinanyvirtualroom',
-            $context,
-            $USER
-        );
-        return (bool)$usercapabilitylist[$seminarevent->get_id()][$USER->id];
+        $has_caps = has_capability('mod/facetoface:joinanyvirtualroom', $context, $USER);
+        $usercapabilitylist[$eventid][$USER->id] = $has_caps;
+        return $has_caps;
     }
 
     /**
@@ -224,18 +269,18 @@ final class room_helper {
         if (isset($facilitatorlist[$session->get_id()][$USER->id])) {
             return (bool)$facilitatorlist[$session->get_id()][$USER->id];
         }
-        $facilitators = facilitator_list::from_session($session->get_id());
-        if ($facilitators->is_empty()) {
-            return false;
-        }
 
-        $isfacilitator = false;
-        foreach ($facilitators as $facilitator) {
-            if ($USER->id == $facilitator->get_userid()) {
-                $isfacilitator = true;
-                break;
-            }
-        }
+        $isfacilitator = builder::table('facetoface_facilitator', 'fa')
+            ->join(['user', 'u'], 'userid', 'id')
+            ->join(['facetoface_facilitator_dates', 'fad'], 'fa.id', 'facilitatorid')
+            ->join(['facetoface_sessions_dates', 'sd'], 'fad.sessionsdateid', 'id')
+            ->where('u.id', $USER->id)
+            ->where('u.deleted', 0)
+            ->where('u.suspended', 0)
+            ->where('fa.hidden', 0)
+            ->where('sd.id', $session->get_id())
+            ->exists();
+
         $facilitatorlist[$session->get_id()][$USER->id] = $isfacilitator;
         return (bool)$facilitatorlist[$session->get_id()][$USER->id];
     }

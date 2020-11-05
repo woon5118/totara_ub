@@ -60,7 +60,7 @@ class f2f_room_actions extends base {
         }
 
         $output = array();
-        $params = ['id' => $value, 'sesskey' => sesskey()];
+        $params = ['id' => $value];
 
         $output[] = $OUTPUT->action_icon(
             new moodle_url('/mod/facetoface/room/edit.php', $params),
@@ -70,7 +70,7 @@ class f2f_room_actions extends base {
             ])
         );
         if ($extrafields->hidden && $report->src->get_embeddedurl()) {
-            $urlparams = array_merge(array_merge($params, ['action' => 'show']), $report->src->get_urlparams());
+            $urlparams = array_merge(array_merge($params, ['action' => 'show', 'sesskey' => sesskey()]), $report->src->get_urlparams());
             $output[] = $OUTPUT->action_icon(
                 new moodle_url($report->src->get_embeddedurl(), $urlparams),
                 new flex_icon('show', [
@@ -79,7 +79,7 @@ class f2f_room_actions extends base {
                 ])
             );
         } else if ($report->src->get_embeddedurl()) {
-            $urlparams = array_merge(array_merge($params, ['action' => 'hide']), $report->src->get_urlparams());
+            $urlparams = array_merge(array_merge($params, ['action' => 'hide', 'sesskey' => sesskey()]), $report->src->get_urlparams());
             $output[] = $OUTPUT->action_icon(
                 new moodle_url($report->src->get_embeddedurl(), $urlparams),
                 new flex_icon('hide', [

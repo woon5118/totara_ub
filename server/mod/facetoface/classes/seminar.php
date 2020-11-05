@@ -346,7 +346,9 @@ final class seminar implements seminar_iterator_item {
      * Delete seminar and related items from database
      */
     public function delete(): void {
-        global $DB;
+        global $DB, $CFG;
+
+        require_once($CFG->dirroot . '/mod/facetoface/notification/lib.php'); // facetoface_notification
 
         $seminarinterests = new interest_list(['facetoface' => $this->get_id()]);
         $seminarinterests->delete();

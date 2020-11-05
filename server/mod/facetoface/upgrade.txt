@@ -3,6 +3,10 @@ information provided here is intended especially for developers.
 
 === 13.2 ===
 
+* mod_facetoface_renderer::get_room_details_html() has been deprecated; please use mod_facetoface_renderer::get_session_room_details_html() instead
+* mod_facetoface_renderer::render_room_details() no longer writes out a virtual room link; the virtual room is rendered as a card in mod_facetoface\detail\room_content\render_card()
+* mod_facetoface\signup::create() has been updated; the 2nd parameter now accepts both a seminar_event instance and an event ID
+* seminarevent_detail_section template added the nodivider property
 * editrecipients.html has been removed and should no longer be included anywhere.
 
 === 13.0 ===

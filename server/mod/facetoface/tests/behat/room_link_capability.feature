@@ -1,4 +1,4 @@
-@javascript @mod @mod_facetoface @totara
+@javascript @mod @mod_facetoface @mod_facetoface_virtual_room @totara
 Feature: Check seminar room link setting
   In order to allow users to see the room link
   As an admin

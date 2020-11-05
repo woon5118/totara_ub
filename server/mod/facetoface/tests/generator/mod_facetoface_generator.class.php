@@ -269,7 +269,7 @@ class mod_facetoface_generator extends testing_module_generator {
         }
 
         if (empty($record->url)) {
-            $record->url = 'https://example.com/channel/id/12345';
+            $record->url = '';
         }
 
         if (!isset($record->description)) {

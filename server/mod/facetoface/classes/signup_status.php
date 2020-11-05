@@ -212,7 +212,7 @@ final class signup_status implements seminar_iterator_item {
      */
     public static function create(signup $signup, state $state, int $timecreated = 0, float $grade = null, $reserved = null) : signup_status {
         if ($reserved !== null) {
-            throw \coding_exception('the argument `$reserved` must be null at this moment.');
+            throw new \coding_exception('the argument `$reserved` must be null at this moment.');
         }
         if (empty($timecreated)) {
             $timecreated = time();

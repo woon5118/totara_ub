@@ -90,7 +90,7 @@ final class signup implements seminar_iterator_item {
      */
     const DBTABLE = 'facetoface_signups';
     /**
-     * @var seminar_event linked instance
+     * @var seminar_event|null linked instance
      */
     private $seminarevent = null;
 
@@ -123,15 +123,22 @@ final class signup implements seminar_iterator_item {
      * Will return an existing signup, or create a new one if none exists.
      *
      * @param int $userid
-     * @param seminar_event $seminarevent
+     * @param seminar_event|integer $seminarevent
      * @param int $notificationtype - Default 3 = MDL_F2F_BOTH
      * @param bool $includearchived - Default false = exclude archived
      * @return signup
      */
-    public static function create(int $userid, seminar_event $seminarevent, int $notificationtype = 3, bool $includearchived = false): signup {
+    public static function create(int $userid, $seminarevent, int $notificationtype = 3, bool $includearchived = false): signup {
         global $DB;
 
-        if (empty($seminarevent->get_id())) {
+        if ($seminarevent instanceof seminar_event) {
+            $eventid = $seminarevent->get_id();
+        } else {
+            $eventid = (int)$seminarevent;
+            $seminarevent = null;
+        }
+        /** @var seminar_event|null $seminarevent */
+        if (empty($eventid)) {
             throw new signup_exception("Cannot create signup: Seminar event id is not set (it must be saved before signup created)");
         }
 
@@ -139,9 +146,9 @@ final class signup implements seminar_iterator_item {
         $signup->seminarevent = $seminarevent;
         $signup->set_notificationtype($notificationtype);
         $signup->userid = $userid;
-        $signup->sessionid = $seminarevent->get_id();
+        $signup->sessionid = $eventid;
         if ($signup->userid > 0) {
-            $conditions = ['userid' => $userid, 'sessionid' => $seminarevent->get_id()];
+            $conditions = ['userid' => $userid, 'sessionid' => $eventid];
             if (!$includearchived) {
                 $conditions['archived'] = 0;
             }

@@ -32,7 +32,9 @@ use moodle_url;
 use mod_facetoface_renderer;
 use rb_facetoface_summary_asset_embedded;
 use mod_facetoface\asset;
+use mod_facetoface\output\seminarresource_card;
 use mod_facetoface\seminar_attachment_item;
+use mod_facetoface\seminar_session;
 
 /**
  * Generate asset details.
@@ -75,6 +77,10 @@ class asset_content extends content_generator {
 
     protected function render_empty(moodle_url $manageurl): string {
         return get_string('reports:selectasset', 'mod_facetoface', $manageurl->out());
+    }
+
+    protected function render_card(?seminar_session $session, seminar_attachment_item $item, stdClass $user, mod_facetoface_renderer $renderer): ?seminarresource_card {
+        return null;
     }
 
     protected function get_manage_button(bool $frommanage): string {

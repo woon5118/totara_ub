@@ -1352,7 +1352,6 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
      * test: false && (false || false)
      */
     public function test_show_joinnow_button_1() {
-        global $DB;
         $now = time();
 
         $testroom = $this->facetoface_generator->add_site_wide_room(array());
@@ -1367,7 +1366,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         // Test
         foreach ($seminarevent->get_sessions() as $session) {
             // time is not right, no attendee booked, no trainer
-            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session, null, $now));
         }
     }
 
@@ -1389,7 +1388,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         // Test
         foreach ($seminarevent->get_sessions() as $session) {
             // time is right, no attendee booked, no trainer
-            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session, null, $now));
         }
     }
 
@@ -1419,7 +1418,8 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         // Test
         foreach ($seminarevent->get_sessions() as $session) {
             // time is right, attendee booked, no trainer
-            $this->assertTrue(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+            $this->assertTrue(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session, null, $now));
+            $this->assertTrue(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session, $signup, $now));
         }
     }
 
@@ -1458,7 +1458,7 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         // Test
         foreach ($seminarevent->get_sessions() as $session) {
             // time is right, no attendee booked, yes trainer
-            $this->assertTrue(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+            $this->assertTrue(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session, null, $now));
         }
     }
 
@@ -1487,7 +1487,8 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         // Test
         foreach ($seminarevent->get_sessions() as $session) {
             // time is not right, attendee booked, no trainer
-            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session, null, $now));
+            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session, $signup, $now));
         }
     }
 
@@ -1525,8 +1526,70 @@ class mod_facetoface_roomlib_testcase extends advanced_testcase {
         // Test
         foreach ($seminarevent->get_sessions() as $session) {
             // time is not right, no attendee booked, yes trainer
-            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session));
+            $this->assertFalse(\mod_facetoface\room_helper::show_joinnow($seminarevent, $session, null, $now));
         }
+    }
+
+    /**
+     * Test the visibility of the 'join now' button on a cancelled event.
+     *
+     * @param integer $timestart
+     * @param integer $timefinish
+     * @param boolean[] $expections
+     * @dataProvider data_show_joinnow_button_7
+     */
+    public function test_show_joinnow_button_7(int $timestart, int $timefinish, array $expections): void {
+        $DB = \core\orm\query\sql\sql::get_db();
+
+        $now = time();
+        $testroom = $this->facetoface_generator->add_site_wide_room(array());
+        $course = $this->getDataGenerator()->create_course();
+        $facetoface = $this->facetoface_generator->create_instance(array('course' => $course->id));
+
+        $sessiondates = array();
+        $sessiondates[] = $this->prepare_date($now + $timestart, $now + ($timefinish), $testroom->id);
+        $seminareventid =
+            $this->facetoface_generator->add_session(array('facetoface' => $facetoface->id, 'sessiondates' => $sessiondates));
+        $seminarevent = new \mod_facetoface\seminar_event($seminareventid);
+        /** @var mod_facetoface\seminar_session */
+        $session = $seminarevent->get_sessions()->current();
+
+        $learner = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($learner->id, $course->id, 'student');
+
+        $trainer = $this->getDataGenerator()->create_user();
+        $trainerrole = $DB->get_record('role', ['shortname' => 'teacher']);
+
+        $DB->set_field('facetoface', 'approvalrole', $trainerrole->id, ['id' => $facetoface->id]);
+        $DB->insert_record('facetoface_session_roles',
+            (object)['sessionid' => $seminarevent->get_id(), 'roleid' => $trainerrole->id, 'userid' => $trainer->id]);
+
+        $context = context_course::instance($course->id);
+        $this->getDataGenerator()->role_assign($trainerrole->id, $trainer->id, $context->id);
+        $this->getDataGenerator()->enrol_user($trainer->id, $course->id, 'editingteacher');
+
+        $this->setUser($trainer);
+        $this->assertEquals($expections[0], \mod_facetoface\room_helper::show_joinnow($seminarevent, $session, null, $now));
+        $this->setUser($learner);
+        $this->assertEquals($expections[1], \mod_facetoface\room_helper::show_joinnow($seminarevent, $session, null, $now));
+        // Poor man's cancellation.
+        $seminarevent->set_cancelledstatus(1)->save();
+        $this->setUser($trainer);
+        $this->assertEquals($expections[2], \mod_facetoface\room_helper::show_joinnow($seminarevent, $session, null, $now));
+        $this->setUser($learner);
+        $this->assertEquals($expections[3], \mod_facetoface\room_helper::show_joinnow($seminarevent, $session, null, $now));
+    }
+
+    /**
+     * @return array of [delta_timestart, delta_timefinish, expected => [trainer_alive, learner_alive, trainer_cancelled, learner_cancelled]]
+     */
+    public function data_show_joinnow_button_7(): array {
+        return [
+            'far future' => [DAYSECS * 1, DAYSECS * 2, [false, false, false, false]],
+            'near future' => [MINSECS * 10, HOURSECS * 2, [true, true, false, false]],
+            'ongoing' => [HOURSECS * -1, HOURSECS * 1, [true, true, false, false]],
+            'past' => [DAYSECS * -2, DAYSECS * -1, [false, false, false, false]],
+        ];
     }
 
     /**

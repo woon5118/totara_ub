@@ -25,6 +25,7 @@ use mod_facetoface\{signup, signup_status, seminar_event, seminar, calendar};
 use mod_facetoface\signup\state\{
     attendance_state,
     booked,
+    event_cancelled,
     waitlisted,
     requested,
     requestedadmin,
@@ -34,7 +35,8 @@ use mod_facetoface\signup\state\{
     unable_to_attend,
     no_show,
     state,
-    not_set
+    not_set,
+    user_cancelled
 };
 
 defined('MOODLE_INTERNAL') || die();
@@ -53,7 +55,9 @@ final class mod_facetoface_generator_util {
         'fully_attended' => fully_attended::class,
         'partially_attended' => partially_attended::class,
         'unable_to_attend' => unable_to_attend::class,
-        'no_show' => no_show::class
+        'no_show' => no_show::class,
+        'event_cancelled' => event_cancelled::class,
+        'user_cancelled' => user_cancelled::class,
     ];
 
     private static function get_event_id_from_detail(string $details): int {

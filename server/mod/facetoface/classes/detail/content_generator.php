@@ -29,7 +29,6 @@ use stdClass;
 use context;
 use context_module;
 use context_system;
-use html_writer;
 use moodle_exception;
 use moodle_url;
 use rb_config;
@@ -37,8 +36,11 @@ use rb_global_restriction_set;
 use reportbuilder;
 use totara_reportbuilder_renderer;
 use mod_facetoface\output\seminarevent_actionbar;
+use mod_facetoface\output\seminarresource_card;
+use mod_facetoface\output\seminarresource_information;
 use mod_facetoface\seminar_attachment_item;
 use mod_facetoface\seminar_event;
+use mod_facetoface\seminar_session;
 use mod_facetoface_renderer;
 
 /**
@@ -46,62 +48,58 @@ use mod_facetoface_renderer;
  */
 abstract class content_generator {
     /**
-     * @var string
-     */
-    private $idparam;
-
-    /**
-     * @var string
-     */
-    private $section;
-
-    /**
-     * @var string
+     * @var string {report_builder}.shortname
      */
     private $reportshortname;
 
     /**
-     * @var moodle_url
+     * @var moodle_url page url
      */
     private $baseurl;
 
     /**
-     * @var string
+     * @var string the label of the edit button
      */
     private $managelabel;
 
     /**
-     * @var moodle_url
+     * @var moodle_url the url of the edit button
      */
     private $manageurl;
 
     /**
-     * @var integer
+     * @var integer the id of the current resource item
      */
     private $id = 0;
 
     /**
-     * @var moodle_url
+     * @var moodle_url the url of the go back button
      */
     private $backurl;
 
     /**
-     * @var boolean
+     * @var boolean the debug flag that is passed to the report builder
      */
     private $debug = false;
 
     /**
-     * @var boolean
+     * @var boolean the popup layout for backward compatibility
+     * @deprecated Totara 13
      */
     private $popup = false;
 
     /**
-     * @var integer
+     * @var integer seminar_event.id aka {facetoface_sessions}.id
      */
     private $eventid = 0;
 
     /**
-     * @var boolean
+     * @var integer seminar_session.id aka {facetoface_sessions_dates}.id
+     */
+    private $sessionid = 0;
+
+    /**
+     * @var boolean read-only view
      */
     private $view = false;
 
@@ -114,26 +112,28 @@ abstract class content_generator {
      * @param string|moodle_url $baseurl the URL to this page
      */
     public function __construct(string $idparam, string $section, string $reportshortname, $baseurl) {
-        $this->idparam = $idparam;
-        $this->section = $section;
         $this->reportshortname = $reportshortname;
         $this->baseurl = new moodle_url($baseurl);
 
-        $this->id = optional_param($this->idparam, 0, PARAM_INT);
+        $this->id = optional_param($idparam, 0, PARAM_INT);
         $this->backurl = optional_param('b', '', PARAM_URL);
         $this->debug = (bool)optional_param('debug', 0, PARAM_INT);
         $this->popup = (bool)optional_param('popup', 0, PARAM_INT);
-        $this->sid = optional_param('sid', 0, PARAM_INT);
+        $this->eventid = optional_param('sid', 0, PARAM_INT);
+        $this->sessionid = optional_param('sdid', 0, PARAM_INT);
         $this->view = (bool)optional_param('view', 0, PARAM_INT);
 
         $params = [
-            $this->idparam => $this->id,
+            $idparam => $this->id,
             'b' => $this->backurl,
             'debug' => $this->debug,
             'popup' => $this->popup,
-            'sid' => $this->sid,
+            'sid' => $this->eventid,
             'view' => $this->view,
         ];
+        if (!empty($this->sessionid)) {
+            $params['sdid'] = $this->sessionid;
+        }
 
         foreach ($params as $name => $value) {
             if (!empty($value)) {
@@ -206,6 +206,17 @@ abstract class content_generator {
      * @return string
      */
     abstract protected function render_empty(moodle_url $manageurl): string;
+
+    /**
+     * Render a card content.
+     *
+     * @param seminar_session|null $session the current seminar session or null if nothing applicable
+     * @param seminar_attachment_item $item an item returned by load()
+     * @param stdClass $user
+     * @param mod_facetoface_renderer $renderer
+     * @return seminarresource_card|null
+     */
+    abstract protected function render_card(?seminar_session $session, seminar_attachment_item $item, stdClass $user, mod_facetoface_renderer $renderer): ?seminarresource_card;
 
     /**
      * Get the label of the 'Manage (thing)' button.
@@ -311,6 +322,8 @@ abstract class content_generator {
         $renderer = $PAGE->get_renderer('mod_facetoface');
         $renderer->setcontext($context);
 
+        $data = [];
+
         $hascapability = $this->has_edit_capability($item, $context, $USER);
         if ($hascapability) {
             $editlabel = $this->get_edit_button($item);
@@ -325,37 +338,48 @@ abstract class content_generator {
                 ->set_align('far')
                 ->set_class('eventdetail')
                 ->add_commandlink('edit', $editurl, $editlabel, false, $disabled);
-            echo $renderer->render($builder->build());
+            $data['headeraction'] = $builder->build()->get_template_data();
         }
 
-        echo $renderer->heading($PAGE->title);
+        $data['heading'] = $PAGE->title;
 
-        echo $this->render_details($item, $USER, $renderer);
+        $session = !empty($this->sessionid) ? new seminar_session($this->sessionid) : null;
+        $card = $this->render_card($session, $item, $USER, $renderer);
+        if ($card !== null) {
+            $data['card'] = $card->get_template_data();
+        }
+
+        $data['details'] = $this->render_details($item, $USER, $renderer);
 
         if ($report) {
             $report->display_restrictions();
 
-            echo html_writer::start_tag('section', ['class' => 'mod_facetoface__eventinfo__content__eventdetail__section']);
-            echo $renderer->heading($this->get_report_header($item), 3);
+            $data['report'] = [];
+            $data['report']['header'] = $this->get_report_header($item);
 
             /** @var totara_reportbuilder_renderer $reportrenderer */
             $reportrenderer = $PAGE->get_renderer('totara_reportbuilder');
 
             // This must be done after the header and before any other use of the report.
             list($reporthtml, $debughtml) = $reportrenderer->report_html($report, $this->debug);
-            echo $debughtml;
+            $data['report']['debughtml'] = $debughtml;
 
-            echo $reportrenderer->print_description($report->description, $report->_id);
+            $data['report']['description'] = $reportrenderer->print_description($report->description, $report->_id);
 
             // Print saved search options and filters.
-            $report->display_saved_search_options();
-            $report->display_search();
-            $report->display_sidebar_search();
-            echo $reporthtml;
+            $data['report']['searchoptions'] = self::capture_output(function (reportbuilder $report) {
+                $report->display_saved_search_options();
+            }, $report);
+            $data['report']['search'] = self::capture_output(function (reportbuilder $report) {
+                $report->display_search();
+            }, $report);
+            $data['report']['sidebar'] = self::capture_output(function (reportbuilder $report) {
+                $report->display_sidebar_search();
+            }, $report);
+
+            $data['report']['reporthtml'] = $reporthtml;
 
             $report->include_js();
-
-            echo html_writer::end_tag('section');
         }
 
         $builder = seminarevent_actionbar::builder()
@@ -370,7 +394,23 @@ abstract class content_generator {
             $builder->add_commandlink('manage', $this->manageurl, $this->managelabel);
         }
 
-        echo $renderer->render($builder->build());
+        $data['footeraction'] = $builder->build()->get_template_data();
+        echo $renderer->render(new seminarresource_information($data));
+    }
+
+    /**
+     * @param callable $callback
+     * @param mixed ...$args
+     * @return string
+     */
+    private static function capture_output(callable $callback, ...$args): string {
+        ob_start();
+        try {
+            $callback(...$args);
+            return ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
     }
 
     /**

@@ -81,8 +81,9 @@ class editroom extends \moodleform {
         $mform->addRule('roomcapacity', null, 'required', null, 'client');
         $mform->addRule('roomcapacity', null, 'numeric', null, 'client');
 
-        // Room link.
+        // Virtual room link.
         $mform->addElement('text', 'url', get_string('roomurl', 'mod_facetoface'), ['maxlength' => '1024', 'size' => '45']);
+        $mform->addHelpButton('url', 'roomurl', 'mod_facetoface');
         $mform->setType('url', PARAM_URL);
 
         // 'Allow room booking conflicts' checkbox

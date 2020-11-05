@@ -384,9 +384,15 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $seminar = $this->createSeminar($course, 'f2f');
 
-        $room = $this->createSeminarRoom('Site x 1', [
-            'locationaddress' => "Address\nTest\nTest2",
-        ]);
+        $room = $this->createSeminarRoom(
+            [
+                'name' => 'Site x 1',
+                'url' => 'https://example.com/channel/id/12345',
+            ],
+            [
+                'locationaddress' => "Address\nTest\nTest2",
+            ]
+        );
 
         $dates = [
             $this->createSeminarDate(WEEKSECS, null, $room->id),

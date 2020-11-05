@@ -1211,6 +1211,21 @@ trait mod_facetoface_renderer_deprecated {
     }
 
     /**
+     * Gets the HTML output for room details.
+     *
+     * @param \mod_facetoface\room $room - The room instance to get details for
+     * @param string|null $backurl
+     * @param bool $joinnow to display virtual room link if exists and time has come(15 min prior to the session start time)
+     * @return string containing room details with relevant html tags.
+     * @deprecated since Totara 13.2
+     */
+    public function get_room_details_html(room $room, string $backurl = null, bool $joinnow = false): string {
+        debugging('mod_facetoface_renderer::' . __FUNCTION__ . '() is deprecated. Please use mod_facetoface_renderer::get_session_room_details_html() instead.', DEBUG_DEVELOPER);
+        $session = new seminar_session();
+        return $this->get_session_room_details_html($session, $room, $backurl, $joinnow);
+    }
+
+    /**
      * Set signup link when enrolment method is enabled and called.
      *
      * @param string $link

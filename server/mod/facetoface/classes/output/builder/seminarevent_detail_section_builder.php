@@ -27,7 +27,6 @@ namespace mod_facetoface\output\builder;
 defined('MOODLE_INTERNAL') || die();
 
 use mod_facetoface\output\seminarevent_detail_section;
-use mod_facetoface\output\seminarevent_actionbar;
 
 /**
  * A builder class for seminarevent_detail_section.
@@ -52,6 +51,11 @@ final class seminarevent_detail_section_builder {
      * @var string
      */
     private $intro = '';
+
+    /**
+     * @var boolean
+     */
+    private $divider = true;
 
     /**
      * @var array
@@ -139,6 +143,17 @@ final class seminarevent_detail_section_builder {
     }
 
     /**
+     * Display the divider.
+     *
+     * @param boolean $show
+     * @return self
+     */
+    public function show_divider(bool $show): self {
+        $this->divider = $show;
+        return $this;
+    }
+
+    /**
      * Create a seminarevent_detail_section object.
      *
      * @return seminarevent_detail_section
@@ -150,6 +165,7 @@ final class seminarevent_detail_section_builder {
                 'title' => $this->title,
                 'intro' => $this->intro,
                 'id' => $this->id,
+                'nodivider' => !$this->divider,
                 'details' => $this->details,
             ]
         );
