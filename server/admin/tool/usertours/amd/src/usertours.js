@@ -126,7 +126,9 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
             // Normalize for the new library.
             tourConfig.eventHandlers = {
                 afterEnd: [usertours.markTourComplete],
+                beforeRender: [usertours.suspendZIndex],
                 afterRender: [usertours.markStepShown],
+                afterHide: [usertours.resetZIndex]
             };
 
             // Sort out the tour name.
@@ -158,6 +160,28 @@ function(ajax, BootstrapTour, $, templates, str, log, notification) {
 
             usertours.currentTour = new BootstrapTour(tourConfig);
             return usertours.currentTour.startTour();
+        },
+
+        /**
+         * Suspends z-index's of so that the tour targets items correctly
+         */
+        suspendZIndex: function() {
+            document.body.childNodes.forEach(function(child) {
+                if (child.style) {
+                    child.style.zIndex = 'auto';
+                }
+            });
+        },
+
+        /**
+         * Re-applies z-indexs so that the page functions as expected
+         */
+        resetZIndex: function() {
+            document.body.childNodes.forEach(function(child) {
+                if (child.style) {
+                    child.style.zIndex = '';
+                }
+            });
         },
 
         /**
