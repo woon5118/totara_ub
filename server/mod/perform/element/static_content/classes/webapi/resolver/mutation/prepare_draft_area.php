@@ -28,8 +28,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
-use mod_perform\entities\activity\section_element;
-use mod_perform\models\activity\element;
+use mod_perform\entity\activity\section_element;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 

@@ -356,4 +356,44 @@ class mod_perform_webapi_mutation_move_element_to_section_testcase extends advan
         self::expectExceptionMessage("Element cannot be moved if activity is active");
         move_element_to_section::resolve($args, $ec);
     }
+
+    public function test_missing_permission(): void {
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $config = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(2)
+            ->set_activity_status(draft::get_code())
+            ->set_number_of_sections_per_activity(2)
+            ->set_number_of_elements_per_section(2)
+            ->set_relationships_per_section([])
+            ->set_cohort_assignments_per_activity(0);
+        $activities = $generator->create_full_activities($config);
+
+        /** @var activity $activity1 */
+        $activity1 = $activities->first();
+        $a1_sections = $activity1->get_sections();
+        $a1_section1 = $a1_sections->first();
+        $a1_section2 = $a1_sections->last();
+        $a1_s1_sectionelements = $a1_section1->get_section_elements();
+        $a1_s1_sectionelement1 = $a1_s1_sectionelements->first();
+
+        // Move between sections.
+        $args = [
+            'input' => [
+                'element_id' => $a1_s1_sectionelement1->element_id,
+                'source_section_id' => $a1_section1->id,
+                'target_section_id' => $a1_section2->id,
+            ],
+            'activity' => $activity1,
+        ];
+
+        $user = self::getDataGenerator()->create_user();
+        self::setUser($user);
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
+    }
 }

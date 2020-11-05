@@ -40,8 +40,7 @@ Feature: Manage performance activity multiple choice-answers elements
     Then I should see perform multiple answers question "Question 1" is saved with options "Option one,Option two"
     And I should see perform multiple answers question "Question 2" is saved with options "Option three,Option four"
     And I should see perform multiple answers question "Question 3" is saved with options "Option five,Option six"
-    When I click on the Reporting ID action for question "Question 1"
-    Then I should see "Identifier 1"
+    And I should see "Identifier 1" in the "Question 1" tui "card"
 
   Scenario: Save multiple choice multiple answers elements with more options
     Given I log in as "admin"

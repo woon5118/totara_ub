@@ -23,7 +23,7 @@ Feature: Short text element supports multi-lang filters in titles
     And I save the activity content element
     And I close the tui notification toast
     Then I should see "it's an English question"
-    When I click on the Edit element action for question "it's an English question"
+    When I click on the Edit element button for question "it's an English question"
     Then the following fields match these values:
       | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
     When I save the activity content element
@@ -32,7 +32,7 @@ Feature: Short text element supports multi-lang filters in titles
     Then "rawTitle" "field" should not be visible
     And I should see "it's an English question"
     And I should not see "deutsche Frage"
-    When I click on the Edit element action for question "it's an English question"
+    When I click on the Edit element button for question "it's an English question"
     Then "rawTitle" "field" should be visible
     And the following fields match these values:
       | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
@@ -42,7 +42,7 @@ Feature: Short text element supports multi-lang filters in titles
     And I save the activity content element
     And I close the tui notification toast
     Then I should see "changed & updated"
-    When I click on the Edit element action for question "changed & updated"
+    When I click on the Edit element button for question "changed & updated"
     Then the following fields match these values:
       | rawTitle | <span lang="en" class="multilang">changed & updated</span><span lang="de" class="multilang">geaendert & gespeichert</span> |
     When I save the activity content element

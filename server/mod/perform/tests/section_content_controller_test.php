@@ -83,6 +83,8 @@ class section_content_controller_testcase extends advanced_testcase {
     private static function get_expected_props(int $section_id, activity $activity, string $expected_title): array {
         return [
             'section-id' => $section_id,
+            'activity-id' => $activity->id,
+            'is-multi-section-active' => $activity->get_multisection_setting(),
             'title' => $expected_title,
             'activity-state' => [
                 'code' => active::get_code(),

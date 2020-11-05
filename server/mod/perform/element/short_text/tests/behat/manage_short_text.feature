@@ -31,5 +31,4 @@ Feature: Manage performance activity short text elements
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section
     When I click on "Edit content elements" "link_or_button"
-    And I click on the Reporting ID action for question "Question 1"
-    Then I should see "Identifier 1"
+    And I should see "Identifier 1" in the "Question 1" tui "card"

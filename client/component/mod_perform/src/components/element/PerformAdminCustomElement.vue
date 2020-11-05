@@ -31,47 +31,9 @@
       v-if="sectionElement.element.element_plugin"
       class="tui-performAdminCustomElement__actions"
     >
-      <Popover
-        v-if="
-          sectionElement.element.identifier &&
-            !isActive &&
-            sectionComponent.type !== 'editing'
-        "
-        class="tui-performAdminCustomElement__actions-reportingId"
-      >
-        <h2 class="tui-performAdminCustomElement__actions-reportingIdHeader">
-          {{ $str('reporting_identifier', 'mod_perform') }}
-        </h2>
-        <div class="tui-performAdminCustomElement__actions-reportingIdContent">
-          {{ sectionElement.element.identifier }}
-        </div>
-        <template v-slot:trigger>
-          <ButtonIcon
-            class="tui-performAdminCustomElement__reportingId"
-            :aria-label="
-              $str(
-                'reporting_identifier_a11y',
-                'mod_perform',
-                sectionElement.element.title
-                  ? sectionElement.element.title
-                  : sectionElement.element.element_plugin.name
-              )
-            "
-            :styleclass="{ transparent: true }"
-          >
-            <template>
-              <ReportsIcon
-                :alt="$str('reporting_identifier', 'mod_perform')"
-                :title="$str('reporting_identifier', 'mod_perform')"
-              />
-            </template>
-          </ButtonIcon>
-        </template>
-      </Popover>
-
       <EditButton
         v-if="!isActive && sectionComponent.type === 'view'"
-        class="tui-performAdminCustomElement__edit"
+        class="tui-performAdminCustomElement__actions-item"
         :aria-label="
           $str(
             'edit_element',
@@ -83,19 +45,26 @@
         "
         @click="edit"
       />
-      <DeleteButton
+      <Dropdown
         v-if="!isActive && sectionComponent.type === 'view'"
-        :aria-label="
-          $str(
-            'delete_element',
-            'mod_perform',
-            sectionElement.element.title
-              ? sectionElement.element.title
-              : sectionElement.element.element_plugin.name
-          )
-        "
-        @click="remove"
-      />
+        position="bottom-right"
+        class="tui-performAdminCustomElement__actions-item"
+      >
+        <template v-slot:trigger="{ toggle }">
+          <MoreButton
+            :no-padding="true"
+            :aria-label="$str('element_action_options', 'mod_perform')"
+            @click="toggle"
+          />
+        </template>
+        <DropdownItem v-if="isMultiSectionActive" @click="move">
+          {{ $str('move_to_other_section', 'mod_perform') }}
+        </DropdownItem>
+        <DropdownItem @click="remove">
+          {{ $str('delete', 'core') }}
+        </DropdownItem>
+      </Dropdown>
+
       <ButtonIcon
         v-if="isActive && sectionComponent.type === 'view'"
         :aria-label="
@@ -108,7 +77,7 @@
           )
         "
         :styleclass="{ transparentNoPadding: true }"
-        @click="displayRead()"
+        @click="displayRead"
       >
         <SettingsIcon />
       </ButtonIcon>
@@ -162,6 +131,18 @@
         @update="$emit('update', $event)"
       />
     </div>
+
+    <div class="tui-performAdminCustomElement__lozenge">
+      <Lozenge
+        v-if="
+          sectionElement.element.identifier &&
+            !isActive &&
+            sectionComponent.type !== 'editing'
+        "
+        :text="sectionElement.element.identifier"
+        type="neutral"
+      />
+    </div>
   </Card>
 </template>
 
@@ -170,9 +151,11 @@ import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Card from 'tui/components/card/Card';
 import DeleteButton from 'tui/components/buttons/DeleteIcon';
 import DragHandleIcon from 'tui/components/icons/DragHandle';
+import Dropdown from 'tui/components/dropdown/Dropdown';
+import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import EditButton from 'tui/components/buttons/EditIcon';
-import Popover from 'tui/components/popover/Popover';
-import ReportsIcon from 'tui/components/icons/Reports';
+import Lozenge from 'tui/components/lozenge/Lozenge';
+import MoreButton from 'tui/components/buttons/MoreIcon';
 import SettingsIcon from 'tui/components/icons/Settings';
 
 export default {
@@ -181,9 +164,11 @@ export default {
     Card,
     DeleteButton,
     DragHandleIcon,
+    Dropdown,
+    DropdownItem,
     EditButton,
-    Popover,
-    ReportsIcon,
+    Lozenge,
+    MoreButton,
     SettingsIcon,
   },
 
@@ -192,9 +177,13 @@ export default {
     draggable: Boolean,
     dragging: Boolean,
     errors: Object,
+    isMultiSectionActive: {
+      type: Boolean,
+      required: true,
+    },
+    sectionComponent: Object,
     sectionElement: Object,
     sectionId: String,
-    sectionComponent: Object,
   },
 
   computed: {
@@ -213,6 +202,9 @@ export default {
     displayRead() {
       this.$emit('display-read');
     },
+    move() {
+      this.$emit('move');
+    },
   },
 };
 </script>
@@ -220,14 +212,16 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "delete_element",
       "edit_element",
+      "element_action_options",
       "element_type_heading_a11y",
-      "reporting_identifier",
-      "reporting_identifier_a11y",
-      "setting_element",
+      "move_to_other_section",
+      "section_element_tag_optional",
       "section_element_tag_required",
-      "section_element_tag_optional"
+      "setting_element"
+    ],
+    "core": [
+      "delete"
     ]
   }
 </lang-strings>
@@ -245,18 +239,16 @@ export default {
     flex-direction: row;
     justify-content: flex-end;
 
-    &-reportingId {
-      display: flex;
+    &-item {
+      padding: 0 var(--gap-1);
     }
+  }
 
-    &-reportingIdHeader {
-      margin: 0;
-      @include tui-font-heading-label();
-    }
-
-    &-reportingIdContent {
-      margin-top: var(--gap-2);
-    }
+  &__lozenge {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: var(--gap-2);
   }
 
   &__content {

@@ -70,6 +70,7 @@
                 <PerformAdminCustomElement
                   v-if="elementPlugins.length"
                   :activity-state="activityState"
+                  :is-multi-section-active="isMultiSectionActive"
                   :draggable="
                     (!anyDragging || dragging) &&
                       validDragElement(sectionElement) &&
@@ -84,6 +85,7 @@
                   @display="display(sectionElement)"
                   @display-read="displayReadOnly(sectionElement)"
                   @remove="tryDelete(sectionElement, index)"
+                  @move="showMoveModal(sectionElement, index)"
                 />
               </div>
             </Draggable>
@@ -102,6 +104,7 @@
             v-if="elementPlugins.length"
             :key="sectionElement.id"
             :activity-state="activityState"
+            :is-multi-section-active="isMultiSectionActive"
             :section-component="getSectionComponent(sectionElement)"
             :section-element="sectionElement"
             :section-id="sectionId"
@@ -126,39 +129,113 @@
       >
         <p>{{ $str('modal_element_delete_message', 'mod_perform') }}</p>
       </ConfirmationModal>
+
+      <ModalPresenter :open="moveModalOpen" @request-close="closeMoveModal">
+        <Modal size="normal" :aria-labelledby="moveModalId">
+          <ModalContent
+            :close-button="false"
+            :title="$str('modal_element_move_title', 'mod_perform')"
+            :title-id="moveModalId"
+            @dismiss="closeMoveModal"
+          >
+            <p>
+              {{ $str('modal_element_move_message', 'mod_perform') }}
+            </p>
+            <Loader :loading="$apollo.loading">
+              <Uniform>
+                <FormRow
+                  :label="$str('modal_element_move_from', 'mod_perform')"
+                >
+                  {{ title }}
+                </FormRow>
+                <FormRow
+                  v-slot="{ id, label }"
+                  :label="$str('modal_element_move_to', 'mod_perform')"
+                >
+                  <FormSelect
+                    v-model="moveToSectionId"
+                    :name="$str('modal_element_move_to', 'mod_perform')"
+                    :options="otherSections"
+                  />
+                </FormRow>
+                <FormRow>
+                  <ButtonGroup>
+                    <Button
+                      :styleclass="{ primary: 'true' }"
+                      :disabled="isSaving || !moveToSectionId"
+                      :text="$str('move', 'mod_perform')"
+                      @click="moveSelectedElement"
+                    />
+                    <ButtonCancel
+                      :disabled="isSaving"
+                      @click="closeMoveModal"
+                    />
+                  </ButtonGroup>
+                </FormRow>
+              </Uniform>
+            </Loader>
+          </ModalContent>
+        </Modal>
+      </ModalPresenter>
     </template>
   </Layout>
 </template>
 
 <script>
+import { Uniform, FormRow, FormSelect } from 'tui/components/uniform';
+import Button from 'tui/components/buttons/Button';
+import ButtonCancel from 'tui/components/buttons/Cancel';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ContentAddElementButton from 'mod_perform/components/manage_activity/content/ContentAddElementButton';
 import Draggable from 'tui/components/drag_drop/Draggable';
 import Droppable from 'tui/components/drag_drop/Droppable';
 import Layout from 'tui/components/layouts/LayoutOneColumn';
+import Loader from 'tui/components/loading/Loader';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import PageBackLink from 'tui/components/layouts/PageBackLink';
 import PerformAdminCustomElement from 'mod_perform/components/element/PerformAdminCustomElement';
+
+import moveElementToSectionMutation from 'mod_perform/graphql/move_element_to_section';
 import performElementPluginsQuery from 'mod_perform/graphql/element_plugins';
 import sectionDetailQuery from 'mod_perform/graphql/section_admin';
+import sectionsQuery from 'mod_perform/graphql/sections';
 import updateSectionElementMutation from 'mod_perform/graphql/update_section_elements';
+
 import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
 import { notify } from 'tui/notifications';
 import { pull, uniqueId } from 'tui/util';
 
 export default {
   components: {
+    Button,
+    ButtonCancel,
+    ButtonGroup,
     ConfirmationModal,
     ContentAddElementButton,
     Draggable,
     Droppable,
+    FormRow,
+    FormSelect,
     Layout,
+    Loader,
+    Modal,
+    ModalContent,
+    ModalPresenter,
     PageBackLink,
     PerformAdminCustomElement,
+    Uniform,
   },
 
   props: {
     activityState: {
       type: Object,
+      required: true,
+    },
+    activityId: {
+      type: String,
       required: true,
     },
     sectionId: {
@@ -168,6 +245,10 @@ export default {
     title: {
       type: String,
       required: true,
+    },
+    isMultiSectionActive: {
+      required: true,
+      type: Boolean,
     },
     goBackLink: {
       type: Object,
@@ -183,14 +264,19 @@ export default {
         section_elements: [],
       },
       sectionElements: [],
+      sections: [],
+      skipSectionsQuery: true,
       editingIds: [],
       readOnlyIds: [],
       removeIds: [],
       errors: {},
       isSaving: false,
       deleteModalOpen: false,
+      moveModalOpen: false,
       elementToDelete: null,
+      elementToMove: null,
       type: null,
+      moveToSectionId: null,
     };
   },
 
@@ -214,6 +300,16 @@ export default {
         return [];
       },
       update: data => data.mod_perform_element_plugins,
+    },
+    sections: {
+      query: sectionsQuery,
+      variables() {
+        return { activity_id: this.activityId };
+      },
+      update: data => data.mod_perform_activity.sections,
+      skip() {
+        return this.skipSectionsQuery;
+      },
     },
   },
 
@@ -243,6 +339,22 @@ export default {
      */
     isDraft() {
       return this.activityState.name === ACTIVITY_STATUS_DRAFT;
+    },
+
+    /**
+     * Get info for all sections in the activity except the current one.
+     */
+    otherSections() {
+      return this.sections
+        .map(section => ({
+          id: section.id,
+          label: section.display_title,
+        }))
+        .filter(section => section.id !== this.sectionId);
+    },
+
+    moveModalId() {
+      return this.$id('move-modal');
     },
   },
 
@@ -443,6 +555,69 @@ export default {
     },
 
     /**
+     * Display the modal for moving an element to another section.
+     * @param {Object} sectionElement
+     * @param {Number} index
+     */
+    showMoveModal(sectionElement, index) {
+      this.skipSectionsQuery = false;
+      this.moveModalOpen = true;
+      this.elementToMove = sectionElement;
+      this.elementToMove.index = index;
+    },
+
+    /**
+     * Validate current settings and call mutation to move element.
+     */
+    moveSelectedElement() {
+      if (!this.moveToSectionId || !this.elementToMove) {
+        return;
+      }
+      if (
+        this.otherSections.filter(
+          section => section.id === this.moveToSectionId
+        ).length !== 1
+      ) {
+        return;
+      }
+
+      // Move element.
+      this.doMoveSelectedElement();
+    },
+
+    /**
+     * Trigger mutation to move the element to another section.
+     */
+    async doMoveSelectedElement() {
+      this.isSaving = true;
+
+      try {
+        const { data: result } = await this.$apollo.mutate({
+          mutation: moveElementToSectionMutation,
+          variables: {
+            input: {
+              element_id: this.elementToMove.element.id,
+              source_section_id: this.sectionId,
+              target_section_id: this.moveToSectionId,
+            },
+          },
+          refetchAll: false,
+        });
+        this.updateSectionElementData(
+          result.mod_perform_move_element_to_section.source_section_elements
+        );
+        this.showSuccessNotification(
+          this.$str('toast_success_move_element', 'mod_perform')
+        );
+        this.remove(this.elementToMove);
+      } catch (e) {
+        this.showErrorNotification();
+      }
+      this.closeMoveModal();
+      this.isSaving = false;
+    },
+
+    /**
      * Trigger mutation to delete the element from the DB.
      */
     async deleteSelectedElement() {
@@ -502,6 +677,14 @@ export default {
     closeDeleteModal() {
       this.deleteModalOpen = false;
       this.elementToDelete = null;
+    },
+
+    /**
+     * Close modal for moving elements.
+     */
+    closeMoveModal() {
+      this.moveModalOpen = false;
+      this.moveToSectionId = null;
     },
 
     /**
@@ -723,9 +906,15 @@ export default {
   "mod_perform": [
     "modal_element_delete_message",
     "modal_element_delete_title",
+    "modal_element_move_from",
+    "modal_element_move_message",
+    "modal_element_move_title",
+    "modal_element_move_to",
+    "move",
     "required_fields",
     "toast_error_generic_update",
     "toast_success_delete_element",
+    "toast_success_move_element",
     "toast_success_save_element",
     "unsaved_changes_warning"
   ]

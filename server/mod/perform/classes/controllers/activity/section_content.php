@@ -82,12 +82,14 @@ class section_content extends perform_controller {
         $activity_state = $section->activity->get_status_state();
         $props = [
             'section-id' => (string)$this->get_section_id_param(),
+            'activity-id' => (string)$section->activity_id,
             'activity-state' => [
                 'code' => $activity_state::get_code(),
                 'name' => $activity_state::get_name(),
                 'display_name' => $activity_state::get_display_name(),
             ],
             'title' => format_string($title),
+            'is-multi-section-active' => $section->activity->get_multisection_setting(),
             'go-back-link' => [
                 'url' => (string)edit_activity::get_url(['activity_id' => $section->activity_id]),
                 'text' => get_string('back_to_activity_content', 'mod_perform', format_string($section->activity->name)),

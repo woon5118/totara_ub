@@ -32,10 +32,9 @@ use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
-use mod_perform\entities\activity\section_element as section_element_entity;
+use mod_perform\entity\activity\section_element as section_element_entity;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
-use PHPUnit\Exception;
 
 class move_element_to_section implements mutation_resolver, has_middleware {
 

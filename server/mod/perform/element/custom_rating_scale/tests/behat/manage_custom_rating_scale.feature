@@ -44,8 +44,7 @@ Feature: Manage performance activity custom rating scale elements
     Then I should see perform custom rating scale question "Question 1" is saved with options "Option one (score: 1),Option two (score: 2)"
     And I should see perform custom rating scale question "Question 2" is saved with options "Option three (score: 3),Option four (score: 4)"
     And I should see perform custom rating scale question "Question 3" is saved with options "Option five (score: 5),Option six (score: 6)"
-    When I click on the Reporting ID action for question "Question 1"
-    Then I should see "Identifier 1"
+    Then I should see "Identifier 1" in the "Question 1" tui "card"
 
   Scenario: Save custom rating scale elements with more options
     Given I log in as "admin"

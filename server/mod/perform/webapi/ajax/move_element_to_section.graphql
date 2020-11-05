@@ -1,27 +1,27 @@
 mutation mod_perform_move_element_to_section(
-    $input: mod_perform_move_element_to_section_input!
+  $input: mod_perform_move_element_to_section_input!
 ) {
-    mod_perform_move_element_to_section(input: $input) {
-        source_section_elements {
-            id
-            element {
-                id
-                element_plugin {
-                    plugin_name
-                    name
-                    admin_form_component
-                    admin_display_component
-                    admin_read_only_display_component
-                    participant_form_component
-                }
-                title
-                raw_title: title(format: RAW)
-                identifier
-                data
-                raw_data: data(format: RAW)
-                is_required
-            }
-            sort_order
+  mod_perform_move_element_to_section(input: $input) {
+    source_section_elements {
+      id
+      element {
+        id
+        element_plugin {
+          plugin_name
+          name
+          admin_edit_component
+          admin_view_component
+          admin_summary_component
+          participant_form_component
         }
+        title
+        raw_title: title(format: RAW)
+        identifier
+        data
+        raw_data: data(format: RAW)
+        is_required
+      }
+      sort_order
     }
+  }
 }

@@ -1873,12 +1873,17 @@ class behat_totara_tui extends behat_base {
                 }
                 return null;
             },
+            'card' => function () use ($label, $container) {
+                $locator = ".//div[contains(concat(' ', normalize-space(@class), ' '), ' tui-card ') and contains(., " . behat_context_helper::escape($label) . ")]";
+                return $this->find('xpath', $locator, false, $container);
+            },
 
             'text' => $find_default,
             'link' => $find_default,
             'link_or_button' => $find_default,
             'button' => $find_default,
             'checkbox' => $find_default,
+
         ];
 
         if (isset($finders[$tui_selector])) {

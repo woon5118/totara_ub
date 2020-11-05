@@ -778,7 +778,7 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @When /^I click on the (Reporting ID|Edit element|Delete element) action for question "([^"]*)"$/
+     * @When /^I click on the (Edit element|Actions) button for question "([^"]*)"$/
      * @param string $question_text
      */
     public function i_click_on_the_action_for_question(string $action_type, string $question_text): void {

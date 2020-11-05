@@ -19,8 +19,7 @@ Feature: Manage performance activity long text elements
     And I click on the "responseRequired" tui checkbox
     And I save the activity content element
     Then I should see "Required"
-    When I click on the Reporting ID action for question "Question 1"
-    Then I should see "Identifier 1"
+    Then I should see "Identifier 1" in the "Question 1" tui "card"
     And I add a "Long text" activity content element
     And I set the following fields to these values:
       | rawTitle | Question 2 |
@@ -31,6 +30,5 @@ Feature: Manage performance activity long text elements
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section
     When I click on "Edit content elements" "link_or_button"
-    And I should see "Required"
-    When I click on the Reporting ID action for question "Question 1"
-    Then I should see "Identifier 1"
+    Then I should see "Required"
+    And I should see "Identifier 1" in the "Question 1" tui "card"

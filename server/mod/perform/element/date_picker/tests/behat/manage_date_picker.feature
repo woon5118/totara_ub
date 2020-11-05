@@ -25,8 +25,7 @@ Feature: Manage performance activity date picker elements
     And I close the tui notification toast
     And I follow "Content (Activity one)"
     When I navigate to manage perform activity content page
-    When I click on the Reporting ID action for question "Question 1"
-    Then I should see "Identifier 1"
+    Then I should see "Identifier 1" in the "Question 1" tui "card"
 
   Scenario: Save required and optional date picker elements
     Given I log in as "admin"
