@@ -30,9 +30,21 @@
       :aria-label="ariaLabel || placeholder"
       :disabled="disabled"
       :placeholder="placeholder || $str('search', 'core')"
+      :styleclass="{ postIcon: enableClearIcon }"
+      class="tui-searchBox__search"
       @input="input"
       @submit="submit"
     />
+    <div v-if="isClearIconVisible" class="tui-searchBox__clearContainer">
+      <ButtonIcon
+        :aria-label="$str('clear_search_term', 'totara_core')"
+        :disabled="disabled"
+        :styleclass="{ small: true, transparent: true }"
+        @click="clear"
+      >
+        <RemoveIcon class="tui-searchBox__removeIcon" />
+      </ButtonIcon>
+    </div>
     <ButtonIcon
       :aria-label="ariaLabel || placeholder"
       :disabled="disabled"
@@ -51,6 +63,7 @@ import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import InputSearch from 'tui/components/form/InputSearch';
 import Label from 'tui/components/form/Label';
 import SearchIcon from 'tui/components/icons/Search';
+import RemoveIcon from 'tui/components/icons/Remove';
 
 export default {
   components: {
@@ -58,6 +71,7 @@ export default {
     InputSearch,
     Label,
     SearchIcon,
+    RemoveIcon,
   },
   inheritAttrs: false,
 
@@ -79,7 +93,14 @@ export default {
     'size',
     'spellcheck',
     'value',
+    'enableClearIcon',
   ],
+
+  data() {
+    return {
+      isClearIconVisible: this.enableClearIcon ? !!this.value : false,
+    };
+  },
 
   computed: {
     generatedId() {
@@ -88,8 +109,16 @@ export default {
   },
 
   methods: {
-    input(e) {
-      this.$emit('input', e);
+    input(value) {
+      if (this.enableClearIcon) {
+        this.isClearIconVisible = !!value;
+      }
+      this.$emit('input', value);
+    },
+
+    clear() {
+      this.isClearIconVisible = false;
+      this.$emit('clear');
     },
 
     submit() {
@@ -103,16 +132,39 @@ export default {
 {
   "core": [
     "search"
+  ],
+  "totara_core": [
+    "clear_search_term"
   ]
 }
 </lang-strings>
 
 <style lang="scss">
 .tui-searchBox {
+  position: relative;
   display: flex;
+
+  &__search {
+    // disable the default clear (x) action in IE
+    &::-ms-clear {
+      display: none;
+    }
+  }
 
   .tui-formLabel {
     margin-right: var(--gap-2);
+  }
+
+  &__clearContainer {
+    position: absolute;
+    right: var(--gap-8);
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  &__removeIcon {
+    color: var(--color-neutral-6);
   }
 
   // So that the search button matches the format of the input that is next to it

@@ -28,9 +28,12 @@
       :selected-sort="inner.selectedSort"
       :selected-access="inner.selectedAccess"
       :search-term="inner.searchTerm"
+      :spaces-cursor="workspace.cursor"
+      :spaces-is-loading="$apollo.queries.workspace.loading"
       class="tui-spacesPage__filter"
       @submit-search="updateFilter"
       @filter="updateFilter"
+      @clear="updateFilter"
     />
 
     <SpaceCardsGrid

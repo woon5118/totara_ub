@@ -91,6 +91,7 @@ $string['cannotdownloadtotaralanguageupdatelist'] = 'Cannot download list of lan
 $string['cannotundeleteuser'] = 'Cannot undelete user';
 $string['clearall'] = 'Clear all';
 $string['clearselection'] = 'Clear selection';
+$string['clear_search_term'] = 'Clear this search term';
 $string['clickfordetail'] = 'Click here for more details';
 $string['close'] = 'Close';
 $string['cloudconfigoverride'] = 'This setting is not available on Totara cloud.';

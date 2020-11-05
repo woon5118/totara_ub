@@ -57,6 +57,12 @@
       </template>
     </VirtualScroll>
     <div
+      v-if="!isLoading && cursor.total === 0"
+      class="tui-spaceCardsGrid__emptyResult"
+    >
+      {{ $str('space_empty_result', 'container_workspace') }}
+    </div>
+    <div
       v-if="loadMoreVisibility"
       class="tui-spaceCardsGrid__loadMoreContainer"
     >
@@ -166,6 +172,7 @@ export default {
   {
     "container_workspace": [
       "loadmore",
+      "space_empty_result",
       "total_space_x",
       "vieweditems",
       "workspace_cards_grid"
@@ -192,6 +199,10 @@ export default {
     justify-content: center;
     padding-top: var(--gap-6);
     padding-bottom: var(--gap-8);
+  }
+
+  &__emptyResult {
+    @include tui-font-body;
   }
 
   &__viewedSpaces {

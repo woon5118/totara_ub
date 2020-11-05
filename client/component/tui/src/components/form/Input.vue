@@ -28,6 +28,7 @@
     :autofocus="autofocus"
     :class="[
       styleclass.preIcon ? 'tui-formInput--preIcon' : null,
+      styleclass.postIcon ? 'tui-formInput--postIcon' : null,
       styleclass.transparent ? 'tui-formInput--transparent' : null,
       charLength ? 'tui-formInput--charLength-' + charLength : null,
       charLength ? 'tui-input--customSize' : null,
@@ -91,6 +92,7 @@ export default {
     styleclass: {
       default: () => ({
         preIcon: false,
+        postIcon: false,
         transparent: false,
       }),
       type: Object,
@@ -222,6 +224,10 @@ input[type].tui-formInput {
 
   &--preIcon {
     padding-left: var(--gap-6);
+  }
+
+  &--postIcon {
+    padding-right: var(--gap-6);
   }
 
   &--transparent,

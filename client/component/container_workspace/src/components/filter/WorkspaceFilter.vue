@@ -49,15 +49,29 @@
             :label="$str('search_spaces', 'container_workspace')"
             :placeholder="$str('search_spaces', 'container_workspace')"
             :show-label="false"
+            :enable-clear-icon="true"
             :stacked="stacked"
             @submit="submitSearch"
+            @clear="clearSearch"
           />
         </template>
       </FilterBar>
 
       <div class="tui-workspaceFilter__sortFilter">
+        <div v-if="!spacesIsLoading" class="tui-workspaceFilter__total">
+          <template v-if="spacesCursor.total === 0 || spacesCursor.total > 1">
+            {{
+              $str('total_space_x', 'container_workspace', spacesCursor.total)
+            }}
+          </template>
+          <template v-else-if="spacesCursor.total === 1">
+            {{ $str('single_space', 'container_workspace') }}
+          </template>
+        </div>
+
         <SelectFilter
           v-model="selection.sort"
+          class="tui-workspaceFilter__filter"
           :label="$str('sortby', 'core')"
           :show-label="true"
           :options="options.sorts"
@@ -103,6 +117,15 @@ export default {
       type: String,
       default: null,
     },
+
+    spacesCursor: {
+      type: Object,
+      default() {
+        return { total: 0, next: '' };
+      },
+    },
+
+    spacesIsLoading: Boolean,
   },
 
   apollo: {
@@ -166,6 +189,11 @@ export default {
       this.$emit('submit-search', this.selection);
     },
 
+    clearSearch() {
+      this.selection.searchTerm = '';
+      this.$emit('clear', this.selection);
+    },
+
     filterChanged() {
       this.$emit('filter', this.selection);
     },
@@ -178,6 +206,8 @@ export default {
     "container_workspace": [
       "membership",
       "search_spaces",
+      "total_space_x",
+      "single_space",
       "find_spaces",
       "workspace_access"
     ],
@@ -193,8 +223,17 @@ export default {
 .tui-workspaceFilter {
   &__sortFilter {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     margin-top: var(--gap-8);
+  }
+
+  &__total {
+    align-self: center;
+    @include tui-font-heading-x-small;
+  }
+
+  &__filter {
+    margin-left: auto;
   }
 }
 </style>
