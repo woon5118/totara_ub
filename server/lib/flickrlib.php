@@ -236,8 +236,13 @@ class phpFlickr {
         /** I've added this method to get the friendly geodata (i.e. 'in New York, NY') that the
          * website provides, but isn't available in the API. I'm providing this service as long
          * as it doesn't flood my server with requests and crash it all the time.
+         *
+         * @deprecated since Totara 13.2
          */
-        return unserialize(file_get_contents('http://phpflickr.com/geodata/?format=php&lat=' . $lat . '&lon=' . $lon));
+
+        debugging('getFriendlyGeodata() method has been deprecated. Please use a different reverse geocoding solution',
+            DEBUG_DEVELOPER);
+        return false;
     }
 
     function auth ($perms = "write", $remember_uri = true)
