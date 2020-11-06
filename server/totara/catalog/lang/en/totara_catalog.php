@@ -131,7 +131,7 @@ $string['pluginname'] = 'Course Catalogue';
 $string['progress_bar'] = 'Progress bar';
 $string['providertype'] = 'Provider type';
 $string['redirect_message_catalog_not_configured'] = 'The page you are looking for is no longer active. All courses can be found under {$a->go_to_active_catalog}.';
-$string['redirect_message_go_to_active_catalog_link'] = 'Find Learning';
+$string['redirect_message_go_to_active_catalog_link_text'] = 'Find Learning';
 $string['refresh_catalog_data_task'] = 'Refresh the catalog data';
 $string['results_empty'] = 'No available learning matches your search';
 $string['rich_text_content'] = 'Rich text content';
@@ -164,3 +164,6 @@ $string['view_options'] = 'View options';
 $string['view_catalog'] = 'View catalogue.';
 $string['warning_empty_catalog'] = "'Include in catalogue' has no selections and will result in an empty catalogue.";
 $string['filters_subheading'] = 'Define the available Filter Sources which allow a user to refine the items displayed in the catalogue.';
+
+// Deprecated since Totara 13.2.
+$string['redirect_message_go_to_active_catalog_link'] = 'Find Learning';

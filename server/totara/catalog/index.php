@@ -73,7 +73,7 @@ if ($CFG->catalogtype !== 'totara') {
     $redirect_url = $CFG->catalogtype === 'enhanced' ? '/totara/coursecatalog/courses.php' : '/course/index.php';
     $redirect_link = html_writer::link(
         new moodle_url($redirect_url),
-        get_string('redirect_message_go_to_active_catalog_link', 'totara_catalog')
+        get_string('redirect_message_go_to_active_catalog_link_text', 'totara_catalog')
     );
     echo $OUTPUT->notification(
         get_string('redirect_message_catalog_not_configured', 'totara_catalog', ['go_to_active_catalog' => $redirect_link])
