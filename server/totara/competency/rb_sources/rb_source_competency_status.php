@@ -376,7 +376,7 @@ class rb_source_competency_status extends rb_base_source {
                 new rb_column_option(
                     'assignment',
                     'userid',
-                    get_string('activity_log_link', 'rb_source_competency_status'),
+                    get_string('activity_log_link_text', 'rb_source_competency_status'),
                     'auser.id',
                     [
                         'joins' => 'auser',

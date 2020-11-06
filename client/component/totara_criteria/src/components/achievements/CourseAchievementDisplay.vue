@@ -110,7 +110,7 @@
 
               <ActionLink
                 :href="row.course.url_view"
-                :text="$str('course_link', 'totara_criteria')"
+                :text="$str('go_to_course', 'totara_criteria')"
                 :class="'tui-criteriaCourseAchievement__summary-button'"
                 :styleclass="{
                   primary: true,
@@ -261,8 +261,8 @@ export default {
       "complete",
       "completion",
       "complete_courses",
-      "course_link",
       "courses",
+      "go_to_course",
       "hidden_course",
       "no_courses",
       "not_available",

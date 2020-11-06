@@ -43,7 +43,6 @@ $string['completion'] = 'Completion';
 $string['confirm_assign_competency_body_by_other'] = 'The competency {$a} will be added to this user\'s profile and their achievement on it will be tracked. Are you sure you would like to assign this competency to them?';
 $string['confirm_assign_competency_body_by_self'] = 'The competency {$a} will be added to your profile and your achievement on it will be tracked. Are you sure you would like to assign this competency to yourself?';
 $string['confirm_assign_competency_title'] = 'Confirm assignment';
-$string['course_link'] = 'Go to course';
 $string['courses'] = 'Courses';
 $string['courses_required'] = '{$a} required only';
 $string['criteria'] = 'Criteria';
@@ -52,6 +51,7 @@ $string['criterion_not_found'] = 'Criteria not found';
 $string['done'] = 'Done';
 $string['error_competency_assignment'] = 'There was an error and the assignment could not be created.';
 $string['error_invalid_configuration'] = 'The criterion configuration is invalid';
+$string['go_to_course'] = 'Go to course';
 $string['hidden_course'] = 'This course is not available to view';
 $string['network_error'] = 'Network error';
 $string['no'] = 'No';
@@ -65,3 +65,6 @@ $string['required_only'] = '{$a} required only';
 $string['self_assign_competency'] = 'Self assign competency';
 $string['type'] = 'Type';
 $string['view_competency'] = 'View competency';
+
+// Deprecated since Totara 13.2.
+$string['course_link'] = 'Go to course';

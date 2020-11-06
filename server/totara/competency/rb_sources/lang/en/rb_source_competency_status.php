@@ -27,7 +27,7 @@ $string['sourcesummary'] = 'Learners progress on their assigned competencies.';
 $string['sourcetitle'] = 'Competency Status';
 
 $string['achievement_level_related_id'] = 'Achievement level related ID (Scale value ID number)';
-$string['activity_log_link'] = 'Assignment activity log link';
+$string['activity_log_link_text'] = 'Assignment activity log link';
 $string['assignment_status'] = 'Assignment status';
 $string['competency_id'] = 'Competency ID';
 $string['competency_id_number'] = 'Competency ID Number';
@@ -40,3 +40,6 @@ $string['time_created'] = 'Date achievement level achieved';
 $string['type_assignment'] = 'Competency Assignment';
 $string['type_competency'] = 'Competency';
 $string['type_competency_status'] = 'Competency Status';
+
+// Deprecated since Totara 13.2.
+$string['activity_log_link'] = 'Assignment activity log link';
