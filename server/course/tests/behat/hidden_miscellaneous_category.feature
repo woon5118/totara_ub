@@ -19,8 +19,8 @@ Feature: Check that hiding the Miscellaneous category does not break Find Learni
       | cat1_program1 | cat1_program1 | cat1     |
     And the following "certifications" exist in "totara_program" plugin:
       | fullname   | shortname  | category |
-      | cat0_cert1 | cat0_cert1 | 1        |
-      | cat1_cert1 | cat1_cert1 | 2        |
+      | cat0_cert1 | cat0_cert1 | 0        |
+      | cat1_cert1 | cat1_cert1 | cat1     |
     And I navigate to "Courses and categories" node in "Site administration > Courses"
     And I click on ".action-hide" "css_element" in the "#category-listing .listitem-category[data-id=\"1\"][data-visible]" "css_element"
 

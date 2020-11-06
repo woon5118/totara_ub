@@ -33,15 +33,15 @@ Feature: Check that searching for hidden programs when toggling course catalog w
     # Create certs (set both types of visibility to ensure normal doesn't interfere).
     And the following "certifications" exist in "totara_program" plugin:
       | fullname   | shortname  | category | visible | audiencevisible |
-      | cat0_cert1 | cat0_cert1 | 2        | 0       | 2               |
-      | cat0_cert2 | cat0_cert2 | 2        | 1       | 0               |
-      | cat0_cert3 | cat0_cert3 | 2        | 0       | 3               |
-      | cat1_cert1 | cat1_cert1 | 3        | 0       | 2               |
-      | cat1_cert2 | cat1_cert2 | 3        | 1       | 0               |
-      | cat1_cert3 | cat1_cert3 | 3        | 0       | 3               |
-      | cat2_cert1 | cat2_cert1 | 4        | 0       | 2               |
-      | cat2_cert2 | cat2_cert2 | 4        | 1       | 0               |
-      | cat2_cert3 | cat2_cert3 | 4        | 0       | 3               |
+      | cat0_cert1 | cat0_cert1 | top      | 0       | 2               |
+      | cat0_cert2 | cat0_cert2 | top      | 1       | 0               |
+      | cat0_cert3 | cat0_cert3 | top      | 0       | 3               |
+      | cat1_cert1 | cat1_cert1 | cat1     | 0       | 2               |
+      | cat1_cert2 | cat1_cert2 | cat1     | 1       | 0               |
+      | cat1_cert3 | cat1_cert3 | cat1     | 0       | 3               |
+      | cat2_cert1 | cat2_cert1 | cat2     | 0       | 2               |
+      | cat2_cert2 | cat2_cert2 | cat2     | 1       | 0               |
+      | cat2_cert3 | cat2_cert3 | cat2     | 0       | 3               |
     # 2 = COHORT_VISIBLE_ALL, 0 = COHORT_VISIBLE_ENROLLED, 3 = COHORT_VISIBLE_NOUSERS.
 
     # Create new roles.

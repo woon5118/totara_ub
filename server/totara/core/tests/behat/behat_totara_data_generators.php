@@ -164,6 +164,9 @@ class behat_totara_data_generators extends behat_base {
             'certifications' => array(
                 'datagenerator' => 'certification',
                 'required' => array('shortname'),
+                'switchids' => array(
+                    'category' => 'category'
+                ),
             ),
         ),
         'totara_hierarchy' => array(

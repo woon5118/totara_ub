@@ -24,10 +24,10 @@ Feature: Test file for catalog
       | Kim Sa Rang's Journey to the Middle Earth | prog4     | prog4    | cat1b    | 1       |
     And the following "certifications" exist in "totara_program" plugin:
       | fullname | shortname | category | visible |
-      | cert1    | cert1     | 2        | 1       |
-      | cert2    | cert2     | 3        | 0       |
-      | cert3    | cert3     | 4        | 0       |
-      | cert4    | cert4     | 1        | 1       |
+      | cert1    | cert1     | cat1     | 1       |
+      | cert2    | cert2     | cat2     | 0       |
+      | cert3    | cert3     | cat1a    | 0       |
+      | cert4    | cert4     | 0        | 1       |
     And the following "users" exist:
       | username | firstname | lastname |
       | jongsuk  | Jong Suk  | Lee      |

@@ -19,18 +19,18 @@ Feature: Navigate to all certifications in a category with sub-categories
 
     And the following "certifications" exist in "totara_program" plugin:
       | fullname   | shortname  | category |
-      | cert1      | cert1      | 2        |
-      | cert2      | cert2      | 2        |
-      | cert3      | cert3      | 2        |
-      | cert4      | cert4      | 2        |
-      | cert5      | cert5      | 2        |
-      | cert6      | cert6      | 2        |
-      | cert7      | cert7      | 2        |
-      | cert8      | cert8      | 2        |
-      | cert9      | cert9      | 2        |
-      | cert10     | cert10     | 2        |
-      | cert11     | cert11     | 2        |
-      | cert12     | cert12     | 2        |
+      | cert1      | cert1      | CAT1     |
+      | cert2      | cert2      | CAT1     |
+      | cert3      | cert3      | CAT1     |
+      | cert4      | cert4      | CAT1     |
+      | cert5      | cert5      | CAT1     |
+      | cert6      | cert6      | CAT1     |
+      | cert7      | cert7      | CAT1     |
+      | cert8      | cert8      | CAT1     |
+      | cert9      | cert9      | CAT1     |
+      | cert10     | cert10     | CAT1     |
+      | cert11     | cert11     | CAT1     |
+      | cert12     | cert12     | CAT1     |
 
     When I navigate to "Manage certifications" node in "Site administration > Certifications"
     And I follow "Category 1"
