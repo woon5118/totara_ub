@@ -62,6 +62,15 @@ class myteam extends item {
     }
 
     /**
+     * Don't show this item by default
+     *
+     * @return bool
+     */
+    public function get_default_visibility() {
+        return advanced_feature::is_enabled('competency_assignment') || advanced_feature::is_enabled('performance_activities');
+    }
+
+    /**
      * Is this menu item completely disabled?
      *
      * @return bool
@@ -69,8 +78,7 @@ class myteam extends item {
     public function is_disabled() {
         // The team page won't show up if the team feature is disabled
         // or perform related features are completely disabled
-        return advanced_feature::is_disabled('myteam')
-            || (advanced_feature::is_disabled('competency_assignment') && advanced_feature::is_disabled('performance_activities'));
+        return advanced_feature::is_disabled('myteam');
     }
 
     public function get_incompatible_preset_rules(): array {

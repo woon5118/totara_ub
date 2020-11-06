@@ -2,15 +2,16 @@
 Feature: Test Team menu item
   In order to use Team menu item
   As an admin
-  I must be able to cofigure it
+  I must be able to configure it
 
-  Scenario: Make sure Team is available by default
+  Scenario: Make sure Team is hidden by default on a default installation
     Given I am on a totara site
     And I log in as "admin"
 
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Team" in the "#totaramenutable" "css_element"
-    And I should see "Team" in the totara menu
+    And I should see "Hide" in the "Team" "table_row"
+    And I should not see "Team" in the totara menu
 
   Scenario: I can see Team as manager
     Given I am on a totara site
