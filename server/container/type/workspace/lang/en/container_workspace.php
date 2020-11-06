@@ -46,7 +46,7 @@ $string['comment_on_discussion'] = 'Comment on discussion';
 $string['comment_on_discussion_message'] = '{$a->author} has commented on your discussion post in the {$a->workspace_name} workspace';
 $string['comment_on_discussion_title'] = '{$a} has commented on your discussion post';
 $string['copied_to_clipboard'] = 'Copied to clipboard';
-$string['copy_discussion_link'] = 'Copy link';
+$string['copy_discussion_link_text'] = 'Copy link';
 $string['collapse_nav'] = 'Collapse navigation selection';
 $string['current_owner'] = "Current owner";
 $string['create_space'] = 'Create a workspace';
@@ -269,3 +269,6 @@ $string['messageprovider:comment_on_discussion'] = "Comments on discussion posts
 $string['messageprovider:join_request'] = "Request to join Private workspace";
 $string['messageprovider:added_to_workspace'] = 'User has been added to a workspace';
 $string['messageprovider:transfer_ownership'] = 'Workspace ownership has been transferred';
+
+// Deprecated since Totara 13.2.
+$string['copy_discussion_link'] = 'Copy link';

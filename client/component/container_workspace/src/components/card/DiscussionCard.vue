@@ -138,7 +138,7 @@
         </DropdownItem>
 
         <DropdownItem @click="handleCopyLink">
-          {{ $str('copy_discussion_link', 'container_workspace') }}
+          {{ $str('copy_discussion_link_text', 'container_workspace') }}
         </DropdownItem>
       </Dropdown>
     </div>
@@ -490,7 +490,7 @@ export default {
   {
     "container_workspace": [
       "discussion_actions",
-      "copy_discussion_link",
+      "copy_discussion_link_text",
       "like_discussion",
       "remove_like_discussion",
       "comment",
