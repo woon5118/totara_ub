@@ -138,6 +138,15 @@ class totara_core_weblib_testcase extends advanced_testcase {
 
     }
 
+    /**
+     * tests for proprietary CSS allowed in \HTMLPurifier_CSSDefinition::doSetupProprietary()
+     */
+    public function test_purify_html_css_proprietary() {
+        // Include just a few options here to make sure it was enabled.
+        $this->assertSame('<div style="border-radius:5px;"></div>', purify_html('<div style="border-radius: 5px" />'));
+        $this->assertSame('<div style="page-break-before:always;"></div>', purify_html('<div style="page-break-before: always" />'));
+    }
+
     public function test_clean_string() {
         $data = '&amp;&lt;&gt;&quot;&apos;<>"\'{}';
         $expected = '&#38;&#60;&#62;&#34;&#39;&#60;&#62;&#34;&#39;&#123;&#125;';
