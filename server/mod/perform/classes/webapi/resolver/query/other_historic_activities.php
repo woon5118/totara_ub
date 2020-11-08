@@ -25,17 +25,14 @@ namespace mod_perform\webapi\resolver\query;
 
 use core\collection;
 use core\entity\user;
-use core\orm\query\builder;
-use core\orm\query\sql\query as sql_query;
-use core\orm\query\table;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use moodle_url;
-use totara_core\advanced_feature;
+use \mod_perform\data_providers\activity\other_historic_activities as other_historic_activities_provider;
 
+global $CFG;
 require_once($CFG->dirroot . '/totara/appraisal/lib.php');
 require_once($CFG->dirroot . '/totara/feedback360/lib.php');
 
@@ -47,8 +44,8 @@ class other_historic_activities implements query_resolver, has_middleware {
     public static function resolve(array $args, execution_context $ec) {
         $userid = user::logged_in()->id;
 
-        $appraisals = self::get_appraisals($userid);
-        $feedbacks = self::get_feedbacks($userid);
+        $appraisals = other_historic_activities_provider::get_appraisals($userid);
+        $feedbacks = other_historic_activities_provider::get_feedbacks($userid);
 
         $data = array_merge($appraisals, $feedbacks);
 
@@ -65,103 +62,4 @@ class other_historic_activities implements query_resolver, has_middleware {
         ];
     }
 
-    private static function get_appraisals(int $userid): array {
-
-        $data = [];
-        if (advanced_feature::is_disabled('appraisals')) {
-            return $data;
-        }
-
-        $viewappraisals = (\appraisal::can_view_own_appraisals($userid) || \appraisal::can_view_staff_appraisals($userid));
-
-        if (!$viewappraisals) {
-            return $data;
-        }
-
-        $roles = \appraisal::get_roles();
-        unset($roles[\appraisal::ROLE_LEARNER]);
-        foreach ($roles as $role => $value) {
-            $appraisals = \appraisal::get_user_appraisals_extended($userid, $role);
-            foreach ($appraisals as $appraisal) {
-                $params = [
-                    'role' => $role,
-                    'subjectid' => $appraisal->userid,
-                    'appraisalid' => $appraisal->id,
-                    'action' => 'stages'
-                ];
-                $appraisal_link = new moodle_url('/totara/appraisal/myappraisal.php', $params);
-                $data[] = [
-                    'activity_name' => format_string($appraisal->name),
-                    'activity_link' => $appraisal_link->out(false),
-                    'type' => get_string('appraisal_legacy', 'totara_appraisal'),
-                    'subject_user' => fullname($appraisal->user),
-                    'relationship_to' => get_string($value, 'totara_appraisal'),
-                    'status' => \appraisal::display_status($appraisal->status)
-                ];
-            }
-        }
-        return $data;
-    }
-
-    private static function get_feedbacks(int $userid): array {
-        global $DB;
-
-        $data = [];
-        if (advanced_feature::is_disabled('feedback360')) {
-            return $data;
-        }
-
-        if (!\feedback360::can_view_feedback360s($userid)) {
-            return $data;
-        }
-
-        $usernamefields = get_all_user_name_fields(true, 'u');
-        $what = explode(',', "re.*,fb.name,ua.timedue,ua.userid,{$usernamefields}");
-        $builder = builder::table('feedback360_resp_assignment', 're')
-            ->join((new table('feedback360_user_assignment'))->as('ua'), 'ua.id', '=', 're.feedback360userassignmentid')
-            ->join((new table('feedback360'))->as('fb'), 'fb.id', '=', 'ua.feedback360id')
-            ->join((new table('user'))->as('u'), 'u.id', '=', 'ua.userid')
-            ->select($what)
-            ->where('re.userid', '=', $userid)
-            ->where_raw('re.userid <> ua.userid');
-        [$sql, $params] = sql_query::from_builder($builder)->build();
-        $resp_assignments = $DB->get_records_sql($sql, $params);
-        foreach ($resp_assignments as $resp_assignment) {
-            $feedback_link = new moodle_url('/totara/feedback360/index.php');
-            $data[] = [
-                'activity_name' => format_string($resp_assignment->name),
-                'activity_link' => $feedback_link->out(false),
-                'type' => get_string('feedback360:utf8', 'totara_feedback360'),
-                'subject_user' => fullname($resp_assignment),
-                'relationship_to' => get_string('manager', 'totara_feedback360'),
-                'status' => self::get_feedback_status($resp_assignment)
-            ];
-        }
-        return $data;
-    }
-
-    /**
-     * Get user feedback360 status depending from timecompleted or timedue
-     *
-     * @param $resp_assignment
-     * @return string
-     */
-    private static function get_feedback_status($resp_assignment): string {
-        if (!empty($resp_assignment->timecompleted)) {
-            // Completed
-            $status = get_string('completed', 'totara_feedback360');
-        } else {
-            if (empty($resp_assignment->timedue)) {
-                // Infinite time.
-                $status = '';
-            } else if ($resp_assignment->timedue < time()) {
-                // Overdue.
-                $status = get_string('overdue', 'totara_feedback360');
-            } else {
-                // Pending.
-                $status = get_string('pending', 'totara_feedback360');
-            }
-        }
-        return $status;
-    }
 }
