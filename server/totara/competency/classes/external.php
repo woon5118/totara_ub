@@ -292,13 +292,16 @@ class external extends external_api {
         advanced_feature::require('competencies');
         require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
+
         $incoming_courses = collection::new($courses);
         $incoming_course_ids = $incoming_courses->pluck('id');
 
         [$totara_visibility_sql, $totara_visibility_params] = totara_visibility_where();
         $visible_course_ids = course::repository()
             ->select(['id'])
-            ->join(['context', 'ctx'], 'id', 'ctx.instanceid')
+            ->where('containertype', container_course::get_type())
             ->filter_by_ids($incoming_course_ids)
             ->where_raw($totara_visibility_sql, $totara_visibility_params)
             ->get()

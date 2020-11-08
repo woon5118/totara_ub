@@ -58,7 +58,7 @@ Feature: Test competencies can be user assigned
     # Assert there is an html description that has actually rendered html
     And I should see "Find out more" in the "Find out more" "link"
 
-    When I close the tui datatable expandable content
+    When I toggle expanding row "1" of the tui datatable
     And I click "Competency Type One" in the "Competency types" tui multi select filter
     Then I should see "1 competencies"
     And I should see the tui datatable contains:
