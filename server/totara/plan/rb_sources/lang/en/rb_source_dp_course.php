@@ -57,8 +57,6 @@ $string['blended'] = 'Blended';
 $string['facetoface'] = 'Seminar';
 // Completion history
 $string['course_completion_previous_completion'] = 'Previous Completions';
-// AMOS does not like strings containing _link but we must leave it here to avoid breaking older sites.
-$string['course_completion_history_link'] = 'Previous Completions';
 $string['course_completion_history_count'] = 'Previous Completion count';
 
 // column types for this source, as strings
@@ -66,3 +64,6 @@ $string['type_plan'] = 'Plan';
 $string['type_template'] = 'Plan Template';
 $string['type_course_completion'] = 'Course Completion';
 $string['type_course_completion_history'] = 'Previous Course Completions';
+
+// Deprecated since Totara 13.2.
+$string['course_completion_history_link'] = 'Previous Completions';
