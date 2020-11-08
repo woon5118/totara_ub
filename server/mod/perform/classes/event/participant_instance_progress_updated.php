@@ -26,7 +26,7 @@ namespace mod_perform\event;
 defined('MOODLE_INTERNAL') || die();
 
 use core\event\base;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\participant_instance;
 
 class participant_instance_progress_updated extends progress_updated_event {

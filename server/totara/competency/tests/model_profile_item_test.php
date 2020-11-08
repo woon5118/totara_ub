@@ -22,7 +22,7 @@
  */
 
 use core\collection;
-use totara_competency\entities\assignment;
+use totara_competency\entity\assignment;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\profile\item;
 use totara_competency\models\profile\traits\assignment_key;

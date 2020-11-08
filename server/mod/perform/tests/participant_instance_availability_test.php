@@ -23,7 +23,7 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
 use mod_perform\event\participant_instance_availability_closed;
 use mod_perform\event\participant_instance_progress_updated;
 use mod_perform\event\participant_section_progress_updated;

@@ -24,7 +24,7 @@
 namespace mod_perform\rb;
 
 use context_user;
-use core\entities\tenant;
+use core\entity\tenant;
 use mod_perform\util as perform_util;
 
 class util {

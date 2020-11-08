@@ -37,7 +37,7 @@ $no_of_users = 5;
 $users_per_relationship = 5;
 
 use mod_perform\constants;
-use mod_perform\entities\activity\track_assignment;
+use mod_perform\entity\activity\track_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\track;
 use mod_perform\task\service\subject_instance_creation;

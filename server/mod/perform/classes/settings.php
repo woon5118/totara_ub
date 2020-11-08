@@ -26,11 +26,10 @@ namespace mod_perform;
 use admin_externalpage;
 use context_coursecat;
 use context_user;
-use core\entities\user;
+use core\entity\user;
 use mod_perform\controllers\activity\manage_activities;
 use mod_perform\controllers\reporting\performance\activity_response_data;
 use moodle_url;
-use mod_perform\util;
 
 /**
  * The settings in this class are deliberately not part of the usual settings.php.

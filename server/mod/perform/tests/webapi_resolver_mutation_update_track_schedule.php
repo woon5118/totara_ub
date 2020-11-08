@@ -27,7 +27,7 @@ require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
-use mod_perform\entities\activity\track_assignment;
+use mod_perform\entity\activity\track_assignment;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 

@@ -23,13 +23,13 @@
 
 namespace pathway_manual\models;
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
-use pathway_manual\entities\rating as rating_entity;
+use pathway_manual\entity\rating as rating_entity;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\role_factory;
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -23,7 +23,7 @@
 
 namespace mod_perform\models\activity;
 
-use mod_perform\entities\activity\element as element_entity;
+use mod_perform\entity\activity\element as element_entity;
 
 /**
  * Class element_plugin

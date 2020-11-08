@@ -28,8 +28,8 @@ use core\orm\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
 use core\orm\query\exceptions\record_not_found_exception;
-use mod_perform\entities\activity\notification as notification_entity;
-use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
+use mod_perform\entity\activity\notification as notification_entity;
+use mod_perform\entity\activity\notification_recipient as notification_recipient_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\notification\factory;
 

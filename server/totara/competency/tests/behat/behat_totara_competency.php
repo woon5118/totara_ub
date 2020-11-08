@@ -24,10 +24,10 @@
 
 use Behat\Gherkin\Node\TableNode as TableNode;
 use Behat\Mink\Exception\ExpectationException;
-use core\entities\user;
+use core\entity\user;
 use Behat\Mink\Element\NodeElement;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\pathway_factory;
 use totara_criteria\criterion;

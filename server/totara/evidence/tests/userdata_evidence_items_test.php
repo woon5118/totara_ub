@@ -23,9 +23,9 @@
  */
 
 use totara_evidence\customfield_area\evidence;
-use totara_evidence\entities\evidence_field_data;
-use totara_evidence\entities\evidence_item;
-use totara_evidence\entities\evidence_type;
+use totara_evidence\entity\evidence_field_data;
+use totara_evidence\entity\evidence_item;
+use totara_evidence\entity\evidence_type;
 use totara_evidence\event\evidence_item_deleted;
 use totara_evidence\userdata\evidence_items_other;
 use totara_evidence\userdata\evidence_items_self;

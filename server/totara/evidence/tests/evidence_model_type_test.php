@@ -22,9 +22,9 @@
  * @category test
  */
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
-use totara_evidence\entities;
+use totara_evidence\entity;
 use totara_evidence\models;
 
 global $CFG;
@@ -327,9 +327,9 @@ class totara_evidence_model_type_testcase extends totara_evidence_testcase {
 
         $this->assertCount($dummy_types + 1, $this->types());
         $this->assertCount($fields_count + $dummy_fields, $this->fields());
-        $this->assertNotNull(entities\evidence_type::repository()->find($type->get_id()));
+        $this->assertNotNull(entity\evidence_type::repository()->find($type->get_id()));
         foreach ($fields as $field) {
-            $this->assertNotNull(entities\evidence_type_field::repository()->find($field->id));
+            $this->assertNotNull(entity\evidence_type_field::repository()->find($field->id));
         }
 
         // Guest user doesn't have permission
@@ -358,11 +358,11 @@ class totara_evidence_model_type_testcase extends totara_evidence_testcase {
         $item->delete();
         $type_id = $type->get_id();
         $type->delete();
-        $this->assertNull(entities\evidence_type::repository()->find($type_id));
+        $this->assertNull(entity\evidence_type::repository()->find($type_id));
         $this->assertCount($dummy_types, $this->types());
         $this->assertCount($dummy_fields, $this->fields());
         foreach ($fields as $field) {
-            $this->assertNull(entities\evidence_type_field::repository()->find($field->id));
+            $this->assertNull(entity\evidence_type_field::repository()->find($field->id));
         }
     }
 
@@ -610,13 +610,13 @@ class totara_evidence_model_type_testcase extends totara_evidence_testcase {
     public function test_model_type_multilang(): void {
         self::setAdminUser();
 
-        /** @var entities\evidence_type $course_type_entity */
-        $course_type_entity = entities\evidence_type::repository()
+        /** @var entity\evidence_type $course_type_entity */
+        $course_type_entity = entity\evidence_type::repository()
             ->where('idnumber', 'coursecompletionimport')->one();
         $course_type = models\evidence_type::load_by_entity($course_type_entity);
 
-        /** @var entities\evidence_type $certification_type_entity */
-        $certification_type_entity = entities\evidence_type::repository()
+        /** @var entity\evidence_type $certification_type_entity */
+        $certification_type_entity = entity\evidence_type::repository()
             ->where('idnumber', 'certificationcompletionimport')->one();
         $certification_type = models\evidence_type::load_by_entity($certification_type_entity);
 

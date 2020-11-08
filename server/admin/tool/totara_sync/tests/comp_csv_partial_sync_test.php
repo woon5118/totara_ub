@@ -21,7 +21,7 @@
  * @package tool_totara_sync
  */
 
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();

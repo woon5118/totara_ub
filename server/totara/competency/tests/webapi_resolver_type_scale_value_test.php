@@ -23,7 +23,7 @@
 
 use core\format;
 use core\webapi\execution_context;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\scale_value;
 use totara_competency\webapi\resolver\type\scale_value as scale_value_type;
 
 /**

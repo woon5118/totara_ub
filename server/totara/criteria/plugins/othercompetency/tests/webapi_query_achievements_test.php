@@ -39,7 +39,7 @@ require_once $CFG->dirroot . '/totara/criteria/tests/competency_achievements_tes
 class criteria_othercompetency_webapi_query_achievements_testcase extends totara_criteria_competency_achievements_testcase {
 
     /**
-     * @var \totara_competency\entities\competency[] $other_competency_items
+     * @var \totara_competency\entity\competency[] $other_competency_items
      */
     private $other_competency_items;
 
@@ -134,8 +134,8 @@ class criteria_othercompetency_webapi_query_achievements_testcase extends totara
         // Logging in...
         $this->setUser($this->data['user']);
 
-        /** @var \totara_competency\entities\competency[] $competencies */
-        $competencies = \totara_competency\entities\competency::repository()
+        /** @var \totara_competency\entity\competency[] $competencies */
+        $competencies = \totara_competency\entity\competency::repository()
             ->where_in('id', $criterion->get_item_ids())
             ->order_by('sortthread')
             ->get()

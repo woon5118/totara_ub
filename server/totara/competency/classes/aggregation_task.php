@@ -26,9 +26,9 @@ namespace totara_competency;
 use core\orm\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
-use totara_competency\entities\competency;
-use totara_competency\entities\pathway as pathway_entity;
-use totara_competency\entities\pathway_achievement;
+use totara_competency\entity\competency;
+use totara_competency\entity\pathway as pathway_entity;
+use totara_competency\entity\pathway_achievement;
 
 /**
  * Class to run the aggregation on a list of users and competencies.

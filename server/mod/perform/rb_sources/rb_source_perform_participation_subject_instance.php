@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use core\entities\user;
+use core\entity\user;
 use mod_perform\models\activity\participant_source;
 use mod_perform\state\subject_instance\pending;
 use mod_perform\rb\traits\activity_trait;

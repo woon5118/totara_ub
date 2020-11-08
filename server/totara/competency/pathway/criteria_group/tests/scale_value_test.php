@@ -155,7 +155,7 @@ class scale_value_test extends \advanced_testcase {
             );
         }
 
-        /** @var \totara_competency\entities\scale $scale */
+        /** @var \totara_competency\entity\scale $scale */
 
         foreach ($this->data['competency_list'] as $competency) {
                 $criteria_group_data = [

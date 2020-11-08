@@ -26,8 +26,8 @@ namespace totara_competency\controllers\profile;
 use context_system;
 use core\format;
 use core\webapi\formatter\field\string_field_formatter;
-use totara_competency\entities\competency_framework;
-use totara_competency\entities\competency_type;
+use totara_competency\entity\competency_framework;
+use totara_competency\entity\competency_type;
 use totara_competency\helpers\capability_helper;
 use totara_mvc\tui_view;
 

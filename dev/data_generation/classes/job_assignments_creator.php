@@ -28,7 +28,7 @@ use degeneration\items\job_assignment;
 use degeneration\items\organisation;
 use degeneration\items\position;
 use degeneration\items\user;
-use totara_job\entities\job_assignment as job_assignment_entity;
+use totara_job\entity\job_assignment as job_assignment_entity;
 
 class job_assignments_creator {
     /**

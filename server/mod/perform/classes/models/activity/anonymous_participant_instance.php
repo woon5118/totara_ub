@@ -24,8 +24,8 @@
 namespace mod_perform\models\activity;
 
 use core\collection;
-use core\entities\user;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use core\entity\user;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\response\participant_section;
 use mod_perform\state\participant_instance\participant_instance_availability;
 use mod_perform\state\participant_instance\participant_instance_progress;

@@ -23,10 +23,10 @@
 
 namespace pathway_manual\models;
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\entity\entity;
 use pathway_manual\models\roles\role;
-use pathway_manual\entities\rating;
+use pathway_manual\entity\rating;
 
 /**
  * Class rateable_user

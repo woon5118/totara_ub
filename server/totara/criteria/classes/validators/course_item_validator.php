@@ -27,7 +27,7 @@ global $CFG;
 require_once($CFG->dirroot . '/lib/completionlib.php');
 
 use completion_info;
-use totara_competency\entities\course as course_entity;
+use totara_competency\entity\course as course_entity;
 
 
 /**

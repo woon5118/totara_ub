@@ -24,7 +24,7 @@
 namespace mod_perform\notification;
 
 use coding_exception;
-use core\entities\user;
+use core\entity\user;
 use mod_perform\controllers\activity\user_activities_select_participants;
 use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\models\activity\participant_instance;

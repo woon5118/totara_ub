@@ -23,9 +23,9 @@
 
 use core\orm\query\builder;
 use mod_perform\constants;
-use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\activity as activity_entity;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\state\activity\draft;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 

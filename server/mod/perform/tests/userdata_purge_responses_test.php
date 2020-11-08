@@ -22,16 +22,16 @@
 */
 
 use container_perform\perform;
-use mod_perform\entities\activity\activity;
-use mod_perform\entities\activity\element;
-use mod_perform\entities\activity\element_response;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\participant_section;
-use mod_perform\entities\activity\section;
-use mod_perform\entities\activity\section_element;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\activity;
+use mod_perform\entity\activity\element;
+use mod_perform\entity\activity\element_response;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\participant_section;
+use mod_perform\entity\activity\section;
+use mod_perform\entity\activity\section_element;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\track;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\in_progress;
 use mod_perform\userdata\purge_other_responses;

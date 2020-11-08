@@ -25,7 +25,7 @@ namespace totara_competency;
 
 
 use stdClass;
-use totara_competency\entities\pathway_achievement;
+use totara_competency\entity\pathway_achievement;
 
 abstract class pathway_evaluator {
 

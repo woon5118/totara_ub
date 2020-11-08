@@ -29,7 +29,7 @@ use core\orm\query\builder;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use hierarchy_position\entities\position_framework as position_framework_entity;
+use hierarchy_position\entity\position_framework as position_framework_entity;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -406,7 +406,7 @@ class rb_source_perform_response_base extends rb_base_source {
         $si = (new mod_perform_generator(new testing_data_generator()))->create_subject_instance([
             'activity_name' => 'Weekly catchup',
             'subject_is_participating' => true,
-            'subject_user_id' => \core\entities\user::repository()->get()->last()->id,
+            'subject_user_id' => \core\entity\user::repository()->get()->last()->id,
             'include_questions' => true,
             'update_participant_sections_status' => 'complete',
         ]);

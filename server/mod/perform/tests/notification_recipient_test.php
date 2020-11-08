@@ -25,7 +25,7 @@
 use core\orm\query\builder;
 use mod_perform\constants;
 use mod_perform\notification\recipient;
-use totara_core\entities\relationship as relationship_entity;
+use totara_core\entity\relationship as relationship_entity;
 use totara_core\relationship\relationship as relationship_model;
 
 

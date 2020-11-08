@@ -30,16 +30,16 @@ use core\orm\query\builder;
 use criteria_childcompetency\childcompetency;
 use criteria_linkedcourses\linkedcourses;
 use pathway_criteria_group\criteria_group;
-use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
+use pathway_criteria_group\entity\criteria_group_criterion as criteria_group_criterion_entity;
 use pathway_learning_plan\learning_plan;
-use totara_competency\entities\competency;
-use totara_competency\entities\configuration_change;
-use totara_competency\entities\pathway as pathway_entity;
-use totara_competency\entities\scale;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\competency;
+use totara_competency\entity\configuration_change;
+use totara_competency\entity\pathway as pathway_entity;
+use totara_competency\entity\scale;
+use totara_competency\entity\scale_value;
 use totara_core\advanced_feature;
 use totara_criteria\criterion;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 
 /**
  * Class handling legacy aggregation method on the competency

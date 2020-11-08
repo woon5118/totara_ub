@@ -23,10 +23,10 @@
 
 use core\orm\entity\relations\has_many_through;
 use core\orm\query\builder;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency;
-use totara_competency\entities\competency_framework;
-use totara_competency\entities\scale;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency;
+use totara_competency\entity\competency_framework;
+use totara_competency\entity\scale;
 
 /**
  * @group totara_competency

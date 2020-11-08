@@ -21,12 +21,12 @@
  * @package totara_competency
  */
 
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency;
-use core\entities\cohort;
-use hierarchy_organisation\entities\organisation;
-use hierarchy_position\entities\position;
-use core\entities\user;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency;
+use core\entity\cohort;
+use hierarchy_organisation\entity\organisation;
+use hierarchy_position\entity\position;
+use core\entity\user;
 use totara_competency\user_groups;
 
 define('CLI_SCRIPT', 1);

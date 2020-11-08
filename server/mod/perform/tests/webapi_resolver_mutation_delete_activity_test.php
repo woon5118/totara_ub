@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entity\activity\activity as activity_entity;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 

@@ -1,6 +1,10 @@
 This files describes API changes in Totara Job,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* totara_job\entities\job_assignment has been moved to totara_job\entity\job_assignment
+
 === 13.0 ===
 
 * totara/job/dialog/get_deletion_notification.php has been deprecated, please use get_string AMD module instead.

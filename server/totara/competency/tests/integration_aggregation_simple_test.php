@@ -24,10 +24,10 @@
 use pathway_learning_plan\learning_plan;
 use pathway_manual\manual;
 use pathway_manual\models\roles\manager;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\configuration_change;
-use totara_competency\entities\pathway as pathway_entity;
-use totara_competency\entities\pathway_achievement as pathway_achievement_entity;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\configuration_change;
+use totara_competency\entity\pathway as pathway_entity;
+use totara_competency\entity\pathway_achievement as pathway_achievement_entity;
 use totara_competency\expand_task;
 use totara_competency\linked_courses;
 use totara_competency\pathway;

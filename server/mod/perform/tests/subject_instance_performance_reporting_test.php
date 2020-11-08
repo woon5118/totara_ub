@@ -24,8 +24,8 @@
 use core\orm\query\builder;
 use mod_perform\constants;
 use mod_perform\dates\date_offset;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use mod_perform\task\service\subject_instance_creation;

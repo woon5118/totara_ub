@@ -23,10 +23,10 @@
 
 namespace pathway_manual\models\roles;
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\entity\repository;
 use core\orm\query\builder;
-use totara_job\entities\job_assignment;
+use totara_job\entity\job_assignment;
 
 class appraiser extends role {
 

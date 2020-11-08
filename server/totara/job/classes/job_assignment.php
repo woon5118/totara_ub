@@ -320,10 +320,10 @@ class job_assignment {
     /**
      * Create an instance from an orm entity.
      *
-     * @param entities\job_assignment $job_assignment
+     * @param entity\job_assignment $job_assignment
      * @return static
      */
-    public static function from_entity(entities\job_assignment $job_assignment): self {
+    public static function from_entity(entity\job_assignment $job_assignment): self {
         $record = (object) $job_assignment->to_array();
 
         return new self($record);

@@ -1,6 +1,10 @@
 This files describes API changes in Learning plans,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+
+* totara_plan\entities\plan_evidence_relation has been moved to totara_plan\entity\plan_evidence_relation
+
 === 13.0 ===
 
 * Replaced /totara/plan/components/competency/find.js YUI module with AMD module

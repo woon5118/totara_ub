@@ -26,10 +26,10 @@ namespace mod_perform\models\activity\helpers;
 use coding_exception;
 use core\orm\entity\entity;
 use core\orm\entity\repository;
-use mod_perform\entities\activity\manual_relationship_selection;
-use mod_perform\entities\activity\manual_relationship_selection_progress;
-use mod_perform\entities\activity\manual_relationship_selection_progress_repository;
-use mod_perform\entities\activity\manual_relationship_selector;
+use mod_perform\entity\activity\manual_relationship_selection;
+use mod_perform\entity\activity\manual_relationship_selection_progress;
+use mod_perform\entity\activity\manual_relationship_selection_progress_repository;
+use mod_perform\entity\activity\manual_relationship_selector;
 
 /**
  * Common functionality for handling manual relationships and participant selections.

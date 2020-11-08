@@ -22,11 +22,11 @@
  * @package mod_perform
  */
 
-use core\entities\tenant;
-use core\entities\user;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\entities\activity\track;
-use mod_perform\entities\activity\track_user_assignment;
+use core\entity\tenant;
+use core\entity\user;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\track;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\util;

@@ -24,7 +24,7 @@
 namespace mod_perform\observers;
 
 use core\event\base;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\event\activity_created;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\subject_instance as subject_instance_model;

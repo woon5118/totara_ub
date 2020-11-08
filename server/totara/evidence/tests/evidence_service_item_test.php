@@ -22,7 +22,7 @@
  * @category test
  */
 
-use core\entities\user;
+use core\entity\user;
 use totara_core\phpunit\webservice_utils;
 
 global $CFG;

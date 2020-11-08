@@ -24,11 +24,11 @@
 namespace totara_evidence\models;
 
 use coding_exception;
-use core\entities\user;
+use core\entity\user;
 use core\orm\collection;
 use core\orm\query\builder;
 use totara_evidence\customfield_area;
-use totara_evidence\entities;
+use totara_evidence\entity;
 use totara_evidence\event;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
 
@@ -74,7 +74,7 @@ class evidence_item extends evidence {
     ];
 
     protected static function get_entity_class(): string {
-        return entities\evidence_item::class;
+        return entity\evidence_item::class;
     }
 
     /**
@@ -136,7 +136,7 @@ class evidence_item extends evidence {
         }
         evidence_item_capability_helper::for_user($for_user)->can_create(true);
 
-        $entity = new entities\evidence_item();
+        $entity = new entity\evidence_item();
         $entity->name = $name;
         $entity->typeid = $type->get_id();
         $entity->user_id = $for_user;
@@ -200,10 +200,10 @@ class evidence_item extends evidence {
         $this->can_modify(true);
 
         $event = builder::get_db()->transaction(function () {
-            $event = event\evidence_item_deleted::create_from_item(new entities\evidence_item($this->entity->id));
+            $event = event\evidence_item_deleted::create_from_item(new entity\evidence_item($this->entity->id));
 
             foreach ($this->entity->data as $data) {
-                /** @var entities\evidence_field_data $data */
+                /** @var entity\evidence_field_data $data */
                 customfield_area\field_helper::get_field_instance($data)->delete();
             }
             $this->entity->delete();

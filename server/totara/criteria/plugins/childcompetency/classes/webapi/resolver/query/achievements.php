@@ -27,10 +27,10 @@ namespace criteria_childcompetency\webapi\resolver\query;
 use core\orm\collection;
 use core\orm\entity\repository;
 use criteria_childcompetency\childcompetency;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use totara_criteria\criterion;
 use totara_criteria\webapi\resolver\query\competency_achievements;
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 
 /**
  * Fetches all achievments for the childcompetency criteria type

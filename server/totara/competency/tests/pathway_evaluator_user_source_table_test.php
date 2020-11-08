@@ -23,8 +23,8 @@
 
 use pathway_criteria_group\criteria_group;
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\pathway_achievement;
-use totara_competency\entities\competency;
+use totara_competency\entity\pathway_achievement;
+use totara_competency\entity\competency;
 
 /**
  * @group totara_competency

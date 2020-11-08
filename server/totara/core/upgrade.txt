@@ -4,6 +4,8 @@ information provided here is intended especially for developers.
 === 13.2 ===
 
 * Added a new method _update_with_data() to totara_dialog.js for sending post requests with body data
+* totara_core\entities\relationship_resolver has been moved to totara_core\entity\relationship_resolver
+* totara_core\entities\relationship has been moved to totara_core\entity\relationship
 
 === 13.0 ===
 

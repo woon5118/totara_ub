@@ -33,7 +33,7 @@ use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\job_assignment_start_date;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
-use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entity\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;

@@ -24,8 +24,8 @@
 namespace aggregation_highest;
 
 
-use totara_competency\entities\pathway_achievement;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\pathway_achievement;
+use totara_competency\entity\scale_value;
 use totara_competency\overall_aggregation;
 
 class highest extends overall_aggregation {

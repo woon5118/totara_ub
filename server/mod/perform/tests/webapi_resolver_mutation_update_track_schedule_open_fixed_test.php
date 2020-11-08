@@ -27,7 +27,7 @@ require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
 use mod_perform\constants;
-use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entity\activity\track as track_entity;
 use mod_perform\event\track_schedule_changed;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use totara_core\advanced_feature;

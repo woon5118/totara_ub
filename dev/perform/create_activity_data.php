@@ -10,9 +10,9 @@ require __DIR__ . '/../../server/config.php';
 require_once($CFG->dirroot . '/lib/clilib.php');
 require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');
 
-use core\entities\user;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track_user_assignment;
+use core\entity\user;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\task\service\subject_instance_creation;
 

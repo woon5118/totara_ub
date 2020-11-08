@@ -21,9 +21,9 @@
  * @package mod_perform
  */
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
-use mod_perform\entities\activity\element;
+use mod_perform\entity\activity\element;
 use mod_perform\models\activity\activity;
 use mod_perform\util;
 use totara_job\job_assignment;
@@ -119,7 +119,7 @@ class mod_perform_util_testcase extends advanced_testcase {
         }
 
         /** @var activity $hidden_activity */
-        $hidden_activity = mod_perform\entities\activity\activity::repository()
+        $hidden_activity = mod_perform\entity\activity\activity::repository()
             ->where('name', 'hidden-activity')
             ->order_by('id')
             ->first(true);

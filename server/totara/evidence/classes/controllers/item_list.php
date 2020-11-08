@@ -23,9 +23,9 @@
 
 namespace totara_evidence\controllers;
 
-use core\entities\user;
+use core\entity\user;
 use moodle_url;
-use totara_evidence\entities;
+use totara_evidence\entity\evidence_item;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
 use totara_evidence\output\header;
 use totara_mvc\has_report;
@@ -72,7 +72,7 @@ class item_list extends item {
             $title  = get_string('evidence_bank', 'totara_evidence');
         }
 
-        $items = entities\evidence_item::repository()
+        $items = evidence_item::repository()
             ->filter_by_standard_location()
             ->where('user_id', $this->user->id);
         if ($this->can_view_own_items_only) {

@@ -28,10 +28,10 @@ namespace totara_competency;
 use coding_exception;
 use ReflectionClass;
 use stdClass;
-use totara_competency\entities\competency;
-use totara_competency\entities\pathway as pathway_entity;
-use totara_competency\entities\pathway_achievement;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\competency;
+use totara_competency\entity\pathway as pathway_entity;
+use totara_competency\entity\pathway_achievement;
+use totara_competency\entity\scale_value;
 
 /**
  * Base class for pathway plugins

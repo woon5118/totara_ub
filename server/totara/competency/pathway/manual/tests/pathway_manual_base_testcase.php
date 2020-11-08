@@ -21,9 +21,9 @@
  * @package pathway_manual
  */
 
-use core\entities\user;
-use totara_competency\entities\competency;
-use totara_competency\entities\scale;
+use core\entity\user;
+use totara_competency\entity\competency;
+use totara_competency\entity\scale;
 use totara_job\job_assignment;
 
 abstract class pathway_manual_base_testcase extends advanced_testcase {

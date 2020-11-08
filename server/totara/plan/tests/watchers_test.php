@@ -22,10 +22,10 @@
  */
 
 use core\orm\collection;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\competency_framework;
-use totara_competency\entities\scale;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\competency_framework;
+use totara_competency\entity\scale;
+use totara_competency\entity\scale_value;
 use totara_competency\expand_task;
 use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_competency\models\assignment_actions;

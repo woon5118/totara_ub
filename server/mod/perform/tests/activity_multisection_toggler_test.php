@@ -24,7 +24,7 @@
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 
 use mod_perform\constants;
-use mod_perform\entities\activity\section as section_entity;
+use mod_perform\entity\activity\section as section_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\section_element;

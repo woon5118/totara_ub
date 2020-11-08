@@ -22,12 +22,12 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\activity;
-use mod_perform\entities\activity\manual_relationship_selection;
-use mod_perform\entities\activity\manual_relationship_selection_progress;
-use mod_perform\entities\activity\manual_relationship_selector;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entity\activity\activity;
+use mod_perform\entity\activity\manual_relationship_selection;
+use mod_perform\entity\activity\manual_relationship_selection_progress;
+use mod_perform\entity\activity\manual_relationship_selector;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\track as track_entity;
 use mod_perform\expand_task;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
@@ -36,7 +36,7 @@ use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\task\service\manual_participant_progress;
 use mod_perform\task\service\subject_instance_creation;
-use totara_core\entities\relationship;
+use totara_core\entity\relationship;
 use totara_core\relationship\relationship as relationship_model;
 use totara_job\job_assignment;
 

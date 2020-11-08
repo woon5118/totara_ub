@@ -29,7 +29,7 @@ namespace criteria_othercompetency\observer;
 use hierarchy_competency\event\competency_deleted;
 use totara_criteria\criterion_factory;
 use totara_criteria\hook\criteria_validity_changed;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 
 class competency {
 

@@ -38,6 +38,8 @@ $renamedclasses = array(
     'totara_core\formatter\field\field_formatter_interface' => core\webapi\formatter\field\field_formatter_interface::class,
     'totara_core\formatter\field\string_field_formatter' => core\webapi\formatter\field\string_field_formatter::class,
     'totara_core\formatter\field\text_field_formatter' => core\webapi\formatter\field\text_field_formatter::class,
+    'totara_core\entities\relationship_resolver' => totara_core\entity\relationship_resolver::class,
+    'totara_core\entities\relationship' => totara_core\entity\relationship::class,
 );
 
 // Add the old Tui component class, just while we reorganise.

@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use core\entities\tenant;
+use core\entity\tenant;
 use core\theme\settings as theme_settings;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 

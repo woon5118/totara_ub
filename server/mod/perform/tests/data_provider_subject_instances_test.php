@@ -24,8 +24,8 @@
 use core\orm\query\builder;
 use core\pagination\cursor;
 use mod_perform\data_providers\activity\subject_instance_for_participant;
-use mod_perform\entities\activity\filters\subject_instances_about;
-use mod_perform\entities\activity\participant_instance;
+use mod_perform\entity\activity\filters\subject_instances_about;
+use mod_perform\entity\activity\participant_instance;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\models\activity\subject_instance;
@@ -170,7 +170,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
         $this->assertCount(2, $returned_participant_instances);
         $this->assertContains($subject_participant_instances->first()->id, $returned_participant_instances->pluck('id'));
     }
-    
+
     /**
      * @dataProvider cursor_size_provider
      * @param int $page_size
@@ -197,26 +197,26 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
         );
         // Just verifying test parameters here ...
         $this->assertSame(count($expected_subject_instances), count($item_counts));
-        
+
         $cursor = cursor::create()->set_limit($page_size);
-        
+
         for ($i = 0; $i < count($item_counts); $i++) {
             $paginator = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
                 ->add_filters(['about' => [subject_instances_about::VALUE_ABOUT_SELF]])
                 ->get_next($cursor);
-    
+
             $items = $paginator->get_items();
             $this->assertCount($item_counts[$i], $items);
             $actual_ids = $items->pluck('id');
             // Order should be the same
             $this->assertSame($expected_subject_instances[$i], $actual_ids);
-    
+
             $cursor = $paginator->get_next_cursor();
         }
-        
+
         $this->assertNull($cursor);
     }
-    
+
     /**
      * Data provider for cursor sizes
      */
@@ -229,5 +229,5 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
             ['page_size' => 5, 'item_counts' => [4]],
         ];
     }
-    
+
 }

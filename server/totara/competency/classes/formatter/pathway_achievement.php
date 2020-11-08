@@ -24,7 +24,7 @@
 namespace totara_competency\formatter;
 
 use core\orm\formatter\entity_formatter;
-use totara_competency\entities\pathway_achievement as pathway_achievement_entity;
+use totara_competency\entity\pathway_achievement as pathway_achievement_entity;
 use core\webapi\formatter\field\date_field_formatter;
 
 /**

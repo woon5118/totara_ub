@@ -26,7 +26,7 @@ namespace totara_evidence\rb\display;
 use rb_column;
 use reportbuilder;
 use stdClass;
-use totara_evidence\entities\evidence_item;
+use totara_evidence\entity\evidence_item;
 use totara_evidence\output\item_list_actions;
 use totara_mvc\view;
 use totara_reportbuilder\rb\display\base;

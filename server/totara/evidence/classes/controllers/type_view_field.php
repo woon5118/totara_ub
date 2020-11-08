@@ -25,8 +25,9 @@ namespace totara_evidence\controllers;
 
 use moodle_url;
 use totara_evidence\controllers\helpers\customfield_form_helper;
-use totara_evidence\entities\evidence_type_field;
-use totara_evidence\models;
+use totara_evidence\entity\evidence_type_field;
+use totara_evidence\models\evidence_type;
+use totara_evidence\models\helpers\multilang_helper;
 use totara_evidence\output\header;
 use totara_mvc\view;
 
@@ -34,12 +35,12 @@ class type_view_field extends type {
 
     public function action() {
         $field = new evidence_type_field($this->get_required_param('id', PARAM_INT));
-        $type  = models\evidence_type::load_by_id($field->typeid);
+        $type  = evidence_type::load_by_id($field->typeid);
 
         $this->set_url(new moodle_url('/totara/evidence/type/view_field.php', ['id' => $field->id]));
 
         $field_type = get_string("customfieldtype{$field->datatype}", 'totara_customfield');
-        $field_name = models\helpers\multilang_helper::parse_field_name_string($field->fullname);
+        $field_name = multilang_helper::parse_field_name_string($field->fullname);
 
         $title = get_string('title_type_field_name', 'totara_evidence', [
             'type' => $field_type,

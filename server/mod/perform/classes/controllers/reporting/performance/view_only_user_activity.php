@@ -24,7 +24,7 @@
 namespace mod_perform\controllers\reporting\performance;
 
 use context;
-use core\entities\user;
+use core\entity\user;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\util;

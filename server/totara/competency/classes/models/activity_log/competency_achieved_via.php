@@ -24,7 +24,7 @@
 namespace totara_competency\models\activity_log;
 
 use core\orm\entity\entity;
-use totara_competency\entities\competency_achievement as competency_achievement_entity;
+use totara_competency\entity\competency_achievement as competency_achievement_entity;
 use totara_competency\models\activity_log;
 use totara_competency\pathway;
 

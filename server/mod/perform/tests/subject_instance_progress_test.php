@@ -22,10 +22,10 @@
  */
 
 use core\collection;
-use core\entities\user;
+use core\entity\user;
 use mod_perform\constants;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\event\subject_instance_progress_updated;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\models\response\participant_section;

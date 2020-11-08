@@ -24,7 +24,7 @@
 namespace pathway_test_pathway;
 
 use totara_competency\base_achievement_detail;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\scale_value;
 use totara_competency\pathway;
 
 defined('MOODLE_INTERNAL') || die();

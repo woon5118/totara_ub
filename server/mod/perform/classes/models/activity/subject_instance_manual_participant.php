@@ -26,7 +26,7 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
-use mod_perform\entities\activity\subject_instance_manual_participant as manual_participant_entity;
+use mod_perform\entity\activity\subject_instance_manual_participant as manual_participant_entity;
 
 /**
  * A manually selected user (either inside or outside of the system) that will participate in a subject instance's activity.

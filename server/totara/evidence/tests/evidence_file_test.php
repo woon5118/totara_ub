@@ -24,7 +24,7 @@
 
 use core\orm\query\builder;
 use totara_evidence\customfield_area;
-use totara_evidence\entities\evidence_item;
+use totara_evidence\entity\evidence_item;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/evidence/tests/evidence_testcase.php');

@@ -37,7 +37,7 @@ use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\fixed_range_resolver;
-use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entity\activity\track as track_entity;
 use mod_perform\models\activity\track as track_model;
 use mod_perform\state\activity\active;
 use mod_perform\user_groups\grouping;

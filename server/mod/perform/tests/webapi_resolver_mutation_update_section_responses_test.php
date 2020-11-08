@@ -23,13 +23,13 @@
  */
 
 use core\collection;
-use core\entities\user;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity\section_element;
+use core\entity\user;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\participant_section as participant_section_entity;
+use mod_perform\entity\activity\section_element;
 use mod_perform\event\participant_section_progress_updated;
 use mod_perform\event\participant_section_saved_as_draft;
-use mod_perform\entities\activity\element_response as element_response_entity;
+use mod_perform\entity\activity\element_response as element_response_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
 use mod_perform\models\response\participant_section;

@@ -24,7 +24,7 @@
 namespace mod_perform\task\service;
 
 use coding_exception;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\subject_instance;
 
 /**
  * A simple readonly object to transfer data from one service to another.

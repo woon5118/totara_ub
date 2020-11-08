@@ -22,13 +22,13 @@
  * @category test
  */
 
-use core\entities\user;
+use core\entity\user;
 use mod_perform\constants;
 use mod_perform\data_providers\response\participant_section_with_responses;
-use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\activity as activity_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\participant_section as participant_section_entity;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\participant_source;

@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');
 
 use moodleform;
 use totara_evidence\customfield_area;
-use totara_evidence\entities\evidence_item;
+use totara_evidence\entity\evidence_item;
 use totara_mvc\viewable;
 
 class edit_evidence extends moodleform implements viewable {

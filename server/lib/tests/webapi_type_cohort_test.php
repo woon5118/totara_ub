@@ -24,7 +24,7 @@
 
 use core\format;
 use core\webapi\execution_context;
-use core\entities\cohort as cohort_entity;
+use core\entity\cohort as cohort_entity;
 use core\webapi\resolver\type\cohort as cohort_type;
 
 

@@ -24,8 +24,8 @@
 namespace totara_evidence\controllers;
 
 use moodle_url;
-use totara_evidence\entities;
-use totara_evidence\models;
+use totara_evidence\entity\evidence_type;
+use totara_evidence\models\evidence_type as evidence_type_model;
 use totara_evidence\output\header;
 use totara_mvc\has_report;
 use totara_mvc\report_view;
@@ -38,7 +38,7 @@ class type_list extends type {
     protected $url = '/totara/evidence/type/index.php';
 
     public function action() {
-        if (entities\evidence_type::repository()->count() > 0) {
+        if (evidence_type::repository()->count() > 0) {
             $report = $this->load_embedded_report('evidence_type');
             $content = new report_view('totara_evidence/report', $report);
         } else {
@@ -48,7 +48,7 @@ class type_list extends type {
         }
 
         $button = null;
-        if (models\evidence_type::can_manage()) {
+        if (evidence_type_model::can_manage()) {
             $button = [
                 'url'   => new moodle_url('/totara/evidence/type/create.php'),
                 'label' => get_string('add_evidence_type', 'totara_evidence')

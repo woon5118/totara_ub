@@ -32,9 +32,8 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use moodle_exception;
-use required_capability_exception;
-use totara_competency\entities;
-use totara_competency\entities\competency_repository;
+use totara_competency\entity\competency as competency_entity;
+use totara_competency\entity\competency_repository;
 use totara_core\advanced_feature;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;
@@ -123,7 +122,7 @@ class competency extends external_api {
         }
 
         $order_dir = (strtolower($order_dir) == 'asc') ? 'ASC' : 'DESC';
-        $repository = entities\competency::repository();
+        $repository = competency_entity::repository();
         $competencies = $repository
             ->select('*')
             ->when(!empty($filters['excluded_competency_id']), function (competency_repository $repository) use ($filters) {
@@ -135,7 +134,7 @@ class competency extends external_api {
             ->order_by($order_by, $order_dir)
             ->paginate($page);
 
-        $competencies->transform(function (entities\competency $competency) {
+        $competencies->transform(function (competency_entity $competency) {
             return self::prepare_competency_response($competency, false, false, true);
         });
 
@@ -187,8 +186,8 @@ class competency extends external_api {
             throw new moodle_exception('accessdenied', 'admin');
         }
 
-        /** @var entities\competency $competency */
-        $competency = entities\competency::repository()->find($id);
+        /** @var competency_entity $competency */
+        $competency = competency_entity::repository()->find($id);
         if (empty($competency)) {
             return [];
         }
@@ -213,13 +212,14 @@ class competency extends external_api {
     /**
      * Prepare assignment response
      *
-     * @param entities\competency $competency
+     * @param competency_entity $competency
      * @param bool|null $with_crumbs
      * @param bool|null $with_user_groups
      * @param bool|null $with_assignments
+     *
      * @return array
      */
-    protected static function prepare_competency_response(entities\competency $competency,
+    protected static function prepare_competency_response(competency_entity $competency,
                                                             ?bool $with_crumbs =  false,
                                                             ?bool $with_user_groups = false,
                                                             ?bool $with_assignments = false): array {

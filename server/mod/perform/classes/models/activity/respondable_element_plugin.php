@@ -25,7 +25,7 @@ namespace mod_perform\models\activity;
 
 use coding_exception;
 use core\collection;
-use mod_perform\entities\activity\element as element_entity;
+use mod_perform\entity\activity\element as element_entity;
 use mod_perform\models\response\element_validation_error;
 
 /**

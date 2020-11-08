@@ -25,7 +25,7 @@ namespace mod_perform\task\service\data;
 
 use coding_exception;
 use core\orm\query\builder;
-use mod_perform\entities\activity\activity;
+use mod_perform\entity\activity\activity;
 
 /**
  * A collection of activity configuration used in subject/participant instance creation.

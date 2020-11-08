@@ -27,9 +27,9 @@ namespace totara_criteria;
 use core\orm\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
-use totara_criteria\entities\criteria_item as criteria_item_entity;
-use totara_criteria\entities\criteria_item_record as criteria_item_record_entity;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criteria_item as criteria_item_entity;
+use totara_criteria\entity\criteria_item_record as criteria_item_record_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 

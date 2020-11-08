@@ -24,7 +24,7 @@
 namespace mod_perform\userdata;
 
 use context;
-use mod_perform\entities\activity\element_response;
+use mod_perform\entity\activity\element_response;
 use mod_perform\userdata\traits\export_trait;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;

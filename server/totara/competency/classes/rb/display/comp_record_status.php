@@ -27,7 +27,7 @@ use rb_column;
 use reportbuilder;
 use stdClass;
 use totara_reportbuilder\rb\display\base;
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 
 class comp_record_status extends base {
 

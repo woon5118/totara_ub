@@ -23,7 +23,7 @@
 
 namespace totara_evidence\forms;
 
-use totara_evidence\entities\evidence_type;
+use totara_evidence\entity\evidence_type;
 use totara_form\form;
 use totara_form\form\element\action_button;
 use totara_form\form\element\editor;

@@ -24,9 +24,9 @@
 namespace mod_perform\observers;
 
 use core\event\user_deleted;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance;

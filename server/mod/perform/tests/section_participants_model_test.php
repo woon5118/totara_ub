@@ -24,7 +24,7 @@
 
 use core\collection;
 use mod_perform\constants;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\expand_task;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\subject_instance;

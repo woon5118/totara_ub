@@ -24,7 +24,7 @@ namespace degeneration\items\container_perform;
 
 use coding_exception;
 use degeneration\App;
-use mod_perform\entities\activity\element_identifier as element_identifier_entity;
+use mod_perform\entity\activity\element_identifier as element_identifier_entity;
 
 class element_data_generator {
 

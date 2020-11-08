@@ -22,10 +22,10 @@
  */
 
 use core\orm\query\builder;
-use totara_evidence\entities\evidence_field_data;
-use totara_evidence\entities\evidence_item;
-use totara_evidence\entities\evidence_type;
-use totara_evidence\entities\evidence_type_field;
+use totara_evidence\entity\evidence_field_data;
+use totara_evidence\entity\evidence_item;
+use totara_evidence\entity\evidence_type;
+use totara_evidence\entity\evidence_type_field;
 use totara_evidence\models;
 
 require_once(__DIR__ . '/evidence_migration_test.php');

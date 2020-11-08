@@ -26,9 +26,9 @@ use pathway_learning_plan\learning_plan;
 use pathway_learning_plan\learning_plan_evaluator;
 use pathway_manual\manual_evaluator_user_source;
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\competency;
-use totara_competency\entities\pathway_achievement;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\competency;
+use totara_competency\entity\pathway_achievement;
+use totara_competency\entity\scale_value;
 
 /**
  * @group totara_competency

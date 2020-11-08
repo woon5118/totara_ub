@@ -24,14 +24,14 @@
 namespace totara_competency\models\profile;
 
 use coding_exception;
-use core\entities\user;
+use core\entity\user;
 use core\orm\collection;
 use stdClass;
 use totara_competency\data_providers\assignments;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\scale_value;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\user_group_factory;
 

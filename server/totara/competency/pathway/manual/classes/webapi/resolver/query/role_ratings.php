@@ -23,14 +23,14 @@
 
 namespace pathway_manual\webapi\resolver\query;
 
-use core\entities\user;
+use core\entity\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use pathway_manual\models\rateable_competency;
-use totara_competency\entities\assignment;
+use totara_competency\entity\assignment;
 use totara_competency\helpers\capability_helper;
 
 class role_ratings implements query_resolver, has_middleware {

@@ -21,7 +21,7 @@
  * @package totara_job
  */
 
-use core\entities\tenant;
+use core\entity\tenant;
 use totara_core\relationship\relationship;
 use totara_core\relationship\relationship_resolver_dto;
 use totara_job\job_assignment;

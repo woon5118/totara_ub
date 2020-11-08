@@ -23,13 +23,13 @@
  */
 
 use PHPUnit\Framework\MockObject\MockObject;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency;
-use totara_competency\entities\competency_repository;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency;
+use totara_competency\entity\competency_repository;
 use totara_competency\expand_task;
 use totara_competency\user_groups;
 use totara_competency\data_providers\user_assignable_competencies as data_provider;
-use totara_competency\entities\competency as competency_entity;
+use totara_competency\entity\competency as competency_entity;
 use totara_competency\models\self_assignable_competency;
 use totara_job\job_assignment;
 

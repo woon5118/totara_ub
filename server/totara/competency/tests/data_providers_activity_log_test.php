@@ -21,20 +21,20 @@
  * @package totara_competency
  */
 
-use totara_competency\entities\competency_assignment_user_log;
+use totara_competency\entity\competency_assignment_user_log;
 use totara_competency\aggregation_users_table;
 use totara_competency\competency_aggregator_user_source;
 use totara_competency\data_providers;
 use totara_competency\models\assignment_actions;
 use totara_competency\expand_task;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\configuration_change;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\configuration_change;
 use totara_competency\models\activity_log;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\scale_value;
 use totara_competency\pathway_evaluator;
 use totara_competency\achievement_configuration;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use totara_competency\competency_achievement_aggregator;
 use totara_competency\base_achievement_detail;
 use totara_competency\pathway_evaluator_user_source;

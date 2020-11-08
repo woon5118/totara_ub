@@ -23,7 +23,7 @@
 
 namespace mod_perform\state\subject_instance\condition;
 
-use mod_perform\entities\activity\manual_relationship_selection_progress;
+use mod_perform\entity\activity\manual_relationship_selection_progress;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\state\condition;
 

@@ -24,7 +24,7 @@
 namespace core\formatter;
 
 use cohort as core_cohort;
-use core\entities\cohort as cohort_entity;
+use core\entity\cohort as cohort_entity;
 use core\webapi\formatter\formatter;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;

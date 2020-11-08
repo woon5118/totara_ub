@@ -31,7 +31,7 @@ use totara_core\basket\session_basket;
  *
  * Filters for all ids in the given basket, used for showing selected items in the interface
  *
- * @package totara_competency\entities\filters
+ * @package core\entity\filters
  *
  * @deprecated since Totara 13
  */

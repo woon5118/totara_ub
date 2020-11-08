@@ -27,7 +27,7 @@ use core\format;
 use core\webapi\execution_context;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;
-use hierarchy_organisation\entities\organisation as organisation_entity;
+use hierarchy_organisation\entity\organisation as organisation_entity;
 
 /**
  * Organisation hierarchy type.

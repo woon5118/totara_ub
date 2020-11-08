@@ -23,7 +23,7 @@
 
 namespace totara_evidence\output;
 
-use core\entities\user;
+use core\entity\user;
 use core\output\template;
 use moodle_url;
 

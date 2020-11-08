@@ -26,7 +26,7 @@ namespace totara_core\relationship;
 use coding_exception;
 use core\collection;
 use core\orm\entity\repository;
-use totara_core\entities\relationship as relationship_entity;
+use totara_core\entity\relationship as relationship_entity;
 
 /**
  * Data provider for relationships.

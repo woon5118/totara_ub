@@ -26,7 +26,7 @@ namespace totara_evidence\models\helpers;
 use coding_exception;
 use context;
 use context_user;
-use core\entities\user;
+use core\entity\user;
 use totara_evidence\models\evidence_item;
 
 /**

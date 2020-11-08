@@ -26,7 +26,7 @@ namespace totara_competency\event;
 defined('MOODLE_INTERNAL') || die();
 
 use core\event\base;
-use totara_competency\entities\competency_assignment_user;
+use totara_competency\entity\competency_assignment_user;
 
 abstract class assignment_user extends base {
 

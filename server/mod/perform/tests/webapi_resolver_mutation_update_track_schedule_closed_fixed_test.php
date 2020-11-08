@@ -23,7 +23,7 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entity\activity\track as track_entity;
 use mod_perform\event\track_schedule_changed;
 use totara_core\dates\date_time_setting;
 use totara_webapi\phpunit\webapi_phpunit_helper;

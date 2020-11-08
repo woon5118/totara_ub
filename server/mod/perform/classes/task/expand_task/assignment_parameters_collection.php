@@ -25,7 +25,7 @@ namespace mod_perform\task\expand_task;
 
 use core\collection;
 use Iterator;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\track_user_assignment;
 
 /**
  * Represent expand task assignment parameters.

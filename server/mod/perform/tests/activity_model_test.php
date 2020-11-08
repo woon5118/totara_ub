@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entity\activity\activity as activity_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\state\activity\active;

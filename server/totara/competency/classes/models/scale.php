@@ -26,10 +26,10 @@ namespace totara_competency\models;
 use core\orm\collection;
 use core\orm\entity\model;
 use core\orm\entity\repository;
-use totara_competency\entities\competency;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\scale as scale_entity;
-use totara_competency\entities\scale_assignment;
+use totara_competency\entity\competency;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\scale as scale_entity;
+use totara_competency\entity\scale_assignment;
 use totara_core\advanced_feature;
 
 /**

@@ -24,11 +24,11 @@
 
 use core\orm\query\builder;
 use core\webapi\execution_context;
-use pathway_learning_plan\entities\plan_competency_value;
+use pathway_learning_plan\entity\plan_competency_value;
 use pathway_learning_plan\models\competency_plan;
 use pathway_learning_plan\webapi\resolver\query\competency_plans;
 use totara_competency\expand_task;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 
 defined('MOODLE_INTERNAL') || die();
 

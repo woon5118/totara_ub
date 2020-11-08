@@ -24,7 +24,7 @@
 namespace degeneration\items;
 
 use degeneration\App;
-use totara_competency\entities\course as course_entity;
+use totara_competency\entity\course as course_entity;
 
 class course extends item {
 

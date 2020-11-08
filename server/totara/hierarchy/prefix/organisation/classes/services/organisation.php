@@ -33,7 +33,7 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
-use hierarchy_organisation\entities\organisation as organisation_entity;
+use hierarchy_organisation\entity\organisation as organisation_entity;
 
 defined('MOODLE_INTERNAL') || die();
 

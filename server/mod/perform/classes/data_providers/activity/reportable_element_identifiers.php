@@ -24,10 +24,10 @@
 namespace mod_perform\data_providers\activity;
 
 use core\orm\collection;
-use mod_perform\entities\activity\element_identifier as element_identifier_entity;
-use mod_perform\entities\activity\element;
-use mod_perform\entities\activity\section;
-use mod_perform\entities\activity\section_element;
+use mod_perform\entity\activity\element_identifier as element_identifier_entity;
+use mod_perform\entity\activity\element;
+use mod_perform\entity\activity\section;
+use mod_perform\entity\activity\section_element;
 use mod_perform\models\activity\element_identifier as element_identifier_model;
 
 /**

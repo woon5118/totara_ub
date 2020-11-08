@@ -22,11 +22,11 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\section_relationship;
+use mod_perform\entity\activity\section_relationship;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\section;
 use mod_perform\state\activity\active;
-use totara_core\entities\relationship;
+use totara_core\entity\relationship;
 
 abstract class mod_perform_relationship_testcase extends advanced_testcase {
     /**

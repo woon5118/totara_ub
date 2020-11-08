@@ -22,9 +22,9 @@
  * @category test
  */
 
-use core\entities\user;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency;
+use core\entity\user;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency;
 use totara_competency\user_groups;
 use totara_core\basket\session_basket;
 

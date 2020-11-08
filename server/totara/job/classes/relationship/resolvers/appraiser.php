@@ -29,7 +29,7 @@ use core\orm\query\field;
 use core\tenant_orm_helper;
 use totara_core\relationship\relationship_resolver;
 use totara_core\relationship\relationship_resolver_dto;
-use totara_job\entities\job_assignment;
+use totara_job\entity\job_assignment;
 
 class appraiser extends relationship_resolver {
 

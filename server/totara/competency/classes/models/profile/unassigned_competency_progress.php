@@ -24,7 +24,7 @@
 namespace totara_competency\models\profile;
 
 use core\orm\collection;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 
 /**
  * This is an adapter class/null object for competency progress with no assignments.

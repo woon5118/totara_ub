@@ -22,9 +22,9 @@
  * @package totara_criteria
  */
 
-use totara_competency\entities\scale;
+use totara_competency\entity\scale;
 use totara_competency\pathway;
-use totara_competency\entities\competency as competency_entity;
+use totara_competency\entity\competency as competency_entity;
 use pathway_criteria_group\criteria_group;
 use totara_criteria\criterion;
 

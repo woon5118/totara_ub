@@ -24,7 +24,7 @@
  */
 
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use criteria_linkedcourses\items_processor;
 use pathway_criteria_group\criteria_group;
 use criteria_linkedcourses\linkedcourses;

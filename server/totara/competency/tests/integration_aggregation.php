@@ -21,10 +21,10 @@
  * @package totara_competency
  */
 
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency;
-use totara_competency\entities\scale;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency;
+use totara_competency\entity\scale;
+use totara_competency\entity\scale_value;
 use totara_competency\expand_task;
 use totara_core\advanced_feature;
 use totara_job\job_assignment;

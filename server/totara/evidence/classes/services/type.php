@@ -33,7 +33,7 @@ use external_value;
 use html_writer;
 use totara_core\advanced_feature;
 use totara_evidence\customfield_area;
-use totara_evidence\entities\evidence_type;
+use totara_evidence\entity\evidence_type;
 use totara_evidence\models;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
 

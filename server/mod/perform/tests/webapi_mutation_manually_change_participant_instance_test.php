@@ -22,9 +22,9 @@
  * @category test
  */
 
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\participant_section;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\participant_section;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\state\participant_instance\open as participant_instance_open;
 use mod_perform\state\participant_instance\closed as participant_instance_closed;
 use mod_perform\state\participant_instance\not_started as participant_instance_not_started;

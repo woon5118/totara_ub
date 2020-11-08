@@ -73,7 +73,7 @@ class mod_perform_notification_placeholder_testcase extends mod_perform_notifica
         $sic = new \mod_perform\task\service\subject_instance_creation();
         $sic->generate_instances();
 
-        $entities = \mod_perform\entities\activity\participant_instance::repository()->get()->map_to(participant_instance::class);
+        $entities = \mod_perform\entity\activity\participant_instance::repository()->get()->map_to(participant_instance::class);
         return [$activity, $users, $entities];
     }
 

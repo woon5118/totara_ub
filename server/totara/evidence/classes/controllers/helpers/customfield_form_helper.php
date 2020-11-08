@@ -23,12 +23,12 @@
 
 namespace totara_evidence\controllers\helpers;
 
-use core\entities\user;
+use core\entity\user;
 use core\notification;
 use moodle_url;
 use totara_evidence\controllers\item;
 use totara_evidence\customfield_area\field_helper;
-use totara_evidence\entities\evidence_type_field;
+use totara_evidence\entity\evidence_type_field;
 use totara_evidence\forms\edit_evidence;
 use totara_evidence\forms\view_field;
 use totara_evidence\models\evidence_item;

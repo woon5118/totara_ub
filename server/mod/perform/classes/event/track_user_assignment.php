@@ -26,7 +26,7 @@ namespace mod_perform\event;
 defined('MOODLE_INTERNAL') || die();
 
 use core\event\base;
-use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
+use mod_perform\entity\activity\track_user_assignment as track_user_assignment_entity;
 
 abstract class track_user_assignment extends base {
 

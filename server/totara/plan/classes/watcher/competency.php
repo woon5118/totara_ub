@@ -25,7 +25,7 @@ namespace totara_plan\watcher;
 
 use development_plan;
 use dp_competency_component;
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 use totara_competency\hook\competency_achievement_updated_bulk;
 
 global $CFG;

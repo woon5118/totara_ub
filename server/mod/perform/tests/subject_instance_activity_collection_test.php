@@ -21,10 +21,10 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\activity;
+use mod_perform\entity\activity\activity;
 use mod_perform\task\service\data\subject_instance_activity;
 use mod_perform\task\service\data\subject_instance_activity_collection;
-use totara_core\entities\relationship;
+use totara_core\entity\relationship;
 
 class mod_perform_subject_instance_activity_collection_test extends advanced_testcase {
 

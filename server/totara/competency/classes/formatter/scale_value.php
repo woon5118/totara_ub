@@ -40,7 +40,7 @@ class scale_value extends entity_formatter {
             'idnumber' => null,
             'description' => function ($value, text_field_formatter $formatter) {
                 $component = 'totara_hierarchy';
-                $filearea = \totara_competency\entities\scale_value::TABLE;
+                $filearea = \totara_competency\entity\scale_value::TABLE;
                 $itemid = $this->object->id;
 
                 return $formatter

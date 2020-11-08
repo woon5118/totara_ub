@@ -25,8 +25,8 @@ namespace degeneration\items;
 
 use degeneration\App;
 use degeneration\Cache;
-use totara_competency\entities\scale;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\scale;
+use totara_competency\entity\scale_value;
 
 class competency_scale extends item {
 

@@ -23,8 +23,8 @@
 
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\activity_assigned_date;
-use mod_perform\entities\activity\track as track_enttity;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\track as track_enttity;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\track;
 

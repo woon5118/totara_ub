@@ -24,14 +24,14 @@
 
 use core\orm\query\builder;
 use totara_competency\assignment_create_exception;
-use totara_competency\entities\assignment as assignment_entity;
+use totara_competency\entity\assignment as assignment_entity;
 use totara_competency\event\assignment_created;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\user_group\cohort as cohort_model;
 use totara_competency\models\user_group\organisation as organisation_model;
 use totara_competency\models\user_group\position as position_model;
-use hierarchy_organisation\entities\organisation as organisation_entity;
-use hierarchy_position\entities\position as position_entity;
+use hierarchy_organisation\entity\organisation as organisation_entity;
+use hierarchy_position\entity\position as position_entity;
 use totara_competency\user_groups;
 
 defined('MOODLE_INTERNAL') || die();
@@ -557,7 +557,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         builder::table('comp_assign_availability')
             ->insert([
                 'comp_id' => $competency_id,
-                'availability' => \totara_competency\entities\competency::ASSIGNMENT_CREATE_SELF
+                'availability' => \totara_competency\entity\competency::ASSIGNMENT_CREATE_SELF
             ]);
     }
 
@@ -565,7 +565,7 @@ class totara_competency_assignment_model_create_testcase extends assignment_mode
         builder::table('comp_assign_availability')
             ->insert([
                 'comp_id' => $competency_id,
-                'availability' => \totara_competency\entities\competency::ASSIGNMENT_CREATE_OTHER
+                'availability' => \totara_competency\entity\competency::ASSIGNMENT_CREATE_OTHER
             ]);
     }
 

@@ -23,7 +23,7 @@
 
 namespace totara_competency\baskets;
 
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use core\orm\entity\filter\basket;
 use core\orm\entity\filter\hierarchy_item_visible;
 use totara_core\basket\basket_interface;

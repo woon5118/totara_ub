@@ -24,9 +24,9 @@
 namespace mod_perform\controllers\activity;
 
 use context;
-use core\entities\user;
+use core\entity\user;
 use mod_perform\controllers\perform_controller;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\util;
 use moodle_exception;

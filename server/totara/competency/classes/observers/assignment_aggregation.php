@@ -25,8 +25,8 @@ namespace totara_competency\observers;
 
 
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\pathway_achievement;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\pathway_achievement;
 use totara_competency\event\assignment_user_archived;
 use totara_competency\event\assignment_user_assigned;
 use totara_competency\event\assignment_user_assigned_bulk;

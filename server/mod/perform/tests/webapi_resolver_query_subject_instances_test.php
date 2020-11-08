@@ -25,14 +25,14 @@
 
 use core\collection;
 use core\date_format;
-use core\entities\user;
+use core\entity\user;
 use core\webapi\formatter\field\date_field_formatter;
 use mod_perform\constants;
-use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\entities\activity\external_participant;
-use mod_perform\entities\activity\filters\subject_instances_about;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\activity as activity_entity;
+use mod_perform\entity\activity\external_participant;
+use mod_perform\entity\activity\filters\subject_instances_about;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\expand_task;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\participant_instance as participant_instance_model;

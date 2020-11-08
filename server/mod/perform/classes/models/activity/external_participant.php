@@ -27,8 +27,8 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use core\orm\entity\model;
 use core\orm\query\builder;
-use mod_perform\entities\activity\external_participant as external_participant_entity;
-use mod_perform\entities\activity\participant_instance;
+use mod_perform\entity\activity\external_participant as external_participant_entity;
+use mod_perform\entity\activity\participant_instance;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use user_picture;
 

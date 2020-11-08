@@ -28,7 +28,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
+use pathway_criteria_group\entity\criteria_group as criteria_group_entity;
 
 /**
  * Fetches all criterions within the given group

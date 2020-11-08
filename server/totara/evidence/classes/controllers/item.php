@@ -25,7 +25,7 @@ namespace totara_evidence\controllers;
 
 use context;
 use context_user;
-use core\entities\user;
+use core\entity\user;
 use moodle_url;
 use totara_core\advanced_feature;
 use totara_evidence\models;

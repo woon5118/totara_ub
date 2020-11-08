@@ -25,7 +25,7 @@ namespace mod_perform\observers;
 
 use core\event\user_tenant_membership_changed;
 use core\orm\collection;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\models\activity\activity;
 
 class tenant_membership_changed {

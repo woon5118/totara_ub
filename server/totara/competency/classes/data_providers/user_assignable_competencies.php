@@ -26,13 +26,13 @@ namespace totara_competency\data_providers;
 use core\orm\collection;
 use core\orm\pagination\cursor_paginator;
 use core\pagination\cursor;
-use totara_competency\entities\competency as competency_entity;
-use totara_competency\entities\competency_repository;
-use totara_competency\entities\filters\competency_user_assignment_status;
-use totara_competency\entities\filters\competency_user_assignment_type;
+use totara_competency\entity\competency as competency_entity;
+use totara_competency\entity\competency_repository;
+use totara_competency\entity\filters\competency_user_assignment_status;
+use totara_competency\entity\filters\competency_user_assignment_type;
 use totara_competency\models\assignment;
 use totara_competency\models\assignment_user;
-use core\entities\user;
+use core\entity\user;
 use totara_competency\models\self_assignable_competency;
 
 class user_assignable_competencies extends user_data_provider {

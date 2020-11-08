@@ -26,9 +26,9 @@ namespace pathway_learning_plan\models;
 use core\orm\entity\entity;
 use development_plan;
 use dp_competency_component;
-use pathway_learning_plan\entities\plan_competency_value;
-use totara_competency\entities\assignment;
-use totara_competency\entities\scale_value;
+use pathway_learning_plan\entity\plan_competency_value;
+use totara_competency\entity\assignment;
+use totara_competency\entity\scale_value;
 
 defined('MOODLE_INTERNAL') || die();
 

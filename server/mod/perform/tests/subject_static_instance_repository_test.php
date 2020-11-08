@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\subject_static_instance;
+use mod_perform\entity\activity\subject_static_instance;
 use totara_job\job_assignment;
 
 /**

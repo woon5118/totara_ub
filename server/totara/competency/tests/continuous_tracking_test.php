@@ -23,7 +23,10 @@
  */
 
 use totara_competency\admin_setting_continuous_tracking;
-use totara_competency\entities;
+use totara_competency\entity;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_assignment_user;
+use totara_competency\expand_task;
 use totara_job\job_assignment;
 
 defined('MOODLE_INTERNAL') || die();
@@ -71,14 +74,14 @@ class totara_competency_continuous_tracking_testcase extends advanced_testcase {
 
         $this->expand();
 
-        $this->assertEquals(5, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(5, competency_assignment_user::repository()->count());
 
         job_assignment::delete($job1);
         job_assignment::delete($job2);
 
         $this->expand();
 
-        $this->assertEquals(3, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(3, competency_assignment_user::repository()->count());
     }
 
     public function test_continuous_tracking_enabled() {
@@ -111,17 +114,17 @@ class totara_competency_continuous_tracking_testcase extends advanced_testcase {
 
         $this->expand();
 
-        $this->assertEquals(5, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(5, competency_assignment_user::repository()->count());
 
         job_assignment::delete($job1);
         job_assignment::delete($job2);
 
         $this->expand();
 
-        $this->assertEquals(5, entities\competency_assignment_user::repository()->count());
-        $this->assertEquals(2, entities\competency_assignment_user::repository()
-            ->join(entities\assignment::TABLE, 'assignment_id', 'id')
-            ->where(entities\assignment::TABLE.'.type', entities\assignment::TYPE_SYSTEM)
+        $this->assertEquals(5, competency_assignment_user::repository()->count());
+        $this->assertEquals(2, competency_assignment_user::repository()
+            ->join(assignment::TABLE, 'assignment_id', 'id')
+            ->where(assignment::TABLE.'.type', assignment::TYPE_SYSTEM)
             ->where('user_id', [$user1->id, $user2->id])
             ->count()
         );
@@ -181,11 +184,11 @@ class totara_competency_continuous_tracking_testcase extends advanced_testcase {
 
         // Create an assignment for a competency
         $gen = $this->generator()->assignment_generator();
-        $data['ass'][] = $gen->create_user_assignment($one->id, null, ['status' => entities\assignment::STATUS_ACTIVE, 'type' => entities\assignment::TYPE_ADMIN]);
-        $data['ass'][] = $gen->create_user_assignment($two->id, null, ['status' => entities\assignment::STATUS_ACTIVE, 'type' => entities\assignment::TYPE_SELF]);
-        $data['ass'][] = $gen->create_user_assignment($three->id, null, ['status' => entities\assignment::STATUS_ACTIVE, 'type' => entities\assignment::TYPE_SYSTEM]);
-        $data['ass'][] = $gen->create_position_assignment($three->id, $pos1->id, ['status' => entities\assignment::STATUS_ACTIVE, 'type' => entities\assignment::TYPE_ADMIN]);
-        $data['ass'][] = $gen->create_organisation_assignment($three->id, $org1->id, ['status' => entities\assignment::STATUS_ACTIVE, 'type' => entities\assignment::TYPE_ADMIN]);
+        $data['ass'][] = $gen->create_user_assignment($one->id, null, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]);
+        $data['ass'][] = $gen->create_user_assignment($two->id, null, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_SELF]);
+        $data['ass'][] = $gen->create_user_assignment($three->id, null, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_SYSTEM]);
+        $data['ass'][] = $gen->create_position_assignment($three->id, $pos1->id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]);
+        $data['ass'][] = $gen->create_organisation_assignment($three->id, $org1->id, ['status' => assignment::STATUS_ACTIVE, 'type' => assignment::TYPE_ADMIN]);
 
         return $data;
     }
@@ -201,7 +204,7 @@ class totara_competency_continuous_tracking_testcase extends advanced_testcase {
 
     private function expand() {
         // We need the expanded users for the logging to work
-        $expand_task = new \totara_competency\expand_task($GLOBALS['DB']);
+        $expand_task = new expand_task($GLOBALS['DB']);
         $expand_task->expand_all();
     }
 }

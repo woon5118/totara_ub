@@ -23,9 +23,9 @@
  */
 
 use core\collection;
-use core\entities\user;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_achievement;
+use core\entity\user;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_achievement;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\profile\competency_progress;
 use totara_competency\models\profile\filter;

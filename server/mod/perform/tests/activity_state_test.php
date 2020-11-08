@@ -22,7 +22,7 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\section_relationship as section_relationship_entity;
+use mod_perform\entity\activity\section_relationship as section_relationship_entity;
 use mod_perform\event\activity_activated;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section_relationship;

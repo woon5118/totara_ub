@@ -25,7 +25,7 @@ namespace totara_competency;
 
 
 use stdClass;
-use totara_competency\entities\pathway as pathway_entity;
+use totara_competency\entity\pathway as pathway_entity;
 
 /**
  * Pathway factory class to obtain an instance of the specific pathway type

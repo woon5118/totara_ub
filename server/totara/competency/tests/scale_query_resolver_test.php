@@ -22,7 +22,7 @@
  */
 
 use core\orm\query\builder;
-use totara_competency\entities\assignment;
+use totara_competency\entity\assignment;
 use totara_core\advanced_feature;
 use totara_core\feature_not_available_exception;
 use totara_webapi\phpunit\webapi_phpunit_helper;

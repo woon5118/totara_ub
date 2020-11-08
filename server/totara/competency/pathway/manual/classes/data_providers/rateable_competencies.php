@@ -26,13 +26,13 @@ namespace pathway_manual\data_providers;
 use core\orm\collection;
 use core\orm\entity\repository;
 use core\orm\query\field;
-use pathway_manual\entities\role;
+use pathway_manual\entity\role;
 use pathway_manual\manual;
 use pathway_manual\models\roles\role_factory;
-use totara_competency\entities\competency;
-use totara_competency\entities\competency_assignment_user;
-use totara_competency\entities\competency_repository;
-use totara_competency\entities\pathway;
+use totara_competency\entity\competency;
+use totara_competency\entity\competency_assignment_user;
+use totara_competency\entity\competency_repository;
+use totara_competency\entity\pathway;
 
 /**
  * Class rateable_competencies

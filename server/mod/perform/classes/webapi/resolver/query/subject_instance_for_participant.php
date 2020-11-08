@@ -23,14 +23,14 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use core\entities\user;
+use core\entity\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\activity\subject_instance_for_participant as subject_instance_data_provider;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\util;

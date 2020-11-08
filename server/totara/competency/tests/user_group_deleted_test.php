@@ -24,7 +24,7 @@
 
 
 use totara_competency\admin_setting_continuous_tracking;
-use totara_competency\entities\assignment;
+use totara_competency\entity\assignment;
 use totara_competency\expand_task;
 use totara_competency\user_groups;
 

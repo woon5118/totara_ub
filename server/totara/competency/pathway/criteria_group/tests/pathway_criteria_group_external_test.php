@@ -22,13 +22,13 @@
  */
 
 
-use pathway_criteria_group\entities\criteria_group;
+use pathway_criteria_group\entity\criteria_group;
 use pathway_criteria_group\external;
 use pathway_manual\models\roles\manager;
-use totara_competency\entities\pathway;
+use totara_competency\entity\pathway;
 use totara_competency\linked_courses;
 use totara_criteria\criterion;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');

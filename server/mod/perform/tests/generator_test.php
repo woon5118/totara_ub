@@ -23,17 +23,17 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\section_relationship;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\entities\activity\track as track_entity;
-use mod_perform\entities\activity\track_assignment as track_assignment_entity;
-use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
+use mod_perform\entity\activity\activity as activity_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\section_relationship;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\track as track_entity;
+use mod_perform\entity\activity\track_assignment as track_assignment_entity;
+use mod_perform\entity\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\models\activity\track_status;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\user_groups\grouping;
-use totara_job\entities\job_assignment as job_assignment_entity;
+use totara_job\entity\job_assignment as job_assignment_entity;
 use totara_job\job_assignment;
 
 /**
@@ -338,16 +338,16 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $si = $generator->create_subject_instance([
             'activity_name' => 'Weekly catchup',
             'subject_is_participating' => true,
-            'subject_user_id' => \core\entities\user::repository()->get()->last()->id,
+            'subject_user_id' => \core\entity\user::repository()->get()->last()->id,
             'include_questions' => true,
         ]);
 
-        $responses = \mod_perform\entities\activity\element_response::repository()->get();
+        $responses = \mod_perform\entity\activity\element_response::repository()->get();
         $this->assertCount(0, $responses);
 
         $generator->create_responses($si);
 
-        $responses = \mod_perform\entities\activity\element_response::repository()->get();
+        $responses = \mod_perform\entity\activity\element_response::repository()->get();
         $this->assertCount(2, $responses);
     }
 
@@ -358,16 +358,16 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $si = $generator->create_subject_instance([
             'activity_name' => 'Weekly catchup',
             'subject_is_participating' => true,
-            'subject_user_id' => \core\entities\user::repository()->get()->last()->id,
+            'subject_user_id' => \core\entity\user::repository()->get()->last()->id,
             'include_questions' => true,
         ]);
 
-        $responses = \mod_perform\entities\activity\element_response::repository()->get();
+        $responses = \mod_perform\entity\activity\element_response::repository()->get();
         $this->assertCount(0, $responses);
 
         $generator->create_responses($si, 1);
 
-        $responses = \mod_perform\entities\activity\element_response::repository()->get();
+        $responses = \mod_perform\entity\activity\element_response::repository()->get();
         $this->assertCount(1, $responses);
     }
 

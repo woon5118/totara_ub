@@ -26,11 +26,11 @@ namespace totara_competency\models;
 use core\orm\entity\repository;
 use core\orm\collection;
 use core\orm\query\builder;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_assignment_user;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_assignment_user;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\expand_task;
-use core\entities\user;
+use core\entity\user;
 use totara_competency\user_groups;
 
 class assignment_user {

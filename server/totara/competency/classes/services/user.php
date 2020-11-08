@@ -25,7 +25,7 @@ namespace totara_competency\services;
 
 use context_system;
 use context_user;
-use core\entities\user as user_entity;
+use core\entity\user as user_entity;
 use core\orm\entity\repository;
 use core\orm\query\field;
 use core\tenant_orm_helper;

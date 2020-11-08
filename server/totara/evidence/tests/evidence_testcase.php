@@ -23,7 +23,7 @@
 
 use core\orm\collection;
 use core\orm\entity\repository;
-use totara_evidence\entities;
+use totara_evidence\entity;
 
 abstract class totara_evidence_testcase extends advanced_testcase {
 
@@ -56,18 +56,18 @@ abstract class totara_evidence_testcase extends advanced_testcase {
     }
 
     protected function items(): collection {
-        return entities\evidence_item::repository()->order_by('id')->get();
+        return entity\evidence_item::repository()->order_by('id')->get();
     }
 
-    protected function type_repository(): entities\evidence_type_repository {
-        return entities\evidence_type::repository()
+    protected function type_repository(): entity\evidence_type_repository {
+        return entity\evidence_type::repository()
             ->where('idnumber', '<>', 'coursecompletionimport')
             ->where('idnumber', '<>', 'certificationcompletionimport');
     }
 
     protected function field_repository(): repository {
-        return entities\evidence_type_field::repository()
-            ->join([entities\evidence_type::TABLE, 'type'], 'typeid', 'id')
+        return entity\evidence_type_field::repository()
+            ->join([entity\evidence_type::TABLE, 'type'], 'typeid', 'id')
             ->where('type.idnumber', '<>', 'coursecompletionimport')
             ->where('type.idnumber', '<>', 'certificationcompletionimport');
     }

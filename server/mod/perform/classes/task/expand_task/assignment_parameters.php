@@ -23,7 +23,7 @@
 
 namespace mod_perform\task\expand_task;
 
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\track_user_assignment;
 use stdClass;
 
 /**
@@ -43,7 +43,7 @@ class assignment_parameters {
 
     /**
      * assignment_parameters constructor.
-     * 
+     *
      * Factory functions should be used instead.
      *
      * @param int $user_id

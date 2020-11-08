@@ -23,22 +23,24 @@
 
 namespace totara_competency\models\activity_log;
 
-use core\orm\entity\entity;
-use totara_competency\entities\scale_value;
+use coding_exception;
+use core\orm\entity\entity as core_entity;
+use stdClass;
+use totara_competency\entity\configuration_change as configuration_change_entity;
+use totara_competency\entity\scale_value;
 use totara_competency\models\activity_log;
-use totara_competency\entities;
 
 class configuration_change extends activity_log {
 
     /**
      * Load an instance of this model using data from the entity passed in.
      *
-     * @param entity $entity
+     * @param core_entity $entity
      * @return activity_log
      */
-    public static function load_by_entity(entity $entity): activity_log {
-        if (!($entity instanceof entities\configuration_change)) {
-            throw new \coding_exception('Invalid entity', 'Entity must be instance of configuration_change');
+    public static function load_by_entity(core_entity $entity): activity_log {
+        if (!($entity instanceof configuration_change_entity)) {
+            throw new coding_exception('Invalid entity', 'Entity must be instance of configuration_change');
         }
 
         return (new configuration_change())->set_entity($entity);
@@ -59,23 +61,23 @@ class configuration_change extends activity_log {
      * @return string
      */
     public function get_description(): string {
-        /** @var entities\configuration_change $entity */
+        /** @var configuration_change_entity $entity */
         $entity = $this->get_entity();
 
         switch ($entity->change_type) {
-            case entities\configuration_change::CHANGED_COMPETENCY_AGGREGATION:
+            case configuration_change_entity::CHANGED_COMPETENCY_AGGREGATION:
                 return get_string('activity_log_competency_aggregation_changed', 'totara_competency');
-            case entities\configuration_change::CHANGED_AGGREGATION:
+            case configuration_change_entity::CHANGED_AGGREGATION:
                 return get_string('activity_log_aggregation_changed', 'totara_competency');
-            case entities\configuration_change::CHANGED_CRITERIA:
+            case configuration_change_entity::CHANGED_CRITERIA:
                 return get_string('activity_log_criteria_change', 'totara_competency');
-            case entities\configuration_change::CHANGED_MIN_PROFICIENCY:
+            case configuration_change_entity::CHANGED_MIN_PROFICIENCY:
                 $data = $entity->get_decoded_related_info();
-                $a = new \stdClass();
+                $a = new stdClass();
                 $a->scale_value_name = (new scale_value($data['new_min_proficiency_id']))->name;
                 return get_string('activity_log_minprof_changed', 'totara_competency', $a);
             default:
-                throw new \coding_exception('Invalid type', 'Invalid change type: ' . $entity->change_type);
+                throw new coding_exception('Invalid type', 'Invalid change type: ' . $entity->change_type);
         }
     }
 }

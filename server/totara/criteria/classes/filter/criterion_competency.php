@@ -27,7 +27,7 @@ namespace totara_criteria\filter;
 use core\orm\entity\filter\filter;
 use core\orm\query\table;
 use totara_criteria\criterion;
-use totara_criteria\entities\criteria_metadata as metadata_entity;
+use totara_criteria\entity\criteria_metadata as metadata_entity;
 
 class criterion_competency extends filter {
 

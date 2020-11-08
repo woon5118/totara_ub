@@ -26,10 +26,10 @@ namespace criteria_othercompetency\webapi\resolver\query;
 use core\orm\collection;
 use core\orm\entity\repository;
 use criteria_othercompetency\othercompetency;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use totara_criteria\criterion;
 use totara_criteria\webapi\resolver\query\competency_achievements;
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 
 /**
  * Fetches all achievments for the othercompetency criteria type

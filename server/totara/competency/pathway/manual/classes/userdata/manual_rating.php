@@ -24,7 +24,7 @@
 namespace pathway_manual\userdata;
 
 use core\orm\entity\repository;
-use pathway_manual\entities\rating;
+use pathway_manual\entity\rating;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;

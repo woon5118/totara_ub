@@ -37,7 +37,7 @@ class core_orm_entity_property_testcase extends advanced_testcase {
     public function test_entities_have_phpdoc_properties() {
         global $DB;
 
-        $entities = \core_component::get_namespace_classes('entities', entity::class);
+        $entities = \core_component::get_namespace_classes('entity', entity::class);
 
         /** @var entity $entity_classname */
         foreach ($entities as $entity_classname) {

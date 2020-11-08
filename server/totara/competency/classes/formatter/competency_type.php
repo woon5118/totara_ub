@@ -29,7 +29,7 @@ use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;
 
 /**
- * @property \totara_competency\entities\competency_type $object
+ * @property \totara_competency\entity\competency_type $object
  */
 class competency_type extends entity_formatter {
 

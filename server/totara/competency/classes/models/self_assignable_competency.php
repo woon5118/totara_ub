@@ -25,7 +25,7 @@ namespace totara_competency\models;
 
 use coding_exception;
 use core\orm\collection;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 
 class self_assignable_competency {
 

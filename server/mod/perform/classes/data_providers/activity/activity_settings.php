@@ -25,7 +25,7 @@ namespace mod_perform\data_providers\activity;
 
 use coding_exception;
 use core\collection;
-use mod_perform\entities\activity\activity_setting as activity_setting_entity;
+use mod_perform\entity\activity\activity_setting as activity_setting_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 

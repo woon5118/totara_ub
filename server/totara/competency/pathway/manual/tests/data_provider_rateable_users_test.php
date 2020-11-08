@@ -21,12 +21,12 @@
  * @package pathway_manual
  */
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
 use pathway_manual\data_providers\rateable_users;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use totara_competency\expand_task;
 use totara_competency\models\assignment;
 use totara_competency\user_groups;

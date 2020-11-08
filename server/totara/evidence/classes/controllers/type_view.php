@@ -25,9 +25,10 @@ namespace totara_evidence\controllers;
 
 use html_writer;
 use moodle_url;
-use totara_evidence\customfield_area;
-use totara_evidence\entities\evidence_type_field;
-use totara_evidence\models;
+use totara_evidence\customfield_area\evidence;
+use totara_evidence\entity\evidence_type_field;
+use totara_evidence\models\evidence_type;
+use totara_evidence\models\helpers\multilang_helper;
 use totara_evidence\output\header;
 use totara_evidence\output\table;
 use totara_mvc\view;
@@ -36,13 +37,13 @@ class type_view extends type {
 
     public function action() {
         $id = $this->get_required_param('id', PARAM_INT);
-        $type = models\evidence_type::load_by_id($id);
+        $type = evidence_type::load_by_id($id);
 
         $this->set_url(new moodle_url('/totara/evidence/type/view.php', ['id' => $type->get_id()]));
 
         if ($type->can_modify()) {
             $edit_button = [
-                'url'   => customfield_area\evidence::get_url($type->get_id()),
+                'url'   => evidence::get_url($type->get_id()),
                 'label' => get_string('edit_this_type', 'totara_evidence')
             ];
         }
@@ -56,7 +57,7 @@ class type_view extends type {
                     'value' => function (evidence_type_field $field): string {
                         return html_writer::link(
                             new moodle_url('/totara/evidence/type/view_field.php', ['id' => $field->id]),
-                            models\helpers\multilang_helper::parse_field_name_string($field->fullname)
+                            multilang_helper::parse_field_name_string($field->fullname)
                         );
                     },
                     'label' => get_string('custom_field_name', 'totara_evidence')

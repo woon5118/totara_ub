@@ -22,8 +22,8 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\models\activity\participant_source;
 use mod_perform\state\participant_instance\closed as participant_instance_availability_closed;
 use mod_perform\state\participant_instance\open as participant_instance_availability_open;

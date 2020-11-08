@@ -22,7 +22,7 @@
  * @category test
  */
 
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\subject_instance;
 
 require_once(__DIR__ . '/state_testcase.php');

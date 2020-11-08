@@ -24,10 +24,10 @@
 use core\orm\query\builder;
 use hierarchy_competency\event\scale_min_proficient_value_updated;
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\assignment as assignment_entity;
-use totara_competency\entities\configuration_change;
-use totara_competency\entities\scale as scale_entity;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\assignment as assignment_entity;
+use totara_competency\entity\configuration_change;
+use totara_competency\entity\scale as scale_entity;
+use totara_competency\entity\scale_value;
 use totara_competency\expand_task;
 use totara_core\advanced_feature;
 

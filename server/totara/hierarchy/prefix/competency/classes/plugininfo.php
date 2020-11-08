@@ -23,7 +23,7 @@
 
 namespace hierarchy_competency;
 
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 
 defined('MOODLE_INTERNAL') || die();
 

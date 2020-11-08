@@ -28,7 +28,7 @@ use core\orm\entity\buffer;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use GraphQL\Deferred;
-use totara_competency\entities\pathway_achievement as pathway_achievement_entity;
+use totara_competency\entity\pathway_achievement as pathway_achievement_entity;
 use totara_competency\formatter;
 
 /**

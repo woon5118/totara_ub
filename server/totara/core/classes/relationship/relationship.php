@@ -29,8 +29,8 @@ use core\orm\entity\model;
 use core\orm\query\builder;
 use core_component;
 use moodle_exception;
-use totara_core\entities\relationship as relationship_entity;
-use totara_core\entities\relationship_resolver as relationship_resolver_entity;
+use totara_core\entity\relationship as relationship_entity;
+use totara_core\entity\relationship_resolver as relationship_resolver_entity;
 
 /**
  * A dynamically defined way of identifying the many users that are associated with a single user based on a given input.

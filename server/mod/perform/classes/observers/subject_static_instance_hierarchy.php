@@ -25,7 +25,7 @@ namespace mod_perform\observers;
 
 use hierarchy_organisation\event\organisation_deleted;
 use hierarchy_position\event\position_deleted;
-use mod_perform\entities\activity\subject_static_instance;
+use mod_perform\entity\activity\subject_static_instance;
 use totara_job\event\job_assignment_deleted;
 
 class subject_static_instance_hierarchy {

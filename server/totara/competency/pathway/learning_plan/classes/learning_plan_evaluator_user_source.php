@@ -23,7 +23,7 @@
 
 namespace pathway_learning_plan;
 
-use totara_competency\entities\pathway_achievement;
+use totara_competency\entity\pathway_achievement;
 use totara_competency\pathway;
 use totara_competency\pathway_evaluator_user_source;
 

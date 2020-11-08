@@ -22,11 +22,11 @@
  * @category test
  */
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
 use totara_core\phpunit\webservice_utils;
 use totara_evidence\customfield_area\evidence;
-use totara_evidence\entities;
+use totara_evidence\entity;
 use totara_evidence\models;
 
 global $CFG;
@@ -217,7 +217,7 @@ class totara_evidence_service_type_testcase extends totara_evidence_testcase {
         }
 
         // When query is empty, list all types
-        $expected = $this->types()->map(static function (entities\evidence_type $type) {
+        $expected = $this->types()->map(static function (entity\evidence_type $type) {
             return [
                 'value' => $type->id,
                 'label' => $type->name

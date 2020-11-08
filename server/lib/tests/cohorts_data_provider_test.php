@@ -24,7 +24,7 @@
 
 use core\collection;
 use core\data_providers\cohorts;
-use core\entities\cohort as cohort_entity;
+use core\entity\cohort as cohort_entity;
 use core\orm\query\builder;
 use core\pagination\cursor;
 

@@ -24,15 +24,15 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use core\entities\user;
+use core\entity\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\response\view_only_section_with_responses;
-use mod_perform\entities\activity\section;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\section;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\util;
 

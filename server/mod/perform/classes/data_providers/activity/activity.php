@@ -30,7 +30,7 @@ use core\pagination\base_paginator;
 use core\pagination\cursor;
 use mod_perform\data_providers\cursor_paginator_trait;
 use mod_perform\data_providers\provider;
-use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entity\activity\activity as activity_entity;
 use mod_perform\models\activity\activity as activity_model;
 use totara_core\access;
 

@@ -24,7 +24,7 @@
 namespace pathway_manual\observers;
 
 use hierarchy_competency\event\competency_deleted;
-use pathway_manual\entities\rating;
+use pathway_manual\entity\rating;
 
 class competency {
 

@@ -21,9 +21,9 @@
  * @package tool_totara_sync
  */
 
-use totara_competency\entities\competency_framework;
-use totara_competency\entities\scale;
-use totara_competency\entities\scale_assignment;
+use totara_competency\entity\competency_framework;
+use totara_competency\entity\scale;
+use totara_competency\entity\scale_assignment;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
@@ -648,7 +648,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
 
     public function test_sync_assign_availability_empty_field() {
         advanced_feature::enable('competency_assignment');
-        
+
         global $DB;
 
         $this->create_competency();

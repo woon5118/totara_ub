@@ -23,8 +23,8 @@
 
 namespace totara_competency\views\filters;
 
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_framework;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_framework;
 use totara_competency\user_groups;
 use totara_core\output\select_multi;
 use totara_core\output\select_region_panel;

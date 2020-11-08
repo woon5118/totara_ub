@@ -25,13 +25,13 @@ namespace pathway_manual\controllers;
 
 use context;
 use context_user;
-use core\entities\user;
+use core\entity\user;
 use moodle_url;
 use pathway_manual\models\roles;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\self_role;
-use totara_competency\entities\competency_assignment_user;
+use totara_competency\entity\competency_assignment_user;
 use totara_competency\helpers\capability_helper;
 use totara_competency\totara\menu\my_competencies;
 use totara_mvc\controller;

@@ -24,17 +24,17 @@
 namespace totara_competency\models;
 
 use coding_exception;
-use core\entities\cohort;
-use core\entities\user;
+use core\entity\cohort;
+use core\entity\user;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\filter\hierarchy_item_visible;
-use hierarchy_organisation\entities\organisation;
-use hierarchy_position\entities\position;
+use hierarchy_organisation\entity\organisation;
+use hierarchy_position\entity\position;
 use totara_competency\assignment_create_exception;
-use totara_competency\entities\assignment as assignment_entity;
-use totara_competency\entities\competency;
-use totara_competency\entities\competency_assignment_user;
+use totara_competency\entity\assignment as assignment_entity;
+use totara_competency\entity\competency;
+use totara_competency\entity\competency_assignment_user;
 use totara_competency\event\assignment_activated;
 use totara_competency\event\assignment_archived;
 use totara_competency\event\assignment_created;
@@ -44,7 +44,7 @@ use totara_competency\helpers\capability_helper;
 use totara_competency\models\profile\proficiency_value;
 use totara_competency\task\expand_assignment_task;
 use totara_competency\user_groups;
-use totara_hierarchy\entities\hierarchy_item;
+use totara_hierarchy\entity\hierarchy_item;
 
 class assignment {
 

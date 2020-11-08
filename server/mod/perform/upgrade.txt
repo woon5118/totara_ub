@@ -33,3 +33,51 @@ information provided here is intended especially for developers.
 * \mod_perform\classes\models\activity\element_plugin::get_participant_response_component() - should only be used on respondable_element_plugin and classes extending it.
 * \mod_perform\models\activity\details\subject_instance_notification::load_by_activity() is deprecated; instead load
   subject instances using the subject instance repository, then subject_instance_notification::load_by_subject_instance().
+* mod_perform\entities\activity\filters\subject_instance_id has been moved to mod_perform\entity\activity\filters\subject_instance_id
+* mod_perform\entities\activity\filters\subject_instances_about has been moved to mod_perform\entity\activity\filters\subject_instances_about
+* mod_perform\entities\activity\activity has been moved to mod_perform\entity\activity\activity
+* mod_perform\entities\activity\activity_repository has been moved to mod_perform\entity\activity\activity_repository
+* mod_perform\entities\activity\activity_setting has been moved to mod_perform\entity\activity\activity_setting
+* mod_perform\entities\activity\activity_setting_repository has been moved to mod_perform\entity\activity\activity_setting_repository
+* mod_perform\entities\activity\activity_type has been moved to mod_perform\entity\activity\activity_type
+* mod_perform\entities\activity\activity_type_repository has been moved to mod_perform\entity\activity\activity_type_repository
+* mod_perform\entities\activity\element has been moved to mod_perform\entity\activity\element
+* mod_perform\entities\activity\element_identifier has been moved to mod_perform\entity\activity\element_identifier
+* mod_perform\entities\activity\element_identifier_repository has been moved to mod_perform\entity\activity\element_identifier_repository
+* mod_perform\entities\activity\element_repository has been moved to mod_perform\entity\activity\element_repository
+* mod_perform\entities\activity\element_response has been moved to mod_perform\entity\activity\element_response
+* mod_perform\entities\activity\element_response_repository has been moved to mod_perform\entity\activity\element_response_repository
+* mod_perform\entities\activity\external_participant has been moved to mod_perform\entity\activity\external_participant
+* mod_perform\entities\activity\external_participant_repository has been moved to mod_perform\entity\activity\external_participant_repository
+* mod_perform\entities\activity\manual_relationship_selection has been moved to mod_perform\entity\activity\manual_relationship_selection
+* mod_perform\entities\activity\manual_relationship_selection_progress has been moved to mod_perform\entity\activity\manual_relationship_selection_progress
+* mod_perform\entities\activity\manual_relationship_selection_progress_repository has been moved to mod_perform\entity\activity\manual_relationship_selection_progress_repository
+* mod_perform\entities\activity\manual_relationship_selection_repository has been moved to mod_perform\entity\activity\manual_relationship_selection_repository
+* mod_perform\entities\activity\manual_relationship_selector has been moved to mod_perform\entity\activity\manual_relationship_selector
+* mod_perform\entities\activity\manual_relationship_selector_repository has been moved to mod_perform\entity\activity\manual_relationship_selector_repository
+* mod_perform\entities\activity\notification has been moved to mod_perform\entity\activity\notification
+* mod_perform\entities\activity\notification_recipient has been moved to mod_perform\entity\activity\notification_recipient
+* mod_perform\entities\activity\participant_instance has been moved to mod_perform\entity\activity\participant_instance
+* mod_perform\entities\activity\participant_instance_repository has been moved to mod_perform\entity\activity\participant_instance_repository
+* mod_perform\entities\activity\participant_section has been moved to mod_perform\entity\activity\participant_section
+* mod_perform\entities\activity\participant_section_repository has been moved to mod_perform\entity\activity\participant_section_repository
+* mod_perform\entities\activity\section has been moved to mod_perform\entity\activity\section
+* mod_perform\entities\activity\section_element has been moved to mod_perform\entity\activity\section_element
+* mod_perform\entities\activity\section_element_repository has been moved to mod_perform\entity\activity\section_element_repository
+* mod_perform\entities\activity\section_relationship has been moved to mod_perform\entity\activity\section_relationship
+* mod_perform\entities\activity\section_repository has been moved to mod_perform\entity\activity\section_repository
+* mod_perform\entities\activity\subject_instance has been moved to mod_perform\entity\activity\subject_instance
+* mod_perform\entities\activity\subject_instance_manual_participant has been moved to mod_perform\entity\activity\subject_instance_manual_participant
+* mod_perform\entities\activity\subject_instance_manual_participant_repository has been moved to mod_perform\entity\activity\subject_instance_manual_participant_repository
+* mod_perform\entities\activity\subject_instance_repository has been moved to mod_perform\entity\activity\subject_instance_repository
+* mod_perform\entities\activity\subject_static_instance has been moved to mod_perform\entity\activity\subject_static_instance
+* mod_perform\entities\activity\subject_static_instance_repository has been moved to mod_perform\entity\activity\subject_static_instance_repository
+* mod_perform\entities\activity\temp_track_user_assignment_queue has been moved to mod_perform\entity\activity\temp_track_user_assignment_queue
+* mod_perform\entities\activity\track has been moved to mod_perform\entity\activity\track
+* mod_perform\entities\activity\track_assignment has been moved to mod_perform\entity\activity\track_assignment
+* mod_perform\entities\activity\track_assignment_repository has been moved to mod_perform\entity\activity\track_assignment_repository
+* mod_perform\entities\activity\track_repository has been moved to mod_perform\entity\activity\track_repository
+* mod_perform\entities\activity\track_user_assignment has been moved to mod_perform\entity\activity\track_user_assignment
+* mod_perform\entities\activity\track_user_assignment_repository has been moved to mod_perform\entity\activity\track_user_assignment_repository
+* mod_perform\entities\activity\track_user_assignment_via has been moved to mod_perform\entity\activity\track_user_assignment_via
+

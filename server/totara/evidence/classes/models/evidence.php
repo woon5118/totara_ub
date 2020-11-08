@@ -23,9 +23,9 @@
 
 namespace totara_evidence\models;
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\entity\model;
-use totara_evidence\entities;
+use totara_evidence\entity;
 
 /**
  * Class evidence
@@ -47,7 +47,7 @@ use totara_evidence\entities;
 abstract class evidence extends model {
 
     /**
-     * @var entities\evidence_type|entities\evidence_item
+     * @var entity\evidence_type|entity\evidence_item
      */
     protected $entity;
 

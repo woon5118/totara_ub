@@ -23,7 +23,7 @@
 
 namespace mod_perform\state\subject_instance;
 
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\state\subject_instance\condition\all_participant_instances_complete;
 use mod_perform\state\subject_instance\condition\not_all_participant_instances_complete;
 use mod_perform\state\transition;

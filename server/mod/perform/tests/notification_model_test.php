@@ -23,7 +23,7 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\notification as notification_entity;
+use mod_perform\entity\activity\notification as notification_entity;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\notification\trigger;

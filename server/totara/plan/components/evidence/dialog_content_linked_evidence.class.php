@@ -26,9 +26,9 @@
  * Devplan linked evidence specific evidence dialog generator
  */
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\entity\repository;
-use totara_evidence\entities\evidence_item;
+use totara_evidence\entity\evidence_item;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
 
 defined('MOODLE_INTERNAL') || die();

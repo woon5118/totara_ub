@@ -23,7 +23,7 @@
 
 namespace totara_competency\event;
 
-use totara_competency\entities\competency_assignment_user;
+use totara_competency\entity\competency_assignment_user;
 
 defined('MOODLE_INTERNAL') || die();
 

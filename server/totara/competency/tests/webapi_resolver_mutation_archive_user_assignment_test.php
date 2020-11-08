@@ -23,12 +23,12 @@
  */
 
 use \core\webapi\execution_context;
-use totara_competency\entities\assignment as assignment_entity;
+use totara_competency\entity\assignment as assignment_entity;
 use \totara_competency\models\assignment as assignment_model;
 use totara_competency\user_groups;
 use \totara_competency\webapi\resolver\mutation\archive_user_assignment;
 use \core\orm\query\builder;
-use \totara_competency\entities\competency;
+use \totara_competency\entity\competency;
 use \totara_job\job_assignment;
 use \totara_competency\models\assignment_actions;
 use \totara_competency\expand_task;

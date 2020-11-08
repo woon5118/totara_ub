@@ -23,7 +23,7 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use core\entities\user;
+use core\entity\user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;

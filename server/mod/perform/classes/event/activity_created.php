@@ -24,7 +24,7 @@
 namespace mod_perform\event;
 
 use core\event\base;
-use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entity\activity\activity as activity_entity;
 use mod_perform\models\activity\activity;
 
 class activity_created extends base {

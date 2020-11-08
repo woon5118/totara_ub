@@ -24,11 +24,11 @@
 namespace mod_perform;
 
 use core\plugininfo\mod;
-use mod_perform\entities\activity\activity;
-use mod_perform\entities\activity\track_user_assignment;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\element_response;
+use mod_perform\entity\activity\activity;
+use mod_perform\entity\activity\track_user_assignment;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\element_response;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();

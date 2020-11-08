@@ -24,13 +24,13 @@
 namespace totara_competency;
 
 use context_system;
-use core\entities\expandable;
+use core\entity\expandable;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_assignment_user;
-use totara_competency\entities\competency_assignment_user_repository;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_assignment_user;
+use totara_competency\entity\competency_assignment_user_repository;
 use totara_competency\event\assignment_user_assigned_bulk;
 use totara_competency\event\assignment_user_unassigned;
 use totara_competency\models\assignment as assignment_model;

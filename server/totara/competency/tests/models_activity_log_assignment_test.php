@@ -23,8 +23,8 @@
 
 use totara_competency\user_groups;
 use totara_competency\models\activity_log;
-use totara_competency\entities\competency_assignment_user_log;
-use totara_competency\entities\assignment;
+use totara_competency\entity\competency_assignment_user_log;
+use totara_competency\entity\assignment;
 
 /**
  * @group totara_competency

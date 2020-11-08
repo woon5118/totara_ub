@@ -26,7 +26,7 @@ namespace totara_competency\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use totara_competency\entities\pathway as pathway_entity;
+use totara_competency\entity\pathway as pathway_entity;
 use totara_competency\pathway as pathway_instance;
 use totara_competency\pathway_factory;
 use core\webapi\formatter\field\string_field_formatter;

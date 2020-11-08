@@ -25,7 +25,7 @@ namespace totara_competency\models\user_group;
 
 use context_user;
 use core\orm\collection;
-use core\entities\user as user_entity;
+use core\entity\user as user_entity;
 use core\orm\entity\entity;
 use totara_competency\models\user_group;
 use totara_competency\user_groups;

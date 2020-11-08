@@ -24,7 +24,7 @@
 namespace totara_competency\services;
 
 use context_system;
-use core\entities\cohort as cohort_entity;
+use core\entity\cohort as cohort_entity;
 use core\orm\paginator;
 use core\orm\query\builder;
 use external_function_parameters;

@@ -35,9 +35,9 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
-use totara_competency\entities\competency;
-use totara_competency\entities\competency_framework;
-use totara_competency\entities\course;
+use totara_competency\entity\competency;
+use totara_competency\entity\competency_framework;
+use totara_competency\entity\course;
 use totara_core\advanced_feature;
 use core\webapi\formatter\field\string_field_formatter;
 

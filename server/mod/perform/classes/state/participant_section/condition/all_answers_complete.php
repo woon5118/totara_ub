@@ -24,7 +24,7 @@
 namespace mod_perform\state\participant_section\condition;
 
 use core\orm\collection;
-use mod_perform\entities\activity\element_response;
+use mod_perform\entity\activity\element_response;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\response\participant_section;
 use mod_perform\models\response\section_element_response;

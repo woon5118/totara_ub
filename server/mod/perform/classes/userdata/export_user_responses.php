@@ -24,7 +24,7 @@
 namespace mod_perform\userdata;
 
 use context;
-use mod_perform\entities\activity\element_response;
+use mod_perform\entity\activity\element_response;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\respondable_element_plugin;
 use mod_perform\userdata\traits\export_trait;

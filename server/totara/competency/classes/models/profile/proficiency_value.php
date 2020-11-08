@@ -24,9 +24,9 @@
 namespace totara_competency\models\profile;
 
 use coding_exception;
-use totara_competency\entities\assignment;
-use totara_competency\entities\scale;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\assignment;
+use totara_competency\entity\scale;
+use totara_competency\entity\scale_value;
 
 /**
  * Class proficiency value model

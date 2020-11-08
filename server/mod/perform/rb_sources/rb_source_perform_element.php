@@ -23,7 +23,7 @@
  *
  */
 
-use core\entities\user;
+use core\entity\user;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\rb\traits\activity_trait;
 use mod_perform\rb\traits\course_visibility_trait;
@@ -32,7 +32,7 @@ use mod_perform\rb\traits\section_element_trait;
 use mod_perform\rb\traits\section_trait;
 use mod_perform\rb\util;
 use totara_core\advanced_feature;
-use totara_core\entities\relationship;
+use totara_core\entity\relationship;
 use totara_core\relationship\relationship as relationship_model;
 
 defined('MOODLE_INTERNAL') || die();

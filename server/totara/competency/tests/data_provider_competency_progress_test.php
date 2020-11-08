@@ -27,7 +27,7 @@ global $CFG;
 use core\collection;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\data_providers\competency_progress;
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 use totara_competency\models\profile\competency_progress as cp;
 
 require_once($CFG->dirroot . '/totara/competency/tests/totara_competency_testcase.php');

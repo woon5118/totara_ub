@@ -24,7 +24,7 @@
 namespace mod_perform\event;
 
 use core\event\base;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\participant_instance;
 
 /**_

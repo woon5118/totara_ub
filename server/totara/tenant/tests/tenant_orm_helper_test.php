@@ -21,8 +21,8 @@
  * @package totara_tenant
  */
 
-use core\entities\tenant;
-use core\entities\user;
+use core\entity\tenant;
+use core\entity\user;
 use core\orm\query\builder;
 use core\orm\query\field;
 use core\tenant_orm_helper;

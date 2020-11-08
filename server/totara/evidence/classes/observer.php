@@ -26,7 +26,7 @@ namespace totara_evidence;
 use core\event\user_deleted;
 use core\orm\query\builder;
 use totara_evidence\customfield_area\field_helper;
-use totara_evidence\entities\evidence_item;
+use totara_evidence\entity\evidence_item;
 
 class observer {
 

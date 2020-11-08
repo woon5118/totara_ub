@@ -22,7 +22,7 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\section as section_entity;
+use mod_perform\entity\activity\section as section_entity;
 use mod_perform\models\activity\section;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;

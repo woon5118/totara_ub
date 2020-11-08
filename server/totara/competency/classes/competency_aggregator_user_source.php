@@ -26,9 +26,9 @@ namespace totara_competency;
 use core\orm\collection;
 use core\orm\query\builder;
 use stdClass;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\competency_assignment_user;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\competency_assignment_user;
 use totara_core\advanced_feature;
 
 class competency_aggregator_user_source {

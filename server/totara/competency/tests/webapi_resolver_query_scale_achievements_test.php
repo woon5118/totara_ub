@@ -23,9 +23,9 @@
  */
 
 use core\webapi\execution_context;
-use totara_competency\entities\assignment;
-use totara_competency\entities\pathway_achievement;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\assignment;
+use totara_competency\entity\pathway_achievement;
+use totara_competency\entity\scale_value;
 use totara_competency\expand_task;
 use totara_competency\plugin_types;
 use totara_competency\task\competency_aggregation_all;

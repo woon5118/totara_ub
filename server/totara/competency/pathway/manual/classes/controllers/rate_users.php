@@ -25,7 +25,7 @@ namespace pathway_manual\controllers;
 
 use context;
 use context_system;
-use core\entities\user;
+use core\entity\user;
 use pathway_manual\models\roles;
 use pathway_manual\models\roles\role;
 use totara_mvc\controller;

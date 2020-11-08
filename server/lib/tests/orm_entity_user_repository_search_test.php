@@ -22,8 +22,8 @@
  * @category test
  */
 
-use core\entities\user;
-use core\entities\user_repository;
+use core\entity\user;
+use core\entity\user_repository;
 use totara_tenant\local\util;
 
 defined('MOODLE_INTERNAL') || die();

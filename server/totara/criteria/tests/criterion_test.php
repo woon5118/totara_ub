@@ -22,7 +22,7 @@
  */
 
 use totara_criteria\criterion;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 
 
 /**

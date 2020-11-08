@@ -24,8 +24,8 @@
 namespace mod_perform\notification;
 
 use coding_exception;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\notification\internals\sink;

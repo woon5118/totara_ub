@@ -30,7 +30,7 @@ use core\orm\query\raw_field;
 /**
  * Filters for some user name information
  *
- * @package totara_competency\entities\filters
+ * @package core\entity\filters
  */
 class user_name extends like {
 

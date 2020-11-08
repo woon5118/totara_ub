@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use core\entities\user;
+use core\entity\user;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 class container_workspace_webapi_search_users_testcase extends advanced_testcase {

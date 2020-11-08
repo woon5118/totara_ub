@@ -25,7 +25,7 @@ namespace mod_perform\controllers\activity;
 
 use context;
 use context_coursecat;
-use core\entities\user;
+use core\entity\user;
 use mod_perform\controllers\perform_controller;
 use mod_perform\totara\menu\my_activities;
 use mod_perform\util;

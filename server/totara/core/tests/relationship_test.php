@@ -22,8 +22,8 @@
  */
 
 use core\orm\query\exceptions\record_not_found_exception;
-use totara_core\entities\relationship as relationship_entity;
-use totara_core\entities\relationship_resolver;
+use totara_core\entity\relationship as relationship_entity;
+use totara_core\entity\relationship_resolver;
 use totara_core\relationship\relationship;
 use totara_core\relationship\resolvers\subject;
 

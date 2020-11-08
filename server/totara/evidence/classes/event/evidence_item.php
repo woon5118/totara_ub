@@ -26,9 +26,9 @@ namespace totara_evidence\event;
 use coding_exception;
 use context_system;
 use context_user;
-use core\entities\user;
+use core\entity\user;
 use core\event\base;
-use totara_evidence\entities;
+use totara_evidence\entity;
 
 abstract class evidence_item extends base {
 
@@ -37,17 +37,17 @@ abstract class evidence_item extends base {
      */
     protected function init(): void {
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = entities\evidence_item::TABLE;
+        $this->data['objecttable'] = entity\evidence_item::TABLE;
     }
 
     /**
      * Create instance of event for an evidence item.
      *
-     * @param entities\evidence_item $evidence_item
+     * @param entity\evidence_item $evidence_item
      * @return evidence_item|base
      * @throws coding_exception
      */
-    public static function create_from_item(entities\evidence_item $evidence_item): evidence_item {
+    public static function create_from_item(entity\evidence_item $evidence_item): evidence_item {
         $data = [
             'objectid' => $evidence_item->id,
             'context' => context_system::instance(),

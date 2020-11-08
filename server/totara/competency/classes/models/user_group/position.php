@@ -26,7 +26,7 @@ namespace totara_competency\models\user_group;
 use context_system;
 use core\orm\collection;
 use core\orm\entity\entity;
-use hierarchy_position\entities\position as position_entity;
+use hierarchy_position\entity\position as position_entity;
 use totara_competency\models\user_group;
 use totara_competency\user_groups;
 

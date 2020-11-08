@@ -22,11 +22,11 @@
  * @subpackage test
  */
 
-use pathway_manual\entities\rating;
+use pathway_manual\entity\rating;
 use pathway_manual\userdata\manual_rating_other;
 use pathway_manual\userdata\manual_rating_self;
-use totara_competency\entities\competency;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\competency;
+use totara_competency\entity\scale_value;
 use totara_userdata\userdata\target_user;
 
 /**

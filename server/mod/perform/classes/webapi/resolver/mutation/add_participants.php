@@ -24,12 +24,12 @@
 namespace mod_perform\webapi\resolver\mutation;
 
 use coding_exception;
-use core\entities\user;
+use core\entity\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\models\activity\activity;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\util;

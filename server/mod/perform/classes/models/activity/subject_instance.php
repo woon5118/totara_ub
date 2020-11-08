@@ -30,7 +30,7 @@ use core\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
 use mod_perform\constants;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\event\subject_instance_manual_participants_selected;
 use mod_perform\models\activity\helpers\manual_participant_helper;
 use mod_perform\state\participant_instance\open as participant_instance_open;
@@ -46,7 +46,7 @@ use mod_perform\state\subject_instance\subject_instance_manual_status;
 use mod_perform\state\subject_instance\subject_instance_progress;
 use stdClass;
 use totara_core\relationship\relationship;
-use totara_job\entities\job_assignment as job_assignment_entity;
+use totara_job\entity\job_assignment as job_assignment_entity;
 use totara_job\job_assignment;
 
 /**

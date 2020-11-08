@@ -25,10 +25,10 @@ namespace totara_competency\data_providers;
 
 use core\orm\entity\entity;
 use core\orm\entity\repository;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\competency_assignment_user_log;
-use totara_competency\entities\configuration_change;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\competency_assignment_user_log;
+use totara_competency\entity\configuration_change;
 use totara_competency\models;
 use totara_competency\models\activity_log_factory;
 

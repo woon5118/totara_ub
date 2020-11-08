@@ -22,7 +22,7 @@
  * @category test
  */
 
-use core\entities\user;
+use core\entity\user;
 
 /**
  * Class core_orm_entity_user_testcase
@@ -62,7 +62,7 @@ class core_orm_entity_user_testcase extends advanced_testcase {
     }
 
     /**
-     * @covers \core\entities\user::logged_in
+     * @covers \core\entity\user::logged_in
      */
     public function test_get_logged_in(): void {
         self::setUser($this->user_1);
@@ -81,7 +81,7 @@ class core_orm_entity_user_testcase extends advanced_testcase {
     }
 
     /**
-     * @covers \core\entities\user::is_logged_in
+     * @covers \core\entity\user::is_logged_in
      */
     public function test_is_logged_in(): void {
         self::setUser($this->user_1);
@@ -104,7 +104,7 @@ class core_orm_entity_user_testcase extends advanced_testcase {
     }
 
     /**
-     * @covers \core\entities\user::get_fullname_attribute
+     * @covers \core\entity\user::get_fullname_attribute
      */
     public function test_get_fullname_attribute(): void {
         $this->assertNotEquals(fullname($this->user_1), fullname($this->user_2));

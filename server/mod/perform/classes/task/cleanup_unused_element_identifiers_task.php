@@ -24,7 +24,7 @@
 namespace mod_perform\task;
 
 use core\task\scheduled_task;
-use mod_perform\entities\activity\element_identifier;
+use mod_perform\entity\activity\element_identifier;
 
 /**
  * Task to delete element identifier records when the identifier is no longer referenced by any elements.

@@ -27,7 +27,7 @@ use core\webapi\execution_context;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
 use mod_perform\activity_access_denied_exception;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\webapi\middleware\require_activity;
 

@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2018 onwards Totara Learning Solutions LTD
@@ -23,7 +23,10 @@
  */
 
 use core\orm\query\builder;
-use totara_competency\entities;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_assignment_user;
+use totara_competency\entity\competency_assignment_user_log;
+use totara_competency\entity\competency_assignment_user_repository;
 use totara_competency\expand_task;
 use totara_competency\models\assignment_user;
 
@@ -42,37 +45,37 @@ class totara_competency_assignment_user_testcase extends advanced_testcase {
     public function test_remove_orphaned_records() {
         ['assignments' => $assignments] = $this->generate_assignments();
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_ACTIVE;
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_ACTIVE;
         $assignment1->save();
 
-        $assignment2 = new entities\assignment($assignments[1]);
-        $assignment2->status = entities\assignment::STATUS_ACTIVE;
+        $assignment2 = new assignment($assignments[1]);
+        $assignment2->status = assignment::STATUS_ACTIVE;
         $assignment2->save();
 
-        $assignment3 = new entities\assignment($assignments[2]);
-        $assignment3->status = entities\assignment::STATUS_ACTIVE;
+        $assignment3 = new assignment($assignments[2]);
+        $assignment3->status = assignment::STATUS_ACTIVE;
         $assignment3->save();
 
         $task = new expand_task($GLOBALS['DB']);
         $task->expand_all();
-        $this->assertEquals(3, entities\competency_assignment_user::repository()->count());
+        $this->assertEquals(3, competency_assignment_user::repository()->count());
 
-        $assignment1->status = entities\assignment::STATUS_ARCHIVED;
+        $assignment1->status = assignment::STATUS_ARCHIVED;
         $assignment1->save();
 
-        $assignment2->status = entities\assignment::STATUS_DRAFT;
+        $assignment2->status = assignment::STATUS_DRAFT;
         $assignment2->save();
 
-        entities\competency_assignment_user_repository::remove_orphaned_records();
+        competency_assignment_user_repository::remove_orphaned_records();
 
         $this->assertEquals(
             1,
-            entities\competency_assignment_user::repository()->count()
+            competency_assignment_user::repository()->count()
         );
         $this->assertEquals(
             1,
-            entities\competency_assignment_user::repository()
+            competency_assignment_user::repository()
                 ->where('assignment_id', $assignment3->id)
                 ->count()
         );
@@ -81,7 +84,7 @@ class totara_competency_assignment_user_testcase extends advanced_testcase {
     public function test_has_assignment() {
         ['assignments' => $assignments] = $this->generate_assignments();
 
-        $assignment1 = new entities\assignment($assignments[0]);
+        $assignment1 = new assignment($assignments[0]);
 
         $user_id = $assignment1->user_group_id;
 
@@ -108,8 +111,8 @@ class totara_competency_assignment_user_testcase extends advanced_testcase {
     public function test_active_assignments() {
         ['assignments' => $assignments] = $this->generate_assignments();
 
-        $assignment1 = new entities\assignment($assignments[0]);
-        $assignment1->status = entities\assignment::STATUS_ACTIVE;
+        $assignment1 = new assignment($assignments[0]);
+        $assignment1->status = assignment::STATUS_ACTIVE;
         $assignment1->save();
 
         $user_id = $assignment1->user_group_id;
@@ -123,7 +126,7 @@ class totara_competency_assignment_user_testcase extends advanced_testcase {
 
         $gen = $this->generator();
         $cohort = $gen->assignment_generator()->create_cohort();
-        $assignment2 = $gen->assignment_generator()->create_cohort_assignment($assignment1->competency_id, $cohort->id, ['status' => entities\assignment::STATUS_ACTIVE]);
+        $assignment2 = $gen->assignment_generator()->create_cohort_assignment($assignment1->competency_id, $cohort->id, ['status' => assignment::STATUS_ACTIVE]);
         cohort_add_member($cohort->id, $user_id);
 
         $expand_task = new expand_task($GLOBALS['DB']);
@@ -139,7 +142,7 @@ class totara_competency_assignment_user_testcase extends advanced_testcase {
         $competency = $this->generator()->create_competency();
         $assignment = $this->generator()
             ->assignment_generator()
-            ->create_user_assignment($competency->id, $user->id, ['status' => entities\assignment::STATUS_ARCHIVED]);
+            ->create_user_assignment($competency->id, $user->id, ['status' => assignment::STATUS_ARCHIVED]);
 
         $this->expand();
 
@@ -155,7 +158,7 @@ class totara_competency_assignment_user_testcase extends advanced_testcase {
             ->insert([
                 'assignment_id' => $assignment->id,
                 'user_id' => $user->id,
-                'action' => entities\competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED,
+                'action' => competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED,
                 'created_at' => time(),
             ]);
 

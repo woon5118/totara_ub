@@ -27,7 +27,7 @@ use coding_exception;
 use context_system;
 use core\orm\query\builder;
 use coursecat;
-use totara_competency\entities\course_categories;
+use totara_competency\entity\course_categories;
 
 final class perform_helper {
 

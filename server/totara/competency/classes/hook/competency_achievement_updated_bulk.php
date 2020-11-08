@@ -23,7 +23,7 @@
 
 namespace totara_competency\hook;
 
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use totara_core\hook\base;
 
 class competency_achievement_updated_bulk extends base {

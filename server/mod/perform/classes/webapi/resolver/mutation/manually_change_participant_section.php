@@ -23,7 +23,7 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
-use core\entities\user;
+use core\entity\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;

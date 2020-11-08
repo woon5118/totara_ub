@@ -7,6 +7,14 @@ information provided here is intended especially for developers.
 * Introduced new config variables $CFG->link_parser_allowed_hosts and $CFG->link_parser_blocked_hosts to be able to explicitly allow or block hosts
   to be parsed by the get_linkmetadata GraphQL query.
 * \coursecat::delete_courses_and_containers() is now publicly accessible.
+* core\entities\cohort has been moved to core\entity\cohort
+* core\entities\cohort_filters has been moved to core\entity\cohort_filters
+* core\entities\cohort_repository has been moved to core\entity\cohort_repository
+* core\entities\expand has been moved to core\entity\expand
+* core\entities\expandable has been moved to core\entity\expandable
+* core\entities\tenant has been moved to core\entity\tenant
+* core\entities\user has been moved to core\entity\user
+* core\entities\user_repository has been moved to core\entity\user_repository
 
 === 13.1 ===
 

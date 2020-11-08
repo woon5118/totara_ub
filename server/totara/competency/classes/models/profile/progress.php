@@ -25,9 +25,9 @@ namespace totara_competency\models\profile;
 
 use core\orm\collection;
 use stdClass;
-use core\entities\user;
+use core\entity\user;
 use totara_competency\data_providers\assignments;
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 
 /**
  * This is a generic profile progress model scaffolding, it has the following properties available:

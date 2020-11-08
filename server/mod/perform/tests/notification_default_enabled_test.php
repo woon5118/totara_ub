@@ -24,8 +24,8 @@
 use container_perform\perform;
 use core\collection;
 use mod_perform\constants;
-use mod_perform\entities\activity\notification as notification_entity;
-use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
+use mod_perform\entity\activity\notification as notification_entity;
+use mod_perform\entity\activity\notification_recipient as notification_recipient_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\helpers\relationship_helper;
@@ -35,7 +35,7 @@ use mod_perform\notification\broker;
 use mod_perform\notification\factory;
 use mod_perform\notification\loader;
 use mod_perform\util;
-use totara_core\entities\relationship as relationship_entity;
+use totara_core\entity\relationship as relationship_entity;
 use totara_core\relationship\relationship;
 
 require_once(__DIR__ . '/notification_testcase.php');

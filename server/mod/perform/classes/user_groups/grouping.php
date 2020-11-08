@@ -24,12 +24,12 @@
 namespace mod_perform\user_groups;
 
 use coding_exception;
-use core\entities\cohort;
-use core\entities\expand;
-use core\entities\user;
+use core\entity\cohort;
+use core\entity\expand;
+use core\entity\user;
 use core\orm\entity\entity;
-use hierarchy_organisation\entities\organisation;
-use hierarchy_position\entities\position;
+use hierarchy_organisation\entity\organisation;
+use hierarchy_position\entity\position;
 use mod_perform\models\activity\track_assignment;
 
 /**

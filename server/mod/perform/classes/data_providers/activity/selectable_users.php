@@ -25,8 +25,8 @@
 namespace mod_perform\data_providers\activity;
 
 use context_user;
-use core\entities\user;
-use core\entities\user_repository;
+use core\entity\user;
+use core\entity\user_repository;
 use core\orm\entity\repository;
 use core\orm\query\field;
 use core\tenant_orm_helper;

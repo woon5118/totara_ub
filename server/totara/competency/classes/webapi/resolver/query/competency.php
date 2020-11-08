@@ -30,7 +30,7 @@ use core\webapi\middleware\require_login;
 use core\webapi\middleware\require_system_capability;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use totara_competency\entities\competency as competency_entity;
+use totara_competency\entity\competency as competency_entity;
 
 /**
  * Query to return a single competency.

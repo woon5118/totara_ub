@@ -25,8 +25,8 @@
 use criteria_coursecompletion\coursecompletion;
 use pathway_criteria_group\aggregation_helper;
 use pathway_criteria_group\criteria_group;
-use totara_competency\entities\course as course_entity;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\course as course_entity;
+use totara_competency\entity\scale_value;
 use totara_competency\expand_task;
 use totara_competency\linked_courses;
 use totara_core\advanced_feature;

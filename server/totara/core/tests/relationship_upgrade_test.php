@@ -21,8 +21,8 @@
  * @package totara_core
  */
 
-use totara_core\entities\relationship as relationship_entity;
-use totara_core\entities\relationship_resolver;
+use totara_core\entity\relationship as relationship_entity;
+use totara_core\entity\relationship_resolver;
 use totara_core\relationship\resolvers\subject;
 
 global $CFG;

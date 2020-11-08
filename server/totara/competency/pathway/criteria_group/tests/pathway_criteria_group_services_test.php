@@ -20,7 +20,7 @@
  * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  */
 
-use totara_competency\entities\scale_value;
+use totara_competency\entity\scale_value;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');

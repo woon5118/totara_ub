@@ -25,7 +25,7 @@ namespace totara_competency\controllers\profile;
 
 use context;
 use context_user;
-use core\entities\user;
+use core\entity\user;
 use moodle_exception;
 use moodle_url;
 use totara_competency\helpers\capability_helper;

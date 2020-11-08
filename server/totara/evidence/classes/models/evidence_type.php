@@ -25,13 +25,13 @@ namespace totara_evidence\models;
 
 use coding_exception;
 use context_system;
-use core\entities\user;
+use core\entity\user;
 use core\orm\collection;
 use core\orm\query\builder;
 use required_capability_exception;
 use totara_evidence\customfield_area;
-use totara_evidence\entities;
-use totara_evidence\entities\evidence_type_field;
+use totara_evidence\entity;
+use totara_evidence\entity\evidence_type_field;
 use totara_evidence\event;
 use totara_evidence\models\helpers\multilang_helper;
 
@@ -97,7 +97,7 @@ class evidence_type extends evidence {
     ];
 
     protected static function get_entity_class(): string {
-        return entities\evidence_type::class;
+        return entity\evidence_type::class;
     }
 
     /**
@@ -186,12 +186,12 @@ class evidence_type extends evidence {
         if (empty(trim($name))) {
             throw new coding_exception('A name must be specified');
         }
-        if (strlen($idnumber) > 0 && totara_idnumber_exists(entities\evidence_type::TABLE, $idnumber)) {
+        if (strlen($idnumber) > 0 && totara_idnumber_exists(entity\evidence_type::TABLE, $idnumber)) {
             throw new coding_exception('ID number already exists');
         }
         self::can_manage(true);
 
-        $entity = new entities\evidence_type();
+        $entity = new entity\evidence_type();
         $entity->name = $name;
         $entity->idnumber = $idnumber;
         $entity->description = $description;
@@ -228,7 +228,7 @@ class evidence_type extends evidence {
             throw new coding_exception('Must specify an attribute to change');
         }
         $this->can_modify(true);
-        if ($idnumber != '' && totara_idnumber_exists(entities\evidence_type::TABLE, $idnumber, $this->entity->id)) {
+        if ($idnumber != '' && totara_idnumber_exists(entity\evidence_type::TABLE, $idnumber, $this->entity->id)) {
             throw new coding_exception('ID number already exists');
         }
 
@@ -261,11 +261,11 @@ class evidence_type extends evidence {
         $this->can_modify(true);
 
         $event = builder::get_db()->transaction(function () {
-            $event = event\evidence_type_deleted::create_from_type(new entities\evidence_type($this->entity->id));
+            $event = event\evidence_type_deleted::create_from_type(new entity\evidence_type($this->entity->id));
 
             $file_storage = get_file_storage();
             foreach ($this->entity->fields as $field) {
-                /** @var entities\evidence_type_field $field */
+                /** @var entity\evidence_type_field $field */
                 // Delete any files used in the default value for a text area field
                 if ($field->datatype === 'textarea') {
                     $file_storage->delete_area_files(

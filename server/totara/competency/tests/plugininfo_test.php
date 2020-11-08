@@ -21,10 +21,10 @@
  * @package totara_competency
  */
 
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\competency_assignment_user;
-use totara_competency\entities\scale as scale_entity;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\competency_assignment_user;
+use totara_competency\entity\scale as scale_entity;
 use totara_competency\expand_task;
 use totara_competency\plugininfo;
 use totara_competency\task\competency_aggregation_all;

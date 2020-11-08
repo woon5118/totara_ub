@@ -23,13 +23,13 @@
 
 namespace pathway_manual\models;
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\entity\entity;
 use moodle_url;
-use pathway_manual\entities\rating;
+use pathway_manual\entity\rating;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\self_role;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use user_picture;
 
 defined('MOODLE_INTERNAL') || die();

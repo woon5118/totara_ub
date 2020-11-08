@@ -26,10 +26,10 @@ namespace mod_perform\models\activity;
 use mod_perform\state\state;
 use stdClass;
 use core\orm\entity\model;
-use mod_perform\entities\activity\subject_static_instance as subject_static_instance_entity;
+use mod_perform\entity\activity\subject_static_instance as subject_static_instance_entity;
 use mod_perform\state\state_aware;
 use totara_job\job_assignment;
-use totara_job\entities\job_assignment as job_assignment_entity;
+use totara_job\entity\job_assignment as job_assignment_entity;
 
 /**
  * Class subject_static_instance

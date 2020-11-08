@@ -24,7 +24,7 @@
 namespace degeneration\items;
 
 use degeneration\App;
-use hierarchy_organisation\entities\organisation as organisation_entity;
+use hierarchy_organisation\entity\organisation as organisation_entity;
 
 /**
  * Class organisation

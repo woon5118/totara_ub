@@ -22,7 +22,7 @@
  * @category test
  */
 
-use pathway_manual\entities\rating as rating_entity;
+use pathway_manual\entity\rating as rating_entity;
 use pathway_manual\models\rating as rating_model;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;

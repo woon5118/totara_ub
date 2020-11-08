@@ -26,7 +26,7 @@ namespace totara_evidence\rb\display;
 use rb_column;
 use reportbuilder;
 use stdClass;
-use totara_evidence\entities\evidence_type;
+use totara_evidence\entity\evidence_type;
 use totara_reportbuilder\rb\display\base;
 use totara_reportbuilder\rb\display\format_text;
 

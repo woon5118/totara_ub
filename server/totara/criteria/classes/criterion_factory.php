@@ -26,7 +26,7 @@ namespace totara_criteria;
 use coding_exception;
 use stdClass;
 use totara_competency\plugin_types;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 
 /**
  * Criterion factory class to obtain an instance of the specific criterion type

@@ -25,7 +25,7 @@ namespace aggregation_latest_achieved;
 
 
 use core\collection;
-use totara_competency\entities\pathway_achievement;
+use totara_competency\entity\pathway_achievement;
 use totara_competency\overall_aggregation;
 use totara_competency\pathway;
 

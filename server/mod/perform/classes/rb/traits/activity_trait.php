@@ -24,7 +24,7 @@
 namespace mod_perform\rb\traits;
 
 use coding_exception;
-use mod_perform\entities\activity\activity_type as activity_type_entity;
+use mod_perform\entity\activity\activity_type as activity_type_entity;
 use mod_perform\models\activity\activity_type as activity_type_model;
 use rb_base_source;
 use rb_column_option;

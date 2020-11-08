@@ -25,7 +25,7 @@ namespace mod_perform\observers;
 
 use core\event\base;
 use mod_perform\event\participant_instance_progress_updated;
-use mod_perform\entities\activity\participant_instance;
+use mod_perform\entity\activity\participant_instance;
 use mod_perform\models\activity\subject_instance;
 
 class participant_instance_progress {

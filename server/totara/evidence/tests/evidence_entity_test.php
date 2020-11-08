@@ -22,8 +22,8 @@
  * @category test
  */
 
-use totara_evidence\entities;
-use totara_evidence\entities\evidence_field_data;
+use totara_evidence\entity;
+use totara_evidence\entity\evidence_field_data;
 use totara_evidence\models\evidence_type;
 
 global $CFG;
@@ -85,7 +85,7 @@ class totara_evidence_entity_testcase extends totara_evidence_testcase {
             $this->generator()->create_evidence_item_entity(['type' => 0]);
         }
 
-        $items = entities\evidence_item::repository()
+        $items = entity\evidence_item::repository()
             ->where('typeid', $type->id)
             ->order_by('id')
             ->get()
@@ -138,7 +138,7 @@ class totara_evidence_entity_testcase extends totara_evidence_testcase {
 
         $field = $this->fields()->all()[0];
 
-        $field_data = (new entities\evidence_field_data([
+        $field_data = (new entity\evidence_field_data([
             'fieldid'    => $field->id,
             'evidenceid' => $item->id,
             'data'       => 'Data'
@@ -152,7 +152,7 @@ class totara_evidence_entity_testcase extends totara_evidence_testcase {
         $expected = [];
 
         for ($i = 0; $i < $children_count; $i++) {
-            $child = new entities\evidence_field_data_param([
+            $child = new entity\evidence_field_data_param([
                 'dataid' => $field_data->id,
                 'value'  => "Param Data $i"
             ]);
@@ -179,7 +179,7 @@ class totara_evidence_entity_testcase extends totara_evidence_testcase {
             'data'       => 'Data'
         ];
 
-        $parent = new entities\evidence_field_data($parent_data);
+        $parent = new entity\evidence_field_data($parent_data);
         $parent->save();
 
         $children_count = 3;
@@ -187,7 +187,7 @@ class totara_evidence_entity_testcase extends totara_evidence_testcase {
         $expected = [];
 
         for ($i = 0; $i < $children_count; $i++) {
-            $child = new entities\evidence_field_data_param([
+            $child = new entity\evidence_field_data_param([
                 'dataid' => $parent->id,
                 'value'  => "Param Data $i"
             ]);
@@ -222,10 +222,10 @@ class totara_evidence_entity_testcase extends totara_evidence_testcase {
             $system_items[] = $this->generator()->create_evidence_item_entity(['typeid' => $system_type->id])->to_array();
         }
 
-        $this->assertEquals($standard_items, entities\evidence_item::repository()
+        $this->assertEquals($standard_items, entity\evidence_item::repository()
             ->filter_by_standard_location()->order_by('id')->get()->to_array()
         );
-        $this->assertEquals($system_items, entities\evidence_item::repository()
+        $this->assertEquals($system_items, entity\evidence_item::repository()
             ->filter_by_rol_location()->order_by('id')->get()->to_array()
         );
     }

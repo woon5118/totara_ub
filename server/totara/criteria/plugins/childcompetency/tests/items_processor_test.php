@@ -26,11 +26,11 @@ use core\orm\query\table;
 use criteria_childcompetency\childcompetency;
 use criteria_childcompetency\items_processor;
 use totara_criteria\criterion;
-use totara_competency\entities\competency as competency_entity;
-use totara_criteria\entities\criterion as criterion_entity;
-use totara_criteria\entities\criteria_item as item_entity;
-use totara_criteria\entities\criteria_item_record as item_record_entity;
-use totara_criteria\entities\criteria_metadata as metadata_entity;
+use totara_competency\entity\competency as competency_entity;
+use totara_criteria\entity\criterion as criterion_entity;
+use totara_criteria\entity\criteria_item as item_entity;
+use totara_criteria\entity\criteria_item_record as item_record_entity;
+use totara_criteria\entity\criteria_metadata as metadata_entity;
 
 /**
  * @group totara_competency

@@ -27,10 +27,10 @@ namespace totara_competency;
 use core\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
-use totara_competency\entities\competency;
-use totara_competency\entities\configuration_change;
-use totara_competency\entities\configuration_history;
-use totara_competency\entities\scale_aggregation;
+use totara_competency\entity\competency;
+use totara_competency\entity\configuration_change;
+use totara_competency\entity\configuration_history;
+use totara_competency\entity\scale_aggregation;
 use context_system;
 
 /**

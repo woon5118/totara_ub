@@ -22,13 +22,13 @@
  * @subpackage plan
  */
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
-use totara_evidence\entities\evidence_item as evidence_item_entity;
+use totara_evidence\entity\evidence_item as evidence_item_entity;
 use totara_evidence\models\evidence_item;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
 use totara_evidence\output\view_item;
-use totara_plan\entities\plan_evidence_relation;
+use totara_plan\entity\plan_evidence_relation;
 
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    //  It must be included from a Moodle page

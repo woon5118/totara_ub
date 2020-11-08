@@ -24,7 +24,7 @@
 namespace mod_perform\relationship\resolvers;
 
 use context;
-use mod_perform\entities\activity\subject_instance_manual_participant;
+use mod_perform\entity\activity\subject_instance_manual_participant;
 use totara_core\relationship\relationship_resolver;
 use totara_core\relationship\relationship_resolver_dto;
 

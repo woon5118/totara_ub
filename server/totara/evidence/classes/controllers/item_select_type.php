@@ -24,7 +24,7 @@
 namespace totara_evidence\controllers;
 
 use moodle_url;
-use totara_evidence\entities;
+use totara_evidence\entity\evidence_type;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
 use totara_evidence\output\header;
 use totara_mvc\view;
@@ -63,7 +63,7 @@ class item_select_type extends item {
                 'label' => $back_label
             ]),
             'content' => new view('totara_evidence/select_type', [
-                'has_types' => entities\evidence_type::repository()->filter_by_standard_location()->filter_by_active()->exists(),
+                'has_types' => evidence_type::repository()->filter_by_standard_location()->filter_by_active()->exists(),
                 'user_id'   => $this->user->id
             ])
         ]))

@@ -25,9 +25,9 @@ namespace mod_perform\userdata;
 
 use context;
 use Exception;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\track;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\userdata\traits\purge_trait;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;

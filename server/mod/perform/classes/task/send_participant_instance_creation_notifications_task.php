@@ -25,7 +25,7 @@ namespace mod_perform\task;
 
 use coding_exception;
 use core\task\adhoc_task;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
 use mod_perform\notification\factory;
 
 /**

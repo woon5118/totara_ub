@@ -24,7 +24,7 @@
 namespace aggregation_first;
 
 
-use totara_competency\entities\scale_value;
+use totara_competency\entity\scale_value;
 use totara_competency\overall_aggregation;
 use totara_competency\pathway;
 

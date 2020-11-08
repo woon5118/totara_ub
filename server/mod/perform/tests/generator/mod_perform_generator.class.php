@@ -24,28 +24,29 @@
 
 use container_perform\perform as perform_container;
 use core\collection;
-use core\entities\cohort;
-use core\entities\user;
+use core\entity\cohort;
+use core\entity\user;
 use core\orm\query\builder;
 use core\session\manager;
 use core_container\module\module;
-use hierarchy_organisation\entities\organisation;
-use hierarchy_position\entities\position;
+use hierarchy_organisation\entity\organisation;
+use hierarchy_position\entity\position;
 use mod_perform\constants;
 use mod_perform\dates\date_offset;
-use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\entities\activity\element as element_entity;
-use mod_perform\entities\activity\element_response;
-use mod_perform\entities\activity\manual_relationship_selection;
-use mod_perform\entities\activity\manual_relationship_selection_progress;
-use mod_perform\entities\activity\manual_relationship_selector;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity\section as section_entity;
-use mod_perform\entities\activity\section_element as section_element_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\entities\activity\track as track_entity;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\activity as activity_entity;
+use mod_perform\entity\activity\element as element_entity;
+use mod_perform\entity\activity\element_response;
+use mod_perform\entity\activity\manual_relationship_selection;
+use mod_perform\entity\activity\manual_relationship_selection_progress;
+use mod_perform\entity\activity\manual_relationship_selector;
+use mod_perform\entity\activity\notification_recipient as notification_recipient_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\participant_section as participant_section_entity;
+use mod_perform\entity\activity\section as section_entity;
+use mod_perform\entity\activity\section_element as section_element_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\track as track_entity;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
@@ -79,9 +80,10 @@ use mod_perform\task\service\manual_participant_progress;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
-use totara_core\entities\relationship;
+use totara_core\entity\relationship;
 use totara_core\relationship\relationship as core_relationship;
 use totara_core\relationship\relationship_provider as core_relationship_provider;
+use totara_job\entity\job_assignment as job_assignment_entity;
 use totara_job\job_assignment;
 
 /**
@@ -445,7 +447,7 @@ class mod_perform_generator extends component_generator_base {
         array $data,
         bool $active = true
     ): notification_recipient {
-        $entity = \mod_perform\entities\activity\notification_recipient::repository()
+        $entity = notification_recipient_entity::repository()
             ->join([relationship::TABLE, 'relationship'], 'core_relationship_id', 'id')
             ->where('notification_id', $notification->id)
             ->where('relationship.idnumber', $data['idnumber'])
@@ -1330,7 +1332,7 @@ class mod_perform_generator extends component_generator_base {
     }
 
     private function get_last_job_assignment_idnumber(): int {
-        $last_record = \totara_job\entities\job_assignment::repository()
+        $last_record = job_assignment_entity::repository()
             ->order_by('id', 'desc')
             ->select('id')
             ->first();

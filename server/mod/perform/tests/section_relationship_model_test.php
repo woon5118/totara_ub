@@ -23,7 +23,7 @@
 
 use core\orm\query\exceptions\record_not_found_exception;
 use mod_perform\constants;
-use mod_perform\entities\activity\section;
+use mod_perform\entity\activity\section;
 use mod_perform\models\activity\section_relationship;
 
 require_once(__DIR__.'/relationship_testcase.php');

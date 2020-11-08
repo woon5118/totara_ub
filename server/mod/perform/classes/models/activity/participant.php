@@ -24,7 +24,7 @@
 namespace mod_perform\models\activity;
 
 use coding_exception;
-use core\entities\user;
+use core\entity\user;
 use user_picture;
 
 /**

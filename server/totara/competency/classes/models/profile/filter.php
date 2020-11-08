@@ -28,7 +28,7 @@ use core\collection;
 use totara_competency\data_providers\assignments;
 use totara_competency\models\assignment;
 use totara_competency\models\assignment as assignment_model;
-use totara_competency\entities\assignment as assignment_entity;
+use totara_competency\entity\assignment as assignment_entity;
 use totara_competency\models\profile\traits\assignment_key;
 use totara_competency\models\user_group_factory;
 

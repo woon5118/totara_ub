@@ -24,17 +24,17 @@
 namespace mod_perform\models\activity\helpers;
 
 use core\orm\query\builder;
-use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\entities\activity\element as element_entity;
-use mod_perform\entities\activity\element_response as element_response_entity;
-use mod_perform\entities\activity\manual_relationship_selection;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity\section as section_entity;
-use mod_perform\entities\activity\section_element as section_element_entity;
-use mod_perform\entities\activity\section_relationship as section_relationship_entity;
-use mod_perform\entities\activity\track as track_entity;
-use mod_perform\entities\activity\track_user_assignment;
-use mod_perform\entities\activity\track_user_assignment_via;
+use mod_perform\entity\activity\activity as activity_entity;
+use mod_perform\entity\activity\element as element_entity;
+use mod_perform\entity\activity\element_response as element_response_entity;
+use mod_perform\entity\activity\manual_relationship_selection;
+use mod_perform\entity\activity\participant_section as participant_section_entity;
+use mod_perform\entity\activity\section as section_entity;
+use mod_perform\entity\activity\section_element as section_element_entity;
+use mod_perform\entity\activity\section_relationship as section_relationship_entity;
+use mod_perform\entity\activity\track as track_entity;
+use mod_perform\entity\activity\track_user_assignment;
+use mod_perform\entity\activity\track_user_assignment_via;
 use mod_perform\event\activity_deleted;
 use mod_perform\models\activity\activity;
 

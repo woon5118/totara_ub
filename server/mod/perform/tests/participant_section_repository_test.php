@@ -1,8 +1,8 @@
 <?php
 
-use core\entities\user;
+use core\entity\user;
 use mod_perform\data_providers\response\participant_section;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\entity\activity\participant_section as participant_section_entity;
 
 /**
  * This file is part of Totara Learn
@@ -25,11 +25,11 @@ use mod_perform\entities\activity\participant_section as participant_section_ent
  * @author Kunle Odusan <kunle.odusan@totaralearning.com>
  */
 
-use mod_perform\entities\activity\participant_section_repository;
+use mod_perform\entity\activity\participant_section_repository;
 use mod_perform\models\activity\participant_source;
 
 /**
- * @covers \mod_perform\entities\activity\participant_section_repository
+ * @covers \mod_perform\entity\activity\participant_section_repository
  * @group perform
 */
 class mod_perform_participant_section_repository_test extends advanced_testcase {

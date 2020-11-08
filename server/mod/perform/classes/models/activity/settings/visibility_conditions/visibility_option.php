@@ -24,7 +24,7 @@
 namespace mod_perform\models\activity\settings\visibility_conditions;
 
 use core\collection;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\participant_instance;
 
 /**

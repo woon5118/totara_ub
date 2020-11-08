@@ -24,7 +24,7 @@
 namespace core\webapi\middleware;
 
 use Closure;
-use core\entities\tenant;
+use core\entity\tenant;
 use core\webapi\middleware;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;

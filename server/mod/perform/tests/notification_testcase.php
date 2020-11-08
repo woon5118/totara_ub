@@ -25,9 +25,9 @@
 use core\orm\collection;
 use mod_perform\constants;
 use mod_perform\dates\date_offset;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\details\subject_instance_notification;
 use mod_perform\models\activity\notification;
@@ -46,7 +46,7 @@ use mod_perform\notification\triggerable;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
-use totara_core\entities\relationship as relationship_entity;
+use totara_core\entity\relationship as relationship_entity;
 use totara_core\relationship\relationship;
 
 abstract class mod_perform_notification_testcase extends advanced_testcase {

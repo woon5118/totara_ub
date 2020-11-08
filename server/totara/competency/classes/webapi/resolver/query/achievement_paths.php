@@ -23,7 +23,7 @@
 
 namespace totara_competency\webapi\resolver\query;
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
@@ -31,8 +31,8 @@ use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use moodle_exception;
-use totara_competency\entities\assignment;
-use totara_competency\entities\pathway as pathway_entity;
+use totara_competency\entity\assignment;
+use totara_competency\entity\pathway as pathway_entity;
 use totara_competency\helpers\capability_helper;
 use totara_competency\models\assignment_user;
 use totara_competency\pathway;

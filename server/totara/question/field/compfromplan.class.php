@@ -24,7 +24,7 @@
  */
 global $CFG;
 
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 use totara_core\advanced_feature;
 
 require_once('reviewrating.class.php');

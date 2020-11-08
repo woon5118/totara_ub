@@ -22,10 +22,10 @@
  * @category test
  */
 
-use core\entities\user as user_entity;
-use totara_competency\entities\assignment as assignment_entity;
-use totara_competency\entities\competency as competency_entity;
-use totara_competency\entities\competency_assignment_user;
+use core\entity\user as user_entity;
+use totara_competency\entity\assignment as assignment_entity;
+use totara_competency\entity\competency as competency_entity;
+use totara_competency\entity\competency_assignment_user;
 use totara_competency\expand_task;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\models\user_group\user;

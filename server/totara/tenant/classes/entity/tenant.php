@@ -39,7 +39,7 @@ use core\orm\entity\entity;
  * @property int $timecreated Time record created
  * @property int $usercreated Time user updated
  *
- * @package totara_tenant\entities
+ * @package totara_tenant\entity
  */
 class tenant extends entity {
 

@@ -23,10 +23,10 @@
 
 namespace pathway_manual\models;
 
-use core\entities\user;
+use core\entity\user;
 use pathway_manual\models\roles\role;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency;
 
 /**
  * Class rateable_competency

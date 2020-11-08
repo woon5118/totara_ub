@@ -21,8 +21,8 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\section;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\section;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\models\activity\activity;
 
 /**

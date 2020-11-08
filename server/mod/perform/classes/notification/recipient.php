@@ -26,7 +26,7 @@ namespace mod_perform\notification;
 use coding_exception;
 use core\orm\query\builder;
 use mod_perform\constants;
-use totara_core\entities\relationship as relationship_entity;
+use totara_core\entity\relationship as relationship_entity;
 use totara_core\relationship\relationship;
 
 /**

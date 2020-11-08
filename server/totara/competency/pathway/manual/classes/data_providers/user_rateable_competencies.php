@@ -23,19 +23,19 @@
 
 namespace pathway_manual\data_providers;
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\collection;
 use core\orm\query\field;
-use pathway_manual\entities\rating;
+use pathway_manual\entity\rating;
 use pathway_manual\models\rateable_competency;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\role_factory;
 use pathway_manual\models\user_competencies;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency;
-use totara_competency\entities\competency_assignment_user;
-use totara_competency\entities\competency_repository;
-use totara_competency\entities\competency_type as competency_type_entity;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency;
+use totara_competency\entity\competency_assignment_user;
+use totara_competency\entity\competency_repository;
+use totara_competency\entity\competency_type as competency_type_entity;
 use totara_competency\models\assignment_reason;
 
 /**

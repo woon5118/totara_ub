@@ -24,17 +24,17 @@
 namespace mod_perform;
 
 use context;
-use core\entities\expandable;
-use core\entities\user;
+use core\entity\expandable;
+use core\entity\user;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
 use mod_perform\dates\constants;
 use mod_perform\dates\resolvers\anniversary_of;
-use mod_perform\entities\activity\track_assignment;
-use mod_perform\entities\activity\track_assignment_repository;
-use mod_perform\entities\activity\track_user_assignment;
-use mod_perform\entities\activity\track_user_assignment_via;
+use mod_perform\entity\activity\track_assignment;
+use mod_perform\entity\activity\track_assignment_repository;
+use mod_perform\entity\activity\track_user_assignment;
+use mod_perform\entity\activity\track_user_assignment_via;
 use mod_perform\event\track_user_assigned_bulk;
 use mod_perform\event\track_user_unassigned;
 use mod_perform\models\activity\activity;

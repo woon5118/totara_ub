@@ -23,7 +23,7 @@
 
 namespace pathway_manual\models;
 
-use core\entities\user;
+use core\entity\user;
 use pathway_manual\data_providers\rateable_competencies;
 use pathway_manual\models\roles\role;
 

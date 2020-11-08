@@ -24,7 +24,7 @@
 namespace totara_competency;
 
 use moodle_recordset;
-use totara_competency\entities\pathway_achievement;
+use totara_competency\entity\pathway_achievement;
 
 class pathway_evaluator_user_source {
 

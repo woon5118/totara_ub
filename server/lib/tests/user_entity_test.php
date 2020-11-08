@@ -22,7 +22,7 @@
  * @category test
  */
 
-use core\entities\user;
+use core\entity\user;
 
 defined('MOODLE_INTERNAL') || die();
 

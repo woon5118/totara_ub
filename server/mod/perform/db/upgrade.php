@@ -28,6 +28,7 @@
  * @return bool
  *
  */
+
 defined('MOODLE_INTERNAL') || die();
 
 function xmldb_perform_upgrade($oldversion) {

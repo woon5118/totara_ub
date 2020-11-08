@@ -40,5 +40,13 @@ $renamedclasses = array(
     'core\progress\null' => 'core\progress\none',
     'core_search\area\base' => 'core_search\base',
     'core_search\area\base_mod' => 'core_search\base_mod',
-    'core_search\area\base_activity' => 'core_search\base_activity'
+    'core_search\area\base_activity' => 'core_search\base_activity',
+    'core\entities\cohort' => 'core\entity\cohort',
+    'core\entities\cohort_filters' => 'core\entity\cohort_filters',
+    'core\entities\cohort_repository' => 'core\entity\cohort_repository',
+    'core\entities\expand' => 'core\entity\expand',
+    'core\entities\expandable' => 'core\entity\expandable',
+    'core\entities\tenant' => 'core\entity\tenant',
+    'core\entities\user' => 'core\entity\user',
+    'core\entities\user_repository' => 'core\entity\user_repository',
 );

@@ -26,7 +26,7 @@ namespace mod_perform\data_providers\activity;
 use core\collection;
 use core\orm\entity\repository;
 use mod_perform\data_providers\provider;
-use mod_perform\entities\activity\activity_type as activity_type_entity;
+use mod_perform\entity\activity\activity_type as activity_type_entity;
 use mod_perform\models\activity\activity_type as activity_type_model;
 
 /**

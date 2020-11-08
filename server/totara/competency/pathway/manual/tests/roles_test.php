@@ -21,7 +21,7 @@
  * @package pathway_manual
  */
 
-use core\entities\user;
+use core\entity\user;
 use pathway_manual\models\roles;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;

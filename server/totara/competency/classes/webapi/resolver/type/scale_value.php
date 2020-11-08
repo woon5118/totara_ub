@@ -27,7 +27,7 @@ use context_system;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use totara_competency\entities\scale_value as scale_value_entity;
+use totara_competency\entity\scale_value as scale_value_entity;
 use totara_competency\formatter;
 
 /**

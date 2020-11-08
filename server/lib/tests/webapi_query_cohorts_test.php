@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use core\collection;
-use core\entities\cohort as cohort_entity;
+use core\entity\cohort as cohort_entity;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**

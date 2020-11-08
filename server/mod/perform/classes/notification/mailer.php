@@ -24,7 +24,7 @@
 namespace mod_perform\notification;
 
 use coding_exception;
-use core\entities\user as user_entity;
+use core\entity\user as user_entity;
 use core\message\message;
 use core_user;
 use dml_exception;

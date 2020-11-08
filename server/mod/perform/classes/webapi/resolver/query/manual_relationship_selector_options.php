@@ -29,7 +29,7 @@ use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
-use totara_core\entities\relationship;
+use totara_core\entity\relationship;
 use totara_core\relationship\relationship_provider;
 
 /**

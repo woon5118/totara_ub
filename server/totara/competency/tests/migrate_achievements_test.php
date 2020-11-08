@@ -21,7 +21,7 @@
  * @package totara_competency
  */
 
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 use totara_competency\migration_helper;
 use totara_core\advanced_feature;
 

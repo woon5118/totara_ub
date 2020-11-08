@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
@@ -23,10 +23,11 @@
 
 namespace totara_competency\models\activity_log;
 
-use core\orm\entity\entity;
-use totara_competency\entities\scale_value;
+use coding_exception;
+use core\orm\entity\entity as core_entity;
+use totara_competency\entity\competency_achievement as competency_achievement_entity;
+use totara_competency\entity\scale_value;
 use totara_competency\models\activity_log;
-use totara_competency\entities;
 
 class competency_achievement extends activity_log {
 
@@ -38,12 +39,12 @@ class competency_achievement extends activity_log {
     /**
      * Load an instance of this model using data from the entity passed in.
      *
-     * @param entity $entity
+     * @param core_entity $entity
      * @return activity_log
      */
-    public static function load_by_entity(entity $entity): activity_log {
-        if (!($entity instanceof entities\competency_achievement)) {
-            throw new \coding_exception('Invalid entity', 'Entity must be instance of competency_achievement');
+    public static function load_by_entity(core_entity $entity): activity_log {
+        if (!($entity instanceof competency_achievement_entity)) {
+            throw new coding_exception('Invalid entity', 'Entity must be instance of competency_achievement');
         }
 
         $model = new competency_achievement();
@@ -100,5 +101,4 @@ class competency_achievement extends activity_log {
     public function has_scale_value(): bool {
         return !empty($this->scale_value);
     }
-
 }

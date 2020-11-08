@@ -23,7 +23,7 @@
  */
 
 use totara_evidence\customfield_area\evidence;
-use totara_evidence\entities\evidence_item;
+use totara_evidence\entity\evidence_item;
 use totara_completionimport\event\bulk_course_completionimport;
 
 defined('MOODLE_INTERNAL') || die;

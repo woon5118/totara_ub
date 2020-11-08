@@ -25,9 +25,9 @@ namespace mod_perform\task\service;
 
 use core\collection;
 use core\orm\query\builder;
-use mod_perform\entities\activity\subject_static_instance;
+use mod_perform\entity\activity\subject_static_instance;
 use stdClass;
-use totara_job\entities\job_assignment as job_assignment_entity;
+use totara_job\entity\job_assignment as job_assignment_entity;
 
 /**
  * Class subject_static_instance_creation

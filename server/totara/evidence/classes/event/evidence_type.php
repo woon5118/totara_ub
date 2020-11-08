@@ -26,7 +26,7 @@ namespace totara_evidence\event;
 use coding_exception;
 use context_system;
 use core\event\base;
-use totara_evidence\entities;
+use totara_evidence\entity;
 
 abstract class evidence_type extends base {
 
@@ -35,17 +35,17 @@ abstract class evidence_type extends base {
      */
     protected function init(): void {
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = entities\evidence_type::TABLE;
+        $this->data['objecttable'] = entity\evidence_type::TABLE;
     }
 
     /**
      * Create instance of event for an evidence type.
      *
-     * @param entities\evidence_type $evidence_type
+     * @param entity\evidence_type $evidence_type
      * @return evidence_type|base
      * @throws coding_exception
      */
-    public static function create_from_type(entities\evidence_type $evidence_type): evidence_type {
+    public static function create_from_type(entity\evidence_type $evidence_type): evidence_type {
         $data = [
             'objectid' => $evidence_type->id,
             'context' => context_system::instance(),

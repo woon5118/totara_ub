@@ -25,7 +25,7 @@ namespace mod_perform\models\activity;
 
 use coding_exception;
 use core\orm\entity\model;
-use mod_perform\entities\activity\activity_setting as activity_setting_entity;
+use mod_perform\entity\activity\activity_setting as activity_setting_entity;
 use mod_perform\models\activity\settings\visibility_conditions\all_responses;
 use mod_perform\models\activity\settings\visibility_conditions\visibility_manager;
 use moodle_exception;

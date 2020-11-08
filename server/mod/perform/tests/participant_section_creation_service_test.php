@@ -23,11 +23,11 @@
 
 use core\collection;
 use mod_perform\constants;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\participant_section;
-use mod_perform\entities\activity\section;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\participant_section;
+use mod_perform\entity\activity\section;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\participant_source;

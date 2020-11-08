@@ -24,8 +24,7 @@
 namespace mod_perform\controllers\reporting\performance;
 
 use context;
-use context_coursecat;
-use core\entities\user;
+use core\entity\user;
 use mod_perform\controllers\perform_controller;
 use mod_perform\util;
 use mod_perform\views\embedded_report_view;

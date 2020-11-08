@@ -23,14 +23,14 @@
 
 namespace totara_competency\webapi\resolver\mutation;
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
-use totara_competency\entities\assignment;
+use totara_competency\entity\assignment;
 use totara_competency\expand_task;
 use totara_competency\helpers\capability_helper;
 use totara_competency\models\assignment as assignment_model;

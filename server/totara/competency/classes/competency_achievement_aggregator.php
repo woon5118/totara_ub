@@ -25,9 +25,9 @@ namespace totara_competency;
 
 use core\orm\query\builder;
 use stdClass;
-use totara_competency\entities\achievement_via;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\achievement_via;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_achievement;
 use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_core\advanced_feature;
 

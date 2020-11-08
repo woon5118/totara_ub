@@ -22,14 +22,14 @@
  */
 
 use core\event\course_restored;
-use totara_competency\entities\course as course_entity;
+use totara_competency\entity\course as course_entity;
 use totara_completionimport\event\bulk_course_completionimport;
 use criteria_coursecompletion\observer\course as course_observer;
 use totara_core\event\course_completion_reset;
-use totara_criteria\entities\criteria_item as item_entity;
-use totara_criteria\entities\criteria_item_record as item_record_entity;
-use totara_criteria\entities\criterion as criterion_entity;
-use totara_criteria\entities\criterion_item;
+use totara_criteria\entity\criteria_item as item_entity;
+use totara_criteria\entity\criteria_item_record as item_record_entity;
+use totara_criteria\entity\criterion as criterion_entity;
+use totara_criteria\entity\criterion_item;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 

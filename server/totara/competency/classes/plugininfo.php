@@ -24,9 +24,9 @@
 namespace totara_competency;
 
 use core\plugininfo\totara;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_assignment_user;
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_assignment_user;
+use totara_competency\entity\competency_achievement;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();

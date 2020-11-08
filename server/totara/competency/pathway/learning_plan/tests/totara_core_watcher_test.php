@@ -22,7 +22,7 @@
  */
 
 use core\hook\admin_setting_changed;
-use totara_competency\entities\pathway as pathway_entity;
+use totara_competency\entity\pathway as pathway_entity;
 use totara_core\advanced_feature;
 
 global $CFG;

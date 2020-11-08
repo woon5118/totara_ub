@@ -26,7 +26,7 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\webapi\resolver\mutation\create_activity;
 use totara_core\advanced_feature;
-use totara_core\entities\relationship as relationship_entity;
+use totara_core\entity\relationship as relationship_entity;
 use totara_core\relationship\relationship;
 use totara_core\relationship\relationship_provider;
 use totara_webapi\phpunit\webapi_phpunit_helper;

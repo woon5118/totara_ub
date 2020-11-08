@@ -30,9 +30,9 @@ use criteria_childcompetency\items_processor;
 use hierarchy_competency\event\competency_created;
 use hierarchy_competency\event\competency_deleted;
 use hierarchy_competency\event\competency_moved;
-use totara_competency\entities\competency as competency_entity;
-use totara_criteria\entities\criteria_item as item_entity;
-use totara_criteria\entities\criteria_metadata as metadata_entity;
+use totara_competency\entity\competency as competency_entity;
+use totara_criteria\entity\criteria_item as item_entity;
+use totara_criteria\entity\criteria_metadata as metadata_entity;
 use totara_criteria\criterion;
 
 class competency {

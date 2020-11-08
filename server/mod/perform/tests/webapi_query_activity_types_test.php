@@ -23,7 +23,7 @@
  */
 
 use core\webapi\execution_context;
-use mod_perform\entities\activity\activity_type as activity_type_entity;
+use mod_perform\entity\activity\activity_type as activity_type_entity;
 use mod_perform\models\activity\activity_type as activity_type_model;
 use mod_perform\webapi\resolver\query\activity_types;
 use totara_core\advanced_feature;

@@ -25,11 +25,11 @@ namespace pathway_manual\models;
 
 use core\collection;
 use core\orm\query\field;
-use pathway_manual\entities\role as role_entity;
+use pathway_manual\entity\role as role_entity;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\role_factory;
-use totara_competency\entities\competency;
-use totara_competency\entities\pathway;
+use totara_competency\entity\competency;
+use totara_competency\entity\pathway;
 
 class roles {
 

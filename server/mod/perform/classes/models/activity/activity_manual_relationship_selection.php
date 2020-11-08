@@ -25,7 +25,7 @@
 namespace mod_perform\models\activity;
 
 use core\orm\entity\model;
-use mod_perform\entities\activity\manual_relationship_selection;
+use mod_perform\entity\activity\manual_relationship_selection;
 use totara_core\relationship\relationship;
 
 /**

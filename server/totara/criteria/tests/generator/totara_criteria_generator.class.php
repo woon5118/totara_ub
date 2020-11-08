@@ -28,12 +28,12 @@ use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
 use criteria_othercompetency\othercompetency;
-use totara_competency\entities\competency;
-use totara_competency\entities\course;
+use totara_competency\entity\competency;
+use totara_competency\entity\course;
 use totara_competency\plugin_types;
 use totara_criteria\criterion;
 use totara_criteria\criterion_factory;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 
 /**
  * Coursecompletion criterion generator.

@@ -28,7 +28,7 @@ use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\formatter;
 
 /**
- * @property \totara_competency\entities\scale $object
+ * @property \totara_competency\entity\scale $object
  */
 class scale extends formatter {
 

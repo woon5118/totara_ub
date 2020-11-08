@@ -26,7 +26,7 @@ namespace totara_competency\models\user_group;
 use context_system;
 use core\orm\collection;
 use core\orm\entity\entity;
-use hierarchy_organisation\entities\organisation as organisation_entity;
+use hierarchy_organisation\entity\organisation as organisation_entity;
 use totara_competency\models\user_group;
 use totara_competency\user_groups;
 

@@ -26,7 +26,7 @@ namespace mod_perform\task\service;
 use coding_exception;
 use core\collection;
 use core\orm\query\builder;
-use mod_perform\entities\activity\participant_section;
+use mod_perform\entity\activity\participant_section;
 use mod_perform\state\participant_section\availability_not_applicable;
 use mod_perform\state\participant_section\open;
 use mod_perform\state\participant_section\progress_not_applicable;

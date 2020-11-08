@@ -28,8 +28,8 @@ use context_system;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\role_factory;
 use totara_competency\achievement_configuration;
-use totara_competency\entities\competency;
-use totara_competency\entities\configuration_change;
+use totara_competency\entity\competency;
+use totara_competency\entity\configuration_change;
 use totara_core\advanced_feature;
 
 class external extends \external_api {

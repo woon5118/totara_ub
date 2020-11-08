@@ -21,7 +21,7 @@
  * @package totara_evidence
  */
 
-use core\entities\user;
+use core\entity\user;
 use totara_evidence\models;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
 use totara_reportbuilder\rb;

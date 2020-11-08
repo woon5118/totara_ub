@@ -24,7 +24,7 @@
 
 namespace totara_criteria\evaluators;
 
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 use totara_core\advanced_feature;
 use totara_criteria\criterion;
 

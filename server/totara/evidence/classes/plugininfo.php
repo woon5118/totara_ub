@@ -25,8 +25,8 @@ namespace totara_evidence;
 
 use core\plugininfo\totara;
 use totara_core\advanced_feature;
-use totara_evidence\entities\evidence_item;
-use totara_evidence\entities\evidence_type;
+use totara_evidence\entity\evidence_item;
+use totara_evidence\entity\evidence_type;
 
 defined('MOODLE_INTERNAL') || die();
 

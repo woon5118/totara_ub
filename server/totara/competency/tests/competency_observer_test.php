@@ -26,12 +26,12 @@ use criteria_childcompetency\childcompetency;
 use criteria_linkedcourses\linkedcourses;
 use hierarchy_competency\event\competency_created;
 use hierarchy_competency\event\competency_updated;
-use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
-use totara_competency\entities\pathway as pathway_entity;
+use pathway_criteria_group\entity\criteria_group_criterion as criteria_group_criterion_entity;
+use totara_competency\entity\pathway as pathway_entity;
 use totara_competency\pathway;
 use totara_core\advanced_feature;
 use totara_criteria\criterion;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 
 /**
  * Tests covering the competency observer making sure the events do the right thing

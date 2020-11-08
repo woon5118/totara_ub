@@ -27,12 +27,12 @@ use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
-use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
-use mod_perform\entities\activity\section as section_entity;
-use mod_perform\entities\activity\section_relationship as section_relationship_entity;
+use mod_perform\entity\activity\notification_recipient as notification_recipient_entity;
+use mod_perform\entity\activity\section as section_entity;
+use mod_perform\entity\activity\section_relationship as section_relationship_entity;
 use mod_perform\notification\factory;
 use mod_perform\notification\recipient;
-use totara_core\entities\relationship as relationship_entity;
+use totara_core\entity\relationship as relationship_entity;
 use totara_core\relationship\relationship;
 
 /**

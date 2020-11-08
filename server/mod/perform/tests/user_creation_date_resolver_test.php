@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-use core\entities\user;
+use core\entity\user;
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;

@@ -25,8 +25,8 @@ namespace mod_perform\models\activity;
 
 use coding_exception;
 use core\orm\entity\model;
-use mod_perform\entities\activity\element as element_entity;
-use mod_perform\entities\activity\section_element as section_element_entity;
+use mod_perform\entity\activity\element as element_entity;
+use mod_perform\entity\activity\section_element as section_element_entity;
 
 /**
  * Class element

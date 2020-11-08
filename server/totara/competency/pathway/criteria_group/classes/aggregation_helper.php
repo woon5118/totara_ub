@@ -25,9 +25,9 @@
 namespace pathway_criteria_group;
 
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\pathway as pathway_entity;
-use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
-use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
+use totara_competency\entity\pathway as pathway_entity;
+use pathway_criteria_group\entity\criteria_group as criteria_group_entity;
+use pathway_criteria_group\entity\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\pathway;
 
 class aggregation_helper {

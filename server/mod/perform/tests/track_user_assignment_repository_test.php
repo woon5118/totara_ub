@@ -22,9 +22,9 @@
  */
 
 use mod_perform\dates\date_offset;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track as track_entity;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\track as track_entity;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\track;
 

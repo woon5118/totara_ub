@@ -26,8 +26,8 @@ namespace hierarchy_organisation\data_providers;
 use coding_exception;
 use core\orm\pagination\cursor_paginator;
 use core\pagination\cursor;
-use hierarchy_organisation\entities\organisation;
-use hierarchy_organisation\entities\organisation_filters;
+use hierarchy_organisation\entity\organisation;
+use hierarchy_organisation\entity\organisation_filters;
 
 defined('MOODLE_INTERNAL') || die();
 

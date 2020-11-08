@@ -25,7 +25,7 @@ namespace degeneration;
 
 use degeneration\items\hierarchy_item;
 use degeneration\items\item;
-use totara_hierarchy\entities\hierarchy_framework;
+use totara_hierarchy\entity\hierarchy_framework;
 
 class hierarchy {
 

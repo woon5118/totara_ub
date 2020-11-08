@@ -28,7 +28,7 @@ use context_coursecat;
 use context_user;
 use core\output\notification;
 use mod_perform\controllers\perform_controller;
-use mod_perform\entities\activity\element_identifier as element_identifier_entity;
+use mod_perform\entity\activity\element_identifier as element_identifier_entity;
 use mod_perform\util;
 use mod_perform\views\embedded_report_view;
 use mod_perform\views\override_nav_breadcrumbs;

@@ -24,12 +24,12 @@
 
 use core\orm\query\exceptions\record_not_found_exception;
 use mod_perform\constants;
-use mod_perform\entities\activity\manual_relationship_selection;
-use mod_perform\entities\activity\manual_relationship_selection_progress as manual_relationship_selection_progress_entity;
-use mod_perform\entities\activity\manual_relationship_selector as manual_relationship_selector_entity;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
+use mod_perform\entity\activity\manual_relationship_selection;
+use mod_perform\entity\activity\manual_relationship_selection_progress as manual_relationship_selection_progress_entity;
+use mod_perform\entity\activity\manual_relationship_selector as manual_relationship_selector_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 use mod_perform\models\activity\section_element as section_element_model;

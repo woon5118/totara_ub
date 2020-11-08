@@ -25,9 +25,9 @@ use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use pathway_criteria_group\criteria_group;
-use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
-use totara_competency\entities\competency;
-use totara_competency\entities\scale;
+use pathway_criteria_group\entity\criteria_group_criterion as criteria_group_criterion_entity;
+use totara_competency\entity\competency;
+use totara_competency\entity\scale;
 use totara_criteria\criterion;
 
 /**

@@ -22,7 +22,7 @@
  */
 
 use core\collection;
-use totara_core\entities\relationship as relationship_entity;
+use totara_core\entity\relationship as relationship_entity;
 use totara_core\relationship\relationship;
 use totara_core\relationship\relationship_provider;
 

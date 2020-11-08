@@ -22,10 +22,10 @@
  */
 
 use core\collection;
-use core\entities\user;
+use core\entity\user;
 use core\orm\entity\entity;
-use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\activity as activity_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\response\participant_section;

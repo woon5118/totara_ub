@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use core\entities\tenant;
+use core\entity\tenant;
 use totara_engage\access\access;
 use totara_engage\access\access_manager;
 use totara_playlist\playlist;

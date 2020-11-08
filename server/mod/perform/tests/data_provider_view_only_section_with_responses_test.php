@@ -23,17 +23,17 @@
  */
 
 use core\collection;
-use core\entities\user;
+use core\entity\user;
 use mod_perform\constants;
 use mod_perform\data_providers\response\view_only_section_with_responses;
-use mod_perform\entities\activity\participant_section;
-use mod_perform\entities\activity\section;
+use mod_perform\entity\activity\participant_section;
+use mod_perform\entity\activity\section;
 use mod_perform\models\activity\section as section_model;
-use mod_perform\entities\activity\section_element;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\section_element;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\participant_instance;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\response\responder_group;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\view_only_element_response;

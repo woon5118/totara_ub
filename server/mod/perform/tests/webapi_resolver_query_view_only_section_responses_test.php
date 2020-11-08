@@ -21,11 +21,11 @@
  * @package mod_perform
  */
 
-use core\entities\user;
-use mod_perform\entities\activity\section as section_entity;
+use core\entity\user;
+use mod_perform\entity\activity\section as section_entity;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\activity;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\entity\activity\participant_section as participant_section_entity;
 use mod_perform\models\response\view_only_section;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;

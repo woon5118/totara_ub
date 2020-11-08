@@ -45,7 +45,7 @@ class user implements \core\webapi\type_resolver {
     public static function resolve(string $field, $user, array $args, execution_context $ec) {
         global $CFG, $USER;
 
-        if ($user instanceof \core\entities\user) {
+        if ($user instanceof \core\entity\user) {
             $user = $user->get_record();
         }
 

@@ -23,9 +23,9 @@
  */
 
 use core\collection;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\scale as scale_entity;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\scale as scale_entity;
+use totara_competency\entity\scale_value;
 use totara_competency\models\scale;
 use totara_core\advanced_feature;
 

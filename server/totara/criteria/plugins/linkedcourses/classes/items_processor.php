@@ -27,12 +27,12 @@ namespace criteria_linkedcourses;
 use core\orm\query\builder;
 use totara_competency\achievement_configuration;
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\competency as competency_entitiy;
-use totara_competency\entities\configuration_change;
+use totara_competency\entity\competency as competency_entitiy;
+use totara_competency\entity\configuration_change;
 use totara_core\advanced_feature;
-use totara_criteria\entities\criteria_metadata;
-use totara_criteria\entities\criterion;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criteria_metadata;
+use totara_criteria\entity\criterion;
+use totara_criteria\entity\criterion as criterion_entity;
 use totara_competency\linked_courses;
 use totara_criteria\hook\criteria_validity_changed;
 

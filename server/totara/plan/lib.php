@@ -26,10 +26,10 @@
  * @subpackage plan
  */
 
-use core\entities\user;
-use totara_competency\entities\competency_achievement;
+use core\entity\user;
+use totara_competency\entity\competency_achievement;
 use totara_core\advanced_feature;
-use totara_evidence\entities\evidence_item;
+use totara_evidence\entity\evidence_item;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
 
 require_once($CFG->dirroot . '/totara/plan/development_plan.class.php');

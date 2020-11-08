@@ -29,7 +29,7 @@ use invalid_parameter_exception;
 use core\webapi\middleware;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\helpers\access_checks;

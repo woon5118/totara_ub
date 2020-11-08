@@ -24,9 +24,9 @@
 use pathway_criteria_group\criteria_group;
 use pathway_criteria_group\criteria_group_evaluator;
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\competency;
-use totara_competency\entities\pathway_achievement;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\competency;
+use totara_competency\entity\pathway_achievement;
+use totara_competency\entity\scale_value;
 use totara_competency\pathway_evaluator_user_source;
 use totara_criteria\criterion;
 use totara_criteria\evaluators\item_evaluator;

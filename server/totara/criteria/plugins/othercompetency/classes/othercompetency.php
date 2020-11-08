@@ -24,7 +24,7 @@
 namespace criteria_othercompetency;
 
 use totara_competency\achievement_configuration;
-use totara_competency\entities\competency as competency_entity;
+use totara_competency\entity\competency as competency_entity;
 use totara_criteria\criterion;
 use totara_criteria\evaluators\competency_item_evaluator;
 use totara_criteria\validators\competency_item_validator;

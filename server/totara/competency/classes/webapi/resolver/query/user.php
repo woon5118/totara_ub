@@ -24,6 +24,7 @@
 namespace totara_competency\webapi\resolver\query;
 
 use context_user;
+use core\entity\user as user_entity;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -51,7 +52,7 @@ class user implements query_resolver, has_middleware {
             capability_helper::require_can_view_profile($user_id, $context);
         }
 
-        return new \core\entities\user($user_id);
+        return new user_entity($user_id);
     }
 
     /**

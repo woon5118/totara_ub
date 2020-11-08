@@ -25,17 +25,17 @@
 namespace mod_perform\webapi\resolver\query;
 
 use core\collection;
-use core\entities\user;
+use core\entity\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\subject_instance;
 use mod_perform\util;
 use mod_perform\webapi\middleware\require_activity;
 use moodle_exception;
 use totara_core\relationship\relationship;
-use mod_perform\entities\activity\activity;
+use mod_perform\entity\activity\activity;
 
 /**
  * Query to return relationships involved in a subject instance.

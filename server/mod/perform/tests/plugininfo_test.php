@@ -23,7 +23,7 @@
 
 use mod_perform\constants;
 use mod_perform\plugininfo;
-use mod_perform\entities\activity\subject_instance;
+use mod_perform\entity\activity\subject_instance;
 use totara_core\advanced_feature;
 
 /**

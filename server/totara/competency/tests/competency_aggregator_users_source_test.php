@@ -24,11 +24,11 @@
 use core\orm\query\builder;
 use totara_competency\aggregation_users_table;
 use totara_competency\competency_aggregator_user_source;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency as competency_entity;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\scale as scale_entity;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency as competency_entity;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\scale as scale_entity;
+use totara_competency\entity\scale_value;
 use totara_competency\expand_task;
 use totara_competency\linked_courses;
 

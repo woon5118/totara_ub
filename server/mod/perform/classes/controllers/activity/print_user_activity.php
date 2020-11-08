@@ -24,8 +24,7 @@
 namespace mod_perform\controllers\activity;
 
 use context;
-use core\entities\user;
-use invalid_parameter_exception;
+use core\entity\user;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\response\participant_section as participant_section_model;

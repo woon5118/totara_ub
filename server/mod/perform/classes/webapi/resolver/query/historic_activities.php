@@ -24,7 +24,7 @@
 namespace mod_perform\webapi\resolver\query;
 
 use core\collection;
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
 use core\orm\query\sql\query as sql_query;
 use core\orm\query\table;

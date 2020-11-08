@@ -22,7 +22,7 @@
  */
 
 use mod_perform\controllers\activity\print_user_activity;
-use mod_perform\entities\activity\participant_instance;
+use mod_perform\entity\activity\participant_instance;
 
 /**
  * @group perform

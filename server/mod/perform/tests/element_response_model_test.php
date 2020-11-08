@@ -24,10 +24,10 @@
 
 use core\collection;
 
-use mod_perform\entities\activity\element_response as element_response_entity;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\section as section_entity;
-use mod_perform\entities\activity\section_element as section_element_entity;
+use mod_perform\entity\activity\element_response as element_response_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\section as section_entity;
+use mod_perform\entity\activity\section_element as section_element_entity;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\response\section_element_response;

@@ -22,9 +22,9 @@
  */
 
 use totara_competency\models\activity_log;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\scale_value;
-use totara_competency\entities\assignment;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\scale_value;
+use totara_competency\entity\assignment;
 
 /**
  * @group totara_competency

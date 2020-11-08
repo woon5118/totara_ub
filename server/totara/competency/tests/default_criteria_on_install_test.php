@@ -29,7 +29,7 @@ use criteria_linkedcourses\linkedcourses;
 use pathway_criteria_group\criteria_group;
 use pathway_learning_plan\learning_plan;
 use totara_competency\achievement_configuration;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use totara_criteria\criterion;
 use totara_competency\task\default_criteria_on_install;
 use totara_core\advanced_feature;

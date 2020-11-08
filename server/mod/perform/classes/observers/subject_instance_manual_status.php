@@ -24,9 +24,9 @@
 namespace mod_perform\observers;
 
 use core\collection;
-use mod_perform\entities\activity\manual_relationship_selection_progress;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\subject_instance_manual_participant;
+use mod_perform\entity\activity\manual_relationship_selection_progress;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\subject_instance_manual_participant;
 use mod_perform\event\subject_instance_activated;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_dto;

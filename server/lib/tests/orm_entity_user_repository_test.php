@@ -22,7 +22,7 @@
  * @category test
  */
 
-use core\entities\user;
+use core\entity\user;
 use core_user\profile\display_setting;
 
 /**

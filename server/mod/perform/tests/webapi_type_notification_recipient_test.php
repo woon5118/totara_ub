@@ -24,7 +24,7 @@
 
 use core\format;
 use mod_perform\constants;
-use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
+use mod_perform\entity\activity\notification_recipient as notification_recipient_entity;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_recipient as recipient_model;
 use mod_perform\models\activity\section_relationship;

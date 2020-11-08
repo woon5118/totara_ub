@@ -22,15 +22,15 @@
 */
 
 use container_perform\perform;
-use mod_perform\entities\activity\activity;
-use mod_perform\entities\activity\element;
-use mod_perform\entities\activity\element_response;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\participant_section;
-use mod_perform\entities\activity\section;
-use mod_perform\entities\activity\section_element;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track;
+use mod_perform\entity\activity\activity;
+use mod_perform\entity\activity\element;
+use mod_perform\entity\activity\element_response;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\participant_section;
+use mod_perform\entity\activity\section;
+use mod_perform\entity\activity\section_element;
+use mod_perform\entity\activity\subject_instance;
+use mod_perform\entity\activity\track;
 use mod_perform\userdata\export_user_responses;
 use mod_perform\userdata\export_other_visible_responses;
 use mod_perform\userdata\export_other_hidden_responses;
@@ -350,7 +350,7 @@ class mod_perform_userdata_export_responses_testcase  extends advanced_testcase 
         /** @var section $activity_section */
         foreach ($activity_sections as $activity_section) {
             $section_relationships = $activity_section->section_relationships;
-            /** @var \mod_perform\entities\activity\section_relationship $section_relationship */
+            /** @var \mod_perform\entity\activity\section_relationship $section_relationship */
             foreach ($section_relationships as $section_relationship) {
                 $section_relationship->can_view = 0;
                 $section_relationship->save();

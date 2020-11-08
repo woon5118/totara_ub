@@ -21,8 +21,8 @@
  * @package totara_competency
  */
 
-use totara_competency\entities\scale;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\scale;
+use totara_competency\entity\scale_value;
 use totara_competency\pathway;
 use totara_competency\pathway_factory;
 

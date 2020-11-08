@@ -23,11 +23,11 @@
 namespace degeneration\items\container_perform;
 
 use mod_perform\constants;
-use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entity\activity\track as track_entity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\settings\visibility_conditions\all_responses;
 use mod_perform\state\activity\active;
-use totara_core\entities\relationship;
+use totara_core\entity\relationship;
 
 class preset_configurations {
 

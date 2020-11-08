@@ -23,7 +23,7 @@
 
 namespace degeneration\items;
 
-use core\entities\user as user_entity;
+use core\entity\user as user_entity;
 use core\orm\entity\entity;
 use core\orm\query\builder;
 use degeneration\App;

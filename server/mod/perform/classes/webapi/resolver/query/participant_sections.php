@@ -24,7 +24,7 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use core\entities\user;
+use core\entity\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
@@ -33,7 +33,7 @@ use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\response\participant_section;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\entity\activity\participant_section as participant_section_entity;
 use moodle_exception;
 
 class participant_sections implements query_resolver, has_middleware {

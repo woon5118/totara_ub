@@ -22,12 +22,12 @@
  */
 
 use core\collection;
-use core\entities\user;
+use core\entity\user;
 use mod_perform\constants;
-use mod_perform\entities\activity\manual_relationship_selection_progress;
-use mod_perform\entities\activity\manual_relationship_selector;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\subject_instance_manual_participant;
+use mod_perform\entity\activity\manual_relationship_selection_progress;
+use mod_perform\entity\activity\manual_relationship_selector;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\subject_instance_manual_participant;
 use mod_perform\event\subject_instance_manual_participants_selected;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\subject_instance;

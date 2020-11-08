@@ -29,8 +29,8 @@ use core\orm\query\builder;
 use mod_perform\dates\constants;
 use mod_perform\dates\resolvers\anniversary_of;
 use mod_perform\dates\resolvers\date_resolver;
-use mod_perform\entities\activity\track;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\track;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\models\activity\track as track_model;
 
 /**

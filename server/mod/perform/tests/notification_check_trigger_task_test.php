@@ -24,13 +24,13 @@
 
 use core\collection;
 use mod_perform\constants;
-use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\entities\activity\notification as notification_entity;
-use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity\section as section_entity;
-use mod_perform\entities\activity\section_element as section_element_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\activity as activity_entity;
+use mod_perform\entity\activity\notification as notification_entity;
+use mod_perform\entity\activity\notification_recipient as notification_recipient_entity;
+use mod_perform\entity\activity\participant_section as participant_section_entity;
+use mod_perform\entity\activity\section as section_entity;
+use mod_perform\entity\activity\section_element as section_element_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\section_element as section_element_model;

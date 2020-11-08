@@ -24,7 +24,7 @@
 namespace pathway_criteria_group;
 
 use moodle_recordset;
-use totara_competency\entities\pathway_achievement;
+use totara_competency\entity\pathway_achievement;
 use totara_competency\pathway;
 use totara_competency\pathway_evaluator_user_source;
 use totara_core\advanced_feature;

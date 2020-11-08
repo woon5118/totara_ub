@@ -21,19 +21,19 @@
  * @package totara_evidence
  */
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\collection;
 use core\orm\query\builder;
 use totara_evidence\customfield_area\evidence as customfields;
-use totara_evidence\entities\evidence_field_data;
-use totara_evidence\entities\evidence_item;
-use totara_evidence\entities\evidence_type;
-use totara_evidence\entities\evidence_type_field;
+use totara_evidence\entity\evidence_field_data;
+use totara_evidence\entity\evidence_item;
+use totara_evidence\entity\evidence_type;
+use totara_evidence\entity\evidence_type_field;
 use totara_evidence\event\evidence_item_created;
 use totara_evidence\event\evidence_type_created;
 use totara_evidence\models;
 use totara_job\job_assignment;
-use totara_plan\entities\plan_evidence_relation;
+use totara_plan\entity\plan_evidence_relation;
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/phpunit/classes/util.php');

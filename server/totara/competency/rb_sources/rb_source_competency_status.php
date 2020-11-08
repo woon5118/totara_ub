@@ -23,9 +23,9 @@
  * @package totara_competency
  */
 
-use totara_competency\entities\assignment;
+use totara_competency\entity\assignment;
 use totara_competency\user_groups;
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
 

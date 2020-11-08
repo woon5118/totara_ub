@@ -22,10 +22,10 @@
  */
 
 use totara_criteria\course_item_helper;
-use totara_criteria\entities\criteria_item;
-use totara_criteria\entities\criteria_item_record;
-use totara_criteria\entities\criterion as criterion_entity;
-use totara_competency\entities\course as course_entity;
+use totara_criteria\entity\criteria_item;
+use totara_criteria\entity\criteria_item_record;
+use totara_criteria\entity\criterion as criterion_entity;
+use totara_competency\entity\course as course_entity;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 

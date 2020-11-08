@@ -26,8 +26,8 @@ namespace pathway_learning_plan;
 
 use context_system;
 use totara_competency\achievement_configuration;
-use totara_competency\entities\competency;
-use totara_competency\entities\configuration_change;
+use totara_competency\entity\competency;
+use totara_competency\entity\configuration_change;
 use totara_core\advanced_feature;
 
 class external extends \external_api {

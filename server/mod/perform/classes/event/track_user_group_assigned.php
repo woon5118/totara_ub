@@ -24,7 +24,7 @@
 namespace mod_perform\event;
 
 use core\event\base;
-use mod_perform\entities\activity\track_assignment as track_assignment_entity;
+use mod_perform\entity\activity\track_assignment as track_assignment_entity;
 use mod_perform\models\activity\track_assignment;
 use mod_perform\user_groups\grouping;
 

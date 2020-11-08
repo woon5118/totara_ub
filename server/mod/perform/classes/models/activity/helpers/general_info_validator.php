@@ -27,7 +27,7 @@ use core_text;
 
 use core\collection;
 
-use mod_perform\entities\activity\activity_type as activity_type_entity;
+use mod_perform\entity\activity\activity_type as activity_type_entity;
 
 use mod_perform\models\activity\activity;
 

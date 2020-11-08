@@ -23,7 +23,7 @@
 
 namespace totara_competency\models\profile\traits;
 
-use totara_competency\entities\assignment;
+use totara_competency\entity\assignment;
 
 trait assignment_key {
 

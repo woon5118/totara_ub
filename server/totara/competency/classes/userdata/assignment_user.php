@@ -23,8 +23,12 @@
 
 namespace totara_competency\userdata;
 
+use context;
 use core\orm\query\builder;
-use totara_competency\entities;
+use totara_competency\entity;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_assignment_user;
+use totara_competency\entity\competency_assignment_user_log;
 use totara_competency\user_groups;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
@@ -74,26 +78,26 @@ class assignment_user extends item {
      *       it is also possible that we do not know the original user context id.
      *
      * @param target_user $user
-     * @param \context $context restriction for purging e.g., system context for everything, course context for purging one course
+     * @param context $context restriction for purging e.g., system context for everything, course context for purging one course
      * @return int result self::RESULT_STATUS_SUCCESS, self::RESULT_STATUS_ERROR or status::RESULT_STATUS_SKIPPED
      */
-    protected static function purge(target_user $user, \context $context) {
+    protected static function purge(target_user $user, context $context) {
         // Delete in a transaction to avoid potential collision
         // with expand_task running at the exact same time and
         // restoring deleted records for individual user assignment
         builder::get_db()->transaction(function () use ($user) {
             // Delete logs for this user
-            builder::table(entities\competency_assignment_user_log::TABLE)
+            builder::table(competency_assignment_user_log::TABLE)
                 ->where('user_id', $user->id)
                 ->delete();
 
             // Delete all user assignment records
-            builder::table(entities\competency_assignment_user::TABLE)
+            builder::table(competency_assignment_user::TABLE)
                 ->where('user_id', $user->id)
                 ->delete();
 
             // Delete all individual assignments
-            builder::table(entities\assignment::TABLE)
+            builder::table(assignment::TABLE)
                 ->where('user_group_type', user_groups::USER)
                 ->where('user_group_id', $user->id)
                 ->delete();
@@ -115,23 +119,23 @@ class assignment_user extends item {
      * Export user data from this item.
      *
      * @param target_user $user
-     * @param \context $context restriction for exporting i.e., system context for everything and course context for course export
-     * @return \totara_userdata\userdata\export|int object or error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
+     * @param context $context restriction for exporting i.e., system context for everything and course context for course export
+     * @return export|int object or error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
-    protected static function export(target_user $user, \context $context) {
+    protected static function export(target_user $user, context $context) {
         $export = new export();
 
         // Get all assignments for the given user
-        $assignments = entities\assignment::repository()
+        $assignments = assignment::repository()
             ->select('*')
             ->with_names()
-            ->join(entities\competency_assignment_user::TABLE, 'id', 'assignment_id')
-            ->where(entities\competency_assignment_user::TABLE.'.user_id', $user->id)
+            ->join(competency_assignment_user::TABLE, 'id', 'assignment_id')
+            ->where(competency_assignment_user::TABLE.'.user_id', $user->id)
             ->get();
 
         $export->data['assignments'] = $assignments->to_array();
 
-        $logs = entities\competency_assignment_user_log::repository()
+        $logs = competency_assignment_user_log::repository()
             ->where('user_id', $user->id)
             ->get();
 
@@ -155,11 +159,11 @@ class assignment_user extends item {
      * Count user data for this item.
      *
      * @param target_user $user
-     * @param \context $context restriction for counting i.e., system context for everything and course context for course data
+     * @param context $context restriction for counting i.e., system context for everything and course context for course data
      * @return int negative number is error result self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
-    protected static function count(target_user $user, \context $context) {
-        return entities\competency_assignment_user::repository()
+    protected static function count(target_user $user, context $context) {
+        return competency_assignment_user::repository()
             ->where('user_id', $user->id)
             ->count();
     }

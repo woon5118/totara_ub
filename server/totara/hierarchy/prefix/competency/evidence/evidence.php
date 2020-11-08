@@ -26,7 +26,7 @@
  */
 
 use core\orm\query\order;
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 
 require_once("{$CFG->dirroot}/completion/data_object.php");
 
@@ -66,7 +66,7 @@ class competency_evidence extends data_object {
     public $reaggregate;
 
     final public function __construct($params = null, $fetch = true) {
-        debugging('\competency_evidence has been deprecated, please use \totara_competency\entities\competency_achievement.', DEBUG_DEVELOPER);
+        debugging('\competency_evidence has been deprecated, please use \totara_competency\entity\competency_achievement.', DEBUG_DEVELOPER);
     }
 
     /**
@@ -78,7 +78,7 @@ class competency_evidence extends data_object {
      * @deprecated since Totara 13.0
      */
     public static function fetch($params) {
-        debugging('\competency_evidence::fetch has been deprecated, please use \totara_competency\entities\competency_achievement .',
+        debugging('\competency_evidence::fetch has been deprecated, please use \totara_competency\entity\competency_achievement .',
             DEBUG_DEVELOPER
         );
 

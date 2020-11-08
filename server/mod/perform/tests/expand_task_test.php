@@ -22,18 +22,18 @@
  * @category test
  */
 
-use core\entities\tenant;
-use core\entities\user;
+use core\entity\tenant;
+use core\entity\user;
 use core\orm\entity\repository as entity_repository;
 use core\orm\query\builder;
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
-use mod_perform\entities\activity\activity;
-use mod_perform\entities\activity\track as track_entity;
-use mod_perform\entities\activity\track_assignment;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\activity;
+use mod_perform\entity\activity\track as track_entity;
+use mod_perform\entity\activity\track_assignment;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\event\track_user_assigned_bulk;
 use mod_perform\event\track_user_unassigned;
 use mod_perform\expand_task;
@@ -1361,7 +1361,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
     /**
      * Returns a new instance of the expand task
-     * 
+     *
      * @return expand_task
      */
     private function get_expand_task(): expand_task {

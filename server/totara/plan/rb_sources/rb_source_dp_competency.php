@@ -21,7 +21,7 @@
  * @package totara_plan
  */
 
-use totara_competency\entities\competency_achievement;
+use totara_competency\entity\competency_achievement;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
@@ -57,7 +57,7 @@ class rb_source_dp_competency extends rb_base_source {
 
         $tcajoin = $DB->sql_concat_join("','", array($DB->sql_cast_2char('tca.user_id'), $DB->sql_cast_2char('tca.competency_id')));
         $pjoin  = $DB->sql_concat_join("','", array($DB->sql_cast_2char('p1.userid'), $DB->sql_cast_2char('pca1.competencyid')));
-        $active_assignment = \totara_competency\entities\competency_achievement::ACTIVE_ASSIGNMENT;
+        $active_assignment = \totara_competency\entity\competency_achievement::ACTIVE_ASSIGNMENT;
         $this->base = "(
             SELECT DISTINCT {$tcajoin} AS id, tca.user_id AS userid, tca.competency_id AS competencyid
             FROM {totara_competency_achievement} tca

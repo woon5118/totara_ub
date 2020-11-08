@@ -22,10 +22,10 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\track;
-use mod_perform\entities\activity\track as track_entity;
-use mod_perform\entities\activity\track_assignment;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entity\activity\track;
+use mod_perform\entity\activity\track as track_entity;
+use mod_perform\entity\activity\track_assignment;
+use mod_perform\entity\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\activity;
 use mod_perform\state\activity\draft;

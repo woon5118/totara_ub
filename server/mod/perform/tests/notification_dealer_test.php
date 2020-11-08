@@ -24,8 +24,8 @@
 
 use core\orm\query\builder;
 use mod_perform\constants;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\participant_instance as participant_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\expand_task;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
@@ -172,7 +172,7 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
 
         // Trigger again
         $sink->clear();
-        $entities = \mod_perform\entities\activity\participant_instance::repository()->get();
+        $entities = \mod_perform\entity\activity\participant_instance::repository()->get();
         $dealer = factory::create_dealer_on_participant_instances($entities->all());
         $dealer->dispatch('mock_two');
         $this->assertEquals(0, $sink->get_by_class_key('mock_one')->count());

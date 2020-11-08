@@ -24,7 +24,7 @@
 namespace pathway_manual\models\roles;
 
 use coding_exception;
-use core\entities\user;
+use core\entity\user;
 
 class self_role extends role {
 

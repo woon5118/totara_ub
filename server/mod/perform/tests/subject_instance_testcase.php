@@ -22,9 +22,9 @@
  */
 
 use core\webapi\execution_context;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\subject_instance;
-use mod_perform\entities\activity\participant_section;
+use mod_perform\entity\activity\participant_section;
 use totara_job\job_assignment;
 
 /**

@@ -26,7 +26,7 @@ namespace mod_perform\data_providers\activity;
 use core\collection;
 use core\orm\entity\repository;
 use core\orm\query\field;
-use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entity\activity\activity as activity_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\rb\util as rb_util;
 use mod_perform\state\activity\draft;

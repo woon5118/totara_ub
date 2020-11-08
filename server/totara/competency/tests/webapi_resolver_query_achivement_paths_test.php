@@ -24,8 +24,8 @@
 
 use core\webapi\execution_context;
 use pathway_manual\models\roles\manager;
-use totara_competency\entities\assignment;
-use totara_competency\entities\pathway;
+use totara_competency\entity\assignment;
+use totara_competency\entity\pathway;
 use totara_competency\expand_task;
 use totara_competency\webapi\resolver\query\achievement_paths;
 use totara_criteria\criterion;

@@ -23,14 +23,14 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use core\entities\user;
+use core\entity\user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\element as element_model;
-use mod_perform\entities\activity\element as element_entity;
+use mod_perform\entity\activity\element as element_entity;
 use mod_perform\util;
 use moodle_exception;
 

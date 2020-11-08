@@ -23,31 +23,31 @@
  */
 
 use aggregation_test_aggregation\test_aggregation;
-use core\entities\cohort;
-use core\entities\user;
-use hierarchy_organisation\entities\organisation;
-use hierarchy_position\entities\position;
+use core\entity\cohort;
+use core\entity\user;
+use hierarchy_organisation\entity\organisation;
+use hierarchy_position\entity\position;
 use pathway_criteria_group\criteria_group;
 use pathway_learning_plan\learning_plan;
-use pathway_manual\entities\rating;
+use pathway_manual\entity\rating;
 use pathway_manual\manual;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\role_factory;
 use pathway_test_pathway\test_pathway;
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\competency;
-use totara_competency\entities\competency_framework;
-use totara_competency\entities\competency_type;
-use totara_competency\entities\course;
-use totara_competency\entities\pathway as pathway_entity;
-use totara_competency\entities\scale;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\competency;
+use totara_competency\entity\competency_framework;
+use totara_competency\entity\competency_type;
+use totara_competency\entity\course;
+use totara_competency\entity\pathway as pathway_entity;
+use totara_competency\entity\scale;
+use totara_competency\entity\scale_value;
 use totara_competency\pathway;
 use totara_competency\plugin_types;
 use totara_competency\user_groups;
 use totara_criteria\criterion;
 use totara_criteria\criterion_factory;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/competency/tests/fixtures/test_achievement_detail.php');

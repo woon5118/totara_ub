@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
 use mod_perform\models\activity\activity;
 use totara_core\advanced_feature;
@@ -74,7 +74,7 @@ class mod_perform_webapi_resolver_participant_manageable_activities_testcase ext
         }
 
         /** @var activity $hidden_activity */
-        $hidden_activity = mod_perform\entities\activity\activity::repository()
+        $hidden_activity = mod_perform\entity\activity\activity::repository()
             ->where('name', 'hidden-activity')
             ->order_by('id')
             ->first(true);

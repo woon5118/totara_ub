@@ -31,7 +31,7 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
-use hierarchy_position\entities\position as position_entity;
+use hierarchy_position\entity\position as position_entity;
 use totara_core\advanced_feature;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;

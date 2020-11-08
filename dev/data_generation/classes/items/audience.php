@@ -23,7 +23,7 @@
 
 namespace degeneration\items;
 
-use core\entities\cohort;
+use core\entity\cohort;
 use degeneration\App;
 use degeneration\Cache;
 use stdClass;

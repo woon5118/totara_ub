@@ -23,7 +23,7 @@
 
 namespace mod_perform\task;
 
-use core\entities\user;
+use core\entity\user;
 use core\message\message;
 use core\task\adhoc_task;
 use core\task\manager;

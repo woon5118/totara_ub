@@ -25,8 +25,8 @@ namespace totara_competency\task;
 
 use core\collection;
 use core\task\adhoc_task;
-use totara_competency\entities\competency;
-use totara_competency\entities\scale_aggregation;
+use totara_competency\entity\competency;
+use totara_competency\entity\scale_aggregation;
 use totara_competency\legacy_aggregation;
 use totara_core\advanced_feature;
 

@@ -25,7 +25,7 @@ namespace criteria_othercompetency;
 
 use Exception;
 use totara_competency\achievement_configuration;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use totara_criteria\criterion_display;
 
 /**

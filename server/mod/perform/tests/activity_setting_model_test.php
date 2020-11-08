@@ -22,7 +22,7 @@
  * @category test
  */
 
-use mod_perform\entities\activity\activity_setting as activity_setting_entity;
+use mod_perform\entity\activity\activity_setting as activity_setting_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\settings\visibility_conditions\all_responses;

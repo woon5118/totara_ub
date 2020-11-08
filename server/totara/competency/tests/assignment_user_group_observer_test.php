@@ -21,7 +21,7 @@
  * @package totara_competency
  */
 
-use totara_competency\entities\assignment;
+use totara_competency\entity\assignment;
 use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
 use totara_competency\user_groups;

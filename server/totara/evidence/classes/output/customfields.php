@@ -26,7 +26,7 @@ namespace totara_evidence\output;
 use core\output\template;
 use totara_evidence\customfield_area\evidence;
 use totara_evidence\customfield_area\field_helper;
-use totara_evidence\entities\evidence_field_data;
+use totara_evidence\entity\evidence_field_data;
 use totara_evidence\models\evidence_item;
 use totara_evidence\models\helpers\multilang_helper;
 

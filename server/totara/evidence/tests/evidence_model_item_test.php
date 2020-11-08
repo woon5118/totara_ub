@@ -22,9 +22,9 @@
  * @category test
  */
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
-use totara_evidence\entities;
+use totara_evidence\entity;
 use totara_evidence\models;
 
 global $CFG;
@@ -256,14 +256,14 @@ class totara_evidence_model_item_testcase extends totara_evidence_testcase {
         $deleted_params = [];
 
         foreach ($fields as $i => $field) {
-            $data = entities\evidence_field_data::repository()
+            $data = entity\evidence_field_data::repository()
                 ->where('fieldid', $field->id)
                 ->where('evidenceid', $item->get_id())
                 ->order_by('id')
                 ->first();
             $deleted_data[] = $data;
 
-            $param = new entities\evidence_field_data_param([
+            $param = new entity\evidence_field_data_param([
                 'dataid' => $data->id,
                 'value'  => "Data $i Param"
             ]);
@@ -275,12 +275,12 @@ class totara_evidence_model_item_testcase extends totara_evidence_testcase {
 
         $item = models\evidence_item::load_by_id($evidence_id);
 
-        $this->assertNotNull(entities\evidence_item::repository()->find($evidence_id));
+        $this->assertNotNull(entity\evidence_item::repository()->find($evidence_id));
         foreach ($deleted_data as $data) {
-            $this->assertNotNull(entities\evidence_field_data::repository()->find($data->id));
+            $this->assertNotNull(entity\evidence_field_data::repository()->find($data->id));
         }
         foreach ($deleted_params as $param) {
-            $this->assertNotNull(entities\evidence_field_data_param::repository()->find($param->id));
+            $this->assertNotNull(entity\evidence_field_data_param::repository()->find($param->id));
         }
 
         $item_entity = $this->generator()->create_evidence_item_entity();
@@ -338,12 +338,12 @@ class totara_evidence_model_item_testcase extends totara_evidence_testcase {
         $item->delete();
         $this->assertCount($dummy_items, $this->items());
         $this->assertCount($fields_count, $this->fields());
-        $this->assertNull(entities\evidence_item::repository()->find($evidence_id));
+        $this->assertNull(entity\evidence_item::repository()->find($evidence_id));
         foreach ($deleted_data as $data) {
-            $this->assertNull(entities\evidence_field_data::repository()->find($data->id));
+            $this->assertNull(entity\evidence_field_data::repository()->find($data->id));
         }
         foreach ($deleted_params as $param) {
-            $this->assertNull(entities\evidence_field_data_param::repository()->find($param->id));
+            $this->assertNull(entity\evidence_field_data_param::repository()->find($param->id));
         }
     }
 
@@ -376,7 +376,7 @@ class totara_evidence_model_item_testcase extends totara_evidence_testcase {
         $user = $this->generator()->create_evidence_user(['username' => 'user_one']);
         $type = $this->generator()->create_evidence_type(['name' => 'Type']);
 
-        $item = new entities\evidence_item();
+        $item = new entity\evidence_item();
         $item->name        = 1;
         $item->typeid      = $type->get_id();
         $item->user_id     = $user->id;
@@ -422,12 +422,12 @@ class totara_evidence_model_item_testcase extends totara_evidence_testcase {
             ];
             $item = $this->generator()->create_evidence_item($data);
             $item_entity = $this->items()->all()[$i];
-            $data_one = (new entities\evidence_field_data([
+            $data_one = (new entity\evidence_field_data([
                 'evidenceid' => $item->get_id(),
                 'fieldid' => $field_one->id,
                 'data' => $i
             ]))->save();
-            $data_two = (new entities\evidence_field_data([
+            $data_two = (new entity\evidence_field_data([
                 'evidenceid' => $item->get_id(),
                 'fieldid' => $field_two->id,
                 'data' => $i

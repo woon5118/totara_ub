@@ -25,9 +25,9 @@ namespace mod_perform\models\response;
 
 use core\collection;
 use core\orm\entity\model;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\entity\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\participant_instance;
-use mod_perform\entities\activity\section as section_entity;
+use mod_perform\entity\activity\section as section_entity;
 use mod_perform\models\activity\section;
 
 /**

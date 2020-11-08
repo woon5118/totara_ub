@@ -28,7 +28,7 @@ use moodle_exception;
 use moodle_url;
 use totara_core\advanced_feature;
 use totara_customfield\area;
-use totara_evidence\entities;
+use totara_evidence\entity;
 use totara_evidence\models\evidence_item;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
 
@@ -88,7 +88,7 @@ class evidence implements area {
      * @return string
      */
     public static function get_base_table(): string {
-        return entities\evidence_type::TABLE;
+        return entity\evidence_type::TABLE;
     }
 
     /**
@@ -134,7 +134,7 @@ class evidence implements area {
 
             $file = $file_storage->get_file_by_hash(sha1($file_path));
             if ($file && !$file->is_directory()) {
-                $evidence = (new entities\evidence_field_data($file->get_itemid()))->item;
+                $evidence = (new entity\evidence_field_data($file->get_itemid()))->item;
                 if (self::can_view($evidence->id)) {
                     send_stored_file($file, 86400, 0, true, $options);
                 }

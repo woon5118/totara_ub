@@ -21,8 +21,8 @@
  * @package totara_competency
  */
 
-use totara_competency\entities\configuration_change;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\configuration_change;
+use totara_competency\entity\scale_value;
 use totara_core\advanced_feature;
 
 /**

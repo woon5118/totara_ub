@@ -26,12 +26,12 @@ use core\collection as core_collection;
 use core\orm\collection;
 use totara_competency\expand_task;
 use totara_competency\models\assignment as assignment_model;
-use core\entities\user;
+use core\entity\user;
 use totara_competency\user_groups;
-use totara_competency\entities\assignment;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\scale;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\assignment;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\scale;
+use totara_competency\entity\scale_value;
 use totara_job\job_assignment;
 
 abstract class totara_competency_testcase extends advanced_testcase {

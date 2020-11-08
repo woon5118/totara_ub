@@ -30,7 +30,7 @@ use degeneration\items\competency;
 use degeneration\items\item;
 use Exception;
 use ReflectionClass;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\scale_value;
 use totara_competency_generator;
 
 /**

@@ -24,7 +24,7 @@
 namespace mod_perform\models\activity;
 
 use core\orm\entity\model;
-use mod_perform\entities\activity\section_element as section_element_entity;
+use mod_perform\entity\activity\section_element as section_element_entity;
 
 /**
  * Class section_element

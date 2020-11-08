@@ -24,8 +24,8 @@
 namespace pathway_manual\models;
 
 use core\orm\collection;
-use totara_competency\entities\competency_framework;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\competency_framework;
+use totara_competency\entity\scale_value;
 
 /**
  * Class framework_group

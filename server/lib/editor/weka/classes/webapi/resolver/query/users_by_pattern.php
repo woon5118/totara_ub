@@ -22,7 +22,7 @@
  */
 namespace editor_weka\webapi\resolver\query;
 
-use core\entities\user_repository;
+use core\entity\user_repository;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;

@@ -25,7 +25,7 @@ namespace mod_perform\userdata;
 
 use context;
 use Exception;
-use mod_perform\entities\activity\participant_instance;
+use mod_perform\entity\activity\participant_instance;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\userdata\traits\purge_trait;
 use totara_userdata\userdata\item;

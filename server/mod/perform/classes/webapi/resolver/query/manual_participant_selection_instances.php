@@ -25,14 +25,14 @@ namespace mod_perform\webapi\resolver\query;
 
 use context_coursecat;
 use core\collection;
-use core\entities\user;
+use core\entity\user;
 use core\orm\entity\repository;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use mod_perform\entities\activity\manual_relationship_selection_progress;
+use mod_perform\entity\activity\manual_relationship_selection_progress;
 use mod_perform\models\activity\helpers\manual_participant_helper;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\util;

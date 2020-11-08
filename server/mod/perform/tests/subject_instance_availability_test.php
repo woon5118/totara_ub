@@ -23,7 +23,7 @@
  */
 
 use mod_perform\constants;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entity\activity\subject_instance as subject_instance_entity;
 use mod_perform\event\participant_instance_progress_updated;
 use mod_perform\event\participant_section_progress_updated;
 use mod_perform\event\subject_instance_availability_closed;
@@ -254,7 +254,7 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
             'subject_user_id' => $user1->id,
             'include_questions' => false,
         ]);
-        
+
         $subject2_entity = $generator->create_subject_instance([
             'activity_id' => $activity->id,
             'subject_user_id' => $user2->id,

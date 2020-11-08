@@ -22,7 +22,7 @@
  * @package totara_competency
  */
 
-use totara_competency\entities\pathway_achievement;
+use totara_competency\entity\pathway_achievement;
 
 /**
  * @group totara_competency

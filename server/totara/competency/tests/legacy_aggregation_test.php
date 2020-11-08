@@ -28,19 +28,19 @@ use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use pathway_criteria_group\criteria_group;
-use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
+use pathway_criteria_group\entity\criteria_group_criterion as criteria_group_criterion_entity;
 use totara_competency\achievement_configuration;
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\competency as competency_entity;
-use totara_competency\entities\configuration_change;
-use totara_competency\entities\pathway as pathway_entity;
-use totara_competency\entities\scale as scale_entity;
+use totara_competency\entity\competency as competency_entity;
+use totara_competency\entity\configuration_change;
+use totara_competency\entity\pathway as pathway_entity;
+use totara_competency\entity\scale as scale_entity;
 use totara_competency\legacy_aggregation;
 use totara_competency\linked_courses;
 use totara_competency\pathway;
 use totara_core\advanced_feature;
 use totara_criteria\criterion;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 
 /**
  * @group totara_competency

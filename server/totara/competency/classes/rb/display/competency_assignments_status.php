@@ -27,7 +27,7 @@ use rb_column;
 use reportbuilder;
 use stdClass;
 use totara_reportbuilder\rb\display\base;
-use totara_competency\entities\assignment;
+use totara_competency\entity\assignment;
 
 defined('MOODLE_INTERNAL') || die();
 

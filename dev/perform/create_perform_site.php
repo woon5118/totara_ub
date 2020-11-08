@@ -30,15 +30,15 @@ use criteria_onactivate\onactivate;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\self_role;
-use totara_competency\entities\assignment;
+use totara_competency\entity\assignment;
 use totara_competency\expand_task;
 use totara_competency\models\assignment_actions;
-use core\entities\user;
-use totara_competency\entities\competency as competency_entity;
-use totara_competency\entities\scale_value;
+use core\entity\user;
+use totara_competency\entity\competency as competency_entity;
+use totara_competency\entity\scale_value;
 use totara_competency\linked_courses;
 use totara_criteria\criterion;
-use totara_evidence\entities\evidence_type;
+use totara_evidence\entity\evidence_type;
 use totara_evidence\models\evidence_item;
 use totara_job\job_assignment;
 
@@ -74,7 +74,7 @@ Options:
     exit(1);
 }
 
-if (\totara_competency\entities\competency::repository()->exists()) {
+if (\totara_competency\entity\competency::repository()->exists()) {
     echo "This script has already been run on this installation. Please try again on a clean site.\n";
     exit(1);
 }
@@ -348,7 +348,7 @@ Feel free to browse, list of users is below, their password is 12345.
             ]
         ],
     ];
-    $data['scales']['default'] = (object) totara_competency\entities\scale::repository()->order_by('id')->first()->to_array();
+    $data['scales']['default'] = (object) totara_competency\entity\scale::repository()->order_by('id')->first()->to_array();
 
     foreach ($scales as $key => $scale) {
         $data['scales'][$key] = create_scale($scale);
@@ -3793,7 +3793,7 @@ function get_evidence_type($key, $data) {
  * @param string $user
  * @param int $index
  * @param $data
- * @return \totara_evidence\entities\evidence_item|null
+ * @return \totara_evidence\entity\evidence_item|null
  */
 function get_evidence_item($user, $index, $data) {
     $evidence_items = $data['evidence_items'][$user] ?? null;
@@ -4062,7 +4062,7 @@ function create_criteria_pathways($competencies, $data, $generator) {
  * Create an individual criterion for a criteria group.
  *
  * @param array $criteria_group
- * @param stdClass|\totara_competency\entities\competency $competency
+ * @param stdClass|\totara_competency\entity\competency $competency
  * @param totara_criteria_generator $generator
  * @return criterion[]
  */
@@ -4151,7 +4151,7 @@ function create_manual_ratings($manual_ratings, $data) {
             $scale = $data['scales'][$scale];
             $scale_value_id = array_keys($scale->values)[$index];
 
-            (new \pathway_manual\entities\rating([
+            (new \pathway_manual\entity\rating([
                 'user_id' => $user->id,
                 'competency_id' => $comp->id,
                 'assigned_by' => get_user($rating[1], $data)->id,
@@ -4180,7 +4180,7 @@ function create_learning_plans($user, $plans, $data, $generator) {
         $competencies = [];
         foreach ($plan as $competency => $scale_value) {
             $competency = get_competency($competency, null, $data);
-            $competency = new totara_competency\entities\competency($competency, false);
+            $competency = new totara_competency\entity\competency($competency, false);
 
             $scale_value = scale_value::repository()
                 ->where('scaleid', $competency->scale->id)

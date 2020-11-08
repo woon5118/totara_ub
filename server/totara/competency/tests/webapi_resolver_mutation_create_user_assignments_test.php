@@ -26,11 +26,11 @@ use core\orm\collection;
 use core\orm\query\builder;
 use core\webapi\execution_context;
 use totara_competency\assignment_create_exception;
-use totara_competency\entities\assignment as assignment_entity;
-use totara_competency\entities\competency_assignment_user;
+use totara_competency\entity\assignment as assignment_entity;
+use totara_competency\entity\competency_assignment_user;
 use totara_competency\models\assignment as assignment_model;
 use totara_competency\user_groups;
-use totara_competency\entities\competency as competency_entity;
+use totara_competency\entity\competency as competency_entity;
 use totara_competency\webapi\resolver\mutation\create_user_assignments;
 use totara_job\job_assignment;
 

@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use core\entities\tenant;
+use core\entity\tenant;
 use core\webapi\execution_context;
 use totara_engage\access\access;
 use totara_engage\resource\resource_factory;

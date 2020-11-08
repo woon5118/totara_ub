@@ -22,16 +22,16 @@
  */
 
 use core\orm\entity\entity;
-use totara_competency\entities\achievement_via;
-use totara_competency\entities\assignment;
-use totara_competency\entities\assignment_availability;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\configuration_change;
-use totara_competency\entities\configuration_history;
-use totara_competency\entities\pathway;
-use totara_competency\entities\pathway_achievement;
-use totara_competency\entities\scale_aggregation;
-use totara_competency\entities\competency as competency_entity;
+use totara_competency\entity\achievement_via;
+use totara_competency\entity\assignment;
+use totara_competency\entity\assignment_availability;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\configuration_change;
+use totara_competency\entity\configuration_history;
+use totara_competency\entity\pathway;
+use totara_competency\entity\pathway_achievement;
+use totara_competency\entity\scale_aggregation;
+use totara_competency\entity\competency as competency_entity;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
@@ -43,10 +43,10 @@ require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/lib.php');
  */
 class totara_competency_competency_deletion_testcase extends advanced_testcase {
 
-    /** @var \totara_competency\entities\competency */
+    /** @var competency_entity */
     private $comp_1;
 
-    /** @var \totara_competency\entities\competency */
+    /** @var competency_entity */
     private $comp_2;
 
     protected function setUp(): void {
@@ -321,10 +321,10 @@ class totara_competency_competency_deletion_testcase extends advanced_testcase {
     /**
      * Delete the competency.
      *
-     * @param \totara_competency\entities\competency $competency
+     * @param competency_entity $competency
      */
-    private function delete(\totara_competency\entities\competency $competency) {
-        $hierarchy_comp = new \competency();
+    private function delete(competency_entity $competency) {
+        $hierarchy_comp = new competency();
         $hierarchy_comp->delete_hierarchy_item($competency->id);
     }
 

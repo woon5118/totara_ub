@@ -27,7 +27,7 @@ use mod_perform\notification\composer;
 use mod_perform\notification\placeholder;
 use mod_perform\notification\recipient;
 use mod_perform\notification\trigger;
-use totara_core\entities\relationship as relationship_entity;
+use totara_core\entity\relationship as relationship_entity;
 use totara_core\relationship\relationship;
 
 require_once(__DIR__ . '/notification_testcase.php');

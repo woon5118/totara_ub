@@ -31,7 +31,7 @@
 
 use core\orm\query\builder;
 use hierarchy_competency\event\competency_updated;
-use totara_competency\entities\competency_achievement as competency_achievement_entity;
+use totara_competency\entity\competency_achievement as competency_achievement_entity;
 use totara_competency\pathway;
 use totara_core\advanced_feature;
 

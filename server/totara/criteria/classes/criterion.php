@@ -28,9 +28,9 @@ use coding_exception;
 use core\orm\query\builder;
 use ReflectionClass;
 use stdClass;
-use totara_criteria\entities\criterion as criterion_entity;
-use totara_criteria\entities\criteria_item as criteria_item_entity;
-use totara_criteria\entities\criteria_metadata as criteria_metadata_entity;
+use totara_criteria\entity\criterion as criterion_entity;
+use totara_criteria\entity\criteria_item as criteria_item_entity;
+use totara_criteria\entity\criteria_metadata as criteria_metadata_entity;
 use totara_criteria\hook\criteria_validity_changed;
 
 /**

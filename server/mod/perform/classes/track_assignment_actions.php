@@ -23,7 +23,7 @@
 
 namespace mod_perform;
 
-use mod_perform\entities\activity\track_assignment;
+use mod_perform\entity\activity\track_assignment;
 
 /**
  * This is mostly there for performing bulk actions on assignments

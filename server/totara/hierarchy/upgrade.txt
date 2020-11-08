@@ -1,6 +1,23 @@
 This files describes API changes in Totara Hierarchies,
 information provided here is intended especially for developers.
 
+=== 13.2 ===
+* totara_hierarchy\entities\hierarchy_framework has been moved to totara_hierarchy\entity\hierarchy_framework
+* totara_hierarchy\entities\hierarchy_framework_repository has been moved to totara_hierarchy\entity\hierarchy_framework_repository
+* totara_hierarchy\entities\hierarchy_item has been moved to totara_hierarchy\entity\hierarchy_item
+* totara_hierarchy\entities\hierarchy_item_repository has been moved to totara_hierarchy\entity\hierarchy_item_repository
+* totara_hierarchy\entities\hierarchy_type has been moved to totara_hierarchy\entity\hierarchy_type
+* hierarchy_organisation\entities\organisation has been moved to hierarchy_organisation\entity\organisation
+* hierarchy_organisation\entities\organisation_filters has been moved to hierarchy_organisation\entity\organisation_filters
+* hierarchy_organisation\entities\organisation_framework has been moved to hierarchy_organisation\entity\organisation_framework
+* hierarchy_organisation\entities\organisation_framework_repository has been moved to hierarchy_organisation\entity\organisation_framework_repository
+* hierarchy_organisation\entities\organisation_repository has been moved to hierarchy_organisation\entity\organisation_repository
+* hierarchy_position\entities\position has been moved to hierarchy_position\entity\position
+* hierarchy_position\entities\position_filters has been moved to hierarchy_position\entity\position_filters
+* hierarchy_position\entities\position_framework has been moved to hierarchy_position\entity\position_framework
+* hierarchy_position\entities\position_framework_repository has been moved to hierarchy_position\entity\position_framework_repository
+* hierarchy_position\entities\position_repository has been moved to hierarchy_position\entity\position_repository
+
 === 13.0 ===
 
 * hierarchy_competency\userdata\competency_evidence class has been deprecated, please use totara_competency\userdata\achievement instead.

@@ -24,7 +24,7 @@
 namespace totara_criteria;
 
 use core\orm\entity\repository;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 

@@ -25,9 +25,9 @@ namespace totara_competency\userdata;
 
 use core\orm\entity\repository;
 use core\orm\query\builder;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\pathway_achievement;
-use totara_criteria\entities\criteria_item_record;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\pathway_achievement;
+use totara_criteria\entity\criteria_item_record;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;

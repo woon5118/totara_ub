@@ -25,7 +25,7 @@ namespace totara_evidence\customfield_area;
 
 use customfield_base;
 use customfield_define_base;
-use totara_evidence\entities\evidence_field_data;
+use totara_evidence\entity\evidence_field_data;
 
 global $CFG;
 require_once($CFG->dirroot . '/totara/customfield/fieldlib.php');

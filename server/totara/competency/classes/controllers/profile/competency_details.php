@@ -24,7 +24,7 @@
 namespace totara_competency\controllers\profile;
 
 use pathway_manual\controllers\rate_competencies;
-use totara_competency\entities\competency;
+use totara_competency\entity\competency;
 use totara_mvc\tui_view;
 
 class competency_details extends base {

@@ -23,7 +23,7 @@
 
 namespace mod_perform\state\participant_instance\condition;
 
-use mod_perform\entities\activity\participant_section;
+use mod_perform\entity\activity\participant_section;
 use mod_perform\state\condition;
 use mod_perform\state\participant_section\complete;
 use mod_perform\state\participant_section\in_progress;

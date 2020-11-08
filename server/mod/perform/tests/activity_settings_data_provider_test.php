@@ -24,7 +24,7 @@
 
 use mod_perform\data_providers\activity\activity_settings;
 use mod_perform\models\activity\activity_setting;
-use mod_perform\entities\activity\activity_setting as activity_setting_entity;
+use mod_perform\entity\activity\activity_setting as activity_setting_entity;
 
 /**
  * @coversDefaultClass \mod_perform\data_providers\activity\activity_settings

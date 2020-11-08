@@ -24,7 +24,7 @@
 namespace degeneration\items;
 
 use degeneration\App;
-use totara_competency\entities\competency as competency_entity;
+use totara_competency\entity\competency as competency_entity;
 
 /**
  * Class competency

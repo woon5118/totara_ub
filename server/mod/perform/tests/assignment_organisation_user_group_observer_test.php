@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\track_assignment;
+use mod_perform\entity\activity\track_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\user_groups\grouping;

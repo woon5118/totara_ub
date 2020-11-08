@@ -28,7 +28,7 @@ use core\date_format;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use pathway_manual\entities\rating as rating_entity;
+use pathway_manual\entity\rating as rating_entity;
 use core\webapi\formatter\field\date_field_formatter;
 use core\webapi\formatter\field\string_field_formatter;
 

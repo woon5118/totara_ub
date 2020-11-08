@@ -24,7 +24,7 @@
 namespace mod_perform\data_providers\response;
 
 use Exception;
-use mod_perform\entities\activity\participant_section_repository;
+use mod_perform\entity\activity\participant_section_repository;
 use mod_perform\models\response\participant_section as participant_section_model;
 
 class participant_section {

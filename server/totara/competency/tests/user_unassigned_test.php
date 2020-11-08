@@ -24,11 +24,11 @@
 
 use core\orm\query\builder;
 use pathway_manual\models\roles\self_role;
-use totara_competency\entities\achievement_via;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\competency_assignment_user;
-use totara_competency\entities\competency_assignment_user_log;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\achievement_via;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\competency_assignment_user;
+use totara_competency\entity\competency_assignment_user_log;
+use totara_competency\entity\scale_value;
 use totara_competency\expand_task;
 use totara_competency\settings;
 use totara_competency\task\competency_aggregation_all;

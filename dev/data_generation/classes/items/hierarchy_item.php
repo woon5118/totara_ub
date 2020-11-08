@@ -25,9 +25,9 @@ namespace degeneration\items;
 
 use degeneration\App;
 use degeneration\Cache;
-use hierarchy_organisation\entities\organisation_framework;
-use totara_competency\entities\competency_framework;
-use totara_hierarchy\entities\hierarchy_framework;
+use hierarchy_organisation\entity\organisation_framework;
+use totara_competency\entity\competency_framework;
+use totara_hierarchy\entity\hierarchy_framework;
 
 abstract class hierarchy_item extends item {
 
@@ -137,7 +137,7 @@ abstract class hierarchy_item extends item {
                 false
             )
         );
-        
+
         Cache::get()->add($this);
 
         return true;
@@ -193,7 +193,7 @@ abstract class hierarchy_item extends item {
                 return competency_framework::class;
 
             case 'position':
-                return \hierarchy_position\entities\position_framework::class;
+                return \hierarchy_position\entity\position_framework::class;
 
             case 'organisation':
                 return organisation_framework::class;

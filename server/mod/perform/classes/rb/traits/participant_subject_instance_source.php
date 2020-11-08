@@ -23,7 +23,7 @@
 
 namespace mod_perform\rb\traits;
 
-use mod_perform\entities\activity\activity_type as activity_type_entity;
+use mod_perform\entity\activity\activity_type as activity_type_entity;
 use mod_perform\models\activity\activity_type as activity_type_model;
 use rb_column_option;
 use rb_filter_option;

@@ -28,7 +28,7 @@ use core\orm\entity\repository;
 use core\tenant_orm_helper;
 use totara_core\relationship\relationship_resolver;
 use totara_core\relationship\relationship_resolver_dto;
-use totara_job\entities\job_assignment;
+use totara_job\entity\job_assignment;
 
 class manager extends relationship_resolver {
 

@@ -22,9 +22,9 @@
  * @category test
  */
 
-use core\entities\user;
+use core\entity\user;
 use core\orm\query\builder;
-use totara_evidence\entities\evidence_type;
+use totara_evidence\entity\evidence_type;
 use totara_evidence\models\evidence_item;
 use totara_evidence\models\helpers\evidence_item_capability_helper;
 

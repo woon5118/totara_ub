@@ -22,7 +22,7 @@
  * @category test
  */
 
-use totara_competency\entities;
+use totara_competency\entity;
 use totara_competency\user_groups;
 
 defined('MOODLE_INTERNAL') || die();
@@ -131,7 +131,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $updated_at = 1;
         foreach ($assignments as $assignment) {
-            $assignment = new entities\assignment($assignment->id);
+            $assignment = new entity\assignment($assignment->id);
             $assignment->updated_at = $updated_at;
             $assignment->do_not_update_timestamps()->save();
             $updated_at++;
@@ -161,7 +161,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
         ['ass' => $ass] = $this->generate_data();
 
         // Only types
-        $filters = ['assignment_type' => [entities\assignment::TYPE_ADMIN, entities\assignment::TYPE_SELF]];
+        $filters = ['assignment_type' => [entity\assignment::TYPE_ADMIN, entity\assignment::TYPE_SELF]];
         $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
@@ -175,7 +175,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
         $this->assert_result_contains_ids([$ass[0]->id, $ass[1]->id], $result);
 
         // Mix of user_group_type and type
-        $filters = ['assignment_type' => [user_groups::POSITION, entities\assignment::TYPE_SELF]];
+        $filters = ['assignment_type' => [user_groups::POSITION, entity\assignment::TYPE_SELF]];
         $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
@@ -189,7 +189,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
         $this->assert_result_contains_ids([$ass[1]->id, $ass[3]->id], $result);
 
         // Just one system filter
-        $filters = ['assignment_type' => [entities\assignment::TYPE_SYSTEM]];
+        $filters = ['assignment_type' => [entity\assignment::TYPE_SYSTEM]];
         $res = $this->call_webservice_api('totara_competency_assignment_index', [
             'filters' => $filters,
             'page' => 0,
@@ -297,11 +297,11 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         // Create an assignment for a competency
         $gen = $this->generator()->assignment_generator();
-        $data['ass'][] = $gen->create_user_assignment($one->id, null, ['status' => entities\assignment::STATUS_ACTIVE, 'type' => entities\assignment::TYPE_ADMIN]);
-        $data['ass'][] = $gen->create_user_assignment($two->id, null, ['status' => entities\assignment::STATUS_ACTIVE, 'type' => entities\assignment::TYPE_SELF]);
-        $data['ass'][] = $gen->create_user_assignment($three->id, null, ['status' => entities\assignment::STATUS_ACTIVE, 'type' => entities\assignment::TYPE_SYSTEM]);
-        $data['ass'][] = $gen->create_position_assignment($three->id, $pos1->id, ['status' => entities\assignment::STATUS_ACTIVE, 'type' => entities\assignment::TYPE_ADMIN]);
-        $data['ass'][] = $gen->create_organisation_assignment($three->id, $org1->id, ['status' => entities\assignment::STATUS_ACTIVE, 'type' => entities\assignment::TYPE_ADMIN]);
+        $data['ass'][] = $gen->create_user_assignment($one->id, null, ['status' => entity\assignment::STATUS_ACTIVE, 'type' => entity\assignment::TYPE_ADMIN]);
+        $data['ass'][] = $gen->create_user_assignment($two->id, null, ['status' => entity\assignment::STATUS_ACTIVE, 'type' => entity\assignment::TYPE_SELF]);
+        $data['ass'][] = $gen->create_user_assignment($three->id, null, ['status' => entity\assignment::STATUS_ACTIVE, 'type' => entity\assignment::TYPE_SYSTEM]);
+        $data['ass'][] = $gen->create_position_assignment($three->id, $pos1->id, ['status' => entity\assignment::STATUS_ACTIVE, 'type' => entity\assignment::TYPE_ADMIN]);
+        $data['ass'][] = $gen->create_organisation_assignment($three->id, $org1->id, ['status' => entity\assignment::STATUS_ACTIVE, 'type' => entity\assignment::TYPE_ADMIN]);
 
         return $data;
     }

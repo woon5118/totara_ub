@@ -27,7 +27,7 @@ use coding_exception;
 use context;
 use context_system;
 use core\format;
-use core\entities\cohort as cohort_entity;
+use core\entity\cohort as cohort_entity;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use core\formatter\cohort as cohort_formatter;

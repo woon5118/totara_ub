@@ -27,7 +27,7 @@ use degeneration\App;
 use degeneration\items\competency;
 use degeneration\items\user;
 use pathway_manual\manual;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\scale_value;
 
 /**
  * Class criterion

@@ -26,7 +26,7 @@ namespace degeneration\items;
 use core\orm\query\builder;
 use degeneration\App;
 use degeneration\Cache;
-use totara_job\entities\job_assignment as job_assignment_entity;
+use totara_job\entity\job_assignment as job_assignment_entity;
 use totara_job\job_assignment as core_job_assignment;
 
 class job_assignment extends item {

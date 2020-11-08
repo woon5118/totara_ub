@@ -24,7 +24,7 @@
 
 namespace pathway_manual;
 
-use pathway_manual\entities\rating;
+use pathway_manual\entity\rating;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\role_factory;
 use totara_competency\base_achievement_detail;

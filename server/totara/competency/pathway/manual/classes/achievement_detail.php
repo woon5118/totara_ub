@@ -23,7 +23,7 @@
 
 namespace pathway_manual;
 
-use pathway_manual\entities\rating;
+use pathway_manual\entity\rating;
 use totara_competency\base_achievement_detail;
 
 class achievement_detail extends base_achievement_detail {

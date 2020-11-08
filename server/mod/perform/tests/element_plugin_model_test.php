@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\element as element_entity;
+use mod_perform\entity\activity\element as element_entity;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\respondable_element_plugin;
 

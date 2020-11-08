@@ -22,7 +22,7 @@
  */
 
 use core\collection;
-use mod_perform\entities\activity\participant_instance;
+use mod_perform\entity\activity\participant_instance;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\activity\settings\visibility_conditions\all_responses;
 use mod_perform\models\activity\settings\visibility_conditions\none;

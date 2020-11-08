@@ -26,7 +26,7 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
-use mod_perform\entities\activity\element_identifier as element_identifier_entity;
+use mod_perform\entity\activity\element_identifier as element_identifier_entity;
 
 /**
  * Class element_identifier

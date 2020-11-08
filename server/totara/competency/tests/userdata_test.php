@@ -22,14 +22,14 @@
  * @subpackage test
  */
 
-use totara_competency\entities\competency;
-use totara_competency\entities\competency_achievement;
-use totara_competency\entities\pathway_achievement;
-use totara_competency\entities\scale_value;
+use totara_competency\entity\competency;
+use totara_competency\entity\competency_achievement;
+use totara_competency\entity\pathway_achievement;
+use totara_competency\entity\scale_value;
 use totara_competency\userdata\achievement;
-use totara_criteria\entities\criteria_item;
-use totara_criteria\entities\criteria_item_record;
-use totara_criteria\entities\criterion;
+use totara_criteria\entity\criteria_item;
+use totara_criteria\entity\criteria_item_record;
+use totara_criteria\entity\criterion;
 use totara_userdata\userdata\target_user;
 
 /**

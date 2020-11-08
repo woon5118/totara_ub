@@ -28,7 +28,7 @@ use pathway_manual\models\roles\self_role;
 use pathway_manual\userdata\manual_rating_other;
 use totara_competency\aggregation_task;
 use totara_competency\aggregation_users_table;
-use totara_competency\entities\pathway_achievement;
+use totara_competency\entity\pathway_achievement;
 use totara_job\job_assignment;
 use totara_userdata\userdata\target_user;
 

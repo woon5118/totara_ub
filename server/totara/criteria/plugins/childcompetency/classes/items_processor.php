@@ -25,10 +25,10 @@
 namespace criteria_childcompetency;
 
 use totara_competency\achievement_configuration;
-use totara_competency\entities\configuration_change;
-use totara_competency\entities\competency as competency_entity;
-use totara_criteria\entities\criteria_metadata as criteria_metadata_entity;
-use totara_criteria\entities\criterion as criterion_entity;
+use totara_competency\entity\configuration_change;
+use totara_competency\entity\competency as competency_entity;
+use totara_criteria\entity\criteria_metadata as criteria_metadata_entity;
+use totara_criteria\entity\criterion as criterion_entity;
 use totara_criteria\hook\criteria_validity_changed;
 
 class items_processor {

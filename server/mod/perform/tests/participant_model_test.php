@@ -24,7 +24,7 @@
 
 use mod_perform\models\activity\participant;
 use mod_perform\models\activity\participant_source;
-use core\entities\user;
+use core\entity\user;
 use mod_perform\models\activity\external_participant;
 
 /**

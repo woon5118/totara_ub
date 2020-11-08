@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\participant_instance;
+use mod_perform\entity\activity\participant_instance;
 use mod_perform\models\activity\participant_source;
 use mod_perform\state\participant_instance\not_started;
 

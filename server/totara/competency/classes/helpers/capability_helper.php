@@ -25,11 +25,11 @@ namespace totara_competency\helpers;
 
 use context;
 use context_user;
-use core\entities\user;
+use core\entity\user;
 use moodle_exception;
 use pathway_manual\models\roles\appraiser;
 use totara_competency\models\assignment;
-use totara_competency\entities\assignment as assignment_entity;
+use totara_competency\entity\assignment as assignment_entity;
 
 defined('MOODLE_INTERNAL') || die();
 

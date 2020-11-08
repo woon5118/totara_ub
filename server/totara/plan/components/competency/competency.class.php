@@ -23,7 +23,7 @@
  * @subpackage plan
  */
 
-use totara_competency\entities\competency_achievement as competency_achievement_entity;
+use totara_competency\entity\competency_achievement as competency_achievement_entity;
 use totara_plan\event\competency_value_set;
 
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/lib.php');
