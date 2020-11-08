@@ -39,12 +39,16 @@ if (!empty($CFG->forcelogin)) {
 try {
     // Start buffer capture so that we can `remove` any errors
     ob_start();
-    // Require id This is the key for whatever branch we want to get.
-    // This accepts alphanum because the courses and my courses branches don't have numerical keys.
-    // For those branches we return the alphanum key, courses and mycourses.
-    $branchid = required_param('id', PARAM_ALPHANUM);
     // This identifies the type of the branch we want to get
     $branchtype = required_param('type', PARAM_INT);
+    // Require id This is the key for whatever branch we want to get.
+    // Totara: require it to be an integer unless branch type is root node.
+    if ($branchtype == navigation_node::TYPE_ROOTNODE) {
+        // This accepts alphanum because the root node branches don't have numerical keys.
+        $branchid = required_param('id', PARAM_ALPHANUM);
+    } else {
+        $branchid = required_param('id', PARAM_INT);
+    }
     // This identifies the block instance requesting AJAX extension
     $instanceid = optional_param('instance', null, PARAM_INT);
     // Totara: This identifies the block type requesting AJAX extension
@@ -97,13 +101,7 @@ try {
     $converter = new navigation_json();
 
     // Find the actual branch we are looking for
-    if ($branchtype != 0) {
-        $branch = $navigation->find($branchid, $branchtype);
-    } else if ($branchid === 'mycourses' || $branchid === 'courses') {
-        $branch = $navigation->find($branchid, navigation_node::TYPE_ROOTNODE);
-    } else {
-        throw new coding_exception('Invalid branch type/id passed to AJAX call to load branches.');
-    }
+    $branch = $navigation->find($branchid, $branchtype);
 
     // Remove links to categories if required.
     if (!$linkcategories) {
