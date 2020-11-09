@@ -1362,3 +1362,36 @@ M.util.validate_email = function(value) {
     var expression = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     return expression.test(value);
 };
+
+// As we don't want the sesskey in a URL (as there are plenty of locations where a URL is stored),
+// we set a data attribute on the link so that we can convert the GET request to a POST (and hide the
+// sesskey from logs and referers).
+document.body.addEventListener('click', function (e) {
+    var node = e.target.closest('a[data-addsesskey]');
+    if (node) {
+        e.preventDefault();
+        var url = node.getAttribute('href').split('?')[0];
+        var queryString = node.getAttribute('href').split('?')[1];
+        var urlForm = document.createElement('form');
+        var sesskeyInput = document.createElement('input');
+        sesskeyInput.type = 'hidden';
+        sesskeyInput.name = 'sesskey';
+        sesskeyInput.value = M.cfg.sesskey;
+        urlForm.appendChild(sesskeyInput);
+
+        queryString.split('&').forEach(function(string) {
+            var query = string.split('=');
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = query[0];
+            input.value = decodeURIComponent(query[1]);
+            urlForm.appendChild(input);
+        });
+
+        urlForm.action = url;
+        urlForm.method = 'POST';
+        urlForm.style.display = 'none';
+        document.body.appendChild(urlForm);
+        urlForm.submit();
+    }
+})

@@ -1345,7 +1345,7 @@ class block_manager {
         global $CFG;
 
         $controls = array();
-        $actionurl = $this->page->url->out(false, array('sesskey'=> sesskey()));
+        $actionurl = $this->page->url->out(false);
         $blocktitle = $block->get_title();
         if (empty($blocktitle)) {
             $blocktitle = $block->arialabel;
@@ -1358,7 +1358,7 @@ class block_manager {
                 new moodle_url($actionurl, array('bui_moveid' => $block->instance->id)),
                 \core\output\flex_icon::get_icon('f/move', 'moodle', array('class' => 'iconsmall', 'title' => '', 'alt' => $str)),
                 $str,
-                array('class' => 'editing_move')
+                array('class' => 'editing_move', 'data-addsesskey' => true)
             );
 
         }
@@ -1370,7 +1370,7 @@ class block_manager {
                 new moodle_url($actionurl, array('bui_editid' => $block->instance->id)),
                 \core\output\flex_icon::get_icon('t/edit', 'moodle', array('class' => 'iconsmall', 'title' => '', 'alt' => $str)),
                 $str,
-                array('class' => 'editing_edit')
+                array('class' => 'editing_edit', 'data-addsesskey' => true)
             );
 
         }
@@ -1381,12 +1381,12 @@ class block_manager {
                 $str = new lang_string('hideblock', 'block', $blocktitle);
                 $url = new moodle_url($actionurl, array('bui_hideid' => $block->instance->id));
                 $icon = \core\output\flex_icon::get_icon('t/hide', 'moodle', array('class' => 'iconsmall', 'title' => '', 'alt' => $str));
-                $attributes = array('class' => 'editing_hide');
+                $attributes = array('class' => 'editing_hide', 'data-addsesskey' => true);
             } else {
                 $str = new lang_string('showblock', 'block', $blocktitle);
                 $url = new moodle_url($actionurl, array('bui_showid' => $block->instance->id));
                 $icon = \core\output\flex_icon::get_icon('t/show', 'moodle', array('class' => 'iconsmall', 'title' => '', 'alt' => $str));
-                $attributes = array('class' => 'editing_show');
+                $attributes = array('class' => 'editing_show', 'data-addsesskey' => true);
             }
             $controls[] = new action_menu_link_secondary($url, $icon, $str, $attributes);
         }
@@ -1434,7 +1434,7 @@ class block_manager {
                 new moodle_url($actionurl, array('bui_deleteid' => $block->instance->id)),
                 \core\output\flex_icon::get_icon('t/delete', 'moodle', array('class' => 'iconsmall', 'title' => '', 'alt' => $str)),
                 $str,
-                array('class' => 'editing_delete')
+                array('class' => 'editing_delete', 'data-addsesskey' => true)
             );
         }
 
