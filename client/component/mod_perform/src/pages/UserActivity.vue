@@ -19,45 +19,43 @@
 
 <template>
   <div class="tui-performUserActivity">
-    <Loader :loading="$apollo.loading">
-      <NotificationBanner
-        v-if="activityNotFound"
-        :dismissable="false"
-        :message="
-          $str('user_activities_activity_does_not_exist', 'mod_perform')
-        "
-        type="error"
-      />
-      <ActivityContentPrint
-        v-else-if="print && subjectInstance"
-        :activity="subjectInstance.activity"
-        :participant-instance-id="participantInstanceId"
-        :subject-user="subjectInstance.subject_user"
-        :created-at="subjectInstance.created_at"
-        :due-date="subjectInstance.due_date"
-        :job-assignments="jobAssignments"
-      />
-      <ActivityContent
-        v-else-if="!print && subjectInstance"
-        :current-user-id="currentUserId"
-        :activity="subjectInstance.activity"
-        :participant-instance-id="participantInstanceId"
-        :participant-section-id="participantSectionId"
-        :subject-user="subjectInstance.subject_user"
-        :token="token"
-        :job-assignments="jobAssignments"
-      />
-    </Loader>
+    <Loader :loading="$apollo.loading" />
+    <NotificationBanner
+      v-if="activityNotFound"
+      :dismissable="false"
+      :message="$str('user_activities_activity_does_not_exist', 'mod_perform')"
+      type="error"
+    />
+    <ActivityContentPrint
+      v-else-if="print && subjectInstance"
+      :activity="subjectInstance.activity"
+      :participant-instance-id="participantInstanceId"
+      :subject-user="subjectInstance.subject_user"
+      :created-at="subjectInstance.created_at"
+      :due-date="subjectInstance.due_date"
+      :job-assignments="jobAssignments"
+    />
+    <ActivityContent
+      v-else-if="!print && subjectInstance"
+      :current-user-id="currentUserId"
+      :activity="subjectInstance.activity"
+      :participant-instance-id="participantInstanceId"
+      :participant-section-id="participantSectionId"
+      :subject-user="subjectInstance.subject_user"
+      :token="token"
+      :job-assignments="jobAssignments"
+    />
   </div>
 </template>
 
 <script>
-import externalSubjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_external_participant_nosession';
-import subjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_participant';
 import Loader from 'tui/components/loading/Loader';
 import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import ActivityContent from 'mod_perform/components/user_activities/ActivityContent';
 import ActivityContentPrint from 'mod_perform/components/user_activities/ActivityContentPrint';
+// Query
+import externalSubjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_external_participant_nosession';
+import subjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_participant';
 
 export default {
   components: {

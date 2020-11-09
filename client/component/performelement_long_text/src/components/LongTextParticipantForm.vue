@@ -17,7 +17,12 @@
 -->
 <template>
   <FormScope :path="path" :process="process">
-    <FormTextarea :rows="6" name="response" :validations="validations" />
+    <FormTextarea
+      :rows="6"
+      name="response"
+      :validations="validations"
+      :char-length="50"
+    />
   </FormScope>
 </template>
 

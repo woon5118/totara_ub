@@ -170,10 +170,11 @@ export default {
 
 <style lang="scss">
 .tui-otherParticipantResponses {
-  &__response {
-    width: 100%;
-    margin-top: var(--gap-4);
+  & > * + * {
+    margin-top: var(--gap-8);
+  }
 
+  &__response {
     & > * + * {
       margin-top: var(--gap-6);
     }

@@ -35,7 +35,7 @@
         />
       </div>
     </GridItem>
-    <GridItem :units="8">
+    <GridItem :units="8" class="tui-participantGeneralInformation__rhs">
       <div class="tui-participantGeneralInformation__relationship">
         <p class="tui-participantGeneralInformation__relationship-heading">
           {{
@@ -128,12 +128,15 @@ export default {
     border-bottom: var(--border-width-thin) solid var(--color-neutral-5);
   }
 
+  &__rhs {
+    background: var(--color-neutral-2);
+  }
+
   &__relationship {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     padding: var(--gap-2) var(--gap-4) var(--gap-1) var(--gap-4);
-    background: var(--color-neutral-2);
     border-radius: var(--border-radius-normal);
   }
 

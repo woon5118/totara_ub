@@ -21,7 +21,7 @@
     class="tui-loader"
     :class="{ 'tui-loader--active': loading, 'tui-loader--fullpage': fullpage }"
   >
-    <div v-if="emptySlot && loading" class="tui-loader__empty" />
+    <div v-if="isEmptySlot() && loading" class="tui-loader__empty" />
     <slot />
     <div v-if="loading" class="tui-loader__overlay" role="alert">
       <div class="tui-loader__overlay-positioner">
@@ -47,8 +47,8 @@ export default {
     loading: Boolean,
   },
 
-  computed: {
-    emptySlot() {
+  methods: {
+    isEmptySlot() {
       return !this.$slots.default;
     },
   },

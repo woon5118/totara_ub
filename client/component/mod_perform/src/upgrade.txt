@@ -15,7 +15,8 @@ information provided here is intended especially for developers.
     * Replaced the following
         * ElementAdminReadOnlyDisplay.vue with PerformAdminCustomElementSummary.vue
     * Updated the template structure of ActivityContent.vue and ActivityContentPrint.vue to drive view only responses off new generic
-      view only response components (ResponseDisplay.vue and HtmlResponseDisplay.vue), removed unused css classes
+      view only response components (ResponseDisplay.vue and HtmlResponseDisplay.vue), removed unused css classes. Also refactored 
+      the existing layout approach and standardised the page margins with other Tui pages.
         * Template & SCSS changes
 * Deprecated the method createNotificationIfNotExists() from NotificationsTab.vue as notifications now always exist.
   See server/mod/perform/upgrade.txt for more detail.

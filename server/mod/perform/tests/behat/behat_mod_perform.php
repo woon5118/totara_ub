@@ -963,7 +963,7 @@ class behat_mod_perform extends behat_base {
             if ($found_question === null) {
                 continue;
             }
-            $actual_title = trim(str_replace(['(optional)', '*'], ['', ''], $found_question->getText()));
+            $actual_title = trim(str_replace(['(optional)', '*', 'Required', 'Optional'], ['', '', '', ''], $found_question->getText()));
             if ($actual_title === $question_text) {
                 return $question;
             }
@@ -991,27 +991,25 @@ class behat_mod_perform extends behat_base {
 
     private function find_required_question_from_text(string $question_text, bool $is_required): NodeElement {
         /** @var NodeElement[] $questions */
-        $questions = $this->find_all('css', self::PERFORM_ELEMENT_LOCATOR);
 
-        foreach ($questions as $question) {
-            $found_question = $question->find('css', self::PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR);
+        $question = $this->find_question_from_text($question_text);
 
-            if ($found_question !== null && trim($found_question->getText()) === $question_text) {
-                if ($is_required) {
-                    $required_found = $found_question->getParent()->find('css', self::PERFORM_ELEMENT_QUESTION_REQUIRED_LOCATOR);
-                    if ($required_found === null) {
-                        $this->fail('Found question but it is not required.');
-                    }
-                } else {
-                    $required_found = $found_question->getParent()->find('css', self::PERFORM_ELEMENT_QUESTION_OPTIONAL_LOCATOR);
-                    if ($required_found === null) {
-                        $this->fail('Found question but it is not optional.');
-                    }
+        if ($question !== null) {
+            if ($is_required) {
+                $required_found = $question->find('css', self::PERFORM_ELEMENT_QUESTION_REQUIRED_LOCATOR);
+                if ($required_found === null) {
+                    $this->fail('Found question but it is not required.');
                 }
-
-                return $question;
+            } else {
+                $required_found = $question->find('css', self::PERFORM_ELEMENT_QUESTION_OPTIONAL_LOCATOR);
+                if ($required_found === null) {
+                    $this->fail('Found question but it is not optional.');
+                }
             }
+
+            return $question;
         }
+        
 
         throw new ExpectationException("Required Question not found with text {$question_text}", $this->getSession());
     }

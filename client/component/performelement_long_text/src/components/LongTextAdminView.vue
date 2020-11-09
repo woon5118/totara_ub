@@ -20,7 +20,7 @@
   <div class="tui-longTextAdminView">
     <Form input-width="full" :vertical="true">
       <FormRow>
-        <Textarea :rows="6" name="answer_text" :char-length="20" />
+        <Textarea :rows="6" name="answer_text" :char-length="50" />
       </FormRow>
     </Form>
   </div>

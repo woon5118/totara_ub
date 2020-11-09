@@ -6,4 +6,5 @@ information provided here is intended especially for developers.
 * Added closeable prop to Popover.vue component
 * Added closeable prop to PopoverFrame.vue component
 * Added closeablePopover prop to LabelledButtonTrigger.vue component
-* Updated Range.vue component to not emmit a change event on focus
+* Updated Range.vue component to not emit a change event on focus
+* Converted Loader.vue emptySlot computed property to a isEmptySlot method so it correctly updates for subsequent requests

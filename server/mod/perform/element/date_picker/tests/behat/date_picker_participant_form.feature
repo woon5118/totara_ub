@@ -26,14 +26,14 @@ Feature: Interact with the date picker in the participant form
     And I add a "Date picker" activity content element
 
     When I set the following fields to these values:
-      | rawTitle | Required date picker |
+      | rawTitle | Req date picker |
     And I click on the "responseRequired" tui checkbox
     And I save the activity content element
     Then I should see "Required"
     And I add a "Date picker" activity content element
 
     When I set the following fields to these values:
-      | rawTitle | Optional date picker |
+      | rawTitle | Opt date picker |
     And I save the activity content element
     And I close the tui notification toast
     And I close the tui modal
@@ -59,39 +59,39 @@ Feature: Interact with the date picker in the participant form
     And I click on "Date pickers" "link"
     And I click on "Save as draft" "button"
     Then I should see "Draft saved" in the tui success notification toast
-    And I should see "Required date picker" has no validation errors
-    And I should see "Optional date picker" has no validation errors
+    And I should see "Req date picker" has no validation errors
+    And I should see "Opt date picker" has no validation errors
 
     When I click on "Submit" "button"
-    Then I should see "Required date picker" has the validation error "Required"
-    And I should see "Optional date picker" has no validation errors
+    Then I should see "Req date picker" has the validation error "Required"
+    And I should see "Opt date picker" has no validation errors
 
     When I set the "sectionElements[1][response]" tui date selector to "1  "
     And I set the "sectionElements[2][response]" tui date selector to "1  "
     And I click on "Save as draft" "button"
-    Then I should see "Required date picker" has the validation error "Invalid date. Select day, month and year"
-    And I should see "Optional date picker" has the validation error "Invalid date. Select day, month and year"
+    Then I should see "Req date picker" has the validation error "Invalid date. Select day, month and year"
+    And I should see "Opt date picker" has the validation error "Invalid date. Select day, month and year"
 
     When I click on "Submit" "button"
-    Then I should see "Required date picker" has the validation error "Invalid date. Select day, month and year"
-    Then I should see "Optional date picker" has the validation error "Invalid date. Select day, month and year"
+    Then I should see "Req date picker" has the validation error "Invalid date. Select day, month and year"
+    Then I should see "Opt date picker" has the validation error "Invalid date. Select day, month and year"
 
     When I set the "sectionElements[1][response]" tui date selector to "1 January "
     And I set the "sectionElements[2][response]" tui date selector to "1 January "
     And I click on "Save as draft" "button"
-    Then I should see "Required date picker" has the validation error "Invalid date. Select day, month and year"
-    And I should see "Optional date picker" has the validation error "Invalid date. Select day, month and year"
+    Then I should see "Req date picker" has the validation error "Invalid date. Select day, month and year"
+    And I should see "Opt date picker" has the validation error "Invalid date. Select day, month and year"
 
     When I click on "Submit" "button"
-    Then I should see "Required date picker" has the validation error "Invalid date. Select day, month and year"
-    And I should see "Optional date picker" has the validation error "Invalid date. Select day, month and year"
+    Then I should see "Req date picker" has the validation error "Invalid date. Select day, month and year"
+    And I should see "Opt date picker" has the validation error "Invalid date. Select day, month and year"
 
     When I set the "sectionElements[1][response]" tui date selector to "1 January 2020"
     And I set the "sectionElements[2][response]" tui date selector to "1 January 2020"
     And I click on "Save as draft" "button"
-    Then I should see "Required date picker" has no validation errors
-    And I should see "Optional date picker" has no validation errors
+    Then I should see "Req date picker" has no validation errors
+    And I should see "Opt date picker" has no validation errors
 
     When I click on "Submit" "button"
-    Then I should see "Required date picker" has no validation errors
-    And I should see "Optional date picker" has no validation errors
+    Then I should see "Req date picker" has no validation errors
+    And I should see "Opt date picker" has no validation errors
