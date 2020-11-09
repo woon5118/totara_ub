@@ -24,6 +24,7 @@ namespace ml_recommender\local\export;
 
 use ml_recommender\local\csv\writer;
 use ml_recommender\local\environment;
+use totara_engage\timeview\time_view;
 
 /**
  * Export class for interaction table.
@@ -36,6 +37,8 @@ class user_interactions extends export {
 
     public function export(writer $writer): bool {
         $recordset = $this->get_export_recordset();
+
+        $microlearning_time_view = time_view::LESS_THAN_FIVE;
 
         if (!$recordset->valid()) {
             return false;
@@ -52,7 +55,13 @@ class user_interactions extends export {
         foreach ($recordset as $interaction) {
             // Get the mapped item and user ids.
             $user_id = $interaction->user_id;
-            $item_id = $interaction->component . $interaction->item_id;
+
+            // The timeview value will only be correct for, and pertinent to, engage_article.
+            if ($interaction->component == 'engage_article' && $microlearning_time_view == $interaction->timeview) {
+                $item_id = 'engage_microlearning' . $interaction->item_id;
+            } else {
+                $item_id = $interaction->component . $interaction->item_id;
+            }
             $timestamp = $interaction->mytimestamp;
 
             // Normalise "rating" - more than 1 interaction is positive - implicit feedback.  See:
@@ -99,14 +108,16 @@ class user_interactions extends export {
         list($components_in_sql, $components_params) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
 
         $sql = "
-            SELECT user_id, item_id, component, MAX(time_created) AS mytimestamp, SUM(rating) AS myrating
+            SELECT ri.user_id, ri.item_id, mrc.component, MAX(ri.time_created) AS mytimestamp, SUM(ri.rating) AS myrating, tea.timeview
             FROM {ml_recommender_interactions} ri
             INNER JOIN {ml_recommender_components} mrc ON (mrc.id = ri.component_id)
             INNER JOIN {ml_recommender_interaction_types} mrit ON (mrit.id = ri.interaction_type_id)
+            LEFT JOIN {engage_resource} ter on (ter.id = ri.item_id and mrc.component = 'engage_article')
+            LEFT JOIN {engage_article} tea on (tea.id = ter.instanceid)
             $tenant_join_sql
             WHERE component $components_in_sql
-              AND time_created >= :mintimestamp
-            GROUP BY user_id, item_id, component 
+              AND ri.time_created >= :mintimestamp
+            GROUP BY user_id, item_id, component, timeview
         ";
         $params_sql['mintimestamp'] = $min_timestamp;
 
@@ -134,7 +145,8 @@ class user_interactions extends export {
                 e.courseid AS item_id,
                 cc.containertype AS component,
                 ue.timecreated AS mytimestamp,
-                2 AS myrating
+                2 AS myrating,
+                null as timeview
             FROM {user_enrolments} ue
             INNER JOIN {enrol} e ON (ue.enrolid = e.id)
             INNER JOIN {course} cc ON e.courseid = cc.id 
@@ -144,7 +156,7 @@ class user_interactions extends export {
 
         // Set recordset cursor.
         $params = array_merge($params_sql, $components_params);
-        //die(var_dump([$sql, $params]));
+
         return $DB->get_recordset_sql($sql, $params);
     }
 }

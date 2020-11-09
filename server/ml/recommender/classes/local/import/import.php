@@ -74,6 +74,7 @@ abstract class import {
     protected function get_component_id(string $unique_id): array {
         if (preg_match('/^([a-zA-Z_]+)(\d+)$/', $unique_id, $matches)) {
             $component = $matches[1];
+            $component = ($component == 'engage_microlearning') ? 'engage_article' : $component;
             $item_id = $matches[2];
             return [$component, $item_id];
         }

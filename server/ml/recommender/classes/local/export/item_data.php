@@ -23,6 +23,7 @@
 namespace ml_recommender\local\export;
 
 use ml_recommender\local\csv\writer;
+use totara_engage\timeview\time_view;
 
 /**
  * Export class for item (i.e. articles, playlists) data.
@@ -51,6 +52,7 @@ class item_data extends export {
             'container_course',
             'container_workspace',
             'engage_article',
+            'engage_microlearning',
             'totara_playlist'
         ];
         $component_names = $this->one_hot_components($component_names);
@@ -95,6 +97,7 @@ class item_data extends export {
                 $this_item_topics = $DB->get_fieldset_select('tag_instance', 'tagid', $select, [$item->id, $tag_component_names[$component]]);
             } else {
                 $select = 'itemid = ? and component = ?';
+                $component = ($component == 'engage_microlearning') ? 'engage_article' : $component;
                 $this_item_topics = $DB->get_fieldset_select('tag_instance', 'tagid', $select, [$item->id, $component]);
             }
 
@@ -177,19 +180,27 @@ class item_data extends export {
         }
 
         // Build sql.
+        $unique_microlearning_id = $DB->sql_concat("'engage_microlearning'", 'er.id');
         $unique_article_id = $DB->sql_concat("'engage_article'", 'er.id');
         $unique_playlist_id = $DB->sql_concat("'totara_playlist'", 'tp.id');
         $unique_workspace_id = $DB->sql_concat("'container_workspace'", 'cw.id');
         $unique_course_id = $DB->sql_concat("'container_course'", 'cc.id');
 
         $public = \totara_engage\access\access::PUBLIC;
+        $microlearning_time_view = time_view::LESS_THAN_FIVE;
 
         $sql = "
+        SELECT $unique_microlearning_id AS uniqueid, er.id, er.name AS title, ea.content AS content, ea.format as summaryformat 
+        FROM {engage_resource} er 
+        JOIN {engage_article} ea ON er.instanceid = ea.id
+        $tenant_er_join_sql
+        WHERE er.resourcetype = 'engage_article' AND er.access = $public AND ea.timeview = $microlearning_time_view 
+        UNION ALL
         SELECT $unique_article_id AS uniqueid, er.id, er.name AS title, ea.content AS content, ea.format as summaryformat 
         FROM {engage_resource} er 
         JOIN {engage_article} ea ON er.instanceid = ea.id
         $tenant_er_join_sql
-        WHERE er.resourcetype = 'engage_article' AND er.access = $public
+        WHERE er.resourcetype = 'engage_article' AND er.access = $public AND ea.timeview != $microlearning_time_view
         UNION ALL
         SELECT $unique_playlist_id AS uniqueid, tp.id, tp.name AS title, tp.summary AS content, tp.summaryformat
         FROM {playlist} tp

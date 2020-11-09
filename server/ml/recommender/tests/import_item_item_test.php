@@ -38,6 +38,8 @@ class ml_recommender_import_item_item_testcase extends advanced_testcase {
             ['target_iid' => 'totara_playlist1', 'similar_iid' => 'engage_article96', 'ranking' => 0.629082918167],
             ['target_iid' => 'totara_playlist1', 'similar_iid' => 'totara_playlist70', 'ranking' => 0.627931892872],
             ['target_iid' => 'engage_article2', 'similar_iid' => 'engage_article24', 'ranking' => 0.602713346481],
+            ['target_iid' => 'engage_microlearning1', 'similar_iid' => 'engage_microlearning70', 'ranking' => 0.627931892872],
+            ['target_iid' => 'engage_microlearning2', 'similar_iid' => 'engage_microlearning24', 'ranking' => 0.602713346481],
             ['target_iid' => 'engage_article2', 'similar_iid' => 'engage_article47', 'ranking' => 0.599358260632]
         ];
 

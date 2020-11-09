@@ -38,6 +38,8 @@ class ml_recommender_import_item_user_testcase extends advanced_testcase {
             ['uid' => 2, 'iid' => 'engage_article242', 'ranking' => 1.892577528954],
             ['uid' => 2, 'iid' => 'totara_playlist1', 'ranking' => 1.879106402397],
             ['uid' => 1, 'iid' => 'engage_article271', 'ranking' => 1.845853328705],
+            ['uid' => 1, 'iid' => 'engage_microlearning1', 'ranking' => 1.879106402397],
+            ['uid' => 2, 'iid' => 'engage_microlearning1', 'ranking' => 1.845853328705],
             ['uid' => 1, 'iid' => 'engage_article122', 'ranking' => 1.669565081596]
         ];
 
