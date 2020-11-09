@@ -119,6 +119,19 @@ function wekaNodeClickTarget(domNode, type) {
     }
 
     /**
+     * @param boolean $activate set true if this function is called during the activation of the weka editor
+     * @throws coding_exception Thrown when something's off.
+     */
+    private function validate_common(bool $activate = false) {
+        if (!$this->running_javascript()) {
+            throw new coding_exception('Weka editor tests require JavaScript.');
+        }
+        if (!$activate && !$this->current_weka) {
+            throw new coding_exception('Activate a Weka editor first.');
+        }
+    }
+
+    /**
      * Set the weka editor content to the specified text.
      *
      * @Given /^I activate the weka editor with css "(?P<field_selector>(?:[^"]|\\")*)"$/
@@ -176,6 +189,26 @@ function wekaNodeClickTarget(domNode, type) {
         \behat_hooks::set_step_readonly(false);
         $value = str_replace('\n', "\n", $value);
         $this->type_chars($value);
+    }
+
+    /**
+     * Replace the selected text in the weka editor.
+     *
+     * @Given /^I replace the selection with "(?P<field_value_string>(?:[^"]|\\")*)" in the weka editor$/
+     * @param string $value
+     */
+    public function i_replace_the_selection_with_in_the_weka_editor($value) {
+        $this->validate_common();
+        \behat_hooks::set_step_readonly(false);
+        $value = str_replace('\n', "\n", $value);
+        $js = "(function(){
+var sel = window.getSelection();
+if (sel.rangeCount < 1) return;
+var range = sel.getRangeAt(0);
+range.deleteContents();
+range.insertNode(document.createTextNode(". json_encode($value, JSON_UNESCAPED_SLASHES) ."));
+}());";
+        $this->getSession()->executeScript($js);
     }
 
     /**

@@ -56,10 +56,12 @@ Feature: Test the totara_mobile_program query
     And I click on "Save changes" "button"
     And I activate the weka editor with css "#uid-1"
     And I select the text "HTML" in the weka editor
-    And I type "JSON" in the weka editor
+    And I replace the selection with "JSON" in the weka editor
+    Then I should not see "HTML" in the "#uid-1" "css_element"
     And I activate the weka editor with css "#uid-2"
     And I select the text "LMTH" in the weka editor
-    And I type "NOSJ" in the weka editor
+    And I replace the selection with "NOSJ" in the weka editor
+    Then I should not see "LMTH" in the "#uid-2" "css_element"
     And I click on "Save changes" "button"
     And I log out
     When I am using the mobile emulator

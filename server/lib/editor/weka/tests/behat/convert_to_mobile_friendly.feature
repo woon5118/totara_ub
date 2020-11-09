@@ -38,7 +38,7 @@ Feature: Convert from HTML to Weka editor test
     Then I should see "Please check mobile-friendly content and save when ready"
     And I activate the weka editor with css "#uid-1"
     And I select the text "Test" in the weka editor
-    And I type "Update" in the weka editor
+    And I replace the selection with "Update" in the weka editor
     And I click on "Save and display" "button"
     Then I should not see "Edit course settings"
     And I click on "Find Learning" in the totara menu
@@ -58,10 +58,10 @@ Feature: Convert from HTML to Weka editor test
     Then I should see "Please check mobile-friendly content and save when ready" exactly "2" times
     And I activate the weka editor with css "#uid-1"
     And I select the text "Test" in the weka editor
-    And I type "Update" in the weka editor
+    And I replace the selection with "Update" in the weka editor
     And I activate the weka editor with css "#uid-2"
     And I select the text "Later" in the weka editor
-    And I type "See Ya" in the weka editor
+    And I replace the selection with "See Ya" in the weka editor
     And I click on "Save changes" "button"
     Then I should not see "Define the program name, availability and description"
     And I should see "Hello World Update"
@@ -89,7 +89,7 @@ Feature: Convert from HTML to Weka editor test
     Then I should see "Please check mobile-friendly content and save when ready"
     And I activate the weka editor with css "#uid-1"
     And I select the text "Test" in the weka editor
-    And I type "Update" in the weka editor
+    And I replace the selection with "Update" in the weka editor
     And I click on "Save and return to course" "button"
     Then I should not see "Updating Label in Topic 1"
     And I should see "Hello World Update"
@@ -106,7 +106,7 @@ Feature: Convert from HTML to Weka editor test
     Then I should see "Please check mobile-friendly content and save when ready"
     And I activate the weka editor with css "#uid-1"
     And I select the text "Test" in the weka editor
-    And I type "Update" in the weka editor
+    And I replace the selection with "Update" in the weka editor
     And I click on "Save changes" "button"
     Then I should not see "Summary of Topic 1"
     And I should see "Hello World Update"

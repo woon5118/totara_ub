@@ -7,7 +7,6 @@ Feature: Test basic Weka functionality
       | user_one | User      | One      | one@example.com |
 
   Scenario: Create resource
-    Given I am on a totara site
     And I log in as "admin"
     And I navigate to the "weka_basic" fixture in the "lib/editor/weka" plugin
     And I set the weka editor with css ".tui-fixture-wekaBasic" to "First sample content"
@@ -54,3 +53,13 @@ Feature: Test basic Weka functionality
     And I click on "#hashtag" "link"
     Then I should see "View search results"
     And "a[href$='index.php?catalog_fts=hashtag']" "css_element" should exist
+
+  Scenario: Replace selection
+    And I log in as "admin"
+    And I navigate to the "weka_basic" fixture in the "lib/editor/weka" plugin
+    When I set the weka editor with css ".tui-fixture-wekaBasic" to "uno dos tres!"
+    Then I should see "uno dos tres!" in the ".tui-fixture-wekaBasic" "css_element"
+    When I activate the weka editor with css ".tui-fixture-wekaBasic"
+    And I select the text "tres" in the weka editor
+    And I replace the selection with "cuatro" in the weka editor
+    Then I should see "uno dos cuatro!" in the ".tui-fixture-wekaBasic" "css_element"
