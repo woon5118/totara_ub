@@ -63,6 +63,12 @@ export default {
 
   mixins: [ContainerMixin],
 
+  props: {
+    showNotification: {
+      type: Boolean,
+    },
+  },
+
   data() {
     return {
       stage: 0,
@@ -159,7 +165,7 @@ export default {
           },
         })
         .then(({ data: { article } }) => {
-          if (article) {
+          if (article && this.showNotification && !this.container) {
             notify({
               message: this.$str('created', 'engage_article'),
               type: 'success',

@@ -31,7 +31,10 @@
       :styleclass="{ circle: true, xsmall: true, primary: false }"
     >
       <template v-slot:modal>
-        <ContributeModal :exclude-modals="['totara_playlist']" />
+        <ContributeModal
+          :exclude-modals="['totara_playlist']"
+          :show-notification="showNotification"
+        />
       </template>
     </Contribute>
   </div>
@@ -52,6 +55,17 @@ export default {
 
   mixins: [NavigationMixin],
 
+  computed: {
+    /**
+     * Determine showing notification or not.
+     *
+     */
+    showNotification() {
+      return Object.keys(this.values).includes('showNotification')
+        ? this.values.showNotification
+        : true;
+    },
+  },
   methods: {
     getLinkClasses(name) {
       let classes = this.getNavigationLinkClass(name, 0);

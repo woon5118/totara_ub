@@ -48,6 +48,9 @@ $tui = new \totara_tui\output\component(
             'component' => 'YourResourcesContent',
             'tuicomponent' => 'totara_engage/components/contribution/YourResources',
         ],
+        'page-props' => [
+            'showNotification' => false
+        ],
     ]
 );
 $tui->register($PAGE);

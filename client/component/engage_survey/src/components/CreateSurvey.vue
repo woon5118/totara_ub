@@ -59,6 +59,12 @@ export default {
 
   mixins: [ContainerMixin],
 
+  props: {
+    showNotification: {
+      type: Boolean,
+    },
+  },
+
   data() {
     return {
       stage: 0,
@@ -150,7 +156,7 @@ export default {
           },
         })
         .then(({ data: { survey } }) => {
-          if (survey) {
+          if (survey && this.showNotification && !this.container) {
             notify({
               message: this.$str('created', 'engage_survey'),
               type: 'success',

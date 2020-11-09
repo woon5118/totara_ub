@@ -70,6 +70,7 @@
           <component
             :is="selectedTab"
             :container="container"
+            :show-notification="showNotification"
             @change-title="stage = $event"
             @done="$emit('done', $event)"
             @cancel="$emit('request-close')"
@@ -135,6 +136,9 @@ export default {
 
         return keys.every(key => key in obj);
       },
+    },
+    showNotification: {
+      type: Boolean,
     },
   },
 
