@@ -1464,7 +1464,7 @@ class restore_ui_stage_complete extends restore_ui_stage_process {
         }
         $html .= $renderer->notification(get_string('restoreexecutionsuccess', 'backup'), 'notifysuccess');
         $html .= $renderer->continue_button(new moodle_url('/course/view.php', array(
-            'id' => $this->get_ui()->get_controller()->get_courseid())), 'get');
+            'id' => $this->get_ui()->get_controller()->get_courseid())), 'get', false);
         $html .= $renderer->box_end();
 
         return $html;

@@ -676,14 +676,16 @@ class core_backup_renderer extends plugin_renderer_base {
      * @param string $method
      * @return string
      */
-    public function continue_button($url, $method = 'post') {
+    public function continue_button($url, $method = 'post', $sesskey = true) {
         if (!($url instanceof moodle_url)) {
             $url = new moodle_url($url);
         }
         if ($method != 'post') {
             $method = 'get';
         }
-        $url->param('sesskey', sesskey());
+        if ($sesskey) {
+            $url->param('sesskey', sesskey());
+        }
         $button = new single_button($url, get_string('continue'), $method, true);
         $button->class = 'continuebutton';
         return $this->render($button);
