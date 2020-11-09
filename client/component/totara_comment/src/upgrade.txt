@@ -3,5 +3,11 @@ information provided here is intended especially for developers.
 
 === 13.2 ===
 
+* Added new optional prop "canViewAuthor" in Reply.vue
+* Added new optional prop "canViewAuthor" in Comment.vue
+* Renamed CSS class name from "tui-commentUserLink--small" to "tui-commentUserLink--smallLink"
+* Renamed CSS class name from "tui-commentUserLink--large" to "tui-commentUserLink--largeLink"
+* Updated prop "profileUrl" to optional instead of required in "CommentReplyHeader.vue"
+* Updated prop "profileUrl" to optional instead of required in "CommentUserLink.vue"
 * Deprecated prop "component" in ReplyForm.vue, this prop will no longer be used.
 * Deprecated prop "area" in ReplyForm.vue, this prop will no longer be used.

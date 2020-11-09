@@ -10,6 +10,7 @@ type totara_comment_comment_interactor {
   can_report: Boolean!
   can_reply: Boolean!
   can_react: Boolean!
+  can_view_author: Boolean!
   reacted: Boolean!
 }
 
@@ -25,6 +26,7 @@ type totara_comment_reply_interactor {
   can_report: Boolean!
   can_react: Boolean!
   can_follow_reply: Boolean!
+  can_view_author: Boolean!
   reacted: Boolean!
 }
 

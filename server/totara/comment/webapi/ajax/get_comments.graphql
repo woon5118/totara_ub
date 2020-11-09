@@ -46,6 +46,7 @@ query totara_comment_get_comments(
       can_reply
       can_react
       reacted
+      can_view_author
     }
   }
 }

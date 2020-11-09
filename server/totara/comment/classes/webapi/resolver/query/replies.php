@@ -17,15 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author  Kian Nguyen <kian.nguyen@totaralearning.com>
  * @package totara_comment
  */
 namespace totara_comment\webapi\resolver\query;
 
+use context;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use totara_comment\access\author_access_handler;
 use totara_comment\comment;
 use totara_comment\exception\comment_exception;
 use totara_comment\loader\comment_loader;
@@ -36,7 +38,7 @@ use totara_comment\resolver_factory;
  */
 final class replies implements query_resolver, has_middleware {
     /**
-     * @param array $args
+     * @param array             $args
      * @param execution_context $ec
      * @return comment[]
      */
@@ -45,7 +47,7 @@ final class replies implements query_resolver, has_middleware {
 
         $page = 1;
         if (isset($args['page'])) {
-            $page = (int) $args['page'];
+            $page = (int)$args['page'];
         }
 
         $comment = comment::from_id($args['commentid']);
@@ -58,7 +60,7 @@ final class replies implements query_resolver, has_middleware {
         $resolver = resolver_factory::create_resolver($component);
 
         $context_id = $resolver->get_context_id($instance_id, $instance_area);
-        $context = \context::instance_by_id($context_id);
+        $context = context::instance_by_id($context_id);
 
         if (!$ec->has_relevant_context()) {
             $ec->set_relevant_context($context);
@@ -72,7 +74,27 @@ final class replies implements query_resolver, has_middleware {
         $paginator = comment_loader::get_replies($comment, $page);
 
         $replies = $paginator->get_items()->all();
+        static::cache_author_accesses($replies, $USER->id);
+
         return array_reverse($replies);
+    }
+
+    /**
+     * @param comment[] $replies
+     * @param int       $actor_id
+     *
+     * @return void
+     */
+    private static function cache_author_accesses(array $replies, int $actor_id): void {
+        $author_ids = array_map(
+            function (comment $comment): int {
+                return $comment->get_userid();
+            },
+            $replies
+        );
+
+        $handler = new author_access_handler($actor_id);
+        $handler->process_access_against_users($author_ids);
     }
 
     /**
@@ -83,5 +105,4 @@ final class replies implements query_resolver, has_middleware {
             new require_login(),
         ];
     }
-
 }

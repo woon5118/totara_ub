@@ -17,9 +17,11 @@
 -->
 
 <template>
-  <a :href="profileUrl">
+  <a v-if="profileUrl" :href="profileUrl">
     <CoreAvatar :src="imageSrc" :alt="imageAlt" size="xxsmall" />
   </a>
+
+  <CoreAvatar v-else :src="imageSrc" :alt="imageAlt" size="xxsmall" />
 </template>
 
 <script>
@@ -41,10 +43,7 @@ export default {
       type: String,
     },
 
-    profileUrl: {
-      required: true,
-      type: String,
-    },
+    profileUrl: String,
   },
 };
 </script>

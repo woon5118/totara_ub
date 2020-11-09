@@ -59,6 +59,7 @@
           :show-like-button-text="showLikeButtonText"
           :show-reply-button-text="showReplyButtonText"
           :inline-head="commentInlineHead"
+          :can-view-author="comment.interactor.can_view_author"
           class="tui-commentThread__comment"
           :class="{
             'tui-commentThread__comment--large': isLarge,

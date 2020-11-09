@@ -67,6 +67,9 @@ final class reply_interactor implements type_resolver {
             case 'reacted':
                 return $source->reacted();
 
+            case 'can_view_author':
+                return $source->can_view_author();
+
             default:
                 debugging("The field '{$field}' is not yet supported", DEBUG_DEVELOPER);
                 return null;

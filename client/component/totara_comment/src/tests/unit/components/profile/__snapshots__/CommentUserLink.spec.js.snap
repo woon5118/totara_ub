@@ -2,7 +2,7 @@
 
 exports[`totara_comment/components/profile/CommentUserLink.vue Checks snapshot 1`] = `
 <a
-  class="tui-commentUserLink tui-commentUserLink--small"
+  class="tui-commentUserLink tui-commentUserLink--smallLink"
   href="http://example.com"
 >
   

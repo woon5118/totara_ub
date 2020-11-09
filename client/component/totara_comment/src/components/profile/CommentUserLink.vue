@@ -18,15 +18,27 @@
 
 <template>
   <a
+    v-if="profileUrl"
     :href="profileUrl"
     class="tui-commentUserLink"
     :class="{
-      'tui-commentUserLink--small': isSmall,
-      'tui-commentUserLink--large': isLarge,
+      'tui-commentUserLink--smallLink': isSmall,
+      'tui-commentUserLink--largeLink': isLarge,
     }"
   >
     {{ userFullName }}
   </a>
+
+  <span
+    v-else
+    class="tui-commentUserLink"
+    :class="{
+      'tui-commentUserLink--smallText': isSmall,
+      'tui-commentUserLink--largeText': isLarge,
+    }"
+  >
+    {{ userFullName }}
+  </span>
 </template>
 
 <script>
@@ -35,11 +47,6 @@ import { isValid, SIZE_SMALL, SIZE_LARGE } from 'totara_comment/size';
 export default {
   props: {
     userFullName: {
-      type: String,
-      required: true,
-    },
-
-    profileUrl: {
       type: String,
       required: true,
     },
@@ -59,6 +66,8 @@ export default {
         return isValid(prop);
       },
     },
+
+    profileUrl: String,
   },
 
   computed: {
@@ -75,14 +84,24 @@ export default {
 
 <style lang="scss">
 .tui-commentUserLink {
-  font-weight: bold;
-
-  &--small {
+  &--smallLink {
     @include tui-font-link-small();
+    @include tui-font-heavy();
   }
 
-  &--large {
+  &--largeLink {
     @include tui-font-link();
+    @include tui-font-heavy();
+  }
+
+  &--smallText {
+    @include tui-font-body-small();
+    @include tui-font-heavy();
+  }
+
+  &--largeText {
+    @include tui-font-body();
+    @include tui-font-heavy();
   }
 }
 </style>

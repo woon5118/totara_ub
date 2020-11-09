@@ -23,6 +23,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['bracketnumber'] = '({$a})';
+$string['cachedef_author_access'] = "Comment's author access cache";
 $string['comments'] = 'Comments ({$a})';
 $string['deletecommentconfirm'] = 'Your comment will be deleted. Any replies to your comment will remain.';
 $string['deletedcomment'] = "This comment has been deleted.";

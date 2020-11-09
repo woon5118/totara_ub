@@ -234,6 +234,7 @@ export default {
     showLikeButtonText: Boolean,
     showReplyButtonText: Boolean,
     inlineHead: Boolean,
+    canViewAuthor: Boolean,
   },
 
   data() {
@@ -260,7 +261,14 @@ export default {
       return this.replyAble || this.reactAble;
     },
 
+    /**
+     * @return {String|undefined}
+     */
     profileUrl() {
+      if (!this.canViewAuthor) {
+        return undefined;
+      }
+
       return this.$url('/user/profile.php', { id: this.userId });
     },
   },

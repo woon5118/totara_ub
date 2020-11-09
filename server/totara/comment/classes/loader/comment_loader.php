@@ -29,7 +29,6 @@ use totara_comment\comment;
 use totara_comment\entity\comment as comment_entity;
 use totara_comment\pagination\cursor;
 use totara_comment\pagination\cursor_paginator;
-use totara_comment\repository\comment_repository;
 
 /**
  * Communication layer between the application and the database.
@@ -156,6 +155,11 @@ final class comment_loader {
         // We have to loaded from the bottom to top. In order to include any latest comments in the result set.
         // Then at the webapi level, it has to be reverse to the asc.
         $builder->order_by('tm.timecreated', order::DIRECTION_DESC);
+
+        // We need to sort by id as well, this might be a rare case, but sometimes there are like millions
+        // of records had the same time_created field. Which means that sort by time_created field only
+        // can cause the pagination going on forever.
+        $builder->order_by('tm.id', order::DIRECTION_DESC);
         return $builder;
     }
 
@@ -224,7 +228,6 @@ final class comment_loader {
      * @return int
      */
     public static function count_comments(int $instance_id, string $component, string $area): int {
-        /** @var comment_repository $repo */
         $repo = comment_entity::repository();
         return $repo->count_comment_for_instances($instance_id, $component, $area);
     }

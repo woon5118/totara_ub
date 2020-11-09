@@ -90,11 +90,6 @@ export default {
       },
     },
 
-    profileUrl: {
-      type: String,
-      required: true,
-    },
-
     userFullName: {
       type: String,
       required: true,
@@ -125,6 +120,7 @@ export default {
       required: true,
     },
 
+    profileUrl: String,
     inlineHead: Boolean,
   },
 

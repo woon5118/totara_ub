@@ -35,6 +35,7 @@ mutation totara_comment_update_comment(
       can_reply
       can_react
       reacted
+      can_view_author
     }
   }
 }

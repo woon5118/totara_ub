@@ -61,6 +61,7 @@
           :report-able="reply.interactor.can_report"
           :reply-able="reply.interactor.can_follow_reply"
           :react-able="reply.interactor.can_react"
+          :can-view-author="reply.interactor.can_view_author"
           :total-reactions="reply.totalreactions"
           :reacted="reply.interactor.reacted"
           :edited="reply.edited"

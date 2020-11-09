@@ -26,6 +26,7 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use totara_comment\access\author_access_handler;
 use totara_comment\comment;
 use totara_comment\exception\comment_exception;
 use totara_comment\loader\comment_loader;
@@ -74,10 +75,29 @@ final class comments implements query_resolver, has_middleware {
         );
 
         $comments = $paginator->get_items()->all();
+        static::cache_author_accesses($comments, $USER->id);
 
         // We need to sort the comments base on the time creation, so that the earliest comments
         // will go to first index following by the next recent comments.
         return array_reverse($comments);
+    }
+
+    /**
+     * @param array $comments
+     * @param int   $actor_id
+     *
+     * @return void
+     */
+    private static function cache_author_accesses(array $comments, int $actor_id): void {
+        $author_ids = array_map(
+            function (comment $comment): int {
+                return $comment->get_userid();
+            },
+            $comments
+        );
+
+        $handler = new author_access_handler($actor_id);
+        $handler->process_access_against_users($author_ids);
     }
 
     /**

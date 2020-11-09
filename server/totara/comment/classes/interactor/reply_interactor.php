@@ -22,6 +22,7 @@
  */
 namespace totara_comment\interactor;
 
+use totara_comment\access\author_access_handler;
 use totara_comment\comment;
 use totara_comment\resolver_factory;
 use totara_reaction\loader\reaction_loader;
@@ -195,5 +196,15 @@ final class reply_interactor {
             comment::REPLY_AREA,
             $this->actor_id
         );
+    }
+
+    /**
+     * @return bool
+     */
+    public function can_view_author(): bool {
+        $handler = new author_access_handler($this->actor_id);
+        $owner_id = $this->reply->get_userid();
+
+        return $handler->can_see_user($owner_id);
     }
 }

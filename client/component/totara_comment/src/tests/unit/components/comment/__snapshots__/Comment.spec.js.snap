@@ -8,12 +8,10 @@ exports[`totara_comment/components/comment/Comment.vue Checks snapshot 1`] = `
   <avatar-stub
     imagealt="xx fwf"
     imagesrc="http://example.com"
-    profileurl="/user/profile.php?[object Object]"
   />
    
   <commentheader-stub
     deleteable="true"
-    profileurl="/user/profile.php?[object Object]"
     size="small"
     timedescription="5th September 2019"
     updateable="true"

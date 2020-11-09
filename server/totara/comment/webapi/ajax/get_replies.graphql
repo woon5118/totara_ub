@@ -27,6 +27,7 @@ query totara_comment_get_replies(
       can_update
       can_react
       can_follow_reply
+      can_view_author
       reacted
     }
   }

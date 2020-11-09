@@ -192,6 +192,7 @@ export default {
     showLikeButtonText: Boolean,
     showReplyButtonText: Boolean,
     inlineHead: Boolean,
+    canViewAuthor: Boolean,
   },
 
   data() {
@@ -202,7 +203,15 @@ export default {
   },
 
   computed: {
+    /**
+     * @return {String|undefined}
+     */
     profileUrl() {
+      if (!this.canViewAuthor) {
+        // Do not provide author's profile url when the actor cannot view the author
+        return undefined;
+      }
+
       return this.$url('/user/profile.php', { id: this.userId });
     },
 
