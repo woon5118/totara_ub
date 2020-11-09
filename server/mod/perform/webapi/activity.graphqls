@@ -78,7 +78,7 @@ An element plugin configuration
 """
 type mod_perform_element_plugin_config {
   """
-  is respondable element
+  is_respondable config setting
   """
   is_respondable: Boolean!
 
@@ -124,38 +124,45 @@ type mod_perform_element_plugin {
   Name of vue component used to display the element configuration form to the activity admin
   """
   admin_form_component: String!
-    @deprecated(reason: "Use `admin_edit_form_component` instead.")
+    @deprecated(reason: "Use `admin_edit_component` instead.")
 
   """
   Name of vue component used to display the element configuration form to the activity admin
   """
   admin_edit_component: String!
+
   """
   Name of the vue component used to display the preview of a completed element to the activity admin
   """
   admin_display_component: String!
     @deprecated(reason: "Use `admin_view_component` instead.")
+
   """
   Name of the vue component used to display the preview of a completed element to the activity admin
   """
   admin_view_component: String!
+
   """
   Name of the vue component used to display a read-only view of an element when an activity is active
   """
   admin_read_only_display_component: String!
-    @deprecated(reason: "Use `admin_read_only_component` instead.")
+    @deprecated(reason: "Use `admin_summary_component` instead.")
+
   """
   Name of the vue component used to display a summary view of an element when an activity is active
   """
   admin_summary_component: String!
+
   """
   Name of the vue component used to display the form element to the participant when they are completing the activity
   """
   participant_form_component: String!
+
   """
   Name of the vue component used to display a participant's response to this element
   """
-  participant_response_component: String!
+  participant_response_component: String
+
   """
   Value indicating which group of elements this element is under (1 for question elements, 2 for other non-respondable elements)
   """

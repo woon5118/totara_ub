@@ -41,7 +41,7 @@ function performelement_multi_choice_multi_change_data() {
             continue;
         }
 
-        //move settings to flat structure
+        // move settings to flat structure
         if (isset($decoded_data['settings'])) {
             foreach ($decoded_data['settings'] as $setting) {
                 $decoded_data[$setting['name']] = $setting['value'];

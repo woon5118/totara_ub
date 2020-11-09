@@ -189,9 +189,9 @@ class mod_perform_webapi_resolver_query_view_only_section_responses_testcase ext
                     'element_plugin' =>
                         [
                             'participant_form_component' =>
-                                'performelement_short_text/components/ShortTextElementParticipantForm',
+                                'performelement_short_text/components/ShortTextParticipantForm',
                             'participant_response_component' =>
-                                'performelement_short_text/components/ShortTextElementParticipantResponse',
+                                'mod_perform/components/element/participant_form/ResponseDisplay',
                         ],
                     'title' => 'test element title',
                     'data' => null,
@@ -211,9 +211,8 @@ class mod_perform_webapi_resolver_query_view_only_section_responses_testcase ext
                     'element_plugin' =>
                         [
                             'participant_form_component' =>
-                                'performelement_static_content/components/StaticContentElementParticipant',
-                            'participant_response_component' =>
-                                'performelement_static_content/components/StaticContentElementParticipant',
+                                'performelement_static_content/components/StaticContentParticipantForm',
+                            'participant_response_component' => null,
                         ],
                     'title' => 'test element title',
                     'data' => null,
@@ -243,6 +242,7 @@ class mod_perform_webapi_resolver_query_view_only_section_responses_testcase ext
                             ]
                         ],
                         'response_data' => null,
+                        'response_data_formatted_lines' => [],
                     ]
                 ]
             ]
@@ -286,19 +286,18 @@ class mod_perform_webapi_resolver_query_view_only_section_responses_testcase ext
             'Expected one section element'
         );
 
-        $this->assertContains(
+        $this->assertEquals(
             $this->create_section_element_response($section_element->id, $subject_participant_user),
-            $section_element_responses
+            $section_element_responses[0]
         );
 
-        $this->assertContains(
+        $this->assertEquals(
             $this->create_static_section_element_response($static_section_element->id, $subject_participant_user),
-            $section_element_responses
+            $section_element_responses[1]
         );
     }
 
     /**
-     * @param string $cap
      * @param stdClass $reporter
      * @param stdClass $subject
      */

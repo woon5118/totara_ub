@@ -191,14 +191,14 @@ Feature: Test viewing Performance activity response data
     Then I should see "Question one" in the tui modal
     And I should see "(optional)" in the tui modal
     And the following fields match these values:
-      | [answer_text] |  |
+      | [response] |  |
 
     When I click on "Close" "button"
     And I click on "Preview" "button" in the "Question two" "table_row"
     Then I should see "Question two" in the tui modal
     And I should see "(optional)" in the tui modal
     And the following fields match these values:
-      | [answer_text] |  |
+      | [response] |  |
 
     # Now check the required questions activity.
     When I navigate to the mod perform response data report for "Simple required questions activity" activity
@@ -212,14 +212,14 @@ Feature: Test viewing Performance activity response data
     Then I should see "Question one" in the tui modal
     And I should see "*" in the tui modal
     And the following fields match these values:
-      | [answer_text] |  |
+      | [response] |  |
 
     When I click on "Close" "button"
     And I click on "Preview" "button" in the "Question two" "table_row"
     Then I should see "Question two" in the tui modal
     And I should see "*" in the tui modal
     And the following fields match these values:
-      | [answer_text] |  |
+      | [response] |  |
 
     # Check back link goes to the correct tab (by content).
     When I close the tui modal

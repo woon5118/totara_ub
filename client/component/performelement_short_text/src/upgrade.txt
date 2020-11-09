@@ -6,3 +6,7 @@ information provided here is intended especially for developers.
     * ShortTextElementAdminDisplay.vue replaced with ShortTextAdminView.vue
     * ShortTextElementAdminForm.vue replaced with ShortTextAdminEdit.vue
     * ShortTextElementAdminReadOnlyDisplay.vue replaced with ShortTextAdminSummary.vue
+* Replaced ShortTextElementParticipantForm.vue with CustomRatingScaleParticipantForm.vue and changed validation
+  to use core validation rules where possible
+    * Template & lang string changes
+* Removed ShortTextElementParticipantResponse.vue, generic ResponseDisplay.vue component is used instead

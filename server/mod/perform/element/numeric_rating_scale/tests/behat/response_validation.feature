@@ -60,4 +60,4 @@ Feature: Numeric rating scale response validation
     When I click on ".tui-range__input" "css_element"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
-    And I should see "Section submitted." in the tui success notification toast
+    And I should see "Section submitted" in the tui success notification toast

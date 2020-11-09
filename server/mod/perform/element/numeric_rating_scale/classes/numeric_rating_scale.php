@@ -58,17 +58,7 @@ class numeric_rating_scale extends respondable_element_plugin {
      * @return string|string[]
      */
     public function decode_response(?string $encoded_response_data, ?string $encoded_element_data) {
-        $response_data = json_decode($encoded_response_data, true);
-
-        if ($response_data === null) {
-            return null;
-        }
-
-        if (!isset($response_data['answer_value'])) {
-            throw new coding_exception('Invalid response data format, expected "answer_value" field');
-        }
-
-        return $response_data['answer_value'];
+        return json_decode($encoded_response_data, true);
     }
 
     /**
@@ -91,13 +81,6 @@ class numeric_rating_scale extends respondable_element_plugin {
         if ($answer_value < $low || $answer_value > $high) {
             $errors->append(new answer_invalid_error());
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function get_group(): int {
-        return self::GROUP_QUESTION;
     }
 
     /**

@@ -23,7 +23,6 @@
 
 $string['answer_text'] = 'Answer text {$a}';
 $string['error_answer_required'] = 'Answer is required';
-$string['error_you_must_answer_this_question'] = 'Required';
 $string['name'] = 'Multiple choice: multi-select';
 $string['no_response_submitted'] = 'No response submitted';
 $string['option_required_error'] = 'Option field cannot be left blank';
@@ -36,7 +35,6 @@ $string['response_restriction'] = 'Response restriction';
 $string['restriction_minimum_label'] = 'Minimum selection (empty = unlimited)';
 $string['restriction_maximum_label'] = 'Maximum selection (empty = unlimited)';
 $string['restriction_response_help_text'] = 'Use this setting to determine a minimum and maximum number of options to be selected. Leave empty if you don’t want any restrictions.';
-$string['your_response'] = 'Your response';
 
 // Deprecated in 13
 $string['error_question_required'] = 'Question is required';
@@ -45,3 +43,5 @@ $string['minmaximum_value_error'] = 'Invalid. Restriction must not exceed total 
 $string['minmaximum_zero_error'] = 'Invalid. Restriction must be bigger then 0';
 $string['question_title'] = 'Question text';
 $string['reporting_id_help_text'] = 'Create unique element identifier for reporting purposes.';
+$string['error_you_must_answer_this_question'] = 'Required';
+$string['your_response'] = 'Your response';

@@ -23,9 +23,7 @@
 
 $string['answer_text'] = 'Answer text {$a}';
 $string['error_answer_required'] = 'Answer is required';
-$string['error_you_must_answer_this_question'] = 'Required';
 $string['name'] = 'Multiple choice: single-select';
-$string['no_response_submitted'] = 'No response submitted';
 $string['option_required_error'] = 'Option field cannot be left blank';
 $string['options'] = 'Options';
 $string['pluginname'] = 'Multiple choice single select element';
@@ -34,3 +32,5 @@ $string['single_select_options'] = 'Single-select options';
 // Deprecated in 13
 $string['error_question_required'] = 'Question is required';
 $string['question_title'] = 'Question text';
+$string['error_you_must_answer_this_question'] = 'Required';
+$string['no_response_submitted'] = 'No response submitted';

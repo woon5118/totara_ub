@@ -34,7 +34,7 @@ Feature: Viewing other responses
     When I click on "Submit" "button"
     And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Section submitted." in the tui success notification toast
+    And I should see "Section submitted" in the tui success notification toast
     And the "Your activities" tui tab should be active
 
     When I click on "John is participating subject" "link"
@@ -86,7 +86,7 @@ Feature: Viewing other responses
     And I confirm the tui confirmation modal
 
     Then I should see "Performance activities"
-    And I should see "Section submitted." in the tui success notification toast
+    And I should see "Section submitted" in the tui success notification toast
     And the "Activities about others" tui tab should be active
 
     When I click on "Close" "button"
@@ -119,7 +119,7 @@ Feature: Viewing other responses
     And I confirm the tui confirmation modal
 
     Then I should see "Performance activities"
-    And I should see "Section submitted." in the tui success notification toast and close it
+    And I should see "Section submitted" in the tui success notification toast and close it
     And the "Activities about others" tui tab should be active
 
     When I log out
@@ -154,7 +154,7 @@ Feature: Viewing other responses
     When I click on "Submit" "button"
     And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Section submitted." in the tui success notification toast
+    And I should see "Section submitted" in the tui success notification toast
     And the "Your activities" tui tab should be active
 
   Scenario: I can save as a draft

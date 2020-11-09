@@ -34,6 +34,7 @@ query mod_perform_participant_sections_for_print(
       sort_order
       response_data
       response_data_raw: response_data(format: RAW)
+      response_data_formatted_lines
       other_responder_groups {
         relationship_name
         responses {
@@ -44,6 +45,7 @@ query mod_perform_participant_sections_for_print(
             }
           }
           response_data
+          response_data_formatted_lines
         }
       }
     }

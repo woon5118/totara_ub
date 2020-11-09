@@ -61,12 +61,8 @@ class multi_choice_multi extends respondable_element_plugin {
             return null;
         }
 
-        if (!isset($response_data['answer_option'])) {
-            throw new coding_exception('Invalid response data format, expected "answer_option" field');
-        }
-
-        if (!is_array($response_data['answer_option'])) {
-            throw new coding_exception('Invalid response data format, expected "answer_option" to be an array');
+        if (!is_array($response_data)) {
+            throw new coding_exception('Invalid response data format, expected array of selected options');
         }
 
         if ($element_data === null || !isset($element_data['options'])) {
@@ -79,23 +75,18 @@ class multi_choice_multi extends respondable_element_plugin {
 
         $responses = [];
         foreach ($element_data['options'] as $i => $option) {
-            if (!isset($option['name']) || !isset($option['value'])) {
+            if (!isset($option['name'], $option['value'])) {
                 throw new coding_exception('Invalid element options format, expected "name" and "value" fields');
             }
-            foreach ($response_data['answer_option'] as $answer_option) {
+
+            foreach ($response_data as $answer_option) {
                 if ($option['name'] == $answer_option) {
                     $responses[] = $option['value'];
                 }
             }
         }
-        return $responses;
-    }
 
-    /**
-     * @inheritDoc
-     */
-    public function get_group(): int {
-        return self::GROUP_QUESTION;
+        return $responses;
     }
 
     /**
@@ -104,4 +95,12 @@ class multi_choice_multi extends respondable_element_plugin {
     public function get_sortorder(): int {
         return 20;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_example_response_data(): string {
+        return '[]';
+    }
+
 }

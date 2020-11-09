@@ -228,8 +228,21 @@
                       >
                         <template v-slot:content>
                           <component
-                            :is="sectionElement.component"
-                            v-bind="loadUserSectionElementProps(sectionElement)"
+                            :is="sectionElement.responseDisplayComponent"
+                            v-if="activeSectionIsClosed"
+                            :element="sectionElement.element"
+                            :data="sectionElement.response_data"
+                            :response-lines="
+                              sectionElement.response_data_formatted_lines
+                            "
+                          />
+                          <component
+                            :is="sectionElement.formComponent"
+                            v-else
+                            :is-draft="isDraft"
+                            :element="sectionElement.element"
+                            :path="['sectionElements', sectionElement.id]"
+                            :error="errors && errors[sectionElement.id]"
                           />
                         </template>
                       </ElementParticipantForm>
@@ -238,8 +251,11 @@
                         class="tui-participantContent__staticElement"
                       >
                         <component
-                          :is="sectionElement.component"
-                          v-bind="loadUserSectionElementProps(sectionElement)"
+                          :is="sectionElement.formComponent"
+                          :is-draft="isDraft"
+                          :element="sectionElement.element"
+                          :path="['sectionElements', sectionElement.id]"
+                          :error="errors && errors[sectionElement.id]"
                         />
                       </div>
                       <OtherParticipantResponses
@@ -832,14 +848,22 @@ export default {
         this.initialValues = {
           sectionElements: {},
         };
+
         this.sectionElements = result.section_element_responses.map(item => {
-          let component = this.activeSectionIsClosed
-            ? item.element.element_plugin.participant_response_component
-            : item.element.element_plugin.participant_form_component;
+          let responseDisplayComponent = null;
+          if (item.element.is_respondable) {
+            responseDisplayComponent = tui.asyncComponent(
+              item.element.element_plugin.participant_response_component
+            );
+          }
+
           return {
             id: item.section_element_id,
             clientId: uniqueId(),
-            component: tui.asyncComponent(component),
+            formComponent: tui.asyncComponent(
+              item.element.element_plugin.participant_form_component
+            ),
+            responseDisplayComponent,
             element: {
               type: item.element.element_plugin,
               title: item.element.title,
@@ -850,7 +874,15 @@ export default {
             },
             sort_order: item.sort_order,
             is_respondable: item.element.is_respondable,
-            response_data: item.response_data,
+            // We need to handle the absence of response data in the view-only report mode
+            // in this mode the actor doesn't have "response_data" directly,
+            // all responses are grouped under "other_responder_groups".
+            response_data: this.viewOnlyReportMode
+              ? null
+              : JSON.parse(item.response_data),
+            response_data_formatted_lines: this.viewOnlyReportMode
+              ? []
+              : item.response_data_formatted_lines,
             other_responder_groups: item.other_responder_groups,
           };
         });
@@ -863,9 +895,10 @@ export default {
         result.section_element_responses
           .filter(item => item.element.is_respondable)
           .forEach(item => {
-            this.initialValues.sectionElements[
-              item.section_element_id
-            ] = JSON.parse(item.response_data_raw);
+            this.initialValues.sectionElements[item.section_element_id] = {
+              response: JSON.parse(item.response_data_raw),
+            };
+
             this.hasOtherResponse = item.other_responder_groups.length > 0;
             item.other_responder_groups.forEach(group => {
               if (group.responses.length > 0 && item.response_data) {
@@ -897,28 +930,6 @@ export default {
         .sort(response => (response.response_data === null ? 1 : -1));
 
       return groupClone;
-    },
-
-    /**
-     * Creates user section element component props
-     *
-     * @param {Object} sectionElement
-     * @return {Object}
-     */
-    loadUserSectionElementProps(sectionElement) {
-      let props = {
-        element: sectionElement.element,
-      };
-      if (this.activeSectionIsClosed) {
-        props.data = JSON.parse(sectionElement.response_data);
-        props.class = 'tui-participantContent__readonly';
-      } else {
-        props.isDraft = this.isDraft;
-        props.path = ['sectionElements', sectionElement.id];
-        props.error = this.errors && this.errors[sectionElement.id];
-      }
-
-      return props;
     },
 
     /**
@@ -1412,7 +1423,7 @@ export default {
   }
 
   &__sectionItem {
-    margin-top: var(--gap-4);
+    margin-top: var(--gap-12);
 
     &-content {
       & > * {
@@ -1422,15 +1433,6 @@ export default {
     &-contentHeader {
       display: inline-flex;
       @include tui-font-heading-x-small();
-      margin-left: 0;
-    }
-  }
-
-  &__staticElement {
-    display: flex;
-    &__name {
-      @include tui-font-body();
-      margin-left: var(--gap-3);
     }
   }
 

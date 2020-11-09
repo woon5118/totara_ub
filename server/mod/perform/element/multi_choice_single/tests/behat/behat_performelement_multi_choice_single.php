@@ -30,6 +30,42 @@ class behat_performelement_multi_choice_single extends behat_base {
     public const QUESTION_DISPLAY_OPTIONS_LOCATOR = '.tui-radio__label';
 
     /**
+     * @When /^I click multi choice single question element$/
+     * @deprecated since Totara 13.2
+     */
+    public function i_click_multi_choice_single_question_element(): void {
+        debugging(
+            '\behat_performelement_multi_choice_single::i_save_multi_choice_single_question_element_data() is deprecated and should no longer be used.'
+            . ' Please use behat_mod_perform::i_add_a_custom_element() with "Multiple choice: single-select" as the parameter',
+            DEBUG_DEVELOPER
+        );
+
+        behat_hooks::set_step_readonly(false);
+
+        $behat_general = behat_context_helper::get('behat_general');
+
+        $behat_general->i_click_on("Add element","button");
+        $behat_general->i_click_on("Multiple choice: single-select", "button");
+    }
+
+    /**
+     * @When /^I save multi choice single question element data$/
+     * @deprecated since Totara 13.2
+     */
+    public function i_save_multi_choice_single_question_element_data(): void {
+        debugging(
+            '\behat_performelement_multi_choice_single::i_save_multi_choice_single_question_element_data() is deprecated and should no longer be used.'
+            . ' Please use behat_mod_perform::i_save_the_custom_element_settings() with "save" as the parameter',
+            DEBUG_DEVELOPER
+        );
+
+        behat_hooks::set_step_readonly(false);
+
+        $done_button = $this->find('css', behat_mod_perform::ADMIN_FORM_DONE_BUTTON);
+        $done_button->click();
+    }
+
+    /**
      * @When /^I click multi choice single question add new option$/
      */
     public function i_click_multi_choice_single_question_add_new_option(): void {

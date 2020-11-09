@@ -32,30 +32,35 @@ use core\webapi\formatter\field\text_field_formatter;
  * Formats user entered responses for this element.
  */
 class response_formatter extends base {
+
     /**
      * {@inheritdoc}
      */
     protected function get_default_format($value) {
-        $options = json_decode($value, true);
-        if (!is_array($options)) {
+        if ($value === 'null') {
+            return null;
+        }
+
+        $decoded_value = json_decode($value, true);
+
+        if (!$decoded_value || !is_string($decoded_value)) {
             return $value;
         }
 
-        $answer = $options['answer_text'] ?? null;
-        if ($answer) {
-            $format = $this->format ?? format::FORMAT_HTML;
-            $formatter = new text_field_formatter($format, $this->context);
-            $formatter->disabled_pluginfile_url_rewrite();
-            $formatter->set_text_format(FORMAT_MOODLE);
+        $format = $this->format ?? format::FORMAT_HTML;
 
-            $options['answer_text'] = $formatter->format($answer);
+        $formatter = new text_field_formatter($format, $this->context);
+        $formatter->disabled_pluginfile_url_rewrite();
+        $formatter->set_text_format(FORMAT_MOODLE);
+
+        $formatted_value = $formatter->format($decoded_value);
+        $formatted_value = json_encode($formatted_value);
+
+        if ($formatted_value === false) {
+            throw new coding_exception('Error encoding the formatted response');
         }
 
-        $options = json_encode($options);
-        if ($options === false) {
-            throw new coding_exception('Error encoding the formatted options');
-        }
-
-        return $options;
+        return $formatted_value;
     }
+
 }

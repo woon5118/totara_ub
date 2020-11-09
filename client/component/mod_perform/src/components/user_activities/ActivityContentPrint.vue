@@ -95,11 +95,14 @@
                 >
                   <template v-slot:content>
                     <component
-                      :is="elementResponse.responseComponent"
+                      :is="elementResponse.responseDisplayComponent"
                       v-if="sectionResponse.availability_status === 'CLOSED'"
                       class="tui-participantContentPrint__element tui-participantContentPrint__element--readOnly"
                       :element="elementResponse.element"
-                      :data="JSON.parse(elementResponse.response_data)"
+                      :data="elementResponse.response_data"
+                      :response-lines="
+                        elementResponse.response_data_formatted_lines
+                      "
                     />
                     <component
                       :is="elementResponse.formComponent"
@@ -110,20 +113,12 @@
                     />
                   </template>
                 </ElementParticipantForm>
-                <template v-else-if="!elementResponse.is_respondable">
-                  <component
-                    :is="elementResponse.responseComponent"
-                    v-if="sectionResponse.availability_status === 'CLOSED'"
-                    :element="elementResponse.element"
-                    :data="JSON.parse(elementResponse.response_data)"
-                  />
-                  <component
-                    :is="elementResponse.formComponent"
-                    v-else
-                    :element="elementResponse.element"
-                    :path="['sectionElements', elementResponse.id]"
-                  />
-                </template>
+                <component
+                  :is="elementResponse.formComponent"
+                  v-else-if="!elementResponse.is_respondable"
+                  :element="elementResponse.element"
+                  :path="['sectionElements', elementResponse.id]"
+                />
                 <OtherParticipantResponses
                   :view-only="false"
                   :section-element="elementResponse"
@@ -250,7 +245,7 @@ export default {
                 sectionElementResponse.element.element_plugin
                   .participant_form_component
               ),
-              responseComponent: tui.asyncComponent(
+              responseDisplayComponent: tui.asyncComponent(
                 sectionElementResponse.element.element_plugin
                   .participant_response_component
               ),
@@ -262,8 +257,12 @@ export default {
               },
               sort_order: sectionElementResponse.sort_order,
               is_respondable: sectionElementResponse.element.is_respondable,
-              response_data: sectionElementResponse.response_data,
-              response_data_raw: sectionElementResponse.response_data_raw,
+              response_data: JSON.parse(sectionElementResponse.response_data),
+              response_data_raw: JSON.parse(
+                sectionElementResponse.response_data_raw
+              ),
+              response_data_formatted_lines:
+                sectionElementResponse.response_data_formatted_lines,
               other_responder_groups:
                 sectionElementResponse.other_responder_groups,
             };
@@ -292,7 +291,7 @@ export default {
           .forEach(elementResponse => {
             initialUniformValues[sectionResponse.id].sectionElements[
               elementResponse.id
-            ] = JSON.parse(elementResponse.response_data_raw);
+            ] = { response: elementResponse.response_data_raw };
           });
       });
 

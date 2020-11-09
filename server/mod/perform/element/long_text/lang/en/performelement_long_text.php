@@ -21,12 +21,12 @@
  * @package performelement_long_text
  */
 
-$string['error_you_must_answer_this_question'] = 'Required';
 $string['name'] = 'Long text';
 $string['pluginname'] = 'Long text element';
-$string['response_no_response_submitted'] = 'No response submitted';
 
 
 // Deprecated in 13
 $string['error_question_required'] = 'Question is required';
 $string['title'] = 'Question text';
+$string['error_you_must_answer_this_question'] = 'Required';
+$string['response_no_response_submitted'] = 'No response submitted';

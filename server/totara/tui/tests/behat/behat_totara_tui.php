@@ -1068,6 +1068,10 @@ class behat_totara_tui extends behat_base {
         ];
 
         foreach ($selections as $key => $selection) {
+            if ($selection === '') {
+                continue;
+            }
+
             /** @var NodeElement $select_node */
             $select_node = $date_selector->find('css', ".tui-dateSelector__date-$key select");
             $select_node->selectOption($selection);

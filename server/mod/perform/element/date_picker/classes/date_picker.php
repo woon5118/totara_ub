@@ -24,16 +24,10 @@
 namespace performelement_date_picker;
 
 use coding_exception;
+use mod_perform\models\activity\element;
 use mod_perform\models\activity\respondable_element_plugin;
 
 class date_picker extends respondable_element_plugin {
-
-    /**
-     * @inheritDoc
-     */
-    public function get_group(): int {
-        return self::GROUP_QUESTION;
-    }
 
     /**
      * @inheritDoc
@@ -48,29 +42,55 @@ class date_picker extends respondable_element_plugin {
      * @param string|null $encoded_response_data
      * @param string|null $encoded_element_data
      * @return string|string[]
-     * @throws coding_exception
      */
     public function decode_response(?string $encoded_response_data, ?string $encoded_element_data) {
+        return userdate(
+            $this->get_response_timestamp($encoded_response_data),
+            get_string('strftimedatefullshort', 'langconfig')
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function format_response_lines(?string $encoded_response_data, ?string $encoded_element_data): array {
+        $decoded_response = $this->get_response_timestamp($encoded_response_data);
+
+        if ($decoded_response === null) {
+            return [];
+        }
+
+        $formatted_date = userdate(
+            $decoded_response,
+            get_string('strftimedate', 'langconfig')
+        );
+
+        return [$formatted_date];
+    }
+
+    /**
+     * Pull the timestamp of the response date out of the encoded response.
+     *
+     * @param string|null $encoded_response_data
+     * @return int|null
+     */
+    private function get_response_timestamp(?string $encoded_response_data): ?int {
         $response_data = json_decode($encoded_response_data, true);
 
         if ($response_data === null) {
             return null;
         }
 
-        if (!isset($response_data['date'])) {
-            throw new coding_exception('Invalid response data format, expected "date" field');
-        }
-
-        if (!isset($response_data['date']['iso'])) {
+        if (!isset($response_data['iso'])) {
             throw new coding_exception('Invalid response data format, expected "date" field to contain "iso" property');
         }
 
-        $date_object = \DateTime::createFromFormat('Y-m-d', $response_data['date']['iso']);
+        $date_object = \DateTime::createFromFormat('Y-m-d', $response_data['iso']);
 
         if ($date_object === false) {
             throw new coding_exception('Invalid response data format, could not parse ISO date');
         }
 
-        return userdate($date_object->getTimestamp(), get_string('strftimedatefullshort', 'langconfig'));
+        return $date_object->getTimestamp();
     }
 }

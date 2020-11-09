@@ -51,28 +51,17 @@ class long_text extends respondable_element_plugin {
      *
      * @param string|null $encoded_response_data
      * @param string|null $encoded_element_data
-     * @return string|string[]
-     * @throws coding_exception
+     * @return string|null
      */
-    public function decode_response(?string $encoded_response_data, ?string $encoded_element_data) {
-        $response_data = json_decode($encoded_response_data, true);
-
-        if ($response_data === null) {
-            return null;
-        }
-
-        if (!is_array($response_data) || !array_key_exists('answer_text', $response_data)) {
-            throw new coding_exception('Invalid response data format, expected "answer_text" field');
-        }
-
-        return $response_data['answer_text'];
+    public function decode_response(?string $encoded_response_data, ?string $encoded_element_data): ?string {
+        return $this->decode_simple_string_response($encoded_response_data);
     }
 
     /**
      * @inheritDoc
      */
-    public function get_group(): int {
-        return self::GROUP_QUESTION;
+    public function get_participant_response_component(): string {
+        return 'mod_perform/components/element/participant_form/HtmlResponseDisplay';
     }
 
     /**

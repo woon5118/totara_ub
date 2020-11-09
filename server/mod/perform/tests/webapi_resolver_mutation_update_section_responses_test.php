@@ -81,8 +81,8 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
         /** @var section_element $section_element2 */
         $section_element2 = $section_elements->last();
 
-        $encoded_response1 = json_encode(['answer_text' => 'A quick brown fox']);
-        $encoded_response2 = json_encode(['answer_text' => 'Answer 2']);
+        $encoded_response1 = json_encode('A quick brown fox');
+        $encoded_response2 = json_encode('Answer 2');
 
         $args = [
             'input' => [
@@ -150,7 +150,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
             'Expected participant section to change to progress status "complete"'
         );
 
-        $encoded_response1_modified = json_encode(['answer_text' => 'Changed answer one']);
+        $encoded_response1_modified = json_encode('Changed answer one');
 
         $args = [
             'input' => [
@@ -236,11 +236,11 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
                 'update' => [
                     [
                         'section_element_id' => $section_elements->first()->id,
-                        'response_data' => json_encode(['answer_text' => 'A quick brown fox']),
+                        'response_data' => json_encode('A quick brown fox'),
                     ],
                     [
                         'section_element_id' => $section_elements->last()->id,
-                        'response_data' => json_encode(['answer_text' => 'Answer 2']),
+                        'response_data' => json_encode('Answer 2'),
                     ],
                 ],
             ],
@@ -297,11 +297,11 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
                 'update' => [
                     [
                         'section_element_id' => $section_elements->shift()->id,
-                        'response_data' => json_encode(['answer_text' => 'A quick brown fox']),
+                        'response_data' => json_encode('A quick brown fox'),
                     ],
                     [
                         'section_element_id' => $section_elements->shift()->id,
-                        'response_data' => json_encode(['answer_text' => 'Answer 2']),
+                        'response_data' => json_encode('Answer 2'),
                     ],
                 ],
             ],
@@ -354,11 +354,11 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
                 'update' => [
                     [
                         'section_element_id' => $section_element1->id,
-                        'response_data' => json_encode(['answer_text' => 'This one is fine']),
+                        'response_data' => json_encode('This one is fine'),
                     ],
                     [
                         'section_element_id' => $section_element2->id,
-                        'response_data' => json_encode(['answer_text' => random_string(short_text::MAX_ANSWER_LENGTH + 1)]),
+                        'response_data' => json_encode(random_string(short_text::MAX_ANSWER_LENGTH + 1)),
                     ],
                 ],
             ],
@@ -420,11 +420,11 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
                 'update' => [
                     [
                         'section_element_id' => $section_element1->id,
-                        'response_data' => json_encode(['answer_text' => 'This one is fine']),
+                        'response_data' => json_encode('This one is fine'),
                     ],
                     [
                         'section_element_id' => $section_element2->id,
-                        'response_data' => json_encode(['answer_text' => random_string(short_text::MAX_ANSWER_LENGTH + 1)]),
+                        'response_data' => json_encode(random_string(short_text::MAX_ANSWER_LENGTH + 1)),
                     ],
                 ],
             ],
@@ -445,11 +445,11 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
                 'update' => [
                     [
                         'section_element_id' => 1,
-                        'response_data' => json_encode(['answer_text' => 'This one is fine']),
+                        'response_data' => json_encode('This one is fine'),
                     ],
                     [
                         'section_element_id' => 2,
-                        'response_data' => json_encode(['answer_text' => random_string(short_text::MAX_ANSWER_LENGTH + 1)]),
+                        'response_data' => json_encode(random_string(short_text::MAX_ANSWER_LENGTH + 1)),
                     ],
                 ],
             ],
@@ -492,7 +492,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
         /** @var section_element $section_element2 */
         $section_element2 = $section_elements->last();
 
-        $encoded_response1 = json_encode(['answer_text' => 'A quick brown fox']);
+        $encoded_response1 = json_encode('A quick brown fox');
         participant_section::load_by_entity($participant_section)->get_progress_state()->on_participant_access();
 
         $args = [
@@ -595,7 +595,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
                 'update' => [
                     [
                         'section_element_id' => $other_participants_section_element_id,
-                        'response_data' => json_encode(['answer_text' => 'This one belongs to the other participants section']),
+                        'response_data' => json_encode('This one belongs to the other participants section'),
                     ],
                 ],
             ],
@@ -644,11 +644,11 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
                 'update' => [
                     [
                         'section_element_id' => $section_element1->id,
-                        'response_data' => json_encode(['answer_text' => 'This one is fine']),
+                        'response_data' => json_encode('This one is fine'),
                     ],
                     [
                         'section_element_id' => 0,
-                        'response_data' => json_encode(['answer_text' => "This section element doesn't exist at all"]),
+                        'response_data' => json_encode("This section element doesn't exist at all"),
                     ],
                 ],
             ],

@@ -17,18 +17,14 @@
 -->
 <template>
   <FormScope :path="path" :process="process">
-    <FormTextarea
-      :disabled="disabled"
-      :rows="6"
-      name="answer_text"
-      :validations="v => [answerRequired]"
-    />
+    <FormTextarea :rows="6" name="response" :validations="validations" />
   </FormScope>
 </template>
 
 <script>
 import FormScope from 'tui/components/reform/FormScope';
 import FormTextarea from 'tui/components/uniform/FormTextarea';
+import { v as validation } from 'tui/validation';
 
 export default {
   components: {
@@ -36,7 +32,6 @@ export default {
     FormTextarea,
   },
   props: {
-    disabled: Boolean,
     path: {
       type: [String, Array],
       default: '',
@@ -45,44 +40,35 @@ export default {
     isDraft: Boolean,
     element: Object,
   },
-  methods: {
-    process(value) {
-      if (!value) {
-        return { answer_text: '' };
-      }
-      value.answer_text = value.answer_text.trim();
-      return value;
-    },
-
+  computed: {
     /**
-     * answer validator based on element config
+     * An array of validation rules for the element.
+     * The rules returned depend on if we are saving as draft or if a response is required or not.
      *
-     * @return {function[]}
+     * @return {(function|object)[]}
      */
-    answerRequired(val) {
-      if (this.element.is_required) {
-        //no validation required if it's in draft status
-        if (this.isDraft) {
-          return null;
-        }
-        const isEmpty =
-          !val || (typeof val === 'string' && val.trim().length === 0);
-        if (isEmpty) {
-          return this.$str(
-            'error_you_must_answer_this_question',
-            'performelement_long_text'
-          );
-        }
+    validations() {
+      if (!this.isDraft && this.element && this.element.is_required) {
+        return [validation.required()];
       }
+
+      return [];
+    },
+  },
+  methods: {
+    /**
+     * Process the form values.
+     *
+     * @param value
+     * @return {null|string}
+     */
+    process(value) {
+      if (!value || !value.response) {
+        return null;
+      }
+
+      return value.response.trim();
     },
   },
 };
 </script>
-
-<lang-strings>
-  {
-    "performelement_long_text": [
-      "error_you_must_answer_this_question"
-    ]
-  }
-</lang-strings>

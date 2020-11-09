@@ -33,27 +33,19 @@ use performelement_short_text\short_text;
 class mod_perform_element_short_text_testcase extends advanced_testcase {
 
     /**
-     * @dataProvider invalid_response_data_format_provider
      * @param array|null $response_data
      * @throws coding_exception
      */
-    public function test_validate_response_invalid_format(array $response_data): void {
+    public function test_validate_response_invalid_format(): void {
         /** @var short_text $short_text */
         $short_text = element_plugin::load_by_plugin('short_text');
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('Invalid response data format, expected "answer_text" field');
+        $this->expectExceptionMessage('Invalid response data format, expected a string');
 
-        $element = $this->perform_generator()->create_element(['title'=>'element one', 'is_required'=>true]);
-        $short_text->validate_response(json_encode($response_data), $element);
+        $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true]);
+        $short_text->validate_response(json_encode(['key']), $element);
     }
-
-    public function invalid_response_data_format_provider(): array {
-        return [
-            'missing key' => [['irrelevant_key' => 1]],
-        ];
-    }
-
 
     /**
      * @dataProvider validation_provider
@@ -66,7 +58,7 @@ class mod_perform_element_short_text_testcase extends advanced_testcase {
         $short_text = element_plugin::load_by_plugin('short_text');
 
         $element = $this->perform_generator()->create_element(['title'=>'element one', 'is_required'=>true]);
-        $errors = $short_text->validate_response(json_encode(['answer_text' => $answer_text]), $element);
+        $errors = $short_text->validate_response(json_encode($answer_text), $element);
 
         self::assertEquals($expected_errors, $errors);
     }

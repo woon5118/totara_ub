@@ -160,7 +160,7 @@ Feature: Respond to activity with multiple sections
     Then I should see "Once submitted, your responses will be visible to other users who have permission to view them."
     And I should not see "You will not be able to update your responses after submission."
     And I confirm the tui confirmation modal
-    And I should see "Section submitted." in the tui success notification toast
+    And I should see "Section submitted" in the tui success notification toast
 
   Scenario: Navigate to next section from side panel
     Given I log in as "user1"

@@ -6,3 +6,7 @@ information provided here is intended especially for developers.
     * LongTextElementAdminDisplay.vue replaced with LongTextAdminView.vue
     * LongTextElementAdminForm.vue replaced with LongTextAdminEdit.vue
     * LongTextElementAdminReadOnlyDisplay.vue replaced with LongTextAdminSummary.vue
+* Replaced LongTextElementParticipantForm.vue with LongTextParticipantForm.vue and changed validation
+  to use core validation rules where possible
+    * Template & lang string changes
+* Removed LongTextElementParticipantResponse.vue, generic HtmlResponseDisplay.vue component is used instead

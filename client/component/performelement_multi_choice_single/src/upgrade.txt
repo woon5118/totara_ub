@@ -6,3 +6,7 @@ information provided here is intended especially for developers.
     * MultiChoiceSingleElementAdminDisplay.vue replaced with MultiChoiceSingleAdminView.vue
     * MultiChoiceSingleElementAdminForm.vue replaced with MultiChoiceSingleAdminEdit.vue
     * MultiChoiceSingleElementAdminReadOnlyDisplay.vue replaced with MultiChoiceSingleAdminSummary.vue
+* Replaced MultiChoiceSingleElementParticipantForm.vue with CustomRatingScaleParticipantForm.vue and changed validation
+  to use core validation rules where possible
+    * Template & lang string changes
+* Removed MultiChoiceSingleElementParticipantResponse.vue, generic ResponseDisplay.vue component is used instead

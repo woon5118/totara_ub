@@ -6,4 +6,7 @@ information provided here is intended especially for developers.
     * DatePickerElementAdminDisplay.vue replaced with DatePickerAdminView.vue
     * DatePickerElementAdminForm.vue replaced with DatePickerAdminEdit.vue
     * DatePickerElementAdminReadOnlyDisplay.vue replaced with DatePickerAdminSummary.vue
-
+* Replaced DatePickerElementParticipantForm.vue with CustomRatingScaleParticipantForm.vue and changed validation
+  to use core validation rules where possible
+    * Template & lang string changes
+* Removed DatePickerElementParticipantResponse.vue, generic ResponseDisplay.vue component is used instead

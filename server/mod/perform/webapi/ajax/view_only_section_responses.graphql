@@ -36,6 +36,7 @@ query mod_perform_view_only_section_responses(
             }
           }
           response_data
+          response_data_formatted_lines
         }
       }
     }

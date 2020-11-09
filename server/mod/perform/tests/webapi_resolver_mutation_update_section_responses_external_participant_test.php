@@ -59,7 +59,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_external_par
         $answers = [];
         $i = 1;
         foreach ($section_elements as $section_element) {
-            $encoded_response = json_encode(['answer_text' => 'response '.$i]);
+            $encoded_response = json_encode('response '.$i);
             $expected_responses[] = $encoded_response;
             $answers[] = [
                 'section_element_id' => $section_element->id,
@@ -168,7 +168,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_external_par
         $answers = [];
         $i = 1;
         foreach ($section_elements as $section_element) {
-            $encoded_response = json_encode(['answer_text' => 'response '.$i]);
+            $encoded_response = json_encode('response '.$i);
             $expected_responses[] = $encoded_response;
             $answers[] = [
                 'section_element_id' => $section_element->id,
@@ -250,12 +250,10 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_external_par
 
         $token = $external_section->participant_instance->external_participant->token;
 
-        $expected_responses = [];
         $answers = [];
         $i = 1;
         foreach ($section_elements as $section_element) {
-            $encoded_response = json_encode(['answer_text' => 'response '.$i]);
-            $expected_responses[] = $encoded_response;
+            $encoded_response = json_encode('response '.$i);
             $answers[] = [
                 'section_element_id' => $section_element->id,
                 'response_data' => $encoded_response,
@@ -290,12 +288,11 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_external_par
 
         $token = $external_section->participant_instance->external_participant->token;
 
-        $expected_responses = [];
         $answers = [];
         $i = 1;
         foreach ($section_elements as $section_element) {
-            $encoded_response = json_encode(['answer_text' => 'response '.$i]);
-            $expected_responses[] = $encoded_response;
+            $encoded_response = json_encode('response '.$i);
+
             $answers[] = [
                 'section_element_id' => $section_element->id,
                 'response_data' => $encoded_response,
@@ -335,12 +332,10 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_external_par
 
         $token = $external_section->participant_instance->external_participant->token;
 
-        $expected_responses = [];
         $answers = [];
         $i = 1;
         foreach ($section_elements as $section_element) {
-            $encoded_response = json_encode(['answer_text' => 'response '.$i]);
-            $expected_responses[] = $encoded_response;
+            $encoded_response = json_encode('response '.$i);
             $answers[] = [
                 'section_element_id' => $section_element->id,
                 'response_data' => $encoded_response,

@@ -37,6 +37,7 @@ query mod_perform_participant_section_external_participant_nosession(
       sort_order
       response_data
       response_data_raw: response_data(format: RAW)
+      response_data_formatted_lines
       validation_errors {
         error_code
         error_message
@@ -51,6 +52,7 @@ query mod_perform_participant_section_external_participant_nosession(
             }
           }
           response_data
+          response_data_formatted_lines
         }
       }
       visible_to {

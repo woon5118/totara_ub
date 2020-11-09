@@ -70,7 +70,7 @@ Feature: Viewing and responding to perform activities
     When I click on "Submit" "button"
     And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Section submitted." in the tui success notification toast
+    And I should see "Section submitted" in the tui success notification toast
     And the "Activities about others" tui tab should be active
     And I should see the tui datatable contains:
       | Activity title   | Type      | User      | Overall progress | Your progress |
@@ -99,7 +99,7 @@ Feature: Viewing and responding to perform activities
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Section submitted." in the tui success notification toast
+    And I should see "Section submitted" in the tui success notification toast
 
     When I click on "single user manager-appraiser" "button_exact"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
@@ -117,7 +117,7 @@ Feature: Viewing and responding to perform activities
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Section submitted." in the tui success notification toast
+    And I should see "Section submitted" in the tui success notification toast
 
     When I click on "single user manager-appraiser" "button_exact"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"

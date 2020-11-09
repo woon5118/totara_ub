@@ -6,3 +6,7 @@ information provided here is intended especially for developers.
     * MultiChoiceMultiElementAdminDisplay.vue replaced with MultiChoiceMultiAdminView.vue
     * MultiChoiceMultiElementAdminForm.vue replaced with MultiChoiceMultiAdminEdit.vue
     * MultiChoiceMultiElementAdminReadOnlyDisplay.vue replaced with MultiChoiceMultiAdminSummary.vue
+* Replaced MultiChoiceMultiElementParticipantForm.vue with CustomRatingScaleParticipantForm.vue and changed validation
+  to use core validation rules where possible
+    * Template & lang string changes
+* Removed MultiChoiceMultiElementParticipantResponse.vue, generic ResponseDisplay.vue component is used instead

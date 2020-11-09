@@ -113,6 +113,12 @@ abstract class element_plugin {
      * @deprecated since Totara 13.2
      */
     public function get_admin_form_component(): string {
+        debugging(
+            '\mod_perform\models\activity\element_plugin::get_admin_form_component() is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
+
         return $this->get_component_path('ElementAdminForm');
     }
 
@@ -134,6 +140,12 @@ abstract class element_plugin {
      * @deprecated since Totara 13.2
      */
     public function get_admin_display_component(): string {
+        debugging(
+            '\mod_perform\models\activity\element_plugin::get_admin_display_component() is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
+
         return $this->get_component_path('ElementAdminDisplay');
     }
 
@@ -155,6 +167,12 @@ abstract class element_plugin {
      * @deprecated since Totara 13.2
      */
     public function get_admin_read_only_display_component(): string {
+        debugging(
+            '\mod_perform\models\activity\element_plugin::get_admin_read_only_display_component() is deprecated and should no longer be used.'
+            . ' There is no alternative.',
+            DEBUG_DEVELOPER
+        );
+
         return $this->get_component_path('ElementAdminReadOnlyDisplay');
     }
 
@@ -172,14 +190,21 @@ abstract class element_plugin {
      * @return string
      */
     public function get_participant_form_component(): string {
-        return $this->get_component_path('ElementParticipantForm');
+        return $this->get_component_path('ParticipantForm');
     }
 
     /**
      * This method return element's user form vue component name
      * @return string
+     * @deprecated since Totara 13.2
      */
     public function get_participant_response_component(): string {
+        debugging(
+            '\mod_perform\models\activity\element_plugin::get_participant_response_component() is deprecated and should no longer be used.'
+            . 'Only classes expending \mod_perform\models\activity\respondable_element_plugin should implement this method',
+            DEBUG_DEVELOPER
+        );
+
         return $this->get_component_path('ElementParticipantResponse');
     }
 

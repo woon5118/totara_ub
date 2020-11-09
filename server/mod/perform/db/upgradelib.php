@@ -110,3 +110,47 @@ function mod_perform_upgrade_create_missing_notification_records(array $notifica
 
     $transaction->allow_commit();
 }
+
+/**
+ * Unwraps element_response.response_data json, to simple json encoded strings.
+ * This removed the need for unwrapping code in client side components and server side validation and formatting.
+ *
+ * answer_text: long_text, short_text
+ * answer_value: numeric_rating_scale
+ * answer_option: custom_rating_scale, multi_choice_single, multi_choice_multi
+ * date: date_picker
+ */
+function mod_perform_upgrade_unwrap_response_data() {
+    global $DB;
+
+    $possible_wrapping_fields = ['answer_text', 'answer_option', 'date', 'answer_value'];
+
+    $existing_responses = $DB->get_recordset_select('perform_element_response', "response_data <> 'null'");
+    foreach ($existing_responses as $existing_response) {
+        $decoded_response_data = json_decode($existing_response->response_data, true);
+
+        if (!is_array($decoded_response_data)) {
+            continue;
+        }
+
+        $unwrapped = null;
+
+        foreach ($possible_wrapping_fields as $possible_wrapping_field) {
+            if (array_key_exists($possible_wrapping_field, $decoded_response_data)) {
+                $unwrapped = $decoded_response_data[$possible_wrapping_field];
+                break;
+            }
+        }
+
+        if ($unwrapped) {
+            $unwrapped_encoded = json_encode($unwrapped);
+
+            $DB->set_field(
+                'perform_element_response',
+                'response_data',
+                $unwrapped_encoded,
+                ['id' => $existing_response->id]
+            );
+        }
+    }
+}

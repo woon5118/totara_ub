@@ -43,16 +43,14 @@ class mod_perform_webapi_resolver_query_element_plugins_testcase extends advance
             $this->assertInstanceOf(element_plugin::class, $element_plugin);
             $this->assertNotEmpty($element_plugin->get_plugin_name());
             $this->assertNotEmpty($element_plugin->get_name());
-            $this->assertNotEmpty($element_plugin->get_admin_form_component());
-            $this->assertNotEmpty($element_plugin->get_admin_display_component());
-            $this->assertNotEmpty($element_plugin->get_admin_read_only_display_component());
+            $this->assertNotEmpty($element_plugin->get_admin_edit_component());
+            $this->assertNotEmpty($element_plugin->get_admin_view_component());
+            $this->assertNotEmpty($element_plugin->get_admin_summary_component());
             $this->assertNotEmpty($element_plugin->get_participant_form_component());
         }
     }
 
     public function test_successful_ajax_call(): void {
-        // Need to activate this test after TL-28153 implemented
-        $this->markTestSkipped();
         $this->setAdminUser();
         $result = $this->parsed_graphql_operation(self::QUERY, []);
         $this->assert_webapi_operation_successful($result);
@@ -70,10 +68,9 @@ class mod_perform_webapi_resolver_query_element_plugins_testcase extends advance
             $this->assertIsBool($element_plugin['plugin_config']['is_title_required']);
             $this->assertIsBool($element_plugin['plugin_config']['is_response_required_enabled']);
             $this->assertNotEmpty($element_plugin['admin_edit_component']);
-            $this->assertNotEmpty($element_plugin['admin_display_component']);
-            $this->assertNotEmpty($element_plugin['admin_read_only_display_component']);
             $this->assertNotEmpty($element_plugin['admin_view_component']);
             $this->assertNotEmpty($element_plugin['admin_summary_component']);
+            $this->assertNotEmpty($element_plugin['participant_form_component']);
         }
     }
 

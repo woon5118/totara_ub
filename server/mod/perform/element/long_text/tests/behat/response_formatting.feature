@@ -4,8 +4,8 @@ Feature: Long text element response correctly processes text
   Background:
     Given I am on a totara site
     And the following "users" exist:
-      | username | firstname | lastname | email                   |
-      | john     | John      | One      | john.one@example.com    |
+      | username | firstname | lastname | email                |
+      | john     | John      | One      | john.one@example.com |
     And the following "cohorts" exist:
       | name | idnumber |
       | aud1 | aud1     |
@@ -60,7 +60,7 @@ Feature: Long text element response correctly processes text
     When I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I click on "activity1" "link"
-    Then I should see "This is a test heading" in the ".tui-longTextElementParticipantResponse__answer h1" "css_element"
-    And I should see "capital" in the ".tui-longTextElementParticipantResponse__answer strong" "css_element"
+    Then I should see "This is a test heading" in the ".tui-participantFormHtmlResponseDisplay h1" "css_element"
+    And I should see "capital" in the ".tui-participantFormHtmlResponseDisplay strong" "css_element"
     And I should see "With some capital text<&\'"
     And I should not see "1234"

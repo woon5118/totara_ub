@@ -28,17 +28,11 @@ use mod_perform\models\activity\element as element_model;
 use performelement_static_content\local\helper;
 
 class static_content extends element_plugin {
-    /**
-     * This method return element's user form vue component name
-     * @return string
-     */
-    public function get_participant_form_component(): string {
-        return $this->get_component_path('ElementParticipant');
-    }
 
     /**
      * This method return element's user form vue component name
      * @return string
+     * @deprecated since Totara 13.2
      */
     public function get_participant_response_component(): string {
         return $this->get_component_path('ElementParticipant');

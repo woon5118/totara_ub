@@ -16,19 +16,20 @@
   @module performelement_custom_rating_scale
 -->
 <template>
-  <FormScope :path="path">
-    <FormRadioGroup name="answer_option" :validate="answerValidator">
+  <FormScope :path="path" :process="process">
+    <FormRadioGroup name="response" :validations="validations">
       <Radio
         v-for="(item, index) in element.data.options"
         :key="index"
         :value="item.name"
-        >{{
+      >
+        {{
           $str('answer_output', 'performelement_custom_rating_scale', {
             label: item.value.text,
             count: item.value.score,
           })
-        }}</Radio
-      >
+        }}
+      </Radio>
     </FormRadioGroup>
   </FormScope>
 </template>
@@ -37,6 +38,7 @@
 import FormScope from 'tui/components/reform/FormScope';
 import Radio from 'tui/components/form/Radio';
 import FormRadioGroup from 'tui/components/uniform/FormRadioGroup';
+import { v as validation } from 'tui/validation';
 
 export default {
   components: {
@@ -53,20 +55,38 @@ export default {
       required: true,
     },
   },
+  computed: {
+    /**
+     * An array of validation rules for the element.
+     * The rules returned depend on if we are saving as draft or if a response is required or not.
+     *
+     * @return {(function|object)[]}
+     */
+    validations() {
+      if (this.isDraft) {
+        return [];
+      }
+
+      if (this.element && this.element.is_required) {
+        return [validation.required()];
+      }
+
+      return [];
+    },
+  },
   methods: {
     /**
-     * answer validator based on element config
+     * Process the form values.
      *
-     * @return {function[]}
+     * @param value
+     * @return {null|string}
      */
-    answerValidator(val) {
-      if (this.isDraft) {
+    process(value) {
+      if (!value || !value.response) {
         return null;
       }
 
-      if (this.element.is_required && !val) {
-        return this.$str('required', 'performelement_custom_rating_scale');
-      }
+      return value.response;
     },
   },
 };
@@ -74,8 +94,7 @@ export default {
 <lang-strings>
   {
     "performelement_custom_rating_scale": [
-      "answer_output",
-      "required"
+      "answer_output"
     ]
   }
 </lang-strings>

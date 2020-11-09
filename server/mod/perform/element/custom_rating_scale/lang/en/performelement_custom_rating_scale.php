@@ -28,9 +28,7 @@ $string['answer_score'] = 'Score {$a->index}';
 $string['answer_text'] = 'Text {$a->index}';
 $string['custom_rating_options'] = 'Custom rating options';
 $string['name'] = 'Custom rating scale';
-$string['no_response_submitted'] = 'No response submitted';
 $string['pluginname'] = 'Custom rating scale element';
-$string['required'] = 'Required';
 $string['score'] = 'Score';
 $string['text'] = 'Text';
 
@@ -43,3 +41,5 @@ $string['error:question_required'] = 'Question is required';
 
 // Deprecated in 13
 $string['question_title'] = 'Question';
+$string['required'] = 'Required';
+$string['no_response_submitted'] = 'No response submitted';

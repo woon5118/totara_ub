@@ -23,7 +23,9 @@
 
 namespace mod_perform\formatter\response;
 
+use core\format;
 use core\orm\formatter\entity_model_formatter;
+use core\webapi\formatter\field\string_field_formatter;
 use mod_perform\models\response\section_element_response as section_element_response_model;
 
 /**
@@ -40,6 +42,9 @@ class section_element_response extends entity_model_formatter {
             'element' => null,
             'sort_order' => null,
             'response_data' => element_response_formatter::for_element($this->object->element),
+            'response_data_formatted_lines' => function ($value, $format) {
+                return (new string_field_formatter($format ?? format::FORMAT_PLAIN, $this->object->get_participant_instance()->get_context()))->format($value);
+            },
             'participant_instance' => null,
             'other_responder_groups' => null,
             'visible_to' => null,

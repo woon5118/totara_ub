@@ -61,6 +61,7 @@ class section_element_response extends model implements section_element_response
         'section_element',
         'section_element_id',
         'response_data', // as a JSON encoded string
+        'response_data_formatted_lines',
         'element',
         'validation_errors',
         'participant_instance',
@@ -165,6 +166,25 @@ class section_element_response extends model implements section_element_response
 
     public function get_response_data(): ?string {
         return $this->entity->response_data;
+    }
+
+    /**
+     * Get the response data formatted ready for display broken into an array entry for each response.
+     * For example for multi_choice_multi will have each selected checkbox value as an array entry.
+     *
+     * @return string[]
+     */
+    public function get_response_data_formatted_lines(): array {
+        $element_plugin = $this->get_element()->get_element_plugin();
+
+        if (!$element_plugin instanceof respondable_element_plugin) {
+            return [];
+        }
+
+        return $element_plugin->format_response_lines(
+            $this->entity->response_data,
+            $this->get_element()->data
+        );
     }
 
     public function get_section_element(): section_element {

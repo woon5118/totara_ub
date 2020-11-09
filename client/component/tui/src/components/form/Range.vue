@@ -44,7 +44,6 @@
       @input="handleChange"
       @change="handleChange"
       @click="handleChange"
-      @focus="handleChange"
     />
   </div>
 </template>

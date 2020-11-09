@@ -25,11 +25,14 @@ namespace mod_perform\formatter\activity;
 
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\formatter;
+use mod_perform\models\activity\respondable_element_plugin;
+use mod_perform\models\activity\element_plugin as element_plugin_model;
 
 /**
  * Class element_plugin
  *
  * @package mod_perform\formatter\activity
+ * @property element_plugin_model|respondable_element_plugin object
  */
 class element_plugin extends formatter {
 
@@ -51,6 +54,12 @@ class element_plugin extends formatter {
     }
 
     protected function get_field(string $field) {
+        $respondable_only_fields = ['participant_response_component'];
+
+        if (!$this->object->get_is_respondable() && in_array($field, $respondable_only_fields)) {
+            return null;
+        }
+
         switch ($field) {
             case 'plugin_name':
                 return $this->object->get_plugin_name();

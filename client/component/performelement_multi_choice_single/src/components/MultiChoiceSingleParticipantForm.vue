@@ -16,14 +16,15 @@
   @module performelement_multi_choice_single
 -->
 <template>
-  <FormScope :path="path">
-    <FormRadioGroup :validate="answerValidator" name="answer_option">
+  <FormScope :path="path" :process="process">
+    <FormRadioGroup :validations="validations" name="response">
       <Radio
         v-for="item in element.data.options"
         :key="item.name"
         :value="item.name"
-        >{{ item.value }}</Radio
       >
+        {{ item.value }}
+      </Radio>
     </FormRadioGroup>
   </FormScope>
 </template>
@@ -32,6 +33,7 @@
 import FormScope from 'tui/components/reform/FormScope';
 import Radio from 'tui/components/form/Radio';
 import FormRadioGroup from 'tui/components/uniform/FormRadioGroup';
+import { v as validation } from 'tui/validation';
 
 export default {
   components: {
@@ -46,34 +48,35 @@ export default {
     isDraft: Boolean,
     element: Object,
   },
+  computed: {
+    /**
+     * An array of validation rules for the element.
+     * The rules returned depend on if we are saving as draft or if a response is required or not.
+     *
+     * @return {(function|object)[]}
+     */
+    validations() {
+      if (!this.isDraft && this.element && this.element.is_required) {
+        return [validation.required()];
+      }
+
+      return [];
+    },
+  },
   methods: {
     /**
-     * answer validator based on element config
+     * Process the form values.
      *
-     * @return {function[]}
+     * @param value
+     * @return {null|string}
      */
-    answerValidator(val) {
-      if (this.element.is_required) {
-        //no validation required if it's in draft status
-        if (this.isDraft) {
-          return null;
-        }
-        const isEmpty =
-          !val || (typeof val === 'string' && val.trim().length === 0);
-        if (isEmpty)
-          return this.$str(
-            'error_you_must_answer_this_question',
-            'performelement_multi_choice_single'
-          );
+    process(value) {
+      if (!value || !value.response) {
+        return null;
       }
+
+      return value.response;
     },
   },
 };
 </script>
-<lang-strings>
-  {
-    "performelement_multi_choice_single": [
-      "error_you_must_answer_this_question"
-    ]
-  }
-</lang-strings>

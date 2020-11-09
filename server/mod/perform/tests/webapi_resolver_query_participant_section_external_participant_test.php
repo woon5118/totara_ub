@@ -203,9 +203,9 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
                     'element_plugin' =>
                         [
                             'participant_form_component' =>
-                                'performelement_short_text/components/ShortTextElementParticipantForm',
+                                'performelement_short_text/components/ShortTextParticipantForm',
                             'participant_response_component' =>
-                                'performelement_short_text/components/ShortTextElementParticipantResponse',
+                                'mod_perform/components/element/participant_form/ResponseDisplay',
                         ],
                     'title' => 'test element title',
                     'data' => null,
@@ -215,6 +215,7 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
             'sort_order' => 1,
             'response_data' => null,
             'response_data_raw' => null,
+            'response_data_formatted_lines' => [],
             'validation_errors' => [],
             'other_responder_groups' => [
                 [
@@ -227,7 +228,8 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
                                     'profileimageurlsmall' => self::get_default_image_url()
                                 ]
                             ],
-                            'response_data' => null
+                            'response_data' => null,
+                            'response_data_formatted_lines' => [],
                         ]
                     ]
                 ]
@@ -249,9 +251,8 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
                     'element_plugin' =>
                         [
                             'participant_form_component' =>
-                                'performelement_static_content/components/StaticContentElementParticipant',
-                            'participant_response_component' =>
-                                'performelement_static_content/components/StaticContentElementParticipant',
+                                'performelement_static_content/components/StaticContentParticipantForm',
+                            'participant_response_component' => null
                         ],
                     'title' => 'test element title',
                     'data' => null,
@@ -264,6 +265,7 @@ class mod_perform_webapi_resolver_query_participant_section_external_participant
             'validation_errors' => [],
             'other_responder_groups' => [],
             'visible_to' => [],
+            'response_data_formatted_lines' => [],
         ];
     }
 

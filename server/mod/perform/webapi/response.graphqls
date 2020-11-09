@@ -122,6 +122,10 @@ type mod_perform_section_element_response implements section_element_response {
   """
   response_data(format: core_format): String
   """
+  The response data formatted ready to be displayed to the user. Each array entry represents a line or sub-response.
+  """
+  response_data_formatted_lines(format: core_format): [String!]!
+  """
   List of validation errors from this specific section_element
   """
   validation_errors: [mod_perform_validation_error!]!

@@ -25,6 +25,8 @@ use core\entities\user;
 use mod_perform\constants;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\element_response;
+use mod_perform\entities\activity\section_element;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
@@ -81,6 +83,38 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         }
     }
 
+    public function test_response_data_formats(): void {
+        [$participant_sections, ,] = $this->create_test_data();
+
+        $raw_response = '<script>alert(1)</script><b>bold</b>';
+
+        $participant_section = $participant_sections->first();
+
+        /** @var section_element $section_element */
+        foreach ($participant_section->section_elements as $section_element) {
+            $element_response = new element_response();
+            $element_response->participant_instance_id = $participant_section->participant_instance_id;
+            $element_response->section_element_id = $section_element->id;
+
+            $element_response->response_data = json_encode($raw_response);
+            $element_response->save();
+        }
+
+        self::setUser($participant_section->participant_instance->participant_user->id);
+
+        $args = ['participant_section_id' => $participant_section->id];
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+        $result = $this->get_webapi_operation_data($result);
+        $section_element_responses = $result['section_element_responses'];
+
+        $respondable_element_response = $section_element_responses[0];
+        self::assertEquals('"alert(1)bold"', $respondable_element_response['response_data']);
+        self::assertEquals('"<script>alert(1)<\/script><b>bold<\/b>"', $respondable_element_response['response_data_raw']);
+        self::assertEquals('alert(1)bold', $respondable_element_response['response_data_formatted_lines'][0]);
+    }
+
     public function test_failed_ajax_query(): void {
         [$participant_sections,] = $this->create_test_data();
         $participant_instance = $participant_sections->first()->participant_instance;
@@ -118,9 +152,9 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $result = $this->parsed_graphql_operation(self::QUERY, ['participant_section_id' => 1293]);
         $this->assert_webapi_operation_successful($result);
         [$data, ] = $result;
-        $this->assertNull($data);
+        self::assertNull($data);
 
-        $this->setUser();
+        self::setUser();
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_failed($result, 'not logged in');
     }
@@ -165,7 +199,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $args = ['participant_section_id' => $participant_section->id];
 
         $participant = $participant_section->participant_instance->participant_user;
-        $this->setUser($participant->get_record());
+        self::setUser($participant->get_record());
 
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
@@ -173,14 +207,14 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $result = $this->get_webapi_operation_data($result);
 
         $section_element_responses = $result['section_element_responses'];
-        $this->assertCount(3, $section_element_responses);
+        self::assertCount(3, $section_element_responses);
         foreach ($section_element_responses as $section_element_response) {
             // Manager and appraiser both show up
-            $this->assertCount(2, $section_element_response['other_responder_groups']);
+            self::assertCount(2, $section_element_response['other_responder_groups']);
             foreach ($section_element_response['other_responder_groups'] as $other_responder_groups) {
-                $this->assertArrayHasKey('relationship_name', $other_responder_groups);
-                $this->assertArrayHasKey('responses', $other_responder_groups);
-                $this->assertNotEmpty($other_responder_groups['responses']);
+                self::assertArrayHasKey('relationship_name', $other_responder_groups);
+                self::assertArrayHasKey('responses', $other_responder_groups);
+                self::assertNotEmpty($other_responder_groups['responses']);
             }
         }
 
@@ -196,23 +230,48 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
 
         $result = $this->get_webapi_operation_data($result);
         $section_element_responses = $result['section_element_responses'];
-        $this->assertCount(3, $section_element_responses);
+        self::assertCount(3, $section_element_responses);
         foreach ($section_element_responses as $section_element_response) {
             // Only one is left, the manager
-            $this->assertCount(2, $section_element_response['other_responder_groups']);
+            self::assertCount(2, $section_element_response['other_responder_groups']);
             foreach ($section_element_response['other_responder_groups'] as $other_responder_groups) {
-                $this->assertArrayHasKey('relationship_name', $other_responder_groups);
-                $this->assertArrayHasKey('responses', $other_responder_groups);
+                self::assertArrayHasKey('relationship_name', $other_responder_groups);
+                self::assertArrayHasKey('responses', $other_responder_groups);
                 if ($other_responder_groups['relationship_name'] == 'Manager') {
-                    $this->assertNotEmpty($other_responder_groups['responses']);
+                    self::assertNotEmpty($other_responder_groups['responses']);
                 } else {
-                    $this->assertEmpty($other_responder_groups['responses']);
+                    self::assertEmpty($other_responder_groups['responses']);
                 }
             }
         }
     }
 
     private function create_test_data(): array {
+        self::setAdminUser();
+
+        $data_generator = self::getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+
+        /** @var activity $activity */
+        $activity = $perform_generator->create_full_activities()->first();
+        /** @var section $section */
+        $section = $activity->sections->first();
+
+        $element = $perform_generator->create_element();
+        $section_element = $perform_generator->create_section_element($section, $element);
+
+        $static_element = $perform_generator->create_element(['plugin_name' => 'static_content']);
+        $static_section_element = $perform_generator->create_section_element($section, $static_element);
+
+        $participant_sections = participant_section_entity::repository()
+            ->order_by('id', 'desc')
+            ->get();
+
+        return [$participant_sections, $section_element, $static_section_element];
+    }
+
+    private function create_response_format_test_data(): array {
         self::setAdminUser();
 
         $data_generator = self::getDataGenerator();
@@ -245,9 +304,9 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                     'element_plugin' =>
                         [
                             'participant_form_component' =>
-                                'performelement_short_text/components/ShortTextElementParticipantForm',
+                                'performelement_short_text/components/ShortTextParticipantForm',
                             'participant_response_component' =>
-                                'performelement_short_text/components/ShortTextElementParticipantResponse',
+                                'mod_perform/components/element/participant_form/ResponseDisplay',
                         ],
                     'title' => 'test element title',
                     'data' => null,
@@ -257,6 +316,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
             'sort_order' => 1,
             'response_data' => null,
             'response_data_raw' => null,
+            'response_data_formatted_lines' => [],
             'validation_errors' => [],
             'other_responder_groups' => [],
             'visible_to' => [],
@@ -271,9 +331,8 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                     'element_plugin' =>
                         [
                             'participant_form_component' =>
-                                'performelement_static_content/components/StaticContentElementParticipant',
-                            'participant_response_component' =>
-                                'performelement_static_content/components/StaticContentElementParticipant',
+                                'performelement_static_content/components/StaticContentParticipantForm',
+                            'participant_response_component' => null,
                         ],
                     'title' => 'test element title',
                     'data' => null,
@@ -283,6 +342,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
             'sort_order' => 2,
             'response_data' => null,
             'response_data_raw' => null,
+            'response_data_formatted_lines' => [],
             'validation_errors' => [],
             'other_responder_groups' => [],
             'visible_to' => [],
@@ -302,26 +362,26 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $this->assert_webapi_operation_successful($result);
 
         $result = $this->get_webapi_operation_data($result);
-        $this->assertEquals($participant_section->id, $result['id']);
-        $this->assertSame($participant_section->section->title, $result['section']['display_title']);
-        $this->assertSame('IN_PROGRESS', $result['progress_status']);
+        self::assertEquals($participant_section->id, $result['id']);
+        self::assertSame($participant_section->section->title, $result['section']['display_title']);
+        self::assertSame('IN_PROGRESS', $result['progress_status']);
 
 
-        $this->assertCount(1, $result['answerable_participant_instances']);
-        $this->assertSame('Subject', $result['answerable_participant_instances'][0]['core_relationship']['name']);
+        self::assertCount(1, $result['answerable_participant_instances']);
+        self::assertSame('Subject', $result['answerable_participant_instances'][0]['core_relationship']['name']);
 
         $section_element_responses = $result['section_element_responses'];
 
-        $this->assertCount(
+        self::assertCount(
             $participant_section->section->section_elements->count(),
             $section_element_responses,
             'Expected section elements count do not match'
         );
-        $this->assertEquals(
+        self::assertEquals(
             $this->create_section_element_response($section_element->id),
             $section_element_responses[0]
         );
-        $this->assertEquals(
+        self::assertEquals(
             $this->create_static_section_element_response($static_section_element->id),
             $section_element_responses[1]
         );

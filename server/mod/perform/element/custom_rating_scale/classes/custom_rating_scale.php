@@ -24,11 +24,13 @@
 namespace performelement_custom_rating_scale;
 
 use core\collection;
-use coding_exception;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\respondable_element_plugin;
+use mod_perform\models\activity\single_select_element_plugin_trait;
 
 class custom_rating_scale extends respondable_element_plugin {
+    use single_select_element_plugin_trait;
+
     /**
      * @inheritDoc
      */
@@ -46,46 +48,25 @@ class custom_rating_scale extends respondable_element_plugin {
     }
 
     /**
-     * Pull the answer text string out of the encoded json data.
-     *
-     * @param string|null $encoded_response_data
-     * @param string|null $encoded_element_data
-     * @return string|string[]
-     * @throws coding_exception
-     */
-    public function decode_response(?string $encoded_response_data, ?string $encoded_element_data): ?array {
-        $response_data = json_decode($encoded_response_data, true);
-        $element_data = json_decode($encoded_element_data, true);
-
-        if ($response_data === null) {
-            return null;
-        }
-
-        if (!isset($response_data['answer_option'])) {
-            throw new coding_exception('Invalid response data format, expected "answer_option" field');
-        }
-
-        if ($element_data === null || !isset($element_data['options'])) {
-            throw new coding_exception('Invalid element data format, expected "options" field');
-        }
-
-        foreach ($element_data['options'] as $i => $option) {
-            if (!isset($option['name']) || !isset($option['value'])) {
-                throw new coding_exception('Invalid element options format, expected "name" and "value" fields');
-            }
-            if ($option['name'] == $response_data['answer_option']) {
-                return $option['value'];
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * @inheritDoc
      */
-    public function get_group(): int {
-        return self::GROUP_QUESTION;
+    public function format_response_lines(?string $encoded_response_data, ?string $encoded_element_data): array {
+        $decoded_response = $this->decode_response($encoded_response_data, $encoded_element_data);
+
+        if ($decoded_response === null) {
+            return [];
+        }
+
+        $response_string = get_string(
+            'answer_output',
+            'performelement_custom_rating_scale',
+            [
+                'label' => $decoded_response['text'],
+                'count' => $decoded_response['score']
+            ]
+        );
+
+        return [$response_string];
     }
 
     /**
@@ -94,4 +75,5 @@ class custom_rating_scale extends respondable_element_plugin {
     public function get_sortorder(): int {
         return 50;
     }
+
 }

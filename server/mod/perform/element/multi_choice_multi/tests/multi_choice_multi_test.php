@@ -31,42 +31,29 @@ use performelement_multi_choice_multi\multi_choice_multi;
  */
 class mod_perform_element_multi_choice_multi_testcase extends advanced_testcase {
 
-    /**
-     * @dataProvider invalid_response_data_format_provider
-     * @param array|null $response_data
-     * @throws coding_exception
-     */
-    public function test_validate_response_invalid_format(array $response_data): void {
+    public function test_validate_response_invalid_format(): void {
         /** @var multi_choice_multi $element_type */
         $element_type = element_plugin::load_by_plugin('multi_choice_multi');
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('Invalid response data format, expected "answer_option" field');
+        $this->expectExceptionMessage('Invalid response data format, expected array of selected options');
 
         $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true]);
-        $element_type->validate_response(json_encode($response_data), $element);
+        $element_type->validate_response(json_encode('single_value'), $element);
     }
-
-    public function invalid_response_data_format_provider(): array {
-        return [
-            'missing key' => [['irrelevant_key' => 1]],
-        ];
-    }
-
 
     /**
      * @dataProvider validation_provider
      * @param collection $expected_errors
-     * @param array $answer_option
-     * @throws coding_exception
+     * @param array|null $selected_options
      */
-    public function test_validation(collection $expected_errors, array $answer_option): void {
+    public function test_validation(collection $expected_errors, ?array $selected_options): void {
         /** @var multi_choice_multi $element_type */
         $element_type = element_plugin::load_by_plugin('multi_choice_multi');
 
         $json = '{"options":[{"name":"option_0","value":"11"},{"name":"option_1","value":"12"},{"name":"option_2","value":"13"}]}';
         $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true, 'data' => $json]);
-        $errors = $element_type->validate_response(json_encode(['answer_option' => $answer_option]), $element);
+        $errors = $element_type->validate_response(json_encode($selected_options), $element);
 
         self::assertEquals($expected_errors, $errors);
     }
@@ -82,7 +69,7 @@ class mod_perform_element_multi_choice_multi_testcase extends advanced_testcase 
             ],
             'missing answer' => [
                 new collection([new answer_required_error()]),
-                [],
+                null,
             ],
         ];
     }

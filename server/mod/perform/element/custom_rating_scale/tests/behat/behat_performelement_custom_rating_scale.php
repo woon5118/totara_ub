@@ -30,6 +30,42 @@ class behat_performelement_custom_rating_scale extends behat_base {
     public const QUESTION_DISPLAY_OPTIONS_LOCATOR = '.tui-radio__label';
 
     /**
+     * @When /^I click custom rating scale question element$/
+     * @deprecated since Totara 13.2
+     */
+    public function i_click_custom_rating_scale_question_element(): void {
+        debugging(
+            '\behat_performelement_multi_choice_single::i_save_multi_choice_single_question_element_data() is deprecated and should no longer be used.'
+            . ' Please use behat_mod_perform::i_add_a_custom_element() with "Custom rating scale" as the parameter',
+            DEBUG_DEVELOPER
+        );
+
+        behat_hooks::set_step_readonly(false);
+
+        $behat_general = behat_context_helper::get('behat_general');
+
+        $behat_general->i_click_on("Add element","button");
+        $behat_general->i_click_on("Custom rating scale","button");
+    }
+
+    /**
+     * @When /^I save custom rating scale question element data$/
+     * @deprecated since Totara 13.2
+     */
+    public function i_save_custom_rating_scale_question_element_data(): void {
+        debugging(
+            '\behat_performelement_multi_choice_single::i_save_multi_choice_single_question_element_data() is deprecated and should no longer be used.'
+            . ' Please use behat_mod_perform::i_save_the_custom_element_settings() with "save" as the parameter',
+            DEBUG_DEVELOPER
+        );
+
+        behat_hooks::set_step_readonly(false);
+
+        $done_button = $this->find('css', self::DONE_BUTTON_LOCATOR);
+        $done_button->click();
+    }
+
+    /**
      * @When /^I click custom rating scale question add new option$/
      */
     public function i_click_custom_rating_scale_question_add_new_option(): void {

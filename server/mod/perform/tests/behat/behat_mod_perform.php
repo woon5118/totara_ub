@@ -59,8 +59,8 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses .tui-formLabel';
     public const TUI_OTHER_PARTICIPANT_RESPONSES_ANONYMOUS_RESPONSE_PARTICIPANT_LOCATOR = '.tui-otherParticipantResponses__anonymousResponse-participant';
-    public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
-    public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceSingleParticipantResponse__answer';
+    public const PARTICIPANT_FORM_RESPONSE_DISPLAY_LOCATOR = '.tui-participantFormResponseDisplay';
+    public const PARTICIPANT_FORM_HTML_VIEW_ONLY_RESPONSE_LOCATOR = '.tui-participantFormHtmlResponseDisplay';
     public const PERFORM_ACTIVITY_PRINT_SECTION_LOCATOR = '.tui-participantContentPrint .tui-participantContentPrint__section .tui-participantContentPrint__section:nth-of-type(%d)';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_VALUE_EXTERNAL = '.tui-participantContent__user-relationshipValue';
     public const PERFORM_ACTIVITY_GENERAL_INFORMATION_RELATIONSHIP_LOCATOR = '.tui-participantGeneralInformation__relationship-heading';
@@ -85,6 +85,14 @@ class behat_mod_perform extends behat_base {
     public const QUESTION_DRAG_ITEM_LOCATOR = '.tui-performEditSectionContentModal__draggableItem';
     public const QUESTION_DRAG_MOVE_ICON_LOCATOR = '.tui-performAdminCustomElement__moveIcon';
     public const RESPONSE_VISIBILITY_DESCRIPTION_LOCATOR = '.tui-participantContent__sectionHeadingOtherResponsesDescription';
+
+    public const ADMIN_FORM_RESPONSE_REQUIRED = 'input[name="responseRequired"]';
+    public const ADMIN_FORM_TITLE_INPUT = 'input[name=rawTitle]';
+    public const ADMIN_FORM_DONE_BUTTON = '.tui-performAdminCustomElementEdit__submit';
+    public const ADMIN_FORM = '.tui-performAdminCustomElement';
+    public const ADMIN_FORM_STATIC_CONTENT_WEKA = '.tui-weka';
+    public const FORM_BUILDER_ADD_ELEMENT_BUTTONS = '.tui-dropdownButton';
+    public const FORM_BUILDER_RAW_TITLE_NAME = 'rawTitle';
 
     /**
      * Navigate to the specified page and wait for JS.
@@ -921,14 +929,10 @@ class behat_mod_perform extends behat_base {
 
     private function find_question_other_responses_by_element(string $element_type, NodeElement $other_responses) {
         $map = [
-            'short text' => self::SHORT_TEXT_ANSWER_LOCATOR,
-            'multi choice' => self::MULTI_CHOICE_ANSWER_LOCATOR
+            'long text' => self::PARTICIPANT_FORM_HTML_VIEW_ONLY_RESPONSE_LOCATOR,
         ];
 
-        $locator =  $map[$element_type] ?? null;
-        if ($locator === null) {
-            throw new ExpectationException("Invalid perform element type {$element_type}", $this->getSession());
-        }
+        $locator =  $map[$element_type] ?? self::PARTICIPANT_FORM_RESPONSE_DISPLAY_LOCATOR;
 
         return $other_responses->findAll('css', $locator);
     }
@@ -1401,6 +1405,118 @@ class behat_mod_perform extends behat_base {
         $today_date_formatted = (new DateTime())->format('j F Y');
 
         $this->i_should_see_in_the_line_of_the_perform_activities_instance_info_card($today_date_formatted, $label_text);
+    }
+
+    /**
+     * @Given /^I add one of every element type in the mod perform form builder (and make them required)$/
+     * @Given /^I add one of every element type in the mod perform form builder$/
+     * @param bool $required
+     */
+    public function i_add_one_of_every_element_type_in_the_mod_perform_form_builder(bool $required = false): void {
+        foreach ($this->get_form_builder_element_add_buttons() as $i => $element_add_button) {
+            $this->execute('behat_general::i_click_on', ['Add element', 'link_or_button']);
+
+            if (!$element_add_button->isVisible()) {
+                $element_add_button->focus(); // Ensure we scroll the element option into view.
+            }
+
+            $element_add_button->click();
+
+            $this->wait_for_pending_js();
+
+            $this->fill_last_element_settings_in_form_builder(trim($element_add_button->getHtml()), $required);
+
+            $this->wait_for_pending_js();
+        }
+    }
+
+    /**
+     * @return NodeElement[]
+     */
+    private function get_form_builder_element_add_buttons(): array {
+        $this->execute('behat_general::i_click_on', ['Add element', 'link_or_button']);
+        $element_add_buttons = $this->find_all('css', self::FORM_BUILDER_ADD_ELEMENT_BUTTONS);
+        $this->execute('behat_general::i_click_on', ['Add element', 'link_or_button']);
+
+        return $element_add_buttons;
+    }
+
+    private function fill_last_element_settings_in_form_builder(string $title, bool $required): void {
+        $element_setting_containers = $this->find_all('css', self::ADMIN_FORM);
+
+        /** @var NodeElement $element_setting_container */
+        $element_setting_container = end($element_setting_containers);
+
+        $element_title = $element_setting_container->find('css', self::ADMIN_FORM_TITLE_INPUT);
+        $element_title->setValue($title);
+
+        switch ($title) {
+            case 'Multiple choice: multi-select':
+                $this->fill_multi_choice_multi_admin_form_settings($element_setting_container);
+                break;
+            case 'Numeric rating scale':
+                $this->fill_numeric_rating_scale_admin_form_settings($element_setting_container);
+                break;
+            case 'Static content':
+                $this->fill_static_content_admin_form_settings();
+                break;
+            default:
+                $this->fill_element_admin_form_settings($element_setting_container);
+        }
+
+        if ($required && $title !== 'Static content') {
+            $response_required_input = $element_setting_container->find('css', self::ADMIN_FORM_RESPONSE_REQUIRED);
+            $response_required_input->getParent()->find('css', 'label')->click();
+        }
+
+        $element_setting_container->find('css', self::ADMIN_FORM_DONE_BUTTON)->click();
+    }
+
+    private function fill_element_admin_form_settings(NodeElement $element_setting_container): void {
+        $inputs = $element_setting_container->findAll('css', 'input');
+
+        /** @var NodeElement $input */
+        foreach ($inputs as $i => $input) {
+            // Don't fill in title again.
+            if ($input->getAttribute('name') === self::FORM_BUILDER_RAW_TITLE_NAME) {
+                continue;
+            }
+
+            $type = $input->getAttribute('type');
+
+            if (in_array($type, ['text', 'number'], true)) {
+                $input->focus();
+                $input->setValue($i + 1);
+            }
+        }
+    }
+
+    private function fill_multi_choice_multi_admin_form_settings(NodeElement $settings_container): void {
+        $answer_0 = $settings_container->find('css', 'input[name="options[0][value]"]');
+        $answer_0->focus();
+        $answer_0->setValue('Choice 0');
+
+        $answer_1 = $settings_container->find('css', 'input[name="options[1][value]"]');
+        $answer_1->focus();
+        $answer_1->setValue('Choice 1');
+    }
+
+    private function fill_numeric_rating_scale_admin_form_settings(NodeElement $settings_container): void {
+        $low_value = $settings_container->find('css', 'input[name=lowValue]');
+        $low_value->focus();
+        $low_value->setValue('1');
+
+        $high_value = $settings_container->find('css', 'input[name=highValue]');
+        $high_value->focus();
+        $high_value->setValue('3');
+
+        $default_value = $settings_container->find('css', 'input[name=defaultValue]');
+        $default_value->focus();
+        $default_value->setValue('2');
+    }
+
+    private function fill_static_content_admin_form_settings(): void {
+        $this->execute('behat_weka::i_set_the_weka_editor_with_css_to', [self::ADMIN_FORM_STATIC_CONTENT_WEKA, 'static content']);
     }
 
     /**

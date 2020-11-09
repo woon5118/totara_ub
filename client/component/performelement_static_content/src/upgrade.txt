@@ -6,3 +6,4 @@ information provided here is intended especially for developers.
     * StaticContentElementAdminDisplay.vue replaced with StaticContentAdminView.vue
     * StaticContentElementAdminForm.vue replaced with StaticContentAdminEdit.vue
     * StaticContentElementAdminReadOnlyDisplay.vue replaced with StaticContentAdminSummary.vue
+    * StaticContentElementParticipantForm.vue with StaticContentParticipantForm.vue

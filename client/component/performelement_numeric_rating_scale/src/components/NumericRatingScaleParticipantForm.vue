@@ -17,24 +17,19 @@
 -->
 
 <template>
-  <FormScope :path="path">
+  <FormScope :path="path" :process="process">
     <div class="tui-elementEditNumericRatingScaleParticipantForm">
-      <div class="tui-elementEditNumericRatingScaleParticipantForm__input">
-        <FormNumber
-          name="answer_value"
-          :min="min"
-          :max="max"
-          :validations="v => [v.min(min), v.max(max)]"
-        />
-      </div>
       <FormRange
-        name="answer_value"
+        name="response"
         :default-value="element.data.defaultValue"
         :show-labels="false"
         :min="min"
         :max="max"
-        :validations="rangeValidations"
+        :validations="validations"
       />
+      <div class="tui-elementEditNumericRatingScaleParticipantForm__input">
+        <FormNumber name="response" :min="min" :max="max" />
+      </div>
     </div>
   </FormScope>
 </template>
@@ -42,6 +37,7 @@
 <script>
 import FormScope from 'tui/components/reform/FormScope';
 import { FormRange, FormNumber } from 'tui/components/uniform';
+import { v as validation } from 'tui/validation';
 
 export default {
   components: {
@@ -49,7 +45,6 @@ export default {
     FormRange,
     FormNumber,
   },
-
   props: {
     path: [String, Array],
     error: String,
@@ -59,23 +54,56 @@ export default {
       required: true,
     },
   },
-
   computed: {
+    /**
+     * The minimum value that can be selected.
+     *
+     * @return {number}
+     */
     min() {
       return parseInt(this.element.data.lowValue, 10);
     },
+    /**
+     * The maximum value that can be selected.
+     *
+     * @return {number}
+     */
     max() {
       return parseInt(this.element.data.highValue, 10);
     },
   },
-
   methods: {
-    rangeValidations(v) {
-      //no validation required if it's in draft status
+    /**
+     * An array of validation rules for the element.
+     * The rules returned depend on if we are saving as draft or if a response is required or not.
+     *
+     * @return {(function|object)[]}
+     */
+    validations() {
+      const rules = [validation.min(this.min), validation.max(this.max)];
+
       if (this.isDraft) {
-        return [];
+        return rules;
       }
-      return this.element.is_required ? [v.required()] : [];
+
+      if (this.element && this.element.is_required) {
+        return [validation.required(), ...rules];
+      }
+
+      return rules;
+    },
+    /**
+     * Process the form values.
+     *
+     * @param value
+     * @return {null|string}
+     */
+    process(value) {
+      if (!value || !value.response) {
+        return null;
+      }
+
+      return value.response;
     },
   },
 };
@@ -83,9 +111,6 @@ export default {
 
 <style lang="scss">
 .tui-elementEditNumericRatingScaleParticipantForm {
-  display: flex;
-  flex-direction: column-reverse;
-
   &__input {
     margin-top: var(--gap-2);
   }

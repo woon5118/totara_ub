@@ -21,13 +21,13 @@
  * @package performelement_date_picker
  */
 
-$string['answer_text'] = 'Answer text';
-$string['error_invalid_date'] = 'Invalid date. Select day, month and year';
-$string['error_you_must_answer_this_question'] = 'Required';
 $string['name'] = 'Date picker';
-$string['no_response_submitted'] = 'No response submitted';
 $string['pluginname'] = 'Date picker';
 
 // Deprecated in 13
 $string['date'] = 'Date';
 $string['question_title'] = 'Question';
+$string['error_invalid_date'] = 'Invalid date. Select day, month and year';
+$string['answer_text'] = 'Answer text';
+$string['no_response_submitted'] = 'No response submitted';
+$string['error_you_must_answer_this_question'] = 'Required';

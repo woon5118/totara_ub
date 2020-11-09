@@ -33,10 +33,11 @@ use performelement_short_text\formatter\response_formatter;
  * @group perform
  */
 class performelement_short_text_response_formatter_testcase extends advanced_testcase {
+
     /**
      * @covers ::format
      */
-    public function test_format() {
+    public function test_format(): void {
         $plugin = element_plugin::load_by_plugin('short_text');
         $formatter_class = element_response_formatter::for_plugin($plugin);
         $this->assertEquals(response_formatter::class, $formatter_class);
@@ -52,15 +53,28 @@ class performelement_short_text_response_formatter_testcase extends advanced_tes
 
         $formatter = new $formatter_class(format::FORMAT_PLAIN, $context);
         $this->assertEquals($answer, $formatter->format($answer), 'wrong formatting');
+
+        $this->assertNull($formatter->format(json_encode(null)), 'wrong formatting');
+        $this->assertNull($formatter->format(null), 'wrong formatting');
     }
 
     /**
      * @covers ::format
+     * @dataProvider non_json_value_provider
+     * @param string|null|bool $value
      */
-    public function test_non_json_value() {
-        $answer = '<h1>This is a <strong>test</strong> answer</h1>';
-
+    public function test_non_json_value($value): void {
         $formatter = new response_formatter(format::FORMAT_PLAIN, context_system::instance());
-        $this->assertEquals($answer, $formatter->format($answer), 'wrong formatting');
+
+        $this->assertEquals($value, $formatter->format($value), 'wrong formatting');
     }
+
+    public function non_json_value_provider(): array {
+        return [
+            'non json encoded string' => ['<h1>This is a <strong>test</strong> answer</h1>'],
+            'null' => [null],
+            'false' => [false],
+        ];
+    }
+
 }

@@ -3,11 +3,11 @@ Feature: Print view of a single-section user activity
 
   Background:
     Given the following "users" exist:
-      | username          | firstname         | lastname | email                               |
-      | john              | John              | One      | john.one@example.com                |
-      | david             | David             | Two      | david.two@example.com               |
-      | manager-appraiser | Managerappraiser  | Three    | manager-appraiser.three@example.com |
-      | appraiser         | Appraiser         | Four     | appraiser.four@example.com          |
+      | username          | firstname        | lastname | email                               |
+      | john              | John             | One      | john.one@example.com                |
+      | david             | David            | Two      | david.two@example.com               |
+      | manager-appraiser | Managerappraiser | Three    | manager-appraiser.three@example.com |
+      | appraiser         | Appraiser        | Four     | appraiser.four@example.com          |
     And the following job assignments exist:
       | user  | manager           | appraiser         |
       | john  | manager-appraiser | manager-appraiser |
@@ -66,14 +66,24 @@ Feature: Print view of a single-section user activity
     And I click on "Single section activity" "link"
     And I wait until ".tui-performElementResponse .tui-formField" "css_element" exists
     And I answer "short text" question "Question 1" with "David answer one"
+    When I click on "Save as draft" "button"
+    Then I should see "Draft saved" in the tui success notification toast
+
+    When I click on "Cancel" "button"
+    And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "david" is the participant
+    Then the field with xpath "//*[@name='sectionElements[1][response]']" matches value "David answer one"
+
+    When I navigate to the outstanding perform activities list page
+    And I click on "Single section activity" "link"
     And I click on "Submit" "button"
     And I confirm the tui confirmation modal
     And I should see "Section submitted and closed." in the tui success notification toast
     And I navigate to the "print" user activity page for performance activity "Single section activity" where "david" is the subject and "david" is the participant
     # No form field should be displayed any more.
-    Then ".tui-formField" "css_element" should not exist in the ".tui-performElementResponse" "css_element"
+    Then ".tui-formField" "css_element" should not exist in the ".tui-participantContentPrint" "css_element"
     # Instead response version of the question element should be shown.
-    And ".tui-shortTextElementParticipantResponse__answer" "css_element" should exist in the ".tui-performElementResponse" "css_element"
+    And ".tui-participantFormResponseDisplay" "css_element" should exist in the ".tui-participantContentPrint" "css_element"
+
     And I should see "David answer one"
     And I should see "Manager response"
     And I should see "John One"
