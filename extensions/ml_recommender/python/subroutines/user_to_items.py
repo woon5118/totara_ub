@@ -28,6 +28,7 @@ class UserToItems:
             self,
             u_mapping=None,
             i_mapping=None,
+            item_type_map=None,
             item_features=None,
             model=None,
             num_items=10,
@@ -51,6 +52,8 @@ class UserToItems:
         """
         self.u_mapping = u_mapping
         self.i_mapping = i_mapping
+        self.i_mapping_rev = {v: k for k, v in i_mapping.items()}
+        self.item_type_map = item_type_map
         self.item_features = item_features
         self.model = model
         self.num_items = num_items
@@ -61,8 +64,8 @@ class UserToItems:
         Returns top `num_items` recommended items where `num_items` is the instance variable of the class
         :param internal_uid: The internal id of the user for whom the recommendations are sought
         :type internal_uid: int
-        :return: A zip object where the first elements are the internal ids of the items and the second ones ranking
-        :rtype: zip object
+        :return: A list of tuples where the first elements are the Totara ids of the items and the second ones the ranking
+        :rtype: list
         """
         item_ids = np.fromiter(self.i_mapping.values(), dtype=np.int32)
         predictions = self.model.predict(
@@ -72,8 +75,15 @@ class UserToItems:
             item_features=self.item_features,
             num_threads=self.num_threads
         )
-        best_id = predictions.argsort()[-self.num_items:][::-1]
-        best_with_score = zip(best_id, predictions[best_id])
+        sorted_ids = predictions.argsort()[::-1]
+        sorted_items = [(self.i_mapping_rev[x], predictions[x], self.item_type_map[self.i_mapping_rev[x]]) for x in sorted_ids]
+        best_with_score = []
+        item_types = ['container_course', 'container_workspace', 'engage_article', 'engage_microlearning', 'totara_playlist']
+        for type in item_types:
+            type_recommended = [(x[0], x[1]) for x in sorted_items if x[2] == type]
+            type_recommended = type_recommended[:self.num_items]
+            best_with_score.extend(type_recommended)
+
         return best_with_score
 
     def all_items(self):
@@ -83,14 +93,13 @@ class UserToItems:
         :rtype: DataFrame
         """
         user_items = []
-        i_mapping_rev = {v: k for k, v in self.i_mapping.items()}
         for totara_uid, internal_uid in self.u_mapping.items():
             might_like_items = self.__get_items(internal_uid=internal_uid)
             for item in might_like_items:
                 user_items.append(
                     {
                         'uid': totara_uid,
-                        'iid': i_mapping_rev[item[0]],
+                        'iid': item[0],
                         'ranking': item[1]
                     }
                 )

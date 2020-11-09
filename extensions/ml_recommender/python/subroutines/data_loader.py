@@ -58,11 +58,8 @@ class DataLoader:
         :rtype: list
         """
         file_path = os.path.join(self.data_home, f'user_interactions_{self.tenant}.csv')
-        with open(file_path) as f:
-            next(f)
-            content = f.readlines()
-        interactions = [tuple(line.split(',')[:3]) for line in content]
-        interactions = [(int(inter[0]), inter[1], float(inter[2])) for inter in interactions]
+        interactions = pd.read_csv(filepath_or_buffer=file_path, sep=',', encoding='utf-8')
+        interactions = [(int(x[0]), x[1], float(x[2])) for x in interactions.to_numpy()]
         return interactions
 
     def __get_users(self):
@@ -80,7 +77,8 @@ class DataLoader:
         """
         Converts a pandas series into a dictionary whose keys are series' indices and the values are series' values.
         Removes entries where the values are not 1
-        :param row: pandas series
+        :param row: One record from the pandas DataFrame of items features
+        :type row: Pandas Series object
         :return: A dictionary whose keys are series' indices and the values are series' values
         """
         nonzero_row = row[row == 1]
@@ -101,17 +99,34 @@ class DataLoader:
         features_zip = zip(dataframe.index.tolist(), dataframe.features.tolist())
         return list(features_zip)
 
+    @staticmethod
+    def __get_items_attr(dataframe=None):
+        """
+        This method creates a map between the item_id and item_type from the input dataframe
+        :param dataframe: A pandas DataFrame where row labels are item ids, column headers are item_types and the
+            values in these columns are binary coded (0 or 1), defaults to None
+        :type dataframe: Pandas DataFrame object
+        :return: A dictionary whose keys are item_id and the values are item_type
+        """
+        dataframe_stacked = dataframe[dataframe==1].stack().reset_index()
+        item_type_map = pd.Series(dataframe_stacked.level_1.values, index=dataframe_stacked.item_id).to_dict()
+        return item_type_map
+
     def __get_items(self):
         """
         This method reads the data from the `item_data` file of the given tenant and returns a fully processed
         items data. The processing depends on the type of `query` defined in the instance variable of the class
-        :return: A dictionary containing three items; 'features_list' - a full list of all the possible features
+        :return: A dictionary containing four items; 'features_list' - a full list of all the possible features
             of the items data, 'items_features_data' - A list containing tuples of the shape
-            `(item_id, {features_name: weight, ...})`, and `item_ids` - a list of item ids.
+            `(item_id, {features_name: weight, ...})`, `item_ids` - a list of item ids and `item_type_map` - a
+            dictionary with keys as the `item_id` and values as `item_type`
         """
         file_path = os.path.join(self.data_home, f'item_data_{self.tenant}.csv')
         items_data = pd.read_csv(filepath_or_buffer=file_path, sep=',', encoding='utf-8', index_col='item_id')
         item_ids = items_data.index.tolist()
+        type_cols = ['container_course', 'container_workspace', 'engage_article', 'engage_microlearning', 'totara_playlist']
+
+        item_type_map = self.__get_items_attr(dataframe=items_data[type_cols])
 
         if self.query == 'hybrid':
             # Retrieve stopwords list.
@@ -180,7 +195,8 @@ class DataLoader:
         items_processed_data = {
             'items_features_data': items_features_data,
             'features_list': features_list,
-            'item_ids': item_ids
+            'item_ids': item_ids,
+            'item_type_map': item_type_map
         }
 
         return items_processed_data
@@ -218,8 +234,9 @@ class DataLoader:
         data and transforms that into the sparse matrices that can be consumed by the LightFM model class.
         :return: A dictionary with the items; `interactions` - a sparse matrix of user-item interaction, `weights` - a
             sparse matrix of of sample weights of the same shape as the `interactions`, `item_features` - a sparse
-            matrix of the shape `[n_items, n_features]` where each row contains item's weights over features, and
-            `mapping` - a tuple of four dictionaries (user id map, user features map, item id map, item feature map)
+            matrix of the shape `[n_items, n_features]` where each row contains item's weights over features,
+            `mapping` - a tuple of four dictionaries (user id map, user features map, item id map, item feature map),
+            and `item_type_map` - a dictionay with keys as the `item_id` and values as `item_type`
         """
         # Read all datasets, preprocess and transform data to be consumed by the LightFM data class
         transformed_data = self.__transform_data()
@@ -249,6 +266,7 @@ class DataLoader:
             'interactions': interactions,
             'weights': weights,
             'item_features': item_features,
-            'mapping': dataset.mapping()
+            'mapping': dataset.mapping(),
+            'item_type_map': transformed_data['items_data']['item_type_map']
         }
         return results

@@ -47,9 +47,9 @@ def run_modelling_process():
     item_result_count = args.result_count_item
 
     # ------------------------------------------------------
-    # Minimum number of users for whom to run the recommendation engine in a tenant
+    # Minimum number of users in interactions set for whom to run the recommendation engine in a tenant
     min_users = 10
-    # Minimum number of items for which to run the recommendation engine in a tenant
+    # Minimum number of items in interactions set for which to run the recommendation engine in a tenant
     min_items = 10
     # -------------------------------------------------------
     # Set path for the natural language processing libraries
@@ -136,7 +136,7 @@ def run_modelling_process():
             print('Making I2I recommendations')
             item_representations = final_model.get_item_representations(features=processed_data['item_features'])[1]
             similar_items = SimilarItems(
-                mapping=processed_data['mapping'][2],
+                item_mapping=processed_data['mapping'][2],
                 item_representations=item_representations,
                 num_items=item_result_count
             ).all_items()
@@ -153,6 +153,7 @@ def run_modelling_process():
             might_like_items = UserToItems(
                 u_mapping=processed_data['mapping'][0],
                 i_mapping=processed_data['mapping'][2],
+                item_type_map=processed_data['item_type_map'],
                 item_features=processed_data['item_features'],
                 model=final_model,
                 num_items=user_result_count,

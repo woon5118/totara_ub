@@ -18,47 +18,49 @@ Please contact [licensing@totaralearning.com] for more information.
 
 import numpy as np
 import pandas as pd
-from operator import itemgetter
 
 
 class SimilarItems:
     """
     This is a conceptual representation for generating the list of similar items for the items
     """
-    def __init__(self, mapping=None, item_representations=None, num_items=10):
+    def __init__(self, item_mapping=None, item_representations=None, num_items=10):
         """
         Constructor method
-        :param mapping: A dictionary where keys are Totara item ids and values are internal item ids, defaults to None
-        :type mapping: dict, mandatory
+        :param item_mapping: A dictionary where keys are Totara item ids and values are internal item ids, defaults to None
+        :type item_mapping: dict, mandatory
         :param item_representations: The latent representations of the items in the shape `[n_items, num_components]`,
             defaults to None
         :type item_representations: np.float32 array, mandatory
         :param num_items: The number of similar item recommendations for each item, defaults to None
         :type num_items: int, optional
         """
-        self.mapping = mapping
+        self.item_mapping = item_mapping
+        self.mapping_rev = {v: k for k, v in item_mapping.items()}
         self.item_representations = item_representations
         self.num_items = num_items
 
-    def __get_items(self, internal_idx):
+    def __get_items(self, item_meta):
         """
         Returns `num_items` number of items (as defined in the class constructor method) similar
         to the item with internal id `internal_idx`
-        :param internal_idx: Internal id of the item whose similar items are being sought
-        :type internal_idx: int, mandatory
-        :return: A list of (`iternal_id`, `similarity_score`) of `num_items` that are similar to the given item
+        :param item_meta: Totara id, and Internal id of the item whose similar items are being sought
+        :type item_meta: tuple (`totara_id`, `internal_id`), mandatory
+        :return: A list of (`totara_id`, `similarity_score`) of `num_items` that are similar to the given item
         :rtype: list
         """
         # Cosine similarity
-        scores = self.item_representations.dot(self.item_representations[internal_idx, :])
+        dot_prods_with_item = self.item_representations.dot(self.item_representations[item_meta[1], :])
         item_norms = np.linalg.norm(self.item_representations, axis=1)
-        scores /= item_norms
+        cosine_denominators = item_norms * item_norms[item_meta[1]]
+        cosine_scores = list(enumerate(dot_prods_with_item / cosine_denominators))
 
-        best = [item[0] for item in sorted(enumerate(scores), key=itemgetter(1), reverse=True)[:self.num_items]]
-        sorted_best = zip(best, scores[best] / item_norms[internal_idx])
+        scores = [(self.mapping_rev[x[0]], x[1]) for x in cosine_scores]
+        scores.sort(key=lambda tup: tup[1], reverse=True)
+        scores = [x for x in scores if x[0] != item_meta[0]]
+        similar_items = scores[:self.num_items]
 
-        sorted_best = [(item[0], item[1]) for item in sorted_best if item[0] != internal_idx]
-        return sorted_best
+        return similar_items
 
     def all_items(self):
         """
@@ -68,15 +70,15 @@ class SimilarItems:
         :rtype: DataFrame
         """
         similar_items = []
-        mapping_rev = {v: k for k, v in self.mapping.items()}
-        for totara_id, internal_id in self.mapping.items():
-            i_similar = self.__get_items(internal_idx=internal_id)
-            for item in i_similar:
+        for item in self.item_mapping.items():
+            i_similar = self.__get_items(item_meta=item)
+            for s_item in i_similar:
                 similar_items.append(
                     {
-                        'target_iid': totara_id,
-                        'similar_iid': mapping_rev[item[0]],
-                        'ranking': item[1]
+                        'target_iid': item[0],
+                        'similar_iid': s_item[0],
+                        'ranking': s_item[1]
                     }
                 )
+
         return pd.DataFrame(similar_items)
