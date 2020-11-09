@@ -35,7 +35,7 @@ use core\orm\collection;
  * @property int $sortorder
  * @property int $visible
  * @property int $hidecustomfields
- * @property int $timecreatedcat
+ * @property int $timecreated
  * @property int $timemodified
  * @property int $usermodified
  * @property string $fullname

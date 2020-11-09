@@ -22,10 +22,15 @@
  */
 namespace totara_engage\entity;
 
+use coding_exception;
 use totara_engage\repository\answer_choice_repository;
 
 /**
+ * @property int $id
  * @property int $optionid
+ * @property int $questionid
+ * @property int $userid
+ * @property int $timecreated
  */
 final class answer_choice extends answer {
     /**
@@ -38,7 +43,7 @@ final class answer_choice extends answer {
      */
     public function get_answer_option(): answer_option {
         if (!$this->exists()) {
-            throw new \coding_exception(
+            throw new coding_exception(
                 "Cannot get the picked option record of a choice that is not existing in the system"
             );
         }

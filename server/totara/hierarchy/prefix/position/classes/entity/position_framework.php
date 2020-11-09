@@ -32,7 +32,7 @@ use totara_hierarchy\entity\hierarchy_framework;
  * @property int $sortorder
  * @property int $visible
  * @property int $hidecustomfields
- * @property int $timecreatedcat
+ * @property int $timecreated
  * @property int $timemodified
  * @property int $usermodified
  * @property string $fullname

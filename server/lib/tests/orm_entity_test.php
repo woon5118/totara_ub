@@ -1054,6 +1054,12 @@ class core_orm_entity_testcase extends orm_entity_testcase {
         $entity->relate('sample_relation', $related_entity);
         $this->assertInstanceOf(sample_entity::class, $entity->sample_relation);
     }
+
+    public function test_entities_namespace_does_not_exist() {
+
+        $entities = core_component::get_namespace_classes('entities', entity::class);
+        $this->assertEmpty($entities, 'entities namespace is not allowed for entity::class use entity namespace rather.');
+    }
 }
 
 /**

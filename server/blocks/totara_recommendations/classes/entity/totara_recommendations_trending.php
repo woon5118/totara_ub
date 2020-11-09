@@ -28,7 +28,7 @@ use core\orm\entity\entity;
 
 /**
  * @property int            $id
- * @property string|null    unique_id
+ * @property string|null    $unique_id
  * @property int            $item_id
  * @property string|null    $component
  * @property string|null    $area

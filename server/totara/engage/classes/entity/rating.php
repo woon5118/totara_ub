@@ -28,7 +28,7 @@ use totara_engage\repository\rating_repository;
 /**
  * @property string         $component
  * @property string         $area
- * @property int            instanceid
+ * @property int            $instanceid
  * @property int            $rating
  * @property int            $userid
  * @property int            $timecreated
