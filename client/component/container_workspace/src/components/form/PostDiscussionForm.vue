@@ -22,6 +22,7 @@
       :profile-url="avatarImageUrl"
       :image-alt="avatarImageAlt"
       :image-src="avatarImageSrc"
+      class="tui-workspacePostDiscussionForm__avatar"
     />
 
     <WorkspaceDiscussionForm
@@ -77,6 +78,11 @@ export default {
 <style lang="scss">
 .tui-workspacePostDiscussionForm {
   display: flex;
+  &__avatar {
+    @media (max-width: $tui-screen-sm) {
+      display: none;
+    }
+  }
   &__form {
     flex-grow: 1;
     width: 100%;
