@@ -83,8 +83,9 @@ export default {
       },
       update: data => data.mod_perform_notifications,
       skip() {
-        return this.skipQuery;
+        return this.skipQuery && !this.tabIsActive;
       },
+      fetchPolicy: 'network-only',
     },
   },
 
