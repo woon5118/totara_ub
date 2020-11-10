@@ -29,6 +29,17 @@ namespace totara_reportbuilder\local\graph\settings;
  * @package totara_reportbuilder\local\graph\settings
  */
 abstract class base {
+    public const DEFAULT_COLORS = [
+        '#3869B1',
+        '#DA7E31',
+        '#3F9852',
+        '#CC2428',
+        '#958C3D',
+        '#6B4C9A',
+        '#8C8C8C',
+    ];
+
+    public const INVALID_COLOR = '#404040';
 
     /**
      * Return chart settings based on user-provided settings object
@@ -94,5 +105,25 @@ abstract class base {
             }
         }
         return $output;
+    }
+
+    /**
+     * Parse colors to array.
+     *
+     * @param string|array $colors
+     * @return array
+     */
+    public static function parse_colors($colors): array {
+        // NOTE: SVGGraph supports complex color descriptions, so let each library do own color cleaning.
+        if (!is_array($colors)) {
+            $colors = trim($colors);
+            if ($colors === '') {
+                return [];
+            }
+            $colors = explode(',', $colors);
+            return array_map('trim', $colors);
+        } else {
+            return array_values($colors);
+        }
     }
 }

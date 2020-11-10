@@ -45,7 +45,7 @@ abstract class base {
     /** @var int legend column index when headings used as category */
     protected $legendcolumn;
     /** @var array Settings supplied by user */
-    protected $usersettings;
+    protected $usersettings = [];
     /** @var  array list of supported chart types */
     protected static $allowed_types;
 
@@ -82,10 +82,8 @@ abstract class base {
         }
 
         // Load user settings.
-        if (isset($this->graphrecord->settings)) {
-            $this->usersettings = fix_utf8(json_decode($this->graphrecord->settings, true));
-        } else {
-            $this->usersettings = [];
+        if (!empty($this->graphrecord->settings)) {
+            $this->usersettings = (array)fix_utf8(json_decode($this->graphrecord->settings, true));
         }
 
         $columns = [];

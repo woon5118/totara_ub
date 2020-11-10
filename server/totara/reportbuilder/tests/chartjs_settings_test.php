@@ -22,6 +22,7 @@
  */
 
 use totara_reportbuilder\local\graph\settings\chartjs;
+use totara_reportbuilder\local\graph\settings\base;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -112,6 +113,7 @@ class totara_reportbuilder_chartjs_settings_testcase extends \basic_testcase {
         ];
 
         $expected = [
+            'colors' => base::DEFAULT_COLORS,
             'layout' => [
                 'padding' => [
                     'top' => 1,
@@ -218,6 +220,7 @@ class totara_reportbuilder_chartjs_settings_testcase extends \basic_testcase {
         ];
 
         $expected = [
+            'colors' => base::DEFAULT_COLORS,
             'layout' => [
                 'padding' => 10
             ],
@@ -247,5 +250,77 @@ class totara_reportbuilder_chartjs_settings_testcase extends \basic_testcase {
 
         $chartsettings = chartjs::create($settings);
         $this->assertEquals($expected, $chartsettings);
+    }
+
+    public function test_colors() {
+        $settings = [
+            'colors' => ['red', 'green'],
+        ];
+        $expected = [
+            'colors' => ['#FF0000', '#008000'],
+        ];
+        $chartsettings = chartjs::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'colors' => 'red,#008000',
+        ];
+        $expected = [
+            'colors' => ['#FF0000', '#008000'],
+        ];
+        $chartsettings = chartjs::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'colours' => ['red', 'green'],
+        ];
+        $expected = [
+            'colors' => ['#FF0000', '#008000'],
+        ];
+        $chartsettings = chartjs::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'colours' => 'red, green',
+        ];
+        $expected = [
+            'colors' => ['#FF0000', '#008000'],
+        ];
+        $chartsettings = chartjs::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'custom' => ['colours' => 'red,green'],
+        ];
+        $expected = [
+            'colors' => ['#FF0000', '#008000'],
+        ];
+        $chartsettings = chartjs::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'colors' => ['#fff', '$#$', ['grrr'], true, false, ''],
+        ];
+        $expected = [
+            'colors' => ['#fff', base::INVALID_COLOR, base::INVALID_COLOR, base::INVALID_COLOR, base::INVALID_COLOR, base::INVALID_COLOR],
+        ];
+        $chartsettings = chartjs::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'colors' => ' ',
+        ];
+        $expected = [
+            'colors' => base::DEFAULT_COLORS,
+        ];
+        $chartsettings = chartjs::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [];
+        $expected = [
+            'colors' => base::DEFAULT_COLORS,
+        ];
+        $chartsettings = chartjs::create($settings);
+        $this->assertSame($expected, $chartsettings);
     }
 }

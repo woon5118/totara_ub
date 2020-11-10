@@ -48,6 +48,16 @@ final class chartjs extends base {
     protected function init(): void {
         parent::init();
 
+        if ($this->graphrecord->type === '') {
+            return;
+        }
+
+        $this->usersettings = settings\chartjs::create($this->usersettings);
+
+        // Set up colours.
+        $this->colors = $this->usersettings['colors'];
+        unset($this->usersettings['colors']);
+
         // We turn off most of the responsive settings in progress charts so that
         // we can more easily control the graph layouts with css
         $this->chartsettings = [
@@ -88,15 +98,6 @@ final class chartjs extends base {
         }
 
         $this->labels = [];
-        $this->colors = [
-            '#3869B1',
-            '#DA7E31',
-            '#3F9852',
-            '#CC2428',
-            '#958C3D',
-            '#6B4C9A',
-            '#8C8C8C',
-        ];
 
         //Create an array entry for each series
         foreach ($this->series as $k => $item) {
@@ -121,12 +122,6 @@ final class chartjs extends base {
                     $this->values[$k]['borderColor'] = $this->colors[$k % count($this->colors)];
                 }
             }
-        }
-
-        if (!empty($this->usersettings)) {
-            $this->usersettings = settings\chartjs::create($this->usersettings);
-        } else {
-            $this->usersettings = [];
         }
     }
 

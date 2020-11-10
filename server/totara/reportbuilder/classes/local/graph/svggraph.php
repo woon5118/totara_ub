@@ -45,6 +45,18 @@ final class svggraph extends base {
     ];
 
     protected function init(): void {
+        parent::init();
+
+        if ($this->graphrecord->type === '') {
+            return;
+        }
+
+        $this->usersettings = settings\svggraph::create($this->usersettings);
+
+        // Set up colours.
+        $this->svggraphcolours = $this->usersettings['colors'];
+        unset($this->usersettings['colors']);
+
         $this->svggraphsettings = [
             'preserve_aspect_ratio' => 'xMidYMid meet',
             'auto_fit' => true,
@@ -69,14 +81,6 @@ final class svggraph extends base {
             'legend_shorten' => 80,
             'legend_entries' => []
         ];
-
-        parent::init();
-
-        if (!empty($this->usersettings)) {
-            $this->usersettings = settings\svggraph::create($this->usersettings);
-        } else {
-            $this->usersettings = [];
-        }
     }
 
     protected function process_data(array $data): void {
@@ -335,41 +339,10 @@ final class svggraph extends base {
             }
         }
 
-        $this->svggraphcolours = [
-            '#3869B1',
-            '#DA7E31',
-            '#3F9852',
-            '#CC2428',
-            '#958C3D',
-            '#6B4C9A',
-            '#8C8C8C',
-        ];
-
         if ($seriescount == 1 and !$this->is_pie_chart()) {
             // Set this to the first colour so a single series doesn't come out looking like a rainbow
             $this->svggraphcolours = [$this->svggraphcolours[0]];
         }
-    }
-
-    /**
-     * Apply user specified colours.
-     *
-     * @param array $settings the parsed settings
-     * @return array settings with removed 'colours' option
-     */
-    protected function apply_custom_colours($settings) {
-        if (!empty($settings['colours'])) {
-            if (is_array($settings['colours'])) {
-                $colours = array_values($settings['colours']);
-            } else {
-                $colours = explode(',', $settings['colours']);
-            }
-            $colours = array_map('trim', $colours);
-            $this->svggraphcolours = $colours;
-        }
-        unset($settings['colours']);
-
-        return $settings;
     }
 
     protected function get_final_settings() {
@@ -387,7 +360,6 @@ final class svggraph extends base {
 
         // Set up legend defaults and shorten entries if requested.
         $settings = $this->shorten_legend($settings);
-        $settings = $this->apply_custom_colours($settings);
 
         $settings = array_merge($settings, $this->usersettings);
 

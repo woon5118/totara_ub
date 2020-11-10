@@ -26,6 +26,7 @@ namespace totara_reportbuilder\local\graph\settings;
 final class svggraph extends base {
 
     public static $translation = [
+        'colors' => 'colours', // Used in first T13 upgrade only.
         'padding' => [
             '_default' => ['pad_top', 'pad_left', 'pad_bottom', 'pad_right'],
             'top' => 'pad_top',
@@ -106,24 +107,45 @@ final class svggraph extends base {
     protected static $derived = [];
 
     public static function create(array $settings): array {
-        $setting_list = [];
+        $options = [];
+
+        // Normalise colors or use defaults.
+        if (!empty($settings['colors'])) {
+            $options['colors'] = static::parse_colors($settings['colors']);
+        } else if (!empty($settings['colours'])) {
+            $options['colors'] = static::parse_colors($settings['colours']);
+        } else if (!empty($settings['custom']['colours'])) {
+            // BC for sites upgraded to 13.0 and 13.1 earlier.
+            $options['colors'] = static::parse_colors($settings['custom']['colours']);
+        }
+        if (empty($options['colors'])) {
+            $options['colors'] = self::DEFAULT_COLORS;
+        }
+        unset($settings['colors']);
+        unset($settings['colours']);
+        unset($settings['custom']['colours']);
+
+        if (!$settings) {
+            // Skip the rest of setting processing.
+            return $options;
+        }
 
         foreach (self::$translation as $key => $value) {
-            $setting_list = array_merge($setting_list, self::match($key, $settings, self::$translation));
+            $options = array_merge($options, self::match($key, $settings, self::$translation));
         }
 
         // Set the derived settings
         foreach (self::$derived as $key => $value) {
-            if (isset($setting_list[$key])) {
-                $setting_list = array_merge($setting_list, $value);
+            if (isset($options[$key])) {
+                $options = array_merge($options, $value);
             }
         }
 
         // If there are custom settings, override the options with anything inside it
         if (isset($settings['custom'])) {
-            $setting_list = array_replace_recursive($setting_list, $settings['custom']);
+            $options = array_replace_recursive($options, $settings['custom']);
         }
 
-        return $setting_list;
+        return $options;
     }
 }

@@ -392,6 +392,7 @@ class totara_reportbuilder_upgradelib_testcase extends advanced_testcase {
             show_legend=true
             show_tooltips=false
             axis_text_angle_h=-90
+            colours = red,green,#0000ff
         ";
 
         $DB->update_record('report_builder_graph', $this->rbgraph);
@@ -416,7 +417,8 @@ class totara_reportbuilder_upgradelib_testcase extends advanced_testcase {
             // Makes sure the unrecognized settings are placed into the "custom" field for full backwards compatibility
             'custom' => [
                 'axis_text_angle_h' => '-90'
-            ]
+            ],
+            'colors' => 'red,green,#0000ff',
         ], JSON_PRETTY_PRINT);
         $this->assertEquals($expected, $graph->settings);
 

@@ -22,6 +22,7 @@
  */
 
 use totara_reportbuilder\local\graph\settings\svggraph;
+use totara_reportbuilder\local\graph\settings\base;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -104,6 +105,7 @@ class totara_reportbuilder_svggraph_settings_testcase extends \basic_testcase {
         ];
 
         $expected = [
+            'colors' => base::DEFAULT_COLORS,
             'pad_top' => 1,
             'pad_left' => 2,
             'pad_bottom' => 3,
@@ -166,6 +168,7 @@ class totara_reportbuilder_svggraph_settings_testcase extends \basic_testcase {
         ];
 
         $expected = [
+            'colors' => base::DEFAULT_COLORS,
             'pad_top' => 10,
             'pad_left' => 10,
             'pad_bottom' => 10,
@@ -190,6 +193,7 @@ class totara_reportbuilder_svggraph_settings_testcase extends \basic_testcase {
         ];
 
         $expected = [
+            'colors' => base::DEFAULT_COLORS,
             'pad_top' => 2,
             'auto_fit' => true
         ];
@@ -197,4 +201,77 @@ class totara_reportbuilder_svggraph_settings_testcase extends \basic_testcase {
         $chartsettings = svggraph::create($settings);
         $this->assertEquals($expected, $chartsettings);
     }
+
+    public function test_colors() {
+        $settings = [
+            'colors' => ['red', 'green'],
+        ];
+        $expected = [
+            'colors' => ['red', 'green'],
+        ];
+        $chartsettings = svggraph::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'colors' => 'red,#008000',
+        ];
+        $expected = [
+            'colors' => ['red', '#008000'],
+        ];
+        $chartsettings = svggraph::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'colours' => ['red', 'green'],
+        ];
+        $expected = [
+            'colors' => ['red', 'green'],
+        ];
+        $chartsettings = svggraph::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'colours' => 'red, green',
+        ];
+        $expected = [
+            'colors' => ['red', 'green'],
+        ];
+        $chartsettings = svggraph::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'custom' => ['colours' => 'red,green'],
+        ];
+        $expected = [
+            'colors' => ['red', 'green'],
+        ];
+        $chartsettings = svggraph::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'colors' => ['#fff', '$#$', ['grrr'], true, false, ''],
+        ];
+        $expected = [
+            'colors' => ['#fff', '$#$', ['grrr'], true, false, ''],
+        ];
+        $chartsettings = svggraph::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [
+            'colors' => ' ',
+        ];
+        $expected = [
+            'colors' => base::DEFAULT_COLORS,
+        ];
+        $chartsettings = svggraph::create($settings);
+        $this->assertSame($expected, $chartsettings);
+
+        $settings = [];
+        $expected = [
+            'colors' => base::DEFAULT_COLORS,
+        ];
+        $chartsettings = svggraph::create($settings);
+        $this->assertSame($expected, $chartsettings);
+    }
+
 }

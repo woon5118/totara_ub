@@ -109,11 +109,29 @@ final class chartjs extends base {
     ];
 
     public static function create(array $settings): array {
-        if (!is_array($settings) || count($settings) === 0) {
-            return [];
+        $options = [];
+
+        // Normalise colors or use defaults.
+        if (!empty($settings['colors'])) {
+            $options['colors'] = static::parse_colors($settings['colors']);
+        } else if (!empty($settings['colours'])) {
+            $options['colors'] = static::parse_colors($settings['colours']);
+        } else if (!empty($settings['custom']['colours'])) {
+            // BC for sites upgraded to 13.0 and 13.1 earlier.
+            $options['colors'] = static::parse_colors($settings['custom']['colours']);
+        }
+        if (empty($options['colors'])) {
+            $options['colors'] = self::DEFAULT_COLORS;
+        }
+        unset($settings['colors']);
+        unset($settings['colours']);
+        unset($settings['custom']['colours']);
+
+        if (!$settings) {
+            // Skip the rest of setting processing.
+            return $options;
         }
 
-        $options = [];
         $setting_list = [];
 
         // We can't just iterate over all options, since we have to treat 'axis' specially.
@@ -223,5 +241,32 @@ final class chartjs extends base {
             $parent[$level] = [];
         }
         self::keys_to_object($components[1], $value, $parent[$level]);
+    }
+
+    /**
+     * Parse colors to array.
+     *
+     * @param string|array $colors
+     * @return array
+     */
+    public static function parse_colors($colors): array {
+        $colors = parent::parse_colors($colors);
+
+        foreach ($colors as $k => $v) {
+            if (!is_string($v)) {
+                // Complex SVGGraph color settings are not supported here.
+                $colors[$k] = self::INVALID_COLOR;
+            } else {
+                // Accept only valid CSS colours here.
+                $color = purify_css_color($v);
+                if ($color === false) {
+                    $colors[$k] = self::INVALID_COLOR;
+                } else {
+                    $colors[$k] = $color;
+                }
+            }
+        }
+
+        return $colors;
     }
 }
