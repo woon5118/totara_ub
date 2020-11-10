@@ -35,6 +35,11 @@ class static_content extends element_plugin {
      * @deprecated since Totara 13.2
      */
     public function get_participant_response_component(): string {
+        debugging(
+            '\performelement_static_content\static_content::get_participant_response_component() is deprecated and should no longer be used.'
+            . 'Only classes expending \mod_perform\models\activity\respondable_element_plugin should implement this method',
+            DEBUG_DEVELOPER
+        );
         return $this->get_component_path('ElementParticipant');
     }
 

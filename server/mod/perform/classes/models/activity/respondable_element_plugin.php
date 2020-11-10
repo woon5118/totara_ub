@@ -151,7 +151,9 @@ abstract class respondable_element_plugin extends element_plugin {
     }
 
     /**
-     * @inheritDoc
+     * This method return element's user form vue component name.
+     *
+     * @return string
      */
     public function get_participant_response_component(): string {
         return 'mod_perform/components/element/participant_form/ResponseDisplay';
