@@ -117,7 +117,12 @@ class card_loader {
                     );
                 } else {
                     $master->join(['user', 'u'], 'master.userid', 'u.id');
-                    $master->where_null('u.tenantid');
+                    $master->when(
+                        (!empty($CFG->tenantsisolated)),
+                        function (builder $inner_builder): void {
+                            $inner_builder->where_null('u.tenantid');
+                        }
+                    );
                 }
 
                 // In both cases, we will have to only include those records from users that
