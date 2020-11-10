@@ -16,7 +16,6 @@ Feature: User search discussions
     Given I am on a totara site
     And I log in as "user_two"
     And I click on "Find Workspaces" in the totara menu
-    And I click on "Find Workspaces" in the totara menu
     And I follow "Workspace 101"
     And I click on "Join workspace" "button"
     # This is pretty bad - but on a slow machine such as Macbook pro - we will have to wait for javascript
@@ -41,7 +40,6 @@ Feature: User search discussions
   Scenario: Search for the discussion via comment
     Given I am on a totara site
     And I log in as "user_two"
-    And I click on "Find Workspaces" in the totara menu
     And I click on "Find Workspaces" in the totara menu
     And I follow "Workspace 101"
     And I click on "Join workspace" "button"
@@ -79,4 +77,25 @@ Feature: User search discussions
     And I set the field "Search discussions" to "reply"
     When I click on "Search discussions" "button"
     Then I should not see "This is the discussion 1"
+    And I should see "The second discussion"
+
+  @javascript
+  Scenario: Search for the discussion with no result
+    Given I log in as "user_one"
+    And I click on "Your Workspaces" in the totara menu
+    And I activate the weka editor with css ".tui-workspaceDiscussionForm__editor"
+    And I type "The first discussion" in the weka editor
+    And I wait for the next second
+    When I click on "Post" "button"
+    Then I should see "The first discussion"
+    And I wait for the next second
+    And I type "The second discussion" in the weka editor
+    And I wait for the next second
+    When I click on "Post" "button"
+    Then I should see "The second discussion"
+    And I set the field "Search discussions" to "test"
+    When I click on "Search discussions" "button"
+    Then I should see "No results found." in the ".tui-workspaceDiscussionTab__message" "css_element"
+    When I click on "Clear this search term" "button"
+    Then I should see "The first discussion"
     And I should see "The second discussion"

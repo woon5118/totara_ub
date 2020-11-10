@@ -50,6 +50,7 @@
             :selected-id="selectedId"
             :values="values"
             :show-contribute="section.showcontribute"
+            :redirection="redirection"
           />
         </template>
       </template>
@@ -94,6 +95,7 @@ export default {
       type: String,
       required: true,
     },
+    redirection: Boolean,
   },
 
   data() {

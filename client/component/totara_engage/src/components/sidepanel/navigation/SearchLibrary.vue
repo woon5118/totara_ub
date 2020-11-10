@@ -24,6 +24,8 @@
     :disabled="false"
     :aria-label="$str('searchlibrary', 'totara_engage')"
     :placeholder="$str('searchlibrary', 'totara_engage')"
+    :enable-clear-icon="true"
+    @clear="clearSearchInput"
     @input="searchInput"
     @submit="submit"
   />
@@ -41,6 +43,10 @@ export default {
   },
 
   mixins: [NavigationMixin],
+
+  props: {
+    redirection: Boolean,
+  },
 
   data() {
     return {
@@ -64,6 +70,15 @@ export default {
       window.location.href = this.$url('/totara/engage/search_results.php', {
         search: this.searchValue,
       });
+    },
+
+    clearSearchInput() {
+      this.searchValue = '';
+      if (this.redirection) {
+        window.location.href = this.$url('/totara/engage/search_results.php', {
+          search: this.searchValue,
+        });
+      }
     },
   },
 };

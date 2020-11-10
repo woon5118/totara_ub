@@ -50,7 +50,8 @@ $tui = new \totara_tui\output\component(
             'tuicomponent' => 'totara_engage/components/contribution/SearchResults',
         ],
         'page-props' => [
-            'search' => $search
+            'search' => $search,
+            'redirection' => true
         ],
     ]
 );

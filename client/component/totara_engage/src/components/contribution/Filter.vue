@@ -75,6 +75,8 @@
             :disabled="false"
             :aria-label="$str('filtersearch', 'totara_engage')"
             :placeholder="searchPlaceholder"
+            :enable-clear-icon="true"
+            @clear="clearSearchInput"
             @input="searchInput"
             @submit="searchSubmit"
           />
@@ -287,6 +289,10 @@ export default {
       this.$emit('search', {
         value: this.search,
       });
+    },
+
+    clearSearchInput() {
+      this.search = '';
     },
   },
 };

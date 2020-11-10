@@ -183,6 +183,7 @@ $string['resourceonly'] = 'Show standalone resources only';
 $string['resource_unavailable'] = 'The resource is no longer available';
 $string['restricted'] = "Limited people";
 $string['savedresources'] = 'Saved resources';
+$string['search'] = 'Search';
 $string['searchlibrary'] = 'Search your library';
 $string['searchresults'] = 'Search results';
 $string['searchresultsdetail'] = 'Search results: {$a}';

@@ -39,8 +39,17 @@
       class="tui-workspaceDiscussionTab__filter"
       @update-search-term="searchTerm = $event"
       @update-sort="sort = $event"
+      @clear="searchTerm = $event"
     />
 
+    <div
+      v-if="
+        !$apollo.loading && page.cursor.total === 0 && searchTerm.length !== 0
+      "
+      class="tui-workspaceDiscussionTab__message"
+    >
+      {{ $str('no_discussion_result', 'container_workspace') }}
+    </div>
     <!-- Using the discussion's id so that we can make sure the state is being reset after ward. -->
     <VirtualScroll
       data-key="id"
@@ -480,7 +489,8 @@ export default {
       "loadmore",
       "total_discussions",
       "vieweditems",
-      "discussions_list"
+      "discussions_list",
+      "no_discussion_result"
     ]
   }
 </lang-strings>
@@ -514,6 +524,10 @@ export default {
   &__loadMore {
     display: flex;
     align-self: center;
+  }
+
+  &__message {
+    @include tui-font-body();
   }
 }
 </style>

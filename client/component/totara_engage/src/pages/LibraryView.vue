@@ -41,6 +41,7 @@
           :title="title"
           :units="units"
           :grid-direction="gridDirection"
+          :redirection="pageProps.redirection"
         />
       </template>
       <!-- /sidePanelLeft -->

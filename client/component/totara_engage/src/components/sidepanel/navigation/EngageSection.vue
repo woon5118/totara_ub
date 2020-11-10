@@ -18,7 +18,11 @@
 
 <template>
   <section>
-    <SearchLibrary :selected-id="selectedId" :values="values" />
+    <SearchLibrary
+      :selected-id="selectedId"
+      :values="values"
+      :redirection="redirection"
+    />
 
     <h3 class="sr-only">{{ $str('yourresources', 'totara_engage') }}</h3>
 
@@ -66,6 +70,10 @@ export default {
   },
 
   mixins: [NavigationMixin],
+
+  props: {
+    redirection: Boolean,
+  },
 
   methods: {
     selectSharedWithYouFilter() {

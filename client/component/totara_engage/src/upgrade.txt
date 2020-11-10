@@ -3,6 +3,9 @@ information provided here is intended especially for developers.
 
 === 13.2 ===
 
+* Added new optional prop "redirection" for component NavigationPanel.vue
+* Added new optional prop "redirection" for component EngageSection.vue
+* Added new optional prop "redirection" for component SearchLibrary.vue
 * Removed ButtonLabel.vue
 * Replaced ButtonLabel with LabelledButtonTrigger in Share.vue component
 * Removed the close button in the popover from Share.vue component

@@ -128,6 +128,7 @@ $string['no_file_found'] = 'No files have been uploaded in this workspace\'s dis
 $string['no_member_found'] = 'No members match your search. Please try again.';
 $string['no_spaces'] = "You don't currently belong to any workspaces";
 $string['non_member'] = "Non-member";
+$string['no_discussion_result'] = "No results found.";
 $string['one_member'] = '1 member';
 $string['or'] = 'Or';
 $string['owner'] = 'Owner';

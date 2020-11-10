@@ -23,8 +23,10 @@
         :aria-label="$str('search_discussions', 'container_workspace')"
         :label-visible="false"
         :placeholder="$str('search_discussions', 'container_workspace')"
+        :enable-clear-icon="true"
         class="tui-workspaceDiscussionFilter__search-box"
         @submit="$emit('update-search-term', innerSearchTerm)"
+        @clear="clearSearchTerm"
       />
 
       <a
@@ -127,6 +129,13 @@ export default {
       if (value !== this.sort) {
         this.$emit('update-sort', value);
       }
+    },
+  },
+
+  methods: {
+    clearSearchTerm() {
+      this.innerSearchTerm = '';
+      this.$emit('clear', this.innerSearchTerm);
     },
   },
 };

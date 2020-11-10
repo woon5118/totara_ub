@@ -81,11 +81,13 @@ export default {
 
   computed: {
     pageHeading() {
-      return this.$str(
-        'searchresultsdetail',
-        'totara_engage',
-        this.pageProps.search || ''
-      );
+      return !this.pageProps.search
+        ? this.$str('search', 'totara_engage')
+        : this.$str(
+            'searchresultsdetail',
+            'totara_engage',
+            this.pageProps.search
+          );
     },
   },
 
@@ -105,6 +107,7 @@ export default {
 <lang-strings>
 {
   "totara_engage": [
+    "search",
     "searchresultsdetail"
   ]
 }

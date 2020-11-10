@@ -27,6 +27,7 @@
       <MemberSearchBox
         :search-term="searchTerm"
         @submit="searchTerm = $event"
+        @clear="searchTerm = $event"
       />
     </div>
 
