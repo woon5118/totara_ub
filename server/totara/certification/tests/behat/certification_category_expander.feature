@@ -14,13 +14,13 @@ Feature: Find learning certificate category management
         | cat1     | cat1b    | Category 1b |
     Given the following "certifications" exist in "totara_program" plugin:
         | shortname | fullname  | category | visible |
-        | t1        | top1      | 1        | 0       |
-        | t2        | top2      | 1        | 1       |
-        | c1c1      | c1c1      | 2        | 0       |
-        | c1c2      | c1c2      | 2        | 1       |
-        | c1ac1     | c1ac1     | 3        | 1       |
-        | c1bc1     | c1bc1     | 4        | 0       |
-        | c1bc2     | c1bc2     | 4        | 1       |
+        | t1        | top1      | 0        | 0       |
+        | t2        | top2      | 0        | 1       |
+        | c1c1      | c1c1      | cat1     | 0       |
+        | c1c2      | c1c2      | cat1     | 1       |
+        | c1ac1     | c1ac1     | cat1a    | 1       |
+        | c1bc1     | c1bc1     | cat1b    | 0       |
+        | c1bc2     | c1bc2     | cat1b    | 1       |
     And I log in as "admin"
     And I set the following administration settings values:
         | catalogtype | moodle |
