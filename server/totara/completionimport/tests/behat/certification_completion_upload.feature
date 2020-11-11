@@ -23,6 +23,9 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I should see "2 Records imported pending processing"
     And I run all adhoc tasks
 
+    When I am on homepage
+    Then I should see "Certification completion import successfully completed"
+
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
@@ -76,6 +79,11 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "2 Records imported pending processing"
     And I run all adhoc tasks
+
+    When I am on homepage
+    Then I should see "Certification completion import completed with errors"
+    And I click on "View all alerts" "link"
+    And I should see "was processed but contains 2 error(s)"
 
     When I follow "Certification import report"
     Then I should see "2 records shown"

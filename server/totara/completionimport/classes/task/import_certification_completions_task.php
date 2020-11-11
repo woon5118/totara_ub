@@ -50,11 +50,13 @@ class import_certification_completions_task extends \core\task\adhoc_task {
             $importname = $customdata->importname;
             $importtime = $customdata->importtime;
 
+            // Get the users who uploaded certification completion in the given time to notify them after importing.
+            $userstonotify = get_list_of_certification_import_users($importtime);
+
             import_data_checks($importname, $importtime);
             import_data_adjustments($importname, $importtime);
 
-            // Get the users who uploaded certification completion in the given time to notify them after importing.
-            $userstonotify = get_list_of_certification_import_users($importtime);
+            $numerrors = $DB->count_records('totara_compl_import_cert', ['timecreated' => $importtime, 'importerror' => 1]);
 
             try {
                 // Put into evidence any courses / certifications not found.
@@ -62,7 +64,7 @@ class import_certification_completions_task extends \core\task\adhoc_task {
 
                 // Run the specific course enrolment / certification assignment.
                 $functionname = 'import_' . $importname;
-                $errors = $functionname($importname, $importtime);
+                $functionname($importname, $importtime);
 
                 mtrace("Certification completion import with timestamp '$importtime' processed");
 
@@ -86,8 +88,14 @@ class import_certification_completions_task extends \core\task\adhoc_task {
                         ['importname' => $importname, 'timecreated' => $importtime, 'importuserid' => $userto->id, 'clearfilters' => 1]);
                     $a->reportlink = $OUTPUT->action_link($reporturl, get_string('report_certification', 'totara_completionimport'));
 
-                    $event->subject = get_string('importsuccessfulcertsubject', 'totara_completionimport');
-                    $event->fullmessage = get_string('importsuccessfulcertfullmessage', 'totara_completionimport', $a);
+                    if ($numerrors) {
+                        $a->numerrors = $numerrors;
+                        $event->subject = get_string('importsuccessfulwitherrorscertsubject', 'totara_completionimport');
+                        $event->fullmessage = get_string('importsuccessfulwitherrorscertfullmessage', 'totara_completionimport', $a);
+                    } else {
+                        $event->subject = get_string('importsuccessfulcertsubject', 'totara_completionimport');
+                        $event->fullmessage = get_string('importsuccessfulcertfullmessage', 'totara_completionimport', $a);
+                    }
 
                     // Send success alert
                     tm_alert_send($event);
