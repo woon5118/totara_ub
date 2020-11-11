@@ -21,9 +21,9 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\element_response;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\section_element;
+use mod_perform\entity\activity\element_response;
+use mod_perform\entity\activity\participant_instance;
+use mod_perform\entity\activity\section_element;
 
 require_once(__DIR__ . '/../db/upgradelib.php');
 

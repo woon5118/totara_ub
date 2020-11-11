@@ -22,7 +22,7 @@
  */
 namespace engage_article\watcher;
 
-use core\entities\user;
+use core\entity\user;
 use editor_weka\hook\find_context;
 use editor_weka\hook\search_users_by_pattern;
 use engage_article\totara_engage\resource\article;

@@ -22,7 +22,7 @@
  */
 namespace editor_weka\hook;
 
-use core\entities\user;
+use core\entity\user;
 use totara_core\hook\base;
 use totara_core\identifier\component_area;
 

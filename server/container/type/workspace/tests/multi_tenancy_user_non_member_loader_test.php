@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-use core\entities\user;
+use core\entity\user;
 use container_workspace\query\member\non_member_query;
 use container_workspace\loader\member\non_member_loader;
 

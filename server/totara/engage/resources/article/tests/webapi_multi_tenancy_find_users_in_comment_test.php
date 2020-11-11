@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use engage_article\totara_engage\resource\article;
 use editor_weka\webapi\resolver\query\users_by_pattern;
-use core\entities\user;
+use core\entity\user;
 
 class engage_article_webapi_multi_tenancy_find_users_in_comment_testcase extends advanced_testcase {
     use webapi_phpunit_helper;

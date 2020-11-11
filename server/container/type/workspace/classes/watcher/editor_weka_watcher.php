@@ -26,7 +26,8 @@ use container_workspace\discussion\discussion;
 use container_workspace\member\member;
 use container_workspace\member\status;
 use container_workspace\workspace;
-use core\entities\user;
+use context_course;
+use core\entity\user;
 use core_container\factory;
 use editor_weka\hook\find_context;
 use editor_weka\hook\search_users_by_pattern;
@@ -67,7 +68,7 @@ final class editor_weka_watcher {
                     ['id' => $discussion_id]
                 );
 
-                $context = \context_course::instance($workspace_id);
+                $context = context_course::instance($workspace_id);
                 $hook->set_context($context);
                 return;
             }
@@ -76,7 +77,7 @@ final class editor_weka_watcher {
         if (workspace::DESCRIPTION_AREA === $area) {
             $workspace_id = $hook->get_instance_id();
             if (null !== $workspace_id) {
-                $context = \context_course::instance($workspace_id);
+                $context = context_course::instance($workspace_id);
                 $hook->set_context($context);
             }
         }

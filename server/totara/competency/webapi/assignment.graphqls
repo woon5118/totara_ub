@@ -233,7 +233,7 @@ input totara_competency_self_assigned_competencies_filter {
   """
   text: param_text
   """
-  Filter by one or more assignment types by providing an array of strings matching one or more of the totara_competency\entities\assignment TYPE_ constants (e.g. 'admin', 'self', 'system', 'other' or 'legacy')
+  Filter by one or more assignment types by providing an array of strings matching one or more of the totara_competency\entity\assignment TYPE_ constants (e.g. 'admin', 'self', 'system', 'other' or 'legacy')
   """
   assignment_type: [param_alphaext]
   """
@@ -241,7 +241,7 @@ input totara_competency_self_assigned_competencies_filter {
   """
   framework: param_integer
   """
-  Filter by assignment status. Code matching one of the totara_competency\entities\assignment STATUS_ constants (e.g. 0 => 'draft', 1 => 'active', 2 => 'archived')
+  Filter by assignment status. Code matching one of the totara_competency\entity\assignment STATUS_ constants (e.g. 0 => 'draft', 1 => 'active', 2 => 'archived')
   """
   assignment_status: param_integer
   """

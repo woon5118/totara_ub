@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use editor_weka\webapi\resolver\query\users_by_pattern;
-use core\entities\user;
+use core\entity\user;
 use core\record\tenant;
 
 class editor_weka_webapi_find_users_testcase extends advanced_testcase {

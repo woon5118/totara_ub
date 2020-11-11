@@ -22,6 +22,7 @@
  */
 namespace editor_weka\webapi\resolver\query;
 
+use coding_exception;
 use core\entity\user_repository;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
@@ -29,7 +30,7 @@ use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use context_user;
 use context;
-use core\entities\user;
+use core\entity\user;
 use editor_weka\hook\search_users_by_pattern;
 
 /**
@@ -58,7 +59,7 @@ final class users_by_pattern implements query_resolver, has_middleware {
         }
 
         if ($context->is_user_access_prevented($USER->id)) {
-            throw new \coding_exception("User with id '{$USER->id}' cannot access context");
+            throw new coding_exception("User with id '{$USER->id}' cannot access context");
         }
 
         $pattern = $args['pattern'] ?? '';

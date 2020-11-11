@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use editor_weka\webapi\resolver\query\users_by_pattern;
-use core\entities\user;
+use core\entity\user;
 use container_workspace\workspace;
 use container_workspace\discussion\discussion;
 

@@ -90,7 +90,7 @@ function evidence_delete($evidenceid) {
  * @return array
  */
 function totara_plan_get_custom_fields($itemid) {
-    debugging('totara_plan_get_custom_fields() has been deprecated and is no longer used, please use totara_evidence\entities\evidence_item->data instead.', DEBUG_DEVELOPER);
+    debugging('totara_plan_get_custom_fields() has been deprecated and is no longer used, please use totara_evidence\entity\evidence_item->data instead.', DEBUG_DEVELOPER);
     return evidence_item::load_by_id($itemid)->get_customfield_data()->to_array();
 }
 

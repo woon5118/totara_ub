@@ -26,7 +26,7 @@ use container_workspace\workspace;
 use container_workspace\discussion\discussion;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use editor_weka\webapi\resolver\query\users_by_pattern;
-use core\entities\user;
+use core\entity\user;
 
 class container_workspace_webapi_find_users_in_tenant_workspace_as_tenant_user_testcase extends advanced_testcase {
     use webapi_phpunit_helper;

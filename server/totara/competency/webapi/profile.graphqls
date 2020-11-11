@@ -156,7 +156,7 @@ type totara_competency_profile_assignment_filter_option {
   """
   type: String!
   """
-  Filter by assignment status. Code matching one of the totara_competency\entities\assignment STATUS_ constants (e.g. 0 => 'draft', 1 => 'active', 2 => 'archived')
+  Filter by assignment status. Code matching one of the totara_competency\entity\assignment STATUS_ constants (e.g. 0 => 'draft', 1 => 'active', 2 => 'archived')
   """
   status: Int!
   """
@@ -182,7 +182,7 @@ input totara_competency_profile_assignment_filters {
   """
   type: String
   """
-  Filter by assignment status. Code matching one of the totara_competency\entities\assignment STATUS_ constants (e.g. 0 => 'draft', 1 => 'active', 2 => 'archived')
+  Filter by assignment status. Code matching one of the totara_competency\entity\assignment STATUS_ constants (e.g. 0 => 'draft', 1 => 'active', 2 => 'archived')
   """
   status: Int
   """

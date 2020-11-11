@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 use totara_webapi\phpunit\webapi_phpunit_helper;
 use editor_weka\webapi\resolver\query\users_by_pattern;
 use totara_playlist\playlist;
-use core\entities\user;
+use core\entity\user;
 
 class totara_playlist_webapi_multi_tenancy_find_users_testcase extends advanced_testcase {
     use webapi_phpunit_helper;

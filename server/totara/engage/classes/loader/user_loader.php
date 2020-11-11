@@ -25,7 +25,7 @@ namespace totara_engage\loader;
 use core\orm\pagination\offset_cursor_paginator;
 use core\orm\query\builder;
 use totara_engage\query\user_query;
-use core\entities\user;
+use core\entity\user;
 use context;
 
 /**

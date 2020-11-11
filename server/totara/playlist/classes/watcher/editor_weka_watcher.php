@@ -22,7 +22,7 @@
  */
 namespace totara_playlist\watcher;
 
-use core\entities\user;
+use core\entity\user;
 use editor_weka\hook\search_users_by_pattern;
 use editor_weka\hook\find_context;
 use totara_comment\comment_helper;
