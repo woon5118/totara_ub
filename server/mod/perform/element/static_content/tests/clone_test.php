@@ -35,6 +35,7 @@ require_once(__DIR__ . '/static_content_testcase.php');
 
 /**
  * @group perform
+ * @group perform_element
  */
 class performelement_static_content_clone_testcase extends performelement_static_content_testcase {
 

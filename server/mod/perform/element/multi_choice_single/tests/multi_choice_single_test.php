@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara Perform
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
@@ -17,31 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
- * @package performelement_multi_choice_multi
+ * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @package mod_perform
  */
 
 use core\collection;
 use mod_perform\models\activity\element_plugin;
-use performelement_multi_choice_multi\answer_required_error;
-use performelement_multi_choice_multi\multi_choice_multi;
+use performelement_multi_choice_single\option_required_error;
+use performelement_multi_choice_single\multi_choice_single;
 
 /**
  * @group perform
  * @group perform_element
  */
-class mod_perform_element_multi_choice_multi_testcase extends advanced_testcase {
+class performelement_multi_choice_single_testcase extends advanced_testcase {
 
-    public function test_validate_response_invalid_format(): void {
-        /** @var multi_choice_multi $element_type */
-        $element_type = element_plugin::load_by_plugin('multi_choice_multi');
-
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('Invalid response data format, expected array of selected options');
-
-        $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true]);
-        $element_type->validate_response(json_encode('single_value'), $element);
-    }
 
     /**
      * @dataProvider validation_provider
@@ -49,8 +39,8 @@ class mod_perform_element_multi_choice_multi_testcase extends advanced_testcase 
      * @param array|null $selected_options
      */
     public function test_validation(collection $expected_errors, ?array $selected_options): void {
-        /** @var multi_choice_multi $element_type */
-        $element_type = element_plugin::load_by_plugin('multi_choice_multi');
+        /** @var multi_choice_single $element_type */
+        $element_type = element_plugin::load_by_plugin('multi_choice_single');
 
         $json = '{"options":[{"name":"option_0","value":"11"},{"name":"option_1","value":"12"},{"name":"option_2","value":"13"}]}';
         $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true, 'data' => $json]);
@@ -61,15 +51,8 @@ class mod_perform_element_multi_choice_multi_testcase extends advanced_testcase 
 
     public function validation_provider(): array {
         return [
-            'no errors' => [
-                new collection(),
-                [
-                    'option_0',
-                    'option_2',
-                ],
-            ],
             'missing answer' => [
-                new collection([new answer_required_error()]),
+                new collection([new option_required_error()]),
                 null,
             ],
         ];
@@ -81,8 +64,8 @@ class mod_perform_element_multi_choice_multi_testcase extends advanced_testcase 
      * @param array|null $selected_options
      */
     public function test_draft_validation(collection $expected_errors, ?array $selected_options): void {
-        /** @var multi_choice_multi $element_type */
-        $element_type = element_plugin::load_by_plugin('multi_choice_multi');
+        /** @var multi_choice_single $element_type */
+        $element_type = element_plugin::load_by_plugin('multi_choice_single');
 
         $json = '{"options":[{"name":"option_0","value":"11"},{"name":"option_1","value":"12"},{"name":"option_2","value":"13"}]}';
         $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true, 'data' => $json]);
@@ -93,13 +76,6 @@ class mod_perform_element_multi_choice_multi_testcase extends advanced_testcase 
 
     public function draft_validation_provider(): array {
         return [
-            'no errors' => [
-                new collection(),
-                [
-                    'option_0',
-                    'option_2',
-                ],
-            ],
             'missing answer' => [
                 new collection(),
                 null,

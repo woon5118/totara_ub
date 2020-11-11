@@ -29,6 +29,7 @@ use performelement_custom_rating_scale\custom_rating_scale;
 
 /**
  * @group perform
+ * @group perform_element
  */
 class performelement_custom_rating_scale_data_field_formatter_testcase extends advanced_testcase {
 

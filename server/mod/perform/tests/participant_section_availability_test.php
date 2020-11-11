@@ -243,7 +243,7 @@ class mod_perform_participant_section_availability_testcase extends state_testca
                 return $this;
             }
 
-            public function validate_response(): bool {
+            public function validate_response($is_draft_validation = false): bool {
                 $this->validation_errors = new collection();
                 return true;
             }

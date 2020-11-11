@@ -33,7 +33,11 @@ class numeric_rating_scale extends respondable_element_plugin {
     /**
      * @inheritDoc
      */
-    public function validate_response(?string $encoded_response_data, ?element $element): collection {
+    public function validate_response(
+        ?string $encoded_response_data,
+        ?element $element,
+        $is_draft_validation = false
+    ): collection {
         $element_data = $element->data ?? null;
         $answer_value = $this->decode_response($encoded_response_data, $element_data);
 
@@ -41,11 +45,12 @@ class numeric_rating_scale extends respondable_element_plugin {
             throw new coding_exception('Invalid element data format, expected "options" field');
         }
         $errors = new collection();
-
-        if ($answer_value !== '') {
-            $this->validate_value($answer_value, $element, $errors);
-        } else if ($element->is_required) {
+        if ($this->fails_required_validation($answer_value === '' || is_null($answer_value), $element, $is_draft_validation)) {
             $errors->append(new answer_required_error());
+        }
+
+        if (!is_null($answer_value) && $answer_value !== '') {
+            $this->validate_value($answer_value, $element, $errors);
         }
 
         return $errors;

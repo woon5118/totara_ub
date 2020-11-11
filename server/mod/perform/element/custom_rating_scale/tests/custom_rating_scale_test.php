@@ -17,49 +17,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
  * @package mod_perform
  */
 
+
 use core\collection;
 use mod_perform\models\activity\element_plugin;
-use performelement_date_picker\date_picker;
-use performelement_date_picker\date_iso_required_error;
-use performelement_date_picker\answer_required_error;
-use performelement_date_picker\invalid_date_error;
+use performelement_custom_rating_scale\custom_rating_scale;
+use performelement_custom_rating_scale\answer_required_error;
 
 /**
  * @group perform
  * @group perform_element
  */
-class performelement_date_picker_testcase extends advanced_testcase {
-
-    public function test_format_response_lines(): void {
-        $date_picker = date_picker::load_by_plugin('date_picker');
-        $response = ['iso' => '2020-12-04'];
-
-        $element_data = [];
-
-        $lines = $date_picker->format_response_lines(json_encode($response), json_encode($element_data));
-        self::assertCount(1, $lines);
-        self::assertEquals('4 December 2020', $lines[0]);
-
-        $lines = $date_picker->format_response_lines(json_encode(null), json_encode($element_data));
-        self::assertCount(0, $lines);
-    }
+class performelement_custom_rating_scale_testcase extends advanced_testcase {
 
     /**
      * @dataProvider validation_provider
      * @param collection $expected_errors
-     * @param array|null $answer
+     * @param string $answer_text
      */
-    public function test_validation(collection $expected_errors, ?array $answer): void {
-        /** @var date_picker $element_type */
-        $element_type = element_plugin::load_by_plugin('date_picker');
+    public function test_validation(collection $expected_errors, string $answer_text): void {
+        /** @var custom_rating_scale $element_type */
+        $element_type = element_plugin::load_by_plugin('custom_rating_scale');
 
-        $json = '{}';
+        $json = '{"options":[{"name":"option_5107756","value":{"text":"text1","score":"1"}},{"name":"option_5379667","value":{"text":"text2","score":"2"}}]}';
         $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true, 'data' => $json]);
-        $errors = $element_type->validate_response(json_encode($answer), $element);
+        $errors = $element_type->validate_response(json_encode($answer_text), $element);
 
         self::assertEquals($expected_errors, $errors);
     }
@@ -68,19 +53,11 @@ class performelement_date_picker_testcase extends advanced_testcase {
         return [
             'valid' => [
                 new collection(),
-                ['iso' => '1903-03-03'],
+                'option_5107756',
             ],
             'missing answer' => [
                 new collection([new answer_required_error()]),
-                null,
-            ],
-            'missing iso' => [
-                new collection([new date_iso_required_error()]),
-                ['i' => '1903-03-03']
-            ],
-            'invalid date' => [
-                new collection([new invalid_date_error()]),
-                ['iso' => 'not-a-date']
+                '',
             ]
         ];
     }
@@ -88,15 +65,15 @@ class performelement_date_picker_testcase extends advanced_testcase {
     /**
      * @dataProvider draft_validation_provider
      * @param collection $expected_errors
-     * @param array|null $answer
+     * @param string $answer_text
      */
-    public function test_draft_validation(collection $expected_errors, ?array $answer): void {
-        /** @var date_picker $element_type */
-        $element_type = element_plugin::load_by_plugin('date_picker');
+    public function test_draft_validation(collection $expected_errors, string $answer_text): void {
+        /** @var custom_rating_scale $element_type */
+        $element_type = element_plugin::load_by_plugin('custom_rating_scale');
 
-        $json = '{}';
+        $json = '{"options":[{"name":"option_5107756","value":{"text":"text1","score":"1"}},{"name":"option_5379667","value":{"text":"text2","score":"2"}}]}';
         $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true, 'data' => $json]);
-        $errors = $element_type->validate_response(json_encode($answer), $element, true);
+        $errors = $element_type->validate_response(json_encode($answer_text), $element, true);
 
         self::assertEquals($expected_errors, $errors);
     }
@@ -105,19 +82,11 @@ class performelement_date_picker_testcase extends advanced_testcase {
         return [
             'valid' => [
                 new collection(),
-                ['iso' => '1903-03-03'],
+                'option_5107756',
             ],
             'missing answer' => [
                 new collection(),
-                null,
-            ],
-            'missing iso' => [
-                new collection([new date_iso_required_error()]),
-                ['i' => '1903-03-03']
-            ],
-            'invalid date' => [
-                new collection([new invalid_date_error()]),
-                ['iso' => 'not-a-date']
+                '',
             ]
         ];
     }

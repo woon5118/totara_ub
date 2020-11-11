@@ -36,20 +36,22 @@ class short_text extends respondable_element_plugin {
     /**
      * @inheritDoc
      */
-    public function validate_response(?string $encoded_response_data, ?element $element): collection {
+    public function validate_response(
+        ?string $encoded_response_data,
+        ?element $element,
+        $is_draft_validation = false
+    ): collection {
         $element_data = $element->data ?? null;
         $answer_text = $this->decode_response($encoded_response_data, $element_data);
 
         $errors = new collection();
-
-        if ((string)$answer_text === '' && $element->is_required) {
+        if ($this->fails_required_validation(trim($answer_text) === '', $element, $is_draft_validation)) {
             $errors->append(new answer_required_error());
         }
 
         if (core_text::strlen($answer_text) > self::MAX_ANSWER_LENGTH) {
             $errors->append(new answer_length_exceeded_error());
         }
-
         return $errors;
     }
 

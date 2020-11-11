@@ -28,9 +28,8 @@ use mod_perform\models\activity\element_plugin;
 use performelement_long_text\formatter\response_formatter;
 
 /**
- * @coversDefaultClass \performelement_long_text\formatter\response_formatter
- *
  * @group perform
+ * @group perform_element
  */
 class performelement_long_text_response_formatter_testcase extends advanced_testcase {
     /**

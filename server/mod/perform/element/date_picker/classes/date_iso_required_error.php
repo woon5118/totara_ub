@@ -15,25 +15,23 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Angela Kuznetsova <angela.kuznetsoav@totaralearning.com>
- * @package performelement_custom_rating_scale
+ * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @package mod_perform
  */
-
-namespace performelement_custom_rating_scale;
+namespace performelement_date_picker;
 
 use mod_perform\models\response\element_validation_error;
 
-class option_required_error extends element_validation_error {
+class date_iso_required_error extends element_validation_error {
 
-    public const OPTION_REQUIRED = 'OPTION_REQUIRED';
+    public const ISO_REQUIRED = 'ISO_REQUIRED';
 
     public function __construct() {
-        $error_code = self::OPTION_REQUIRED;
-        $error_message = get_string('error:answer_required', 'performelement_custom_rating_scale');
+        $error_code = self::ISO_REQUIRED;
+        $error_message = get_string('error_iso_required', 'performelement_date_picker');
 
         parent::__construct($error_code, $error_message);
     }
-
 }

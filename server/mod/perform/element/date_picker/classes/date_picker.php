@@ -24,6 +24,7 @@
 namespace performelement_date_picker;
 
 use coding_exception;
+use core\collection;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\respondable_element_plugin;
 
@@ -34,6 +35,38 @@ class date_picker extends respondable_element_plugin {
      */
     public function get_sortorder(): int {
         return 10;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validate_response(
+        ?string $encoded_response_data,
+        ?element $element,
+        $is_draft_validation = false
+    ): collection {
+
+        $response_data = json_decode($encoded_response_data, true);
+
+        $errors = new collection();
+
+        if ($this->fails_required_validation(is_null($response_data), $element, $is_draft_validation)) {
+            $errors->append(new answer_required_error());
+        }
+
+        if (!is_null($response_data)) {
+            if (!isset($response_data['iso'])) {
+                $errors->append(new date_iso_required_error());
+            } else {
+                $date_object = \DateTime::createFromFormat('Y-m-d', $response_data['iso']);
+
+                if ($date_object === false) {
+                    $errors->append(new invalid_date_error());
+                }
+            }
+        }
+
+        return $errors;
     }
 
     /**
@@ -81,15 +114,7 @@ class date_picker extends respondable_element_plugin {
             return null;
         }
 
-        if (!isset($response_data['iso'])) {
-            throw new coding_exception('Invalid response data format, expected "date" field to contain "iso" property');
-        }
-
         $date_object = \DateTime::createFromFormat('Y-m-d', $response_data['iso']);
-
-        if ($date_object === false) {
-            throw new coding_exception('Invalid response data format, could not parse ISO date');
-        }
 
         return $date_object->getTimestamp();
     }

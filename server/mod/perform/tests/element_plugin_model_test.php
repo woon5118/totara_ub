@@ -21,6 +21,8 @@
  * @package mod_perform
  */
 
+use core\collection;
+use mod_perform\models\activity\element;
 use mod_perform\entity\activity\element as element_entity;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\respondable_element_plugin;
@@ -53,6 +55,13 @@ class mod_perform_element_plugin_model_testcase extends advanced_testcase {
             }
             public function get_sortorder(): int {
                 return 0;
+            }
+            public function validate_response(
+                ?string $encoded_response_data,
+                ?element $element,
+                $is_draft_validation = false
+            ): collection {
+                return collection::new([]);
             }
         };
 

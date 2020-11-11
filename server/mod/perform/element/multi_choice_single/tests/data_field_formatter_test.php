@@ -29,6 +29,7 @@ use performelement_multi_choice_single\multi_choice_single;
 
 /**
  * @group perform
+ * @group perform_element
  */
 class performelement_multi_choice_single_data_field_formatter_testcase extends advanced_testcase {
 

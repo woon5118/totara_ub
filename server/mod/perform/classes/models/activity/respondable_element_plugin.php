@@ -46,12 +46,32 @@ abstract class respondable_element_plugin extends element_plugin {
      *
      * @param string|null $encoded_response_data
      * @param element|null $element
+     * @param bool|false $is_draft_validation
      *
      * @return collection|element_validation_error[]
      * @see element_validation_error
      */
-    public function validate_response(?string $encoded_response_data, ?element $element): collection {
-        return new collection();
+    abstract public function validate_response(
+        ?string $encoded_response_data,
+        ?element $element,
+        $is_draft_validation = false
+    ): collection ;
+
+    /**
+     * Does the response fail the element specific definition of required.
+     *
+     * @param bool         $is_empty_answer
+     * @param element|null $element
+     * @param bool         $is_draft_validation
+     *
+     * @return bool
+     */
+    public function fails_required_validation(
+        bool $is_empty_answer,
+        ?element $element,
+        bool $is_draft_validation = false
+    ): bool {
+        return $is_empty_answer && $element->is_required && !$is_draft_validation;
     }
 
     public function validate_element(element_entity $element) {

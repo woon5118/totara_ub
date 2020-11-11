@@ -356,7 +356,7 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
                 return $this;
             }
 
-            public function validate_response(): bool {
+            public function validate_response($is_draft_validation = false): bool {
                 $this->validation_errors = new collection();
                 return true;
             }

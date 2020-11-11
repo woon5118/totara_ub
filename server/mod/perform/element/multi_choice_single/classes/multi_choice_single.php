@@ -23,11 +23,33 @@
 
 namespace performelement_multi_choice_single;
 
+use core\collection;
+use mod_perform\models\activity\element;
 use mod_perform\models\activity\respondable_element_plugin;
 use mod_perform\models\activity\single_select_element_plugin_trait;
 
 class multi_choice_single extends respondable_element_plugin {
     use single_select_element_plugin_trait;
+
+    /**
+     * @inheritDoc
+     */
+    public function validate_response(
+        ?string $encoded_response_data,
+        ?element $element,
+        $is_draft_validation = false
+    ): collection {
+        $element_data = $element->data ?? null;
+        $answer_option = $this->decode_response($encoded_response_data, $element_data);
+
+        $errors = new collection();
+
+        if ($this->fails_required_validation(is_null($answer_option), $element, $is_draft_validation)) {
+            $errors->append(new option_required_error());
+        }
+
+        return $errors;
+    }
 
     /**
      * @inheritDoc

@@ -28,6 +28,7 @@ require_once(__DIR__ . '/../db/upgradelib.php');
 
 /**
  * @group perform
+ * @group perform_element
  */
 class mod_perform_upgrade_change_data_test_testcase extends advanced_testcase {
 

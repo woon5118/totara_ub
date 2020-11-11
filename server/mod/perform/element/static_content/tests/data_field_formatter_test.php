@@ -30,6 +30,7 @@ use core\json_editor\node\paragraph;
 
 /**
  * @group perform
+ * @group perform_element
  */
 class performelement_static_content_data_field_formatter_testcase extends advanced_testcase {
 

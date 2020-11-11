@@ -17,20 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Angela Kuznetsova <angela.kuznetsova@totaralearning.com>
- * @package performelement_date_picker
+ * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @package mod_perform
  */
+namespace performelement_date_picker;
 
-$string['error_iso_required'] = 'Invalid response data format, expected "date" field to contain "iso" property';
-$string['error_iso_date']     = 'Invalid response data format, could not parse ISO date';
-$string['name'] = 'Date picker';
-$string['pluginname'] = 'Date picker';
+use mod_perform\models\response\element_validation_error;
 
+class invalid_date_error extends element_validation_error {
 
-// Deprecated in 13
-$string['date'] = 'Date';
-$string['question_title'] = 'Question';
-$string['error_invalid_date'] = 'Invalid date. Select day, month and year';
-$string['answer_text'] = 'Answer text';
-$string['no_response_submitted'] = 'No response submitted';
-$string['error_you_must_answer_this_question'] = 'Required';
+    public const VALID_ISO = 'VALID_ISO';
+
+    public function __construct() {
+        $error_code = self::VALID_ISO;
+        $error_message = get_string('error_iso_date', 'performelement_date_picker');
+
+        parent::__construct($error_code, $error_message);
+    }
+}

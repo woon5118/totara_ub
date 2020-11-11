@@ -32,13 +32,17 @@ class multi_choice_multi extends respondable_element_plugin {
     /**
      * @inheritDoc
      */
-    public function validate_response(?string $encoded_response_data, ?element $element): collection {
+    public function validate_response(
+        ?string $encoded_response_data,
+        ?element $element,
+        $is_draft_validation = false
+    ): collection {
         $element_data = $element->data ?? null;
         $answer_option = $this->decode_response($encoded_response_data, $element_data);
 
         $errors = new collection();
 
-        if (empty($answer_option) && !is_null($element) && $element->is_required) {
+        if ($this->fails_required_validation(empty($answer_option), $element, $is_draft_validation)) {
             $errors->append(new answer_required_error());
         }
 

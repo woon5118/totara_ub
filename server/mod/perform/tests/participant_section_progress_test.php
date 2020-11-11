@@ -463,7 +463,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
                 return $this;
             }
 
-            public function validate_response(): bool {
+            public function validate_response($is_draft_validation = false): bool {
                 $this->validation_errors = new collection();
                 return true;
             }
@@ -482,7 +482,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
                 return $this;
             }
 
-            public function validate_response(): bool {
+            public function validate_response($is_draft_validation = false): bool {
                 $error1 = new element_validation_error(1, 'one');
                 $error2 = new element_validation_error(2, 'two');
 

@@ -232,9 +232,14 @@ class section_element_response extends model implements section_element_response
 
     /**
      * Run the element plugin specific validation on the response data.
+     *
+     * This function has the side-effect of setting the validation_errors
+     * property.
+     *
+     * @param bool $is_draft_validation
      * @return bool
      */
-    public function validate_response(): bool {
+    public function validate_response($is_draft_validation = false): bool {
         $element_plugin = $this->get_element()->get_element_plugin();
 
         if (!$element_plugin instanceof respondable_element_plugin) {
@@ -243,7 +248,8 @@ class section_element_response extends model implements section_element_response
 
         $this->validation_errors = $element_plugin->validate_response(
             $this->entity->response_data,
-            $this->get_element()
+            $this->get_element(),
+            $is_draft_validation
         );
 
         return $this->validation_errors->count() === 0;

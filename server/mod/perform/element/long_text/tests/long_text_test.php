@@ -28,6 +28,7 @@ use performelement_long_text\long_text;
 
 /**
  * @group perform
+ * @group perform_element
  */
 class mod_perform_element_long_text_testcase extends advanced_testcase {
 
@@ -68,6 +69,36 @@ class mod_perform_element_long_text_testcase extends advanced_testcase {
             ],
             'missing answer (whitespace only)' => [
                 new collection([new answer_required_error()]), '             ',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider draft_validation_provider
+     * @param collection $expected_errors
+     * @param string $answer_text
+     * @throws coding_exception
+     */
+    public function test_draft_validation(collection $expected_errors, string $answer_text): void {
+        /** @var long_text $long_text */
+        $long_text = element_plugin::load_by_plugin('long_text');
+
+        $element = $this->perform_generator()->create_element(['title' => 'element one', 'is_required' => true]);
+        $errors = $long_text->validate_response(json_encode($answer_text), $element, true);
+
+        self::assertEquals($expected_errors, $errors);
+    }
+
+    public function draft_validation_provider(): array {
+        return [
+            'no errors' => [
+                new collection(), 'A long answer'
+            ],
+            'missing answer' => [
+                new collection(), '',
+            ],
+            'missing answer (whitespace only)' => [
+                new collection(), '             ',
             ],
         ];
     }
