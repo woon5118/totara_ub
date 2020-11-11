@@ -29,7 +29,6 @@ use mod_perform\entity\activity\activity as activity_entity;
 use mod_perform\entity\activity\track as track_entity;
 use mod_perform\entity\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\entity\activity\subject_instance as subject_instance_entity;
-use mod_perform\models\activity\activity as activity_model;
 use stdClass;
 
 /**
