@@ -132,6 +132,18 @@ final class chartjs extends base {
             return $options;
         }
 
+        // Add color ranges.
+        if (!empty($settings['colorRanges']) and is_array($settings['colorRanges'])) {
+            $options['colorRanges'] = $settings['colorRanges'];
+        }
+        unset($settings['colorRanges']);
+
+        // Add special type specific configuration options.
+        if (!empty($settings['type'])) {
+            $options['type'] = $settings['type'];
+        }
+        unset($settings['type']);
+
         $setting_list = [];
 
         // We can't just iterate over all options, since we have to treat 'axis' specially.

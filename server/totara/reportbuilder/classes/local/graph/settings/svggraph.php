@@ -130,6 +130,18 @@ final class svggraph extends base {
             return $options;
         }
 
+        // Add color ranges.
+        if (!empty($settings['colorRanges']) and is_array($settings['colorRanges'])) {
+            $options['colorRanges'] = $settings['colorRanges'];
+        }
+        unset($settings['colorRanges']);
+
+        // Add special type specific configuration options.
+        if (!empty($settings['type'])) {
+            $options['type'] = $settings['type'];
+        }
+        unset($settings['type']);
+
         foreach (self::$translation as $key => $value) {
             $options = array_merge($options, self::match($key, $settings, self::$translation));
         }

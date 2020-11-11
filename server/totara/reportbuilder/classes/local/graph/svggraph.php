@@ -31,7 +31,7 @@ final class svggraph extends base {
     protected $svggraphsettings;
     /** @var string SVGGraph type */
     protected $svggraphtype;
-    /** @var string SVGGraph colours */
+    /** @var array SVGGraph colours */
     protected $svggraphcolours;
     /** @var  array list of supported chart types */
     protected static $allowed_types = [
@@ -147,8 +147,37 @@ final class svggraph extends base {
         $renderwidth = isset($width) ? $width : 1000;
         $renderheight = isset($height) ? $height : 400;
 
+        // Tweak colours.
+        $colours = $this->svggraphcolours;
+        if (count($this->series) == 1 and !$this->is_pie_chart()) {
+            if (!empty($this->usersettings['colorRanges'])) {
+                // Use colorRanges only for non-pie charts with one data series.
+                $colorranges = $this->usersettings['colorRanges'];
+                $colours = [];
+                foreach ($this->values as $k => $data) {
+                    $v = $data[1];
+                    $ci = 0;
+                    foreach ($colorranges as $boundary) {
+                        if ($v < $boundary) {
+                            break;
+                        }
+                        $ci++;
+                    }
+                    $ci = $ci % count($this->svggraphcolours);
+                    $colours[] = $this->svggraphcolours[$ci];
+                }
+                // Hide legend if not explicitly shown because it cannot show the correct colur box.
+                if (!isset($settings['show_legend'])) {
+                    $settings['show_legend'] = false;
+                }
+            } else {
+                // Set this to the first colour so a single series doesn't come out looking like a rainbow
+                $colours = [$this->svggraphcolours[0]];
+            }
+        }
+
         $svggraph = new \SVGGraph($renderwidth, $renderheight, $settings);
-        $svggraph->Colours($this->svggraphcolours);
+        $svggraph->Colours($colours);
         $svggraph->Values($this->shorten_labels($this->values, $settings));
         $svg = $svggraph->Fetch($this->svggraphtype, false, false);
 
@@ -168,7 +197,7 @@ final class svggraph extends base {
             $settings['axis_max_' . $dir] = $settings['axis_min_' . $dir] + 1;
         }
         $svggraph = new \SVGGraph($renderwidth, $renderheight, $settings);
-        $svggraph->Colours($this->svggraphcolours);
+        $svggraph->Colours($colours);
         $svggraph->Values($this->shorten_labels($this->values, $settings));
 
         $svg = $svggraph->Fetch($this->svggraphtype, false, false);
@@ -338,17 +367,15 @@ final class svggraph extends base {
                 $this->svggraphsettings['axis_text_angle_h'] = -90;
             }
         }
-
-        if ($seriescount == 1 and !$this->is_pie_chart()) {
-            // Set this to the first colour so a single series doesn't come out looking like a rainbow
-            $this->svggraphcolours = [$this->svggraphcolours[0]];
-        }
     }
 
     protected function get_final_settings() {
         $settings = $this->svggraphsettings;
 
         foreach ($this->usersettings as $k => $v) {
+            if ($k === 'type') {
+                continue;
+            }
             $settings[$k] = $v;
         }
 
