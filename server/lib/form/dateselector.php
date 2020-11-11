@@ -141,11 +141,13 @@ class MoodleQuickForm_date_selector extends MoodleQuickForm_group {
             $image = $OUTPUT->pix_icon('i/calendar', get_string('calendar', 'calendar'), 'moodle');
             $this->_elements[] = $this->createFormElement('link', 'calendar',
                     null, '#', $image,
-                    array('class' => 'visibleifjs'));
+                    array('class' => 'visibleifjs', 'tabindex' => -1, 'aria-hidden' => 'true'));
         }
         // If optional we add a checkbox which the user can use to turn if on
         if ($this->_options['optional']) {
-            $this->_elements[] = $this->createFormElement('checkbox', 'enabled', null, get_string('enable'), $this->getAttributes(), true);
+            $attrs = is_array($this->getAttributes()) ? $this->getAttributes() : [];            
+            $attrs = array_merge($attrs, ['aria-label' => get_string('enablex', 'core_form', $this->_label)]);
+            $this->_elements[] = $this->createFormElement('checkbox', 'enabled', null, get_string('enable'), $attrs, true);
         }
         foreach ($this->_elements as $element){
             if (method_exists($element, 'setHiddenLabel')){

@@ -28,6 +28,7 @@ $string['advancedelement'] = 'Advanced element';
 $string['close'] = 'Close';
 $string['day'] = 'Day';
 $string['display'] = 'Display';
+$string['enablex'] = 'Enable {$a}';
 $string['err_alphanumeric'] = 'You must enter only letters or numbers here.';
 $string['err_email'] = 'You must enter a valid email address here.';
 $string['err_json_editor'] = 'Invalid content provided';
