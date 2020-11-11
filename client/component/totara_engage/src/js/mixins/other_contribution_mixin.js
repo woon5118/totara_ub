@@ -41,12 +41,13 @@ export default {
         },
         cards: [],
       },
+      contributionCount: 0,
       loadingMore: false,
     };
   },
 
   apollo: {
-    contribution: {
+    otherUserContributions: {
       query: userContributionCards,
       fetchPolicy: 'network-only',
       loadingKey: 'loading',
@@ -60,13 +61,24 @@ export default {
         });
       },
 
-      result() {
-        const checkingErrorTotal = obj =>
-          obj.cursor.next === null && obj.cards.length < obj.cursor.total;
+      update({ contribution, count }) {
+        return {
+          contribution,
+          count,
+        };
+      },
+
+      result({ data: { contribution, count } }) {
+        // Handle the reactive property count
+        this.contributionCount = count;
+        // End handling the reactive property count
+
+        // Handle the reactive property contribution
+        this.contribution = contribution;
 
         // Correct the TYPE filter items when getting backend error result
         if (this.filterValue.type) {
-          const { cards, cursor } = this.contribution;
+          const { cards, cursor } = contribution;
           const filteredCards = cards.filter(
             card => card.component === this.filterValue.type
           );
@@ -77,16 +89,20 @@ export default {
           };
         }
 
+        const checkingErrorTotal = obj =>
+          obj.cursor.next === null && obj.cards.length < obj.cursor.total;
+
         // Correct the total items when getting backend error result
-        if (checkingErrorTotal(this.contribution)) {
+        if (checkingErrorTotal(contribution)) {
           this.contribution = {
             cursor: {
-              total: this.contribution.cards.length,
+              total: contribution.cards.length,
               next: null,
             },
-            cards: this.contribution.cards,
+            cards: contribution.cards,
           };
         }
+        // End handling the reactive property contribution
       },
 
       /**

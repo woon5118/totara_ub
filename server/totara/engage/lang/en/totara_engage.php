@@ -144,6 +144,7 @@ $string['more'] = 'More';
 $string['multichoiceanswerdeleted'] = "Multi choice answer deleted";
 $string['navigation'] = "Navigation";
 $string['noshares'] = "Not shared";
+$string['nocontributions'] = '{$a} has not made any contributions yet.';
 $string['numberofcomments'] = '{$a} comment(s)';
 $string['numberofinstances'] = 'Number of instances';
 $string['numberoflikes'] = '{$a} like(s)';

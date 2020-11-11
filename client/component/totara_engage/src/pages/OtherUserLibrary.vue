@@ -30,6 +30,8 @@
       :custom-title="countSharedResource"
       :custom-load-more-text="loadMoreText"
       :show-empty-content="filterChange"
+      :show-empty-contribution="showEmptyContribution"
+      :custom-empty-content="$str('nocontributions', 'totara_engage', name)"
       @scrolled-to-bottom="scrolledToBottom"
       @load-more="loadMore"
     >
@@ -49,6 +51,7 @@
 
       <template v-slot:filters>
         <ContributionFilter
+          v-if="contributionCount"
           component="totara_engage"
           area="otheruserlib"
           :has-bottom-bar="true"
@@ -124,6 +127,9 @@ export default {
       const { type, topic, sort } = this.filterValue;
       return type !== null || topic !== null || sort !== 5;
     },
+    showEmptyContribution() {
+      return this.contributionCount === 0;
+    },
   },
 
   created() {
@@ -135,6 +141,7 @@ export default {
 <lang-strings>
 {
   "totara_engage": [
+    "nocontributions",
     "usersresources",
     "itemscount",
     "itemscountone"

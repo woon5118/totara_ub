@@ -37,7 +37,10 @@
     <slot name="filters" />
 
     <section v-show="!loading || loadingMore">
-      <div class="tui-contributionBaseContent__counterContainer">
+      <div
+        v-if="!showEmptyContribution"
+        class="tui-contributionBaseContent__counterContainer"
+      >
         <div class="tui-contributionBaseContent__counter">
           <template v-if="customTitle">
             {{ customTitle }}
@@ -56,7 +59,12 @@
       <slot name="cards">
         <template v-if="showEmptyContent && cards.length === 0">
           <h5 class="tui-contributionBaseContent__emptyText">
-            {{ $str('emptycontent', 'totara_engage') }}
+            <template v-if="showEmptyContribution">
+              {{ customEmptyContent }}
+            </template>
+            <template v-else>
+              {{ $str('emptycontent', 'totara_engage') }}
+            </template>
           </h5>
         </template>
         <CardsGrid
@@ -140,7 +148,9 @@ export default {
       type: Boolean,
       default: false,
     },
+    showEmptyContribution: Boolean,
     fromLibrary: Boolean,
+    customEmptyContent: String,
   },
 
   data() {
