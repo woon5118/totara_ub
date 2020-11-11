@@ -28,8 +28,6 @@ describe('totara_comment/components/form/ReplyForm.vue', () => {
   beforeAll(() => {
     wrapper = shallowMount(ReplyForm, {
       propsData: {
-        component: 'totara_comment',
-        area: 'comment',
         commentId: 14,
       },
 
